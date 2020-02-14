@@ -35,6 +35,8 @@
 		<poi.version>3.17</poi.version>
 		<oshi.version>3.9.1</oshi.version>
 		<velocity.version>1.7</velocity.version>
+		<mybatis-plus.version>3.3.0</mybatis-plus.version>
+		<hutool.version>5.0.6</hutool.version>
 	</properties>
 
 	<dependencies>
@@ -50,7 +52,6 @@
                     <groupId>org.springframework.boot</groupId>
                 </exclusion>
             </exclusions>
-             -->
 		</dependency>
 
 		<!-- SpringBoot 测试 -->
@@ -104,18 +105,24 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- SpringBoot集成mybatis框架 -->
-		<dependency>
-			<groupId>org.mybatis.spring.boot</groupId>
-			<artifactId>mybatis-spring-boot-starter</artifactId>
-			<version>${mybatis.spring.boot.starter.version}</version>
-		</dependency>
+<!--		&lt;!&ndash; SpringBoot集成mybatis框架 &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>org.mybatis.spring.boot</groupId>-->
+<!--			<artifactId>mybatis-spring-boot-starter</artifactId>-->
+<!--			<version>${mybatis.spring.boot.starter.version}</version>-->
+<!--		</dependency>-->
 		
 		<!-- pagehelper 分页插件 -->
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
 			<artifactId>pagehelper-spring-boot-starter</artifactId>
 			<version>${pagehelper.spring.boot.starter.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.mybatis</groupId>
+					<artifactId>mybatis</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!--阿里数据库连接池 -->
@@ -238,7 +245,25 @@
 			<artifactId>velocity</artifactId>
 			<version>${velocity.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-boot-starter</artifactId>
+			<version>${mybatis-plus.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-extension</artifactId>
+			<version>${mybatis-plus.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-all</artifactId>
+			<version>${hutool.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
