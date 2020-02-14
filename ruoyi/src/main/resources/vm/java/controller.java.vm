@@ -1,6 +1,12 @@
 package ${packageName}.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
 import java.util.List;
+import java.util.Arrays;
+
+import com.ruoyi.common.utils.StringUtils;
+import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,82 +28,159 @@ import com.ruoyi.framework.web.page.TableDataInfo;
 
 /**
  * ${functionName}Controller
- * 
+ *
  * @author ${author}
  * @date ${datetime}
  */
+@AllArgsConstructor
 @RestController
-@RequestMapping("/${moduleName}/${businessName}")
-public class ${ClassName}Controller extends BaseController
-{
-    @Autowired
-    private I${ClassName}Service ${className}Service;
+@RequestMapping("/${moduleName}/${businessName}" )
+public class ${ClassName}Controller extends BaseController {
+
+    private final I${ClassName}Service i${ClassName}Service;
 
     /**
      * 查询${functionName}列表
      */
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:list')")
-    @GetMapping("/list")
-    public TableDataInfo list(${ClassName} ${className})
-    {
+    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:list')" )
+    @GetMapping("/list" )
+    public TableDataInfo list(${ClassName} ${className}) {
         startPage();
-        List<${ClassName}> list = ${className}Service.select${ClassName}List(${className});
+        LambdaQueryWrapper<${ClassName}> lqw = new LambdaQueryWrapper<${ClassName}>();
+#foreach($column in $columns)
+#set($queryType=$column.queryType)
+#set($javaField=$column.javaField)
+#set($javaType=$column.javaType)
+#set($columnName=$column.columnName)
+#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+#if($column.query)
+#if($column.queryType == "EQ")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.eq(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.eq(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "NE")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.ne(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.ne(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "GT")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.gt(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.gt(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "GTE")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.ge(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.ge(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "LT")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.lt(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.lt(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "LTE")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.le(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.le(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "LIKE")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.like(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.like(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "BETWEEN")
+#end
+#end
+#end
+        List<${ClassName}> list = i${ClassName}Service.list(lqw);
         return getDataTable(list);
     }
 
     /**
      * 导出${functionName}列表
      */
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:export')")
-    @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
-    @GetMapping("/export")
-    public AjaxResult export(${ClassName} ${className})
-    {
-        List<${ClassName}> list = ${className}Service.select${ClassName}List(${className});
-        ExcelUtil<${ClassName}> util = new ExcelUtil<${ClassName}>(${ClassName}.class);
-        return util.exportExcel(list, "${businessName}");
+    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:export')" )
+    @Log(title = "${functionName}" , businessType = BusinessType.EXPORT)
+    @GetMapping("/export" )
+    public AjaxResult export(${ClassName} ${className}) {
+        LambdaQueryWrapper<${ClassName}> lqw = new LambdaQueryWrapper<${ClassName}>(${className});
+        List<${ClassName}> list = i${ClassName}Service.list(lqw);
+        ExcelUtil<${ClassName}> util = new ExcelUtil<${ClassName}>(${ClassName}. class);
+        return util.exportExcel(list, "${businessName}" );
     }
 
     /**
      * 获取${functionName}详细信息
      */
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:query')")
-    @GetMapping(value = "/{${pkColumn.javaField}}")
-    public AjaxResult getInfo(@PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField})
-    {
-        return AjaxResult.success(${className}Service.select${ClassName}ById(${pkColumn.javaField}));
+    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:query')" )
+    @GetMapping(value = "/{${pkColumn.javaField}}" )
+    public AjaxResult getInfo(@PathVariable("${pkColumn.javaField}" ) ${pkColumn.javaType} ${pkColumn.javaField}) {
+        return AjaxResult.success(i${ClassName}Service.getById(${pkColumn.javaField}));
     }
 
     /**
      * 新增${functionName}
      */
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:add')")
-    @Log(title = "${functionName}", businessType = BusinessType.INSERT)
+    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:add')" )
+    @Log(title = "${functionName}" , businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody ${ClassName} ${className})
-    {
-        return toAjax(${className}Service.insert${ClassName}(${className}));
+    public AjaxResult add(@RequestBody ${ClassName} ${className}) {
+        return toAjax(i${ClassName}Service.save(${className}) ? 1 : 0);
     }
 
     /**
      * 修改${functionName}
      */
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:edit')")
-    @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
+    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:edit')" )
+    @Log(title = "${functionName}" , businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody ${ClassName} ${className})
-    {
-        return toAjax(${className}Service.update${ClassName}(${className}));
+    public AjaxResult edit(@RequestBody ${ClassName} ${className}) {
+        return toAjax(i${ClassName}Service.updateById(${className}) ? 1 : 0);
     }
 
     /**
      * 删除${functionName}
      */
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:remove')")
-    @Log(title = "${functionName}", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{${pkColumn.javaField}s}")
-    public AjaxResult remove(@PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s)
-    {
-        return toAjax(${className}Service.delete${ClassName}ByIds(${pkColumn.javaField}s));
+    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:remove')" )
+    @Log(title = "${functionName}" , businessType = BusinessType.DELETE)
+    @DeleteMapping("/{${pkColumn.javaField}s}" )
+    public AjaxResult remove(@PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
+        return toAjax(i${ClassName}Service.removeByIds(Arrays.asList(${pkColumn.javaField}s)) ? 1 : 0);
     }
 }
