@@ -23,13 +23,13 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `chkj_test`;
 CREATE TABLE `chkj_test`  (
   `id` int(0) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `test_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'key键',
-  `value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '值',
+  `test_key` varchar(255) NOT NULL DEFAULT '' COMMENT 'key键',
+  `value` varchar(255) NOT NULL DEFAULT '' COMMENT '值',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本',
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `deleted` tinyint(0) NULL DEFAULT 0 COMMENT '删除状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '测试表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 COMMENT = '测试表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of gen_table
