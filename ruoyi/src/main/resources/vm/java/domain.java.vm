@@ -64,16 +64,8 @@ private static final long serialVersionUID=1L;
 #if($column.isPk==1)
     @TableId(value = "$column.columnName", type = IdType.AUTO)
     private $column.javaType $column.javaField;
-
-#end
-#end
-#foreach ($column in $columns)
-#if(!$table.isSuperColumn($column.javaField))
-#if($column.javaField.length() > 2 && $column.javaField.substring(1,2).matches("[A-Z]"))
-#set($AttrName=$column.javaField)
 #else
     private $column.javaType $column.javaField;
-#end
 #end
 #end
 }
