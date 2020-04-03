@@ -135,7 +135,6 @@
   </div>
 </template>
 
-
 <script>
 import draggable from 'vuedraggable'
 import { saveAs } from 'file-saver'
@@ -429,7 +428,7 @@ input, textarea{
     padding: 12px 18px 15px 15px;
   }
 }
-.el-scrollbar__wrap {
+.left-scrollbar .el-scrollbar__wrap {
   box-sizing: border-box;
   overflow-x: hidden !important;
   margin-bottom: 0 !important;
@@ -503,7 +502,7 @@ input, textarea{
   }
 }
 
-.el-scrollbar__view{
+.left-scrollbar .el-scrollbar__view{
   overflow-x: hidden;
 }
 

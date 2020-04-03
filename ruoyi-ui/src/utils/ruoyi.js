@@ -17,6 +17,8 @@ export function parseTime(time, pattern) {
 	} else {
 		if ((typeof time === 'string') && (/^[0-9]+$/.test(time))) {
 			time = parseInt(time)
+		} else if (typeof time === 'string') {
+			time = time.replace(new RegExp(/-/gm), '/');
 		}
 		if ((typeof time === 'number') && (time.toString().length === 10)) {
 			time = time * 1000
@@ -101,7 +103,6 @@ export function praseStrEmpty(str) {
     }
     return str;
 }
-
 
 /**
  * 构造树型结构数据
