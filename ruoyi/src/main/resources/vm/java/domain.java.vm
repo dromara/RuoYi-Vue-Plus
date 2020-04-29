@@ -23,7 +23,7 @@ import ${import};
 
 /**
  * ${functionName}对象 ${tableName}
- *
+ * 
  * @author ${author}
  * @date ${datetime}
  */

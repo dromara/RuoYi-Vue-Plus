@@ -53,7 +53,7 @@
 	margin-left: 20px;
 }
 
-.el-dialog {
+.el-dialog:not(.is-fullscreen){
 	margin-top: 6vh !important;
 }
 
@@ -138,7 +138,7 @@
 	padding-left: 15px;
 	margin-bottom: 10px;
 }
-
+  
 /* text color */
 .text-navy {
 	color: #1ab394;
@@ -188,7 +188,6 @@
 	box-shadow: 0 0 4px #ccc;
 	overflow: hidden;
 }
-
 
 /* 拖拽列样式 */
 .sortable-ghost{
