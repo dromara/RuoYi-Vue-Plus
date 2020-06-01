@@ -94,6 +94,15 @@
           v-hasPermi="['system:dict:export']"
         >导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          icon="el-icon-refresh"
+          size="mini"
+          @click="handleClearCache"
+          v-hasPermi="['system:dict:remove']"
+        >清理缓存</el-button>
+      </el-col>
     </el-row>
 
     <el-table v-loading="loading" :data="typeList" @selection-change="handleSelectionChange">
@@ -173,7 +182,7 @@
 </template>
 
 <script>
-import { listType, getType, delType, addType, updateType, exportType } from "@/api/system/dict/type";
+import { listType, getType, delType, addType, updateType, exportType, clearCache } from "@/api/system/dict/type";
 
 export default {
   name: "Dict",
@@ -300,8 +309,6 @@ export default {
                 this.msgSuccess("修改成功");
                 this.open = false;
                 this.getList();
-              } else {
-                this.msgError(response.msg);
               }
             });
           } else {
@@ -310,8 +317,6 @@ export default {
                 this.msgSuccess("新增成功");
                 this.open = false;
                 this.getList();
-              } else {
-                this.msgError(response.msg);
               }
             });
           }
@@ -344,6 +349,14 @@ export default {
         }).then(response => {
           this.download(response.msg);
         }).catch(function() {});
+    },
+    /** 清理缓存按钮操作 */
+    handleClearCache() {
+      clearCache().then(response => {
+        if (response.code === 200) {
+          this.msgSuccess("清理成功");
+        }
+      });
     }
   }
 };
