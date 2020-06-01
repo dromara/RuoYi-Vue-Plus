@@ -31,6 +31,7 @@ server:
     # 是否分配的直接内存
     direct-buffers: true
 
+
 # 日志配置
 logging:
   level:
