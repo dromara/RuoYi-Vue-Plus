@@ -2,6 +2,8 @@ package com.ruoyi.common.utils.file;
 
 import java.io.File;
 import java.io.IOException;
+
+import com.ruoyi.common.core.lang.UUID;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.constant.Constants;
@@ -123,7 +125,7 @@ public class FileUploadUtils
      */
     public static final String extractFilename(MultipartFile file)
     {
-        String fileName = file.getOriginalFilename();
+        String fileName = UUID.randomUUID().toString(true);
         String extension = getExtension(file);
         fileName = DateUtils.datePath() + "/" + encodingFilename(fileName) + "." + extension;
         return fileName;
