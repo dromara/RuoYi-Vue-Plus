@@ -125,7 +125,7 @@ public class FileUploadUtils
      */
     public static final String extractFilename(MultipartFile file)
     {
-        String fileName = UUID.randomUUID().toString(true);
+        String fileName = file.getOriginalFilename();
         String extension = getExtension(file);
         fileName = DateUtils.datePath() + "/" + encodingFilename(fileName) + "." + extension;
         return fileName;
