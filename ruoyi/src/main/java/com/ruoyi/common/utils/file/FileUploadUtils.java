@@ -2,8 +2,6 @@ package com.ruoyi.common.utils.file;
 
 import java.io.File;
 import java.io.IOException;
-
-import com.ruoyi.common.core.lang.UUID;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.constant.Constants;
@@ -17,7 +15,7 @@ import com.ruoyi.framework.config.RuoYiConfig;
 
 /**
  * 文件上传工具类
- * 
+ *
  * @author ruoyi
  */
 public class FileUploadUtils
@@ -84,6 +82,7 @@ public class FileUploadUtils
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             throw new IOException(e.getMessage(), e);
         }
     }
@@ -139,10 +138,11 @@ public class FileUploadUtils
         {
             desc.getParentFile().mkdirs();
         }
-        if (!desc.exists())
-        {
-            desc.createNewFile();
-        }
+        // 解决undertow文件上传bug,因底层实现不同,无需创建新文件
+//        if (!desc.exists())
+//        {
+//            desc.createNewFile();
+//        }
         return desc;
     }
 
@@ -229,7 +229,7 @@ public class FileUploadUtils
 
     /**
      * 获取文件名的后缀
-     * 
+     *
      * @param file 表单文件
      * @return 后缀名
      */
