@@ -147,6 +147,7 @@ public class SysConfigServiceImpl implements ISysConfigService
     /**
      * 清空缓存数据
      */
+    @Override
     public void clearCache()
     {
         Collection<String> keys = redisCache.keys(Constants.SYS_CONFIG_KEY + "*");
@@ -173,7 +174,7 @@ public class SysConfigServiceImpl implements ISysConfigService
 
     /**
      * 设置cache key
-     *
+     * 
      * @param configKey 参数键
      * @return 缓存键key
      */
