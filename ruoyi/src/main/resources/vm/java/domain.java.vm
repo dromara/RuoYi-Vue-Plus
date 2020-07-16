@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.io.Serializable;
 import java.util.Date;
+import java.math.BigDecimal
 #if($table.crud)
 import com.ruoyi.framework.web.domain.BaseEntity;
 #elseif($table.tree)
