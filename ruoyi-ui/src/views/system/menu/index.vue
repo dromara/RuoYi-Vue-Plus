@@ -49,16 +49,16 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini"
-            type="text"
-            icon="el-icon-edit"
+          <el-button size="mini" 
+            type="text" 
+            icon="el-icon-edit" 
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:menu:edit']"
           >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-plus"
+          <el-button 
+            size="mini" 
+            type="text" 
+            icon="el-icon-plus" 
             @click="handleAdd(scope.row)"
             v-hasPermi="['system:menu:add']"
           >新增</el-button>
@@ -314,8 +314,10 @@ export default {
     handleAdd(row) {
       this.reset();
       this.getTreeselect();
-      if (row != null) {
+      if (row != null && row.menuId) {
         this.form.parentId = row.menuId;
+      } else {
+        this.form.parentId = 0;
       }
       this.open = true;
       this.title = "添加菜单";
