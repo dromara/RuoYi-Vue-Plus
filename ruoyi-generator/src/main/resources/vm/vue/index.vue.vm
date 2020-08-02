@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
 #foreach($column in $columns)
 #if($column.query)
 #set($dictType=$column.dictType)
@@ -51,7 +51,7 @@
 #end
 #end
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -95,6 +95,14 @@
           v-hasPermi="['${moduleName}:${businessName}:export']"
         >导出</el-button>
       </el-col>
+      <div class="top-right-btn">
+        <el-tooltip class="item" effect="dark" content="刷新" placement="top">
+          <el-button size="mini" circle icon="el-icon-refresh" @click="handleQuery" />
+        </el-tooltip>
+        <el-tooltip class="item" effect="dark" :content="showSearch ? '隐藏搜索' : '显示搜索'" placement="top">
+          <el-button size="mini" circle icon="el-icon-search" @click="showSearch=!showSearch" />
+        </el-tooltip>
+      </div>
     </el-row>
 
     <el-table v-loading="loading" :data="${businessName}List" @selection-change="handleSelectionChange">
@@ -185,6 +193,23 @@
             <el-option label="请选择字典生成" value="" />
           </el-select>
         </el-form-item>
+#elseif($column.htmlType == "checkbox" && "" != $dictType)
+        <el-form-item label="${comment}">
+          <el-checkbox-group v-model="form.${field}">
+            <el-checkbox
+              v-for="dict in ${field}Options"
+              :key="dict.dictValue"
+              :label="dict.dictValue">
+              {{dict.dictLabel}}
+            </el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+#elseif($column.htmlType == "checkbox" && $dictType)
+        <el-form-item label="${comment}">
+          <el-checkbox-group v-model="form.${field}">
+            <el-checkbox>请选择字典生成</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
 #elseif($column.htmlType == "radio" && "" != $dictType)
         <el-form-item label="${comment}">
           <el-radio-group v-model="form.${field}">
@@ -243,6 +268,8 @@ export default {
       single: true,
       // 非多个禁用
       multiple: true,
+      // 显示搜索条件
+      showSearch: true,
       // 总条数
       total: 0,
       // ${functionName}表格数据
@@ -269,7 +296,7 @@ export default {
         pageSize: 10,
 #foreach ($column in $columns)
 #if($column.query)
-        $column.javaField: undefined#if($velocityCount != $columns.size()),#end
+        $column.javaField: null#if($velocityCount != $columns.size()),#end
 
 #end
 #end
@@ -326,7 +353,7 @@ export default {
 #end
     // $comment字典翻译
     ${column.javaField}Format(row, column) {
-      return this.selectDictLabel(this.${column.javaField}Options, row.${column.javaField});
+      return this.selectDictLabel#if($column.htmlType == "checkbox")s#end(this.${column.javaField}Options, row.${column.javaField});
     },
 #end
 #end
@@ -340,10 +367,13 @@ export default {
       this.form = {
 #foreach ($column in $columns)
 #if($column.htmlType == "radio")
-        $column.javaField: "0"#if($velocityCount != $columns.size()),#end
+        $column.javaField: #if($column.javaType == "Integer" || $column.javaType == "Long")0#else"0"#end#if($velocityCount != $columns.size()),#end
+
+#elseif($column.htmlType == "checkbox")
+        $column.javaField: []#if($velocityCount != $columns.size()),#end
 
 #else
-        $column.javaField: undefined#if($velocityCount != $columns.size()),#end
+        $column.javaField: null#if($velocityCount != $columns.size()),#end
 
 #end
 #end
@@ -363,7 +393,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.${pkColumn.javaField})
-      this.single = selection.length!=1
+      this.single = selection.length!==1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -378,15 +408,25 @@ export default {
       const ${pkColumn.javaField} = row.${pkColumn.javaField} || this.ids
       get${BusinessName}(${pkColumn.javaField}).then(response => {
         this.form = response.data;
+#foreach ($column in $columns)
+#if($column.htmlType == "checkbox")
+        this.form.$column.javaField = this.form.${column.javaField}.split(",");
+#end
+#end
         this.open = true;
         this.title = "修改${functionName}";
       });
     },
     /** 提交按钮 */
-    submitForm: function() {
+    submitForm() {
       this.#[[$]]#refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.${pkColumn.javaField} != undefined) {
+#foreach ($column in $columns)
+#if($column.htmlType == "checkbox")
+          this.form.$column.javaField = this.form.${column.javaField}.join(",");
+#end
+#end
+          if (this.form.${pkColumn.javaField} != null) {
             update${BusinessName}(this.form).then(response => {
               if (response.code === 200) {
                 this.msgSuccess("修改成功");

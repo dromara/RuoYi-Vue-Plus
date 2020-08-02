@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="表名称" prop="tableName">
         <el-input
           v-model="queryParams.tableName"
@@ -32,7 +32,7 @@
         ></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -76,6 +76,14 @@
           v-hasPermi="['tool:gen:remove']"
         >删除</el-button>
       </el-col>
+      <div class="top-right-btn">
+        <el-tooltip class="item" effect="dark" content="刷新" placement="top">
+          <el-button size="mini" circle icon="el-icon-refresh" @click="handleQuery" />
+        </el-tooltip>
+        <el-tooltip class="item" effect="dark" :content="showSearch ? '隐藏搜索' : '显示搜索'" placement="top">
+          <el-button size="mini" circle icon="el-icon-search" @click="showSearch=!showSearch" />
+        </el-tooltip>
+      </div>
     </el-row>
 
     <el-table v-loading="loading" :data="tableList" @selection-change="handleSelectionChange">
@@ -166,7 +174,7 @@
 </template>
 
 <script>
-import { listTable, previewTable, delTable } from "@/api/tool/gen";
+import { listTable, previewTable, delTable, genCode } from "@/api/tool/gen";
 import importTable from "./importTable";
 import { downLoadZip } from "@/utils/zipdownload";
 export default {
@@ -186,6 +194,8 @@ export default {
       single: true,
       // 非多个禁用
       multiple: true,
+      // 显示搜索条件
+      showSearch: true,
       // 总条数
       total: 0,
       // 表数据
@@ -241,7 +251,13 @@ export default {
         this.msgError("请选择要生成的数据");
         return;
       }
-      downLoadZip("/tool/gen/batchGenCode?tables=" + tableNames, "ruoyi");
+      if(row.genType === "1") {
+        genCode(row.tableName).then(response => {
+          this.msgSuccess("成功生成到自定义路径：" + row.genPath);
+        });
+      } else {
+        downLoadZip("/tool/gen/batchGenCode?tables=" + tableNames, "ruoyi");
+      }
     },
     /** 打开导入表弹窗 */
     openImportTable() {

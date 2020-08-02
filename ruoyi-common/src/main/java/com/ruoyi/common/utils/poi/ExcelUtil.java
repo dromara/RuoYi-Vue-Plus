@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -200,7 +199,10 @@ public class ExcelUtil<T>
                     // 设置类的私有字段属性可访问.
                     field.setAccessible(true);
                     Integer column = cellMap.get(attr.name());
-                    fieldsMap.put(column, field);
+                    if (column != null)
+                    {
+                        fieldsMap.put(column, field);
+                    }
                 }
             }
             for (int i = 1; i < rows; i++)
@@ -271,11 +273,11 @@ public class ExcelUtil<T>
                         }
                         else if (StringUtils.isNotEmpty(attr.readConverterExp()))
                         {
-                            val = reverseByExp(Convert.toStr(val), attr.readConverterExp());
+                            val = reverseByExp(Convert.toStr(val), attr.readConverterExp(), attr.separator());
                         }
                         else if (StringUtils.isNotEmpty(attr.dictType()))
                         {
-                            val = reverseDictByExp(attr.dictType(), Convert.toStr(val));
+                            val = reverseDictByExp(Convert.toStr(val), attr.dictType(), attr.separator());
                         }
                         ReflectUtils.invokeSetter(entity, propertyName, val);
                     }
@@ -534,6 +536,7 @@ public class ExcelUtil<T>
                 Object value = getTargetValue(vo, field, attr);
                 String dateFormat = attr.dateFormat();
                 String readConverterExp = attr.readConverterExp();
+                String separator = attr.separator();
                 String dictType = attr.dictType();
                 if (StringUtils.isNotEmpty(dateFormat) && StringUtils.isNotNull(value))
                 {
@@ -541,11 +544,11 @@ public class ExcelUtil<T>
                 }
                 else if (StringUtils.isNotEmpty(readConverterExp) && StringUtils.isNotNull(value))
                 {
-                    cell.setCellValue(convertByExp(Convert.toStr(value), readConverterExp));
+                    cell.setCellValue(convertByExp(Convert.toStr(value), readConverterExp, separator));
                 }
                 else if (StringUtils.isNotEmpty(dictType))
                 {
-                    cell.setCellValue(convertDictByExp(dictType, Convert.toStr(value)));
+                    cell.setCellValue(convertDictByExp(Convert.toStr(value), dictType, separator));
                 }
                 else
                 {
@@ -623,28 +626,36 @@ public class ExcelUtil<T>
      * 
      * @param propertyValue 参数值
      * @param converterExp 翻译注解
+     * @param separator 分隔符
      * @return 解析后值
-     * @throws Exception
      */
-    public static String convertByExp(String propertyValue, String converterExp) throws Exception
+    public static String convertByExp(String propertyValue, String converterExp, String separator)
     {
-        try
+        StringBuilder propertyString = new StringBuilder();
+        String[] convertSource = converterExp.split(",");
+        for (String item : convertSource)
         {
-            String[] convertSource = converterExp.split(",");
-            for (String item : convertSource)
+            String[] itemArray = item.split("=");
+            if (StringUtils.containsAny(separator, propertyValue))
             {
-                String[] itemArray = item.split("=");
+                for (String value : propertyValue.split(separator))
+                {
+                    if (itemArray[0].equals(value))
+                    {
+                        propertyString.append(itemArray[1] + separator);
+                        break;
+                    }
+                }
+            }
+            else
+            {
                 if (itemArray[0].equals(propertyValue))
                 {
                     return itemArray[1];
                 }
             }
         }
-        catch (Exception e)
-        {
-            throw e;
-        }
-        return propertyValue;
+        return StringUtils.stripEnd(propertyString.toString(), separator);
     }
 
     /**
@@ -652,52 +663,62 @@ public class ExcelUtil<T>
      * 
      * @param propertyValue 参数值
      * @param converterExp 翻译注解
+     * @param separator 分隔符
      * @return 解析后值
-     * @throws Exception
      */
-    public static String reverseByExp(String propertyValue, String converterExp) throws Exception
+    public static String reverseByExp(String propertyValue, String converterExp, String separator)
     {
-        try
+        StringBuilder propertyString = new StringBuilder();
+        String[] convertSource = converterExp.split(",");
+        for (String item : convertSource)
         {
-            String[] convertSource = converterExp.split(",");
-            for (String item : convertSource)
+            String[] itemArray = item.split("=");
+            if (StringUtils.containsAny(separator, propertyValue))
             {
-                String[] itemArray = item.split("=");
+                for (String value : propertyValue.split(separator))
+                {
+                    if (itemArray[1].equals(value))
+                    {
+                        propertyString.append(itemArray[0] + separator);
+                        break;
+                    }
+                }
+            }
+            else
+            {
                 if (itemArray[1].equals(propertyValue))
                 {
                     return itemArray[0];
                 }
             }
         }
-        catch (Exception e)
-        {
-            throw e;
-        }
-        return propertyValue;
+        return StringUtils.stripEnd(propertyString.toString(), separator);
     }
 
     /**
      * 解析字典值
      * 
-     * @param dictType 字典类型
      * @param dictValue 字典值
+     * @param dictType 字典类型
+     * @param separator 分隔符
      * @return 字典标签
      */
-    public static String convertDictByExp(String dictType, String dictValue) throws Exception
+    public static String convertDictByExp(String dictValue, String dictType, String separator)
     {
-        return DictUtils.getDictLabel(dictType, dictValue);
+        return DictUtils.getDictLabel(dictType, dictValue, separator);
     }
 
     /**
      * 反向解析值字典值
      * 
+     * @param dictLabel 字典标签
      * @param dictType 字典类型
-     * @param dictValue 字典标签
+     * @param separator 分隔符
      * @return 字典值
      */
-    public static String reverseDictByExp(String dictType, String dictLabel) throws Exception
+    public static String reverseDictByExp(String dictLabel, String dictType, String separator)
     {
-        return DictUtils.getDictValue(dictType, dictLabel);
+        return DictUtils.getDictValue(dictType, dictLabel, separator);
     }
 
     /**
@@ -875,14 +896,7 @@ public class ExcelUtil<T>
                     }
                     else
                     {
-                        if ((Double) val % 1 > 0)
-                        {
-                            val = new DecimalFormat("0.00").format(val);
-                        }
-                        else
-                        {
-                            val = new DecimalFormat("0").format(val);
-                        }
+                        val = new BigDecimal(val.toString()); // 浮点格式处理
                     }
                 }
                 else if (cell.getCellTypeEnum() == CellType.STRING)
