@@ -54,15 +54,12 @@ export function resetForm(refName) {
 }
 
 // 添加日期范围
-export function addDateRange(params, dateRange) {
-	var search = params;
-	search.beginTime = "";
-	search.endTime = "";
-	if (null != dateRange && '' != dateRange) {
-		search.beginTime = this.dateRange[0];
-		search.endTime = this.dateRange[1];
+export function addDateRange (params = {}, dateRange) {
+	if (dateRange != null && dateRange !== '') {
+	  params.beginTime = this.dateRange[0]
+	  params.endTime = this.dateRange[1]
 	}
-	return search;
+	return params
 }
 
 // 回显数据字典
@@ -83,8 +80,8 @@ export function selectDictLabels(datas, value, separator) {
 	var currentSeparator = undefined === separator ? "," : separator;
 	var temp = value.split(currentSeparator);
 	Object.keys(value.split(currentSeparator)).some((val) => {
-        Object.keys(datas).some((key) => {
-            if (datas[key].dictValue == ('' + temp[val])) {
+		Object.keys(datas).some((key) => {
+			if (datas[key].dictValue == ('' + temp[val])) {
 				actions.push(datas[key].dictLabel + currentSeparator);
 			}
 		})
@@ -146,4 +143,3 @@ export function handleTree(data, id, parentId, children, rootId) {
 	});
 	return treeData != '' ? treeData : data;
 }
-
