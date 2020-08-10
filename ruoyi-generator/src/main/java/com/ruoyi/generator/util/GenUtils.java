@@ -147,10 +147,10 @@ public class GenUtils
      */
     public static String getBusinessName(String tableName)
     {
-        int lastIndex = tableName.indexOf("_");
+        int lastIndex = tableName.lastIndexOf("_");
         int nameLength = tableName.length();
         String businessName = StringUtils.substring(tableName, lastIndex + 1, nameLength);
-        return StringUtils.toCamelCase(businessName);
+        return businessName;
     }
 
     /**
@@ -195,7 +195,7 @@ public class GenUtils
     /**
      * 关键字替换
      * 
-     * @param name 需要被替换的名字
+     * @param text 需要被替换的名字
      * @return 替换后的名字
      */
     public static String replaceText(String text)
