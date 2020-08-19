@@ -60,7 +60,7 @@ private static final long serialVersionUID=1L;
 #end
 #end
 #if($column.isPk==1)
-    @TableId(value = "$column.columnName", type = IdType.AUTO)
+    @TableId(value = "$column.columnName")
     private $column.javaType $column.javaField;
 #else
     private $column.javaType $column.javaField;
