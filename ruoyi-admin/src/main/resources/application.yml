@@ -9,7 +9,7 @@ ruoyi:
   # 实例演示开关
   demoEnabled: true
   # 文件路径,使用jvm系统变量,兼容windows和linux;
-  profile: ${user.home}/ruoyi/uploadPath
+  profile: ${user.dir}/ruoyi/uploadPath
   # 获取ip地址开关
   addressEnabled: false
   # 验证码类型 math 数组计算 char 字符验证
