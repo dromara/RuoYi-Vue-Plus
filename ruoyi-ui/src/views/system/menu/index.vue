@@ -62,16 +62,16 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini" 
-            type="text" 
-            icon="el-icon-edit" 
+          <el-button size="mini"
+            type="text"
+            icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:menu:edit']"
           >修改</el-button>
-          <el-button 
-            size="mini" 
-            type="text" 
-            icon="el-icon-plus" 
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-plus"
             @click="handleAdd(scope.row)"
             v-hasPermi="['system:menu:add']"
           >新增</el-button>
@@ -184,6 +184,14 @@
                   :key="dict.dictValue"
                   :label="dict.dictValue"
                 >{{dict.dictLabel}}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item v-if="form.menuType == 'C'" label="是否缓存">
+              <el-radio-group v-model="form.isCache">
+                <el-radio label="0">缓存</el-radio>
+                <el-radio label="1">不缓存</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -316,6 +324,7 @@ export default {
         menuType: "M",
         orderNum: undefined,
         isFrame: "1",
+        isCache: "0",
         visible: "0",
         status: "0"
       };
