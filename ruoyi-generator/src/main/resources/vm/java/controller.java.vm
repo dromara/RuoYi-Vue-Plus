@@ -138,6 +138,7 @@ public class ${ClassName}Controller extends BaseController {
     }
 #elseif($table.tree)
     public AjaxResult list(${ClassName} ${className}) {
+        LambdaQueryWrapper<${ClassName}> lqw = new LambdaQueryWrapper<${ClassName}>();
         List<${ClassName}> list = i${ClassName}Service.list(lqw);
         return AjaxResult.success(list);
     }
