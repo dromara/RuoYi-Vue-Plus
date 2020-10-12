@@ -62,16 +62,16 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini"
-            type="text"
-            icon="el-icon-edit"
+          <el-button size="mini" 
+            type="text" 
+            icon="el-icon-edit" 
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:menu:edit']"
           >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-plus"
+          <el-button 
+            size="mini" 
+            type="text" 
+            icon="el-icon-plus" 
             @click="handleAdd(scope.row)"
             v-hasPermi="['system:menu:add']"
           >新增</el-button>
@@ -367,19 +367,15 @@ export default {
         if (valid) {
           if (this.form.menuId != undefined) {
             updateMenu(this.form).then(response => {
-              if (response.code === 200) {
-                this.msgSuccess("修改成功");
-                this.open = false;
-                this.getList();
-              }
+              this.msgSuccess("修改成功");
+              this.open = false;
+              this.getList();
             });
           } else {
             addMenu(this.form).then(response => {
-              if (response.code === 200) {
-                this.msgSuccess("新增成功");
-                this.open = false;
-                this.getList();
-              }
+              this.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
             });
           }
         }
@@ -396,7 +392,7 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        }).catch(function() {});
+        })
     }
   }
 };
