@@ -17,6 +17,8 @@ import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.exception.DemoModeException;
 import com.ruoyi.common.utils.StringUtils;
 
+import javax.validation.ConstraintViolationException;
+
 /**
  * 全局异常处理器
  * 
@@ -92,6 +94,16 @@ public class GlobalExceptionHandler
     {
         log.error(e.getMessage(), e);
         String message = e.getAllErrors().get(0).getDefaultMessage();
+        return AjaxResult.error(message);
+    }
+
+    /**
+     * 自定义验证异常
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public AjaxResult constraintViolationException(ConstraintViolationException e) {
+        log.error(e.getMessage(), e);
+        String message = e.getConstraintViolations().iterator().next().getMessage();
         return AjaxResult.error(message);
     }
 
