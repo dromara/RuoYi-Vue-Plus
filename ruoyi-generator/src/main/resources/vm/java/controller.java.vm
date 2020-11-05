@@ -51,7 +51,7 @@ public class ${ClassName}Controller extends BaseController {
     public TableDataInfo list(${ClassName} ${className})
     {
         startPage();
-        LambdaQueryWrapper<${ClassName}> lqw = new LambdaQueryWrapper<${ClassName}>();
+        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery(${className});
 #foreach($column in $columns)
 #set($queryType=$column.queryType)
 #set($javaField=$column.javaField)
@@ -138,7 +138,7 @@ public class ${ClassName}Controller extends BaseController {
     }
 #elseif($table.tree)
     public AjaxResult list(${ClassName} ${className}) {
-        LambdaQueryWrapper<${ClassName}> lqw = new LambdaQueryWrapper<${ClassName}>();
+        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery(${className});
         List<${ClassName}> list = i${ClassName}Service.list(lqw);
         return AjaxResult.success(list);
     }
