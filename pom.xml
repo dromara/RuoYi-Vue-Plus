@@ -31,8 +31,8 @@
         <poi.version>3.17</poi.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
-        <mybatis-plus.version>3.3.0</mybatis-plus.version>
-        <hutool.version>5.1.0</hutool.version>
+        <mybatis-plus.version>3.4.1</mybatis-plus.version>
+        <hutool.version>5.4.0</hutool.version>
     </properties>
 	
     <!-- 依赖声明 -->
