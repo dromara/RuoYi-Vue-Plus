@@ -4,6 +4,7 @@
 * Bean简化 使用 Lombok 简化 get set toString 等等
 * 容器改动 Tomcat 改为 并发性能更好的 undertow
 * 代码生成模板 改为适配 Mybatis-Plus 的代码
+* 重磅更新 升级MybatisPlus 3.4.1 重写配置文件详细注释 更新所有插件
 
 ## 平台简介
 
