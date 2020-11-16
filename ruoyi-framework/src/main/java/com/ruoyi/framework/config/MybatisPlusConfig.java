@@ -1,9 +1,15 @@
 package com.ruoyi.framework.config;
 
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
+import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
+import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
+import com.baomidou.mybatisplus.extension.incrementer.H2KeyGenerator;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.IllegalSQLInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.pagination.optimize.JsqlParserCountOptimize;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -17,7 +23,20 @@ public class MybatisPlusConfig {
 	 */
 	@Bean
 	public PaginationInnerInterceptor paginationInnerInterceptor() {
-		return new PaginationInnerInterceptor();
+		PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
+		// 设置数据库类型为mysql
+		paginationInnerInterceptor.setDbType(DbType.MYSQL);
+		// 设置最大单页限制数量，默认 500 条，-1 不受限制
+		paginationInnerInterceptor.setMaxLimit(-1L);
+		return paginationInnerInterceptor;
+	}
+
+	/**
+	 * 新的分页插件,一缓和二缓遵循mybatis的规则,需要设置 MybatisConfiguration#useDeprecatedExecutor = false 避免缓存出现问题(该属性会在旧插件移除后一同移除)
+	 */
+	@Bean
+	public ConfigurationCustomizer configurationCustomizer() {
+		return configuration -> configuration.setUseDeprecatedExecutor(false);
 	}
 
 	/**
@@ -44,5 +63,30 @@ public class MybatisPlusConfig {
 //	public IllegalSQLInnerInterceptor illegalSQLInnerInterceptor() {
 //		return new IllegalSQLInnerInterceptor();
 //	}
+
+	/**
+	 * Sequence主键策略 IdType.INPUT 时使用
+	 * 内置支持：
+	 *
+	 * DB2KeyGenerator
+	 * H2KeyGenerator
+	 * KingbaseKeyGenerator
+	 * OracleKeyGenerator
+	 * PostgreKeyGenerator
+	 */
+//	@Bean
+//	public IKeyGenerator keyGenerator() {
+//		return new H2KeyGenerator();
+//	}
+
+
+	/**
+	 * 自定义主键策略
+	 */
+//	@Bean
+//	public IdentifierGenerator idGenerator() {
+//		return new CustomIdGenerator();
+//	}
+
 
 }
