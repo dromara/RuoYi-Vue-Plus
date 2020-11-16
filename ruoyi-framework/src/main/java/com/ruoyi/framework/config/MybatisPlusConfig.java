@@ -2,6 +2,7 @@ package com.ruoyi.framework.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
+import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.extension.incrementer.H2KeyGenerator;
@@ -86,6 +87,14 @@ public class MybatisPlusConfig {
 //	@Bean
 //	public IdentifierGenerator idGenerator() {
 //		return new CustomIdGenerator();
+//	}
+
+	/**
+	 * 元对象字段填充控制器
+	 */
+//	@Bean
+//	public MetaObjectHandler metaObjectHandler() {
+//		return new MyMetaObjectHandler();
 //	}
 
 
