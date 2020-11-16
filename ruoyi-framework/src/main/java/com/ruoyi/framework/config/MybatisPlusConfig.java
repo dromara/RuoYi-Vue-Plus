@@ -5,12 +5,13 @@ import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
+import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
+import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.incrementer.H2KeyGenerator;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.IllegalSQLInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.pagination.optimize.JsqlParserCountOptimize;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -21,6 +22,7 @@ public class MybatisPlusConfig {
 
 	/**
 	 * 分页插件，自动识别数据库类型
+	 * https://baomidou.com/guide/interceptor-pagination.html
 	 */
 	@Bean
 	public PaginationInnerInterceptor paginationInnerInterceptor() {
@@ -42,6 +44,7 @@ public class MybatisPlusConfig {
 
 	/**
 	 * 乐观锁插件
+	 * https://baomidou.com/guide/interceptor-optimistic-locker.html
 	 */
 	@Bean
 	public OptimisticLockerInnerInterceptor optimisticLockerInnerInterceptor() {
@@ -50,6 +53,7 @@ public class MybatisPlusConfig {
 
 	/**
 	 * 如果是对全表的删除或更新操作，就会终止该操作
+	 * https://baomidou.com/guide/interceptor-block-attack.html
 	 */
 	@Bean
 	public BlockAttackInnerInterceptor blockAttackInnerInterceptor() {
@@ -74,6 +78,7 @@ public class MybatisPlusConfig {
 	 * KingbaseKeyGenerator
 	 * OracleKeyGenerator
 	 * PostgreKeyGenerator
+	 * https://baomidou.com/guide/sequence.html
 	 */
 //	@Bean
 //	public IKeyGenerator keyGenerator() {
@@ -83,6 +88,7 @@ public class MybatisPlusConfig {
 
 	/**
 	 * 自定义主键策略
+	 * https://baomidou.com/guide/id-generator.html
 	 */
 //	@Bean
 //	public IdentifierGenerator idGenerator() {
@@ -91,11 +97,27 @@ public class MybatisPlusConfig {
 
 	/**
 	 * 元对象字段填充控制器
+	 * https://baomidou.com/guide/auto-fill-metainfo.html
 	 */
 //	@Bean
 //	public MetaObjectHandler metaObjectHandler() {
 //		return new MyMetaObjectHandler();
 //	}
 
+	/**
+	 * sql注入器配置
+	 * https://baomidou.com/guide/sql-injector.html
+	 */
+//	@Bean
+//	public ISqlInjector sqlInjector() {
+//		return new DefaultSqlInjector();
+//	}
+
+	/**
+	 * TenantLineInnerInterceptor 多租户插件
+	 * https://baomidou.com/guide/interceptor-tenant-line.html
+	 * DynamicTableNameInnerInterceptor 动态表名插件
+	 * https://baomidou.com/guide/interceptor-dynamic-table-name.html
+	 */
 
 }
