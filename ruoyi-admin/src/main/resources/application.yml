@@ -38,7 +38,7 @@ server:
 # 日志配置
 logging:
   level:
-    com.ruoyi: debug
+    com.ruoyi: @logging.level@
     org.springframework: warn
 
 # Spring配置
@@ -48,7 +48,7 @@ spring:
     # 国际化资源文件路径
     basename: i18n/messages
   profiles: 
-    active: dev
+    active: @profiles.active@
   # 文件上传
   servlet:
      multipart:
