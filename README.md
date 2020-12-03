@@ -1,6 +1,8 @@
 ## 重点注意事项
 
-同一个事务下是无法切换数据源的(常识 参考Spring事务传播与隔离级别)
+若依文档对事务注解的描述 [关于事务](http://https://doc.ruoyi.vip/ruoyi/document/htsc.html#%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86)
+以下对多数据源事务做补充:
+* 同一个事务下是无法切换数据源的
 * 禁止 父方法使用 @Transactional 创建事务 子方法使用 @DataSource 切换数据源
 * 正确用法: 子方法单独创建事务 或 父方法使用 @Transactional(propagation = Propagation.REQUIRES_NEW) 为所有子方法创建新事务
 
