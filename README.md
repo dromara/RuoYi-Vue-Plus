@@ -2,7 +2,7 @@
 
 同一个事务下是无法切换数据源的(常识 参考Spring事务传播与隔离级别)
 * 禁止 父方法使用 @Transactional 创建事务 子方法使用 @DataSource 切换数据源
-* 正确用法: 子方法单独创建事务 或 父方法使用 @Transactional(propagation = Propagation.REQUIRES_NEW) 为所有子方法创建新事物
+* 正确用法: 子方法单独创建事务 或 父方法使用 @Transactional(propagation = Propagation.REQUIRES_NEW) 为所有子方法创建新事务
 
 ## 修改RuoYi功能
 
