@@ -5,6 +5,10 @@
 * 禁止 父方法使用 @Transactional 创建事务 子方法使用 @DataSource 切换数据源
 * 正确用法: 子方法单独创建事务 或 父方法使用 @Transactional(propagation = Propagation.REQUIRES_NEW) 为所有子方法创建新事务
 
+关于如何使用Tomcat
+* 查看ruoyi-framework模块的pom.xml文件,根据注释更改依赖
+* 查看ruoyi-admin模块中的application.yml文件,根据注释更改配置
+
 ## 修改RuoYi功能
 
 * ORM框架 使用 Mybatis-Plus 简化CRUD

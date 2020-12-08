@@ -22,6 +22,7 @@ server:
   servlet:
     # 应用的访问路径
     context-path: /
+  # undertow 配置
   undertow:
     # HTTP post内容的最大大小。当值为-1时，默认值为大小是无限的
     max-http-post-size: -1
@@ -34,6 +35,14 @@ server:
     worker-threads: 256
     # 是否分配的直接内存
     direct-buffers: true
+#  # tomcat 配置
+#  tomcat:
+#    # tomcat的URI编码
+#    uri-encoding: UTF-8
+#    # tomcat最大线程数，默认为200
+#    max-threads: 500
+#    # Tomcat启动初始化的线程数，默认值25
+#    min-spare-threads: 30
 
 # 日志配置
 logging:
