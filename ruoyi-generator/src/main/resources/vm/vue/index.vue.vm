@@ -323,7 +323,7 @@ export default {
         pageSize: 10,
 #foreach ($column in $columns)
 #if($column.query)
-        $column.javaField: null#if($velocityCount != $columns.size()),#end
+        $column.javaField: undefined#if($velocityCount != $columns.size()),#end
 
 #end
 #end
@@ -399,7 +399,7 @@ export default {
         $column.javaField: []#if($velocityCount != $columns.size()),#end
 
 #else
-        $column.javaField: null#if($velocityCount != $columns.size()),#end
+        $column.javaField: undefined#if($velocityCount != $columns.size()),#end
 
 #end
 #end
