@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.incrementer.H2KeyGenerator;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.IllegalSQLInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
@@ -20,11 +21,22 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 public class MybatisPlusConfig {
 
+	@Bean
+	public MybatisPlusInterceptor mybatisPlusInterceptor() {
+		MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+		// 分页插件
+		interceptor.addInnerInterceptor(paginationInnerInterceptor());
+		// 乐观锁插件
+		interceptor.addInnerInterceptor(optimisticLockerInnerInterceptor());
+		// 阻断插件
+		interceptor.addInnerInterceptor(blockAttackInnerInterceptor());
+		return interceptor;
+	}
+
 	/**
 	 * 分页插件，自动识别数据库类型
 	 * https://baomidou.com/guide/interceptor-pagination.html
 	 */
-	@Bean
 	public PaginationInnerInterceptor paginationInnerInterceptor() {
 		PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
 		// 设置数据库类型为mysql
@@ -46,7 +58,6 @@ public class MybatisPlusConfig {
 	 * 乐观锁插件
 	 * https://baomidou.com/guide/interceptor-optimistic-locker.html
 	 */
-	@Bean
 	public OptimisticLockerInnerInterceptor optimisticLockerInnerInterceptor() {
 		return new OptimisticLockerInnerInterceptor();
 	}
@@ -55,7 +66,6 @@ public class MybatisPlusConfig {
 	 * 如果是对全表的删除或更新操作，就会终止该操作
 	 * https://baomidou.com/guide/interceptor-block-attack.html
 	 */
-	@Bean
 	public BlockAttackInnerInterceptor blockAttackInnerInterceptor() {
 		return new BlockAttackInnerInterceptor();
 	}
@@ -64,7 +74,6 @@ public class MybatisPlusConfig {
 	 * sql性能规范插件(垃圾SQL拦截)
 	 * 如有需要可以启用
 	 */
-//	@Bean
 //	public IllegalSQLInnerInterceptor illegalSQLInnerInterceptor() {
 //		return new IllegalSQLInnerInterceptor();
 //	}
