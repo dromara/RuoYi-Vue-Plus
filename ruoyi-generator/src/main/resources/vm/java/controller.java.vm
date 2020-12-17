@@ -52,7 +52,7 @@ public class ${ClassName}Controller extends BaseController {
     public TableDataInfo list(${ClassName} ${className})
     {
         startPage();
-        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery(${className});
+        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.<${ClassName}>lambdaQuery();
 #foreach($column in $columns)
 #set($queryType=$column.queryType)
 #set($javaField=$column.javaField)
