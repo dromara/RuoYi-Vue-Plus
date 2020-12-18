@@ -52,7 +52,7 @@ public class ${ClassName}Controller extends BaseController {
     public TableDataInfo list(${ClassName} ${className})
     {
         startPage();
-        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.<${ClassName}>lambdaQuery();
+        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery();
 #foreach($column in $columns)
 #set($queryType=$column.queryType)
 #set($javaField=$column.javaField)
@@ -139,7 +139,7 @@ public class ${ClassName}Controller extends BaseController {
     }
 #elseif($table.tree)
     public AjaxResult list(${ClassName} ${className}) {
-        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery(${className});
+        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery();
         List<${ClassName}> list = i${ClassName}Service.list(lqw);
         return AjaxResult.success(list);
     }
@@ -152,7 +152,7 @@ public class ${ClassName}Controller extends BaseController {
     @Log(title = "${functionName}" , businessType = BusinessType.EXPORT)
     @GetMapping("/export" )
     public AjaxResult export(${ClassName} ${className}) {
-        LambdaQueryWrapper<${ClassName}> lqw = new LambdaQueryWrapper<${ClassName}>(${className});
+        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery(${className});
         List<${ClassName}> list = i${ClassName}Service.list(lqw);
         ExcelUtil<${ClassName}> util = new ExcelUtil<${ClassName}>(${ClassName}. class);
         return util.exportExcel(list, "${businessName}" );
