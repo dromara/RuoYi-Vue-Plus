@@ -10,14 +10,12 @@ import com.ruoyi.common.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
 import java.math.BigDecimal;
-#if($table.crud)
-import com.ruoyi.common.core.domain.BaseEntity;
-#elseif($table.tree)
-import com.ruoyi.common.core.domain.TreeEntity;
-#end
 
 /**
  * ${functionName}对象 ${tableName}
@@ -25,11 +23,6 @@ import com.ruoyi.common.core.domain.TreeEntity;
  * @author ${author}
  * @date ${datetime}
  */
-#if($table.crud)
-#set($Entity="BaseEntity")
-#elseif($table.tree)
-#set($Entity="TreeEntity")
-#end
 @Data
 @ToString
 @EqualsAndHashCode
@@ -66,4 +59,7 @@ private static final long serialVersionUID=1L;
     private $column.javaType $column.javaField;
 #end
 #end
+
+    @TableField(exist = false)
+    private Map<String, Object> params = new HashMap<>();
 }

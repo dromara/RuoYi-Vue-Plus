@@ -10,6 +10,7 @@ import ${packageName}.domain.${ClassName};
 import ${packageName}.service.I${ClassName}Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ${functionName}Service业务层处理
@@ -101,6 +102,10 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         }
 #end
 #elseif($queryType == "BETWEEN")
+        Map<String, Object> params = ${className}.getParams();
+        if (params.get("begin$AttrName") != null && params.get("end$AttrName") != null) {
+            lqw.between(${ClassName}::get$AttrName ,params.get("begin$AttrName"),params.get("end$AttrName"));
+        }
 #end
 #end
 #end
