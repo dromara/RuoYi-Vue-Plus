@@ -85,9 +85,7 @@ public class ${ClassName}Controller extends BaseController {
     @Log(title = "${functionName}" , businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody ${ClassName} ${className}) {
-        AjaxResult result = toAjax(i${ClassName}Service.save(${className}) ? 1 : 0);
-        result.put("data",${className});
-        return result;
+        return toAjax(i${ClassName}Service.save(${className}) ? 1 : 0);
     }
 
     /**
