@@ -2,6 +2,7 @@ package ${packageName}.service;
 
 import ${packageName}.domain.${ClassName};
 import com.baomidou.mybatisplus.extension.service.IService;
+import java.util.List;
 
 /**
  * ${functionName}Service接口
@@ -11,4 +12,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface I${ClassName}Service extends IService<${ClassName}> {
 
+    /**
+     * 查询列表
+     */
+    List<${ClassName}> queryList(${ClassName} ${className});
 }
