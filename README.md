@@ -9,6 +9,10 @@
 * 查看ruoyi-framework模块的pom.xml文件,根据注释更改依赖
 * 查看ruoyi-admin模块中的application.yml文件,根据注释更改配置
 
+关于如何创建新模块
+* 参考ruoyi-demo模块
+* 需要改动: 父pom 与 admin模块pom
+
 ## 修改RuoYi功能
 
 * ORM框架 使用 Mybatis-Plus 简化CRUD
@@ -17,6 +21,7 @@
 * 代码生成模板 改为适配 Mybatis-Plus 的代码
 * 项目修改为 maven多环境配置
 * 重磅更新 升级MybatisPlus 3.4.1 重写配置文件详细注释 更新所有插件
+* 增加demo模块示例(给不会增加模块的小伙伴做参考)
 * 同步升级 3.3
 
 ## 平台简介

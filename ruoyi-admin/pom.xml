@@ -73,6 +73,12 @@
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
 
+        <!--  demo模块  -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-demo</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
