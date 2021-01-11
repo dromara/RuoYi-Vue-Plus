@@ -32,51 +32,51 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
 #if($column.query)
 #if($column.queryType == "EQ")
-#if($javaType == 'String') 
+#if($javaType == 'String')
         if (StringUtils.isNotBlank(${className}.get$AttrName())){
             lqw.eq(${ClassName}::get$AttrName ,${className}.get$AttrName());
         }
-#else 
+#else
         if (${className}.get$AttrName() != null){
             lqw.eq(${ClassName}::get$AttrName ,${className}.get$AttrName());
         }
 #end
 #elseif($queryType == "NE")
-#if($javaType == 'String') 
+#if($javaType == 'String')
         if (StringUtils.isNotBlank(${className}.get$AttrName())){
             lqw.ne(${ClassName}::get$AttrName ,${className}.get$AttrName());
         }
-#else 
+#else
         if (${className}.get$AttrName() != null){
             lqw.ne(${ClassName}::get$AttrName ,${className}.get$AttrName());
         }
-#end 
+#end
 #elseif($queryType == "GT")
-#if($javaType == 'String') 
+#if($javaType == 'String')
         if (StringUtils.isNotBlank(${className}.get$AttrName())){
             lqw.gt(${ClassName}::get$AttrName ,${className}.get$AttrName());
         }
-#else 
+#else
         if (${className}.get$AttrName() != null){
             lqw.gt(${ClassName}::get$AttrName ,${className}.get$AttrName());
         }
 #end
 #elseif($queryType == "GTE")
-#if($javaType == 'String') 
+#if($javaType == 'String')
         if (StringUtils.isNotBlank(${className}.get$AttrName())){
             lqw.ge(${ClassName}::get$AttrName ,${className}.get$AttrName());
         }
-#else 
+#else
         if (${className}.get$AttrName() != null){
             lqw.ge(${ClassName}::get$AttrName ,${className}.get$AttrName());
         }
 #end
 #elseif($queryType == "LT")
-#if($javaType == 'String') 
+#if($javaType == 'String')
         if (StringUtils.isNotBlank(${className}.get$AttrName())){
             lqw.lt(${ClassName}::get$AttrName ,${className}.get$AttrName());
         }
-#else 
+#else
         if (${className}.get$AttrName() != null){
             lqw.lt(${ClassName}::get$AttrName ,${className}.get$AttrName());
         }

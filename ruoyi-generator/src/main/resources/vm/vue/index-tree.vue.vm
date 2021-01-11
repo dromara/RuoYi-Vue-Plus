@@ -73,7 +73,7 @@
       <el-col :span="1.5">
         <el-button
           type="primary"
-		  plain
+          plain
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
@@ -159,7 +159,7 @@
         </el-form-item>
 #elseif($column.htmlType == "fileUpload")
         <el-form-item label="${comment}">
-          <imageUpload v-model="form.${field}"/>
+          <fileUpload v-model="form.${field}"/>
         </el-form-item>
 #elseif($column.htmlType == "editor")
         <el-form-item label="${comment}">
