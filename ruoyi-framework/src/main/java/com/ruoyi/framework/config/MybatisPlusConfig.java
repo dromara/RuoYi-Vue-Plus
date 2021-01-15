@@ -1,7 +1,6 @@
 package com.ruoyi.framework.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
-import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
@@ -44,14 +43,6 @@ public class MybatisPlusConfig {
 		// 设置最大单页限制数量，默认 500 条，-1 不受限制
 		paginationInnerInterceptor.setMaxLimit(-1L);
 		return paginationInnerInterceptor;
-	}
-
-	/**
-	 * 新的分页插件,一缓和二缓遵循mybatis的规则,需要设置 MybatisConfiguration#useDeprecatedExecutor = false 避免缓存出现问题(该属性会在旧插件移除后一同移除)
-	 */
-	@Bean
-	public ConfigurationCustomizer configurationCustomizer() {
-		return configuration -> configuration.setUseDeprecatedExecutor(false);
 	}
 
 	/**

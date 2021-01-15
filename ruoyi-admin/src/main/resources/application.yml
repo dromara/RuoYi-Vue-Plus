@@ -84,7 +84,7 @@ token:
 # https://baomidou.com/config/
 mybatis-plus:
   # 对应的 XML 文件位置
-  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
   # 实体扫描，多个package用逗号或者分号分隔
   typeAliasesPackage: com.ruoyi.**.domain
   # 针对 typeAliasesPackage，如果配置了该属性，则仅仅会扫描路径下以该类作为父类的域对象

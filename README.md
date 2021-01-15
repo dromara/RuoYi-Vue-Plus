@@ -20,7 +20,7 @@
 * 容器改动 Tomcat 改为 并发性能更好的 undertow
 * 代码生成模板 改为适配 Mybatis-Plus 的代码
 * 项目修改为 maven多环境配置
-* 重磅更新 升级MybatisPlus 3.4.1 重写配置文件详细注释 更新所有插件
+* 升级MybatisPlus 3.4.2
 * 增加demo模块示例(给不会增加模块的小伙伴做参考)
 * 同步升级 3.3
 
