@@ -15,7 +15,7 @@
 
 ## 修改RuoYi功能
 
-* ORM框架 使用 Mybatis-Plus 简化CRUD
+* ORM框架 使用 Mybatis-Plus 简化CRUD (目前支持单表生成 不支持树表与主子表)
 * Bean简化 使用 Lombok 简化 get set toString 等等
 * 容器改动 Tomcat 改为 并发性能更好的 undertow
 * 代码生成模板 改为适配 Mybatis-Plus 的代码
