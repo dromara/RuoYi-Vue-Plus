@@ -2,9 +2,7 @@ package ${packageName}.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 import com.ruoyi.common.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -24,8 +22,6 @@ import java.math.BigDecimal;
  * @date ${datetime}
  */
 @Data
-@ToString
-@EqualsAndHashCode
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("${tableName}")
