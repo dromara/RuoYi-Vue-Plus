@@ -9,7 +9,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 @Configuration
-public class ValidatorConf {
+public class ValidatorConfig {
 
     /**
      * 配置校验框架 快速返回模式
