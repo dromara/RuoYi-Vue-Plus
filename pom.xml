@@ -33,6 +33,8 @@
         <jwt.version>0.9.1</jwt.version>
         <mybatis-plus.version>3.4.2</mybatis-plus.version>
         <hutool.version>5.4.0</hutool.version>
+        <feign.version>2.2.6.RELEASE</feign.version>
+        <feign-okhttp.version>11.0</feign-okhttp.version>
     </properties>
 	
     <!-- 依赖声明 -->
@@ -181,6 +183,18 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-openfeign</artifactId>
+                <version>${feign.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-okhttp</artifactId>
+                <version>${feign-okhttp.version}</version>
             </dependency>
 
             <!-- 定时任务-->
