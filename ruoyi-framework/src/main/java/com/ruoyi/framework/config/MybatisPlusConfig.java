@@ -69,22 +69,6 @@ public class MybatisPlusConfig {
 //		return new IllegalSQLInnerInterceptor();
 //	}
 
-	/**
-	 * Sequence主键策略 IdType.INPUT 时使用
-	 * 内置支持：
-	 *
-	 * DB2KeyGenerator
-	 * H2KeyGenerator
-	 * KingbaseKeyGenerator
-	 * OracleKeyGenerator
-	 * PostgreKeyGenerator
-	 * https://baomidou.com/guide/sequence.html
-	 */
-//	@Bean
-//	public IKeyGenerator keyGenerator() {
-//		return new H2KeyGenerator();
-//	}
-
 
 	/**
 	 * 自定义主键策略
