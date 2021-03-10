@@ -153,7 +153,7 @@ mybatis-plus:
       # 全局的entity的逻辑删除字段属性名
       logicDeleteField: null
       # 逻辑已删除值
-      logicDeleteValue: 1
+      logicDeleteValue: 2
       # 逻辑未删除值
       logicNotDeleteValue: 0
       # 字段验证策略之 insert,在 insert 的时候的字段验证策略
