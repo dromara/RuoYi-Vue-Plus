@@ -1,6 +1,6 @@
 package com.ruoyi.framework.web.domain.server;
 
-import com.ruoyi.common.utils.Arith;
+import cn.hutool.core.util.NumberUtil;
 
 /**
  * 內存相关信息
@@ -26,7 +26,7 @@ public class Mem
 
     public double getTotal()
     {
-        return Arith.div(total, (1024 * 1024 * 1024), 2);
+        return NumberUtil.div(total, (1024 * 1024 * 1024), 2);
     }
 
     public void setTotal(long total)
@@ -36,7 +36,7 @@ public class Mem
 
     public double getUsed()
     {
-        return Arith.div(used, (1024 * 1024 * 1024), 2);
+        return NumberUtil.div(used, (1024 * 1024 * 1024), 2);
     }
 
     public void setUsed(long used)
@@ -46,7 +46,7 @@ public class Mem
 
     public double getFree()
     {
-        return Arith.div(free, (1024 * 1024 * 1024), 2);
+        return NumberUtil.div(free, (1024 * 1024 * 1024), 2);
     }
 
     public void setFree(long free)
@@ -56,6 +56,6 @@ public class Mem
 
     public double getUsage()
     {
-        return Arith.mul(Arith.div(used, total, 4), 100);
+        return NumberUtil.mul(NumberUtil.div(used, total, 4), 100);
     }
 }
