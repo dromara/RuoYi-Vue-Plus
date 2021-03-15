@@ -2,16 +2,13 @@ package com.ruoyi.web.controller.common;
 
 import java.util.concurrent.TimeUnit;
 
-import cn.hutool.captcha.CircleCaptcha;
-import cn.hutool.captcha.ICaptcha;
-import cn.hutool.captcha.LineCaptcha;
-import cn.hutool.captcha.ShearCaptcha;
+import cn.hutool.captcha.*;
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.captcha.generator.MathGenerator;
 import cn.hutool.captcha.generator.RandomGenerator;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.ruoyi.common.core.text.Convert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -76,12 +73,15 @@ public class CaptchaController {
         }
         if ("line".equals(captchaCategory)) {
             lineCaptcha.setGenerator(codeGenerator);
+            lineCaptcha.createCode();
             capStr = lineCaptcha.getCode();
         } else if ("circle".equals(captchaCategory)) {
             circleCaptcha.setGenerator(codeGenerator);
+            circleCaptcha.createCode();
             capStr = circleCaptcha.getCode();
         } else if ("shear".equals(captchaCategory)) {
             shearCaptcha.setGenerator(codeGenerator);
+            shearCaptcha.createCode();
             capStr = shearCaptcha.getCode();
         }  else {
             throw new IllegalArgumentException("验证码类别异常");
