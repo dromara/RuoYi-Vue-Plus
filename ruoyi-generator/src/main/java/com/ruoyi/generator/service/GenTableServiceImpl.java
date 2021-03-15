@@ -1,5 +1,31 @@
 package com.ruoyi.generator.service;
 
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.constant.GenConstants;
+import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.file.FileUtils;
+import com.ruoyi.generator.domain.GenTable;
+import com.ruoyi.generator.domain.GenTableColumn;
+import com.ruoyi.generator.mapper.GenTableColumnMapper;
+import com.ruoyi.generator.mapper.GenTableMapper;
+import com.ruoyi.generator.util.GenUtils;
+import com.ruoyi.generator.util.VelocityInitializer;
+import com.ruoyi.generator.util.VelocityUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -10,31 +36,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import org.apache.commons.io.IOUtils;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.constant.GenConstants;
-import com.ruoyi.common.core.text.CharsetKit;
-import com.ruoyi.common.exception.CustomException;
-import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.generator.domain.GenTable;
-import com.ruoyi.generator.domain.GenTableColumn;
-import com.ruoyi.generator.mapper.GenTableColumnMapper;
-import com.ruoyi.generator.mapper.GenTableMapper;
-import com.ruoyi.generator.util.GenUtils;
-import com.ruoyi.generator.util.VelocityInitializer;
-import com.ruoyi.generator.util.VelocityUtils;
 
 /**
  * 业务 服务层实现
@@ -256,7 +257,7 @@ public class GenTableServiceImpl implements IGenTableService
         List<String> templates = VelocityUtils.getTemplateList(table.getTplCategory());
         for (String template : templates)
         {
-            if (!StringUtils.containsAny(template, "sql.vm", "api.js.vm", "index.vue.vm", "index-tree.vue.vm"))
+            if (!StrUtil.containsAny(template, "sql.vm", "api.js.vm", "index.vue.vm", "index-tree.vue.vm"))
             {
                 // 渲染模板
                 StringWriter sw = new StringWriter();
@@ -265,7 +266,7 @@ public class GenTableServiceImpl implements IGenTableService
                 try
                 {
                     String path = getGenPath(table, template);
-                    FileUtils.writeStringToFile(new File(path), sw.toString(), CharsetKit.UTF_8);
+                    FileUtils.writeStringToFile(new File(path), sw.toString(), Constants.UTF8);
                 }
                 catch (IOException e)
                 {
@@ -289,7 +290,7 @@ public class GenTableServiceImpl implements IGenTableService
         List<String> tableColumnNames = tableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
 
         List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
-        if (StringUtils.isEmpty(dbTableColumns))
+        if (Validator.isEmpty(dbTableColumns))
         {
             throw new CustomException("同步数据失败，原表结构不存在");
         }
@@ -304,7 +305,7 @@ public class GenTableServiceImpl implements IGenTableService
         });
 
         List<GenTableColumn> delColumns = tableColumns.stream().filter(column -> !dbTableColumnNames.contains(column.getColumnName())).collect(Collectors.toList());
-        if (StringUtils.isNotEmpty(delColumns))
+        if (Validator.isNotEmpty(delColumns))
         {
             genTableColumnMapper.deleteGenTableColumns(delColumns);
         }
@@ -381,25 +382,25 @@ public class GenTableServiceImpl implements IGenTableService
         {
             String options = JSON.toJSONString(genTable.getParams());
             JSONObject paramsObj = JSONObject.parseObject(options);
-            if (StringUtils.isEmpty(paramsObj.getString(GenConstants.TREE_CODE)))
+            if (Validator.isEmpty(paramsObj.getString(GenConstants.TREE_CODE)))
             {
                 throw new CustomException("树编码字段不能为空");
             }
-            else if (StringUtils.isEmpty(paramsObj.getString(GenConstants.TREE_PARENT_CODE)))
+            else if (Validator.isEmpty(paramsObj.getString(GenConstants.TREE_PARENT_CODE)))
             {
                 throw new CustomException("树父编码字段不能为空");
             }
-            else if (StringUtils.isEmpty(paramsObj.getString(GenConstants.TREE_NAME)))
+            else if (Validator.isEmpty(paramsObj.getString(GenConstants.TREE_NAME)))
             {
                 throw new CustomException("树名称字段不能为空");
             }
             else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory()))
             {
-                if (StringUtils.isEmpty(genTable.getSubTableName()))
+                if (Validator.isEmpty(genTable.getSubTableName()))
                 {
                     throw new CustomException("关联子表的表名不能为空");
                 }
-                else if (StringUtils.isEmpty(genTable.getSubTableFkName()))
+                else if (Validator.isEmpty(genTable.getSubTableFkName()))
                 {
                     throw new CustomException("子表关联的外键名不能为空");
                 }
@@ -422,7 +423,7 @@ public class GenTableServiceImpl implements IGenTableService
                 break;
             }
         }
-        if (StringUtils.isNull(table.getPkColumn()))
+        if (Validator.isNull(table.getPkColumn()))
         {
             table.setPkColumn(table.getColumns().get(0));
         }
@@ -436,7 +437,7 @@ public class GenTableServiceImpl implements IGenTableService
                     break;
                 }
             }
-            if (StringUtils.isNull(table.getSubTable().getPkColumn()))
+            if (Validator.isNull(table.getSubTable().getPkColumn()))
             {
                 table.getSubTable().setPkColumn(table.getSubTable().getColumns().get(0));
             }
@@ -451,7 +452,7 @@ public class GenTableServiceImpl implements IGenTableService
     public void setSubTable(GenTable table)
     {
         String subTableName = table.getSubTableName();
-        if (StringUtils.isNotEmpty(subTableName))
+        if (Validator.isNotEmpty(subTableName))
         {
             table.setSubTable(genTableMapper.selectGenTableByName(subTableName));
         }
@@ -465,7 +466,7 @@ public class GenTableServiceImpl implements IGenTableService
     public void setTableFromOptions(GenTable genTable)
     {
         JSONObject paramsObj = JSONObject.parseObject(genTable.getOptions());
-        if (StringUtils.isNotNull(paramsObj))
+        if (Validator.isNotNull(paramsObj))
         {
             String treeCode = paramsObj.getString(GenConstants.TREE_CODE);
             String treeParentCode = paramsObj.getString(GenConstants.TREE_PARENT_CODE);
@@ -491,7 +492,7 @@ public class GenTableServiceImpl implements IGenTableService
     public static String getGenPath(GenTable table, String template)
     {
         String genPath = table.getGenPath();
-        if (StringUtils.equals(genPath, "/"))
+        if (StrUtil.equals(genPath, "/"))
         {
             return System.getProperty("user.dir") + File.separator + "src" + File.separator + VelocityUtils.getFileName(template, table);
         }

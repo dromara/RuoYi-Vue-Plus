@@ -1,62 +1,34 @@
 package com.ruoyi.common.utils.poi;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.ClientAnchor;
-import org.apache.poi.ss.usermodel.DataValidation;
-import org.apache.poi.ss.usermodel.DataValidationConstraint;
-import org.apache.poi.ss.usermodel.DataValidationHelper;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Drawing;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
-import org.apache.poi.xssf.usermodel.XSSFDataValidation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
 import com.ruoyi.common.annotation.Excel.Type;
 import com.ruoyi.common.annotation.Excels;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.DictUtils;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileTypeUtils;
 import com.ruoyi.common.utils.file.ImageUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
+import org.apache.poi.xssf.usermodel.XSSFDataValidation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Excel相关处理
@@ -153,7 +125,7 @@ public class ExcelUtil<T>
      */
     public List<T> importExcel(InputStream is) throws Exception
     {
-        return importExcel(StringUtils.EMPTY, is);
+        return importExcel(StrUtil.EMPTY, is);
     }
 
     /**
@@ -169,7 +141,7 @@ public class ExcelUtil<T>
         this.wb = WorkbookFactory.create(is);
         List<T> list = new ArrayList<T>();
         Sheet sheet = null;
-        if (StringUtils.isNotEmpty(sheetName))
+        if (Validator.isNotEmpty(sheetName))
         {
             // 如果指定sheet名,则取指定sheet中的内容.
             sheet = wb.getSheet(sheetName);
@@ -196,7 +168,7 @@ public class ExcelUtil<T>
             for (int i = 0; i < heard.getPhysicalNumberOfCells(); i++)
             {
                 Cell cell = heard.getCell(i);
-                if (StringUtils.isNotNull(cell))
+                if (Validator.isNotNull(cell))
                 {
                     String value = this.getCellValue(heard, i).toString();
                     cellMap.put(value, i);
@@ -243,14 +215,14 @@ public class ExcelUtil<T>
                     if (String.class == fieldType)
                     {
                         String s = Convert.toStr(val);
-                        if (StringUtils.endsWith(s, ".0"))
+                        if (StrUtil.endWith(s, ".0"))
                         {
-                            val = StringUtils.substringBefore(s, ".0");
+                            val = StrUtil.subBefore(s, ".0",false);
                         }
                         else
                         {
                             String dateFormat = field.getAnnotation(Excel.class).dateFormat();
-                            if (StringUtils.isNotEmpty(dateFormat))
+                            if (Validator.isNotEmpty(dateFormat))
                             {
                                 val = DateUtils.parseDateToStr(dateFormat, (Date) val);
                             }
@@ -260,7 +232,7 @@ public class ExcelUtil<T>
                             }
                         }
                     }
-                    else if ((Integer.TYPE == fieldType || Integer.class == fieldType) && StringUtils.isNumeric(Convert.toStr(val)))
+                    else if ((Integer.TYPE == fieldType || Integer.class == fieldType) && Validator.isNumber(Convert.toStr(val)))
                     {
                         val = Convert.toInt(val);
                     }
@@ -295,19 +267,19 @@ public class ExcelUtil<T>
                     {
                         val = Convert.toBool(val, false);
                     }
-                    if (StringUtils.isNotNull(fieldType))
+                    if (Validator.isNotNull(fieldType))
                     {
                         Excel attr = field.getAnnotation(Excel.class);
                         String propertyName = field.getName();
-                        if (StringUtils.isNotEmpty(attr.targetAttr()))
+                        if (Validator.isNotEmpty(attr.targetAttr()))
                         {
                             propertyName = field.getName() + "." + attr.targetAttr();
                         }
-                        else if (StringUtils.isNotEmpty(attr.readConverterExp()))
+                        else if (Validator.isNotEmpty(attr.readConverterExp()))
                         {
                             val = reverseByExp(Convert.toStr(val), attr.readConverterExp(), attr.separator());
                         }
-                        else if (StringUtils.isNotEmpty(attr.dictType()))
+                        else if (Validator.isNotEmpty(attr.dictType()))
                         {
                             val = reverseDictByExp(Convert.toStr(val), attr.dictType(), attr.separator());
                         }
@@ -533,18 +505,18 @@ public class ExcelUtil<T>
     {
         if (ColumnType.STRING == attr.cellType())
         {
-            cell.setCellValue(StringUtils.isNull(value) ? attr.defaultValue() : value + attr.suffix());
+            cell.setCellValue(Validator.isNull(value) ? attr.defaultValue() : value + attr.suffix());
         }
         else if (ColumnType.NUMERIC == attr.cellType())
         {
-            cell.setCellValue(StringUtils.contains(Convert.toStr(value), ".") ? Convert.toDouble(value) : Convert.toInt(value));
+            cell.setCellValue(StrUtil.contains(Convert.toStr(value), ".") ? Convert.toDouble(value) : Convert.toInt(value));
         }
         else if (ColumnType.IMAGE == attr.cellType())
         {
             ClientAnchor anchor = new XSSFClientAnchor(0, 0, 0, 0, (short) cell.getColumnIndex(), cell.getRow().getRowNum(), (short) (cell.getColumnIndex() + 1),
                     cell.getRow().getRowNum() + 1);
             String imagePath = Convert.toStr(value);
-            if (StringUtils.isNotEmpty(imagePath))
+            if (Validator.isNotEmpty(imagePath))
             {
                 byte[] data = ImageUtils.getImage(imagePath);
                 getDrawingPatriarch(cell.getSheet()).createPicture(anchor,
@@ -597,7 +569,7 @@ public class ExcelUtil<T>
             sheet.setColumnWidth(column, (int) ((attr.width() + 0.72) * 256));
         }
         // 如果设置了提示信息则鼠标放上去提示.
-        if (StringUtils.isNotEmpty(attr.prompt()))
+        if (Validator.isNotEmpty(attr.prompt()))
         {
             // 这里默认设了2-101列提示.
             setXSSFPrompt(sheet, "", attr.prompt(), 1, 100, column, column);
@@ -634,15 +606,15 @@ public class ExcelUtil<T>
                 String readConverterExp = attr.readConverterExp();
                 String separator = attr.separator();
                 String dictType = attr.dictType();
-                if (StringUtils.isNotEmpty(dateFormat) && StringUtils.isNotNull(value))
+                if (Validator.isNotEmpty(dateFormat) && Validator.isNotNull(value))
                 {
                     cell.setCellValue(DateUtils.parseDateToStr(dateFormat, (Date) value));
                 }
-                else if (StringUtils.isNotEmpty(readConverterExp) && StringUtils.isNotNull(value))
+                else if (Validator.isNotEmpty(readConverterExp) && Validator.isNotNull(value))
                 {
                     cell.setCellValue(convertByExp(Convert.toStr(value), readConverterExp, separator));
                 }
-                else if (StringUtils.isNotEmpty(dictType) && StringUtils.isNotNull(value))
+                else if (Validator.isNotEmpty(dictType) && Validator.isNotNull(value))
                 {
                     cell.setCellValue(convertDictByExp(Convert.toStr(value), dictType, separator));
                 }
@@ -737,7 +709,7 @@ public class ExcelUtil<T>
         for (String item : convertSource)
         {
             String[] itemArray = item.split("=");
-            if (StringUtils.containsAny(separator, propertyValue))
+            if (StrUtil.containsAny(separator, propertyValue))
             {
                 for (String value : propertyValue.split(separator))
                 {
@@ -756,7 +728,7 @@ public class ExcelUtil<T>
                 }
             }
         }
-        return StringUtils.stripEnd(propertyString.toString(), separator);
+        return StrUtil.strip(propertyString.toString(), null,separator);
     }
 
     /**
@@ -774,7 +746,7 @@ public class ExcelUtil<T>
         for (String item : convertSource)
         {
             String[] itemArray = item.split("=");
-            if (StringUtils.containsAny(separator, propertyValue))
+            if (StrUtil.containsAny(separator, propertyValue))
             {
                 for (String value : propertyValue.split(separator))
                 {
@@ -793,7 +765,7 @@ public class ExcelUtil<T>
                 }
             }
         }
-        return StringUtils.stripEnd(propertyString.toString(), separator);
+        return StrUtil.strip(propertyString.toString(), null,separator);
     }
     
     /**
@@ -906,10 +878,10 @@ public class ExcelUtil<T>
     private Object getTargetValue(T vo, Field field, Excel excel) throws Exception
     {
         Object o = field.get(vo);
-        if (StringUtils.isNotEmpty(excel.targetAttr()))
+        if (Validator.isNotEmpty(excel.targetAttr()))
         {
             String target = excel.targetAttr();
-            if (target.indexOf(".") > -1)
+            if (target.contains("."))
             {
                 String[] targets = target.split("[.]");
                 for (String name : targets)
@@ -935,7 +907,7 @@ public class ExcelUtil<T>
      */
     private Object getValue(Object o, String name) throws Exception
     {
-        if (StringUtils.isNotNull(o) && StringUtils.isNotEmpty(name))
+        if (Validator.isNotNull(o) && Validator.isNotEmpty(name))
         {
             Class<?> clazz = o.getClass();
             Field field = clazz.getDeclaredField(name);
@@ -1048,7 +1020,7 @@ public class ExcelUtil<T>
         try
         {
             Cell cell = row.getCell(column);
-            if (StringUtils.isNotNull(cell))
+            if (Validator.isNotNull(cell))
             {
                 if (cell.getCellType() == CellType.NUMERIC || cell.getCellType() == CellType.FORMULA)
                 {

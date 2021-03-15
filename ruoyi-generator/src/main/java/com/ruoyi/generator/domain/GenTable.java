@@ -1,12 +1,13 @@
 package com.ruoyi.generator.domain;
 
-import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import org.apache.commons.lang3.ArrayUtils;
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.domain.BaseEntity;
-import com.ruoyi.common.utils.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * 业务表 gen_table
@@ -332,7 +333,7 @@ public class GenTable extends BaseEntity
 
     public static boolean isSub(String tplCategory)
     {
-        return tplCategory != null && StringUtils.equals(GenConstants.TPL_SUB, tplCategory);
+        return tplCategory != null && StrUtil.equals(GenConstants.TPL_SUB, tplCategory);
     }
 
     public boolean isTree()
@@ -342,7 +343,7 @@ public class GenTable extends BaseEntity
 
     public static boolean isTree(String tplCategory)
     {
-        return tplCategory != null && StringUtils.equals(GenConstants.TPL_TREE, tplCategory);
+        return tplCategory != null && StrUtil.equals(GenConstants.TPL_TREE, tplCategory);
     }
 
     public boolean isCrud()
@@ -352,7 +353,7 @@ public class GenTable extends BaseEntity
 
     public static boolean isCrud(String tplCategory)
     {
-        return tplCategory != null && StringUtils.equals(GenConstants.TPL_CRUD, tplCategory);
+        return tplCategory != null && StrUtil.equals(GenConstants.TPL_CRUD, tplCategory);
     }
 
     public boolean isSuperColumn(String javaField)
@@ -364,9 +365,9 @@ public class GenTable extends BaseEntity
     {
         if (isTree(tplCategory))
         {
-            return StringUtils.equalsAnyIgnoreCase(javaField,
+            return StrUtil.equalsAnyIgnoreCase(javaField,
                     ArrayUtils.addAll(GenConstants.TREE_ENTITY, GenConstants.BASE_ENTITY));
         }
-        return StringUtils.equalsAnyIgnoreCase(javaField, GenConstants.BASE_ENTITY);
+        return StrUtil.equalsAnyIgnoreCase(javaField, GenConstants.BASE_ENTITY);
     }
 }

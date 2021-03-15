@@ -1,9 +1,9 @@
 package com.ruoyi.common.utils;
 
+import cn.hutool.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import com.ruoyi.common.constant.HttpStatus;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.CustomException;
 
@@ -25,7 +25,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new CustomException("获取用户账户异常", HttpStatus.UNAUTHORIZED);
+            throw new CustomException("获取用户账户异常", HttpStatus.HTTP_UNAUTHORIZED);
         }
     }
 
@@ -40,7 +40,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new CustomException("获取用户信息异常", HttpStatus.UNAUTHORIZED);
+            throw new CustomException("获取用户信息异常", HttpStatus.HTTP_UNAUTHORIZED);
         }
     }
 

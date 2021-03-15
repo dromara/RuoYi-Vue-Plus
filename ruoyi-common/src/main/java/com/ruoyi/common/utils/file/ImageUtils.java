@@ -1,5 +1,12 @@
 package com.ruoyi.common.utils.file;
 
+import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.constant.Constants;
+import org.apache.poi.util.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -7,12 +14,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
-import org.apache.poi.util.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.ruoyi.common.config.RuoYiConfig;
-import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.utils.StringUtils;
 
 /**
  * 图片处理工具类
@@ -82,7 +83,7 @@ public class ImageUtils
             {
                 // 本机地址
                 String localPath = RuoYiConfig.getProfile();
-                String downloadPath = localPath + StringUtils.substringAfter(url, Constants.RESOURCE_PREFIX);
+                String downloadPath = localPath + StrUtil.subAfter(url, Constants.RESOURCE_PREFIX,false);
                 in = new FileInputStream(downloadPath);
             }
             return IOUtils.toByteArray(in);

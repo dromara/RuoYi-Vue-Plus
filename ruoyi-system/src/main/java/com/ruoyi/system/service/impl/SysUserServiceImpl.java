@@ -1,29 +1,26 @@
 package com.ruoyi.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import cn.hutool.core.lang.Validator;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.domain.SysUserRole;
-import com.ruoyi.system.mapper.SysPostMapper;
-import com.ruoyi.system.mapper.SysRoleMapper;
-import com.ruoyi.system.mapper.SysUserMapper;
-import com.ruoyi.system.mapper.SysUserPostMapper;
-import com.ruoyi.system.mapper.SysUserRoleMapper;
+import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 用户 业务层处理
@@ -105,7 +102,7 @@ public class SysUserServiceImpl implements ISysUserService
         {
             idsStr.append(role.getRoleName()).append(",");
         }
-        if (StringUtils.isNotEmpty(idsStr.toString()))
+        if (Validator.isNotEmpty(idsStr.toString()))
         {
             return idsStr.substring(0, idsStr.length() - 1);
         }
@@ -127,7 +124,7 @@ public class SysUserServiceImpl implements ISysUserService
         {
             idsStr.append(post.getPostName()).append(",");
         }
-        if (StringUtils.isNotEmpty(idsStr.toString()))
+        if (Validator.isNotEmpty(idsStr.toString()))
         {
             return idsStr.substring(0, idsStr.length() - 1);
         }
@@ -160,9 +157,9 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public String checkPhoneUnique(SysUser user)
     {
-        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
+        Long userId = Validator.isNull(user.getUserId()) ? -1L : user.getUserId();
         SysUser info = userMapper.checkPhoneUnique(user.getPhonenumber());
-        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue())
+        if (Validator.isNotNull(info) && info.getUserId().longValue() != userId.longValue())
         {
             return UserConstants.NOT_UNIQUE;
         }
@@ -178,9 +175,9 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public String checkEmailUnique(SysUser user)
     {
-        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
+        Long userId = Validator.isNull(user.getUserId()) ? -1L : user.getUserId();
         SysUser info = userMapper.checkEmailUnique(user.getEmail());
-        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue())
+        if (Validator.isNotNull(info) && info.getUserId().longValue() != userId.longValue())
         {
             return UserConstants.NOT_UNIQUE;
         }
@@ -195,7 +192,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public void checkUserAllowed(SysUser user)
     {
-        if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin())
+        if (Validator.isNotNull(user.getUserId()) && user.isAdmin())
         {
             throw new CustomException("不允许操作超级管理员用户");
         }
@@ -312,7 +309,7 @@ public class SysUserServiceImpl implements ISysUserService
     public void insertUserRole(SysUser user)
     {
         Long[] roles = user.getRoleIds();
-        if (StringUtils.isNotNull(roles))
+        if (Validator.isNotNull(roles))
         {
             // 新增用户与角色管理
             List<SysUserRole> list = new ArrayList<SysUserRole>();
@@ -338,7 +335,7 @@ public class SysUserServiceImpl implements ISysUserService
     public void insertUserPost(SysUser user)
     {
         Long[] posts = user.getPostIds();
-        if (StringUtils.isNotNull(posts))
+        if (Validator.isNotNull(posts))
         {
             // 新增用户与岗位管理
             List<SysUserPost> list = new ArrayList<SysUserPost>();
@@ -405,7 +402,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName)
     {
-        if (StringUtils.isNull(userList) || userList.size() == 0)
+        if (Validator.isNull(userList) || userList.size() == 0)
         {
             throw new CustomException("导入用户数据不能为空！");
         }
@@ -420,7 +417,7 @@ public class SysUserServiceImpl implements ISysUserService
             {
                 // 验证是否存在这个用户
                 SysUser u = userMapper.selectUserByUserName(user.getUserName());
-                if (StringUtils.isNull(u))
+                if (Validator.isNull(u))
                 {
                     user.setPassword(SecurityUtils.encryptPassword(password));
                     user.setCreateBy(operName);

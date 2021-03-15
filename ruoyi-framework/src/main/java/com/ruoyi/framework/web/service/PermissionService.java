@@ -1,13 +1,14 @@
 package com.ruoyi.framework.web.service;
 
-import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.common.utils.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 /**
  * RuoYi首创 自定义权限实现，ss取自SpringSecurity首字母
@@ -38,12 +39,12 @@ public class PermissionService
      */
     public boolean hasPermi(String permission)
     {
-        if (StringUtils.isEmpty(permission))
+        if (Validator.isEmpty(permission))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions()))
+        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getPermissions()))
         {
             return false;
         }
@@ -69,12 +70,12 @@ public class PermissionService
      */
     public boolean hasAnyPermi(String permissions)
     {
-        if (StringUtils.isEmpty(permissions))
+        if (Validator.isEmpty(permissions))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions()))
+        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getPermissions()))
         {
             return false;
         }
@@ -97,19 +98,19 @@ public class PermissionService
      */
     public boolean hasRole(String role)
     {
-        if (StringUtils.isEmpty(role))
+        if (Validator.isEmpty(role))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles()))
+        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getUser().getRoles()))
         {
             return false;
         }
         for (SysRole sysRole : loginUser.getUser().getRoles())
         {
             String roleKey = sysRole.getRoleKey();
-            if (SUPER_ADMIN.equals(roleKey) || roleKey.equals(StringUtils.trim(role)))
+            if (SUPER_ADMIN.equals(roleKey) || roleKey.equals(StrUtil.trim(role)))
             {
                 return true;
             }
@@ -136,12 +137,12 @@ public class PermissionService
      */
     public boolean hasAnyRoles(String roles)
     {
-        if (StringUtils.isEmpty(roles))
+        if (Validator.isEmpty(roles))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles()))
+        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getUser().getRoles()))
         {
             return false;
         }
@@ -164,6 +165,6 @@ public class PermissionService
      */
     private boolean hasPermissions(Set<String> permissions, String permission)
     {
-        return permissions.contains(ALL_PERMISSION) || permissions.contains(StringUtils.trim(permission));
+        return permissions.contains(ALL_PERMISSION) || permissions.contains(StrUtil.trim(permission));
     }
 }

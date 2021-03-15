@@ -1,13 +1,15 @@
 package com.ruoyi.common.utils;
 
-import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import com.ruoyi.common.core.text.Convert;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 /**
  * 客户端工具类
@@ -121,13 +123,13 @@ public class ServletUtils
         }
 
         String uri = request.getRequestURI();
-        if (StringUtils.inStringIgnoreCase(uri, ".json", ".xml"))
+        if (StrUtil.equalsAnyIgnoreCase(uri, ".json", ".xml"))
         {
             return true;
         }
 
         String ajax = request.getParameter("__ajax");
-        if (StringUtils.inStringIgnoreCase(ajax, "json", "xml"))
+        if (StrUtil.equalsAnyIgnoreCase(ajax, "json", "xml"))
         {
             return true;
         }

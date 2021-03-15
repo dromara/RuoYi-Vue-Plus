@@ -1,15 +1,16 @@
 package com.ruoyi.framework.config;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.DispatcherType;
+import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.filter.RepeatableFilter;
+import com.ruoyi.common.filter.XssFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.ruoyi.common.filter.RepeatableFilter;
-import com.ruoyi.common.filter.XssFilter;
-import com.ruoyi.common.utils.StringUtils;
+
+import javax.servlet.DispatcherType;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Filter配置
@@ -35,7 +36,7 @@ public class FilterConfig
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setDispatcherTypes(DispatcherType.REQUEST);
         registration.setFilter(new XssFilter());
-        registration.addUrlPatterns(StringUtils.split(urlPatterns, ","));
+        registration.addUrlPatterns(StrUtil.split(urlPatterns, ","));
         registration.setName("xssFilter");
         registration.setOrder(FilterRegistrationBean.HIGHEST_PRECEDENCE);
         Map<String, String> initParameters = new HashMap<String, String>();

@@ -1,6 +1,15 @@
 package com.ruoyi.framework.aspectj;
 
-import java.lang.reflect.Method;
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.annotation.DataScope;
+import com.ruoyi.common.core.domain.BaseEntity;
+import com.ruoyi.common.core.domain.entity.SysRole;
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.framework.web.service.TokenService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Aspect;
@@ -8,15 +17,8 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-import com.ruoyi.common.annotation.DataScope;
-import com.ruoyi.common.core.domain.BaseEntity;
-import com.ruoyi.common.core.domain.entity.SysRole;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.framework.web.service.TokenService;
+
+import java.lang.reflect.Method;
 
 /**
  * 数据过滤处理
@@ -79,11 +81,11 @@ public class DataScopeAspect
         }
         // 获取当前的用户
         LoginUser loginUser = SpringUtils.getBean(TokenService.class).getLoginUser(ServletUtils.getRequest());
-        if (StringUtils.isNotNull(loginUser))
+        if (Validator.isNotNull(loginUser))
         {
             SysUser currentUser = loginUser.getUser();
             // 如果是超级管理员，则不过滤数据
-            if (StringUtils.isNotNull(currentUser) && !currentUser.isAdmin())
+            if (Validator.isNotNull(currentUser) && !currentUser.isAdmin())
             {
                 dataScopeFilter(joinPoint, currentUser, controllerDataScope.deptAlias(),
                         controllerDataScope.userAlias());
@@ -112,25 +114,25 @@ public class DataScopeAspect
             }
             else if (DATA_SCOPE_CUSTOM.equals(dataScope))
             {
-                sqlString.append(StringUtils.format(
+                sqlString.append(StrUtil.format(
                         " OR {}.dept_id IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = {} ) ", deptAlias,
                         role.getRoleId()));
             }
             else if (DATA_SCOPE_DEPT.equals(dataScope))
             {
-                sqlString.append(StringUtils.format(" OR {}.dept_id = {} ", deptAlias, user.getDeptId()));
+                sqlString.append(StrUtil.format(" OR {}.dept_id = {} ", deptAlias, user.getDeptId()));
             }
             else if (DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope))
             {
-                sqlString.append(StringUtils.format(
+                sqlString.append(StrUtil.format(
                         " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
                         deptAlias, user.getDeptId(), user.getDeptId()));
             }
             else if (DATA_SCOPE_SELF.equals(dataScope))
             {
-                if (StringUtils.isNotBlank(userAlias))
+                if (StrUtil.isNotBlank(userAlias))
                 {
-                    sqlString.append(StringUtils.format(" OR {}.user_id = {} ", userAlias, user.getUserId()));
+                    sqlString.append(StrUtil.format(" OR {}.user_id = {} ", userAlias, user.getUserId()));
                 }
                 else
                 {
@@ -140,10 +142,10 @@ public class DataScopeAspect
             }
         }
 
-        if (StringUtils.isNotBlank(sqlString.toString()))
+        if (StrUtil.isNotBlank(sqlString.toString()))
         {
             Object params = joinPoint.getArgs()[0];
-            if (StringUtils.isNotNull(params) && params instanceof BaseEntity)
+            if (Validator.isNotNull(params) && params instanceof BaseEntity)
             {
                 BaseEntity baseEntity = (BaseEntity) params;
                 baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");

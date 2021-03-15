@@ -1,5 +1,11 @@
 package com.ruoyi.framework.web.exception;
 
+import cn.hutool.core.lang.Validator;
+import cn.hutool.http.HttpStatus;
+import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.exception.BaseException;
+import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.DemoModeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -10,12 +16,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import com.ruoyi.common.constant.HttpStatus;
-import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.exception.BaseException;
-import com.ruoyi.common.exception.CustomException;
-import com.ruoyi.common.exception.DemoModeException;
-import com.ruoyi.common.utils.StringUtils;
 
 import javax.validation.ConstraintViolationException;
 
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler
     @ExceptionHandler(CustomException.class)
     public AjaxResult businessException(CustomException e)
     {
-        if (StringUtils.isNull(e.getCode()))
+        if (Validator.isNull(e.getCode()))
         {
             return AjaxResult.error(e.getMessage());
         }
@@ -55,14 +55,14 @@ public class GlobalExceptionHandler
     public AjaxResult handlerNoFoundException(Exception e)
     {
         log.error(e.getMessage(), e);
-        return AjaxResult.error(HttpStatus.NOT_FOUND, "路径不存在，请检查路径是否正确");
+        return AjaxResult.error(HttpStatus.HTTP_NOT_FOUND, "路径不存在，请检查路径是否正确");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public AjaxResult handleAuthorizationException(AccessDeniedException e)
     {
         log.error(e.getMessage());
-        return AjaxResult.error(HttpStatus.FORBIDDEN, "没有权限，请联系管理员授权");
+        return AjaxResult.error(HttpStatus.HTTP_FORBIDDEN, "没有权限，请联系管理员授权");
     }
 
     @ExceptionHandler(AccountExpiredException.class)

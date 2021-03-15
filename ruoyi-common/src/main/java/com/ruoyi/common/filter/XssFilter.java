@@ -1,19 +1,15 @@
 package com.ruoyi.common.filter;
 
+import cn.hutool.core.util.StrUtil;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import com.ruoyi.common.utils.StringUtils;
 
 /**
  * 防止XSS攻击的过滤器
@@ -37,7 +33,7 @@ public class XssFilter implements Filter
     {
         String tempExcludes = filterConfig.getInitParameter("excludes");
         String tempEnabled = filterConfig.getInitParameter("enabled");
-        if (StringUtils.isNotEmpty(tempExcludes))
+        if (StrUtil.isNotEmpty(tempExcludes))
         {
             String[] url = tempExcludes.split(",");
             for (int i = 0; url != null && i < url.length; i++)
@@ -45,7 +41,7 @@ public class XssFilter implements Filter
                 excludes.add(url[i]);
             }
         }
-        if (StringUtils.isNotEmpty(tempEnabled))
+        if (StrUtil.isNotEmpty(tempEnabled))
         {
             enabled = Boolean.valueOf(tempEnabled);
         }

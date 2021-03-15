@@ -1,21 +1,23 @@
 package com.ruoyi.system.service.impl;
 
-import java.util.Collection;
-import java.util.List;
-import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.enums.DataSourceType;
 import com.ruoyi.common.exception.CustomException;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.mapper.SysConfigMapper;
 import com.ruoyi.system.service.ISysConfigService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 参数配置 服务层实现
@@ -69,19 +71,19 @@ public class SysConfigServiceImpl implements ISysConfigService
     public String selectConfigByKey(String configKey)
     {
         String configValue = Convert.toStr(redisCache.getCacheObject(getCacheKey(configKey)));
-        if (StringUtils.isNotEmpty(configValue))
+        if (Validator.isNotEmpty(configValue))
         {
             return configValue;
         }
         SysConfig config = new SysConfig();
         config.setConfigKey(configKey);
         SysConfig retConfig = configMapper.selectConfig(config);
-        if (StringUtils.isNotNull(retConfig))
+        if (Validator.isNotNull(retConfig))
         {
             redisCache.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
             return retConfig.getConfigValue();
         }
-        return StringUtils.EMPTY;
+        return StrUtil.EMPTY;
     }
 
     /**
@@ -142,7 +144,7 @@ public class SysConfigServiceImpl implements ISysConfigService
         for (Long configId : configIds)
         {
             SysConfig config = selectConfigById(configId);
-            if (StringUtils.equals(UserConstants.YES, config.getConfigType()))
+            if (StrUtil.equals(UserConstants.YES, config.getConfigType()))
             {
                 throw new CustomException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
             }
@@ -175,9 +177,9 @@ public class SysConfigServiceImpl implements ISysConfigService
     @Override
     public String checkConfigKeyUnique(SysConfig config)
     {
-        Long configId = StringUtils.isNull(config.getConfigId()) ? -1L : config.getConfigId();
+        Long configId = Validator.isNull(config.getConfigId()) ? -1L : config.getConfigId();
         SysConfig info = configMapper.checkConfigKeyUnique(config.getConfigKey());
-        if (StringUtils.isNotNull(info) && info.getConfigId().longValue() != configId.longValue())
+        if (Validator.isNotNull(info) && info.getConfigId().longValue() != configId.longValue())
         {
             return UserConstants.NOT_UNIQUE;
         }

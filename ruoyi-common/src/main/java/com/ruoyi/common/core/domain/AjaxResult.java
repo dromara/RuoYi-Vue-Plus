@@ -1,8 +1,9 @@
 package com.ruoyi.common.core.domain;
 
+import cn.hutool.core.lang.Validator;
+import cn.hutool.http.HttpStatus;
+
 import java.util.HashMap;
-import com.ruoyi.common.constant.HttpStatus;
-import com.ruoyi.common.utils.StringUtils;
 
 /**
  * 操作消息提醒
@@ -52,7 +53,7 @@ public class AjaxResult extends HashMap<String, Object>
     {
         super.put(CODE_TAG, code);
         super.put(MSG_TAG, msg);
-        if (StringUtils.isNotNull(data))
+        if (Validator.isNotNull(data))
         {
             super.put(DATA_TAG, data);
         }
@@ -98,7 +99,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult success(String msg, Object data)
     {
-        return new AjaxResult(HttpStatus.SUCCESS, msg, data);
+        return new AjaxResult(HttpStatus.HTTP_OK, msg, data);
     }
 
     /**
@@ -131,7 +132,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult error(String msg, Object data)
     {
-        return new AjaxResult(HttpStatus.ERROR, msg, data);
+        return new AjaxResult(HttpStatus.HTTP_INTERNAL_ERROR, msg, data);
     }
 
     /**

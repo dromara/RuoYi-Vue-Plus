@@ -1,12 +1,12 @@
 package com.ruoyi.common.utils.ip;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.http.HttpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 获取地址类
@@ -36,7 +36,7 @@ public class AddressUtils
             try
             {
                 String rspStr = HttpUtils.sendGet(IP_URL, "ip=" + ip + "&json=true", Constants.GBK);
-                if (StringUtils.isEmpty(rspStr))
+                if (StrUtil.isEmpty(rspStr))
                 {
                     log.error("获取地理位置异常 {}", ip);
                     return UNKNOWN;

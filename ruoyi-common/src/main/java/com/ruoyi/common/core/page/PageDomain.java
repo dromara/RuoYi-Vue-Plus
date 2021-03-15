@@ -1,6 +1,6 @@
 package com.ruoyi.common.core.page;
 
-import com.ruoyi.common.utils.StringUtils;
+import cn.hutool.core.util.StrUtil;
 
 /**
  * 分页数据
@@ -23,11 +23,11 @@ public class PageDomain
 
     public String getOrderBy()
     {
-        if (StringUtils.isEmpty(orderByColumn))
+        if (StrUtil.isEmpty(orderByColumn))
         {
             return "";
         }
-        return StringUtils.toUnderScoreCase(orderByColumn) + " " + isAsc;
+        return StrUtil.toUnderlineCase(orderByColumn) + " " + isAsc;
     }
 
     public Integer getPageNum()

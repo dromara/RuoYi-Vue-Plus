@@ -1,20 +1,22 @@
 package com.ruoyi.quartz.util;
 
-import java.util.Date;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.constant.ScheduleConstants;
+import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.quartz.domain.SysJob;
+import com.ruoyi.quartz.domain.SysJobLog;
+import com.ruoyi.quartz.service.ISysJobLogService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.constant.ScheduleConstants;
-import com.ruoyi.common.utils.ExceptionUtil;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.bean.BeanUtils;
-import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.quartz.domain.SysJob;
-import com.ruoyi.quartz.domain.SysJobLog;
-import com.ruoyi.quartz.service.ISysJobLogService;
+
+import java.util.Date;
 
 /**
  * 抽象quartz调用
@@ -34,11 +36,11 @@ public abstract class AbstractQuartzJob implements Job
     public void execute(JobExecutionContext context) throws JobExecutionException
     {
         SysJob sysJob = new SysJob();
-        BeanUtils.copyBeanProp(sysJob, context.getMergedJobDataMap().get(ScheduleConstants.TASK_PROPERTIES));
+        BeanUtil.copyProperties(sysJob, context.getMergedJobDataMap().get(ScheduleConstants.TASK_PROPERTIES));
         try
         {
             before(context, sysJob);
-            if (sysJob != null)
+            if (Validator.isNotNull(sysJob))
             {
                 doExecute(context, sysJob);
             }
@@ -84,7 +86,7 @@ public abstract class AbstractQuartzJob implements Job
         if (e != null)
         {
             sysJobLog.setStatus(Constants.FAIL);
-            String errorMsg = StringUtils.substring(ExceptionUtil.getExceptionMessage(e), 0, 2000);
+            String errorMsg = StrUtil.sub(ExceptionUtil.stacktraceToString(e), 0, 2000);
             sysJobLog.setExceptionInfo(errorMsg);
         }
         else
