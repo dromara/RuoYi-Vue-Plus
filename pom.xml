@@ -19,7 +19,6 @@
         <java.version>1.8</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <druid.version>1.2.4</druid.version>
-        <bitwalker.version>1.21</bitwalker.version>
         <swagger.version>2.9.2</swagger.version>
         <pagehelper.boot.version>1.3.0</pagehelper.boot.version>
         <fastjson.version>1.2.75</fastjson.version>
@@ -55,13 +54,6 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
-            </dependency>
-	        
-            <!-- 解析客户端操作系统、浏览器等 -->
-            <dependency>
-                <groupId>eu.bitwalker</groupId>
-                <artifactId>UserAgentUtils</artifactId>
-                <version>${bitwalker.version}</version>
             </dependency>
 			
             <!-- pagehelper 分页插件 -->
