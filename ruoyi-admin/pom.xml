@@ -43,10 +43,9 @@
             <version>1.5.21</version>
         </dependency>
 
-        <!-- swagger2-UI-->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>swagger-bootstrap-ui</artifactId>
         </dependency>
 
          <!-- Mysql驱动包 -->
