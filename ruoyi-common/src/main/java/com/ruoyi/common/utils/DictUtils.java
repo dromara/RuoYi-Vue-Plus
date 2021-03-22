@@ -1,14 +1,15 @@
 package com.ruoyi.common.utils;
 
-import java.util.Collection;
-import java.util.List;
-
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.spring.SpringUtils;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 字典工具类
@@ -87,7 +88,7 @@ public class DictUtils
         StringBuilder propertyString = new StringBuilder();
         List<SysDictData> datas = getDictCache(dictType);
 
-        if (StrUtil.containsAny(separator, dictValue) && Validator.isNotEmpty(datas))
+        if (StrUtil.containsAny(separator, dictValue) && CollUtil.isNotEmpty(datas))
         {
             for (SysDictData dict : datas)
             {
@@ -127,7 +128,7 @@ public class DictUtils
         StringBuilder propertyString = new StringBuilder();
         List<SysDictData> datas = getDictCache(dictType);
 
-        if (StrUtil.containsAny(separator, dictLabel) && Validator.isNotEmpty(datas))
+        if (StrUtil.containsAny(separator, dictLabel) && CollUtil.isNotEmpty(datas))
         {
             for (SysDictData dict : datas)
             {
