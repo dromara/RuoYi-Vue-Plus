@@ -185,7 +185,7 @@ public class GenUtils
             String[] searchList = StrUtil.split(tablePrefix, ",");
             tableName = replaceFirst(tableName, searchList);
         }
-        return StrUtil.toCamelCase(tableName);
+        return StrUtil.upperFirst(StrUtil.toCamelCase(tableName));
     }
 
     /**
