@@ -1,7 +1,13 @@
 package ${packageName}.service;
 
 import ${packageName}.domain.${ClassName};
+import ${packageName}.vo.${ClassName}Vo;
+import ${packageName}.bo.${ClassName}QueryBo;
+import ${packageName}.bo.${ClassName}AddBo;
+import ${packageName}.bo.${ClassName}EditBo;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -11,9 +17,36 @@ import java.util.List;
  * @date ${datetime}
  */
 public interface I${ClassName}Service extends IService<${ClassName}> {
+	/**
+	 * 查询单个
+	 * @return
+	 */
+	${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField});
 
-    /**
-     * 查询列表
-     */
-    List<${ClassName}> queryList(${ClassName} ${className});
+	/**
+	 * 查询列表
+	 */
+	List<${ClassName}Vo> queryList(${ClassName}QueryBo bo);
+
+	/**
+	 * 根据新增业务对象插入${functionName}
+	 * @param bo ${functionName}新增业务对象
+	 * @return
+	 */
+	Boolean insertByAddBo(${ClassName}AddBo bo);
+
+	/**
+	 * 根据编辑业务对象修改${functionName}
+	 * @param bo ${functionName}编辑业务对象
+	 * @return
+	 */
+	Boolean updateByEditBo(${ClassName}EditBo bo);
+
+	/**
+	 * 校验并删除数据
+	 * @param ids 主键集合
+	 * @param isValid 是否校验,true-删除前校验,false-不校验
+	 * @return
+	 */
+	Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
 }

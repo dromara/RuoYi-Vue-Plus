@@ -65,9 +65,9 @@ public class BaseController
      * 响应请求分页数据
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected TableDataInfo getDataTable(List<?> list)
+    protected <T> TableDataInfo<T> getDataTable(List<T> list)
     {
-        TableDataInfo rspData = new TableDataInfo();
+        TableDataInfo<T> rspData = new TableDataInfo();
         rspData.setCode(HttpStatus.HTTP_OK);
         rspData.setMsg("查询成功");
         rspData.setRows(list);
@@ -81,7 +81,7 @@ public class BaseController
      * @param rows 影响行数
      * @return 操作结果
      */
-    protected AjaxResult toAjax(int rows)
+    protected AjaxResult<Void> toAjax(int rows)
     {
         return rows > 0 ? AjaxResult.success() : AjaxResult.error();
     }
@@ -92,7 +92,7 @@ public class BaseController
      * @param result 结果
      * @return 操作结果
      */
-    protected AjaxResult toAjax(boolean result)
+    protected AjaxResult<Void> toAjax(boolean result)
     {
         return result ? success() : error();
     }
@@ -100,7 +100,7 @@ public class BaseController
     /**
      * 返回成功
      */
-    public AjaxResult success()
+    public AjaxResult<Void> success()
     {
         return AjaxResult.success();
     }
@@ -108,7 +108,7 @@ public class BaseController
     /**
      * 返回失败消息
      */
-    public AjaxResult error()
+    public AjaxResult<Void> error()
     {
         return AjaxResult.error();
     }
@@ -116,7 +116,7 @@ public class BaseController
     /**
      * 返回成功消息
      */
-    public AjaxResult success(String message)
+    public AjaxResult<Void> success(String message)
     {
         return AjaxResult.success(message);
     }
@@ -124,7 +124,7 @@ public class BaseController
     /**
      * 返回失败消息
      */
-    public AjaxResult error(String message)
+    public AjaxResult<Void> error(String message)
     {
         return AjaxResult.error(message);
     }

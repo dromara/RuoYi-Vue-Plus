@@ -1,16 +1,23 @@
 package ${packageName}.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.lang3.StringUtils;
-import ${packageName}.mapper.${ClassName}Mapper;
+import ${packageName}.bo.${ClassName}AddBo;
+import ${packageName}.bo.${ClassName}QueryBo;
+import ${packageName}.bo.${ClassName}EditBo;
 import ${packageName}.domain.${ClassName};
+import ${packageName}.mapper.${ClassName}Mapper;
+import ${packageName}.vo.${ClassName}Vo;
 import ${packageName}.service.I${ClassName}Service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * ${functionName}Service业务层处理
@@ -22,93 +29,80 @@ import java.util.Map;
 public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${ClassName}> implements I${ClassName}Service {
 
     @Override
-    public List<${ClassName}> queryList(${ClassName} ${className}) {
+    public ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField}){
+        ${ClassName} db = this.baseMapper.selectById(${pkColumn.javaField});
+		return entity2Vo(Collections.singletonList(db)).get(0);
+    }
+
+    @Override
+    public List<${ClassName}Vo> queryList(${ClassName}QueryBo bo) {
         LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery();
 #foreach($column in $columns)
+#if($column.query)
 #set($queryType=$column.queryType)
 #set($javaField=$column.javaField)
 #set($javaType=$column.javaType)
 #set($columnName=$column.columnName)
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-#if($column.query)
-#if($column.queryType == "EQ")
+#set($mpMethod=$column.queryType.toLowerCase())
+#if($queryType != 'BETWEEN')
 #if($javaType == 'String')
-        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-            lqw.eq(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
+#set($condition='StringUtils.isNotBlank(bo.get'+$AttrName+'())')
 #else
-        if (${className}.get$AttrName() != null){
-            lqw.eq(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
+#set($condition='bo.get'+$AttrName+'() != null')
 #end
-#elseif($queryType == "NE")
-#if($javaType == 'String')
-        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-            lqw.ne(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
+        lqw.$mpMethod($condition, ${ClassName}::get$AttrName, bo.get$AttrName());
 #else
-        if (${className}.get$AttrName() != null){
-            lqw.ne(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
-#end
-#elseif($queryType == "GT")
-#if($javaType == 'String')
-        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-            lqw.gt(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
-#else
-        if (${className}.get$AttrName() != null){
-            lqw.gt(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
-#end
-#elseif($queryType == "GTE")
-#if($javaType == 'String')
-        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-            lqw.ge(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
-#else
-        if (${className}.get$AttrName() != null){
-            lqw.ge(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
-#end
-#elseif($queryType == "LT")
-#if($javaType == 'String')
-        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-            lqw.lt(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
-#else
-        if (${className}.get$AttrName() != null){
-            lqw.lt(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
-#end
-#elseif($queryType == "LTE")
-#if($javaType == 'String')
-        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-            lqw.le(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
-#else
-        if (${className}.get$AttrName() != null){
-            lqw.le(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
-#end
-#elseif($queryType == "LIKE")
-#if($javaType == 'String')
-        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-            lqw.like(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
-#else
-        if (${className}.get$AttrName() != null){
-            lqw.like(${ClassName}::get$AttrName ,${className}.get$AttrName());
-        }
-#end
-#elseif($queryType == "BETWEEN")
         Map<String, Object> params = ${className}.getParams();
         if (params.get("begin$AttrName") != null && params.get("end$AttrName") != null) {
-            lqw.between(${ClassName}::get$AttrName ,params.get("begin$AttrName"),params.get("end$AttrName"));
+            lqw.between(${ClassName}::get$AttrName ,params.get("begin$AttrName"), params.get("end$AttrName"));
         }
 #end
 #end
 #end
-        return this.list(lqw);
+        return entity2Vo(this.list(lqw));
+    }
+
+    /**
+    * 实体类转化成视图对象
+    *
+    * @param collection 实体类集合
+    * @return
+    */
+    private List<${ClassName}Vo> entity2Vo(Collection<${ClassName}> collection) {
+        return collection.stream()
+                .map(any -> BeanUtil.toBean(any, ${ClassName}Vo.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Boolean insertByAddBo(${ClassName}AddBo bo) {
+        ${ClassName} add = BeanUtil.toBean(bo, ${ClassName}.class);
+        validEntityBeforeSave(add);
+        return this.save(add);
+    }
+
+    @Override
+    public Boolean updateByEditBo(${ClassName}EditBo bo) {
+        ${ClassName} update = BeanUtil.toBean(bo, ${ClassName}.class);
+        validEntityBeforeSave(update);
+        return this.updateById(update);
+    }
+
+    /**
+     * 保存前的数据校验
+     *
+     * @param entity 实体类数据
+     */
+    private void validEntityBeforeSave(${ClassName} entity){
+        //TODO 做一些数据校验,如唯一约束
+    }
+
+    @Override
+    public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
+        if(isValid){
+            //TODO 做一些业务上的校验,判断是否需要校验
+        }
+        return this.removeByIds(ids);
     }
 }

@@ -129,6 +129,10 @@ public class VelocityUtils
     {
         List<String> templates = new ArrayList<String>();
         templates.add("vm/java/domain.java.vm");
+        templates.add("vm/java/vo.java.vm");
+        templates.add("vm/java/queryBo.java.vm");
+        templates.add("vm/java/addBo.java.vm");
+        templates.add("vm/java/editBo.java.vm");
         templates.add("vm/java/mapper.java.vm");
         templates.add("vm/java/service.java.vm");
         templates.add("vm/java/serviceImpl.java.vm");
@@ -175,6 +179,22 @@ public class VelocityUtils
         if (template.contains("domain.java.vm"))
         {
             fileName = StrUtil.format("{}/domain/{}.java", javaPath, className);
+        }
+        if (template.contains("vo.java.vm"))
+        {
+            fileName = StrUtil.format("{}/vo/{}Vo.java", javaPath, className);
+        }
+        if (template.contains("queryBo.java.vm"))
+        {
+            fileName = StrUtil.format("{}/bo/{}QueryBo.java", javaPath, className);
+        }
+        if (template.contains("addBo.java.vm"))
+        {
+            fileName = StrUtil.format("{}/bo/{}AddBo.java", javaPath, className);
+        }
+        if (template.contains("editBo.java.vm"))
+        {
+            fileName = StrUtil.format("{}/bo/{}EditBo.java", javaPath, className);
         }
         if (template.contains("sub-domain.java.vm") && StrUtil.equals(GenConstants.TPL_SUB, genTable.getTplCategory()))
         {

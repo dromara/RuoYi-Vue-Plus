@@ -8,7 +8,7 @@ import java.util.List;
  * 
  * @author ruoyi
  */
-public class TableDataInfo implements Serializable
+public class TableDataInfo<T> implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -16,7 +16,7 @@ public class TableDataInfo implements Serializable
     private long total;
 
     /** 列表数据 */
-    private List<?> rows;
+    private List<T> rows;
 
     /** 消息状态码 */
     private int code;
@@ -37,7 +37,7 @@ public class TableDataInfo implements Serializable
      * @param list 列表数据
      * @param total 总记录数
      */
-    public TableDataInfo(List<?> list, int total)
+    public TableDataInfo(List<T> list, int total)
     {
         this.rows = list;
         this.total = total;
@@ -53,12 +53,12 @@ public class TableDataInfo implements Serializable
         this.total = total;
     }
 
-    public List<?> getRows()
+    public List<T> getRows()
     {
         return rows;
     }
 
-    public void setRows(List<?> rows)
+    public void setRows(List<T> rows)
     {
         this.rows = rows;
     }

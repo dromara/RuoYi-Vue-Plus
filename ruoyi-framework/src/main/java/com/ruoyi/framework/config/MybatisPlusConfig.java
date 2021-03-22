@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerIntercep
 import com.baomidou.mybatisplus.extension.plugins.inner.IllegalSQLInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.ruoyi.framework.mybatisplus.CreateAndUpdateMetaObjectHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -83,10 +84,10 @@ public class MybatisPlusConfig {
 	 * 元对象字段填充控制器
 	 * https://baomidou.com/guide/auto-fill-metainfo.html
 	 */
-//	@Bean
-//	public MetaObjectHandler metaObjectHandler() {
-//		return new MyMetaObjectHandler();
-//	}
+	@Bean
+	public MetaObjectHandler metaObjectHandler() {
+		return new CreateAndUpdateMetaObjectHandler();
+	}
 
 	/**
 	 * sql注入器配置

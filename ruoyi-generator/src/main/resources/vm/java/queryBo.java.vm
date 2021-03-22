@@ -1,0 +1,42 @@
+package ${packageName}.bo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+#foreach ($import in $importList)
+import ${import};
+#end
+
+/**
+ * ${functionName}分页查询对象 ${tableName}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Data
+@ApiModel("${functionName}分页查询对象")
+public class ${ClassName}QueryBo {
+	private static final long serialVersionUID = 1L;
+	/** 分页大小 */
+	@ApiModelProperty("分页大小")
+	private Integer pageSize;
+	/** 当前页数 */
+	@ApiModelProperty("当前页数")
+	private Integer pageNum;
+	/** 排序列 */
+	@ApiModelProperty("排序列")
+	private String orderByColumn;
+	/** 排序的方向desc或者asc */
+	@ApiModelProperty(value = "排序的方向", example = "asc,desc")
+	private String isAsc;
+
+
+#foreach ($column in $columns)
+#if(!$table.isSuperColumn($column.javaField) && $column.query)
+	/** $column.columnComment */
+	@ApiModelProperty("$column.columnComment")
+	private $column.javaType $column.javaField;
+#end
+#end
+}

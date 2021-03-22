@@ -1,14 +1,9 @@
 package ${packageName}.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import com.ruoyi.common.annotation.Excel;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
@@ -32,30 +27,19 @@ private static final long serialVersionUID=1L;
 #foreach ($column in $columns)
 
     /** $column.columnComment */
-#if($column.list)
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
-#else
-#set($comment=$column.columnComment)
+#if($column.javaField=="createBy"||$column.javaField=="createTime")
+    @TableField(fill = FieldFill.INSERT)
 #end
-#if($parentheseIndex != -1)
-    @Excel(name = "${comment}" , readConverterExp = "$column.readConverterExp()")
-#elseif($column.javaType == 'Date')
-    @Excel(name = "${comment}" , width = 30, dateFormat = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-#else
-    @Excel(name = "${comment}")
+#if($column.javaField=="updateBy"||$column.javaField=="updateTime")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
 #end
+#if($column.javaField=='delFlag')
+    @TableLogic
 #end
 #if($column.isPk==1)
     @TableId(value = "$column.columnName")
-    private $column.javaType $column.javaField;
-#else
-    private $column.javaType $column.javaField;
 #end
+    private $column.javaType $column.javaField;
 #end
 
-    @TableField(exist = false)
-    private Map<String, Object> params = new HashMap<>();
 }

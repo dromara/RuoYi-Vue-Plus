@@ -1,0 +1,36 @@
+package ${packageName}.bo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+
+#foreach ($import in $importList)
+import ${import};
+#end
+
+/**
+ * ${functionName}添加对象 ${tableName}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Data
+@ApiModel("${functionName}添加对象")
+public class ${ClassName}AddBo {
+    private static final long serialVersionUID = 1L;
+
+#foreach ($column in $columns)
+#if($column.isInsert && $column.isPk!=1)
+    /** $column.columnComment */
+    @ApiModelProperty("$column.columnComment")
+    private $column.javaType $column.javaField;
+#end
+#end
+#if($table.sub)
+
+    /** $table.subTable.functionName信息 */
+    @ApiModelProperty("$table.subTable.functionName")
+    private List<${subClassName}> ${subclassName}List;
+#end
+}

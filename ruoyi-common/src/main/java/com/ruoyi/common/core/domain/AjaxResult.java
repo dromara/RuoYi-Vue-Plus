@@ -2,6 +2,7 @@ package com.ruoyi.common.core.domain;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.http.HttpStatus;
+import lombok.Data;
 
 import java.util.HashMap;
 
@@ -10,7 +11,7 @@ import java.util.HashMap;
  * 
  * @author ruoyi
  */
-public class AjaxResult extends HashMap<String, Object>
+public class AjaxResult<T> extends HashMap<String, Object>
 {
     private static final long serialVersionUID = 1L;
 
@@ -22,6 +23,17 @@ public class AjaxResult extends HashMap<String, Object>
 
     /** 数据对象 */
     public static final String DATA_TAG = "data";
+
+    public Integer getCode(){
+        return (Integer) super.get(CODE_TAG);
+    }
+
+    public String getMsg(){
+        return (String) super.get(MSG_TAG);
+    }
+    public T getData(){
+        return (T) super.get(DATA_TAG);
+    }
 
     /**
      * 初始化一个新创建的 AjaxResult 对象，使其表示一个空消息。
@@ -49,7 +61,7 @@ public class AjaxResult extends HashMap<String, Object>
      * @param msg 返回内容
      * @param data 数据对象
      */
-    public AjaxResult(int code, String msg, Object data)
+    public AjaxResult(int code, String msg, T data)
     {
         super.put(CODE_TAG, code);
         super.put(MSG_TAG, msg);
@@ -64,7 +76,7 @@ public class AjaxResult extends HashMap<String, Object>
      * 
      * @return 成功消息
      */
-    public static AjaxResult success()
+    public static AjaxResult<Void> success()
     {
         return AjaxResult.success("操作成功");
     }
@@ -74,7 +86,7 @@ public class AjaxResult extends HashMap<String, Object>
      * 
      * @return 成功消息
      */
-    public static AjaxResult success(Object data)
+    public static <T> AjaxResult<T> success(T data)
     {
         return AjaxResult.success("操作成功", data);
     }
@@ -85,7 +97,7 @@ public class AjaxResult extends HashMap<String, Object>
      * @param msg 返回内容
      * @return 成功消息
      */
-    public static AjaxResult success(String msg)
+    public static AjaxResult<Void> success(String msg)
     {
         return AjaxResult.success(msg, null);
     }
@@ -97,7 +109,7 @@ public class AjaxResult extends HashMap<String, Object>
      * @param data 数据对象
      * @return 成功消息
      */
-    public static AjaxResult success(String msg, Object data)
+    public static <T> AjaxResult<T> success(String msg, T data)
     {
         return new AjaxResult(HttpStatus.HTTP_OK, msg, data);
     }
@@ -107,7 +119,7 @@ public class AjaxResult extends HashMap<String, Object>
      * 
      * @return
      */
-    public static AjaxResult error()
+    public static AjaxResult<Void> error()
     {
         return AjaxResult.error("操作失败");
     }
@@ -118,7 +130,7 @@ public class AjaxResult extends HashMap<String, Object>
      * @param msg 返回内容
      * @return 警告消息
      */
-    public static AjaxResult error(String msg)
+    public static AjaxResult<Void> error(String msg)
     {
         return AjaxResult.error(msg, null);
     }
@@ -130,7 +142,7 @@ public class AjaxResult extends HashMap<String, Object>
      * @param data 数据对象
      * @return 警告消息
      */
-    public static AjaxResult error(String msg, Object data)
+    public static <T> AjaxResult<T> error(String msg, T data)
     {
         return new AjaxResult(HttpStatus.HTTP_INTERNAL_ERROR, msg, data);
     }
@@ -142,7 +154,7 @@ public class AjaxResult extends HashMap<String, Object>
      * @param msg 返回内容
      * @return 警告消息
      */
-    public static AjaxResult error(int code, String msg)
+    public static AjaxResult<Void> error(int code, String msg)
     {
         return new AjaxResult(code, msg, null);
     }
