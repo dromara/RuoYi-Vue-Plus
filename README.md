@@ -23,6 +23,7 @@
 * Bean简化 使用 Lombok 简化 get set toString 等等
 * 容器改动 Tomcat 改为 并发性能更好的 undertow
 * 代码生成模板 改为适配 Mybatis-Plus 的代码
+* 代码生成模板 拆分出Vo,QueryBo,AddBo,EditBo等领域对象
 * 项目修改为 maven多环境配置
 * swagger 修改为 knife4j
 * 集成 Hutool 5.X 并重写RuoYi部分功能
