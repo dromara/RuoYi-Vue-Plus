@@ -3,6 +3,9 @@ package ${packageName}.bo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
 
 #foreach ($import in $importList)
 import ${import};
@@ -17,7 +20,7 @@ import ${import};
 @Data
 @ApiModel("${functionName}分页查询对象")
 public class ${ClassName}QueryBo {
-	private static final long serialVersionUID = 1L;
+
 	/** 分页大小 */
 	@ApiModelProperty("分页大小")
 	private Integer pageSize;
@@ -39,4 +42,7 @@ public class ${ClassName}QueryBo {
 	private $column.javaType $column.javaField;
 #end
 #end
+
+	@TableField(exist = false)
+	private Map<String, Object> params = new HashMap<>();
 }

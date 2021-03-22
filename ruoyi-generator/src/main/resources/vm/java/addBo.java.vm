@@ -3,6 +3,7 @@ package ${packageName}.bo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import java.util.Date;
 
 
 #foreach ($import in $importList)
@@ -18,7 +19,6 @@ import ${import};
 @Data
 @ApiModel("${functionName}添加对象")
 public class ${ClassName}AddBo {
-    private static final long serialVersionUID = 1L;
 
 #foreach ($column in $columns)
 #if($column.isInsert && $column.isPk!=1)

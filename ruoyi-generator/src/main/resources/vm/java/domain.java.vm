@@ -6,9 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
-import java.util.HashMap;
 import java.math.BigDecimal;
+import com.ruoyi.common.annotation.Excel;
 
 /**
  * ${functionName}对象 ${tableName}
