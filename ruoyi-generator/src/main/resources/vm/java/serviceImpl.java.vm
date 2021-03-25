@@ -70,9 +70,17 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     * @return
     */
     private List<${ClassName}Vo> entity2Vo(Collection<${ClassName}> collection) {
-        return collection.stream()
+        List<${ClassName}Vo> voList = collection.stream()
                 .map(any -> BeanUtil.toBean(any, ${ClassName}Vo.class))
                 .collect(Collectors.toList());
+        if (collection instanceof Page) {
+            Page<${ClassName}> page = (Page<${ClassName}>)collection;
+            Page<${ClassName}Vo> pageVo = new Page<>();
+            BeanUtil.copyProperties(page,pageVo);
+            pageVo.addAll(voList);
+            voList = pageVo;
+        }
+        return voList;
     }
 
     @Override
