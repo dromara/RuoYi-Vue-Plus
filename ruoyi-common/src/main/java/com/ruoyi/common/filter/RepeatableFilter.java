@@ -26,8 +26,7 @@ public class RepeatableFilter implements Filter
     {
         ServletRequest requestWrapper = null;
         if (request instanceof HttpServletRequest
-                && StrUtil.equalsAnyIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE))
-                && StringUtils.startsWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE))
+                && StrUtil.startWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE))
         {
             requestWrapper = new RepeatedlyRequestWrapper((HttpServletRequest) request, response);
         }
