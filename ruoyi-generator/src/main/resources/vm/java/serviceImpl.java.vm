@@ -31,7 +31,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     @Override
     public ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField}){
         ${ClassName} db = this.baseMapper.selectById(${pkColumn.javaField});
-		return entity2Vo(Collections.singletonList(db)).get(0);
+        return BeanUtil.toBean(db, ${ClassName}Vo.class)
     }
 
     @Override
