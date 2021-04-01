@@ -3,10 +3,10 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="${packageName}.mapper.${ClassName}Mapper">
-    
-    <resultMap type="${ClassName}" id="${ClassName}Result">
+
+    <resultMap type="${packageName}.domain.${ClassName}" id="${ClassName}Result">
 #foreach ($column in $columns)
-        <result property="${column.javaField}"    column="${column.columnName}"    />
+        <result property="${column.javaField}" column="${column.columnName}"/>
 #end
     </resultMap>
 
