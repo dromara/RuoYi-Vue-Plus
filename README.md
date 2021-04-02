@@ -17,6 +17,10 @@
 * 直接在mysql表中 添加 parentId orderNum 等字段(根据需要参考 TreeEntity类)
 * 代码生成选择树表生成即可
 
+关于数据权限
+* @DataScope 注解代码生成仅支持在 Controller list 方法使用
+* 其余方法如要使用 需参考 list 方法实现在 LambdaQueryWrapper 注入数据权限生成的 SQL 语句
+
 ## 修改RuoYi功能
 
 * ORM框架 使用 Mybatis-Plus 简化CRUD (目前支持单表生成与树表 不支持主子表)
