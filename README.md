@@ -35,7 +35,7 @@
 * 升级MybatisPlus 3.4.2
 * 增加demo模块示例(给不会增加模块的小伙伴做参考)
 * 同步升级 3.4.0
-* 多模块 master 分支 https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/master/
+* 单模块 fast 分支 https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/master/
 
 ## 平台简介
 
