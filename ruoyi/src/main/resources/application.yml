@@ -1,0 +1,210 @@
+# 项目相关配置
+ruoyi:
+  # 名称
+  name: RuoYi
+  # 版本
+  version: 3.4.0
+  # 版权年份
+  copyrightYear: 2021
+  # 实例演示开关
+  demoEnabled: true
+  # 文件路径,使用jvm系统变量,兼容windows和linux;
+  profile: ${user.dir}/ruoyi/uploadPath
+  # 获取ip地址开关
+  addressEnabled: false
+
+captcha:
+  # 验证码类型 math 数组计算 char 字符验证
+  captchaType: math
+  # line 线段干扰 circle 圆圈干扰 shear 扭曲干扰
+  captchaCategory: circle
+  # 数字验证码位数
+  captchaNumberLength: 1
+  # 字符验证码长度
+  captchaCharLength: 4
+
+# 开发环境配置
+server:
+  # 服务器的HTTP端口，默认为8080
+  port: 8081
+  servlet:
+    # 应用的访问路径
+    context-path: /
+  # undertow 配置
+  undertow:
+    # HTTP post内容的最大大小。当值为-1时，默认值为大小是无限的
+    max-http-post-size: -1
+    # 以下的配置会影响buffer,这些buffer会用于服务器连接的IO操作,有点类似netty的池化内存管理
+    # 每块buffer的空间大小,越小的空间被利用越充分
+    buffer-size: 512
+    # 设置IO线程数, 它主要执行非阻塞的任务,它们会负责多个连接, 默认设置每个CPU核心一个线程
+    io-threads: 8
+    # 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载
+    worker-threads: 256
+    # 是否分配的直接内存
+    direct-buffers: true
+#  # tomcat 配置
+#  tomcat:
+#    # tomcat的URI编码
+#    uri-encoding: UTF-8
+#    # tomcat最大线程数，默认为200
+#    max-threads: 500
+#    # Tomcat启动初始化的线程数，默认值25
+#    min-spare-threads: 30
+
+# 日志配置
+logging:
+  level:
+    com.ruoyi: @logging.level@
+    org.springframework: warn
+
+# Spring配置
+spring:
+  # 资源信息
+  messages:
+    # 国际化资源文件路径
+    basename: i18n/messages
+  profiles: 
+    active: @profiles.active@
+  # 文件上传
+  servlet:
+     multipart:
+       # 单个文件大小
+       max-file-size:  10MB
+       # 设置总上传的文件大小
+       max-request-size:  20MB
+  # 服务模块
+  devtools:
+    restart:
+      # 热部署开关
+      enabled: true
+
+# token配置
+token:
+    # 令牌自定义标识
+    header: Authorization
+    # 令牌密钥
+    secret: abcdefghijklmnopqrstuvwxyz
+    # 令牌有效期（默认30分钟）
+    expireTime: 30
+  
+# MyBatis配置
+# https://baomidou.com/config/
+mybatis-plus:
+  # 对应的 XML 文件位置
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  # 实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.ruoyi.**.domain
+  # 针对 typeAliasesPackage，如果配置了该属性，则仅仅会扫描路径下以该类作为父类的域对象
+  #typeAliasesSuperType: Class<?>
+  # 如果配置了该属性，SqlSessionFactoryBean 会把该包下面的类注册为对应的 TypeHandler
+  #typeHandlersPackage: null
+  # 如果配置了该属性，会将路径下的枚举类进行注入，让实体类字段能够简单快捷的使用枚举属性
+  #typeEnumsPackage: null
+  # 启动时是否检查 MyBatis XML 文件的存在，默认不检查
+  checkConfigLocation: false
+  # 通过该属性可指定 MyBatis 的执行器，MyBatis 的执行器总共有三种：
+  # SIMPLE：该执行器类型不做特殊的事情，为每个语句的执行创建一个新的预处理语句（PreparedStatement）
+  # REUSE：该执行器类型会复用预处理语句（PreparedStatement）
+  # BATCH：该执行器类型会批量执行所有的更新语句
+  executorType: SIMPLE
+  # 指定外部化 MyBatis Properties 配置，通过该配置可以抽离配置，实现不同环境的配置部署
+  configurationProperties: null
+  configuration:
+    # 自动驼峰命名规则（camel case）映射
+    # 如果您的数据库命名符合规则无需使用 @TableField 注解指定数据库字段名
+    mapUnderscoreToCamelCase: true
+    # 默认枚举处理类,如果配置了该属性,枚举将统一使用指定处理器进行处理
+    # org.apache.ibatis.type.EnumTypeHandler : 存储枚举的名称
+    # org.apache.ibatis.type.EnumOrdinalTypeHandler : 存储枚举的索引
+    # com.baomidou.mybatisplus.extension.handlers.MybatisEnumTypeHandler : 枚举类需要实现IEnum接口或字段标记@EnumValue注解.
+    defaultEnumTypeHandler: org.apache.ibatis.type.EnumTypeHandler
+    # 当设置为 true 的时候，懒加载的对象可能被任何懒属性全部加载，否则，每个属性都按需加载。需要和 lazyLoadingEnabled 一起使用。
+    aggressiveLazyLoading: true
+    # MyBatis 自动映射策略
+    # NONE：不启用自动映射
+    # PARTIAL：只对非嵌套的 resultMap 进行自动映射
+    # FULL：对所有的 resultMap 都进行自动映射
+    autoMappingBehavior: PARTIAL
+    # MyBatis 自动映射时未知列或未知属性处理策
+    # NONE：不做任何处理 (默认值)
+    # WARNING：以日志的形式打印相关警告信息
+    # FAILING：当作映射失败处理，并抛出异常和详细信息
+    autoMappingUnknownColumnBehavior: NONE
+    # Mybatis一级缓存，默认为 SESSION
+    # SESSION session级别缓存，同一个session相同查询语句不会再次查询数据库
+    # STATEMENT 关闭一级缓存
+    localCacheScope: SESSION
+    # 开启Mybatis二级缓存，默认为 true
+    cacheEnabled: true
+  global-config:
+    # 是否打印 Logo banner
+    banner: true
+    # 是否初始化 SqlRunner
+    enableSqlRunner: false
+    dbConfig:
+      # 主键类型
+      # AUTO 数据库ID自增
+      # NONE 空
+      # INPUT 用户输入ID
+      # ASSIGN_ID 全局唯一ID
+      # ASSIGN_UUID 全局唯一ID UUID
+      idType: AUTO
+      # 表名前缀
+      tablePrefix: null
+      # 字段 format,例: %s,(对主键无效)
+      columnFormat: null
+      # 表名是否使用驼峰转下划线命名,只对表名生效
+      tableUnderline: true
+      # 大写命名,对表名和字段名均生效
+      capitalMode: false
+      # 全局的entity的逻辑删除字段属性名
+      logicDeleteField: null
+      # 逻辑已删除值
+      logicDeleteValue: 2
+      # 逻辑未删除值
+      logicNotDeleteValue: 0
+      # 字段验证策略之 insert,在 insert 的时候的字段验证策略
+      # IGNORED 忽略判断
+      # NOT_NULL 非NULL判断
+      # NOT_EMPTY 非空判断(只对字符串类型字段,其他类型字段依然为非NULL判断)
+      # DEFAULT 默认的,一般只用于注解里
+      # NEVER 不加入 SQL
+      insertStrategy: NOT_NULL
+      # 字段验证策略之 update,在 update 的时候的字段验证策略
+      updateStrategy: NOT_NULL
+      # 字段验证策略之 select,在 select 的时候的字段验证策略既 wrapper 根据内部 entity 生成的 where 条件
+      selectStrategy: NOT_NULL
+
+# PageHelper分页插件
+pagehelper: 
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql 
+
+# Swagger配置
+swagger:
+  # 是否开启swagger
+  enabled: true
+  # 请求前缀
+  pathMapping: /dev-api
+
+# 防止XSS攻击
+xss: 
+  # 过滤开关
+  enabled: true
+  # 排除链接（多个用逗号分隔）
+  excludes: /system/notice/*
+  # 匹配链接
+  urlPatterns: /system/*,/monitor/*,/tool/*
+
+feign:
+  # 开启压缩
+  compression:
+    request:
+      enabled: true
+    response:
+      enabled: true
+  okhttp:
+    enabled: true
