@@ -53,6 +53,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 #end
         lqw.$mpMethod($condition, ${ClassName}::get$AttrName, bo.get$AttrName());
 #else
+        lqw.apply(bo.getParams().get("dataScope") != null,bo.getParams().get("dataScope").toString());
         Map<String, Object> params = bo.getParams();
         if (params.get("begin$AttrName") != null && params.get("end$AttrName") != null) {
             lqw.between(${ClassName}::get$AttrName ,params.get("begin$AttrName"), params.get("end$AttrName"));

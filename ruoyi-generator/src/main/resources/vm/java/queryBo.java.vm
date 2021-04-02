@@ -1,9 +1,10 @@
 package ${packageName}.bo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
@@ -18,9 +19,15 @@ import ${import};
  * @author ${author}
  * @date ${datetime}
  */
+#if($table.crud || $table.sub)
+#set($Entity="BaseEntity")
+#elseif($table.tree)
+#set($Entity="TreeEntity")
+#end
 @Data
+@EqualsAndHashCode(callSuper = true)
 @ApiModel("${functionName}分页查询对象")
-public class ${ClassName}QueryBo {
+public class ${ClassName}QueryBo extends ${Entity} {
 
 	/** 分页大小 */
 	@ApiModelProperty("分页大小")
@@ -44,6 +51,4 @@ public class ${ClassName}QueryBo {
 #end
 #end
 
-	@TableField(exist = false)
-	private Map<String, Object> params = new HashMap<>();
 }
