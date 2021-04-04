@@ -12,6 +12,11 @@ import java.util.HashMap;
 #foreach ($import in $importList)
 import ${import};
 #end
+#if($table.crud || $table.sub)
+import com.ruoyi.common.core.domain.BaseEntity;
+#elseif($table.tree)
+import com.ruoyi.common.core.domain.TreeEntity;
+#end
 
 /**
  * ${functionName}分页查询对象 ${tableName}

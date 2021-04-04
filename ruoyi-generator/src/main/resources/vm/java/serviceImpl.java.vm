@@ -32,7 +32,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     @Override
     public ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField}){
         ${ClassName} db = this.baseMapper.selectById(${pkColumn.javaField});
-        return BeanUtil.toBean(db, ${ClassName}Vo.class)
+        return BeanUtil.toBean(db, ${ClassName}Vo.class);
     }
 
     @Override
