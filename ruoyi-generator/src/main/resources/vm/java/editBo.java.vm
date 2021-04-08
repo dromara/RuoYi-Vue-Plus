@@ -20,7 +20,7 @@ import ${import};
 public class ${ClassName}EditBo {
 
 #foreach ($column in $columns)
-#if($column.isEdit)
+#if($column.isEdit || $column.isPk==1)
 
     /** $column.columnComment */
     @ApiModelProperty("$column.columnComment")
