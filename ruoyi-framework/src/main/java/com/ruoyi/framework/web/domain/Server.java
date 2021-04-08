@@ -1,25 +1,19 @@
 package com.ruoyi.framework.web.domain;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-
-import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.*;
 import cn.hutool.system.oshi.CpuInfo;
 import cn.hutool.system.oshi.OshiUtil;
-import com.ruoyi.framework.web.domain.server.Cpu;
-import com.ruoyi.framework.web.domain.server.Jvm;
-import com.ruoyi.framework.web.domain.server.Mem;
-import com.ruoyi.framework.web.domain.server.Sys;
-import com.ruoyi.framework.web.domain.server.SysFile;
+import com.ruoyi.framework.web.domain.server.*;
 import lombok.Data;
 import oshi.hardware.GlobalMemory;
 import oshi.software.os.FileSystem;
 import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 服务器相关信息
@@ -149,15 +143,15 @@ public class Server {
         long mb = kb * 1024;
         long gb = mb * 1024;
         if (size >= gb) {
-            return StrUtil.format("%.1f GB", (float) size / gb);
+            return String.format("%.1f GB", (float) size / gb);
         } else if (size >= mb) {
             float f = (float) size / mb;
-            return StrUtil.format(f > 100 ? "%.0f MB" : "%.1f MB", f);
+            return String.format(f > 100 ? "%.0f MB" : "%.1f MB", f);
         } else if (size >= kb) {
             float f = (float) size / kb;
-            return StrUtil.format(f > 100 ? "%.0f KB" : "%.1f KB", f);
+            return String.format(f > 100 ? "%.0f KB" : "%.1f KB", f);
         } else {
-            return StrUtil.format("%d B", size);
+            return String.format("%d B", size);
         }
     }
 }
