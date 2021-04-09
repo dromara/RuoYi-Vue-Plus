@@ -24,6 +24,9 @@ public class ${ClassName}EditBo {
 
     /** $column.columnComment */
     @ApiModelProperty("$column.columnComment")
+#if($column.javaType == 'Date')
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+#end
     private $column.javaType $column.javaField;
 #end
 #end
