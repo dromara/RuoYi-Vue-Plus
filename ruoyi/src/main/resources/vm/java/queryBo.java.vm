@@ -52,6 +52,9 @@ public class ${ClassName}QueryBo extends ${Entity} {
 #if(!$table.isSuperColumn($column.javaField) && $column.query)
 	/** $column.columnComment */
 	@ApiModelProperty("$column.columnComment")
+#if($column.javaType == 'Date')
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+#end
 	private $column.javaType $column.javaField;
 #end
 #end
