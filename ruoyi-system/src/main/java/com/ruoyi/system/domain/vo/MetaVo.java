@@ -1,12 +1,18 @@
 package com.ruoyi.system.domain.vo;
 
+import lombok.*;
+import lombok.experimental.Accessors;
+
 /**
  * 路由显示信息
- * 
+ *
  * @author ruoyi
  */
-public class MetaVo
-{
+
+@Data
+@NoArgsConstructor
+@Accessors(chain = true)
+public class MetaVo {
     /**
      * 设置该路由在侧边栏和面包屑中展示的名字
      */
@@ -22,50 +28,15 @@ public class MetaVo
      */
     private boolean noCache;
 
-    public MetaVo()
-    {
-    }
-
-    public MetaVo(String title, String icon)
-    {
+    public MetaVo(String title, String icon) {
         this.title = title;
         this.icon = icon;
     }
 
-    public MetaVo(String title, String icon, boolean noCache)
-    {
+    public MetaVo(String title, String icon, boolean noCache) {
         this.title = title;
         this.icon = icon;
         this.noCache = noCache;
     }
 
-    public boolean isNoCache()
-    {
-        return noCache;
-    }
-
-    public void setNoCache(boolean noCache)
-    {
-        this.noCache = noCache;
-    }
-
-    public String getTitle()
-    {
-        return title;
-    }
-
-    public void setTitle(String title)
-    {
-        this.title = title;
-    }
-
-    public String getIcon()
-    {
-        return icon;
-    }
-
-    public void setIcon(String icon)
-    {
-        this.icon = icon;
-    }
 }
