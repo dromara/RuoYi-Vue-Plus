@@ -1,14 +1,16 @@
 package com.ruoyi.generator.mapper;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.generator.domain.GenTable;
+
+import java.util.List;
 
 /**
  * 业务 数据层
  * 
  * @author ruoyi
  */
-public interface GenTableMapper
+public interface GenTableMapper extends BaseMapper<GenTable>
 {
     /**
      * 查询业务列表

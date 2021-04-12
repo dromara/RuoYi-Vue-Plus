@@ -1,6 +1,8 @@
 package com.ruoyi.quartz.service.impl;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.quartz.domain.SysJobLog;
@@ -13,7 +15,7 @@ import com.ruoyi.quartz.service.ISysJobLogService;
  * @author ruoyi
  */
 @Service
-public class SysJobLogServiceImpl implements ISysJobLogService
+public class SysJobLogServiceImpl extends ServiceImpl<SysJobLogMapper, SysJobLog> implements ISysJobLogService
 {
     @Autowired
     private SysJobLogMapper jobLogMapper;

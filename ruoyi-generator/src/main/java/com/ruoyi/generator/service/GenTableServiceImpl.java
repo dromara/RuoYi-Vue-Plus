@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.exception.CustomException;
@@ -44,7 +45,7 @@ import java.util.zip.ZipOutputStream;
  * @author ruoyi
  */
 @Service
-public class GenTableServiceImpl implements IGenTableService
+public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> implements IGenTableService
 {
     private static final Logger log = LoggerFactory.getLogger(GenTableServiceImpl.class);
 

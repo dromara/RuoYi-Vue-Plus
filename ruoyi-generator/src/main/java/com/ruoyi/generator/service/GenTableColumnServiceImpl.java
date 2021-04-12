@@ -1,6 +1,8 @@
 package com.ruoyi.generator.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import cn.hutool.core.convert.Convert;
@@ -13,7 +15,7 @@ import com.ruoyi.generator.mapper.GenTableColumnMapper;
  * @author ruoyi
  */
 @Service
-public class GenTableColumnServiceImpl implements IGenTableColumnService 
+public class GenTableColumnServiceImpl extends ServiceImpl<GenTableColumnMapper, GenTableColumn> implements IGenTableColumnService
 {
 	@Autowired
 	private GenTableColumnMapper genTableColumnMapper;

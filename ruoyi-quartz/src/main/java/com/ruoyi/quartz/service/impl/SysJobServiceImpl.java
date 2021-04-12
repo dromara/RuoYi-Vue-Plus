@@ -2,6 +2,8 @@ package com.ruoyi.quartz.service.impl;
 
 import java.util.List;
 import javax.annotation.PostConstruct;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.quartz.JobDataMap;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -23,7 +25,7 @@ import com.ruoyi.quartz.util.ScheduleUtils;
  * @author ruoyi
  */
 @Service
-public class SysJobServiceImpl implements ISysJobService
+public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> implements ISysJobService
 {
     @Autowired
     private Scheduler scheduler;
