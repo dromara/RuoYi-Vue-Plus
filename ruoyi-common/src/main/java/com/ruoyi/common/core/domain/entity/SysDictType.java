@@ -11,6 +11,8 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 字典类型表 sys_dict_type
@@ -65,5 +67,11 @@ public class SysDictType
 
     /** 备注 */
     private String remark;
+
+    /**
+     * 请求参数
+     */
+    @TableField(exist = false)
+    private Map<String, Object> params = new HashMap<>();
 
 }

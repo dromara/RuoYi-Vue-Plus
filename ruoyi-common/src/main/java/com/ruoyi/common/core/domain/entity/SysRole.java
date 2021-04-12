@@ -11,6 +11,8 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 角色表 sys_role
@@ -84,6 +86,12 @@ public class SysRole
 
     /** 备注 */
     private String remark;
+
+    /**
+     * 请求参数
+     */
+    @TableField(exist = false)
+    private Map<String, Object> params = new HashMap<>();
 
     /** 用户是否存在此角色标识 默认不存在 */
     @TableField(exist = false)

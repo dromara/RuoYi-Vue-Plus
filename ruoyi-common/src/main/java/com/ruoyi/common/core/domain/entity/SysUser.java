@@ -16,7 +16,9 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户对象 sys_user
@@ -112,6 +114,12 @@ public class SysUser
 
     /** 备注 */
     private String remark;
+
+    /**
+     * 请求参数
+     */
+    @TableField(exist = false)
+    private Map<String, Object> params = new HashMap<>();
 
     /** 部门对象 */
     @Excels({

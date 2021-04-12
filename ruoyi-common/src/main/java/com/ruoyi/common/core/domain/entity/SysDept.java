@@ -9,9 +9,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 部门表 sys_dept
@@ -87,5 +85,11 @@ public class SysDept
     /** 子部门 */
     @TableField(exist = false)
     private List<SysDept> children = new ArrayList<SysDept>();
+
+    /**
+     * 请求参数
+     */
+    @TableField(exist = false)
+    private Map<String, Object> params = new HashMap<>();
 
 }
