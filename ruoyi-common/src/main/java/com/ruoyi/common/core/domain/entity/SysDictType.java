@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,8 +24,8 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("sys_config")
-public class SysDictType
+@TableName("sys_dict_type")
+public class SysDictType implements Serializable
 {
     private static final long serialVersionUID = 1L;
 

@@ -32,8 +32,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> implements ISysDeptService {
-    @Autowired
-    private SysDeptMapper deptMapper;
 
     @Autowired
     private SysRoleMapper roleMapper;
@@ -109,7 +107,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     @Override
     public List<Integer> selectDeptListByRoleId(Long roleId) {
         SysRole role = roleMapper.selectRoleById(roleId);
-        return deptMapper.selectDeptListByRoleId(roleId, role.isDeptCheckStrictly());
+        return baseMapper.selectDeptListByRoleId(roleId, role.isDeptCheckStrictly());
     }
 
     /**

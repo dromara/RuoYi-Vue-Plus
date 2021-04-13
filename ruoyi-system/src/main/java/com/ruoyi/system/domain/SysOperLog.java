@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_oper_log")
-public class SysOperLog {
+public class SysOperLog implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -50,6 +51,7 @@ public class SysOperLog {
     /**
      * 业务类型数组
      */
+    @TableField(exist = false)
     private Integer[] businessTypes;
 
     /**

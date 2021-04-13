@@ -20,14 +20,6 @@ public interface SysUserPostMapper extends BaseMapper<SysUserPost> {
     public int deleteUserPostByUserId(Long userId);
 
     /**
-     * 通过岗位ID查询岗位使用数量
-     *
-     * @param postId 岗位ID
-     * @return 结果
-     */
-    public int countUserPostById(Long postId);
-
-    /**
      * 批量删除用户和岗位关联
      *
      * @param ids 需要删除的数据ID

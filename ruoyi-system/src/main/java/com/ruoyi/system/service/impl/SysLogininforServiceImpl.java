@@ -1,13 +1,17 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.domain.SysLogininfor;
 import com.ruoyi.system.mapper.SysLogininforMapper;
 import com.ruoyi.system.service.ISysLogininforService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 系统访问日志情况信息 服务层处理
@@ -17,9 +21,6 @@ import java.util.List;
 @Service
 public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, SysLogininfor> implements ISysLogininforService {
 
-    @Autowired
-    private SysLogininforMapper logininforMapper;
-
     /**
      * 新增系统登录日志
      *
@@ -27,7 +28,7 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
      */
     @Override
     public void insertLogininfor(SysLogininfor logininfor) {
-        logininforMapper.insertLogininfor(logininfor);
+        save(logininfor);
     }
 
     /**
@@ -38,7 +39,18 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
      */
     @Override
     public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor) {
-        return logininforMapper.selectLogininforList(logininfor);
+        Map<String, Object> params = logininfor.getParams();
+        return list(new LambdaQueryWrapper<SysLogininfor>()
+                .like(StrUtil.isNotBlank(logininfor.getIpaddr()),SysLogininfor::getIpaddr,logininfor.getIpaddr())
+                .eq(StrUtil.isNotBlank(logininfor.getStatus()),SysLogininfor::getStatus,logininfor.getStatus())
+                .like(StrUtil.isNotBlank(logininfor.getUserName()),SysLogininfor::getUserName,logininfor.getUserName())
+                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                        "date_format(login_time,'%y%m%d') &gt;= date_format({0},'%y%m%d')",
+                        params.get("beginTime"))
+                .apply(Validator.isNotEmpty(params.get("endTime")),
+                        "date_format(login_time,'%y%m%d') &lt;= date_format({0},'%y%m%d'",
+                        params.get("endTime"))
+                .orderByDesc(SysLogininfor::getInfoId));
     }
 
     /**
@@ -49,7 +61,7 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
      */
     @Override
     public int deleteLogininforByIds(Long[] infoIds) {
-        return logininforMapper.deleteLogininforByIds(infoIds);
+        return baseMapper.deleteBatchIds(Arrays.asList(infoIds));
     }
 
     /**
@@ -57,6 +69,6 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
      */
     @Override
     public void cleanLogininfor() {
-        logininforMapper.cleanLogininfor();
+        remove(new LambdaQueryWrapper<>());
     }
 }

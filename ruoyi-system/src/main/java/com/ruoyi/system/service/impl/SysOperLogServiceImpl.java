@@ -1,13 +1,18 @@
 package com.ruoyi.system.service.impl;
 
-import java.util.List;
-
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.ruoyi.system.domain.SysOperLog;
 import com.ruoyi.system.mapper.SysOperLogMapper;
 import com.ruoyi.system.service.ISysOperLogService;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 操作日志 服务层处理
@@ -16,8 +21,6 @@ import com.ruoyi.system.service.ISysOperLogService;
  */
 @Service
 public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOperLog> implements ISysOperLogService {
-    @Autowired
-    private SysOperLogMapper operLogMapper;
 
     /**
      * 新增操作日志
@@ -26,7 +29,7 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
      */
     @Override
     public void insertOperlog(SysOperLog operLog) {
-        operLogMapper.insertOperlog(operLog);
+        save(operLog);
     }
 
     /**
@@ -37,7 +40,26 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
      */
     @Override
     public List<SysOperLog> selectOperLogList(SysOperLog operLog) {
-        return operLogMapper.selectOperLogList(operLog);
+        Map<String, Object> params = operLog.getParams();
+        return list(new LambdaQueryWrapper<SysOperLog>()
+                .like(StrUtil.isNotBlank(operLog.getTitle()),SysOperLog::getTitle,operLog.getTitle())
+                .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
+                        SysOperLog::getBusinessType,operLog.getBusinessType())
+                .func(f -> {
+                    if (ArrayUtil.isNotEmpty(operLog.getBusinessTypes())){
+                        f.in(SysOperLog::getBusinessType, Arrays.asList(operLog.getBusinessTypes()));
+                    }
+                })
+                .eq(operLog.getStatus() != null && operLog.getStatus() > 0,
+                        SysOperLog::getStatus,operLog.getStatus())
+                .like(StrUtil.isNotBlank(operLog.getOperName()),SysOperLog::getOperName,operLog.getOperName())
+                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                        "date_format(login_time,'%y%m%d') &gt;= date_format({0},'%y%m%d')",
+                        params.get("beginTime"))
+                .apply(Validator.isNotEmpty(params.get("endTime")),
+                        "date_format(login_time,'%y%m%d') &lt;= date_format({0},'%y%m%d'",
+                        params.get("endTime"))
+                .orderByDesc(SysOperLog::getOperId));
     }
 
     /**
@@ -48,7 +70,7 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
      */
     @Override
     public int deleteOperLogByIds(Long[] operIds) {
-        return operLogMapper.deleteOperLogByIds(operIds);
+        return baseMapper.deleteBatchIds(Arrays.asList(operIds));
     }
 
     /**
@@ -59,7 +81,7 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
      */
     @Override
     public SysOperLog selectOperLogById(Long operId) {
-        return operLogMapper.selectOperLogById(operId);
+        return getById(operId);
     }
 
     /**
@@ -67,6 +89,6 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
      */
     @Override
     public void cleanOperLog() {
-        operLogMapper.cleanOperLog();
+        remove(new LambdaQueryWrapper<>());
     }
 }

@@ -15,6 +15,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_user")
-public class SysUser
+public class SysUser implements Serializable
 {
     private static final long serialVersionUID = 1L;
 

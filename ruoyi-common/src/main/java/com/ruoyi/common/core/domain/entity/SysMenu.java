@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -20,7 +21,7 @@ import java.util.*;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_menu")
-public class SysMenu
+public class SysMenu implements Serializable
 {
     private static final long serialVersionUID = 1L;
 

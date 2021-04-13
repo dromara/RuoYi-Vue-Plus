@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -29,8 +30,6 @@ import java.util.Map;
  */
 @Service
 public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDictType> implements ISysDictTypeService {
-    @Autowired
-    private SysDictTypeMapper dictTypeMapper;
 
     @Autowired
     private SysDictDataMapper dictDataMapper;
@@ -45,7 +44,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
             List<SysDictData> dictDatas = dictDataMapper.selectList(
                     new LambdaQueryWrapper<SysDictData>()
                             .eq(SysDictData::getStatus, 0)
-                            .eq(SysDictData::getDictType, dictType)
+                            .eq(SysDictData::getDictType, dictType.getDictType())
                             .orderByAsc(SysDictData::getDictSort));
             DictUtils.setDictCache(dictType.getDictType(), dictDatas);
         }
@@ -61,13 +60,13 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     public List<SysDictType> selectDictTypeList(SysDictType dictType) {
         Map<String, Object> params = dictType.getParams();
         return list(new LambdaQueryWrapper<SysDictType>()
-                .like(SysDictType::getDictName, dictType.getDictName())
-                .eq(SysDictType::getStatus, dictType.getStatus())
-                .like(SysDictType::getDictType, dictType.getDictType())
-                .apply(params.get("beginTime") != null,
+                .like(StrUtil.isNotBlank(dictType.getDictName()),SysDictType::getDictName, dictType.getDictName())
+                .eq(StrUtil.isNotBlank(dictType.getStatus()),SysDictType::getStatus, dictType.getStatus())
+                .like(StrUtil.isNotBlank(dictType.getDictType()),SysDictType::getDictType, dictType.getDictType())
+                .apply(Validator.isNotEmpty(params.get("beginTime")),
                         "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
-                .apply(params.get("endTime") != null,
+                .apply(Validator.isNotEmpty(params.get("endTime")),
                         "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime")));
     }
@@ -165,7 +164,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      */
     @Override
     public int insertDictType(SysDictType dictType) {
-        int row = dictTypeMapper.insert(dictType);
+        int row = baseMapper.insert(dictType);
         if (row > 0) {
             DictUtils.clearDictCache();
         }
@@ -185,7 +184,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
         dictDataMapper.update(null, new LambdaUpdateWrapper<SysDictData>()
                 .set(SysDictData::getDictType, dictType.getDictType())
                 .eq(SysDictData::getDictType, oldDict.getDictType()));
-        int row = dictTypeMapper.updateById(dictType);
+        int row = baseMapper.updateById(dictType);
         if (row > 0) {
             DictUtils.clearDictCache();
         }

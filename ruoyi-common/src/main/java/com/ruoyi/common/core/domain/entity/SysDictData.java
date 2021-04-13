@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,13 +26,13 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_dict_data")
-public class SysDictData
+public class SysDictData implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     /** 字典编码 */
     @Excel(name = "字典编码", cellType = ColumnType.NUMERIC)
-    @TableId(value = "dept_code",type = IdType.AUTO)
+    @TableId(value = "dict_code",type = IdType.AUTO)
     private Long dictCode;
 
     /** 字典排序 */
