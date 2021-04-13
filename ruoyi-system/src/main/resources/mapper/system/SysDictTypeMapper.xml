@@ -20,27 +20,6 @@
         from sys_dict_type
     </sql>
 
-    <select id="selectDictTypeList" parameterType="SysDictType" resultMap="SysDictTypeResult">
-        <include refid="selectDictTypeVo"/>
-        <where>
-            <if test="dictName != null and dictName != ''">
-                AND dict_name like concat('%', #{dictName}, '%')
-            </if>
-            <if test="status != null and status != ''">
-                AND status = #{status}
-            </if>
-            <if test="dictType != null and dictType != ''">
-                AND dict_type like concat('%', #{dictType}, '%')
-            </if>
-            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-                and date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
-            </if>
-            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-                and date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
-            </if>
-        </where>
-    </select>
-
     <select id="selectDictTypeAll" resultMap="SysDictTypeResult">
         <include refid="selectDictTypeVo"/>
     </select>
@@ -59,49 +38,5 @@
         <include refid="selectDictTypeVo"/>
         where dict_type = #{dictType} limit 1
     </select>
-
-    <delete id="deleteDictTypeById" parameterType="Long">
-        delete
-        from sys_dict_type
-        where dict_id = #{dictId}
-    </delete>
-
-    <delete id="deleteDictTypeByIds" parameterType="Long">
-        delete from sys_dict_type where dict_id in
-        <foreach collection="array" item="dictId" open="(" separator="," close=")">
-            #{dictId}
-        </foreach>
-    </delete>
-
-    <update id="updateDictType" parameterType="SysDictType">
-        update sys_dict_type
-        <set>
-            <if test="dictName != null and dictName != ''">dict_name = #{dictName},</if>
-            <if test="dictType != null and dictType != ''">dict_type = #{dictType},</if>
-            <if test="status != null">status = #{status},</if>
-            <if test="remark != null">remark = #{remark},</if>
-            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
-            update_time = sysdate()
-        </set>
-        where dict_id = #{dictId}
-    </update>
-
-    <insert id="insertDictType" parameterType="SysDictType">
-        insert into sys_dict_type(
-        <if test="dictName != null and dictName != ''">dict_name,</if>
-        <if test="dictType != null and dictType != ''">dict_type,</if>
-        <if test="status != null">status,</if>
-        <if test="remark != null and remark != ''">remark,</if>
-        <if test="createBy != null and createBy != ''">create_by,</if>
-        create_time
-        )values(
-        <if test="dictName != null and dictName != ''">#{dictName},</if>
-        <if test="dictType != null and dictType != ''">#{dictType},</if>
-        <if test="status != null">#{status},</if>
-        <if test="remark != null and remark != ''">#{remark},</if>
-        <if test="createBy != null and createBy != ''">#{createBy},</if>
-        sysdate()
-        )
-    </insert>
 
 </mapper> 

@@ -91,8 +91,12 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
         lqw.eq(StrUtil.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType());
         lqw.like(StrUtil.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey());
         Map<String, Object> params = config.getParams();
-        lqw.between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"));
+        lqw.apply(params.get("beginTime") != null,
+                "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
+                params.get("beginTime"));
+        lqw.apply(params.get("endTime") != null,
+                "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
+                params.get("endTime"));
         return baseMapper.selectList(lqw);
     }
 
