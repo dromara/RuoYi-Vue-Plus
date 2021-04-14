@@ -74,7 +74,7 @@ public class ${ClassName}Controller extends BaseController {
     public AjaxResult<${ClassName}Vo> export(${ClassName}QueryBo bo) {
         List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
         ExcelUtil<${ClassName}Vo> util = new ExcelUtil<${ClassName}Vo>(${ClassName}Vo.class);
-        return util.exportExcel(list, "${businessName}数据" );
+        return util.exportExcel(list, "${functionName}");
     }
 
     /**
