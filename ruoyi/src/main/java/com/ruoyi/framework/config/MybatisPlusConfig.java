@@ -2,14 +2,7 @@ package com.ruoyi.framework.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
-import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
-import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
-import com.baomidou.mybatisplus.core.injector.ISqlInjector;
-import com.baomidou.mybatisplus.extension.incrementer.H2KeyGenerator;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.IllegalSQLInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.ruoyi.framework.mybatisplus.CreateAndUpdateMetaObjectHandler;
@@ -29,7 +22,7 @@ public class MybatisPlusConfig {
 		// 乐观锁插件
 		interceptor.addInnerInterceptor(optimisticLockerInnerInterceptor());
 		// 阻断插件
-		interceptor.addInnerInterceptor(blockAttackInnerInterceptor());
+//		interceptor.addInnerInterceptor(blockAttackInnerInterceptor());
 		return interceptor;
 	}
 
@@ -58,9 +51,9 @@ public class MybatisPlusConfig {
 	 * 如果是对全表的删除或更新操作，就会终止该操作
 	 * https://baomidou.com/guide/interceptor-block-attack.html
 	 */
-	public BlockAttackInnerInterceptor blockAttackInnerInterceptor() {
-		return new BlockAttackInnerInterceptor();
-	}
+//	public BlockAttackInnerInterceptor blockAttackInnerInterceptor() {
+//		return new BlockAttackInnerInterceptor();
+//	}
 
 	/**
 	 * sql性能规范插件(垃圾SQL拦截)
