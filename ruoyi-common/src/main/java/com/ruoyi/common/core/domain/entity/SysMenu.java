@@ -35,6 +35,7 @@ public class SysMenu implements Serializable
     private String menuName;
 
     /** 父菜单名称 */
+    @TableField(exist = false)
     private String parentName;
 
     /** 父菜单ID */
