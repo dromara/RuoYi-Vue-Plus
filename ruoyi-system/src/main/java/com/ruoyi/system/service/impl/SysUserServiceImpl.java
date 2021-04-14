@@ -16,8 +16,7 @@ import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,12 +30,9 @@ import java.util.List;
  *
  * @author ruoyi
  */
+@Slf4j
 @Service
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
-    private static final Logger log = LoggerFactory.getLogger(SysUserServiceImpl.class);
-
-    @Autowired
-    private SysUserMapper userMapper;
 
     @Autowired
     private SysRoleMapper roleMapper;
@@ -62,7 +58,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUserList(SysUser user) {
-        return userMapper.selectUserList(user);
+        return baseMapper.selectUserList(user);
     }
 
     /**
@@ -73,7 +69,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public SysUser selectUserByUserName(String userName) {
-        return userMapper.selectUserByUserName(userName);
+        return baseMapper.selectUserByUserName(userName);
     }
 
     /**
@@ -84,7 +80,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public SysUser selectUserById(Long userId) {
-        return userMapper.selectUserById(userId);
+        return baseMapper.selectUserById(userId);
     }
 
     /**
@@ -198,7 +194,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Transactional
     public int insertUser(SysUser user) {
         // 新增用户信息
-        int rows = userMapper.insert(user);
+        int rows = baseMapper.insert(user);
         // 新增用户岗位关联
         insertUserPost(user);
         // 新增用户与角色管理
@@ -224,7 +220,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getUserId,userId));
         // 新增用户与岗位管理
         insertUserPost(user);
-        return userMapper.updateById(user);
+        return baseMapper.updateById(user);
     }
 
     /**
@@ -235,7 +231,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public int updateUserStatus(SysUser user) {
-        return userMapper.updateById(user);
+        return baseMapper.updateById(user);
     }
 
     /**
@@ -246,7 +242,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public int updateUserProfile(SysUser user) {
-        return userMapper.updateById(user);
+        return baseMapper.updateById(user);
     }
 
     /**
@@ -258,7 +254,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public boolean updateUserAvatar(String userName, String avatar) {
-        return userMapper.update(null,
+        return baseMapper.update(null,
                 new LambdaUpdateWrapper<SysUser>()
                         .set(SysUser::getAvatar,avatar)
                         .eq(SysUser::getUserName,userName)) > 0;
@@ -272,7 +268,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public int resetPwd(SysUser user) {
-        return userMapper.updateById(user);
+        return baseMapper.updateById(user);
     }
 
     /**
@@ -284,7 +280,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public int resetUserPwd(String userName, String password) {
-        return userMapper.update(null,
+        return baseMapper.update(null,
                 new LambdaUpdateWrapper<SysUser>()
                         .set(SysUser::getPassword,password)
                         .eq(SysUser::getUserName,userName));
@@ -351,7 +347,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId,userId));
         // 删除用户与岗位表
         userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getUserId,userId));
-        return userMapper.deleteById(userId);
+        return baseMapper.deleteById(userId);
     }
 
     /**
@@ -371,7 +367,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getUserId,ids));
         // 删除用户与岗位表
         userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().in(SysUserPost::getUserId,ids));
-        return userMapper.deleteBatchIds(ids);
+        return baseMapper.deleteBatchIds(ids);
     }
 
     /**
@@ -395,7 +391,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         for (SysUser user : userList) {
             try {
                 // 验证是否存在这个用户
-                SysUser u = userMapper.selectUserByUserName(user.getUserName());
+                SysUser u = baseMapper.selectUserByUserName(user.getUserName());
                 if (Validator.isNull(u)) {
                     user.setPassword(SecurityUtils.encryptPassword(password));
                     user.setCreateBy(operName);
