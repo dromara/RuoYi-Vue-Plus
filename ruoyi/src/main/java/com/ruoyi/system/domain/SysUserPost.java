@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("sys_config")
+@TableName("sys_user_post")
 public class SysUserPost {
     /**
      * 用户ID
