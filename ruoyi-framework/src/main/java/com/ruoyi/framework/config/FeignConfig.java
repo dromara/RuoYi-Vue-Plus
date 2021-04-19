@@ -1,10 +1,12 @@
 package com.ruoyi.framework.config;
 
 import feign.*;
+import feign.hystrix.HystrixFeign;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.TimeUnit;
 
+@EnableFeignClients
 @Configuration
 @ConditionalOnClass(Feign.class)
 @AutoConfigureBefore(FeignAutoConfiguration.class)
@@ -29,7 +32,7 @@ public class FeignConfig {
 
     @Bean
     public Feign.Builder feignBuilder() {
-        return Feign.builder();
+        return HystrixFeign.builder();
     }
 
     @Bean

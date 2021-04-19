@@ -208,3 +208,5 @@ feign:
       enabled: true
   okhttp:
     enabled: true
+  hystrix:
+    enabled: true
