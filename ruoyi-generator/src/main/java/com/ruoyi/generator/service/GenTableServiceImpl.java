@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
@@ -122,7 +123,15 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         int row = baseMapper.updateById(genTable);
         if (row > 0) {
             for (GenTableColumn cenTableColumn : genTable.getColumns()) {
-                genTableColumnMapper.updateById(cenTableColumn);
+                genTableColumnMapper.update(cenTableColumn,
+                        new LambdaUpdateWrapper<GenTableColumn>()
+                                .set(cenTableColumn.getIsPk() == null, GenTableColumn::getIsPk, null)
+                                .set(cenTableColumn.getIsIncrement() == null, GenTableColumn::getIsIncrement, null)
+                                .set(cenTableColumn.getIsInsert() == null, GenTableColumn::getIsInsert, null)
+                                .set(cenTableColumn.getIsEdit() == null, GenTableColumn::getIsEdit, null)
+                                .set(cenTableColumn.getIsList() == null, GenTableColumn::getIsList, null)
+                                .set(cenTableColumn.getIsQuery() == null, GenTableColumn::getIsQuery, null)
+                                .eq(GenTableColumn::getColumnId,cenTableColumn.getColumnId()));
             }
         }
     }
