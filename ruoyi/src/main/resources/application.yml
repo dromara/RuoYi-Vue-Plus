@@ -26,7 +26,7 @@ captcha:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
-  port: 8081
+  port: 8080
   servlet:
     # 应用的访问路径
     context-path: /
@@ -57,6 +57,7 @@ logging:
   level:
     com.ruoyi: @logging.level@
     org.springframework: warn
+  config: classpath:logback.xml
 
 # Spring配置
 spring:
@@ -64,30 +65,57 @@ spring:
   messages:
     # 国际化资源文件路径
     basename: i18n/messages
-  profiles: 
+  profiles:
     active: @profiles.active@
   # 文件上传
   servlet:
-     multipart:
-       # 单个文件大小
-       max-file-size:  10MB
-       # 设置总上传的文件大小
-       max-request-size:  20MB
+    multipart:
+      # 单个文件大小
+      max-file-size:  10MB
+      # 设置总上传的文件大小
+      max-request-size:  20MB
   # 服务模块
   devtools:
     restart:
       # 热部署开关
       enabled: true
+  application:
+    name: ruoyi-vue-plus
+  boot:
+    admin:
+      # Spring Boot Admin Client 客户端的相关配置
+      client:
+        # 设置 Spring Boot Admin Server 地址
+        url: http://localhost:${server.port}${spring.boot.admin.context-path}
+        instance:
+          prefer-ip: true # 注册实例时，优先使用 IP
+#        username: ruoyi
+#        password: 123456
+      # Spring Boot Admin Server 服务端的相关配置
+      context-path: /admin # 配置 Spring
+
+# Actuator 监控端点的配置项
+management:
+  endpoints:
+    web:
+      # Actuator 提供的 API 接口的根目录。默认为 /actuator
+      base-path: /actuator
+      exposure:
+        # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+        include: '*'
+  endpoint:
+    logfile:
+      external-file: ./logs/sys-console.log
 
 # token配置
 token:
-    # 令牌自定义标识
-    header: Authorization
-    # 令牌密钥
-    secret: abcdefghijklmnopqrstuvwxyz
-    # 令牌有效期（默认30分钟）
-    expireTime: 30
-  
+  # 令牌自定义标识
+  header: Authorization
+  # 令牌密钥
+  secret: abcdefghijklmnopqrstuvwxyz
+  # 令牌有效期（默认30分钟）
+  expireTime: 30
+
 # MyBatis配置
 # https://baomidou.com/config/
 mybatis-plus:
@@ -177,11 +205,11 @@ mybatis-plus:
       selectStrategy: NOT_NULL
 
 # PageHelper分页插件
-pagehelper: 
+pagehelper:
   helperDialect: mysql
   reasonable: true
   supportMethodsArguments: true
-  params: count=countSql 
+  params: count=countSql
 
 # Swagger配置
 swagger:
@@ -191,7 +219,7 @@ swagger:
   pathMapping: /dev-api
 
 # 防止XSS攻击
-xss: 
+xss:
   # 过滤开关
   enabled: true
   # 排除链接（多个用逗号分隔）

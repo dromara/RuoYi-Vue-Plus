@@ -6,9 +6,9 @@ spring:
         druid:
             # 主库数据源
             master:
-                url: jdbc:mysql://192.168.31.222:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
+                url: jdbc:mysql://192.168.0.222:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
                 username: root
-                password: c6142b27f1385bc163ffe7f4ebfc52ac
+                password: root
             # 从库数据源
             slave:
                 # 从数据源开关/默认关闭
@@ -43,8 +43,8 @@ spring:
                 allow:
                 url-pattern: /druid/*
                 # 控制台管理用户名和密码
-                login-username: 
-                login-password: 
+                login-username: ruoyi
+                login-password: 123456
             filter:
                 stat:
                     enabled: true
@@ -58,7 +58,7 @@ spring:
     # redis 配置
     redis:
         # 地址
-        host: 192.168.31.222
+        host: 192.168.0.222
         # 端口，默认为6379
         port: 6379
         # 数据库索引

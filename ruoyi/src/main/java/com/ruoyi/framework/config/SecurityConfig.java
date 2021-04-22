@@ -1,5 +1,9 @@
 package com.ruoyi.framework.config;
 
+import com.ruoyi.framework.security.filter.JwtAuthenticationTokenFilter;
+import com.ruoyi.framework.security.handle.AuthenticationEntryPointImpl;
+import com.ruoyi.framework.security.handle.LogoutSuccessHandlerImpl;
+import de.codecentric.boot.admin.server.config.AdminServerProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -14,9 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.filter.CorsFilter;
-import com.ruoyi.framework.security.filter.JwtAuthenticationTokenFilter;
-import com.ruoyi.framework.security.handle.AuthenticationEntryPointImpl;
-import com.ruoyi.framework.security.handle.LogoutSuccessHandlerImpl;
 
 /**
  * spring security配置
@@ -55,6 +56,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
      */
     @Autowired
     private CorsFilter corsFilter;
+
+    @Autowired
+    private AdminServerProperties adminServerProperties;
     
     /**
      * 解决 无法直接注入 AuthenticationManager
@@ -113,6 +117,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/webjars/**").anonymous()
                 .antMatchers("/*/api-docs").anonymous()
                 .antMatchers("/druid/**").anonymous()
+                // Spring Boot Admin Server 的安全配置
+                .antMatchers(adminServerProperties.getContextPath()).anonymous()
+                .antMatchers(adminServerProperties.getContextPath() + "/**").anonymous()
+                // Spring Boot Actuator 的安全配置
+                .antMatchers("/actuator").anonymous()
+                .antMatchers("/actuator/**").anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()

@@ -33,6 +33,7 @@
 * swagger 修改为 knife4j
 * 集成 Hutool 5.X 并重写RuoYi部分功能
 * 集成 Feign 接口化管理 Http 请求(如三方请求 支付,短信,推送等)
+* 集成 spring-boot-admin 全方位监控
 * 升级MybatisPlus 3.4.2
 * 增加demo模块示例(给不会增加模块的小伙伴做参考)
 * 同步升级 3.4.0
