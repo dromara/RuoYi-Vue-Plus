@@ -25,18 +25,6 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 			this.setFieldValByName("createTime", createTime, metaObject);
 		}
 		//endregion
-		//region 处理修改人信息
-		Object updateBy = this.getFieldValByName("updateBy", metaObject);
-		Object updateTime = this.getFieldValByName("updateTime", metaObject);
-		if (updateBy == null) {
-			updateBy = createBy;
-			this.setFieldValByName("updateBy", updateBy, metaObject);
-		}
-		if (updateTime == null) {
-			updateTime = createTime;
-			this.setFieldValByName("updateTime", updateTime, metaObject);
-		}
-		//endregion
 	}
 
 	@Override

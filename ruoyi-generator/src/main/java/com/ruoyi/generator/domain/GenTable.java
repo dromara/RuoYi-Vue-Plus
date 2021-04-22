@@ -135,6 +135,7 @@ public class GenTable implements Serializable {
     /**
      * 创建者
      */
+    @TableField(fill = FieldFill.INSERT)
     private String createBy;
 
     /**
@@ -147,6 +148,7 @@ public class GenTable implements Serializable {
     /**
      * 更新者
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
 
     /**
