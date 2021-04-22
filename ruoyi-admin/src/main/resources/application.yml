@@ -57,6 +57,7 @@ logging:
   level:
     com.ruoyi: @logging.level@
     org.springframework: warn
+  config: classpath:logback.xml
 
 # Spring配置
 spring:
@@ -78,6 +79,33 @@ spring:
     restart:
       # 热部署开关
       enabled: true
+  application:
+    name: ruoyi-vue-plus
+  boot:
+    admin:
+      # Spring Boot Admin Client 客户端的相关配置
+      client:
+        # 设置 Spring Boot Admin Server 地址
+        url: http://localhost:${server.port}${spring.boot.admin.context-path}
+        instance:
+          prefer-ip: true # 注册实例时，优先使用 IP
+#        username: ruoyi
+#        password: 123456
+      # Spring Boot Admin Server 服务端的相关配置
+      context-path: /admin # 配置 Spring
+
+# Actuator 监控端点的配置项
+management:
+  endpoints:
+    web:
+      # Actuator 提供的 API 接口的根目录。默认为 /actuator
+      base-path: /actuator
+      exposure:
+        # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+        include: '*'
+  endpoint:
+    logfile:
+      external-file: ./logs/sys-console.log
 
 # token配置
 token:
