@@ -73,10 +73,14 @@ public class SysUser implements Serializable
     /** 用户头像 */
     private String avatar;
 
-    /** 密码 */
-    @JsonIgnore
+       /** 密码 */
     @JsonProperty
     private String password;
+
+    @JsonIgnore
+    public String getPassword() {
+        return password;
+    }
 
     /** 盐加密 */
     private String salt;
