@@ -1,5 +1,9 @@
 package com.ruoyi.common.config;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +12,10 @@ import org.springframework.stereotype.Component;
  * 
  * @author ruoyi
  */
+
+@Data
+@NoArgsConstructor
+@Accessors(chain = true)
 @Component
 @ConfigurationProperties(prefix = "ruoyi")
 public class RuoYiConfig
@@ -25,64 +33,16 @@ public class RuoYiConfig
     private boolean demoEnabled;
 
     /** 上传路径 */
+    @Getter
     private static String profile;
 
     /** 获取地址开关 */
+    @Getter
     private static boolean addressEnabled;
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public String getVersion()
-    {
-        return version;
-    }
-
-    public void setVersion(String version)
-    {
-        this.version = version;
-    }
-
-    public String getCopyrightYear()
-    {
-        return copyrightYear;
-    }
-
-    public void setCopyrightYear(String copyrightYear)
-    {
-        this.copyrightYear = copyrightYear;
-    }
-
-    public boolean isDemoEnabled()
-    {
-        return demoEnabled;
-    }
-
-    public void setDemoEnabled(boolean demoEnabled)
-    {
-        this.demoEnabled = demoEnabled;
-    }
-
-    public static String getProfile()
-    {
-        return profile;
-    }
 
     public void setProfile(String profile)
     {
         RuoYiConfig.profile = profile;
-    }
-
-    public static boolean isAddressEnabled()
-    {
-        return addressEnabled;
     }
 
     public void setAddressEnabled(boolean addressEnabled)
