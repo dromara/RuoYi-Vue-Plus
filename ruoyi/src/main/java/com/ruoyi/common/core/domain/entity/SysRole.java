@@ -70,6 +70,7 @@ public class SysRole implements Serializable
     private String delFlag;
 
     /** 创建者 */
+    @TableField(fill = FieldFill.INSERT)
     private String createBy;
 
     /** 创建时间 */
@@ -78,6 +79,7 @@ public class SysRole implements Serializable
     private Date createTime;
 
     /** 更新者 */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
 
     /** 更新时间 */
