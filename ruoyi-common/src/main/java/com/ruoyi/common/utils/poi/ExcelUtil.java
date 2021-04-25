@@ -513,7 +513,7 @@ public class ExcelUtil<T>
         }
         else if (ColumnType.NUMERIC == attr.cellType())
         {
-            if (StrUtil.isNotNull(value))
+            if (Validator.isNotNull(value))
             {
                 cell.setCellValue(StrUtil.contains(Convert.toStr(value), ".") ? Convert.toDouble(value) : Convert.toInt(value));
             }
