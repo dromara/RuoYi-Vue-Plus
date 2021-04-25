@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 /**
  * 菜单 业务层处理
- *
+ * 
  * @author ruoyi
  */
 @Service
@@ -142,6 +142,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 router.setRedirect("noRedirect");
                 router.setChildren(buildMenus(cMenus));
             } else if (isMenuFrame(menu)) {
+                router.setMeta(null);
                 List<RouterVo> childrenList = new ArrayList<RouterVo>();
                 RouterVo children = new RouterVo();
                 children.setPath(menu.getPath());
