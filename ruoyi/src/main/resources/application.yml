@@ -198,11 +198,11 @@ mybatis-plus:
       # NOT_EMPTY 非空判断(只对字符串类型字段,其他类型字段依然为非NULL判断)
       # DEFAULT 默认的,一般只用于注解里
       # NEVER 不加入 SQL
-      insertStrategy: NOT_NULL
+      insertStrategy: NOT_EMPTY
       # 字段验证策略之 update,在 update 的时候的字段验证策略
-      updateStrategy: NOT_NULL
+      updateStrategy: NOT_EMPTY
       # 字段验证策略之 select,在 select 的时候的字段验证策略既 wrapper 根据内部 entity 生成的 where 条件
-      selectStrategy: NOT_NULL
+      selectStrategy: NOT_EMPTY
 
 # PageHelper分页插件
 pagehelper:
