@@ -7,49 +7,39 @@ import org.apache.ibatis.reflection.MetaObject;
 import java.util.Date;
 
 /**
- * @author woo
- * @date 2021/3/11
+ * MP注入处理器
+ * @author Lion Li
+ * @date 2021/4/25
  */
 public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
+
 	@Override
 	public void insertFill(MetaObject metaObject) {
-		//region 处理创建人信息
-		Object createBy = this.getFieldValByName("createBy", metaObject);
-		Object createTime = this.getFieldValByName("createTime", metaObject);
-		if (createBy == null) {
-			createBy = SecurityUtils.getUsername();
-			this.setFieldValByName("createBy", createBy, metaObject);
+		//根据属性名字设置要填充的值
+		if (metaObject.hasGetter("createTime")) {
+			if (metaObject.getValue("createTime") == null) {
+				this.setFieldValByName("createTime", new Date(), metaObject);
+			}
 		}
-		if (createTime == null) {
-			createTime = new Date();
-			this.setFieldValByName("createTime", createTime, metaObject);
+		if (metaObject.hasGetter("createBy")) {
+			if (metaObject.getValue("createBy") == null) {
+				this.setFieldValByName("createBy", SecurityUtils.getUsername(), metaObject);
+			}
 		}
-		//endregion
 	}
 
 	@Override
 	public void updateFill(MetaObject metaObject) {
-		//region 处理修改人信息
-		Object updateBy = this.getFieldValByName("updateBy", metaObject);
-		Object updateTime = this.getFieldValByName("updateTime", metaObject);
-		if (updateBy == null) {
-			updateBy = SecurityUtils.getUsername();
-			this.setFieldValByName("updateBy", updateBy, metaObject);
+		if (metaObject.hasGetter("updateBy")) {
+			if (metaObject.getValue("updateBy") == null) {
+				this.setFieldValByName("updateBy", SecurityUtils.getUsername(), metaObject);
+			}
 		}
-		if (updateTime == null) {
-			updateTime = new Date();
-			this.setFieldValByName("updateTime", updateTime, metaObject);
+		if (metaObject.hasGetter("updateTime")) {
+			if (metaObject.getValue("updateTime") == null) {
+				this.setFieldValByName("updateTime", new Date(), metaObject);
+			}
 		}
-		//endregion
 	}
 
-	@Override
-	public boolean openInsertFill() {
-		return true;
-	}
-
-	@Override
-	public boolean openUpdateFill() {
-		return true;
-	}
 }
