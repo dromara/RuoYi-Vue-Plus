@@ -513,7 +513,10 @@ public class ExcelUtil<T>
         }
         else if (ColumnType.NUMERIC == attr.cellType())
         {
-            cell.setCellValue(StrUtil.contains(Convert.toStr(value), ".") ? Convert.toDouble(value) : Convert.toInt(value));
+            if (StrUtil.isNotNull(value))
+            {
+                cell.setCellValue(StrUtil.contains(Convert.toStr(value), ".") ? Convert.toDouble(value) : Convert.toInt(value));
+            }
         }
         else if (ColumnType.IMAGE == attr.cellType())
         {
