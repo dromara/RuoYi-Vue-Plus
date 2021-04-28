@@ -11,6 +11,7 @@ import com.ruoyi.system.service.ISysOperLogService;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
      */
     @Override
     public void insertOperlog(SysOperLog operLog) {
+        operLog.setOperTime(new Date());
         save(operLog);
     }
 
