@@ -10,6 +10,7 @@ import com.ruoyi.system.service.ISysLogininforService;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
      */
     @Override
     public void insertLogininfor(SysLogininfor logininfor) {
+        logininfor.setLoginTime(new Date());
         save(logininfor);
     }
 
