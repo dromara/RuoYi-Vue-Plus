@@ -8,8 +8,8 @@
     <artifactId>ruoyi</artifactId>
     <version>3.4.0</version>
 
-    <name>ruoyi</name>
-    <url>http://www.ruoyi.vip</url>
+    <name>RuoYi-Vue-Plus</name>
+    <url>https://gitee.com/JavaLionLi/RuoYi-Vue-Plus</url>
     <description>若依管理系统</description>
     
     <properties>
