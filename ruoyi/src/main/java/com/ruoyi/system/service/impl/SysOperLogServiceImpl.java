@@ -11,6 +11,7 @@ import com.ruoyi.system.service.ISysOperLogService;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
      */
     @Override
     public void insertOperlog(SysOperLog operLog) {
+        operLog.setOperTime(new Date());
         save(operLog);
     }
 
@@ -54,10 +56,10 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
                         SysOperLog::getStatus,operLog.getStatus())
                 .like(StrUtil.isNotBlank(operLog.getOperName()),SysOperLog::getOperName,operLog.getOperName())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(login_time,'%y%m%d') &gt;= date_format({0},'%y%m%d')",
+                        "date_format(oper_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(login_time,'%y%m%d') &lt;= date_format({0},'%y%m%d'",
+                        "date_format(oper_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"))
                 .orderByDesc(SysOperLog::getOperId));
     }
