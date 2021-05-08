@@ -1,7 +1,6 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.annotation.DataScope;
@@ -49,20 +48,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Override
     @DataScope(deptAlias = "d")
     public List<SysRole> selectRoleList(SysRole role) {
-        Map<String, Object> params = role.getParams();
-        Object dataScope = params.get("dataScope");
-        return list(new LambdaQueryWrapper<SysRole>()
-                .like(StrUtil.isNotBlank(role.getRoleName()), SysRole::getRoleName, role.getRoleName())
-                .eq(StrUtil.isNotBlank(role.getStatus()), SysRole::getStatus, role.getStatus())
-                .like(StrUtil.isNotBlank(role.getRoleKey()), SysRole::getRoleKey, role.getRoleKey())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
-                        params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
-                        params.get("endTime"))
-                .apply(dataScope != null, dataScope != null ? dataScope.toString() : null)
-                .orderByAsc(SysRole::getRoleSort));
+        return baseMapper.selectRoleList(role);
     }
 
     /**
@@ -236,7 +222,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      * @param role 角色对象
      */
     public int insertRoleMenu(SysRole role) {
-        int rows = 0;
+        int rows = 1;
         // 新增用户与角色管理
         List<SysRoleMenu> list = new ArrayList<SysRoleMenu>();
         for (Long menuId : role.getMenuIds()) {
@@ -259,7 +245,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      * @param role 角色对象
      */
     public int insertRoleDept(SysRole role) {
-        int rows = 0;
+        int rows = 1;
         // 新增角色与部门（数据权限）管理
         List<SysRoleDept> list = new ArrayList<SysRoleDept>();
         for (Long deptId : role.getDeptIds()) {

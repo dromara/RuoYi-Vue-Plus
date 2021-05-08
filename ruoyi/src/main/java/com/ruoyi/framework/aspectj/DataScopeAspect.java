@@ -3,7 +3,6 @@ package com.ruoyi.framework.aspectj;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.annotation.DataScope;
-import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
@@ -19,6 +18,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * 数据过滤处理
@@ -145,10 +145,15 @@ public class DataScopeAspect
         if (StrUtil.isNotBlank(sqlString.toString()))
         {
             Object params = joinPoint.getArgs()[0];
-            if (Validator.isNotNull(params) && params instanceof BaseEntity)
+            if (Validator.isNotNull(params))
             {
-                BaseEntity baseEntity = (BaseEntity) params;
-                baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
+                try {
+                    Method getParams = params.getClass().getDeclaredMethod("getParams", null);
+                    Map<String, Object> invoke = (Map<String, Object>) getParams.invoke(params, null);
+                    invoke.put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
