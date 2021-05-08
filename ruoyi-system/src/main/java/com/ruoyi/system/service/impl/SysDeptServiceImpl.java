@@ -48,15 +48,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     @Override
     @DataScope(deptAlias = "d")
     public List<SysDept> selectDeptList(SysDept dept) {
-        Object dataScope = dept.getParams().get("dataScope");
-        return list(new LambdaQueryWrapper<SysDept>()
-                .eq(dept.getParentId() != null && dept.getParentId() != 0,
-                        SysDept::getParentId, dept.getParentId())
-                .like(StrUtil.isNotBlank(dept.getDeptName()), SysDept::getDeptName, dept.getDeptName())
-                .eq(StrUtil.isNotBlank(dept.getStatus()), SysDept::getStatus, dept.getStatus())
-                .apply(dataScope != null, dataScope != null ? dataScope.toString() : null)
-                .orderByAsc(SysDept::getParentId)
-                .orderByAsc(SysDept::getOrderNum));
+        return baseMapper.selectDeptList(dept);
     }
 
     /**

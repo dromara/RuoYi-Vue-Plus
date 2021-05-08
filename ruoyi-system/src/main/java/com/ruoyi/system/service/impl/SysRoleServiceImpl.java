@@ -49,20 +49,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Override
     @DataScope(deptAlias = "d")
     public List<SysRole> selectRoleList(SysRole role) {
-        Map<String, Object> params = role.getParams();
-        Object dataScope = params.get("dataScope");
-        return list(new LambdaQueryWrapper<SysRole>()
-                .like(StrUtil.isNotBlank(role.getRoleName()), SysRole::getRoleName, role.getRoleName())
-                .eq(StrUtil.isNotBlank(role.getStatus()), SysRole::getStatus, role.getStatus())
-                .like(StrUtil.isNotBlank(role.getRoleKey()), SysRole::getRoleKey, role.getRoleKey())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
-                        params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
-                        params.get("endTime"))
-                .apply(dataScope != null, dataScope != null ? dataScope.toString() : null)
-                .orderByAsc(SysRole::getRoleSort));
+        return baseMapper.selectRoleList(role);
     }
 
     /**
