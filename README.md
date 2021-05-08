@@ -39,6 +39,9 @@
 * 同步升级 3.4.0
 * 多模块 master 分支 https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/master/
 
+## 关注作者(扫码加群)
+![](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
+
 ## 平台简介
 
 若依是一套全部开源的快速开发平台，毫无保留给个人及企业免费使用。
