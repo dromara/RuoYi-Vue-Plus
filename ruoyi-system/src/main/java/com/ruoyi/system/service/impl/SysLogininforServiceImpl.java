@@ -47,10 +47,10 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
                 .eq(StrUtil.isNotBlank(logininfor.getStatus()),SysLogininfor::getStatus,logininfor.getStatus())
                 .like(StrUtil.isNotBlank(logininfor.getUserName()),SysLogininfor::getUserName,logininfor.getUserName())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(login_time,'%y%m%d') &gt;= date_format({0},'%y%m%d')",
+                        "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(login_time,'%y%m%d') &lt;= date_format({0},'%y%m%d'",
+                        "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d'",
                         params.get("endTime"))
                 .orderByDesc(SysLogininfor::getInfoId));
     }
