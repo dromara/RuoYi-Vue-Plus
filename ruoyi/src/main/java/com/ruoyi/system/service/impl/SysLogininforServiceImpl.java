@@ -50,7 +50,7 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
                         "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d'",
+                        "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"))
                 .orderByDesc(SysLogininfor::getInfoId));
     }

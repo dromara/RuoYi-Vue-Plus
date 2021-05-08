@@ -56,10 +56,10 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
                         SysOperLog::getStatus,operLog.getStatus())
                 .like(StrUtil.isNotBlank(operLog.getOperName()),SysOperLog::getOperName,operLog.getOperName())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+                        "date_format(oper_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d'",
+                        "date_format(oper_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"))
                 .orderByDesc(SysOperLog::getOperId));
     }
