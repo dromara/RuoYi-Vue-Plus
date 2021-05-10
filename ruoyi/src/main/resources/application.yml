@@ -1,9 +1,9 @@
 # 项目相关配置
 ruoyi:
   # 名称
-  name: RuoYi
+  name: RuoYi-Vue-Plus
   # 版本
-  version: 3.4.0
+  version: ${ruoyi-vue-plus.version}
   # 版权年份
   copyrightYear: 2021
   # 实例演示开关

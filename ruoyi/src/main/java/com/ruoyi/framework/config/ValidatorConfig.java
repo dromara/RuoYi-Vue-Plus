@@ -8,6 +8,11 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+/**
+ * 校验框架配置类
+ *
+ * @author Lion Li
+ */
 @Configuration
 public class ValidatorConfig {
 
