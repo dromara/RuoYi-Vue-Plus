@@ -1,8 +1,8 @@
 {
-  "name": "ruoyi",
-  "version": "3.4.0",
-  "description": "若依管理系统",
-  "author": "若依",
+  "name": "ruoyi-vue-plus",
+  "version": "1.0.0",
+  "description": "RuoYi-Vue-Plus后台管理系统",
+  "author": "LionLi",
   "license": "MIT",
   "scripts": {
     "dev": "vue-cli-service serve",

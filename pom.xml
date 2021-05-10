@@ -5,15 +5,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	
     <groupId>com.ruoyi</groupId>
-    <artifactId>ruoyi</artifactId>
-    <version>3.4.0</version>
+    <artifactId>ruoyi-vue-plus</artifactId>
+    <version>${ruoyi-vue-plus.version}</version>
 
     <name>RuoYi-Vue-Plus</name>
     <url>https://gitee.com/JavaLionLi/RuoYi-Vue-Plus</url>
-    <description>若依管理系统</description>
+    <description>RuoYi-Vue-Plus后台管理系统</description>
     
     <properties>
-        <ruoyi.version>3.4.0</ruoyi.version>
+        <ruoyi-vue-plus.version>1.0.0</ruoyi-vue-plus.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -168,42 +168,42 @@
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-quartz</artifactId>
-                <version>${ruoyi.version}</version>
+                <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 	
             <!-- 代码生成-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-generator</artifactId>
-                <version>${ruoyi.version}</version>
+                <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 			
             <!-- 核心模块-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-framework</artifactId>
-                <version>${ruoyi.version}</version>
+                <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 			
             <!-- 系统模块-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-system</artifactId>
-                <version>${ruoyi.version}</version>
+                <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 			
             <!-- 通用工具-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-common</artifactId>
-                <version>${ruoyi.version}</version>
+                <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
             <!-- demo模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-demo</artifactId>
-                <version>${ruoyi.version}</version>
+                <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
         </dependencies>
