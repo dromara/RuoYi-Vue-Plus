@@ -11,6 +11,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
 
+/**
+ * springboot-admin server配置类
+ *
+ * @author Lion Li
+ */
 @Configuration
 @EnableAdminServer
 public class AdminServerConfig {

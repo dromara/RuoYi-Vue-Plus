@@ -5,6 +5,11 @@ import com.ruoyi.demo.feign.FeignTestService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+/**
+ * feign测试fallback
+ *
+ * @author Lion Li
+ */
 @Slf4j
 @Component
 public class FeignTestFallback implements FeignTestService {

@@ -10,6 +10,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/**
+ * mybatis-plus配置类
+ *
+ * @author Lion Li
+ */
 @EnableTransactionManagement(proxyTargetClass = true)
 @Configuration
 public class MybatisPlusConfig {
