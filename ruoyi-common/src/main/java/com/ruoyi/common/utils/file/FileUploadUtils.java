@@ -133,15 +133,13 @@ public class FileUploadUtils
     {
         File desc = new File(uploadDir + File.separator + fileName);
 
-        if (!desc.getParentFile().exists())
+        if (!desc.exists())
         {
-            desc.getParentFile().mkdirs();
+            if (!desc.getParentFile().exists())
+            {
+                desc.getParentFile().mkdirs();
+            }
         }
-        // 解决undertow文件上传bug,因底层实现不同,无需创建新文件
-//        if (!desc.exists())
-//        {
-//            desc.createNewFile();
-//        }
         return desc;
     }
 
@@ -187,6 +185,11 @@ public class FileUploadUtils
             else if (allowedExtension == MimeTypeUtils.MEDIA_EXTENSION)
             {
                 throw new InvalidExtensionException.InvalidMediaExtensionException(allowedExtension, extension,
+                        fileName);
+            }
+            else if (allowedExtension == MimeTypeUtils.VIDEO_EXTENSION)
+            {
+                throw new InvalidExtensionException.InvalidVideoExtensionException(allowedExtension, extension,
                         fileName);
             }
             else
