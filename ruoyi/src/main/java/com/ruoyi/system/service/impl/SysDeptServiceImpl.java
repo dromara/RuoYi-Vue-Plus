@@ -241,7 +241,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         List<SysDept> children = list(new LambdaQueryWrapper<SysDept>()
                 .apply("find_in_set({0},ancestors)",deptId));
         for (SysDept child : children) {
-            child.setAncestors(child.getAncestors().replace(oldAncestors, newAncestors));
+            child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
         }
         if (children.size() > 0) {
             updateBatchById(children);

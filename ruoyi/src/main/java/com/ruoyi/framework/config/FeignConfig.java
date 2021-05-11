@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Lion Li
  */
-@EnableFeignClients("com.ruoyi.**.feign")
+@EnableFeignClients("${feign.package}")
 @Configuration
 @ConditionalOnClass(Feign.class)
 @AutoConfigureBefore(FeignAutoConfiguration.class)
