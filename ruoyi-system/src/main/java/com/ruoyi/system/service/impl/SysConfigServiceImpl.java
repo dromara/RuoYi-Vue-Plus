@@ -58,7 +58,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
                         "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
+                        "date_format(create_time,'%y%m%d') <= date_format(#{0},'%y%m%d')",
                         params.get("endTime"));
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
     }
