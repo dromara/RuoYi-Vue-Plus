@@ -1,26 +1,3 @@
-## 重点注意事项
-
-若依文档对事务注解的描述 [关于事务](https://doc.ruoyi.vip/ruoyi/document/htsc.html#%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86)  以下对多数据源事务做补充:
-* 同一个事务下是无法切换数据源的
-* 禁止 父方法使用 @Transactional 创建事务 子方法使用 @DataSource 切换数据源
-* 正确用法: 子方法单独创建事务 或 父方法使用 @Transactional(propagation = Propagation.REQUIRES_NEW) 为所有子方法创建新事务
-
-关于如何使用Tomcat
-* 查看ruoyi-framework模块的pom.xml文件,根据注释更改依赖
-* 查看ruoyi-admin模块中的application.yml文件,根据注释更改配置
-
-关于如何创建新模块
-* 参考ruoyi-demo模块
-* 需要改动: 父pom 与 admin模块pom
-
-关于树表生成
-* 直接在mysql表中 添加 parentId orderNum 等字段(根据需要参考 TreeEntity类)
-* 代码生成选择树表生成即可
-
-关于数据权限
-* @DataScope 注解代码生成仅支持在 Controller list 方法使用
-* 其余方法如要使用 需参考 list 方法实现在 LambdaQueryWrapper 注入数据权限生成的 SQL 语句
-
 ## 修改RuoYi功能
 
 * ORM框架 使用 Mybatis-Plus 简化CRUD (目前支持单表生成与树表 不支持主子表)
@@ -30,6 +7,7 @@
 * 代码生成模板 改为适配 Mybatis-Plus 的代码
 * 代码生成模板 拆分出Vo,QueryBo,AddBo,EditBo等领域对象
 * 项目修改为 maven多环境配置
+* 项目配置修改为 application.yml 统一管理
 * swagger 修改为 knife4j
 * 集成 Hutool 5.X 并重写RuoYi部分功能
 * 集成 Feign 接口化管理 Http 请求(如三方请求 支付,短信,推送等)
@@ -53,6 +31,28 @@
 * 高效率开发，使用代码生成器可以一键生成前后端代码。
 * 提供了单应用版本[RuoYi-Vue-fast](https://github.com/yangzongzhuan/RuoYi-Vue-fast)，Oracle版本[RuoYi-Vue-Oracle](https://github.com/yangzongzhuan/RuoYi-Vue-Oracle)，保持同步更新。
 * 不分离版本，请移步[RuoYi](https://gitee.com/y_project/RuoYi)，微服务版本，请移步[RuoYi-Cloud](https://gitee.com/y_project/RuoYi-Cloud)
+
+## 重点注意事项
+
+若依文档对事务注解的描述 [关于事务](https://doc.ruoyi.vip/ruoyi/document/htsc.html#%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86)  以下对多数据源事务做补充:
+* 同一个事务下是无法切换数据源的
+* 禁止 父方法使用 @Transactional 创建事务 子方法使用 @DataSource 切换数据源
+* 正确用法: 子方法单独创建事务 或 父方法使用 @Transactional(propagation = Propagation.REQUIRES_NEW) 为所有子方法创建新事务
+
+关于如何使用Tomcat
+* 查看ruoyi-framework模块的pom.xml文件,根据注释更改依赖
+* 查看ruoyi-admin模块中的application.yml文件,根据注释更改配置
+
+关于如何创建新模块
+* 参考ruoyi-demo模块
+* 需要改动: 父pom 与 admin模块pom
+
+关于树表生成
+* 直接在mysql表中 添加 parentId orderNum 等字段(根据需要参考 TreeEntity类)
+* 代码生成选择树表生成即可
+
+关于vue与boot整合部署  
+* [前端静态资源如何整合到后端访问](https://doc.ruoyi.vip/ruoyi-vue/other/faq.html#前端静态资源如何整合到后端访问)
 
 ## 内置功能
 
