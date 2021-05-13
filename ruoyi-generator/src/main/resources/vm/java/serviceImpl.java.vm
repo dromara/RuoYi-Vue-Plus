@@ -2,11 +2,11 @@ package ${packageName}.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.PageUtils;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.github.pagehelper.Page;
 import ${packageName}.bo.${ClassName}AddBo;
 import ${packageName}.bo.${ClassName}QueryBo;
 import ${packageName}.bo.${ClassName}EditBo;
@@ -15,11 +15,8 @@ import ${packageName}.mapper.${ClassName}Mapper;
 import ${packageName}.vo.${ClassName}Vo;
 import ${packageName}.service.I${ClassName}Service;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * ${functionName}Service业务层处理
@@ -61,27 +58,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 #end
 #end
 #end
-        return entity2Vo(this.list(lqw));
-    }
-
-    /**
-    * 实体类转化成视图对象
-    *
-    * @param collection 实体类集合
-    * @return
-    */
-    private List<${ClassName}Vo> entity2Vo(Collection<${ClassName}> collection) {
-        List<${ClassName}Vo> voList = collection.stream()
-                .map(any -> BeanUtil.toBean(any, ${ClassName}Vo.class))
-                .collect(Collectors.toList());
-        if (collection instanceof Page) {
-            Page<${ClassName}> page = (Page<${ClassName}>)collection;
-            Page<${ClassName}Vo> pageVo = new Page<>();
-            BeanUtil.copyProperties(page,pageVo);
-            pageVo.addAll(voList);
-            voList = pageVo;
-        }
-        return voList;
+        return PageUtils.buildDataInfo(page(PageUtils.buildPagePlus(), lqw));
     }
 
     @Override

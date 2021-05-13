@@ -53,9 +53,7 @@ public class ${ClassName}Controller extends BaseController {
     @GetMapping("/list")
 #if($table.crud || $table.sub)
     public TableDataInfo<${ClassName}Vo> list(${ClassName}QueryBo bo) {
-        startPage();
-        List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
-        return getDataTable(list);
+        return i${ClassName}Service.queryPageList(bo);
     }
 #elseif($table.tree)
     public AjaxResult<${ClassName}Vo> list(${ClassName}QueryBo bo) {

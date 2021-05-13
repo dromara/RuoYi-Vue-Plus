@@ -5,7 +5,10 @@ import ${packageName}.vo.${ClassName}Vo;
 import ${packageName}.bo.${ClassName}QueryBo;
 import ${packageName}.bo.${ClassName}AddBo;
 import ${packageName}.bo.${ClassName}EditBo;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.page.IServicePlus;
+#if($table.crud || $table.sub)
+import com.ruoyi.common.core.page.TableDataInfo;
+#end
 
 import java.util.Collection;
 import java.util.List;
@@ -16,13 +19,19 @@ import java.util.List;
  * @author ${author}
  * @date ${datetime}
  */
-public interface I${ClassName}Service extends IService<${ClassName}> {
+public interface I${ClassName}Service extends IServicePlus<${ClassName}> {
 	/**
 	 * 查询单个
 	 * @return
 	 */
 	${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField});
 
+#if($table.crud || $table.sub)
+	/**
+	 * 查询列表
+	 */
+    TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}QueryBo bo);
+#end
 	/**
 	 * 查询列表
 	 */
