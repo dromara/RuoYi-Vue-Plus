@@ -18,6 +18,7 @@ import ${packageName}.service.I${ClassName}Service;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +38,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 
     @Override
     public List<${ClassName}Vo> queryList(${ClassName}QueryBo bo) {
+        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery();
 #foreach($column in $columns)
 #if($column.query)
@@ -54,12 +56,8 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 #end
         lqw.$mpMethod($condition, ${ClassName}::get$AttrName, bo.get$AttrName());
 #else
-        Object dataScope = bo.getParams().get("dataScope");
-        lqw.apply(dataScope != null, dataScope != null ? dataScope.toString() : null);
-        Map<String, Object> params = bo.getParams();
-        if (params.get("begin$AttrName") != null && params.get("end$AttrName") != null) {
-            lqw.between(${ClassName}::get$AttrName ,params.get("begin$AttrName"), params.get("end$AttrName"));
-        }
+        lqw.between(params.get("begin$AttrName") != null && params.get("end$AttrName") != null,
+            ${ClassName}::get$AttrName ,params.get("begin$AttrName"), params.get("end$AttrName"));
 #end
 #end
 #end
