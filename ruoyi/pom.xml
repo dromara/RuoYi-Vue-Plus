@@ -13,7 +13,7 @@
     <description>RuoYi-Vue-Plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>1.0.0</ruoyi-vue-plus.version>
+        <ruoyi-vue-plus.version>1.0.2</ruoyi-vue-plus.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>

@@ -79,6 +79,10 @@ spring:
     restart:
       # 热部署开关
       enabled: true
+  # 与vue整合部署使用
+  thymeleaf:
+    # 将系统模板放置到最前面 否则会与 springboot-admin 页面冲突
+    template-resolver-order: 1
   application:
     name: ruoyi-vue-plus
   boot:
