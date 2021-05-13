@@ -15,9 +15,9 @@
 * 升级MybatisPlus 3.4.2
 * 增加demo模块示例(给不会增加模块的小伙伴做参考)
 * 同步升级 3.4.0
-* 单模块 fast 分支 https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/
+* 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
 
-## 关注作者(扫码加群)
+## 关注作者(扫码请备注: "加群")
 ![](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
 
 ## 平台简介
@@ -29,8 +29,6 @@
 * 权限认证使用Jwt，支持多终端认证系统。
 * 支持加载动态权限菜单，多方式轻松权限控制。
 * 高效率开发，使用代码生成器可以一键生成前后端代码。
-* 提供了单应用版本[RuoYi-Vue-fast](https://github.com/yangzongzhuan/RuoYi-Vue-fast)，Oracle版本[RuoYi-Vue-Oracle](https://github.com/yangzongzhuan/RuoYi-Vue-Oracle)，保持同步更新。
-* 不分离版本，请移步[RuoYi](https://gitee.com/y_project/RuoYi)，微服务版本，请移步[RuoYi-Cloud](https://gitee.com/y_project/RuoYi-Cloud)
 
 ## 重点注意事项
 
@@ -50,6 +48,10 @@
 关于树表生成
 * 直接在mysql表中 添加 parentId orderNum 等字段(根据需要参考 TreeEntity类)
 * 代码生成选择树表生成即可
+
+关于数据权限
+* 参考（用户，角色，部门）列表接口用法
+* 从 bo.getParam().get("dataScope") 即可获取数据权限生成的SQL
 
 关于vue与boot整合部署  
 * [前端静态资源如何整合到后端访问](https://doc.ruoyi.vip/ruoyi-vue/other/faq.html#前端静态资源如何整合到后端访问)
