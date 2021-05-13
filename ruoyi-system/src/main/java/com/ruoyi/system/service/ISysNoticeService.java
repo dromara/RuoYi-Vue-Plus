@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysNotice;
 
 import java.util.List;
@@ -10,7 +11,11 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface ISysNoticeService extends IService<SysNotice> {
+public interface ISysNoticeService extends IServicePlus<SysNotice> {
+
+
+    TableDataInfo<SysNotice> selectPageNoticeList(SysNotice notice);
+
     /**
      * 查询公告信息
      *

@@ -40,9 +40,7 @@ public class SysNoticeController extends BaseController
     @GetMapping("/list")
     public TableDataInfo list(SysNotice notice)
     {
-        startPage();
-        List<SysNotice> list = noticeService.selectNoticeList(notice);
-        return getDataTable(list);
+        return noticeService.selectPageNoticeList(notice);
     }
 
     /**

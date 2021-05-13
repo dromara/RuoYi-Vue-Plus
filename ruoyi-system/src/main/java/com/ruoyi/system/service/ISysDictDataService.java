@@ -1,7 +1,8 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.entity.SysDictData;
+import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.page.TableDataInfo;
 
 import java.util.List;
 
@@ -10,7 +11,11 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface ISysDictDataService extends IService<SysDictData> {
+public interface ISysDictDataService extends IServicePlus<SysDictData> {
+
+
+    TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData);
+
     /**
      * 根据条件分页查询字典数据
      *

@@ -1,13 +1,14 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.domain.SysRoleMenu;
@@ -39,6 +40,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
     @Autowired
     private SysRoleDeptMapper roleDeptMapper;
+
+    @Override
+    @DataScope(deptAlias = "d")
+    public TableDataInfo<SysRole> selectPageRoleList(SysRole role) {
+        return PageUtils.buildDataInfo(baseMapper.selectPageRoleList(PageUtils.buildPage(), role));
+    }
 
     /**
      * 根据条件分页查询角色数据

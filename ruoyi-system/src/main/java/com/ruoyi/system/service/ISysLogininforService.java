@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysLogininfor;
 
 import java.util.List;
@@ -10,7 +11,11 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface ISysLogininforService extends IService<SysLogininfor> {
+public interface ISysLogininforService extends IServicePlus<SysLogininfor> {
+
+
+    TableDataInfo<SysLogininfor> selectPageLogininforList(SysLogininfor logininfor);
+
     /**
      * 新增系统登录日志
      *

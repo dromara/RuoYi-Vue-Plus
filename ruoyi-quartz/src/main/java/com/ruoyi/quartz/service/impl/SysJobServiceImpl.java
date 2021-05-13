@@ -4,7 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.ScheduleConstants;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.job.TaskException;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.quartz.domain.SysJob;
 import com.ruoyi.quartz.mapper.SysJobMapper;
 import com.ruoyi.quartz.service.ISysJobService;
@@ -41,6 +43,16 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
         for (SysJob job : jobList) {
             ScheduleUtils.createScheduleJob(scheduler, job);
         }
+    }
+
+    @Override
+    public TableDataInfo<SysJob> selectPageJobList(SysJob job) {
+        LambdaQueryWrapper<SysJob> lqw = new LambdaQueryWrapper<SysJob>()
+                .like(StrUtil.isNotBlank(job.getJobName()), SysJob::getJobName, job.getJobName())
+                .eq(StrUtil.isNotBlank(job.getJobGroup()), SysJob::getJobGroup, job.getJobGroup())
+                .eq(StrUtil.isNotBlank(job.getStatus()), SysJob::getStatus, job.getStatus())
+                .like(StrUtil.isNotBlank(job.getInvokeTarget()), SysJob::getInvokeTarget, job.getInvokeTarget());
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
     }
 
     /**

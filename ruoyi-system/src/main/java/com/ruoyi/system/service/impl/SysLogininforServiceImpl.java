@@ -4,6 +4,8 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.domain.SysLogininfor;
 import com.ruoyi.system.mapper.SysLogininforMapper;
 import com.ruoyi.system.service.ISysLogininforService;
@@ -21,6 +23,23 @@ import java.util.Map;
  */
 @Service
 public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, SysLogininfor> implements ISysLogininforService {
+
+    @Override
+    public TableDataInfo<SysLogininfor> selectPageLogininforList(SysLogininfor logininfor) {
+        Map<String, Object> params = logininfor.getParams();
+        LambdaQueryWrapper<SysLogininfor> lqw = new LambdaQueryWrapper<SysLogininfor>()
+                .like(StrUtil.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
+                .eq(StrUtil.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
+                .like(StrUtil.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
+                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                        "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+                        params.get("beginTime"))
+                .apply(Validator.isNotEmpty(params.get("endTime")),
+                        "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+                        params.get("endTime"))
+                .orderByDesc(SysLogininfor::getInfoId);
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+    }
 
     /**
      * 新增系统登录日志

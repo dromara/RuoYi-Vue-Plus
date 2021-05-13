@@ -9,8 +9,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.domain.entity.SysDictType;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.DictUtils;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
 import com.ruoyi.system.mapper.SysDictTypeMapper;
 import com.ruoyi.system.service.ISysDictTypeService;
@@ -48,6 +50,22 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
                             .orderByAsc(SysDictData::getDictSort));
             DictUtils.setDictCache(dictType.getDictType(), dictDatas);
         }
+    }
+
+    @Override
+    public TableDataInfo<SysDictType> selectPageDictTypeList(SysDictType dictType) {
+        Map<String, Object> params = dictType.getParams();
+        LambdaQueryWrapper<SysDictType> lqw = new LambdaQueryWrapper<SysDictType>()
+                .like(StrUtil.isNotBlank(dictType.getDictName()), SysDictType::getDictName, dictType.getDictName())
+                .eq(StrUtil.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
+                .like(StrUtil.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
+                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+                        params.get("beginTime"))
+                .apply(Validator.isNotEmpty(params.get("endTime")),
+                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+                        params.get("endTime"));
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage(),lqw));
     }
 
     /**

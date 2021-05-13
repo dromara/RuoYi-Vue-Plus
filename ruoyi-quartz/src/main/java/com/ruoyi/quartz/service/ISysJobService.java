@@ -1,6 +1,7 @@
 package com.ruoyi.quartz.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.job.TaskException;
 import com.ruoyi.quartz.domain.SysJob;
 import org.quartz.SchedulerException;
@@ -12,13 +13,15 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface ISysJobService extends IService<SysJob> {
+public interface ISysJobService extends IServicePlus<SysJob> {
     /**
      * 获取quartz调度器的计划任务
      *
      * @param job 调度信息
      * @return 调度任务集合
      */
+    public TableDataInfo<SysJob> selectPageJobList(SysJob job);
+
     public List<SysJob> selectJobList(SysJob job);
 
     /**

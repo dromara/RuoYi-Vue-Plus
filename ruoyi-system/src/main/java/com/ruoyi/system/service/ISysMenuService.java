@@ -1,8 +1,8 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysMenu;
+import com.ruoyi.common.core.page.IServicePlus;
 import com.ruoyi.system.domain.vo.RouterVo;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.Set;
  *
  * @author ruoyi
  */
-public interface ISysMenuService extends IService<SysMenu> {
+public interface ISysMenuService extends IServicePlus<SysMenu> {
     /**
      * 根据用户查询系统菜单列表
      *

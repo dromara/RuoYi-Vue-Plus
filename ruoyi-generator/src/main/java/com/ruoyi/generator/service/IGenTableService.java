@@ -1,6 +1,7 @@
 package com.ruoyi.generator.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.generator.domain.GenTable;
 
 import java.util.List;
@@ -11,7 +12,14 @@ import java.util.Map;
  *
  * @author ruoyi
  */
-public interface IGenTableService extends IService<GenTable> {
+public interface IGenTableService extends IServicePlus<GenTable> {
+
+
+    TableDataInfo<GenTable> selectPageGenTableList(GenTable genTable);
+
+
+    TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable);
+
     /**
      * 查询业务列表
      *

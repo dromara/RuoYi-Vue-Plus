@@ -5,6 +5,8 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.domain.SysOperLog;
 import com.ruoyi.system.mapper.SysOperLogMapper;
 import com.ruoyi.system.service.ISysOperLogService;
@@ -22,6 +24,31 @@ import java.util.Map;
  */
 @Service
 public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOperLog> implements ISysOperLogService {
+
+    @Override
+    public TableDataInfo<SysOperLog> selectPageOperLogList(SysOperLog operLog) {
+        Map<String, Object> params = operLog.getParams();
+        LambdaQueryWrapper<SysOperLog> lqw = new LambdaQueryWrapper<SysOperLog>()
+                .like(StrUtil.isNotBlank(operLog.getTitle()), SysOperLog::getTitle, operLog.getTitle())
+                .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
+                        SysOperLog::getBusinessType, operLog.getBusinessType())
+                .func(f -> {
+                    if (ArrayUtil.isNotEmpty(operLog.getBusinessTypes())) {
+                        f.in(SysOperLog::getBusinessType, Arrays.asList(operLog.getBusinessTypes()));
+                    }
+                })
+                .eq(operLog.getStatus() != null && operLog.getStatus() > 0,
+                        SysOperLog::getStatus, operLog.getStatus())
+                .like(StrUtil.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
+                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                        "date_format(oper_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+                        params.get("beginTime"))
+                .apply(Validator.isNotEmpty(params.get("endTime")),
+                        "date_format(oper_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+                        params.get("endTime"))
+                .orderByDesc(SysOperLog::getOperId);
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+    }
 
     /**
      * 新增操作日志
