@@ -56,7 +56,7 @@ public class ${ClassName}Controller extends BaseController {
         return i${ClassName}Service.queryPageList(bo);
     }
 #elseif($table.tree)
-    public AjaxResult<${ClassName}Vo> list(${ClassName}QueryBo bo) {
+    public AjaxResult<List<${ClassName}Vo>> list(${ClassName}QueryBo bo) {
         List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
         return AjaxResult.success(list);
     }
