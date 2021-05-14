@@ -80,6 +80,19 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.0.0 - 2021-5-15">
+              <ol>
+                <li>springboot 升级 2.3.10 依赖全面升级适配</li>
+                <li>add 增加分页工具</li>
+                <li>add 增加 增强Mapper 与 增强Service 重写业务适配</li>
+                <li>add 代码生成器 增加校验注解</li>
+                <li>update 代码生成器修改为MP分页</li>
+                <li>update 使用 MP 分页工具 重构业务</li>
+                <li>update 重写文档介绍</li>
+                <li>remove 移除 pagehelper 分页工具</li>
+                <li>fix 修复代码生成 数据权限问题</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v1.0.2 - 2021-5-13">
               <ol>
                 <li>update 更新整合打包文档 重新排版</li>
@@ -127,7 +140,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "1.0.2",
+      version: "2.0.0",
     };
   },
   methods: {
