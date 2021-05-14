@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.Date;
-import javax.validation.constraints.*;
 
 #foreach ($import in $importList)
 import ${import};
@@ -55,11 +54,6 @@ public class ${ClassName}QueryBo extends ${Entity} {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 #end
 	@ApiModelProperty("$column.columnComment")
-#if($column.javaType == 'String')
-	@NotBlank(message = "$column.columnComment不能为空")
-#else
-	@NotNull(message = "$column.columnComment不能为空")
-#end
 	private $column.javaType $column.javaField;
 #end
 #end
