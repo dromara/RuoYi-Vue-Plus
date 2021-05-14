@@ -88,25 +88,7 @@
                     <warName>${project.artifactId}</warName>
                 </configuration>   
            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <!--打包该目录下的 application.yml -->
-                <directory>src/main/resources</directory>
-                <!-- 启用过滤 即该资源中的变量将会被过滤器中的值替换 -->
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
 
 </project>
