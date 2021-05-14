@@ -2,11 +2,15 @@ package ${packageName}.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+#if($table.crud || $table.sub)
+import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.core.page.PagePlus;
+import com.ruoyi.common.core.page.TableDataInfo;
+#end
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.github.pagehelper.Page;
 import ${packageName}.bo.${ClassName}AddBo;
 import ${packageName}.bo.${ClassName}QueryBo;
 import ${packageName}.bo.${ClassName}EditBo;
@@ -15,10 +19,9 @@ import ${packageName}.mapper.${ClassName}Mapper;
 import ${packageName}.vo.${ClassName}Vo;
 import ${packageName}.service.I${ClassName}Service;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Collection;
 
 /**
  * ${functionName}Service业务层处理
@@ -31,12 +34,24 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 
     @Override
     public ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField}){
-        ${ClassName} db = this.baseMapper.selectById(${pkColumn.javaField});
-        return BeanUtil.toBean(db, ${ClassName}Vo.class);
+        return getVoById(${pkColumn.javaField}, ${ClassName}Vo.class);
     }
+
+#if($table.crud || $table.sub)
+    @Override
+    public TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}QueryBo bo) {
+        PagePlus<${ClassName}, ${ClassName}Vo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo), ${ClassName}Vo.class);
+        return PageUtils.buildDataInfo(result);
+    }
+#end
 
     @Override
     public List<${ClassName}Vo> queryList(${ClassName}QueryBo bo) {
+        return listVo(buildQueryWrapper(bo), ${ClassName}Vo.class);
+    }
+
+    private LambdaQueryWrapper<${ClassName}> buildQueryWrapper(${ClassName}QueryBo bo) {
+        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery();
 #foreach($column in $columns)
 #if($column.query)
@@ -54,50 +69,26 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 #end
         lqw.$mpMethod($condition, ${ClassName}::get$AttrName, bo.get$AttrName());
 #else
-        Object dataScope = bo.getParams().get("dataScope");
-        lqw.apply(dataScope != null, dataScope != null ? dataScope.toString() : null);
-        Map<String, Object> params = bo.getParams();
-        if (params.get("begin$AttrName") != null && params.get("end$AttrName") != null) {
-            lqw.between(${ClassName}::get$AttrName ,params.get("begin$AttrName"), params.get("end$AttrName"));
-        }
+        lqw.between(params.get("begin$AttrName") != null && params.get("end$AttrName") != null,
+            ${ClassName}::get$AttrName ,params.get("begin$AttrName"), params.get("end$AttrName"));
 #end
 #end
 #end
-        return entity2Vo(this.list(lqw));
-    }
-
-    /**
-    * 实体类转化成视图对象
-    *
-    * @param collection 实体类集合
-    * @return
-    */
-    private List<${ClassName}Vo> entity2Vo(Collection<${ClassName}> collection) {
-        List<${ClassName}Vo> voList = collection.stream()
-                .map(any -> BeanUtil.toBean(any, ${ClassName}Vo.class))
-                .collect(Collectors.toList());
-        if (collection instanceof Page) {
-            Page<${ClassName}> page = (Page<${ClassName}>)collection;
-            Page<${ClassName}Vo> pageVo = new Page<>();
-            BeanUtil.copyProperties(page,pageVo);
-            pageVo.addAll(voList);
-            voList = pageVo;
-        }
-        return voList;
+        return lqw;
     }
 
     @Override
     public Boolean insertByAddBo(${ClassName}AddBo bo) {
         ${ClassName} add = BeanUtil.toBean(bo, ${ClassName}.class);
         validEntityBeforeSave(add);
-        return this.save(add);
+        return save(add);
     }
 
     @Override
     public Boolean updateByEditBo(${ClassName}EditBo bo) {
         ${ClassName} update = BeanUtil.toBean(bo, ${ClassName}.class);
         validEntityBeforeSave(update);
-        return this.updateById(update);
+        return updateById(update);
     }
 
     /**
@@ -114,6 +105,6 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         if(isValid){
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return this.removeByIds(ids);
+        return removeByIds(ids);
     }
 }

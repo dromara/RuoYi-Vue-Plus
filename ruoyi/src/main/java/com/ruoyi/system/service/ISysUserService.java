@@ -1,7 +1,8 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.page.TableDataInfo;
 
 import java.util.List;
 
@@ -10,7 +11,11 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface ISysUserService extends IService<SysUser> {
+public interface ISysUserService extends IServicePlus<SysUser> {
+
+
+    TableDataInfo<SysUser> selectPageUserList(SysUser user);
+
     /**
      * 根据条件分页查询用户列表
      *

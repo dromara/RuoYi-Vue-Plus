@@ -1,6 +1,6 @@
 package com.ruoyi.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.common.core.page.BaseMapperPlus;
 import com.ruoyi.system.domain.SysLogininfor;
 
 /**
@@ -8,6 +8,6 @@ import com.ruoyi.system.domain.SysLogininfor;
  *
  * @author ruoyi
  */
-public interface SysLogininforMapper extends BaseMapper<SysLogininfor> {
+public interface SysLogininforMapper extends BaseMapperPlus<SysLogininfor> {
 
 }

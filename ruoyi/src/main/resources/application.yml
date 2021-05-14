@@ -37,12 +37,13 @@ server:
     # 以下的配置会影响buffer,这些buffer会用于服务器连接的IO操作,有点类似netty的池化内存管理
     # 每块buffer的空间大小,越小的空间被利用越充分
     buffer-size: 512
-    # 设置IO线程数, 它主要执行非阻塞的任务,它们会负责多个连接, 默认设置每个CPU核心一个线程
-    io-threads: 8
-    # 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载
-    worker-threads: 256
     # 是否分配的直接内存
     direct-buffers: true
+    threads:
+      # 设置IO线程数, 它主要执行非阻塞的任务,它们会负责多个连接, 默认设置每个CPU核心一个线程
+      io: 8
+      # 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载
+      worker: 256
 #  # tomcat 配置
 #  tomcat:
 #    # tomcat的URI编码
@@ -65,15 +66,15 @@ spring:
   messages:
     # 国际化资源文件路径
     basename: i18n/messages
-  profiles: 
+  profiles:
     active: @profiles.active@
   # 文件上传
   servlet:
-     multipart:
-       # 单个文件大小
-       max-file-size:  10MB
-       # 设置总上传的文件大小
-       max-request-size:  20MB
+    multipart:
+      # 单个文件大小
+      max-file-size: 10MB
+      # 设置总上传的文件大小
+      max-request-size: 20MB
   # 服务模块
   devtools:
     restart:
@@ -83,44 +84,17 @@ spring:
   thymeleaf:
     # 将系统模板放置到最前面 否则会与 springboot-admin 页面冲突
     template-resolver-order: 1
-  application:
-    name: ruoyi-vue-plus
-  boot:
-    admin:
-      # Spring Boot Admin Client 客户端的相关配置
-      client:
-        # 设置 Spring Boot Admin Server 地址
-        url: http://localhost:${server.port}${spring.boot.admin.context-path}
-        instance:
-          prefer-ip: true # 注册实例时，优先使用 IP
-#        username: ruoyi
-#        password: 123456
-      # Spring Boot Admin Server 服务端的相关配置
-      context-path: /admin # 配置 Spring
-
-# Actuator 监控端点的配置项
-management:
-  endpoints:
-    web:
-      # Actuator 提供的 API 接口的根目录。默认为 /actuator
-      base-path: /actuator
-      exposure:
-        # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
-        include: '*'
-  endpoint:
-    logfile:
-      external-file: ./logs/sys-console.log
 
 # token配置
 token:
-    # 令牌自定义标识
-    header: Authorization
-    # 令牌密钥
-    secret: abcdefghijklmnopqrstuvwxyz
-    # 令牌有效期（默认30分钟）
-    expireTime: 30
-  
-# MyBatis配置
+  # 令牌自定义标识
+  header: Authorization
+  # 令牌密钥
+  secret: abcdefghijklmnopqrstuvwxyz
+  # 令牌有效期（默认30分钟）
+  expireTime: 30
+
+# MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:
   mapperPackage: com.ruoyi.**.mapper
@@ -209,13 +183,6 @@ mybatis-plus:
       # 字段验证策略之 select,在 select 的时候的字段验证策略既 wrapper 根据内部 entity 生成的 where 条件
       selectStrategy: NOT_EMPTY
 
-# PageHelper分页插件
-pagehelper: 
-  helperDialect: mysql
-  reasonable: true
-  supportMethodsArguments: true
-  params: count=countSql 
-
 # Swagger配置
 swagger:
   # 是否开启swagger
@@ -230,7 +197,7 @@ swagger:
   version: '版本号: ${ruoyi-vue-plus.version}'
 
 # 防止XSS攻击
-xss: 
+xss:
   # 过滤开关
   enabled: true
   # 排除链接（多个用逗号分隔）
@@ -238,6 +205,7 @@ xss:
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
 
+# 全局线程池相关配置
 threadPoolConfig:
   # 是否开启线程池
   enabled: false
@@ -256,6 +224,7 @@ threadPoolConfig:
   # AbortPolicy 中止
   rejectedExecutionHandler: CallerRunsPolicy
 
+# feign 相关配置
 feign:
   package: com.ruoyi.**.feign
   # 开启压缩
@@ -268,3 +237,64 @@ feign:
     enabled: true
   hystrix:
     enabled: true
+
+--- # 定时任务配置
+spring:
+  quartz:
+    scheduler-name: RuoyiScheduler
+    startup-delay: 1s
+    overwrite-existing-jobs: true
+    auto-startup: true
+    job-store-type: jdbc
+    properties:
+      org:
+        quartz:
+          # Scheduler 相关配置
+          scheduler:
+            instanceName: RuoyiScheduler
+            instanceId: AUTO
+          # 线程池相关配置
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 20
+            threadPriority: 5
+          # JobStore 集群配置
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            isClustered: true
+            clusterCheckinInterval: 15000
+            txIsolationLevelSerializable: true
+            misfireThreshold: 60000
+            tablePrefix: QRTZ_
+            # sqlserver 启用
+            # selectWithLockSQL: SELECT * FROM {0}LOCKS UPDLOCK WHERE LOCK_NAME = ?
+
+--- # 监控配置
+spring:
+  application:
+    name: ruoyi-vue-plus
+  boot:
+    admin:
+      # Spring Boot Admin Client 客户端的相关配置
+      client:
+        # 设置 Spring Boot Admin Server 地址
+        url: http://localhost:${server.port}${spring.boot.admin.context-path}
+        instance:
+          prefer-ip: true # 注册实例时，优先使用 IP
+      #        username: ruoyi
+      #        password: 123456
+      # Spring Boot Admin Server 服务端的相关配置
+      context-path: /admin # 配置 Spring
+
+# Actuator 监控端点的配置项
+management:
+  endpoints:
+    web:
+      # Actuator 提供的 API 接口的根目录。默认为 /actuator
+      base-path: /actuator
+      exposure:
+        # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+        include: '*'
+  endpoint:
+    logfile:
+      external-file: ./logs/sys-console.log

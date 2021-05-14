@@ -10,7 +10,9 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.generator.domain.GenTable;
@@ -64,6 +66,16 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         GenTable genTable = baseMapper.selectGenTableById(id);
         setTableFromOptions(genTable);
         return genTable;
+    }
+
+    @Override
+    public TableDataInfo<GenTable> selectPageGenTableList(GenTable genTable) {
+        return PageUtils.buildDataInfo(baseMapper.selectPageGenTableList(PageUtils.buildPage(), genTable));
+    }
+
+    @Override
+    public TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable) {
+        return PageUtils.buildDataInfo(baseMapper.selectPageDbTableList(PageUtils.buildPage(), genTable));
     }
 
     /**

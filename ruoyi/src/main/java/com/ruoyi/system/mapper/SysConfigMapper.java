@@ -1,6 +1,6 @@
 package com.ruoyi.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.common.core.page.BaseMapperPlus;
 import com.ruoyi.system.domain.SysConfig;
 
 /**
@@ -8,6 +8,6 @@ import com.ruoyi.system.domain.SysConfig;
  *
  * @author ruoyi
  */
-public interface SysConfigMapper extends BaseMapper<SysConfig> {
+public interface SysConfigMapper extends BaseMapperPlus<SysConfig> {
 
 }

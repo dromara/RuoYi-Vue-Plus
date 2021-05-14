@@ -39,6 +39,29 @@
                  left join sys_dept d on u.dept_id = d.dept_id
     </sql>
 
+    <select id="selectPageRoleList" parameterType="SysRole" resultMap="SysRoleResult">
+        <include refid="selectRoleVo"/>
+        where r.del_flag = '0'
+        <if test="role.roleName != null and role.roleName != ''">
+            AND r.role_name like concat('%', #{role.roleName}, '%')
+        </if>
+        <if test="role.status != null and role.status != ''">
+            AND r.status = #{role.status}
+        </if>
+        <if test="role.roleKey != null and role.roleKey != ''">
+            AND r.role_key like concat('%', #{role.roleKey}, '%')
+        </if>
+        <if test="role.params.beginTime != null and role.params.beginTime != ''"><!-- 开始时间检索 -->
+            and date_format(r.create_time,'%y%m%d') &gt;= date_format(#{role.params.beginTime},'%y%m%d')
+        </if>
+        <if test="role.params.endTime != null and role.params.endTime != ''"><!-- 结束时间检索 -->
+            and date_format(r.create_time,'%y%m%d') &lt;= date_format(#{role.params.endTime},'%y%m%d')
+        </if>
+        <!-- 数据范围过滤 -->
+        ${role.params.dataScope}
+        order by r.role_sort
+    </select>
+
     <select id="selectRoleList" parameterType="SysRole" resultMap="SysRoleResult">
         <include refid="selectRoleVo"/>
         where r.del_flag = '0'

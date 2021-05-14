@@ -1,7 +1,9 @@
 package com.ruoyi.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.page.BaseMapperPlus;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -10,7 +12,10 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface SysUserMapper extends BaseMapper<SysUser> {
+public interface SysUserMapper extends BaseMapperPlus<SysUser> {
+
+    Page<SysUser> selectPageUserList(@Param("page") Page<SysUser> page, @Param("user") SysUser user);
+
     /**
      * 根据条件分页查询用户列表
      *

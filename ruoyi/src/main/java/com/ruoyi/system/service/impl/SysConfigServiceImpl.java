@@ -8,9 +8,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.enums.DataSourceType;
 import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.mapper.SysConfigMapper;
 import com.ruoyi.system.service.ISysConfigService;
@@ -43,6 +45,22 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
         for (SysConfig config : configsList) {
             redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
         }
+    }
+
+    @Override
+    public TableDataInfo<SysConfig> selectPageConfigList(SysConfig config) {
+        Map<String, Object> params = config.getParams();
+        LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
+                .like(StrUtil.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
+                .eq(StrUtil.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
+                .like(StrUtil.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
+                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                        "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
+                        params.get("beginTime"))
+                .apply(Validator.isNotEmpty(params.get("endTime")),
+                        "date_format(create_time,'%y%m%d') <= date_format(#{0},'%y%m%d')",
+                        params.get("endTime"));
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
     }
 
     /**
@@ -86,17 +104,17 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
      */
     @Override
     public List<SysConfig> selectConfigList(SysConfig config) {
-        LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<>();
-        lqw.like(StrUtil.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName());
-        lqw.eq(StrUtil.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType());
-        lqw.like(StrUtil.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey());
         Map<String, Object> params = config.getParams();
-        lqw.apply(Validator.isNotEmpty(params.get("beginTime")),
-                "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
-                params.get("beginTime"));
-        lqw.apply(Validator.isNotEmpty(params.get("endTime")),
-                "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
-                params.get("endTime"));
+        LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
+                .like(StrUtil.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
+                .eq(StrUtil.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
+                .like(StrUtil.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
+                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                        "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
+                        params.get("beginTime"))
+                .apply(Validator.isNotEmpty(params.get("endTime")),
+                        "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
+                        params.get("endTime"));
         return baseMapper.selectList(lqw);
     }
 

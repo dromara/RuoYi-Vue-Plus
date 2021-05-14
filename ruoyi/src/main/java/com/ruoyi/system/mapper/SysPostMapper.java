@@ -1,6 +1,6 @@
 package com.ruoyi.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.common.core.page.BaseMapperPlus;
 import com.ruoyi.system.domain.SysPost;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface SysPostMapper extends BaseMapper<SysPost> {
+public interface SysPostMapper extends BaseMapperPlus<SysPost> {
 
     /**
      * 根据用户ID获取岗位选择框列表
