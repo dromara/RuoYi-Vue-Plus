@@ -5,19 +5,20 @@
         <h2>RuoYi-Vue-Plus后台管理框架</h2>
         <p>
           基于 RuoYi-Vue 集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 定期与 RuoYi-Vue 同步
-          * 前端开发框架 Vue、Element UI
-          * 后端开发框架 Spring Boot、Redis
-          * 容器框架 Undertow 基于 Netty 的高性能容器
-          * 权限认证框架 Spring Security、Jwt，支持多终端认证系统
-          * 关系数据库 MySQL 适配 8.X
-          * 缓存数据库 Redis 适配 6.X
-          * 数据库开发框架 Mybatis-Plus 快速 CRUD 增加开发效率 插件化支持各类需求
-          * 网络框架 Feign、OkHttp3 接口化管理 HTTP 请求
-          * 工具类框架 Hutool、Lombok 减少代码冗余 增加安全性
-          * 监控框架 spring-boot-admin 全方位服务监控
-          * 校验框架 validation 增强接口安全性 严谨性
-          * 文档框架 knife4j 美化接口文档
-          * 代码生成器可以一键生成前后端代码
+          <br/>
+          * 前端开发框架 Vue、Element UI<br/>
+          * 后端开发框架 Spring Boot、Redis<br/>
+          * 容器框架 Undertow 基于 Netty 的高性能容器<br/>
+          * 权限认证框架 Spring Security、Jwt，支持多终端认证系统<br/>
+          * 关系数据库 MySQL 适配 8.X<br/>
+          * 缓存数据库 Redis 适配 6.X<br/>
+          * 数据库开发框架 Mybatis-Plus 快速 CRUD 增加开发效率 插件化支持各类需求<br/>
+          * 网络框架 Feign、OkHttp3 接口化管理 HTTP 请求<br/>
+          * 工具类框架 Hutool、Lombok 减少代码冗余 增加安全性<br/>
+          * 监控框架 spring-boot-admin 全方位服务监控<br/>
+          * 校验框架 validation 增强接口安全性 严谨性<br/>
+          * 文档框架 knife4j 美化接口文档<br/>
+          * 代码生成器 一键生成前后端代码<br/>
         </p>
         <p>
           <b>当前版本:</b> <span>v{{ version }}</span>

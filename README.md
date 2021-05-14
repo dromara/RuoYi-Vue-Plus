@@ -13,7 +13,7 @@
 * 监控框架 spring-boot-admin 全方位服务监控
 * 校验框架 validation 增强接口安全性 严谨性
 * 文档框架 knife4j 美化接口文档
-* 代码生成器可以一键生成前后端代码
+* 代码生成器 一键生成前后端代码
 
 ## 修改RuoYi功能
 
@@ -32,17 +32,20 @@
 ### 代码改动
 
 * 所有原生功能使用 Mybatis-Plus 与 Lombok 重写
+* 增加 IServicePlus 与 BaseMapperPlus 可自定义通用方法
 * 代码生成模板 改为适配 Mybatis-Plus 的代码
 * 代码生成模板 拆分出 Vo,QueryBo,AddBo,EditBo 等领域对象
-* 增加 IServicePlus 与 BaseMapperPlus 可自定义通用方法
+* 代码生成模板 增加 文档注解 与 校验注解 简化通用操作
 * 项目修改为 maven多环境配置
 * 项目配置修改为 application.yml 统一管理
 
 ### 其他
+
 * 同步升级 RuoYi-Vue 3.4.0
 * 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
 
 ## 关注作者(扫码请备注: "加群")
+
 ![](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
 
 ## 重点注意事项
