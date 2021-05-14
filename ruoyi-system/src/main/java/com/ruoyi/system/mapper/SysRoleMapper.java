@@ -1,8 +1,8 @@
 package com.ruoyi.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.entity.SysRole;
+import com.ruoyi.common.core.page.BaseMapperPlus;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface SysRoleMapper extends BaseMapper<SysRole> {
+public interface SysRoleMapper extends BaseMapperPlus<SysRole> {
 
     Page<SysRole> selectPageRoleList(@Param("page") Page<SysRole> page, @Param("role") SysRole role);
 

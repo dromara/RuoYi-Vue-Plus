@@ -4,7 +4,20 @@
       <el-col :sm="24" :lg="12" style="padding-left: 20px">
         <h2>RuoYi-Vue-Plus后台管理框架</h2>
         <p>
-          基于RuoYi-Vue集成 Lombok+Mybatis-Plus+Undertow+knife4j+Hutool+Feign 重写所有原生业务 定期与RuoYi-Vue同步
+          基于 RuoYi-Vue 集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 定期与 RuoYi-Vue 同步
+          * 前端开发框架 Vue、Element UI
+          * 后端开发框架 Spring Boot、Redis
+          * 容器框架 Undertow 基于 Netty 的高性能容器
+          * 权限认证框架 Spring Security、Jwt，支持多终端认证系统
+          * 关系数据库 MySQL 适配 8.X
+          * 缓存数据库 Redis 适配 6.X
+          * 数据库开发框架 Mybatis-Plus 快速 CRUD 增加开发效率 插件化支持各类需求
+          * 网络框架 Feign、OkHttp3 接口化管理 HTTP 请求
+          * 工具类框架 Hutool、Lombok 减少代码冗余 增加安全性
+          * 监控框架 spring-boot-admin 全方位服务监控
+          * 校验框架 validation 增强接口安全性 严谨性
+          * 文档框架 knife4j 美化接口文档
+          * 代码生成器可以一键生成前后端代码
         </p>
         <p>
           <b>当前版本:</b> <span>v{{ version }}</span>
@@ -66,6 +79,23 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v1.0.2 - 2021-5-13">
+              <ol>
+                <li>update 更新整合打包文档 重新排版</li>
+                <li>fix vue与boot整合打包与admin页面路由冲突</li>
+              </ol>
+            </el-collapse-item>
+            <el-collapse-item title="v1.0.1 - 2021-5-11">
+              <ol>
+                <li>update 更新banner</li>
+                <li>update 配置转移到 yml 文件 统一管理</li>
+                <li>update 上传媒体类型添加视频格式</li>
+                <li>update 树级结构更新子节点使用replaceFirst</li>
+                <li>update 删除操作日志记录日志</li>
+                <li>fix 修正导入表权限标识</li>
+                <li>fix 文件上传时报错</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v1.0.0 - 2021-5-10">
               <ol>
                 <li>RuoYi-Vue-Plus 后台管理系统正式发布</li>
@@ -96,7 +126,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "1.0.0",
+      version: "1.0.2",
     };
   },
   methods: {

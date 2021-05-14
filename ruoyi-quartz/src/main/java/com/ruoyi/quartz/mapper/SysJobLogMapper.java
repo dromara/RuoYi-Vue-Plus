@@ -1,6 +1,6 @@
 package com.ruoyi.quartz.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.common.core.page.BaseMapperPlus;
 import com.ruoyi.quartz.domain.SysJobLog;
 
 /**
@@ -8,6 +8,6 @@ import com.ruoyi.quartz.domain.SysJobLog;
  *
  * @author ruoyi
  */
-public interface SysJobLogMapper extends BaseMapper<SysJobLog> {
+public interface SysJobLogMapper extends BaseMapperPlus<SysJobLog> {
 
 }

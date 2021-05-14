@@ -1,7 +1,7 @@
 package com.ruoyi.generator.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.core.page.BaseMapperPlus;
 import com.ruoyi.generator.domain.GenTable;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface GenTableMapper extends BaseMapper<GenTable> {
+public interface GenTableMapper extends BaseMapperPlus<GenTable> {
 
 
     Page<GenTable> selectPageGenTableList(@Param("page") Page<GenTable> page, @Param("genTable") GenTable genTable);
