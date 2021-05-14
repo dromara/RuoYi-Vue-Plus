@@ -1,34 +1,49 @@
+## 平台简介
+
+基于 RuoYi-Vue 集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 定期与 RuoYi-Vue 同步
+* 前端开发框架 Vue、Element UI
+* 后端开发框架 Spring Boot、Redis
+* 容器框架 Undertow 基于 Netty 的高性能容器
+* 权限认证框架 Spring Security、Jwt，支持多终端认证系统
+* 关系数据库 MySQL 适配 8.X 
+* 缓存数据库 Redis 适配 6.X
+* 数据库开发框架 Mybatis-Plus 快速 CRUD 增加开发效率 插件化支持各类需求
+* 网络框架 Feign、OkHttp3 接口化管理 HTTP 请求
+* 工具类框架 Hutool、Lombok 减少代码冗余 增加安全性
+* 监控框架 spring-boot-admin 全方位服务监控
+* 校验框架 validation 增强接口安全性 严谨性
+* 文档框架 knife4j 美化接口文档
+* 代码生成器可以一键生成前后端代码
+
 ## 修改RuoYi功能
 
-* ORM框架 使用 Mybatis-Plus 简化CRUD (目前支持单表生成与树表 不支持主子表)
+### 依赖改动
+
+* ORM框架 使用 Mybatis-Plus 3.4.2 简化CRUD (不支持主子表)
 * Bean简化 使用 Lombok 简化 get set toString 等等
 * 容器改动 Tomcat 改为 并发性能更好的 undertow
-* 所有原生功能使用 Mybatis-Plus 与 Lombok 重写
-* 代码生成模板 改为适配 Mybatis-Plus 的代码
-* 代码生成模板 拆分出Vo,QueryBo,AddBo,EditBo等领域对象
-* 项目修改为 maven多环境配置
-* 项目配置修改为 application.yml 统一管理
-* swagger 修改为 knife4j
+* 分页移除 pagehelper 改为 Mybatis-Plus 分页
+* 升级 swagger 为 knife4j
 * 集成 Hutool 5.X 并重写RuoYi部分功能
 * 集成 Feign 接口化管理 Http 请求(如三方请求 支付,短信,推送等)
 * 集成 spring-boot-admin 全方位监控
-* 升级MybatisPlus 3.4.2
-* 增加demo模块示例(给不会增加模块的小伙伴做参考)
-* 同步升级 3.4.0
+* 增加 demo 模块示例(给不会增加模块的小伙伴做参考)
+
+### 代码改动
+
+* 所有原生功能使用 Mybatis-Plus 与 Lombok 重写
+* 代码生成模板 改为适配 Mybatis-Plus 的代码
+* 代码生成模板 拆分出 Vo,QueryBo,AddBo,EditBo 等领域对象
+* 增加 IServicePlus 与 BaseMapperPlus 可自定义通用方法
+* 项目修改为 maven多环境配置
+* 项目配置修改为 application.yml 统一管理
+
+### 其他
+* 同步升级 RuoYi-Vue 3.4.0
 * 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
 
 ## 关注作者(扫码请备注: "加群")
 ![](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
-
-## 平台简介
-
-若依是一套全部开源的快速开发平台，毫无保留给个人及企业免费使用。
-
-* 前端采用Vue、Element UI。
-* 后端采用Spring Boot、Spring Security、Redis & Jwt。
-* 权限认证使用Jwt，支持多终端认证系统。
-* 支持加载动态权限菜单，多方式轻松权限控制。
-* 高效率开发，使用代码生成器可以一键生成前后端代码。
 
 ## 重点注意事项
 
