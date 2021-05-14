@@ -4,6 +4,8 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.quartz.domain.SysJobLog;
 import com.ruoyi.quartz.mapper.SysJobLogMapper;
 import com.ruoyi.quartz.service.ISysJobLogService;
@@ -20,6 +22,23 @@ import java.util.Map;
  */
 @Service
 public class SysJobLogServiceImpl extends ServiceImpl<SysJobLogMapper, SysJobLog> implements ISysJobLogService {
+
+    @Override
+    public TableDataInfo<SysJobLog> selectPageJobLogList(SysJobLog jobLog) {
+        Map<String, Object> params = jobLog.getParams();
+        LambdaQueryWrapper<SysJobLog> lqw = new LambdaQueryWrapper<SysJobLog>()
+                .like(StrUtil.isNotBlank(jobLog.getJobName()), SysJobLog::getJobName, jobLog.getJobName())
+                .eq(StrUtil.isNotBlank(jobLog.getJobGroup()), SysJobLog::getJobGroup, jobLog.getJobGroup())
+                .eq(StrUtil.isNotBlank(jobLog.getStatus()), SysJobLog::getStatus, jobLog.getStatus())
+                .like(StrUtil.isNotBlank(jobLog.getInvokeTarget()), SysJobLog::getInvokeTarget, jobLog.getInvokeTarget())
+                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+                        params.get("beginTime"))
+                .apply(Validator.isNotEmpty(params.get("endTime")),
+                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+                        params.get("endTime"));
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+    }
 
     /**
      * 获取quartz调度器日志的计划任务

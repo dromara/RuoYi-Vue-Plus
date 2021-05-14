@@ -56,8 +56,46 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<sql id="selectGenTableVo">
         select table_id, table_name, table_comment, sub_table_name, sub_table_fk_name, class_name, tpl_category, package_name, module_name, business_name, function_name, function_author, gen_type, gen_path, options, create_by, create_time, update_by, update_time, remark from gen_table
     </sql>
-    
-    <select id="selectGenTableList" parameterType="GenTable" resultMap="GenTableResult">
+
+	<select id="selectPageGenTableList" parameterType="GenTable" resultMap="GenTableResult">
+		<include refid="selectGenTableVo"/>
+		<where>
+			<if test="genTable.tableName != null and genTable.tableName != ''">
+				AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
+			</if>
+			<if test="genTable.tableComment != null and genTable.tableComment != ''">
+				AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
+			</if>
+			<if test="genTable.params.beginTime != null and genTable.params.beginTime != ''"><!-- 开始时间检索 -->
+				AND date_format(create_time,'%y%m%d') &gt;= date_format(#{genTable.params.beginTime},'%y%m%d')
+			</if>
+			<if test="genTable.params.endTime != null and genTable.params.endTime != ''"><!-- 结束时间检索 -->
+				AND date_format(create_time,'%y%m%d') &lt;= date_format(#{genTable.params.endTime},'%y%m%d')
+			</if>
+		</where>
+	</select>
+
+	<select id="selectPageDbTableList" parameterType="GenTable" resultMap="GenTableResult">
+		select table_name, table_comment, create_time, update_time from information_schema.tables
+		where table_schema = (select database())
+		AND table_name NOT LIKE 'qrtz_%' AND table_name NOT LIKE 'gen_%'
+		AND table_name NOT IN (select table_name from gen_table)
+		<if test="genTable.tableName != null and genTable.tableName != ''">
+			AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
+		</if>
+		<if test="genTable.tableComment != null and genTable.tableComment != ''">
+			AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
+		</if>
+		<if test="genTable.params.beginTime != null and genTable.params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(create_time,'%y%m%d') &gt;= date_format(#{genTable.params.beginTime},'%y%m%d')
+		</if>
+		<if test="genTable.params.endTime != null and genTable.params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(create_time,'%y%m%d') &lt;= date_format(#{genTable.params.endTime},'%y%m%d')
+		</if>
+	</select>
+
+
+	<select id="selectGenTableList" parameterType="GenTable" resultMap="GenTableResult">
 		<include refid="selectGenTableVo"/>
 		<where>
 			<if test="tableName != null and tableName != ''">

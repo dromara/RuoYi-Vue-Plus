@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysPost;
 
 import java.util.List;
@@ -10,7 +11,11 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface ISysPostService extends IService<SysPost> {
+public interface ISysPostService extends IServicePlus<SysPost> {
+
+
+    TableDataInfo<SysPost> selectPagePostList(SysPost post);
+
     /**
      * 查询岗位信息集合
      *

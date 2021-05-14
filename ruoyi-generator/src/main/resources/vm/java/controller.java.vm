@@ -4,16 +4,11 @@ import java.util.List;
 import java.util.Arrays;
 
 import lombok.RequiredArgsConstructor;
+import javax.validation.constraints.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -52,13 +47,11 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:list')")
     @GetMapping("/list")
 #if($table.crud || $table.sub)
-    public TableDataInfo<${ClassName}Vo> list(${ClassName}QueryBo bo) {
-        startPage();
-        List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
-        return getDataTable(list);
+    public TableDataInfo<${ClassName}Vo> list(@Validated ${ClassName}QueryBo bo) {
+        return i${ClassName}Service.queryPageList(bo);
     }
 #elseif($table.tree)
-    public AjaxResult<${ClassName}Vo> list(${ClassName}QueryBo bo) {
+    public AjaxResult<List<${ClassName}Vo>> list(@Validated ${ClassName}QueryBo bo) {
         List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
         return AjaxResult.success(list);
     }
@@ -71,7 +64,7 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:export')")
     @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult<${ClassName}Vo> export(${ClassName}QueryBo bo) {
+    public AjaxResult<${ClassName}Vo> export(@Validated ${ClassName}QueryBo bo) {
         List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
         ExcelUtil<${ClassName}Vo> util = new ExcelUtil<${ClassName}Vo>(${ClassName}Vo.class);
         return util.exportExcel(list, "${functionName}");
@@ -83,7 +76,8 @@ public class ${ClassName}Controller extends BaseController {
     @ApiOperation("获取${functionName}详细信息")
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:query')")
     @GetMapping("/{${pkColumn.javaField}}")
-    public AjaxResult<${ClassName}Vo> getInfo(@PathVariable("${pkColumn.javaField}" ) ${pkColumn.javaType} ${pkColumn.javaField}) {
+    public AjaxResult<${ClassName}Vo> getInfo(@NotNull(message = "主键不能为空")
+                                                  @PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField}) {
         return AjaxResult.success(i${ClassName}Service.queryById(${pkColumn.javaField}));
     }
 
@@ -94,7 +88,7 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:add')")
     @Log(title = "${functionName}", businessType = BusinessType.INSERT)
     @PostMapping()
-    public AjaxResult<Void> add(@RequestBody ${ClassName}AddBo bo) {
+    public AjaxResult<Void> add(@Validated @RequestBody ${ClassName}AddBo bo) {
         return toAjax(i${ClassName}Service.insertByAddBo(bo) ? 1 : 0);
     }
 
@@ -105,7 +99,7 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:edit')")
     @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
     @PutMapping()
-    public AjaxResult<Void> edit(@RequestBody ${ClassName}EditBo bo) {
+    public AjaxResult<Void> edit(@Validated @RequestBody ${ClassName}EditBo bo) {
         return toAjax(i${ClassName}Service.updateByEditBo(bo) ? 1 : 0);
     }
 
@@ -116,7 +110,8 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:remove')")
     @Log(title = "${functionName}" , businessType = BusinessType.DELETE)
     @DeleteMapping("/{${pkColumn.javaField}s}")
-    public AjaxResult<Void> remove(@PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
+    public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
+                                       @PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
         return toAjax(i${ClassName}Service.deleteWithValidByIds(Arrays.asList(${pkColumn.javaField}s), true) ? 1 : 0);
     }
 }

@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.Date;
-import java.util.Map;
-import java.util.HashMap;
 
 #foreach ($import in $importList)
 import ${import};
@@ -29,6 +27,7 @@ import com.ruoyi.common.core.domain.TreeEntity;
 #elseif($table.tree)
 #set($Entity="TreeEntity")
 #end
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ApiModel("${functionName}分页查询对象")

@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysOperLog;
 
 import java.util.List;
@@ -10,7 +11,10 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface ISysOperLogService extends IService<SysOperLog> {
+public interface ISysOperLogService extends IServicePlus<SysOperLog> {
+
+    TableDataInfo<SysOperLog> selectPageOperLogList(SysOperLog operLog);
+
     /**
      * 新增操作日志
      *

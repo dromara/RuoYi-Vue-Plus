@@ -4,7 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.domain.entity.SysDictData;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.DictUtils;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
 import com.ruoyi.system.service.ISysDictDataService;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,16 @@ import java.util.List;
 @Service
 public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData> implements ISysDictDataService {
 
+    @Override
+    public TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData) {
+        LambdaQueryWrapper<SysDictData> lqw = new LambdaQueryWrapper<SysDictData>()
+                .eq(StrUtil.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
+                .like(StrUtil.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
+                .eq(StrUtil.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
+                .orderByAsc(SysDictData::getDictSort);
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage(),lqw));
+    }
+
     /**
      * 根据条件分页查询字典数据
      *
@@ -28,7 +40,8 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      */
     @Override
     public List<SysDictData> selectDictDataList(SysDictData dictData) {
-        return list(new LambdaQueryWrapper<SysDictData>().eq(StrUtil.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
+        return list(new LambdaQueryWrapper<SysDictData>()
+                .eq(StrUtil.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
                 .like(StrUtil.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
                 .eq(StrUtil.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
                 .orderByAsc(SysDictData::getDictSort));

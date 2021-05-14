@@ -19,8 +19,8 @@
 
         <!-- 定时任务 -->
         <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>com.mchange</groupId>

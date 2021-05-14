@@ -1,6 +1,6 @@
 package com.ruoyi.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.common.core.page.BaseMapperPlus;
 import com.ruoyi.system.domain.SysUserRole;
 
 /**
@@ -8,6 +8,6 @@ import com.ruoyi.system.domain.SysUserRole;
  *
  * @author ruoyi
  */
-public interface SysUserRoleMapper extends BaseMapper<SysUserRole> {
+public interface SysUserRoleMapper extends BaseMapperPlus<SysUserRole> {
 
 }

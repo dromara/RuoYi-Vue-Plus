@@ -8,7 +8,9 @@ import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
@@ -48,6 +50,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Autowired
     private ISysConfigService configService;
+
+    @Override
+    @DataScope(deptAlias = "d", userAlias = "u")
+    public TableDataInfo<SysUser> selectPageUserList(SysUser user) {
+        return PageUtils.buildDataInfo(baseMapper.selectPageUserList(PageUtils.buildPage(), user));
+    }
 
     /**
      * 根据条件分页查询用户列表

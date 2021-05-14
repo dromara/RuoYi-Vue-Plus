@@ -5,7 +5,9 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.mapper.SysPostMapper;
@@ -27,6 +29,15 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
 
     @Autowired
     private SysUserPostMapper userPostMapper;
+
+    @Override
+    public TableDataInfo<SysPost> selectPagePostList(SysPost post) {
+        LambdaQueryWrapper<SysPost> lqw = new LambdaQueryWrapper<SysPost>()
+                .like(StrUtil.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
+                .eq(StrUtil.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
+                .like(StrUtil.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage(),lqw));
+    }
 
     /**
      * 查询岗位信息集合
