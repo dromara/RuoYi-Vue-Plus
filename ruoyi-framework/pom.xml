@@ -61,12 +61,6 @@
             <artifactId>druid-spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- 获取系统信息 -->
-        <dependency>
-            <groupId>com.github.oshi</groupId>
-            <artifactId>oshi-core</artifactId>
-        </dependency>
-
         <!-- 系统模块-->
         <dependency>
             <groupId>com.ruoyi</groupId>
