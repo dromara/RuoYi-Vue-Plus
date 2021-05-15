@@ -37,9 +37,25 @@ public class PageUtils {
      */
     public static final String IS_ASC = "isAsc";
 
+    /**
+     * 当前记录起始索引 默认值
+     */
+    public static final int DEFAULT_PAGE_NUM = 1;
+
+    /**
+     * 每页显示记录数 默认值
+     */
+    public static final int DEFAULT_PAGE_SIZE = 10;
+
+    /**
+     * 构建 plus 分页对象
+     * @param <T> domain 实体
+     * @param <K> vo 实体
+     * @return 分页对象
+     */
     public static <T, K> PagePlus<T, K> buildPagePlus() {
-        Integer pageNum = ServletUtils.getParameterToInt(PAGE_NUM);
-        Integer pageSize = ServletUtils.getParameterToInt(PAGE_SIZE);
+        Integer pageNum = ServletUtils.getParameterToInt(PAGE_NUM, DEFAULT_PAGE_NUM);
+        Integer pageSize = ServletUtils.getParameterToInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
         String orderByColumn = ServletUtils.getParameter(ORDER_BY_COLUMN);
         String isAsc = ServletUtils.getParameter(IS_ASC);
         PagePlus<T, K> page = new PagePlus<>(pageNum, pageSize);
@@ -54,9 +70,14 @@ public class PageUtils {
         return page;
     }
 
+    /**
+     * 构建 MP 普通分页对象
+     * @param <T> domain 实体
+     * @return 分页对象
+     */
     public static <T> Page<T> buildPage() {
-        Integer pageNum = ServletUtils.getParameterToInt(PAGE_NUM);
-        Integer pageSize = ServletUtils.getParameterToInt(PAGE_SIZE);
+        Integer pageNum = ServletUtils.getParameterToInt(PAGE_NUM, DEFAULT_PAGE_NUM);
+        Integer pageSize = ServletUtils.getParameterToInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
         String orderByColumn = ServletUtils.getParameter(ORDER_BY_COLUMN);
         String isAsc = ServletUtils.getParameter(IS_ASC);
         Page<T> page = new Page<>(pageNum, pageSize);
