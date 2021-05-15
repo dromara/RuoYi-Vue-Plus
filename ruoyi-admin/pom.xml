@@ -24,11 +24,6 @@
             <optional>true</optional> <!-- 表示依赖不会传递 -->
         </dependency>
 
-        <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-spring-boot-starter</artifactId>
-        </dependency>
-
          <!-- Mysql驱动包 -->
         <dependency>
             <groupId>mysql</groupId>

@@ -5,6 +5,8 @@ import com.ruoyi.common.config.RuoYiConfig;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -14,7 +16,7 @@ import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,20 +27,16 @@ import java.util.List;
  * @author Lion Li
  */
 @Configuration
-@EnableSwagger2WebMvc
+@EnableSwagger2
 @EnableKnife4j
+@ConditionalOnClass({Docket.class, ApiInfoBuilder.class})
+@ConditionalOnProperty(prefix = "swagger", value = "enable", matchIfMissing = true)
 public class SwaggerConfig {
     /**
      * 系统基础配置
      */
     @Autowired
     private RuoYiConfig ruoyiConfig;
-
-    /**
-     * 是否开启swagger
-     */
-    @Value("${swagger.enabled}")
-    private boolean enabled;
 
     /**
      * 设置请求的统一前缀
@@ -70,8 +68,6 @@ public class SwaggerConfig {
     @Bean
     public Docket createRestApi() {
         return new Docket(DocumentationType.SWAGGER_2)
-                // 是否启用Swagger
-                .enable(enabled)
                 // 用来创建该API的基本信息，展示在文档的页面中（自定义展示的信息）
                 .apiInfo(apiInfo())
                 // 设置哪些接口暴露给Swagger展示
@@ -85,15 +81,14 @@ public class SwaggerConfig {
                 .build()
                 /* 设置安全模式，swagger可以设置访问token */
                 .securitySchemes(securitySchemes())
-                .securityContexts(securityContexts())
-                .pathMapping(pathMapping);
+                .securityContexts(securityContexts());
     }
 
     /**
      * 安全模式，这里指定token通过Authorization头请求头传递
      */
-    private List<ApiKey> securitySchemes() {
-        List<ApiKey> apiKeyList = new ArrayList<ApiKey>();
+    private List<SecurityScheme> securitySchemes() {
+        List<SecurityScheme> apiKeyList = new ArrayList<SecurityScheme>();
         apiKeyList.add(new ApiKey("Authorization", "Authorization", "header"));
         return apiKeyList;
     }
