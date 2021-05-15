@@ -82,7 +82,7 @@
           <el-collapse accordion>
             <el-collapse-item title="v2.1.0 - 2021-5-17">
               <ol>
-                <li>update swagger升级3.0.2</li>
+                <li>update knife4j升级3.0.2</li>
                 <li>update 增强分页工具兼容性</li>
                 <li>update 通用Service接口 增加自定义vo转换函数</li>
                 <li>remove 移除ruoyi自带服务监控(Admin已全部包含)</li>
