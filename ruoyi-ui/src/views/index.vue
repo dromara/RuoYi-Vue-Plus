@@ -80,6 +80,14 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.1.0 - 2021-5-17">
+              <ol>
+                <li>update swagger升级3.0.2</li>
+                <li>update 增强分页工具兼容性</li>
+                <li>update 通用Service接口 增加自定义vo转换函数</li>
+                <li>remove 移除ruoyi自带服务监控(Admin已全部包含)</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.0.0 - 2021-5-15">
               <ol>
                 <li>springboot 升级 2.3.10 依赖全面升级适配</li>
@@ -140,7 +148,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "2.0.0",
+      version: "2.1.0",
     };
   },
   methods: {
