@@ -26,7 +26,7 @@
 * 升级 swagger 为 knife4j
 * 集成 Hutool 5.X 并重写RuoYi部分功能
 * 集成 Feign 接口化管理 Http 请求(如三方请求 支付,短信,推送等)
-* 集成 spring-boot-admin 全方位监控
+* 移除 自带服务监控 改为 spring-boot-admin 全方位监控
 * 增加 demo 模块示例(给不会增加模块的小伙伴做参考)
 
 ### 代码改动
