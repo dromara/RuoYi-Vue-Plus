@@ -93,14 +93,6 @@ public class PagePlus<T,K> implements IPage<T> {
         this.isSearchCount = isSearchCount;
     }
 
-    public boolean hasPrevious() {
-        return this.current > 1L;
-    }
-
-    public boolean hasNext() {
-        return this.current < this.getPages();
-    }
-
     @Override
     public String countId() {
         return this.getCountId();
