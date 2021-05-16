@@ -14,8 +14,14 @@
 	</appender>
 
     <!-- 控制台输出 -->
-    <appender name="file_console" class="ch.qos.logback.core.FileAppender">
+    <appender name="file_console" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.path}/sys-console.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${log.path}/sys-console.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 日志最大 1天 -->
+            <maxHistory>1</maxHistory>
+        </rollingPolicy>
         <encoder>
             <pattern>${log.pattern}</pattern>
             <charset>utf-8</charset>
