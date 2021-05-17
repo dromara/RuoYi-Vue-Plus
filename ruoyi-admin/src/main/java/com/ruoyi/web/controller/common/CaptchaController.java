@@ -13,8 +13,8 @@ import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.framework.config.properties.CaptchaProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,18 +42,8 @@ public class CaptchaController {
 	@Autowired
 	private RedisCache redisCache;
 
-	// 验证码类型
-	@Value("${captcha.captchaType}")
-	private String captchaType;
-	// 验证码类别
-	@Value("${captcha.captchaCategory}")
-	private String captchaCategory;
-	// 数字验证码位数
-	@Value("${captcha.captchaNumberLength}")
-	private int numberLength;
-	// 字符验证码长度
-	@Value("${captcha.captchaCharLength}")
-	private int charLength;
+	@Autowired
+	private CaptchaProperties captchaProperties;
 
 	/**
 	 * 生成验证码
@@ -67,17 +57,17 @@ public class CaptchaController {
 		// 生成验证码
 		CodeGenerator codeGenerator;
 		AbstractCaptcha captcha;
-		switch (captchaType) {
+		switch (captchaProperties.getType()) {
 			case "math":
-				codeGenerator = new MathGenerator(numberLength);
+				codeGenerator = new MathGenerator(captchaProperties.getNumberLength());
 				break;
 			case "char":
-				codeGenerator = new RandomGenerator(charLength);
+				codeGenerator = new RandomGenerator(captchaProperties.getCharLength());
 				break;
 			default:
 				throw new IllegalArgumentException("验证码类型异常");
 		}
-		switch (captchaCategory) {
+		switch (captchaProperties.getCategory()) {
 			case "line":
 				captcha = lineCaptcha;
 				break;
@@ -92,9 +82,9 @@ public class CaptchaController {
 		}
 		captcha.setGenerator(codeGenerator);
 		captcha.createCode();
-		if ("math".equals(captchaType)) {
+		if ("math".equals(captchaProperties.getType())) {
 			code = getCodeResult(captcha.getCode());
-		} else if ("char".equals(captchaType)) {
+		} else if ("char".equals(captchaProperties.getType())) {
 			code = captcha.getCode();
 		}
 		redisCache.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
@@ -105,6 +95,7 @@ public class CaptchaController {
 	}
 
 	private String getCodeResult(String capStr) {
+		int numberLength = captchaProperties.getNumberLength();
 		int a = Convert.toInt(StrUtil.sub(capStr, 0, numberLength).trim());
 		char operator = capStr.charAt(numberLength);
 		int b = Convert.toInt(StrUtil.sub(capStr, numberLength + 1, numberLength + 1 + numberLength).trim());
