@@ -2,7 +2,6 @@ package com.ruoyi.framework.config.properties;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -32,5 +31,29 @@ public class SwaggerProperties {
      * 字符验证码长度
      */
     private String version;
+
+	/**
+	 * 联系方式
+	 */
+    private Contact contact;
+
+    @Data
+	@NoArgsConstructor
+	public static class Contact{
+
+		/**
+		 * 联系人
+		 **/
+		private String name;
+		/**
+		 * 联系人url
+		 **/
+		private String url;
+		/**
+		 * 联系人email
+		 **/
+		private String email;
+
+	}
 
 }
