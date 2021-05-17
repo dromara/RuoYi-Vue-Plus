@@ -3,7 +3,8 @@ package com.ruoyi.framework.config;
 import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.filter.RepeatableFilter;
 import com.ruoyi.common.filter.XssFilter;
-import org.springframework.beans.factory.annotation.Value;
+import com.ruoyi.framework.config.properties.XssProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,41 +16,33 @@ import java.util.Map;
 /**
  * Filter配置
  *
- * @author ruoyi
+ * @author Lion Li
  */
 @Configuration
-public class FilterConfig
-{
-    @Value("${xss.enabled}")
-    private String enabled;
+public class FilterConfig {
 
-    @Value("${xss.excludes}")
-    private String excludes;
+    @Autowired
+    private XssProperties xssProperties;
 
-    @Value("${xss.urlPatterns}")
-    private String urlPatterns;
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Bean
-    public FilterRegistrationBean xssFilterRegistration()
-    {
+    public FilterRegistrationBean xssFilterRegistration() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setDispatcherTypes(DispatcherType.REQUEST);
         registration.setFilter(new XssFilter());
-        registration.addUrlPatterns(StrUtil.split(urlPatterns, ","));
+        registration.addUrlPatterns(StrUtil.split(xssProperties.getUrlPatterns(), ","));
         registration.setName("xssFilter");
         registration.setOrder(FilterRegistrationBean.HIGHEST_PRECEDENCE);
         Map<String, String> initParameters = new HashMap<String, String>();
-        initParameters.put("excludes", excludes);
-        initParameters.put("enabled", enabled);
+        initParameters.put("excludes", xssProperties.getExcludes());
+        initParameters.put("enabled", xssProperties.getEnabled());
         registration.setInitParameters(initParameters);
         return registration;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Bean
-    public FilterRegistrationBean someFilterRegistration()
-    {
+    public FilterRegistrationBean someFilterRegistration() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(new RepeatableFilter());
         registration.addUrlPatterns("/*");

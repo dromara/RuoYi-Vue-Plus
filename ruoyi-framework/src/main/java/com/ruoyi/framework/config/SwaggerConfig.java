@@ -1,4 +1,4 @@
-package com.ruoyi.web.core.config;
+package com.ruoyi.framework.config;
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.ruoyi.common.config.RuoYiConfig;
@@ -37,12 +37,6 @@ public class SwaggerConfig {
      */
     @Autowired
     private RuoYiConfig ruoyiConfig;
-
-    /**
-     * 设置请求的统一前缀
-     */
-    @Value("${swagger.pathMapping}")
-    private String pathMapping;
 
     /**
      * 标题

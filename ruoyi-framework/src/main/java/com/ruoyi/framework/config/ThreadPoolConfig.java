@@ -1,8 +1,9 @@
 package com.ruoyi.framework.config;
 
 import com.ruoyi.common.utils.Threads;
+import com.ruoyi.framework.config.properties.ThreadPoolProperties;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,43 +22,31 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class ThreadPoolConfig {
 
-    // 核心线程池大小
-    @Value("${threadPoolConfig.corePoolSize}")
-    private int corePoolSize;
-
-    // 最大可创建的线程数
-    @Value("${threadPoolConfig.maxPoolSize}")
-    private int maxPoolSize;
-
-    // 队列最大长度
-    @Value("${threadPoolConfig.queueCapacity}")
-    private int queueCapacity;
-
-    // 线程池维护线程所允许的空闲时间
-    @Value("${threadPoolConfig.keepAliveSeconds}")
-    private int keepAliveSeconds;
-
-    // 线程池对拒绝任务(无线程可用)的处理策略
-    @Value("${threadPoolConfig.rejectedExecutionHandler}")
-    private String rejectedExecutionHandler;
+    @Autowired
+    private ThreadPoolProperties threadPoolProperties;
 
     @Bean(name = "threadPoolTaskExecutor")
     @ConditionalOnProperty(prefix = "threadPoolTaskExecutor", name = "enabled", havingValue = "true")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setMaxPoolSize(maxPoolSize);
-        executor.setCorePoolSize(corePoolSize);
-        executor.setQueueCapacity(queueCapacity);
-        executor.setKeepAliveSeconds(keepAliveSeconds);
+        executor.setMaxPoolSize(threadPoolProperties.getMaxPoolSize());
+        executor.setCorePoolSize(threadPoolProperties.getCorePoolSize());
+        executor.setQueueCapacity(threadPoolProperties.getQueueCapacity());
+        executor.setKeepAliveSeconds(threadPoolProperties.getKeepAliveSeconds());
         RejectedExecutionHandler handler;
-        if (rejectedExecutionHandler.equals("CallerRunsPolicy")) {
-            handler = new ThreadPoolExecutor.CallerRunsPolicy();
-        } else if (rejectedExecutionHandler.equals("DiscardOldestPolicy")) {
-            handler = new ThreadPoolExecutor.DiscardOldestPolicy();
-        } else if (rejectedExecutionHandler.equals("DiscardPolicy")) {
-            handler = new ThreadPoolExecutor.DiscardPolicy();
-        } else {
-            handler = new ThreadPoolExecutor.AbortPolicy();
+        switch (threadPoolProperties.getRejectedExecutionHandler()) {
+            case "CallerRunsPolicy":
+                handler = new ThreadPoolExecutor.CallerRunsPolicy();
+                break;
+            case "DiscardOldestPolicy":
+                handler = new ThreadPoolExecutor.DiscardOldestPolicy();
+                break;
+            case "DiscardPolicy":
+                handler = new ThreadPoolExecutor.DiscardPolicy();
+                break;
+            default:
+                handler = new ThreadPoolExecutor.AbortPolicy();
+                break;
         }
         executor.setRejectedExecutionHandler(handler);
         return executor;
@@ -68,7 +57,7 @@ public class ThreadPoolConfig {
      */
     @Bean(name = "scheduledExecutorService")
     protected ScheduledExecutorService scheduledExecutorService() {
-        return new ScheduledThreadPoolExecutor(corePoolSize,
+        return new ScheduledThreadPoolExecutor(threadPoolProperties.getCorePoolSize(),
                 new BasicThreadFactory.Builder().namingPattern("schedule-pool-%d").daemon(true).build()) {
             @Override
             protected void afterExecute(Runnable r, Throwable t) {
