@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	
+    <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.ruoyi</groupId>
     <artifactId>ruoyi-vue-plus</artifactId>
     <version>${ruoyi-vue-plus.version}</version>
@@ -11,9 +11,9 @@
     <name>RuoYi-Vue-Plus</name>
     <url>https://gitee.com/JavaLionLi/RuoYi-Vue-Plus</url>
     <description>RuoYi-Vue-Plus后台管理系统</description>
-    
+
     <properties>
-        <ruoyi-vue-plus.version>2.1.0</ruoyi-vue-plus.version>
+        <ruoyi-vue-plus.version>2.1.1</ruoyi-vue-plus.version>
         <spring-boot.version>2.3.10.RELEASE</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -32,11 +32,11 @@
         <feign-okhttp.version>11.0</feign-okhttp.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
     </properties>
-	
+
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
-        
+
             <!-- SpringBoot的依赖配置-->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -45,7 +45,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            
+
             <!--阿里数据库连接池 -->
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -70,14 +70,14 @@
                 <artifactId>swagger-annotations</artifactId>
                 <version>${swagger-annotations.version}</version>
             </dependency>
-			
+
             <!-- excel工具 -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
             </dependency>
-			
+
             <!--velocity代码生成使用模板 -->
             <dependency>
                 <groupId>org.apache.velocity</groupId>
@@ -91,7 +91,7 @@
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
             </dependency>
-			
+
             <!--Token生成与解析-->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
@@ -144,28 +144,28 @@
                 <artifactId>ruoyi-quartz</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
-	
+
             <!-- 代码生成-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-generator</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
-			
+
             <!-- 核心模块-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-framework</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
-			
+
             <!-- 系统模块-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-system</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
-			
+
             <!-- 通用工具-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
