@@ -15,13 +15,13 @@ ruoyi:
 
 captcha:
   # 验证码类型 math 数组计算 char 字符验证
-  captchaType: math
+  type: math
   # line 线段干扰 circle 圆圈干扰 shear 扭曲干扰
-  captchaCategory: circle
+  category: circle
   # 数字验证码位数
-  captchaNumberLength: 1
+  numberLength: 1
   # 字符验证码长度
-  captchaCharLength: 4
+  charLength: 4
 
 # 开发环境配置
 server:
@@ -187,14 +187,17 @@ mybatis-plus:
 swagger:
   # 是否开启swagger
   enabled: true
-  # 请求前缀
-  pathMapping: /dev-api
   # 标题
   title: '标题：RuoYi-Vue-Plus后台管理系统_接口文档'
   # 描述
   description: '描述：用于管理集团旗下公司的人员信息,具体包括XXX,XXX模块...'
   # 版本
   version: '版本号: ${ruoyi-vue-plus.version}'
+  # 作者信息
+  contact:
+    name: Lion Li
+    email: crazylionli@163.com
+    url: https://gitee.com/JavaLionLi/RuoYi-Vue-Plus
 
 # 防止XSS攻击
 xss:
@@ -206,7 +209,7 @@ xss:
   urlPatterns: /system/*,/monitor/*,/tool/*
 
 # 全局线程池相关配置
-threadPoolConfig:
+thread-pool:
   # 是否开启线程池
   enabled: false
   # 核心线程池大小

@@ -80,9 +80,18 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.1.1 - 2021-5-19">
+              <ol>
+                <li>update 配置统一提取为 properties 配置类</li>
+                <li>update 分页工具 删除过期方法</li>
+                <li>update admin 实时监控日志 改为保留一天</li>
+                <li>fix 修复swagger开关无法控制关闭问题</li>
+                <li>fix maven install 异常</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.1.0 - 2021-5-17">
               <ol>
-                <li>update swagger升级3.0.2</li>
+                <li>update knife4j升级3.0.2</li>
                 <li>update 增强分页工具兼容性</li>
                 <li>update 通用Service接口 增加自定义vo转换函数</li>
                 <li>remove 移除ruoyi自带服务监控(Admin已全部包含)</li>
