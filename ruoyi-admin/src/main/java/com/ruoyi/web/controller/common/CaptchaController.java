@@ -5,7 +5,6 @@ import cn.hutool.captcha.CircleCaptcha;
 import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.captcha.ShearCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
-import cn.hutool.captcha.generator.MathGenerator;
 import cn.hutool.captcha.generator.RandomGenerator;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
@@ -13,6 +12,7 @@ import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.framework.captcha.UnsignedMathGenerator;
 import com.ruoyi.framework.config.properties.CaptchaProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,7 +59,7 @@ public class CaptchaController {
 		AbstractCaptcha captcha;
 		switch (captchaProperties.getType()) {
 			case "math":
-				codeGenerator = new MathGenerator(captchaProperties.getNumberLength());
+				codeGenerator = new UnsignedMathGenerator(captchaProperties.getNumberLength());
 				break;
 			case "char":
 				codeGenerator = new RandomGenerator(captchaProperties.getCharLength());
