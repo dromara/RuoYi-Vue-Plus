@@ -19,6 +19,10 @@ public class SwaggerProperties {
      * 验证码类型
      */
     private Boolean enabled;
+	/**
+	 * 设置请求的统一前缀
+	 */
+	private String pathMapping;
     /**
      * 验证码类别
      */
