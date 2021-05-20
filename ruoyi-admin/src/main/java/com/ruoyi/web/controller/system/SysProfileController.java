@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 个人信息 业务处理
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -43,10 +45,11 @@ public class SysProfileController extends BaseController
     {
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
         SysUser user = loginUser.getUser();
-        AjaxResult ajax = AjaxResult.success(user);
+		Map<String,Object> ajax = new HashMap<>();
+		ajax.put("user", user);
         ajax.put("roleGroup", userService.selectUserRoleGroup(loginUser.getUsername()));
         ajax.put("postGroup", userService.selectUserPostGroup(loginUser.getUsername()));
-        return ajax;
+        return AjaxResult.success(ajax);
     }
 
     /**
@@ -121,12 +124,12 @@ public class SysProfileController extends BaseController
             String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file);
             if (userService.updateUserAvatar(loginUser.getUsername(), avatar))
             {
-                AjaxResult ajax = AjaxResult.success();
+				Map<String,Object> ajax = new HashMap<>();
                 ajax.put("imgUrl", avatar);
                 // 更新缓存用户头像
                 loginUser.getUser().setAvatar(avatar);
                 tokenService.setLoginUser(loginUser);
-                return ajax;
+                return AjaxResult.success(ajax);
             }
         }
         return AjaxResult.error("上传图片异常，请联系管理员");
