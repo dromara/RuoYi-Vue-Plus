@@ -135,7 +135,7 @@ export default {
     // 上传成功回调
     handleUploadSuccess(res, file) {
       this.$message.success("上传成功");
-      this.$emit("input", res.url);
+      this.$emit("input", res.data.url);
     },
     // 删除文件
     handleDelete(index) {

@@ -1,161 +1,134 @@
 package com.ruoyi.common.core.domain;
 
-import cn.hutool.core.lang.Validator;
 import cn.hutool.http.HttpStatus;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.HashMap;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * 操作消息提醒
- * 
- * @author ruoyi
+ *
+ * @author Lion Li
  */
-public class AjaxResult<T> extends HashMap<String, Object>
-{
-    private static final long serialVersionUID = 1L;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
+@ApiModel("请求响应对象")
+public class AjaxResult<T> {
 
-    /** 状态码 */
-    public static final String CODE_TAG = "code";
+	private static final long serialVersionUID = 1L;
 
-    /** 返回内容 */
-    public static final String MSG_TAG = "msg";
+	/**
+	 * 状态码
+	 */
+	@ApiModelProperty("消息状态码")
+	private int code;
 
-    /** 数据对象 */
-    public static final String DATA_TAG = "data";
+	/**
+	 * 返回内容
+	 */
+	@ApiModelProperty("消息内容")
+	private String msg;
 
-    public Integer getCode(){
-        return (Integer) super.get(CODE_TAG);
-    }
+	/**
+	 * 数据对象
+	 */
+	@ApiModelProperty("数据对象")
+	private T data;
 
-    public String getMsg(){
-        return (String) super.get(MSG_TAG);
-    }
-    public T getData(){
-        return (T) super.get(DATA_TAG);
-    }
+	/**
+	 * 初始化一个新创建的 AjaxResult 对象
+	 *
+	 * @param code 状态码
+	 * @param msg  返回内容
+	 */
+	public AjaxResult(int code, String msg) {
+		this.code = code;
+		this.msg = msg;
+	}
 
-    /**
-     * 初始化一个新创建的 AjaxResult 对象，使其表示一个空消息。
-     */
-    public AjaxResult()
-    {
-    }
+	/**
+	 * 返回成功消息
+	 *
+	 * @return 成功消息
+	 */
+	public static AjaxResult<Void> success() {
+		return AjaxResult.success("操作成功");
+	}
 
-    /**
-     * 初始化一个新创建的 AjaxResult 对象
-     * 
-     * @param code 状态码
-     * @param msg 返回内容
-     */
-    public AjaxResult(int code, String msg)
-    {
-        super.put(CODE_TAG, code);
-        super.put(MSG_TAG, msg);
-    }
+	/**
+	 * 返回成功数据
+	 *
+	 * @return 成功消息
+	 */
+	public static <T> AjaxResult<T> success(T data) {
+		return AjaxResult.success("操作成功", data);
+	}
 
-    /**
-     * 初始化一个新创建的 AjaxResult 对象
-     * 
-     * @param code 状态码
-     * @param msg 返回内容
-     * @param data 数据对象
-     */
-    public AjaxResult(int code, String msg, T data)
-    {
-        super.put(CODE_TAG, code);
-        super.put(MSG_TAG, msg);
-        if (Validator.isNotNull(data))
-        {
-            super.put(DATA_TAG, data);
-        }
-    }
+	/**
+	 * 返回成功消息
+	 *
+	 * @param msg 返回内容
+	 * @return 成功消息
+	 */
+	public static AjaxResult<Void> success(String msg) {
+		return AjaxResult.success(msg, null);
+	}
 
-    /**
-     * 返回成功消息
-     * 
-     * @return 成功消息
-     */
-    public static AjaxResult<Void> success()
-    {
-        return AjaxResult.success("操作成功");
-    }
+	/**
+	 * 返回成功消息
+	 *
+	 * @param msg  返回内容
+	 * @param data 数据对象
+	 * @return 成功消息
+	 */
+	public static <T> AjaxResult<T> success(String msg, T data) {
+		return new AjaxResult<>(HttpStatus.HTTP_OK, msg, data);
+	}
 
-    /**
-     * 返回成功数据
-     * 
-     * @return 成功消息
-     */
-    public static <T> AjaxResult<T> success(T data)
-    {
-        return AjaxResult.success("操作成功", data);
-    }
+	/**
+	 * 返回错误消息
+	 *
+	 * @return
+	 */
+	public static AjaxResult<Void> error() {
+		return AjaxResult.error("操作失败");
+	}
 
-    /**
-     * 返回成功消息
-     * 
-     * @param msg 返回内容
-     * @return 成功消息
-     */
-    public static AjaxResult<Void> success(String msg)
-    {
-        return AjaxResult.success(msg, null);
-    }
+	/**
+	 * 返回错误消息
+	 *
+	 * @param msg 返回内容
+	 * @return 警告消息
+	 */
+	public static AjaxResult<Void> error(String msg) {
+		return AjaxResult.error(msg, null);
+	}
 
-    /**
-     * 返回成功消息
-     * 
-     * @param msg 返回内容
-     * @param data 数据对象
-     * @return 成功消息
-     */
-    public static <T> AjaxResult<T> success(String msg, T data)
-    {
-        return new AjaxResult(HttpStatus.HTTP_OK, msg, data);
-    }
+	/**
+	 * 返回错误消息
+	 *
+	 * @param msg  返回内容
+	 * @param data 数据对象
+	 * @return 警告消息
+	 */
+	public static <T> AjaxResult<T> error(String msg, T data) {
+		return new AjaxResult<>(HttpStatus.HTTP_INTERNAL_ERROR, msg, data);
+	}
 
-    /**
-     * 返回错误消息
-     * 
-     * @return
-     */
-    public static AjaxResult<Void> error()
-    {
-        return AjaxResult.error("操作失败");
-    }
+	/**
+	 * 返回错误消息
+	 *
+	 * @param code 状态码
+	 * @param msg  返回内容
+	 * @return 警告消息
+	 */
+	public static AjaxResult<Void> error(int code, String msg) {
+		return new AjaxResult<>(code, msg, null);
+	}
 
-    /**
-     * 返回错误消息
-     * 
-     * @param msg 返回内容
-     * @return 警告消息
-     */
-    public static AjaxResult<Void> error(String msg)
-    {
-        return AjaxResult.error(msg, null);
-    }
-
-    /**
-     * 返回错误消息
-     * 
-     * @param msg 返回内容
-     * @param data 数据对象
-     * @return 警告消息
-     */
-    public static <T> AjaxResult<T> error(String msg, T data)
-    {
-        return new AjaxResult(HttpStatus.HTTP_INTERNAL_ERROR, msg, data);
-    }
-
-    /**
-     * 返回错误消息
-     * 
-     * @param code 状态码
-     * @param msg 返回内容
-     * @return 警告消息
-     */
-    public static AjaxResult<Void> error(int code, String msg)
-    {
-        return new AjaxResult(code, msg, null);
-    }
 }
