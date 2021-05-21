@@ -5,7 +5,6 @@ import cn.hutool.captcha.CircleCaptcha;
 import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.captcha.ShearCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
-import cn.hutool.captcha.generator.MathGenerator;
 import cn.hutool.captcha.generator.RandomGenerator;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
@@ -13,12 +12,15 @@ import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.framework.captcha.UnsignedMathGenerator;
 import com.ruoyi.framework.config.properties.CaptchaProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -59,7 +61,7 @@ public class CaptchaController {
 		AbstractCaptcha captcha;
 		switch (captchaProperties.getType()) {
 			case "math":
-				codeGenerator = new MathGenerator(captchaProperties.getNumberLength());
+				codeGenerator = new UnsignedMathGenerator(captchaProperties.getNumberLength());
 				break;
 			case "char":
 				codeGenerator = new RandomGenerator(captchaProperties.getCharLength());
@@ -88,10 +90,10 @@ public class CaptchaController {
 			code = captcha.getCode();
 		}
 		redisCache.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
-		AjaxResult ajax = AjaxResult.success();
+		Map<String,Object> ajax = new HashMap<>();
 		ajax.put("uuid", uuid);
 		ajax.put("img", captcha.getImageBase64());
-		return ajax;
+		return AjaxResult.success(ajax);
 	}
 
 	private String getCodeResult(String capStr) {

@@ -60,7 +60,7 @@ export default {
       this.$emit("input", "");
     },
     handleUploadSuccess(res) {
-      this.$emit("input", res.url);
+      this.$emit("input", res.data.url);
       this.loading.close();
     },
     handleBeforeUpload() {
