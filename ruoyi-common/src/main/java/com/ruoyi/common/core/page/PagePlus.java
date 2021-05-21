@@ -123,15 +123,27 @@ public class PagePlus<T,K> implements IPage<T> {
         return this.optimizeCountSql;
     }
 
-    @Override
-    public boolean isSearchCount() {
-        return this.total >= 0L && this.isSearchCount;
-    }
+	@Override
+	public long getPages() {
+		// 解决 github issues/3208
+		return IPage.super.getPages();
+	}
 
-    public PagePlus<T, K> setSearchCount(boolean isSearchCount) {
-        this.isSearchCount = isSearchCount;
-        return this;
-    }
+	public static <T,K> PagePlus<T,K> of(long current, long size) {
+		return of(current, size, 0);
+	}
+
+	public static <T,K> PagePlus<T,K> of(long current, long size, long total) {
+		return of(current, size, total, true);
+	}
+
+	public static <T,K> PagePlus<T,K> of(long current, long size, boolean searchCount) {
+		return of(current, size, 0, searchCount);
+	}
+
+	public static <T,K> PagePlus<T,K> of(long current, long size, long total, boolean searchCount) {
+		return new PagePlus<>(current, size, total, searchCount);
+	}
 
 }
 
