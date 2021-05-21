@@ -80,6 +80,15 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.1.1 - 2021-5-21">
+              <ol>
+                <li>update springboot 升级 2.3.11</li>
+                <li>update mybatis-plus 升级 3.4.3 分页Plus对象适配更新</li>
+                <li>update 验证码生成更新为无符号整数计算</li>
+                <li>update 请求响应对象 与 分页对象 结构修改 适配接口文档配置</li>
+                <li>update swagger增加请求前缀</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.1.1 - 2021-5-19">
               <ol>
                 <li>update 配置统一提取为 properties 配置类</li>
