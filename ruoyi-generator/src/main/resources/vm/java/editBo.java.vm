@@ -29,10 +29,12 @@ public class ${ClassName}EditBo {
 #if($column.javaType == 'Date')
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 #end
+#if($column.isRequired==1)
 #if($column.javaType == 'String')
     @NotBlank(message = "$column.columnComment不能为空")
 #else
     @NotNull(message = "$column.columnComment不能为空")
+#end
 #end
     private $column.javaType $column.javaField;
 #end
