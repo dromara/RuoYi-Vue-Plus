@@ -20,6 +20,11 @@
 ## 关注作者(扫码加群)
 ![](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
 
+## 捐献作者
+作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  
+<img src="https://images.gitee.com/uploads/images/2021/0525/101654_451e4523_1766278.jpeg" width="300px" height="450px" />
+<img src="https://images.gitee.com/uploads/images/2021/0525/101713_3d18b119_1766278.jpeg" width="300px" height="450px" />
+
 ## 平台简介
 
 若依是一套全部开源的快速开发平台，毫无保留给个人及企业免费使用。
