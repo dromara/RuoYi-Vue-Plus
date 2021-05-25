@@ -13,16 +13,16 @@
     <description>RuoYi-Vue-Plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>2.1.2</ruoyi-vue-plus.version>
+        <ruoyi-vue-plus.version>2.2.0</ruoyi-vue-plus.version>
         <spring-boot.version>2.3.11.RELEASE</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
-        <druid.version>1.2.4</druid.version>
+        <druid.version>1.2.6</druid.version>
         <knife4j.version>3.0.2</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
-        <fastjson.version>1.2.75</fastjson.version>
+        <fastjson.version>1.2.76</fastjson.version>
         <poi.version>4.1.2</poi.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>

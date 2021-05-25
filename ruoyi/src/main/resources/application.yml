@@ -14,6 +14,8 @@ ruoyi:
   addressEnabled: false
 
 captcha:
+  # 验证码开关
+  enabled: true
   # 验证码类型 math 数组计算 char 字符验证
   type: math
   # line 线段干扰 circle 圆圈干扰 shear 扭曲干扰

@@ -13,12 +13,29 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "captcha")
 public class CaptchaProperties {
-    // 验证码类型
+
+	/**
+	 * 验证码开关
+	 */
+	private Boolean enabled;
+
+	/**
+	 * 验证码类型
+ 	 */
     private String type;
-    // 验证码类别
+
+	/**
+	 * 验证码类别
+	 */
     private String category;
-    // 数字验证码位数
+
+	/**
+	 * 数字验证码位数
+	 */
     private Integer numberLength;
-    // 字符验证码长度
+
+	/**
+	 * 字符验证码长度
+	 */
     private Integer charLength;
 }

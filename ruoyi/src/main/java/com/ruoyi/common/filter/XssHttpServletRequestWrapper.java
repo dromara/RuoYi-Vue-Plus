@@ -1,6 +1,7 @@
 package com.ruoyi.common.filter;
 
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +16,7 @@ import java.io.IOException;
 
 /**
  * XSS过滤处理
- * 
+ *
  * @author ruoyi
  */
 public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
@@ -94,12 +95,12 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
 
     /**
      * 是否是Json请求
-     * 
+     *
      * @param request
      */
     public boolean isJsonRequest()
     {
         String header = super.getHeader(HttpHeaders.CONTENT_TYPE);
-        return MediaType.APPLICATION_JSON_VALUE.equalsIgnoreCase(header);
+        return StrUtil.startWithIgnoreCase(header, MediaType.APPLICATION_JSON_VALUE);
     }
 }
