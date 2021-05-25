@@ -1,5 +1,6 @@
 package com.ruoyi.framework.aspectj;
 
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.annotation.Log;
@@ -198,7 +199,7 @@ public class LogAspect
         {
             for (int i = 0; i < paramsArray.length; i++)
             {
-                if (StrUtil.isNotNull(paramsArray[i]) && !isFilterObject(paramsArray[i]))
+                if (Validator.isNotNull(paramsArray[i]) && !isFilterObject(paramsArray[i]))
                 {
                     Object jsonObj = JSON.toJSON(paramsArray[i]);
                     params += jsonObj.toString() + " ";

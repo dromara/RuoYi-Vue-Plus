@@ -80,7 +80,7 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
-            <el-collapse-item title="v2.1.1 - 2021-5-21">
+            <el-collapse-item title="v2.1.2 - 2021-5-21">
               <ol>
                 <li>update springboot 升级 2.3.11</li>
                 <li>update mybatis-plus 升级 3.4.3 分页Plus对象适配更新</li>
@@ -166,7 +166,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "2.1.0",
+      version: "2.1.2",
     };
   },
   methods: {
