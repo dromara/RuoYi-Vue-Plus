@@ -12,6 +12,7 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
+import com.ruoyi.framework.config.properties.CaptchaProperties;
 import com.ruoyi.framework.manager.AsyncManager;
 import com.ruoyi.framework.manager.factory.AsyncFactory;
 import com.ruoyi.system.service.ISysUserService;
@@ -41,7 +42,10 @@ public class SysLoginService
     @Autowired
     private RedisCache redisCache;
 
-    @Autowired
+	@Autowired
+	private CaptchaProperties captchaProperties;
+
+	@Autowired
     private ISysUserService userService;
 
     /**
@@ -55,19 +59,19 @@ public class SysLoginService
      */
     public String login(String username, String password, String code, String uuid)
     {
-        String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
-        String captcha = redisCache.getCacheObject(verifyKey);
-        redisCache.deleteObject(verifyKey);
-        if (captcha == null)
-        {
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire")));
-            throw new CaptchaExpireException();
-        }
-        if (!code.equalsIgnoreCase(captcha))
-        {
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
-            throw new CaptchaException();
-        }
+		if(captchaProperties.getEnabled()) {
+			String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
+			String captcha = redisCache.getCacheObject(verifyKey);
+			redisCache.deleteObject(verifyKey);
+			if (captcha == null) {
+				AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire")));
+				throw new CaptchaExpireException();
+			}
+			if (!code.equalsIgnoreCase(captcha)) {
+				AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
+				throw new CaptchaException();
+			}
+		}
         // 用户验证
         Authentication authentication = null;
         try
