@@ -50,6 +50,7 @@
 
 ## 捐献作者
 作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭
+![](https://images.gitee.com/uploads/images/2021/0525/101654_451e4523_1766278.jpeg "微信二维码.jpg")![](https://images.gitee.com/uploads/images/2021/0525/101713_3d18b119_1766278.jpeg "支付宝二维码.jpg")
 
 
 ## 重点注意事项
