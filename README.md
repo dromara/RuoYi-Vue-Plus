@@ -41,12 +41,17 @@
 
 ### 其他
 
-* 同步升级 RuoYi-Vue 3.4.0
+* 同步升级 RuoYi-Vue 3.5.0
 * 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
 
 ## 关注作者(扫码请备注: "加群")
 
 ![](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
+
+## 捐献作者
+作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  
+<img src="https://images.gitee.com/uploads/images/2021/0525/101654_451e4523_1766278.jpeg" width="300px" height="450px" />
+<img src="https://images.gitee.com/uploads/images/2021/0525/101713_3d18b119_1766278.jpeg" width="300px" height="450px" />
 
 ## 重点注意事项
 

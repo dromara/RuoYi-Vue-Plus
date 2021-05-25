@@ -143,6 +143,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
                                 .set(cenTableColumn.getIsEdit() == null, GenTableColumn::getIsEdit, null)
                                 .set(cenTableColumn.getIsList() == null, GenTableColumn::getIsList, null)
                                 .set(cenTableColumn.getIsQuery() == null, GenTableColumn::getIsQuery, null)
+								.set(cenTableColumn.getIsRequired() == null, GenTableColumn::getIsRequired, null)
                                 .eq(GenTableColumn::getColumnId,cenTableColumn.getColumnId()));
             }
         }

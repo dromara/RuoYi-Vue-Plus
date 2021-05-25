@@ -52,6 +52,12 @@ public class CaptchaController {
 	 */
 	@GetMapping("/captchaImage")
 	public AjaxResult getCode() {
+		Map<String, Object> ajax = new HashMap<>();
+		Boolean enabled = captchaProperties.getEnabled();
+		ajax.put("enabled", enabled);
+		if (!enabled) {
+			return AjaxResult.success(ajax);
+		}
 		// 保存验证码信息
 		String uuid = IdUtil.simpleUUID();
 		String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
@@ -90,7 +96,6 @@ public class CaptchaController {
 			code = captcha.getCode();
 		}
 		redisCache.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
-		Map<String,Object> ajax = new HashMap<>();
 		ajax.put("uuid", uuid);
 		ajax.put("img", captcha.getImageBase64());
 		return AjaxResult.success(ajax);
