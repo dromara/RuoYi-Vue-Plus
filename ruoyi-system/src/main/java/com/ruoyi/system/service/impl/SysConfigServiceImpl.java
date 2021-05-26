@@ -55,10 +55,10 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
                 .eq(StrUtil.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
                 .like(StrUtil.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
+                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(create_time,'%y%m%d') <= date_format(#{0},'%y%m%d')",
+                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"));
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
     }
@@ -110,10 +110,10 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
                 .eq(StrUtil.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
                 .like(StrUtil.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
+                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format(#{0},'%y%m%d')",
+                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"));
         return baseMapper.selectList(lqw);
     }
