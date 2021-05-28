@@ -33,6 +33,9 @@ import java.util.Map;
 @Service
 public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDictType> implements ISysDictTypeService {
 
+	@Autowired
+	private SysDictTypeMapper dictTypeMapper;
+
     @Autowired
     private SysDictDataMapper dictDataMapper;
 
@@ -41,15 +44,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      */
     @PostConstruct
     public void init() {
-        List<SysDictType> dictTypeList = list();
-        for (SysDictType dictType : dictTypeList) {
-            List<SysDictData> dictDatas = dictDataMapper.selectList(
-                    new LambdaQueryWrapper<SysDictData>()
-                            .eq(SysDictData::getStatus, 0)
-                            .eq(SysDictData::getDictType, dictType.getDictType())
-                            .orderByAsc(SysDictData::getDictSort));
-            DictUtils.setDictCache(dictType.getDictType(), dictDatas);
-        }
+        loadingDictCache();
     }
 
     @Override
@@ -151,60 +146,81 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      * @return 结果
      */
     @Override
-    public int deleteDictTypeByIds(Long[] dictIds) {
+    public void deleteDictTypeByIds(Long[] dictIds) {
         for (Long dictId : dictIds) {
             SysDictType dictType = selectDictTypeById(dictId);
             if (dictDataMapper.selectCount(new LambdaQueryWrapper<SysDictData>()
                     .eq(SysDictData::getDictType, dictType.getDictType())) > 0) {
                 throw new CustomException(String.format("%1$s已分配,不能删除", dictType.getDictName()));
             }
+            dictTypeMapper.deleteDictTypeById(dictId);
+            DictUtils.removeDictCache(dictType.getDictType());
         }
-        int count = baseMapper.deleteBatchIds(Arrays.asList(dictIds));
-        if (count > 0) {
-            DictUtils.clearDictCache();
-        }
-        return count;
     }
 
     /**
-     * 清空缓存数据
+     * 加载字典缓存数据
      */
-    @Override
-    public void clearCache() {
+    public void loadingDictCache()
+    {
+        List<SysDictType> dictTypeList = dictTypeMapper.selectDictTypeAll();
+        for (SysDictType dictType : dictTypeList)
+        {
+            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dictType.getDictType());
+            DictUtils.setDictCache(dictType.getDictType(), dictDatas);
+        }
+    }
+
+    /**
+     * 清空字典缓存数据
+     */
+    public void clearDictCache()
+    {
         DictUtils.clearDictCache();
+    }
+
+    /**
+     * 重置字典缓存数据
+     */
+    public void resetDictCache()
+    {
+        clearDictCache();
+        loadingDictCache();
     }
 
     /**
      * 新增保存字典类型信息
      *
-     * @param dictType 字典类型信息
+     * @param dict 字典类型信息
      * @return 结果
      */
     @Override
-    public int insertDictType(SysDictType dictType) {
-        int row = baseMapper.insert(dictType);
+    public int insertDictType(SysDictType dict) {
+        int row = baseMapper.insert(dict);
         if (row > 0) {
-            DictUtils.clearDictCache();
+			DictUtils.setDictCache(dict.getDictType(), null);
         }
         return row;
     }
 
     /**
      * 修改保存字典类型信息
-     *
-     * @param dictType 字典类型信息
+     * @param dict 字典类型信息
      * @return 结果
      */
     @Override
     @Transactional
-    public int updateDictType(SysDictType dictType) {
-        SysDictType oldDict = getById(dictType.getDictId());
-        dictDataMapper.update(null, new LambdaUpdateWrapper<SysDictData>()
-                .set(SysDictData::getDictType, dictType.getDictType())
-                .eq(SysDictData::getDictType, oldDict.getDictType()));
-        int row = baseMapper.updateById(dictType);
-        if (row > 0) {
-            DictUtils.clearDictCache();
+    public int updateDictType(SysDictType dict)
+    {
+		SysDictType oldDict = getById(dict.getDictId());
+		dictDataMapper.update(null, new LambdaUpdateWrapper<SysDictData>()
+			.set(SysDictData::getDictType, dict.getDictType())
+			.eq(SysDictData::getDictType, oldDict.getDictType()));
+		int row = baseMapper.updateById(dict);
+        if (row > 0)
+        {
+            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dict.getDictType());
+            DictUtils.setDictCache(dict.getDictType(), dictDatas);
         }
         return row;
     }

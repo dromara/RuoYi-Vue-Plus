@@ -22,6 +22,9 @@ import java.util.List;
 @Service
 public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData> implements ISysDictDataService {
 
+	@Autowired
+	private SysDictDataMapper dictDataMapper;
+
     @Override
     public TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData) {
         LambdaQueryWrapper<SysDictData> lqw = new LambdaQueryWrapper<SysDictData>()
@@ -81,25 +84,31 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      * @return 结果
      */
     @Override
-    public int deleteDictDataByIds(Long[] dictCodes) {
-        int row = baseMapper.deleteBatchIds(Arrays.asList(dictCodes));
-        if (row > 0) {
-            DictUtils.clearDictCache();
+    public void deleteDictDataByIds(Long[] dictCodes)
+    {
+        for (Long dictCode : dictCodes)
+        {
+            SysDictData data = selectDictDataById(dictCode);
+            dictDataMapper.deleteDictDataById(dictCode);
+            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
+            DictUtils.setDictCache(data.getDictType(), dictDatas);
         }
-        return row;
     }
 
     /**
      * 新增保存字典数据信息
      *
-     * @param dictData 字典数据信息
+     * @param data 字典数据信息
      * @return 结果
      */
     @Override
-    public int insertDictData(SysDictData dictData) {
-        int row = baseMapper.insert(dictData);
-        if (row > 0) {
-            DictUtils.clearDictCache();
+    public int insertDictData(SysDictData data)
+    {
+        int row = baseMapper.insert(data);
+        if (row > 0)
+        {
+            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
+            DictUtils.setDictCache(data.getDictType(), dictDatas);
         }
         return row;
     }
@@ -107,14 +116,17 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     /**
      * 修改保存字典数据信息
      *
-     * @param dictData 字典数据信息
+     * @param data 字典数据信息
      * @return 结果
      */
     @Override
-    public int updateDictData(SysDictData dictData) {
-        int row = baseMapper.updateById(dictData);
-        if (row > 0) {
-            DictUtils.clearDictCache();
+    public int updateDictData(SysDictData data)
+    {
+        int row = baseMapper.updateById(data);
+        if (row > 0)
+        {
+            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
+            DictUtils.setDictCache(data.getDictType(), dictDatas);
         }
         return row;
     }
