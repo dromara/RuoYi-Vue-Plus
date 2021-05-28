@@ -79,6 +79,11 @@
 关于vue与boot整合部署  
 * [前端静态资源如何整合到后端访问](https://doc.ruoyi.vip/ruoyi-vue/other/faq.html#前端静态资源如何整合到后端访问)
 
+关于修改包名
+* 将文件夹全部修改为 com.xxx
+* 使用IDEA全局替换 com.ruoyi 替换为 com.xxx
+* 严禁手动修改
+
 ## 内置功能
 
 1.  用户管理：用户是系统操作者，该功能主要完成系统用户配置。
