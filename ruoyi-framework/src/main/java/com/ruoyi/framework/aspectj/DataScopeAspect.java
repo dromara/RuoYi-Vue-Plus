@@ -68,7 +68,7 @@ public class DataScopeAspect
     @Before("dataScopePointCut()")
     public void doBefore(JoinPoint point) throws Throwable
     {
-        clearDataScope(point);
+		clearDataScope(point);
         handleDataScope(point);
     }
 
@@ -145,18 +145,8 @@ public class DataScopeAspect
 
         if (StrUtil.isNotBlank(sqlString.toString()))
         {
-            Object params = joinPoint.getArgs()[0];
-            if (Validator.isNotNull(params))
-            {
-                try {
-                    Method getParams = params.getClass().getDeclaredMethod("getParams", null);
-                    Map<String, Object> invoke = (Map<String, Object>) getParams.invoke(params, null);
-                    invoke.put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+			putDataScope(joinPoint, " AND (" + sqlString.substring(4) + ")");
+		}
     }
 
     /**
@@ -175,16 +165,29 @@ public class DataScopeAspect
         return null;
     }
 
-    /**
-     * 拼接权限sql前先清空params.dataScope参数防止注入
-     */
-    private void clearDataScope(final JoinPoint joinPoint)
-    {
-        Object params = joinPoint.getArgs()[0];
-        if (StringUtils.isNotNull(params) && params instanceof BaseEntity)
-        {
-            BaseEntity baseEntity = (BaseEntity) params;
-            baseEntity.getParams().put(DATA_SCOPE, "");
-        }
-    }
+	/**
+	 * 拼接权限sql前先清空params.dataScope参数防止注入
+	 */
+	private void clearDataScope(final JoinPoint joinPoint)
+	{
+		Object params = joinPoint.getArgs()[0];
+		if (Validator.isNotNull(params))
+		{
+			putDataScope(joinPoint, "");
+		}
+	}
+
+	private static void putDataScope(JoinPoint joinPoint, String sql) {
+		Object params = joinPoint.getArgs()[0];
+		if (Validator.isNotNull(params))
+		{
+			try {
+				Method getParams = params.getClass().getDeclaredMethod("getParams", null);
+				Map<String, Object> invoke = (Map<String, Object>) getParams.invoke(params, null);
+				invoke.put(DATA_SCOPE, sql);
+			} catch (Exception e) {
+				// 方法未找到 不处理
+			}
+		}
+	}
 }
