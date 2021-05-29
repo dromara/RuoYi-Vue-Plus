@@ -58,7 +58,9 @@
             and date_format(r.create_time,'%y%m%d') &lt;= date_format(#{role.params.endTime},'%y%m%d')
         </if>
         <!-- 数据范围过滤 -->
-        ${role.params.dataScope}
+        <if test="role.params.dataScope != null and role.params.dataScope != ''">
+            AND ( ${role.params.dataScope} )
+        </if>
         order by r.role_sort
     </select>
 
@@ -81,7 +83,9 @@
             and date_format(r.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
         </if>
         <!-- 数据范围过滤 -->
-        ${params.dataScope}
+        <if test="params.dataScope != null and params.dataScope != ''">
+            AND ( ${params.dataScope} )
+        </if>
         order by r.role_sort
     </select>
 
@@ -103,4 +107,4 @@
         WHERE r.del_flag = '0' and u.user_name = #{userName}
     </select>
 
-</mapper> 
+</mapper>
