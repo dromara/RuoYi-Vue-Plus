@@ -106,6 +106,10 @@ public class DataScopeAspect
     {
         StringBuilder sqlString = new StringBuilder();
 
+		// 将 "." 提取出,不写别名为单表查询,写别名为多表查询
+		deptAlias = StrUtil.isNotBlank(deptAlias) ? deptAlias + "." : "";
+		userAlias = StrUtil.isNotBlank(userAlias) ? userAlias + "." : "";
+
         for (SysRole role : user.getRoles())
         {
             String dataScope = role.getDataScope();
@@ -117,24 +121,24 @@ public class DataScopeAspect
             else if (DATA_SCOPE_CUSTOM.equals(dataScope))
             {
                 sqlString.append(StrUtil.format(
-                        " OR {}.dept_id IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = {} ) ", deptAlias,
+                        " OR {}dept_id IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = {} ) ", deptAlias,
                         role.getRoleId()));
             }
             else if (DATA_SCOPE_DEPT.equals(dataScope))
             {
-                sqlString.append(StrUtil.format(" OR {}.dept_id = {} ", deptAlias, user.getDeptId()));
+                sqlString.append(StrUtil.format(" OR {}dept_id = {} ", deptAlias, user.getDeptId()));
             }
             else if (DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope))
             {
                 sqlString.append(StrUtil.format(
-                        " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
+                        " OR {}dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
                         deptAlias, user.getDeptId(), user.getDeptId()));
             }
             else if (DATA_SCOPE_SELF.equals(dataScope))
             {
                 if (StrUtil.isNotBlank(userAlias))
                 {
-                    sqlString.append(StrUtil.format(" OR {}.user_id = {} ", userAlias, user.getUserId()));
+                    sqlString.append(StrUtil.format(" OR {}user_id = {} ", userAlias, user.getUserId()));
                 }
                 else
                 {
@@ -146,7 +150,7 @@ public class DataScopeAspect
 
         if (StrUtil.isNotBlank(sqlString.toString()))
         {
-			putDataScope(joinPoint, "AND (" + sqlString.substring(4) + ")");
+			putDataScope(joinPoint, sqlString.substring(4));
 		}
     }
 
