@@ -184,7 +184,7 @@ public class DataScopeAspect
 		{
 			if(params instanceof BaseEntity) {
 				BaseEntity baseEntity = (BaseEntity) params;
-				baseEntity.getParams().put(DATA_SCOPE, "");
+				baseEntity.getParams().put(DATA_SCOPE, sql);
 			} else {
 				try {
 					Method getParams = params.getClass().getDeclaredMethod("getParams", null);
