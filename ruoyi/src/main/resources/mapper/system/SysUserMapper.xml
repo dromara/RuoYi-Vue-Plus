@@ -106,9 +106,7 @@
             ancestors) ))
         </if>
         <!-- 数据范围过滤 -->
-        <if test="user.params.dataScope != null and user.params.dataScope != ''">
-            AND ( ${user.params.dataScope} )
-        </if>
+        ${user.params.dataScope}
     </select>
 
     <select id="selectUserList" parameterType="SysUser" resultMap="SysUserResult">
@@ -137,9 +135,7 @@
             ancestors) ))
         </if>
         <!-- 数据范围过滤 -->
-        <if test="params.dataScope != null and params.dataScope != ''">
-            AND ( ${params.dataScope} )
-        </if>
+        ${params.dataScope}
     </select>
 
     <select id="selectUserByUserName" parameterType="String" resultMap="SysUserResult">

@@ -74,10 +74,15 @@
 
 关于数据权限
 * 参考（用户，角色，部门）列表接口用法
-* 从 bo.getParam().get("dataScope") 即可获取数据权限生成的SQL
+* 目前仅支持 XML 方式使用(后续修改为支持MP)
 
 关于vue与boot整合部署  
 * [前端静态资源如何整合到后端访问](https://doc.ruoyi.vip/ruoyi-vue/other/faq.html#前端静态资源如何整合到后端访问)
+
+关于修改包名
+* 将文件夹全部修改为 com.xxx
+* 使用IDEA全局替换 com.ruoyi 替换为 com.xxx
+* 严禁手动修改
 
 ## 内置功能
 
