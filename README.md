@@ -73,8 +73,9 @@
 * 代码生成选择树表生成即可
 
 关于数据权限
-* 参考（用户，角色，部门）列表接口用法
-* 目前仅支持 XML 方式使用(后续修改为支持MP)
+* 创建表 需预留 dept_id 字段 如需用户权限 还需预留 user_id 字段
+* 支持 Mybatis-Plus 方式注入 参考 demo 模块用法(需导入 test.sql 文件)
+* 支持 XML 方式注入 参考 system 模块用法
 
 关于vue与boot整合部署  
 * [前端静态资源如何整合到后端访问](https://doc.ruoyi.vip/ruoyi-vue/other/faq.html#前端静态资源如何整合到后端访问)
