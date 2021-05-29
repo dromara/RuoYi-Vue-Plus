@@ -33,9 +33,6 @@ import java.util.Map;
 public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig> implements ISysConfigService {
 
 	@Autowired
-	private SysConfigMapper configMapper;
-
-	@Autowired
 	private RedisCache redisCache;
 
 	/**
@@ -160,7 +157,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 			if (StrUtil.equals(UserConstants.YES, config.getConfigType())) {
 				throw new CustomException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
 			}
-			configMapper.deleteById(configId);
+			baseMapper.deleteById(configId);
 			redisCache.deleteObject(getCacheKey(config.getConfigKey()));
 		}
 	}

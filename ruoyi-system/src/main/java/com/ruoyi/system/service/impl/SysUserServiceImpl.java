@@ -52,7 +52,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private ISysConfigService configService;
 
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
+    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
     public TableDataInfo<SysUser> selectPageUserList(SysUser user) {
         return PageUtils.buildDataInfo(baseMapper.selectPageUserList(PageUtils.buildPage(), user));
     }
@@ -64,7 +64,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
+    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
     public List<SysUser> selectUserList(SysUser user) {
         return baseMapper.selectUserList(user);
     }
