@@ -135,7 +135,7 @@
             ancestors) ))
         </if>
         <!-- 数据范围过滤 -->
-        ${params.dataScope}
+        AND ( ${params.dataScope} )
     </select>
 
     <select id="selectUserByUserName" parameterType="String" resultMap="SysUserResult">
@@ -149,4 +149,4 @@
     </select>
 
 
-</mapper> 
+</mapper>

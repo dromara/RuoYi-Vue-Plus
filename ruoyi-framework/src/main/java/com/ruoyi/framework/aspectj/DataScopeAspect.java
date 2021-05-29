@@ -145,7 +145,7 @@ public class DataScopeAspect
 
         if (StrUtil.isNotBlank(sqlString.toString()))
         {
-			putDataScope(joinPoint, " AND (" + sqlString.substring(4) + ")");
+			putDataScope(joinPoint, sqlString.substring(4));
 		}
     }
 
