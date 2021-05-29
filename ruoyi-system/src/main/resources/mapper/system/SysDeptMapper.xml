@@ -40,9 +40,7 @@
             AND status = #{status}
         </if>
         <!-- 数据范围过滤 -->
-        <if test="params.dataScope != null and params.dataScope != ''">
-            AND ( ${params.dataScope} )
-        </if>
+        ${params.dataScope}
         order by d.parent_id, d.order_num
     </select>
 

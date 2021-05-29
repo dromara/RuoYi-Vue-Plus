@@ -83,7 +83,6 @@
             <el-collapse-item title="v2.2.1 - 2021-5-29">
               <ol>
                 <li>add 增加 security 权限框架 @Async 异步注解配置</li>
-                <li>update 优化数据权限sql 解决MP apply注入附带 AND 语法问题</li>
                 <li>update 优化dataScope参数防止注入</li>
                 <li>update 优化参数&字典缓存操作</li>
                 <li>update 增加修改包名文档</li>
