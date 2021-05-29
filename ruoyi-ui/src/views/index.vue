@@ -80,6 +80,17 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.2.1 - 2021-5-29">
+              <ol>
+                <li>add 增加 security 权限框架 @Async 异步注解配置</li>
+                <li>update 优化数据权限sql 解决MP apply注入附带 AND 语法问题</li>
+                <li>update 优化dataScope参数防止注入</li>
+                <li>update 优化参数&字典缓存操作</li>
+                <li>update 增加修改包名文档</li>
+                <li>update 文档增加演示图例</li>
+                <li>fix 修复部门类sql符号错误</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.2.0 - 2021-5-25">
               <ol>
                 <li>同步升级 RuoYi-Vue 3.5.0</li>
@@ -180,7 +191,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "2.2.0",
+      version: "2.2.1",
     };
   },
   methods: {

@@ -40,7 +40,9 @@
             AND status = #{status}
         </if>
         <!-- 数据范围过滤 -->
-        ${params.dataScope}
+        <if test="params.dataScope != null and params.dataScope != ''">
+            AND ( ${params.dataScope} )
+        </if>
         order by d.parent_id, d.order_num
     </select>
 
@@ -49,11 +51,10 @@
         from sys_dept d
         left join sys_role_dept rd on d.dept_id = rd.dept_id
         where rd.role_id = #{roleId}
-        <if test="deptCheckStrictly">
-            and d.dept_id not in (select d.parent_id from sys_dept d inner join sys_role_dept rd on d.dept_id =
-            rd.dept_id and rd.role_id = #{roleId})
-        </if>
+            <if test="deptCheckStrictly">
+                and d.dept_id not in (select d.parent_id from sys_dept d inner join sys_role_dept rd on d.dept_id = rd.dept_id and rd.role_id = #{roleId})
+            </if>
         order by d.parent_id, d.order_num
     </select>
 
-</mapper> 
+</mapper>

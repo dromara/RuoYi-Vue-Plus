@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * 数据字典信息
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -107,6 +107,7 @@ public class SysDictDataController extends BaseController
     @DeleteMapping("/{dictCodes}")
     public AjaxResult remove(@PathVariable Long[] dictCodes)
     {
-        return toAjax(dictDataService.deleteDictDataByIds(dictCodes));
+        dictDataService.deleteDictDataByIds(dictCodes);
+        return success();
     }
 }
