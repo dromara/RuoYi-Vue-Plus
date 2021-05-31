@@ -311,9 +311,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 list.add(ur);
             }
             if (list.size() > 0) {
-                for (SysUserRole sysUserRole : list) {
-                    userRoleMapper.insert(sysUserRole);
-                }
+				userRoleMapper.batchUserRole(list);
             }
         }
     }
@@ -335,9 +333,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 list.add(up);
             }
             if (list.size() > 0) {
-                for (SysUserPost sysUserPost : list) {
-                    userPostMapper.insert(sysUserPost);
-                }
+				userPostMapper.batchUserPost(list);
             }
         }
     }

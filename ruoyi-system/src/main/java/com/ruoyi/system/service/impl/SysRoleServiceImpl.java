@@ -240,9 +240,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             list.add(rm);
         }
         if (list.size() > 0) {
-            for (SysRoleMenu sysRoleMenu : list) {
-                rows += roleMenuMapper.insert(sysRoleMenu);
-            }
+			rows = roleMenuMapper.batchRoleMenu(list);
         }
         return rows;
     }
@@ -263,9 +261,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             list.add(rd);
         }
         if (list.size() > 0) {
-            for (SysRoleDept sysRoleDept : list) {
-                rows += roleDeptMapper.insert(sysRoleDept);
-            }
+			rows = roleDeptMapper.batchRoleDept(list);
         }
         return rows;
     }

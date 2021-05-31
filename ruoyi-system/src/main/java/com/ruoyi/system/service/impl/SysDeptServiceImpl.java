@@ -244,7 +244,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
             child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
         }
         if (children.size() > 0) {
-            updateBatchById(children);
+            baseMapper.updateDeptChildren(children);
         }
     }
 
