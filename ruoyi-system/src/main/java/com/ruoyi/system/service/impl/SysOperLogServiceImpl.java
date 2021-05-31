@@ -41,10 +41,10 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
                         SysOperLog::getStatus, operLog.getStatus())
                 .like(StrUtil.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(oper_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+                        "oper_time >= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(oper_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+                        "oper_time <= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("endTime"))
                 .orderByDesc(SysOperLog::getOperId);
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
@@ -83,10 +83,10 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
                         SysOperLog::getStatus,operLog.getStatus())
                 .like(StrUtil.isNotBlank(operLog.getOperName()),SysOperLog::getOperName,operLog.getOperName())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(oper_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+                        "oper_time >= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(oper_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+                        "oper_time <= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("endTime"))
                 .orderByDesc(SysOperLog::getOperId));
     }

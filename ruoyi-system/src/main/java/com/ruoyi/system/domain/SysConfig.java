@@ -25,6 +25,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_config")
+@KeySequence(value = "seq_sys_config")
 public class SysConfig implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -32,7 +33,7 @@ public class SysConfig implements Serializable {
      * 参数主键
      */
     @Excel(name = "参数主键", cellType = ColumnType.NUMERIC)
-    @TableId(value = "config_id", type = IdType.AUTO)
+    @TableId(value = "config_id", type = IdType.INPUT)
     private Long configId;
 
     /**

@@ -95,7 +95,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
     public String checkPostNameUnique(SysPost post) {
         Long postId = Validator.isNull(post.getPostId()) ? -1L : post.getPostId();
         SysPost info = getOne(new LambdaQueryWrapper<SysPost>()
-                .eq(SysPost::getPostName, post.getPostName()).last("limit 1"));
+                .eq(SysPost::getPostName, post.getPostName()).last("and rownum <= 1"));
         if (Validator.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -112,7 +112,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
     public String checkPostCodeUnique(SysPost post) {
         Long postId = Validator.isNull(post.getPostId()) ? -1L : post.getPostId();
         SysPost info = getOne(new LambdaQueryWrapper<SysPost>()
-                .eq(SysPost::getPostCode, post.getPostCode()).last("limit 1"));
+                .eq(SysPost::getPostCode, post.getPostCode()).last("and rownum <= 1"));
         if (Validator.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }

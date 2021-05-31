@@ -2,6 +2,7 @@ package com.ruoyi.framework.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.baomidou.mybatisplus.extension.incrementer.OracleKeyGenerator;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
@@ -41,7 +42,7 @@ public class MybatisPlusConfig {
 	public PaginationInnerInterceptor paginationInnerInterceptor() {
 		PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
 		// 设置数据库类型为mysql
-		paginationInnerInterceptor.setDbType(DbType.MYSQL);
+		paginationInnerInterceptor.setDbType(DbType.ORACLE);
 		// 设置最大单页限制数量，默认 500 条，-1 不受限制
 		paginationInnerInterceptor.setMaxLimit(-1L);
 		return paginationInnerInterceptor;
@@ -106,4 +107,15 @@ public class MybatisPlusConfig {
 	 * https://baomidou.com/guide/interceptor-dynamic-table-name.html
 	 */
 
+	/**
+	 * Sequence主键自增
+	 *
+	 * @return 返回oracle自增类
+	 * @author zhenggc
+	 * @date 2019/1/2
+	 */
+	@Bean
+	public OracleKeyGenerator oracleKeyGenerator(){
+		return new OracleKeyGenerator();
+	}
 }

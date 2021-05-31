@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  * 角色表 sys_role
- * 
+ *
  * @author ruoyi
  */
 
@@ -25,13 +25,14 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_role")
+@KeySequence(value = "seq_sys_role")
 public class SysRole implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     /** 角色ID */
     @Excel(name = "角色序号", cellType = ColumnType.NUMERIC)
-    @TableId(value = "role_id",type = IdType.AUTO)
+    @TableId(value = "role_id",type = IdType.INPUT)
     private Long roleId;
 
     /** 角色名称 */

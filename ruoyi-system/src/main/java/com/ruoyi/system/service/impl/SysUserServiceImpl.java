@@ -137,7 +137,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public String checkUserNameUnique(String userName) {
-        int count = count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName).last("limit 1"));
+        int count = count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName).last("and rownum <= 1"));
         if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -155,7 +155,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         Long userId = Validator.isNull(user.getUserId()) ? -1L : user.getUserId();
         SysUser info = getOne(new LambdaQueryWrapper<SysUser>()
                 .select(SysUser::getUserId, SysUser::getPhonenumber)
-                .eq(SysUser::getPhonenumber, user.getPhonenumber()).last("limit 1"));
+                .eq(SysUser::getPhonenumber, user.getPhonenumber()).last("and rownum <= 1"));
         if (Validator.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -173,7 +173,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         Long userId = Validator.isNull(user.getUserId()) ? -1L : user.getUserId();
         SysUser info = getOne(new LambdaQueryWrapper<SysUser>()
                 .select(SysUser::getUserId, SysUser::getEmail)
-                .eq(SysUser::getEmail, user.getEmail()).last("limit 1"));
+                .eq(SysUser::getEmail, user.getEmail()).last("and rownum <= 1"));
         if (Validator.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }

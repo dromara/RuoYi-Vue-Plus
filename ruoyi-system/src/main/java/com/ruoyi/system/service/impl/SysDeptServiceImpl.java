@@ -123,7 +123,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     public int selectNormalChildrenDeptById(Long deptId) {
         return count(new LambdaQueryWrapper<SysDept>()
                 .eq(SysDept::getStatus, 0)
-                .apply("find_in_set({0}, ancestors)", deptId));
+                .apply("find_in_set({0}, ancestors) <> 0", deptId));
     }
 
     /**
@@ -136,7 +136,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     public boolean hasChildByDeptId(Long deptId) {
         int result = count(new LambdaQueryWrapper<SysDept>()
                 .eq(SysDept::getParentId, deptId)
-                .last("limit 1"));
+                .last("and rownum <= 1"));
         return result > 0 ? true : false;
     }
 
@@ -165,7 +165,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         SysDept info = getOne(new LambdaQueryWrapper<SysDept>()
                 .eq(SysDept::getDeptName, dept.getDeptName())
                 .eq(SysDept::getParentId, dept.getParentId())
-                .last("limit 1"));
+                .last("and rownum <= 1"));
         if (Validator.isNotNull(info) && info.getDeptId().longValue() != deptId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -239,7 +239,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      */
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors) {
         List<SysDept> children = list(new LambdaQueryWrapper<SysDept>()
-                .apply("find_in_set({0},ancestors)",deptId));
+                .apply("find_in_set({0},ancestors) <> 0",deptId));
         for (SysDept child : children) {
             child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
         }

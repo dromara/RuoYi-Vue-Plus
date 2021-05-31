@@ -32,10 +32,10 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
                 .eq(StrUtil.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
                 .like(StrUtil.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+                        "login_time >= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+                        "login_time <= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("endTime"))
                 .orderByDesc(SysLogininfor::getInfoId);
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
@@ -66,10 +66,10 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
                 .eq(StrUtil.isNotBlank(logininfor.getStatus()),SysLogininfor::getStatus,logininfor.getStatus())
                 .like(StrUtil.isNotBlank(logininfor.getUserName()),SysLogininfor::getUserName,logininfor.getUserName())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+                        "login_time >= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+                        "login_time <= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("endTime"))
                 .orderByDesc(SysLogininfor::getInfoId));
     }

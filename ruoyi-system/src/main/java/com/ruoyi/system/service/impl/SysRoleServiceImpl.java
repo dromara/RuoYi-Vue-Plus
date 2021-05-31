@@ -119,7 +119,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     public String checkRoleNameUnique(SysRole role) {
         Long roleId = Validator.isNull(role.getRoleId()) ? -1L : role.getRoleId();
         SysRole info = getOne(new LambdaQueryWrapper<SysRole>()
-                .eq(SysRole::getRoleName, role.getRoleName()).last("limit 1"));
+                .eq(SysRole::getRoleName, role.getRoleName()).last("and rownum <= 1"));
         if (Validator.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -136,7 +136,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     public String checkRoleKeyUnique(SysRole role) {
         Long roleId = Validator.isNull(role.getRoleId()) ? -1L : role.getRoleId();
         SysRole info = getOne(new LambdaQueryWrapper<SysRole>()
-                .eq(SysRole::getRoleKey, role.getRoleKey()).last("limit 1"));
+                .eq(SysRole::getRoleKey, role.getRoleKey()).last("and rownum <= 1"));
         if (Validator.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }

@@ -22,13 +22,14 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_notice")
+@KeySequence(value = "seq_sys_notice")
 public class SysNotice implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 公告ID
      */
-    @TableId(value = "notice_id", type = IdType.AUTO)
+    @TableId(value = "notice_id", type = IdType.INPUT)
     private Long noticeId;
 
     /**

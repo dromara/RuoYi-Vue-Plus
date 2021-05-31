@@ -146,6 +146,7 @@ mybatis-plus:
     localCacheScope: SESSION
     # 开启Mybatis二级缓存，默认为 true
     cacheEnabled: true
+    jdbc-type-for-null: 'null'
   global-config:
     # 是否打印 Logo banner
     banner: true

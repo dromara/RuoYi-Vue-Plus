@@ -25,6 +25,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_post")
+@KeySequence(value = "seq_sys_post")
 public class SysPost implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -32,7 +33,7 @@ public class SysPost implements Serializable {
      * 岗位序号
      */
     @Excel(name = "岗位序号", cellType = ColumnType.NUMERIC)
-    @TableId(value = "post_id", type = IdType.AUTO)
+    @TableId(value = "post_id", type = IdType.INPUT)
     private Long postId;
 
     /**

@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * 定时任务调度日志表 sys_job_log
- * 
+ *
  * @author ruoyi
  */
 
@@ -21,13 +21,13 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_job_log")
-public class SysJobLog
-{
+@KeySequence(value = "seq_sys_job_log")
+public class SysJobLog {
     private static final long serialVersionUID = 1L;
 
     /** ID */
     @Excel(name = "日志序号")
-    @TableId(value = "job_log_id", type = IdType.AUTO)
+    @TableId(value = "job_log_id", type = IdType.INPUT)
     private Long jobLogId;
 
     /** 任务名称 */

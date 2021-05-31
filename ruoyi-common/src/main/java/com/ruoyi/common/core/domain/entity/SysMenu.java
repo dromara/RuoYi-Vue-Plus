@@ -13,7 +13,7 @@ import java.util.*;
 
 /**
  * 菜单权限表 sys_menu
- * 
+ *
  * @author ruoyi
  */
 
@@ -21,12 +21,13 @@ import java.util.*;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_menu")
+@KeySequence(value = "seq_sys_menu")
 public class SysMenu implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     /** 菜单ID */
-    @TableId(value = "menu_id",type = IdType.AUTO)
+    @TableId(value = "menu_id",type = IdType.INPUT)
     private Long menuId;
 
     /** 菜单名称 */
@@ -65,7 +66,7 @@ public class SysMenu implements Serializable
 
     /** 显示状态（0显示 1隐藏） */
     private String visible;
-    
+
     /** 菜单状态（0显示 1隐藏） */
     private String status;
 

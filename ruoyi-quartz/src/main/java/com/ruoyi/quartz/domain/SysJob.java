@@ -28,6 +28,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_job")
+@KeySequence(value = "seq_sys_job")
 public class SysJob implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -35,7 +36,7 @@ public class SysJob implements Serializable {
      * 任务ID
      */
     @Excel(name = "任务序号", cellType = ColumnType.NUMERIC)
-    @TableId(value = "job_id", type = IdType.AUTO)
+    @TableId(value = "job_id", type = IdType.INPUT)
     private Long jobId;
 
     /**

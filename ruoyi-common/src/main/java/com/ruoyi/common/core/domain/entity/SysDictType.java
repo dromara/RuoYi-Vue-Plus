@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  * 字典类型表 sys_dict_type
- * 
+ *
  * @author ruoyi
  */
 
@@ -25,13 +25,14 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_dict_type")
+@KeySequence(value = "seq_sys_dict_type")
 public class SysDictType implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     /** 字典主键 */
     @Excel(name = "字典主键", cellType = ColumnType.NUMERIC)
-    @TableId(value = "dict_id",type = IdType.AUTO)
+    @TableId(value = "dict_id",type = IdType.INPUT)
     private Long dictId;
 
     /** 字典名称 */

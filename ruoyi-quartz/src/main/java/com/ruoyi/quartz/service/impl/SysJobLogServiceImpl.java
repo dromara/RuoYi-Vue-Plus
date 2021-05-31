@@ -32,10 +32,10 @@ public class SysJobLogServiceImpl extends ServiceImpl<SysJobLogMapper, SysJobLog
                 .eq(StrUtil.isNotBlank(jobLog.getStatus()), SysJobLog::getStatus, jobLog.getStatus())
                 .like(StrUtil.isNotBlank(jobLog.getInvokeTarget()), SysJobLog::getInvokeTarget, jobLog.getInvokeTarget())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+                        "create_time >= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+                        "create_time <= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("endTime"));
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
     }
@@ -55,10 +55,10 @@ public class SysJobLogServiceImpl extends ServiceImpl<SysJobLogMapper, SysJobLog
                 .eq(StrUtil.isNotBlank(jobLog.getStatus()), SysJobLog::getStatus, jobLog.getStatus())
                 .like(StrUtil.isNotBlank(jobLog.getInvokeTarget()), SysJobLog::getInvokeTarget, jobLog.getInvokeTarget())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+                        "create_time >= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
-                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+                        "create_time <= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
                         params.get("endTime")));
     }
 

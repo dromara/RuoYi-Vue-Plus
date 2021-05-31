@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 /**
  * 菜单 业务层处理
- * 
+ *
  * @author ruoyi
  */
 @Service
@@ -276,7 +276,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         SysMenu info = getOne(new LambdaQueryWrapper<SysMenu>()
                 .eq(SysMenu::getMenuName,menu.getMenuName())
                 .eq(SysMenu::getParentId,menu.getParentId())
-                .last("limit 1"));
+                .last("and rownum <= 1"));
         if (Validator.isNotNull(info) && info.getMenuId().longValue() != menuId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }

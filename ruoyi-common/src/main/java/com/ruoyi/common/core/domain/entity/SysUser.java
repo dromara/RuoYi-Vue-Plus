@@ -31,13 +31,14 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_user")
+@KeySequence(value = "seq_sys_user")
 public class SysUser implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     /** 用户ID */
     @Excel(name = "用户序号", cellType = ColumnType.NUMERIC, prompt = "用户编号")
-    @TableId(value = "user_id",type = IdType.AUTO)
+    @TableId(value = "user_id",type = IdType.INPUT)
     private Long userId;
 
     /** 部门ID */

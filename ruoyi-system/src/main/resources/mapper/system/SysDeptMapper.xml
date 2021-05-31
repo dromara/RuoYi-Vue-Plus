@@ -34,7 +34,7 @@
             AND parent_id = #{parentId}
         </if>
         <if test="deptName != null and deptName != ''">
-            AND dept_name like concat('%', #{deptName}, '%')
+            AND dept_name like concat(concat('%', #{deptName}), '%')
         </if>
         <if test="status != null and status != ''">
             AND status = #{status}

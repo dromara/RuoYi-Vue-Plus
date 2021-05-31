@@ -14,7 +14,7 @@ import java.util.*;
 
 /**
  * 部门表 sys_dept
- * 
+ *
  * @author ruoyi
  */
 
@@ -22,12 +22,13 @@ import java.util.*;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_dept")
+@KeySequence(value = "seq_sys_dept")
 public class SysDept implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     /** 部门ID */
-    @TableId(value = "dept_id",type = IdType.AUTO)
+    @TableId(value = "dept_id",type = IdType.INPUT)
     private Long deptId;
 
     /** 父部门ID */
@@ -85,7 +86,7 @@ public class SysDept implements Serializable
     @TableField(fill = FieldFill.INSERT_UPDATE)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
-    
+
     /** 子部门 */
     @TableField(exist = false)
     private List<SysDept> children = new ArrayList<SysDept>();

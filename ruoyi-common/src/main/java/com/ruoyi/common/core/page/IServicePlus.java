@@ -107,7 +107,7 @@ public interface IServicePlus<T> extends IService<T> {
 
     /**
      * 根据 Wrapper，查询一条记录 <br/>
-     * <p>结果集，如果是多个会抛出异常，随机取一条加上限制条件 wrapper.last("LIMIT 1")</p>
+     * <p>结果集，如果是多个会抛出异常，随机取一条加上限制条件 wrapper.last("and rownum <= 1")</p>
      *
      * @param kClass       vo类型
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
@@ -118,7 +118,7 @@ public interface IServicePlus<T> extends IService<T> {
 
     /**
      * 根据 Wrapper，查询一条记录 <br/>
-     * <p>结果集，如果是多个会抛出异常，随机取一条加上限制条件 wrapper.last("LIMIT 1")</p>
+     * <p>结果集，如果是多个会抛出异常，随机取一条加上限制条件 wrapper.last("and rownum <= 1")</p>
      *
      * @param convertor    转换函数
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}

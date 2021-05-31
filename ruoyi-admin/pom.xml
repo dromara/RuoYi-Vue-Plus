@@ -30,6 +30,14 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
+        <!--oracle驱动-->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3</version>
+        </dependency>
+
+
         <!-- 核心模块-->
         <dependency>
             <groupId>com.ruoyi</groupId>

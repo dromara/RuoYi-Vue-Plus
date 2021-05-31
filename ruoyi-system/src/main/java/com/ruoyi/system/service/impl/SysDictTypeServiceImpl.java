@@ -52,10 +52,10 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 			.eq(StrUtil.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
 			.like(StrUtil.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
 			.apply(Validator.isNotEmpty(params.get("beginTime")),
-				"date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+				"create_time >= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
 				params.get("beginTime"))
 			.apply(Validator.isNotEmpty(params.get("endTime")),
-				"date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+				"create_time <= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
 				params.get("endTime"));
 		return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
 	}
@@ -74,10 +74,10 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 			.eq(StrUtil.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
 			.like(StrUtil.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
 			.apply(Validator.isNotEmpty(params.get("beginTime")),
-				"date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
+				"create_time >= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
 				params.get("beginTime"))
 			.apply(Validator.isNotEmpty(params.get("endTime")),
-				"date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
+				"create_time <= TO_DATE({0},'yyyy-MM-dd HH24:mi:ss')",
 				params.get("endTime")));
 	}
 
@@ -228,7 +228,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 		Long dictId = Validator.isNull(dict.getDictId()) ? -1L : dict.getDictId();
 		SysDictType dictType = getOne(new LambdaQueryWrapper<SysDictType>()
 			.eq(SysDictType::getDictType, dict.getDictType())
-			.last("limit 1"));
+			.last("and rownum <= 1"));
 		if (Validator.isNotNull(dictType) && dictType.getDictId().longValue() != dictId.longValue()) {
 			return UserConstants.NOT_UNIQUE;
 		}

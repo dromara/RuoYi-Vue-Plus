@@ -1,9 +1,6 @@
 package com.ruoyi.system.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
@@ -26,6 +23,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_logininfor")
+@KeySequence(value = "seq_sys_logininfor")
 public class SysLogininfor implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -33,7 +31,7 @@ public class SysLogininfor implements Serializable {
      * ID
      */
     @Excel(name = "序号", cellType = ColumnType.NUMERIC)
-    @TableId(value = "info_id", type = IdType.AUTO)
+    @TableId(value = "info_id", type = IdType.INPUT)
     private Long infoId;
 
     /**

@@ -1,9 +1,6 @@
 package com.ruoyi.system.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
@@ -26,6 +23,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_oper_log")
+@KeySequence(value = "seq_sys_oper_log")
 public class SysOperLog implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -33,7 +31,7 @@ public class SysOperLog implements Serializable {
      * 日志主键
      */
     @Excel(name = "操作序号", cellType = ColumnType.NUMERIC)
-    @TableId(value = "oper_id", type = IdType.AUTO)
+    @TableId(value = "oper_id", type = IdType.INPUT)
     private Long operId;
 
     /**
