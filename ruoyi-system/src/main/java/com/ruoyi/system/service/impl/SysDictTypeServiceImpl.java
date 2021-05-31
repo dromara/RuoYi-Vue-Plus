@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +32,6 @@ import java.util.Map;
  */
 @Service
 public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDictType> implements ISysDictTypeService {
-
-	@Autowired
-	private SysDictTypeMapper dictTypeMapper;
 
 	@Autowired
 	private SysDictDataMapper dictDataMapper;
@@ -149,9 +147,9 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 				.eq(SysDictData::getDictType, dictType.getDictType())) > 0) {
 				throw new CustomException(String.format("%1$s已分配,不能删除", dictType.getDictName()));
 			}
-			dictTypeMapper.deleteById(dictId);
 			DictUtils.removeDictCache(dictType.getDictType());
 		}
+		baseMapper.deleteBatchIds(Arrays.asList(dictIds));
 	}
 
 	/**

@@ -11,6 +11,7 @@ import com.ruoyi.system.mapper.SysDictDataMapper;
 import com.ruoyi.system.service.ISysDictDataService;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -83,10 +84,10 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 	public void deleteDictDataByIds(Long[] dictCodes) {
 		for (Long dictCode : dictCodes) {
 			SysDictData data = selectDictDataById(dictCode);
-			baseMapper.deleteById(dictCode);
 			List<SysDictData> dictDatas = baseMapper.selectDictDataByType(data.getDictType());
 			DictUtils.setDictCache(data.getDictType(), dictDatas);
 		}
+		baseMapper.deleteBatchIds(Arrays.asList(dictCodes));
 	}
 
 	/**
