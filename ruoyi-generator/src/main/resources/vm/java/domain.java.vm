@@ -11,7 +11,7 @@ import com.ruoyi.common.annotation.Excel;
 
 /**
  * ${functionName}对象 ${tableName}
- * 
+ *
  * @author ${author}
  * @date ${datetime}
  */
@@ -21,7 +21,7 @@ import com.ruoyi.common.annotation.Excel;
 @TableName("${tableName}")
 public class ${ClassName} implements Serializable {
 
-private static final long serialVersionUID=1L;
+    private static final long serialVersionUID=1L;
 
 #foreach ($column in $columns)
 
@@ -34,6 +34,9 @@ private static final long serialVersionUID=1L;
 #end
 #if($column.javaField=='delFlag')
     @TableLogic
+#end
+#if($column.javaField=='version')
+    @Version
 #end
 #if($column.isPk==1)
     @TableId(value = "$column.columnName")

@@ -13,7 +13,7 @@
     <description>RuoYi-Vue-Plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>2.2.1</ruoyi-vue-plus.version>
+        <ruoyi-vue-plus.version>2.3.0</ruoyi-vue-plus.version>
         <spring-boot.version>2.3.11.RELEASE</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -31,6 +31,7 @@
         <feign.version>2.2.6.RELEASE</feign.version>
         <feign-okhttp.version>11.0</feign-okhttp.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
+        <redisson.version>3.15.2</redisson.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -178,6 +179,13 @@
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-demo</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+
+            <!--redisson-->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
 
         </dependencies>

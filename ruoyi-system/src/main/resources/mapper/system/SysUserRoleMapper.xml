@@ -9,4 +9,11 @@
         <result property="roleId" column="role_id"/>
     </resultMap>
 
-</mapper> 
+    <insert id="batchUserRole">
+        insert into sys_user_role(user_id, role_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.userId},#{item.roleId})
+        </foreach>
+    </insert>
+
+</mapper>

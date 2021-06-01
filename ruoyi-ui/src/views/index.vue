@@ -80,6 +80,16 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.3.0 - 2021-6-1">
+              <ol>
+                <li>add 升级 luttuce 为 redisson 性能更强 工具更全</li>
+                <li>add 增加测试数据sql文件</li>
+                <li>add 增加demo模块 单表演示案例(包含数据权限)</li>
+                <li>update 完美修复 数据权限功能(支持单表多表过滤)</li>
+                <li>update 优化代码生成模板</li>
+                <li>update 优化 system 模块 批量操作性能</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.2.1 - 2021-5-29">
               <ol>
                 <li>add 增加 security 权限框架 @Async 异步注解配置</li>

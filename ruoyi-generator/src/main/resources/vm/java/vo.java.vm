@@ -13,7 +13,7 @@ import java.util.Date;
 
 
 /**
- * ${functionName}视图对象 mall_package
+ * ${functionName}视图对象 ${tableName}
  *
  * @author ${author}
  * @date ${datetime}
@@ -21,6 +21,7 @@ import java.util.Date;
 @Data
 @ApiModel("${functionName}视图对象")
 public class ${ClassName}Vo {
+
 	private static final long serialVersionUID = 1L;
 
 	/** $pkColumn.columnComment */
@@ -46,6 +47,7 @@ public class ${ClassName}Vo {
 #end
 	@ApiModelProperty("$column.columnComment")
 	private $column.javaType $column.javaField;
+
 #end
 #end
 

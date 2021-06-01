@@ -24,6 +24,7 @@ public class ${ClassName}AddBo {
 
 #foreach ($column in $columns)
 #if($column.isInsert && $column.isPk!=1)
+
     /** $column.columnComment */
     @ApiModelProperty("$column.columnComment")
 #if($column.javaType == 'Date')

@@ -151,6 +151,12 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>
 
+        <!--redisson-->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

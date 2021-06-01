@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +32,6 @@ import java.util.Map;
  */
 @Service
 public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig> implements ISysConfigService {
-
-	@Autowired
-	private SysConfigMapper configMapper;
 
 	@Autowired
 	private RedisCache redisCache;
@@ -160,9 +158,9 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 			if (StrUtil.equals(UserConstants.YES, config.getConfigType())) {
 				throw new CustomException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
 			}
-			configMapper.deleteById(configId);
 			redisCache.deleteObject(getCacheKey(config.getConfigKey()));
 		}
+		baseMapper.deleteBatchIds(Arrays.asList(configIds));
 	}
 
 	/**
