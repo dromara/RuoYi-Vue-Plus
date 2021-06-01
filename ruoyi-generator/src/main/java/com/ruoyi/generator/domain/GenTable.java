@@ -26,13 +26,14 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("gen_table")
+@KeySequence(value = "seq_gen_table")
 public class GenTable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 编号
      */
-    @TableId(value = "table_id", type = IdType.AUTO)
+    @TableId(value = "table_id", type = IdType.INPUT)
     private Long tableId;
 
     /**

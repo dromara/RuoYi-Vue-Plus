@@ -19,6 +19,7 @@ import com.ruoyi.common.annotation.Excel;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("${tableName}")
+@KeySequence(value = "seq_${tableName}")
 public class ${ClassName} implements Serializable {
 
     private static final long serialVersionUID=1L;
@@ -39,7 +40,7 @@ public class ${ClassName} implements Serializable {
     @Version
 #end
 #if($column.isPk==1)
-    @TableId(value = "$column.columnName")
+    @TableId(value = "$column.columnName", type = IdType.INPUT)
 #end
     private $column.javaType $column.javaField;
 #end

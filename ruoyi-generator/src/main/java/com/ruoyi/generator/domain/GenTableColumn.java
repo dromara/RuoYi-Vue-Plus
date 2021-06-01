@@ -22,13 +22,14 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("gen_table_column")
+@KeySequence(value = "seq_gen_table_column")
 public class GenTableColumn implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 编号
      */
-    @TableId(value = "column_id", type = IdType.AUTO)
+    @TableId(value = "column_id", type = IdType.INPUT)
     private Long columnId;
 
     /**
