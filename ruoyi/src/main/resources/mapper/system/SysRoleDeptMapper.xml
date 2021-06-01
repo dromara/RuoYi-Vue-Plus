@@ -9,4 +9,11 @@
         <result property="deptId" column="dept_id"/>
     </resultMap>
 
-</mapper> 
+    <insert id="batchRoleDept">
+        insert into sys_role_dept(role_id, dept_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.roleId},#{item.deptId})
+        </foreach>
+    </insert>
+
+</mapper>

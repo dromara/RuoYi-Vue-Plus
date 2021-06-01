@@ -52,7 +52,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private ISysConfigService configService;
 
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
+    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
     public TableDataInfo<SysUser> selectPageUserList(SysUser user) {
         return PageUtils.buildDataInfo(baseMapper.selectPageUserList(PageUtils.buildPage(), user));
     }
@@ -64,7 +64,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
+    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
     public List<SysUser> selectUserList(SysUser user) {
         return baseMapper.selectUserList(user);
     }
@@ -100,7 +100,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public String selectUserRoleGroup(String userName) {
         List<SysRole> list = roleMapper.selectRolesByUserName(userName);
-        StringBuffer idsStr = new StringBuffer();
+        StringBuilder idsStr = new StringBuilder();
         for (SysRole role : list) {
             idsStr.append(role.getRoleName()).append(",");
         }
@@ -119,7 +119,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public String selectUserPostGroup(String userName) {
         List<SysPost> list = postMapper.selectPostsByUserName(userName);
-        StringBuffer idsStr = new StringBuffer();
+        StringBuilder idsStr = new StringBuilder();
         for (SysPost post : list) {
             idsStr.append(post.getPostName()).append(",");
         }
@@ -311,9 +311,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 list.add(ur);
             }
             if (list.size() > 0) {
-                for (SysUserRole sysUserRole : list) {
-                    userRoleMapper.insert(sysUserRole);
-                }
+				userRoleMapper.batchUserRole(list);
             }
         }
     }
@@ -335,9 +333,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 list.add(up);
             }
             if (list.size() > 0) {
-                for (SysUserPost sysUserPost : list) {
-                    userPostMapper.insert(sysUserPost);
-                }
+				userPostMapper.batchUserPost(list);
             }
         }
     }
