@@ -152,7 +152,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button :loading="buttonLoading" type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -168,6 +168,8 @@ export default {
   },
   data() {
     return {
+      //按钮loading
+      buttonLoading: false,
       // 遮罩层
       loading: true,
       // 导出遮罩层
@@ -291,17 +293,17 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          this.loading = true;
+          this.buttonLoading = true;
           if (this.form.id != null) {
             updateDemo(this.form).then(response => {
-              this.loading = false;
+              this.buttonLoading = false;
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addDemo(this.form).then(response => {
-              this.loading = false;
+              this.buttonLoading = false;
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
