@@ -52,7 +52,7 @@
 
 ## 关注作者(扫码请备注: "加群")
 
-![](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
+![作者图片](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
 
 ## 捐献作者
 作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  
