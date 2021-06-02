@@ -159,6 +159,7 @@ public class DataScopeAspect {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void putDataScope(JoinPoint joinPoint, String sql) {
 		Object params = joinPoint.getArgs()[0];
 		if (Validator.isNotNull(params)) {
@@ -167,8 +168,8 @@ public class DataScopeAspect {
 				baseEntity.getParams().put(DATA_SCOPE, sql);
 			} else {
 				try {
-					Method getParams = params.getClass().getDeclaredMethod("getParams", null);
-					Map<String, Object> invoke = (Map<String, Object>) getParams.invoke(params, null);
+					Method getParams = params.getClass().getDeclaredMethod("getParams");
+					Map<String, Object> invoke = (Map<String, Object>) getParams.invoke(params);
 					invoke.put(DATA_SCOPE, sql);
 				} catch (Exception e) {
 					// 方法未找到 不处理
