@@ -277,9 +277,11 @@ export default {
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
+      this.loading = true;
       this.reset();
       const id = row.id || this.ids
       getDemo(id).then(response => {
+        this.loading = false;
         this.form = response.data;
         this.open = true;
         this.title = "修改测试单表";
@@ -289,14 +291,17 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          this.loading = true;
           if (this.form.id != null) {
             updateDemo(this.form).then(response => {
+              this.loading = false;
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addDemo(this.form).then(response => {
+              this.loading = false;
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -312,9 +317,11 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(function() {
+      }).then(() => {
+        this.loading = true;
         return delDemo(ids);
       }).then(() => {
+        this.loading = false;
         this.getList();
         this.msgSuccess("删除成功");
       })

@@ -12,7 +12,7 @@ CREATE TABLE test_demo
     create_by   varchar(64) NULL DEFAULT NULL COMMENT '创建人',
     update_time datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
     update_by   varchar(64) NULL DEFAULT NULL COMMENT '更新人',
-    del_flag    int(0) NULL DEFAULT NULL COMMENT '删除标志',
+    del_flag    int(0) NULL DEFAULT 0 COMMENT '删除标志',
     PRIMARY KEY (id) USING BTREE
 ) ENGINE = InnoDB COMMENT = '测试单表';
 
@@ -29,7 +29,7 @@ CREATE TABLE test_tree
     create_by   varchar(64) NULL DEFAULT NULL COMMENT '创建人',
     update_time datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
     update_by   varchar(64) NULL DEFAULT NULL COMMENT '更新人',
-    del_flag    int(0) NULL DEFAULT NULL COMMENT '删除标志',
+    del_flag    int(0) NULL DEFAULT 0 COMMENT '删除标志',
     PRIMARY KEY (id) USING BTREE
 ) ENGINE = InnoDB COMMENT = '测试树表';
 

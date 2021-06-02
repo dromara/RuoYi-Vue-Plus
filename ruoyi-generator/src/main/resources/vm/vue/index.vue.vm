@@ -556,7 +556,7 @@ export default {
     submitForm() {
       this.#[[$]]#refs["form"].validate(valid => {
         if (valid) {
-            this.loading = true;
+          this.loading = true;
 #foreach ($column in $columns)
 #if($column.htmlType == "checkbox")
           this.form.$column.javaField = this.form.${column.javaField}.join(",");
@@ -590,7 +590,7 @@ export default {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
-        }).then(()=> {
+        }).then(() => {
           this.loading = true;
           return del${BusinessName}(${pkColumn.javaField}s);
         }).then(() => {
