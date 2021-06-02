@@ -96,8 +96,12 @@ public class RedisCache {
 	 * @param collection 多个对象
 	 * @return
 	 */
-	public long deleteObject(final Collection collection) {
-		return redissonClient.getKeys().delete(Arrays.toString(collection.toArray()));
+	public void deleteObject(final Collection collection) {
+		RBatch batch = redissonClient.createBatch();
+		collection.forEach(t->{
+			batch.getBucket(t.toString()).deleteAsync();
+		});
+		batch.execute();
 	}
 
 	/**
