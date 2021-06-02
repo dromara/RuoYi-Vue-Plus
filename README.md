@@ -1,4 +1,7 @@
 ## 平台简介
+[![码云Gitee](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/blob/master/LICENSE)
+[![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
 
 基于 RuoYi-Vue 集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 定期与 RuoYi-Vue 同步
 * 前端开发框架 Vue、Element UI
@@ -19,7 +22,7 @@
 
 ### 依赖改动
 
-* ORM框架 使用 Mybatis-Plus 3.4.2 简化CRUD (不支持主子表)
+* ORM框架 使用 Mybatis-Plus 简化CRUD (不支持主子表)
 * Bean简化 使用 Lombok 简化 get set toString 等等
 * 容器改动 Tomcat 改为 并发性能更好的 undertow
 * 分页移除 pagehelper 改为 Mybatis-Plus 分页
