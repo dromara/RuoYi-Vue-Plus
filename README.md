@@ -45,6 +45,7 @@
 
 * 同步升级 RuoYi-Vue 3.5.0
 * 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
+* Oracle 模块 oracle 分支 [RuoYi-Vue-Plus-oracle](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/oracle/)
 
 ## 关注作者(扫码请备注: "加群")
 
