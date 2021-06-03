@@ -152,7 +152,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button :loading="buttonLoading" type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -168,6 +168,8 @@ export default {
   },
   data() {
     return {
+      //按钮loading
+      buttonLoading: false,
       // 遮罩层
       loading: true,
       // 导出遮罩层
@@ -277,9 +279,11 @@ export default {
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
+      this.loading = true;
       this.reset();
       const id = row.id || this.ids
       getDemo(id).then(response => {
+        this.loading = false;
         this.form = response.data;
         this.open = true;
         this.title = "修改测试单表";
@@ -289,14 +293,17 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          this.buttonLoading = true;
           if (this.form.id != null) {
             updateDemo(this.form).then(response => {
+              this.buttonLoading = false;
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addDemo(this.form).then(response => {
+              this.buttonLoading = false;
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -312,9 +319,11 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(function() {
+      }).then(() => {
+        this.loading = true;
         return delDemo(ids);
       }).then(() => {
+        this.loading = false;
         this.getList();
         this.msgSuccess("删除成功");
       })
