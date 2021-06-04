@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * 分布式锁（注解模式，不推荐使用，最好用锁的工具类）
+ *
+ * @author shenxinquan
  */
 
 @Target({ElementType.METHOD})
@@ -14,14 +16,12 @@ import java.lang.annotation.Target;
 public @interface RedisLock {
 
 	/**
-	 * 锁过期时间
-	 * @return
+	 * 锁过期时间 默认30秒
 	 */
-	int expireTime() default 30;//30秒
+	int expireTime() default 30;
 
 	/**
 	 * 锁key值
-	 * @return
 	 */
 	String key() default "redisLockKey";
 }

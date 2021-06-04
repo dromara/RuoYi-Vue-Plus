@@ -1,15 +1,15 @@
-package com.ruoyi.common.core.redis;
+package com.ruoyi.framework.aspectj;
 
 
 import com.ruoyi.common.annotation.RedisLock;
-import com.ruoyi.common.utils.file.ImageUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -21,15 +21,20 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 分布式锁（注解实现版本）
+ *
+ * @author shenxinquan
  */
-@Component
+
+@Slf4j
 @Aspect
 @Order(9)
+@Component
 public class RedisLockAspect {
-	@Autowired
-	private RedisLockUtil redisUtil;
 
-	private static final Logger log = LoggerFactory.getLogger(RedisLockAspect.class);
+	@Autowired
+	private RedissonClient redissonClient;
+
+	private static final String LOCK_TITLE = "RedisLock_";
 
 	@Pointcut("@annotation(com.ruoyi.common.annotation.RedisLock)")
 	public void annotationPointcut() {
@@ -47,6 +52,7 @@ public class RedisLockAspect {
 		String key = "";
 		// 默认30秒过期时间
 		int expireTime = 30;
+
 		try {
 			// 得到访问的方法对象
 			Method method = className.getMethod(methodName, argClass);
@@ -60,18 +66,26 @@ public class RedisLockAspect {
 		} catch (Exception e) {
 			throw new RuntimeException("redis分布式锁注解参数异常", e);
 		}
-		Object res = new Object();
-		if (redisUtil.acquire(key, expireTime, TimeUnit.SECONDS)) {
-			try {
-				res = joinPoint.proceed();
-				return res;
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			} finally {
-				redisUtil.release(key);
+
+		Object res;
+		try {
+			if (acquire(key, expireTime, TimeUnit.SECONDS)) {
+				try {
+					res = joinPoint.proceed();
+					return res;
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				} finally {
+					release(key);
+				}
+			} else {
+				throw new RuntimeException("redis分布式锁注解参数异常");
 			}
-		}else {
-			throw new RuntimeException("redis分布式锁注解参数异常");
+		} catch (IllegalMonitorStateException e) {
+			log.error("lock timeout => key : " + key + " , ThreadName : " + Thread.currentThread().getName());
+			throw new RuntimeException("lock timeout => key : " + key);
+		} catch (Exception e) {
+			throw new Exception("redis分布式未知异常", e);
 		}
 	}
 
@@ -95,9 +109,6 @@ public class RedisLockAspect {
 
 	/**
 	 * 获取key中#p0中的参数名称
-	 *
-	 * @param key
-	 * @return
 	 */
 	private static List<String> getKeyParsList(String key) {
 		List<String> listPar = new ArrayList<>();
@@ -107,7 +118,7 @@ public class RedisLockAspect {
 			String parName;
 			int indexPre = key.indexOf("#");
 			if (plusIndex > 0) {
-				indexNext = key.indexOf("#") + key.substring(key.indexOf("#")).indexOf("+");
+				indexNext = key.indexOf("#") + plusIndex;
 				parName = key.substring(indexPre, indexNext);
 			} else {
 				parName = key.substring(indexPre);
@@ -119,6 +130,38 @@ public class RedisLockAspect {
 			}
 		}
 		return listPar;
+	}
+
+	/**
+	 * 加锁（RLock）带超时时间的
+	 */
+	private boolean acquire(String key, long expire, TimeUnit expireUnit) {
+		//声明key对象
+		key = LOCK_TITLE + key;
+		try {
+			//获取锁对象
+			RLock mylock = redissonClient.getLock(key);
+			//加锁，并且设置锁过期时间，防止死锁的产生
+			mylock.tryLock(expire, expire, expireUnit);
+		} catch (InterruptedException e) {
+			return false;
+		}
+		log.info("lock => key : " + key + " , ThreadName : " + Thread.currentThread().getName());
+		//加锁成功
+		return true;
+	}
+
+	/**
+	 * 锁的释放
+	 */
+	private void release(String lockName) {
+		//必须是和加锁时的同一个key
+		String key = LOCK_TITLE + lockName;
+		//获取所对象
+		RLock mylock = redissonClient.getLock(key);
+		//释放锁（解锁）
+		mylock.unlock();
+		log.info("unlock => key : " + key + " , ThreadName : " + Thread.currentThread().getName());
 	}
 
 }
