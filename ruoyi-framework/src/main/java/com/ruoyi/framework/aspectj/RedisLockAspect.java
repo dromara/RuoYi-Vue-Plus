@@ -2,6 +2,7 @@ package com.ruoyi.framework.aspectj;
 
 
 import com.ruoyi.common.annotation.RedisLock;
+import com.ruoyi.common.constant.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -34,8 +35,6 @@ public class RedisLockAspect {
 	@Autowired
 	private RedissonClient redissonClient;
 
-	private static final String LOCK_TITLE = "RedisLock_";
-
 	@Pointcut("@annotation(com.ruoyi.common.annotation.RedisLock)")
 	public void annotationPointcut() {
 	}
@@ -67,6 +66,8 @@ public class RedisLockAspect {
 			throw new RuntimeException("redis分布式锁注解参数异常", e);
 		}
 
+		// 声明锁名称
+		key = Constants.REDIS_LOCK_KEY + key;
 		Object res;
 		try {
 			if (acquire(key, expireTime, TimeUnit.SECONDS)) {
@@ -136,8 +137,6 @@ public class RedisLockAspect {
 	 * 加锁（RLock）带超时时间的
 	 */
 	private boolean acquire(String key, long expire, TimeUnit expireUnit) {
-		//声明key对象
-		key = LOCK_TITLE + key;
 		try {
 			//获取锁对象
 			RLock mylock = redissonClient.getLock(key);
@@ -155,13 +154,11 @@ public class RedisLockAspect {
 	 * 锁的释放
 	 */
 	private void release(String lockName) {
-		//必须是和加锁时的同一个key
-		String key = LOCK_TITLE + lockName;
 		//获取所对象
-		RLock mylock = redissonClient.getLock(key);
+		RLock mylock = redissonClient.getLock(lockName);
 		//释放锁（解锁）
 		mylock.unlock();
-		log.info("unlock => key : " + key + " , ThreadName : " + Thread.currentThread().getName());
+		log.info("unlock => key : " + lockName + " , ThreadName : " + Thread.currentThread().getName());
 	}
 
 }
