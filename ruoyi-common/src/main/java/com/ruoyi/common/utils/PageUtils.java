@@ -43,9 +43,9 @@ public class PageUtils {
     public static final int DEFAULT_PAGE_NUM = 1;
 
     /**
-     * 每页显示记录数 默认值
+     * 每页显示记录数 默认值 默认查全部
      */
-    public static final int DEFAULT_PAGE_SIZE = 10;
+    public static final int DEFAULT_PAGE_SIZE = Integer.MAX_VALUE;
 
     /**
      * 构建 plus 分页对象
