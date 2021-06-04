@@ -29,7 +29,7 @@ public class ${ClassName}Vo {
 	private ${pkColumn.javaType} ${pkColumn.javaField};
 
 #foreach ($column in $columns)
-#if($column.isList)
+#if($column.isList && $column.isPk!=1)
 	/** $column.columnComment */
 #set($parentheseIndex=$column.columnComment.indexOf("（"))
 #if($parentheseIndex != -1)
