@@ -1,5 +1,6 @@
 package com.ruoyi.common.utils.file;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -113,7 +114,8 @@ public class FileUploadUtils
         String fileName = extractFilename(file);
 
         File desc = getAbsoluteFile(baseDir, fileName);
-        file.transferTo(desc);
+		desc = FileUtil.touch(desc);
+		FileUtil.writeFromStream(file.getInputStream(), desc);
         String pathFileName = getPathFileName(baseDir, fileName);
         return pathFileName;
     }
