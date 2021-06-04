@@ -1,5 +1,6 @@
 package com.ruoyi.framework.config;
 
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.framework.config.properties.RedissonProperties;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -52,7 +53,7 @@ public class RedisConfig extends CachingConfigurerSupport {
 			.setAddress(prefix + redisProperties.getHost() + ":" + redisProperties.getPort())
 			.setConnectTimeout(((Long) redisProperties.getTimeout().toMillis()).intValue())
 			.setDatabase(redisProperties.getDatabase())
-			.setPassword(redisProperties.getPassword())
+			.setPassword(StrUtil.isNotBlank(redisProperties.getPassword()) ? redisProperties.getPassword() : null)
 			.setTimeout(singleServerConfig.getTimeout())
 			.setRetryAttempts(singleServerConfig.getRetryAttempts())
 			.setRetryInterval(singleServerConfig.getRetryInterval())

@@ -1,4 +1,7 @@
 ## 平台简介
+[![码云Gitee](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/blob/master/LICENSE)
+[![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
 
 基于 RuoYi-Vue 集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 定期与 RuoYi-Vue 同步
 * 前端开发框架 Vue、Element UI
@@ -19,7 +22,7 @@
 
 ### 依赖改动
 
-* ORM框架 使用 Mybatis-Plus 3.4.2 简化CRUD (不支持主子表)
+* ORM框架 使用 Mybatis-Plus 简化CRUD (不支持主子表)
 * Bean简化 使用 Lombok 简化 get set toString 等等
 * 容器改动 Tomcat 改为 并发性能更好的 undertow
 * 分页移除 pagehelper 改为 Mybatis-Plus 分页
@@ -45,10 +48,11 @@
 
 * 同步升级 RuoYi-Vue 3.5.0
 * 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
+* Oracle 模块 oracle 分支 [RuoYi-Vue-Plus-oracle](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/oracle/)
 
 ## 关注作者(扫码请备注: "加群")
 
-![](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
+![作者图片](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
 
 ## 捐献作者
 作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  

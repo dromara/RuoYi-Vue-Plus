@@ -80,6 +80,18 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.3.1 - 2021-6-4">
+              <ol>
+                <li>add 增加 redisson 分布式锁 注解与demo案例</li>
+                <li>add 增加 Oracle 分支</li>
+                <li>update 优化 redis 空密码兼容性</li>
+                <li>update 优化前端代码生成按钮增加 loading</li>
+                <li>fix 修复 redisson 不能批量删除的bug</li>
+                <li>fix 修复表单构建选择下拉选择控制台报错问题</li>
+                <li>fix 修复 vo 代码生成 主键列表显示 重复生成bug</li>
+                <li>fix 修复上传路径 win 打包编译为 win 路径, linux 报错bug</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.3.0 - 2021-6-1">
               <ol>
                 <li>add 升级 luttuce 为 redisson 性能更强 工具更全</li>
@@ -195,12 +207,14 @@
 </template>
 
 <script>
+import config from '../../package.json'
+
 export default {
   name: "index",
   data() {
     return {
       // 版本号
-      version: "2.3.0",
+      version: config.version,
     };
   },
   methods: {
