@@ -8,6 +8,7 @@ import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.web.service.TokenService;
 import org.aspectj.lang.JoinPoint;
@@ -166,13 +167,8 @@ public class DataScopeAspect {
 				BaseEntity baseEntity = (BaseEntity) params;
 				baseEntity.getParams().put(DATA_SCOPE, sql);
 			} else {
-				try {
-					Method getParams = params.getClass().getDeclaredMethod("getParams", null);
-					Map<String, Object> invoke = (Map<String, Object>) getParams.invoke(params, null);
-					invoke.put(DATA_SCOPE, sql);
-				} catch (Exception e) {
-					// 方法未找到 不处理
-				}
+				Map<String, Object> invoke = ReflectUtils.invokeGetter(params, "params");
+				invoke.put(DATA_SCOPE, sql);
 			}
 		}
 	}

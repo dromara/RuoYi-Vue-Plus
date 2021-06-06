@@ -80,7 +80,7 @@ redisson:
   # 单节点配置
   singleServerConfig:
     # 客户端名称
-    clientName: ${ruoyi-vue-plus.name}
+    clientName: ${ruoyi.name}
     # 最小空闲连接数
     connectionMinimumIdleSize: 32
     # 连接池大小

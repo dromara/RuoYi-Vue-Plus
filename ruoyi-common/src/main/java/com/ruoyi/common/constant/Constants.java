@@ -2,7 +2,7 @@ package com.ruoyi.common.constant;
 
 /**
  * 通用常量信息
- * 
+ *
  * @author ruoyi
  */
 public class Constants
@@ -126,4 +126,9 @@ public class Constants
      * 资源映射路径 前缀
      */
     public static final String RESOURCE_PREFIX = "/profile";
+
+	/**
+	 * 资源映射路径 前缀
+	 */
+	public static final String REDIS_LOCK_KEY = "redis_lock:";
 }
