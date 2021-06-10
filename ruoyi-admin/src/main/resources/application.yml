@@ -288,8 +288,6 @@ spring:
         url: http://localhost:${server.port}${spring.boot.admin.context-path}
         instance:
           prefer-ip: true # 注册实例时，优先使用 IP
-      #        username: ruoyi
-      #        password: 123456
       # Spring Boot Admin Server 服务端的相关配置
       context-path: /admin # 配置 Spring
 
