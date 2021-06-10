@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Swagger2的接口配置
+ * Swagger 文档配置
  *
  * @author Lion Li
  */

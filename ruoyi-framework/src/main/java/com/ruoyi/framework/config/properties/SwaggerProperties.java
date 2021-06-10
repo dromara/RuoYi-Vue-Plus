@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * 验证码 配置属性
+ * swagger 配置属性
  *
  * @author Lion Li
  */

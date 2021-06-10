@@ -4,6 +4,11 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * token 配置属性
+ *
+ * @author Lion Li
+ */
 @Data
 @Component
 @ConfigurationProperties(prefix = "token")

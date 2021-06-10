@@ -11,6 +11,11 @@ import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+/**
+ * 异步配置
+ *
+ * @author Lion Li
+ */
 @EnableAsync
 @Configuration
 public class AsyncConfig extends AsyncConfigurerSupport {

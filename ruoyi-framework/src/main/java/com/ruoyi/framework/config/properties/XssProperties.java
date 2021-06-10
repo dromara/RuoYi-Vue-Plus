@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * 验证码 配置属性
+ * xss过滤 配置属性
  *
  * @author Lion Li
  */

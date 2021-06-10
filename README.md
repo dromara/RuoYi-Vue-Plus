@@ -18,6 +18,9 @@
 * 文档框架 knife4j 美化接口文档
 * 代码生成器 一键生成前后端代码
 
+## 参考文档
+[参考文档 Wiki](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)
+
 ## 修改RuoYi功能
 
 ### 依赖改动
@@ -58,38 +61,6 @@
 作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  
 <img src="https://images.gitee.com/uploads/images/2021/0525/101654_451e4523_1766278.jpeg" width="300px" height="450px" />
 <img src="https://images.gitee.com/uploads/images/2021/0525/101713_3d18b119_1766278.jpeg" width="300px" height="450px" />
-
-## 重点注意事项
-
-若依文档对事务注解的描述 [关于事务](https://doc.ruoyi.vip/ruoyi/document/htsc.html#%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86)  以下对多数据源事务做补充:
-* 同一个事务下是无法切换数据源的
-* 禁止 父方法使用 @Transactional 创建事务 子方法使用 @DataSource 切换数据源
-* 正确用法: 子方法单独创建事务 或 父方法使用 @Transactional(propagation = Propagation.REQUIRES_NEW) 为所有子方法创建新事务
-
-关于如何使用Tomcat
-* 查看ruoyi-framework模块的pom.xml文件,根据注释更改依赖
-* 查看ruoyi-admin模块中的application.yml文件,根据注释更改配置
-
-关于如何创建新模块
-* 参考ruoyi-demo模块
-* 需要改动: 父pom 与 admin模块pom
-
-关于树表生成
-* 直接在mysql表中 添加 parentId orderNum 等字段(根据需要参考 TreeEntity类)
-* 代码生成选择树表生成即可
-
-关于数据权限
-* 创建表 需预留 dept_id 字段 如需用户权限 还需预留 user_id 字段
-* 支持 Mybatis-Plus 方式注入 参考 demo 模块用法(需导入 test.sql 文件)
-* 支持 XML 方式注入 参考 system 模块用法
-
-关于vue与boot整合部署  
-* [前端静态资源如何整合到后端访问](https://doc.ruoyi.vip/ruoyi-vue/other/faq.html#前端静态资源如何整合到后端访问)
-
-关于修改包名
-* 将文件夹全部修改为 com.xxx
-* 使用IDEA全局替换 com.ruoyi 替换为 com.xxx
-* 严禁手动修改
 
 ## 内置功能
 
