@@ -52,7 +52,7 @@ public class RedisLockController {
 			if (flag) {
 				log.info("获取锁成功: " + key);
 				Thread.sleep(3000);
-				redisLockManager.unLock();
+				redisLockManager.unLock(key);
 				log.info("释放锁成功: " + key);
 			} else {
 				log.error("获取锁失败: " + key);

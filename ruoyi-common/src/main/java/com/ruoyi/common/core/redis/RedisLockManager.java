@@ -22,15 +22,50 @@ public class RedisLockManager {
 	@Autowired
 	private RedissonClient redissonClient;
 
-	private final ThreadLocal<RLock> threadLocal = new ThreadLocal<>();
+	/**
+	 * 通用锁
+	 */
+	private final static Integer BASE_LOCK = 1;
+
+	/**
+	 * 公平锁
+	 */
+	private final static Integer FAIR_LOCK = 2;
+
+	/**
+	 * 计数锁
+	 */
+	private final static Integer COUNT_LOCK = 3;
+
+	/**
+	 * 存放当前线程获取锁的类型
+	 */
+	private final ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
+
+	/**
+	 * 获取锁
+	 */
+	private <T> T getLock(String key, Integer lockType) {
+		Assert.isTrue(StrUtil.isNotBlank(key), "key不能为空");
+		threadLocal.set(lockType);
+		Object lock;
+		if (BASE_LOCK.equals(lockType)) {
+			lock = redissonClient.getLock(key);
+		} else if (FAIR_LOCK.equals(lockType)) {
+			lock = redissonClient.getFairLock(key);
+		} else if (COUNT_LOCK.equals(lockType)) {
+			lock = redissonClient.getCountDownLatch(key);
+		} else {
+			throw new RuntimeException("锁不存在!");
+		}
+		return (T)lock;
+	}
 
 	/**
 	 * 获取锁（不用设置超时时间，一直等待）
 	 */
 	public boolean getLock(String key) {
-		Assert.isTrue(StrUtil.isNotBlank(key), "key不能为空");
-		RLock lock = redissonClient.getLock(key);
-		threadLocal.set(lock);
+		RLock lock = getLock(key, BASE_LOCK);
 		return lock.tryLock();
 	}
 
@@ -41,13 +76,16 @@ public class RedisLockManager {
 	 * @param time       过期时间
 	 * @param expireUnit 时间单位
 	 */
-	public boolean getLock(String key, long time, TimeUnit expireUnit) throws InterruptedException {
-		Assert.isTrue(StrUtil.isNotBlank(key), "key不能为空");
+	public boolean getLock(String key, long time, TimeUnit expireUnit) {
 		Assert.isTrue(time > 0, "过期时间必须大于0");
 		Assert.isTrue(Validator.isNotEmpty(expireUnit), "时间单位不能为空");
-		RLock lock = redissonClient.getLock(key);
-		threadLocal.set(lock);
-		return lock.tryLock(time, expireUnit);
+		RLock lock = getLock(key, BASE_LOCK);
+		try {
+			return lock.tryLock(time, expireUnit);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	/**
@@ -57,17 +95,20 @@ public class RedisLockManager {
 	 * @param waitTime   获取锁等待时间
 	 * @param leaseTime  保留锁的时间
 	 * @param expireUnit 时间单位
-	 * @throws InterruptedException
 	 */
-	public boolean getLock(String key, long waitTime, long leaseTime, TimeUnit expireUnit) throws InterruptedException {
-		Assert.isTrue(StrUtil.isNotBlank(key), "key不能为空");
+	public boolean getLock(String key, long waitTime, long leaseTime, TimeUnit expireUnit) {
 		Assert.isTrue(waitTime > 0, "获取锁等待时间必须大于0");
 		Assert.isTrue(leaseTime > 0, "保留锁的时间必须大于0");
 		Assert.isTrue(Validator.isNotEmpty(expireUnit), "时间单位不能为空");
-		RLock lock = redissonClient.getLock(key);
-		threadLocal.set(lock);
-		return lock.tryLock(waitTime, leaseTime, expireUnit);
+		RLock lock = getLock(key, BASE_LOCK);
+		try {
+			return lock.tryLock(waitTime, leaseTime, expireUnit);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
+
 
 	/**
 	 * 获取计数器锁
@@ -75,10 +116,9 @@ public class RedisLockManager {
 	 * @param key
 	 * @param count countDownLatch 的数量
 	 */
-	public RCountDownLatch countDownLatch(String key, long count) {
-		Assert.isTrue(StrUtil.isNotBlank(key), "key不能为空");
+	public RCountDownLatch getCountDownLatch(String key, long count) {
 		Assert.isTrue(count >= 0, "count数量必须大于等于0");
-		RCountDownLatch rCountDownLatch = redissonClient.getCountDownLatch(key);
+		RCountDownLatch rCountDownLatch = getLock(key, COUNT_LOCK);
 		rCountDownLatch.trySetCount(count);
 		return rCountDownLatch;
 	}
@@ -93,14 +133,17 @@ public class RedisLockManager {
 	 * @return
 	 * @throws InterruptedException
 	 */
-	public boolean getFairLock(String key, long waitTime, long leaseTime, TimeUnit expireUnit) throws InterruptedException {
-		Assert.isTrue(StrUtil.isNotBlank(key), "key不能为空");
+	public boolean getFairLock(String key, long waitTime, long leaseTime, TimeUnit expireUnit) {
 		Assert.isTrue(waitTime > 0, "获取锁等待时间必须大于0");
 		Assert.isTrue(leaseTime > 0, "保留锁的时间必须大于0");
 		Assert.isTrue(Validator.isNotEmpty(expireUnit), "时间单位不能为空");
-		RLock lock = redissonClient.getFairLock(key);
-		threadLocal.set(lock);
-		return lock.tryLock(waitTime, leaseTime, expireUnit);
+		RLock lock = getLock(key, FAIR_LOCK);
+		try {
+			return lock.tryLock(waitTime, leaseTime, expireUnit);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	/**
@@ -109,23 +152,25 @@ public class RedisLockManager {
 	 * @param key
 	 * @param leaseTime  持有锁的时间
 	 * @param expireUnit 时间单位
-	 * @return
-	 * @throws InterruptedException
 	 */
-	public boolean getFairLock(String key, long leaseTime, TimeUnit expireUnit) throws InterruptedException {
-		Assert.isTrue(StrUtil.isNotBlank(key), "key不能为空");
+	public boolean getFairLock(String key, long leaseTime, TimeUnit expireUnit) {
 		Assert.isTrue(leaseTime > 0, "保留锁的时间必须大于0");
 		Assert.isTrue(Validator.isNotEmpty(expireUnit), "时间单位不能为空");
-		RLock lock = redissonClient.getFairLock(key);
-		threadLocal.set(lock);
-		return lock.tryLock(leaseTime, expireUnit);
+		RLock lock = getLock(key, FAIR_LOCK);
+		try {
+			return lock.tryLock(leaseTime, expireUnit);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	/**
 	 * 释放锁(统一释放)
 	 */
-	public void unLock() {
-		RLock lock = threadLocal.get();
+	public void unLock(String key) {
+		Integer lockType = threadLocal.get();
+		RLock lock = getLock(key, lockType);
 		lock.unlock();
 		threadLocal.remove();
 	}

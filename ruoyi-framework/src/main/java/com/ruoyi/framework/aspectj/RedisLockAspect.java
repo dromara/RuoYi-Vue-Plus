@@ -10,7 +10,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -78,7 +77,7 @@ public class RedisLockAspect {
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				} finally {
-					redisLockManager.unLock();
+					redisLockManager.unLock(key);
 					log.info("unlock => key : " + key + " , ThreadName : " + Thread.currentThread().getName());
 				}
 			} else {
