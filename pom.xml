@@ -47,7 +47,7 @@
                 <scope>import</scope>
             </dependency>
 
-            <!--阿里数据库连接池 -->
+            <!-- 阿里数据库连接池 -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
@@ -79,7 +79,7 @@
                 <version>${poi.version}</version>
             </dependency>
 
-            <!--velocity代码生成使用模板 -->
+            <!-- velocity代码生成使用模板 -->
             <dependency>
                 <groupId>org.apache.velocity</groupId>
                 <artifactId>velocity</artifactId>
@@ -93,7 +93,7 @@
                 <version>${fastjson.version}</version>
             </dependency>
 
-            <!--Token生成与解析-->
+            <!-- Token生成与解析-->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
