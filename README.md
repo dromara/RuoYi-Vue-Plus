@@ -46,6 +46,8 @@
 * 项目修改为 maven多环境配置
 * 项目配置修改为 application.yml 统一管理
 * 数据权限修改为 适配支持单表、多表
+* 使用 redisson 实现 spring-cache 整合
+* 增加 mybatis-plus 二级缓存 redis 存储
 
 ### 其他
 
