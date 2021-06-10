@@ -33,11 +33,6 @@ public class RedisLockManager {
 	private final static Integer FAIR_LOCK = 2;
 
 	/**
-	 * 计数锁
-	 */
-	private final static Integer COUNT_LOCK = 3;
-
-	/**
 	 * 存放当前线程获取锁的类型
 	 */
 	private final ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
@@ -45,20 +40,18 @@ public class RedisLockManager {
 	/**
 	 * 获取锁
 	 */
-	private <T> T getLock(String key, Integer lockType) {
+	private RLock getLock(String key, Integer lockType) {
 		Assert.isTrue(StrUtil.isNotBlank(key), "key不能为空");
 		threadLocal.set(lockType);
-		Object lock;
+		RLock lock;
 		if (BASE_LOCK.equals(lockType)) {
 			lock = redissonClient.getLock(key);
 		} else if (FAIR_LOCK.equals(lockType)) {
 			lock = redissonClient.getFairLock(key);
-		} else if (COUNT_LOCK.equals(lockType)) {
-			lock = redissonClient.getCountDownLatch(key);
 		} else {
 			throw new RuntimeException("锁不存在!");
 		}
-		return (T)lock;
+		return lock;
 	}
 
 	/**
@@ -118,7 +111,7 @@ public class RedisLockManager {
 	 */
 	public RCountDownLatch getCountDownLatch(String key, long count) {
 		Assert.isTrue(count >= 0, "count数量必须大于等于0");
-		RCountDownLatch rCountDownLatch = getLock(key, COUNT_LOCK);
+		RCountDownLatch rCountDownLatch = redissonClient.getCountDownLatch(key);
 		rCountDownLatch.trySetCount(count);
 		return rCountDownLatch;
 	}
