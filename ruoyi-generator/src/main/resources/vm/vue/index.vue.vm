@@ -599,7 +599,7 @@ export default {
           this.loading = false;
           this.getList();
           this.msgSuccess("删除成功");
-        })
+        }).catch(() => {});
     },
 #if($table.sub)
 	/** ${subTable.functionName}序号 */
@@ -648,7 +648,7 @@ export default {
         }).then(response => {
           this.download(response.msg);
           this.exportLoading = false;
-        })
+        }).catch(() => {});
     }
   }
 };

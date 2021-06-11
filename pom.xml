@@ -13,7 +13,7 @@
     <description>RuoYi-Vue-Plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>2.3.1</ruoyi-vue-plus.version>
+        <ruoyi-vue-plus.version>2.3.2</ruoyi-vue-plus.version>
         <spring-boot.version>2.3.11.RELEASE</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -21,7 +21,6 @@
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <druid.version>1.2.6</druid.version>
         <knife4j.version>3.0.2</knife4j.version>
-        <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <fastjson.version>1.2.76</fastjson.version>
         <poi.version>4.1.2</poi.version>
         <velocity.version>1.7</velocity.version>
@@ -47,7 +46,7 @@
                 <scope>import</scope>
             </dependency>
 
-            <!--阿里数据库连接池 -->
+            <!-- 阿里数据库连接池 -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
@@ -58,18 +57,6 @@
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>swagger-annotations</artifactId>
-                        <groupId>io.swagger</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>${swagger-annotations.version}</version>
             </dependency>
 
             <!-- excel工具 -->
@@ -79,7 +66,7 @@
                 <version>${poi.version}</version>
             </dependency>
 
-            <!--velocity代码生成使用模板 -->
+            <!-- velocity代码生成使用模板 -->
             <dependency>
                 <groupId>org.apache.velocity</groupId>
                 <artifactId>velocity</artifactId>
@@ -93,7 +80,7 @@
                 <version>${fastjson.version}</version>
             </dependency>
 
-            <!--Token生成与解析-->
+            <!-- Token生成与解析-->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
@@ -139,6 +126,13 @@
                 <version>${spring-boot-admin.version}</version>
             </dependency>
 
+            <!--redisson-->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+
             <!-- 定时任务-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
@@ -179,13 +173,6 @@
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-demo</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
-            </dependency>
-
-            <!--redisson-->
-            <dependency>
-                <groupId>org.redisson</groupId>
-                <artifactId>redisson-spring-boot-starter</artifactId>
-                <version>${redisson.version}</version>
             </dependency>
 
         </dependencies>

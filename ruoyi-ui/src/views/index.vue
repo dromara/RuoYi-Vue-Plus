@@ -80,6 +80,17 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.3.2 - 2021-6-11">
+              <ol>
+                <li>add redis锁工具类编写</li>
+                <li>update spring-cache 整合 redisson</li>
+                <li>update MybatisPlus整合Redis二级缓存</li>
+                <li>update swagger 升级为 3.0.0 使用 OAS_30 协议</li>
+                <li>update 优化 代码生成器 增加表单防重注解</li>
+                <li>update 优化 锁切面代码 key到常量类</li>
+                <li>fix 修复相对路径上传异常问题</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.3.1 - 2021-6-4">
               <ol>
                 <li>add 增加 redisson 分布式锁 注解与demo案例</li>

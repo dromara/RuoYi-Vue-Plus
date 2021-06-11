@@ -3,6 +3,7 @@ package com.ruoyi.framework.config;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.ruoyi.framework.config.properties.SwaggerProperties;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,18 +14,16 @@ import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Swagger2的接口配置
+ * Swagger 文档配置
  *
  * @author Lion Li
  */
 @Configuration
-@EnableSwagger2
 @EnableKnife4j
 public class SwaggerConfig {
 
@@ -36,7 +35,7 @@ public class SwaggerConfig {
 	 */
 	@Bean
 	public Docket createRestApi() {
-		return new Docket(DocumentationType.SWAGGER_2)
+		return new Docket(DocumentationType.OAS_30)
 			.enable(swaggerProperties.getEnabled())
 			// 用来创建该API的基本信息，展示在文档的页面中（自定义展示的信息）
 			.apiInfo(apiInfo())
@@ -60,7 +59,7 @@ public class SwaggerConfig {
 	 */
 	private List<SecurityScheme> securitySchemes() {
 		List<SecurityScheme> apiKeyList = new ArrayList<SecurityScheme>();
-		apiKeyList.add(new ApiKey("Authorization", "Authorization", "header"));
+		apiKeyList.add(new ApiKey("Authorization", "Authorization", In.HEADER.toValue()));
 		return apiKeyList;
 	}
 
@@ -72,7 +71,7 @@ public class SwaggerConfig {
 		securityContexts.add(
 			SecurityContext.builder()
 				.securityReferences(defaultAuth())
-				.forPaths(PathSelectors.regex("^(?!auth).*$"))
+				.operationSelector(o -> o.requestMappingPattern().matches("/.*"))
 				.build());
 		return securityContexts;
 	}
