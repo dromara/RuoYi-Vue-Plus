@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
+import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -28,7 +29,7 @@ import io.swagger.annotations.ApiOperation;
 
 /**
  * ${functionName}Controller
- * 
+ *
  * @author ${author}
  * @date ${datetime}
  */
@@ -87,6 +88,7 @@ public class ${ClassName}Controller extends BaseController {
     @ApiOperation("新增${functionName}")
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:add')")
     @Log(title = "${functionName}", businessType = BusinessType.INSERT)
+    @RepeatSubmit
     @PostMapping()
     public AjaxResult<Void> add(@Validated @RequestBody ${ClassName}AddBo bo) {
         return toAjax(i${ClassName}Service.insertByAddBo(bo) ? 1 : 0);
@@ -98,6 +100,7 @@ public class ${ClassName}Controller extends BaseController {
     @ApiOperation("修改${functionName}")
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:edit')")
     @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
+    @RepeatSubmit
     @PutMapping()
     public AjaxResult<Void> edit(@Validated @RequestBody ${ClassName}EditBo bo) {
         return toAjax(i${ClassName}Service.updateByEditBo(bo) ? 1 : 0);
