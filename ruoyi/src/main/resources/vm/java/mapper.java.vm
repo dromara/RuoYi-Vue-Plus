@@ -2,6 +2,8 @@ package ${packageName}.mapper;
 
 import ${packageName}.domain.${ClassName};
 import com.ruoyi.common.core.page.BaseMapperPlus;
+import com.ruoyi.common.core.mybatisplus.MybatisPlusRedisCache;
+import org.apache.ibatis.annotations.CacheNamespace;
 
 /**
  * ${functionName}Mapper接口
@@ -9,6 +11,7 @@ import com.ruoyi.common.core.page.BaseMapperPlus;
  * @author ${author}
  * @date ${datetime}
  */
+@CacheNamespace(implementation = MybatisPlusRedisCache.class, eviction = MybatisPlusRedisCache.class)
 public interface ${ClassName}Mapper extends BaseMapperPlus<${ClassName}> {
 
 }

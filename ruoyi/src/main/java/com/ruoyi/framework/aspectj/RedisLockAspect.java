@@ -2,6 +2,8 @@ package com.ruoyi.framework.aspectj;
 
 
 import com.ruoyi.common.annotation.RedisLock;
+import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.core.redis.RedisLockManager;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -32,9 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisLockAspect {
 
 	@Autowired
-	private RedissonClient redissonClient;
-
-	private static final String LOCK_TITLE = "RedisLock_";
+	private RedisLockManager redisLockManager;
 
 	@Pointcut("@annotation(com.ruoyi.common.annotation.RedisLock)")
 	public void annotationPointcut() {
@@ -67,16 +67,20 @@ public class RedisLockAspect {
 			throw new RuntimeException("redis分布式锁注解参数异常", e);
 		}
 
+		// 声明锁名称
+		key = Constants.REDIS_LOCK_KEY + key;
 		Object res;
 		try {
-			if (acquire(key, expireTime, TimeUnit.SECONDS)) {
+			if (redisLockManager.getLock(key, expireTime, TimeUnit.SECONDS)) {
+				log.info("lock => key : " + key + " , ThreadName : " + Thread.currentThread().getName());
 				try {
 					res = joinPoint.proceed();
 					return res;
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				} finally {
-					release(key);
+					redisLockManager.unLock(key);
+					log.info("unlock => key : " + key + " , ThreadName : " + Thread.currentThread().getName());
 				}
 			} else {
 				throw new RuntimeException("redis分布式锁注解参数异常");
@@ -130,38 +134,6 @@ public class RedisLockAspect {
 			}
 		}
 		return listPar;
-	}
-
-	/**
-	 * 加锁（RLock）带超时时间的
-	 */
-	private boolean acquire(String key, long expire, TimeUnit expireUnit) {
-		//声明key对象
-		key = LOCK_TITLE + key;
-		try {
-			//获取锁对象
-			RLock mylock = redissonClient.getLock(key);
-			//加锁，并且设置锁过期时间，防止死锁的产生
-			mylock.tryLock(expire, expire, expireUnit);
-		} catch (InterruptedException e) {
-			return false;
-		}
-		log.info("lock => key : " + key + " , ThreadName : " + Thread.currentThread().getName());
-		//加锁成功
-		return true;
-	}
-
-	/**
-	 * 锁的释放
-	 */
-	private void release(String lockName) {
-		//必须是和加锁时的同一个key
-		String key = LOCK_TITLE + lockName;
-		//获取所对象
-		RLock mylock = redissonClient.getLock(key);
-		//释放锁（解锁）
-		mylock.unlock();
-		log.info("unlock => key : " + key + " , ThreadName : " + Thread.currentThread().getName());
 	}
 
 }

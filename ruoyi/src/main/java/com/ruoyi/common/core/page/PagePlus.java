@@ -10,6 +10,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 分页 Page 增强对象
+ *
+ * @param <T> 数据库实体
+ * @param <K> vo实体
+ * @author Lion Li
+ */
 @Data
 @Accessors(chain = true)
 public class PagePlus<T,K> implements IPage<T> {
