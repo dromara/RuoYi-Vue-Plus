@@ -148,7 +148,6 @@
 #foreach($column in $columns)
 #set($field=$column.javaField)
 #if($column.insert && !$column.pk)
-#if(($column.usableColumn) || (!$column.superColumn))
 #set($parentheseIndex=$column.columnComment.indexOf("（"))
 #if($parentheseIndex != -1)
 #set($comment=$column.columnComment.substring(0, $parentheseIndex))
@@ -244,7 +243,6 @@
 #end
 #end
 #end
-#end
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :loading="buttonLoading" type="primary" @click="submitForm">确 定</el-button>
@@ -259,19 +257,19 @@ import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${Busin
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 #foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "imageUpload")
+#if($column.insert && !$column.pk && $column.htmlType == "imageUpload")
 import ImageUpload from '@/components/ImageUpload';
 #break
 #end
 #end
 #foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "fileUpload")
+#if($column.insert && !$column.pk && $column.htmlType == "fileUpload")
 import FileUpload from '@/components/FileUpload';
 #break
 #end
 #end
 #foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "editor")
+#if($column.insert && !$column.pk && $column.htmlType == "editor")
 import Editor from '@/components/Editor';
 #break
 #end
@@ -281,19 +279,19 @@ export default {
   name: "${BusinessName}",
   components: {
 #foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "imageUpload")
+#if($column.insert && !$column.pk && $column.htmlType == "imageUpload")
     ImageUpload,
 #break
 #end
 #end
 #foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "fileUpload")
+#if($column.insert && !$column.pk && $column.htmlType == "fileUpload")
     FileUpload,
 #break
 #end
 #end
 #foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "editor")
+#if($column.insert && !$column.pk && $column.htmlType == "editor")
     Editor,
 #break
 #end
