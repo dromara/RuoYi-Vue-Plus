@@ -8,10 +8,8 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.BusinessStatus;
 import com.ruoyi.common.enums.HttpMethod;
 import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.framework.manager.AsyncManager;
-import com.ruoyi.framework.manager.factory.AsyncFactory;
+import com.ruoyi.framework.web.service.AsyncService;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.domain.SysOperLog;
 import org.aspectj.lang.JoinPoint;
@@ -93,7 +91,7 @@ public class LogAspect
             SysOperLog operLog = new SysOperLog();
             operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
             // 请求的地址
-            String ip = IpUtils.getIpAddr(ServletUtils.getRequest());
+            String ip = ServletUtils.getClientIP();
             operLog.setOperIp(ip);
             // 返回参数
             operLog.setJsonResult(JSON.toJSONString(jsonResult));
@@ -118,7 +116,7 @@ public class LogAspect
             // 处理设置注解上的参数
             getControllerMethodDescription(joinPoint, controllerLog, operLog);
             // 保存数据库
-            AsyncManager.me().execute(AsyncFactory.recordOper(operLog));
+			SpringUtils.getBean(AsyncService.class).recordOper(operLog);
         }
         catch (Exception exp)
         {
