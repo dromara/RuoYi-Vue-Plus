@@ -1,7 +1,6 @@
 package ${packageName}.vo;
 
 import com.ruoyi.common.annotation.Excel;
-import com.fasterxml.jackson.annotation.JsonFormat;
 #foreach ($import in $importList)
 import ${import};
 #end
@@ -41,7 +40,6 @@ public class ${ClassName}Vo {
 	@Excel(name = "${comment}" , readConverterExp = "$column.readConverterExp()")
 #elseif($column.javaType == 'Date')
 	@Excel(name = "${comment}" , width = 30, dateFormat = "yyyy-MM-dd")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 #else
 	@Excel(name = "${comment}")
 #end

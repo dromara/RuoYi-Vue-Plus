@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-
+import java.util.Date;
 
 
 /**
@@ -39,5 +39,9 @@ public class TestDemoAddBo {
     @ApiModelProperty("值")
     @NotBlank(message = "值不能为空")
     private String value;
+
+	/** 创建时间 */
+	@ApiModelProperty("创建时间")
+	private Date createTime;
 
 }

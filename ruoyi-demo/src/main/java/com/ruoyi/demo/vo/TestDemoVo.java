@@ -1,10 +1,10 @@
 package com.ruoyi.demo.vo;
 
 import com.ruoyi.common.annotation.Excel;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.util.Date;
 
 
@@ -52,7 +52,7 @@ public class TestDemoVo {
 
 	/** 创建时间 */
 	@Excel(name = "创建时间" , width = 30, dateFormat = "yyyy-MM-dd")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@ApiModelProperty("创建时间")
 	private Date createTime;
 
@@ -63,7 +63,7 @@ public class TestDemoVo {
 
 	/** 更新时间 */
 	@Excel(name = "更新时间" , width = 30, dateFormat = "yyyy-MM-dd")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+//	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@ApiModelProperty("更新时间")
 	private Date updateTime;
 

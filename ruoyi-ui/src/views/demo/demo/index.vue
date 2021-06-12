@@ -150,6 +150,14 @@
         <el-form-item label="值" prop="value">
           <el-input v-model="form.value" placeholder="请输入值" />
         </el-form-item>
+        <el-form-item label="创建时间" prop="createTime">
+          <el-date-picker clearable size="small"
+                          v-model="form.createTime"
+                          type="datetime"
+                          value-format="yyyy-MM-dd HH:mm:ss"
+                          placeholder="选择创建时间">
+          </el-date-picker>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :loading="buttonLoading" type="primary" @click="submitForm">确 定</el-button>
