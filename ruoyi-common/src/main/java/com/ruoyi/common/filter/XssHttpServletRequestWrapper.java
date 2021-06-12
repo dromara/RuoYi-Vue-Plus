@@ -1,9 +1,9 @@
 package com.ruoyi.common.filter;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
-import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * XSS过滤处理
@@ -57,7 +58,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
         }
 
         // 为空，直接返回
-        String json = IOUtils.toString(super.getInputStream(), "utf-8");
+        String json = IoUtil.read(super.getInputStream(), StandardCharsets.UTF_8);
         if (Validator.isEmpty(json))
         {
             return super.getInputStream();
@@ -65,7 +66,8 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
 
         // xss过滤
         json = HtmlUtil.cleanHtmlTag(json).trim();
-        final ByteArrayInputStream bis = new ByteArrayInputStream(json.getBytes("utf-8"));
+
+        final ByteArrayInputStream bis = IoUtil.toStream(json, StandardCharsets.UTF_8);
         return new ServletInputStream()
         {
             @Override

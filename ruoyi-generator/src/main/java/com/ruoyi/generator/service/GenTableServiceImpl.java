@@ -263,12 +263,8 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
                 StringWriter sw = new StringWriter();
                 Template tpl = Velocity.getTemplate(template, Constants.UTF8);
                 tpl.merge(context, sw);
-                try {
-                    String path = getGenPath(table, template);
-                    FileUtils.writeStringToFile(new File(path), sw.toString(), Constants.UTF8);
-                } catch (IOException e) {
-                    throw new CustomException("渲染模板失败，表名：" + table.getTableName());
-                }
+                String path = getGenPath(table, template);
+                FileUtils.writeUtf8String(sw.toString(), path);
             }
         }
     }
