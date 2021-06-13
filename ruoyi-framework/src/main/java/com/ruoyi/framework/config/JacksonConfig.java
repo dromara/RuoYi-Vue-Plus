@@ -3,34 +3,48 @@ package com.ruoyi.framework.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.ruoyi.common.utils.JsonUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+
+import java.time.LocalDateTime;
 
 /**
- * 当Mybatis plus设置为雪花ID时
- * 使用此类，会把所有数字返回变为字符串返回适配前端Long型失真问题
+ * jackson 配置
  *
- * @author Ming LI
+ * @author Lion Li
  */
+@Slf4j
 @Configuration
 public class JacksonConfig {
 
 	@Bean
-	@Primary
-	@ConditionalOnMissingBean(ObjectMapper.class)
-	@ConditionalOnProperty(value = "mybatis-plus.global-config.dbConfig.idType", havingValue = "ASSIGN_ID")
-	public ObjectMapper jacksonObjectMapper(Jackson2ObjectMapperBuilder builder) {
-		ObjectMapper objectMapper = builder.createXmlMapper(false).build();
-		// 全局配置序列化返回 JSON 处理
-		SimpleModule simpleModule = new SimpleModule();
-		//JSON Long ==> String
-		simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
-		objectMapper.registerModule(simpleModule);
-		return objectMapper;
+	public BeanPostProcessor objectMapperBeanPostProcessor() {
+		return new BeanPostProcessor() {
+			@Override
+			public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+				if (!(bean instanceof ObjectMapper)) {
+					return bean;
+				}
+				ObjectMapper objectMapper = (ObjectMapper) bean;
+				// 全局配置序列化返回 JSON 处理
+				SimpleModule simpleModule = new SimpleModule();
+				//JSON Long ==> String 把所有数字返回变为字符串返回适配前端Long型失真问题
+				simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
+				simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
+				simpleModule.addSerializer(LocalDateTime.class, LocalDateTimeSerializer.INSTANCE);
+				simpleModule.addDeserializer(LocalDateTime.class, LocalDateTimeDeserializer.INSTANCE);
+				objectMapper.registerModule(simpleModule);
+				JsonUtils.init(objectMapper);
+				log.info("初始化 jackson 配置");
+				return bean;
+			}
+		};
 	}
 
 }
