@@ -53,12 +53,6 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <!-- 阿里JSON解析器 -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-        </dependency>
-
         <!-- excel工具 -->
         <dependency>
             <groupId>org.apache.poi</groupId>

@@ -3,10 +3,12 @@ package com.ruoyi.common.utils.ip;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
 
 /**
  * 获取地址类
@@ -38,9 +40,9 @@ public class AddressUtils {
 					log.error("获取地理位置异常 {}", ip);
 					return UNKNOWN;
 				}
-				JSONObject obj = JSONObject.parseObject(rspStr);
-				String region = obj.getString("pro");
-				String city = obj.getString("city");
+				Map<String, String> obj = JsonUtils.parseMap(rspStr);
+				String region = obj.get("pro");
+				String city = obj.get("city");
 				return String.format("%s %s", region, city);
 			} catch (Exception e) {
 				log.error("获取地理位置异常 {}", ip);

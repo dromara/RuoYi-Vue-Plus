@@ -3,8 +3,6 @@ package com.ruoyi.generator.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -12,6 +10,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.file.FileUtils;
@@ -130,7 +129,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     @Override
     @Transactional
     public void updateGenTable(GenTable genTable) {
-        String options = JSON.toJSONString(genTable.getParams());
+        String options = JsonUtils.toJsonString(genTable.getParams());
         genTable.setOptions(options);
         int row = baseMapper.updateById(genTable);
         if (row > 0) {
@@ -361,13 +360,12 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     @Override
     public void validateEdit(GenTable genTable) {
         if (GenConstants.TPL_TREE.equals(genTable.getTplCategory())) {
-            String options = JSON.toJSONString(genTable.getParams());
-            JSONObject paramsObj = JSONObject.parseObject(options);
-            if (Validator.isEmpty(paramsObj.getString(GenConstants.TREE_CODE))) {
+			Map<String, Object> paramsObj = genTable.getParams();
+            if (Validator.isEmpty(paramsObj.get(GenConstants.TREE_CODE))) {
                 throw new CustomException("树编码字段不能为空");
-            } else if (Validator.isEmpty(paramsObj.getString(GenConstants.TREE_PARENT_CODE))) {
+            } else if (Validator.isEmpty(paramsObj.get(GenConstants.TREE_PARENT_CODE))) {
                 throw new CustomException("树父编码字段不能为空");
-            } else if (Validator.isEmpty(paramsObj.getString(GenConstants.TREE_NAME))) {
+            } else if (Validator.isEmpty(paramsObj.get(GenConstants.TREE_NAME))) {
                 throw new CustomException("树名称字段不能为空");
             } else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory())) {
                 if (Validator.isEmpty(genTable.getSubTableName())) {
@@ -425,13 +423,13 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
      * @param genTable 设置后的生成对象
      */
     public void setTableFromOptions(GenTable genTable) {
-        JSONObject paramsObj = JSONObject.parseObject(genTable.getOptions());
+		Map<String, String> paramsObj = JsonUtils.parseMap(genTable.getOptions());
         if (Validator.isNotNull(paramsObj)) {
-            String treeCode = paramsObj.getString(GenConstants.TREE_CODE);
-            String treeParentCode = paramsObj.getString(GenConstants.TREE_PARENT_CODE);
-            String treeName = paramsObj.getString(GenConstants.TREE_NAME);
-            String parentMenuId = paramsObj.getString(GenConstants.PARENT_MENU_ID);
-            String parentMenuName = paramsObj.getString(GenConstants.PARENT_MENU_NAME);
+            String treeCode = paramsObj.get(GenConstants.TREE_CODE);
+            String treeParentCode = paramsObj.get(GenConstants.TREE_PARENT_CODE);
+            String treeName = paramsObj.get(GenConstants.TREE_NAME);
+            String parentMenuId = paramsObj.get(GenConstants.PARENT_MENU_ID);
+            String parentMenuName = paramsObj.get(GenConstants.PARENT_MENU_NAME);
 
             genTable.setTreeCode(treeCode);
             genTable.setTreeParentCode(treeParentCode);
