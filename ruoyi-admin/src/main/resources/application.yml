@@ -92,7 +92,7 @@ token:
   # 令牌自定义标识
   header: Authorization
   # 令牌密钥 HMAC-SHA sha256
-  secret: ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890==========
+  secret: ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890===========
   # 令牌有效期（默认30分钟）
   expireTime: 30
 
