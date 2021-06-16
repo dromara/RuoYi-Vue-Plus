@@ -2,7 +2,6 @@ package com.ruoyi.framework.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.ruoyi.common.utils.JsonUtils;
@@ -34,9 +33,6 @@ public class JacksonConfig {
 				ObjectMapper objectMapper = (ObjectMapper) bean;
 				// 全局配置序列化返回 JSON 处理
 				SimpleModule simpleModule = new SimpleModule();
-				//JSON Long ==> String 把所有数字返回变为字符串返回适配前端Long型失真问题
-				simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
-				simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
 				simpleModule.addSerializer(LocalDateTime.class, LocalDateTimeSerializer.INSTANCE);
 				simpleModule.addDeserializer(LocalDateTime.class, LocalDateTimeDeserializer.INSTANCE);
 				objectMapper.registerModule(simpleModule);

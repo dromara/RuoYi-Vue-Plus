@@ -1,6 +1,8 @@
 package com.ruoyi.demo.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -23,8 +25,13 @@ public class TestDemo implements Serializable {
     private static final long serialVersionUID=1L;
 
 
-    /** 主键 */
+	/**
+	 * 主键
+	 * 如果是自定义id 或者 雪花id
+	 * 需要增加序列化为字符串注解 因为Long到前端会失真
+	 */
     @TableId(value = "id")
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /** 部门id */
