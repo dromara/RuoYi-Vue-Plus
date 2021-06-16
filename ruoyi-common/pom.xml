@@ -146,12 +146,19 @@
             <artifactId>redisson-spring-boot-starter</artifactId>
         </dependency>
 
-        <!--jaxb-->
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-        </dependency>
-
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>jdk11</id>
+            <dependencies>
+                <!--jaxb-->
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
 </project>
