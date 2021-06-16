@@ -1,5 +1,6 @@
 package com.ruoyi.common.utils;
 
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,6 +33,9 @@ public class JsonUtils {
     }
 
     public static String toJsonString(Object object) {
+		if (Validator.isEmpty(object)) {
+			return null;
+		}
         try {
             return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
@@ -62,6 +66,9 @@ public class JsonUtils {
     }
 
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
+		if (StrUtil.isBlank(text)) {
+			return null;
+		}
         try {
             return objectMapper.readValue(text, typeReference);
         } catch (IOException e) {
@@ -70,6 +77,9 @@ public class JsonUtils {
     }
 
 	public static <T> Map<String, T> parseMap(String text) {
+		if (StrUtil.isBlank(text)) {
+			return null;
+		}
 		try {
 			return objectMapper.readValue(text, new TypeReference<Map<String, T>>() {});
 		} catch (IOException e) {

@@ -319,7 +319,7 @@ public class VelocityUtils
      */
     public static String getTreecode(Map<String, Object> paramsObj)
     {
-        if (paramsObj.containsKey(GenConstants.TREE_CODE))
+        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_CODE))
         {
             return StrUtil.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_CODE)));
         }
@@ -334,7 +334,7 @@ public class VelocityUtils
      */
     public static String getTreeParentCode(Map<String, Object> paramsObj)
     {
-        if (paramsObj.containsKey(GenConstants.TREE_PARENT_CODE))
+        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_PARENT_CODE))
         {
             return StrUtil.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_PARENT_CODE)));
         }
@@ -349,7 +349,7 @@ public class VelocityUtils
      */
     public static String getTreeName(Map<String, Object> paramsObj)
     {
-        if (paramsObj.containsKey(GenConstants.TREE_NAME))
+        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_NAME))
         {
             return StrUtil.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_NAME)));
         }
@@ -365,8 +365,8 @@ public class VelocityUtils
     public static int getExpandColumn(GenTable genTable)
     {
         String options = genTable.getOptions();
-        Map<String, String> paramsObj = JsonUtils.parseMap(options);
-        String treeName = paramsObj.get(GenConstants.TREE_NAME);
+        Map<String, Object> paramsObj = JsonUtils.parseMap(options);
+        String treeName = Convert.toStr(paramsObj.get(GenConstants.TREE_NAME));
         int num = 0;
         for (GenTableColumn column : genTable.getColumns())
         {
