@@ -25,7 +25,7 @@
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
         <mybatis-plus.version>3.4.3.1</mybatis-plus.version>
-        <hutool.version>5.6.5</hutool.version>
+        <hutool.version>5.7.1</hutool.version>
         <feign.version>2.2.6.RELEASE</feign.version>
         <feign-okhttp.version>11.0</feign-okhttp.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
