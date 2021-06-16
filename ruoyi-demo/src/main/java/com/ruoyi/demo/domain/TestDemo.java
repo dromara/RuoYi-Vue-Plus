@@ -27,8 +27,6 @@ public class TestDemo implements Serializable {
 
 	/**
 	 * 主键
-	 * 如果是自定义id 或者 雪花id
-	 * 需要增加序列化为字符串注解 因为Long到前端会失真
 	 */
     @TableId(value = "id")
 	@JsonSerialize(using = ToStringSerializer.class)

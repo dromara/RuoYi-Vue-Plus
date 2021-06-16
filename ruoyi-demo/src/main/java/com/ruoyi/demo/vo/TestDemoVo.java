@@ -1,5 +1,7 @@
 package com.ruoyi.demo.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.ruoyi.common.annotation.Excel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -21,8 +23,13 @@ public class TestDemoVo {
 
 	private static final long serialVersionUID = 1L;
 
-	/** 主键 */
+	/**
+	 * 主键
+	 * 如果是自定义id 或者 雪花id
+	 * 需要增加序列化为字符串注解 因为Long到前端会失真
+	 */
 	@ApiModelProperty("主键")
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 
 	/** 部门id */
