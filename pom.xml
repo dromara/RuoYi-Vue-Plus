@@ -24,7 +24,7 @@
         <fastjson.version>1.2.76</fastjson.version>
         <poi.version>4.1.2</poi.version>
         <velocity.version>1.7</velocity.version>
-        <jwt.version>0.9.1</jwt.version>
+        <jwt.version>0.11.2</jwt.version>
         <mybatis-plus.version>3.4.3</mybatis-plus.version>
         <hutool.version>5.6.5</hutool.version>
         <feign.version>2.2.6.RELEASE</feign.version>
@@ -83,7 +83,17 @@
             <!-- Token生成与解析-->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt</artifactId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
                 <version>${jwt.version}</version>
             </dependency>
 

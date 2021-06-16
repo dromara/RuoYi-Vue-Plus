@@ -14,10 +14,13 @@ import com.ruoyi.framework.config.properties.TokenProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -145,10 +148,9 @@ public class TokenService {
      * @return 令牌
      */
     private String createToken(Map<String, Object> claims) {
-        String token = Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, tokenProperties.getSecret()).compact();
-        return token;
+		byte[] keyBytes = Decoders.BASE64.decode(tokenProperties.getSecret());
+		Key key = Keys.hmacShaKeyFor(keyBytes);
+		return Jwts.builder().setClaims(claims).signWith(key).compact();
     }
 
     /**
@@ -158,10 +160,7 @@ public class TokenService {
      * @return 数据声明
      */
     private Claims parseToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(tokenProperties.getSecret())
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parserBuilder().setSigningKey(tokenProperties.getSecret()).build().parseClaimsJws(token).getBody();
     }
 
     /**
