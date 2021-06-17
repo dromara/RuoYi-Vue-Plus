@@ -1,5 +1,6 @@
 package com.ruoyi.quartz.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -8,7 +9,6 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.job.TaskException;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.quartz.domain.SysJob;
 import com.ruoyi.quartz.service.ISysJobService;
@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * 调度任务信息操作处理
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -77,7 +77,7 @@ public class SysJobController extends BaseController
         {
             return AjaxResult.error("新增任务'" + sysJob.getJobName() + "'失败，Cron表达式不正确");
         }
-        else if (StringUtils.containsIgnoreCase(sysJob.getInvokeTarget(), Constants.LOOKUP_RMI))
+        else if (StrUtil.containsIgnoreCase(sysJob.getInvokeTarget(), Constants.LOOKUP_RMI))
         {
             return AjaxResult.error("新增任务'" + sysJob.getJobName() + "'失败，目标字符串不允许'rmi://'调用");
         }
@@ -97,7 +97,7 @@ public class SysJobController extends BaseController
         {
             return AjaxResult.error("修改任务'" + sysJob.getJobName() + "'失败，Cron表达式不正确");
         }
-        else if (StringUtils.containsIgnoreCase(sysJob.getInvokeTarget(), Constants.LOOKUP_RMI))
+        else if (StrUtil.containsIgnoreCase(sysJob.getInvokeTarget(), Constants.LOOKUP_RMI))
         {
             return AjaxResult.error("修改任务'" + sysJob.getJobName() + "'失败，目标字符串不允许'rmi://'调用");
         }

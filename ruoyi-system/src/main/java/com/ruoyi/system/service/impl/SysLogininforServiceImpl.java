@@ -36,9 +36,8 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
                         "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
-                        params.get("endTime"))
-                .orderByDesc(SysLogininfor::getInfoId);
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+                        params.get("endTime"));
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage("info_id","desc"), lqw));
     }
 
     /**
