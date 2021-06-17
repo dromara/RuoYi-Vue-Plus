@@ -30,7 +30,6 @@
         <feign-okhttp.version>11.0</feign-okhttp.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
         <redisson.version>3.15.2</redisson.version>
-        <jaxb.version>3.0.1</jaxb.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -125,14 +124,6 @@
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson.version}</version>
             </dependency>
-
-            <!-- jdk11 缺失依赖 jaxb-->
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
-                <version>${jaxb.version}</version>
-            </dependency>
-
 
             <!-- 定时任务-->
             <dependency>
@@ -290,7 +281,18 @@
             </activation>
             <properties>
                 <java.version>11</java.version>
+                <jaxb.version>3.0.1</jaxb.version>
             </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <!-- jdk11 缺失依赖 jaxb-->
+                    <dependency>
+                        <groupId>com.sun.xml.bind</groupId>
+                        <artifactId>jaxb-impl</artifactId>
+                        <version>${jaxb.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
             <dependencies>
                 <!--jaxb-->
                 <dependency>
