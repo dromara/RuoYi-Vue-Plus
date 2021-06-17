@@ -443,7 +443,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     /**
      * 获取代码生成地址
      *
-     * @param table    业务表信息
+     * @param table 业务表信息
      * @param template 模板文件路径
      * @return 生成地址
      */
