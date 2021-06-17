@@ -291,6 +291,13 @@
             <properties>
                 <java.version>11</java.version>
             </properties>
+            <dependencies>
+                <!--jaxb-->
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 
