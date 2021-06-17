@@ -58,5 +58,5 @@ public interface I${ClassName}Service extends IServicePlus<${ClassName}> {
 	 * @param isValid 是否校验,true-删除前校验,false-不校验
 	 * @return
 	 */
-	Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+	Boolean deleteWithValidByIds(Collection<${pkColumn.javaType}> ids, Boolean isValid);
 }
