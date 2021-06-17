@@ -53,7 +53,7 @@
               <li>JWT</li>
               <li>MyBatis</li>
               <li>Druid</li>
-              <li>Fastjson</li>
+              <li>Jackson</li>
               <li>...</li>
             </ul>
           </el-col>

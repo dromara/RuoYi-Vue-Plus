@@ -18,6 +18,7 @@
 * 监控框架 spring-boot-admin 全方位服务监控
 * 校验框架 validation 增强接口安全性 严谨性
 * 文档框架 knife4j 美化接口文档
+* 序列化框架 统一使用 jackson 高效可靠
 * 代码生成器 一键生成前后端代码
 
 ## 参考文档
@@ -37,6 +38,7 @@
 * 移除 自带服务监控 改为 spring-boot-admin 全方位监控
 * 增加 demo 模块示例(给不会增加模块的小伙伴做参考)
 * 增加 redisson 支持分布式锁 功能更强大
+* 移除 fastjson 统一使用 jackson 序列化
 
 ### 代码改动
 
