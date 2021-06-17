@@ -37,7 +37,7 @@
 * 集成 Feign 接口化管理 Http 请求(如三方请求 支付,短信,推送等)
 * 移除 自带服务监控 改为 spring-boot-admin 全方位监控
 * 增加 demo 模块示例(给不会增加模块的小伙伴做参考)
-* 增加 redisson 支持分布式锁 功能更强大
+* 增加 redisson 高性能 Redis 客户端
 * 移除 fastjson 统一使用 jackson 序列化
 
 ### 代码改动
@@ -50,6 +50,7 @@
 * 项目修改为 maven多环境配置
 * 项目配置修改为 application.yml 统一管理
 * 数据权限修改为 适配支持单表、多表
+* 使用 redisson 实现分布式锁注解与工具类
 * 使用 redisson 实现 spring-cache 整合
 * 增加 mybatis-plus 二级缓存 redis 存储
 
