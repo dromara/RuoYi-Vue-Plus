@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
+import java.util.TimeZone;
 
 /**
  * jackson 配置
@@ -36,6 +37,7 @@ public class JacksonConfig {
 				simpleModule.addSerializer(LocalDateTime.class, LocalDateTimeSerializer.INSTANCE);
 				simpleModule.addDeserializer(LocalDateTime.class, LocalDateTimeDeserializer.INSTANCE);
 				objectMapper.registerModule(simpleModule);
+				objectMapper.setTimeZone(TimeZone.getDefault());
 				JsonUtils.init(objectMapper);
 				log.info("初始化 jackson 配置");
 				return bean;
