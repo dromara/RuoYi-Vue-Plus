@@ -1,7 +1,7 @@
 package com.ruoyi.demo.mapper;
 
-import com.ruoyi.common.core.mybatisplus.MybatisPlusRedisCache;
-import com.ruoyi.common.core.page.BaseMapperPlus;
+import com.ruoyi.common.core.mybatisplus.cache.MybatisPlusRedisCache;
+import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import com.ruoyi.demo.domain.TestDemo;
 import org.apache.ibatis.annotations.CacheNamespace;
 

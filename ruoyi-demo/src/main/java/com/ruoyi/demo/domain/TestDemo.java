@@ -69,7 +69,6 @@ public class TestDemo implements Serializable {
     private String updateBy;
 
     /** 删除标志 */
-    @TableLogic
     private Long delFlag;
 
 }
