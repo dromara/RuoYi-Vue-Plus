@@ -1,6 +1,6 @@
 package com.ruoyi.quartz.mapper;
 
-import com.ruoyi.common.core.page.BaseMapperPlus;
+import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import com.ruoyi.quartz.domain.SysJob;
 
 /**

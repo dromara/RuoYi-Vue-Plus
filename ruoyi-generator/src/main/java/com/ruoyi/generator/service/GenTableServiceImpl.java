@@ -6,9 +6,9 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.JsonUtils;
@@ -50,7 +50,7 @@ import java.util.zip.ZipOutputStream;
  */
 @Slf4j
 @Service
-public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> implements IGenTableService {
+public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTable> implements IGenTableService {
 
     @Autowired
     private GenTableColumnMapper genTableColumnMapper;

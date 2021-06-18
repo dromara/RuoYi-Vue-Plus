@@ -3,11 +3,11 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.lang.Validator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.PageUtils;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
+public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser> implements ISysUserService {
 
     @Autowired
     private SysRoleMapper roleMapper;
@@ -311,7 +311,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 list.add(ur);
             }
             if (list.size() > 0) {
-				userRoleMapper.batchUserRole(list);
+				userRoleMapper.insertAll(list);
             }
         }
     }
@@ -333,7 +333,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 list.add(up);
             }
             if (list.size() > 0) {
-				userPostMapper.batchUserPost(list);
+				userPostMapper.insertAll(list);
             }
         }
     }

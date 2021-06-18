@@ -5,7 +5,7 @@ import ${packageName}.vo.${ClassName}Vo;
 import ${packageName}.bo.${ClassName}QueryBo;
 import ${packageName}.bo.${ClassName}AddBo;
 import ${packageName}.bo.${ClassName}EditBo;
-import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 #if($table.crud || $table.sub)
 import com.ruoyi.common.core.page.TableDataInfo;
 #end

@@ -5,7 +5,7 @@ import com.ruoyi.demo.vo.TestDemoVo;
 import com.ruoyi.demo.bo.TestDemoQueryBo;
 import com.ruoyi.demo.bo.TestDemoAddBo;
 import com.ruoyi.demo.bo.TestDemoEditBo;
-import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 import java.util.Collection;

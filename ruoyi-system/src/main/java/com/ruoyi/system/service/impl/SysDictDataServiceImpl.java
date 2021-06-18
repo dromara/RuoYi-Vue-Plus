@@ -2,8 +2,8 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.domain.entity.SysDictData;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.DictUtils;
 import com.ruoyi.common.utils.PageUtils;
@@ -20,7 +20,7 @@ import java.util.List;
  * @author ruoyi
  */
 @Service
-public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData> implements ISysDictDataService {
+public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, SysDictData> implements ISysDictDataService {
 
 	@Override
 	public TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData) {

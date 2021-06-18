@@ -3,7 +3,7 @@ package com.ruoyi.quartz.service.impl;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.quartz.domain.SysJobLog;
@@ -21,7 +21,7 @@ import java.util.Map;
  * @author ruoyi
  */
 @Service
-public class SysJobLogServiceImpl extends ServiceImpl<SysJobLogMapper, SysJobLog> implements ISysJobLogService {
+public class SysJobLogServiceImpl extends ServicePlusImpl<SysJobLogMapper, SysJobLog> implements ISysJobLogService {
 
     @Override
     public TableDataInfo<SysJobLog> selectPageJobLogList(SysJobLog jobLog) {
