@@ -30,6 +30,7 @@
         <feign-okhttp.version>11.0</feign-okhttp.version>
         <spring-boot-admin.version>2.4.1</spring-boot-admin.version>
         <redisson.version>3.15.2</redisson.version>
+        <datasource.version>3.4.0</datasource.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -79,6 +80,13 @@
                 <version>${jwt.version}</version>
             </dependency>
 
+            <!-- dynamic-datasource 多数据源-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+                <version>${datasource.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
@@ -89,6 +97,7 @@
                 <artifactId>mybatis-plus-extension</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
