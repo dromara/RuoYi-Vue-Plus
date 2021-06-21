@@ -40,7 +40,9 @@ public class InsertAll extends AbstractMethod {
 	private String prepareValuesSqlForMysqlBatch(TableInfo tableInfo) {
 		final StringBuilder valueSql = new StringBuilder();
 		valueSql.append("<foreach collection=\"list\" item=\"item\" index=\"index\" open=\"(\" separator=\"),(\" close=\")\">");
-		valueSql.append("#{item.").append(tableInfo.getKeyProperty()).append("},");
+		if (StrUtil.isNotBlank(tableInfo.getKeyColumn())) {
+			valueSql.append("#{item.").append(tableInfo.getKeyProperty()).append("},");
+		}
 		tableInfo.getFieldList().forEach(x -> valueSql.append("#{item.").append(x.getProperty()).append("},"));
 		valueSql.delete(valueSql.length() - 1, valueSql.length());
 		valueSql.append("</foreach>");
