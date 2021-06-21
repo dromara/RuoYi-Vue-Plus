@@ -253,7 +253,7 @@ feign:
       enabled: true
   okhttp:
     enabled: true
-  hystrix:
+  circuitbreaker:
     enabled: true
 
 --- # 定时任务配置

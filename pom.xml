@@ -14,7 +14,7 @@
 
     <properties>
         <ruoyi-vue-plus.version>2.3.2</ruoyi-vue-plus.version>
-        <spring-boot.version>2.3.11.RELEASE</spring-boot.version>
+        <spring-boot.version>2.4.7</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -25,10 +25,10 @@
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
         <mybatis-plus.version>3.4.3</mybatis-plus.version>
-        <hutool.version>5.7.1</hutool.version>
-        <feign.version>2.2.6.RELEASE</feign.version>
+        <hutool.version>5.7.2</hutool.version>
+        <feign.version>3.0.3</feign.version>
         <feign-okhttp.version>11.0</feign-okhttp.version>
-        <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
+        <spring-boot-admin.version>2.4.1</spring-boot-admin.version>
         <redisson.version>3.15.2</redisson.version>
     </properties>
 

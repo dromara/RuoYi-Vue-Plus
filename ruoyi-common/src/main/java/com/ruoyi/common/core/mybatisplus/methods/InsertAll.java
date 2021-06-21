@@ -1,5 +1,6 @@
 package com.ruoyi.common.core.mybatisplus.methods;
 
+import cn.hutool.core.util.StrUtil;
 import org.apache.ibatis.executor.keygen.NoKeyGenerator;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlSource;
@@ -26,7 +27,9 @@ public class InsertAll extends AbstractMethod {
 
 	private String prepareFieldSql(TableInfo tableInfo) {
 		StringBuilder fieldSql = new StringBuilder();
-		fieldSql.append(tableInfo.getKeyColumn()).append(",");
+		if (StrUtil.isNotBlank(tableInfo.getKeyColumn())) {
+			fieldSql.append(tableInfo.getKeyColumn()).append(",");
+		}
 		tableInfo.getFieldList().forEach(x -> fieldSql.append(x.getColumn()).append(","));
 		fieldSql.delete(fieldSql.length() - 1, fieldSql.length());
 		fieldSql.insert(0, "(");
