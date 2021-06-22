@@ -20,7 +20,7 @@ import java.util.Objects;
  * @author ruoyi
  */
 @Aspect
-@Order(1)
+@Order(-500)
 @Component
 public class DataSourceAspect {
 
@@ -34,7 +34,9 @@ public class DataSourceAspect {
 		DataSource dataSource = getDataSource(point);
 
 		if (Validator.isNotNull(dataSource)) {
-			DynamicDataSourceContextHolder.push(dataSource.value().name());
+			DynamicDataSourceContextHolder.poll();
+			String source = dataSource.value().getSource();
+			DynamicDataSourceContextHolder.push(source);
 		}
 
 		try {
