@@ -15,7 +15,7 @@ ruoyi:
 
 captcha:
   # 验证码开关
-  enabled: false
+  enabled: true
   # 验证码类型 math 数组计算 char 字符验证
   type: math
   # line 线段干扰 circle 圆圈干扰 shear 扭曲干扰
@@ -255,6 +255,13 @@ feign:
     enabled: true
   circuitbreaker:
     enabled: true
+
+--- # 分布式锁 lock4j 全局配置
+lock4j:
+  # 获取分布式锁超时时间，默认为 3000 毫秒
+  acquire-timeout: 3000
+  # 分布式锁的超时时间，默认为 30 毫秒
+  expire: 30000
 
 --- # 定时任务配置
 spring:

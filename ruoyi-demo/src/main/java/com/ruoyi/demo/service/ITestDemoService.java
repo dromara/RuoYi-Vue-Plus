@@ -19,10 +19,6 @@ import java.util.List;
  */
 public interface ITestDemoService extends IServicePlus<TestDemo> {
 
-	void testLock4j(String key);
-
-	void testLock4jLockTemaplate(String key);
-
 	/**
 	 * 查询单个
 	 * @return

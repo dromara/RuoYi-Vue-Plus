@@ -21,6 +21,8 @@
 * 序列化框架 统一使用 jackson 高效可靠
 * 代码生成器 一键生成前后端代码
 * 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构
+* Redis客户端 采用 Redisson 性能更强
+* 分布式锁 Lock4j 注解锁、工具锁 多种多样
 
 ## 参考文档
 
@@ -43,6 +45,7 @@
 * 增加 redisson 高性能 Redis 客户端
 * 移除 fastjson 统一使用 jackson 序列化
 * 集成 dynamic-datasource 多数据源(默认支持MySQL,其他种类需自行适配)
+* 集成 Lock4j 实现分布式 注解锁、工具锁 多种多样
 
 ### 代码改动
 
