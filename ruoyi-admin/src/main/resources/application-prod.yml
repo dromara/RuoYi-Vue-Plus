@@ -4,7 +4,10 @@ spring:
     exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
+    # 动态数据源文档 https://www.kancloud.cn/tracy5546/dynamic-datasource/content
     dynamic:
+      #设置默认的数据源或者数据源组,默认值即为 master
+      primary: master
       datasource:
         # 主库数据源
         master:
