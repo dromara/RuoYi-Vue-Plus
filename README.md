@@ -23,6 +23,8 @@
 * 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构
 
 ## 参考文档
+
+使用框架前请仔细阅读文档重点注意事项  
 [参考文档 Wiki](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)
 
 ## 修改RuoYi功能
