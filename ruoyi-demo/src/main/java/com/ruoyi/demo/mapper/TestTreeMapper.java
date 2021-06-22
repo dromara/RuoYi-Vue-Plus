@@ -1,9 +1,7 @@
 package com.ruoyi.demo.mapper;
 
-import com.ruoyi.common.core.mybatisplus.cache.MybatisPlusRedisCache;
 import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import com.ruoyi.demo.domain.TestTree;
-import org.apache.ibatis.annotations.CacheNamespace;
 
 /**
  * 测试树表Mapper接口
@@ -11,7 +9,7 @@ import org.apache.ibatis.annotations.CacheNamespace;
  * @author Lion Li
  * @date 2021-05-30
  */
-@CacheNamespace(implementation = MybatisPlusRedisCache.class, eviction = MybatisPlusRedisCache.class)
+//@CacheNamespace(implementation = MybatisPlusRedisCache.class, eviction = MybatisPlusRedisCache.class)
 public interface TestTreeMapper extends BaseMapperPlus<TestTree> {
 
 }

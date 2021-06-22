@@ -33,6 +33,7 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
 		return getVoById(id, TestTreeVo.class);
 	}
 
+//	@DataSource(DataSourceType.SLAVE) // 切换从库查询
 	@DataScope(isUser = true)
 	@Override
 	public List<TestTreeVo> queryList(TestTreeQueryBo bo) {
