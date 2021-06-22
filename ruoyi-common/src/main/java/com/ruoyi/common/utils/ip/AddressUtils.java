@@ -2,6 +2,7 @@ package com.ruoyi.common.utils.ip;
 
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HtmlUtil;
 import cn.hutool.http.HttpUtil;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
@@ -27,6 +28,7 @@ public class AddressUtils {
 	public static String getRealAddressByIP(String ip) {
 		String address = UNKNOWN;
 		// 内网不查询
+		ip = "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : HtmlUtil.cleanHtmlTag(ip);
 		if (NetUtil.isInnerIP(ip)) {
 			return "内网IP";
 		}
