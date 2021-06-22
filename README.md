@@ -20,6 +20,7 @@
 * 文档框架 knife4j 美化接口文档
 * 序列化框架 统一使用 jackson 高效可靠
 * 代码生成器 一键生成前后端代码
+* 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构
 
 ## 参考文档
 [参考文档 Wiki](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)
@@ -39,6 +40,7 @@
 * 增加 demo 模块示例(给不会增加模块的小伙伴做参考)
 * 增加 redisson 高性能 Redis 客户端
 * 移除 fastjson 统一使用 jackson 序列化
+* 集成 dynamic-datasource 多数据源(默认支持MySQL,其他种类需自行适配)
 
 ### 代码改动
 
