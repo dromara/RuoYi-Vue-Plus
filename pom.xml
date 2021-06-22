@@ -30,6 +30,7 @@
         <feign-okhttp.version>11.0</feign-okhttp.version>
         <spring-boot-admin.version>2.4.1</spring-boot-admin.version>
         <redisson.version>3.15.2</redisson.version>
+        <lock4j.version>2.2.1</lock4j.version>
         <datasource.version>3.4.0</datasource.version>
     </properties>
 
@@ -133,7 +134,11 @@
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
+                <version>${lock4j.version}</version>
+            </dependency>
             <!-- 定时任务-->
             <dependency>
                 <groupId>com.ruoyi</groupId>

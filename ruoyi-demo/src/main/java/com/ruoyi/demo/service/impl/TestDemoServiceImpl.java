@@ -2,6 +2,10 @@ package com.ruoyi.demo.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.lock.LockInfo;
+import com.baomidou.lock.LockTemplate;
+import com.baomidou.lock.annotation.Lock4j;
+import com.baomidou.lock.executor.RedissonLockExecutor;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.DataScope;
@@ -18,8 +22,10 @@ import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.mapper.TestDemoMapper;
 import com.ruoyi.demo.service.ITestDemoService;
 import com.ruoyi.demo.vo.TestDemoVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +38,43 @@ import java.util.Map;
  */
 @Service
 public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDemo> implements ITestDemoService {
+
+
+	@Autowired
+	private LockTemplate lockTemplate;
+
+	@Override
+	public void testLock4jLockTemaplate(String key) {
+		final LockInfo lockInfo = lockTemplate.lock(key, 30000L, 5000L, RedissonLockExecutor.class);
+		if (null == lockInfo) {
+			throw new RuntimeException("业务处理中,请稍后再试");
+		}
+		// 获取锁成功，处理业务
+		try {
+			try {
+				Thread.sleep(8000);
+			} catch (InterruptedException e) {
+				//
+			}
+		 System.out.println("执行简单方法1 , 当前线程:" + Thread.currentThread().getName());
+		} finally {
+			//释放锁
+			lockTemplate.releaseLock(lockInfo);
+		}
+		//结束
+	}
+
+	@Override
+	@Lock4j(executor = RedissonLockExecutor.class,keys = {"#key"})
+	public void testLock4j(String key) {
+		System.out.println("start:"+key+",time:"+LocalTime.now().toString());
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("end :"+key+",time:"+LocalTime.now().toString());
+	}
 
 	@Override
 	public TestDemoVo queryById(Long id) {
