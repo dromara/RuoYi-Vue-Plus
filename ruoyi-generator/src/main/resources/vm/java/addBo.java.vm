@@ -2,7 +2,6 @@ package ${packageName}.bo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import java.util.Date;
 import javax.validation.constraints.*;
@@ -27,9 +26,6 @@ public class ${ClassName}AddBo {
 
     /** $column.columnComment */
     @ApiModelProperty("$column.columnComment")
-#if($column.javaType == 'Date')
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-#end
 #if($column.isRequired==1)
 #if($column.javaType == 'String')
     @NotBlank(message = "$column.columnComment不能为空")

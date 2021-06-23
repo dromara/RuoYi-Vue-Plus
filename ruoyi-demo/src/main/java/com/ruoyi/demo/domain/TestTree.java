@@ -1,13 +1,14 @@
 package com.ruoyi.demo.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
 import java.io.Serializable;
 import java.util.Date;
-import java.math.BigDecimal;
-import com.ruoyi.common.annotation.Excel;
 
 /**
  * 测试树表对象 test_tree
@@ -26,6 +27,7 @@ public class TestTree implements Serializable {
 
     /** 主键 */
     @TableId(value = "id")
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /** 父id */

@@ -3,8 +3,8 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.PageUtils;
@@ -25,7 +25,7 @@ import java.util.List;
  * @author ruoyi
  */
 @Service
-public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> implements ISysPostService {
+public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost> implements ISysPostService {
 
     @Autowired
     private SysUserPostMapper userPostMapper;

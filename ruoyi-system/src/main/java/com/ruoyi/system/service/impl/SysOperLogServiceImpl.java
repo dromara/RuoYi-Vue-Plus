@@ -4,7 +4,7 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.domain.SysOperLog;
@@ -23,7 +23,7 @@ import java.util.Map;
  * @author ruoyi
  */
 @Service
-public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOperLog> implements ISysOperLogService {
+public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, SysOperLog> implements ISysOperLogService {
 
     @Override
     public TableDataInfo<SysOperLog> selectPageOperLogList(SysOperLog operLog) {
@@ -45,9 +45,8 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
                         "date_format(oper_time,'%y%m%d') <= date_format({0},'%y%m%d')",
-                        params.get("endTime"))
-                .orderByDesc(SysOperLog::getOperId);
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+                        params.get("endTime"));
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage("oper_id","desc"), lqw));
     }
 
     /**

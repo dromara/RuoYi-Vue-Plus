@@ -2,6 +2,8 @@
 [![码云Gitee](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/blob/master/LICENSE)
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
+[![JDK-8+](https://img.shields.io/badge/JDK-8-green.svg)]()
+[![JDK-11](https://img.shields.io/badge/JDK-11-green.svg)]()
 
 基于 RuoYi-Vue 集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 定期与 RuoYi-Vue 同步
 * 前端开发框架 Vue、Element UI
@@ -16,9 +18,15 @@
 * 监控框架 spring-boot-admin 全方位服务监控
 * 校验框架 validation 增强接口安全性 严谨性
 * 文档框架 knife4j 美化接口文档
+* 序列化框架 统一使用 jackson 高效可靠
 * 代码生成器 一键生成前后端代码
+* 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构
+* Redis客户端 采用 Redisson 性能更强
+* 分布式锁 Lock4j 注解锁、工具锁 多种多样
 
 ## 参考文档
+
+使用框架前请仔细阅读文档重点注意事项  
 [参考文档 Wiki](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)
 
 ## 修改RuoYi功能
@@ -34,7 +42,10 @@
 * 集成 Feign 接口化管理 Http 请求(如三方请求 支付,短信,推送等)
 * 移除 自带服务监控 改为 spring-boot-admin 全方位监控
 * 增加 demo 模块示例(给不会增加模块的小伙伴做参考)
-* 增加 redisson 支持分布式锁 功能更强大
+* 增加 redisson 高性能 Redis 客户端
+* 移除 fastjson 统一使用 jackson 序列化
+* 集成 dynamic-datasource 多数据源(默认支持MySQL,其他种类需自行适配)
+* 集成 Lock4j 实现分布式 注解锁、工具锁 多种多样
 
 ### 代码改动
 
@@ -46,6 +57,7 @@
 * 项目修改为 maven多环境配置
 * 项目配置修改为 application.yml 统一管理
 * 数据权限修改为 适配支持单表、多表
+* 使用 redisson 实现分布式锁注解与工具类
 * 使用 redisson 实现 spring-cache 整合
 * 增加 mybatis-plus 二级缓存 redis 存储
 

@@ -1,7 +1,6 @@
 package com.ruoyi.framework.config;
 
 import feign.*;
-import feign.hystrix.HystrixFeign;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -33,11 +32,6 @@ public class FeignConfig {
                 .writeTimeout(120, TimeUnit.SECONDS)
                 .connectionPool(new ConnectionPool())
                 .build();
-    }
-
-    @Bean
-    public Feign.Builder feignBuilder() {
-        return HystrixFeign.builder();
     }
 
     @Bean

@@ -2,14 +2,20 @@ package com.ruoyi.framework.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.baomidou.mybatisplus.core.injector.AbstractMethod;
+import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
+import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.ruoyi.common.core.mybatisplus.methods.InsertAll;
 import com.ruoyi.framework.mybatisplus.CreateAndUpdateMetaObjectHandler;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.util.List;
 
 /**
  * mybatis-plus配置类
@@ -94,10 +100,17 @@ public class MybatisPlusConfig {
 	 * sql注入器配置
 	 * https://baomidou.com/guide/sql-injector.html
 	 */
-//	@Bean
-//	public ISqlInjector sqlInjector() {
-//		return new DefaultSqlInjector();
-//	}
+	@Bean
+	public ISqlInjector sqlInjector() {
+		return new DefaultSqlInjector() {
+			@Override
+			public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
+				List<AbstractMethod> methodList = super.getMethodList(mapperClass);
+				methodList.add(new InsertAll());
+				return methodList;
+			}
+		};
+	}
 
 	/**
 	 * TenantLineInnerInterceptor 多租户插件

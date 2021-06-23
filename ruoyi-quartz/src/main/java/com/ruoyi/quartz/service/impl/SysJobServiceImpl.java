@@ -2,8 +2,8 @@ package com.ruoyi.quartz.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.ScheduleConstants;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.job.TaskException;
 import com.ruoyi.common.utils.PageUtils;
@@ -29,7 +29,7 @@ import java.util.List;
  * @author ruoyi
  */
 @Service
-public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> implements ISysJobService {
+public class SysJobServiceImpl extends ServicePlusImpl<SysJobMapper, SysJob> implements ISysJobService {
     @Autowired
     private Scheduler scheduler;
 

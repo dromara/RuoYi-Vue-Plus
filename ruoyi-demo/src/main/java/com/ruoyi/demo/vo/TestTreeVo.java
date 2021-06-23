@@ -1,10 +1,13 @@
 package com.ruoyi.demo.vo;
 
-import com.ruoyi.common.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.ruoyi.common.annotation.Excel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.util.Date;
 
 
@@ -23,6 +26,7 @@ public class TestTreeVo {
 
 	/** 主键 */
 	@ApiModelProperty("主键")
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 
 	/** 父id */

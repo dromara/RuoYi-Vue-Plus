@@ -1,17 +1,17 @@
 package com.ruoyi.generator.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.file.FileUtils;
@@ -50,7 +50,7 @@ import java.util.zip.ZipOutputStream;
  */
 @Slf4j
 @Service
-public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> implements IGenTableService {
+public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTable> implements IGenTableService {
 
     @Autowired
     private GenTableColumnMapper genTableColumnMapper;
@@ -130,7 +130,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     @Override
     @Transactional
     public void updateGenTable(GenTable genTable) {
-        String options = JSON.toJSONString(genTable.getParams());
+        String options = JsonUtils.toJsonString(genTable.getParams());
         genTable.setOptions(options);
         int row = baseMapper.updateById(genTable);
         if (row > 0) {
@@ -263,12 +263,8 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
                 StringWriter sw = new StringWriter();
                 Template tpl = Velocity.getTemplate(template, Constants.UTF8);
                 tpl.merge(context, sw);
-                try {
-                    String path = getGenPath(table, template);
-                    FileUtils.writeStringToFile(new File(path), sw.toString(), Constants.UTF8);
-                } catch (IOException e) {
-                    throw new CustomException("渲染模板失败，表名：" + table.getTableName());
-                }
+                String path = getGenPath(table, template);
+                FileUtils.writeUtf8String(sw.toString(), path);
             }
         }
     }
@@ -365,13 +361,12 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     @Override
     public void validateEdit(GenTable genTable) {
         if (GenConstants.TPL_TREE.equals(genTable.getTplCategory())) {
-            String options = JSON.toJSONString(genTable.getParams());
-            JSONObject paramsObj = JSONObject.parseObject(options);
-            if (Validator.isEmpty(paramsObj.getString(GenConstants.TREE_CODE))) {
+			Map<String, Object> paramsObj = genTable.getParams();
+            if (Validator.isEmpty(paramsObj.get(GenConstants.TREE_CODE))) {
                 throw new CustomException("树编码字段不能为空");
-            } else if (Validator.isEmpty(paramsObj.getString(GenConstants.TREE_PARENT_CODE))) {
+            } else if (Validator.isEmpty(paramsObj.get(GenConstants.TREE_PARENT_CODE))) {
                 throw new CustomException("树父编码字段不能为空");
-            } else if (Validator.isEmpty(paramsObj.getString(GenConstants.TREE_NAME))) {
+            } else if (Validator.isEmpty(paramsObj.get(GenConstants.TREE_NAME))) {
                 throw new CustomException("树名称字段不能为空");
             } else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory())) {
                 if (Validator.isEmpty(genTable.getSubTableName())) {
@@ -429,13 +424,13 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
      * @param genTable 设置后的生成对象
      */
     public void setTableFromOptions(GenTable genTable) {
-        JSONObject paramsObj = JSONObject.parseObject(genTable.getOptions());
+		Map<String, Object> paramsObj = JsonUtils.parseMap(genTable.getOptions());
         if (Validator.isNotNull(paramsObj)) {
-            String treeCode = paramsObj.getString(GenConstants.TREE_CODE);
-            String treeParentCode = paramsObj.getString(GenConstants.TREE_PARENT_CODE);
-            String treeName = paramsObj.getString(GenConstants.TREE_NAME);
-            String parentMenuId = paramsObj.getString(GenConstants.PARENT_MENU_ID);
-            String parentMenuName = paramsObj.getString(GenConstants.PARENT_MENU_NAME);
+            String treeCode = Convert.toStr(paramsObj.get(GenConstants.TREE_CODE));
+            String treeParentCode = Convert.toStr(paramsObj.get(GenConstants.TREE_PARENT_CODE));
+            String treeName = Convert.toStr(paramsObj.get(GenConstants.TREE_NAME));
+            String parentMenuId = Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID));
+            String parentMenuName = Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_NAME));
 
             genTable.setTreeCode(treeCode);
             genTable.setTreeParentCode(treeParentCode);
@@ -448,7 +443,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     /**
      * 获取代码生成地址
      *
-     * @param table    业务表信息
+     * @param table 业务表信息
      * @param template 模板文件路径
      * @return 生成地址
      */

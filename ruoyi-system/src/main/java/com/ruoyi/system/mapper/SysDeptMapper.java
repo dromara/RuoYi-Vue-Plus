@@ -1,7 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import com.ruoyi.common.core.domain.entity.SysDept;
-import com.ruoyi.common.core.page.BaseMapperPlus;
+import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept> {
     /**
      * 根据角色ID查询部门树信息
      *
-     * @param roleId            角色ID
+     * @param roleId 角色ID
      * @param deptCheckStrictly 部门树选择项是否关联显示
      * @return 选中部门列表
      */

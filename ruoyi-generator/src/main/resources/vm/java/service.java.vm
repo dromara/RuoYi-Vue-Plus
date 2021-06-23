@@ -5,7 +5,7 @@ import ${packageName}.vo.${ClassName}Vo;
 import ${packageName}.bo.${ClassName}QueryBo;
 import ${packageName}.bo.${ClassName}AddBo;
 import ${packageName}.bo.${ClassName}EditBo;
-import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 #if($table.crud || $table.sub)
 import com.ruoyi.common.core.page.TableDataInfo;
 #end
@@ -58,5 +58,5 @@ public interface I${ClassName}Service extends IServicePlus<${ClassName}> {
 	 * @param isValid 是否校验,true-删除前校验,false-不校验
 	 * @return
 	 */
-	Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+	Boolean deleteWithValidByIds(Collection<${pkColumn.javaType}> ids, Boolean isValid);
 }

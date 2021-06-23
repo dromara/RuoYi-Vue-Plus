@@ -56,7 +56,7 @@ public class SysDeptController extends BaseController
         {
             SysDept d = (SysDept) it.next();
             if (d.getDeptId().intValue() == deptId
-                    || ArrayUtils.contains(StrUtil.split(d.getAncestors(), ","), deptId + ""))
+                    || ArrayUtils.contains(StrUtil.splitToArray(d.getAncestors(), ","), deptId + ""))
             {
                 it.remove();
             }

@@ -1,39 +1,41 @@
 package com.ruoyi.framework.manager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.ruoyi.common.utils.Threads;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.PreDestroy;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * 确保应用退出时能关闭后台线程
  *
- * @author ruoyi
+ * @author Lion Li
  */
+@Slf4j(topic = "sys-user")
 @Component
-public class ShutdownManager
-{
-    private static final Logger logger = LoggerFactory.getLogger("sys-user");
+public class ShutdownManager {
 
-    @PreDestroy
-    public void destroy()
-    {
-        shutdownAsyncManager();
-    }
+	@Autowired
+	@Qualifier("scheduledExecutorService")
+	private ScheduledExecutorService scheduledExecutorService;
 
-    /**
-     * 停止异步执行任务
-     */
-    private void shutdownAsyncManager()
-    {
-        try
-        {
-            logger.info("====关闭后台任务任务线程池====");
-            AsyncManager.me().shutdown();
-        }
-        catch (Exception e)
-        {
-            logger.error(e.getMessage(), e);
-        }
-    }
+	@PreDestroy
+	public void destroy() {
+		shutdownAsyncManager();
+	}
+
+	/**
+	 * 停止异步执行任务
+	 */
+	private void shutdownAsyncManager() {
+		try {
+			log.info("====关闭后台任务任务线程池====");
+			Threads.shutdownAndAwaitTermination(scheduledExecutorService);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
 }

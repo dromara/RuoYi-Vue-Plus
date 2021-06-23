@@ -54,10 +54,10 @@ public class CommonController
 
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, realFileName);
-            FileUtils.writeBytes(filePath, response.getOutputStream());
+			FileUtils.writeToStream(filePath, response.getOutputStream());
             if (delete)
             {
-                FileUtils.deleteFile(filePath);
+				FileUtils.del(filePath);
             }
         }
         catch (Exception e)
@@ -111,7 +111,7 @@ public class CommonController
             String downloadName = StrUtil.subAfter(downloadPath, "/",true);
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, downloadName);
-            FileUtils.writeBytes(downloadPath, response.getOutputStream());
+            FileUtils.writeToStream(downloadPath, response.getOutputStream());
         }
         catch (Exception e)
         {

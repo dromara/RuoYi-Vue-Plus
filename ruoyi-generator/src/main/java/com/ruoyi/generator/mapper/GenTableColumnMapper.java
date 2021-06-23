@@ -1,6 +1,6 @@
 package com.ruoyi.generator.mapper;
 
-import com.ruoyi.common.core.page.BaseMapperPlus;
+import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import com.ruoyi.generator.domain.GenTableColumn;
 
 import java.util.List;
