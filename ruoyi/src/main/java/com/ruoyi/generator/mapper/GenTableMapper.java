@@ -1,7 +1,7 @@
 package com.ruoyi.generator.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.common.core.page.BaseMapperPlus;
+import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import com.ruoyi.generator.domain.GenTable;
 import org.apache.ibatis.annotations.Param;
 

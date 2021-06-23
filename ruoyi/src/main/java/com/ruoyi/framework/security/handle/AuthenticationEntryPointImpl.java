@@ -2,8 +2,8 @@ package com.ruoyi.framework.security.handle;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpStatus;
-import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -16,7 +16,7 @@ import java.io.Serializable;
 
 /**
  * 认证失败处理类 返回未授权
- * 
+ *
  * @author ruoyi
  */
 @Component
@@ -30,6 +30,6 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint, S
     {
         int code = HttpStatus.HTTP_UNAUTHORIZED;
         String msg = StrUtil.format("请求访问：{}，认证失败，无法访问系统资源", request.getRequestURI());
-        ServletUtils.renderString(response, JSON.toJSONString(AjaxResult.error(code, msg)));
+        ServletUtils.renderString(response, JsonUtils.toJsonString(AjaxResult.error(code, msg)));
     }
 }

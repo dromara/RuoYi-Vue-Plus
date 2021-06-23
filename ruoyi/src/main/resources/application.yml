@@ -11,7 +11,7 @@ ruoyi:
   # 文件路径
   profile: ./ruoyi/uploadPath
   # 获取ip地址开关
-  addressEnabled: false
+  addressEnabled: true
 
 captcha:
   # 验证码开关
@@ -86,6 +86,17 @@ spring:
   thymeleaf:
     # 将系统模板放置到最前面 否则会与 springboot-admin 页面冲突
     template-resolver-order: 1
+  jackson:
+    # 日期格式化
+    date-format: yyyy-MM-dd HH:mm:ss
+    serialization:
+      # 格式化输出
+      indent_output: false
+      # 忽略无法转换的对象
+      fail_on_empty_beans: false
+    deserialization:
+      # 允许对象忽略json中不存在的属性
+      fail_on_unknown_properties: false
 
 # token配置
 token:
@@ -242,8 +253,15 @@ feign:
       enabled: true
   okhttp:
     enabled: true
-  hystrix:
+  circuitbreaker:
     enabled: true
+
+--- # 分布式锁 lock4j 全局配置
+lock4j:
+  # 获取分布式锁超时时间，默认为 3000 毫秒
+  acquire-timeout: 3000
+  # 分布式锁的超时时间，默认为 30 毫秒
+  expire: 30000
 
 --- # 定时任务配置
 spring:

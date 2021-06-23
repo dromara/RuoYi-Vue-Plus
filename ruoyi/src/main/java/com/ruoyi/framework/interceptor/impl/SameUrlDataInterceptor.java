@@ -1,17 +1,19 @@
 package com.ruoyi.framework.interceptor.impl;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Validator;
-import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.filter.RepeatedlyRequestWrapper;
-import com.ruoyi.common.utils.http.HttpHelper;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.framework.interceptor.RepeatSubmitInterceptor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -19,9 +21,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * 判断请求url和数据是否和上一次相同，
  * 如果和上次相同，则是重复提交表单。 有效时间为10秒内。
- * 
+ *
  * @author ruoyi
  */
+@Slf4j
 @Component
 public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
 {
@@ -38,7 +41,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
 
     /**
      * 间隔时间，单位:秒 默认10秒
-     * 
+     *
      * 两次相同参数的请求，如果间隔时间大于该参数，系统不会认定为重复提交的数据
      */
     private int intervalTime = 10;
@@ -56,13 +59,17 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
         if (request instanceof RepeatedlyRequestWrapper)
         {
             RepeatedlyRequestWrapper repeatedlyRequest = (RepeatedlyRequestWrapper) request;
-            nowParams = HttpHelper.getBodyString(repeatedlyRequest);
-        }
+			try {
+				nowParams = IoUtil.readUtf8(repeatedlyRequest.getInputStream());
+			} catch (IOException e) {
+				log.warn("读取流出现问题！");
+			}
+		}
 
         // body参数为空，获取Parameter的数据
         if (Validator.isEmpty(nowParams))
         {
-            nowParams = JSONObject.toJSONString(request.getParameterMap());
+            nowParams = JsonUtils.toJsonString(request.getParameterMap());
         }
         Map<String, Object> nowDataMap = new HashMap<String, Object>();
         nowDataMap.put(REPEAT_PARAMS, nowParams);

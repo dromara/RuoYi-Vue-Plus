@@ -1,5 +1,6 @@
 package com.ruoyi.common.utils.file;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 
@@ -11,91 +12,16 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * 文件处理工具类
- * 
+ *
  * @author ruoyi
  */
-public class FileUtils extends org.apache.commons.io.FileUtils
+public class FileUtils extends FileUtil
 {
     public static String FILENAME_PATTERN = "[a-zA-Z0-9_\\-\\|\\.\\u4e00-\\u9fa5]+";
 
     /**
-     * 输出指定文件的byte数组
-     * 
-     * @param filePath 文件路径
-     * @param os 输出流
-     * @return
-     */
-    public static void writeBytes(String filePath, OutputStream os) throws IOException
-    {
-        FileInputStream fis = null;
-        try
-        {
-            File file = new File(filePath);
-            if (!file.exists())
-            {
-                throw new FileNotFoundException(filePath);
-            }
-            fis = new FileInputStream(file);
-            byte[] b = new byte[1024];
-            int length;
-            while ((length = fis.read(b)) > 0)
-            {
-                os.write(b, 0, length);
-            }
-        }
-        catch (IOException e)
-        {
-            throw e;
-        }
-        finally
-        {
-            if (os != null)
-            {
-                try
-                {
-                    os.close();
-                }
-                catch (IOException e1)
-                {
-                    e1.printStackTrace();
-                }
-            }
-            if (fis != null)
-            {
-                try
-                {
-                    fis.close();
-                }
-                catch (IOException e1)
-                {
-                    e1.printStackTrace();
-                }
-            }
-        }
-    }
-
-    /**
-     * 删除文件
-     * 
-     * @param filePath 文件
-     * @return
-     */
-    public static boolean deleteFile(String filePath)
-    {
-        boolean flag = false;
-        File file = new File(filePath);
-        // 路径为文件且不为空则进行删除
-        if (file.isFile() && file.exists())
-        {
-            file.delete();
-            flag = true;
-        }
-        return flag;
-    }
-
-    /**
      * 文件名称验证
-     * 
+     *
      * @param filename 文件名称
      * @return true 正常 false 非法
      */
@@ -130,7 +56,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     /**
      * 下载文件名重新编码
-     * 
+     *
      * @param request 请求对象
      * @param fileName 文件名
      * @return 编码后的文件名
@@ -142,7 +68,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         if (agent.contains("MSIE"))
         {
             // IE浏览器
-            filename = URLEncoder.encode(filename, "utf-8");
+            filename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString());
             filename = filename.replace("+", " ");
         }
         else if (agent.contains("Firefox"))
@@ -153,12 +79,12 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         else if (agent.contains("Chrome"))
         {
             // google浏览器
-            filename = URLEncoder.encode(filename, "utf-8");
+            filename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString());
         }
         else
         {
             // 其它浏览器
-            filename = URLEncoder.encode(filename, "utf-8");
+            filename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString());
         }
         return filename;
     }

@@ -2,10 +2,10 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.lang.Validator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.PageUtils;
@@ -30,7 +30,7 @@ import java.util.*;
  * @author ruoyi
  */
 @Service
-public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements ISysRoleService {
+public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole> implements ISysRoleService {
 
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
@@ -240,7 +240,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             list.add(rm);
         }
         if (list.size() > 0) {
-			rows = roleMenuMapper.batchRoleMenu(list);
+			rows = roleMenuMapper.insertAll(list);
         }
         return rows;
     }
@@ -261,7 +261,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             list.add(rd);
         }
         if (list.size() > 0) {
-			rows = roleDeptMapper.batchRoleDept(list);
+			rows = roleDeptMapper.insertAll(list);
         }
         return rows;
     }

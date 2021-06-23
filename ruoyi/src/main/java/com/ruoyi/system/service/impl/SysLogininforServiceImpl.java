@@ -3,7 +3,7 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.domain.SysLogininfor;
@@ -22,7 +22,7 @@ import java.util.Map;
  * @author ruoyi
  */
 @Service
-public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, SysLogininfor> implements ISysLogininforService {
+public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMapper, SysLogininfor> implements ISysLogininforService {
 
     @Override
     public TableDataInfo<SysLogininfor> selectPageLogininforList(SysLogininfor logininfor) {
@@ -36,9 +36,8 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
                         params.get("beginTime"))
                 .apply(Validator.isNotEmpty(params.get("endTime")),
                         "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
-                        params.get("endTime"))
-                .orderByDesc(SysLogininfor::getInfoId);
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+                        params.get("endTime"));
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage("info_id","desc"), lqw));
     }
 
     /**

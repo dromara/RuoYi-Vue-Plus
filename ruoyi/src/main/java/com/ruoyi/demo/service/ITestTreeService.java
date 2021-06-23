@@ -1,6 +1,6 @@
 package com.ruoyi.demo.service;
 
-import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.demo.bo.TestTreeAddBo;
 import com.ruoyi.demo.bo.TestTreeEditBo;
 import com.ruoyi.demo.bo.TestTreeQueryBo;

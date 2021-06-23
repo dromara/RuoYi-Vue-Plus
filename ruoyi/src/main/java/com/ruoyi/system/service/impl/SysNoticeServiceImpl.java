@@ -2,7 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.domain.SysNotice;
@@ -19,7 +19,7 @@ import java.util.List;
  * @author ruoyi
  */
 @Service
-public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice> implements ISysNoticeService {
+public class SysNoticeServiceImpl extends ServicePlusImpl<SysNoticeMapper, SysNotice> implements ISysNoticeService {
 
     @Override
     public TableDataInfo<SysNotice> selectPageNoticeList(SysNotice notice) {

@@ -4,8 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.annotation.DataScope;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.demo.bo.TestTreeAddBo;
 import com.ruoyi.demo.bo.TestTreeEditBo;
 import com.ruoyi.demo.bo.TestTreeQueryBo;
@@ -26,13 +26,14 @@ import java.util.Map;
  * @date 2021-05-30
  */
 @Service
-public class TestTreeServiceImpl extends ServiceImpl<TestTreeMapper, TestTree> implements ITestTreeService {
+public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTree> implements ITestTreeService {
 
 	@Override
 	public TestTreeVo queryById(Long id) {
 		return getVoById(id, TestTreeVo.class);
 	}
 
+//	@DataSource(DataSourceType.SLAVE) // 切换从库查询
 	@DataScope(isUser = true)
 	@Override
 	public List<TestTreeVo> queryList(TestTreeQueryBo bo) {

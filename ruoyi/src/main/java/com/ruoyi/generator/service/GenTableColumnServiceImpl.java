@@ -1,7 +1,7 @@
 package com.ruoyi.generator.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.generator.domain.GenTableColumn;
 import com.ruoyi.generator.mapper.GenTableColumnMapper;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.List;
  * @author ruoyi
  */
 @Service
-public class GenTableColumnServiceImpl extends ServiceImpl<GenTableColumnMapper, GenTableColumn> implements IGenTableColumnService {
+public class GenTableColumnServiceImpl extends ServicePlusImpl<GenTableColumnMapper, GenTableColumn> implements IGenTableColumnService {
 
     /**
      * 查询业务字段列表

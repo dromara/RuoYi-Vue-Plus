@@ -128,6 +128,11 @@ public class Constants
     public static final String RESOURCE_PREFIX = "/profile";
 
 	/**
+	 * RMI 远程方法调用
+	 */
+	public static final String LOOKUP_RMI = "rmi://";
+
+	/**
 	 * 资源映射路径 前缀
 	 */
 	public static final String REDIS_LOCK_KEY = "redis_lock:";

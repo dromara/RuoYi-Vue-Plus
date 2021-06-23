@@ -1,6 +1,6 @@
 package com.ruoyi.generator.service;
 
-import com.ruoyi.common.core.page.IServicePlus;
+import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.generator.domain.GenTableColumn;
 
 import java.util.List;

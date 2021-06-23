@@ -29,9 +29,6 @@ public class ResourcesConfig implements WebMvcConfigurer
     {
         /** 本地文件上传路径 */
         registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**").addResourceLocations("file:" + RuoYiConfig.getProfile() + "/");
-
-        /** swagger配置 */
-        registry.addResourceHandler("/swagger-ui/**").addResourceLocations("classpath:/META-INF/resources/webjars/springfox-swagger-ui/");
     }
 
     /**
@@ -53,7 +50,7 @@ public class ResourcesConfig implements WebMvcConfigurer
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         // 设置访问源地址
-        config.addAllowedOrigin("*");
+		config.addAllowedOriginPattern("*");
         // 设置访问源请求头
         config.addAllowedHeader("*");
         // 设置访问源请求方法

@@ -2,16 +2,14 @@ package com.ruoyi.framework.aspectj;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.BusinessStatus;
 import com.ruoyi.common.enums.HttpMethod;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.framework.manager.AsyncManager;
-import com.ruoyi.framework.manager.factory.AsyncFactory;
+import com.ruoyi.framework.web.service.AsyncService;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.domain.SysOperLog;
 import org.aspectj.lang.JoinPoint;
@@ -32,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -93,10 +90,10 @@ public class LogAspect
             SysOperLog operLog = new SysOperLog();
             operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
             // 请求的地址
-            String ip = IpUtils.getIpAddr(ServletUtils.getRequest());
+            String ip = ServletUtils.getClientIP();
             operLog.setOperIp(ip);
             // 返回参数
-            operLog.setJsonResult(JSON.toJSONString(jsonResult));
+            operLog.setJsonResult(JsonUtils.toJsonString(jsonResult));
 
             operLog.setOperUrl(ServletUtils.getRequest().getRequestURI());
             if (loginUser != null)
@@ -118,7 +115,7 @@ public class LogAspect
             // 处理设置注解上的参数
             getControllerMethodDescription(joinPoint, controllerLog, operLog);
             // 保存数据库
-            AsyncManager.me().execute(AsyncFactory.recordOper(operLog));
+			SpringUtils.getBean(AsyncService.class).recordOper(operLog);
         }
         catch (Exception exp)
         {
@@ -194,19 +191,16 @@ public class LogAspect
      */
     private String argsArrayToString(Object[] paramsArray)
     {
-        String params = "";
+        StringBuilder params = new StringBuilder();
         if (paramsArray != null && paramsArray.length > 0)
         {
-            for (int i = 0; i < paramsArray.length; i++)
-            {
-                if (Validator.isNotNull(paramsArray[i]) && !isFilterObject(paramsArray[i]))
-                {
-                    Object jsonObj = JSON.toJSON(paramsArray[i]);
-                    params += jsonObj.toString() + " ";
-                }
-            }
+			for (Object o : paramsArray) {
+				if (Validator.isNotNull(o) && !isFilterObject(o)) {
+					params.append(JsonUtils.toJsonString(o)).append(" ");
+				}
+			}
         }
-        return params.trim();
+        return params.toString().trim();
     }
 
     /**
@@ -226,19 +220,17 @@ public class LogAspect
         else if (Collection.class.isAssignableFrom(clazz))
         {
             Collection collection = (Collection) o;
-            for (Iterator iter = collection.iterator(); iter.hasNext();)
-            {
-                return iter.next() instanceof MultipartFile;
-            }
+			for (Object value : collection) {
+				return value instanceof MultipartFile;
+			}
         }
         else if (Map.class.isAssignableFrom(clazz))
         {
             Map map = (Map) o;
-            for (Iterator iter = map.entrySet().iterator(); iter.hasNext();)
-            {
-                Map.Entry entry = (Map.Entry) iter.next();
-                return entry.getValue() instanceof MultipartFile;
-            }
+			for (Object value : map.entrySet()) {
+				Map.Entry entry = (Map.Entry) value;
+				return entry.getValue() instanceof MultipartFile;
+			}
         }
         return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse
                 || o instanceof BindingResult;

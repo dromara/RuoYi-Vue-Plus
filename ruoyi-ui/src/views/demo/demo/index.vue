@@ -19,15 +19,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="版本" prop="version">
-        <el-input
-          v-model="queryParams.version"
-          placeholder="请输入版本"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
           v-model="daterangeCreateTime"
@@ -39,33 +30,6 @@
           start-placeholder="开始日期"
           end-placeholder="结束日期"
         ></el-date-picker>
-      </el-form-item>
-      <el-form-item label="删除标志" prop="deleted">
-        <el-input
-          v-model="queryParams.deleted"
-          placeholder="请输入删除标志"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="父id" prop="parentId">
-        <el-input
-          v-model="queryParams.parentId"
-          placeholder="请输入父id"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="排序号" prop="orderNum">
-        <el-input
-          v-model="queryParams.orderNum"
-          placeholder="请输入排序号"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -81,7 +45,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['demo:test:add']"
+          v-hasPermi="['demo:demo:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -92,7 +56,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['demo:test:edit']"
+          v-hasPermi="['demo:demo:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -103,7 +67,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['demo:test:remove']"
+          v-hasPermi="['demo:demo:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -112,27 +76,34 @@
           plain
           icon="el-icon-download"
           size="mini"
+          :loading="exportLoading"
           @click="handleExport"
-          v-hasPermi="['demo:test:export']"
+          v-hasPermi="['demo:demo:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="testList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="demoList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="主键" align="center" prop="id" v-if="false"/>
+      <el-table-column label="部门id" align="center" prop="deptId" />
+      <el-table-column label="用户id" align="center" prop="userId" />
+      <el-table-column label="排序号" align="center" prop="orderNum" />
       <el-table-column label="key键" align="center" prop="testKey" />
       <el-table-column label="值" align="center" prop="value" />
-      <el-table-column label="版本" align="center" prop="version" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="删除标志" align="center" prop="deleted" />
-      <el-table-column label="父id" align="center" prop="parentId" />
-      <el-table-column label="排序号" align="center" prop="orderNum" />
+      <el-table-column label="创建人" align="center" prop="createBy" />
+      <el-table-column label="更新时间" align="center" prop="updateTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="更新人" align="center" prop="updateBy" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -140,19 +111,19 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['demo:test:edit']"
+            v-hasPermi="['demo:demo:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['demo:test:remove']"
+            v-hasPermi="['demo:demo:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -161,30 +132,35 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改测试对话框 -->
+    <!-- 添加或修改测试单表对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="部门id" prop="deptId">
+          <el-input v-model="form.deptId" placeholder="请输入部门id" />
+        </el-form-item>
+        <el-form-item label="用户id" prop="userId">
+          <el-input v-model="form.userId" placeholder="请输入用户id" />
+        </el-form-item>
+        <el-form-item label="排序号" prop="orderNum">
+          <el-input v-model="form.orderNum" placeholder="请输入排序号" />
+        </el-form-item>
         <el-form-item label="key键" prop="testKey">
           <el-input v-model="form.testKey" placeholder="请输入key键" />
         </el-form-item>
         <el-form-item label="值" prop="value">
           <el-input v-model="form.value" placeholder="请输入值" />
         </el-form-item>
-        <el-form-item label="版本" prop="version">
-          <el-input v-model="form.version" placeholder="请输入版本" />
-        </el-form-item>
-        <el-form-item label="删除标志" prop="deleted">
-          <el-input v-model="form.deleted" placeholder="请输入删除标志" />
-        </el-form-item>
-        <el-form-item label="父id" prop="parentId">
-          <el-input v-model="form.parentId" placeholder="请输入父id" />
-        </el-form-item>
-        <el-form-item label="排序号" prop="orderNum">
-          <el-input v-model="form.orderNum" placeholder="请输入排序号" />
+        <el-form-item label="创建时间" prop="createTime">
+          <el-date-picker clearable size="small"
+                          v-model="form.createTime"
+                          type="datetime"
+                          value-format="yyyy-MM-dd HH:mm:ss"
+                          placeholder="选择创建时间">
+          </el-date-picker>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button :loading="buttonLoading" type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -192,16 +168,20 @@
 </template>
 
 <script>
-import { listTest, getTest, delTest, addTest, updateTest, exportTest } from "@/api/demo/test";
+import { listDemo, getDemo, delDemo, addDemo, updateDemo, exportDemo } from "@/api/demo/demo";
 
 export default {
-  name: "Test",
+  name: "Demo",
   components: {
   },
   data() {
     return {
+      //按钮loading
+      buttonLoading: false,
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -212,8 +192,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 测试表格数据
-      testList: [],
+      // 测试单表表格数据
+      demoList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -226,16 +206,18 @@ export default {
         pageSize: 10,
         testKey: undefined,
         value: undefined,
-        version: undefined,
         createTime: undefined,
-        deleted: undefined,
-        parentId: undefined,
-        orderNum: undefined
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
+        testKey: [
+          { required: true, message: "key键不能为空", trigger: "blur" }
+        ],
+        value: [
+          { required: true, message: "值不能为空", trigger: "blur" }
+        ],
       }
     };
   },
@@ -243,7 +225,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询测试列表 */
+    /** 查询测试单表列表 */
     getList() {
       this.loading = true;
       this.queryParams.params = {};
@@ -251,8 +233,8 @@ export default {
         this.queryParams.params["beginCreateTime"] = this.daterangeCreateTime[0];
         this.queryParams.params["endCreateTime"] = this.daterangeCreateTime[1];
       }
-      listTest(this.queryParams).then(response => {
-        this.testList = response.rows;
+      listDemo(this.queryParams).then(response => {
+        this.demoList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -266,13 +248,17 @@ export default {
     reset() {
       this.form = {
         id: undefined,
+        deptId: undefined,
+        userId: undefined,
+        orderNum: undefined,
         testKey: undefined,
         value: undefined,
         version: undefined,
         createTime: undefined,
-        deleted: undefined,
-        parentId: undefined,
-        orderNum: undefined
+        createBy: undefined,
+        updateTime: undefined,
+        updateBy: undefined,
+        delFlag: undefined
       };
       this.resetForm("form");
     },
@@ -297,30 +283,35 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加测试";
+      this.title = "添加测试单表";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
+      this.loading = true;
       this.reset();
       const id = row.id || this.ids
-      getTest(id).then(response => {
+      getDemo(id).then(response => {
+        this.loading = false;
         this.form = response.data;
         this.open = true;
-        this.title = "修改测试";
+        this.title = "修改测试单表";
       });
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          this.buttonLoading = true;
           if (this.form.id != null) {
-            updateTest(this.form).then(response => {
+            updateDemo(this.form).then(response => {
+              this.buttonLoading = false;
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addTest(this.form).then(response => {
+            addDemo(this.form).then(response => {
+              this.buttonLoading = false;
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -332,29 +323,33 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除测试编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delTest(ids);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
+      this.$confirm('是否确认删除测试单表编号为"' + ids + '"的数据项?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.loading = true;
+        return delDemo(ids);
+      }).then(() => {
+        this.loading = false;
+        this.getList();
+        this.msgSuccess("删除成功");
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有测试数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportTest(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-        })
+      this.$confirm('是否确认导出所有测试单表数据项?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.exportLoading = true;
+        return exportDemo(queryParams);
+      }).then(response => {
+        this.download(response.msg);
+        this.exportLoading = false;
+      })
     }
   }
 };

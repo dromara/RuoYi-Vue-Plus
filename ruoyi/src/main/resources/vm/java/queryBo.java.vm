@@ -50,9 +50,6 @@ public class ${ClassName}QueryBo extends ${Entity} {
 #foreach ($column in $columns)
 #if(!$table.isSuperColumn($column.javaField) && $column.query)
 	/** $column.columnComment */
-#if($column.javaType == 'Date')
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-#end
 	@ApiModelProperty("$column.columnComment")
 	private $column.javaType $column.javaField;
 #end

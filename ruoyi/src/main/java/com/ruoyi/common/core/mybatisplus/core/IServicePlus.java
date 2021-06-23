@@ -1,9 +1,10 @@
-package com.ruoyi.common.core.page;
+package com.ruoyi.common.core.mybatisplus.core;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.page.PagePlus;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -182,7 +183,6 @@ public interface IServicePlus<T> extends IService<T> {
      *
      * @param page         翻页对象
      * @param queryWrapper 实体对象封装操作类
-     * @param kClass       vo类型
      */
     default <K> PagePlus<T, K> pageVo(PagePlus<T, K> page, Wrapper<T> queryWrapper, Class<K> kClass) {
         PagePlus<T, K> result = getBaseMapper().selectPage(page, queryWrapper);
@@ -210,7 +210,6 @@ public interface IServicePlus<T> extends IService<T> {
      * 无条件翻页查询
      *
      * @param page   翻页对象
-     * @param kClass vo类型
      */
     default <K> PagePlus<T, K> pageVo(PagePlus<T, K> page, Class<K> kClass) {
         return pageVo(page, Wrappers.emptyWrapper(), kClass);
@@ -226,5 +225,21 @@ public interface IServicePlus<T> extends IService<T> {
         return pageVo(page, Wrappers.emptyWrapper(), convertor);
     }
 
+	@Override
+	default boolean saveBatch(Collection<T> entityList) {
+		return saveBatch(entityList, DEFAULT_BATCH_SIZE);
+	}
+
+	@Override
+	default boolean saveOrUpdateBatch(Collection<T> entityList) {
+		return saveOrUpdateBatch(entityList, DEFAULT_BATCH_SIZE);
+	}
+
+	@Override
+	default boolean updateBatchById(Collection<T> entityList) {
+		return updateBatchById(entityList, DEFAULT_BATCH_SIZE);
+	}
+
+	boolean saveAll(Collection<T> entityList);
 }
 

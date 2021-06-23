@@ -1,4 +1,4 @@
-package com.ruoyi.common.core.mybatisplus;
+package com.ruoyi.common.core.mybatisplus.cache;
 
 import cn.hutool.extra.spring.SpringUtil;
 import com.ruoyi.common.core.redis.RedisCache;

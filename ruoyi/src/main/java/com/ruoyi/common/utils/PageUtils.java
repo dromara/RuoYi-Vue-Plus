@@ -70,20 +70,31 @@ public class PageUtils {
         return page;
     }
 
+	public static <T> Page<T> buildPage() {
+		return buildPage(null, null);
+	}
+
     /**
      * 构建 MP 普通分页对象
      * @param <T> domain 实体
      * @return 分页对象
      */
-    public static <T> Page<T> buildPage() {
+    public static <T> Page<T> buildPage(String defaultOrderByColumn, String defaultIsAsc) {
         Integer pageNum = ServletUtils.getParameterToInt(PAGE_NUM, DEFAULT_PAGE_NUM);
         Integer pageSize = ServletUtils.getParameterToInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
-        String orderByColumn = ServletUtils.getParameter(ORDER_BY_COLUMN);
-        String isAsc = ServletUtils.getParameter(IS_ASC);
+        String orderByColumn = ServletUtils.getParameter(ORDER_BY_COLUMN, defaultOrderByColumn);
+        String isAsc = ServletUtils.getParameter(IS_ASC, defaultIsAsc);
+		// 兼容前端排序类型
+		if ("ascending".equals(isAsc)) {
+			isAsc = "asc";
+		} else if ("descending".equals(isAsc)) {
+			isAsc = "desc";
+		}
         Page<T> page = new Page<>(pageNum, pageSize);
         if (StrUtil.isNotBlank(orderByColumn)) {
             String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
-            if ("asc".equals(isAsc)) {
+			orderBy = StrUtil.toUnderlineCase(orderBy);
+			if ("asc".equals(isAsc)) {
                 page.addOrder(OrderItem.asc(orderBy));
             } else if ("desc".equals(isAsc)) {
                 page.addOrder(OrderItem.desc(orderBy));
