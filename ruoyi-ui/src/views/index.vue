@@ -19,6 +19,9 @@
           * 校验框架 validation 增强接口安全性 严谨性<br/>
           * 文档框架 knife4j 美化接口文档<br/>
           * 代码生成器 一键生成前后端代码<br/>
+          * 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构<br/>
+          * Redis客户端 采用 Redisson 性能更强<br/>
+          * 分布式锁 Lock4j 注解锁、工具锁 多种多样<br/>
         </p>
         <p>
           <b>当前版本:</b> <span>v{{ version }}</span>
@@ -34,6 +37,14 @@
             plain
             @click="goTarget('https://gitee.com/JavaLionLi/RuoYi-Vue-Plus')"
             >访问码云</el-button
+          >
+          <el-button
+            type="primary"
+            size="mini"
+            icon="el-icon-cloudy"
+            plain
+            @click="goTarget('https://github.com/JavaLionLi/RuoYi-Vue-Plus')"
+          >访问GitHub</el-button
           >
         </p>
       </el-col>
@@ -80,6 +91,27 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.4.0 - 2021-6-24">
+              <ol>
+                <li>update springboot 2.3.11 => 2.4.7</li>
+                <li>update springboot-admin 2.3.1 => 2.4.1</li>
+                <li>update feign 2.2.6 => 3.0.3</li>
+                <li>update hutool 5.6.7 => 5.7.2</li>
+                <li>update 多数据源替换成dynamic-datasource</li>
+                <li>update 适配 jdk11</li>
+                <li>update 集成 Lock4j 分布式锁</li>
+                <li>update 移除 fastjson 增加 jackson 工具类 重写相关业务</li>
+                <li>update 优化 异步工厂重写 使用 spring 异步处理</li>
+                <li>update 全局挂载字典标签组件</li>
+                <li>update 日志列表支持排序操作</li>
+                <li>update 更新 feign demo 更清晰的用法</li>
+                <li>update 更新多数据源演示案例</li>
+                <li>add 增加 ServicePlusImpl 自动以实现类 重写移除事务注解方法 防止多数据源失效</li>
+                <li>add 增加 自定义 批量insert方法</li>
+                <li>add 增加 Swagger3 用法示例</li>
+                <li>fix 修复地址ip地址特殊回环问题</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.3.2 - 2021-6-11">
               <ol>
                 <li>add redis锁工具类编写</li>
