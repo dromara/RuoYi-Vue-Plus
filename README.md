@@ -33,7 +33,7 @@
 使用框架前请仔细阅读文档重点注意事项
 <br>
 >[初始化项目 必看](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/关于初始化项目?sort_id=4164117)
-<br>
+> 
 >[参考文档 Wiki](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)
 
 ## 提问四部曲
