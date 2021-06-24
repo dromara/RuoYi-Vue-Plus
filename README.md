@@ -1,8 +1,12 @@
 ## 平台简介
 [![码云Gitee](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
+[![GitHub](https://img.shields.io/github/stars/JavaLionLi/RuoYi-Vue-Plus.svg?style=social&label=Stars)](https://github.com/JavaLionLi/RuoYi-Vue-Plus)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/blob/master/LICENSE)
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
-[![JDK-8+](https://img.shields.io/badge/JDK-8-green.svg)]()
+<br>
+[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-2.3.2-success.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.4-blue.svg)]()
+[![JDK-8+](https://img.shields.io/badge/JDK-8+-green.svg)]()
 [![JDK-11](https://img.shields.io/badge/JDK-11-green.svg)]()
 
 基于 RuoYi-Vue 集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 定期与 RuoYi-Vue 同步
@@ -26,7 +30,10 @@
 
 ## 参考文档
 
-使用框架前请仔细阅读文档重点注意事项  
+使用框架前请仔细阅读文档重点注意事项
+<br>
+[初始化项目 必看](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/关于初始化项目?sort_id=4164117)
+<br>
 [参考文档 Wiki](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)
 
 ## 修改RuoYi功能
@@ -57,13 +64,13 @@
 * 项目修改为 maven多环境配置
 * 项目配置修改为 application.yml 统一管理
 * 数据权限修改为 适配支持单表、多表
-* 使用 redisson 实现分布式锁注解与工具类
 * 使用 redisson 实现 spring-cache 整合
 * 增加 mybatis-plus 二级缓存 redis 存储
 
 ### 其他
 
 * 同步升级 RuoYi-Vue 3.5.0
+* GitHub 地址 [RuoYi-Vue-Plus-github](https://github.com/JavaLionLi/RuoYi-Vue-Plus)
 * 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
 * Oracle 模块 oracle 分支 [RuoYi-Vue-Plus-oracle](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/oracle/)
 
