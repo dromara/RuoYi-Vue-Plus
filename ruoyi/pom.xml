@@ -13,7 +13,7 @@
     <description>RuoYi-Vue-Plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>2.3.2</ruoyi-vue-plus.version>
+        <ruoyi-vue-plus.version>2.4.0</ruoyi-vue-plus.version>
         <spring-boot.version>2.4.7</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
