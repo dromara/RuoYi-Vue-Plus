@@ -95,9 +95,8 @@
 * 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
 * Oracle 模块 oracle 分支 [RuoYi-Vue-Plus-oracle](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/oracle/)
 
-## 关注作者(扫码请备注: "加群")
-
-![作者图片](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
+## 扫码加群 一起交流
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0625/160026_11d949aa_1766278.jpeg "07f7121fab14e57e03e5f6a35eff6ce.jpg")
 
 ## 捐献作者
 作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  
