@@ -110,6 +110,7 @@ token:
 # MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:
+  # 不支持多包, 如有需要请在注解配置
   mapperPackage: com.ruoyi.**.mapper
   # 对应的 XML 文件位置
   mapperLocations: classpath*:mapper/**/*Mapper.xml
@@ -244,6 +245,7 @@ thread-pool:
 
 # feign 相关配置
 feign:
+  # 不支持多包, 如有需要请在注解配置
   package: com.ruoyi.**.feign
   # 开启压缩
   compression:
