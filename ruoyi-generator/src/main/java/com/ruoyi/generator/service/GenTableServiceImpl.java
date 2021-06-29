@@ -258,7 +258,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         // 获取模板列表
         List<String> templates = VelocityUtils.getTemplateList(table.getTplCategory());
         for (String template : templates) {
-            if (!StrUtil.containsAny(template, "sql.vm", "api.js.vm", "index.vue.vm", "index-tree.vue.vm")) {
+            if (!StrUtil.containsAny("sql.vm", "api.js.vm", "index.vue.vm", "index-tree.vue.vm", template)) {
                 // 渲染模板
                 StringWriter sw = new StringWriter();
                 Template tpl = Velocity.getTemplate(template, Constants.UTF8);
