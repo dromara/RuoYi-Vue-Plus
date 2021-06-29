@@ -110,7 +110,8 @@ token:
 # MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:
-  # 不支持多包, 如有需要请在注解配置
+  # 不支持多包, 如有需要可在注解配置 或 提升扫包等级
+  # 例如 com.**.**.mapper
   mapperPackage: com.ruoyi.**.mapper
   # 对应的 XML 文件位置
   mapperLocations: classpath*:mapper/**/*Mapper.xml
@@ -158,6 +159,8 @@ mybatis-plus:
     localCacheScope: SESSION
     # 开启Mybatis二级缓存，默认为 true
     cacheEnabled: true
+    # 更详细的日志输出 会有性能损耗
+    # logImpl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     # 是否打印 Logo banner
     banner: true
@@ -245,7 +248,8 @@ thread-pool:
 
 # feign 相关配置
 feign:
-  # 不支持多包, 如有需要请在注解配置
+  # 不支持多包, 如有需要可在注解配置 或 提升扫包等级
+  # 例如 com.**.**.feign
   package: com.ruoyi.**.feign
   # 开启压缩
   compression:
