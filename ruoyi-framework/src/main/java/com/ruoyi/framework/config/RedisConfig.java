@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -78,8 +79,13 @@ public class RedisConfig extends CachingConfigurerSupport {
 	 */
 	@Bean
 	public CacheManager cacheManager(RedissonClient redissonClient) {
+		List<RedissonProperties.CacheGroup> cacheGroup = redissonProperties.getCacheGroup();
 		Map<String, CacheConfig> config = new HashMap<>();
-		config.put("redissonCacheMap", new CacheConfig(30*60*1000, 10*60*1000));
+		for (RedissonProperties.CacheGroup group : cacheGroup) {
+			CacheConfig cacheConfig = new CacheConfig(group.getTtl(), group.getMaxIdleTime());
+			cacheConfig.setMaxSize(group.getMaxSize());
+			config.put(group.getGroupId(), cacheConfig);
+		}
 		return new RedissonSpringCacheManager(redissonClient, config, JsonJacksonCodec.INSTANCE);
 	}
 

@@ -262,6 +262,21 @@ feign:
   circuitbreaker:
     enabled: true
 
+--- # redisson 缓存配置
+redisson:
+  cacheGroup:
+    # 用例: @Cacheable(cacheNames="groupId", key="#XXX") 方可使用缓存组配置
+    - groupId: redissonCacheMap
+      # 组过期时间(脚本监控)
+      ttl: 60000
+      # 组最大空闲时间(脚本监控)
+      maxIdleTime: 60000
+      # 组最大长度
+      maxSize: 0
+    - groupId: testCache
+      ttl: 1000
+      maxIdleTime: 500
+
 --- # 分布式锁 lock4j 全局配置
 lock4j:
   # 获取分布式锁超时时间，默认为 3000 毫秒

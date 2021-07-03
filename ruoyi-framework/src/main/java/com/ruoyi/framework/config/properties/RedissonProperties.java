@@ -2,10 +2,11 @@ package com.ruoyi.framework.config.properties;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.redisson.client.codec.Codec;
 import org.redisson.config.TransportMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Redisson 配置属性
@@ -36,6 +37,11 @@ public class RedissonProperties {
 	 * 单机服务配置
 	 */
 	private SingleServerConfig singleServerConfig;
+
+	/**
+	 * 缓存组
+	 */
+	private List<CacheGroup> cacheGroup;
 
 	@Data
 	@NoArgsConstructor
@@ -95,6 +101,32 @@ public class RedissonProperties {
 		 * DNS监测时间间隔，单位：毫秒
 		 */
 		private int dnsMonitoringInterval;
+
+	}
+
+	@Data
+	@NoArgsConstructor
+	public static class CacheGroup {
+
+		/**
+		 * 组id
+		 */
+		private String groupId;
+
+		/**
+		 * 组过期时间
+		 */
+		private long ttl;
+
+		/**
+		 * 组最大空闲时间
+		 */
+		private long maxIdleTime;
+
+		/**
+		 * 组最大长度
+		 */
+		private int maxSize;
 
 	}
 
