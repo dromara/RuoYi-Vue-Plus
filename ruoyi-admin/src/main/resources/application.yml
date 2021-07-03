@@ -158,7 +158,7 @@ mybatis-plus:
     # STATEMENT 关闭一级缓存
     localCacheScope: SESSION
     # 开启Mybatis二级缓存，默认为 true
-    cacheEnabled: true
+    cacheEnabled: false
     # 更详细的日志输出 会有性能损耗
     # logImpl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
