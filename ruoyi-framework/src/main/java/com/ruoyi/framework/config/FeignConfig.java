@@ -54,4 +54,40 @@ public class FeignConfig {
         return new Retryer.Default();
     }
 
+//	/**
+//	 * 自定义异常解码器
+//	 * 用于自定义返回体异常熔断
+//	 */
+//	@Bean
+//	public ErrorDecoder errorDecoder() {
+//		return new CustomErrorDecoder();
+//	}
+//
+//
+//	/**
+//	 * 自定义返回体解码器
+//	 */
+//	@Slf4j
+//	public static class CustomErrorDecoder implements ErrorDecoder {
+//
+//		@Override
+//		public Exception decode(String methodKey, Response response) {
+//			Exception exception = null;
+//			try {
+//				// 获取原始的返回内容
+//				String json = JsonUtils.toJsonString(response.body().asReader(StandardCharsets.UTF_8));
+//				exception = new RuntimeException(json);
+//				// 将返回内容反序列化为Result，这里应根据自身项目作修改
+//				AjaxResult result = JsonUtils.parseObject(json, AjaxResult.class);
+//				// 业务异常抛出简单的 RuntimeException，保留原来错误信息
+//				if (result.getCode() != 200) {
+//					exception = new RuntimeException(result.getMsg());
+//				}
+//			} catch (IOException e) {
+//				log.error(e.getMessage(), e);
+//			}
+//			return exception;
+//		}
+//	}
+
 }
