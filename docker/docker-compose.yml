@@ -84,7 +84,8 @@ services:
     privileged: true
     restart: always
     networks:
-    - ruoyi_net
+      ruoyi_net:
+        ipv4_address: 172.30.0.60
 
 networks:
   ruoyi_net:
