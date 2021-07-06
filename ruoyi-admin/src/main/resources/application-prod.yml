@@ -12,7 +12,7 @@ spring:
         # 主库数据源
         master:
           driverClassName: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
+          url: jdbc:mysql://172.30.0.36:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
           username: root
           password: root
         # 从库数据源
@@ -66,7 +66,7 @@ spring:
   # redis 配置
   redis:
     # 地址
-    host: localhost
+    host: 172.30.0.48
     # 端口，默认为6379
     port: 6379
     # 数据库索引

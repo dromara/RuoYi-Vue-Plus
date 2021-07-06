@@ -57,7 +57,7 @@ services:
       - ruoyi_net
 
   redis:
-    image: redis:6.0.9
+    image: redis:6.2.1
     container_name: redis
     ports:
       - 6379:6379
