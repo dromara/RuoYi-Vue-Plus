@@ -148,6 +148,10 @@ public class SysUser implements Serializable
     @TableField(exist = false)
     private Long[] postIds;
 
+	/** 角色ID */
+	@TableField(exist = false)
+	private Long roleId;
+
     public SysUser(Long userId)
     {
         this.userId = userId;
