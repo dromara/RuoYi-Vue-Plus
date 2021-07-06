@@ -76,10 +76,9 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser> 
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
-    public List<SysUser> selectAllocatedList(SysUser user)
-    {
-        return userMapper.selectAllocatedList(user);
+    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
+    public TableDataInfo<SysUser> selectAllocatedList(SysUser user) {
+		return PageUtils.buildDataInfo(baseMapper.selectAllocatedList(PageUtils.buildPage(), user));
     }
 
     /**
@@ -89,10 +88,9 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser> 
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
-    public List<SysUser> selectUnallocatedList(SysUser user)
-    {
-        return userMapper.selectUnallocatedList(user);
+    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
+    public TableDataInfo<SysUser> selectUnallocatedList(SysUser user) {
+		return PageUtils.buildDataInfo(baseMapper.selectUnallocatedList(PageUtils.buildPage(), user));
     }
 
     /**
@@ -266,7 +264,8 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser> 
     @Override
     public void insertUserAuth(Long userId, Long[] roleIds)
     {
-        userRoleMapper.deleteUserRoleByUserId(userId);
+        userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
+			.eq(SysUserRole::getUserId, userId));
         insertUserRole(userId, roleIds);
     }
 
@@ -383,22 +382,18 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser> 
      * @param userId 用户ID
      * @param roleIds 角色组
      */
-    public void insertUserRole(Long userId, Long[] roleIds)
-    {
-        if (StringUtils.isNotNull(roleIds))
-        {
+    public void insertUserRole(Long userId, Long[] roleIds) {
+        if (Validator.isNotNull(roleIds)) {
             // 新增用户与角色管理
             List<SysUserRole> list = new ArrayList<SysUserRole>();
-            for (Long roleId : roleIds)
-            {
+            for (Long roleId : roleIds) {
                 SysUserRole ur = new SysUserRole();
                 ur.setUserId(userId);
                 ur.setRoleId(roleId);
                 list.add(ur);
             }
-            if (list.size() > 0)
-            {
-                userRoleMapper.batchUserRole(list);
+            if (list.size() > 0) {
+                userRoleMapper.insertAll(list);
             }
         }
     }

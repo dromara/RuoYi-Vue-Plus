@@ -66,16 +66,12 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole> 
      * @return 角色列表
      */
     @Override
-    public List<SysRole> selectRolesByUserId(Long userId)
-    {
-        List<SysRole> userRoles = roleMapper.selectRolePermissionByUserId(userId);
+    public List<SysRole> selectRolesByUserId(Long userId) {
+        List<SysRole> userRoles = baseMapper.selectRolePermissionByUserId(userId);
         List<SysRole> roles = selectRoleAll();
-        for (SysRole role : roles)
-        {
-            for (SysRole userRole : userRoles)
-            {
-                if (role.getRoleId().longValue() == userRole.getRoleId().longValue())
-                {
+        for (SysRole role : roles) {
+            for (SysRole userRole : userRoles) {
+                if (role.getRoleId().longValue() == userRole.getRoleId().longValue()) {
                     role.setFlag(true);
                     break;
                 }
@@ -338,9 +334,10 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole> 
      * @return 结果
      */
     @Override
-    public int deleteAuthUser(SysUserRole userRole)
-    {
-        return userRoleMapper.deleteUserRoleInfo(userRole);
+    public int deleteAuthUser(SysUserRole userRole) {
+        return userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
+			.eq(SysUserRole::getRoleId, userRole.getRoleId())
+			.eq(SysUserRole::getUserId, userRole.getUserId()));
     }
 
     /**
@@ -351,9 +348,10 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole> 
      * @return 结果
      */
     @Override
-    public int deleteAuthUsers(Long roleId, Long[] userIds)
-    {
-        return userRoleMapper.deleteUserRoleInfos(roleId, userIds);
+    public int deleteAuthUsers(Long roleId, Long[] userIds) {
+		return userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
+			.eq(SysUserRole::getRoleId, roleId)
+			.in(SysUserRole::getUserId, Arrays.asList(userIds)));
     }
 
     /**
@@ -364,17 +362,15 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole> 
      * @return 结果
      */
     @Override
-    public int insertAuthUsers(Long roleId, Long[] userIds)
-    {
+    public int insertAuthUsers(Long roleId, Long[] userIds) {
         // 新增用户与角色管理
         List<SysUserRole> list = new ArrayList<SysUserRole>();
-        for (Long userId : userIds)
-        {
+        for (Long userId : userIds) {
             SysUserRole ur = new SysUserRole();
             ur.setUserId(userId);
             ur.setRoleId(roleId);
             list.add(ur);
         }
-        return userRoleMapper.batchUserRole(list);
+        return userRoleMapper.insertAll(list);
     }
 }

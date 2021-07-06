@@ -148,16 +148,16 @@
              left join sys_dept d on u.dept_id = d.dept_id
              left join sys_user_role ur on u.user_id = ur.user_id
              left join sys_role r on r.role_id = ur.role_id
-        where u.del_flag = '0' and r.role_id = #{roleId}
-        <if test="userName != null and userName != ''">
-            AND u.user_name like concat('%', #{userName}, '%')
+        where u.del_flag = '0' and r.role_id = #{user.roleId}
+        <if test="user.userName != null and user.userName != ''">
+            AND u.user_name like concat('%', #{user.userName}, '%')
         </if>
-        <if test="phonenumber != null and phonenumber != ''">
-            AND u.phonenumber like concat('%', #{phonenumber}, '%')
+        <if test="user.phonenumber != null and user.phonenumber != ''">
+            AND u.phonenumber like concat('%', #{user.phonenumber}, '%')
         </if>
         <!-- 数据范围过滤 -->
-        <if test="params.dataScope != null and params.dataScope != ''">
-            AND ( ${params.dataScope} )
+        <if test="user.params.dataScope != null and user.params.dataScope != ''">
+            AND ( ${user.params.dataScope} )
         </if>
     </select>
 
@@ -167,17 +167,17 @@
              left join sys_dept d on u.dept_id = d.dept_id
              left join sys_user_role ur on u.user_id = ur.user_id
              left join sys_role r on r.role_id = ur.role_id
-        where u.del_flag = '0' and (r.role_id != #{roleId} or r.role_id IS NULL)
-        and u.user_id not in (select u.user_id from sys_user u inner join sys_user_role ur on u.user_id = ur.user_id and ur.role_id = #{roleId})
-        <if test="userName != null and userName != ''">
-            AND u.user_name like concat('%', #{userName}, '%')
+        where u.del_flag = '0' and (r.role_id != #{user.roleId} or r.role_id IS NULL)
+        and u.user_id not in (select u.user_id from sys_user u inner join sys_user_role ur on u.user_id = ur.user_id and ur.role_id = #{user.roleId})
+        <if test="user.userName != null and user.userName != ''">
+            AND u.user_name like concat('%', #{user.userName}, '%')
         </if>
-        <if test="phonenumber != null and phonenumber != ''">
-            AND u.phonenumber like concat('%', #{phonenumber}, '%')
+        <if test="user.phonenumber != null and user.phonenumber != ''">
+            AND u.phonenumber like concat('%', #{user.phonenumber}, '%')
         </if>
         <!-- 数据范围过滤 -->
-        <if test="params.dataScope != null and params.dataScope != ''">
-            AND ( ${params.dataScope} )
+        <if test="user.params.dataScope != null and user.params.dataScope != ''">
+            AND ( ${user.params.dataScope} )
         </if>
     </select>
 
