@@ -29,12 +29,12 @@ base(){
 
 #启动程序模块
 start(){
-	docker-compose up -d ruoyi-admin
+	docker-compose up -d ruoyi-server1 ruoyi-server2
 }
 
 #停止程序模块
 stop(){
-	docker-compose stop ruoyi-admin
+	docker-compose stop ruoyi-server1 ruoyi-server2
 }
 
 #关闭所有模块

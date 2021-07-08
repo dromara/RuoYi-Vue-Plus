@@ -75,18 +75,31 @@ services:
       ruoyi_net:
         ipv4_address: 172.30.0.48
 
-  ruoyi-admin:
-    image: "ruoyi/ruoyi-admin:2.4.0"
+  ruoyi-server1:
+    image: "ruoyi/ruoyi-server:2.4.0"
     environment:
       - TZ=Asia/Shanghai
     volumes:
       # 配置文件
-      - /docker/server/logs/:/ruoyi/server/logs/
+      - /docker/server1/logs/:/ruoyi/server/logs/
     privileged: true
     restart: always
     networks:
       ruoyi_net:
         ipv4_address: 172.30.0.60
+
+  ruoyi-server2:
+    image: "ruoyi/ruoyi-server:2.4.0"
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      # 配置文件
+      - /docker/server2/logs/:/ruoyi/server/logs/
+    privileged: true
+    restart: always
+    networks:
+      ruoyi_net:
+        ipv4_address: 172.30.0.61
 
 networks:
   ruoyi_net:
