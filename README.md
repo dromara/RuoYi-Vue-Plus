@@ -9,7 +9,12 @@
 [![JDK-8+](https://img.shields.io/badge/JDK-8+-green.svg)]()
 [![JDK-11](https://img.shields.io/badge/JDK-11-green.svg)]()
 
-基于 RuoYi-Vue 集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 定期与 RuoYi-Vue 同步
+RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期与 RuoYi-Vue 同步
+
+集成 Lock4j dynamic-datasource 等分布式场景解决方案
+
+集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 
+
 * 前端开发框架 Vue、Element UI
 * 后端开发框架 Spring Boot、Redis
 * 容器框架 Undertow 基于 Netty 的高性能容器
@@ -27,6 +32,7 @@
 * 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构
 * Redis客户端 采用 Redisson 性能更强
 * 分布式锁 Lock4j 注解锁、工具锁 多种多样
+* 部署方式 Docker 容器编排 一键部署业务集群
 
 ## 参考文档
 
@@ -80,6 +86,7 @@
 * 移除 fastjson 统一使用 jackson 序列化
 * 集成 dynamic-datasource 多数据源(默认支持MySQL,其他种类需自行适配)
 * 集成 Lock4j 实现分布式 注解锁、工具锁 多种多样
+* 增加 Docker 容器编排 打包插件与部署脚本
 
 ### 代码改动
 
