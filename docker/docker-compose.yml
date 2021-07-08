@@ -78,7 +78,7 @@ services:
         ipv4_address: 172.30.0.48
 
   ruoyi-admin:
-    image: "${REGISTER}/ruoyi-admin:${TAG}"
+    image: "ruoyi/ruoyi-admin:2.4.0"
     environment:
       - TZ=Asia/Shanghai
     privileged: true
