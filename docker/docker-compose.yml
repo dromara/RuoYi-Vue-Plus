@@ -18,8 +18,6 @@ services:
       - /docker/mysql/data/:/var/lib/mysql/
       # 配置挂载
       - /docker/mysql/conf/:/etc/mysql/conf.d/
-      # 初始化目录挂载
-      - /docker/mysql/init/:/docker-entrypoint-initdb.d/
     command:
       # 将mysql8.0默认密码策略 修改为 原先 策略 (mysql8.0对其默认策略做了更改 会导致密码无法匹配)
       --default-authentication-plugin=mysql_native_password
@@ -81,6 +79,9 @@ services:
     image: "ruoyi/ruoyi-admin:2.4.0"
     environment:
       - TZ=Asia/Shanghai
+    volumes:
+      # 配置文件
+      - /docker/server/logs/:/ruoyi/server/logs/
     privileged: true
     restart: always
     networks:

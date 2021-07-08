@@ -16,9 +16,9 @@ port(){
 ##放置挂载文件
 mount(){
 	#挂载配置文件
-	if test ! -f "/docker/nginx/nginx.conf" ;then
-		mkdir -p /docker/nginx
-		cp nginx/nginx.conf /docker/nginx/nginx.conf
+	if test ! -f "/docker/nginx/conf/nginx.conf" ;then
+		mkdir -p /docker/nginx/conf
+		cp nginx/nginx.conf /docker/nginx/conf/nginx.conf
 	fi
 }
 
@@ -64,13 +64,13 @@ case "$1" in
 	base
 ;;
 "start")
-	modules
+	start
 ;;
 "stop")
-	stopmodules
+	stop
 ;;
 "stopall")
-	stop
+	stopall
 ;;
 "rm")
 	rm

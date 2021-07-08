@@ -2,9 +2,10 @@ FROM anapsix/alpine-java:8_server-jre_unlimited
 
 MAINTAINER Lion Li
 
-RUN mkdir -p /ruoyi/admin
+RUN mkdir -p /ruoyi/server
+RUN mkdir -p /ruoyi/server/logs
 
-WORKDIR /ruoyi/admin
+WORKDIR /ruoyi/server
 
 EXPOSE 8080
 
