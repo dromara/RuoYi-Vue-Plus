@@ -1,26 +1,16 @@
 <template>
-  <div v-loading="loading" :style="'height:'+ height">
-    <iframe :src="src" frameborder="no" style="width: 100%;height: 100%" scrolling="auto" />
-  </div>
+  <i-frame :src="url" />
 </template>
 <script>
+import iFrame from "@/components/iFrame/index";
 export default {
   name: "Admin",
+  components: { iFrame },
   data() {
+    console.log(process.env)
     return {
-      src: "http://localhost:9090/admin/login",
-      height: document.documentElement.clientHeight - 94.5 + "px;",
-      loading: true
+      url: process.env.VUE_APP_MONITRO_ADMIN
     };
   },
-  mounted: function() {
-    setTimeout(() => {
-      this.loading = false;
-    }, 230);
-    const that = this;
-    window.onresize = function temp() {
-      that.height = document.documentElement.clientHeight - 94.5 + "px;";
-    };
-  }
 };
 </script>

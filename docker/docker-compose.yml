@@ -101,6 +101,16 @@ services:
       ruoyi_net:
         ipv4_address: 172.30.0.61
 
+  ruoyi-monitor-admin:
+    image: "ruoyi/ruoyi-monitor-admin:2.4.0"
+    environment:
+      - TZ=Asia/Shanghai
+    privileged: true
+    restart: always
+    networks:
+      ruoyi_net:
+        ipv4_address: 172.30.0.90
+
 networks:
   ruoyi_net:
     driver: bridge

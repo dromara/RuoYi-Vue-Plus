@@ -34,7 +34,7 @@
         <datasource.version>3.4.0</datasource.version>
 
         <!-- docker 配置 -->
-        <docker.registry.url>localhost</docker.registry.url>
+        <docker.registry.url>192.168.31.240</docker.registry.url>
         <docker.registry.host>http://${docker.registry.url}:2375</docker.registry.host>
         <docker.namespace>ruoyi</docker.namespace>
         <docker.plugin.version>1.2.0</docker.plugin.version>

@@ -2,7 +2,7 @@
 
 #使用说明，用来提示输入参数
 usage() {
-	echo "Usage: sh 执行脚本.sh [port|mount|base|start|stop|stopall|rm|rmiNoneTag]"
+	echo "Usage: sh 执行脚本.sh [port|mount|monitor|base|start|stop|stopall|rm|rmiNoneTag]"
 	exit 1
 }
 
@@ -25,6 +25,11 @@ mount(){
 #启动基础模块
 base(){
 	docker-compose up -d mysql nginx-web redis
+}
+
+#启动基础模块
+monitor(){
+	docker-compose up -d ruoyi-monitor-admin
 }
 
 #启动程序模块
@@ -62,6 +67,9 @@ case "$1" in
 ;;
 "base")
 	base
+;;
+"monitor")
+	monitor
 ;;
 "start")
 	start
