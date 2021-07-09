@@ -208,6 +208,7 @@ public class SysRoleController extends BaseController
     /**
      * 批量取消授权用户
      */
+    @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancelAll")
     public AjaxResult cancelAuthUserAll(Long roleId, Long[] userIds)
@@ -218,6 +219,7 @@ public class SysRoleController extends BaseController
     /**
      * 批量选择用户授权
      */
+    @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/selectAll")
     public AjaxResult selectAuthUserAll(Long roleId, Long[] userIds)

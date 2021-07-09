@@ -262,6 +262,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser> 
      * @param roleIds 角色组
      */
     @Override
+    @Transactional
     public void insertUserAuth(Long userId, Long[] roleIds)
     {
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
