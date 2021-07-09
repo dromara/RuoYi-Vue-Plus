@@ -64,6 +64,8 @@ logging:
 
 # Spring配置
 spring:
+  application:
+    name: ${ruoyi.name}
   # 资源信息
   messages:
     # 国际化资源文件路径
@@ -317,18 +319,16 @@ spring:
 
 --- # 监控配置
 spring:
-  application:
-    name: ruoyi-vue-plus
   boot:
     admin:
       # Spring Boot Admin Client 客户端的相关配置
       client:
         # 设置 Spring Boot Admin Server 地址
-        url: http://localhost:${server.port}${spring.boot.admin.context-path}
+        url: http://localhost:9090/admin
         instance:
           prefer-ip: true # 注册实例时，优先使用 IP
-      # Spring Boot Admin Server 服务端的相关配置
-      context-path: /admin # 配置 Spring
+        username: ruoyi
+        password: 123456
 
 # Actuator 监控端点的配置项
 management:
@@ -338,6 +338,7 @@ management:
       base-path: /actuator
       exposure:
         # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+        # 生产环境不建议放开所有 根据项目需求放开即可
         include: '*'
   endpoint:
     logfile:

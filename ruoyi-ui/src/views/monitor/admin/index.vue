@@ -8,7 +8,7 @@ export default {
   name: "Admin",
   data() {
     return {
-      src: process.env.VUE_APP_BASE_API + "/admin",
+      src: "http://localhost:9090/admin/login",
       height: document.documentElement.clientHeight - 94.5 + "px;",
       loading: true
     };
