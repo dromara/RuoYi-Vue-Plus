@@ -44,4 +44,17 @@ public class MetaVo {
         this.noCache = noCache;
     }
 
+	public MetaVo(String title, String icon, String link) {
+		this.title = title;
+		this.icon = icon;
+		this.link = link;
+	}
+
+	public MetaVo(String title, String icon, boolean noCache, String link) {
+		this.title = title;
+		this.icon = icon;
+		this.noCache = noCache;
+		this.link = link;
+	}
+
 }
