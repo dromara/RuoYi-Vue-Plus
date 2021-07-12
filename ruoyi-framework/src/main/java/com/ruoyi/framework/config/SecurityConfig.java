@@ -3,7 +3,6 @@ package com.ruoyi.framework.config;
 import com.ruoyi.framework.security.filter.JwtAuthenticationTokenFilter;
 import com.ruoyi.framework.security.handle.AuthenticationEntryPointImpl;
 import com.ruoyi.framework.security.handle.LogoutSuccessHandlerImpl;
-import de.codecentric.boot.admin.server.config.AdminServerProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -57,9 +56,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     @Autowired
     private CorsFilter corsFilter;
 
-    @Autowired
-    private AdminServerProperties adminServerProperties;
-
     /**
      * 解决 无法直接注入 AuthenticationManager
      *
@@ -104,12 +100,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/login", "/captchaImage").anonymous()
                 .antMatchers(
                         HttpMethod.GET,
+                        "/",
                         "/*.html",
                         "/**/*.html",
                         "/**/*.css",
-                        "/**/*.js"
+                        "/**/*.js",
+                        "/profile/**"
                 ).permitAll()
-                .antMatchers("/profile/**").anonymous()
                 .antMatchers("/common/download**").anonymous()
                 .antMatchers("/common/download/resource**").anonymous()
                 .antMatchers("/doc.html").anonymous()
@@ -117,9 +114,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/webjars/**").anonymous()
                 .antMatchers("/*/api-docs").anonymous()
                 .antMatchers("/druid/**").anonymous()
-                // Spring Boot Admin Server 的安全配置
-                .antMatchers(adminServerProperties.getContextPath()).anonymous()
-                .antMatchers(adminServerProperties.getContextPath() + "/**").anonymous()
                 // Spring Boot Actuator 的安全配置
                 .antMatchers("/actuator").anonymous()
                 .antMatchers("/actuator/**").anonymous()

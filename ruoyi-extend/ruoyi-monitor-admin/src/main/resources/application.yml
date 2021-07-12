@@ -1,0 +1,11 @@
+server:
+  port: 9090
+
+spring:
+  security:
+    user:
+      name: ruoyi
+      password: 123456
+  boot:
+    admin:
+      context-path: /admin

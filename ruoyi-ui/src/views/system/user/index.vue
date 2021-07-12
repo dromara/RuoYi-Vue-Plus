@@ -167,7 +167,7 @@
             width="160"
             class-name="small-padding fixed-width"
           >
-            <template slot-scope="scope">
+            <template slot-scope="scope" v-if="scope.row.userId !== 1">
               <el-button
                 size="mini"
                 type="text"
@@ -176,20 +176,23 @@
                 v-hasPermi="['system:user:edit']"
               >修改</el-button>
               <el-button
-                v-if="scope.row.userId !== 1"
                 size="mini"
                 type="text"
                 icon="el-icon-delete"
                 @click="handleDelete(scope.row)"
                 v-hasPermi="['system:user:remove']"
               >删除</el-button>
-              <el-button
-                size="mini"
-                type="text"
-                icon="el-icon-key"
-                @click="handleResetPwd(scope.row)"
-                v-hasPermi="['system:user:resetPwd']"
-              >重置</el-button>
+              <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)">
+                <span class="el-dropdown-link">
+                  <i class="el-icon-d-arrow-right el-icon--right"></i>更多
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item command="handleResetPwd" icon="el-icon-key"
+                    v-hasPermi="['system:user:resetPwd']">重置密码</el-dropdown-item>
+                  <el-dropdown-item command="handleAuthRole" icon="el-icon-circle-check"
+                    v-hasPermi="['system:user:edit']">分配角色</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
             </template>
           </el-table-column>
         </el-table>
@@ -561,6 +564,19 @@ export default {
       this.single = selection.length != 1;
       this.multiple = !selection.length;
     },
+    // 更多操作触发
+    handleCommand(command, row) {
+      switch (command) {
+        case "handleResetPwd":
+          this.handleResetPwd(row);
+          break;
+        case "handleAuthRole":
+          this.handleAuthRole(row);
+          break;
+        default:
+          break;
+      }
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
@@ -602,6 +618,11 @@ export default {
             this.msgSuccess("修改成功，新密码是：" + value);
           });
         }).catch(() => {});
+    },
+    /** 分配角色操作 */
+    handleAuthRole: function(row) {
+      const userId = row.userId;
+      this.$router.push("/auth/role/" + userId);
     },
     /** 提交按钮 */
     submitForm: function() {

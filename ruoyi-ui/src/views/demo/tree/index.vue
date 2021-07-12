@@ -255,17 +255,19 @@ export default {
           this.buttonLoading = true;
           if (this.form.id != null) {
             updateTree(this.form).then(response => {
-              this.buttonLoading = false;
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
+            }).finally(() => {
+              this.buttonLoading = false;
             });
           } else {
             addTree(this.form).then(response => {
-              this.buttonLoading = false;
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
+            }).finally(() => {
+              this.buttonLoading = false;
             });
           }
         }

@@ -6,32 +6,38 @@
 
     <groupId>com.ruoyi</groupId>
     <artifactId>ruoyi-vue-plus</artifactId>
-    <version>${ruoyi-vue-plus.version}</version>
+    <version>2.5.0</version>
 
     <name>RuoYi-Vue-Plus</name>
     <url>https://gitee.com/JavaLionLi/RuoYi-Vue-Plus</url>
     <description>RuoYi-Vue-Plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>2.4.0</ruoyi-vue-plus.version>
-        <spring-boot.version>2.4.7</spring-boot.version>
+        <ruoyi-vue-plus.version>2.5.0</ruoyi-vue-plus.version>
+        <spring-boot.version>2.4.8</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <druid.version>1.2.6</druid.version>
-        <knife4j.version>3.0.2</knife4j.version>
+        <knife4j.version>3.0.3</knife4j.version>
         <poi.version>4.1.2</poi.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
         <mybatis-plus.version>3.4.3</mybatis-plus.version>
-        <hutool.version>5.7.2</hutool.version>
+        <hutool.version>5.7.4</hutool.version>
         <feign.version>3.0.3</feign.version>
         <feign-okhttp.version>11.0</feign-okhttp.version>
-        <spring-boot-admin.version>2.4.1</spring-boot-admin.version>
-        <redisson.version>3.15.2</redisson.version>
+        <spring-boot-admin.version>2.4.3</spring-boot-admin.version>
+        <redisson.version>3.16.0</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <datasource.version>3.4.0</datasource.version>
+
+        <!-- docker 配置 -->
+        <docker.registry.url>localhost</docker.registry.url>
+        <docker.registry.host>http://${docker.registry.url}:2375</docker.registry.host>
+        <docker.namespace>ruoyi</docker.namespace>
+        <docker.plugin.version>1.2.0</docker.plugin.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -192,6 +198,7 @@
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>ruoyi-demo</module>
+        <module>ruoyi-extend</module>
     </modules>
     <packaging>pom</packaging>
 

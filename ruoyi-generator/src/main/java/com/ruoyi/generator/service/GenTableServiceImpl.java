@@ -182,9 +182,9 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
                     List<GenTableColumn> genTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
                     for (GenTableColumn column : genTableColumns) {
                         GenUtils.initColumnField(column, table);
-                        genTableColumnMapper.insert(column);
                     }
-                }
+					genTableColumnMapper.insertAll(genTableColumns);
+				}
             }
         } catch (Exception e) {
             throw new CustomException("导入失败：" + e.getMessage());
@@ -258,7 +258,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         // 获取模板列表
         List<String> templates = VelocityUtils.getTemplateList(table.getTplCategory());
         for (String template : templates) {
-            if (!StrUtil.containsAny(template, "sql.vm", "api.js.vm", "index.vue.vm", "index-tree.vue.vm")) {
+            if (!StrUtil.containsAny("sql.vm", "api.js.vm", "index.vue.vm", "index-tree.vue.vm", template)) {
                 // 渲染模板
                 StringWriter sw = new StringWriter();
                 Template tpl = Velocity.getTemplate(template, Constants.UTF8);
@@ -290,9 +290,9 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         dbTableColumns.forEach(column -> {
             if (!tableColumnNames.contains(column.getColumnName())) {
                 GenUtils.initColumnField(column, table);
-                genTableColumnMapper.insert(column);
-            }
-        });
+			}
+		});
+		genTableColumnMapper.insertAll(tableColumns);
 
         List<GenTableColumn> delColumns = tableColumns.stream().filter(column -> !dbTableColumnNames.contains(column.getColumnName())).collect(Collectors.toList());
         if (CollUtil.isNotEmpty(delColumns)) {

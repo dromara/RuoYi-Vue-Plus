@@ -3,6 +3,7 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysMenu;
@@ -10,6 +11,7 @@ import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysRoleMenu;
 import com.ruoyi.system.domain.vo.MetaVo;
 import com.ruoyi.system.domain.vo.RouterVo;
@@ -135,7 +137,7 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu> 
             router.setName(getRouteName(menu));
             router.setPath(getRouterPath(menu));
             router.setComponent(getComponent(menu));
-            router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StrUtil.equals("1", menu.getIsCache())));
+            router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StrUtil.equals("1", menu.getIsCache()), menu.getPath()));
             List<SysMenu> cMenus = menu.getChildren();
             if (!cMenus.isEmpty() && UserConstants.TYPE_DIR.equals(menu.getMenuType())) {
                 router.setAlwaysShow(true);
@@ -148,7 +150,19 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu> 
                 children.setPath(menu.getPath());
                 children.setComponent(menu.getComponent());
                 children.setName(StrUtil.upperFirst(menu.getPath()));
-                children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StrUtil.equals("1", menu.getIsCache())));
+                children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StrUtil.equals("1", menu.getIsCache()), menu.getPath()));
+				childrenList.add(children);
+				router.setChildren(childrenList);
+			} else if (menu.getParentId().intValue() == 0 && isInnerLink(menu)) {
+				router.setMeta(null);
+				router.setPath("/inner");
+				List<RouterVo> childrenList = new ArrayList<RouterVo>();
+				RouterVo children = new RouterVo();
+				String routerPath = StringUtils.replaceEach(menu.getPath(), new String[] { Constants.HTTP, Constants.HTTPS }, new String[] { "", "" });
+				children.setPath(routerPath);
+				children.setComponent(UserConstants.INNER_LINK);
+				children.setName(StringUtils.capitalize(routerPath));
+				children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), menu.getPath()));
                 childrenList.add(children);
                 router.setChildren(childrenList);
             }
@@ -305,6 +319,10 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu> 
      */
     public String getRouterPath(SysMenu menu) {
         String routerPath = menu.getPath();
+        // 内链打开外网方式
+        if (menu.getParentId().intValue() != 0 && isInnerLink(menu)) {
+            routerPath = StringUtils.replaceEach(routerPath, new String[] { Constants.HTTP, Constants.HTTPS }, new String[] { "", "" });
+        }
         // 非外链并且是一级目录（类型为目录）
         if (0 == menu.getParentId().intValue() && UserConstants.TYPE_DIR.equals(menu.getMenuType())
                 && UserConstants.NO_FRAME.equals(menu.getIsFrame())) {
@@ -327,7 +345,9 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu> 
         String component = UserConstants.LAYOUT;
         if (StrUtil.isNotEmpty(menu.getComponent()) && !isMenuFrame(menu)) {
             component = menu.getComponent();
-        } else if (StrUtil.isEmpty(menu.getComponent()) && isParentView(menu)) {
+		} else if (StrUtil.isEmpty(menu.getComponent()) && menu.getParentId().intValue() != 0 && isInnerLink(menu)) {
+			component = UserConstants.INNER_LINK;
+		} else if (StrUtil.isEmpty(menu.getComponent()) && isParentView(menu)) {
             component = UserConstants.PARENT_VIEW;
         }
         return component;
@@ -345,6 +365,16 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu> 
     }
 
     /**
+     * 是否为内链组件
+     *
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    public boolean isInnerLink(SysMenu menu) {
+        return menu.getIsFrame().equals(UserConstants.NO_FRAME) && StringUtils.ishttp(menu.getPath());
+    }
+
+    /**
      * 是否为parent_view组件
      *
      * @param menu 菜单信息
@@ -357,7 +387,7 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu> 
     /**
      * 根据父节点的ID获取所有子节点
      *
-     * @param list     分类表
+     * @param list 分类表
      * @param parentId 传入的父节点ID
      * @return String
      */

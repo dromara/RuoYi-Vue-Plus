@@ -70,6 +70,30 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser> 
     }
 
     /**
+     * 根据条件分页查询已分配用户角色列表
+     *
+     * @param user 用户信息
+     * @return 用户信息集合信息
+     */
+    @Override
+    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
+    public TableDataInfo<SysUser> selectAllocatedList(SysUser user) {
+		return PageUtils.buildDataInfo(baseMapper.selectAllocatedList(PageUtils.buildPage(), user));
+    }
+
+    /**
+     * 根据条件分页查询未分配用户角色列表
+     *
+     * @param user 用户信息
+     * @return 用户信息集合信息
+     */
+    @Override
+    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
+    public TableDataInfo<SysUser> selectUnallocatedList(SysUser user) {
+		return PageUtils.buildDataInfo(baseMapper.selectUnallocatedList(PageUtils.buildPage(), user));
+    }
+
+    /**
      * 通过用户名查询用户
      *
      * @param userName 用户名
@@ -232,6 +256,21 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser> 
     }
 
     /**
+     * 用户授权角色
+     *
+     * @param userId 用户ID
+     * @param roleIds 角色组
+     */
+    @Override
+    @Transactional
+    public void insertUserAuth(Long userId, Long[] roleIds)
+    {
+        userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
+			.eq(SysUserRole::getUserId, userId));
+        insertUserRole(userId, roleIds);
+    }
+
+    /**
      * 修改用户状态
      *
      * @param user 用户信息
@@ -257,7 +296,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser> 
      * 修改用户头像
      *
      * @param userName 用户名
-     * @param avatar   头像地址
+     * @param avatar 头像地址
      * @return 结果
      */
     @Override
@@ -339,6 +378,28 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser> 
     }
 
     /**
+     * 新增用户角色信息
+     *
+     * @param userId 用户ID
+     * @param roleIds 角色组
+     */
+    public void insertUserRole(Long userId, Long[] roleIds) {
+        if (Validator.isNotNull(roleIds)) {
+            // 新增用户与角色管理
+            List<SysUserRole> list = new ArrayList<SysUserRole>();
+            for (Long roleId : roleIds) {
+                SysUserRole ur = new SysUserRole();
+                ur.setUserId(userId);
+                ur.setRoleId(roleId);
+                list.add(ur);
+            }
+            if (list.size() > 0) {
+                userRoleMapper.insertAll(list);
+            }
+        }
+    }
+
+    /**
      * 通过用户ID删除用户
      *
      * @param userId 用户ID
@@ -377,9 +438,9 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser> 
     /**
      * 导入用户数据
      *
-     * @param userList        用户数据列表
+     * @param userList 用户数据列表
      * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据
-     * @param operName        操作用户
+     * @param operName 操作用户
      * @return 结果
      */
     @Override
