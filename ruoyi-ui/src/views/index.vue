@@ -91,6 +91,32 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.5.0 - 2021-7-12">
+              <ol>
+                <li>update springboot 2.4.7 => 2.4.8</li>
+                <li>update knife4j 3.0.2 => 3.0.3</li>
+                <li>update hutool 5.7.2 => 5.7.4</li>
+                <li>update spring-boot-admin 2.4.1 => 2.4.3</li>
+                <li>update redisson 3.15.2 => 3.16.0</li>
+                <li>add 增加 docker 编排 与 shell 脚本</li>
+                <li>add 增加 feign 熔断 自定义结构体解析方法 与 demo 注释</li>
+                <li>add 用户管理新增分配角色功能</li>
+                <li>add 角色管理新增分配用户功能</li>
+                <li>add 增加spring-cache演示案例</li>
+                <li>update 独立 springboot-admin 监控到扩展模块项目</li>
+                <li>update springboot-admin 监控 增加用户登录权限管理</li>
+                <li>update 优化代码生成器 批量导入</li>
+                <li>update 优化 增加MP注入异常拦截</li>
+                <li>update 关闭默认二级缓存 推荐使用 spring-cache 注解手动缓存</li>
+                <li>update FileUpload ImageUpload组件 支持多图片上传</li>
+                <li>update 优化中英文语言配置</li>
+                <li>update 规范maven写法</li>
+                <li>fix redis获取map属性bug修复。</li>
+                <li>fix 修复 按钮loading 后端500卡死问题</li>
+                <li>fix 相对路径下载问题</li>
+                <li>fix 修复 hutool 工具返回结果不一致问题</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.4.0 - 2021-6-24">
               <ol>
                 <li>update springboot 2.3.11 => 2.4.7</li>

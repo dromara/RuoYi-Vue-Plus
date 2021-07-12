@@ -4,12 +4,17 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/blob/master/LICENSE)
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
 <br>
-[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-2.4.0-success.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
+[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-2.5.0-success.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.4-blue.svg)]()
 [![JDK-8+](https://img.shields.io/badge/JDK-8+-green.svg)]()
 [![JDK-11](https://img.shields.io/badge/JDK-11-green.svg)]()
 
-基于 RuoYi-Vue 集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 定期与 RuoYi-Vue 同步
+RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期与 RuoYi-Vue 同步
+
+集成 Lock4j dynamic-datasource 等分布式场景解决方案
+
+集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 
+
 * 前端开发框架 Vue、Element UI
 * 后端开发框架 Spring Boot、Redis
 * 容器框架 Undertow 基于 Netty 的高性能容器
@@ -27,12 +32,15 @@
 * 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构
 * Redis客户端 采用 Redisson 性能更强
 * 分布式锁 Lock4j 注解锁、工具锁 多种多样
+* 部署方式 Docker 容器编排 一键部署业务集群
 
 ## 参考文档
 
 使用框架前请仔细阅读文档重点注意事项
 <br>
 >[初始化项目 必看](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/关于初始化项目?sort_id=4164117)
+> 
+>[部署项目 必看](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/关于应用部署?sort_id=4219382)
 > 
 >[参考文档 Wiki](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)
 
@@ -58,6 +66,12 @@
 ### 四、加群
 以上三点已经能解决大家绝大部分问题了，如果还有问题没能通过这几种方式解决，那么加群，大家一起在群里探讨一下
 
+## 贡献代码
+
+欢迎各路英雄豪杰 `PR` 代码 请提交到 `dev` 开发分支 统一测试发版
+
+框架定位为 `通用后台管理系统(分布式集群强化)` 原则上不接受业务 `PR` 
+
 ## 修改RuoYi功能
 ### 依赖改动
 
@@ -74,6 +88,7 @@
 * 移除 fastjson 统一使用 jackson 序列化
 * 集成 dynamic-datasource 多数据源(默认支持MySQL,其他种类需自行适配)
 * 集成 Lock4j 实现分布式 注解锁、工具锁 多种多样
+* 增加 Docker 容器编排 打包插件与部署脚本
 
 ### 代码改动
 
@@ -90,14 +105,13 @@
 
 ### 其他
 
-* 同步升级 RuoYi-Vue 3.5.0
+* 同步升级 RuoYi-Vue
 * GitHub 地址 [RuoYi-Vue-Plus-github](https://github.com/JavaLionLi/RuoYi-Vue-Plus)
 * 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
 * Oracle 模块 oracle 分支 [RuoYi-Vue-Plus-oracle](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/oracle/)
 
-## 关注作者(扫码请备注: "加群")
-
-![作者图片](https://images.gitee.com/uploads/images/2021/0508/235345_5503356a_1766278.jpeg)
+## 扫码加群 一起交流
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0625/160026_11d949aa_1766278.jpeg "07f7121fab14e57e03e5f6a35eff6ce.jpg")
 
 ## 捐献作者
 作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  

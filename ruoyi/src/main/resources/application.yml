@@ -64,6 +64,8 @@ logging:
 
 # Spring配置
 spring:
+  application:
+    name: ${ruoyi.name}
   # 资源信息
   messages:
     # 国际化资源文件路径
@@ -110,6 +112,8 @@ token:
 # MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:
+  # 不支持多包, 如有需要可在注解配置 或 提升扫包等级
+  # 例如 com.**.**.mapper
   mapperPackage: com.ruoyi.**.mapper
   # 对应的 XML 文件位置
   mapperLocations: classpath*:mapper/**/*Mapper.xml
@@ -156,7 +160,9 @@ mybatis-plus:
     # STATEMENT 关闭一级缓存
     localCacheScope: SESSION
     # 开启Mybatis二级缓存，默认为 true
-    cacheEnabled: true
+    cacheEnabled: false
+    # 更详细的日志输出 会有性能损耗
+    # logImpl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     # 是否打印 Logo banner
     banner: true
@@ -203,7 +209,7 @@ swagger:
   # 请求前缀
   pathMapping: /dev-api
   # 标题
-  title: '标题：RuoYi-Vue-Plus后台管理系统_接口文档'
+  title: '标题：${ruoyi.name}后台管理系统_接口文档'
   # 描述
   description: '描述：用于管理集团旗下公司的人员信息,具体包括XXX,XXX模块...'
   # 版本
@@ -244,6 +250,8 @@ thread-pool:
 
 # feign 相关配置
 feign:
+  # 不支持多包, 如有需要可在注解配置 或 提升扫包等级
+  # 例如 com.**.**.feign
   package: com.ruoyi.**.feign
   # 开启压缩
   compression:
@@ -255,6 +263,21 @@ feign:
     enabled: true
   circuitbreaker:
     enabled: true
+
+--- # redisson 缓存配置
+redisson:
+  cacheGroup:
+    # 用例: @Cacheable(cacheNames="groupId", key="#XXX") 方可使用缓存组配置
+    - groupId: redissonCacheMap
+      # 组过期时间(脚本监控)
+      ttl: 60000
+      # 组最大空闲时间(脚本监控)
+      maxIdleTime: 60000
+      # 组最大长度
+      maxSize: 0
+    - groupId: testCache
+      ttl: 1000
+      maxIdleTime: 500
 
 --- # 分布式锁 lock4j 全局配置
 lock4j:
@@ -293,31 +316,3 @@ spring:
             tablePrefix: QRTZ_
             # sqlserver 启用
             # selectWithLockSQL: SELECT * FROM {0}LOCKS UPDLOCK WHERE LOCK_NAME = ?
-
---- # 监控配置
-spring:
-  application:
-    name: ruoyi-vue-plus
-  boot:
-    admin:
-      # Spring Boot Admin Client 客户端的相关配置
-      client:
-        # 设置 Spring Boot Admin Server 地址
-        url: http://localhost:${server.port}${spring.boot.admin.context-path}
-        instance:
-          prefer-ip: true # 注册实例时，优先使用 IP
-      # Spring Boot Admin Server 服务端的相关配置
-      context-path: /admin # 配置 Spring
-
-# Actuator 监控端点的配置项
-management:
-  endpoints:
-    web:
-      # Actuator 提供的 API 接口的根目录。默认为 /actuator
-      base-path: /actuator
-      exposure:
-        # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
-        include: '*'
-  endpoint:
-    logfile:
-      external-file: ./logs/sys-console.log

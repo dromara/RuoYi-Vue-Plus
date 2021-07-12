@@ -205,9 +205,9 @@ public class RedisCache {
 	 * @param hKeys Hash键集合
 	 * @return Hash对象集合
 	 */
-	public <T> List<T> getMultiCacheMapValue(final String key, final Collection<Object> hKeys) {
-		RListMultimap rListMultimap = redissonClient.getListMultimap(key);
-		return rListMultimap.getAll(hKeys);
+	public <K,V> Map<K,V> getMultiCacheMapValue(final String key, final Set<K> hKeys) {
+		RMap<K,V>  rMap = redissonClient.getMap(key);
+		return rMap.getAll(hKeys);
 	}
 
 	/**

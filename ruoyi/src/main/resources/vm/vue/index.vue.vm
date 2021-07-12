@@ -308,51 +308,13 @@
 
 <script>
 import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${BusinessName}, update${BusinessName}, export${BusinessName} } from "@/api/${moduleName}/${businessName}";
-#foreach($column in $columns)
-#if($column.insert && !$column.pk && $column.htmlType == "imageUpload")
-import ImageUpload from '@/components/ImageUpload';
-#break
-#end
-#end
-#foreach($column in $columns)
-#if($column.insert && !$column.pk && $column.htmlType == "fileUpload")
-import FileUpload from '@/components/FileUpload';
-#break
-#end
-#end
-#foreach($column in $columns)
-#if($column.insert && !$column.pk && $column.htmlType == "editor")
-import Editor from '@/components/Editor';
-#break
-#end
-#end
 
 export default {
   name: "${BusinessName}",
-  components: {
-#foreach($column in $columns)
-#if($column.insert && !$column.pk && $column.htmlType == "imageUpload")
-    ImageUpload,
-#break
-#end
-#end
-#foreach($column in $columns)
-#if($column.insert && !$column.pk && $column.htmlType == "fileUpload")
-    FileUpload,
-#break
-#end
-#end
-#foreach($column in $columns)
-#if($column.insert && !$column.pk && $column.htmlType == "editor")
-    Editor,
-#break
-#end
-#end
-  },
   data() {
     return {
-	  //按钮loading
-	  buttonLoading: false,
+      // 按钮loading
+      buttonLoading: false,
       // 遮罩层
       loading: true,
       // 导出遮罩层
@@ -567,17 +529,19 @@ export default {
 #end
           if (this.form.${pkColumn.javaField} != null) {
             update${BusinessName}(this.form).then(response => {
-              this.buttonLoading = false;
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
+            }).finally(() => {
+              this.buttonLoading = false;
             });
           } else {
             add${BusinessName}(this.form).then(response => {
-              this.buttonLoading = false;
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
+            }).finally(() => {
+              this.buttonLoading = false;
             });
           }
         }

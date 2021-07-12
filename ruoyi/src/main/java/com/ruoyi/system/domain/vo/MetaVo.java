@@ -1,6 +1,8 @@
 package com.ruoyi.system.domain.vo;
 
-import lombok.*;
+import com.ruoyi.common.utils.StringUtils;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -28,6 +30,11 @@ public class MetaVo {
      */
     private boolean noCache;
 
+	/**
+	 * 内链地址（http(s)://开头）
+	 */
+	private String link;
+
     public MetaVo(String title, String icon) {
         this.title = title;
         this.icon = icon;
@@ -38,5 +45,20 @@ public class MetaVo {
         this.icon = icon;
         this.noCache = noCache;
     }
+
+	public MetaVo(String title, String icon, String link) {
+		this.title = title;
+		this.icon = icon;
+		this.link = link;
+	}
+
+	public MetaVo(String title, String icon, boolean noCache, String link) {
+		this.title = title;
+		this.icon = icon;
+		this.noCache = noCache;
+		if (StringUtils.ishttp(link)) {
+			this.link = link;
+		}
+	}
 
 }

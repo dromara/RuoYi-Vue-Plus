@@ -60,6 +60,27 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole> 
     }
 
     /**
+     * 根据用户ID查询角色
+     *
+     * @param userId 用户ID
+     * @return 角色列表
+     */
+    @Override
+    public List<SysRole> selectRolesByUserId(Long userId) {
+        List<SysRole> userRoles = baseMapper.selectRolePermissionByUserId(userId);
+        List<SysRole> roles = selectRoleAll();
+        for (SysRole role : roles) {
+            for (SysRole userRole : userRoles) {
+                if (role.getRoleId().longValue() == userRole.getRoleId().longValue()) {
+                    role.setFlag(true);
+                    break;
+                }
+            }
+        }
+        return roles;
+    }
+
+    /**
      * 根据用户ID查询权限
      *
      * @param userId 用户ID
@@ -304,5 +325,52 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole> 
         // 删除角色与部门关联
         roleDeptMapper.delete(new LambdaQueryWrapper<SysRoleDept>().in(SysRoleDept::getRoleId, ids));
         return baseMapper.deleteBatchIds(ids);
+    }
+
+    /**
+     * 取消授权用户角色
+     *
+     * @param userRole 用户和角色关联信息
+     * @return 结果
+     */
+    @Override
+    public int deleteAuthUser(SysUserRole userRole) {
+        return userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
+			.eq(SysUserRole::getRoleId, userRole.getRoleId())
+			.eq(SysUserRole::getUserId, userRole.getUserId()));
+    }
+
+    /**
+     * 批量取消授权用户角色
+     *
+     * @param roleId 角色ID
+     * @param userIds 需要取消授权的用户数据ID
+     * @return 结果
+     */
+    @Override
+    public int deleteAuthUsers(Long roleId, Long[] userIds) {
+		return userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
+			.eq(SysUserRole::getRoleId, roleId)
+			.in(SysUserRole::getUserId, Arrays.asList(userIds)));
+    }
+
+    /**
+     * 批量选择授权用户角色
+     *
+     * @param roleId 角色ID
+     * @param userIds 需要删除的用户数据ID
+     * @return 结果
+     */
+    @Override
+    public int insertAuthUsers(Long roleId, Long[] userIds) {
+        // 新增用户与角色管理
+        List<SysUserRole> list = new ArrayList<SysUserRole>();
+        for (Long userId : userIds) {
+            SysUserRole ur = new SysUserRole();
+            ur.setUserId(userId);
+            ur.setRoleId(roleId);
+            list.add(ur);
+        }
+        return userRoleMapper.insertAll(list);
     }
 }
