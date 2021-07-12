@@ -28,6 +28,11 @@ public class MetaVo {
      */
     private boolean noCache;
 
+	/**
+	 * 内链地址（http(s)://开头）
+	 */
+	private String link;
+
     public MetaVo(String title, String icon) {
         this.title = title;
         this.icon = icon;

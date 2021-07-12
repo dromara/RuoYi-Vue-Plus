@@ -209,7 +209,7 @@ swagger:
   # 请求前缀
   pathMapping: /dev-api
   # 标题
-  title: '标题：RuoYi-Vue-Plus后台管理系统_接口文档'
+  title: '标题：${ruoyi.name}后台管理系统_接口文档'
   # 描述
   description: '描述：用于管理集团旗下公司的人员信息,具体包括XXX,XXX模块...'
   # 版本
