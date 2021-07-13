@@ -18,7 +18,7 @@
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
-      <el-form-item prop="code" v-if="captchaEnabled">
+      <el-form-item prop="code" v-if="captchaOnOff">
         <el-input
           v-model="loginForm.code"
           auto-complete="off"
@@ -81,8 +81,8 @@ export default {
         code: [{ required: true, trigger: "change", message: "验证码不能为空" }]
       },
       loading: false,
-      redirect: undefined,
-      captchaEnabled:false
+      captchaOnOff: true,
+      redirect: undefined
     };
   },
   watch: {
@@ -100,8 +100,8 @@ export default {
   methods: {
     getCode() {
       getCodeImg().then(res => {
-        this.captchaEnabled = res.data.enabled;
-        if(res.data.enabled){
+        this.captchaOnOff = res.data.captchaOnOff === undefined ? true : res.data.captchaOnOff;
+        if (this.captchaOnOff) {
           this.codeUrl = "data:image/gif;base64," + res.data.img;
           this.loginForm.uuid = res.data.uuid;
         }
@@ -134,7 +134,9 @@ export default {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
           }).catch(() => {
             this.loading = false;
-            this.getCode();
+            if (this.captchaOnOff) {
+              this.getCode();
+            }
           });
         }
       });

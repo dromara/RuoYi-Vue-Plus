@@ -285,7 +285,7 @@ export default {
 #else
 #set($comment=$column.columnComment)
 #end
-#if(${column.dictType} != '')
+#if(${column.dictType} && ${column.dictType} != '')
       // $comment字典
       ${column.javaField}Options: [],
 #elseif($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
@@ -327,7 +327,7 @@ export default {
   created() {
     this.getList();
 #foreach ($column in $columns)
-#if(${column.dictType} != '')
+#if(${column.dictType} && ${column.dictType} != '')
     this.getDicts("${column.dictType}").then(response => {
       this.${column.javaField}Options = response.data;
     });
@@ -379,7 +379,7 @@ export default {
       });
     },
 #foreach ($column in $columns)
-#if(${column.dictType} != '')
+#if(${column.dictType} && ${column.dictType} != '')
 #set($parentheseIndex=$column.columnComment.indexOf("（"))
 #if($parentheseIndex != -1)
 #set($comment=$column.columnComment.substring(0, $parentheseIndex))

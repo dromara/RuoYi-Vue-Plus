@@ -14,6 +14,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.framework.captcha.UnsignedMathGenerator;
 import com.ruoyi.framework.config.properties.CaptchaProperties;
+import com.ruoyi.system.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 验证码操作处理
  *
- * @author Lion Li
+ * @author ruoyi
  */
 @RestController
 public class CaptchaController {
@@ -47,15 +48,18 @@ public class CaptchaController {
 	@Autowired
 	private CaptchaProperties captchaProperties;
 
+	@Autowired
+	private ISysConfigService configService;
+
 	/**
 	 * 生成验证码
 	 */
 	@GetMapping("/captchaImage")
 	public AjaxResult getCode() {
 		Map<String, Object> ajax = new HashMap<>();
-		Boolean enabled = captchaProperties.getEnabled();
-		ajax.put("enabled", enabled);
-		if (!enabled) {
+		boolean captchaOnOff = configService.selectCaptchaOnOff();
+		ajax.put("captchaOnOff", captchaOnOff);
+		if (!captchaOnOff) {
 			return AjaxResult.success(ajax);
 		}
 		// 保存验证码信息
