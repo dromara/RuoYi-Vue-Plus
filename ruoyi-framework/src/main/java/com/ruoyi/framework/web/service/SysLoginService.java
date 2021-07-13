@@ -11,7 +11,6 @@ import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.framework.config.properties.CaptchaProperties;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +41,6 @@ public class SysLoginService
     private RedisCache redisCache;
 
 	@Autowired
-	private CaptchaProperties captchaProperties;
-
-	@Autowired
     private ISysUserService userService;
 
 	@Autowired
@@ -64,11 +60,12 @@ public class SysLoginService
      */
     public String login(String username, String password, String code, String uuid)
     {
-        boolean captchaOnOff = configService.selectCaptchaOnOff();
+		HttpServletRequest request = ServletUtils.getRequest();
+		boolean captchaOnOff = configService.selectCaptchaOnOff();
         // 验证码开关
         if (captchaOnOff)
         {
-            validateCapcha(username, code, uuid);
+            validateCapcha(username, code, uuid, request);
         }
         // 用户验证
         Authentication authentication = null;
@@ -106,8 +103,7 @@ public class SysLoginService
      * @param uuid 唯一标识
      * @return 结果
      */
-    public void validateCapcha(String username, String code, String uuid) {
-		HttpServletRequest request = ServletUtils.getRequest();
+    public void validateCapcha(String username, String code, String uuid, HttpServletRequest request) {
 		String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
 		String captcha = redisCache.getCacheObject(verifyKey);
 		redisCache.deleteObject(verifyKey);
