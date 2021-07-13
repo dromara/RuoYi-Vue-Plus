@@ -91,6 +91,18 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.5.1 - 2021-7-13">
+              <ol>
+                <li>update 验证码开关 转移到表 参数管理 内</li>
+                <li>update 使用hutool重构 判断是否url</li>
+                <li>fix 修复 docker业务集群部署与文件上传的问题</li>
+                <li>fix 修复代码生成同步表结构id冲突问题</li>
+                <li>fix 修复代码生成选择字典 无法取消问题</li>
+                <li>fix 修复代码生成字典为null问题</li>
+                <li>fix 图片上传 多图时无法删除相应图片修复</li>
+                <li>remove 删除富文本video事件</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.5.0 - 2021-7-12">
               <ol>
                 <li>update springboot 2.4.7 => 2.4.8</li>
