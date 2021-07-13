@@ -35,10 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -137,14 +134,17 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
             for (GenTableColumn cenTableColumn : genTable.getColumns()) {
                 genTableColumnMapper.update(cenTableColumn,
                         new LambdaUpdateWrapper<GenTableColumn>()
-                                .set(cenTableColumn.getIsPk() == null, GenTableColumn::getIsPk, null)
-                                .set(cenTableColumn.getIsIncrement() == null, GenTableColumn::getIsIncrement, null)
-                                .set(cenTableColumn.getIsInsert() == null, GenTableColumn::getIsInsert, null)
-                                .set(cenTableColumn.getIsEdit() == null, GenTableColumn::getIsEdit, null)
-                                .set(cenTableColumn.getIsList() == null, GenTableColumn::getIsList, null)
-                                .set(cenTableColumn.getIsQuery() == null, GenTableColumn::getIsQuery, null)
-								.set(cenTableColumn.getIsRequired() == null, GenTableColumn::getIsRequired, null)
-                                .eq(GenTableColumn::getColumnId,cenTableColumn.getColumnId()));
+							.set(StrUtil.isBlank(cenTableColumn.getColumnComment()), GenTableColumn::getColumnComment, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsPk()), GenTableColumn::getIsPk, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsIncrement()), GenTableColumn::getIsIncrement, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsInsert()), GenTableColumn::getIsInsert, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsEdit()), GenTableColumn::getIsEdit, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsList()), GenTableColumn::getIsList, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsQuery()), GenTableColumn::getIsQuery, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsRequired()), GenTableColumn::getIsRequired, null)
+							.set(StrUtil.isBlank(cenTableColumn.getQueryType()), GenTableColumn::getQueryType, null)
+							.set(StrUtil.isBlank(cenTableColumn.getDictType()), GenTableColumn::getDictType, null)
+							.eq(GenTableColumn::getColumnId,cenTableColumn.getColumnId()));
             }
         }
     }
@@ -180,10 +180,14 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
                 if (row > 0) {
                     // 保存列信息
                     List<GenTableColumn> genTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
+					List<GenTableColumn> saveColumns = new ArrayList<>();
                     for (GenTableColumn column : genTableColumns) {
                         GenUtils.initColumnField(column, table);
+						saveColumns.add(column);
                     }
-					genTableColumnMapper.insertAll(genTableColumns);
+                    if (CollUtil.isNotEmpty(saveColumns)) {
+						genTableColumnMapper.insertAll(saveColumns);
+					}
 				}
             }
         } catch (Exception e) {
@@ -287,12 +291,16 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         }
         List<String> dbTableColumnNames = dbTableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
 
+		List<GenTableColumn> saveColumns = new ArrayList<>();
         dbTableColumns.forEach(column -> {
             if (!tableColumnNames.contains(column.getColumnName())) {
                 GenUtils.initColumnField(column, table);
+				saveColumns.add(column);
 			}
 		});
-		genTableColumnMapper.insertAll(tableColumns);
+		if (CollUtil.isNotEmpty(saveColumns)) {
+			genTableColumnMapper.insertAll(saveColumns);
+		}
 
         List<GenTableColumn> delColumns = tableColumns.stream().filter(column -> !dbTableColumnNames.contains(column.getColumnName())).collect(Collectors.toList());
         if (CollUtil.isNotEmpty(delColumns)) {
