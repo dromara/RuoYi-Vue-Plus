@@ -137,14 +137,17 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
             for (GenTableColumn cenTableColumn : genTable.getColumns()) {
                 genTableColumnMapper.update(cenTableColumn,
                         new LambdaUpdateWrapper<GenTableColumn>()
-                                .set(cenTableColumn.getIsPk() == null, GenTableColumn::getIsPk, null)
-                                .set(cenTableColumn.getIsIncrement() == null, GenTableColumn::getIsIncrement, null)
-                                .set(cenTableColumn.getIsInsert() == null, GenTableColumn::getIsInsert, null)
-                                .set(cenTableColumn.getIsEdit() == null, GenTableColumn::getIsEdit, null)
-                                .set(cenTableColumn.getIsList() == null, GenTableColumn::getIsList, null)
-                                .set(cenTableColumn.getIsQuery() == null, GenTableColumn::getIsQuery, null)
-								.set(cenTableColumn.getIsRequired() == null, GenTableColumn::getIsRequired, null)
-                                .eq(GenTableColumn::getColumnId,cenTableColumn.getColumnId()));
+							.set(StrUtil.isBlank(cenTableColumn.getColumnComment()), GenTableColumn::getColumnComment, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsPk()), GenTableColumn::getIsPk, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsIncrement()), GenTableColumn::getIsIncrement, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsInsert()), GenTableColumn::getIsInsert, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsEdit()), GenTableColumn::getIsEdit, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsList()), GenTableColumn::getIsList, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsQuery()), GenTableColumn::getIsQuery, null)
+							.set(StrUtil.isBlank(cenTableColumn.getIsRequired()), GenTableColumn::getIsRequired, null)
+							.set(StrUtil.isBlank(cenTableColumn.getQueryType()), GenTableColumn::getQueryType, null)
+							.set(StrUtil.isBlank(cenTableColumn.getDictType()), GenTableColumn::getDictType, null)
+							.eq(GenTableColumn::getColumnId,cenTableColumn.getColumnId()));
             }
         }
     }
