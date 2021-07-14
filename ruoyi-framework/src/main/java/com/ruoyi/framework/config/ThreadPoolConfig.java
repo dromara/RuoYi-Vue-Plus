@@ -26,7 +26,7 @@ public class ThreadPoolConfig {
     private ThreadPoolProperties threadPoolProperties;
 
     @Bean(name = "threadPoolTaskExecutor")
-    @ConditionalOnProperty(prefix = "threadPoolTaskExecutor", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = "thread-pool", name = "enabled", havingValue = "true")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setMaxPoolSize(threadPoolProperties.getMaxPoolSize());
