@@ -105,7 +105,7 @@
           <span>{{ parseTime(scope.row.${javaField}, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-#elseif($column.list && "" != $column.dictType)
+#elseif($column.list && $column.dictType && "" != $column.dictType)
       <el-table-column label="${comment}" align="center" prop="${javaField}" :formatter="${javaField}Format" />
 #elseif($column.list && "" != $javaField)
 #if(${foreach.index} == 1)
