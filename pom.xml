@@ -33,6 +33,12 @@
         <lock4j.version>2.2.1</lock4j.version>
         <datasource.version>3.4.0</datasource.version>
 
+        <!-- OSS 配置 -->
+        <qiniu.version>7.8.0</qiniu.version>
+        <aliyun.oss.version>3.13.0</aliyun.oss.version>
+        <qcloud.cos.version>5.6.47</qcloud.cos.version>
+        <minio.version>8.2.2</minio.version>
+
         <!-- docker 配置 -->
         <docker.registry.url>localhost</docker.registry.url>
         <docker.registry.host>http://${docker.registry.url}:2375</docker.registry.host>
@@ -183,6 +189,13 @@
             <!-- demo模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-oss</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+
+            <!-- demo模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-demo</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
@@ -199,6 +212,7 @@
         <module>ruoyi-common</module>
         <module>ruoyi-demo</module>
         <module>ruoyi-extend</module>
+        <module>ruoyi-oss</module>
     </modules>
     <packaging>pom</packaging>
 

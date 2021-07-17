@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chkj.cloudStorage.mapper.SysOssMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.chkj.cloudStorage.domain.SysOss">
+        <id column="id" property="id"/>
+        <result column="file_name" property="fileName"/>
+        <result column="file_suffix" property="fileSuffix"/>
+        <result column="url" property="url"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="service" property="service"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, file_name, file_suffix, url, create_time, create_by, service
+    </sql>
+
+</mapper>

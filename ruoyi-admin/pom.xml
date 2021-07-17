@@ -42,6 +42,11 @@
             <artifactId>ruoyi-quartz</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-oss</artifactId>
+        </dependency>
+
         <!-- 代码生成-->
         <dependency>
             <groupId>com.ruoyi</groupId>
