@@ -68,9 +68,9 @@
                 <el-option label="=" value="EQ" />
                 <el-option label="!=" value="NE" />
                 <el-option label=">" value="GT" />
-                <el-option label=">=" value="GTE" />
+                <el-option label=">=" value="GE" />
                 <el-option label="<" value="LT" />
-                <el-option label="<=" value="LTE" />
+                <el-option label="<=" value="LE" />
                 <el-option label="LIKE" value="LIKE" />
                 <el-option label="BETWEEN" value="BETWEEN" />
               </el-select>
