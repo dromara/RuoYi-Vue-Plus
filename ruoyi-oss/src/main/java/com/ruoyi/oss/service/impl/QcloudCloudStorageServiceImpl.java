@@ -8,7 +8,7 @@ import com.qcloud.cos.region.Region;
 import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.properties.CloudStorageProperties;
-import com.ruoyi.oss.properties.QcloudProperties;
+import com.ruoyi.oss.properties.CloudStorageProperties.QcloudProperties;
 import com.ruoyi.oss.service.abstractd.AbstractCloudStorageService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;

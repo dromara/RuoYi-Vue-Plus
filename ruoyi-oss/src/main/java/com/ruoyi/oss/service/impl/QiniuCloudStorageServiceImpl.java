@@ -10,7 +10,7 @@ import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.properties.CloudStorageProperties;
-import com.ruoyi.oss.properties.QiniuProperties;
+import com.ruoyi.oss.properties.CloudStorageProperties.QiniuProperties;
 import com.ruoyi.oss.service.abstractd.AbstractCloudStorageService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
