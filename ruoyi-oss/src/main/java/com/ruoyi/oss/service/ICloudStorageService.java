@@ -2,7 +2,17 @@ package com.ruoyi.oss.service;
 
 import java.io.InputStream;
 
+/**
+ * 云存储服务接口
+ *
+ * @author Lion Li
+ */
 public interface ICloudStorageService {
+
+	/**
+	 * 获取服务商类型
+	 */
+	String getServiceType();
 
 	/**
 	 * 文件路径

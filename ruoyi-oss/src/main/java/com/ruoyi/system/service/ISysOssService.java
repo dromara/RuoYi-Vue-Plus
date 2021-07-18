@@ -1,24 +1,22 @@
 package com.ruoyi.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysOss;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 
 /**
  * 文件上传 服务层
  *
- * @author chkj
- * @date 2019-07-15
+ * @author Lion Li
  */
 public interface ISysOssService extends IService<SysOss> {
-	/**
-	 * 列表查询
-	 */
-	List<SysOss> list(SysOss sysOss);
 
-	Map<String, String> upload(MultipartFile file);
+	TableDataInfo<SysOss> queryPageList(SysOss sysOss);
 
+	SysOss upload(MultipartFile file);
+
+	Boolean deleteByIds(Collection<Long> ids);
 }

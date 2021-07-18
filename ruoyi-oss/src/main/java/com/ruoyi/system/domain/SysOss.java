@@ -9,20 +9,24 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 文件上传表 sys_oss
+ * OSS云存储对象
  *
- * @author chkj
- * @date 2019-07-15
+ * @author Lion Li
  */
 @Data
-@Accessors(chain = true)
 @NoArgsConstructor
+@Accessors(chain = true)
 @TableName("sys_oss")
 public class SysOss implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
-	@TableId(value = "id", type = IdType.AUTO)
-	private Long id;
+
+	/**
+	 * 云存储主键
+	 */
+	@TableId(value = "oss_id")
+	private Long ossId;
 
 	/**
 	 * 文件名
@@ -52,7 +56,20 @@ public class SysOss implements Serializable {
 	private String createBy;
 
 	/**
+	 * 更新时间
+	 */
+	@TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date updateTime;
+
+	/**
+	 * 更新人
+	 */
+	@TableField(fill = FieldFill.INSERT_UPDATE)
+	private String updateBy;
+
+	/**
 	 * 服务商
 	 */
-	private Integer service;
+	private String service;
+
 }

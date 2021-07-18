@@ -1,36 +1,55 @@
 package com.ruoyi.oss.service.abstractd;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.ruoyi.oss.config.CloudStorageConfig;
 import com.ruoyi.oss.service.ICloudStorageService;
-import com.ruoyi.oss.utils.DateUtils;
+import org.springframework.beans.factory.InitializingBean;
 
-import java.util.UUID;
+import java.io.InputStream;
+import java.util.Date;
 
 /**
  * 云存储(支持七牛、阿里云、腾讯云、minio)
+ *
+ * @author Lion Li
  */
-public abstract class AbstractCloudStorageService implements ICloudStorageService {
+public abstract class AbstractCloudStorageService implements ICloudStorageService, InitializingBean {
 
-	/**
-	 * 云存储配置信息
-	 */
-	protected CloudStorageConfig config;
-
-	public int getServiceType() {
-		return config.getType();
-	}
+	@Override
+	public abstract String getServiceType();
 
 	@Override
 	public String getPath(String prefix, String suffix) {
 		// 生成uuid
-		String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+		String uuid = IdUtil.fastSimpleUUID();
 		// 文件路径
-		String path = DateUtils.dateTime() + "/" + uuid;
+		String path = DateUtil.format(new Date(), "yyyyMMdd") + "/" + uuid;
 		if (StrUtil.isNotBlank(prefix)) {
 			path = prefix + "/" + path;
 		}
 		return path + suffix;
 	}
 
+	@Override
+	public abstract String upload(byte[] data, String path);
+
+	@Override
+	public abstract void delete(String path);
+
+	@Override
+	public String upload(InputStream inputStream, String path) {
+		byte[] data = IoUtil.readBytes(inputStream);
+		return this.upload(data, path);
+	}
+
+	@Override
+	public abstract String uploadSuffix(byte[] data, String suffix);
+
+	@Override
+	public abstract String uploadSuffix(InputStream inputStream, String suffix);
+
+	@Override
+	public abstract void afterPropertiesSet() throws Exception;
 }

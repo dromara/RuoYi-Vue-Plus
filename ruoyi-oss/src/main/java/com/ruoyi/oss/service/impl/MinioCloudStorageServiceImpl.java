@@ -1,31 +1,43 @@
 package com.ruoyi.oss.service.impl;
 
-import cn.hutool.core.io.IoUtil;
-import com.ruoyi.oss.config.CloudStorageConfig;
+import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.exception.OssException;
+import com.ruoyi.oss.factory.OssFactory;
+import com.ruoyi.oss.properties.CloudStorageProperties;
+import com.ruoyi.oss.properties.MinioProperties;
 import com.ruoyi.oss.service.abstractd.AbstractCloudStorageService;
 import io.minio.MinioClient;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 
 /**
  * minio存储
+ *
+ * @author Lion Li
  */
-public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService {
+@Lazy
+@Service
+public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService implements InitializingBean {
 
-	private MinioClient minioClient;
+	private final MinioClient minioClient;
+	private final MinioProperties properties;
 
-	public MinioCloudStorageServiceImpl(CloudStorageConfig config) {
-		this.config = config;
-		// 初始化
-		init();
+	@Autowired
+	public MinioCloudStorageServiceImpl(CloudStorageProperties properties) {
+		this.properties = properties.getMinio();
+		minioClient = MinioClient.builder()
+			.endpoint(this.properties.getEndpoint())
+			.credentials(this.properties.getAccessKey(), this.properties.getSecretKey())
+			.build();
 	}
 
-	private void init() {
-		minioClient = MinioClient.builder()
-			.endpoint(config.getDomain())
-			.credentials(config.getAccessKey(), config.getSecretKey())
-			.build();
+	@Override
+	public String getServiceType() {
+		return CloudServiceEnumd.MINIO.getValue();
 	}
 
 	@Override
@@ -35,7 +47,7 @@ public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService {
 		} catch (Exception e) {
 			throw new OssException("上传文件失败，请核对Minio配置信息");
 		}
-		return config.getDomain() + "/" + path;
+		return this.properties.getEndpoint() + "/" + path;
 	}
 
 	@Override
@@ -48,19 +60,17 @@ public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService {
 	}
 
 	@Override
-	public String upload(InputStream inputStream, String path) {
-		byte[] data = IoUtil.readBytes(inputStream);
-		return this.upload(data, path);
-	}
-
-	@Override
 	public String uploadSuffix(byte[] data, String suffix) {
-		return upload(data, getPath(config.getPrefix(), suffix));
+		return upload(data, getPath(this.properties.getPrefix(), suffix));
 	}
 
 	@Override
 	public String uploadSuffix(InputStream inputStream, String suffix) {
-		return upload(inputStream, getPath(config.getPrefix(), suffix));
+		return upload(inputStream, getPath(this.properties.getPrefix(), suffix));
 	}
 
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		OssFactory.register(getServiceType(),this);
+	}
 }

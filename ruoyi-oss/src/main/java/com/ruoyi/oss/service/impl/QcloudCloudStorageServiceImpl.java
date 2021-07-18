@@ -1,33 +1,50 @@
 package com.ruoyi.oss.service.impl;
 
-import cn.hutool.core.io.IoUtil;
 import com.qcloud.cos.COSClient;
-import com.ruoyi.oss.config.CloudStorageConfig;
+import com.qcloud.cos.ClientConfig;
+import com.qcloud.cos.auth.BasicCOSCredentials;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.region.Region;
+import com.ruoyi.oss.enumd.CloudServiceEnumd;
+import com.ruoyi.oss.factory.OssFactory;
+import com.ruoyi.oss.properties.CloudStorageProperties;
+import com.ruoyi.oss.properties.QcloudProperties;
 import com.ruoyi.oss.service.abstractd.AbstractCloudStorageService;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 
 /**
  * 腾讯云存储
+ *
+ * @author Lion Li
  */
-public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService {
+@Lazy
+@Service
+public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService implements InitializingBean {
 
-	private COSClient client;
+	private final COSClient client;
+	private final QcloudProperties properties;
 
-	public QcloudCloudStorageServiceImpl(CloudStorageConfig config) {
-		this.config = config;
-		// 初始化
-		init();
+	@Autowired
+	public QcloudCloudStorageServiceImpl(CloudStorageProperties properties) {
+		this.properties = properties.getQcloud();
+        COSCredentials credentials = new BasicCOSCredentials(
+			this.properties.getSecretId(),
+			this.properties.getSecretKey());
+        // 初始化客户端配置
+        ClientConfig clientConfig = new ClientConfig();
+        // 设置bucket所在的区域，华南：gz 华北：tj 华东：sh
+        clientConfig.setRegion(new Region(this.properties.getRegion()));
+        client = new COSClient(credentials, clientConfig);
 	}
 
-	private void init() {
-//        Credentials credentials = new Credentials(config.getQcloudAppId(), config.getQcloudSecretId(),
-//                config.getQcloudSecretKey());
-//         初始化客户端配置
-//        ClientConfig clientConfig = new ClientConfig();
-//        // 设置bucket所在的区域，华南：gz 华北：tj 华东：sh
-//        clientConfig.setRegion(config.getQcloudRegion());
-//        client = new COSClient(clientConfig, credentials);
+	@Override
+	public String getServiceType() {
+		return CloudServiceEnumd.QCLOUD.getValue();
 	}
 
 	@Override
@@ -43,7 +60,7 @@ public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService {
 //        if (Convert.toInt(jsonObject.get("code")) != 0) {
 //            throw new OssException("文件上传失败，" + Convert.toStr(jsonObject.get("message")));
 //        }
-		return config.getDomain() + path;
+		return this.properties.getDomain() + path;
 	}
 
 	@Override
@@ -57,21 +74,18 @@ public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService {
 //        }
 	}
 
-
-	@Override
-	public String upload(InputStream inputStream, String path) {
-		byte[] data = IoUtil.readBytes(inputStream);
-		return this.upload(data, path);
-	}
-
 	@Override
 	public String uploadSuffix(byte[] data, String suffix) {
-		return upload(data, getPath(config.getPrefix(), suffix));
+		return upload(data, getPath(this.properties.getPrefix(), suffix));
 	}
 
 	@Override
 	public String uploadSuffix(InputStream inputStream, String suffix) {
-		return upload(inputStream, getPath(config.getPrefix(), suffix));
+		return upload(inputStream, getPath(this.properties.getPrefix(), suffix));
 	}
 
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		OssFactory.register(getServiceType(),this);
+	}
 }
