@@ -23,7 +23,9 @@ public class ${ClassName}EditBo {
 #foreach ($column in $columns)
 #if($column.isEdit || $column.isPk==1)
 
-    /** $column.columnComment */
+    /**
+     * $column.columnComment
+     */
     @ApiModelProperty("$column.columnComment")
 #if($column.isRequired==1)
 #if($column.javaType == 'String')
