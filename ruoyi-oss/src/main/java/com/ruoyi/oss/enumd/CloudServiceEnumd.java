@@ -1,5 +1,8 @@
 package com.ruoyi.oss.enumd;
 
+import com.ruoyi.oss.service.impl.AliyunCloudStorageServiceImpl;
+import com.ruoyi.oss.service.impl.MinioCloudStorageServiceImpl;
+import com.ruoyi.oss.service.impl.QiniuCloudStorageServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,22 +18,33 @@ public enum CloudServiceEnumd {
 	/**
 	 * 七牛云
 	 */
-	QINIU("qiniu"),
+	QINIU("qiniu", QiniuCloudStorageServiceImpl.class),
 
 	/**
 	 * 阿里云
 	 */
-	ALIYUN("aliyun"),
+	ALIYUN("aliyun", AliyunCloudStorageServiceImpl.class),
 
 	/**
 	 * 腾讯云
 	 */
-	QCLOUD("qcloud"),
+	QCLOUD("qcloud", QiniuCloudStorageServiceImpl.class),
 
 	/**
 	 * minio
 	 */
-	MINIO("minio");
+	MINIO("minio", MinioCloudStorageServiceImpl.class);
 
 	private final String value;
+
+	private final Class<?> serviceClass;
+
+	public static Class<?> getServiceClass(String value) {
+		for (CloudServiceEnumd clazz : values()) {
+			if (clazz.getValue().equals(value)) {
+				return clazz.getServiceClass();
+			}
+		}
+		return null;
+	}
 }

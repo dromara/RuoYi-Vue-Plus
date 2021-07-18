@@ -32,11 +32,15 @@ public class AliyunCloudStorageServiceImpl extends AbstractCloudStorageService i
 	@Autowired
 	public AliyunCloudStorageServiceImpl(CloudStorageProperties properties) {
 		this.properties = properties.getAliyun();
-		ClientConfiguration configuration = new ClientConfiguration();
-		DefaultCredentialProvider credentialProvider = new DefaultCredentialProvider(
-			this.properties.getAccessKeyId(),
-			this.properties.getAccessKeySecret());
-		client = new OSSClient(this.properties.getEndpoint(), credentialProvider, configuration);
+		try {
+			ClientConfiguration configuration = new ClientConfiguration();
+			DefaultCredentialProvider credentialProvider = new DefaultCredentialProvider(
+				this.properties.getAccessKeyId(),
+				this.properties.getAccessKeySecret());
+			client = new OSSClient(this.properties.getEndpoint(), credentialProvider, configuration);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("阿里云存储配置错误! 请检查系统配置!");
+		}
 	}
 
 	@Override

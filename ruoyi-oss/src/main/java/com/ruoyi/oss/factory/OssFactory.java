@@ -3,6 +3,7 @@ package com.ruoyi.oss.factory;
 import cn.hutool.core.lang.Assert;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.oss.constant.CloudConstant;
+import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.service.ICloudStorageService;
 import com.ruoyi.system.service.ISysConfigService;
 
@@ -26,11 +27,15 @@ public class OssFactory {
 
 	public static ICloudStorageService instance() {
 		String type = sysConfigService.selectConfigByKey(CloudConstant.CLOUD_STORAGE_CONFIG_KEY);
-		return SERVICES.get(type);
+		return instance(type);
 	}
 
 	public static ICloudStorageService instance(String type) {
-		return SERVICES.get(type);
+		ICloudStorageService service = SERVICES.get(type);
+		if (service == null) {
+			service = (ICloudStorageService) SpringUtils.getBean(CloudServiceEnumd.getServiceClass(type));
+		}
+		return service;
 	}
 
 	public static void register(String type, ICloudStorageService iCloudStorageService) {

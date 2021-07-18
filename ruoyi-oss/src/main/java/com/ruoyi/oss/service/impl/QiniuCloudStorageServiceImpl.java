@@ -36,16 +36,20 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 	@Autowired
 	public QiniuCloudStorageServiceImpl(CloudStorageProperties properties) {
 		this.properties = properties.getQiniu();
-		// z0 z1 z2
-		Configuration config = new Configuration(Region.autoRegion());
-		// 默认不使用https
-		config.useHttpsDomains = false;
-		uploadManager = new UploadManager(config);
-		Auth auth = Auth.create(
-			this.properties.getAccessKey(),
-			this.properties.getSecretKey());
-		token = auth.uploadToken(this.properties.getBucketName());
-		bucketManager = new BucketManager(auth, config);
+		try {
+			// z0 z1 z2
+			Configuration config = new Configuration(Region.autoRegion());
+			// 默认不使用https
+			config.useHttpsDomains = false;
+			uploadManager = new UploadManager(config);
+			Auth auth = Auth.create(
+				this.properties.getAccessKey(),
+				this.properties.getSecretKey());
+			token = auth.uploadToken(this.properties.getBucketName());
+			bucketManager = new BucketManager(auth, config);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("七牛云存储配置错误! 请检查系统配置!");
+		}
 	}
 
 

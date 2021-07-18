@@ -29,10 +29,14 @@ public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService im
 	@Autowired
 	public MinioCloudStorageServiceImpl(CloudStorageProperties properties) {
 		this.properties = properties.getMinio();
-		minioClient = MinioClient.builder()
-			.endpoint(this.properties.getEndpoint())
-			.credentials(this.properties.getAccessKey(), this.properties.getSecretKey())
-			.build();
+		try {
+			minioClient = MinioClient.builder()
+				.endpoint(this.properties.getEndpoint())
+				.credentials(this.properties.getAccessKey(), this.properties.getSecretKey())
+				.build();
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Minio存储配置错误! 请检查系统配置!");
+		}
 	}
 
 	@Override

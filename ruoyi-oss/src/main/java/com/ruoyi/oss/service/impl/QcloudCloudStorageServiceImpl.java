@@ -32,14 +32,18 @@ public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService i
 	@Autowired
 	public QcloudCloudStorageServiceImpl(CloudStorageProperties properties) {
 		this.properties = properties.getQcloud();
-        COSCredentials credentials = new BasicCOSCredentials(
-			this.properties.getSecretId(),
-			this.properties.getSecretKey());
-        // 初始化客户端配置
-        ClientConfig clientConfig = new ClientConfig();
-        // 设置bucket所在的区域，华南：gz 华北：tj 华东：sh
-        clientConfig.setRegion(new Region(this.properties.getRegion()));
-        client = new COSClient(credentials, clientConfig);
+		try {
+			COSCredentials credentials = new BasicCOSCredentials(
+				this.properties.getSecretId(),
+				this.properties.getSecretKey());
+			// 初始化客户端配置
+			ClientConfig clientConfig = new ClientConfig();
+			// 设置bucket所在的区域，华南：gz 华北：tj 华东：sh
+			clientConfig.setRegion(new Region(this.properties.getRegion()));
+			client = new COSClient(credentials, clientConfig);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("腾讯云存储配置错误! 请检查系统配置!");
+		}
 	}
 
 	@Override
