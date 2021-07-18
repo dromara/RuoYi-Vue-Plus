@@ -3,40 +3,51 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
+import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.service.ICloudStorageService;
+import com.ruoyi.system.bo.SysOssQueryBo;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.mapper.SysOssMapper;
 import com.ruoyi.system.service.ISysOssService;
-import lombok.extern.slf4j.Slf4j;
+import com.ruoyi.system.vo.SysOssVo;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文件上传 服务层实现
  *
  * @author Lion Li
  */
-@Slf4j
 @Service
-public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> implements ISysOssService {
+public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss> implements ISysOssService {
 
 	@Override
-	public TableDataInfo<SysOss> queryPageList(SysOss sysOss) {
+	public TableDataInfo<SysOssVo> queryPageList(SysOssQueryBo bo) {
+		PagePlus<SysOss, SysOssVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo), SysOssVo.class);
+		return PageUtils.buildDataInfo(result);
+	}
+
+	private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssQueryBo bo) {
+		Map<String, Object> params = bo.getParams();
 		LambdaQueryWrapper<SysOss> lqw = Wrappers.lambdaQuery();
-		lqw.like(StrUtil.isNotBlank(sysOss.getFileName()), SysOss::getFileName, sysOss.getFileName());
-		lqw.like(StrUtil.isNotBlank(sysOss.getFileSuffix()), SysOss::getFileSuffix, sysOss.getFileSuffix());
-		lqw.like(StrUtil.isNotBlank(sysOss.getUrl()), SysOss::getUrl, sysOss.getUrl());
-		lqw.like(StrUtil.isNotBlank(sysOss.getService()), SysOss::getService, sysOss.getService());
-		return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+		lqw.like(StrUtil.isNotBlank(bo.getFileName()), SysOss::getFileName, bo.getFileName());
+		lqw.eq(StrUtil.isNotBlank(bo.getFileSuffix()), SysOss::getFileSuffix, bo.getFileSuffix());
+		lqw.eq(StrUtil.isNotBlank(bo.getUrl()), SysOss::getUrl, bo.getUrl());
+		lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
+			SysOss::getCreateTime ,params.get("beginCreateTime"), params.get("endCreateTime"));
+		lqw.eq(StrUtil.isNotBlank(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
+		lqw.eq(StrUtil.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
+		return lqw;
 	}
 
 	@Override
@@ -59,7 +70,10 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
 	}
 
 	@Override
-	public Boolean deleteByIds(Collection<Long> ids) {
+	public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
+		if(isValid){
+			// 做一些业务上的校验,判断是否需要校验
+		}
 		List<SysOss> list = listByIds(ids);
 		for (SysOss sysOss : list) {
 			ICloudStorageService storage = OssFactory.instance(sysOss.getService());

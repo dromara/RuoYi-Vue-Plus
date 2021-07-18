@@ -1,6 +1,6 @@
 package com.ruoyi.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import com.ruoyi.system.domain.SysOss;
 
 /**
@@ -8,5 +8,5 @@ import com.ruoyi.system.domain.SysOss;
  *
  * @author Lion Li
  */
-public interface SysOssMapper extends BaseMapper<SysOss> {
+public interface SysOssMapper extends BaseMapperPlus<SysOss> {
 }

@@ -17,7 +17,7 @@ create table sys_oss (
 
 insert into sys_config values(10, 'OSS云存储服务商',       'sys.oss.cloudStorageService',      'minio',          'Y', 'admin', sysdate(), '', null, 'OSS云存储服务商(qiniu:七牛云, aliyun:阿里云, qcloud:腾讯云, minio: Minio)');
 
-insert into sys_menu values('118',  '文件管理', '1',   '10', 'oss',     'system/oss/index',      1, 0, 'C', '0', '0', 'system:oss:list',      'oss',       'admin', sysdate(), '', null, '文件管理菜单');
+insert into sys_menu values('118',  '文件管理', '1',   '10', 'oss',     'system/oss/index',      1, 0, 'C', '0', '0', 'system:oss:list',      'upload',       'admin', sysdate(), '', null, '文件管理菜单');
 
 insert into sys_menu values('1600', '文件查询', '118', '1', '#', '', 1, 0, 'F', '0', '0', 'system:oss:query',        '#', 'admin', sysdate(), '', null, '');
 insert into sys_menu values('1601', '文件上传', '118', '2', '#', '', 1, 0, 'F', '0', '0', 'system:oss:upload',       '#', 'admin', sysdate(), '', null, '');
