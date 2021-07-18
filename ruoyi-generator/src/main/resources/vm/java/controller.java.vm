@@ -33,6 +33,7 @@ import io.swagger.annotations.ApiOperation;
  * @author ${author}
  * @date ${datetime}
  */
+@Validated
 @Api(value = "${functionName}控制器", tags = {"${functionName}管理"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
