@@ -24,7 +24,9 @@ public class ${ClassName} implements Serializable {
 
 #foreach ($column in $columns)
 
-    /** $column.columnComment */
+    /**
+     * $column.columnComment
+     */
 #if($column.javaField=="createBy"||$column.javaField=="createTime")
     @TableField(fill = FieldFill.INSERT)
 #end
