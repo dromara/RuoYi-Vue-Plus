@@ -142,8 +142,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
 							.set(StrUtil.isBlank(cenTableColumn.getIsList()), GenTableColumn::getIsList, null)
 							.set(StrUtil.isBlank(cenTableColumn.getIsQuery()), GenTableColumn::getIsQuery, null)
 							.set(StrUtil.isBlank(cenTableColumn.getIsRequired()), GenTableColumn::getIsRequired, null)
-							.set(StrUtil.isBlank(cenTableColumn.getQueryType()), GenTableColumn::getQueryType, null)
-							.set(StrUtil.isBlank(cenTableColumn.getDictType()), GenTableColumn::getDictType, null)
+							.set(StrUtil.isBlank(cenTableColumn.getDictType()), GenTableColumn::getDictType, "")
 							.eq(GenTableColumn::getColumnId,cenTableColumn.getColumnId()));
             }
         }
