@@ -10,6 +10,15 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="原名" prop="originalName">
+        <el-input
+          v-model="queryParams.originalName"
+          placeholder="请输入原名"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="文件后缀" prop="fileSuffix">
         <el-input
           v-model="queryParams.fileSuffix"
@@ -84,6 +93,7 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="云存储主键" align="center" prop="ossId" v-if="false"/>
       <el-table-column label="文件名" align="center" prop="fileName" />
+      <el-table-column label="原名" align="center" prop="originalName" />
       <el-table-column label="文件后缀名" align="center" prop="fileSuffix" />
       <el-table-column label="URL地址" align="center" prop="url" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -172,6 +182,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         fileName: undefined,
+        originalName: undefined,
         fileSuffix: undefined,
         url: undefined,
         createTime: undefined,
@@ -217,6 +228,7 @@ export default {
         ossId: undefined,
         file: undefined,
         fileName: undefined,
+        originalName: undefined,
         fileSuffix: undefined,
         url: undefined,
         createTime: undefined,

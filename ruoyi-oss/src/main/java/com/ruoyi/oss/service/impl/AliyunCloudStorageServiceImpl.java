@@ -3,6 +3,7 @@ package com.ruoyi.oss.service.impl;
 import com.aliyun.oss.ClientConfiguration;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.common.auth.DefaultCredentialProvider;
+import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.factory.OssFactory;
@@ -49,18 +50,18 @@ public class AliyunCloudStorageServiceImpl extends AbstractCloudStorageService i
 	}
 
 	@Override
-	public String upload(byte[] data, String path) {
+	public UploadResult upload(byte[] data, String path) {
 		return upload(new ByteArrayInputStream(data), path);
 	}
 
 	@Override
-	public String upload(InputStream inputStream, String path) {
+	public UploadResult upload(InputStream inputStream, String path) {
 		try {
 			client.putObject(this.properties.getBucketName(), path, inputStream);
 		} catch (Exception e) {
 			throw new OssException("上传文件失败，请检查配置信息");
 		}
-		return this.properties.getEndpoint() + "/" + path;
+		return new UploadResult().setUrl(properties.getEndpoint() + "/" + path).setFilename(path);
 	}
 
 	@Override
@@ -74,12 +75,12 @@ public class AliyunCloudStorageServiceImpl extends AbstractCloudStorageService i
 	}
 
 	@Override
-	public String uploadSuffix(byte[] data, String suffix) {
+	public UploadResult uploadSuffix(byte[] data, String suffix) {
 		return upload(data, getPath(this.properties.getPrefix(), suffix));
 	}
 
 	@Override
-	public String uploadSuffix(InputStream inputStream, String suffix) {
+	public UploadResult uploadSuffix(InputStream inputStream, String suffix) {
 		return upload(inputStream, getPath(this.properties.getPrefix(), suffix));
 	}
 

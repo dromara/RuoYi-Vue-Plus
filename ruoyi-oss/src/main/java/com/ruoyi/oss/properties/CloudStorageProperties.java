@@ -69,27 +69,22 @@ public class CloudStorageProperties {
 	public static class MinioProperties {
 
 		/**
-		 * 七牛绑定的域名
+		 * minio域名
 		 */
 		private String endpoint;
 
 		/**
-		 * 七牛路径前缀
-		 */
-		private String prefix;
-
-		/**
-		 * 七牛ACCESS_KEY
+		 * minio ACCESS_KEY
 		 */
 		private String accessKey;
 
 		/**
-		 * 七牛SECRET_KEY
+		 * minio SECRET_KEY
 		 */
 		private String secretKey;
 
 		/**
-		 * 七牛存储空间名
+		 * minio 存储空间名
 		 */
 		private String bucketName;
 
@@ -113,6 +108,11 @@ public class CloudStorageProperties {
 		 * 腾讯云路径前缀
 		 */
 		private String prefix;
+
+		/**
+		 * 腾讯云appId
+		 */
+		private String appId;
 
 		/**
 		 * 腾讯云SecretId

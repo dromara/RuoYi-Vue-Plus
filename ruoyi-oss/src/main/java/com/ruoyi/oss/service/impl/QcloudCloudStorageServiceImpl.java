@@ -5,6 +5,7 @@ import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.region.Region;
+import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.properties.CloudStorageProperties;
@@ -52,7 +53,7 @@ public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService i
 	}
 
 	@Override
-	public String upload(byte[] data, String path) {
+	public UploadResult upload(byte[] data, String path) {
 		// 腾讯云必需要以"/"开头
 		if (!path.startsWith("/")) {
 			path = "/" + path;
@@ -64,7 +65,7 @@ public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService i
 //        if (Convert.toInt(jsonObject.get("code")) != 0) {
 //            throw new OssException("文件上传失败，" + Convert.toStr(jsonObject.get("message")));
 //        }
-		return this.properties.getDomain() + path;
+		return new UploadResult().setUrl(properties.getDomain() + "/" + path).setFilename(path);
 	}
 
 	@Override
@@ -79,12 +80,12 @@ public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService i
 	}
 
 	@Override
-	public String uploadSuffix(byte[] data, String suffix) {
+	public UploadResult uploadSuffix(byte[] data, String suffix) {
 		return upload(data, getPath(this.properties.getPrefix(), suffix));
 	}
 
 	@Override
-	public String uploadSuffix(InputStream inputStream, String suffix) {
+	public UploadResult uploadSuffix(InputStream inputStream, String suffix) {
 		return upload(inputStream, getPath(this.properties.getPrefix(), suffix));
 	}
 

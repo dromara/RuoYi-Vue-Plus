@@ -18,6 +18,8 @@ services:
       - /docker/mysql/data/:/var/lib/mysql/
       # 配置挂载
       - /docker/mysql/conf/:/etc/mysql/conf.d/
+      # 主机本机时间文件映射 与本机时间同步
+      - /etc/localtime:/etc/localtime:ro
     command:
       # 将mysql8.0默认密码策略 修改为 原先 策略 (mysql8.0对其默认策略做了更改 会导致密码无法匹配)
       --default-authentication-plugin=mysql_native_password
@@ -68,12 +70,41 @@ services:
       - /docker/redis/conf/redis.conf:/redis.conf:rw
       # 数据文件
       - /docker/redis/data:/data:rw
+      # 主机本机时间文件映射 与本机时间同步
+      - /etc/localtime:/etc/localtime:ro
     command: "redis-server --appendonly yes"
     privileged: true
     restart: always
     networks:
       ruoyi_net:
         ipv4_address: 172.30.0.48
+
+  minio:
+    image: minio/minio:RELEASE.2021-07-08T01-15-01Z
+    hostname: "minio"
+    ports:
+      # api 端口
+      - 9000:9000
+      # 控制台端口
+      - 9001:9001
+    environment:
+      # 管理后台用户名
+      MINIO_ACCESS_KEY: ruoyi
+      # 管理后台密码，最小8个字符
+      MINIO_SECRET_KEY: ruoyi123
+    volumes:
+      # 映射当前目录下的data目录至容器内/data目录
+      - /docker/minio/data:/data
+      # 映射配置目录
+      - /docker/minio/config:/root/.minio/
+      # 主机本机时间文件映射 与本机时间同步
+      - /etc/localtime:/etc/localtime:ro
+    command: server --console-address ':9001' /data  # 指定容器中的目录 /data
+    privileged: true
+    restart: always
+    networks:
+      ruoyi_net:
+        ipv4_address: 172.30.0.54
 
   ruoyi-server1:
     image: "ruoyi/ruoyi-server:2.5.1"

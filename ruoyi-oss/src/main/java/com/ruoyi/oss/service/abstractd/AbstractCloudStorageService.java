@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.service.ICloudStorageService;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -33,22 +34,22 @@ public abstract class AbstractCloudStorageService implements ICloudStorageServic
 	}
 
 	@Override
-	public abstract String upload(byte[] data, String path);
+	public abstract UploadResult upload(byte[] data, String path);
 
 	@Override
 	public abstract void delete(String path);
 
 	@Override
-	public String upload(InputStream inputStream, String path) {
+	public UploadResult upload(InputStream inputStream, String path) {
 		byte[] data = IoUtil.readBytes(inputStream);
 		return this.upload(data, path);
 	}
 
 	@Override
-	public abstract String uploadSuffix(byte[] data, String suffix);
+	public abstract UploadResult uploadSuffix(byte[] data, String suffix);
 
 	@Override
-	public abstract String uploadSuffix(InputStream inputStream, String suffix);
+	public abstract UploadResult uploadSuffix(InputStream inputStream, String suffix);
 
 	@Override
 	public abstract void afterPropertiesSet() throws Exception;

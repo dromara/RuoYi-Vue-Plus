@@ -1,5 +1,7 @@
 package com.ruoyi.oss.service;
 
+import com.ruoyi.oss.entity.UploadResult;
+
 import java.io.InputStream;
 
 /**
@@ -30,7 +32,7 @@ public interface ICloudStorageService {
 	 * @param path 文件路径，包含文件名
 	 * @return 返回http地址
 	 */
-	String upload(byte[] data, String path);
+	UploadResult upload(byte[] data, String path);
 
 	/**
 	 * 文件删除
@@ -46,7 +48,7 @@ public interface ICloudStorageService {
 	 * @param suffix 后缀
 	 * @return 返回http地址
 	 */
-	String uploadSuffix(byte[] data, String suffix);
+	UploadResult uploadSuffix(byte[] data, String suffix);
 
 	/**
 	 * 文件上传
@@ -55,7 +57,7 @@ public interface ICloudStorageService {
 	 * @param path        文件路径，包含文件名
 	 * @return 返回http地址
 	 */
-	String upload(InputStream inputStream, String path);
+	UploadResult upload(InputStream inputStream, String path);
 
 	/**
 	 * 文件上传
@@ -64,5 +66,5 @@ public interface ICloudStorageService {
 	 * @param suffix      后缀
 	 * @return 返回http地址
 	 */
-	String uploadSuffix(InputStream inputStream, String suffix);
+	UploadResult uploadSuffix(InputStream inputStream, String suffix);
 }

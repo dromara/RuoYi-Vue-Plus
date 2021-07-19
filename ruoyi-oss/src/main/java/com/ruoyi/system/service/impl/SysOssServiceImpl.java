@@ -8,6 +8,7 @@ import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.service.ICloudStorageService;
 import com.ruoyi.system.bo.SysOssQueryBo;
@@ -41,10 +42,11 @@ public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss> imp
 		Map<String, Object> params = bo.getParams();
 		LambdaQueryWrapper<SysOss> lqw = Wrappers.lambdaQuery();
 		lqw.like(StrUtil.isNotBlank(bo.getFileName()), SysOss::getFileName, bo.getFileName());
+		lqw.like(StrUtil.isNotBlank(bo.getOriginalName()), SysOss::getOriginalName, bo.getOriginalName());
 		lqw.eq(StrUtil.isNotBlank(bo.getFileSuffix()), SysOss::getFileSuffix, bo.getFileSuffix());
 		lqw.eq(StrUtil.isNotBlank(bo.getUrl()), SysOss::getUrl, bo.getUrl());
 		lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
-			SysOss::getCreateTime ,params.get("beginCreateTime"), params.get("endCreateTime"));
+			SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
 		lqw.eq(StrUtil.isNotBlank(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
 		lqw.eq(StrUtil.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
 		return lqw;
@@ -54,24 +56,27 @@ public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss> imp
 	public SysOss upload(MultipartFile file) {
 		String originalfileName = file.getOriginalFilename();
 		String suffix = StrUtil.sub(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
+		ICloudStorageService storage = OssFactory.instance();
+		UploadResult uploadResult;
 		try {
-			ICloudStorageService storage = OssFactory.instance();
-			String url = storage.uploadSuffix(file.getBytes(), suffix);
-			// 保存文件信息
-			SysOss oss = new SysOss()
-				.setUrl(url).setFileSuffix(suffix)
-				.setFileName(originalfileName)
-				.setService(storage.getServiceType());
-			save(oss);
-			return oss;
+			uploadResult = storage.uploadSuffix(file.getBytes(), suffix);
 		} catch (IOException e) {
 			throw new CustomException("文件读取异常!!!", e);
 		}
+		// 保存文件信息
+		SysOss oss = new SysOss()
+			.setUrl(uploadResult.getUrl())
+			.setFileSuffix(suffix)
+			.setFileName(uploadResult.getFilename())
+			.setOriginalName(originalfileName)
+			.setService(storage.getServiceType());
+		save(oss);
+		return oss;
 	}
 
 	@Override
 	public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-		if(isValid){
+		if (isValid) {
 			// 做一些业务上的校验,判断是否需要校验
 		}
 		List<SysOss> list = listByIds(ids);

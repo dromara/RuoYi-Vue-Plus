@@ -44,6 +44,11 @@ public class SysOssQueryBo extends BaseEntity {
 	@ApiModelProperty("文件名")
 	private String fileName;
 	/**
+	 * 原名
+	 */
+	@ApiModelProperty("原名")
+	private String originalName;
+	/**
 	 * 文件后缀名
 	 */
 	@ApiModelProperty("文件后缀名")

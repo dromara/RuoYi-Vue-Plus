@@ -6,6 +6,7 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
+import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.factory.OssFactory;
@@ -59,7 +60,7 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 	}
 
 	@Override
-	public String upload(byte[] data, String path) {
+	public UploadResult upload(byte[] data, String path) {
 		try {
 			Response res = uploadManager.put(data, path, token);
 			if (!res.isOK()) {
@@ -68,7 +69,7 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 		} catch (Exception e) {
 			throw new OssException("上传文件失败，请核对七牛配置信息");
 		}
-		return this.properties.getDomain() + "/" + path;
+		return new UploadResult().setUrl(properties.getDomain() + "/" + path).setFilename(path);
 	}
 
 	@Override
@@ -85,12 +86,12 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 	}
 
 	@Override
-	public String uploadSuffix(byte[] data, String suffix) {
+	public UploadResult uploadSuffix(byte[] data, String suffix) {
 		return upload(data, getPath(this.properties.getPrefix(), suffix));
 	}
 
 	@Override
-	public String uploadSuffix(InputStream inputStream, String suffix) {
+	public UploadResult uploadSuffix(InputStream inputStream, String suffix) {
 		return upload(inputStream, getPath(this.properties.getPrefix(), suffix));
 	}
 
