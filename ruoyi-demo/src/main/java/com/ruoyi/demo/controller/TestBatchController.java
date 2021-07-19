@@ -29,7 +29,7 @@ public class TestBatchController extends BaseController {
     private final ITestDemoService iTestDemoService;
 
     /**
-     * 新增批量方法
+     * 新增批量方法 ( 全量覆盖填充 )
      */
     @PostMapping()
     public AjaxResult<Void> add() {

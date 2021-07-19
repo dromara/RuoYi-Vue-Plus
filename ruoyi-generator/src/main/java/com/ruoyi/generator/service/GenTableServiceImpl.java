@@ -179,14 +179,10 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
                 if (row > 0) {
                     // 保存列信息
                     List<GenTableColumn> genTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
-					List<GenTableColumn> saveColumns = new ArrayList<>();
                     for (GenTableColumn column : genTableColumns) {
                         GenUtils.initColumnField(column, table);
-						saveColumns.add(column);
+						genTableColumnMapper.insert(column);
                     }
-                    if (CollUtil.isNotEmpty(saveColumns)) {
-						genTableColumnMapper.insertAll(saveColumns);
-					}
 				}
             }
         } catch (Exception e) {
@@ -290,16 +286,12 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         }
         List<String> dbTableColumnNames = dbTableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
 
-		List<GenTableColumn> saveColumns = new ArrayList<>();
         dbTableColumns.forEach(column -> {
             if (!tableColumnNames.contains(column.getColumnName())) {
                 GenUtils.initColumnField(column, table);
-				saveColumns.add(column);
+				genTableColumnMapper.insert(column);
 			}
 		});
-		if (CollUtil.isNotEmpty(saveColumns)) {
-			genTableColumnMapper.insertAll(saveColumns);
-		}
 
         List<GenTableColumn> delColumns = tableColumns.stream().filter(column -> !dbTableColumnNames.contains(column.getColumnName())).collect(Collectors.toList());
         if (CollUtil.isNotEmpty(delColumns)) {
