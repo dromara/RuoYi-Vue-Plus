@@ -51,11 +51,8 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T> extends ServiceImpl
 	}
 
 	/**
-	 * 单条执行性能差
-	 *
-	 * {@link #saveAll(Collection)}
+	 * 单条执行性能差 适用于列表对象内容不确定
 	 */
-	@Deprecated
 	@Override
 	public boolean saveBatch(Collection<T> entityList, int batchSize) {
 		return super.saveBatch(entityList, batchSize);
@@ -67,11 +64,8 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T> extends ServiceImpl
 	}
 
 	/**
-	 * 单条执行性能差
-	 *
-	 * {@link #saveAll(Collection)}
+	 * 单条执行性能差 适用于列表对象内容不确定
 	 */
-	@Deprecated
 	@Override
 	public boolean saveOrUpdateBatch(Collection<T> entityList, int batchSize) {
 		return super.saveOrUpdateBatch(entityList, batchSize);
@@ -82,6 +76,10 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T> extends ServiceImpl
 		return super.updateBatchById(entityList, batchSize);
 	}
 
+	/**
+	 * 单sql批量插入( 全量填充 无视数据库默认值 )
+	 * 适用于无脑插入
+	 */
 	@Override
 	public boolean saveAll(Collection<T> entityList) {
 		return baseMapper.insertAll(entityList) == entityList.size();

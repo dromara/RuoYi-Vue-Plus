@@ -13,7 +13,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlSource;
 
 /**
- * 单sql批量插入
+ * 单sql批量插入( 全量填充 无视数据库默认值 )
  *
  * @author Lion Li
  */
