@@ -91,6 +91,18 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.5.2 - 2021-7-19">
+              <ol>
+                <li>update 优化代码生成器注释格式</li>
+                <li>fix 回滚代码生成 批处理优化</li>
+                <li>fix 代码生成 queryType 重复勾选数据库无默认值问题</li>
+                <li>fix 修复接口单参数校验无效问题</li>
+                <li>fix 代码生成 queryType >= <= 标识符错误问题</li>
+                <li>fix 修复代码生成字典问题</li>
+                <li>fix 修复 thread-pool: enabled 配置不生效问题</li>
+                <li>remove 删除无用文档与脚本</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.5.1 - 2021-7-13">
               <ol>
                 <li>update 验证码开关 转移到表 参数管理 内</li>
