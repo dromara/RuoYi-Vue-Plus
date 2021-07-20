@@ -12,5 +12,7 @@ public class CloudConstant {
 	 */
 	public final static String CLOUD_STORAGE_CONFIG_KEY = "sys.oss.cloudStorageService";
 
+	public final static String DEFAULT_CONTENT_TYPE = "application/octet-stream";
+
 
 }

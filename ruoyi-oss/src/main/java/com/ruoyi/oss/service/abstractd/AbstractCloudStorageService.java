@@ -34,22 +34,22 @@ public abstract class AbstractCloudStorageService implements ICloudStorageServic
 	}
 
 	@Override
-	public abstract UploadResult upload(byte[] data, String path);
+	public abstract UploadResult upload(byte[] data, String path, String contentType);
 
 	@Override
 	public abstract void delete(String path);
 
 	@Override
-	public UploadResult upload(InputStream inputStream, String path) {
+	public UploadResult upload(InputStream inputStream, String path, String contentType) {
 		byte[] data = IoUtil.readBytes(inputStream);
-		return this.upload(data, path);
+		return this.upload(data, path, contentType);
 	}
 
 	@Override
-	public abstract UploadResult uploadSuffix(byte[] data, String suffix);
+	public abstract UploadResult uploadSuffix(byte[] data, String suffix, String contentType);
 
 	@Override
-	public abstract UploadResult uploadSuffix(InputStream inputStream, String suffix);
+	public abstract UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType);
 
 	@Override
 	public abstract void afterPropertiesSet() throws Exception;

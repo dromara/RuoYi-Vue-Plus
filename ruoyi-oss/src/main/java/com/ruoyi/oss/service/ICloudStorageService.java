@@ -32,7 +32,7 @@ public interface ICloudStorageService {
 	 * @param path 文件路径，包含文件名
 	 * @return 返回http地址
 	 */
-	UploadResult upload(byte[] data, String path);
+	UploadResult upload(byte[] data, String path, String contentType);
 
 	/**
 	 * 文件删除
@@ -48,7 +48,7 @@ public interface ICloudStorageService {
 	 * @param suffix 后缀
 	 * @return 返回http地址
 	 */
-	UploadResult uploadSuffix(byte[] data, String suffix);
+	UploadResult uploadSuffix(byte[] data, String suffix, String contentType);
 
 	/**
 	 * 文件上传
@@ -57,7 +57,7 @@ public interface ICloudStorageService {
 	 * @param path        文件路径，包含文件名
 	 * @return 返回http地址
 	 */
-	UploadResult upload(InputStream inputStream, String path);
+	UploadResult upload(InputStream inputStream, String path, String contentType);
 
 	/**
 	 * 文件上传
@@ -66,5 +66,5 @@ public interface ICloudStorageService {
 	 * @param suffix      后缀
 	 * @return 返回http地址
 	 */
-	UploadResult uploadSuffix(InputStream inputStream, String suffix);
+	UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType);
 }

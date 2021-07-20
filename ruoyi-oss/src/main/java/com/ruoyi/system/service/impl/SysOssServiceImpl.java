@@ -59,7 +59,7 @@ public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss> imp
 		ICloudStorageService storage = OssFactory.instance();
 		UploadResult uploadResult;
 		try {
-			uploadResult = storage.uploadSuffix(file.getBytes(), suffix);
+			uploadResult = storage.uploadSuffix(file.getBytes(), suffix, file.getContentType());
 		} catch (IOException e) {
 			throw new CustomException("文件读取异常!!!", e);
 		}

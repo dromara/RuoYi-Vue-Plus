@@ -1,5 +1,7 @@
 package com.ruoyi.oss.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.ruoyi.oss.constant.CloudConstant;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.enumd.PolicyType;
@@ -58,17 +60,17 @@ public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService im
 	}
 
 	@Override
-	public UploadResult upload(byte[] data, String path) {
-		return upload(new ByteArrayInputStream(data), path);
+	public UploadResult upload(byte[] data, String path, String contentType) {
+		return upload(new ByteArrayInputStream(data), path, contentType);
 	}
 
 	@Override
-	public UploadResult upload(InputStream inputStream, String path) {
+	public UploadResult upload(InputStream inputStream, String path, String contentType) {
 		try {
 			minioClient.putObject(PutObjectArgs.builder()
 				.bucket(properties.getBucketName())
 				.object(path)
-				.contentType("application/octet-stream")
+				.contentType(StrUtil.blankToDefault(contentType, CloudConstant.DEFAULT_CONTENT_TYPE))
 				.stream(inputStream, inputStream.available(), -1)
 				.build());
 		} catch (Exception e) {
@@ -91,13 +93,13 @@ public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService im
 	}
 
 	@Override
-	public UploadResult uploadSuffix(byte[] data, String suffix) {
-		return upload(data, getPath("", suffix));
+	public UploadResult uploadSuffix(byte[] data, String suffix, String contentType) {
+		return upload(data, getPath("", suffix), contentType);
 	}
 
 	@Override
-	public UploadResult uploadSuffix(InputStream inputStream, String suffix) {
-		return upload(inputStream, getPath("", suffix));
+	public UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType) {
+		return upload(inputStream, getPath("", suffix), contentType);
 	}
 
 	@Override

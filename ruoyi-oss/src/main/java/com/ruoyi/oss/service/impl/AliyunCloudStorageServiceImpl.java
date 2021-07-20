@@ -50,12 +50,12 @@ public class AliyunCloudStorageServiceImpl extends AbstractCloudStorageService i
 	}
 
 	@Override
-	public UploadResult upload(byte[] data, String path) {
-		return upload(new ByteArrayInputStream(data), path);
+	public UploadResult upload(byte[] data, String path, String contentType) {
+		return upload(new ByteArrayInputStream(data), path, contentType);
 	}
 
 	@Override
-	public UploadResult upload(InputStream inputStream, String path) {
+	public UploadResult upload(InputStream inputStream, String path, String contentType) {
 		try {
 			client.putObject(this.properties.getBucketName(), path, inputStream);
 		} catch (Exception e) {
@@ -75,13 +75,13 @@ public class AliyunCloudStorageServiceImpl extends AbstractCloudStorageService i
 	}
 
 	@Override
-	public UploadResult uploadSuffix(byte[] data, String suffix) {
-		return upload(data, getPath(this.properties.getPrefix(), suffix));
+	public UploadResult uploadSuffix(byte[] data, String suffix, String contentType) {
+		return upload(data, getPath(this.properties.getPrefix(), suffix), contentType);
 	}
 
 	@Override
-	public UploadResult uploadSuffix(InputStream inputStream, String suffix) {
-		return upload(inputStream, getPath(this.properties.getPrefix(), suffix));
+	public UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType) {
+		return upload(inputStream, getPath(this.properties.getPrefix(), suffix), contentType);
 	}
 
 	@Override

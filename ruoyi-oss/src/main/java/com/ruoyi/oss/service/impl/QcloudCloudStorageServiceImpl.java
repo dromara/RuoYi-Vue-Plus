@@ -53,7 +53,7 @@ public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService i
 	}
 
 	@Override
-	public UploadResult upload(byte[] data, String path) {
+	public UploadResult upload(byte[] data, String path, String contentType) {
 		// 腾讯云必需要以"/"开头
 		if (!path.startsWith("/")) {
 			path = "/" + path;
@@ -80,13 +80,13 @@ public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService i
 	}
 
 	@Override
-	public UploadResult uploadSuffix(byte[] data, String suffix) {
-		return upload(data, getPath(this.properties.getPrefix(), suffix));
+	public UploadResult uploadSuffix(byte[] data, String suffix, String contentType) {
+		return upload(data, getPath(this.properties.getPrefix(), suffix), contentType);
 	}
 
 	@Override
-	public UploadResult uploadSuffix(InputStream inputStream, String suffix) {
-		return upload(inputStream, getPath(this.properties.getPrefix(), suffix));
+	public UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType) {
+		return upload(inputStream, getPath(this.properties.getPrefix(), suffix), contentType);
 	}
 
 	@Override

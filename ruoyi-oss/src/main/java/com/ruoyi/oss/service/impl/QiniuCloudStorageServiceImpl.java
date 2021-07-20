@@ -60,7 +60,7 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 	}
 
 	@Override
-	public UploadResult upload(byte[] data, String path) {
+	public UploadResult upload(byte[] data, String path, String contentType) {
 		try {
 			Response res = uploadManager.put(data, path, token);
 			if (!res.isOK()) {
@@ -86,13 +86,13 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 	}
 
 	@Override
-	public UploadResult uploadSuffix(byte[] data, String suffix) {
-		return upload(data, getPath(this.properties.getPrefix(), suffix));
+	public UploadResult uploadSuffix(byte[] data, String suffix, String contentType) {
+		return upload(data, getPath(this.properties.getPrefix(), suffix), contentType);
 	}
 
 	@Override
-	public UploadResult uploadSuffix(InputStream inputStream, String suffix) {
-		return upload(inputStream, getPath(this.properties.getPrefix(), suffix));
+	public UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType) {
+		return upload(inputStream, getPath(this.properties.getPrefix(), suffix), contentType);
 	}
 
 	@Override
