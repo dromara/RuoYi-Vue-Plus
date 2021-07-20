@@ -71,9 +71,19 @@
           plain
           icon="el-icon-plus"
           size="mini"
-          @click="handleAdd"
+          @click="handleFile"
           v-hasPermi="['system:oss:upload']"
-        >上传</el-button>
+        >上传文件</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleImage"
+          v-hasPermi="['system:oss:upload']"
+        >上传图片</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -94,8 +104,16 @@
       <el-table-column label="云存储主键" align="center" prop="ossId" v-if="false"/>
       <el-table-column label="文件名" align="center" prop="fileName" />
       <el-table-column label="原名" align="center" prop="originalName" />
-      <el-table-column label="文件后缀名" align="center" prop="fileSuffix" />
-      <el-table-column label="URL地址" align="center" prop="url" />
+      <el-table-column label="文件后缀" align="center" prop="fileSuffix" />
+      <el-table-column label="文件展示" align="center" prop="url" >
+        <template slot-scope="scope">
+          <el-image
+            v-if="scope.row.fileSuffix.indexOf('png','jpg','jpeg') > 0"
+            style="width: 100px; height: 100px;"
+            :src="scope.row.url"
+            :preview-src-list="[scope.row.url]"/>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
@@ -135,7 +153,8 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="文件名">
-          <imageUpload v-model="form.file"/>
+          <fileUpload v-model="form.file" v-if="type === 0"/>
+          <imageUpload v-model="form.file" v-if="type === 1"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -147,7 +166,8 @@
 </template>
 
 <script>
-import { listOss, delOss, addOss, downloadOss } from "@/api/system/oss";
+import { listOss, delOss } from "@/api/system/oss";
+import { downLoadOss } from "@/utils/ossdownload";
 
 export default {
   name: "Oss",
@@ -173,6 +193,8 @@ export default {
       ossList: [],
       // 弹出层标题
       title: "",
+      // 弹出层标题
+      type: 0,
       // 是否显示弹出层
       open: false,
       // 创建时间时间范围
@@ -225,17 +247,7 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        ossId: undefined,
         file: undefined,
-        fileName: undefined,
-        originalName: undefined,
-        fileSuffix: undefined,
-        url: undefined,
-        createTime: undefined,
-        createBy: undefined,
-        updateTime: undefined,
-        updateBy: undefined,
-        service: undefined
       };
       this.resetForm("form");
     },
@@ -256,26 +268,28 @@ export default {
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
-    /** 新增按钮操作 */
-    handleAdd() {
+    /** 文件按钮操作 */
+    handleFile() {
       this.reset();
       this.open = true;
-      this.title = "上传OSS云存储";
+      this.title = "上传文件";
+      this.type = 0;
+    },
+    /** 图片按钮操作 */
+    handleImage() {
+      this.reset();
+      this.open = true;
+      this.title = "上传图片";
+      this.type = 1;
     },
     /** 提交按钮 */
     submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          this.buttonLoading = true;
-          addOss(this.form).then(response => {
-            this.msgSuccess("上传成功");
-            this.open = false;
-            this.getList();
-          }).finally(() => {
-            this.buttonLoading = false;
-          });
-        }
-      });
+      this.open = false;
+      this.getList();
+    },
+    /** 下载按钮操作 */
+    handleDownload(row) {
+      downLoadOss(row.ossId, row.originalName)
     },
     /** 删除按钮操作 */
     handleDelete(row) {

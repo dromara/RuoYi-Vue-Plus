@@ -1,7 +1,6 @@
 package com.ruoyi.oss.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.ruoyi.oss.constant.CloudConstant;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.enumd.PolicyType;
@@ -14,6 +13,7 @@ import io.minio.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -70,7 +70,7 @@ public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService im
 			minioClient.putObject(PutObjectArgs.builder()
 				.bucket(properties.getBucketName())
 				.object(path)
-				.contentType(StrUtil.blankToDefault(contentType, CloudConstant.DEFAULT_CONTENT_TYPE))
+				.contentType(StrUtil.blankToDefault(contentType, MediaType.APPLICATION_OCTET_STREAM_VALUE))
 				.stream(inputStream, inputStream.available(), -1)
 				.build());
 		} catch (Exception e) {

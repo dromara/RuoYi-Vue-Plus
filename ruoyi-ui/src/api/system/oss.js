@@ -9,23 +9,6 @@ export function listOss(query) {
   })
 }
 
-// 上传OSS云存储
-export function addOss(data) {
-  return request({
-    url: '/system/oss/upload',
-    method: 'post',
-    data: data
-  })
-}
-
-// 下载OSS云存储
-export function downloadOss(ossId) {
-  return request({
-    url: '/system/oss/download/' + ossId,
-    method: 'get'
-  })
-}
-
 // 删除OSS云存储
 export function delOss(ossId) {
   return request({

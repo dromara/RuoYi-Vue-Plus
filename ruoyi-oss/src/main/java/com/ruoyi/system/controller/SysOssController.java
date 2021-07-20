@@ -1,6 +1,8 @@
 package com.ruoyi.system.controller;
 
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.http.HttpUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
@@ -18,12 +20,15 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,6 +77,20 @@ public class SysOssController extends BaseController {
 		map.put("url", oss.getUrl());
 		map.put("fileName", oss.getFileName());
 		return AjaxResult.success(map);
+	}
+
+	@ApiOperation("下载OSS云存储")
+	@PreAuthorize("@ss.hasPermi('system:oss:download')")
+	@GetMapping("/download/{ossId}")
+	public void download(@PathVariable Long ossId, HttpServletResponse response) throws IOException {
+		SysOss sysOss = iSysOssService.getById(ossId);
+		if (sysOss == null) {
+			throw new CustomException("文件数据不存在!");
+		}
+		response.reset();
+		response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
+		long data = HttpUtil.download(sysOss.getUrl(), response.getOutputStream(), false);
+		response.setContentLength(Convert.toInt(data));
 	}
 
 	/**
