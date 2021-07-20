@@ -23,13 +23,17 @@ public class ${ClassName}Vo {
 
 	private static final long serialVersionUID = 1L;
 
-	/** $pkColumn.columnComment */
+	/**
+     *  $pkColumn.columnComment
+     */
 	@ApiModelProperty("$pkColumn.columnComment")
 	private ${pkColumn.javaType} ${pkColumn.javaField};
 
 #foreach ($column in $columns)
 #if($column.isList && $column.isPk!=1)
-	/** $column.columnComment */
+    /**
+     * $column.columnComment
+     */
 #set($parentheseIndex=$column.columnComment.indexOf("（"))
 #if($parentheseIndex != -1)
 #set($comment=$column.columnComment.substring(0, $parentheseIndex))

@@ -76,7 +76,7 @@ services:
         ipv4_address: 172.30.0.48
 
   ruoyi-server1:
-    image: "ruoyi/ruoyi-server:2.5.1"
+    image: "ruoyi/ruoyi-server:2.5.2"
     environment:
       - TZ=Asia/Shanghai
     volumes:
@@ -90,7 +90,7 @@ services:
         ipv4_address: 172.30.0.60
 
   ruoyi-server2:
-    image: "ruoyi/ruoyi-server:2.5.1"
+    image: "ruoyi/ruoyi-server:2.5.2"
     environment:
       - TZ=Asia/Shanghai
     volumes:
@@ -104,7 +104,7 @@ services:
         ipv4_address: 172.30.0.61
 
   ruoyi-monitor-admin:
-    image: "ruoyi/ruoyi-monitor-admin:2.5.1"
+    image: "ruoyi/ruoyi-monitor-admin:2.5.2"
     environment:
       - TZ=Asia/Shanghai
     privileged: true
