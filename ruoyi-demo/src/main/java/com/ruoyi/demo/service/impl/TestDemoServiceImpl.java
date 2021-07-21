@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
@@ -40,6 +41,16 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 	@Override
 	public TableDataInfo<TestDemoVo> queryPageList(TestDemoQueryBo bo) {
 		PagePlus<TestDemo, TestDemoVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo), TestDemoVo.class);
+		return PageUtils.buildDataInfo(result);
+	}
+
+	/**
+	 * 自定义分页查询
+	 */
+	@DataScope(isUser = true)
+	@Override
+	public TableDataInfo<TestDemoVo> customPageList(TestDemoQueryBo bo) {
+		Page<TestDemoVo> result = baseMapper.customPageList(PageUtils.buildPage(), buildQueryWrapper(bo));
 		return PageUtils.buildDataInfo(result);
 	}
 

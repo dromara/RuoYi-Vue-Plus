@@ -33,6 +33,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handlePage">搜索(自定义分页接口)</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -168,7 +169,7 @@
 </template>
 
 <script>
-import { listDemo, getDemo, delDemo, addDemo, updateDemo, exportDemo } from "@/api/demo/demo";
+import { listDemo, pageDemo, getDemo, delDemo, addDemo, updateDemo, exportDemo } from "@/api/demo/demo";
 
 export default {
   name: "Demo",
@@ -239,6 +240,20 @@ export default {
         this.loading = false;
       });
     },
+    /** 自定义分页查询 */
+    getPage() {
+      this.loading = true;
+      this.queryParams.params = {};
+      if (null != this.daterangeCreateTime && '' != this.daterangeCreateTime) {
+        this.queryParams.params["beginCreateTime"] = this.daterangeCreateTime[0];
+        this.queryParams.params["endCreateTime"] = this.daterangeCreateTime[1];
+      }
+      pageDemo(this.queryParams).then(response => {
+        this.demoList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
+    },
     // 取消按钮
     cancel() {
       this.open = false;
@@ -266,6 +281,11 @@ export default {
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
+    },
+    /** 搜索按钮操作 */
+    handlePage() {
+      this.queryParams.pageNum = 1;
+      this.getPage();
     },
     /** 重置按钮操作 */
     resetQuery() {

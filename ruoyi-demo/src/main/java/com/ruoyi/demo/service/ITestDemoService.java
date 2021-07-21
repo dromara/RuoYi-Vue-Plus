@@ -1,12 +1,12 @@
 package com.ruoyi.demo.service;
 
-import com.ruoyi.demo.domain.TestDemo;
-import com.ruoyi.demo.vo.TestDemoVo;
-import com.ruoyi.demo.bo.TestDemoQueryBo;
-import com.ruoyi.demo.bo.TestDemoAddBo;
-import com.ruoyi.demo.bo.TestDemoEditBo;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.demo.bo.TestDemoAddBo;
+import com.ruoyi.demo.bo.TestDemoEditBo;
+import com.ruoyi.demo.bo.TestDemoQueryBo;
+import com.ruoyi.demo.domain.TestDemo;
+import com.ruoyi.demo.vo.TestDemoVo;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,7 +29,13 @@ public interface ITestDemoService extends IServicePlus<TestDemo> {
 	 * 查询列表
 	 */
     TableDataInfo<TestDemoVo> queryPageList(TestDemoQueryBo bo);
+
 	/**
+	 * 自定义分页查询
+	 */
+	TableDataInfo<TestDemoVo> customPageList(TestDemoQueryBo bo);
+
+    /**
 	 * 查询列表
 	 */
 	List<TestDemoVo> queryList(TestDemoQueryBo bo);

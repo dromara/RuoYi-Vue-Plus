@@ -48,7 +48,17 @@ public class TestDemoController extends BaseController {
         return iTestDemoService.queryPageList(bo);
     }
 
-    /**
+	/**
+	 * 自定义分页查询
+	 */
+	@ApiOperation("自定义分页查询")
+	@PreAuthorize("@ss.hasPermi('demo:demo:list')")
+	@GetMapping("/page")
+	public TableDataInfo<TestDemoVo> page(@Validated TestDemoQueryBo bo) {
+		return iTestDemoService.customPageList(bo);
+	}
+
+	/**
      * 导出测试单表列表
      */
     @ApiOperation("导出测试单表列表")
