@@ -14,7 +14,7 @@
 
     <properties>
         <ruoyi-vue-plus.version>2.5.2</ruoyi-vue-plus.version>
-        <spring-boot.version>2.4.8</spring-boot.version>
+        <spring-boot.version>2.4.9</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -25,7 +25,7 @@
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
         <mybatis-plus.version>3.4.3</mybatis-plus.version>
-        <hutool.version>5.7.4</hutool.version>
+        <hutool.version>5.7.5</hutool.version>
         <feign.version>3.0.3</feign.version>
         <feign-okhttp.version>11.0</feign-okhttp.version>
         <spring-boot-admin.version>2.4.3</spring-boot-admin.version>
@@ -37,13 +37,13 @@
         <qiniu.version>7.8.0</qiniu.version>
         <aliyun.oss.version>3.13.0</aliyun.oss.version>
         <qcloud.cos.version>5.6.47</qcloud.cos.version>
-        <minio.version>8.2.2</minio.version>
+        <minio.version>8.3.0</minio.version>
 
         <!-- docker 配置 -->
         <docker.registry.url>localhost</docker.registry.url>
         <docker.registry.host>http://${docker.registry.url}:2375</docker.registry.host>
         <docker.namespace>ruoyi</docker.namespace>
-        <docker.plugin.version>1.2.0</docker.plugin.version>
+        <docker.plugin.version>1.2.2</docker.plugin.version>
     </properties>
 
     <!-- 依赖声明 -->
