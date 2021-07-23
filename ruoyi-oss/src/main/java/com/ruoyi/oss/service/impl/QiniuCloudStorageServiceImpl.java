@@ -49,14 +49,28 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 			Auth auth = Auth.create(
 				this.properties.getAccessKey(),
 				this.properties.getSecretKey());
-			token = auth.uploadToken(this.properties.getBucketName());
+			String bucketName = this.properties.getBucketName();
+			token = auth.uploadToken(bucketName);
 			bucketManager = new BucketManager(auth, config);
 
-			if (!ArrayUtil.contains(bucketManager.buckets(), this.properties.getBucketName())) {
-				bucketManager.createBucket(this.properties.getBucketName(), this.properties.getRegion());
+			if (!ArrayUtil.contains(bucketManager.buckets(), bucketName)) {
+				bucketManager.createBucket(bucketName, this.properties.getRegion());
 			}
 		} catch (Exception e) {
 			throw new IllegalArgumentException("七牛云存储配置错误! 请检查系统配置!");
+		}
+	}
+
+	@Override
+	public void createBucket() {
+		try {
+			String bucketName = properties.getBucketName();
+			if (ArrayUtil.contains(bucketManager.buckets(), bucketName)) {
+				return;
+			}
+			bucketManager.createBucket(bucketName, properties.getRegion());
+		} catch (Exception e) {
+			throw new OssException("创建Bucket失败, 请核对七牛云配置信息");
 		}
 	}
 
@@ -68,21 +82,21 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 	@Override
 	public UploadResult upload(byte[] data, String path, String contentType) {
 		try {
-			Response res = uploadManager.put(data, path, token);
+			Response res = uploadManager.put(data, path, token, null, contentType, false);
 			if (!res.isOK()) {
 				throw new RuntimeException("上传七牛出错：" + res.toString());
 			}
 		} catch (Exception e) {
 			throw new OssException("上传文件失败，请核对七牛配置信息");
 		}
-		return new UploadResult().setUrl(properties.getDomain() + "/" + path).setFilename(path);
+		return new UploadResult().setUrl(getEndpointLink() + "/" + path).setFilename(path);
 	}
 
 	@Override
 	public void delete(String path) {
 		try {
-			path = path.replace(this.properties.getDomain() + "/", "");
-			Response res = bucketManager.delete(this.properties.getBucketName(), path);
+			path = path.replace(getEndpointLink() + "/", "");
+			Response res = bucketManager.delete(properties.getBucketName(), path);
 			if (!res.isOK()) {
 				throw new RuntimeException("删除七牛文件出错：" + res.toString());
 			}
@@ -93,17 +107,22 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 
 	@Override
 	public UploadResult uploadSuffix(byte[] data, String suffix, String contentType) {
-		return upload(data, getPath(this.properties.getPrefix(), suffix), contentType);
+		return upload(data, getPath(properties.getPrefix(), suffix), contentType);
 	}
 
 	@Override
 	public UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType) {
-		return upload(inputStream, getPath(this.properties.getPrefix(), suffix), contentType);
+		return upload(inputStream, getPath(properties.getPrefix(), suffix), contentType);
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		OssFactory.register(getServiceType(),this);
+	}
+
+	@Override
+	public String getEndpointLink() {
+		return properties.getDomain();
 	}
 
 	private Region getRegion(String region) {

@@ -11,6 +11,8 @@ import java.io.InputStream;
  */
 public interface ICloudStorageService {
 
+	void createBucket();
+
 	/**
 	 * 获取服务商类型
 	 */
@@ -67,4 +69,6 @@ public interface ICloudStorageService {
 	 * @return 返回http地址
 	 */
 	UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType);
+
+    String getEndpointLink();
 }

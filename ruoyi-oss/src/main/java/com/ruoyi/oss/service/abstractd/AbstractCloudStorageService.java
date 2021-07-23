@@ -19,6 +19,9 @@ import java.util.Date;
 public abstract class AbstractCloudStorageService implements ICloudStorageService, InitializingBean {
 
 	@Override
+	public abstract void createBucket();
+
+	@Override
 	public abstract String getServiceType();
 
 	@Override
@@ -53,4 +56,7 @@ public abstract class AbstractCloudStorageService implements ICloudStorageServic
 
 	@Override
 	public abstract void afterPropertiesSet() throws Exception;
+
+	@Override
+	public abstract String getEndpointLink();
 }

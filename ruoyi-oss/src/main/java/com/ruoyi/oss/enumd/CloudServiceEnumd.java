@@ -2,6 +2,7 @@ package com.ruoyi.oss.enumd;
 
 import com.ruoyi.oss.service.impl.AliyunCloudStorageServiceImpl;
 import com.ruoyi.oss.service.impl.MinioCloudStorageServiceImpl;
+import com.ruoyi.oss.service.impl.QcloudCloudStorageServiceImpl;
 import com.ruoyi.oss.service.impl.QiniuCloudStorageServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +29,7 @@ public enum CloudServiceEnumd {
 	/**
 	 * 腾讯云
 	 */
-	QCLOUD("qcloud", QiniuCloudStorageServiceImpl.class),
+	QCLOUD("qcloud", QcloudCloudStorageServiceImpl.class),
 
 	/**
 	 * minio

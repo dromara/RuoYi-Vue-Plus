@@ -39,18 +39,28 @@ public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService im
 				.endpoint(this.properties.getEndpoint())
 				.credentials(this.properties.getAccessKey(), this.properties.getSecretKey())
 				.build();
-			String bucketName = this.properties.getBucketName();
-			boolean exists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
-			// 不存在就创建桶
-			if (!exists) {
-				minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-				minioClient.setBucketPolicy(SetBucketPolicyArgs.builder()
-					.bucket(bucketName)
-					.config(getPolicy(bucketName, PolicyType.READ))
-					.build());
-			}
+			createBucket();
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Minio存储配置错误! 请检查系统配置!");
+		}
+	}
+
+	@Override
+	public void createBucket() {
+		try {
+			String bucketName = properties.getBucketName();
+			boolean exists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+			if (exists) {
+				return;
+			}
+			// 不存在就创建桶
+			minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+			minioClient.setBucketPolicy(SetBucketPolicyArgs.builder()
+				.bucket(bucketName)
+				.config(getPolicy(bucketName, PolicyType.READ))
+				.build());
+		} catch (Exception e) {
+			throw new OssException("创建Bucket失败, 请核对Minio配置信息");
 		}
 	}
 
@@ -76,12 +86,12 @@ public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService im
 		} catch (Exception e) {
 			throw new OssException("上传文件失败，请核对Minio配置信息");
 		}
-		return new UploadResult().setUrl(getBaseUrl() + path).setFilename(path);
+		return new UploadResult().setUrl(getEndpointLink() + "/" + path).setFilename(path);
 	}
 
 	@Override
 	public void delete(String path) {
-		path = path.replace(getBaseUrl(), "");
+		path = path.replace(getEndpointLink() + "/", "");
 		try {
 			minioClient.removeObject(RemoveObjectArgs.builder()
 				.bucket(properties.getBucketName())
@@ -107,8 +117,9 @@ public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService im
 		OssFactory.register(getServiceType(), this);
 	}
 
-	private String getBaseUrl() {
-		return properties.getEndpoint() + "/" + properties.getBucketName() + "/";
+	@Override
+	public String getEndpointLink() {
+		return properties.getEndpoint() + "/" + properties.getBucketName();
 	}
 
 	private String getPolicy(String bucketName, PolicyType policyType) {

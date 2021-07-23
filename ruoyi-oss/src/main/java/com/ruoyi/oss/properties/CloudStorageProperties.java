@@ -102,17 +102,12 @@ public class CloudStorageProperties {
 		/**
 		 * 腾讯云绑定的域名
 		 */
-		private String domain;
+		private String endpoint;
 
 		/**
 		 * 腾讯云路径前缀
 		 */
 		private String prefix;
-
-		/**
-		 * 腾讯云appId
-		 */
-		private String appId;
 
 		/**
 		 * 腾讯云SecretId
@@ -128,6 +123,11 @@ public class CloudStorageProperties {
 		 * 腾讯云BucketName
 		 */
 		private String bucketName;
+
+		/**
+		 * 七牛是否使用https
+		 */
+		private Boolean isHttps;
 
 		/**
 		 * 腾讯云COS所属地区
@@ -176,7 +176,7 @@ public class CloudStorageProperties {
 		private String region;
 
 		/**
-		 * 七牛存储区域
+		 * 七牛是否使用https
 		 */
 		private Boolean isHttps;
 
