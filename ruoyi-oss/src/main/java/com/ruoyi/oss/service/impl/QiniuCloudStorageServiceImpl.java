@@ -1,5 +1,6 @@
 package com.ruoyi.oss.service.impl;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
@@ -38,21 +39,26 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 	public QiniuCloudStorageServiceImpl(CloudStorageProperties properties) {
 		this.properties = properties.getQiniu();
 		try {
-			// z0 z1 z2
-			Configuration config = new Configuration(Region.autoRegion());
-			// 默认不使用https
+			Configuration config = new Configuration(getRegion(this.properties.getRegion()));
+			// https设置
 			config.useHttpsDomains = false;
+			if (this.properties.getIsHttps() != null) {
+				config.useHttpsDomains = this.properties.getIsHttps();
+			}
 			uploadManager = new UploadManager(config);
 			Auth auth = Auth.create(
 				this.properties.getAccessKey(),
 				this.properties.getSecretKey());
 			token = auth.uploadToken(this.properties.getBucketName());
 			bucketManager = new BucketManager(auth, config);
+
+			if (!ArrayUtil.contains(bucketManager.buckets(), this.properties.getBucketName())) {
+				bucketManager.createBucket(this.properties.getBucketName(), this.properties.getRegion());
+			}
 		} catch (Exception e) {
 			throw new IllegalArgumentException("七牛云存储配置错误! 请检查系统配置!");
 		}
 	}
-
 
 	@Override
 	public String getServiceType() {
@@ -98,6 +104,23 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		OssFactory.register(getServiceType(),this);
+	}
+
+	private Region getRegion(String region) {
+		switch (region) {
+			case "z0":
+				return Region.region0();
+			case "z1":
+				return Region.region1();
+			case "z2":
+				return Region.region2();
+			case "na0":
+				return Region.regionNa0();
+			case "as0":
+				return Region.regionAs0();
+			default:
+				return Region.autoRegion();
+		}
 	}
 
 }

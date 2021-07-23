@@ -143,7 +143,7 @@ public class CloudStorageProperties {
 	 */
 	@Data
 	@NoArgsConstructor
-	public class QiniuProperties {
+	public static class QiniuProperties {
 
 		/**
 		 * 七牛绑定的域名
@@ -169,6 +169,16 @@ public class CloudStorageProperties {
 		 * 七牛存储空间名
 		 */
 		private String bucketName;
+
+		/**
+		 * 七牛存储区域
+		 */
+		private String region;
+
+		/**
+		 * 七牛存储区域
+		 */
+		private Boolean isHttps;
 
 	}
 
