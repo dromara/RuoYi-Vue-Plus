@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "cloud-storage")
 public class CloudStorageProperties {
 
+	private Boolean previewListImage;
+
 	private QiniuProperties qiniu;
 
 	private AliyunProperties aliyun;

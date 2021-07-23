@@ -96,6 +96,7 @@
           v-hasPermi="['system:oss:remove']"
         >删除</el-button>
       </el-col>
+
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -106,7 +107,7 @@
       <el-table-column label="原名" align="center" prop="originalName" />
       <el-table-column label="文件后缀" align="center" prop="fileSuffix" />
       <el-table-column label="文件展示" align="center" prop="url" >
-        <template slot-scope="scope">
+        <template slot-scope="scope" v-if="previewListResource">
           <el-image
             v-if="scope.row.fileSuffix.indexOf('png','jpg','jpeg') > 0"
             style="width: 100px; height: 100px;"
@@ -168,6 +169,8 @@
 <script>
 import { listOss, delOss } from "@/api/system/oss";
 import { downLoadOss } from "@/utils/ossdownload";
+import { updateConfig } from "@/api/system/config";
+
 
 export default {
   name: "Oss",
@@ -197,6 +200,8 @@ export default {
       type: 0,
       // 是否显示弹出层
       open: false,
+      // 预览列表图片
+      previewListResource: true,
       // 创建时间时间范围
       daterangeCreateTime: [],
       // 查询参数
@@ -233,6 +238,9 @@ export default {
         this.queryParams.params["beginCreateTime"] = this.daterangeCreateTime[0];
         this.queryParams.params["endCreateTime"] = this.daterangeCreateTime[1];
       }
+      this.getConfigKey("sys.oss.previewListResource").then(response => {
+        this.previewListResource = response.msg;
+      });
       listOss(this.queryParams).then(response => {
         this.ossList = response.rows;
         this.total = response.total;
