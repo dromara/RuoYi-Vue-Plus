@@ -9,7 +9,7 @@ import lombok.Getter;
 /**
  * 云存储服务商枚举
  *
- * @author LionLi
+ * @author Lion Li
  */
 @Getter
 @AllArgsConstructor

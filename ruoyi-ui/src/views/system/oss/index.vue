@@ -289,7 +289,7 @@ export default {
     },
     /** 下载按钮操作 */
     handleDownload(row) {
-      downLoadOss(row.ossId, row.originalName)
+      downLoadOss(row.ossId)
     },
     /** 删除按钮操作 */
     handleDelete(row) {

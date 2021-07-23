@@ -10,6 +10,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.system.bo.SysOssQueryBo;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.service.ISysOssService;
@@ -29,6 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,6 +91,9 @@ public class SysOssController extends BaseController {
 			throw new CustomException("文件数据不存在!");
 		}
 		response.reset();
+		response.addHeader("Access-Control-Allow-Origin", "*");
+		response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
+		FileUtils.setAttachmentResponseHeader(response, URLEncoder.encode(sysOss.getOriginalName(), StandardCharsets.UTF_8));
 		response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
 		long data = HttpUtil.download(sysOss.getUrl(), response.getOutputStream(), false);
 		response.setContentLength(Convert.toInt(data));
