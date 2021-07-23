@@ -106,13 +106,15 @@
       <el-table-column label="文件名" align="center" prop="fileName" />
       <el-table-column label="原名" align="center" prop="originalName" />
       <el-table-column label="文件后缀" align="center" prop="fileSuffix" />
-      <el-table-column label="文件展示" align="center" prop="url" >
-        <template slot-scope="scope" v-if="previewListResource">
+      <el-table-column label="文件展示" align="center" prop="url">
+        <template slot-scope="scope">
           <el-image
-            v-if="scope.row.fileSuffix.indexOf('png','jpg','jpeg') > 0"
+            v-if="previewListResource && scope.row.fileSuffix.indexOf('png','jpg','jpeg') > 0"
             style="width: 100px; height: 100px;"
             :src="scope.row.url"
             :preview-src-list="[scope.row.url]"/>
+          <span v-text="scope.row.url"
+                v-if="scope.row.fileSuffix.indexOf('png','jpg','jpeg') < 0 || !previewListResource"/>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -239,7 +241,7 @@ export default {
         this.queryParams.params["endCreateTime"] = this.daterangeCreateTime[1];
       }
       this.getConfigKey("sys.oss.previewListResource").then(response => {
-        this.previewListResource = response.msg;
+        this.previewListResource = response.msg === undefined ? true : response.msg === 'true';
       });
       listOss(this.queryParams).then(response => {
         this.ossList = response.rows;
