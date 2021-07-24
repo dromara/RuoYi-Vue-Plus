@@ -42,6 +42,10 @@ spring:
         testOnReturn: false
         # 注意这个值和druid原生不一致，默认启动了stat
         filters: stat
+
+--- # druid 配置
+spring:
+  datasource:
     druid:
       webStatFilter:
         enabled: true
@@ -63,7 +67,9 @@ spring:
         wall:
           config:
             multi-statement-allow: true
-  # redis 配置
+
+--- # redis 配置
+spring:
   redis:
     # 地址
     host: 172.30.0.48
@@ -78,7 +84,6 @@ spring:
     # 是否开启ssl
     ssl: false
 
---- # redisson 客户端配置
 redisson:
   # 线程池数量
   threads: 16
