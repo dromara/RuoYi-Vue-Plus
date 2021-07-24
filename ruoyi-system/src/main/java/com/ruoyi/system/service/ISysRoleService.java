@@ -1,9 +1,8 @@
 package com.ruoyi.system.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.entity.SysRole;
-import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.system.domain.SysUserRole;
 
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.Set;
  *
  * @author ruoyi
  */
-public interface ISysRoleService extends IServicePlus<SysRole> {
+public interface ISysRoleService extends IService<SysRole> {
 
 
     TableDataInfo<SysRole> selectPageRoleList(SysRole role);

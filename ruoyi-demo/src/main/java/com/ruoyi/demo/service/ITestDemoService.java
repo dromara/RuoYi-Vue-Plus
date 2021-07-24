@@ -17,7 +17,7 @@ import java.util.List;
  * @author Lion Li
  * @date 2021-05-30
  */
-public interface ITestDemoService extends IServicePlus<TestDemo> {
+public interface ITestDemoService extends IServicePlus<TestDemo, TestDemoVo> {
 
 	/**
 	 * 查询单个

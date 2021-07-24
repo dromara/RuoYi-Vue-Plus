@@ -1,8 +1,8 @@
 package com.ruoyi.system.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.domain.entity.SysDictType;
-import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface ISysDictTypeService extends IServicePlus<SysDictType> {
+public interface ISysDictTypeService extends IService<SysDictType> {
 
 
     TableDataInfo<SysDictType> selectPageDictTypeList(SysDictType dictType);

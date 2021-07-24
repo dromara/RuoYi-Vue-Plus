@@ -1,6 +1,6 @@
 package com.ruoyi.generator.service;
 
-import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.generator.domain.GenTable;
 
@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author ruoyi
  */
-public interface IGenTableService extends IServicePlus<GenTable> {
+public interface IGenTableService extends IService<GenTable> {
 
 
     TableDataInfo<GenTable> selectPageGenTableList(GenTable genTable);

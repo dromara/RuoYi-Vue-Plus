@@ -30,11 +30,11 @@ import java.util.Map;
  * @author Lion Li
  */
 @Service
-public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss> implements ISysOssService {
+public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, SysOssVo> implements ISysOssService {
 
 	@Override
 	public TableDataInfo<SysOssVo> queryPageList(SysOssQueryBo bo) {
-		PagePlus<SysOss, SysOssVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo), SysOssVo.class);
+		PagePlus<SysOss, SysOssVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
 		return PageUtils.buildDataInfo(result);
 	}
 

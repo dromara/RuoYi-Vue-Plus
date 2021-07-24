@@ -30,24 +30,24 @@ import java.util.Collection;
  * @date ${datetime}
  */
 @Service
-public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper, ${ClassName}> implements I${ClassName}Service {
+public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper, ${ClassName}, ${ClassName}Vo> implements I${ClassName}Service {
 
     @Override
     public ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField}){
-        return getVoById(${pkColumn.javaField}, ${ClassName}Vo.class);
+        return getVoById(${pkColumn.javaField});
     }
 
 #if($table.crud || $table.sub)
     @Override
     public TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}QueryBo bo) {
-        PagePlus<${ClassName}, ${ClassName}Vo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo), ${ClassName}Vo.class);
+        PagePlus<${ClassName}, ${ClassName}Vo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
         return PageUtils.buildDataInfo(result);
     }
 #end
 
     @Override
     public List<${ClassName}Vo> queryList(${ClassName}QueryBo bo) {
-        return listVo(buildQueryWrapper(bo), ${ClassName}Vo.class);
+        return listVo(buildQueryWrapper(bo));
     }
 
     private LambdaQueryWrapper<${ClassName}> buildQueryWrapper(${ClassName}QueryBo bo) {

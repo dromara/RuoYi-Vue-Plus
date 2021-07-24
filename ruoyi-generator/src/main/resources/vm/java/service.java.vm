@@ -19,7 +19,7 @@ import java.util.List;
  * @author ${author}
  * @date ${datetime}
  */
-public interface I${ClassName}Service extends IServicePlus<${ClassName}> {
+public interface I${ClassName}Service extends IServicePlus<${ClassName}, ${ClassName}Vo> {
 	/**
 	 * 查询单个
 	 * @return

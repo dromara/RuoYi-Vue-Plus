@@ -14,7 +14,7 @@ import java.util.Collection;
  *
  * @author Lion Li
  */
-public interface ISysOssService extends IServicePlus<SysOss> {
+public interface ISysOssService extends IServicePlus<SysOss, SysOssVo> {
 
 	TableDataInfo<SysOssVo> queryPageList(SysOssQueryBo sysOss);
 

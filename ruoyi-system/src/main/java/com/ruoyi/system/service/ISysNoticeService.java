@@ -1,6 +1,6 @@
 package com.ruoyi.system.service;
 
-import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysNotice;
 
@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface ISysNoticeService extends IServicePlus<SysNotice> {
+public interface ISysNoticeService extends IService<SysNotice> {
 
 
     TableDataInfo<SysNotice> selectPageNoticeList(SysNotice notice);

@@ -26,18 +26,18 @@ import java.util.Map;
  * @date 2021-05-30
  */
 @Service
-public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTree> implements ITestTreeService {
+public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTree, TestTreeVo> implements ITestTreeService {
 
 	@Override
 	public TestTreeVo queryById(Long id) {
-		return getVoById(id, TestTreeVo.class);
+		return getVoById(id);
 	}
 
 //	@DataSource(DataSourceType.SLAVE) // 切换从库查询
 	@DataScope(isUser = true)
 	@Override
 	public List<TestTreeVo> queryList(TestTreeQueryBo bo) {
-		return listVo(buildQueryWrapper(bo), TestTreeVo.class);
+		return listVo(buildQueryWrapper(bo));
 	}
 
 	private LambdaQueryWrapper<TestTree> buildQueryWrapper(TestTreeQueryBo bo) {

@@ -30,17 +30,17 @@ import java.util.Map;
  * @date 2021-05-30
  */
 @Service
-public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDemo> implements ITestDemoService {
+public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDemo, TestDemoVo> implements ITestDemoService {
 
 	@Override
 	public TestDemoVo queryById(Long id) {
-		return getVoById(id, TestDemoVo.class);
+		return getVoById(id);
 	}
 
 	@DataScope(isUser = true)
 	@Override
 	public TableDataInfo<TestDemoVo> queryPageList(TestDemoQueryBo bo) {
-		PagePlus<TestDemo, TestDemoVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo), TestDemoVo.class);
+		PagePlus<TestDemo, TestDemoVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
 		return PageUtils.buildDataInfo(result);
 	}
 
@@ -57,7 +57,7 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 	@DataScope(isUser = true)
 	@Override
 	public List<TestDemoVo> queryList(TestDemoQueryBo bo) {
-		return listVo(buildQueryWrapper(bo), TestDemoVo.class);
+		return listVo(buildQueryWrapper(bo));
 	}
 
 	private LambdaQueryWrapper<TestDemo> buildQueryWrapper(TestDemoQueryBo bo) {

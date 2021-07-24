@@ -16,7 +16,7 @@ import java.util.List;
  * @author Lion Li
  * @date 2021-05-30
  */
-public interface ITestTreeService extends IServicePlus<TestTree> {
+public interface ITestTreeService extends IServicePlus<TestTree, TestTreeVo> {
 	/**
 	 * 查询单个
 	 * @return
