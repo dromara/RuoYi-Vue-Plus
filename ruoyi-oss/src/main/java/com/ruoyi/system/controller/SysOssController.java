@@ -11,10 +11,10 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.system.bo.SysOssQueryBo;
+import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.service.ISysOssService;
-import com.ruoyi.system.vo.SysOssVo;
+import com.ruoyi.system.domain.vo.SysOssVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -56,7 +56,7 @@ public class SysOssController extends BaseController {
 	@ApiOperation("查询OSS云存储列表")
 	@PreAuthorize("@ss.hasPermi('system:oss:list')")
 	@GetMapping("/list")
-	public TableDataInfo<SysOssVo> list(@Validated SysOssQueryBo bo) {
+	public TableDataInfo<SysOssVo> list(@Validated SysOssBo bo) {
 		return iSysOssService.queryPageList(bo);
 	}
 

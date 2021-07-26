@@ -11,11 +11,11 @@ import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.service.ICloudStorageService;
-import com.ruoyi.system.bo.SysOssQueryBo;
+import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.mapper.SysOssMapper;
 import com.ruoyi.system.service.ISysOssService;
-import com.ruoyi.system.vo.SysOssVo;
+import com.ruoyi.system.domain.vo.SysOssVo;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,12 +33,12 @@ import java.util.Map;
 public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, SysOssVo> implements ISysOssService {
 
 	@Override
-	public TableDataInfo<SysOssVo> queryPageList(SysOssQueryBo bo) {
+	public TableDataInfo<SysOssVo> queryPageList(SysOssBo bo) {
 		PagePlus<SysOss, SysOssVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
 		return PageUtils.buildDataInfo(result);
 	}
 
-	private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssQueryBo bo) {
+	private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {
 		Map<String, Object> params = bo.getParams();
 		LambdaQueryWrapper<SysOss> lqw = Wrappers.lambdaQuery();
 		lqw.like(StrUtil.isNotBlank(bo.getFileName()), SysOss::getFileName, bo.getFileName());

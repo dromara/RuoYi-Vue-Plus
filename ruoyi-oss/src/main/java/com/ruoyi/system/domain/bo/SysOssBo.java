@@ -1,4 +1,4 @@
-package com.ruoyi.system.bo;
+package com.ruoyi.system.domain.bo;
 
 import com.ruoyi.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ApiModel("OSS云存储分页查询对象")
-public class SysOssQueryBo extends BaseEntity {
+public class SysOssBo extends BaseEntity {
 
 	/**
 	 * 分页大小
