@@ -20,7 +20,11 @@ import java.util.function.Function;
  */
 public interface IServicePlus<T, K> extends IService<T> {
 
-	K getVoById(Serializable id, CopyOptions copyOptions);
+	K getVoById(Serializable id, CopyOptions copyOptions, Class<K> kClass);
+
+	default K getVoById(Serializable id, CopyOptions copyOptions) {
+		return getVoById(id, copyOptions, null);
+	}
 
 	default K getVoById(Serializable id) {
 		return getVoById(id, new CopyOptions());
@@ -30,7 +34,11 @@ public interface IServicePlus<T, K> extends IService<T> {
 		return convertor.apply(getById(id));
 	}
 
-	List<K> listVoByIds(Collection<? extends Serializable> idList, CopyOptions copyOptions);
+	List<K> listVoByIds(Collection<? extends Serializable> idList, CopyOptions copyOptions, Class<K> kClass);
+
+	default List<K> listVoByIds(Collection<? extends Serializable> idList, CopyOptions copyOptions) {
+		return listVoByIds(idList, copyOptions, null);
+	}
 
 	default List<K> listVoByIds(Collection<? extends Serializable> idList) {
 		return listVoByIds(idList, new CopyOptions());
@@ -45,7 +53,11 @@ public interface IServicePlus<T, K> extends IService<T> {
 		return convertor.apply(list);
 	}
 
-	List<K> listVoByMap(Map<String, Object> columnMap, CopyOptions copyOptions);
+	List<K> listVoByMap(Map<String, Object> columnMap, CopyOptions copyOptions, Class<K> kClass);
+
+	default List<K> listVoByMap(Map<String, Object> columnMap, CopyOptions copyOptions) {
+		return listVoByMap(columnMap, copyOptions, null);
+	}
 
 	default List<K> listVoByMap(Map<String, Object> columnMap) {
 		return listVoByMap(columnMap, new CopyOptions());
@@ -61,7 +73,11 @@ public interface IServicePlus<T, K> extends IService<T> {
 		return convertor.apply(list);
 	}
 
-	K getVoOne(Wrapper<T> queryWrapper, CopyOptions copyOptions);
+	K getVoOne(Wrapper<T> queryWrapper, CopyOptions copyOptions, Class<K> kClass);
+
+	default K getVoOne(Wrapper<T> queryWrapper, CopyOptions copyOptions) {
+		return getVoOne(queryWrapper, copyOptions, null);
+	}
 
 	default K getVoOne(Wrapper<T> queryWrapper) {
 		return getVoOne(queryWrapper, new CopyOptions());
@@ -71,7 +87,11 @@ public interface IServicePlus<T, K> extends IService<T> {
 		return convertor.apply(getOne(queryWrapper, true));
 	}
 
-	List<K> listVo(Wrapper<T> queryWrapper, CopyOptions copyOptions);
+	List<K> listVo(Wrapper<T> queryWrapper, CopyOptions copyOptions, Class<K> kClass);
+
+	default List<K> listVo(Wrapper<T> queryWrapper, CopyOptions copyOptions) {
+		return listVo(queryWrapper, copyOptions, null);
+	}
 
 	default List<K> listVo(Wrapper<T> queryWrapper) {
 		return listVo(queryWrapper, new CopyOptions());
@@ -93,7 +113,11 @@ public interface IServicePlus<T, K> extends IService<T> {
 		return listVo(Wrappers.emptyWrapper(), convertor);
 	}
 
-	PagePlus<T, K> pageVo(PagePlus<T, K> page, Wrapper<T> queryWrapper, CopyOptions copyOptions);
+	PagePlus<T, K> pageVo(PagePlus<T, K> page, Wrapper<T> queryWrapper, CopyOptions copyOptions, Class<K> kClass);
+
+	default PagePlus<T, K> pageVo(PagePlus<T, K> page, Wrapper<T> queryWrapper, CopyOptions copyOptions) {
+		return pageVo(page, queryWrapper, copyOptions, null);
+	}
 
 	default PagePlus<T, K> pageVo(PagePlus<T, K> page, Wrapper<T> queryWrapper) {
 		return pageVo(page, queryWrapper, new CopyOptions());
