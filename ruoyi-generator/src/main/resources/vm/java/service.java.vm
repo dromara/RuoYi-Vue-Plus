@@ -1,10 +1,8 @@
 package ${packageName}.service;
 
 import ${packageName}.domain.${ClassName};
-import ${packageName}.vo.${ClassName}Vo;
-import ${packageName}.bo.${ClassName}QueryBo;
-import ${packageName}.bo.${ClassName}AddBo;
-import ${packageName}.bo.${ClassName}EditBo;
+import ${packageName}.domain.vo.${ClassName}Vo;
+import ${packageName}.domain.bo.${ClassName}Bo;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 #if($table.crud || $table.sub)
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -30,27 +28,27 @@ public interface I${ClassName}Service extends IServicePlus<${ClassName}, ${Class
 	/**
 	 * 查询列表
 	 */
-    TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}QueryBo bo);
+    TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo);
 #end
 
 	/**
 	 * 查询列表
 	 */
-	List<${ClassName}Vo> queryList(${ClassName}QueryBo bo);
+	List<${ClassName}Vo> queryList(${ClassName}Bo bo);
 
 	/**
 	 * 根据新增业务对象插入${functionName}
 	 * @param bo ${functionName}新增业务对象
 	 * @return
 	 */
-	Boolean insertByAddBo(${ClassName}AddBo bo);
+	Boolean insertByBo(${ClassName}Bo bo);
 
 	/**
 	 * 根据编辑业务对象修改${functionName}
 	 * @param bo ${functionName}编辑业务对象
 	 * @return
 	 */
-	Boolean updateByEditBo(${ClassName}EditBo bo);
+	Boolean updateByBo(${ClassName}Bo bo);
 
 	/**
 	 * 校验并删除数据
