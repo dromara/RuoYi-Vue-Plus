@@ -11,7 +11,7 @@
 
 RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期与 RuoYi-Vue 同步
 
-集成 Lock4j dynamic-datasource 等分布式场景解决方案
+集成 Lock4j dynamic-datasource OSS存储 等分布式场景解决方案
 
 集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 
 
@@ -33,6 +33,7 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期�
 * Redis客户端 采用 Redisson 性能更强
 * 分布式锁 Lock4j 注解锁、工具锁 多种多样
 * 部署方式 Docker 容器编排 一键部署业务集群
+* 文件存储 OSS 对象存储模块 支持(Minio、七牛、阿里、腾讯)
 
 ## 参考文档
 
@@ -89,13 +90,14 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期�
 * 集成 dynamic-datasource 多数据源(默认支持MySQL,其他种类需自行适配)
 * 集成 Lock4j 实现分布式 注解锁、工具锁 多种多样
 * 增加 Docker 容器编排 打包插件与部署脚本
+* 移除 本地文件上传 改为 OSS对象存储 支持(Minio、七牛、阿里、腾讯)
 
 ### 代码改动
 
 * 所有原生功能使用 Mybatis-Plus 与 Lombok 重写
 * 增加 IServicePlus 与 BaseMapperPlus 可自定义通用方法
 * 代码生成模板 改为适配 Mybatis-Plus 的代码
-* 代码生成模板 拆分出 Vo,QueryBo,AddBo,EditBo 等领域对象
+* 代码生成模板 根据 Alibaba 代码规约 拆分出 VO、BO 等领域对象
 * 代码生成模板 增加 文档注解 与 校验注解 简化通用操作
 * 项目修改为 maven多环境配置
 * 项目配置修改为 application.yml 统一管理
