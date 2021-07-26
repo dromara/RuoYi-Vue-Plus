@@ -6,13 +6,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
-import com.ruoyi.demo.bo.TestTreeAddBo;
-import com.ruoyi.demo.bo.TestTreeEditBo;
-import com.ruoyi.demo.bo.TestTreeQueryBo;
 import com.ruoyi.demo.domain.TestTree;
+import com.ruoyi.demo.domain.bo.TestTreeBo;
+import com.ruoyi.demo.domain.vo.TestTreeVo;
 import com.ruoyi.demo.mapper.TestTreeMapper;
 import com.ruoyi.demo.service.ITestTreeService;
-import com.ruoyi.demo.vo.TestTreeVo;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -23,7 +21,7 @@ import java.util.Map;
  * 测试树表Service业务层处理
  *
  * @author Lion Li
- * @date 2021-05-30
+ * @date 2021-07-26
  */
 @Service
 public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTree, TestTreeVo> implements ITestTreeService {
@@ -36,11 +34,11 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
 //	@DataSource(DataSourceType.SLAVE) // 切换从库查询
 	@DataScope(isUser = true)
 	@Override
-	public List<TestTreeVo> queryList(TestTreeQueryBo bo) {
+	public List<TestTreeVo> queryList(TestTreeBo bo) {
 		return listVo(buildQueryWrapper(bo));
 	}
 
-	private LambdaQueryWrapper<TestTree> buildQueryWrapper(TestTreeQueryBo bo) {
+	private LambdaQueryWrapper<TestTree> buildQueryWrapper(TestTreeBo bo) {
 		Map<String, Object> params = bo.getParams();
 		Object dataScope = params.get("dataScope");
 		LambdaQueryWrapper<TestTree> lqw = Wrappers.lambdaQuery();
@@ -53,14 +51,14 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
 	}
 
 	@Override
-	public Boolean insertByAddBo(TestTreeAddBo bo) {
+	public Boolean insertByBo(TestTreeBo bo) {
 		TestTree add = BeanUtil.toBean(bo, TestTree.class);
 		validEntityBeforeSave(add);
 		return save(add);
 	}
 
 	@Override
-	public Boolean updateByEditBo(TestTreeEditBo bo) {
+	public Boolean updateByBo(TestTreeBo bo) {
 		TestTree update = BeanUtil.toBean(bo, TestTree.class);
 		validEntityBeforeSave(update);
 		return updateById(update);

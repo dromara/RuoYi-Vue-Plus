@@ -1,11 +1,9 @@
 package com.ruoyi.demo.service;
 
-import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
-import com.ruoyi.demo.bo.TestTreeAddBo;
-import com.ruoyi.demo.bo.TestTreeEditBo;
-import com.ruoyi.demo.bo.TestTreeQueryBo;
 import com.ruoyi.demo.domain.TestTree;
-import com.ruoyi.demo.vo.TestTreeVo;
+import com.ruoyi.demo.domain.vo.TestTreeVo;
+import com.ruoyi.demo.domain.bo.TestTreeBo;
+import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +12,7 @@ import java.util.List;
  * 测试树表Service接口
  *
  * @author Lion Li
- * @date 2021-05-30
+ * @date 2021-07-26
  */
 public interface ITestTreeService extends IServicePlus<TestTree, TestTreeVo> {
 	/**
@@ -26,21 +24,21 @@ public interface ITestTreeService extends IServicePlus<TestTree, TestTreeVo> {
 	/**
 	 * 查询列表
 	 */
-	List<TestTreeVo> queryList(TestTreeQueryBo bo);
+	List<TestTreeVo> queryList(TestTreeBo bo);
 
 	/**
 	 * 根据新增业务对象插入测试树表
 	 * @param bo 测试树表新增业务对象
 	 * @return
 	 */
-	Boolean insertByAddBo(TestTreeAddBo bo);
+	Boolean insertByBo(TestTreeBo bo);
 
 	/**
 	 * 根据编辑业务对象修改测试树表
 	 * @param bo 测试树表编辑业务对象
 	 * @return
 	 */
-	Boolean updateByEditBo(TestTreeEditBo bo);
+	Boolean updateByBo(TestTreeBo bo);
 
 	/**
 	 * 校验并删除数据

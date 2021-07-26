@@ -10,13 +10,11 @@ import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.PageUtils;
-import com.ruoyi.demo.bo.TestDemoAddBo;
-import com.ruoyi.demo.bo.TestDemoEditBo;
-import com.ruoyi.demo.bo.TestDemoQueryBo;
 import com.ruoyi.demo.domain.TestDemo;
+import com.ruoyi.demo.domain.bo.TestDemoBo;
+import com.ruoyi.demo.domain.vo.TestDemoVo;
 import com.ruoyi.demo.mapper.TestDemoMapper;
 import com.ruoyi.demo.service.ITestDemoService;
-import com.ruoyi.demo.vo.TestDemoVo;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -27,7 +25,7 @@ import java.util.Map;
  * 测试单表Service业务层处理
  *
  * @author Lion Li
- * @date 2021-05-30
+ * @date 2021-07-26
  */
 @Service
 public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDemo, TestDemoVo> implements ITestDemoService {
@@ -39,7 +37,7 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 
 	@DataScope(isUser = true)
 	@Override
-	public TableDataInfo<TestDemoVo> queryPageList(TestDemoQueryBo bo) {
+	public TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo) {
 		PagePlus<TestDemo, TestDemoVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
 		return PageUtils.buildDataInfo(result);
 	}
@@ -49,18 +47,18 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 	 */
 	@DataScope(isUser = true)
 	@Override
-	public TableDataInfo<TestDemoVo> customPageList(TestDemoQueryBo bo) {
+	public TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo) {
 		Page<TestDemoVo> result = baseMapper.customPageList(PageUtils.buildPage(), buildQueryWrapper(bo));
 		return PageUtils.buildDataInfo(result);
 	}
 
 	@DataScope(isUser = true)
 	@Override
-	public List<TestDemoVo> queryList(TestDemoQueryBo bo) {
+	public List<TestDemoVo> queryList(TestDemoBo bo) {
 		return listVo(buildQueryWrapper(bo));
 	}
 
-	private LambdaQueryWrapper<TestDemo> buildQueryWrapper(TestDemoQueryBo bo) {
+	private LambdaQueryWrapper<TestDemo> buildQueryWrapper(TestDemoBo bo) {
 		Map<String, Object> params = bo.getParams();
 		Object dataScope = params.get("dataScope");
 		LambdaQueryWrapper<TestDemo> lqw = Wrappers.lambdaQuery();
@@ -74,14 +72,14 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 	}
 
 	@Override
-	public Boolean insertByAddBo(TestDemoAddBo bo) {
+	public Boolean insertByBo(TestDemoBo bo) {
 		TestDemo add = BeanUtil.toBean(bo, TestDemo.class);
 		validEntityBeforeSave(add);
 		return save(add);
 	}
 
 	@Override
-	public Boolean updateByEditBo(TestDemoEditBo bo) {
+	public Boolean updateByBo(TestDemoBo bo) {
 		TestDemo update = BeanUtil.toBean(bo, TestDemo.class);
 		validEntityBeforeSave(update);
 		return updateById(update);
