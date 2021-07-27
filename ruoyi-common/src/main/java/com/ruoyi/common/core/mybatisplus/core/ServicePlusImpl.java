@@ -1,12 +1,11 @@
 package com.ruoyi.common.core.mybatisplus.core;
 
-import cn.hutool.core.bean.copier.BeanCopier;
 import cn.hutool.core.bean.copier.CopyOptions;
-import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.page.PagePlus;
+import com.ruoyi.common.utils.BeanCopyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ResolvableType;
@@ -15,7 +14,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * IServicePlus 实现类
@@ -125,9 +123,9 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, K> extends ServiceI
 	 * @param id 主键ID
 	 */
 	@Override
-	public K getVoById(Serializable id, CopyOptions copyOptions, Class<K> kClass) {
+	public K getVoById(Serializable id, CopyOptions copyOptions) {
 		T t = getBaseMapper().selectById(id);
-		return oneVoCopy(t, copyOptions, kClass);
+		return BeanCopyUtils.oneCopy(t, copyOptions, voClass);
 	}
 
 	/**
@@ -136,12 +134,12 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, K> extends ServiceI
 	 * @param idList 主键ID列表
 	 */
 	@Override
-	public List<K> listVoByIds(Collection<? extends Serializable> idList, CopyOptions copyOptions, Class<K> kClass) {
+	public List<K> listVoByIds(Collection<? extends Serializable> idList, CopyOptions copyOptions) {
 		List<T> list = getBaseMapper().selectBatchIds(idList);
 		if (list == null) {
 			return null;
 		}
-		return listVoCopy(list, copyOptions, kClass);
+		return BeanCopyUtils.listCopy(list, copyOptions, voClass);
 	}
 
 	/**
@@ -150,12 +148,12 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, K> extends ServiceI
 	 * @param columnMap 表字段 map 对象
 	 */
 	@Override
-	public List<K> listVoByMap(Map<String, Object> columnMap, CopyOptions copyOptions, Class<K> kClass) {
+	public List<K> listVoByMap(Map<String, Object> columnMap, CopyOptions copyOptions) {
 		List<T> list = getBaseMapper().selectByMap(columnMap);
 		if (list == null) {
 			return null;
 		}
-		return listVoCopy(list, copyOptions, kClass);
+		return BeanCopyUtils.listCopy(list, copyOptions, voClass);
 	}
 
 	/**
@@ -165,9 +163,9 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, K> extends ServiceI
 	 * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
 	 */
 	@Override
-	public K getVoOne(Wrapper<T> queryWrapper, CopyOptions copyOptions, Class<K> kClass) {
+	public K getVoOne(Wrapper<T> queryWrapper, CopyOptions copyOptions) {
 		T t = getOne(queryWrapper, true);
-		return oneVoCopy(t, copyOptions, kClass);
+		return BeanCopyUtils.oneCopy(t, copyOptions, voClass);
 	}
 
 	/**
@@ -176,12 +174,12 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, K> extends ServiceI
 	 * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
 	 */
 	@Override
-	public List<K> listVo(Wrapper<T> queryWrapper, CopyOptions copyOptions, Class<K> kClass) {
+	public List<K> listVo(Wrapper<T> queryWrapper, CopyOptions copyOptions) {
 		List<T> list = getBaseMapper().selectList(queryWrapper);
 		if (list == null) {
 			return null;
 		}
-		return listVoCopy(list, copyOptions, kClass);
+		return BeanCopyUtils.listCopy(list, copyOptions, voClass);
 	}
 
 	/**
@@ -191,31 +189,11 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, K> extends ServiceI
 	 * @param queryWrapper 实体对象封装操作类
 	 */
 	@Override
-	public PagePlus<T, K> pageVo(PagePlus<T, K> page, Wrapper<T> queryWrapper, CopyOptions copyOptions, Class<K> kClass) {
+	public PagePlus<T, K> pageVo(PagePlus<T, K> page, Wrapper<T> queryWrapper, CopyOptions copyOptions) {
 		PagePlus<T, K> result = getBaseMapper().selectPage(page, queryWrapper);
-		List<K> volist = listVoCopy(result.getRecords(), copyOptions, kClass);
+		List<K> volist = BeanCopyUtils.listCopy(result.getRecords(), copyOptions, voClass);
 		result.setRecordsVo(volist);
 		return result;
-	}
-
-	private K oneVoCopy(T t, CopyOptions copyOptions, Class<K> kClass) {
-		Class<K> voClass = this.voClass;
-		if (kClass != null) {
-			voClass = kClass;
-		}
-		K k = ReflectUtil.newInstanceIfPossible(voClass);
-		return BeanCopier.create(t, k, copyOptions).copy();
-	}
-
-	private List<K> listVoCopy(List<T> list, CopyOptions copyOptions, Class<K> kClass) {
-		Class<K> voClass = this.voClass;
-		if (kClass != null) {
-			voClass = kClass;
-		}
-		final Class<K> finalVoClass = voClass;
-		return list.stream()
-			.map(any -> BeanCopier.create(any, ReflectUtil.newInstanceIfPossible(finalVoClass), copyOptions).copy())
-			.collect(Collectors.toList());
 	}
 
 }
