@@ -154,7 +154,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 				childrenList.add(children);
 				router.setChildren(childrenList);
 			} else if (menu.getParentId().intValue() == 0 && isInnerLink(menu)) {
-				router.setMeta(null);
+				router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
 				router.setPath("/inner");
 				List<RouterVo> childrenList = new ArrayList<RouterVo>();
 				RouterVo children = new RouterVo();
