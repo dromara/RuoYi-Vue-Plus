@@ -161,7 +161,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 				String routerPath = StringUtils.replaceEach(menu.getPath(), new String[] { Constants.HTTP, Constants.HTTPS }, new String[] { "", "" });
 				children.setPath(routerPath);
 				children.setComponent(UserConstants.INNER_LINK);
-				children.setName(StringUtils.capitalize(routerPath));
+				children.setName(StrUtil.upperFirst(routerPath));
 				children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), menu.getPath()));
                 childrenList.add(children);
                 router.setChildren(childrenList);
