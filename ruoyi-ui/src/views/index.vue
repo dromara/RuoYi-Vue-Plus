@@ -22,6 +22,8 @@
           * 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构<br/>
           * Redis客户端 采用 Redisson 性能更强<br/>
           * 分布式锁 Lock4j 注解锁、工具锁 多种多样<br/>
+          * 部署方式 Docker 容器编排 一键部署业务集群<br/>
+          * 文件存储 OSS 对象存储模块 支持(Minio、七牛、阿里、腾讯)<br/>
         </p>
         <p>
           <b>当前版本:</b> <span>v{{ version }}</span>
@@ -91,6 +93,37 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v2.6.0 - 2021-7-28">
+              <ol>
+                <li>add [重大新增] 增加 OSS 对象存储模块</li>
+                <li>remove [重大改动] 删除 自带通用上传 接口 使用OSS模块替换<li>
+                <li>update [重大改动] 重写VO转换 支持深拷贝 将VO类抽象到 ServicePlus 泛型处理<li>
+                <li>update [重大改动] 多BO合并 使用分组校验 生成BO代码<li>
+                <li>update [重大改动] 重构 IServicePlus 功能 增加 BeanCopyUtils 深拷贝工具<li>
+                <li>update springboot 2.4.9 => 2.5.3<li>
+                <li>update hutool 5.7.4 => 5.7.6<li>
+                <li>update minio 8.2.2 => 8.3.0<li>
+                <li>update docker plugin 1.2.0 => 1.2.2<li>
+                <li>update redisson 3.16.0 => 3.16.1<li>
+                <li>update datasource 3.4.0 => 3.4.1<li>
+                <li>update element-ui 2.15.2 => 2.15.3<li>
+                <li>add 演示Demo增加自定义分页接口案例</li>
+                <li>add 角色&菜单新增字段属性提示信息</li>
+                <li>update 更新druid配置 独立配置更明显</li>
+                <li>update 顶部菜单排除隐藏的默认路由</li>
+                <li>update 富文本新增上传文件大小限制</li>
+                <li>update 导入用户样式调整</li>
+                <li>update 顶部菜单样式调整</li>
+                <li>update 密码框新增显示切换密码图标</li>
+                <li>update 内链设置meta信息</li>
+                <li>update 跳转路由高亮相对应的菜单栏</li>
+                <li>fix 修复多数据源druid全局配置缩进错误 引起无效配置问题</li>
+                <li>fix 修复定时任务日志执行状态显示</li>
+                <li>fix 修复 授权角色空数据问题</li>
+                <li>fix 修复 DictData 删除逻辑问题</li>
+                <li>fix 修复任意账户越权漏洞</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.5.2 - 2021-7-19">
               <ol>
                 <li>update 优化代码生成器注释格式</li>
