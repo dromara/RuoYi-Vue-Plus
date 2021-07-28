@@ -1,4 +1,4 @@
-package ${packageName}.vo;
+package ${packageName}.domain.vo;
 
 import com.ruoyi.common.annotation.Excel;
 #foreach ($import in $importList)

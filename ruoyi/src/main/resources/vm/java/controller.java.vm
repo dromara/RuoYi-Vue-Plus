@@ -13,11 +13,11 @@ import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.validate.AddGroup;
+import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.enums.BusinessType;
-import ${packageName}.vo.${ClassName}Vo;
-import ${packageName}.bo.${ClassName}QueryBo;
-import ${packageName}.bo.${ClassName}AddBo;
-import ${packageName}.bo.${ClassName}EditBo;
+import ${packageName}.domain.vo.${ClassName}Vo;
+import ${packageName}.domain.bo.${ClassName}Bo;
 import ${packageName}.service.I${ClassName}Service;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 #if($table.crud || $table.sub)
@@ -49,11 +49,11 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:list')")
     @GetMapping("/list")
 #if($table.crud || $table.sub)
-    public TableDataInfo<${ClassName}Vo> list(@Validated ${ClassName}QueryBo bo) {
+    public TableDataInfo<${ClassName}Vo> list(@Validated ${ClassName}Bo bo) {
         return i${ClassName}Service.queryPageList(bo);
     }
 #elseif($table.tree)
-    public AjaxResult<List<${ClassName}Vo>> list(@Validated ${ClassName}QueryBo bo) {
+    public AjaxResult<List<${ClassName}Vo>> list(@Validated ${ClassName}Bo bo) {
         List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
         return AjaxResult.success(list);
     }
@@ -66,7 +66,7 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:export')")
     @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult<${ClassName}Vo> export(@Validated ${ClassName}QueryBo bo) {
+    public AjaxResult<${ClassName}Vo> export(@Validated ${ClassName}Bo bo) {
         List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
         ExcelUtil<${ClassName}Vo> util = new ExcelUtil<${ClassName}Vo>(${ClassName}Vo.class);
         return util.exportExcel(list, "${functionName}");
@@ -91,8 +91,8 @@ public class ${ClassName}Controller extends BaseController {
     @Log(title = "${functionName}", businessType = BusinessType.INSERT)
     @RepeatSubmit
     @PostMapping()
-    public AjaxResult<Void> add(@Validated @RequestBody ${ClassName}AddBo bo) {
-        return toAjax(i${ClassName}Service.insertByAddBo(bo) ? 1 : 0);
+    public AjaxResult<Void> add(@Validated(AddGroup.class) @RequestBody ${ClassName}Bo bo) {
+        return toAjax(i${ClassName}Service.insertByBo(bo) ? 1 : 0);
     }
 
     /**
@@ -103,8 +103,8 @@ public class ${ClassName}Controller extends BaseController {
     @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
     @RepeatSubmit
     @PutMapping()
-    public AjaxResult<Void> edit(@Validated @RequestBody ${ClassName}EditBo bo) {
-        return toAjax(i${ClassName}Service.updateByEditBo(bo) ? 1 : 0);
+    public AjaxResult<Void> edit(@Validated(EditGroup.class) @RequestBody ${ClassName}Bo bo) {
+        return toAjax(i${ClassName}Service.updateByBo(bo) ? 1 : 0);
     }
 
     /**

@@ -3,13 +3,13 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.SysRoleMenu;
 import com.ruoyi.system.domain.vo.MetaVo;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author ruoyi
  */
 @Service
-public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu> implements ISysMenuService {
+public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements ISysMenuService {
     public static final String PREMISSION_STRING = "perms[\"{0}\"]";
 
     @Autowired
@@ -154,14 +154,14 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu> 
 				childrenList.add(children);
 				router.setChildren(childrenList);
 			} else if (menu.getParentId().intValue() == 0 && isInnerLink(menu)) {
-				router.setMeta(null);
+				router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
 				router.setPath("/inner");
 				List<RouterVo> childrenList = new ArrayList<RouterVo>();
 				RouterVo children = new RouterVo();
 				String routerPath = StringUtils.replaceEach(menu.getPath(), new String[] { Constants.HTTP, Constants.HTTPS }, new String[] { "", "" });
 				children.setPath(routerPath);
 				children.setComponent(UserConstants.INNER_LINK);
-				children.setName(StringUtils.capitalize(routerPath));
+				children.setName(StrUtil.upperFirst(routerPath));
 				children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), menu.getPath()));
                 childrenList.add(children);
                 router.setChildren(childrenList);

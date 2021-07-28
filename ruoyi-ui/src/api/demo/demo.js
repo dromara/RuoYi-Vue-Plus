@@ -9,6 +9,15 @@ export function listDemo(query) {
   })
 }
 
+// 自定义分页接口
+export function pageDemo(query) {
+  return request({
+    url: '/demo/demo/page',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询测试单表详细
 export function getDemo(id) {
   return request({

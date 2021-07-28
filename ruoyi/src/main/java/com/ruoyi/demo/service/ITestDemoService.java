@@ -1,10 +1,8 @@
 package com.ruoyi.demo.service;
 
 import com.ruoyi.demo.domain.TestDemo;
-import com.ruoyi.demo.vo.TestDemoVo;
-import com.ruoyi.demo.bo.TestDemoQueryBo;
-import com.ruoyi.demo.bo.TestDemoAddBo;
-import com.ruoyi.demo.bo.TestDemoEditBo;
+import com.ruoyi.demo.domain.vo.TestDemoVo;
+import com.ruoyi.demo.domain.bo.TestDemoBo;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 
@@ -15,9 +13,9 @@ import java.util.List;
  * 测试单表Service接口
  *
  * @author Lion Li
- * @date 2021-05-30
+ * @date 2021-07-26
  */
-public interface ITestDemoService extends IServicePlus<TestDemo> {
+public interface ITestDemoService extends IServicePlus<TestDemo, TestDemoVo> {
 
 	/**
 	 * 查询单个
@@ -28,25 +26,31 @@ public interface ITestDemoService extends IServicePlus<TestDemo> {
 	/**
 	 * 查询列表
 	 */
-    TableDataInfo<TestDemoVo> queryPageList(TestDemoQueryBo bo);
+    TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo);
+
 	/**
+	 * 自定义分页查询
+	 */
+	TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo);
+
+    /**
 	 * 查询列表
 	 */
-	List<TestDemoVo> queryList(TestDemoQueryBo bo);
+	List<TestDemoVo> queryList(TestDemoBo bo);
 
 	/**
 	 * 根据新增业务对象插入测试单表
 	 * @param bo 测试单表新增业务对象
 	 * @return
 	 */
-	Boolean insertByAddBo(TestDemoAddBo bo);
+	Boolean insertByBo(TestDemoBo bo);
 
 	/**
 	 * 根据编辑业务对象修改测试单表
 	 * @param bo 测试单表编辑业务对象
 	 * @return
 	 */
-	Boolean updateByEditBo(TestDemoEditBo bo);
+	Boolean updateByBo(TestDemoBo bo);
 
 	/**
 	 * 校验并删除数据

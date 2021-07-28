@@ -1,16 +1,17 @@
 package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.validate.AddGroup;
+import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.demo.bo.TestDemoAddBo;
-import com.ruoyi.demo.bo.TestDemoEditBo;
-import com.ruoyi.demo.bo.TestDemoQueryBo;
+import com.ruoyi.demo.domain.bo.TestDemoBo;
+import com.ruoyi.demo.domain.vo.TestDemoVo;
 import com.ruoyi.demo.service.ITestDemoService;
-import com.ruoyi.demo.vo.TestDemoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,9 @@ import java.util.List;
  * 测试单表Controller
  *
  * @author Lion Li
- * @date 2021-05-30
+ * @date 2021-07-26
  */
+@Validated
 @Api(value = "测试单表控制器", tags = {"测试单表管理"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
@@ -44,18 +46,28 @@ public class TestDemoController extends BaseController {
     @ApiOperation("查询测试单表列表")
     @PreAuthorize("@ss.hasPermi('demo:demo:list')")
     @GetMapping("/list")
-    public TableDataInfo<TestDemoVo> list(@Validated TestDemoQueryBo bo) {
+    public TableDataInfo<TestDemoVo> list(@Validated TestDemoBo bo) {
         return iTestDemoService.queryPageList(bo);
     }
 
-    /**
+	/**
+	 * 自定义分页查询
+	 */
+	@ApiOperation("自定义分页查询")
+	@PreAuthorize("@ss.hasPermi('demo:demo:list')")
+	@GetMapping("/page")
+	public TableDataInfo<TestDemoVo> page(@Validated TestDemoBo bo) {
+		return iTestDemoService.customPageList(bo);
+	}
+
+	/**
      * 导出测试单表列表
      */
     @ApiOperation("导出测试单表列表")
     @PreAuthorize("@ss.hasPermi('demo:demo:export')")
     @Log(title = "测试单表", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult<TestDemoVo> export(@Validated TestDemoQueryBo bo) {
+    public AjaxResult<TestDemoVo> export(@Validated TestDemoBo bo) {
         List<TestDemoVo> list = iTestDemoService.queryList(bo);
         ExcelUtil<TestDemoVo> util = new ExcelUtil<TestDemoVo>(TestDemoVo.class);
         return util.exportExcel(list, "测试单表");
@@ -78,9 +90,10 @@ public class TestDemoController extends BaseController {
     @ApiOperation("新增测试单表")
     @PreAuthorize("@ss.hasPermi('demo:demo:add')")
     @Log(title = "测试单表", businessType = BusinessType.INSERT)
+    @RepeatSubmit
     @PostMapping()
-    public AjaxResult<Void> add(@Validated @RequestBody TestDemoAddBo bo) {
-        return toAjax(iTestDemoService.insertByAddBo(bo) ? 1 : 0);
+    public AjaxResult<Void> add(@Validated(AddGroup.class) @RequestBody TestDemoBo bo) {
+        return toAjax(iTestDemoService.insertByBo(bo) ? 1 : 0);
     }
 
     /**
@@ -89,9 +102,10 @@ public class TestDemoController extends BaseController {
     @ApiOperation("修改测试单表")
     @PreAuthorize("@ss.hasPermi('demo:demo:edit')")
     @Log(title = "测试单表", businessType = BusinessType.UPDATE)
+    @RepeatSubmit
     @PutMapping()
-    public AjaxResult<Void> edit(@Validated @RequestBody TestDemoEditBo bo) {
-        return toAjax(iTestDemoService.updateByEditBo(bo) ? 1 : 0);
+    public AjaxResult<Void> edit(@Validated(EditGroup.class) @RequestBody TestDemoBo bo) {
+        return toAjax(iTestDemoService.updateByBo(bo) ? 1 : 0);
     }
 
     /**

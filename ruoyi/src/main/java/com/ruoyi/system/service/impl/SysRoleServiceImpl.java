@@ -2,10 +2,10 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.lang.Validator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.PageUtils;
@@ -30,7 +30,7 @@ import java.util.*;
  * @author ruoyi
  */
 @Service
-public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole> implements ISysRoleService {
+public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements ISysRoleService {
 
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
@@ -364,13 +364,17 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole> 
     @Override
     public int insertAuthUsers(Long roleId, Long[] userIds) {
         // 新增用户与角色管理
-        List<SysUserRole> list = new ArrayList<SysUserRole>();
+		int rows = 1;
+		List<SysUserRole> list = new ArrayList<SysUserRole>();
         for (Long userId : userIds) {
             SysUserRole ur = new SysUserRole();
             ur.setUserId(userId);
             ur.setRoleId(roleId);
             list.add(ur);
         }
-        return userRoleMapper.insertAll(list);
+		if (list.size() > 0) {
+			rows = userRoleMapper.insertAll(list);
+		}
+        return rows;
     }
 }
