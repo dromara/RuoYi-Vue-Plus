@@ -1,6 +1,6 @@
 package com.ruoyi.system.service;
 
-import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysConfig;
 
@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface ISysConfigService extends IServicePlus<SysConfig> {
+public interface ISysConfigService extends IService<SysConfig> {
 
 
     TableDataInfo<SysConfig> selectPageConfigList(SysConfig config);

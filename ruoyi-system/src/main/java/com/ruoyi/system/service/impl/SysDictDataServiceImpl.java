@@ -2,8 +2,8 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.domain.entity.SysDictData;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.DictUtils;
 import com.ruoyi.common.utils.PageUtils;
@@ -11,7 +11,6 @@ import com.ruoyi.system.mapper.SysDictDataMapper;
 import com.ruoyi.system.service.ISysDictDataService;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -20,7 +19,7 @@ import java.util.List;
  * @author ruoyi
  */
 @Service
-public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, SysDictData> implements ISysDictDataService {
+public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData> implements ISysDictDataService {
 
 	@Override
 	public TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData) {
@@ -84,10 +83,10 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
 	public void deleteDictDataByIds(Long[] dictCodes) {
 		for (Long dictCode : dictCodes) {
 			SysDictData data = selectDictDataById(dictCode);
+            removeById(dictCode);
 			List<SysDictData> dictDatas = baseMapper.selectDictDataByType(data.getDictType());
 			DictUtils.setDictCache(data.getDictType(), dictDatas);
 		}
-		baseMapper.deleteBatchIds(Arrays.asList(dictCodes));
 	}
 
 	/**

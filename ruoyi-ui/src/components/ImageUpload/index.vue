@@ -74,7 +74,7 @@ export default {
       dialogVisible: false,
       hideUpload: false,
       baseUrl: process.env.VUE_APP_BASE_API,
-      uploadImgUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
+      uploadImgUrl: process.env.VUE_APP_BASE_API + "/system/oss/upload", // 上传的图片服务器地址
       headers: {
         Authorization: "Bearer " + getToken(),
       },
@@ -90,11 +90,7 @@ export default {
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
             if (typeof item === "string") {
-              if (item.indexOf(this.baseUrl) === -1) {
-                  item = { name: this.baseUrl + item, url: this.baseUrl + item };
-              } else {
-                  item = { name: item, url: item };
-              }
+              item = { name: item, url: item };
             }
             return item;
           });
@@ -122,7 +118,7 @@ export default {
     },
     // 上传成功回调
     handleUploadSuccess(res) {
-      this.fileList.push({ name: res.data.fileName, url: res.data.fileName });
+      this.fileList.push({ name: res.data.fileName, url: res.data.url });
       this.$emit("input", this.listToString(this.fileList));
       this.loading.close();
     },

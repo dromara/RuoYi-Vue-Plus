@@ -65,7 +65,7 @@ public class SysLoginService
         // 验证码开关
         if (captchaOnOff)
         {
-            validateCapcha(username, code, uuid, request);
+            validateCaptcha(username, code, uuid, request);
         }
         // 用户验证
         Authentication authentication = null;
@@ -103,7 +103,7 @@ public class SysLoginService
      * @param uuid 唯一标识
      * @return 结果
      */
-    public void validateCapcha(String username, String code, String uuid, HttpServletRequest request) {
+    public void validateCaptcha(String username, String code, String uuid, HttpServletRequest request) {
 		String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
 		String captcha = redisCache.getCacheObject(verifyKey);
 		redisCache.deleteObject(verifyKey);

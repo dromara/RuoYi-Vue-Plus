@@ -6,10 +6,17 @@ usage() {
 	exit 1
 }
 
-#开启所需端口
+#开启所需端口(生产环境不推荐开启)
 port(){
+    # mysql 端口
 	firewall-cmd --add-port=3306/tcp --permanent
+	# redis 端口
 	firewall-cmd --add-port=6379/tcp --permanent
+	# minio api 端口
+	firewall-cmd --add-port=9000/tcp --permanent
+	# minio 控制台端口
+	firewall-cmd --add-port=9001/tcp --permanent
+	# 重启防火墙
 	service firewalld restart
 }
 
@@ -24,7 +31,7 @@ mount(){
 
 #启动基础模块
 base(){
-	docker-compose up -d mysql nginx-web redis
+	docker-compose up -d mysql nginx-web redis minio
 }
 
 #启动基础模块

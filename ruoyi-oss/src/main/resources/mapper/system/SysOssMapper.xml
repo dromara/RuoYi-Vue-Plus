@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysOssMapper">
+
+    <resultMap type="com.ruoyi.system.domain.SysOss" id="SysOssResult">
+        <result property="ossId" column="oss_id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="fileSuffix" column="file_suffix"/>
+        <result property="url" column="url"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="service" column="service"/>
+    </resultMap>
+
+
+</mapper>

@@ -18,6 +18,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy" column="update_by"/>
         <result property="delFlag" column="del_flag"/>
     </resultMap>
+    <select id="customPageList" resultType="com.ruoyi.demo.domain.vo.TestDemoVo">
+        SELECT * FROM test_demo ${ew.customSqlSegment}
+    </select>
 
 
 </mapper>
