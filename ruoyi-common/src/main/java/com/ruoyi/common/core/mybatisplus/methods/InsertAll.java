@@ -2,7 +2,6 @@ package com.ruoyi.common.core.mybatisplus.methods;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
@@ -25,7 +24,7 @@ public class InsertAll extends AbstractMethod {
 		final String fieldSql = prepareFieldSql(tableInfo);
 		final String valueSql = prepareValuesSqlForMysqlBatch(tableInfo);
 		KeyGenerator keyGenerator = new NoKeyGenerator();
-		SqlMethod sqlMethod = SqlMethod.INSERT_ONE;
+		String sqlMethod = "insertAll";
 		String keyProperty = null;
 		String keyColumn = null;
 		// 表包含主键处理逻辑,如果不包含主键当普通字段处理
@@ -37,7 +36,7 @@ public class InsertAll extends AbstractMethod {
 				keyColumn = tableInfo.getKeyColumn();
 			} else {
 				if (null != tableInfo.getKeySequence()) {
-					keyGenerator = TableInfoHelper.genKeyGenerator(getMethod(sqlMethod), tableInfo, builderAssistant);
+					keyGenerator = TableInfoHelper.genKeyGenerator(sqlMethod, tableInfo, builderAssistant);
 					keyProperty = tableInfo.getKeyProperty();
 					keyColumn = tableInfo.getKeyColumn();
 				}
@@ -45,7 +44,7 @@ public class InsertAll extends AbstractMethod {
 		}
 		final String sqlResult = String.format(sql, tableInfo.getTableName(), fieldSql, valueSql);
 		SqlSource sqlSource = languageDriver.createSqlSource(configuration, sqlResult, modelClass);
-		return this.addInsertMappedStatement(mapperClass, modelClass, "insertAll", sqlSource, keyGenerator, keyProperty, keyColumn);
+		return this.addInsertMappedStatement(mapperClass, modelClass, sqlMethod, sqlSource, keyGenerator, keyProperty, keyColumn);
 	}
 
 	private String prepareFieldSql(TableInfo tableInfo) {
