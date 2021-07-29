@@ -45,27 +45,9 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期�
 > 
 >[参考文档 Wiki](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)
 
-## 提问四部曲
-### 一、查阅wiki
-优先在`wiki->重点事项`，查找是否有相关问题及解决方案，尤其是框架更新后产生的问题，多会在wiki中提及
+## 软件架构图
 
-> [参考文档 Wiki](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)
-
-### 二、借助issues
-尝试issues中搜索问题关键字（记得选择已完成），看看是否有其他人提出相同问题
-- `如果有`那么依据评论中的解决方案自行尝试解决
-- `如果没有`那么提交一个新的issues描述清楚你的问题，需要包含以下内容（优质的issues，能够帮助作者更高效的帮你解决问题）：
-    - 出现问题的模块或功能或类，总之你要说清楚在哪出的问题
-    - 描述产生问题的相关操作流程，以便复现快速解决
-    - 报错的日志截图，一定是截图，不要复制一堆报错的文本
-> [issues](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/issues)
-
-### 三、百度
-大家都懂，不多描述，将关键的报错信息CC->CV到百度中看看大佬们怎么解决的
-> [百度](http://www.baidu.com)
-
-### 四、加群
-以上三点已经能解决大家绝大部分问题了，如果还有问题没能通过这几种方式解决，那么加群，大家一起在群里探讨一下
+![Plus部署架构图](https://images.gitee.com/uploads/images/2021/0729/112230_4295e5ce_1766278.png "Plus部署架构图.png")
 
 ## 贡献代码
 
