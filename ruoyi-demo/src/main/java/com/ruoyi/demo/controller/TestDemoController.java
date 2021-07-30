@@ -24,6 +24,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 测试单表Controller
@@ -90,7 +91,7 @@ public class TestDemoController extends BaseController {
     @ApiOperation("新增测试单表")
     @PreAuthorize("@ss.hasPermi('demo:demo:add')")
     @Log(title = "测试单表", businessType = BusinessType.INSERT)
-    @RepeatSubmit
+    @RepeatSubmit(intervalTime = 2, timeUnit = TimeUnit.SECONDS)
     @PostMapping()
     public AjaxResult<Void> add(@Validated(AddGroup.class) @RequestBody TestDemoBo bo) {
         return toAjax(iTestDemoService.insertByBo(bo) ? 1 : 0);
