@@ -37,7 +37,7 @@
         <qiniu.version>7.8.0</qiniu.version>
         <aliyun.oss.version>3.13.0</aliyun.oss.version>
         <qcloud.cos.version>5.6.47</qcloud.cos.version>
-        <minio.version>8.3.0</minio.version>
+        <minio.version>8.2.0</minio.version>
 
         <!-- docker 配置 -->
         <docker.registry.url>localhost</docker.registry.url>
