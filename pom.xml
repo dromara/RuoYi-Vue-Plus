@@ -27,7 +27,8 @@
         <mybatis-plus.version>3.4.3</mybatis-plus.version>
         <hutool.version>5.7.6</hutool.version>
         <feign.version>3.0.3</feign.version>
-        <feign-okhttp.version>11.0</feign-okhttp.version>
+        <feign-okhttp.version>11.2</feign-okhttp.version>
+        <okhttp.version>4.9.1</okhttp.version>
         <spring-boot-admin.version>2.4.3</spring-boot-admin.version>
         <redisson.version>3.16.1</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
@@ -37,7 +38,7 @@
         <qiniu.version>7.8.0</qiniu.version>
         <aliyun.oss.version>3.13.0</aliyun.oss.version>
         <qcloud.cos.version>5.6.47</qcloud.cos.version>
-        <minio.version>8.2.0</minio.version>
+        <minio.version>8.3.0</minio.version>
 
         <!-- docker 配置 -->
         <docker.registry.url>localhost</docker.registry.url>
@@ -127,6 +128,12 @@
                 <groupId>io.github.openfeign</groupId>
                 <artifactId>feign-okhttp</artifactId>
                 <version>${feign-okhttp.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
             </dependency>
 
             <dependency>
