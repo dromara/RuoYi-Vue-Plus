@@ -72,9 +72,9 @@ public class CommonController
             // 本地资源路径
             String localPath = RuoYiConfig.getProfile();
             // 数据库资源地址
-            String downloadPath = localPath + StringUtils.subAfter(resource, Constants.RESOURCE_PREFIX,false);
+            String downloadPath = localPath + StringUtils.substringAfter(resource, Constants.RESOURCE_PREFIX);
             // 下载名称
-            String downloadName = StringUtils.subAfter(downloadPath, "/",true);
+            String downloadName = StringUtils.substringAfterLast(downloadPath, "/");
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 			File file = new File(downloadPath);
             FileUtils.setAttachmentResponseHeader(response, downloadName);

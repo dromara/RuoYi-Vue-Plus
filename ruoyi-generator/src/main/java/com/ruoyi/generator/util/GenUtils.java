@@ -61,7 +61,7 @@ public class GenUtils
             column.setHtmlType(GenConstants.HTML_INPUT);
 
             // 如果是浮点型 统一用BigDecimal
-            String[] str = StringUtils.splitToArray(StringUtils.subBetween(column.getColumnType(), "(", ")"), ",");
+            String[] str = StringUtils.split(StringUtils.substringBetween(column.getColumnType(), "(", ")"), ",");
             if (str != null && str.length == 2 && Integer.parseInt(str[1]) > 0)
             {
                 column.setJavaType(GenConstants.TYPE_BIGDECIMAL);
@@ -98,33 +98,33 @@ public class GenUtils
         }
 
         // 查询字段类型
-        if (StringUtils.endWithIgnoreCase(columnName, "name"))
+        if (StringUtils.endsWithIgnoreCase(columnName, "name"))
         {
             column.setQueryType(GenConstants.QUERY_LIKE);
         }
         // 状态字段设置单选框
-        if (StringUtils.endWithIgnoreCase(columnName, "status"))
+        if (StringUtils.endsWithIgnoreCase(columnName, "status"))
         {
             column.setHtmlType(GenConstants.HTML_RADIO);
         }
         // 类型&性别字段设置下拉框
-        else if (StringUtils.endWithIgnoreCase(columnName, "type")
-                || StringUtils.endWithIgnoreCase(columnName, "sex"))
+        else if (StringUtils.endsWithIgnoreCase(columnName, "type")
+                || StringUtils.endsWithIgnoreCase(columnName, "sex"))
         {
             column.setHtmlType(GenConstants.HTML_SELECT);
         }
         // 图片字段设置图片上传控件
-        else if (StringUtils.endWithIgnoreCase(columnName, "image"))
+        else if (StringUtils.endsWithIgnoreCase(columnName, "image"))
         {
             column.setHtmlType(GenConstants.HTML_IMAGE_UPLOAD);
         }
         // 文件字段设置文件上传控件
-        else if (StringUtils.endWithIgnoreCase(columnName, "file"))
+        else if (StringUtils.endsWithIgnoreCase(columnName, "file"))
         {
             column.setHtmlType(GenConstants.HTML_FILE_UPLOAD);
         }
         // 内容字段设置富文本控件
-        else if (StringUtils.endWithIgnoreCase(columnName, "content"))
+        else if (StringUtils.endsWithIgnoreCase(columnName, "content"))
         {
             column.setHtmlType(GenConstants.HTML_EDITOR);
         }
@@ -152,7 +152,7 @@ public class GenUtils
     {
         int lastIndex = packageName.lastIndexOf(".");
         int nameLength = packageName.length();
-        String moduleName = StringUtils.sub(packageName, lastIndex + 1, nameLength);
+        String moduleName = StringUtils.substring(packageName, lastIndex + 1, nameLength);
         return moduleName;
     }
 
@@ -166,7 +166,7 @@ public class GenUtils
     {
         int lastIndex = tableName.lastIndexOf("_");
         int nameLength = tableName.length();
-        String businessName = StringUtils.sub(tableName, lastIndex + 1, nameLength);
+        String businessName = StringUtils.substring(tableName, lastIndex + 1, nameLength);
         return businessName;
     }
 
@@ -182,10 +182,10 @@ public class GenUtils
         String tablePrefix = GenConfig.getTablePrefix();
         if (autoRemovePre && StringUtils.isNotEmpty(tablePrefix))
         {
-            String[] searchList = StringUtils.splitToArray(tablePrefix, ",");
+            String[] searchList = StringUtils.split(tablePrefix, ",");
             tableName = replaceFirst(tableName, searchList);
         }
-        return StringUtils.upperFirst(StringUtils.toCamelCase(tableName));
+        return StringUtils.convertToCamelCase(tableName);
     }
 
     /**
@@ -230,7 +230,7 @@ public class GenUtils
     {
         if (StringUtils.indexOf(columnType, '(') > 0)
         {
-            return StringUtils.subBefore(columnType, "(",false);
+            return StringUtils.substringBefore(columnType, "(");
         }
         else
         {
@@ -248,7 +248,7 @@ public class GenUtils
     {
         if (StringUtils.indexOf(columnType, '(') > 0)
         {
-            String length = StringUtils.subBetween(columnType, "(", ")");
+            String length = StringUtils.substringBetween(columnType, "(", ")");
             return Integer.valueOf(length);
         }
         else

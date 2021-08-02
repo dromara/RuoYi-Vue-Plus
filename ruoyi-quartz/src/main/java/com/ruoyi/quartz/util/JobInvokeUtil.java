@@ -1,6 +1,5 @@
 package com.ruoyi.quartz.util;
 
-import cn.hutool.core.lang.Validator;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.quartz.domain.SysJob;
@@ -52,7 +51,7 @@ public class JobInvokeUtil
             throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
             InvocationTargetException
     {
-        if (Validator.isNotNull(methodParams) && methodParams.size() > 0)
+        if (StringUtils.isNotNull(methodParams) && methodParams.size() > 0)
         {
             Method method = bean.getClass().getDeclaredMethod(methodName, getMethodParamsType(methodParams));
             method.invoke(bean, getMethodParamsValue(methodParams));
@@ -72,7 +71,7 @@ public class JobInvokeUtil
      */
     public static boolean isValidClassName(String invokeTarget)
     {
-        return StringUtils.count(invokeTarget, ".") > 1;
+        return StringUtils.countMatches(invokeTarget, ".") > 1;
     }
 
     /**
@@ -83,8 +82,8 @@ public class JobInvokeUtil
      */
     public static String getBeanName(String invokeTarget)
     {
-        String beanName = StringUtils.subBefore(invokeTarget, "(",false);
-        return StringUtils.subBefore(beanName, ".",true);
+        String beanName = StringUtils.substringBefore(invokeTarget, "(");
+        return StringUtils.substringBefore(beanName, ".");
     }
 
     /**
@@ -95,8 +94,8 @@ public class JobInvokeUtil
      */
     public static String getMethodName(String invokeTarget)
     {
-        String methodName = StringUtils.subBefore(invokeTarget, "(",false);
-        return StringUtils.subAfter(methodName, ".",true);
+        String methodName = StringUtils.substringBefore(invokeTarget, "(");
+        return StringUtils.substringBefore(methodName, ".");
     }
 
     /**
@@ -107,7 +106,7 @@ public class JobInvokeUtil
      */
     public static List<Object[]> getMethodParams(String invokeTarget)
     {
-        String methodStr = StringUtils.subBetween(invokeTarget, "(", ")");
+        String methodStr = StringUtils.substringBetween(invokeTarget, "(", ")");
         if (StringUtils.isEmpty(methodStr))
         {
             return null;

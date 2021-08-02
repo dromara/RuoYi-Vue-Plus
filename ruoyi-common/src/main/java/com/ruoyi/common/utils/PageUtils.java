@@ -92,7 +92,7 @@ public class PageUtils {
         Page<T> page = new Page<>(pageNum, pageSize);
         if (StringUtils.isNotBlank(orderByColumn)) {
             String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
-			orderBy = StringUtils.toUnderlineCase(orderBy);
+			orderBy = StringUtils.toUnderScoreCase(orderBy);
 			if ("asc".equals(isAsc)) {
                 page.addOrder(OrderItem.asc(orderBy));
             } else if ("desc".equals(isAsc)) {

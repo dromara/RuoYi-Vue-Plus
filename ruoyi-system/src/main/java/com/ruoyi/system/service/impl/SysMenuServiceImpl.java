@@ -1,7 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.lang.Validator;
-import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
@@ -11,6 +9,7 @@ import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysRoleMenu;
 import com.ruoyi.system.domain.vo.MetaVo;
 import com.ruoyi.system.domain.vo.RouterVo;
@@ -85,7 +84,7 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu, 
         List<String> perms = baseMapper.selectMenuPermsByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
-            if (Validator.isNotEmpty(perm)) {
+            if (StringUtils.isNotEmpty(perm)) {
                 permsSet.addAll(Arrays.asList(perm.trim().split(",")));
             }
         }
@@ -148,7 +147,7 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu, 
                 RouterVo children = new RouterVo();
                 children.setPath(menu.getPath());
                 children.setComponent(menu.getComponent());
-                children.setName(StringUtils.upperFirst(menu.getPath()));
+                children.setName(StringUtils.capitalize(menu.getPath()));
                 children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StringUtils.equals("1", menu.getIsCache()), menu.getPath()));
 				childrenList.add(children);
 				router.setChildren(childrenList);
@@ -160,7 +159,7 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu, 
 				String routerPath = StringUtils.replaceEach(menu.getPath(), new String[] { Constants.HTTP, Constants.HTTPS }, new String[] { "", "" });
 				children.setPath(routerPath);
 				children.setComponent(UserConstants.INNER_LINK);
-				children.setName(StringUtils.upperFirst(routerPath));
+				children.setName(StringUtils.capitalize(routerPath));
 				children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), menu.getPath()));
                 childrenList.add(children);
                 router.setChildren(childrenList);
@@ -284,12 +283,12 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu, 
      */
     @Override
     public String checkMenuNameUnique(SysMenu menu) {
-        Long menuId = Validator.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
+        Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
         SysMenu info = getOne(new LambdaQueryWrapper<SysMenu>()
                 .eq(SysMenu::getMenuName,menu.getMenuName())
                 .eq(SysMenu::getParentId,menu.getParentId())
                 .last("limit 1"));
-        if (Validator.isNotNull(info) && info.getMenuId().longValue() != menuId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getMenuId().longValue() != menuId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -302,7 +301,7 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu, 
      * @return 路由名称
      */
     public String getRouteName(SysMenu menu) {
-        String routerName = StringUtils.upperFirst(menu.getPath());
+        String routerName = StringUtils.capitalize(menu.getPath());
         // 非外链并且是一级目录（类型为目录）
         if (isMenuFrame(menu)) {
             routerName = StringUtils.EMPTY;

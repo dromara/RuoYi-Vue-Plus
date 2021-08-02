@@ -150,7 +150,7 @@ public class GenTableColumn implements Serializable {
     private Map<String, Object> params = new HashMap<>();
 
     public String getCapJavaField() {
-        return StringUtils.upperFirst(javaField);
+        return StringUtils.uncapitalize(javaField);
     }
 
     public boolean isPk() {
@@ -231,7 +231,7 @@ public class GenTableColumn implements Serializable {
     }
 
     public String readConverterExp() {
-        String remarks = StringUtils.subBetween(this.columnComment, "（", "）");
+        String remarks = StringUtils.substringBetween(this.columnComment, "（", "）");
         StringBuffer sb = new StringBuffer();
         if (StringUtils.isNotEmpty(remarks)) {
             for (String value : remarks.split(" ")) {

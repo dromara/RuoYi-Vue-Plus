@@ -1,11 +1,11 @@
 package com.ruoyi.framework.mybatisplus;
 
-import cn.hutool.core.lang.Validator;
 import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 
@@ -25,12 +25,12 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 		try {
 			//根据属性名字设置要填充的值
 			if (metaObject.hasGetter("createTime")) {
-				if (Validator.isEmpty(metaObject.getValue("createTime"))) {
+				if (StringUtils.isEmpty(metaObject.getValue("createTime"))) {
 					this.setFieldValByName("createTime", new Date(), metaObject);
 				}
 			}
 			if (metaObject.hasGetter("createBy")) {
-				if (Validator.isEmpty(metaObject.getValue("createBy"))) {
+				if (StringUtils.isEmpty(metaObject.getValue("createBy"))) {
 					this.setFieldValByName("createBy", getLoginUsername(), metaObject);
 				}
 			}
@@ -43,12 +43,12 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 	public void updateFill(MetaObject metaObject) {
 		try {
 			if (metaObject.hasGetter("updateBy")) {
-				if (Validator.isEmpty(metaObject.getValue("updateBy"))) {
+				if (StringUtils.isEmpty(metaObject.getValue("updateBy"))) {
 					this.setFieldValByName("updateBy", getLoginUsername(), metaObject);
 				}
 			}
 			if (metaObject.hasGetter("updateTime")) {
-				if (Validator.isEmpty(metaObject.getValue("updateTime"))) {
+				if (StringUtils.isEmpty(metaObject.getValue("updateTime"))) {
 					this.setFieldValByName("updateTime", new Date(), metaObject);
 				}
 			}

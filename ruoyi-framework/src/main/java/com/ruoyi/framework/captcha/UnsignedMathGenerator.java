@@ -45,8 +45,8 @@ public class UnsignedMathGenerator implements CodeGenerator {
 		int max = RandomUtil.randomInt(min, limit);
 		String number1 = Integer.toString(max);
 		String number2 = Integer.toString(min);
-		number1 = StringUtils.padAfter(number1, this.numberLength, CharUtil.SPACE);
-		number2 = StringUtils.padAfter(number2, this.numberLength, CharUtil.SPACE);
+		number1 = StringUtils.rightPad(number1, this.numberLength, CharUtil.SPACE);
+		number2 = StringUtils.rightPad(number2, this.numberLength, CharUtil.SPACE);
 
 		return number1 + RandomUtil.randomChar(operators) + number2 + '=';
 	}

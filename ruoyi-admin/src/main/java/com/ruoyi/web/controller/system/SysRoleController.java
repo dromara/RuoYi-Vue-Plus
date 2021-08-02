@@ -1,6 +1,5 @@
 package com.ruoyi.web.controller.system;
 
-import cn.hutool.core.lang.Validator;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -12,6 +11,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
@@ -117,7 +117,7 @@ public class SysRoleController extends BaseController
         {
             // 更新缓存用户权限
             LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-            if (Validator.isNotNull(loginUser.getUser()) && !loginUser.getUser().isAdmin())
+            if (StringUtils.isNotNull(loginUser.getUser()) && !loginUser.getUser().isAdmin())
             {
                 loginUser.setPermissions(permissionService.getMenuPermission(loginUser.getUser()));
                 loginUser.setUser(userService.selectUserByUserName(loginUser.getUser().getUserName()));

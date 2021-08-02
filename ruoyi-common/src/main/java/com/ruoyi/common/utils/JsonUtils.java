@@ -1,6 +1,5 @@
 package com.ruoyi.common.utils;
 
-import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ArrayUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

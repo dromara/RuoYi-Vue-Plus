@@ -107,9 +107,9 @@ public class CaptchaController {
 
 	private String getCodeResult(String capStr) {
 		int numberLength = captchaProperties.getNumberLength();
-		int a = Convert.toInt(StringUtils.sub(capStr, 0, numberLength).trim());
+		int a = Convert.toInt(StringUtils.substring(capStr, 0, numberLength).trim());
 		char operator = capStr.charAt(numberLength);
-		int b = Convert.toInt(StringUtils.sub(capStr, numberLength + 1, numberLength + 1 + numberLength).trim());
+		int b = Convert.toInt(StringUtils.substring(capStr, numberLength + 1, numberLength + 1 + numberLength).trim());
 		switch (operator) {
 			case '*':
 				return a * b + "";

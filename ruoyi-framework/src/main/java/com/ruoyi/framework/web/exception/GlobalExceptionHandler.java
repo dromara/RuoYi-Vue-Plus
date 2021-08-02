@@ -1,11 +1,11 @@
 package com.ruoyi.framework.web.exception;
 
-import cn.hutool.core.lang.Validator;
 import cn.hutool.http.HttpStatus;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.exception.BaseException;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.exception.DemoModeException;
+import com.ruoyi.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,7 +21,7 @@ import javax.validation.ConstraintViolationException;
 
 /**
  * 全局异常处理器
- * 
+ *
  * @author ruoyi
  */
 @RestControllerAdvice
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler
     @ExceptionHandler(CustomException.class)
     public AjaxResult businessException(CustomException e)
     {
-        if (Validator.isNull(e.getCode()))
+        if (StringUtils.isNull(e.getCode()))
         {
             return AjaxResult.error(e.getMessage());
         }

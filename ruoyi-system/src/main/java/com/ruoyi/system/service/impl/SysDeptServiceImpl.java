@@ -1,8 +1,6 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Validator;
-import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.annotation.DataScope;
@@ -13,6 +11,7 @@ import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
@@ -160,12 +159,12 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public String checkDeptNameUnique(SysDept dept) {
-        Long deptId = Validator.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
+        Long deptId = StringUtils.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
         SysDept info = getOne(new LambdaQueryWrapper<SysDept>()
                 .eq(SysDept::getDeptName, dept.getDeptName())
                 .eq(SysDept::getParentId, dept.getParentId())
                 .last("limit 1"));
-        if (Validator.isNotNull(info) && info.getDeptId().longValue() != deptId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getDeptId().longValue() != deptId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -198,7 +197,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     public int updateDept(SysDept dept) {
         SysDept newParentDept = getById(dept.getParentId());
         SysDept oldDept = getById(dept.getDeptId());
-        if (Validator.isNotNull(newParentDept) && Validator.isNotNull(oldDept)) {
+        if (StringUtils.isNotNull(newParentDept) && StringUtils.isNotNull(oldDept)) {
             String newAncestors = newParentDept.getAncestors() + "," + newParentDept.getDeptId();
             String oldAncestors = oldDept.getAncestors();
             dept.setAncestors(newAncestors);
@@ -275,7 +274,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     private List<SysDept> getChildList(List<SysDept> list, SysDept t) {
         List<SysDept> tlist = new ArrayList<SysDept>();
 		for (SysDept n : list) {
-			if (Validator.isNotNull(n.getParentId()) && n.getParentId().longValue() == t.getDeptId().longValue()) {
+			if (StringUtils.isNotNull(n.getParentId()) && n.getParentId().longValue() == t.getDeptId().longValue()) {
 				tlist.add(n);
 			}
 		}

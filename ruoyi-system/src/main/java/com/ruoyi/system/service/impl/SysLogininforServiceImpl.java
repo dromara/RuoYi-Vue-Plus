@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.lang.Validator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -31,10 +30,10 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
                 .like(StringUtils.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
                 .eq(StringUtils.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
                 .like(StringUtils.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
                         "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
+                .apply(StringUtils.isNotEmpty(params.get("endTime")),
                         "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"));
         return PageUtils.buildDataInfo(page(PageUtils.buildPage("info_id","desc"), lqw));
@@ -64,10 +63,10 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
                 .like(StringUtils.isNotBlank(logininfor.getIpaddr()),SysLogininfor::getIpaddr,logininfor.getIpaddr())
                 .eq(StringUtils.isNotBlank(logininfor.getStatus()),SysLogininfor::getStatus,logininfor.getStatus())
                 .like(StringUtils.isNotBlank(logininfor.getUserName()),SysLogininfor::getUserName,logininfor.getUserName())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
                         "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
+                .apply(StringUtils.isNotEmpty(params.get("endTime")),
                         "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"))
                 .orderByDesc(SysLogininfor::getInfoId));

@@ -83,7 +83,7 @@ public class ImageUtils
             {
                 // 本机地址
                 String localPath = RuoYiConfig.getProfile();
-                String downloadPath = localPath + StringUtils.subAfter(url, Constants.RESOURCE_PREFIX,false);
+                String downloadPath = localPath + StringUtils.substringAfter(url, Constants.RESOURCE_PREFIX);
                 in = new FileInputStream(downloadPath);
             }
             return IOUtils.toByteArray(in);

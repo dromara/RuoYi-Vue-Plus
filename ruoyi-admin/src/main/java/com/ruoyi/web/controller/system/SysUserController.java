@@ -1,6 +1,5 @@
 package com.ruoyi.web.controller.system;
 
-import cn.hutool.core.lang.Validator;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -12,6 +11,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.service.ISysPostService;
@@ -100,7 +100,7 @@ public class SysUserController extends BaseController
         List<SysRole> roles = roleService.selectRoleAll();
         ajax.put("roles", SysUser.isAdmin(userId) ? roles : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
         ajax.put("posts", postService.selectPostAll());
-        if (Validator.isNotNull(userId))
+        if (StringUtils.isNotNull(userId))
         {
             ajax.put("user", userService.selectUserById(userId));
             ajax.put("postIds", postService.selectPostListByUserId(userId));
@@ -121,12 +121,12 @@ public class SysUserController extends BaseController
         {
             return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
         }
-        else if (Validator.isNotEmpty(user.getPhonenumber())
+        else if (StringUtils.isNotEmpty(user.getPhonenumber())
                 && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
         {
             return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
-        else if (Validator.isNotEmpty(user.getEmail())
+        else if (StringUtils.isNotEmpty(user.getEmail())
                 && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
         {
             return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
@@ -145,12 +145,12 @@ public class SysUserController extends BaseController
     public AjaxResult edit(@Validated @RequestBody SysUser user)
     {
         userService.checkUserAllowed(user);
-        if (Validator.isNotEmpty(user.getPhonenumber())
+        if (StringUtils.isNotEmpty(user.getPhonenumber())
                 && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
         {
             return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
-        else if (Validator.isNotEmpty(user.getEmail())
+        else if (StringUtils.isNotEmpty(user.getEmail())
                 && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
         {
             return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");

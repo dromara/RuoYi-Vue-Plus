@@ -1,8 +1,7 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.lang.Validator;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysUserOnline;
 import com.ruoyi.system.service.ISysUserOnlineService;
 import org.springframework.stereotype.Service;
@@ -68,7 +67,7 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
      */
     @Override
     public SysUserOnline loginUserToUserOnline(LoginUser user) {
-        if (Validator.isNull(user) || Validator.isNull(user.getUser())) {
+        if (StringUtils.isNull(user) || StringUtils.isNull(user.getUser())) {
             return null;
         }
         SysUserOnline sysUserOnline = new SysUserOnline();
@@ -79,7 +78,7 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
         sysUserOnline.setBrowser(user.getBrowser());
         sysUserOnline.setOs(user.getOs());
         sysUserOnline.setLoginTime(user.getLoginTime());
-        if (Validator.isNotNull(user.getUser().getDept())) {
+        if (StringUtils.isNotNull(user.getUser().getDept())) {
             sysUserOnline.setDeptName(user.getUser().getDept().getDeptName());
         }
         return sysUserOnline;

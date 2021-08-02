@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.lang.Validator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
@@ -93,10 +92,10 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
      */
     @Override
     public String checkPostNameUnique(SysPost post) {
-        Long postId = Validator.isNull(post.getPostId()) ? -1L : post.getPostId();
+        Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
         SysPost info = getOne(new LambdaQueryWrapper<SysPost>()
                 .eq(SysPost::getPostName, post.getPostName()).last("limit 1"));
-        if (Validator.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -110,10 +109,10 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
      */
     @Override
     public String checkPostCodeUnique(SysPost post) {
-        Long postId = Validator.isNull(post.getPostId()) ? -1L : post.getPostId();
+        Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
         SysPost info = getOne(new LambdaQueryWrapper<SysPost>()
                 .eq(SysPost::getPostCode, post.getPostCode()).last("limit 1"));
-        if (Validator.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;

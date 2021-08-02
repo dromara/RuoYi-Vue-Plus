@@ -2,12 +2,12 @@ package com.ruoyi.framework.interceptor.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.lang.Validator;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.filter.RepeatedlyRequestWrapper;
 import com.ruoyi.common.utils.JsonUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.RepeatSubmitProperties;
 import com.ruoyi.framework.config.properties.TokenProperties;
 import com.ruoyi.framework.interceptor.RepeatSubmitInterceptor;
@@ -60,7 +60,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor {
 		}
 
 		// body参数为空，获取Parameter的数据
-		if (Validator.isEmpty(nowParams)) {
+		if (StringUtils.isEmpty(nowParams)) {
 			nowParams = JsonUtils.toJsonString(request.getParameterMap());
 		}
 		Map<String, Object> nowDataMap = new HashMap<String, Object>();
@@ -72,7 +72,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor {
 
 		// 唯一值（没有消息头则使用请求地址）
 		String submitKey = request.getHeader(tokenProperties.getHeader());
-		if (Validator.isEmpty(submitKey)) {
+		if (StringUtils.isEmpty(submitKey)) {
 			submitKey = url;
 		}
 

@@ -2,7 +2,6 @@ package com.ruoyi.generator.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Validator;
 import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -260,7 +259,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         // 获取模板列表
         List<String> templates = VelocityUtils.getTemplateList(table.getTplCategory());
         for (String template : templates) {
-            if (!StringUtils.containsAny("sql.vm", "api.js.vm", "index.vue.vm", "index-tree.vue.vm", template)) {
+            if (!StringUtils.containsAny(template, "sql.vm", "api.js.vm", "index.vue.vm", "index-tree.vue.vm")) {
                 // 渲染模板
                 StringWriter sw = new StringWriter();
                 Template tpl = Velocity.getTemplate(template, Constants.UTF8);
@@ -284,7 +283,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         List<String> tableColumnNames = tableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
 
         List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
-        if (Validator.isEmpty(dbTableColumns)) {
+        if (StringUtils.isEmpty(dbTableColumns)) {
             throw new CustomException("同步数据失败，原表结构不存在");
         }
         List<String> dbTableColumnNames = dbTableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
@@ -364,16 +363,16 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
     public void validateEdit(GenTable genTable) {
         if (GenConstants.TPL_TREE.equals(genTable.getTplCategory())) {
 			Map<String, Object> paramsObj = genTable.getParams();
-            if (Validator.isEmpty(paramsObj.get(GenConstants.TREE_CODE))) {
+            if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_CODE))) {
                 throw new CustomException("树编码字段不能为空");
-            } else if (Validator.isEmpty(paramsObj.get(GenConstants.TREE_PARENT_CODE))) {
+            } else if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_PARENT_CODE))) {
                 throw new CustomException("树父编码字段不能为空");
-            } else if (Validator.isEmpty(paramsObj.get(GenConstants.TREE_NAME))) {
+            } else if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_NAME))) {
                 throw new CustomException("树名称字段不能为空");
             } else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory())) {
-                if (Validator.isEmpty(genTable.getSubTableName())) {
+                if (StringUtils.isEmpty(genTable.getSubTableName())) {
                     throw new CustomException("关联子表的表名不能为空");
-                } else if (Validator.isEmpty(genTable.getSubTableFkName())) {
+                } else if (StringUtils.isEmpty(genTable.getSubTableFkName())) {
                     throw new CustomException("子表关联的外键名不能为空");
                 }
             }
@@ -392,7 +391,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
                 break;
             }
         }
-        if (Validator.isNull(table.getPkColumn())) {
+        if (StringUtils.isNull(table.getPkColumn())) {
             table.setPkColumn(table.getColumns().get(0));
         }
         if (GenConstants.TPL_SUB.equals(table.getTplCategory())) {
@@ -402,7 +401,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
                     break;
                 }
             }
-            if (Validator.isNull(table.getSubTable().getPkColumn())) {
+            if (StringUtils.isNull(table.getSubTable().getPkColumn())) {
                 table.getSubTable().setPkColumn(table.getSubTable().getColumns().get(0));
             }
         }
@@ -415,7 +414,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      */
     public void setSubTable(GenTable table) {
         String subTableName = table.getSubTableName();
-        if (Validator.isNotEmpty(subTableName)) {
+        if (StringUtils.isNotEmpty(subTableName)) {
             table.setSubTable(baseMapper.selectGenTableByName(subTableName));
         }
     }
@@ -427,7 +426,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      */
     public void setTableFromOptions(GenTable genTable) {
 		Map<String, Object> paramsObj = JsonUtils.parseMap(genTable.getOptions());
-        if (Validator.isNotNull(paramsObj)) {
+        if (StringUtils.isNotNull(paramsObj)) {
             String treeCode = Convert.toStr(paramsObj.get(GenConstants.TREE_CODE));
             String treeParentCode = Convert.toStr(paramsObj.get(GenConstants.TREE_PARENT_CODE));
             String treeName = Convert.toStr(paramsObj.get(GenConstants.TREE_NAME));

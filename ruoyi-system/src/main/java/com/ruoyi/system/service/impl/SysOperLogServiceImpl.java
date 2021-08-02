@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ArrayUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -40,10 +39,10 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
                 .eq(operLog.getStatus() != null && operLog.getStatus() > 0,
                         SysOperLog::getStatus, operLog.getStatus())
                 .like(StringUtils.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
                         "date_format(oper_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
+                .apply(StringUtils.isNotEmpty(params.get("endTime")),
                         "date_format(oper_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"));
         return PageUtils.buildDataInfo(page(PageUtils.buildPage("oper_id","desc"), lqw));
@@ -81,10 +80,10 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
                 .eq(operLog.getStatus() != null && operLog.getStatus() > 0,
                         SysOperLog::getStatus,operLog.getStatus())
                 .like(StringUtils.isNotBlank(operLog.getOperName()),SysOperLog::getOperName,operLog.getOperName())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
                         "date_format(oper_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
+                .apply(StringUtils.isNotEmpty(params.get("endTime")),
                         "date_format(oper_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"))
                 .orderByDesc(SysOperLog::getOperId));

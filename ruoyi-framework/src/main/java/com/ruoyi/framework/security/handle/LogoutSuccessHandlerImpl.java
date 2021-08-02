@@ -1,12 +1,12 @@
 package com.ruoyi.framework.security.handle;
 
-import cn.hutool.core.lang.Validator;
 import cn.hutool.http.HttpStatus;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.web.service.AsyncService;
 import com.ruoyi.framework.web.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
 	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 		throws IOException, ServletException {
 		LoginUser loginUser = tokenService.getLoginUser(request);
-		if (Validator.isNotNull(loginUser)) {
+		if (StringUtils.isNotNull(loginUser)) {
 			String userName = loginUser.getUsername();
 			// 删除用户缓存记录
 			tokenService.delLoginUser(loginUser.getToken());

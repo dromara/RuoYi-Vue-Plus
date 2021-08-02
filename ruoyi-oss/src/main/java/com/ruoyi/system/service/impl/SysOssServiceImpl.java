@@ -55,7 +55,7 @@ public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, Sys
 	@Override
 	public SysOss upload(MultipartFile file) {
 		String originalfileName = file.getOriginalFilename();
-		String suffix = StringUtils.sub(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
+		String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
 		ICloudStorageService storage = OssFactory.instance();
 		UploadResult uploadResult;
 		try {

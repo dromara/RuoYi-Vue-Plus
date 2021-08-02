@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.lang.Validator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
@@ -9,6 +8,7 @@ import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.domain.SysRoleMenu;
@@ -91,7 +91,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
         List<SysRole> perms = baseMapper.selectRolePermissionByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (SysRole perm : perms) {
-            if (Validator.isNotNull(perm)) {
+            if (StringUtils.isNotNull(perm)) {
                 permsSet.addAll(Arrays.asList(perm.getRoleKey().trim().split(",")));
             }
         }
@@ -138,10 +138,10 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
      */
     @Override
     public String checkRoleNameUnique(SysRole role) {
-        Long roleId = Validator.isNull(role.getRoleId()) ? -1L : role.getRoleId();
+        Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
         SysRole info = getOne(new LambdaQueryWrapper<SysRole>()
                 .eq(SysRole::getRoleName, role.getRoleName()).last("limit 1"));
-        if (Validator.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -155,10 +155,10 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
      */
     @Override
     public String checkRoleKeyUnique(SysRole role) {
-        Long roleId = Validator.isNull(role.getRoleId()) ? -1L : role.getRoleId();
+        Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
         SysRole info = getOne(new LambdaQueryWrapper<SysRole>()
                 .eq(SysRole::getRoleKey, role.getRoleKey()).last("limit 1"));
-        if (Validator.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -171,7 +171,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
      */
     @Override
     public void checkRoleAllowed(SysRole role) {
-        if (Validator.isNotNull(role.getRoleId()) && role.isAdmin()) {
+        if (StringUtils.isNotNull(role.getRoleId()) && role.isAdmin()) {
             throw new CustomException("不允许操作超级管理员角色");
         }
     }

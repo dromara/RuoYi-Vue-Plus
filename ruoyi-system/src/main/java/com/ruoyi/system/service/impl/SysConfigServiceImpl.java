@@ -1,7 +1,6 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Validator;
 import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.DataSource;
@@ -51,10 +50,10 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
 			.like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
 			.eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
 			.like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
-			.apply(Validator.isNotEmpty(params.get("beginTime")),
+			.apply(StringUtils.isNotEmpty(params.get("beginTime")),
 				"date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
 				params.get("beginTime"))
-			.apply(Validator.isNotEmpty(params.get("endTime")),
+			.apply(StringUtils.isNotEmpty(params.get("endTime")),
 				"date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
 				params.get("endTime"));
 		return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
@@ -81,12 +80,12 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
 	@Override
 	public String selectConfigByKey(String configKey) {
 		String configValue = Convert.toStr(redisCache.getCacheObject(getCacheKey(configKey)));
-		if (Validator.isNotEmpty(configValue)) {
+		if (StringUtils.isNotEmpty(configValue)) {
 			return configValue;
 		}
 		SysConfig retConfig = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>()
 			.eq(SysConfig::getConfigKey, configKey));
-		if (Validator.isNotNull(retConfig)) {
+		if (StringUtils.isNotNull(retConfig)) {
 			redisCache.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
 			return retConfig.getConfigValue();
 		}
@@ -120,10 +119,10 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
 			.like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
 			.eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
 			.like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
-			.apply(Validator.isNotEmpty(params.get("beginTime")),
+			.apply(StringUtils.isNotEmpty(params.get("beginTime")),
 				"date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
 				params.get("beginTime"))
-			.apply(Validator.isNotEmpty(params.get("endTime")),
+			.apply(StringUtils.isNotEmpty(params.get("endTime")),
 				"date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
 				params.get("endTime"));
 		return baseMapper.selectList(lqw);
@@ -214,9 +213,9 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
 	 */
 	@Override
 	public String checkConfigKeyUnique(SysConfig config) {
-		Long configId = Validator.isNull(config.getConfigId()) ? -1L : config.getConfigId();
+		Long configId = StringUtils.isNull(config.getConfigId()) ? -1L : config.getConfigId();
 		SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, config.getConfigKey()));
-		if (Validator.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
+		if (StringUtils.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
 			return UserConstants.NOT_UNIQUE;
 		}
 		return UserConstants.UNIQUE;

@@ -1,10 +1,10 @@
 package com.ruoyi.framework.web.service;
 
-import cn.hutool.core.lang.Validator;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.exception.BaseException;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
         SysUser user = userService.selectUserByUserName(username);
-        if (Validator.isNull(user))
+        if (StringUtils.isNull(user))
         {
             log.info("登录用户：{} 不存在.", username);
             throw new UsernameNotFoundException("登录用户：" + username + " 不存在");

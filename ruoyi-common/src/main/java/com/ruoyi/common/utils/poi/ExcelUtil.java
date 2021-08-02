@@ -218,9 +218,9 @@ public class ExcelUtil<T>
                     if (String.class == fieldType)
                     {
                         String s = Convert.toStr(val);
-                        if (StringUtils.endWith(s, ".0"))
+                        if (StringUtils.endsWith(s, ".0"))
                         {
-                            val = StringUtils.subBefore(s, ".0",false);
+                            val = StringUtils.substringBefore(s, ".0");
                         }
                         else
                         {
@@ -715,7 +715,7 @@ public class ExcelUtil<T>
         for (String item : convertSource)
         {
             String[] itemArray = item.split("=");
-            if (StringUtils.containsAny(propertyValue, separator))
+            if (StringUtils.containsAny(separator, propertyValue))
             {
                 for (String value : propertyValue.split(separator))
                 {
@@ -734,7 +734,7 @@ public class ExcelUtil<T>
                 }
             }
         }
-        return StringUtils.strip(propertyString.toString(), null,separator);
+        return StringUtils.stripEnd(propertyString.toString(), separator);
     }
 
     /**
@@ -752,7 +752,7 @@ public class ExcelUtil<T>
         for (String item : convertSource)
         {
             String[] itemArray = item.split("=");
-            if (StringUtils.containsAny(propertyValue, separator))
+            if (StringUtils.containsAny(separator, propertyValue))
             {
                 for (String value : propertyValue.split(separator))
                 {
@@ -771,7 +771,7 @@ public class ExcelUtil<T>
                 }
             }
         }
-        return StringUtils.strip(propertyString.toString(), null,separator);
+        return StringUtils.stripEnd(propertyString.toString(), separator);
     }
 
     /**

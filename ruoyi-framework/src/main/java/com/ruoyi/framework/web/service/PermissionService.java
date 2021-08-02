@@ -1,12 +1,12 @@
 package com.ruoyi.framework.web.service;
 
-import cn.hutool.core.lang.Validator;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.ServletUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Set;
 
@@ -39,12 +39,12 @@ public class PermissionService
      */
     public boolean hasPermi(String permission)
     {
-        if (Validator.isEmpty(permission))
+        if (StringUtils.isEmpty(permission))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getPermissions()))
+        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions()))
         {
             return false;
         }
@@ -70,12 +70,12 @@ public class PermissionService
      */
     public boolean hasAnyPermi(String permissions)
     {
-        if (Validator.isEmpty(permissions))
+        if (StringUtils.isEmpty(permissions))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getPermissions()))
+        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions()))
         {
             return false;
         }
@@ -98,12 +98,12 @@ public class PermissionService
      */
     public boolean hasRole(String role)
     {
-        if (Validator.isEmpty(role))
+        if (StringUtils.isEmpty(role))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getUser().getRoles()))
+        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles()))
         {
             return false;
         }
@@ -137,12 +137,12 @@ public class PermissionService
      */
     public boolean hasAnyRoles(String roles)
     {
-        if (Validator.isEmpty(roles))
+        if (StringUtils.isEmpty(roles))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getUser().getRoles()))
+        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles()))
         {
             return false;
         }

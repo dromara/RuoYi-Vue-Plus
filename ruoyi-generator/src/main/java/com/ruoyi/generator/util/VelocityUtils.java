@@ -1,11 +1,10 @@
 package com.ruoyi.generator.util;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Validator;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.JsonUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
 import org.apache.velocity.VelocityContext;
@@ -49,9 +48,9 @@ public class VelocityUtils
         velocityContext.put("tableName", genTable.getTableName());
         velocityContext.put("functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
         velocityContext.put("ClassName", genTable.getClassName());
-        velocityContext.put("className", StringUtils.lowerFirst(genTable.getClassName()));
+        velocityContext.put("className", StringUtils.uncapitalize(genTable.getClassName()));
         velocityContext.put("moduleName", genTable.getModuleName());
-        velocityContext.put("BusinessName", StringUtils.upperFirst(genTable.getBusinessName()));
+        velocityContext.put("BusinessName", StringUtils.capitalize(genTable.getBusinessName()));
         velocityContext.put("businessName", genTable.getBusinessName());
         velocityContext.put("basePackage", getPackagePrefix(packageName));
         velocityContext.put("packageName", packageName);
@@ -110,15 +109,15 @@ public class VelocityUtils
         String subTableName = genTable.getSubTableName();
         String subTableFkName = genTable.getSubTableFkName();
         String subClassName = genTable.getSubTable().getClassName();
-        String subTableFkClassName = StringUtils.toCamelCase(subTableFkName);
+        String subTableFkClassName = StringUtils.convertToCamelCase(subTableFkName);
 
         context.put("subTable", subTable);
         context.put("subTableName", subTableName);
         context.put("subTableFkName", subTableFkName);
         context.put("subTableFkClassName", subTableFkClassName);
-        context.put("subTableFkclassName", StringUtils.lowerFirst(subTableFkClassName));
+        context.put("subTableFkclassName", StringUtils.uncapitalize(subTableFkClassName));
         context.put("subClassName", subClassName);
-        context.put("subclassName", StringUtils.lowerFirst(subClassName));
+        context.put("subclassName", StringUtils.uncapitalize(subClassName));
         context.put("subImportList", getImportList(genTable.getSubTable()));
     }
 
@@ -240,7 +239,7 @@ public class VelocityUtils
     public static String getPackagePrefix(String packageName)
     {
         int lastIndex = packageName.lastIndexOf(".");
-        String basePackage = StringUtils.sub(packageName, 0, lastIndex);
+        String basePackage = StringUtils.substring(packageName, 0, lastIndex);
         return basePackage;
     }
 
@@ -255,7 +254,7 @@ public class VelocityUtils
         List<GenTableColumn> columns = genTable.getColumns();
         GenTable subGenTable = genTable.getSubTable();
         HashSet<String> importList = new HashSet<String>();
-        if (Validator.isNotNull(subGenTable))
+        if (StringUtils.isNotNull(subGenTable))
         {
             importList.add("java.util.List");
         }
@@ -294,7 +293,7 @@ public class VelocityUtils
      */
     public static String getParentMenuId(Map<String, Object> paramsObj)
     {
-        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.PARENT_MENU_ID)
+        if (StringUtils.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.PARENT_MENU_ID)
 				&& StringUtils.isNotEmpty(Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID))))
         {
             return Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID));
@@ -310,7 +309,7 @@ public class VelocityUtils
      */
     public static String getTreecode(Map<String, Object> paramsObj)
     {
-        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_CODE))
+        if (StringUtils.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_CODE))
         {
             return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_CODE)));
         }
@@ -325,7 +324,7 @@ public class VelocityUtils
      */
     public static String getTreeParentCode(Map<String, Object> paramsObj)
     {
-        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_PARENT_CODE))
+        if (StringUtils.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_PARENT_CODE))
         {
             return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_PARENT_CODE)));
         }
@@ -340,7 +339,7 @@ public class VelocityUtils
      */
     public static String getTreeName(Map<String, Object> paramsObj)
     {
-        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_NAME))
+        if (StringUtils.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_NAME))
         {
             return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_NAME)));
         }
