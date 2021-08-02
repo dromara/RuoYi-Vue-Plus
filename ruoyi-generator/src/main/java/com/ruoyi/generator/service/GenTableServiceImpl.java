@@ -3,7 +3,7 @@ package com.ruoyi.generator.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.constant.Constants;
@@ -137,15 +137,15 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
             for (GenTableColumn cenTableColumn : genTable.getColumns()) {
                 genTableColumnMapper.update(cenTableColumn,
                         new LambdaUpdateWrapper<GenTableColumn>()
-							.set(StrUtil.isBlank(cenTableColumn.getColumnComment()), GenTableColumn::getColumnComment, null)
-							.set(StrUtil.isBlank(cenTableColumn.getIsPk()), GenTableColumn::getIsPk, null)
-							.set(StrUtil.isBlank(cenTableColumn.getIsIncrement()), GenTableColumn::getIsIncrement, null)
-							.set(StrUtil.isBlank(cenTableColumn.getIsInsert()), GenTableColumn::getIsInsert, null)
-							.set(StrUtil.isBlank(cenTableColumn.getIsEdit()), GenTableColumn::getIsEdit, null)
-							.set(StrUtil.isBlank(cenTableColumn.getIsList()), GenTableColumn::getIsList, null)
-							.set(StrUtil.isBlank(cenTableColumn.getIsQuery()), GenTableColumn::getIsQuery, null)
-							.set(StrUtil.isBlank(cenTableColumn.getIsRequired()), GenTableColumn::getIsRequired, null)
-							.set(StrUtil.isBlank(cenTableColumn.getDictType()), GenTableColumn::getDictType, "")
+							.set(StringUtils.isBlank(cenTableColumn.getColumnComment()), GenTableColumn::getColumnComment, null)
+							.set(StringUtils.isBlank(cenTableColumn.getIsPk()), GenTableColumn::getIsPk, null)
+							.set(StringUtils.isBlank(cenTableColumn.getIsIncrement()), GenTableColumn::getIsIncrement, null)
+							.set(StringUtils.isBlank(cenTableColumn.getIsInsert()), GenTableColumn::getIsInsert, null)
+							.set(StringUtils.isBlank(cenTableColumn.getIsEdit()), GenTableColumn::getIsEdit, null)
+							.set(StringUtils.isBlank(cenTableColumn.getIsList()), GenTableColumn::getIsList, null)
+							.set(StringUtils.isBlank(cenTableColumn.getIsQuery()), GenTableColumn::getIsQuery, null)
+							.set(StringUtils.isBlank(cenTableColumn.getIsRequired()), GenTableColumn::getIsRequired, null)
+							.set(StringUtils.isBlank(cenTableColumn.getDictType()), GenTableColumn::getDictType, "")
 							.eq(GenTableColumn::getColumnId,cenTableColumn.getColumnId()));
             }
         }
@@ -260,7 +260,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         // 获取模板列表
         List<String> templates = VelocityUtils.getTemplateList(table.getTplCategory());
         for (String template : templates) {
-            if (!StrUtil.containsAny("sql.vm", "api.js.vm", "index.vue.vm", "index-tree.vue.vm", template)) {
+            if (!StringUtils.containsAny("sql.vm", "api.js.vm", "index.vue.vm", "index-tree.vue.vm", template)) {
                 // 渲染模板
                 StringWriter sw = new StringWriter();
                 Template tpl = Velocity.getTemplate(template, Constants.UTF8);
@@ -451,7 +451,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      */
     public static String getGenPath(GenTable table, String template) {
         String genPath = table.getGenPath();
-        if (StrUtil.equals(genPath, "/")) {
+        if (StringUtils.equals(genPath, "/")) {
             return System.getProperty("user.dir") + File.separator + "src" + File.separator + VelocityUtils.getFileName(template, table);
         }
         return genPath + File.separator + VelocityUtils.getFileName(template, table);

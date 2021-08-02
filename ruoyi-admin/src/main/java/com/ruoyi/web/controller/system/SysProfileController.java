@@ -1,6 +1,6 @@
 package com.ruoyi.web.controller.system;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.UserConstants;
@@ -59,12 +59,12 @@ public class SysProfileController extends BaseController
     @PutMapping
     public AjaxResult updateProfile(@RequestBody SysUser user)
     {
-        if (StrUtil.isNotEmpty(user.getPhonenumber())
+        if (StringUtils.isNotEmpty(user.getPhonenumber())
                 && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
         {
             return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
-        if (StrUtil.isNotEmpty(user.getEmail())
+        if (StringUtils.isNotEmpty(user.getEmail())
                 && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
         {
             return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");

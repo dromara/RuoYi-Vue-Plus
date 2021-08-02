@@ -1,6 +1,6 @@
 package com.ruoyi.oss.service.impl;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.aliyun.oss.ClientConfiguration;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.common.auth.DefaultCredentialProvider;
@@ -116,9 +116,9 @@ public class AliyunCloudStorageServiceImpl extends AbstractCloudStorageService i
 	public String getEndpointLink() {
 		String endpoint = properties.getEndpoint();
 		StringBuilder sb = new StringBuilder(endpoint);
-		if (StrUtil.containsAnyIgnoreCase(endpoint, "http://")) {
+		if (StringUtils.containsAnyIgnoreCase(endpoint, "http://")) {
 			sb.insert(7, properties.getBucketName() + ".");
-		} else if (StrUtil.containsAnyIgnoreCase(endpoint, "https://")) {
+		} else if (StringUtils.containsAnyIgnoreCase(endpoint, "https://")) {
 			sb.insert(8, properties.getBucketName() + ".");
 		} else {
 			throw new OssException("Endpoint配置错误");

@@ -1,10 +1,10 @@
 package com.ruoyi.common.core.mybatisplus.methods;
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.ruoyi.common.utils.StringUtils;
 import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
 import org.apache.ibatis.executor.keygen.KeyGenerator;
 import org.apache.ibatis.executor.keygen.NoKeyGenerator;
@@ -28,7 +28,7 @@ public class InsertAll extends AbstractMethod {
 		String keyProperty = null;
 		String keyColumn = null;
 		// 表包含主键处理逻辑,如果不包含主键当普通字段处理
-		if (StrUtil.isNotBlank(tableInfo.getKeyProperty())) {
+		if (StringUtils.isNotBlank(tableInfo.getKeyProperty())) {
 			if (tableInfo.getIdType() == IdType.AUTO) {
 				/** 自增主键 */
 				keyGenerator = new Jdbc3KeyGenerator();
@@ -49,7 +49,7 @@ public class InsertAll extends AbstractMethod {
 
 	private String prepareFieldSql(TableInfo tableInfo) {
 		StringBuilder fieldSql = new StringBuilder();
-		if (StrUtil.isNotBlank(tableInfo.getKeyColumn())) {
+		if (StringUtils.isNotBlank(tableInfo.getKeyColumn())) {
 			fieldSql.append(tableInfo.getKeyColumn()).append(",");
 		}
 		tableInfo.getFieldList().forEach(x -> fieldSql.append(x.getColumn()).append(","));
@@ -62,7 +62,7 @@ public class InsertAll extends AbstractMethod {
 	private String prepareValuesSqlForMysqlBatch(TableInfo tableInfo) {
 		final StringBuilder valueSql = new StringBuilder();
 		valueSql.append("<foreach collection=\"list\" item=\"item\" index=\"index\" open=\"(\" separator=\"),(\" close=\")\">");
-		if (StrUtil.isNotBlank(tableInfo.getKeyColumn())) {
+		if (StringUtils.isNotBlank(tableInfo.getKeyColumn())) {
 			valueSql.append("#{item.").append(tableInfo.getKeyProperty()).append("},");
 		}
 		tableInfo.getFieldList().forEach(x -> valueSql.append("#{item.").append(x.getProperty()).append("},"));

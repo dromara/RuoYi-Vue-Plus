@@ -1,7 +1,7 @@
 package com.ruoyi.common.utils.reflect;
 
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -25,8 +25,8 @@ public class ReflectUtils extends ReflectUtil {
 	@SuppressWarnings("unchecked")
 	public static <E> E invokeGetter(Object obj, String propertyName) {
 		Object object = obj;
-		for (String name : StrUtil.split(propertyName, ".")) {
-			String getterMethodName = GETTER_PREFIX + StrUtil.upperFirst(name);
+		for (String name : StringUtils.split(propertyName, ".")) {
+			String getterMethodName = GETTER_PREFIX + StringUtils.upperFirst(name);
 			object = invoke(object, getterMethodName);
 		}
 		return (E) object;
@@ -38,13 +38,13 @@ public class ReflectUtils extends ReflectUtil {
 	 */
 	public static <E> void invokeSetter(Object obj, String propertyName, E value) {
 		Object object = obj;
-		List<String> names = StrUtil.split(propertyName, ".");
+		List<String> names = StringUtils.split(propertyName, ".");
 		for (int i = 0; i < names.size(); i++) {
 			if (i < names.size() - 1) {
-				String getterMethodName = GETTER_PREFIX + StrUtil.upperFirst(names.get(i));
+				String getterMethodName = GETTER_PREFIX + StringUtils.upperFirst(names.get(i));
 				object = invoke(object, getterMethodName);
 			} else {
-				String setterMethodName = SETTER_PREFIX + StrUtil.upperFirst(names.get(i));
+				String setterMethodName = SETTER_PREFIX + StringUtils.upperFirst(names.get(i));
 				Method method = getMethodByName(object.getClass(), setterMethodName);
 				invoke(object, method, value);
 			}

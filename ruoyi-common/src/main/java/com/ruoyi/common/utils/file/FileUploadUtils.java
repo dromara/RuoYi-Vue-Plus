@@ -1,15 +1,14 @@
 package com.ruoyi.common.utils.file;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.exception.file.FileNameLengthLimitExceededException;
 import com.ruoyi.common.exception.file.FileSizeLimitExceededException;
 import com.ruoyi.common.exception.file.InvalidExtensionException;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -148,7 +147,7 @@ public class FileUploadUtils
     private static final String getPathFileName(String uploadDir, String fileName) throws IOException
     {
         int dirLastIndex = RuoYiConfig.getProfile().length() + 1;
-        String currentDir = StrUtil.subSuf(uploadDir, dirLastIndex);
+        String currentDir = StringUtils.subSuf(uploadDir, dirLastIndex);
         String pathFileName = Constants.RESOURCE_PREFIX + "/" + currentDir + "/" + fileName;
         return pathFileName;
     }
@@ -230,7 +229,7 @@ public class FileUploadUtils
     public static final String getExtension(MultipartFile file)
     {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        if (Validator.isEmpty(extension))
+        if (StringUtils.isEmpty(extension))
         {
             extension = MimeTypeUtils.getExtension(file.getContentType());
         }

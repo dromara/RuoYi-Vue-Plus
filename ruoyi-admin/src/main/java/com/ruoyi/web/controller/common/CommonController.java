@@ -1,6 +1,6 @@
 package com.ruoyi.web.controller.common;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.file.FileUtils;
@@ -37,7 +37,7 @@ public class CommonController
         {
             if (!FileUtils.checkAllowDownload(fileName))
             {
-                throw new Exception(StrUtil.format("文件名称({})非法，不允许下载。 ", fileName));
+                throw new Exception(StringUtils.format("文件名称({})非法，不允许下载。 ", fileName));
             }
             String realFileName = System.currentTimeMillis() + fileName.substring(fileName.indexOf("_") + 1);
             String filePath = RuoYiConfig.getDownloadPath() + fileName;
@@ -67,14 +67,14 @@ public class CommonController
         {
             if (!FileUtils.checkAllowDownload(resource))
             {
-                throw new Exception(StrUtil.format("资源文件({})非法，不允许下载。 ", resource));
+                throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。 ", resource));
             }
             // 本地资源路径
             String localPath = RuoYiConfig.getProfile();
             // 数据库资源地址
-            String downloadPath = localPath + StrUtil.subAfter(resource, Constants.RESOURCE_PREFIX,false);
+            String downloadPath = localPath + StringUtils.subAfter(resource, Constants.RESOURCE_PREFIX,false);
             // 下载名称
-            String downloadName = StrUtil.subAfter(downloadPath, "/",true);
+            String downloadName = StringUtils.subAfter(downloadPath, "/",true);
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 			File file = new File(downloadPath);
             FileUtils.setAttachmentResponseHeader(response, downloadName);

@@ -1,8 +1,8 @@
 package com.ruoyi.common.utils.file;
 
-import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.utils.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class ImageUtils
 
     /**
      * 读取文件为字节数据
-     * 
+     *
      * @param key 地址
      * @return 字节数据
      */
@@ -83,7 +83,7 @@ public class ImageUtils
             {
                 // 本机地址
                 String localPath = RuoYiConfig.getProfile();
-                String downloadPath = localPath + StrUtil.subAfter(url, Constants.RESOURCE_PREFIX,false);
+                String downloadPath = localPath + StringUtils.subAfter(url, Constants.RESOURCE_PREFIX,false);
                 in = new FileInputStream(downloadPath);
             }
             return IOUtils.toByteArray(in);

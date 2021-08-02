@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Validator;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.annotation.DataScope;
@@ -204,8 +205,8 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
             updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
         }
         int result = baseMapper.updateById(dept);
-        if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StrUtil.isNotEmpty(dept.getAncestors())
-			&& !StrUtil.equals("0", dept.getAncestors())) {
+        if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
+			&& !StringUtils.equals("0", dept.getAncestors())) {
             // 如果该部门是启用状态，则启用该部门的所有上级部门
             updateParentDeptStatusNormal(dept);
         }

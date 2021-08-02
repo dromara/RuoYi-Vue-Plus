@@ -1,6 +1,6 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
@@ -24,9 +24,9 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
 	@Override
 	public TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData) {
 		LambdaQueryWrapper<SysDictData> lqw = new LambdaQueryWrapper<SysDictData>()
-			.eq(StrUtil.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
-			.like(StrUtil.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
-			.eq(StrUtil.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
+			.eq(StringUtils.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
+			.like(StringUtils.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
+			.eq(StringUtils.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
 			.orderByAsc(SysDictData::getDictSort);
 		return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
 	}
@@ -40,9 +40,9 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
 	@Override
 	public List<SysDictData> selectDictDataList(SysDictData dictData) {
 		return list(new LambdaQueryWrapper<SysDictData>()
-			.eq(StrUtil.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
-			.like(StrUtil.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
-			.eq(StrUtil.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
+			.eq(StringUtils.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
+			.like(StringUtils.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
+			.eq(StringUtils.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
 			.orderByAsc(SysDictData::getDictSort));
 	}
 

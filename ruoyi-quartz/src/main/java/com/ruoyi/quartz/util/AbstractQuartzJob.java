@@ -3,7 +3,7 @@ package com.ruoyi.quartz.util;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.ScheduleConstants;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -86,7 +86,7 @@ public abstract class AbstractQuartzJob implements Job
         if (e != null)
         {
             sysJobLog.setStatus(Constants.FAIL);
-            String errorMsg = StrUtil.sub(ExceptionUtil.stacktraceToString(e), 0, 2000);
+            String errorMsg = StringUtils.sub(ExceptionUtil.stacktraceToString(e), 0, 2000);
             sysJobLog.setExceptionInfo(errorMsg);
         }
         else

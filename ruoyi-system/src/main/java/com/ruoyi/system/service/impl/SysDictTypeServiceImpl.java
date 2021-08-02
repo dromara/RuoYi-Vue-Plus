@@ -2,7 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.constant.UserConstants;
@@ -48,9 +48,9 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
 	public TableDataInfo<SysDictType> selectPageDictTypeList(SysDictType dictType) {
 		Map<String, Object> params = dictType.getParams();
 		LambdaQueryWrapper<SysDictType> lqw = new LambdaQueryWrapper<SysDictType>()
-			.like(StrUtil.isNotBlank(dictType.getDictName()), SysDictType::getDictName, dictType.getDictName())
-			.eq(StrUtil.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
-			.like(StrUtil.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
+			.like(StringUtils.isNotBlank(dictType.getDictName()), SysDictType::getDictName, dictType.getDictName())
+			.eq(StringUtils.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
+			.like(StringUtils.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
 			.apply(Validator.isNotEmpty(params.get("beginTime")),
 				"date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
 				params.get("beginTime"))
@@ -70,9 +70,9 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
 	public List<SysDictType> selectDictTypeList(SysDictType dictType) {
 		Map<String, Object> params = dictType.getParams();
 		return list(new LambdaQueryWrapper<SysDictType>()
-			.like(StrUtil.isNotBlank(dictType.getDictName()), SysDictType::getDictName, dictType.getDictName())
-			.eq(StrUtil.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
-			.like(StrUtil.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
+			.like(StringUtils.isNotBlank(dictType.getDictName()), SysDictType::getDictName, dictType.getDictName())
+			.eq(StringUtils.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
+			.like(StringUtils.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
 			.apply(Validator.isNotEmpty(params.get("beginTime")),
 				"date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
 				params.get("beginTime"))

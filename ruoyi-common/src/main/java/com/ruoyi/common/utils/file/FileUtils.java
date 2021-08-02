@@ -2,11 +2,11 @@ package com.ruoyi.common.utils.file;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -39,7 +39,7 @@ public class FileUtils extends FileUtil
     public static boolean checkAllowDownload(String resource)
     {
         // 禁止目录上跳级别
-        if (StrUtil.contains(resource, ".."))
+        if (StringUtils.contains(resource, ".."))
         {
             return false;
         }

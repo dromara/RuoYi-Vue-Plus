@@ -1,6 +1,6 @@
 package com.ruoyi.common.filter;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 防止XSS攻击的过滤器
@@ -27,7 +25,7 @@ public class XssFilter implements Filter
     public void init(FilterConfig filterConfig) throws ServletException
     {
         String tempExcludes = filterConfig.getInitParameter("excludes");
-        if (StrUtil.isNotEmpty(tempExcludes))
+        if (StringUtils.isNotEmpty(tempExcludes))
         {
             String[] url = tempExcludes.split(",");
             for (int i = 0; url != null && i < url.length; i++)
@@ -61,7 +59,7 @@ public class XssFilter implements Filter
         {
             return true;
         }
-        return StrUtil.matches(url, excludes);
+        return StringUtils.matches(url, excludes);
     }
 
     @Override

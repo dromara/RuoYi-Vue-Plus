@@ -1,6 +1,6 @@
 package com.ruoyi.generator.util;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.generator.config.GenConfig;
 import com.ruoyi.generator.domain.GenTable;
@@ -40,7 +40,7 @@ public class GenUtils
         column.setTableId(table.getTableId());
         column.setCreateBy(table.getCreateBy());
         // 设置java字段名
-        column.setJavaField(StrUtil.toCamelCase(columnName));
+        column.setJavaField(StringUtils.toCamelCase(columnName));
         // 设置默认类型
         column.setJavaType(GenConstants.TYPE_STRING);
 
@@ -61,7 +61,7 @@ public class GenUtils
             column.setHtmlType(GenConstants.HTML_INPUT);
 
             // 如果是浮点型 统一用BigDecimal
-            String[] str = StrUtil.splitToArray(StrUtil.subBetween(column.getColumnType(), "(", ")"), ",");
+            String[] str = StringUtils.splitToArray(StringUtils.subBetween(column.getColumnType(), "(", ")"), ",");
             if (str != null && str.length == 2 && Integer.parseInt(str[1]) > 0)
             {
                 column.setJavaType(GenConstants.TYPE_BIGDECIMAL);
@@ -98,33 +98,33 @@ public class GenUtils
         }
 
         // 查询字段类型
-        if (StrUtil.endWithIgnoreCase(columnName, "name"))
+        if (StringUtils.endWithIgnoreCase(columnName, "name"))
         {
             column.setQueryType(GenConstants.QUERY_LIKE);
         }
         // 状态字段设置单选框
-        if (StrUtil.endWithIgnoreCase(columnName, "status"))
+        if (StringUtils.endWithIgnoreCase(columnName, "status"))
         {
             column.setHtmlType(GenConstants.HTML_RADIO);
         }
         // 类型&性别字段设置下拉框
-        else if (StrUtil.endWithIgnoreCase(columnName, "type")
-                || StrUtil.endWithIgnoreCase(columnName, "sex"))
+        else if (StringUtils.endWithIgnoreCase(columnName, "type")
+                || StringUtils.endWithIgnoreCase(columnName, "sex"))
         {
             column.setHtmlType(GenConstants.HTML_SELECT);
         }
         // 图片字段设置图片上传控件
-        else if (StrUtil.endWithIgnoreCase(columnName, "image"))
+        else if (StringUtils.endWithIgnoreCase(columnName, "image"))
         {
             column.setHtmlType(GenConstants.HTML_IMAGE_UPLOAD);
         }
         // 文件字段设置文件上传控件
-        else if (StrUtil.endWithIgnoreCase(columnName, "file"))
+        else if (StringUtils.endWithIgnoreCase(columnName, "file"))
         {
             column.setHtmlType(GenConstants.HTML_FILE_UPLOAD);
         }
         // 内容字段设置富文本控件
-        else if (StrUtil.endWithIgnoreCase(columnName, "content"))
+        else if (StringUtils.endWithIgnoreCase(columnName, "content"))
         {
             column.setHtmlType(GenConstants.HTML_EDITOR);
         }
@@ -152,7 +152,7 @@ public class GenUtils
     {
         int lastIndex = packageName.lastIndexOf(".");
         int nameLength = packageName.length();
-        String moduleName = StrUtil.sub(packageName, lastIndex + 1, nameLength);
+        String moduleName = StringUtils.sub(packageName, lastIndex + 1, nameLength);
         return moduleName;
     }
 
@@ -166,7 +166,7 @@ public class GenUtils
     {
         int lastIndex = tableName.lastIndexOf("_");
         int nameLength = tableName.length();
-        String businessName = StrUtil.sub(tableName, lastIndex + 1, nameLength);
+        String businessName = StringUtils.sub(tableName, lastIndex + 1, nameLength);
         return businessName;
     }
 
@@ -180,12 +180,12 @@ public class GenUtils
     {
         boolean autoRemovePre = GenConfig.getAutoRemovePre();
         String tablePrefix = GenConfig.getTablePrefix();
-        if (autoRemovePre && StrUtil.isNotEmpty(tablePrefix))
+        if (autoRemovePre && StringUtils.isNotEmpty(tablePrefix))
         {
-            String[] searchList = StrUtil.splitToArray(tablePrefix, ",");
+            String[] searchList = StringUtils.splitToArray(tablePrefix, ",");
             tableName = replaceFirst(tableName, searchList);
         }
-        return StrUtil.upperFirst(StrUtil.toCamelCase(tableName));
+        return StringUtils.upperFirst(StringUtils.toCamelCase(tableName));
     }
 
     /**
@@ -228,9 +228,9 @@ public class GenUtils
      */
     public static String getDbType(String columnType)
     {
-        if (StrUtil.indexOf(columnType, '(') > 0)
+        if (StringUtils.indexOf(columnType, '(') > 0)
         {
-            return StrUtil.subBefore(columnType, "(",false);
+            return StringUtils.subBefore(columnType, "(",false);
         }
         else
         {
@@ -246,9 +246,9 @@ public class GenUtils
      */
     public static Integer getColumnLength(String columnType)
     {
-        if (StrUtil.indexOf(columnType, '(') > 0)
+        if (StringUtils.indexOf(columnType, '(') > 0)
         {
-            String length = StrUtil.subBetween(columnType, "(", ")");
+            String length = StringUtils.subBetween(columnType, "(", ")");
             return Integer.valueOf(length);
         }
         else

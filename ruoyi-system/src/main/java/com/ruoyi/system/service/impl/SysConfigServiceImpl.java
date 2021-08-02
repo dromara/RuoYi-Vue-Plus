@@ -2,7 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.constant.Constants;
@@ -48,9 +48,9 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
 	public TableDataInfo<SysConfig> selectPageConfigList(SysConfig config) {
 		Map<String, Object> params = config.getParams();
 		LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
-			.like(StrUtil.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
-			.eq(StrUtil.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
-			.like(StrUtil.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
+			.like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
+			.eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
+			.like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
 			.apply(Validator.isNotEmpty(params.get("beginTime")),
 				"date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
 				params.get("beginTime"))
@@ -90,7 +90,7 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
 			redisCache.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
 			return retConfig.getConfigValue();
 		}
-		return StrUtil.EMPTY;
+		return StringUtils.EMPTY;
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
 	@Override
 	public boolean selectCaptchaOnOff() {
 		String captchaOnOff = selectConfigByKey("sys.account.captchaOnOff");
-		if (StrUtil.isEmpty(captchaOnOff)) {
+		if (StringUtils.isEmpty(captchaOnOff)) {
 			return true;
 		}
 		return Convert.toBool(captchaOnOff);
@@ -117,9 +117,9 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
 	public List<SysConfig> selectConfigList(SysConfig config) {
 		Map<String, Object> params = config.getParams();
 		LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
-			.like(StrUtil.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
-			.eq(StrUtil.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
-			.like(StrUtil.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
+			.like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
+			.eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
+			.like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
 			.apply(Validator.isNotEmpty(params.get("beginTime")),
 				"date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
 				params.get("beginTime"))
@@ -169,7 +169,7 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
 	public void deleteConfigByIds(Long[] configIds) {
 		for (Long configId : configIds) {
 			SysConfig config = selectConfigById(configId);
-			if (StrUtil.equals(UserConstants.YES, config.getConfigType())) {
+			if (StringUtils.equals(UserConstants.YES, config.getConfigType())) {
 				throw new CustomException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
 			}
 			redisCache.deleteObject(getCacheKey(config.getConfigKey()));

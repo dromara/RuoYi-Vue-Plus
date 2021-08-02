@@ -1,7 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.system.domain.SysUserOnline;
 import com.ruoyi.system.service.ISysUserOnlineService;
@@ -23,7 +23,7 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
      */
     @Override
     public SysUserOnline selectOnlineByIpaddr(String ipaddr, LoginUser user) {
-        if (StrUtil.equals(ipaddr, user.getIpaddr())) {
+        if (StringUtils.equals(ipaddr, user.getIpaddr())) {
             return loginUserToUserOnline(user);
         }
         return null;
@@ -38,7 +38,7 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
      */
     @Override
     public SysUserOnline selectOnlineByUserName(String userName, LoginUser user) {
-        if (StrUtil.equals(userName, user.getUsername())) {
+        if (StringUtils.equals(userName, user.getUsername())) {
             return loginUserToUserOnline(user);
         }
         return null;
@@ -54,7 +54,7 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
      */
     @Override
     public SysUserOnline selectOnlineByInfo(String ipaddr, String userName, LoginUser user) {
-        if (StrUtil.equals(ipaddr, user.getIpaddr()) && StrUtil.equals(userName, user.getUsername())) {
+        if (StringUtils.equals(ipaddr, user.getIpaddr()) && StringUtils.equals(userName, user.getUsername())) {
             return loginUserToUserOnline(user);
         }
         return null;

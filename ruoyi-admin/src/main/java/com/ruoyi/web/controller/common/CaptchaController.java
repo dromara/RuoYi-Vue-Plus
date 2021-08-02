@@ -8,7 +8,7 @@ import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.captcha.generator.RandomGenerator;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.redis.RedisCache;
@@ -107,9 +107,9 @@ public class CaptchaController {
 
 	private String getCodeResult(String capStr) {
 		int numberLength = captchaProperties.getNumberLength();
-		int a = Convert.toInt(StrUtil.sub(capStr, 0, numberLength).trim());
+		int a = Convert.toInt(StringUtils.sub(capStr, 0, numberLength).trim());
 		char operator = capStr.charAt(numberLength);
-		int b = Convert.toInt(StrUtil.sub(capStr, numberLength + 1, numberLength + 1 + numberLength).trim());
+		int b = Convert.toInt(StringUtils.sub(capStr, numberLength + 1, numberLength + 1 + numberLength).trim());
 		switch (operator) {
 			case '*':
 				return a * b + "";

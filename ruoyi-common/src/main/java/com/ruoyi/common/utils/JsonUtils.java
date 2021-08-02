@@ -2,7 +2,6 @@ package com.ruoyi.common.utils;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +32,7 @@ public class JsonUtils {
     }
 
     public static String toJsonString(Object object) {
-		if (Validator.isEmpty(object)) {
+		if (StringUtils.isNull(object)) {
 			return null;
 		}
         try {
@@ -44,7 +43,7 @@ public class JsonUtils {
     }
 
     public static <T> T parseObject(String text, Class<T> clazz) {
-        if (StrUtil.isEmpty(text)) {
+        if (StringUtils.isEmpty(text)) {
             return null;
         }
         try {
@@ -66,7 +65,7 @@ public class JsonUtils {
     }
 
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
-		if (StrUtil.isBlank(text)) {
+		if (StringUtils.isBlank(text)) {
 			return null;
 		}
         try {
@@ -77,7 +76,7 @@ public class JsonUtils {
     }
 
 	public static <T> Map<String, T> parseMap(String text) {
-		if (StrUtil.isBlank(text)) {
+		if (StringUtils.isBlank(text)) {
 			return null;
 		}
 		try {
@@ -88,7 +87,7 @@ public class JsonUtils {
 	}
 
     public static <T> List<T> parseArray(String text, Class<T> clazz) {
-        if (StrUtil.isEmpty(text)) {
+        if (StringUtils.isEmpty(text)) {
             return new ArrayList<>();
         }
         try {

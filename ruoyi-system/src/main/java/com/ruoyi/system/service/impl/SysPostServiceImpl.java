@@ -1,13 +1,13 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.mapper.SysPostMapper;
@@ -33,9 +33,9 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
     @Override
     public TableDataInfo<SysPost> selectPagePostList(SysPost post) {
         LambdaQueryWrapper<SysPost> lqw = new LambdaQueryWrapper<SysPost>()
-                .like(StrUtil.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
-                .eq(StrUtil.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
-                .like(StrUtil.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
+                .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
+                .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
+                .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(),lqw));
     }
 
@@ -48,9 +48,9 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
     @Override
     public List<SysPost> selectPostList(SysPost post) {
         return list(new LambdaQueryWrapper<SysPost>()
-                .like(StrUtil.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
-                .eq(StrUtil.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
-                .like(StrUtil.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName()));
+                .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
+                .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
+                .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName()));
     }
 
     /**

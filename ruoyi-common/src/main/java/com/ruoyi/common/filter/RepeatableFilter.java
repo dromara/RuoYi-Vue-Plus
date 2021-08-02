@@ -1,6 +1,6 @@
 package com.ruoyi.common.filter;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import org.springframework.http.MediaType;
 
 import javax.servlet.*;
@@ -9,7 +9,7 @@ import java.io.IOException;
 
 /**
  * Repeatable 过滤器
- * 
+ *
  * @author ruoyi
  */
 public class RepeatableFilter implements Filter
@@ -26,7 +26,7 @@ public class RepeatableFilter implements Filter
     {
         ServletRequest requestWrapper = null;
         if (request instanceof HttpServletRequest
-                && StrUtil.startWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE))
+                && StringUtils.startWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE))
         {
             requestWrapper = new RepeatedlyRequestWrapper((HttpServletRequest) request, response);
         }

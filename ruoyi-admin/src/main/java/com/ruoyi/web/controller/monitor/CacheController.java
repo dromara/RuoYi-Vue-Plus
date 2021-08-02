@@ -1,6 +1,6 @@
 package com.ruoyi.web.controller.monitor;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.core.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
@@ -14,7 +14,7 @@ import java.util.*;
 
 /**
  * 缓存监控
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -40,8 +40,8 @@ public class CacheController
         commandStats.stringPropertyNames().forEach(key -> {
             Map<String, String> data = new HashMap<>(2);
             String property = commandStats.getProperty(key);
-            data.put("name", StrUtil.removePrefix(key, "cmdstat_"));
-            data.put("value", StrUtil.subBetween(property, "calls=", ",usec"));
+            data.put("name", StringUtils.removePrefix(key, "cmdstat_"));
+            data.put("value", StringUtils.subBetween(property, "calls=", ",usec"));
             pieList.add(data);
         });
         result.put("commandStats", pieList);

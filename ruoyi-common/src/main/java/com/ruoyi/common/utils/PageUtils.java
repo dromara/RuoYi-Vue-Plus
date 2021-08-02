@@ -1,6 +1,5 @@
 package com.ruoyi.common.utils;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -59,7 +58,7 @@ public class PageUtils {
         String orderByColumn = ServletUtils.getParameter(ORDER_BY_COLUMN);
         String isAsc = ServletUtils.getParameter(IS_ASC);
         PagePlus<T, K> page = new PagePlus<>(pageNum, pageSize);
-        if (StrUtil.isNotBlank(orderByColumn)) {
+        if (StringUtils.isNotBlank(orderByColumn)) {
             String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
             if ("asc".equals(isAsc)) {
                 page.addOrder(OrderItem.asc(orderBy));
@@ -91,9 +90,9 @@ public class PageUtils {
 			isAsc = "desc";
 		}
         Page<T> page = new Page<>(pageNum, pageSize);
-        if (StrUtil.isNotBlank(orderByColumn)) {
+        if (StringUtils.isNotBlank(orderByColumn)) {
             String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
-			orderBy = StrUtil.toUnderlineCase(orderBy);
+			orderBy = StringUtils.toUnderlineCase(orderBy);
 			if ("asc".equals(isAsc)) {
                 page.addOrder(OrderItem.asc(orderBy));
             } else if ("desc".equals(isAsc)) {

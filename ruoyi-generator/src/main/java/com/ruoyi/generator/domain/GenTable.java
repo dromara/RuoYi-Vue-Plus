@@ -1,6 +1,6 @@
 package com.ruoyi.generator.domain;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.constant.GenConstants;
@@ -204,7 +204,7 @@ public class GenTable implements Serializable {
     }
 
     public static boolean isSub(String tplCategory) {
-        return tplCategory != null && StrUtil.equals(GenConstants.TPL_SUB, tplCategory);
+        return tplCategory != null && StringUtils.equals(GenConstants.TPL_SUB, tplCategory);
     }
 
     public boolean isTree() {
@@ -212,7 +212,7 @@ public class GenTable implements Serializable {
     }
 
     public static boolean isTree(String tplCategory) {
-        return tplCategory != null && StrUtil.equals(GenConstants.TPL_TREE, tplCategory);
+        return tplCategory != null && StringUtils.equals(GenConstants.TPL_TREE, tplCategory);
     }
 
     public boolean isCrud() {
@@ -220,7 +220,7 @@ public class GenTable implements Serializable {
     }
 
     public static boolean isCrud(String tplCategory) {
-        return tplCategory != null && StrUtil.equals(GenConstants.TPL_CRUD, tplCategory);
+        return tplCategory != null && StringUtils.equals(GenConstants.TPL_CRUD, tplCategory);
     }
 
     public boolean isSuperColumn(String javaField) {
@@ -229,9 +229,9 @@ public class GenTable implements Serializable {
 
     public static boolean isSuperColumn(String tplCategory, String javaField) {
         if (isTree(tplCategory)) {
-            return StrUtil.equalsAnyIgnoreCase(javaField,
+            return StringUtils.equalsAnyIgnoreCase(javaField,
                     ArrayUtils.addAll(GenConstants.TREE_ENTITY, GenConstants.BASE_ENTITY));
         }
-        return StrUtil.equalsAnyIgnoreCase(javaField, GenConstants.BASE_ENTITY);
+        return StringUtils.equalsAnyIgnoreCase(javaField, GenConstants.BASE_ENTITY);
     }
 }

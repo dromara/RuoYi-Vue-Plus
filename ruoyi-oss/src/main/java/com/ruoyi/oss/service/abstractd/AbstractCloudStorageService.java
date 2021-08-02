@@ -3,7 +3,7 @@ package com.ruoyi.oss.service.abstractd;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.service.ICloudStorageService;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,7 +30,7 @@ public abstract class AbstractCloudStorageService implements ICloudStorageServic
 		String uuid = IdUtil.fastSimpleUUID();
 		// 文件路径
 		String path = DateUtil.format(new Date(), "yyyyMMdd") + "/" + uuid;
-		if (StrUtil.isNotBlank(prefix)) {
+		if (StringUtils.isNotBlank(prefix)) {
 			path = prefix + "/" + path;
 		}
 		return path + suffix;

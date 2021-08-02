@@ -1,9 +1,8 @@
 package com.ruoyi.common.filter;
 
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
+import com.ruoyi.common.utils.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -59,7 +58,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
 
         // 为空，直接返回
         String json = IoUtil.read(super.getInputStream(), StandardCharsets.UTF_8);
-        if (Validator.isEmpty(json))
+        if (StringUtils.isEmpty(json))
         {
             return super.getInputStream();
         }
@@ -103,6 +102,6 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
     public boolean isJsonRequest()
     {
         String header = super.getHeader(HttpHeaders.CONTENT_TYPE);
-        return StrUtil.startWithIgnoreCase(header, MediaType.APPLICATION_JSON_VALUE);
+        return StringUtils.startWithIgnoreCase(header, MediaType.APPLICATION_JSON_VALUE);
     }
 }

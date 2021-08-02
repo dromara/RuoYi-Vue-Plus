@@ -1,7 +1,7 @@
 package com.ruoyi.common.core.controller;
 
-import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +73,6 @@ public class BaseController
      */
     public String redirect(String url)
     {
-        return StrUtil.format("redirect:{}", url);
+        return StringUtils.format("redirect:{}", url);
     }
 }

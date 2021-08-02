@@ -1,6 +1,6 @@
 package com.ruoyi.web.controller.system;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -56,7 +56,7 @@ public class SysDeptController extends BaseController
         {
             SysDept d = (SysDept) it.next();
             if (d.getDeptId().intValue() == deptId
-                    || ArrayUtils.contains(StrUtil.splitToArray(d.getAncestors(), ","), deptId + ""))
+                    || ArrayUtils.contains(StringUtils.splitToArray(d.getAncestors(), ","), deptId + ""))
             {
                 it.remove();
             }
@@ -129,7 +129,7 @@ public class SysDeptController extends BaseController
         {
             return AjaxResult.error("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
         }
-        else if (StrUtil.equals(UserConstants.DEPT_DISABLE, dept.getStatus())
+        else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus())
                 && deptService.selectNormalChildrenDeptById(dept.getDeptId()) > 0)
         {
             return AjaxResult.error("该部门包含未停用的子部门！");

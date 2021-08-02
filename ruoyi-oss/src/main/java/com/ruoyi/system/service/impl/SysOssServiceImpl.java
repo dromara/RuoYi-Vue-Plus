@@ -1,6 +1,6 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
@@ -41,21 +41,21 @@ public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, Sys
 	private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {
 		Map<String, Object> params = bo.getParams();
 		LambdaQueryWrapper<SysOss> lqw = Wrappers.lambdaQuery();
-		lqw.like(StrUtil.isNotBlank(bo.getFileName()), SysOss::getFileName, bo.getFileName());
-		lqw.like(StrUtil.isNotBlank(bo.getOriginalName()), SysOss::getOriginalName, bo.getOriginalName());
-		lqw.eq(StrUtil.isNotBlank(bo.getFileSuffix()), SysOss::getFileSuffix, bo.getFileSuffix());
-		lqw.eq(StrUtil.isNotBlank(bo.getUrl()), SysOss::getUrl, bo.getUrl());
+		lqw.like(StringUtils.isNotBlank(bo.getFileName()), SysOss::getFileName, bo.getFileName());
+		lqw.like(StringUtils.isNotBlank(bo.getOriginalName()), SysOss::getOriginalName, bo.getOriginalName());
+		lqw.eq(StringUtils.isNotBlank(bo.getFileSuffix()), SysOss::getFileSuffix, bo.getFileSuffix());
+		lqw.eq(StringUtils.isNotBlank(bo.getUrl()), SysOss::getUrl, bo.getUrl());
 		lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
 			SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
-		lqw.eq(StrUtil.isNotBlank(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
-		lqw.eq(StrUtil.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
+		lqw.eq(StringUtils.isNotBlank(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
+		lqw.eq(StringUtils.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
 		return lqw;
 	}
 
 	@Override
 	public SysOss upload(MultipartFile file) {
 		String originalfileName = file.getOriginalFilename();
-		String suffix = StrUtil.sub(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
+		String suffix = StringUtils.sub(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
 		ICloudStorageService storage = OssFactory.instance();
 		UploadResult uploadResult;
 		try {

@@ -2,7 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -29,7 +29,7 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
     public TableDataInfo<SysOperLog> selectPageOperLogList(SysOperLog operLog) {
         Map<String, Object> params = operLog.getParams();
         LambdaQueryWrapper<SysOperLog> lqw = new LambdaQueryWrapper<SysOperLog>()
-                .like(StrUtil.isNotBlank(operLog.getTitle()), SysOperLog::getTitle, operLog.getTitle())
+                .like(StringUtils.isNotBlank(operLog.getTitle()), SysOperLog::getTitle, operLog.getTitle())
                 .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
                         SysOperLog::getBusinessType, operLog.getBusinessType())
                 .func(f -> {
@@ -39,7 +39,7 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
                 })
                 .eq(operLog.getStatus() != null && operLog.getStatus() > 0,
                         SysOperLog::getStatus, operLog.getStatus())
-                .like(StrUtil.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
+                .like(StringUtils.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
                         "date_format(oper_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
@@ -70,7 +70,7 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
     public List<SysOperLog> selectOperLogList(SysOperLog operLog) {
         Map<String, Object> params = operLog.getParams();
         return list(new LambdaQueryWrapper<SysOperLog>()
-                .like(StrUtil.isNotBlank(operLog.getTitle()),SysOperLog::getTitle,operLog.getTitle())
+                .like(StringUtils.isNotBlank(operLog.getTitle()),SysOperLog::getTitle,operLog.getTitle())
                 .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
                         SysOperLog::getBusinessType,operLog.getBusinessType())
                 .func(f -> {
@@ -80,7 +80,7 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
                 })
                 .eq(operLog.getStatus() != null && operLog.getStatus() > 0,
                         SysOperLog::getStatus,operLog.getStatus())
-                .like(StrUtil.isNotBlank(operLog.getOperName()),SysOperLog::getOperName,operLog.getOperName())
+                .like(StringUtils.isNotBlank(operLog.getOperName()),SysOperLog::getOperName,operLog.getOperName())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
                         "date_format(oper_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))

@@ -1,6 +1,6 @@
 package com.ruoyi.quartz.domain;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
@@ -125,7 +125,7 @@ public class SysJob implements Serializable {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     public Date getNextValidTime() {
-        if (StrUtil.isNotEmpty(cronExpression)) {
+        if (StringUtils.isNotEmpty(cronExpression)) {
             return CronUtils.getNextExecution(cronExpression);
         }
         return null;

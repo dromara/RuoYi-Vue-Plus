@@ -1,6 +1,6 @@
 package com.ruoyi.generator.domain;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
@@ -150,7 +150,7 @@ public class GenTableColumn implements Serializable {
     private Map<String, Object> params = new HashMap<>();
 
     public String getCapJavaField() {
-        return StrUtil.upperFirst(javaField);
+        return StringUtils.upperFirst(javaField);
     }
 
     public boolean isPk() {
@@ -158,7 +158,7 @@ public class GenTableColumn implements Serializable {
     }
 
     public boolean isPk(String isPk) {
-        return isPk != null && StrUtil.equals("1", isPk);
+        return isPk != null && StringUtils.equals("1", isPk);
     }
 
     public boolean isIncrement() {
@@ -166,7 +166,7 @@ public class GenTableColumn implements Serializable {
     }
 
     public boolean isIncrement(String isIncrement) {
-        return isIncrement != null && StrUtil.equals("1", isIncrement);
+        return isIncrement != null && StringUtils.equals("1", isIncrement);
     }
 
     public boolean isRequired() {
@@ -174,7 +174,7 @@ public class GenTableColumn implements Serializable {
     }
 
     public boolean isRequired(String isRequired) {
-        return isRequired != null && StrUtil.equals("1", isRequired);
+        return isRequired != null && StringUtils.equals("1", isRequired);
     }
 
     public boolean isInsert() {
@@ -182,7 +182,7 @@ public class GenTableColumn implements Serializable {
     }
 
     public boolean isInsert(String isInsert) {
-        return isInsert != null && StrUtil.equals("1", isInsert);
+        return isInsert != null && StringUtils.equals("1", isInsert);
     }
 
     public boolean isEdit() {
@@ -190,7 +190,7 @@ public class GenTableColumn implements Serializable {
     }
 
     public boolean isEdit(String isEdit) {
-        return isEdit != null && StrUtil.equals("1", isEdit);
+        return isEdit != null && StringUtils.equals("1", isEdit);
     }
 
     public boolean isList() {
@@ -198,7 +198,7 @@ public class GenTableColumn implements Serializable {
     }
 
     public boolean isList(String isList) {
-        return isList != null && StrUtil.equals("1", isList);
+        return isList != null && StringUtils.equals("1", isList);
     }
 
     public boolean isQuery() {
@@ -206,7 +206,7 @@ public class GenTableColumn implements Serializable {
     }
 
     public boolean isQuery(String isQuery) {
-        return isQuery != null && StrUtil.equals("1", isQuery);
+        return isQuery != null && StringUtils.equals("1", isQuery);
     }
 
     public boolean isSuperColumn() {
@@ -214,7 +214,7 @@ public class GenTableColumn implements Serializable {
     }
 
     public static boolean isSuperColumn(String javaField) {
-        return StrUtil.equalsAnyIgnoreCase(javaField,
+        return StringUtils.equalsAnyIgnoreCase(javaField,
                 // BaseEntity
                 "createBy", "createTime", "updateBy", "updateTime", "remark",
                 // TreeEntity
@@ -227,15 +227,15 @@ public class GenTableColumn implements Serializable {
 
     public static boolean isUsableColumn(String javaField) {
         // isSuperColumn()中的名单用于避免生成多余Domain属性，若某些属性在生成页面时需要用到不能忽略，则放在此处白名单
-        return StrUtil.equalsAnyIgnoreCase(javaField, "parentId", "orderNum", "remark");
+        return StringUtils.equalsAnyIgnoreCase(javaField, "parentId", "orderNum", "remark");
     }
 
     public String readConverterExp() {
-        String remarks = StrUtil.subBetween(this.columnComment, "（", "）");
+        String remarks = StringUtils.subBetween(this.columnComment, "（", "）");
         StringBuffer sb = new StringBuffer();
-        if (StrUtil.isNotEmpty(remarks)) {
+        if (StringUtils.isNotEmpty(remarks)) {
             for (String value : remarks.split(" ")) {
-                if (StrUtil.isNotEmpty(value)) {
+                if (StringUtils.isNotEmpty(value)) {
                     Object startStr = value.subSequence(0, 1);
                     String endStr = value.substring(1);
                     sb.append("").append(startStr).append("=").append(endStr).append(",");
