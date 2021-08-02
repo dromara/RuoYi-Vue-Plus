@@ -1,7 +1,9 @@
 package com.ruoyi.framework.mybatisplus;
 
+import cn.hutool.core.lang.Validator;
 import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.SecurityUtils;
 import org.apache.ibatis.reflection.MetaObject;
@@ -21,13 +23,13 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 		try {
 			//根据属性名字设置要填充的值
 			if (metaObject.hasGetter("createTime")) {
-				if (metaObject.getValue("createTime") == null) {
+				if (Validator.isEmpty(metaObject.getValue("createTime"))) {
 					this.setFieldValByName("createTime", new Date(), metaObject);
 				}
 			}
 			if (metaObject.hasGetter("createBy")) {
-				if (metaObject.getValue("createBy") == null) {
-					this.setFieldValByName("createBy", SecurityUtils.getUsername(), metaObject);
+				if (Validator.isEmpty(metaObject.getValue("createBy"))) {
+					this.setFieldValByName("createBy", getLoginUsername(), metaObject);
 				}
 			}
 		} catch (Exception e) {
@@ -39,18 +41,29 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 	public void updateFill(MetaObject metaObject) {
 		try {
 			if (metaObject.hasGetter("updateBy")) {
-				if (metaObject.getValue("updateBy") == null) {
-					this.setFieldValByName("updateBy", SecurityUtils.getUsername(), metaObject);
+				if (Validator.isEmpty(metaObject.getValue("updateBy"))) {
+					this.setFieldValByName("updateBy", getLoginUsername(), metaObject);
 				}
 			}
 			if (metaObject.hasGetter("updateTime")) {
-				if (metaObject.getValue("updateTime") == null) {
+				if (Validator.isEmpty(metaObject.getValue("updateTime"))) {
 					this.setFieldValByName("updateTime", new Date(), metaObject);
 				}
 			}
 		} catch (Exception e) {
 			throw new CustomException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
 		}
+	}
+
+	/**
+	 * 获取登录用户名
+	 */
+	private String getLoginUsername() {
+		LoginUser loginUser = SecurityUtils.getLoginUser();
+		if (Validator.isEmpty(loginUser)) {
+			throw new CustomException("用户未登录 => 无法获取用户信息");
+		}
+		return loginUser.getUsername();
 	}
 
 }
