@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.SecurityUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.util.Date;
@@ -16,6 +17,7 @@ import java.util.Date;
  * @author Lion Li
  * @date 2021/4/25
  */
+@Slf4j
 public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 
 	@Override
@@ -59,9 +61,12 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 	 * 获取登录用户名
 	 */
 	private String getLoginUsername() {
-		LoginUser loginUser = SecurityUtils.getLoginUser();
-		if (Validator.isEmpty(loginUser)) {
-			throw new CustomException("用户未登录 => 无法获取用户信息");
+		LoginUser loginUser;
+		try {
+			loginUser = SecurityUtils.getLoginUser();
+		} catch (Exception e) {
+			log.warn("自动注入警告 => 用户未登录");
+			return null;
 		}
 		return loginUser.getUsername();
 	}
