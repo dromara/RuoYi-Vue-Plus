@@ -240,6 +240,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      * @param user 用户信息
      * @return 结果
      */
+	@Override
     public boolean registerUser(SysUser user) {
         return baseMapper.insert(user) > 0;
     }

@@ -113,10 +113,10 @@ export default {
   methods: {
     getCode() {
       getCodeImg().then(res => {
-        this.captchaOnOff = res.captchaOnOff === undefined ? true : res.captchaOnOff;
+        this.captchaOnOff = res.data.captchaOnOff === undefined ? true : res.data.captchaOnOff;
         if (this.captchaOnOff) {
-          this.codeUrl = "data:image/gif;base64," + res.img;
-          this.registerForm.uuid = res.uuid;
+          this.codeUrl = "data:image/gif;base64," + res.data.img;
+          this.registerForm.uuid = res.data.uuid;
         }
       });
     },
