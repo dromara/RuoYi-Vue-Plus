@@ -235,6 +235,16 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     }
 
     /**
+     * 注册用户信息
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+    public boolean registerUser(SysUser user) {
+        return baseMapper.insert(user) > 0;
+    }
+
+    /**
      * 修改保存用户信息
      *
      * @param user 用户信息

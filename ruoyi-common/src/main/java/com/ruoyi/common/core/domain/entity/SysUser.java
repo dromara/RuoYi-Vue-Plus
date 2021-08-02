@@ -62,7 +62,6 @@ public class SysUser implements Serializable
     private String email;
 
     /** 手机号码 */
-    @Size(min = 0, max = 11, message = "手机号码长度不能超过11个字符")
     @Excel(name = "手机号码")
     private String phonenumber;
 

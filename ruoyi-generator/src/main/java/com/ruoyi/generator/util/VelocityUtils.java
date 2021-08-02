@@ -294,7 +294,8 @@ public class VelocityUtils
      */
     public static String getParentMenuId(Map<String, Object> paramsObj)
     {
-        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.PARENT_MENU_ID))
+        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.PARENT_MENU_ID)
+				&& StrUtil.isNotEmpty(paramsObj.getString(GenConstants.PARENT_MENU_ID)))
         {
             return Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID));
         }

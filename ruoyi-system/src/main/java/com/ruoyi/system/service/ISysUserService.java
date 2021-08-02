@@ -112,6 +112,14 @@ public interface ISysUserService extends IService<SysUser> {
     public int insertUser(SysUser user);
 
     /**
+     * 注册用户信息
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+    public boolean registerUser(SysUser user);
+
+    /**
      * 修改用户信息
      *
      * @param user 用户信息
