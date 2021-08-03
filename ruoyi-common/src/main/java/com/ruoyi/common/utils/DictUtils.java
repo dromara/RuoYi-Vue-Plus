@@ -110,7 +110,7 @@ public class DictUtils
                 }
             }
         }
-        return StringUtils.strip(propertyString.toString(), null, separator);
+        return StringUtils.stripEnd(propertyString.toString(), separator);
     }
 
     /**
@@ -150,7 +150,7 @@ public class DictUtils
                 }
             }
         }
-        return StringUtils.strip(propertyString.toString(), null, separator);
+        return StringUtils.stripEnd(propertyString.toString(), separator);
     }
 
     /**
