@@ -3,7 +3,9 @@ import { getToken } from '@/utils/auth'
 
 const mimeMap = {
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  zip: 'application/zip'
+  zip: 'application/zip',
+  excel: 'application/vnd.ms-excel',
+  oss: 'application/octet-stream'
 }
 
 const baseUrl = process.env.VUE_APP_BASE_API
@@ -18,6 +20,54 @@ export function downLoadZip(str, filename) {
     resolveBlob(res, mimeMap.zip)
   })
 }
+
+export function downLoadOss(ossId) {
+  var url = baseUrl + '/system/oss/download/' + ossId
+  axios({
+    method: 'get',
+    url: url,
+    responseType: 'blob',
+    headers: { 'Authorization': 'Bearer ' + getToken() }
+  }).then(res => {
+    resolveBlob(res, mimeMap.oss)
+  })
+}
+
+export function downLoadExcel(url, params) {
+  // get请求映射params参数
+  if (params) {
+    let urlparams = url + '?';
+    for (const propName of Object.keys(params)) {
+      const value = params[propName];
+      var part = encodeURIComponent(propName) + "=";
+      if (value !== null && typeof(value) !== "undefined") {
+        if (typeof value === 'object') {
+          for (const key of Object.keys(value)) {
+            let params = propName + '[' + key + ']';
+            var subPart = encodeURIComponent(params) + "=";
+            urlparams += subPart + encodeURIComponent(value[key]) + "&";
+          }
+        } else {
+          urlparams += part + encodeURIComponent(value) + "&";
+        }
+      }
+    }
+    urlparams = urlparams.slice(0, -1);
+    params = {};
+    url = urlparams;
+  }
+  url = baseUrl + url
+  axios({
+    method: 'get',
+    url: url,
+    params: params,
+    responseType: 'blob',
+    headers: { 'Authorization': 'Bearer ' + getToken() }
+  }).then(res => {
+    resolveBlob(res, mimeMap.excel)
+  })
+}
+
 /**
  * 解析blob响应内容并下载
  * @param {*} res blob响应内容
@@ -34,7 +84,7 @@ export function resolveBlob(res, mimeType) {
   fileName = fileName.replace(/\"/g, '')
   aLink.style.display = 'none'
   aLink.href = URL.createObjectURL(blob)
-  aLink.setAttribute('download', fileName) // 设置下载文件名称
+  aLink.setAttribute('download', decodeURI(fileName)) // 设置下载文件名称
   document.body.appendChild(aLink)
   aLink.click()
   URL.revokeObjectURL(aLink.href);//清除引用
