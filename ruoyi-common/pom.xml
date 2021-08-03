@@ -59,6 +59,11 @@
             <artifactId>poi-ooxml</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+        </dependency>
+
         <!-- yml解析器 -->
         <dependency>
             <groupId>org.yaml</groupId>
