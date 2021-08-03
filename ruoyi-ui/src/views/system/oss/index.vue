@@ -170,9 +170,7 @@
 
 <script>
 import { listOss, delOss } from "@/api/system/oss";
-import { downLoadOss } from "@/utils/ossdownload";
-import { updateConfig } from "@/api/system/config";
-
+import { downLoadOss } from "@/utils/zipdownload";
 
 export default {
   name: "Oss",
