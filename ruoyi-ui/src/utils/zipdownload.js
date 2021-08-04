@@ -53,14 +53,12 @@ export function downLoadExcel(url, params) {
       }
     }
     urlparams = urlparams.slice(0, -1);
-    params = {};
     url = urlparams;
   }
   url = baseUrl + url
   axios({
     method: 'get',
     url: url,
-    params: params,
     responseType: 'blob',
     headers: { 'Authorization': 'Bearer ' + getToken() }
   }).then(res => {
