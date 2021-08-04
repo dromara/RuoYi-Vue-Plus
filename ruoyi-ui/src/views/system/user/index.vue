@@ -346,11 +346,12 @@
 </template>
 
 <script>
-import { listUser, getUser, delUser, addUser, updateUser, exportUser, resetUserPwd, changeUserStatus, importTemplate } from "@/api/system/user";
+import { listUser, getUser, delUser, addUser, updateUser, resetUserPwd, changeUserStatus } from "@/api/system/user";
 import { getToken } from "@/utils/auth";
 import { treeselect } from "@/api/system/dept";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "User",
@@ -660,18 +661,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有用户数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-          this.exportLoading = true;
-          return exportUser(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-          this.exportLoading = false;
-        }).catch(() => {});
+      downLoadExcel('/system/user/export', this.queryParams);
     },
     /** 导入按钮操作 */
     handleImport() {
@@ -680,9 +670,7 @@ export default {
     },
     /** 下载模板操作 */
     importTemplate() {
-      importTemplate().then(response => {
-        this.download(response.msg);
-      });
+      downLoadExcel('/system/user/importTemplate');
     },
     // 文件上传中处理
     handleFileUploadProgress(event, file, fileList) {

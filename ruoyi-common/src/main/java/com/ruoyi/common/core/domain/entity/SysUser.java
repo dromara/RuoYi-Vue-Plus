@@ -1,13 +1,8 @@
 package com.ruoyi.common.core.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ruoyi.common.annotation.Excel;
-import com.ruoyi.common.annotation.Excel.ColumnType;
-import com.ruoyi.common.annotation.Excel.Type;
-import com.ruoyi.common.annotation.Excels;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -37,14 +32,12 @@ public class SysUser implements Serializable {
 	/**
 	 * 用户ID
 	 */
-	@Excel(name = "用户序号", cellType = ColumnType.NUMERIC, prompt = "用户编号")
 	@TableId(value = "user_id", type = IdType.AUTO)
 	private Long userId;
 
 	/**
 	 * 部门ID
 	 */
-	@Excel(name = "部门编号", type = Type.IMPORT)
 	private Long deptId;
 
 	/**
@@ -52,14 +45,12 @@ public class SysUser implements Serializable {
 	 */
 	@NotBlank(message = "用户账号不能为空")
 	@Size(min = 0, max = 30, message = "用户账号长度不能超过30个字符")
-	@Excel(name = "登录名称")
 	private String userName;
 
 	/**
 	 * 用户昵称
 	 */
 	@Size(min = 0, max = 30, message = "用户昵称长度不能超过30个字符")
-	@Excel(name = "用户名称")
 	private String nickName;
 
 	/**
@@ -67,19 +58,16 @@ public class SysUser implements Serializable {
 	 */
 	@Email(message = "邮箱格式不正确")
 	@Size(min = 0, max = 50, message = "邮箱长度不能超过50个字符")
-	@Excel(name = "用户邮箱")
 	private String email;
 
 	/**
 	 * 手机号码
 	 */
-	@Excel(name = "手机号码")
 	private String phonenumber;
 
 	/**
 	 * 用户性别
 	 */
-	@Excel(name = "用户性别", readConverterExp = "0=男,1=女,2=未知")
 	private String sex;
 
 	/**
@@ -106,7 +94,6 @@ public class SysUser implements Serializable {
 	/**
 	 * 帐号状态（0正常 1停用）
 	 */
-	@Excel(name = "帐号状态", readConverterExp = "0=正常,1=停用")
 	private String status;
 
 	/**
@@ -118,13 +105,11 @@ public class SysUser implements Serializable {
 	/**
 	 * 最后登录IP
 	 */
-	@Excel(name = "最后登录IP", type = Type.EXPORT)
 	private String loginIp;
 
 	/**
 	 * 最后登录时间
 	 */
-	@Excel(name = "最后登录时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Type.EXPORT)
 	private Date loginDate;
 
 	/**
@@ -137,7 +122,6 @@ public class SysUser implements Serializable {
 	 * 创建时间
 	 */
 	@TableField(fill = FieldFill.INSERT)
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
 
 	/**
@@ -150,7 +134,6 @@ public class SysUser implements Serializable {
 	 * 更新时间
 	 */
 	@TableField(fill = FieldFill.INSERT_UPDATE)
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
 
 	/**
@@ -167,10 +150,6 @@ public class SysUser implements Serializable {
 	/**
 	 * 部门对象
 	 */
-	@Excels({
-		@Excel(name = "部门名称", targetAttr = "deptName", type = Type.EXPORT),
-		@Excel(name = "部门负责人", targetAttr = "leader", type = Type.EXPORT)
-	})
 	@TableField(exist = false)
 	private SysDept dept;
 
