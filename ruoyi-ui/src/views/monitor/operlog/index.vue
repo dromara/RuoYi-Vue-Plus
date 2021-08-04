@@ -189,7 +189,7 @@
 
 <script>
 import { list, delOperlog, cleanOperlog, exportOperlog } from "@/api/monitor/operlog";
-import { downLoadExcel } from "@/utils/zipdownload";
+import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Operlog",
