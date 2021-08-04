@@ -4,7 +4,6 @@ import { getToken } from '@/utils/auth'
 const mimeMap = {
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   zip: 'application/zip',
-  excel: 'application/vnd.ms-excel',
   oss: 'application/octet-stream'
 }
 
@@ -62,7 +61,7 @@ export function downLoadExcel(url, params) {
     responseType: 'blob',
     headers: { 'Authorization': 'Bearer ' + getToken() }
   }).then(res => {
-    resolveBlob(res, mimeMap.excel)
+    resolveBlob(res, mimeMap.xlsx)
   })
 }
 

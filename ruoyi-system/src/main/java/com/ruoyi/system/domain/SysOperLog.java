@@ -28,9 +28,6 @@ import java.util.Map;
 @Accessors(chain = true)
 @TableName("sys_oper_log")
 @ExcelIgnoreUnannotated
-//@ColumnWidth(16)
-//@HeadRowHeight(14)
-//@HeadFontStyle(fontHeightInPoints = 11)
 public class SysOperLog implements Serializable {
     private static final long serialVersionUID = 1L;
 

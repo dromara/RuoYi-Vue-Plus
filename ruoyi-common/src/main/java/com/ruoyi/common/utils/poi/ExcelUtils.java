@@ -46,7 +46,7 @@ public class ExcelUtils {
 			response.addHeader("Access-Control-Allow-Origin", "*");
 			response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
 			FileUtils.setAttachmentResponseHeader(response, URLEncoder.encode(filename, StandardCharsets.UTF_8.toString()));
-			response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+			response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");
 			ServletOutputStream os = response.getOutputStream();
 			EasyExcel.write(os, clazz)
 				.autoCloseStream(false)

@@ -41,8 +41,6 @@ public class SysOperlogController extends BaseController
     {
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
 		ExcelUtils.exportExcel(list, "操作日志", SysOperLog.class, response);
-//        ExcelUtil<SysOperLog> util = new ExcelUtil<SysOperLog>(SysOperLog.class);
-//        return util.exportEasyExcel(list, "操作日志");
     }
 
     @Log(title = "操作日志", businessType = BusinessType.DELETE)

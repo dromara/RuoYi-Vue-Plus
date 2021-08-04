@@ -188,7 +188,7 @@
 </template>
 
 <script>
-import { list, delOperlog, cleanOperlog, exportOperlog } from "@/api/monitor/operlog";
+import { list, delOperlog, cleanOperlog } from "@/api/monitor/operlog";
 import { downLoadExcel } from "@/utils/download";
 
 export default {

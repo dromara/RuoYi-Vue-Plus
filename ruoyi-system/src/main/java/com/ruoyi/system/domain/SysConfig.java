@@ -1,9 +1,10 @@
 package com.ruoyi.system.domain;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ruoyi.common.annotation.Excel;
-import com.ruoyi.common.annotation.Excel.ColumnType;
+import com.ruoyi.common.annotation.ExcelDictFormat;
+import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -25,20 +26,21 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_config")
+@ExcelIgnoreUnannotated
 public class SysConfig implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 参数主键
      */
-    @Excel(name = "参数主键", cellType = ColumnType.NUMERIC)
+    @ExcelProperty(value = "参数主键")
     @TableId(value = "config_id", type = IdType.AUTO)
     private Long configId;
 
     /**
      * 参数名称
      */
-    @Excel(name = "参数名称")
+    @ExcelProperty(value = "参数名称")
     @NotBlank(message = "参数名称不能为空")
     @Size(min = 0, max = 100, message = "参数名称不能超过100个字符")
     private String configName;
@@ -46,7 +48,7 @@ public class SysConfig implements Serializable {
     /**
      * 参数键名
      */
-    @Excel(name = "参数键名")
+    @ExcelProperty(value = "参数键名")
     @NotBlank(message = "参数键名长度不能为空")
     @Size(min = 0, max = 100, message = "参数键名长度不能超过100个字符")
     private String configKey;
@@ -54,7 +56,7 @@ public class SysConfig implements Serializable {
     /**
      * 参数键值
      */
-    @Excel(name = "参数键值")
+    @ExcelProperty(value = "参数键值")
     @NotBlank(message = "参数键值不能为空")
     @Size(min = 0, max = 500, message = "参数键值长度不能超过500个字符")
     private String configValue;
@@ -62,7 +64,8 @@ public class SysConfig implements Serializable {
     /**
      * 系统内置（Y是 N否）
      */
-    @Excel(name = "系统内置", readConverterExp = "Y=是,N=否")
+    @ExcelProperty(value = "系统内置", converter = ExcelDictConvert.class)
+	@ExcelDictFormat(dictType = "sys_yes_no")
     private String configType;
 
     /**
@@ -75,7 +78,6 @@ public class SysConfig implements Serializable {
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     /**
@@ -88,7 +90,6 @@ public class SysConfig implements Serializable {
      * 更新时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
     /**
