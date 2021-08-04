@@ -8,8 +8,6 @@ ruoyi:
   copyrightYear: 2021
   # 实例演示开关
   demoEnabled: true
-  # 文件路径
-  profile: ./ruoyi/uploadPath
   # 获取ip地址开关
   addressEnabled: true
 
