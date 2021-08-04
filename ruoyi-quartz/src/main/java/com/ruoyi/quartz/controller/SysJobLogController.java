@@ -5,18 +5,19 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.common.utils.poi.ExcelUtils;
 import com.ruoyi.quartz.domain.SysJobLog;
 import com.ruoyi.quartz.service.ISysJobLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
  * 调度日志操作处理
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -42,13 +43,12 @@ public class SysJobLogController extends BaseController
     @PreAuthorize("@ss.hasPermi('monitor:job:export')")
     @Log(title = "任务调度日志", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult export(SysJobLog sysJobLog)
+    public void export(SysJobLog sysJobLog, HttpServletResponse response)
     {
         List<SysJobLog> list = jobLogService.selectJobLogList(sysJobLog);
-        ExcelUtil<SysJobLog> util = new ExcelUtil<SysJobLog>(SysJobLog.class);
-        return util.exportExcel(list, "调度日志");
+		ExcelUtils.exportExcel(list, "调度日志", SysJobLog.class, response);
     }
-    
+
     /**
      * 根据调度编号获取详细信息
      */

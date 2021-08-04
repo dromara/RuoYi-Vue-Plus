@@ -1,6 +1,5 @@
 package com.ruoyi.quartz.controller;
 
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -9,7 +8,8 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.job.TaskException;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.poi.ExcelUtils;
 import com.ruoyi.quartz.domain.SysJob;
 import com.ruoyi.quartz.service.ISysJobService;
 import com.ruoyi.quartz.util.CronUtils;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -48,11 +49,10 @@ public class SysJobController extends BaseController
     @PreAuthorize("@ss.hasPermi('monitor:job:export')")
     @Log(title = "定时任务", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult export(SysJob sysJob)
+    public void export(SysJob sysJob, HttpServletResponse response)
     {
         List<SysJob> list = jobService.selectJobList(sysJob);
-        ExcelUtil<SysJob> util = new ExcelUtil<SysJob>(SysJob.class);
-        return util.exportExcel(list, "定时任务");
+		ExcelUtils.exportExcel(list, "定时任务", SysJob.class, response);
     }
 
     /**

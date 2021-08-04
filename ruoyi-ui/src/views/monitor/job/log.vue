@@ -177,8 +177,9 @@
 </template>
 
 <script>
-import { getJob} from "@/api/monitor/job";
-import { listJobLog, delJobLog, exportJobLog, cleanJobLog } from "@/api/monitor/jobLog";
+import { getJob } from "@/api/monitor/job";
+import { listJobLog, delJobLog, cleanJobLog } from "@/api/monitor/jobLog";
+import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "JobLog",
@@ -310,18 +311,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm("是否确认导出所有调度日志数据项?", "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-          this.exportLoading = true;
-          return exportJobLog(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-          this.exportLoading = false;
-        }).catch(() => {});
+      downLoadExcel('/monitor/jobLog/export', this.queryParams);
     }
   }
 };

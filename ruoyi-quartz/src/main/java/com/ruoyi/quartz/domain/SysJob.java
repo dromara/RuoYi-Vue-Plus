@@ -1,11 +1,13 @@
 package com.ruoyi.quartz.domain;
 
-import com.ruoyi.common.utils.StringUtils;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ruoyi.common.annotation.Excel;
-import com.ruoyi.common.annotation.Excel.ColumnType;
+import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.constant.ScheduleConstants;
+import com.ruoyi.common.convert.ExcelDictConvert;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.quartz.util.CronUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,13 +30,14 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_job")
+@ExcelIgnoreUnannotated
 public class SysJob implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 任务ID
      */
-    @Excel(name = "任务序号", cellType = ColumnType.NUMERIC)
+    @ExcelProperty(value = "任务序号")
     @TableId(value = "job_id", type = IdType.AUTO)
     private Long jobId;
 
@@ -43,13 +46,14 @@ public class SysJob implements Serializable {
      */
     @NotBlank(message = "任务名称不能为空")
     @Size(min = 0, max = 64, message = "任务名称不能超过64个字符")
-    @Excel(name = "任务名称")
+    @ExcelProperty(value = "任务名称")
     private String jobName;
 
     /**
      * 任务组名
      */
-    @Excel(name = "任务组名")
+	@ExcelProperty(value = "任务组名", converter = ExcelDictConvert.class)
+	@ExcelDictFormat(dictType = "sys_job_group")
     private String jobGroup;
 
     /**
@@ -57,7 +61,7 @@ public class SysJob implements Serializable {
      */
     @NotBlank(message = "调用目标字符串不能为空")
     @Size(min = 0, max = 500, message = "调用目标字符串长度不能超过500个字符")
-    @Excel(name = "调用目标字符串")
+    @ExcelProperty(value = "调用目标字符串")
     private String invokeTarget;
 
     /**
@@ -65,25 +69,28 @@ public class SysJob implements Serializable {
      */
     @NotBlank(message = "Cron执行表达式不能为空")
     @Size(min = 0, max = 255, message = "Cron执行表达式不能超过255个字符")
-    @Excel(name = "执行表达式 ")
+    @ExcelProperty(value = "执行表达式")
     private String cronExpression;
 
     /**
      * cron计划策略
      */
-    @Excel(name = "计划策略 ", readConverterExp = "0=默认,1=立即触发执行,2=触发一次执行,3=不触发立即执行")
-    private String misfirePolicy = ScheduleConstants.MISFIRE_DEFAULT;
+    @ExcelProperty(value = "计划策略 ", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(readConverterExp = "0=默认,1=立即触发执行,2=触发一次执行,3=不触发立即执行")
+	private String misfirePolicy = ScheduleConstants.MISFIRE_DEFAULT;
 
     /**
      * 是否并发执行（0允许 1禁止）
      */
-    @Excel(name = "并发执行", readConverterExp = "0=允许,1=禁止")
+    @ExcelProperty(value = "并发执行", converter = ExcelDictConvert.class)
+	@ExcelDictFormat(readConverterExp = "0=允许,1=禁止")
     private String concurrent;
 
     /**
      * 任务状态（0正常 1暂停）
      */
-    @Excel(name = "任务状态", readConverterExp = "0=正常,1=暂停")
+    @ExcelProperty(value = "任务状态", converter = ExcelDictConvert.class)
+	@ExcelDictFormat(dictType = "sys_job_status")
     private String status;
 
     /**
@@ -96,7 +103,6 @@ public class SysJob implements Serializable {
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     /**
@@ -109,7 +115,6 @@ public class SysJob implements Serializable {
      * 更新时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
     /**
