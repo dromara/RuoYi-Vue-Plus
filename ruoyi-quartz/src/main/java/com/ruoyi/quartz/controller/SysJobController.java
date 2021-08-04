@@ -9,7 +9,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.job.TaskException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.poi.ExcelUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.quartz.domain.SysJob;
 import com.ruoyi.quartz.service.ISysJobService;
 import com.ruoyi.quartz.util.CronUtils;
@@ -52,7 +52,7 @@ public class SysJobController extends BaseController
     public void export(SysJob sysJob, HttpServletResponse response)
     {
         List<SysJob> list = jobService.selectJobList(sysJob);
-		ExcelUtils.exportExcel(list, "定时任务", SysJob.class, response);
+		ExcelUtil.exportExcel(list, "定时任务", SysJob.class, response);
     }
 
     /**

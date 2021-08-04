@@ -8,7 +8,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.poi.ExcelUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.service.ISysDictDataService;
 import com.ruoyi.system.service.ISysDictTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class SysDictDataController extends BaseController
     public void export(SysDictData dictData, HttpServletResponse response)
     {
         List<SysDictData> list = dictDataService.selectDictDataList(dictData);
-		ExcelUtils.exportExcel(list, "字典数据", SysDictData.class, response);
+		ExcelUtil.exportExcel(list, "字典数据", SysDictData.class, response);
     }
 
     /**

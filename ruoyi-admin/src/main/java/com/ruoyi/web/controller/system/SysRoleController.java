@@ -12,7 +12,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.poi.ExcelUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.domain.SysUserRole;
@@ -60,7 +60,7 @@ public class SysRoleController extends BaseController
     public void export(SysRole role, HttpServletResponse response)
     {
         List<SysRole> list = roleService.selectRoleList(role);
-		ExcelUtils.exportExcel(list, "角色数据", SysRole.class, response);
+		ExcelUtil.exportExcel(list, "角色数据", SysRole.class, response);
     }
 
     /**

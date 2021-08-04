@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
@@ -68,10 +69,9 @@ public class TestDemoController extends BaseController {
     @PreAuthorize("@ss.hasPermi('demo:demo:export')")
     @Log(title = "测试单表", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult<TestDemoVo> export(@Validated TestDemoBo bo) {
+    public void export(@Validated TestDemoBo bo, HttpServletResponse response) {
         List<TestDemoVo> list = iTestDemoService.queryList(bo);
-        ExcelUtil<TestDemoVo> util = new ExcelUtil<TestDemoVo>(TestDemoVo.class);
-        return util.exportExcel(list, "测试单表");
+		ExcelUtil.exportExcel(list, "测试单表", TestDemoVo.class, response);
     }
 
     /**

@@ -5,7 +5,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.poi.ExcelUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysLogininfor;
 import com.ruoyi.system.service.ISysLogininforService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class SysLogininforController extends BaseController
     public void export(SysLogininfor logininfor, HttpServletResponse response)
     {
         List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
-		ExcelUtils.exportExcel(list, "登录日志", SysLogininfor.class, response);
+		ExcelUtil.exportExcel(list, "登录日志", SysLogininfor.class, response);
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")

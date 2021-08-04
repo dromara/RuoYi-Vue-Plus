@@ -9,7 +9,7 @@ import com.alibaba.excel.metadata.GlobalConfiguration;
 import com.alibaba.excel.metadata.property.ExcelContentProperty;
 import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.poi.ExcelUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -39,9 +39,9 @@ public class ExcelDictConvert implements Converter<Object> {
 		String label = cellData.getStringValue();
 		String value;
 		if (StringUtils.isBlank(type)) {
-			value = ExcelUtils.reverseByExp(label, anno.readConverterExp(), anno.separator());
+			value = ExcelUtil.reverseByExp(label, anno.readConverterExp(), anno.separator());
 		} else {
-			value = ExcelUtils.reverseDictByExp(label, type, anno.separator());
+			value = ExcelUtil.reverseDictByExp(label, type, anno.separator());
 		}
 		return Convert.convert(contentProperty.getField().getType(), value);
 	}
@@ -56,9 +56,9 @@ public class ExcelDictConvert implements Converter<Object> {
 		String value = Convert.toStr(object);
 		String label;
 		if (StringUtils.isBlank(type)) {
-			label = ExcelUtils.convertByExp(value, anno.readConverterExp(), anno.separator());
+			label = ExcelUtil.convertByExp(value, anno.readConverterExp(), anno.separator());
 		} else {
-			label = ExcelUtils.convertDictByExp(value, type, anno.separator());
+			label = ExcelUtil.convertDictByExp(value, type, anno.separator());
 		}
 		return new CellData<>(label);
 	}

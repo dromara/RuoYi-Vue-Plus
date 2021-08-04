@@ -7,7 +7,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.poi.ExcelUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.service.ISysPostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class SysPostController extends BaseController
     public void export(SysPost post, HttpServletResponse response)
     {
         List<SysPost> list = postService.selectPostList(post);
-		ExcelUtils.exportExcel(list, "岗位数据", SysPost.class, response);
+		ExcelUtil.exportExcel(list, "岗位数据", SysPost.class, response);
     }
 
     /**

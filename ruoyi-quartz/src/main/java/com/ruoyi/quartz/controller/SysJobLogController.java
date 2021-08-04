@@ -5,7 +5,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.poi.ExcelUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.quartz.domain.SysJobLog;
 import com.ruoyi.quartz.service.ISysJobLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class SysJobLogController extends BaseController
     public void export(SysJobLog sysJobLog, HttpServletResponse response)
     {
         List<SysJobLog> list = jobLogService.selectJobLogList(sysJobLog);
-		ExcelUtils.exportExcel(list, "调度日志", SysJobLog.class, response);
+		ExcelUtil.exportExcel(list, "调度日志", SysJobLog.class, response);
     }
 
     /**

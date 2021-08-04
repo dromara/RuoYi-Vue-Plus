@@ -8,7 +8,7 @@ import com.ruoyi.common.core.domain.entity.SysDictType;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.poi.ExcelUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.service.ISysDictTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,7 +43,7 @@ public class SysDictTypeController extends BaseController
     public void export(SysDictType dictType, HttpServletResponse response)
     {
         List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
-		ExcelUtils.exportExcel(list, "字典类型", SysDictType.class, response);
+		ExcelUtil.exportExcel(list, "字典类型", SysDictType.class, response);
     }
 
     /**

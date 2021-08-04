@@ -15,7 +15,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.poi.ExcelUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.domain.vo.SysUserExportVo;
 import com.ruoyi.system.domain.vo.SysUserImportVo;
@@ -81,7 +81,7 @@ public class SysUserController extends BaseController
 				vo.setLeader(dept.getLeader());
 			}
 		}
-		ExcelUtils.exportExcel(listVo, "用户数据", SysUserExportVo.class, response);
+		ExcelUtil.exportExcel(listVo, "用户数据", SysUserExportVo.class, response);
     }
 
     @Log(title = "用户管理", businessType = BusinessType.IMPORT)
@@ -89,7 +89,7 @@ public class SysUserController extends BaseController
     @PostMapping("/importData")
     public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
     {
-		List<SysUserImportVo> userListVo = ExcelUtils.importExcel(file.getInputStream(), SysUserImportVo.class);
+		List<SysUserImportVo> userListVo = ExcelUtil.importExcel(file.getInputStream(), SysUserImportVo.class);
 		List<SysUser> userList = BeanUtil.copyToList(userListVo, SysUser.class);
 		LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
         String operName = loginUser.getUsername();
@@ -100,7 +100,7 @@ public class SysUserController extends BaseController
     @GetMapping("/importTemplate")
     public void importTemplate(HttpServletResponse response)
     {
-		ExcelUtils.exportExcel(new ArrayList<>(), "用户数据", SysUserImportVo.class, response);
+		ExcelUtil.exportExcel(new ArrayList<>(), "用户数据", SysUserImportVo.class, response);
     }
 
     /**
