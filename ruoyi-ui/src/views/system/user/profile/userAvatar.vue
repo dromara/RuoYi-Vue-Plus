@@ -77,7 +77,8 @@ export default {
         autoCrop: true, // 是否默认生成截图框
         autoCropWidth: 200, // 默认生成截图框宽度
         autoCropHeight: 200, // 默认生成截图框高度
-        fixedBox: true // 固定截图框大小 不允许改变
+        fixedBox: true, // 固定截图框大小 不允许改变
+        filename: ''
       },
       previews: {}
     };
@@ -116,6 +117,7 @@ export default {
         reader.readAsDataURL(file);
         reader.onload = () => {
           this.options.img = reader.result;
+          this.options.filename = file.name;
         };
       }
     },
@@ -123,7 +125,8 @@ export default {
     uploadImg() {
       this.$refs.cropper.getCropBlob(data => {
         let formData = new FormData();
-        formData.append("avatarfile", data);
+        console.log(this.options.filename)
+        formData.append("avatarfile", data, this.options.filename);
         uploadAvatar(formData).then(response => {
           this.open = false;
           this.options.img = response.data.imgUrl;
