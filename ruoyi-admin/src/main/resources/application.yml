@@ -287,6 +287,20 @@ lock4j:
   # 分布式锁的超时时间，默认为 30 毫秒
   expire: 30000
 
+--- # Actuator 监控端点的配置项
+management:
+  endpoints:
+    web:
+      # Actuator 提供的 API 接口的根目录。默认为 /actuator
+      base-path: /actuator
+      exposure:
+        # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+        # 生产环境不建议放开所有 根据项目需求放开即可
+        include: @endpoints.include@
+  endpoint:
+    logfile:
+      external-file: ./logs/sys-console.log
+
 --- # 定时任务配置
 spring:
   quartz:
