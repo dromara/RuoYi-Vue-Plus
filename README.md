@@ -21,19 +21,21 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期�
 * 权限认证框架 Spring Security、Jwt，支持多终端认证系统
 * 关系数据库 MySQL 适配 8.X 
 * 缓存数据库 Redis 适配 6.X
-* 数据库开发框架 Mybatis-Plus 快速 CRUD 增加开发效率 插件化支持各类需求
+* 数据库框架 Mybatis-Plus 快速 CRUD 增加开发效率 插件化支持各类需求
+* 数据库框架 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构
+* 数据库框架 Redis客户端 采用 Redisson 性能更强
+* 数据库框架 性能分析插件 p6spy 更强劲的 SQL 分析
+* 序列化框架 统一使用 jackson 高效可靠
 * 网络框架 Feign、OkHttp3 接口化管理 HTTP 请求
-* 工具类框架 Hutool、Lombok 减少代码冗余 增加安全性
+* 分布式锁 Lock4j 注解锁、工具锁 多种多样
+* 文件存储 OSS 对象存储模块 支持(Minio、七牛、阿里、腾讯)
 * 监控框架 spring-boot-admin 全方位服务监控
 * 校验框架 validation 增强接口安全性 严谨性
+* Excel框架 Alibaba EasyExcel 性能优异 扩展性强
 * 文档框架 knife4j 美化接口文档
-* 序列化框架 统一使用 jackson 高效可靠
+* 工具类框架 Hutool、Lombok 减少代码冗余 增加安全性
 * 代码生成器 一键生成前后端代码
-* 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构
-* Redis客户端 采用 Redisson 性能更强
-* 分布式锁 Lock4j 注解锁、工具锁 多种多样
 * 部署方式 Docker 容器编排 一键部署业务集群
-* 文件存储 OSS 对象存储模块 支持(Minio、七牛、阿里、腾讯)
 
 ## 参考文档
 
@@ -64,7 +66,8 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期�
 * ORM框架 使用 Mybatis-Plus 简化CRUD (不支持主子表)
 * Bean简化 使用 Lombok 简化 get set toString 等等
 * 容器改动 Tomcat 改为 并发性能更好的 undertow
-* 分页移除 pagehelper 改为 Mybatis-Plus 分页
+* 移除 pagehelper 改为 Mybatis-Plus 分页
+* 集成 p6spy 更强劲的 SQL 分析
 * 升级 swagger 为 knife4j
 * 集成 Hutool 5.X 并重写RuoYi部分功能
 * 集成 Feign 接口化管理 Http 请求(如三方请求 支付,短信,推送等)
@@ -75,7 +78,8 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期�
 * 集成 dynamic-datasource 多数据源(默认支持MySQL,其他种类需自行适配)
 * 集成 Lock4j 实现分布式 注解锁、工具锁 多种多样
 * 增加 Docker 容器编排 打包插件与部署脚本
-* 移除 本地文件上传 改为 OSS对象存储 支持(Minio、七牛、阿里、腾讯)
+* 移除 通用上传下载 改为 OSS对象存储 支持(Minio、七牛、阿里、腾讯)
+* 移除 RuoYi自带 Excel 工具 改为 EasyExcel 工具
 
 ### 代码改动
 
