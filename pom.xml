@@ -26,6 +26,7 @@
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
         <mybatis-plus.version>3.4.3</mybatis-plus.version>
+        <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.7.6</hutool.version>
         <feign.version>3.0.3</feign.version>
         <feign-okhttp.version>11.2</feign-okhttp.version>
@@ -117,6 +118,12 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-extension</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+            <!-- sql性能分析插件 -->
+            <dependency>
+                <groupId>p6spy</groupId>
+                <artifactId>p6spy</artifactId>
+                <version>${p6spy.version}</version>
             </dependency>
 
             <dependency>

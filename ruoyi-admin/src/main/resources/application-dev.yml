@@ -4,7 +4,9 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     # 动态数据源文档 https://www.kancloud.cn/tracy5546/dynamic-datasource/content
     dynamic:
-      #设置默认的数据源或者数据源组,默认值即为 master
+      # 性能分析插件(有性能损耗 不建议生产环境使用)
+      p6spy: true
+      # 设置默认的数据源或者数据源组,默认值即为 master
       primary: master
       datasource:
         # 主库数据源

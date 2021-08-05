@@ -162,8 +162,10 @@ mybatis-plus:
     localCacheScope: SESSION
     # 开启Mybatis二级缓存，默认为 true
     cacheEnabled: false
-    # 更详细的日志输出 会有性能损耗
-    # logImpl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 更详细的日志输出 会有性能损耗 org.apache.ibatis.logging.stdout.StdOutImpl
+    # 关闭日志记录 (可单纯使用 p6spy 分析) org.apache.ibatis.logging.nologging.NoLoggingImpl
+    # 默认日志输出 org.apache.ibatis.logging.slf4j.Slf4jImpl
+    logImpl: org.apache.ibatis.logging.nologging.NoLoggingImpl
   global-config:
     # 是否打印 Logo banner
     banner: true
