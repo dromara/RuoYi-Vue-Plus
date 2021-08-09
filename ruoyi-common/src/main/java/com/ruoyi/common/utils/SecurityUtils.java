@@ -25,7 +25,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new CustomException("获取用户ID异常", HttpStatus.UNAUTHORIZED);
+            throw new CustomException("获取用户ID异常", HttpStatus.HTTP_UNAUTHORIZED);
         }
     }
 
@@ -40,7 +40,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new CustomException("获取部门ID异常", HttpStatus.UNAUTHORIZED);
+            throw new CustomException("获取部门ID异常", HttpStatus.HTTP_UNAUTHORIZED);
         }
     }
 
