@@ -135,7 +135,7 @@ spring:
 cloud-storage:
   # minio配置
   minio:
-    endpoint: http://172.30.0.54:9000
+    endpoint: http://服务器ip:9000
     accessKey: ruoyi
     secretKey: ruoyi123
     bucketName: ruoyi
