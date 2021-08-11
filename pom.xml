@@ -34,7 +34,7 @@
         <spring-boot-admin.version>2.4.3</spring-boot-admin.version>
         <redisson.version>3.16.1</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
-        <datasource.version>3.4.1</datasource.version>
+        <dynamic-ds.version>3.4.1</dynamic-ds.version>
 
         <!-- OSS 配置 -->
         <qiniu.version>7.8.0</qiniu.version>
@@ -106,7 +106,7 @@
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
-                <version>${datasource.version}</version>
+                <version>${dynamic-ds.version}</version>
             </dependency>
 
             <dependency>
