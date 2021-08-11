@@ -32,6 +32,7 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 		} catch (Exception e) {
 			throw new CustomException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
 		}
+		updateFill(metaObject);
 	}
 
 	@Override
