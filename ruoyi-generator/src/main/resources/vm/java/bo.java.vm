@@ -41,7 +41,6 @@ public class ${ClassName}Bo extends ${Entity} {
     /**
      * $column.columnComment
      */
-	@ApiModelProperty("$column.columnComment")
 #if($column.isInsert && $column.isEdit)
 #set($Group="AddGroup.class, EditGroup.class")
 #elseif($column.isInsert)
@@ -50,11 +49,14 @@ public class ${ClassName}Bo extends ${Entity} {
 #set($Group="EditGroup.class")
 #end
 #if($column.isRequired == 1)
+    @ApiModelProperty(value = "$column.columnComment", required = true)
 #if($column.javaType == 'String')
     @NotBlank(message = "$column.columnComment不能为空", groups = { $Group })
 #else
     @NotNull(message = "$column.columnComment不能为空", groups = { $Group })
 #end
+#else
+    @ApiModelProperty(value = "$column.columnComment")
 #end
     private $column.javaType $column.javaField;
 
