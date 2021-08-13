@@ -505,7 +505,9 @@ export default {
 		  this.loading = false;
           this.getList();
           this.msgSuccess("删除成功");
-        }).catch(() => {});
+      }).finally(() => {
+              this.loading = false;
+      });
     }
   }
 };
