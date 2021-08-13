@@ -125,6 +125,19 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/system/oss-config',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'index',
+        component: (resolve) => require(['@/views/system/oss/config'], resolve),
+        name: 'OssConfig',
+        meta: { title: '配置管理', activeMenu: '/system/oss'}
+      }
+    ]
+  },
+  {
     path: '/monitor/job-log',
     component: Layout,
     hidden: true,

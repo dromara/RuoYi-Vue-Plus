@@ -60,7 +60,7 @@ public class SysOssConfig implements Serializable {
     private String endpoint;
 
     /**
-     * 是否htpps（0否 1是）
+     * 是否https（0否 1是）
      */
     private String isHttps;
 

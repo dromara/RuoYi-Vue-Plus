@@ -1,24 +1,24 @@
 package com.ruoyi.system.service;
 
-import com.ruoyi.system.domain.SysOssConfig;
-import com.ruoyi.system.domain.vo.SysOssConfigVo;
-import com.ruoyi.system.domain.bo.SysOssConfigBo;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.system.domain.SysOssConfig;
+import com.ruoyi.system.domain.bo.SysOssConfigBo;
+import com.ruoyi.system.domain.vo.SysOssConfigVo;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * 云存储配置Service接口
  *
- * @author ruoyi
- * @date 2021-08-11
+ * @author Lion Li
+ * @author 孤舟烟雨
+ * @date 2021-08-13
  */
 public interface ISysOssConfigService extends IServicePlus<SysOssConfig, SysOssConfigVo> {
+
 	/**
 	 * 查询单个
-	 * @return
 	 */
 	SysOssConfigVo queryById(Integer ossConfigId);
 
@@ -52,15 +52,7 @@ public interface ISysOssConfigService extends IServicePlus<SysOssConfig, SysOssC
 
 	/**
 	 * 启用停用状态
-	 * @param sysOssConfig
-	 * @return
 	 */
-	int updateOssConfigStatus(SysOssConfig sysOssConfig);
+	int updateOssConfigStatus(SysOssConfigBo bo);
 
-	/**
-	 * 判断configkey是否唯一
-	 * @param bo
-	 * @return
-	 */
-	String checkConfigKeyUnique(SysOssConfigBo bo);
 }

@@ -96,7 +96,16 @@
           v-hasPermi="['system:oss:remove']"
         >删除</el-button>
       </el-col>
-
+      <el-col :span="1.5">
+        <el-button
+          type="info"
+          plain
+          icon="el-icon-s-operation"
+          size="mini"
+          @click="handleOssConfig"
+          v-hasPermi="['system:oss:list']"
+        >配置管理</el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -281,6 +290,10 @@ export default {
       this.ids = selection.map(item => item.ossId)
       this.single = selection.length!==1
       this.multiple = !selection.length
+    },
+    /** 任务日志列表查询 */
+    handleOssConfig() {
+      this.$router.push({ path: '/system/oss-config/index'})
     },
     /** 文件按钮操作 */
     handleFile() {
