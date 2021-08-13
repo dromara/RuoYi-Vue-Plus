@@ -98,6 +98,15 @@
       </el-col>
       <el-col :span="1.5">
         <el-button
+          :type="previewListResource ? 'danger' : 'warning'"
+          plain
+          size="mini"
+          @click="handlePreviewListResource(!previewListResource)"
+          v-hasPermi="['system:oss:edit']"
+        >预览开关 : {{previewListResource ? "禁用" : "启用"}}</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
           type="info"
           plain
           icon="el-icon-s-operation"
@@ -178,7 +187,7 @@
 </template>
 
 <script>
-import { listOss, delOss } from "@/api/system/oss";
+import { listOss, delOss, changePreviewListResource } from "@/api/system/oss";
 import { downLoadOss } from "@/utils/download";
 
 export default {
@@ -325,14 +334,33 @@ export default {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
-        }).then(() => {
-          this.loading = true;
-          return delOss(ossIds);
-        }).then(() => {
-          this.loading = false;
-          this.getList();
-          this.msgSuccess("删除成功");
-        }).catch(() => {});
+      }).then(() => {
+        this.loading = true;
+        return delOss(ossIds);
+      }).then(() => {
+        this.loading = false;
+        this.getList();
+        this.msgSuccess("删除成功");
+      }).finally(() => {
+        this.loading = false;
+      });
+    },
+    // 预览列表图片状态修改
+    handlePreviewListResource(previewListResource) {
+      let text = previewListResource ? "启用" : "停用";
+      this.$confirm(
+        '确认要"' + text + '""预览列表图片"配置吗?', "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+      }).then(() => {
+        return changePreviewListResource(previewListResource);
+      }).then(() => {
+        this.getList()
+        this.msgSuccess(text + "成功");
+      }).catch(() => {
+        this.previewListResource = previewListResource !== true;
+      })
     }
   }
 };

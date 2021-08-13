@@ -345,6 +345,12 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.ids = selection.map(item => item.ossConfigId)
+      this.single = selection.length!==1
+      this.multiple = !selection.length
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
@@ -402,7 +408,9 @@ export default {
         this.loading = false;
         this.getList();
         this.msgSuccess("删除成功");
-      }).catch(() => {});
+      }).finally(() => {
+        this.loading = false;
+      });
     },
     // 云存储配置状态修改
     handleStatusChange(row) {
@@ -412,16 +420,15 @@ export default {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning",
-      }).then(function () {
+      }).then(() => {
         return changeOssConfigStatus(row.ossConfigId, row.status, row.configKey);
       }).then(() => {
         this.getList()
         this.msgSuccess(text + "成功");
-      }).catch(function () {
+      }).catch(() => {
         row.status = row.status === "0" ? "1" : "0";
-      }).finally(() => {
-      });
-    },
-  },
+      })
+    }
+  }
 };
 </script>

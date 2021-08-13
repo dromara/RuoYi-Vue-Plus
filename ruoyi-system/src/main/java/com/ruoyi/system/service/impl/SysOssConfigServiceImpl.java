@@ -88,7 +88,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     @Override
     public Boolean deleteWithValidByIds(Collection<Integer> ids, Boolean isValid) {
     	if(isValid) {
-			if (CollUtil.containsAll(ids, CollUtil.newArrayList(1, 2, 3, 4))) {
+			if (CollUtil.containsAny(ids, CollUtil.newArrayList(1, 2, 3, 4))) {
 				throw new CustomException("系统内置, 不可删除!");
 			}
 		}
