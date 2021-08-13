@@ -5,11 +5,11 @@ import com.ruoyi.oss.entity.UploadResult;
 import java.io.InputStream;
 
 /**
- * 云存储服务接口
+ * 云存储策略
  *
  * @author Lion Li
  */
-public interface ICloudStorageService {
+public interface ICloudStorageStrategy {
 
 	void createBucket();
 

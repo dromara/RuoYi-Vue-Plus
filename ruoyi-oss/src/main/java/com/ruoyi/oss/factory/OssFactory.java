@@ -1,15 +1,16 @@
 package com.ruoyi.oss.factory;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Assert;
-import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.oss.constant.CloudConstant;
 import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.exception.OssException;
-import com.ruoyi.oss.service.ICloudStorageService;
+import com.ruoyi.oss.properties.CloudStorageProperties;
+import com.ruoyi.oss.service.ICloudStorageStrategy;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,26 +28,37 @@ public class OssFactory {
 		OssFactory.redisCache = SpringUtils.getBean(RedisCache.class);
 	}
 
-	private static final Map<String, ICloudStorageService> SERVICES = new ConcurrentHashMap<>();
+	private static final Map<String, ICloudStorageStrategy> SERVICES = new ConcurrentHashMap<>();
 
-	public static ICloudStorageService instance() {
-		String type = Convert.toStr(redisCache.getCacheObject(Constants.SYS_CONFIG_KEY + CloudConstant.CLOUD_STORAGE_CONFIG_KEY));
+	public static ICloudStorageStrategy instance() {
+		String type = Convert.toStr(redisCache.getCacheObject(CloudConstant.CACHE_CONFIG_KEY));
 		if (StringUtils.isEmpty(type)) {
 			throw new OssException("文件存储服务类型无法找到!");
 		}
 		return instance(type);
 	}
 
-	public static ICloudStorageService instance(String type) {
-		ICloudStorageService service = SERVICES.get(type);
+	public static ICloudStorageStrategy instance(String type) {
+		ICloudStorageStrategy service = SERVICES.get(type);
 		if (service == null) {
-			service = (ICloudStorageService) SpringUtils.getBean(CloudServiceEnumd.getServiceClass(type));
+			Object json = redisCache.getCacheObject(CloudConstant.SYS_OSS_KEY + type);
+			CloudStorageProperties properties = JsonUtils.parseObject(json.toString(), CloudStorageProperties.class);
+			String beanName = CloudServiceEnumd.getServiceName(type);
+			ICloudStorageStrategy bean = (ICloudStorageStrategy) ReflectUtils.newInstance(CloudServiceEnumd.getServiceClass(type), properties);
+			SpringUtils.registerBean(beanName, bean);
+			service = SpringUtils.getBean(beanName);
+			SERVICES.put(type, bean);
 		}
 		return service;
 	}
 
-	public static void register(String type, ICloudStorageService iCloudStorageService) {
-		Assert.notNull(type, "type can't be null");
-		SERVICES.put(type, iCloudStorageService);
+	public static void destroy(String type) {
+		ICloudStorageStrategy service = SERVICES.get(type);
+		if (service == null) {
+			return;
+		}
+		SpringUtils.unregisterBean(CloudServiceEnumd.getServiceName(type));
+		SERVICES.remove(type);
 	}
+
 }

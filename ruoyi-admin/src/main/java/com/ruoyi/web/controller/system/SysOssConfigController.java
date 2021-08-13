@@ -92,7 +92,7 @@ public class SysOssConfigController extends BaseController {
 	@Log(title = "云存储配置", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ossConfigIds}")
 	public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
-								   @PathVariable Integer[] ossConfigIds) {
+								   @PathVariable Long[] ossConfigIds) {
 		return toAjax(iSysOssConfigService.deleteWithValidByIds(Arrays.asList(ossConfigIds), true) ? 1 : 0);
 	}
 

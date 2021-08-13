@@ -2,7 +2,6 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -10,23 +9,26 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.constant.CloudConstant;
-import com.ruoyi.system.domain.SysConfig;
+import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.system.domain.SysOssConfig;
 import com.ruoyi.system.domain.bo.SysOssConfigBo;
 import com.ruoyi.system.domain.vo.SysOssConfigVo;
 import com.ruoyi.system.mapper.SysOssConfigMapper;
-import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysOssConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 云存储配置Service业务层处理
@@ -39,7 +41,22 @@ import java.util.Collection;
 @Service
 public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper, SysOssConfig, SysOssConfigVo> implements ISysOssConfigService {
 
-	private final ISysConfigService iSysConfigService;
+	private final RedisCache redisCache;
+
+	/**
+	 * 项目启动时，初始化参数到缓存，加载配置类
+	 */
+	@PostConstruct
+	public void init() {
+		List<SysOssConfig> list = list();
+		for (SysOssConfig config : list) {
+			String configKey = config.getConfigKey();
+			if ("0".equals(config.getStatus())) {
+				redisCache.setCacheObject(CloudConstant.CACHE_CONFIG_KEY, configKey);
+			}
+			redisCache.setCacheObject(getCacheKey(configKey), JsonUtils.toJsonString(config));
+		}
+	}
 
     @Override
     public SysOssConfigVo queryById(Integer ossConfigId){
@@ -63,16 +80,29 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
 
     @Override
     public Boolean insertByBo(SysOssConfigBo bo) {
-        SysOssConfig add = BeanUtil.toBean(bo, SysOssConfig.class);
-        validEntityBeforeSave(add);
-        return save(add);
+        SysOssConfig config = BeanUtil.toBean(bo, SysOssConfig.class);
+        validEntityBeforeSave(config);
+        boolean flag = save(config);
+		if (flag) {
+			redisCache.setCacheObject(
+				getCacheKey(config.getConfigKey()),
+				JsonUtils.toJsonString(config));
+		}
+		return flag;
     }
 
     @Override
     public Boolean updateByBo(SysOssConfigBo bo) {
-        SysOssConfig update = BeanUtil.toBean(bo, SysOssConfig.class);
-        validEntityBeforeSave(update);
-        return updateById(update);
+        SysOssConfig config = BeanUtil.toBean(bo, SysOssConfig.class);
+        validEntityBeforeSave(config);
+		boolean flag = updateById(config);
+		if (flag) {
+			OssFactory.destroy(config.getConfigKey());
+			redisCache.setCacheObject(
+				getCacheKey(config.getConfigKey()),
+				JsonUtils.toJsonString(config));
+		}
+		return flag;
     }
 
     /**
@@ -86,13 +116,21 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     }
 
     @Override
-    public Boolean deleteWithValidByIds(Collection<Integer> ids, Boolean isValid) {
+    public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
     	if(isValid) {
-			if (CollUtil.containsAny(ids, CollUtil.newArrayList(1, 2, 3, 4))) {
+			if (CollUtil.containsAny(ids, CloudConstant.SYSTEM_DATA_IDS)) {
 				throw new CustomException("系统内置, 不可删除!");
 			}
 		}
-        return removeByIds(ids);
+        boolean flag = removeByIds(ids);
+    	if (flag) {
+			for (Long configId : ids) {
+				SysOssConfig config = getById(configId);
+				OssFactory.destroy(config.getConfigKey());
+				redisCache.deleteObject(getCacheKey(config.getConfigKey()));
+			}
+		}
+    	return flag;
     }
 
 	/**
@@ -115,18 +153,23 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public int updateOssConfigStatus(SysOssConfigBo bo) {
-    	SysConfig sysConfig = iSysConfigService.getOne(new LambdaQueryWrapper<SysConfig>()
-				.eq(SysConfig::getConfigKey, CloudConstant.CLOUD_STORAGE_CONFIG_KEY));
-    	if(ObjectUtil.isNotNull(sysConfig)){
-    		sysConfig.setConfigValue(bo.getConfigKey());
-    		iSysConfigService.updateConfig(sysConfig);
-		} else {
-    		throw new CustomException("缺少'云存储配置KEY'参数!");
-		}
 		SysOssConfig sysOssConfig = BeanUtil.toBean(bo, SysOssConfig.class);
-		baseMapper.update(null, new LambdaUpdateWrapper<SysOssConfig>()
+		int row = baseMapper.update(null, new LambdaUpdateWrapper<SysOssConfig>()
 			.set(SysOssConfig::getStatus, "1"));
-		return baseMapper.updateById(sysOssConfig);
+		row += baseMapper.updateById(sysOssConfig);
+		if (row > 0) {
+			redisCache.setCacheObject(CloudConstant.CACHE_CONFIG_KEY, sysOssConfig.getConfigKey());
+		}
+		return row;
 	}
 
+	/**
+	 * 设置cache key
+	 *
+	 * @param configKey 参数键
+	 * @return 缓存键key
+	 */
+	private String getCacheKey(String configKey) {
+		return CloudConstant.SYS_OSS_KEY + configKey;
+	}
 }

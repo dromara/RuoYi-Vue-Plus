@@ -48,7 +48,7 @@ public interface ISysOssConfigService extends IServicePlus<SysOssConfig, SysOssC
 	 * @param isValid 是否校验,true-删除前校验,false-不校验
 	 * @return
 	 */
-	Boolean deleteWithValidByIds(Collection<Integer> ids, Boolean isValid);
+	Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
 
 	/**
 	 * 启用停用状态

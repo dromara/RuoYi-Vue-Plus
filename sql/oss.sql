@@ -40,7 +40,6 @@ create table sys_oss_config (
     primary key (oss_config_id)
 ) engine=innodb comment='云存储配置表';
 
-insert into sys_config values(10, 'OSS云存储服务商',       'sys.oss.cloudStorageService',      'minio',          'Y', 'admin', sysdate(), '', null, 'OSS云存储服务商(qiniu:七牛云, aliyun:阿里云, qcloud:腾讯云, minio: Minio)');
 insert into sys_config values(11, 'OSS预览列表资源开关',   'sys.oss.previewListResource',      'true',           'Y', 'admin', sysdate(), '', null, 'true:开启, false:关闭');
 
 insert into sys_menu values('118',  '文件管理', '1',   '10', 'oss',     'system/oss/index',      1, 0, 'C', '0', '0', 'system:oss:list',      'upload',       'admin', sysdate(), '', null, '文件管理菜单');

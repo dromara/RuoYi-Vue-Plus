@@ -5,18 +5,20 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.entity.UploadResult;
-import com.ruoyi.oss.service.ICloudStorageService;
-import org.springframework.beans.factory.InitializingBean;
+import com.ruoyi.oss.properties.CloudStorageProperties;
+import com.ruoyi.oss.service.ICloudStorageStrategy;
 
 import java.io.InputStream;
 import java.util.Date;
 
 /**
- * 云存储(支持七牛、阿里云、腾讯云、minio)
+ * 云存储策略(支持七牛、阿里云、腾讯云、minio)
  *
  * @author Lion Li
  */
-public abstract class AbstractCloudStorageService implements ICloudStorageService, InitializingBean {
+public abstract class AbstractCloudStorageStrategy implements ICloudStorageStrategy {
+
+	protected CloudStorageProperties properties;
 
 	@Override
 	public abstract void createBucket();
@@ -53,9 +55,6 @@ public abstract class AbstractCloudStorageService implements ICloudStorageServic
 
 	@Override
 	public abstract UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType);
-
-	@Override
-	public abstract void afterPropertiesSet() throws Exception;
 
 	@Override
 	public abstract String getEndpointLink();
