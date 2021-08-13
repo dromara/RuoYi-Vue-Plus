@@ -336,7 +336,7 @@
 import config from '../../package.json'
 
 export default {
-  name: "index",
+  name: "Index",
   data() {
     return {
       // 版本号
