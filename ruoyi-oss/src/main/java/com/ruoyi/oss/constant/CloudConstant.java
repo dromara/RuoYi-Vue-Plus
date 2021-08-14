@@ -1,7 +1,5 @@
 package com.ruoyi.oss.constant;
 
-import com.ruoyi.oss.properties.CloudStorageProperties;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,9 +34,5 @@ public class CloudConstant {
 	 * 系统数据ids
 	 */
 	public static final List<Integer> SYSTEM_DATA_IDS = Arrays.asList(1, 2, 3, 4);
-
-	public static String getPropertiesName(String key) {
-		return key + CloudStorageProperties.class.getSimpleName();
-	}
 
 }
