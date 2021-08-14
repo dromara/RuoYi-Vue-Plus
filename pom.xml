@@ -31,7 +31,7 @@
         <feign.version>3.0.3</feign.version>
         <feign-okhttp.version>11.2</feign-okhttp.version>
         <okhttp.version>4.9.1</okhttp.version>
-        <spring-boot-admin.version>2.4.3</spring-boot-admin.version>
+        <spring-boot-admin.version>2.5.0</spring-boot-admin.version>
         <redisson.version>3.16.1</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.4.1</dynamic-ds.version>
