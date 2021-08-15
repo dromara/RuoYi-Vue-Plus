@@ -2,6 +2,8 @@ package com.ruoyi.oss.properties;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * OSS云存储 配置属性
  *
@@ -44,5 +46,10 @@ public class CloudStorageProperties {
 	 * 是否https（Y=是,N=否）
 	 */
 	private String isHttps;
+
+	/**
+	 * 更新时间
+	 */
+	private Date updateTime;
 
 }

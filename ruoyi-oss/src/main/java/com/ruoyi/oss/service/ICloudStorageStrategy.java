@@ -70,5 +70,5 @@ public interface ICloudStorageStrategy {
 	 */
 	UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType);
 
-    String getEndpointLink();
+	String getEndpointLink();
 }

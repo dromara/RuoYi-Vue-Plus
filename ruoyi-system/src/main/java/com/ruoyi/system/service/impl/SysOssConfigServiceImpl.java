@@ -15,7 +15,6 @@ import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.constant.CloudConstant;
-import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.system.domain.SysOssConfig;
 import com.ruoyi.system.domain.bo.SysOssConfigBo;
 import com.ruoyi.system.domain.vo.SysOssConfigVo;
@@ -54,7 +53,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
 			if ("0".equals(config.getStatus())) {
 				redisCache.setCacheObject(CloudConstant.CACHE_CONFIG_KEY, configKey);
 			}
-			redisCache.setCacheObject(getCacheKey(configKey), JsonUtils.toJsonString(config));
+			setConfigCache(true, config);
 		}
 	}
 
@@ -82,27 +81,14 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     public Boolean insertByBo(SysOssConfigBo bo) {
         SysOssConfig config = BeanUtil.toBean(bo, SysOssConfig.class);
         validEntityBeforeSave(config);
-        boolean flag = save(config);
-		if (flag) {
-			redisCache.setCacheObject(
-				getCacheKey(config.getConfigKey()),
-				JsonUtils.toJsonString(config));
-		}
-		return flag;
+		return setConfigCache(save(config), config);
     }
 
     @Override
     public Boolean updateByBo(SysOssConfigBo bo) {
         SysOssConfig config = BeanUtil.toBean(bo, SysOssConfig.class);
         validEntityBeforeSave(config);
-		boolean flag = updateById(config);
-		if (flag) {
-			OssFactory.destroy(config.getConfigKey());
-			redisCache.setCacheObject(
-				getCacheKey(config.getConfigKey()),
-				JsonUtils.toJsonString(config));
-		}
-		return flag;
+		return setConfigCache(updateById(config), config);
     }
 
     /**
@@ -126,7 +112,6 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     	if (flag) {
 			for (Long configId : ids) {
 				SysOssConfig config = getById(configId);
-				OssFactory.destroy(config.getConfigKey());
 				redisCache.deleteObject(getCacheKey(config.getConfigKey()));
 			}
 		}
@@ -171,5 +156,20 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
 	 */
 	private String getCacheKey(String configKey) {
 		return CloudConstant.SYS_OSS_KEY + configKey;
+	}
+
+	/**
+	 * 如果操作成功 则更新缓存
+	 * @param flag 操作状态
+	 * @param config 配置
+	 * @return 返回操作状态
+	 */
+	private boolean setConfigCache(boolean flag, SysOssConfig config) {
+		if (flag) {
+			redisCache.setCacheObject(
+				getCacheKey(config.getConfigKey()),
+				JsonUtils.toJsonString(config));
+		}
+		return flag;
 	}
 }
