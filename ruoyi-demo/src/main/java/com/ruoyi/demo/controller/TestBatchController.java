@@ -5,6 +5,8 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.service.ITestDemoService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +23,7 @@ import java.util.List;
  * @author Lion Li
  * @date 2021-05-30
  */
+@Api(value = "测试批量方法", tags = {"测试批量方法"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
 @RequestMapping("/demo/batch")
@@ -31,7 +34,9 @@ public class TestBatchController extends BaseController {
     /**
      * 新增批量方法 ( 全量覆盖填充 )
      */
+	@ApiOperation(value = "新增批量方法")
     @PostMapping()
+//	@DataSource(DataSourceType.SLAVE)
     public AjaxResult<Void> add() {
 		List<TestDemo> list = new ArrayList<>();
 		for (int i = 0; i < 1000; i++) {
@@ -41,10 +46,12 @@ public class TestBatchController extends BaseController {
     }
 
     /**
-     * 修改批量方法
+     * 删除批量方法
      */
+	@ApiOperation(value = "删除批量方法")
     @DeleteMapping()
-    public AjaxResult<Void> edit() {
+//	@DataSource(DataSourceType.SLAVE)
+    public AjaxResult<Void> remove() {
         return toAjax(iTestDemoService.remove(new LambdaQueryWrapper<TestDemo>()
 			.eq(TestDemo::getOrderNum, -1L)) ? 1 : 0);
     }
