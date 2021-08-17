@@ -10,7 +10,7 @@ import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -97,7 +97,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     private void validEntityBeforeSave(SysOssConfig entity){
 		if (StringUtils.isNotEmpty(entity.getConfigKey())
 			&& UserConstants.NOT_UNIQUE.equals(checkConfigKeyUnique(entity))) {
-			throw new CustomException("操作配置'" + entity.getConfigKey() + "'失败, 配置key已存在!");
+			throw new ServiceException("操作配置'" + entity.getConfigKey() + "'失败, 配置key已存在!");
 		}
     }
 
@@ -105,7 +105,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
     	if(isValid) {
 			if (CollUtil.containsAny(ids, CloudConstant.SYSTEM_DATA_IDS)) {
-				throw new CustomException("系统内置, 不可删除!");
+				throw new ServiceException("系统内置, 不可删除!");
 			}
 		}
         boolean flag = removeByIds(ids);

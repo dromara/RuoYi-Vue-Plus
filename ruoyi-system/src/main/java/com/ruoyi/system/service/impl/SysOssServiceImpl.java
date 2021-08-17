@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.entity.UploadResult;
@@ -61,7 +61,7 @@ public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, Sys
 		try {
 			uploadResult = storage.uploadSuffix(file.getBytes(), suffix, file.getContentType());
 		} catch (IOException e) {
-			throw new CustomException("文件读取异常!!!", e);
+			throw new ServiceException(e.getMessage());
 		}
 		// 保存文件信息
 		SysOss oss = new SysOss()

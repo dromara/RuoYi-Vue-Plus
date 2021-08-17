@@ -267,7 +267,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
 				try {
                 	String path = getGenPath(table, template);
                 	FileUtils.writeUtf8String(sw.toString(), path);
-				} catch (IOException e) {
+				} catch (Exception e) {
 					throw new ServiceException("渲染模板失败，表名：" + table.getTableName());
 				}
             }

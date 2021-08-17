@@ -10,7 +10,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.oss.constant.CloudConstant;
@@ -79,7 +79,7 @@ public class SysOssController extends BaseController {
 	@PostMapping("/upload")
 	public AjaxResult<Map<String, String>> upload(@RequestPart("file") MultipartFile file) {
 		if (file.isEmpty()) {
-			throw new CustomException("上传文件不能为空");
+			throw new ServiceException("上传文件不能为空");
 		}
 		SysOss oss = iSysOssService.upload(file);
 		Map<String, String> map = new HashMap<>(2);
@@ -94,7 +94,7 @@ public class SysOssController extends BaseController {
 	public void download(@PathVariable Long ossId, HttpServletResponse response) throws IOException {
 		SysOss sysOss = iSysOssService.getById(ossId);
 		if (sysOss == null) {
-			throw new CustomException("文件数据不存在!");
+			throw new ServiceException("文件数据不存在!");
 		}
 		response.reset();
 		response.addHeader("Access-Control-Allow-Origin", "*");

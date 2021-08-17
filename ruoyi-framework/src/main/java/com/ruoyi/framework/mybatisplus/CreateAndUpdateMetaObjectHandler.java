@@ -3,7 +3,7 @@ package com.ruoyi.framework.mybatisplus;
 import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
@@ -30,7 +30,7 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 				this.setFieldValByName("createBy", getLoginUsername(), metaObject);
 			}
 		} catch (Exception e) {
-			throw new CustomException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
+			throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
 		}
 		updateFill(metaObject);
 	}
@@ -45,7 +45,7 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 				this.setFieldValByName("updateTime", new Date(), metaObject);
 			}
 		} catch (Exception e) {
-			throw new CustomException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
+			throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
 		}
 	}
 

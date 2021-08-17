@@ -2,9 +2,8 @@ package com.ruoyi.framework.web.exception;
 
 import cn.hutool.http.HttpStatus;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.exception.BaseException;
-import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.exception.DemoModeException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +13,8 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.NoHandlerFoundException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 
 /**
