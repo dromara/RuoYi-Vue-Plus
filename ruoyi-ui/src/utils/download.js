@@ -44,8 +44,8 @@ export function downLoadExcel(url, params) {
           for (const key of Object.keys(value)) {
             if (value[key] !== null && typeof (value[key]) !== 'undefined') {
               let params = propName + '[' + key + ']';
-              let subPart = encodeURIComponent(params) + "="
-              urlparams += subPart + encodeURIComponent(value[key]) + "&";
+              let subPart = encodeURIComponent(params) + '=';
+              urlparams += subPart + encodeURIComponent(value[key]) + '&';
             }
           }
         } else {
