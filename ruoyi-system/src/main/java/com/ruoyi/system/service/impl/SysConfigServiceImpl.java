@@ -10,7 +10,7 @@ import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.enums.DataSourceType;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.mapper.SysConfigMapper;
@@ -169,7 +169,7 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
 		for (Long configId : configIds) {
 			SysConfig config = selectConfigById(configId);
 			if (StringUtils.equals(UserConstants.YES, config.getConfigType())) {
-				throw new CustomException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
+				throw new ServiceException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
 			}
 			redisCache.deleteObject(getCacheKey(config.getConfigKey()));
 		}

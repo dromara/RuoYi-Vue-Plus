@@ -9,7 +9,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
@@ -188,7 +188,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
 				}
             }
         } catch (Exception e) {
-            throw new CustomException("导入失败：" + e.getMessage());
+            throw new ServiceException("导入失败：" + e.getMessage());
         }
     }
 
@@ -264,8 +264,12 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
                 StringWriter sw = new StringWriter();
                 Template tpl = Velocity.getTemplate(template, Constants.UTF8);
                 tpl.merge(context, sw);
-                String path = getGenPath(table, template);
-                FileUtils.writeUtf8String(sw.toString(), path);
+				try {
+                	String path = getGenPath(table, template);
+                	FileUtils.writeUtf8String(sw.toString(), path);
+				} catch (IOException e) {
+					throw new ServiceException("渲染模板失败，表名：" + table.getTableName());
+				}
             }
         }
     }
@@ -284,7 +288,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
 
         List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
         if (StringUtils.isEmpty(dbTableColumns)) {
-            throw new CustomException("同步数据失败，原表结构不存在");
+            throw new ServiceException("同步数据失败，原表结构不存在");
         }
         List<String> dbTableColumnNames = dbTableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
 
@@ -364,16 +368,16 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         if (GenConstants.TPL_TREE.equals(genTable.getTplCategory())) {
 			Map<String, Object> paramsObj = genTable.getParams();
             if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_CODE))) {
-                throw new CustomException("树编码字段不能为空");
+                throw new ServiceException("树编码字段不能为空");
             } else if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_PARENT_CODE))) {
-                throw new CustomException("树父编码字段不能为空");
+                throw new ServiceException("树父编码字段不能为空");
             } else if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_NAME))) {
-                throw new CustomException("树名称字段不能为空");
+                throw new ServiceException("树名称字段不能为空");
             } else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory())) {
                 if (StringUtils.isEmpty(genTable.getSubTableName())) {
-                    throw new CustomException("关联子表的表名不能为空");
+                    throw new ServiceException("关联子表的表名不能为空");
                 } else if (StringUtils.isEmpty(genTable.getSubTableFkName())) {
-                    throw new CustomException("子表关联的外键名不能为空");
+                    throw new ServiceException("子表关联的外键名不能为空");
                 }
             }
         }

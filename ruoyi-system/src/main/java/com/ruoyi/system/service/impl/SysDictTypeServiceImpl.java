@@ -9,7 +9,7 @@ import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.domain.entity.SysDictType;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DictUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
@@ -144,7 +144,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
 			SysDictType dictType = selectDictTypeById(dictId);
 			if (dictDataMapper.selectCount(new LambdaQueryWrapper<SysDictData>()
 				.eq(SysDictData::getDictType, dictType.getDictType())) > 0) {
-				throw new CustomException(String.format("%1$s已分配,不能删除", dictType.getDictName()));
+				throw new ServiceException(String.format("%1$s已分配,不能删除", dictType.getDictName()));
 			}
 			DictUtils.removeDictCache(dictType.getDictType());
 		}
