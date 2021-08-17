@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.system;
 
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
@@ -78,7 +79,7 @@ public class SysOssController extends BaseController {
 	@RepeatSubmit
 	@PostMapping("/upload")
 	public AjaxResult<Map<String, String>> upload(@RequestPart("file") MultipartFile file) {
-		if (file.isEmpty()) {
+		if (ObjectUtil.isNull(file)) {
 			throw new ServiceException("上传文件不能为空");
 		}
 		SysOss oss = iSysOssService.upload(file);
@@ -93,7 +94,7 @@ public class SysOssController extends BaseController {
 	@GetMapping("/download/{ossId}")
 	public void download(@PathVariable Long ossId, HttpServletResponse response) throws IOException {
 		SysOss sysOss = iSysOssService.getById(ossId);
-		if (sysOss == null) {
+		if (ObjectUtil.isNull(sysOss)) {
 			throw new ServiceException("文件数据不存在!");
 		}
 		response.reset();

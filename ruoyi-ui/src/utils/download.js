@@ -42,9 +42,11 @@ export function downLoadExcel(url, params) {
       if (value !== null && typeof(value) !== "undefined") {
         if (typeof value === 'object') {
           for (const key of Object.keys(value)) {
-            let params = propName + '[' + key + ']';
-            var subPart = encodeURIComponent(params) + "=";
-            urlparams += subPart + encodeURIComponent(value[key]) + "&";
+            if (value[key] !== null && typeof (value[key]) !== 'undefined') {
+              let params = propName + '[' + key + ']';
+              let subPart = encodeURIComponent(params) + "="
+              urlparams += subPart + encodeURIComponent(value[key]) + "&";
+            }
           }
         } else {
           urlparams += part + encodeURIComponent(value) + "&";
