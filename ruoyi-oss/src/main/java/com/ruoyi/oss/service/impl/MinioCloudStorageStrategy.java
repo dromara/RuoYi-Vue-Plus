@@ -99,7 +99,7 @@ public class MinioCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
 	@Override
 	public UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType) {
-		return upload(inputStream, getPath("", suffix), contentType);
+		return upload(inputStream, getPath(properties.getPrefix(), suffix), contentType);
 	}
 
 	@Override
