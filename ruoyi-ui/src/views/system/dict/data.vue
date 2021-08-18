@@ -183,8 +183,9 @@
 </template>
 
 <script>
-import { listData, getData, delData, addData, updateData, exportData } from "@/api/system/dict/data";
+import { listData, getData, delData, addData, updateData } from "@/api/system/dict/data";
 import { listType, getType } from "@/api/system/dict/type";
+import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Data",
@@ -388,18 +389,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-          this.exportLoading = true;
-          return exportData(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-          this.exportLoading = false;
-        }).catch(() => {});
+      downLoadExcel('/system/dict/data/export', this.queryParams);
     }
   }
 };

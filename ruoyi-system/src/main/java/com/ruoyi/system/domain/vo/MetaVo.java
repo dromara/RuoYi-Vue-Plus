@@ -1,6 +1,6 @@
 package com.ruoyi.system.domain.vo;
 
-import cn.hutool.core.lang.Validator;
+import com.ruoyi.common.utils.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -56,7 +56,7 @@ public class MetaVo {
 		this.title = title;
 		this.icon = icon;
 		this.noCache = noCache;
-		if (Validator.isUrl(link)) {
+		if (StringUtils.ishttp(link)) {
 			this.link = link;
 		}
 	}

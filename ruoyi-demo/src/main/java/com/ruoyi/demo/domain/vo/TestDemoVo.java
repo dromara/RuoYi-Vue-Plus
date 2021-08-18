@@ -1,9 +1,11 @@
 package com.ruoyi.demo.domain.vo;
 
-import com.ruoyi.common.annotation.Excel;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.util.Date;
 
 
@@ -16,6 +18,7 @@ import java.util.Date;
  */
 @Data
 @ApiModel("测试单表视图对象")
+@ExcelIgnoreUnannotated
 public class TestDemoVo {
 
 	private static final long serialVersionUID = 1L;
@@ -29,63 +32,63 @@ public class TestDemoVo {
     /**
      * 部门id
      */
-	@Excel(name = "部门id")
+	@ExcelProperty(value = "部门id")
 	@ApiModelProperty("部门id")
 	private Long deptId;
 
     /**
      * 用户id
      */
-	@Excel(name = "用户id")
+	@ExcelProperty(value = "用户id")
 	@ApiModelProperty("用户id")
 	private Long userId;
 
     /**
      * 排序号
      */
-	@Excel(name = "排序号")
+	@ExcelProperty(value = "排序号")
 	@ApiModelProperty("排序号")
 	private Long orderNum;
 
     /**
      * key键
      */
-	@Excel(name = "key键")
+	@ExcelProperty(value = "key键")
 	@ApiModelProperty("key键")
 	private String testKey;
 
     /**
      * 值
      */
-	@Excel(name = "值")
+	@ExcelProperty(value = "值")
 	@ApiModelProperty("值")
 	private String value;
 
     /**
      * 创建时间
      */
-	@Excel(name = "创建时间" , width = 30, dateFormat = "yyyy-MM-dd")
+	@ExcelProperty(value = "创建时间")
 	@ApiModelProperty("创建时间")
 	private Date createTime;
 
     /**
      * 创建人
      */
-	@Excel(name = "创建人")
+	@ExcelProperty(value = "创建人")
 	@ApiModelProperty("创建人")
 	private String createBy;
 
     /**
      * 更新时间
      */
-	@Excel(name = "更新时间" , width = 30, dateFormat = "yyyy-MM-dd")
+	@ExcelProperty(value = "更新时间")
 	@ApiModelProperty("更新时间")
 	private Date updateTime;
 
     /**
      * 更新人
      */
-	@Excel(name = "更新人")
+	@ExcelProperty(value = "更新人")
 	@ApiModelProperty("更新人")
 	private String updateBy;
 

@@ -1,9 +1,10 @@
 package com.ruoyi.system.domain;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ruoyi.common.annotation.Excel;
-import com.ruoyi.common.annotation.Excel.ColumnType;
+import com.ruoyi.common.annotation.ExcelDictFormat;
+import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -25,20 +26,21 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_post")
+@ExcelIgnoreUnannotated
 public class SysPost implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 岗位序号
      */
-    @Excel(name = "岗位序号", cellType = ColumnType.NUMERIC)
+    @ExcelProperty(value = "岗位序号")
     @TableId(value = "post_id", type = IdType.AUTO)
     private Long postId;
 
     /**
      * 岗位编码
      */
-    @Excel(name = "岗位编码")
+    @ExcelProperty(value = "岗位编码")
     @NotBlank(message = "岗位编码不能为空")
     @Size(min = 0, max = 64, message = "岗位编码长度不能超过64个字符")
     private String postCode;
@@ -46,7 +48,7 @@ public class SysPost implements Serializable {
     /**
      * 岗位名称
      */
-    @Excel(name = "岗位名称")
+    @ExcelProperty(value = "岗位名称")
     @NotBlank(message = "岗位名称不能为空")
     @Size(min = 0, max = 50, message = "岗位名称长度不能超过50个字符")
     private String postName;
@@ -54,14 +56,15 @@ public class SysPost implements Serializable {
     /**
      * 岗位排序
      */
-    @Excel(name = "岗位排序")
+    @ExcelProperty(value = "岗位排序")
     @NotBlank(message = "显示顺序不能为空")
     private String postSort;
 
     /**
      * 状态（0正常 1停用）
      */
-    @Excel(name = "状态", readConverterExp = "0=正常,1=停用")
+	@ExcelProperty(value = "状态", converter = ExcelDictConvert.class)
+	@ExcelDictFormat(dictType = "sys_common_status")
     private String status;
 
     /**
@@ -74,7 +77,6 @@ public class SysPost implements Serializable {
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     /**
@@ -87,7 +89,6 @@ public class SysPost implements Serializable {
      * 更新时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
     /**

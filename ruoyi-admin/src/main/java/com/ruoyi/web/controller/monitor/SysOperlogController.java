@@ -12,11 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
  * 操作日志记录
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -36,11 +37,10 @@ public class SysOperlogController extends BaseController
     @Log(title = "操作日志", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('monitor:operlog:export')")
     @GetMapping("/export")
-    public AjaxResult export(SysOperLog operLog)
+    public void export(SysOperLog operLog, HttpServletResponse response)
     {
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
-        ExcelUtil<SysOperLog> util = new ExcelUtil<SysOperLog>(SysOperLog.class);
-        return util.exportExcel(list, "操作日志");
+		ExcelUtil.exportExcel(list, "操作日志", SysOperLog.class, response);
     }
 
     @Log(title = "操作日志", businessType = BusinessType.DELETE)

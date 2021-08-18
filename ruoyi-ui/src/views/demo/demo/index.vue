@@ -169,7 +169,8 @@
 </template>
 
 <script>
-import { listDemo, pageDemo, getDemo, delDemo, addDemo, updateDemo, exportDemo } from "@/api/demo/demo";
+import { listDemo, pageDemo, getDemo, delDemo, addDemo, updateDemo } from "@/api/demo/demo";
+import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Demo",
@@ -360,18 +361,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有测试单表数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        this.exportLoading = true;
-        return exportDemo(queryParams);
-      }).then(response => {
-        this.download(response.msg);
-        this.exportLoading = false;
-      })
+      downLoadExcel('/demo/demo/export', this.queryParams);
     }
   }
 };

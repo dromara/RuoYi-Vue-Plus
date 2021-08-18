@@ -1,7 +1,7 @@
 package com.ruoyi.demo.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -62,11 +62,11 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 		Map<String, Object> params = bo.getParams();
 		Object dataScope = params.get("dataScope");
 		LambdaQueryWrapper<TestDemo> lqw = Wrappers.lambdaQuery();
-		lqw.like(StrUtil.isNotBlank(bo.getTestKey()), TestDemo::getTestKey, bo.getTestKey());
-		lqw.eq(StrUtil.isNotBlank(bo.getValue()), TestDemo::getValue, bo.getValue());
+		lqw.like(StringUtils.isNotBlank(bo.getTestKey()), TestDemo::getTestKey, bo.getTestKey());
+		lqw.eq(StringUtils.isNotBlank(bo.getValue()), TestDemo::getValue, bo.getValue());
 		lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
 			TestDemo::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
-		lqw.apply(dataScope != null && StrUtil.isNotBlank(dataScope.toString()),
+		lqw.apply(dataScope != null && StringUtils.isNotBlank(dataScope.toString()),
 			dataScope != null ? dataScope.toString() : null);
 		return lqw;
 	}

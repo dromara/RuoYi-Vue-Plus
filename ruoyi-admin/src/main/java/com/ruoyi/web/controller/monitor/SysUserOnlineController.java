@@ -1,7 +1,5 @@
 package com.ruoyi.web.controller.monitor;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -11,6 +9,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysUserOnline;
 import com.ruoyi.system.service.ISysUserOnlineService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ import java.util.List;
 
 /**
  * 在线用户监控
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -46,23 +45,23 @@ public class SysUserOnlineController extends BaseController
         for (String key : keys)
         {
             LoginUser user = redisCache.getCacheObject(key);
-            if (Validator.isNotEmpty(ipaddr) && Validator.isNotEmpty(userName))
+            if (StringUtils.isNotEmpty(ipaddr) && StringUtils.isNotEmpty(userName))
             {
-                if (StrUtil.equals(ipaddr, user.getIpaddr()) && StrUtil.equals(userName, user.getUsername()))
+                if (StringUtils.equals(ipaddr, user.getIpaddr()) && StringUtils.equals(userName, user.getUsername()))
                 {
                     userOnlineList.add(userOnlineService.selectOnlineByInfo(ipaddr, userName, user));
                 }
             }
-            else if (Validator.isNotEmpty(ipaddr))
+            else if (StringUtils.isNotEmpty(ipaddr))
             {
-                if (StrUtil.equals(ipaddr, user.getIpaddr()))
+                if (StringUtils.equals(ipaddr, user.getIpaddr()))
                 {
                     userOnlineList.add(userOnlineService.selectOnlineByIpaddr(ipaddr, user));
                 }
             }
-            else if (Validator.isNotEmpty(userName) && Validator.isNotNull(user.getUser()))
+            else if (StringUtils.isNotEmpty(userName) && StringUtils.isNotNull(user.getUser()))
             {
-                if (StrUtil.equals(userName, user.getUsername()))
+                if (StringUtils.equals(userName, user.getUsername()))
                 {
                     userOnlineList.add(userOnlineService.selectOnlineByUserName(userName, user));
                 }

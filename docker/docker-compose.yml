@@ -18,8 +18,6 @@ services:
       - /docker/mysql/data/:/var/lib/mysql/
       # 配置挂载
       - /docker/mysql/conf/:/etc/mysql/conf.d/
-      # 主机本机时间文件映射 与本机时间同步
-      - /etc/localtime:/etc/localtime:ro
     command:
       # 将mysql8.0默认密码策略 修改为 原先 策略 (mysql8.0对其默认策略做了更改 会导致密码无法匹配)
       --default-authentication-plugin=mysql_native_password
@@ -37,6 +35,9 @@ services:
     # 如果需要指定版本 就把 latest 换成版本号
     image: nginx:latest
     container_name: nginx-web
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
     ports:
       - 80:80
       - 443:443
@@ -49,8 +50,6 @@ services:
       - /docker/nginx/html:/usr/share/nginx/html
       # 日志目录
       - /docker/nginx/log:/var/log/nginx
-      # 主机本机时间文件映射 与本机时间同步
-      - /etc/localtime:/etc/localtime:ro
     privileged: true
     restart: always
     networks:
@@ -62,16 +61,13 @@ services:
     ports:
       - 6379:6379
     environment:
-      # 设置环境变量 时区上海 编码UTF-8
+      # 时区上海
       TZ: Asia/Shanghai
-      LANG: en_US.UTF-8
     volumes:
       # 配置文件
       - /docker/redis/conf/redis.conf:/redis.conf:rw
       # 数据文件
       - /docker/redis/data:/data:rw
-      # 主机本机时间文件映射 与本机时间同步
-      - /etc/localtime:/etc/localtime:ro
     command: "redis-server --appendonly yes"
     privileged: true
     restart: always
@@ -88,6 +84,8 @@ services:
       # 控制台端口
       - 9001:9001
     environment:
+      # 时区上海
+      TZ: Asia/Shanghai
       # 管理后台用户名
       MINIO_ACCESS_KEY: ruoyi
       # 管理后台密码，最小8个字符
@@ -97,8 +95,6 @@ services:
       - /docker/minio/data:/data
       # 映射配置目录
       - /docker/minio/config:/root/.minio/
-      # 主机本机时间文件映射 与本机时间同步
-      - /etc/localtime:/etc/localtime:ro
     command: server --console-address ':9001' /data  # 指定容器中的目录 /data
     privileged: true
     restart: always
@@ -107,9 +103,10 @@ services:
         ipv4_address: 172.30.0.54
 
   ruoyi-server1:
-    image: "ruoyi/ruoyi-server:2.6.0"
+    image: "ruoyi/ruoyi-server:3.0.0"
     environment:
-      - TZ=Asia/Shanghai
+      # 时区上海
+      TZ: Asia/Shanghai
     volumes:
       # 配置文件
       - /docker/server1/logs/:/ruoyi/server/logs/
@@ -121,9 +118,10 @@ services:
         ipv4_address: 172.30.0.60
 
   ruoyi-server2:
-    image: "ruoyi/ruoyi-server:2.6.0"
+    image: "ruoyi/ruoyi-server:3.0.0"
     environment:
-      - TZ=Asia/Shanghai
+      # 时区上海
+      TZ: Asia/Shanghai
     volumes:
       # 配置文件
       - /docker/server2/logs/:/ruoyi/server/logs/
@@ -135,9 +133,10 @@ services:
         ipv4_address: 172.30.0.61
 
   ruoyi-monitor-admin:
-    image: "ruoyi/ruoyi-monitor-admin:2.6.0"
+    image: "ruoyi/ruoyi-monitor-admin:3.0.0"
     environment:
-      - TZ=Asia/Shanghai
+      # 时区上海
+      TZ: Asia/Shanghai
     privileged: true
     restart: always
     networks:

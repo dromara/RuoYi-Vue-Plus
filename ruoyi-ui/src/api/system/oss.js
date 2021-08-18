@@ -16,3 +16,14 @@ export function delOss(ossId) {
     method: 'delete'
   })
 }
+
+export function changePreviewListResource(previewListResource) {
+  const data = {
+    previewListResource
+  }
+  return request({
+    url: '/system/oss/changePreviewListResource',
+    method: 'put',
+    data: data
+  })
+}

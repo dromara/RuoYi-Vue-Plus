@@ -253,7 +253,7 @@
 </template>
 
 <script>
-import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${BusinessName}, update${BusinessName}, export${BusinessName} } from "@/api/${moduleName}/${businessName}";
+import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${BusinessName}, update${BusinessName} } from "@/api/${moduleName}/${businessName}";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
@@ -505,7 +505,9 @@ export default {
 		  this.loading = false;
           this.getList();
           this.msgSuccess("删除成功");
-        }).catch(() => {});
+      }).finally(() => {
+              this.loading = false;
+      });
     }
   }
 };

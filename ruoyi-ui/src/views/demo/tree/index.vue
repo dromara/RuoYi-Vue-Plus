@@ -110,7 +110,7 @@
 </template>
 
 <script>
-import { listTree, getTree, delTree, addTree, updateTree, exportTree } from "@/api/demo/tree";
+import { listTree, getTree, delTree, addTree, updateTree } from "@/api/demo/tree";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 

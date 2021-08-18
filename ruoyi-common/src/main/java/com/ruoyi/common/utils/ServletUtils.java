@@ -1,7 +1,6 @@
 package com.ruoyi.common.utils;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -112,12 +111,12 @@ public class ServletUtils extends ServletUtil {
 		}
 
 		String uri = request.getRequestURI();
-		if (StrUtil.equalsAnyIgnoreCase(uri, ".json", ".xml")) {
+		if (StringUtils.equalsAnyIgnoreCase(uri, ".json", ".xml")) {
 			return true;
 		}
 
 		String ajax = request.getParameter("__ajax");
-		if (StrUtil.equalsAnyIgnoreCase(ajax, "json", "xml")) {
+		if (StringUtils.equalsAnyIgnoreCase(ajax, "json", "xml")) {
 			return true;
 		}
 		return false;

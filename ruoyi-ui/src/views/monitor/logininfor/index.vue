@@ -119,7 +119,8 @@
 </template>
 
 <script>
-import { list, delLogininfor, cleanLogininfor, exportLogininfor } from "@/api/monitor/logininfor";
+import { list, delLogininfor, cleanLogininfor } from "@/api/monitor/logininfor";
+import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Logininfor",
@@ -228,18 +229,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有操作日志数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-          this.exportLoading = true;
-          return exportLogininfor(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-          this.exportLoading = false;
-        }).catch(() => {});
+      downLoadExcel('/monitor/logininfor/export', this.queryParams);
     }
   }
 };

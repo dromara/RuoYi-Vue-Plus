@@ -1,6 +1,5 @@
 package com.ruoyi.web.controller.system;
 
-import cn.hutool.core.lang.Validator;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -10,8 +9,8 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
@@ -23,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -56,11 +56,10 @@ public class SysRoleController extends BaseController
     @Log(title = "角色管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:role:export')")
     @GetMapping("/export")
-    public AjaxResult export(SysRole role)
+    public void export(SysRole role, HttpServletResponse response)
     {
         List<SysRole> list = roleService.selectRoleList(role);
-        ExcelUtil<SysRole> util = new ExcelUtil<SysRole>(SysRole.class);
-        return util.exportExcel(list, "角色数据");
+		ExcelUtil.exportExcel(list, "角色数据", SysRole.class, response);
     }
 
     /**
@@ -89,7 +88,7 @@ public class SysRoleController extends BaseController
         {
             return AjaxResult.error("新增角色'" + role.getRoleName() + "'失败，角色权限已存在");
         }
-        role.setCreateBy(SecurityUtils.getUsername());
+        role.setCreateBy(getUsername());
         return toAjax(roleService.insertRole(role));
 
     }
@@ -111,13 +110,13 @@ public class SysRoleController extends BaseController
         {
             return AjaxResult.error("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
         }
-        role.setUpdateBy(SecurityUtils.getUsername());
+        role.setUpdateBy(getUsername());
 
         if (roleService.updateRole(role) > 0)
         {
             // 更新缓存用户权限
             LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-            if (Validator.isNotNull(loginUser.getUser()) && !loginUser.getUser().isAdmin())
+            if (StringUtils.isNotNull(loginUser.getUser()) && !loginUser.getUser().isAdmin())
             {
                 loginUser.setPermissions(permissionService.getMenuPermission(loginUser.getUser()));
                 loginUser.setUser(userService.selectUserByUserName(loginUser.getUser().getUserName()));
@@ -149,7 +148,7 @@ public class SysRoleController extends BaseController
     public AjaxResult changeStatus(@RequestBody SysRole role)
     {
         roleService.checkRoleAllowed(role);
-        role.setUpdateBy(SecurityUtils.getUsername());
+        role.setUpdateBy(getUsername());
         return toAjax(roleService.updateRoleStatus(role));
     }
 

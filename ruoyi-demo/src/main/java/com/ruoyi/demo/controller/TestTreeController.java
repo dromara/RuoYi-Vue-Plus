@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
@@ -57,10 +58,9 @@ public class TestTreeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('demo:tree:export')")
     @Log(title = "测试树表", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult<TestTreeVo> export(@Validated TestTreeBo bo) {
+    public void export(@Validated TestTreeBo bo, HttpServletResponse response) {
         List<TestTreeVo> list = iTestTreeService.queryList(bo);
-        ExcelUtil<TestTreeVo> util = new ExcelUtil<TestTreeVo>(TestTreeVo.class);
-        return util.exportExcel(list, "测试树表");
+		ExcelUtil.exportExcel(list, "测试树表", TestTreeVo.class, response);
     }
 
     /**

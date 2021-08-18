@@ -1,6 +1,6 @@
 package com.ruoyi.framework.security.handle;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import cn.hutool.http.HttpStatus;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.JsonUtils;
@@ -29,7 +29,7 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint, S
             throws IOException
     {
         int code = HttpStatus.HTTP_UNAUTHORIZED;
-        String msg = StrUtil.format("请求访问：{}，认证失败，无法访问系统资源", request.getRequestURI());
+        String msg = StringUtils.format("请求访问：{}，认证失败，无法访问系统资源", request.getRequestURI());
         ServletUtils.renderString(response, JsonUtils.toJsonString(AjaxResult.error(code, msg)));
     }
 }

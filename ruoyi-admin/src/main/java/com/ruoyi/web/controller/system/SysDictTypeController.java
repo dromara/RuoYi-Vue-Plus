@@ -7,7 +7,6 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysDictType;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.service.ISysDictTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -39,11 +39,10 @@ public class SysDictTypeController extends BaseController
     @Log(title = "字典类型", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:dict:export')")
     @GetMapping("/export")
-    public AjaxResult export(SysDictType dictType)
+    public void export(SysDictType dictType, HttpServletResponse response)
     {
         List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
-        ExcelUtil<SysDictType> util = new ExcelUtil<SysDictType>(SysDictType.class);
-        return util.exportExcel(list, "字典类型");
+		ExcelUtil.exportExcel(list, "字典类型", SysDictType.class, response);
     }
 
     /**
@@ -68,7 +67,7 @@ public class SysDictTypeController extends BaseController
         {
             return AjaxResult.error("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-        dict.setCreateBy(SecurityUtils.getUsername());
+        dict.setCreateBy(getUsername());
         return toAjax(dictTypeService.insertDictType(dict));
     }
 
@@ -84,7 +83,7 @@ public class SysDictTypeController extends BaseController
         {
             return AjaxResult.error("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-        dict.setUpdateBy(SecurityUtils.getUsername());
+        dict.setUpdateBy(getUsername());
         return toAjax(dictTypeService.updateDictType(dict));
     }
 
