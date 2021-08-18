@@ -146,9 +146,14 @@ export default {
     },
     // 上传成功回调
     handleUploadSuccess(res, file) {
-      this.$message.success("上传成功");
-      this.fileList.push({ name: res.data.fileName, url: res.data.fileName });
-      this.$emit("input", this.listToString(this.fileList));
+      if (res.code === 200) {
+        this.$message.success("上传成功");
+        this.fileList.push({ name: res.data.fileName, url: res.data.fileName });
+        this.$emit("input", this.listToString(this.fileList));
+      } else {
+        this.$message.error(res.msg);
+        this.loading.close();
+      }
     },
     // 删除文件
     handleDelete(index) {
@@ -170,9 +175,9 @@ export default {
       for (let i in list) {
         strs += list[i].url + separator;
       }
-      return strs != '' ? strs.substr(0, strs.length - 1) : '';
-    }
-  }
+      return strs != "" ? strs.substr(0, strs.length - 1) : "";
+    },
+  },
 };
 </script>
 

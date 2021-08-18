@@ -180,7 +180,7 @@ export default {
         // 调整光标到最后
         quill.setSelection(length + 1);
       } else {
-        this.$message.error("图片插入失败");
+        this.$message.error(res.msg);
       }
     },
     handleUploadError() {

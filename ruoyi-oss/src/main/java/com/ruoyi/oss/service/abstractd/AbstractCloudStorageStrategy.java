@@ -20,6 +20,8 @@ public abstract class AbstractCloudStorageStrategy implements ICloudStorageStrat
 
 	protected CloudStorageProperties properties;
 
+	public abstract void init(CloudStorageProperties properties);
+
 	@Override
 	public abstract void createBucket();
 

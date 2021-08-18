@@ -138,7 +138,7 @@
           <el-input v-model="form.accessKey" placeholder="请输入accessKey" />
         </el-form-item>
         <el-form-item label="secretKey" prop="secretKey">
-          <el-input v-model="form.secretKey" placeholder="请输入秘钥" />
+          <el-input v-model="form.secretKey" placeholder="请输入秘钥" show-password />
         </el-form-item>
         <el-form-item label="桶名称" prop="bucketName">
           <el-input v-model="form.bucketName" placeholder="请输入桶名称" />
