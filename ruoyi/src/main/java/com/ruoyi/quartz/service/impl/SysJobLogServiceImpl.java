@@ -1,7 +1,6 @@
 package com.ruoyi.quartz.service.impl;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -27,14 +26,14 @@ public class SysJobLogServiceImpl extends ServicePlusImpl<SysJobLogMapper, SysJo
     public TableDataInfo<SysJobLog> selectPageJobLogList(SysJobLog jobLog) {
         Map<String, Object> params = jobLog.getParams();
         LambdaQueryWrapper<SysJobLog> lqw = new LambdaQueryWrapper<SysJobLog>()
-                .like(StrUtil.isNotBlank(jobLog.getJobName()), SysJobLog::getJobName, jobLog.getJobName())
-                .eq(StrUtil.isNotBlank(jobLog.getJobGroup()), SysJobLog::getJobGroup, jobLog.getJobGroup())
-                .eq(StrUtil.isNotBlank(jobLog.getStatus()), SysJobLog::getStatus, jobLog.getStatus())
-                .like(StrUtil.isNotBlank(jobLog.getInvokeTarget()), SysJobLog::getInvokeTarget, jobLog.getInvokeTarget())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                .like(StringUtils.isNotBlank(jobLog.getJobName()), SysJobLog::getJobName, jobLog.getJobName())
+                .eq(StringUtils.isNotBlank(jobLog.getJobGroup()), SysJobLog::getJobGroup, jobLog.getJobGroup())
+                .eq(StringUtils.isNotBlank(jobLog.getStatus()), SysJobLog::getStatus, jobLog.getStatus())
+                .like(StringUtils.isNotBlank(jobLog.getInvokeTarget()), SysJobLog::getInvokeTarget, jobLog.getInvokeTarget())
+                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
                         "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
+                .apply(StringUtils.isNotEmpty(params.get("endTime")),
                         "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"));
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
@@ -50,14 +49,14 @@ public class SysJobLogServiceImpl extends ServicePlusImpl<SysJobLogMapper, SysJo
     public List<SysJobLog> selectJobLogList(SysJobLog jobLog) {
         Map<String, Object> params = jobLog.getParams();
         return list(new LambdaQueryWrapper<SysJobLog>()
-                .like(StrUtil.isNotBlank(jobLog.getJobName()), SysJobLog::getJobName, jobLog.getJobName())
-                .eq(StrUtil.isNotBlank(jobLog.getJobGroup()), SysJobLog::getJobGroup, jobLog.getJobGroup())
-                .eq(StrUtil.isNotBlank(jobLog.getStatus()), SysJobLog::getStatus, jobLog.getStatus())
-                .like(StrUtil.isNotBlank(jobLog.getInvokeTarget()), SysJobLog::getInvokeTarget, jobLog.getInvokeTarget())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                .like(StringUtils.isNotBlank(jobLog.getJobName()), SysJobLog::getJobName, jobLog.getJobName())
+                .eq(StringUtils.isNotBlank(jobLog.getJobGroup()), SysJobLog::getJobGroup, jobLog.getJobGroup())
+                .eq(StringUtils.isNotBlank(jobLog.getStatus()), SysJobLog::getStatus, jobLog.getStatus())
+                .like(StringUtils.isNotBlank(jobLog.getInvokeTarget()), SysJobLog::getInvokeTarget, jobLog.getInvokeTarget())
+                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
                         "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
+                .apply(StringUtils.isNotEmpty(params.get("endTime")),
                         "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime")));
     }

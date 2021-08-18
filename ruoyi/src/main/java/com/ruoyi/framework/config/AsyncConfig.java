@@ -1,6 +1,6 @@
 package com.ruoyi.framework.config;
 
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,7 +41,7 @@ public class AsyncConfig extends AsyncConfigurerSupport {
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (throwable, method, objects) -> {
             throwable.printStackTrace();
-            throw new CustomException(
+            throw new ServiceException(
                     "Exception message - " + throwable.getMessage()
                     + ", Method name - " + method.getName()
                     + ", Parameter value - " + Arrays.toString(objects));

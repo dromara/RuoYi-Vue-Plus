@@ -1,20 +1,26 @@
-package com.ruoyi.system.controller;
+package com.ruoyi.web.controller.system;
 
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.system.domain.bo.SysOssBo;
+import com.ruoyi.oss.constant.CloudConstant;
+import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.domain.SysOss;
-import com.ruoyi.system.service.ISysOssService;
+import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.vo.SysOssVo;
+import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.system.service.ISysOssService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -49,6 +55,7 @@ import java.util.Map;
 public class SysOssController extends BaseController {
 
 	private final ISysOssService iSysOssService;
+	private final ISysConfigService iSysConfigService;
 
 	/**
 	 * 查询OSS云存储列表
@@ -72,8 +79,8 @@ public class SysOssController extends BaseController {
 	@RepeatSubmit
 	@PostMapping("/upload")
 	public AjaxResult<Map<String, String>> upload(@RequestPart("file") MultipartFile file) {
-		if (file.isEmpty()) {
-			throw new CustomException("上传文件不能为空");
+		if (ObjectUtil.isNull(file)) {
+			throw new ServiceException("上传文件不能为空");
 		}
 		SysOss oss = iSysOssService.upload(file);
 		Map<String, String> map = new HashMap<>(2);
@@ -87,8 +94,8 @@ public class SysOssController extends BaseController {
 	@GetMapping("/download/{ossId}")
 	public void download(@PathVariable Long ossId, HttpServletResponse response) throws IOException {
 		SysOss sysOss = iSysOssService.getById(ossId);
-		if (sysOss == null) {
-			throw new CustomException("文件数据不存在!");
+		if (ObjectUtil.isNull(sysOss)) {
+			throw new ServiceException("文件数据不存在!");
 		}
 		response.reset();
 		response.addHeader("Access-Control-Allow-Origin", "*");
@@ -109,6 +116,21 @@ public class SysOssController extends BaseController {
 	public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
 								   @PathVariable Long[] ossIds) {
 		return toAjax(iSysOssService.deleteWithValidByIds(Arrays.asList(ossIds), true) ? 1 : 0);
+	}
+
+	/**
+	 * 变更图片列表预览状态
+	 */
+	@ApiOperation("变更图片列表预览状态")
+	@PreAuthorize("@ss.hasPermi('system:oss:edit')")
+	@Log(title = "OSS云存储" , businessType = BusinessType.UPDATE)
+	@PutMapping("/changePreviewListResource")
+	public AjaxResult<Void> changePreviewListResource(@RequestBody String body) {
+		Map<String, Boolean> map = JsonUtils.parseMap(body);
+		SysConfig config = iSysConfigService.getOne(new LambdaQueryWrapper<SysConfig>()
+			.eq(SysConfig::getConfigKey, CloudConstant.PEREVIEW_LIST_RESOURCE_KEY));
+		config.setConfigValue(map.get("previewListResource").toString());
+		return toAjax(iSysConfigService.updateConfig(config));
 	}
 
 }

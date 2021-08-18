@@ -1,13 +1,12 @@
 package com.ruoyi.framework.aspectj;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.BusinessStatus;
 import com.ruoyi.common.enums.HttpMethod;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.web.service.AsyncService;
 import com.ruoyi.framework.web.service.TokenService;
@@ -104,7 +103,7 @@ public class LogAspect
             if (e != null)
             {
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());
-                operLog.setErrorMsg(StrUtil.sub(e.getMessage(), 0, 2000));
+                operLog.setErrorMsg(StringUtils.substring(e.getMessage(), 0, 2000));
             }
             // 设置方法名称
             String className = joinPoint.getTarget().getClass().getName();
@@ -161,12 +160,12 @@ public class LogAspect
         if (HttpMethod.PUT.name().equals(requestMethod) || HttpMethod.POST.name().equals(requestMethod))
         {
             String params = argsArrayToString(joinPoint.getArgs());
-            operLog.setOperParam(StrUtil.sub(params, 0, 2000));
+            operLog.setOperParam(StringUtils.substring(params, 0, 2000));
         }
         else
         {
             Map<?, ?> paramsMap = (Map<?, ?>) ServletUtils.getRequest().getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            operLog.setOperParam(StrUtil.sub(paramsMap.toString(), 0, 2000));
+            operLog.setOperParam(StringUtils.substring(paramsMap.toString(), 0, 2000));
         }
     }
 
@@ -195,7 +194,7 @@ public class LogAspect
         if (paramsArray != null && paramsArray.length > 0)
         {
 			for (Object o : paramsArray) {
-				if (Validator.isNotNull(o) && !isFilterObject(o)) {
+				if (StringUtils.isNotNull(o) && !isFilterObject(o)) {
 					params.append(JsonUtils.toJsonString(o)).append(" ");
 				}
 			}

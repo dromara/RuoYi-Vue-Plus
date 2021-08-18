@@ -44,6 +44,9 @@
           <span v-if="!loading">登 录</span>
           <span v-else>登 录 中...</span>
         </el-button>
+        <div style="float: right;" v-if="register">
+          <router-link class="link-type" :to="'/register'">立即注册</router-link>
+        </div>
       </el-form-item>
     </el-form>
     <!--  底部  -->
@@ -73,15 +76,18 @@ export default {
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur", message: "用户名不能为空" }
+          { required: true, trigger: "blur", message: "请输入您的账号" }
         ],
         password: [
-          { required: true, trigger: "blur", message: "密码不能为空" }
+          { required: true, trigger: "blur", message: "请输入您的密码" }
         ],
-        code: [{ required: true, trigger: "change", message: "验证码不能为空" }]
+        code: [{ required: true, trigger: "change", message: "请输入验证码" }]
       },
       loading: false,
+      // 验证码开关
       captchaOnOff: true,
+      // 注册开关
+      register: false,
       redirect: undefined
     };
   },

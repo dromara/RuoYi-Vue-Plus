@@ -1,7 +1,9 @@
 package com.ruoyi.common.core.controller;
 
-import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +75,38 @@ public class BaseController
      */
     public String redirect(String url)
     {
-        return StrUtil.format("redirect:{}", url);
+        return StringUtils.format("redirect:{}", url);
+    }
+
+    /**
+     * 获取用户缓存信息
+     */
+    public LoginUser getLoginUser()
+    {
+        return SecurityUtils.getLoginUser();
+    }
+
+    /**
+     * 获取登录用户id
+     */
+    public Long getUserId()
+    {
+        return getLoginUser().getUserId();
+    }
+
+    /**
+     * 获取登录部门id
+     */
+    public Long getDeptId()
+    {
+        return getLoginUser().getDeptId();
+    }
+
+    /**
+     * 获取登录用户名
+     */
+    public String getUsername()
+    {
+        return getLoginUser().getUsername();
     }
 }

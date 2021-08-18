@@ -1,11 +1,11 @@
 package com.ruoyi.common.utils.sql;
 
-import cn.hutool.core.lang.Validator;
-import com.ruoyi.common.exception.BaseException;
+import com.ruoyi.common.exception.UtilException;
+import com.ruoyi.common.utils.StringUtils;
 
 /**
  * sql操作工具类
- * 
+ *
  * @author ruoyi
  */
 public class SqlUtil
@@ -20,9 +20,9 @@ public class SqlUtil
      */
     public static String escapeOrderBySql(String value)
     {
-        if (Validator.isNotEmpty(value) && !isValidOrderBySql(value))
+        if (StringUtils.isNotEmpty(value) && !isValidOrderBySql(value))
         {
-            throw new BaseException("参数不符合规范，不能进行查询");
+            throw new UtilException("参数不符合规范，不能进行查询");
         }
         return value;
     }

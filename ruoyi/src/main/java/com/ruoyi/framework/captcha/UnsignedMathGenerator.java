@@ -4,7 +4,7 @@ import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.math.Calculator;
 import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 
 /**
  * 无符号计算生成器
@@ -45,8 +45,8 @@ public class UnsignedMathGenerator implements CodeGenerator {
 		int max = RandomUtil.randomInt(min, limit);
 		String number1 = Integer.toString(max);
 		String number2 = Integer.toString(min);
-		number1 = StrUtil.padAfter(number1, this.numberLength, CharUtil.SPACE);
-		number2 = StrUtil.padAfter(number2, this.numberLength, CharUtil.SPACE);
+		number1 = StringUtils.rightPad(number1, this.numberLength, CharUtil.SPACE);
+		number2 = StringUtils.rightPad(number2, this.numberLength, CharUtil.SPACE);
 
 		return number1 + RandomUtil.randomChar(operators) + number2 + '=';
 	}
@@ -80,6 +80,6 @@ public class UnsignedMathGenerator implements CodeGenerator {
 	 * @return 最大值
 	 */
 	private int getLimit() {
-		return Integer.parseInt("1" + StrUtil.repeat('0', this.numberLength));
+		return Integer.parseInt("1" + StringUtils.repeat('0', this.numberLength));
 	}
 }

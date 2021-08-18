@@ -1,11 +1,10 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysLogininfor;
 import com.ruoyi.system.mapper.SysLogininforMapper;
 import com.ruoyi.system.service.ISysLogininforService;
@@ -28,13 +27,13 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
     public TableDataInfo<SysLogininfor> selectPageLogininforList(SysLogininfor logininfor) {
         Map<String, Object> params = logininfor.getParams();
         LambdaQueryWrapper<SysLogininfor> lqw = new LambdaQueryWrapper<SysLogininfor>()
-                .like(StrUtil.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
-                .eq(StrUtil.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
-                .like(StrUtil.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                .like(StringUtils.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
+                .eq(StringUtils.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
+                .like(StringUtils.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
+                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
                         "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
+                .apply(StringUtils.isNotEmpty(params.get("endTime")),
                         "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"));
         return PageUtils.buildDataInfo(page(PageUtils.buildPage("info_id","desc"), lqw));
@@ -61,13 +60,13 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
     public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor) {
         Map<String, Object> params = logininfor.getParams();
         return list(new LambdaQueryWrapper<SysLogininfor>()
-                .like(StrUtil.isNotBlank(logininfor.getIpaddr()),SysLogininfor::getIpaddr,logininfor.getIpaddr())
-                .eq(StrUtil.isNotBlank(logininfor.getStatus()),SysLogininfor::getStatus,logininfor.getStatus())
-                .like(StrUtil.isNotBlank(logininfor.getUserName()),SysLogininfor::getUserName,logininfor.getUserName())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                .like(StringUtils.isNotBlank(logininfor.getIpaddr()),SysLogininfor::getIpaddr,logininfor.getIpaddr())
+                .eq(StringUtils.isNotBlank(logininfor.getStatus()),SysLogininfor::getStatus,logininfor.getStatus())
+                .like(StringUtils.isNotBlank(logininfor.getUserName()),SysLogininfor::getUserName,logininfor.getUserName())
+                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
                         "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
+                .apply(StringUtils.isNotEmpty(params.get("endTime")),
                         "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"))
                 .orderByDesc(SysLogininfor::getInfoId));

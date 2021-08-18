@@ -93,6 +93,10 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, K> extends ServiceI
 		return super.updateBatchById(entityList, batchSize);
 	}
 
+	/**
+	 * 单sql批量插入( 全量填充 无视数据库默认值 )
+	 * 适用于无脑插入
+	 */
 	@Override
 	public boolean saveBatch(Collection<T> entityList) {
 		return saveBatch(entityList, DEFAULT_BATCH_SIZE);

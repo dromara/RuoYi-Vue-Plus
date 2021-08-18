@@ -1,12 +1,13 @@
 package com.ruoyi.system.domain;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ruoyi.common.annotation.Excel;
-import com.ruoyi.common.annotation.Excel.ColumnType;
+import com.ruoyi.common.annotation.ExcelDictFormat;
+import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -26,63 +27,64 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_logininfor")
+@ExcelIgnoreUnannotated
 public class SysLogininfor implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * ID
      */
-    @Excel(name = "序号", cellType = ColumnType.NUMERIC)
+    @ExcelProperty(value = "序号")
     @TableId(value = "info_id", type = IdType.AUTO)
     private Long infoId;
 
     /**
      * 用户账号
      */
-    @Excel(name = "用户账号")
+    @ExcelProperty(value = "用户账号")
     private String userName;
 
     /**
      * 登录状态 0成功 1失败
      */
-    @Excel(name = "登录状态", readConverterExp = "0=成功,1=失败")
+    @ExcelProperty(value = "登录状态", converter = ExcelDictConvert.class)
+	@ExcelDictFormat(dictType = "sys_common_status")
     private String status;
 
     /**
      * 登录IP地址
      */
-    @Excel(name = "登录地址")
+    @ExcelProperty(value = "登录地址")
     private String ipaddr;
 
     /**
      * 登录地点
      */
-    @Excel(name = "登录地点")
+    @ExcelProperty(value = "登录地点")
     private String loginLocation;
 
     /**
      * 浏览器类型
      */
-    @Excel(name = "浏览器")
+    @ExcelProperty(value = "浏览器")
     private String browser;
 
     /**
      * 操作系统
      */
-    @Excel(name = "操作系统")
+    @ExcelProperty(value = "操作系统")
     private String os;
 
     /**
      * 提示消息
      */
-    @Excel(name = "提示消息")
+    @ExcelProperty(value = "提示消息")
     private String msg;
 
     /**
      * 访问时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Excel(name = "访问时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @ExcelProperty(value = "访问时间")
     private Date loginTime;
 
     /**

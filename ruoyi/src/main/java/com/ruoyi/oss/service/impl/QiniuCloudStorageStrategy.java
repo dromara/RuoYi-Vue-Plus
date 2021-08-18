@@ -10,51 +10,37 @@ import com.qiniu.util.Auth;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.exception.OssException;
-import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.properties.CloudStorageProperties;
-import com.ruoyi.oss.properties.CloudStorageProperties.QiniuProperties;
-import com.ruoyi.oss.service.abstractd.AbstractCloudStorageService;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
+import com.ruoyi.oss.service.abstractd.AbstractCloudStorageStrategy;
 
 import java.io.InputStream;
 
 /**
- * 七牛云存储
+ * 七牛云存储策略
  *
  * @author Lion Li
  */
-@Lazy
-@Service
-public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService implements InitializingBean {
+public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
 	private final UploadManager uploadManager;
 	private final BucketManager bucketManager;
 	private final String token;
-	private final QiniuProperties properties;
 
-	@Autowired
-	public QiniuCloudStorageServiceImpl(CloudStorageProperties properties) {
-		this.properties = properties.getQiniu();
+	public QiniuCloudStorageStrategy(CloudStorageProperties cloudStorageProperties) {
+		properties = cloudStorageProperties;
 		try {
-			Configuration config = new Configuration(getRegion(this.properties.getRegion()));
+			Configuration config = new Configuration(getRegion(properties.getRegion()));
 			// https设置
 			config.useHttpsDomains = false;
-			if (this.properties.getIsHttps() != null) {
-				config.useHttpsDomains = this.properties.getIsHttps();
-			}
+			config.useHttpsDomains = "Y".equals(properties.getIsHttps());
 			uploadManager = new UploadManager(config);
-			Auth auth = Auth.create(
-				this.properties.getAccessKey(),
-				this.properties.getSecretKey());
-			String bucketName = this.properties.getBucketName();
+			Auth auth = Auth.create(properties.getAccessKey(), properties.getSecretKey());
+			String bucketName = properties.getBucketName();
 			token = auth.uploadToken(bucketName);
 			bucketManager = new BucketManager(auth, config);
 
 			if (!ArrayUtil.contains(bucketManager.buckets(), bucketName)) {
-				bucketManager.createBucket(bucketName, this.properties.getRegion());
+				bucketManager.createBucket(bucketName, properties.getRegion());
 			}
 		} catch (Exception e) {
 			throw new IllegalArgumentException("七牛云存储配置错误! 请检查系统配置!");
@@ -116,13 +102,8 @@ public class QiniuCloudStorageServiceImpl extends AbstractCloudStorageService im
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		OssFactory.register(getServiceType(),this);
-	}
-
-	@Override
 	public String getEndpointLink() {
-		return properties.getDomain();
+		return properties.getEndpoint();
 	}
 
 	private Region getRegion(String region) {

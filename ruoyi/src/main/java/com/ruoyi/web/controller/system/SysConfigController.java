@@ -7,7 +7,6 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.service.ISysConfigService;
@@ -16,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -43,11 +43,10 @@ public class SysConfigController extends BaseController
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:config:export')")
     @GetMapping("/export")
-    public AjaxResult export(SysConfig config)
+    public void export(SysConfig config, HttpServletResponse response)
     {
         List<SysConfig> list = configService.selectConfigList(config);
-        ExcelUtil<SysConfig> util = new ExcelUtil<SysConfig>(SysConfig.class);
-        return util.exportExcel(list, "参数数据");
+		ExcelUtil.exportExcel(list, "参数数据", SysConfig.class, response);
     }
 
     /**
@@ -82,7 +81,7 @@ public class SysConfigController extends BaseController
         {
             return AjaxResult.error("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
-        config.setCreateBy(SecurityUtils.getUsername());
+        config.setCreateBy(getUsername());
         return toAjax(configService.insertConfig(config));
     }
 
@@ -98,7 +97,7 @@ public class SysConfigController extends BaseController
         {
             return AjaxResult.error("修改参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
-        config.setUpdateBy(SecurityUtils.getUsername());
+        config.setUpdateBy(getUsername());
         return toAjax(configService.updateConfig(config));
     }
 

@@ -1,6 +1,5 @@
 package com.ruoyi.oss.service.impl;
 
-import cn.hutool.core.util.StrUtil;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -8,45 +7,35 @@ import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.exception.OssException;
-import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.properties.CloudStorageProperties;
-import com.ruoyi.oss.properties.CloudStorageProperties.QcloudProperties;
-import com.ruoyi.oss.service.abstractd.AbstractCloudStorageService;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
+import com.ruoyi.oss.service.abstractd.AbstractCloudStorageStrategy;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
- * 腾讯云存储
+ * 腾讯云存储策略
  *
  * @author Lion Li
  */
-@Lazy
-@Service
-public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService implements InitializingBean {
+public class QcloudCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
 	private final COSClient client;
-	private final QcloudProperties properties;
 
-	@Autowired
-	public QcloudCloudStorageServiceImpl(CloudStorageProperties properties) {
-		this.properties = properties.getQcloud();
+	public QcloudCloudStorageStrategy(CloudStorageProperties cloudStorageProperties) {
+		properties = cloudStorageProperties;
 		try {
 			COSCredentials credentials = new BasicCOSCredentials(
-				this.properties.getSecretId(),
-				this.properties.getSecretKey());
+				properties.getAccessKey(), properties.getSecretKey());
 			// 初始化客户端配置
 			ClientConfig clientConfig = new ClientConfig();
 			// 设置bucket所在的区域，华南：gz 华北：tj 华东：sh
-			clientConfig.setRegion(new Region(this.properties.getRegion()));
-			if (this.properties.getIsHttps()) {
+			clientConfig.setRegion(new Region(properties.getRegion()));
+			if ("Y".equals(properties.getIsHttps())) {
 				clientConfig.setHttpProtocol(HttpProtocol.https);
 			} else {
 				clientConfig.setHttpProtocol(HttpProtocol.http);
@@ -116,17 +105,12 @@ public class QcloudCloudStorageServiceImpl extends AbstractCloudStorageService i
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		OssFactory.register(getServiceType(),this);
-	}
-
-	@Override
 	public String getEndpointLink() {
 		String endpoint = properties.getEndpoint();
 		StringBuilder sb = new StringBuilder(endpoint);
-		if (StrUtil.containsAnyIgnoreCase(endpoint, "http://")) {
+		if (StringUtils.containsAnyIgnoreCase(endpoint, "http://")) {
 			sb.insert(7, properties.getBucketName() + ".");
-		} else if (StrUtil.containsAnyIgnoreCase(endpoint, "https://")) {
+		} else if (StringUtils.containsAnyIgnoreCase(endpoint, "https://")) {
 			sb.insert(8, properties.getBucketName() + ".");
 		} else {
 			throw new OssException("Endpoint配置错误");

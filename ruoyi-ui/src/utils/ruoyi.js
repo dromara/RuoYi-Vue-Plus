@@ -55,16 +55,15 @@ export function resetForm(refName) {
 
 // 添加日期范围
 export function addDateRange(params, dateRange, propName) {
-	var search = params;
-	search.params = {};
-	if (null != dateRange && '' != dateRange) {
-		if (typeof (propName) === "undefined") {
-			search.params["beginTime"] = dateRange[0];
-			search.params["endTime"] = dateRange[1];
-		} else {
-			search.params["begin" + propName] = dateRange[0];
-			search.params["end" + propName] = dateRange[1];
-		}
+	let search = params;
+	search.params = typeof (search.params) === 'object' && search.params !== null && !Array.isArray(search.params) ? search.params : {};
+	dateRange = Array.isArray(dateRange) ? dateRange : [];
+	if (typeof (propName) === 'undefined') {
+		search.params['beginTime'] = dateRange[0];
+		search.params['endTime'] = dateRange[1];
+	} else {
+		search.params['begin' + propName] = dateRange[0];
+		search.params['end' + propName] = dateRange[1];
 	}
 	return search;
 }
@@ -94,11 +93,6 @@ export function selectDictLabels(datas, value, separator) {
 		})
 	})
 	return actions.join('').substring(0, actions.join('').length - 1);
-}
-
-// 通用下载方法
-export function download(fileName) {
-	window.location.href = baseURL + "/common/download?fileName=" + encodeURI(fileName) + "&delete=" + true;
 }
 
 // 字符串格式化(%s )

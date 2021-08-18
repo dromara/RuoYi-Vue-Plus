@@ -1,13 +1,12 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.mapper.SysPostMapper;
@@ -33,9 +32,9 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
     @Override
     public TableDataInfo<SysPost> selectPagePostList(SysPost post) {
         LambdaQueryWrapper<SysPost> lqw = new LambdaQueryWrapper<SysPost>()
-                .like(StrUtil.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
-                .eq(StrUtil.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
-                .like(StrUtil.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
+                .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
+                .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
+                .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(),lqw));
     }
 
@@ -48,9 +47,9 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
     @Override
     public List<SysPost> selectPostList(SysPost post) {
         return list(new LambdaQueryWrapper<SysPost>()
-                .like(StrUtil.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
-                .eq(StrUtil.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
-                .like(StrUtil.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName()));
+                .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
+                .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
+                .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName()));
     }
 
     /**
@@ -93,10 +92,10 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
      */
     @Override
     public String checkPostNameUnique(SysPost post) {
-        Long postId = Validator.isNull(post.getPostId()) ? -1L : post.getPostId();
+        Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
         SysPost info = getOne(new LambdaQueryWrapper<SysPost>()
                 .eq(SysPost::getPostName, post.getPostName()).last("limit 1"));
-        if (Validator.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -110,10 +109,10 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
      */
     @Override
     public String checkPostCodeUnique(SysPost post) {
-        Long postId = Validator.isNull(post.getPostId()) ? -1L : post.getPostId();
+        Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
         SysPost info = getOne(new LambdaQueryWrapper<SysPost>()
                 .eq(SysPost::getPostCode, post.getPostCode()).last("limit 1"));
-        if (Validator.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -153,7 +152,7 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
         for (Long postId : postIds) {
             SysPost post = selectPostById(postId);
             if (countUserPostById(postId) > 0) {
-                throw new CustomException(String.format("%1$s已分配,不能删除", post.getPostName()));
+                throw new ServiceException(String.format("%1$s已分配,不能删除", post.getPostName()));
             }
         }
         return baseMapper.deleteBatchIds(Arrays.asList(postIds));

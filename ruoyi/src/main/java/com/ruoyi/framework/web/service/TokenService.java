@@ -1,6 +1,5 @@
 package com.ruoyi.framework.web.service;
 
-import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
@@ -8,6 +7,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
 import com.ruoyi.framework.config.properties.TokenProperties;
 import io.jsonwebtoken.Claims;
@@ -49,13 +49,17 @@ public class TokenService {
     public LoginUser getLoginUser(HttpServletRequest request) {
         // 获取请求携带的令牌
         String token = getToken(request);
-        if (Validator.isNotEmpty(token)) {
-            Claims claims = parseToken(token);
-            // 解析对应的权限以及用户信息
-            String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
-            String userKey = getTokenKey(uuid);
-            LoginUser user = redisCache.getCacheObject(userKey);
-            return user;
+        if (StringUtils.isNotEmpty(token)) {
+			try {
+				Claims claims = parseToken(token);
+				// 解析对应的权限以及用户信息
+				String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
+				String userKey = getTokenKey(uuid);
+				LoginUser user = redisCache.getCacheObject(userKey);
+				return user;
+			} catch (Exception e) {
+
+			}
         }
         return null;
     }
@@ -64,7 +68,7 @@ public class TokenService {
      * 设置用户身份信息
      */
     public void setLoginUser(LoginUser loginUser) {
-        if (Validator.isNotNull(loginUser) && Validator.isNotEmpty(loginUser.getToken())) {
+        if (StringUtils.isNotNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken())) {
             refreshToken(loginUser);
         }
     }
@@ -73,7 +77,7 @@ public class TokenService {
      * 删除用户身份信息
      */
     public void delLoginUser(String token) {
-        if (Validator.isNotEmpty(token)) {
+        if (StringUtils.isNotEmpty(token)) {
             String userKey = getTokenKey(token);
             redisCache.deleteObject(userKey);
         }
@@ -182,7 +186,7 @@ public class TokenService {
      */
     private String getToken(HttpServletRequest request) {
         String token = request.getHeader(tokenProperties.getHeader());
-        if (Validator.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX)) {
+        if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX)) {
             token = token.replace(Constants.TOKEN_PREFIX, "");
         }
         return token;
