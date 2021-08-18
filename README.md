@@ -102,8 +102,9 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期�
 * 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
 * Oracle 模块 oracle 分支 [RuoYi-Vue-Plus-oracle](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/oracle/)
 
-## 扫码加群 一起交流
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0625/160026_11d949aa_1766278.jpeg "07f7121fab14e57e03e5f6a35eff6ce.jpg")
+## 加群与捐献
+>[加群与捐献](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/加群与捐献?sort_id=4104598)
+>>[https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/加群与捐献?sort_id=4104598](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/加群与捐献?sort_id=4104598)
 
 ## 捐献作者
 作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  
