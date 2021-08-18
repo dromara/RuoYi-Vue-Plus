@@ -11,6 +11,7 @@ import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.properties.CloudStorageProperties;
 import com.ruoyi.oss.service.ICloudStorageStrategy;
+import com.ruoyi.oss.service.abstractd.AbstractCloudStorageStrategy;
 
 import java.util.Date;
 import java.util.Map;
@@ -68,7 +69,8 @@ public class OssFactory {
 			return service;
 		}
 		// 获取redis配置信息 创建对象 并缓存
-		service = (ICloudStorageStrategy) ReflectUtils.newInstance(CloudServiceEnumd.getServiceClass(type), properties);
+		service = (ICloudStorageStrategy) ReflectUtils.newInstance(CloudServiceEnumd.getServiceClass(type));
+		((AbstractCloudStorageStrategy)service).init(properties);
 		SERVICES.put(type, service);
 		SERVICES_UPDATE_TIME.put(type, nowDate);
 		return service;

@@ -24,9 +24,10 @@ import java.io.InputStream;
  */
 public class AliyunCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
-	private final OSSClient client;
+	private OSSClient client;
 
-	public AliyunCloudStorageStrategy(CloudStorageProperties cloudStorageProperties) {
+	@Override
+	public void init(CloudStorageProperties cloudStorageProperties) {
 		properties = cloudStorageProperties;
 		try {
 			ClientConfiguration configuration = new ClientConfiguration();
@@ -35,7 +36,7 @@ public class AliyunCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			client = new OSSClient(properties.getEndpoint(), credentialProvider, configuration);
 			createBucket();
 		} catch (Exception e) {
-			throw new IllegalArgumentException("阿里云存储配置错误! 请检查系统配置!");
+			throw new OssException("阿里云存储配置错误! 请检查系统配置!");
 		}
 	}
 

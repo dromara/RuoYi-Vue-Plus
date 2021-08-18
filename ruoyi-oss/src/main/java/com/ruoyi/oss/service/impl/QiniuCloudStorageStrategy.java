@@ -22,11 +22,12 @@ import java.io.InputStream;
  */
 public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
-	private final UploadManager uploadManager;
-	private final BucketManager bucketManager;
-	private final String token;
+	private UploadManager uploadManager;
+	private BucketManager bucketManager;
+	private String token;
 
-	public QiniuCloudStorageStrategy(CloudStorageProperties cloudStorageProperties) {
+	@Override
+	public void init(CloudStorageProperties cloudStorageProperties) {
 		properties = cloudStorageProperties;
 		try {
 			Configuration config = new Configuration(getRegion(properties.getRegion()));
@@ -43,7 +44,7 @@ public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
 				bucketManager.createBucket(bucketName, properties.getRegion());
 			}
 		} catch (Exception e) {
-			throw new IllegalArgumentException("七牛云存储配置错误! 请检查系统配置!");
+			throw new OssException("七牛云存储配置错误! 请检查系统配置!");
 		}
 	}
 

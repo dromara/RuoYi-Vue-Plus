@@ -20,9 +20,10 @@ import java.io.InputStream;
  */
 public class MinioCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
-	private final MinioClient minioClient;
+	private MinioClient minioClient;
 
-	public MinioCloudStorageStrategy(CloudStorageProperties cloudStorageProperties) {
+	@Override
+	public void init(CloudStorageProperties cloudStorageProperties) {
 		properties = cloudStorageProperties;
 		try {
 			minioClient = MinioClient.builder()
@@ -31,7 +32,7 @@ public class MinioCloudStorageStrategy extends AbstractCloudStorageStrategy {
 				.build();
 			createBucket();
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Minio存储配置错误! 请检查系统配置!");
+			throw new OssException("Minio存储配置错误! 请检查系统配置!");
 		}
 	}
 
