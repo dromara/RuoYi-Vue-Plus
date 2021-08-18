@@ -24,9 +24,10 @@ import java.io.InputStream;
  */
 public class QcloudCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
-	private final COSClient client;
+	private COSClient client;
 
-	public QcloudCloudStorageStrategy(CloudStorageProperties cloudStorageProperties) {
+	@Override
+	public void init(CloudStorageProperties cloudStorageProperties) {
 		properties = cloudStorageProperties;
 		try {
 			COSCredentials credentials = new BasicCOSCredentials(
@@ -43,7 +44,7 @@ public class QcloudCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			client = new COSClient(credentials, clientConfig);
 			createBucket();
 		} catch (Exception e) {
-			throw new IllegalArgumentException("腾讯云存储配置错误! 请检查系统配置!");
+			throw new OssException("腾讯云存储配置错误! 请检查系统配置!");
 		}
 	}
 
