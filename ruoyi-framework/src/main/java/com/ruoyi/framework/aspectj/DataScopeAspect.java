@@ -5,10 +5,10 @@ import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.framework.web.service.TokenService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
@@ -78,7 +78,7 @@ public class DataScopeAspect {
 			return;
 		}
 		// 获取当前的用户
-		LoginUser loginUser = SpringUtils.getBean(TokenService.class).getLoginUser(ServletUtils.getRequest());
+		LoginUser loginUser = SecurityUtils.getLoginUser();
 		if (StringUtils.isNotNull(loginUser)) {
 			SysUser currentUser = loginUser.getUser();
 			// 如果是超级管理员，则不过滤数据

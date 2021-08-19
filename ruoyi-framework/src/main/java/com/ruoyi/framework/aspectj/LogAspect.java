@@ -8,6 +8,7 @@ import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.framework.web.service.AsyncService;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.domain.SysOperLog;
@@ -83,7 +84,7 @@ public class LogAspect
             }
 
             // 获取当前的用户
-            LoginUser loginUser = SpringUtils.getBean(TokenService.class).getLoginUser(ServletUtils.getRequest());
+            LoginUser loginUser = SecurityUtils.getLoginUser();
 
             // *========数据库日志=========*//
             SysOperLog operLog = new SysOperLog();

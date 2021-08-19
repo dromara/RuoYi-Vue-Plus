@@ -1,6 +1,7 @@
 package com.ruoyi.framework.web.service;
 
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.ServletUtils;
@@ -28,9 +29,6 @@ public class PermissionService
 
     private static final String PERMISSION_DELIMETER = ",";
 
-    @Autowired
-    private TokenService tokenService;
-
     /**
      * 验证用户是否具备某权限
      *
@@ -43,7 +41,7 @@ public class PermissionService
         {
             return false;
         }
-        LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
+        LoginUser loginUser = SecurityUtils.getLoginUser();
         if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions()))
         {
             return false;
@@ -74,7 +72,7 @@ public class PermissionService
         {
             return false;
         }
-        LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
+        LoginUser loginUser = SecurityUtils.getLoginUser();
         if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions()))
         {
             return false;
@@ -102,7 +100,7 @@ public class PermissionService
         {
             return false;
         }
-        LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
+        LoginUser loginUser = SecurityUtils.getLoginUser();
         if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles()))
         {
             return false;
@@ -141,7 +139,7 @@ public class PermissionService
         {
             return false;
         }
-        LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
+        LoginUser loginUser = SecurityUtils.getLoginUser();
         if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles()))
         {
             return false;

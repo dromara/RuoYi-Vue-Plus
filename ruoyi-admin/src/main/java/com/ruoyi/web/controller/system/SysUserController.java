@@ -10,11 +10,9 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.service.TokenService;
@@ -54,9 +52,6 @@ public class SysUserController extends BaseController
     @Autowired
     private ISysPostService postService;
 
-    @Autowired
-    private TokenService tokenService;
-
     /**
      * 获取用户列表
      */
@@ -92,8 +87,7 @@ public class SysUserController extends BaseController
     {
 		List<SysUserImportVo> userListVo = ExcelUtil.importExcel(file.getInputStream(), SysUserImportVo.class);
 		List<SysUser> userList = BeanUtil.copyToList(userListVo, SysUser.class);
-		LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        String operName = loginUser.getUsername();
+        String operName = getUsername();
         String message = userService.importUser(userList, updateSupport, operName);
         return AjaxResult.success(message);
     }
