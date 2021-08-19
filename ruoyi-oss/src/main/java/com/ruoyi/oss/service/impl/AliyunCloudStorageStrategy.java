@@ -36,7 +36,7 @@ public class AliyunCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			client = new OSSClient(properties.getEndpoint(), credentialProvider, configuration);
 			createBucket();
 		} catch (Exception e) {
-			throw new OssException("阿里云存储配置错误! 请检查系统配置!");
+			throw new OssException("阿里云存储配置错误! 请检查系统配置:[" + e.getMessage() + "]");
 		}
 	}
 
@@ -51,7 +51,7 @@ public class AliyunCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			createBucketRequest.setCannedACL(CannedAccessControlList.PublicRead);
 			client.createBucket(createBucketRequest);
 		} catch (Exception e) {
-			throw new OssException("创建Bucket失败, 请核对阿里云配置信息");
+			throw new OssException("创建Bucket失败, 请核对阿里云配置信息:[" + e.getMessage() + "]");
 		}
 	}
 
@@ -72,7 +72,7 @@ public class AliyunCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			metadata.setContentType(contentType);
 			client.putObject(new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata));
 		} catch (Exception e) {
-			throw new OssException("上传文件失败，请检查阿里云配置信息");
+			throw new OssException("上传文件失败，请检查阿里云配置信息:[" + e.getMessage() + "]");
 		}
 		return new UploadResult().setUrl(getEndpointLink() + "/" + path).setFilename(path);
 	}
@@ -83,7 +83,7 @@ public class AliyunCloudStorageStrategy extends AbstractCloudStorageStrategy {
 		try {
 			client.deleteObject(properties.getBucketName(), path);
 		} catch (Exception e) {
-			throw new OssException("上传文件失败，请检查阿里云配置信息");
+			throw new OssException("上传文件失败，请检查阿里云配置信息:[" + e.getMessage() + "]");
 		}
 	}
 

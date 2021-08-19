@@ -44,7 +44,7 @@ public class QcloudCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			client = new COSClient(credentials, clientConfig);
 			createBucket();
 		} catch (Exception e) {
-			throw new OssException("腾讯云存储配置错误! 请检查系统配置!");
+			throw new OssException("腾讯云存储配置错误! 请检查系统配置:[" + e.getMessage() + "]");
 		}
 	}
 
@@ -59,7 +59,7 @@ public class QcloudCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
 			client.createBucket(createBucketRequest);
 		} catch (Exception e) {
-			throw new OssException("创建Bucket失败, 请核对腾讯云配置信息");
+			throw new OssException("创建Bucket失败, 请核对腾讯云配置信息:[" + e.getMessage() + "]");
 		}
 	}
 
@@ -80,7 +80,7 @@ public class QcloudCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			metadata.setContentType(contentType);
 			client.putObject(new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata));
 		} catch (Exception e) {
-			throw new OssException("上传文件失败，请检查腾讯云配置信息");
+			throw new OssException("上传文件失败，请检查腾讯云配置信息:[" + e.getMessage() + "]");
 		}
 		return new UploadResult().setUrl(getEndpointLink() + "/" + path).setFilename(path);
 	}
@@ -91,7 +91,7 @@ public class QcloudCloudStorageStrategy extends AbstractCloudStorageStrategy {
 		try {
 			client.deleteObject(new DeleteObjectRequest(properties.getBucketName(), path));
 		} catch (Exception e) {
-			throw new OssException("上传文件失败，请检腾讯云查配置信息");
+			throw new OssException("上传文件失败，请检腾讯云查配置信息:[" + e.getMessage() + "]");
 		}
 	}
 

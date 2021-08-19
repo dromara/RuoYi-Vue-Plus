@@ -44,7 +44,7 @@ public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
 				bucketManager.createBucket(bucketName, properties.getRegion());
 			}
 		} catch (Exception e) {
-			throw new OssException("七牛云存储配置错误! 请检查系统配置!");
+			throw new OssException("七牛云存储配置错误! 请检查系统配置:[" + e.getMessage() + "]");
 		}
 	}
 
@@ -57,7 +57,7 @@ public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			}
 			bucketManager.createBucket(bucketName, properties.getRegion());
 		} catch (Exception e) {
-			throw new OssException("创建Bucket失败, 请核对七牛云配置信息");
+			throw new OssException("创建Bucket失败, 请核对七牛云配置信息:[" + e.getMessage() + "]");
 		}
 	}
 
@@ -74,7 +74,7 @@ public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
 				throw new RuntimeException("上传七牛出错：" + res.toString());
 			}
 		} catch (Exception e) {
-			throw new OssException("上传文件失败，请核对七牛配置信息");
+			throw new OssException("上传文件失败，请核对七牛配置信息:[" + e.getMessage() + "]");
 		}
 		return new UploadResult().setUrl(getEndpointLink() + "/" + path).setFilename(path);
 	}
