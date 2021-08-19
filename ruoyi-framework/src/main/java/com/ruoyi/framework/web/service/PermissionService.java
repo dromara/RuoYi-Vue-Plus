@@ -1,11 +1,9 @@
 package com.ruoyi.framework.web.service;
 
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.utils.ServletUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
