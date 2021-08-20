@@ -1,11 +1,10 @@
 package com.ruoyi.generator.util;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.JsonUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
 import org.apache.velocity.VelocityContext;
@@ -47,11 +46,11 @@ public class VelocityUtils
         VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("tplCategory", genTable.getTplCategory());
         velocityContext.put("tableName", genTable.getTableName());
-        velocityContext.put("functionName", StrUtil.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
+        velocityContext.put("functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
         velocityContext.put("ClassName", genTable.getClassName());
-        velocityContext.put("className", StrUtil.lowerFirst(genTable.getClassName()));
+        velocityContext.put("className", StringUtils.uncapitalize(genTable.getClassName()));
         velocityContext.put("moduleName", genTable.getModuleName());
-        velocityContext.put("BusinessName", StrUtil.upperFirst(genTable.getBusinessName()));
+        velocityContext.put("BusinessName", StringUtils.capitalize(genTable.getBusinessName()));
         velocityContext.put("businessName", genTable.getBusinessName());
         velocityContext.put("basePackage", getPackagePrefix(packageName));
         velocityContext.put("packageName", packageName);
@@ -110,15 +109,15 @@ public class VelocityUtils
         String subTableName = genTable.getSubTableName();
         String subTableFkName = genTable.getSubTableFkName();
         String subClassName = genTable.getSubTable().getClassName();
-        String subTableFkClassName = StrUtil.toCamelCase(subTableFkName);
+        String subTableFkClassName = StringUtils.convertToCamelCase(subTableFkName);
 
         context.put("subTable", subTable);
         context.put("subTableName", subTableName);
         context.put("subTableFkName", subTableFkName);
         context.put("subTableFkClassName", subTableFkClassName);
-        context.put("subTableFkclassName", StrUtil.lowerFirst(subTableFkClassName));
+        context.put("subTableFkclassName", StringUtils.uncapitalize(subTableFkClassName));
         context.put("subClassName", subClassName);
-        context.put("subclassName", StrUtil.lowerFirst(subClassName));
+        context.put("subclassName", StringUtils.uncapitalize(subClassName));
         context.put("subImportList", getImportList(genTable.getSubTable()));
     }
 
@@ -172,45 +171,45 @@ public class VelocityUtils
         // 业务名称
         String businessName = genTable.getBusinessName();
 
-        String javaPath = PROJECT_PATH + "/" + StrUtil.replace(packageName, ".", "/");
+        String javaPath = PROJECT_PATH + "/" + StringUtils.replace(packageName, ".", "/");
         String mybatisPath = MYBATIS_PATH + "/" + moduleName;
         String vuePath = "vue";
 
         if (template.contains("domain.java.vm"))
         {
-            fileName = StrUtil.format("{}/domain/{}.java", javaPath, className);
+            fileName = StringUtils.format("{}/domain/{}.java", javaPath, className);
         }
         if (template.contains("vo.java.vm"))
         {
-            fileName = StrUtil.format("{}/domain/vo/{}Vo.java", javaPath, className);
+            fileName = StringUtils.format("{}/domain/vo/{}Vo.java", javaPath, className);
         }
 		if (template.contains("bo.java.vm"))
 		{
-			fileName = StrUtil.format("{}/domain/bo/{}Bo.java", javaPath, className);
+			fileName = StringUtils.format("{}/domain/bo/{}Bo.java", javaPath, className);
 		}
-        if (template.contains("sub-domain.java.vm") && StrUtil.equals(GenConstants.TPL_SUB, genTable.getTplCategory()))
+        if (template.contains("sub-domain.java.vm") && StringUtils.equals(GenConstants.TPL_SUB, genTable.getTplCategory()))
         {
-            fileName = StrUtil.format("{}/domain/{}.java", javaPath, genTable.getSubTable().getClassName());
+            fileName = StringUtils.format("{}/domain/{}.java", javaPath, genTable.getSubTable().getClassName());
         }
         else if (template.contains("mapper.java.vm"))
         {
-            fileName = StrUtil.format("{}/mapper/{}Mapper.java", javaPath, className);
+            fileName = StringUtils.format("{}/mapper/{}Mapper.java", javaPath, className);
         }
         else if (template.contains("service.java.vm"))
         {
-            fileName = StrUtil.format("{}/service/I{}Service.java", javaPath, className);
+            fileName = StringUtils.format("{}/service/I{}Service.java", javaPath, className);
         }
         else if (template.contains("serviceImpl.java.vm"))
         {
-            fileName = StrUtil.format("{}/service/impl/{}ServiceImpl.java", javaPath, className);
+            fileName = StringUtils.format("{}/service/impl/{}ServiceImpl.java", javaPath, className);
         }
         else if (template.contains("controller.java.vm"))
         {
-            fileName = StrUtil.format("{}/controller/{}Controller.java", javaPath, className);
+            fileName = StringUtils.format("{}/controller/{}Controller.java", javaPath, className);
         }
         else if (template.contains("mapper.xml.vm"))
         {
-            fileName = StrUtil.format("{}/{}Mapper.xml", mybatisPath, className);
+            fileName = StringUtils.format("{}/{}Mapper.xml", mybatisPath, className);
         }
         else if (template.contains("sql.vm"))
         {
@@ -218,15 +217,15 @@ public class VelocityUtils
         }
         else if (template.contains("api.js.vm"))
         {
-            fileName = StrUtil.format("{}/api/{}/{}.js", vuePath, moduleName, businessName);
+            fileName = StringUtils.format("{}/api/{}/{}.js", vuePath, moduleName, businessName);
         }
         else if (template.contains("index.vue.vm"))
         {
-            fileName = StrUtil.format("{}/views/{}/{}/index.vue", vuePath, moduleName, businessName);
+            fileName = StringUtils.format("{}/views/{}/{}/index.vue", vuePath, moduleName, businessName);
         }
         else if (template.contains("index-tree.vue.vm"))
         {
-            fileName = StrUtil.format("{}/views/{}/{}/index.vue", vuePath, moduleName, businessName);
+            fileName = StringUtils.format("{}/views/{}/{}/index.vue", vuePath, moduleName, businessName);
         }
         return fileName;
     }
@@ -240,7 +239,7 @@ public class VelocityUtils
     public static String getPackagePrefix(String packageName)
     {
         int lastIndex = packageName.lastIndexOf(".");
-        String basePackage = StrUtil.sub(packageName, 0, lastIndex);
+        String basePackage = StringUtils.substring(packageName, 0, lastIndex);
         return basePackage;
     }
 
@@ -255,7 +254,7 @@ public class VelocityUtils
         List<GenTableColumn> columns = genTable.getColumns();
         GenTable subGenTable = genTable.getSubTable();
         HashSet<String> importList = new HashSet<String>();
-        if (Validator.isNotNull(subGenTable))
+        if (StringUtils.isNotNull(subGenTable))
         {
             importList.add("java.util.List");
         }
@@ -283,7 +282,7 @@ public class VelocityUtils
      */
     public static String getPermissionPrefix(String moduleName, String businessName)
     {
-        return StrUtil.format("{}:{}", moduleName, businessName);
+        return StringUtils.format("{}:{}", moduleName, businessName);
     }
 
     /**
@@ -294,7 +293,8 @@ public class VelocityUtils
      */
     public static String getParentMenuId(Map<String, Object> paramsObj)
     {
-        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.PARENT_MENU_ID))
+        if (StringUtils.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.PARENT_MENU_ID)
+				&& StringUtils.isNotEmpty(Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID))))
         {
             return Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID));
         }
@@ -309,11 +309,11 @@ public class VelocityUtils
      */
     public static String getTreecode(Map<String, Object> paramsObj)
     {
-        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_CODE))
+        if (StringUtils.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_CODE))
         {
-            return StrUtil.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_CODE)));
+            return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_CODE)));
         }
-        return StrUtil.EMPTY;
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -324,11 +324,11 @@ public class VelocityUtils
      */
     public static String getTreeParentCode(Map<String, Object> paramsObj)
     {
-        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_PARENT_CODE))
+        if (StringUtils.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_PARENT_CODE))
         {
-            return StrUtil.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_PARENT_CODE)));
+            return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_PARENT_CODE)));
         }
-        return StrUtil.EMPTY;
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -339,11 +339,11 @@ public class VelocityUtils
      */
     public static String getTreeName(Map<String, Object> paramsObj)
     {
-        if (Validator.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_NAME))
+        if (StringUtils.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_NAME))
         {
-            return StrUtil.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_NAME)));
+            return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_NAME)));
         }
-        return StrUtil.EMPTY;
+        return StringUtils.EMPTY;
     }
 
     /**

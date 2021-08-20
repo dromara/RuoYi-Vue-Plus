@@ -1,8 +1,8 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.domain.SysNotice;
@@ -19,14 +19,14 @@ import java.util.List;
  * @author ruoyi
  */
 @Service
-public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice> implements ISysNoticeService {
+public class SysNoticeServiceImpl extends ServicePlusImpl<SysNoticeMapper, SysNotice, SysNotice> implements ISysNoticeService {
 
     @Override
     public TableDataInfo<SysNotice> selectPageNoticeList(SysNotice notice) {
         LambdaQueryWrapper<SysNotice> lqw = new LambdaQueryWrapper<SysNotice>()
-                .like(StrUtil.isNotBlank(notice.getNoticeTitle()), SysNotice::getNoticeTitle, notice.getNoticeTitle())
-                .eq(StrUtil.isNotBlank(notice.getNoticeType()), SysNotice::getNoticeType, notice.getNoticeType())
-                .like(StrUtil.isNotBlank(notice.getCreateBy()), SysNotice::getCreateBy, notice.getCreateBy());
+                .like(StringUtils.isNotBlank(notice.getNoticeTitle()), SysNotice::getNoticeTitle, notice.getNoticeTitle())
+                .eq(StringUtils.isNotBlank(notice.getNoticeType()), SysNotice::getNoticeType, notice.getNoticeType())
+                .like(StringUtils.isNotBlank(notice.getCreateBy()), SysNotice::getCreateBy, notice.getCreateBy());
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(),lqw));
     }
 
@@ -50,9 +50,9 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
     @Override
     public List<SysNotice> selectNoticeList(SysNotice notice) {
         return list(new LambdaQueryWrapper<SysNotice>()
-                .like(StrUtil.isNotBlank(notice.getNoticeTitle()),SysNotice::getNoticeTitle,notice.getNoticeTitle())
-                .eq(StrUtil.isNotBlank(notice.getNoticeType()),SysNotice::getNoticeType,notice.getNoticeType())
-                .like(StrUtil.isNotBlank(notice.getCreateBy()),SysNotice::getCreateBy,notice.getCreateBy()));
+                .like(StringUtils.isNotBlank(notice.getNoticeTitle()),SysNotice::getNoticeTitle,notice.getNoticeTitle())
+                .eq(StringUtils.isNotBlank(notice.getNoticeType()),SysNotice::getNoticeType,notice.getNoticeType())
+                .like(StringUtils.isNotBlank(notice.getCreateBy()),SysNotice::getCreateBy,notice.getCreateBy()));
     }
 
     /**

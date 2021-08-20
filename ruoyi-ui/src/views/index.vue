@@ -93,6 +93,54 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v3.0.0 - 2021-8-18">
+              <ol>
+                <li>add [重大更新]重写 OSS 模块相关实现 支持动态配置(页面配置)</li>
+                <li>add [重大更新]增加 jackson 超出 JS 最大数值自动转字符串(雪花id序列化)处理</li>
+                <li>add [重大更新]重写 防重提交拦截器 支持全局与注解自定义 拦截时间配置配置 优化逻辑</li>
+                <li>add [重大更新]新增是否开启用户注册功能</li>
+                <li>add [重大更新]增加 easyexcel 工具类</li>
+                <li>add [重大更新]集成 性能分析插件 p6spy 更强劲的 SQL 分析</li>
+                <li>add [重大更新]增加 完整国际化解决方案</li>
+                <li>add [重大更新]支持自定义注解实现接口限流</li>
+                <li>update feign-okhttp 11.0 => 11.2</li>
+                <li>update okhttp 3.19.4 => 4.9.1</li>
+                <li>update minio 8.2.0 => 8.3.0</li>
+                <li>update hutool 5.7.6 => 5.7.7</li>
+                <li>update element-ui 2.15.2 => 2.15.5</li>
+                <li>update springboot admin 2.4.3 => 2.5.0 (新增 Quartz 专属监控页)</li>
+                <li>add 增加 admin 监控客户端开关</li>
+                <li>add 增加 国际化演示demo</li>
+                <li>update 更新软件架构图</li>
+                <li>update 优化XSS跨站脚本过滤</li>
+                <li>update 优化BLOB下载时清除URL对象引用</li>
+                <li>update 更新 防重提交拦截器 demo演示案例</li>
+                <li>update 日常字符串校验 统一重构到 StringUtils 便于维护扩展</li>
+                <li>update 修改 自动注入器 用户未登录异常拦截抛出警告 返回Null</li>
+                <li>update 重构 统一使用 流工具下载</li>
+                <li>update 重写 所有业务导出 适配easyexcel工具</li>
+                <li>update 移动文件存储业务到 system 模块</li>
+                <li>update 代码生成模板 适配新excel导出</li>
+                <li>update 将 Actuator 配置 移动到全局配置</li>
+                <li>update 统一镜像时区配置 移除主机时间映射</li>
+                <li>update 更改多数据源框架更清晰的依赖名</li>
+                <li>update 更新 阿里云 maven源 新地址</li>
+                <li>update 补全基础实体 文档注解</li>
+                <li>update 代码生成文档注解 增加必填判断配置</li>
+                <li>update 注入器 insert 增加 update 字段处理</li>
+                <li>update 默认首页使用keep-alive缓存</li>
+                <li>fix 生产minio回显问题</li>
+                <li>fix 修复角色分配用户页面接收参数与传递参数类型不一致导致的错误</li>
+                <li>fix 修复代码生成 删除按钮报错 loading 不取消问题</li>
+                <li>fix 解决登录后浏览器后台Breadcrumb组件报错</li>
+                <li>fix 修复DictUtils方法报错</li>
+                <li>fix 头像上传 未走OSS存储问题</li>
+                <li>fix oss列表 jpeg 不回显问题</li>
+                <li>fix 修复操作日志根据状态查询异常问题</li>
+                <li>remove 移除原生excel工具</li>
+                <li>remove 移除通用上传下载接口与配置</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v2.6.0 - 2021-7-28">
               <ol>
                 <li>add [重大新增] 增加 OSS 对象存储模块</li>
@@ -336,7 +384,7 @@
 import config from '../../package.json'
 
 export default {
-  name: "index",
+  name: "Index",
   data() {
     return {
       // 版本号

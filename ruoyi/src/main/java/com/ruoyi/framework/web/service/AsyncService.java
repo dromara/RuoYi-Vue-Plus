@@ -1,5 +1,6 @@
 package com.ruoyi.framework.web.service;
 
+import com.ruoyi.common.utils.StringUtils;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.ruoyi.common.constant.Constants;
@@ -67,7 +68,7 @@ public class AsyncService {
 		logininfor.setOs(os);
 		logininfor.setMsg(message);
 		// 日志状态
-		if (Constants.LOGIN_SUCCESS.equals(status) || Constants.LOGOUT.equals(status)) {
+		if (StringUtils.equalsAny(status, Constants.LOGIN_SUCCESS, Constants.LOGOUT, Constants.REGISTER)) {
 			logininfor.setStatus(Constants.SUCCESS);
 		} else if (Constants.LOGIN_FAIL.equals(status)) {
 			logininfor.setStatus(Constants.FAIL);

@@ -1,18 +1,18 @@
 package com.ruoyi.framework.web.service;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.ServletUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Set;
 
 /**
  * RuoYi首创 自定义权限实现，ss取自SpringSecurity首字母
- * 
+ *
  * @author ruoyi
  */
 @Service("ss")
@@ -33,18 +33,18 @@ public class PermissionService
 
     /**
      * 验证用户是否具备某权限
-     * 
+     *
      * @param permission 权限字符串
      * @return 用户是否具备某权限
      */
     public boolean hasPermi(String permission)
     {
-        if (Validator.isEmpty(permission))
+        if (StringUtils.isEmpty(permission))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getPermissions()))
+        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions()))
         {
             return false;
         }
@@ -70,12 +70,12 @@ public class PermissionService
      */
     public boolean hasAnyPermi(String permissions)
     {
-        if (Validator.isEmpty(permissions))
+        if (StringUtils.isEmpty(permissions))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getPermissions()))
+        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions()))
         {
             return false;
         }
@@ -92,25 +92,25 @@ public class PermissionService
 
     /**
      * 判断用户是否拥有某个角色
-     * 
+     *
      * @param role 角色字符串
      * @return 用户是否具备某角色
      */
     public boolean hasRole(String role)
     {
-        if (Validator.isEmpty(role))
+        if (StringUtils.isEmpty(role))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getUser().getRoles()))
+        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles()))
         {
             return false;
         }
         for (SysRole sysRole : loginUser.getUser().getRoles())
         {
             String roleKey = sysRole.getRoleKey();
-            if (SUPER_ADMIN.equals(roleKey) || roleKey.equals(StrUtil.trim(role)))
+            if (SUPER_ADMIN.equals(roleKey) || roleKey.equals(StringUtils.trim(role)))
             {
                 return true;
             }
@@ -137,12 +137,12 @@ public class PermissionService
      */
     public boolean hasAnyRoles(String roles)
     {
-        if (Validator.isEmpty(roles))
+        if (StringUtils.isEmpty(roles))
         {
             return false;
         }
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-        if (Validator.isNull(loginUser) || Validator.isEmpty(loginUser.getUser().getRoles()))
+        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles()))
         {
             return false;
         }
@@ -158,13 +158,13 @@ public class PermissionService
 
     /**
      * 判断是否包含权限
-     * 
+     *
      * @param permissions 权限列表
      * @param permission 权限字符串
      * @return 用户是否具备某权限
      */
     private boolean hasPermissions(Set<String> permissions, String permission)
     {
-        return permissions.contains(ALL_PERMISSION) || permissions.contains(StrUtil.trim(permission));
+        return permissions.contains(ALL_PERMISSION) || permissions.contains(StringUtils.trim(permission));
     }
 }

@@ -1,8 +1,8 @@
 package com.ruoyi.framework.aspectj;
 
-import cn.hutool.core.lang.Validator;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.ruoyi.common.annotation.DataSource;
+import com.ruoyi.common.utils.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -33,7 +33,7 @@ public class DataSourceAspect {
 	public Object around(ProceedingJoinPoint point) throws Throwable {
 		DataSource dataSource = getDataSource(point);
 
-		if (Validator.isNotNull(dataSource)) {
+		if (StringUtils.isNotNull(dataSource)) {
 			DynamicDataSourceContextHolder.poll();
 			String source = dataSource.value().getSource();
 			DynamicDataSourceContextHolder.push(source);

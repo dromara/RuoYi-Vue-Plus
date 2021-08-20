@@ -1,9 +1,9 @@
 package com.ruoyi.quartz.service.impl;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.ScheduleConstants;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.job.TaskException;
 import com.ruoyi.common.utils.PageUtils;
@@ -29,7 +29,7 @@ import java.util.List;
  * @author ruoyi
  */
 @Service
-public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> implements ISysJobService {
+public class SysJobServiceImpl extends ServicePlusImpl<SysJobMapper, SysJob, SysJob> implements ISysJobService {
     @Autowired
     private Scheduler scheduler;
 
@@ -48,10 +48,10 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
     @Override
     public TableDataInfo<SysJob> selectPageJobList(SysJob job) {
         LambdaQueryWrapper<SysJob> lqw = new LambdaQueryWrapper<SysJob>()
-                .like(StrUtil.isNotBlank(job.getJobName()), SysJob::getJobName, job.getJobName())
-                .eq(StrUtil.isNotBlank(job.getJobGroup()), SysJob::getJobGroup, job.getJobGroup())
-                .eq(StrUtil.isNotBlank(job.getStatus()), SysJob::getStatus, job.getStatus())
-                .like(StrUtil.isNotBlank(job.getInvokeTarget()), SysJob::getInvokeTarget, job.getInvokeTarget());
+                .like(StringUtils.isNotBlank(job.getJobName()), SysJob::getJobName, job.getJobName())
+                .eq(StringUtils.isNotBlank(job.getJobGroup()), SysJob::getJobGroup, job.getJobGroup())
+                .eq(StringUtils.isNotBlank(job.getStatus()), SysJob::getStatus, job.getStatus())
+                .like(StringUtils.isNotBlank(job.getInvokeTarget()), SysJob::getInvokeTarget, job.getInvokeTarget());
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
     }
 
@@ -64,10 +64,10 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
     @Override
     public List<SysJob> selectJobList(SysJob job) {
         return list(new LambdaQueryWrapper<SysJob>()
-                .like(StrUtil.isNotBlank(job.getJobName()), SysJob::getJobName, job.getJobName())
-                .eq(StrUtil.isNotBlank(job.getJobGroup()), SysJob::getJobGroup, job.getJobGroup())
-                .eq(StrUtil.isNotBlank(job.getStatus()), SysJob::getStatus, job.getStatus())
-                .like(StrUtil.isNotBlank(job.getInvokeTarget()), SysJob::getInvokeTarget, job.getInvokeTarget()));
+                .like(StringUtils.isNotBlank(job.getJobName()), SysJob::getJobName, job.getJobName())
+                .eq(StringUtils.isNotBlank(job.getJobGroup()), SysJob::getJobGroup, job.getJobGroup())
+                .eq(StringUtils.isNotBlank(job.getStatus()), SysJob::getStatus, job.getStatus())
+                .like(StringUtils.isNotBlank(job.getInvokeTarget()), SysJob::getInvokeTarget, job.getInvokeTarget()));
     }
 
     /**

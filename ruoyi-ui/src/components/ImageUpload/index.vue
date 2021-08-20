@@ -118,9 +118,14 @@ export default {
     },
     // 上传成功回调
     handleUploadSuccess(res) {
-      this.fileList.push({ name: res.data.fileName, url: res.data.url });
-      this.$emit("input", this.listToString(this.fileList));
-      this.loading.close();
+      if (res.code == 200) {
+        this.fileList.push({ name: res.data.fileName, url: res.data.url });
+        this.$emit("input", this.listToString(this.fileList));
+        this.loading.close();
+      } else {
+        this.$message.error(res.msg);
+        this.loading.close();
+      }
     },
     // 上传前loading加载
     handleBeforeUpload(file) {
@@ -130,7 +135,7 @@ export default {
         if (file.name.lastIndexOf(".") > -1) {
           fileExtension = file.name.slice(file.name.lastIndexOf(".") + 1);
         }
-        isImg = this.fileType.some(type => {
+        isImg = this.fileType.some((type) => {
           if (file.type.indexOf(type) > -1) return true;
           if (fileExtension && fileExtension.indexOf(type) > -1) return true;
           return false;
@@ -163,7 +168,7 @@ export default {
       this.$message.error(`上传文件数量不能超过 ${this.limit} 个!`);
     },
     // 上传失败
-    handleUploadError() {
+    handleUploadError(res) {
       this.$message({
         type: "error",
         message: "上传失败",
@@ -182,25 +187,26 @@ export default {
       for (let i in list) {
         strs += list[i].url + separator;
       }
-      return strs != '' ? strs.substr(0, strs.length - 1) : '';
-    }
-  }
+      return strs != "" ? strs.substr(0, strs.length - 1) : "";
+    },
+  },
 };
 </script>
 <style scoped lang="scss">
 // .el-upload--picture-card 控制加号部分
 ::v-deep.hide .el-upload--picture-card {
-    display: none;
+  display: none;
 }
 // 去掉动画效果
 ::v-deep .el-list-enter-active,
 ::v-deep .el-list-leave-active {
-    transition: all 0s;
+  transition: all 0s;
 }
 
-::v-deep .el-list-enter, .el-list-leave-active {
-    opacity: 0;
-    transform: translateY(0);
+::v-deep .el-list-enter,
+.el-list-leave-active {
+  opacity: 0;
+  transform: translateY(0);
 }
 </style>
 

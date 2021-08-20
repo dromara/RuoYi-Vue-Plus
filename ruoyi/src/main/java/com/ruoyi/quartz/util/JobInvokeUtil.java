@@ -1,7 +1,6 @@
 package com.ruoyi.quartz.util;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.quartz.domain.SysJob;
 
@@ -52,7 +51,7 @@ public class JobInvokeUtil
             throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
             InvocationTargetException
     {
-        if (Validator.isNotNull(methodParams) && methodParams.size() > 0)
+        if (StringUtils.isNotNull(methodParams) && methodParams.size() > 0)
         {
             Method method = bean.getClass().getDeclaredMethod(methodName, getMethodParamsType(methodParams));
             method.invoke(bean, getMethodParamsValue(methodParams));
@@ -66,49 +65,49 @@ public class JobInvokeUtil
 
     /**
      * 校验是否为为class包名
-     * 
+     *
      * @param str 名称
      * @return true是 false否
      */
     public static boolean isValidClassName(String invokeTarget)
     {
-        return StrUtil.count(invokeTarget, ".") > 1;
+        return StringUtils.countMatches(invokeTarget, ".") > 1;
     }
 
     /**
      * 获取bean名称
-     * 
+     *
      * @param invokeTarget 目标字符串
      * @return bean名称
      */
     public static String getBeanName(String invokeTarget)
     {
-        String beanName = StrUtil.subBefore(invokeTarget, "(",false);
-        return StrUtil.subBefore(beanName, ".",true);
+        String beanName = StringUtils.substringBefore(invokeTarget, "(");
+        return StringUtils.substringBefore(beanName, ".");
     }
 
     /**
      * 获取bean方法
-     * 
+     *
      * @param invokeTarget 目标字符串
      * @return method方法
      */
     public static String getMethodName(String invokeTarget)
     {
-        String methodName = StrUtil.subBefore(invokeTarget, "(",false);
-        return StrUtil.subAfter(methodName, ".",true);
+        String methodName = StringUtils.substringBefore(invokeTarget, "(");
+        return StringUtils.substringBefore(methodName, ".");
     }
 
     /**
      * 获取method方法参数相关列表
-     * 
+     *
      * @param invokeTarget 目标字符串
      * @return method方法相关参数列表
      */
     public static List<Object[]> getMethodParams(String invokeTarget)
     {
-        String methodStr = StrUtil.subBetween(invokeTarget, "(", ")");
-        if (StrUtil.isEmpty(methodStr))
+        String methodStr = StringUtils.substringBetween(invokeTarget, "(", ")");
+        if (StringUtils.isEmpty(methodStr))
         {
             return null;
         }
@@ -116,26 +115,26 @@ public class JobInvokeUtil
         List<Object[]> classs = new LinkedList<>();
         for (int i = 0; i < methodParams.length; i++)
         {
-            String str = StrUtil.trimToEmpty(methodParams[i]);
+            String str = StringUtils.trimToEmpty(methodParams[i]);
             // String字符串类型，包含'
-            if (StrUtil.contains(str, "'"))
+            if (StringUtils.contains(str, "'"))
             {
-                classs.add(new Object[] { StrUtil.replace(str, "'", ""), String.class });
+                classs.add(new Object[] { StringUtils.replace(str, "'", ""), String.class });
             }
             // boolean布尔类型，等于true或者false
-            else if (StrUtil.equals(str, "true") || StrUtil.equalsIgnoreCase(str, "false"))
+            else if (StringUtils.equals(str, "true") || StringUtils.equalsIgnoreCase(str, "false"))
             {
                 classs.add(new Object[] { Boolean.valueOf(str), Boolean.class });
             }
             // long长整形，包含L
-            else if (StrUtil.containsIgnoreCase(str, "L"))
+            else if (StringUtils.containsIgnoreCase(str, "L"))
             {
-                classs.add(new Object[] { Long.valueOf(StrUtil.replaceIgnoreCase(str, "L", "")), Long.class });
+                classs.add(new Object[] { Long.valueOf(StringUtils.replaceIgnoreCase(str, "L", "")), Long.class });
             }
             // double浮点类型，包含D
-            else if (StrUtil.containsIgnoreCase(str, "D"))
+            else if (StringUtils.containsIgnoreCase(str, "D"))
             {
-                classs.add(new Object[] { Double.valueOf(StrUtil.replaceIgnoreCase(str, "D", "")), Double.class });
+                classs.add(new Object[] { Double.valueOf(StringUtils.replaceIgnoreCase(str, "D", "")), Double.class });
             }
             // 其他类型归类为整形
             else
@@ -148,7 +147,7 @@ public class JobInvokeUtil
 
     /**
      * 获取参数类型
-     * 
+     *
      * @param methodParams 参数相关列表
      * @return 参数类型列表
      */
@@ -166,7 +165,7 @@ public class JobInvokeUtil
 
     /**
      * 获取参数值
-     * 
+     *
      * @param methodParams 参数相关列表
      * @return 参数值列表
      */

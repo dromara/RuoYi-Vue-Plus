@@ -1,8 +1,10 @@
 package com.ruoyi.quartz.domain;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ruoyi.common.annotation.Excel;
+import com.ruoyi.common.annotation.ExcelDictFormat;
+import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -13,7 +15,7 @@ import java.util.Map;
 
 /**
  * 定时任务调度日志表 sys_job_log
- * 
+ *
  * @author ruoyi
  */
 
@@ -21,44 +23,46 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("sys_job_log")
+@ExcelIgnoreUnannotated
 public class SysJobLog
 {
     private static final long serialVersionUID = 1L;
 
     /** ID */
-    @Excel(name = "日志序号")
+    @ExcelProperty(value = "日志序号")
     @TableId(value = "job_log_id", type = IdType.AUTO)
     private Long jobLogId;
 
     /** 任务名称 */
-    @Excel(name = "任务名称")
+    @ExcelProperty(value = "任务名称")
     private String jobName;
 
     /** 任务组名 */
-    @Excel(name = "任务组名")
+    @ExcelProperty(value = "任务组名", converter = ExcelDictConvert.class)
+	@ExcelDictFormat(dictType = "sys_job_group")
     private String jobGroup;
 
     /** 调用目标字符串 */
-    @Excel(name = "调用目标字符串")
+    @ExcelProperty(value = "调用目标字符串")
     private String invokeTarget;
 
     /** 日志信息 */
-    @Excel(name = "日志信息")
+    @ExcelProperty(value = "日志信息")
     private String jobMessage;
 
     /** 执行状态（0正常 1失败） */
-    @Excel(name = "执行状态", readConverterExp = "0=正常,1=失败")
+    @ExcelProperty(value = "执行状态", converter = ExcelDictConvert.class)
+	@ExcelDictFormat(dictType = "sys_common_status")
     private String status;
 
     /** 异常信息 */
-    @Excel(name = "异常信息")
+    @ExcelProperty(value = "异常信息")
     private String exceptionInfo;
 
     /**
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     /**

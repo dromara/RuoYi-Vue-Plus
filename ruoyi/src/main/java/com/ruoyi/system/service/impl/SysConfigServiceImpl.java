@@ -1,17 +1,16 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.enums.DataSourceType;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.mapper.SysConfigMapper;
@@ -31,7 +30,7 @@ import java.util.Map;
  * @author ruoyi
  */
 @Service
-public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig> implements ISysConfigService {
+public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysConfig, SysConfig> implements ISysConfigService {
 
 	@Autowired
 	private RedisCache redisCache;
@@ -48,13 +47,13 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 	public TableDataInfo<SysConfig> selectPageConfigList(SysConfig config) {
 		Map<String, Object> params = config.getParams();
 		LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
-			.like(StrUtil.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
-			.eq(StrUtil.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
-			.like(StrUtil.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
-			.apply(Validator.isNotEmpty(params.get("beginTime")),
+			.like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
+			.eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
+			.like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
+			.apply(StringUtils.isNotEmpty(params.get("beginTime")),
 				"date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
 				params.get("beginTime"))
-			.apply(Validator.isNotEmpty(params.get("endTime")),
+			.apply(StringUtils.isNotEmpty(params.get("endTime")),
 				"date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
 				params.get("endTime"));
 		return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
@@ -81,16 +80,16 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 	@Override
 	public String selectConfigByKey(String configKey) {
 		String configValue = Convert.toStr(redisCache.getCacheObject(getCacheKey(configKey)));
-		if (Validator.isNotEmpty(configValue)) {
+		if (StringUtils.isNotEmpty(configValue)) {
 			return configValue;
 		}
 		SysConfig retConfig = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>()
 			.eq(SysConfig::getConfigKey, configKey));
-		if (Validator.isNotNull(retConfig)) {
+		if (StringUtils.isNotNull(retConfig)) {
 			redisCache.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
 			return retConfig.getConfigValue();
 		}
-		return StrUtil.EMPTY;
+		return StringUtils.EMPTY;
 	}
 
 	/**
@@ -101,7 +100,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 	@Override
 	public boolean selectCaptchaOnOff() {
 		String captchaOnOff = selectConfigByKey("sys.account.captchaOnOff");
-		if (StrUtil.isEmpty(captchaOnOff)) {
+		if (StringUtils.isEmpty(captchaOnOff)) {
 			return true;
 		}
 		return Convert.toBool(captchaOnOff);
@@ -117,13 +116,13 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 	public List<SysConfig> selectConfigList(SysConfig config) {
 		Map<String, Object> params = config.getParams();
 		LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
-			.like(StrUtil.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
-			.eq(StrUtil.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
-			.like(StrUtil.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
-			.apply(Validator.isNotEmpty(params.get("beginTime")),
+			.like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
+			.eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
+			.like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
+			.apply(StringUtils.isNotEmpty(params.get("beginTime")),
 				"date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
 				params.get("beginTime"))
-			.apply(Validator.isNotEmpty(params.get("endTime")),
+			.apply(StringUtils.isNotEmpty(params.get("endTime")),
 				"date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
 				params.get("endTime"));
 		return baseMapper.selectList(lqw);
@@ -169,8 +168,8 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 	public void deleteConfigByIds(Long[] configIds) {
 		for (Long configId : configIds) {
 			SysConfig config = selectConfigById(configId);
-			if (StrUtil.equals(UserConstants.YES, config.getConfigType())) {
-				throw new CustomException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
+			if (StringUtils.equals(UserConstants.YES, config.getConfigType())) {
+				throw new ServiceException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
 			}
 			redisCache.deleteObject(getCacheKey(config.getConfigKey()));
 		}
@@ -214,9 +213,9 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 	 */
 	@Override
 	public String checkConfigKeyUnique(SysConfig config) {
-		Long configId = Validator.isNull(config.getConfigId()) ? -1L : config.getConfigId();
+		Long configId = StringUtils.isNull(config.getConfigId()) ? -1L : config.getConfigId();
 		SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, config.getConfigKey()));
-		if (Validator.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
+		if (StringUtils.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
 			return UserConstants.NOT_UNIQUE;
 		}
 		return UserConstants.UNIQUE;

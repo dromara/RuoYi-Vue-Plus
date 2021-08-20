@@ -4,7 +4,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
 import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
@@ -85,7 +85,7 @@ public class SysLoginService
             else
             {
 				asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage(), request);
-                throw new CustomException(e.getMessage());
+                throw new ServiceException(e.getMessage());
             }
         }
 		asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);

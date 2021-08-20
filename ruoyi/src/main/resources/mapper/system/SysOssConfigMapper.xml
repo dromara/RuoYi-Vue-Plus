@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysOssConfigMapper">
+
+    <resultMap type="com.ruoyi.system.domain.SysOssConfig" id="SysOssConfigResult">
+        <result property="ossConfigId" column="oss_config_id"/>
+        <result property="configKey" column="config_key"/>
+        <result property="accessKey" column="access_key"/>
+        <result property="secretKey" column="secret_key"/>
+        <result property="bucketName" column="bucket_name"/>
+        <result property="prefix" column="prefix"/>
+        <result property="endpoint" column="endpoint"/>
+        <result property="isHttps" column="is_https"/>
+        <result property="region" column="region"/>
+        <result property="status" column="status"/>
+        <result property="ext1" column="ext1"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+
+</mapper>

@@ -1,5 +1,6 @@
 package com.ruoyi.common.core.domain;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -18,29 +19,50 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class BaseEntity implements Serializable
-{
-    private static final long serialVersionUID = 1L;
+public class BaseEntity implements Serializable {
 
-    /** 搜索值 */
-    private String searchValue;
+	private static final long serialVersionUID = 1L;
 
-    /** 创建者 */
-    private String createBy;
+	/**
+	 * 搜索值
+	 */
+	@ApiModelProperty(value = "搜索值")
+	private String searchValue;
 
-    /** 创建时间 */
-    private Date createTime;
+	/**
+	 * 创建者
+	 */
+	@ApiModelProperty(value = "创建者")
+	private String createBy;
 
-    /** 更新者 */
-    private String updateBy;
+	/**
+	 * 创建时间
+	 */
+	@ApiModelProperty(value = "创建时间")
+	private Date createTime;
 
-    /** 更新时间 */
-    private Date updateTime;
+	/**
+	 * 更新者
+	 */
+	@ApiModelProperty(value = "更新者")
+	private String updateBy;
 
-    /** 备注 */
-    private String remark;
+	/**
+	 * 更新时间
+	 */
+	@ApiModelProperty(value = "更新时间")
+	private Date updateTime;
 
-    /** 请求参数 */
-    private Map<String, Object> params = new HashMap<>();
+	/**
+	 * 备注
+	 */
+	@ApiModelProperty(value = "备注")
+	private String remark;
+
+	/**
+	 * 请求参数
+	 */
+	@ApiModelProperty(value = "请求参数")
+	private Map<String, Object> params = new HashMap<>();
 
 }

@@ -1,9 +1,12 @@
 package ${packageName}.domain.vo;
 
-import com.ruoyi.common.annotation.Excel;
 #foreach ($import in $importList)
 import ${import};
 #end
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.ruoyi.common.annotation.ExcelDictFormat;
+import com.ruoyi.common.convert.ExcelDictConvert;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,6 +22,7 @@ import java.util.Date;
  */
 @Data
 @ApiModel("${functionName}视图对象")
+@ExcelIgnoreUnannotated
 public class ${ClassName}Vo {
 
 	private static final long serialVersionUID = 1L;
@@ -40,12 +44,14 @@ public class ${ClassName}Vo {
 #else
 #set($comment=$column.columnComment)
 #end
-#if($parentheseIndex != -1)
-	@Excel(name = "${comment}" , readConverterExp = "$column.readConverterExp()")
-#elseif($column.javaType == 'Date')
-	@Excel(name = "${comment}" , width = 30, dateFormat = "yyyy-MM-dd")
+#if(${column.dictType} && ${column.dictType} != '')
+    @ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "${column.dictType}")
+#elseif($parentheseIndex != -1)
+	@ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(readConverterExp = "$column.readConverterExp()")
 #else
-	@Excel(name = "${comment}")
+	@ExcelProperty(value = "${comment}")
 #end
 	@ApiModelProperty("$column.columnComment")
 	private $column.javaType $column.javaField;

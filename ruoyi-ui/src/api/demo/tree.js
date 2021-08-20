@@ -42,12 +42,3 @@ export function delTree(id) {
     method: 'delete'
   })
 }
-
-// 导出测试树表
-export function exportTree(query) {
-  return request({
-    url: '/demo/tree/export',
-    method: 'get',
-    params: query
-  })
-}

@@ -1,47 +1,38 @@
 package com.ruoyi.oss.service.impl;
 
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.enumd.PolicyType;
 import com.ruoyi.oss.exception.OssException;
-import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.properties.CloudStorageProperties;
-import com.ruoyi.oss.properties.CloudStorageProperties.MinioProperties;
-import com.ruoyi.oss.service.abstractd.AbstractCloudStorageService;
+import com.ruoyi.oss.service.abstractd.AbstractCloudStorageStrategy;
 import io.minio.*;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
- * minio存储
+ * minio存储策略
  *
  * @author Lion Li
  */
-@Lazy
-@Service
-public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService implements InitializingBean {
+public class MinioCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
-	private final MinioClient minioClient;
-	private final MinioProperties properties;
+	private MinioClient minioClient;
 
-	@Autowired
-	public MinioCloudStorageServiceImpl(CloudStorageProperties properties) {
-		this.properties = properties.getMinio();
+	@Override
+	public void init(CloudStorageProperties cloudStorageProperties) {
+		properties = cloudStorageProperties;
 		try {
 			minioClient = MinioClient.builder()
-				.endpoint(this.properties.getEndpoint())
-				.credentials(this.properties.getAccessKey(), this.properties.getSecretKey())
+				.endpoint(properties.getEndpoint())
+				.credentials(properties.getAccessKey(), properties.getSecretKey())
 				.build();
 			createBucket();
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Minio存储配置错误! 请检查系统配置!");
+			throw new OssException("Minio存储配置错误! 请检查系统配置!");
 		}
 	}
 
@@ -80,7 +71,7 @@ public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService im
 			minioClient.putObject(PutObjectArgs.builder()
 				.bucket(properties.getBucketName())
 				.object(path)
-				.contentType(StrUtil.blankToDefault(contentType, MediaType.APPLICATION_OCTET_STREAM_VALUE))
+				.contentType(StringUtils.blankToDefault(contentType, MediaType.APPLICATION_OCTET_STREAM_VALUE))
 				.stream(inputStream, inputStream.available(), -1)
 				.build());
 		} catch (Exception e) {
@@ -109,12 +100,7 @@ public class MinioCloudStorageServiceImpl extends AbstractCloudStorageService im
 
 	@Override
 	public UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType) {
-		return upload(inputStream, getPath("", suffix), contentType);
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		OssFactory.register(getServiceType(), this);
+		return upload(inputStream, getPath(properties.getPrefix(), suffix), contentType);
 	}
 
 	@Override

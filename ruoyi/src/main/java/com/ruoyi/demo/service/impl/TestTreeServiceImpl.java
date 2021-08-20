@@ -1,7 +1,7 @@
 package com.ruoyi.demo.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.DataScope;
@@ -42,10 +42,10 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
 		Map<String, Object> params = bo.getParams();
 		Object dataScope = params.get("dataScope");
 		LambdaQueryWrapper<TestTree> lqw = Wrappers.lambdaQuery();
-		lqw.like(StrUtil.isNotBlank(bo.getTreeName()), TestTree::getTreeName, bo.getTreeName());
+		lqw.like(StringUtils.isNotBlank(bo.getTreeName()), TestTree::getTreeName, bo.getTreeName());
 		lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
 			TestTree::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
-		lqw.apply(dataScope != null && StrUtil.isNotBlank(dataScope.toString()),
+		lqw.apply(dataScope != null && StringUtils.isNotBlank(dataScope.toString()),
 			dataScope != null ? dataScope.toString() : null);
 		return lqw;
 	}

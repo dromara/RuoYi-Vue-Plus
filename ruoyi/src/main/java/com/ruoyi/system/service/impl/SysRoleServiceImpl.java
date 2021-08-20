@@ -1,14 +1,14 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.lang.Validator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.domain.SysRoleMenu;
@@ -30,7 +30,7 @@ import java.util.*;
  * @author ruoyi
  */
 @Service
-public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements ISysRoleService {
+public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, SysRole> implements ISysRoleService {
 
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
@@ -91,7 +91,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         List<SysRole> perms = baseMapper.selectRolePermissionByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (SysRole perm : perms) {
-            if (Validator.isNotNull(perm)) {
+            if (StringUtils.isNotNull(perm)) {
                 permsSet.addAll(Arrays.asList(perm.getRoleKey().trim().split(",")));
             }
         }
@@ -138,10 +138,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      */
     @Override
     public String checkRoleNameUnique(SysRole role) {
-        Long roleId = Validator.isNull(role.getRoleId()) ? -1L : role.getRoleId();
+        Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
         SysRole info = getOne(new LambdaQueryWrapper<SysRole>()
                 .eq(SysRole::getRoleName, role.getRoleName()).last("limit 1"));
-        if (Validator.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -155,10 +155,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      */
     @Override
     public String checkRoleKeyUnique(SysRole role) {
-        Long roleId = Validator.isNull(role.getRoleId()) ? -1L : role.getRoleId();
+        Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
         SysRole info = getOne(new LambdaQueryWrapper<SysRole>()
                 .eq(SysRole::getRoleKey, role.getRoleKey()).last("limit 1"));
-        if (Validator.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -171,8 +171,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      */
     @Override
     public void checkRoleAllowed(SysRole role) {
-        if (Validator.isNotNull(role.getRoleId()) && role.isAdmin()) {
-            throw new CustomException("不允许操作超级管理员角色");
+        if (StringUtils.isNotNull(role.getRoleId()) && role.isAdmin()) {
+            throw new ServiceException("不允许操作超级管理员角色");
         }
     }
 
@@ -316,7 +316,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             checkRoleAllowed(new SysRole(roleId));
             SysRole role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
-                throw new CustomException(String.format("%1$s已分配,不能删除", role.getRoleName()));
+                throw new ServiceException(String.format("%1$s已分配,不能删除", role.getRoleName()));
             }
         }
         List<Long> ids = Arrays.asList(roleIds);

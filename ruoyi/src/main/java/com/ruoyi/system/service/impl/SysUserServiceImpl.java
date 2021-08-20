@@ -1,17 +1,17 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.lang.Validator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.exception.CustomException;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.domain.SysUserRole;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
+public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, SysUser> implements ISysUserService {
 
     @Autowired
     private SysRoleMapper roleMapper;
@@ -128,7 +128,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         for (SysRole role : list) {
             idsStr.append(role.getRoleName()).append(",");
         }
-        if (Validator.isNotEmpty(idsStr.toString())) {
+        if (StringUtils.isNotEmpty(idsStr.toString())) {
             return idsStr.substring(0, idsStr.length() - 1);
         }
         return idsStr.toString();
@@ -147,7 +147,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         for (SysPost post : list) {
             idsStr.append(post.getPostName()).append(",");
         }
-        if (Validator.isNotEmpty(idsStr.toString())) {
+        if (StringUtils.isNotEmpty(idsStr.toString())) {
             return idsStr.substring(0, idsStr.length() - 1);
         }
         return idsStr.toString();
@@ -176,11 +176,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public String checkPhoneUnique(SysUser user) {
-        Long userId = Validator.isNull(user.getUserId()) ? -1L : user.getUserId();
+        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         SysUser info = getOne(new LambdaQueryWrapper<SysUser>()
                 .select(SysUser::getUserId, SysUser::getPhonenumber)
                 .eq(SysUser::getPhonenumber, user.getPhonenumber()).last("limit 1"));
-        if (Validator.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -194,11 +194,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public String checkEmailUnique(SysUser user) {
-        Long userId = Validator.isNull(user.getUserId()) ? -1L : user.getUserId();
+        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         SysUser info = getOne(new LambdaQueryWrapper<SysUser>()
                 .select(SysUser::getUserId, SysUser::getEmail)
                 .eq(SysUser::getEmail, user.getEmail()).last("limit 1"));
-        if (Validator.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
+        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -211,8 +211,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public void checkUserAllowed(SysUser user) {
-        if (Validator.isNotNull(user.getUserId()) && user.isAdmin()) {
-            throw new CustomException("不允许操作超级管理员用户");
+        if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin()) {
+            throw new ServiceException("不允许操作超级管理员用户");
         }
     }
 
@@ -232,6 +232,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         // 新增用户与角色管理
         insertUserRole(user);
         return rows;
+    }
+
+    /**
+     * 注册用户信息
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+	@Override
+    public boolean registerUser(SysUser user) {
+        return baseMapper.insert(user) > 0;
     }
 
     /**
@@ -340,7 +351,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     public void insertUserRole(SysUser user) {
         Long[] roles = user.getRoleIds();
-        if (Validator.isNotNull(roles)) {
+        if (StringUtils.isNotNull(roles)) {
             // 新增用户与角色管理
             List<SysUserRole> list = new ArrayList<SysUserRole>();
             for (Long roleId : roles) {
@@ -362,7 +373,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     public void insertUserPost(SysUser user) {
         Long[] posts = user.getPostIds();
-        if (Validator.isNotNull(posts)) {
+        if (StringUtils.isNotNull(posts)) {
             // 新增用户与岗位管理
             List<SysUserPost> list = new ArrayList<SysUserPost>();
             for (Long postId : posts) {
@@ -384,7 +395,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @param roleIds 角色组
      */
     public void insertUserRole(Long userId, Long[] roleIds) {
-        if (Validator.isNotNull(roleIds)) {
+        if (StringUtils.isNotNull(roleIds)) {
             // 新增用户与角色管理
             List<SysUserRole> list = new ArrayList<SysUserRole>();
             for (Long roleId : roleIds) {
@@ -445,8 +456,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName) {
-        if (Validator.isNull(userList) || userList.size() == 0) {
-            throw new CustomException("导入用户数据不能为空！");
+        if (StringUtils.isNull(userList) || userList.size() == 0) {
+            throw new ServiceException("导入用户数据不能为空！");
         }
         int successNum = 0;
         int failureNum = 0;
@@ -457,7 +468,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             try {
                 // 验证是否存在这个用户
                 SysUser u = baseMapper.selectUserByUserName(user.getUserName());
-                if (Validator.isNull(u)) {
+                if (StringUtils.isNull(u)) {
                     user.setPassword(SecurityUtils.encryptPassword(password));
                     user.setCreateBy(operName);
                     this.insertUser(user);
@@ -481,7 +492,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         if (failureNum > 0) {
             failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
-            throw new CustomException(failureMsg.toString());
+            throw new ServiceException(failureMsg.toString());
         } else {
             successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
         }

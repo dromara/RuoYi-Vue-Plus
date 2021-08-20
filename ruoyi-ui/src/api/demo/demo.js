@@ -52,11 +52,3 @@ export function delDemo(id) {
   })
 }
 
-// 导出测试单表
-export function exportDemo(query) {
-  return request({
-    url: '/demo/demo/export',
-    method: 'get',
-    params: query
-  })
-}

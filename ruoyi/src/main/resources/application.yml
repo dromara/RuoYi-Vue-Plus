@@ -8,8 +8,6 @@ ruoyi:
   copyrightYear: 2021
   # 实例演示开关
   demoEnabled: true
-  # 文件路径
-  profile: ./ruoyi/uploadPath
   # 获取ip地址开关
   addressEnabled: true
 
@@ -107,6 +105,11 @@ token:
   # 令牌有效期（默认30分钟）
   expireTime: 30
 
+# 重复提交
+repeat-submit:
+  # 全局间隔时间(毫秒)
+  intervalTime: 1000
+
 # MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:
@@ -159,8 +162,10 @@ mybatis-plus:
     localCacheScope: SESSION
     # 开启Mybatis二级缓存，默认为 true
     cacheEnabled: false
-    # 更详细的日志输出 会有性能损耗
-    # logImpl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 更详细的日志输出 会有性能损耗 org.apache.ibatis.logging.stdout.StdOutImpl
+    # 关闭日志记录 (可单纯使用 p6spy 分析) org.apache.ibatis.logging.nologging.NoLoggingImpl
+    # 默认日志输出 org.apache.ibatis.logging.slf4j.Slf4jImpl
+    logImpl: org.apache.ibatis.logging.nologging.NoLoggingImpl
   global-config:
     # 是否打印 Logo banner
     banner: true
@@ -223,7 +228,7 @@ xss:
   # 过滤开关
   enabled: true
   # 排除链接（多个用逗号分隔）
-  excludes: /system/notice/*
+  excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
 
@@ -283,6 +288,20 @@ lock4j:
   acquire-timeout: 3000
   # 分布式锁的超时时间，默认为 30 毫秒
   expire: 30000
+
+--- # Actuator 监控端点的配置项
+management:
+  endpoints:
+    web:
+      # Actuator 提供的 API 接口的根目录。默认为 /actuator
+      base-path: /actuator
+      exposure:
+        # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+        # 生产环境不建议放开所有 根据项目需求放开即可
+        include: @endpoints.include@
+  endpoint:
+    logfile:
+      external-file: ./logs/sys-console.log
 
 --- # 定时任务配置
 spring:

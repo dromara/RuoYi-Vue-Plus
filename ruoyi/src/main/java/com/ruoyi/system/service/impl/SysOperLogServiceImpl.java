@@ -1,10 +1,9 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.system.domain.SysOperLog;
@@ -23,13 +22,13 @@ import java.util.Map;
  * @author ruoyi
  */
 @Service
-public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOperLog> implements ISysOperLogService {
+public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, SysOperLog, SysOperLog> implements ISysOperLogService {
 
     @Override
     public TableDataInfo<SysOperLog> selectPageOperLogList(SysOperLog operLog) {
         Map<String, Object> params = operLog.getParams();
         LambdaQueryWrapper<SysOperLog> lqw = new LambdaQueryWrapper<SysOperLog>()
-                .like(StrUtil.isNotBlank(operLog.getTitle()), SysOperLog::getTitle, operLog.getTitle())
+                .like(StringUtils.isNotBlank(operLog.getTitle()), SysOperLog::getTitle, operLog.getTitle())
                 .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
                         SysOperLog::getBusinessType, operLog.getBusinessType())
                 .func(f -> {
@@ -37,13 +36,13 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
                         f.in(SysOperLog::getBusinessType, Arrays.asList(operLog.getBusinessTypes()));
                     }
                 })
-                .eq(operLog.getStatus() != null && operLog.getStatus() > 0,
+                .eq(operLog.getStatus() != null,
                         SysOperLog::getStatus, operLog.getStatus())
-                .like(StrUtil.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                .like(StringUtils.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
+                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
                         "date_format(oper_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
+                .apply(StringUtils.isNotEmpty(params.get("endTime")),
                         "date_format(oper_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"));
         return PageUtils.buildDataInfo(page(PageUtils.buildPage("oper_id","desc"), lqw));
@@ -70,7 +69,7 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
     public List<SysOperLog> selectOperLogList(SysOperLog operLog) {
         Map<String, Object> params = operLog.getParams();
         return list(new LambdaQueryWrapper<SysOperLog>()
-                .like(StrUtil.isNotBlank(operLog.getTitle()),SysOperLog::getTitle,operLog.getTitle())
+                .like(StringUtils.isNotBlank(operLog.getTitle()),SysOperLog::getTitle,operLog.getTitle())
                 .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
                         SysOperLog::getBusinessType,operLog.getBusinessType())
                 .func(f -> {
@@ -80,11 +79,11 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
                 })
                 .eq(operLog.getStatus() != null && operLog.getStatus() > 0,
                         SysOperLog::getStatus,operLog.getStatus())
-                .like(StrUtil.isNotBlank(operLog.getOperName()),SysOperLog::getOperName,operLog.getOperName())
-                .apply(Validator.isNotEmpty(params.get("beginTime")),
+                .like(StringUtils.isNotBlank(operLog.getOperName()),SysOperLog::getOperName,operLog.getOperName())
+                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
                         "date_format(oper_time,'%y%m%d') >= date_format({0},'%y%m%d')",
                         params.get("beginTime"))
-                .apply(Validator.isNotEmpty(params.get("endTime")),
+                .apply(StringUtils.isNotEmpty(params.get("endTime")),
                         "date_format(oper_time,'%y%m%d') <= date_format({0},'%y%m%d')",
                         params.get("endTime"))
                 .orderByDesc(SysOperLog::getOperId));
