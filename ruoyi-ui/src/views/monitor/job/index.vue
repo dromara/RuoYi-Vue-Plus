@@ -281,7 +281,6 @@
 
 <script>
 import { listJob, getJob, delJob, addJob, updateJob, runJob, changeJobStatus } from "@/api/monitor/job";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Job",
@@ -506,7 +505,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/monitor/job/export', this.queryParams);
+      this.downLoadExcel('/monitor/job/export', this.queryParams);
     }
   }
 };

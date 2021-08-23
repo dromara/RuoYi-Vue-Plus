@@ -120,7 +120,6 @@
 
 <script>
 import { list, delLogininfor, cleanLogininfor } from "@/api/monitor/logininfor";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Logininfor",
@@ -229,7 +228,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/monitor/logininfor/export', this.queryParams);
+      this.downLoadExcel('/monitor/logininfor/export', this.queryParams);
     }
   }
 };

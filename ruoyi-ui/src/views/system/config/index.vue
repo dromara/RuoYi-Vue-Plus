@@ -182,7 +182,6 @@
 
 <script>
 import { listConfig, getConfig, delConfig, addConfig, updateConfig, refreshCache } from "@/api/system/config";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Config",
@@ -343,7 +342,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/system/config/export', this.queryParams);
+      this.downLoadExcel('/system/config/export', this.queryParams);
     },
     /** 刷新缓存按钮操作 */
     handleRefreshCache() {

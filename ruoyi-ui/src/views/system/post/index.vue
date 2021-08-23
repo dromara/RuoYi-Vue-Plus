@@ -157,7 +157,6 @@
 
 <script>
 import { listPost, getPost, delPost, addPost, updatePost } from "@/api/system/post";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Post",
@@ -314,7 +313,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/system/post/export', this.queryParams);
+      this.downLoadExcel('/system/post/export', this.queryParams);
     }
   }
 };

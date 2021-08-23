@@ -189,7 +189,6 @@
 
 <script>
 import { list, delOperlog, cleanOperlog } from "@/api/monitor/operlog";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Operlog",
@@ -317,7 +316,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/monitor/operlog/export', this.queryParams);
+      this.downLoadExcel('/monitor/operlog/export', this.queryParams);
     }
   }
 };

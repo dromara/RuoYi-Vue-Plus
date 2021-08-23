@@ -262,7 +262,6 @@
 import { listRole, getRole, delRole, addRole, updateRole, dataScope, changeRoleStatus } from "@/api/system/role";
 import { treeselect as menuTreeselect, roleMenuTreeselect } from "@/api/system/menu";
 import { treeselect as deptTreeselect, roleDeptTreeselect } from "@/api/system/dept";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Role",
@@ -626,7 +625,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/system/role/export', this.queryParams);
+      this.downLoadExcel('/system/role/export', this.queryParams);
     }
   }
 };

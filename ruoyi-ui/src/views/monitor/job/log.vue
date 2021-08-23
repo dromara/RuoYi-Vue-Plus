@@ -179,7 +179,6 @@
 <script>
 import { getJob } from "@/api/monitor/job";
 import { listJobLog, delJobLog, cleanJobLog } from "@/api/monitor/jobLog";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "JobLog",
@@ -311,7 +310,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/monitor/jobLog/export', this.queryParams);
+      this.downLoadExcel('/monitor/jobLog/export', this.queryParams);
     }
   }
 };

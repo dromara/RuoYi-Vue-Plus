@@ -351,7 +351,6 @@ import { getToken } from "@/utils/auth";
 import { treeselect } from "@/api/system/dept";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "User",
@@ -661,7 +660,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/system/user/export', this.queryParams);
+      this.downLoadExcel('/system/user/export', this.queryParams);
     },
     /** 导入按钮操作 */
     handleImport() {
@@ -670,7 +669,7 @@ export default {
     },
     /** 下载模板操作 */
     importTemplate() {
-      downLoadExcel('/system/user/importTemplate');
+      this.downLoadExcel('/system/user/importTemplate');
     },
     // 文件上传中处理
     handleFileUploadProgress(event, file, fileList) {
