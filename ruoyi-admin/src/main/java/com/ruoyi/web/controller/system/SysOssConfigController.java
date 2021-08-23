@@ -7,6 +7,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
+import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.bo.SysOssConfigBo;
 import com.ruoyi.system.domain.vo.SysOssConfigVo;
@@ -45,7 +46,7 @@ public class SysOssConfigController extends BaseController {
 	@ApiOperation("查询云存储配置列表")
 	@PreAuthorize("@ss.hasPermi('system:oss:list')")
 	@GetMapping("/list")
-	public TableDataInfo<SysOssConfigVo> list(@Validated SysOssConfigBo bo) {
+	public TableDataInfo<SysOssConfigVo> list(@Validated(QueryGroup.class) SysOssConfigBo bo) {
 		return iSysOssConfigService.queryPageList(bo);
 	}
 

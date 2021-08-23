@@ -6,6 +6,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
+import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.demo.domain.bo.TestTreeBo;
@@ -46,7 +47,7 @@ public class TestTreeController extends BaseController {
     @ApiOperation("查询测试树表列表")
     @PreAuthorize("@ss.hasPermi('demo:tree:list')")
     @GetMapping("/list")
-    public AjaxResult<List<TestTreeVo>> list(@Validated TestTreeBo bo) {
+    public AjaxResult<List<TestTreeVo>> list(@Validated(QueryGroup.class) TestTreeBo bo) {
         List<TestTreeVo> list = iTestTreeService.queryList(bo);
         return AjaxResult.success(list);
     }

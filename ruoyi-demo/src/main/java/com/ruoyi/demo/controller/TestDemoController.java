@@ -7,6 +7,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
+import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.demo.domain.bo.TestDemoBo;
@@ -48,7 +49,7 @@ public class TestDemoController extends BaseController {
     @ApiOperation("查询测试单表列表")
     @PreAuthorize("@ss.hasPermi('demo:demo:list')")
     @GetMapping("/list")
-    public TableDataInfo<TestDemoVo> list(@Validated TestDemoBo bo) {
+    public TableDataInfo<TestDemoVo> list(@Validated(QueryGroup.class) TestDemoBo bo) {
         return iTestDemoService.queryPageList(bo);
     }
 
