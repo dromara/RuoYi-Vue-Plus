@@ -17,6 +17,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
+import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import ${packageName}.domain.vo.${ClassName}Vo;
@@ -51,11 +52,11 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:list')")
     @GetMapping("/list")
 #if($table.crud || $table.sub)
-    public TableDataInfo<${ClassName}Vo> list(@Validated ${ClassName}Bo bo) {
+    public TableDataInfo<${ClassName}Vo> list(@Validated(QueryGroup.class) ${ClassName}Bo bo) {
         return i${ClassName}Service.queryPageList(bo);
     }
 #elseif($table.tree)
-    public AjaxResult<List<${ClassName}Vo>> list(@Validated ${ClassName}Bo bo) {
+    public AjaxResult<List<${ClassName}Vo>> list(@Validated(QueryGroup.class) ${ClassName}Bo bo) {
         List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
         return AjaxResult.success(list);
     }
