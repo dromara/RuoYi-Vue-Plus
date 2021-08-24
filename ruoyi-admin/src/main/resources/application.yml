@@ -12,6 +12,7 @@ ruoyi:
   addressEnabled: true
 
 captcha:
+  # 页面 <参数设置> 可开启关闭 验证码校验
   # 验证码类型 math 数组计算 char 字符验证
   type: math
   # line 线段干扰 circle 圆圈干扰 shear 扭曲干扰
