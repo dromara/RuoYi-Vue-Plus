@@ -308,7 +308,6 @@
 
 <script>
 import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${BusinessName}, update${BusinessName} } from "@/api/${moduleName}/${businessName}";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "${BusinessName}",
@@ -601,7 +600,7 @@ export default {
 #end
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/${moduleName}/${businessName}/export', this.queryParams);
+      this.downLoadExcel('/${moduleName}/${businessName}/export', this.queryParams);
     }
   }
 };
