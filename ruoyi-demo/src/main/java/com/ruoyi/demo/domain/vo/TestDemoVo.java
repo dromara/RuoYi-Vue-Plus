@@ -26,6 +26,7 @@ public class TestDemoVo {
 	/**
      *  主键
      */
+	@ExcelProperty(value = "主键")
 	@ApiModelProperty("主键")
 	private Long id;
 

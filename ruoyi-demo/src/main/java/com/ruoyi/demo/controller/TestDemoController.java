@@ -72,6 +72,10 @@ public class TestDemoController extends BaseController {
     @GetMapping("/export")
     public void export(@Validated TestDemoBo bo, HttpServletResponse response) {
         List<TestDemoVo> list = iTestDemoService.queryList(bo);
+		// 测试雪花id导出
+//        for (TestDemoVo vo : list) {
+//			vo.setId(1234567891234567893L);
+//		}
 		ExcelUtil.exportExcel(list, "测试单表", TestDemoVo.class, response);
     }
 
