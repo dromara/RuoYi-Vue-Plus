@@ -1,6 +1,8 @@
 package com.ruoyi.common.core.mybatisplus.core;
 
 import cn.hutool.core.bean.copier.CopyOptions;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -11,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ResolvableType;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +123,27 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, K> extends ServiceI
 	 */
 	@Override
 	public boolean saveAll(Collection<T> entityList) {
-		return baseMapper.insertAll(entityList) == entityList.size();
+		ArrayList<T> list = new ArrayList<>();
+		for (T t : entityList) {
+			try {
+				//获取属性注解的value值
+				Field f = t.getClass().getDeclaredField("id");
+				f.setAccessible( true );//设置可以范围private
+				Object o = f.get(t);//获取出id的值
+				System.out.println(o);
+				if (o == null) {
+					//如果id为null,插入
+					list.add(t);
+				} else {
+					//否则更新
+					baseMapper.updateById(t);
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return baseMapper.insertAll(list) == list.size();
 	}
 
 	/**
