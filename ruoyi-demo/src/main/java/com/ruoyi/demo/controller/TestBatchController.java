@@ -32,7 +32,7 @@ public class TestBatchController extends BaseController {
     private final ITestDemoService iTestDemoService;
 
     /**
-     * 新增批量方法 ( 全量覆盖填充 )
+     * 新增批量方法 可完美替代 saveBatch 秒级插入上万数据 (对mysql负荷较大)
      */
 	@ApiOperation(value = "新增批量方法")
     @PostMapping()

@@ -113,7 +113,7 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, K> extends ServiceI
 	}
 
 	/**
-	 * 单sql批量插入( 全量填充 无视数据库默认值 )
+	 * 单sql批量插入( 全量填充 )
 	 * 适用于无脑插入
 	 */
 	@Override

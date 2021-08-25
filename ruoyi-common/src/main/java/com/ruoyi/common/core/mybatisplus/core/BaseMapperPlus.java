@@ -14,8 +14,7 @@ import java.util.Collection;
 public interface BaseMapperPlus<T> extends BaseMapper<T> {
 
 	/**
-	 * 单sql批量插入( 全量填充 无视数据库默认值 )
-	 * 适用于无脑插入
+	 * 单sql批量插入( 全量填充 )
 	 */
 	int insertAll(@Param("list") Collection<T> batchList);
 
