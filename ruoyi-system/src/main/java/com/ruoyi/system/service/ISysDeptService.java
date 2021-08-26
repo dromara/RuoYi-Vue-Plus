@@ -85,6 +85,13 @@ public interface ISysDeptService extends IService<SysDept> {
     public String checkDeptNameUnique(SysDept dept);
 
     /**
+     * 校验部门是否有数据权限
+     *
+     * @param deptId 部门id
+     */
+    public void checkDeptDataScope(Long deptId);
+
+    /**
      * 新增保存部门信息
      *
      * @param dept 部门信息
