@@ -42,6 +42,9 @@
     <select id="selectPageRoleList" parameterType="SysRole" resultMap="SysRoleResult">
         <include refid="selectRoleVo"/>
         where r.del_flag = '0'
+        <if test="role.roleId != null and role.roleId != 0">
+            AND r.role_id = #{role.roleId}
+        </if>
         <if test="role.roleName != null and role.roleName != ''">
             AND r.role_name like concat('%', #{role.roleName}, '%')
         </if>
