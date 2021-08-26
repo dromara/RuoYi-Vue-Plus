@@ -2,7 +2,6 @@ package com.ruoyi.generator.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.constant.Constants;
@@ -13,6 +12,7 @@ import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
@@ -34,10 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -178,13 +175,17 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
                 String tableName = table.getTableName();
                 GenUtils.initTable(table, operName);
                 int row = baseMapper.insert(table);
-                if (row > 0) {
-                    // 保存列信息
-                    List<GenTableColumn> genTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
-                    for (GenTableColumn column : genTableColumns) {
-                        GenUtils.initColumnField(column, table);
-						genTableColumnMapper.insert(column);
-                    }
+				if (row > 0) {
+					// 保存列信息
+					List<GenTableColumn> genTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
+					List<GenTableColumn> saveColumns = new ArrayList<>();
+					for (GenTableColumn column : genTableColumns) {
+						GenUtils.initColumnField(column, table);
+						saveColumns.add(column);
+					}
+					if (CollUtil.isNotEmpty(saveColumns)) {
+						genTableColumnMapper.insertAll(saveColumns);
+					}
 				}
             }
         } catch (Exception e) {
@@ -292,12 +293,16 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         }
         List<String> dbTableColumnNames = dbTableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
 
-        dbTableColumns.forEach(column -> {
-            if (!tableColumnNames.contains(column.getColumnName())) {
-                GenUtils.initColumnField(column, table);
-				genTableColumnMapper.insert(column);
+		List<GenTableColumn> saveColumns = new ArrayList<>();
+		dbTableColumns.forEach(column -> {
+			if (!tableColumnNames.contains(column.getColumnName())) {
+				GenUtils.initColumnField(column, table);
+				saveColumns.add(column);
 			}
 		});
+		if (CollUtil.isNotEmpty(saveColumns)) {
+			genTableColumnMapper.insertAll(saveColumns);
+		}
 
         List<GenTableColumn> delColumns = tableColumns.stream().filter(column -> !dbTableColumnNames.contains(column.getColumnName())).collect(Collectors.toList());
         if (CollUtil.isNotEmpty(delColumns)) {
