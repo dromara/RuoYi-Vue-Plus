@@ -168,5 +168,7 @@ public interface IServicePlus<T, K> extends IService<T> {
 	}
 
 	boolean saveAll(Collection<T> entityList);
+
+	boolean saveOrUpdateAll(Collection<T> entityList);
 }
 

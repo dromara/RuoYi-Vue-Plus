@@ -1,20 +1,21 @@
 package com.ruoyi.common.core.mybatisplus.core;
 
 import cn.hutool.core.bean.copier.CopyOptions;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.utils.BeanCopyUtils;
+import com.ruoyi.common.utils.reflect.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ResolvableType;
 
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -119,31 +120,37 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, K> extends ServiceI
 
 	/**
 	 * 单sql批量插入( 全量填充 )
-	 * 适用于无脑插入
 	 */
 	@Override
 	public boolean saveAll(Collection<T> entityList) {
-		ArrayList<T> list = new ArrayList<>();
-		for (T t : entityList) {
-			try {
-				//获取属性注解的value值
-				Field f = t.getClass().getDeclaredField("id");
-				f.setAccessible( true );//设置可以范围private
-				Object o = f.get(t);//获取出id的值
-				System.out.println(o);
-				if (o == null) {
-					//如果id为null,插入
-					list.add(t);
-				} else {
-					//否则更新
-					baseMapper.updateById(t);
-				}
+		return baseMapper.insertAll(entityList) == entityList.size();
+	}
 
-			} catch (Exception e) {
-				e.printStackTrace();
+	/**
+	 * 全量保存或更新 ( 按主键区分 )
+	 */
+	@Override
+	public boolean saveOrUpdateAll(Collection<T> entityList) {
+		TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
+		Assert.notNull(tableInfo, "error: can not execute. because can not find cache of TableInfo for entity!");
+		String keyProperty = tableInfo.getKeyProperty();
+		Assert.notEmpty(keyProperty, "error: can not execute. because can not find column for id from entity!");
+		List<T> addList = new ArrayList<>();
+		List<T> updateList = new ArrayList<>();
+		int row = 0;
+		for (T entity : entityList) {
+			Object id = ReflectUtils.invokeGetter(entity, keyProperty);
+			if (ObjectUtil.isNull(id)) {
+				addList.add(entity);
+			} else {
+				updateList.add(entity);
 			}
 		}
-		return baseMapper.insertAll(list) == list.size();
+		if (updateBatchById(updateList)) {
+			row += updateList.size();
+		}
+		row += baseMapper.insertAll(addList);
+		return row == entityList.size();
 	}
 
 	/**
