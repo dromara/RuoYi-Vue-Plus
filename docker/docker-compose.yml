@@ -110,7 +110,6 @@ services:
     volumes:
       # 配置文件
       - /docker/server1/logs/:/ruoyi/server/logs/
-      - /docker/ruoyi/uploadPath/:/ruoyi/server/ruoyi/uploadPath/
     privileged: true
     restart: always
     networks:
@@ -125,7 +124,6 @@ services:
     volumes:
       # 配置文件
       - /docker/server2/logs/:/ruoyi/server/logs/
-      - /docker/ruoyi/uploadPath/:/ruoyi/server/ruoyi/uploadPath/
     privileged: true
     restart: always
     networks:
