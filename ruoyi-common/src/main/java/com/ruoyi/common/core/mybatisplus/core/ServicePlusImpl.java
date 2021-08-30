@@ -127,6 +127,9 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 	 */
 	@Override
 	public boolean saveAll(Collection<T> entityList) {
+		if (CollUtil.isEmpty(entityList)) {
+			return false;
+		}
 		return baseMapper.insertAll(entityList) == entityList.size();
 	}
 
