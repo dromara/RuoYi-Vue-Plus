@@ -1,6 +1,7 @@
 package com.ruoyi.common.core.mybatisplus.core;
 
 import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
@@ -134,6 +135,9 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 	 */
 	@Override
 	public boolean saveOrUpdateAll(Collection<T> entityList) {
+		if (CollUtil.isEmpty(entityList)) {
+			return false;
+		}
 		TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
 		Assert.notNull(tableInfo, "error: can not execute. because can not find cache of TableInfo for entity!");
 		String keyProperty = tableInfo.getKeyProperty();
@@ -149,10 +153,10 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 				updateList.add(entity);
 			}
 		}
-		if (updateList.size()>0 && updateBatchById(updateList)) {
+		if (CollUtil.isNotEmpty(updateList) && updateBatchById(updateList)) {
 			row += updateList.size();
 		}
-        if (addList.size() > 0) {
+        if (CollUtil.isNotEmpty(addList)) {
             row += baseMapper.insertAll(addList);
         }
 		return row == entityList.size();
