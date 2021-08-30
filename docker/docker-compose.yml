@@ -77,7 +77,7 @@ services:
 
   minio:
     image: minio/minio:RELEASE.2021-07-08T01-15-01Z
-    hostname: "minio"
+    container_name: minio
     ports:
       # api 端口
       - 9000:9000
@@ -104,6 +104,7 @@ services:
 
   ruoyi-server1:
     image: "ruoyi/ruoyi-server:3.0.0"
+    container_name: ruoyi-server1
     environment:
       # 时区上海
       TZ: Asia/Shanghai
@@ -118,6 +119,7 @@ services:
 
   ruoyi-server2:
     image: "ruoyi/ruoyi-server:3.0.0"
+    container_name: ruoyi-server2
     environment:
       # 时区上海
       TZ: Asia/Shanghai
@@ -132,6 +134,7 @@ services:
 
   ruoyi-monitor-admin:
     image: "ruoyi/ruoyi-monitor-admin:3.0.0"
+    container_name: ruoyi-monitor-admin
     environment:
       # 时区上海
       TZ: Asia/Shanghai
