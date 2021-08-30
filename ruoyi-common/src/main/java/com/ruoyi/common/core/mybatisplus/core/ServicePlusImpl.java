@@ -149,10 +149,12 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 				updateList.add(entity);
 			}
 		}
-		if (updateBatchById(updateList)) {
+		if (updateList.size()>0 && updateBatchById(updateList)) {
 			row += updateList.size();
 		}
-		row += baseMapper.insertAll(addList);
+        if (addList.size() > 0) {
+            row += baseMapper.insertAll(addList);
+        }
 		return row == entityList.size();
 	}
 
