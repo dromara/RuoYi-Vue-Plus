@@ -65,10 +65,10 @@ services:
       TZ: Asia/Shanghai
     volumes:
       # 配置文件
-      - /docker/redis/conf/redis.conf:/redis.conf:rw
+      - /docker/redis/conf:/redis/config:rw
       # 数据文件
-      - /docker/redis/data:/data:rw
-    command: "redis-server --appendonly yes"
+      - /docker/redis/data:/redis/data:rw
+    command: "redis-server /redis/config/redis.conf --appendonly yes"
     privileged: true
     restart: always
     networks:
