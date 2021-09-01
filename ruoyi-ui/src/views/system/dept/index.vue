@@ -49,7 +49,11 @@
     >
       <el-table-column prop="deptName" label="部门名称" width="260"></el-table-column>
       <el-table-column prop="orderNum" label="排序" width="200"></el-table-column>
-      <el-table-column prop="status" label="状态" :formatter="statusFormat" width="100"></el-table-column>
+      <el-table-column prop="status" label="状态" width="100">
+        <template slot-scope="scope">
+          <dict-tag :options="statusOptions" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="200">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -222,10 +226,6 @@ export default {
         label: node.deptName,
         children: node.children
       };
-    },
-    // 字典状态字典翻译
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.status);
     },
     // 取消按钮
     cancel() {

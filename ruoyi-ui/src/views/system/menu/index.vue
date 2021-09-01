@@ -55,7 +55,11 @@
       <el-table-column prop="orderNum" label="排序" width="60"></el-table-column>
       <el-table-column prop="perms" label="权限标识" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="component" label="组件路径" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="status" label="状态" :formatter="statusFormat" width="80"></el-table-column>
+      <el-table-column prop="status" label="状态" width="80">
+        <template slot-scope="scope">
+          <dict-tag :options="statusOptions" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -337,20 +341,6 @@ export default {
         menu.children = this.handleTree(response.data, "menuId");
         this.menuOptions.push(menu);
       });
-    },
-    // 显示状态字典翻译
-    visibleFormat(row, column) {
-      if (row.menuType == "F") {
-        return "";
-      }
-      return this.selectDictLabel(this.visibleOptions, row.visible);
-    },
-    // 菜单状态字典翻译
-    statusFormat(row, column) {
-      if (row.menuType == "F") {
-        return "";
-      }
-      return this.selectDictLabel(this.statusOptions, row.status);
     },
     // 取消按钮
     cancel() {
