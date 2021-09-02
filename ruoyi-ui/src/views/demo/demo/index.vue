@@ -205,6 +205,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        reasonable: true,
         testKey: undefined,
         value: undefined,
         createTime: undefined,

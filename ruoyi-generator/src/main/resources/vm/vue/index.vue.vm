@@ -367,6 +367,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        reasonable: true,
 #foreach ($column in $columns)
 #if($column.query)
         $column.javaField: undefined#if($velocityCount != $columns.size()),#end
