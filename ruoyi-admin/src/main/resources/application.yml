@@ -246,11 +246,11 @@ thread-pool:
   # 线程池维护线程所允许的空闲时间
   keepAliveSeconds: 300
   # 线程池对拒绝任务(无线程可用)的处理策略
-  # CallerRunsPolicy 等待
-  # DiscardOldestPolicy 放弃最旧的
-  # DiscardPolicy 丢弃
-  # AbortPolicy 中止
-  rejectedExecutionHandler: CallerRunsPolicy
+  # CALLER_RUNS_POLICY 等待
+  # DISCARD_OLDEST_POLICY 放弃最旧的
+  # DISCARD_POLICY 丢弃
+  # ABORT_POLICY 中止
+  rejectedExecutionHandler: CALLER_RUNS_POLICY
 
 # feign 相关配置
 feign:

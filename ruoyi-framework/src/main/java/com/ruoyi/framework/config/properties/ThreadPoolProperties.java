@@ -1,5 +1,6 @@
 package com.ruoyi.framework.config.properties;
 
+import com.ruoyi.common.enums.ThreadPoolRejectedPolicy;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,6 @@ public class ThreadPoolProperties {
     /**
      * 线程池对拒绝任务(无线程可用)的处理策略
      */
-    private String rejectedExecutionHandler;
+    private ThreadPoolRejectedPolicy rejectedExecutionHandler;
 
 }
