@@ -11,6 +11,7 @@ import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.properties.CloudStorageProperties;
 import com.ruoyi.oss.service.ICloudStorageStrategy;
+import com.ruoyi.oss.service.abstractd.AbstractCloudStorageStrategy;
 
 import java.util.Date;
 import java.util.Map;
