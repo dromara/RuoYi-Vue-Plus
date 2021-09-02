@@ -1,5 +1,7 @@
 package com.ruoyi.framework.config.properties;
 
+import com.ruoyi.common.enums.CaptchaCategory;
+import com.ruoyi.common.enums.CaptchaType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -17,12 +19,12 @@ public class CaptchaProperties {
 	/**
 	 * 验证码类型
  	 */
-    private String type;
+    private CaptchaType type;
 
 	/**
 	 * 验证码类别
 	 */
-    private String category;
+    private CaptchaCategory category;
 
 	/**
 	 * 数字验证码位数

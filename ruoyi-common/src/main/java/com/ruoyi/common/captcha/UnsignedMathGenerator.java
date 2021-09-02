@@ -1,4 +1,4 @@
-package com.ruoyi.framework.captcha;
+package com.ruoyi.common.captcha;
 
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.math.Calculator;

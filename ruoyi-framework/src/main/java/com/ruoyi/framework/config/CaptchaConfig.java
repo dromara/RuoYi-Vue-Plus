@@ -1,10 +1,14 @@
 package com.ruoyi.framework.config;
 
-import java.awt.*;
-
-import cn.hutool.captcha.*;
+import cn.hutool.captcha.CaptchaUtil;
+import cn.hutool.captcha.CircleCaptcha;
+import cn.hutool.captcha.LineCaptcha;
+import cn.hutool.captcha.ShearCaptcha;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+
+import java.awt.*;
 
 /**
  * 验证码配置
@@ -22,8 +26,9 @@ public class CaptchaConfig {
     /**
      * 圆圈干扰验证码
      */
-    @Bean(name = "CircleCaptcha")
-    public CircleCaptcha getCircleCaptcha() {
+    @Lazy
+    @Bean
+    public CircleCaptcha circleCaptcha() {
         CircleCaptcha captcha = CaptchaUtil.createCircleCaptcha(width, height);
         captcha.setBackground(background);
         captcha.setFont(font);
@@ -33,8 +38,9 @@ public class CaptchaConfig {
     /**
      * 线段干扰的验证码
      */
-    @Bean(name = "LineCaptcha")
-    public LineCaptcha getLineCaptcha() {
+    @Lazy
+    @Bean
+    public LineCaptcha lineCaptcha() {
         LineCaptcha captcha = CaptchaUtil.createLineCaptcha(width, height);
         captcha.setBackground(background);
         captcha.setFont(font);
@@ -44,8 +50,9 @@ public class CaptchaConfig {
     /**
      * 扭曲干扰验证码
      */
-    @Bean(name = "ShearCaptcha")
-    public ShearCaptcha getShearCaptcha() {
+    @Lazy
+    @Bean
+    public ShearCaptcha shearCaptcha() {
         ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(width, height);
         captcha.setBackground(background);
         captcha.setFont(font);
