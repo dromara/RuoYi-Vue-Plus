@@ -37,11 +37,6 @@ public class PageUtils {
     public static final String IS_ASC = "isAsc";
 
     /**
-     * 分页参数合理化
-     */
-    private static final String REASONABLE = "reasonable";
-
-    /**
      * 当前记录起始索引 默认值
      */
     public static final int DEFAULT_PAGE_NUM = 1;
@@ -50,11 +45,6 @@ public class PageUtils {
      * 每页显示记录数 默认值 默认查全部
      */
     public static final int DEFAULT_PAGE_SIZE = Integer.MAX_VALUE;
-
-    /**
-     * 分页参数合理化 默认值
-     */
-    private static final Boolean DEFAULT_REASONABLE = Boolean.TRUE;
 
     /**
      * 构建 plus 分页对象
@@ -67,10 +57,8 @@ public class PageUtils {
         Integer pageSize = ServletUtils.getParameterToInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
         String orderByColumn = ServletUtils.getParameter(ORDER_BY_COLUMN);
         String isAsc = ServletUtils.getParameter(IS_ASC);
-        Boolean reasonable = ServletUtils.getParameterToBool(REASONABLE, DEFAULT_REASONABLE);
-        //分页合理化，针对不合理的页码自动处理
-        if (reasonable && pageNum <= 0) {
-            pageNum = 1;
+        if (pageNum <= 0) {
+            pageNum = DEFAULT_PAGE_NUM;
         }
         PagePlus<T, K> page = new PagePlus<>(pageNum, pageSize);
         if (StringUtils.isNotBlank(orderByColumn)) {
@@ -98,10 +86,8 @@ public class PageUtils {
         Integer pageSize = ServletUtils.getParameterToInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
         String orderByColumn = ServletUtils.getParameter(ORDER_BY_COLUMN, defaultOrderByColumn);
         String isAsc = ServletUtils.getParameter(IS_ASC, defaultIsAsc);
-        Boolean reasonable = ServletUtils.getParameterToBool(REASONABLE, DEFAULT_REASONABLE);
-        //分页合理化，针对不合理的页码自动处理
-        if (reasonable && pageNum <= 0) {
-            pageNum = 1;
+        if (pageNum <= 0) {
+            pageNum = DEFAULT_PAGE_NUM;
         }
         // 兼容前端排序类型
 		if ("ascending".equals(isAsc)) {
