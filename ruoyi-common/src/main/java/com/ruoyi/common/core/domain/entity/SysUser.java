@@ -78,6 +78,11 @@ public class SysUser implements Serializable {
 	/**
 	 * 密码
 	 */
+	@TableField(
+			insertStrategy = FieldStrategy.NOT_EMPTY,
+			updateStrategy = FieldStrategy.NOT_EMPTY,
+			whereStrategy = FieldStrategy.NOT_EMPTY
+	)
 	private String password;
 
 	@JsonIgnore

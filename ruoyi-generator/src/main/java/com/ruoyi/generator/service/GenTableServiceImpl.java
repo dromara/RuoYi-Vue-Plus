@@ -3,7 +3,6 @@ package com.ruoyi.generator.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
@@ -131,18 +130,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         int row = baseMapper.updateById(genTable);
         if (row > 0) {
             for (GenTableColumn cenTableColumn : genTable.getColumns()) {
-                genTableColumnMapper.update(cenTableColumn,
-                        new LambdaUpdateWrapper<GenTableColumn>()
-							.set(StringUtils.isBlank(cenTableColumn.getColumnComment()), GenTableColumn::getColumnComment, null)
-							.set(StringUtils.isBlank(cenTableColumn.getIsPk()), GenTableColumn::getIsPk, null)
-							.set(StringUtils.isBlank(cenTableColumn.getIsIncrement()), GenTableColumn::getIsIncrement, null)
-							.set(StringUtils.isBlank(cenTableColumn.getIsInsert()), GenTableColumn::getIsInsert, null)
-							.set(StringUtils.isBlank(cenTableColumn.getIsEdit()), GenTableColumn::getIsEdit, null)
-							.set(StringUtils.isBlank(cenTableColumn.getIsList()), GenTableColumn::getIsList, null)
-							.set(StringUtils.isBlank(cenTableColumn.getIsQuery()), GenTableColumn::getIsQuery, null)
-							.set(StringUtils.isBlank(cenTableColumn.getIsRequired()), GenTableColumn::getIsRequired, null)
-							.set(StringUtils.isBlank(cenTableColumn.getDictType()), GenTableColumn::getDictType, "")
-							.eq(GenTableColumn::getColumnId,cenTableColumn.getColumnId()));
+                genTableColumnMapper.updateById(cenTableColumn);
             }
         }
     }

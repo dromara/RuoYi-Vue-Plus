@@ -88,12 +88,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     public Boolean updateByBo(SysOssConfigBo bo) {
         SysOssConfig config = BeanUtil.toBean(bo, SysOssConfig.class);
         validEntityBeforeSave(config);
-		LambdaUpdateWrapper<SysOssConfig> luw = new LambdaUpdateWrapper<>();
-		luw.set(StringUtils.isBlank(config.getPrefix()), SysOssConfig::getPrefix, "");
-		luw.set(StringUtils.isBlank(config.getRegion()), SysOssConfig::getRegion, "");
-		luw.set(StringUtils.isBlank(config.getExt1()), SysOssConfig::getExt1, "");
-		luw.eq(SysOssConfig::getOssConfigId, config.getOssConfigId());
-		return setConfigCache(update(config, luw), config);
+		return setConfigCache(updateById(config), config);
     }
 
     /**
