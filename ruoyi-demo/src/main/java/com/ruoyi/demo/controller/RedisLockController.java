@@ -5,6 +5,8 @@ import com.baomidou.lock.LockTemplate;
 import com.baomidou.lock.annotation.Lock4j;
 import com.baomidou.lock.executor.RedissonLockExecutor;
 import com.ruoyi.common.core.domain.AjaxResult;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,6 +22,7 @@ import java.time.LocalTime;
  *
  * @author shenxinquan
  */
+@Api(value = "测试分布式锁的样例", tags = {"测试分布式锁的样例"})
 @Slf4j
 @RestController
 @RequestMapping("/demo/redisLock")
@@ -31,6 +34,7 @@ public class RedisLockController {
 	/**
 	 * 测试lock4j 注解
 	 */
+	@ApiOperation("测试lock4j 注解")
 	@Lock4j(keys = {"#key"})
 	@GetMapping("/testLock4j")
 	public  AjaxResult<String> testLock4j(String key,String value){
@@ -47,6 +51,7 @@ public class RedisLockController {
 	/**
 	 * 测试lock4j 工具
 	 */
+	@ApiOperation("测试lock4j 工具")
 	@GetMapping("/testLock4jLockTemaplate")
 	public  AjaxResult<String> testLock4jLockTemaplate(String key,String value){
 		final LockInfo lockInfo = lockTemplate.lock(key, 30000L, 5000L, RedissonLockExecutor.class);
@@ -72,6 +77,7 @@ public class RedisLockController {
 	/**
 	 * 测试spring-cache注解
 	 */
+	@ApiOperation("测试spring-cache注解")
 	@Cacheable(value = "test", key = "#key")
 	@GetMapping("/testCache")
 	public AjaxResult<String> testCache(String key) {
