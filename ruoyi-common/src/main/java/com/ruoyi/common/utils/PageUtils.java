@@ -135,4 +135,11 @@ public class PageUtils {
         return rspData;
     }
 
+    public static <T> TableDataInfo<T> buildDataInfo() {
+        TableDataInfo<T> rspData = new TableDataInfo<>();
+        rspData.setCode(HttpStatus.HTTP_OK);
+        rspData.setMsg("查询成功");
+        return rspData;
+    }
+
 }
