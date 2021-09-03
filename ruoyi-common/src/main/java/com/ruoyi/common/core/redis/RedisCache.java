@@ -5,8 +5,12 @@ import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * spring redis 工具类
@@ -19,6 +23,36 @@ public class RedisCache {
 
 	@Autowired
 	private RedissonClient redissonClient;
+
+	/**
+	 * 发布通道消息
+	 *
+	 * @param channelKey 通道key
+	 * @param msg 发送数据
+	 * @param consumer 自定义处理
+	 */
+	public <T> void publish(String channelKey, T msg, Consumer consumer) {
+		RTopic topic = redissonClient.getTopic(channelKey);
+		topic.publish(msg);
+		consumer.accept(msg);
+	}
+
+	public <T> void publish(String channelKey, T msg) {
+		RTopic topic = redissonClient.getTopic(channelKey);
+		topic.publish(msg);
+	}
+
+	/**
+	 * 订阅通道接收消息
+	 *
+	 * @param channelKey 通道key
+	 * @param clazz 消息类型
+	 * @param consumer 自定义处理
+	 */
+	public <T> void subscribe(String channelKey, Class<T> clazz, Consumer consumer) {
+		RTopic topic = redissonClient.getTopic(channelKey);
+		topic.addListener(clazz, (channel, msg) -> consumer.accept(msg));
+	}
 
 	/**
 	 * 缓存基本的对象，Integer、String、实体类等
