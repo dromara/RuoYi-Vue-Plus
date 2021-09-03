@@ -61,14 +61,8 @@ public class PageUtils {
             pageNum = DEFAULT_PAGE_NUM;
         }
         PagePlus<T, K> page = new PagePlus<>(pageNum, pageSize);
-        if (StringUtils.isNotBlank(orderByColumn)) {
-            String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
-            if ("asc".equals(isAsc)) {
-                page.addOrder(OrderItem.asc(orderBy));
-            } else if ("desc".equals(isAsc)) {
-                page.addOrder(OrderItem.desc(orderBy));
-            }
-        }
+        OrderItem orderItem = buildOrderItem(orderByColumn, isAsc);
+        page.addOrder(orderItem);
         return page;
     }
 
@@ -89,23 +83,29 @@ public class PageUtils {
         if (pageNum <= 0) {
             pageNum = DEFAULT_PAGE_NUM;
         }
-        // 兼容前端排序类型
-		if ("ascending".equals(isAsc)) {
-			isAsc = "asc";
-		} else if ("descending".equals(isAsc)) {
-			isAsc = "desc";
-		}
         Page<T> page = new Page<>(pageNum, pageSize);
+        OrderItem orderItem = buildOrderItem(orderByColumn, isAsc);
+        page.addOrder(orderItem);
+        return page;
+    }
+
+    private static OrderItem buildOrderItem(String orderByColumn, String isAsc) {
+        // 兼容前端排序类型
+        if ("ascending".equals(isAsc)) {
+            isAsc = "asc";
+        } else if ("descending".equals(isAsc)) {
+            isAsc = "desc";
+        }
         if (StringUtils.isNotBlank(orderByColumn)) {
             String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
 			orderBy = StringUtils.toUnderScoreCase(orderBy);
 			if ("asc".equals(isAsc)) {
-                page.addOrder(OrderItem.asc(orderBy));
+                return OrderItem.asc(orderBy);
             } else if ("desc".equals(isAsc)) {
-                page.addOrder(OrderItem.desc(orderBy));
+                return OrderItem.desc(orderBy);
             }
         }
-        return page;
+        return null;
     }
 
     public static <T, K> TableDataInfo<K> buildDataInfo(PagePlus<T, K> page) {
