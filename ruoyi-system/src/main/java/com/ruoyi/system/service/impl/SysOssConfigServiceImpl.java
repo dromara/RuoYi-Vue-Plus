@@ -21,6 +21,7 @@ import com.ruoyi.system.domain.vo.SysOssConfigVo;
 import com.ruoyi.system.mapper.SysOssConfigMapper;
 import com.ruoyi.system.service.ISysOssConfigService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ import java.util.List;
  * @author 孤舟烟雨
  * @date 2021-08-13
  */
+@Slf4j
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Service
 public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper, SysOssConfig, SysOssConfigVo> implements ISysOssConfigService {
@@ -169,6 +171,9 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
 			redisCache.setCacheObject(
 				getCacheKey(config.getConfigKey()),
 				JsonUtils.toJsonString(config));
+			redisCache.publish(CloudConstant.CACHE_CONFIG_KEY, config.getConfigKey(), msg -> {
+				log.info("发布刷新OSS配置 => " + msg);
+			});
 		}
 		return flag;
 	}

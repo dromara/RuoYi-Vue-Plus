@@ -31,7 +31,7 @@ public class RedisCache {
 	 * @param msg 发送数据
 	 * @param consumer 自定义处理
 	 */
-	public <T> void publish(String channelKey, T msg, Consumer consumer) {
+	public <T> void publish(String channelKey, T msg, Consumer<T> consumer) {
 		RTopic topic = redissonClient.getTopic(channelKey);
 		topic.publish(msg);
 		consumer.accept(msg);
@@ -49,7 +49,7 @@ public class RedisCache {
 	 * @param clazz 消息类型
 	 * @param consumer 自定义处理
 	 */
-	public <T> void subscribe(String channelKey, Class<T> clazz, Consumer consumer) {
+	public <T> void subscribe(String channelKey, Class<T> clazz, Consumer<T> consumer) {
 		RTopic topic = redissonClient.getTopic(channelKey);
 		topic.addListener(clazz, (channel, msg) -> consumer.accept(msg));
 	}

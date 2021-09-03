@@ -36,7 +36,7 @@ public class RedisPubSubController {
 	@GetMapping("/sub")
 	public AjaxResult<Void> sub(String key){
 		redisCache.subscribe(key, String.class, msg -> {
-			System.out.println("订阅通道 => " + key + ", 接收值 => " + msg.toString());
+			System.out.println("订阅通道 => " + key + ", 接收值 => " + msg);
 		});
 		return AjaxResult.success("操作成功");
 	}
