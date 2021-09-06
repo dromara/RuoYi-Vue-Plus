@@ -1,6 +1,5 @@
 package com.ruoyi.framework.config;
 
-import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
@@ -47,8 +46,6 @@ public class MybatisPlusConfig {
 	 */
 	public PaginationInnerInterceptor paginationInnerInterceptor() {
 		PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
-		// 设置数据库类型为mysql
-		paginationInnerInterceptor.setDbType(DbType.MYSQL);
 		// 设置最大单页限制数量，默认 500 条，-1 不受限制
 		paginationInnerInterceptor.setMaxLimit(-1L);
 		// 分页合理化
