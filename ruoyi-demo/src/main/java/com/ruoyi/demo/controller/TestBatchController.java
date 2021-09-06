@@ -39,7 +39,7 @@ public class TestBatchController extends BaseController {
 //	@DataSource(DataSourceType.SLAVE)
     public AjaxResult<Void> add() {
 		List<TestDemo> list = new ArrayList<>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 1000; i++) {
 			list.add(new TestDemo().setOrderNum(-1L).setTestKey("批量新增").setValue("测试新增"));
 		}
         return toAjax(iTestDemoService.saveAll(list) ? 1 : 0);

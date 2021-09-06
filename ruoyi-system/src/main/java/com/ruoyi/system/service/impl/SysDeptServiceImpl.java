@@ -120,7 +120,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      * @return 子部门数
      */
     @Override
-    public int selectNormalChildrenDeptById(Long deptId) {
+    public long selectNormalChildrenDeptById(Long deptId) {
         return count(new LambdaQueryWrapper<SysDept>()
                 .eq(SysDept::getStatus, 0)
                 .apply("find_in_set({0}, ancestors)", deptId));
@@ -134,7 +134,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public boolean hasChildByDeptId(Long deptId) {
-        int result = count(new LambdaQueryWrapper<SysDept>()
+        long result = count(new LambdaQueryWrapper<SysDept>()
                 .eq(SysDept::getParentId, deptId)
                 .last("limit 1"));
         return result > 0;
@@ -148,7 +148,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public boolean checkDeptExistUser(Long deptId) {
-        int result = userMapper.selectCount(new LambdaQueryWrapper<SysUser>()
+        long result = userMapper.selectCount(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getDeptId, deptId));
         return result > 0;
     }

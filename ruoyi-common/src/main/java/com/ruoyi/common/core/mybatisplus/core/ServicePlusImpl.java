@@ -7,14 +7,13 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
+import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.utils.BeanCopyUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ResolvableType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 		return entityClass;
 	}
 
-	protected Class<T> mapperClass = currentMapperClass();
+	protected Class<M> mapperClass = currentMapperClass();
 
 	protected Class<V> voClass = currentVoClass();
 
@@ -59,22 +58,17 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 	}
 
 	@Override
-	protected Class<T> currentMapperClass() {
-		return (Class<T>) this.getResolvableType().as(ServicePlusImpl.class).getGeneric(0).getType();
+	protected Class<M> currentMapperClass() {
+		return (Class<M>) ReflectionKit.getSuperClassGenericType(this.getClass(), ServicePlusImpl.class, 0);
 	}
 
 	@Override
 	protected Class<T> currentModelClass() {
-		return (Class<T>) this.getResolvableType().as(ServicePlusImpl.class).getGeneric(1).getType();
+		return (Class<T>) ReflectionKit.getSuperClassGenericType(this.getClass(), ServicePlusImpl.class, 1);
 	}
 
 	protected Class<V> currentVoClass() {
-		return (Class<V>) this.getResolvableType().as(ServicePlusImpl.class).getGeneric(2).getType();
-	}
-
-	@Override
-	protected ResolvableType getResolvableType() {
-		return ResolvableType.forClass(ClassUtils.getUserClass(getClass()));
+		return (Class<V>) ReflectionKit.getSuperClassGenericType(this.getClass(), ServicePlusImpl.class, 2);
 	}
 
 	/**

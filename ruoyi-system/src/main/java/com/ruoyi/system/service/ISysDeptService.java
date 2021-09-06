@@ -58,7 +58,7 @@ public interface ISysDeptService extends IService<SysDept> {
      * @param deptId 部门ID
      * @return 子部门数
      */
-    public int selectNormalChildrenDeptById(Long deptId);
+    public long selectNormalChildrenDeptById(Long deptId);
 
     /**
      * 是否存在部门子节点

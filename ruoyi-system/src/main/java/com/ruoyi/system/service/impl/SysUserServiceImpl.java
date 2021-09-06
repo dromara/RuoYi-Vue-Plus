@@ -162,7 +162,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     @Override
     public String checkUserNameUnique(String userName) {
-        int count = count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName).last("limit 1"));
+        long count = count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName).last("limit 1"));
         if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }

@@ -101,7 +101,7 @@ public interface ISysRoleService extends IService<SysRole> {
      * @param roleId 角色ID
      * @return 结果
      */
-    public int countUserRoleByRoleId(Long roleId);
+    public long countUserRoleByRoleId(Long roleId);
 
     /**
      * 新增保存角色信息
