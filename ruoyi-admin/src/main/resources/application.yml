@@ -134,8 +134,6 @@ mybatis-plus:
   # REUSE：该执行器类型会复用预处理语句（PreparedStatement）
   # BATCH：该执行器类型会批量执行所有的更新语句
   executorType: SIMPLE
-  # 指定外部化 MyBatis Properties 配置，通过该配置可以抽离配置，实现不同环境的配置部署
-  configurationProperties: null
   configuration:
     # 自动驼峰命名规则（camel case）映射
     # 如果您的数据库命名符合规则无需使用 @TableField 注解指定数据库字段名
@@ -204,7 +202,7 @@ mybatis-plus:
       # 字段验证策略之 update,在 update 的时候的字段验证策略
       updateStrategy: NOT_NULL
       # 字段验证策略之 select,在 select 的时候的字段验证策略既 wrapper 根据内部 entity 生成的 where 条件
-      selectStrategy: NOT_NULL
+      where-strategy: NOT_NULL
 
 # Swagger配置
 swagger:
