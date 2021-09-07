@@ -1,6 +1,8 @@
 package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.AjaxResult;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 // 类级别 缓存统一配置
 //@CacheConfig(cacheNames = "redissonCacheMap")
+@Api(value = "spring-cache 演示案例", tags = {"spring-cache 演示案例"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
 @RequestMapping("/demo/cache")
@@ -33,6 +36,7 @@ public class RedisCacheController {
 	 *
 	 * cacheNames 为配置文件内 groupId
 	 */
+	@ApiOperation("测试 @Cacheable")
 	@Cacheable(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
 	@GetMapping("/test1")
 	public AjaxResult<String> test1(String key, String value){
@@ -47,6 +51,7 @@ public class RedisCacheController {
 	 *
 	 * cacheNames 为 配置文件内 groupId
 	 */
+	@ApiOperation("测试 @CachePut")
 	@CachePut(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
 	@GetMapping("/test2")
 	public AjaxResult<String> test2(String key, String value){
@@ -61,6 +66,7 @@ public class RedisCacheController {
 	 *
 	 * cacheNames 为 配置文件内 groupId
 	 */
+	@ApiOperation("测试 @CacheEvict")
 	@CacheEvict(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
 	@GetMapping("/test3")
 	public AjaxResult<String> test3(String key, String value){

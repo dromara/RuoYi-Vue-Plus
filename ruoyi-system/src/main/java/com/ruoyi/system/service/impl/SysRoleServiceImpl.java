@@ -6,8 +6,10 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysRoleDept;
@@ -177,13 +179,30 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
     }
 
     /**
+     * 校验角色是否有数据权限
+     *
+     * @param roleId 角色id
+     */
+    @Override
+    public void checkRoleDataScope(Long roleId) {
+        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
+            SysRole role = new SysRole();
+            role.setRoleId(roleId);
+            List<SysRole> roles = SpringUtils.getAopProxy(this).selectRoleList(role);
+            if (StringUtils.isEmpty(roles)) {
+                throw new ServiceException("没有权限访问角色数据！");
+            }
+        }
+    }
+
+    /**
      * 通过角色ID查询角色使用数量
      *
      * @param roleId 角色ID
      * @return 结果
      */
     @Override
-    public int countUserRoleByRoleId(Long roleId) {
+    public long countUserRoleByRoleId(Long roleId) {
         return userRoleMapper.selectCount(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getRoleId, roleId));
     }
 

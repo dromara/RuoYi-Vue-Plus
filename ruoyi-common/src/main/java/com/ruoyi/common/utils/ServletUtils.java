@@ -48,12 +48,26 @@ public class ServletUtils extends ServletUtil {
 		return Convert.toInt(getRequest().getParameter(name), defaultValue);
 	}
 
-	/**
-	 * 获取request
-	 */
-	public static HttpServletRequest getRequest() {
-		return getRequestAttributes().getRequest();
-	}
+    /**
+     * 获取Boolean参数
+     */
+    public static Boolean getParameterToBool(String name) {
+        return Convert.toBool(getRequest().getParameter(name));
+    }
+
+    /**
+     * 获取Boolean参数
+     */
+    public static Boolean getParameterToBool(String name, Boolean defaultValue) {
+        return Convert.toBool(getRequest().getParameter(name), defaultValue);
+    }
+
+    /**
+     * 获取request
+     */
+    public static HttpServletRequest getRequest() {
+        return getRequestAttributes().getRequest();
+    }
 
 	/**
 	 * 获取response

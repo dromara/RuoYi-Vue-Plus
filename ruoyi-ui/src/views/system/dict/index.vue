@@ -194,7 +194,6 @@
 
 <script>
 import { listType, getType, delType, addType, updateType, refreshCache } from "@/api/system/dict/type";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Dict",
@@ -347,7 +346,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/system/dict/type/export', this.queryParams);
+      this.downLoadExcel('/system/dict/type/export', this.queryParams);
     },
     /** 刷新缓存按钮操作 */
     handleRefreshCache() {

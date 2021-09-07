@@ -3,8 +3,6 @@ package com.ruoyi.common.utils;
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
-import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.common.utils.spring.SpringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,7 +27,7 @@ public class DictUtils
      */
     public static void setDictCache(String key, List<SysDictData> dictDatas)
     {
-        SpringUtils.getBean(RedisCache.class).setCacheObject(getCacheKey(key), dictDatas);
+        RedisUtils.setCacheObject(getCacheKey(key), dictDatas);
     }
 
     /**
@@ -40,7 +38,7 @@ public class DictUtils
      */
     public static List<SysDictData> getDictCache(String key)
     {
-        Object cacheObj = SpringUtils.getBean(RedisCache.class).getCacheObject(getCacheKey(key));
+        Object cacheObj = RedisUtils.getCacheObject(getCacheKey(key));
         if (StringUtils.isNotNull(cacheObj))
         {
             List<SysDictData> dictDatas = (List<SysDictData>)cacheObj;
@@ -160,7 +158,7 @@ public class DictUtils
      */
     public static void removeDictCache(String key)
     {
-        SpringUtils.getBean(RedisCache.class).deleteObject(getCacheKey(key));
+        RedisUtils.deleteObject(getCacheKey(key));
     }
 
     /**
@@ -168,8 +166,8 @@ public class DictUtils
      */
     public static void clearDictCache()
     {
-        Collection<String> keys = SpringUtils.getBean(RedisCache.class).keys(Constants.SYS_DICT_KEY + "*");
-        SpringUtils.getBean(RedisCache.class).deleteObject(keys);
+        Collection<String> keys = RedisUtils.keys(Constants.SYS_DICT_KEY + "*");
+        RedisUtils.deleteObject(keys);
     }
 
     /**

@@ -93,6 +93,62 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v3.1.0 - 2021-9-7">
+              <ol>
+                <li>add [重大改动] 过期 RedisCache 新增 RedisUtils 工具类 新增 发布订阅功能 更灵巧便于使用</li>
+                <li>add [重大改动] 新增 saveOrUpdateAll 方法 可完美替代 saveOrUpdateBatch 高性能</li>
+                <li>update [重大改动] 重写 InsertAll 方法实现 可完美替代 saveBatch 秒级插入上万数据</li>
+                <li>update [重大改动] 更改OSS上传通用路径生成 按照年月日分三级目录</li>
+                <li>update [重大改动] MP字段验证策略更改为 NOT_NULL 个别特殊字段使用注解单独处理</li>
+                <li>update [重大改动] 所有业务适配 RedisUtils 新工具</li>
+                <li>update springboot 2.5.3 => 2.5.4</li>
+                <li>update spring-boot-admin 2.5.0 => 2.5.1</li>
+                <li>update mybatis-plus 3.4.3 => 3.4.3.3 适配升级 (包含不兼容升级)</li>
+                <li>update aliyun.oss 3.13.0 => 3.13.1</li>
+                <li>update qcloud.cos 5.6.47 => 5.6.51</li>
+                <li>update hutool 5.7.9 => 5.7.11</li>
+                <li>update maven-jar-plugin 3.1.1 => 3.2.0</li>
+                <li>update feign-okhttp 11.2 => 11.6</li>
+                <li>update redisson 3.16.1 => 3.16.2</li>
+                <li>add 优化 docker 增加 redis 配置文件</li>
+                <li>add 新增暗色菜单风格主题</li>
+                <li>add 菜单&部门新增展开/折叠功能</li>
+                <li>add 页签右键按钮添加图标 页签新增关闭左侧</li>
+                <li>update 优化 OSS 模块与上传组件 异常处理</li>
+                <li>update 更新 jackson 配置 支持 LocalDateTime 全局格式化</li>
+                <li>update 优化 使用权限工具 获取用户信息</li>
+                <li>update 自定义可拖动弹窗宽度指令</li>
+                <li>update 重构 将下载excel工具提取到全局</li>
+                <li>update 定时任务对检查异常进行事务回滚</li>
+                <li>update 优化spy配置文件为 UTF8编码 解决中文注释乱码问题</li>
+                <li>update 修改时检查用户数据权限范围</li>
+                <li>update 解决 logout 写死 无法扩展路径问题</li>
+                <li>update 优化代码生成 导入与同步 批处理效率</li>
+                <li>update 修改时检查用户数据权限范围</li>
+                <li>update 修改代码生成字典回显样式</li>
+                <li>update 修改数据字典回显</li>
+                <li>update 优化验证码配置 使用泛型 防止错误输入</li>
+                <li>update 优化全局线程池配置 使用泛型 防止错误输入</li>
+                <li>update 使用 MP 全局配置分页溢出</li>
+                <li>update 代码生成器 导入表时查询 新创建表的优先排序在前面</li>
+                <li>update 定时任务支持在线生成cron表达式</li>
+                <li>update 自定义弹层溢出滚动样式</li>
+                <li>update 优化分页工具排序处理</li>
+                <li>update 优化 oss配置 使用发布订阅工具 刷新配置</li>
+                <li>update 代码生成 查询数据库列表 按照时间倒序</li>
+                <li>update 使用MP自行判断数据库类型</li>
+                <li>fix 修复保存配置主题颜色失效问题</li>
+                <li>fix 修复 导出雪花id excel失真问题</li>
+                <li>fix 修复 druid 监控 集群模式下 无法路由到同一台服务器问题</li>
+                <li>fix 解决搜索校验不通过问题</li>
+                <li>fix 修复定时器工具编写错误问题</li>
+                <li>fix 修复 minio 无 perfix 问题</li>
+                <li>fix 修复 富文本图片路径错误问题</li>
+                <li>fix 修复 OSS配置清空被过滤问题</li>
+                <li>fix 修复 excel 导入与 class 未对应问题</li>
+                <li>fix 修复字典组件值为整形不显示问题</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v3.0.0 - 2021-8-18">
               <ol>
                 <li>add [重大更新]重写 OSS 模块相关实现 支持动态配置(页面配置)</li>
@@ -381,7 +437,7 @@
 </template>
 
 <script>
-import config from '../../package.json'
+import config from '@/../package.json'
 
 export default {
   name: "Index",

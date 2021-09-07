@@ -3,6 +3,7 @@ package com.ruoyi.framework.config;
 import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.RedissonProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
@@ -29,6 +30,7 @@ import java.util.Map;
  *
  * @author Lion Li
  */
+@Slf4j
 @Configuration
 @EnableCaching
 public class RedisConfig extends CachingConfigurerSupport {
@@ -73,7 +75,9 @@ public class RedisConfig extends CachingConfigurerSupport {
 			.setConnectionMinimumIdleSize(singleServerConfig.getConnectionMinimumIdleSize())
 			.setConnectionPoolSize(singleServerConfig.getConnectionPoolSize())
 			.setDnsMonitoringInterval(singleServerConfig.getDnsMonitoringInterval());
-		return Redisson.create(config);
+		RedissonClient redissonClient = Redisson.create(config);
+		log.info("初始化 redis 配置");
+		return redissonClient;
 	}
 
 	/**

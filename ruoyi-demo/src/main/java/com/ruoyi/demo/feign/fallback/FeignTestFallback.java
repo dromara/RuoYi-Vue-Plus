@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
  * 自定义封装结构体熔断
  * 需重写解码器 根据自定义实体 自行解析熔断
  *
+ * 熔断器需要自行添加配置
+ *
  * @see {com.ruoyi.framework.config.FeignConfig#errorDecoder()}
  * @author Lion Li
  */

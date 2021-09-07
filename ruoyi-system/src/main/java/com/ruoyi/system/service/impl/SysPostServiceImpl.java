@@ -125,7 +125,7 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
      * @return 结果
      */
     @Override
-    public int countUserPostById(Long postId) {
+    public long countUserPostById(Long postId) {
         return userPostMapper.selectCount(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getPostId,postId));
     }
 

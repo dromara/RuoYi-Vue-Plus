@@ -10,6 +10,7 @@ import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
@@ -63,7 +64,7 @@ public class SysOssController extends BaseController {
 	@ApiOperation("查询OSS云存储列表")
 	@PreAuthorize("@ss.hasPermi('system:oss:list')")
 	@GetMapping("/list")
-	public TableDataInfo<SysOssVo> list(@Validated SysOssBo bo) {
+	public TableDataInfo<SysOssVo> list(@Validated(QueryGroup.class) SysOssBo bo) {
 		return iSysOssService.queryPageList(bo);
 	}
 

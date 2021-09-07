@@ -3,6 +3,7 @@ package com.ruoyi.common.utils.poi;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
+import com.ruoyi.common.convert.ExcelBigNumberConvert;
 import com.ruoyi.common.utils.DictUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
@@ -52,6 +53,8 @@ public class ExcelUtil {
 				.autoCloseStream(false)
 				// 自动适配
 				.registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
+				// 大数值自动转换 防止失真
+				.registerConverter(new ExcelBigNumberConvert())
 				.sheet(sheetName).doWrite(list);
 		} catch (IOException e) {
 			throw new RuntimeException("导出Excel异常");

@@ -1,25 +1,22 @@
 package com.ruoyi.web.controller.common;
 
 import cn.hutool.captcha.AbstractCaptcha;
-import cn.hutool.captcha.CircleCaptcha;
-import cn.hutool.captcha.LineCaptcha;
-import cn.hutool.captcha.ShearCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
-import cn.hutool.captcha.generator.RandomGenerator;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.framework.captcha.UnsignedMathGenerator;
+import com.ruoyi.common.enums.CaptchaType;
+import com.ruoyi.common.utils.RedisUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.reflect.ReflectUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.config.properties.CaptchaProperties;
 import com.ruoyi.system.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -31,19 +28,6 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 public class CaptchaController {
-
-	// 圆圈干扰验证码
-	@Resource(name = "CircleCaptcha")
-	private CircleCaptcha circleCaptcha;
-	// 线段干扰的验证码
-	@Resource(name = "LineCaptcha")
-	private LineCaptcha lineCaptcha;
-	// 扭曲干扰验证码
-	@Resource(name = "ShearCaptcha")
-	private ShearCaptcha shearCaptcha;
-
-	@Autowired
-	private RedisCache redisCache;
 
 	@Autowired
 	private CaptchaProperties captchaProperties;
@@ -65,41 +49,16 @@ public class CaptchaController {
 		// 保存验证码信息
 		String uuid = IdUtil.simpleUUID();
 		String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
-		String code = null;
 		// 生成验证码
-		CodeGenerator codeGenerator;
-		AbstractCaptcha captcha;
-		switch (captchaProperties.getType()) {
-			case "math":
-				codeGenerator = new UnsignedMathGenerator(captchaProperties.getNumberLength());
-				break;
-			case "char":
-				codeGenerator = new RandomGenerator(captchaProperties.getCharLength());
-				break;
-			default:
-				throw new IllegalArgumentException("验证码类型异常");
-		}
-		switch (captchaProperties.getCategory()) {
-			case "line":
-				captcha = lineCaptcha;
-				break;
-			case "circle":
-				captcha = circleCaptcha;
-				break;
-			case "shear":
-				captcha = shearCaptcha;
-				break;
-			default:
-				throw new IllegalArgumentException("验证码类别异常");
-		}
+		CaptchaType captchaType = captchaProperties.getType();
+		boolean isMath = CaptchaType.MATH == captchaType;
+		Integer length = isMath ? captchaProperties.getNumberLength() : captchaProperties.getCharLength();
+		CodeGenerator codeGenerator = ReflectUtils.newInstance(captchaType.getClazz(), length);
+		AbstractCaptcha captcha = SpringUtils.getBean(captchaProperties.getCategory().getClazz());
 		captcha.setGenerator(codeGenerator);
 		captcha.createCode();
-		if ("math".equals(captchaProperties.getType())) {
-			code = getCodeResult(captcha.getCode());
-		} else if ("char".equals(captchaProperties.getType())) {
-			code = captcha.getCode();
-		}
-		redisCache.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
+		String code = isMath ? getCodeResult(captcha.getCode()) : captcha.getCode();
+		RedisUtils.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
 		ajax.put("uuid", uuid);
 		ajax.put("img", captcha.getImageBase64());
 		return AjaxResult.success(ajax);
@@ -112,13 +71,13 @@ public class CaptchaController {
 		int b = Convert.toInt(StringUtils.substring(capStr, numberLength + 1, numberLength + 1 + numberLength).trim());
 		switch (operator) {
 			case '*':
-				return a * b + "";
+				return Convert.toStr(a * b);
 			case '+':
-				return a + b + "";
+				return Convert.toStr(a + b);
 			case '-':
-				return a - b + "";
+				return Convert.toStr(a - b);
 			default:
-				return "";
+				return StringUtils.EMPTY;
 		}
 	}
 

@@ -7,7 +7,6 @@ export default {
   name: "Admin",
   components: { iFrame },
   data() {
-    console.log(process.env)
     return {
       url: process.env.VUE_APP_MONITRO_ADMIN
     };

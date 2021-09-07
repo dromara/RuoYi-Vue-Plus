@@ -1,7 +1,7 @@
 package com.ruoyi.common.core.mybatisplus.cache;
 
 import cn.hutool.extra.spring.SpringUtil;
-import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.common.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.cache.Cache;
 import org.springframework.data.redis.connection.RedisServerCommands;
@@ -25,8 +25,6 @@ public class MybatisPlusRedisCache implements Cache {
 
 	private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
-	private RedisCache redisCache;
-
 	private String id;
 
 	public MybatisPlusRedisCache(final String id) {
@@ -43,23 +41,16 @@ public class MybatisPlusRedisCache implements Cache {
 
 	@Override
 	public void putObject(Object key, Object value) {
-		if (redisCache == null) {
-			redisCache = SpringUtil.getBean(RedisCache.class);
-		}
 		if (value != null) {
-			redisCache.setCacheObject(key.toString(), value);
+			RedisUtils.setCacheObject(key.toString(), value);
 		}
 	}
 
 	@Override
 	public Object getObject(Object key) {
-		if (redisCache == null) {
-			//由于启动期间注入失败，只能运行期间注入，这段代码可以删除
-			redisCache = SpringUtil.getBean(RedisCache.class);
-		}
 		try {
 			if (key != null) {
-				return redisCache.getCacheObject(key.toString());
+				return RedisUtils.getCacheObject(key.toString());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -70,11 +61,8 @@ public class MybatisPlusRedisCache implements Cache {
 
 	@Override
 	public Object removeObject(Object key) {
-		if (redisCache == null) {
-			redisCache = SpringUtil.getBean(RedisCache.class);
-		}
 		if (key != null) {
-			redisCache.deleteObject(key.toString());
+			RedisUtils.deleteObject(key.toString());
 		}
 		return null;
 	}
@@ -82,12 +70,9 @@ public class MybatisPlusRedisCache implements Cache {
 	@Override
 	public void clear() {
 		log.debug("清空缓存");
-		if (redisCache == null) {
-			redisCache = SpringUtil.getBean(RedisCache.class);
-		}
-		Collection<String> keys = redisCache.keys("*:" + this.id + "*");
+		Collection<String> keys = RedisUtils.keys("*:" + this.id + "*");
 		if (!CollectionUtils.isEmpty(keys)) {
-			redisCache.deleteObject(keys);
+			RedisUtils.deleteObject(keys);
 		}
 	}
 

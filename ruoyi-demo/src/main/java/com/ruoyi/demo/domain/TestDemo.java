@@ -1,8 +1,6 @@
 package com.ruoyi.demo.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -29,7 +27,6 @@ public class TestDemo implements Serializable {
 	 * 主键
 	 */
     @TableId(value = "id")
-	@JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /**

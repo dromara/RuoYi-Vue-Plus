@@ -57,15 +57,12 @@ public class PageUtils {
         Integer pageSize = ServletUtils.getParameterToInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
         String orderByColumn = ServletUtils.getParameter(ORDER_BY_COLUMN);
         String isAsc = ServletUtils.getParameter(IS_ASC);
-        PagePlus<T, K> page = new PagePlus<>(pageNum, pageSize);
-        if (StringUtils.isNotBlank(orderByColumn)) {
-            String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
-            if ("asc".equals(isAsc)) {
-                page.addOrder(OrderItem.asc(orderBy));
-            } else if ("desc".equals(isAsc)) {
-                page.addOrder(OrderItem.desc(orderBy));
-            }
+        if (pageNum <= 0) {
+            pageNum = DEFAULT_PAGE_NUM;
         }
+        PagePlus<T, K> page = new PagePlus<>(pageNum, pageSize);
+        OrderItem orderItem = buildOrderItem(orderByColumn, isAsc);
+        page.addOrder(orderItem);
         return page;
     }
 
@@ -83,23 +80,32 @@ public class PageUtils {
         Integer pageSize = ServletUtils.getParameterToInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
         String orderByColumn = ServletUtils.getParameter(ORDER_BY_COLUMN, defaultOrderByColumn);
         String isAsc = ServletUtils.getParameter(IS_ASC, defaultIsAsc);
-		// 兼容前端排序类型
-		if ("ascending".equals(isAsc)) {
-			isAsc = "asc";
-		} else if ("descending".equals(isAsc)) {
-			isAsc = "desc";
-		}
+        if (pageNum <= 0) {
+            pageNum = DEFAULT_PAGE_NUM;
+        }
         Page<T> page = new Page<>(pageNum, pageSize);
+        OrderItem orderItem = buildOrderItem(orderByColumn, isAsc);
+        page.addOrder(orderItem);
+        return page;
+    }
+
+    private static OrderItem buildOrderItem(String orderByColumn, String isAsc) {
+        // 兼容前端排序类型
+        if ("ascending".equals(isAsc)) {
+            isAsc = "asc";
+        } else if ("descending".equals(isAsc)) {
+            isAsc = "desc";
+        }
         if (StringUtils.isNotBlank(orderByColumn)) {
             String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
 			orderBy = StringUtils.toUnderScoreCase(orderBy);
 			if ("asc".equals(isAsc)) {
-                page.addOrder(OrderItem.asc(orderBy));
+                return OrderItem.asc(orderBy);
             } else if ("desc".equals(isAsc)) {
-                page.addOrder(OrderItem.desc(orderBy));
+                return OrderItem.desc(orderBy);
             }
         }
-        return page;
+        return null;
     }
 
     public static <T, K> TableDataInfo<K> buildDataInfo(PagePlus<T, K> page) {
@@ -126,6 +132,13 @@ public class PageUtils {
         rspData.setMsg("查询成功");
         rspData.setRows(list);
         rspData.setTotal(list.size());
+        return rspData;
+    }
+
+    public static <T> TableDataInfo<T> buildDataInfo() {
+        TableDataInfo<T> rspData = new TableDataInfo<>();
+        rspData.setCode(HttpStatus.HTTP_OK);
+        rspData.setMsg("查询成功");
         return rspData;
     }
 

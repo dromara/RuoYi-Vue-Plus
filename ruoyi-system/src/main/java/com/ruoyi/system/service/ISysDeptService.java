@@ -58,7 +58,7 @@ public interface ISysDeptService extends IService<SysDept> {
      * @param deptId 部门ID
      * @return 子部门数
      */
-    public int selectNormalChildrenDeptById(Long deptId);
+    public long selectNormalChildrenDeptById(Long deptId);
 
     /**
      * 是否存在部门子节点
@@ -83,6 +83,13 @@ public interface ISysDeptService extends IService<SysDept> {
      * @return 结果
      */
     public String checkDeptNameUnique(SysDept dept);
+
+    /**
+     * 校验部门是否有数据权限
+     *
+     * @param deptId 部门id
+     */
+    public void checkDeptDataScope(Long deptId);
 
     /**
      * 新增保存部门信息

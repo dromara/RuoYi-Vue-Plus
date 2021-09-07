@@ -170,7 +170,6 @@
 
 <script>
 import { listDemo, pageDemo, getDemo, delDemo, addDemo, updateDemo } from "@/api/demo/demo";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Demo",
@@ -361,7 +360,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/demo/demo/export', this.queryParams);
+      this.downLoadExcel('/demo/demo/export', this.queryParams);
     }
   }
 };

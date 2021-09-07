@@ -44,6 +44,7 @@ public class GenTableColumn implements Serializable {
     /**
      * 列描述
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String columnComment;
 
     /**
@@ -65,36 +66,43 @@ public class GenTableColumn implements Serializable {
     /**
      * 是否主键（1是）
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String isPk;
 
     /**
      * 是否自增（1是）
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String isIncrement;
 
     /**
      * 是否必填（1是）
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String isRequired;
 
     /**
      * 是否为插入字段（1是）
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String isInsert;
 
     /**
      * 是否编辑字段（1是）
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String isEdit;
 
     /**
      * 是否列表字段（1是）
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String isList;
 
     /**
      * 是否查询字段（1是）
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String isQuery;
 
     /**
