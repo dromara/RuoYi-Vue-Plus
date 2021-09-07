@@ -16,9 +16,12 @@ import java.util.function.Consumer;
  * spring redis 工具类
  *
  * @author shenxinquan
+ * @see com.ruoyi.common.utils.RedisUtils
+ * @deprecated 3.2.0 删除此类
  **/
 @SuppressWarnings(value = {"unchecked", "rawtypes"})
 @Component
+@Deprecated
 public class RedisCache {
 
 	@Autowired
