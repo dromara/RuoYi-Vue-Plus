@@ -103,7 +103,7 @@ services:
         ipv4_address: 172.30.0.54
 
   ruoyi-server1:
-    image: "ruoyi/ruoyi-server:3.0.0"
+    image: "ruoyi/ruoyi-server:3.1.0"
     container_name: ruoyi-server1
     environment:
       # 时区上海
@@ -118,7 +118,7 @@ services:
         ipv4_address: 172.30.0.60
 
   ruoyi-server2:
-    image: "ruoyi/ruoyi-server:3.0.0"
+    image: "ruoyi/ruoyi-server:3.1.0"
     container_name: ruoyi-server2
     environment:
       # 时区上海
@@ -133,7 +133,7 @@ services:
         ipv4_address: 172.30.0.61
 
   ruoyi-monitor-admin:
-    image: "ruoyi/ruoyi-monitor-admin:3.0.0"
+    image: "ruoyi/ruoyi-monitor-admin:3.1.0"
     container_name: ruoyi-monitor-admin
     environment:
       # 时区上海
