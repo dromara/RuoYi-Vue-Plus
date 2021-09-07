@@ -1,7 +1,7 @@
 package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.common.utils.RedisUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/demo/redis/pubsub")
 public class RedisPubSubController {
 
-	private final RedisCache redisCache;
-
 	@ApiOperation("发布消息")
 	@GetMapping("/pub")
 	public AjaxResult<Void> pub(String key, String value){
-		redisCache.publish(key, value, consumer -> {
+		RedisUtils.publish(key, value, consumer -> {
 			System.out.println("发布通道 => " + key + ", 发送值 => " + value);
 		});
 		return AjaxResult.success("操作成功");
@@ -35,7 +33,7 @@ public class RedisPubSubController {
 	@ApiOperation("订阅消息")
 	@GetMapping("/sub")
 	public AjaxResult<Void> sub(String key){
-		redisCache.subscribe(key, String.class, msg -> {
+		RedisUtils.subscribe(key, String.class, msg -> {
 			System.out.println("订阅通道 => " + key + ", 接收值 => " + msg);
 		});
 		return AjaxResult.success("操作成功");

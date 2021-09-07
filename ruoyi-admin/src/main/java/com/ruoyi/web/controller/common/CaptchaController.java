@@ -6,8 +6,8 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.enums.CaptchaType;
+import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -28,9 +28,6 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 public class CaptchaController {
-
-	@Autowired
-	private RedisCache redisCache;
 
 	@Autowired
 	private CaptchaProperties captchaProperties;
@@ -61,7 +58,7 @@ public class CaptchaController {
 		captcha.setGenerator(codeGenerator);
 		captcha.createCode();
 		String code = isMath ? getCodeResult(captcha.getCode()) : captcha.getCode();
-		redisCache.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
+		RedisUtils.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
 		ajax.put("uuid", uuid);
 		ajax.put("img", captcha.getImageBase64());
 		return AjaxResult.success(ajax);

@@ -1,11 +1,10 @@
 package com.ruoyi.oss.factory;
 
 import cn.hutool.core.convert.Convert;
-import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.JsonUtils;
+import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
-import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.oss.constant.CloudConstant;
 import com.ruoyi.oss.enumd.CloudServiceEnumd;
 import com.ruoyi.oss.exception.OssException;
@@ -25,11 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class OssFactory {
 
-	private static RedisCache redisCache;
-
 	static {
-		OssFactory.redisCache = SpringUtils.getBean(RedisCache.class);
-		redisCache.subscribe(CloudConstant.CACHE_CONFIG_KEY, String.class, msg -> {
+		RedisUtils.subscribe(CloudConstant.CACHE_CONFIG_KEY, String.class, msg -> {
 			refreshService(msg);
 			log.info("订阅刷新OSS配置 => " + msg);
 		});
@@ -45,7 +41,7 @@ public class OssFactory {
 	 */
 	public static ICloudStorageStrategy instance() {
 		// 获取redis 默认类型
-		String type = Convert.toStr(redisCache.getCacheObject(CloudConstant.CACHE_CONFIG_KEY));
+		String type = Convert.toStr(RedisUtils.getCacheObject(CloudConstant.CACHE_CONFIG_KEY));
 		if (StringUtils.isEmpty(type)) {
 			throw new OssException("文件存储服务类型无法找到!");
 		}
@@ -65,7 +61,7 @@ public class OssFactory {
 	}
 
 	private static void refreshService(String type) {
-		Object json = redisCache.getCacheObject(CloudConstant.SYS_OSS_KEY + type);
+		Object json = RedisUtils.getCacheObject(CloudConstant.SYS_OSS_KEY + type);
 		CloudStorageProperties properties = JsonUtils.parseObject(json.toString(), CloudStorageProperties.class);
 		if (properties == null) {
 			throw new OssException("系统异常, '" + type + "'配置信息不存在!");
