@@ -1,10 +1,10 @@
 package com.ruoyi.framework.config;
 
-import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
@@ -46,10 +46,10 @@ public class MybatisPlusConfig {
 	 */
 	public PaginationInnerInterceptor paginationInnerInterceptor() {
 		PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
-		// 设置数据库类型为mysql
-		paginationInnerInterceptor.setDbType(DbType.MYSQL);
 		// 设置最大单页限制数量，默认 500 条，-1 不受限制
 		paginationInnerInterceptor.setMaxLimit(-1L);
+		// 分页合理化
+		paginationInnerInterceptor.setOverflow(true);
 		return paginationInnerInterceptor;
 	}
 
@@ -104,8 +104,8 @@ public class MybatisPlusConfig {
 	public ISqlInjector sqlInjector() {
 		return new DefaultSqlInjector() {
 			@Override
-			public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
-				List<AbstractMethod> methodList = super.getMethodList(mapperClass);
+			public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
+				List<AbstractMethod> methodList = super.getMethodList(mapperClass, tableInfo);
 				methodList.add(new InsertAll());
 				return methodList;
 			}

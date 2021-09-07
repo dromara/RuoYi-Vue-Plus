@@ -185,7 +185,6 @@
 <script>
 import { listData, getData, delData, addData, updateData } from "@/api/system/dict/data";
 import { listType, getType } from "@/api/system/dict/type";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Data",
@@ -389,7 +388,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/system/dict/data/export', this.queryParams);
+      this.downLoadExcel('/system/dict/data/export', this.queryParams);
     }
   }
 };

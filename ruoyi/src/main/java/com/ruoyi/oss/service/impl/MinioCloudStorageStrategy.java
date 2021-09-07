@@ -32,7 +32,7 @@ public class MinioCloudStorageStrategy extends AbstractCloudStorageStrategy {
 				.build();
 			createBucket();
 		} catch (Exception e) {
-			throw new OssException("Minio存储配置错误! 请检查系统配置!");
+			throw new OssException("Minio存储配置错误! 请检查系统配置:[" + e.getMessage() + "]");
 		}
 	}
 
@@ -51,7 +51,7 @@ public class MinioCloudStorageStrategy extends AbstractCloudStorageStrategy {
 				.config(getPolicy(bucketName, PolicyType.READ))
 				.build());
 		} catch (Exception e) {
-			throw new OssException("创建Bucket失败, 请核对Minio配置信息");
+			throw new OssException("创建Bucket失败, 请核对Minio配置信息:[" + e.getMessage() + "]");
 		}
 	}
 
@@ -75,7 +75,7 @@ public class MinioCloudStorageStrategy extends AbstractCloudStorageStrategy {
 				.stream(inputStream, inputStream.available(), -1)
 				.build());
 		} catch (Exception e) {
-			throw new OssException("上传文件失败，请核对Minio配置信息");
+			throw new OssException("上传文件失败，请核对Minio配置信息:[" + e.getMessage() + "]");
 		}
 		return new UploadResult().setUrl(getEndpointLink() + "/" + path).setFilename(path);
 	}
@@ -95,7 +95,7 @@ public class MinioCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
 	@Override
 	public UploadResult uploadSuffix(byte[] data, String suffix, String contentType) {
-		return upload(data, getPath("", suffix), contentType);
+		return upload(data, getPath(properties.getPrefix(), suffix), contentType);
 	}
 
 	@Override

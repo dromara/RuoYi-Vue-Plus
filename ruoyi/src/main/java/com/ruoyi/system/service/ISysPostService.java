@@ -69,7 +69,7 @@ public interface ISysPostService extends IService<SysPost> {
      * @param postId 岗位ID
      * @return 结果
      */
-    public int countUserPostById(Long postId);
+    public long countUserPostById(Long postId);
 
     /**
      * 删除岗位信息

@@ -22,10 +22,15 @@ port(){
 
 ##放置挂载文件
 mount(){
-	#挂载配置文件
+	#挂载 nginx 配置文件
 	if test ! -f "/docker/nginx/conf/nginx.conf" ;then
 		mkdir -p /docker/nginx/conf
 		cp nginx/nginx.conf /docker/nginx/conf/nginx.conf
+	fi
+	#挂载 redis 配置文件
+	if test ! -f "/docker/redis/conf/redis.conf" ;then
+		mkdir -p /docker/redis/conf
+		cp redis/redis.conf /docker/redis/conf/redis.conf
 	fi
 }
 

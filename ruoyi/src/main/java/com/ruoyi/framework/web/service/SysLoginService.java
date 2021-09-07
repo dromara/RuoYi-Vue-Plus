@@ -3,13 +3,13 @@ package com.ruoyi.framework.web.service;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
 import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
+import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
@@ -36,9 +36,6 @@ public class SysLoginService
 
     @Resource
     private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private RedisCache redisCache;
 
 	@Autowired
     private ISysUserService userService;
@@ -105,8 +102,8 @@ public class SysLoginService
      */
     public void validateCaptcha(String username, String code, String uuid, HttpServletRequest request) {
 		String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
-		String captcha = redisCache.getCacheObject(verifyKey);
-		redisCache.deleteObject(verifyKey);
+		String captcha = RedisUtils.getCacheObject(verifyKey);
+        RedisUtils.deleteObject(verifyKey);
 		if (captcha == null) {
 			asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"), request);
 			throw new CaptchaExpireException();

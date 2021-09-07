@@ -1,6 +1,7 @@
 package com.ruoyi.framework.config;
 
 import com.ruoyi.common.utils.Threads;
+import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.framework.config.properties.ThreadPoolProperties;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 线程池配置
@@ -33,21 +33,7 @@ public class ThreadPoolConfig {
         executor.setCorePoolSize(threadPoolProperties.getCorePoolSize());
         executor.setQueueCapacity(threadPoolProperties.getQueueCapacity());
         executor.setKeepAliveSeconds(threadPoolProperties.getKeepAliveSeconds());
-        RejectedExecutionHandler handler;
-        switch (threadPoolProperties.getRejectedExecutionHandler()) {
-            case "CallerRunsPolicy":
-                handler = new ThreadPoolExecutor.CallerRunsPolicy();
-                break;
-            case "DiscardOldestPolicy":
-                handler = new ThreadPoolExecutor.DiscardOldestPolicy();
-                break;
-            case "DiscardPolicy":
-                handler = new ThreadPoolExecutor.DiscardPolicy();
-                break;
-            default:
-                handler = new ThreadPoolExecutor.AbortPolicy();
-                break;
-        }
+        RejectedExecutionHandler handler = ReflectUtils.newInstance(threadPoolProperties.getRejectedExecutionHandler().getClazz());
         executor.setRejectedExecutionHandler(handler);
         return executor;
     }

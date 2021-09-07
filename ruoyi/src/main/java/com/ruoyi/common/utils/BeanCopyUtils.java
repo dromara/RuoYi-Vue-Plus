@@ -2,6 +2,8 @@ package com.ruoyi.common.utils;
 
 import cn.hutool.core.bean.copier.BeanCopier;
 import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 
 import java.util.List;
@@ -36,6 +38,9 @@ public class BeanCopyUtils {
 	 * @return desc
 	 */
 	public static <T, V> V oneCopy(T source, CopyOptions copyOptions, V desc) {
+		if (ObjectUtil.isNull(source)) {
+			return null;
+		}
 		return BeanCopier.create(source, desc, copyOptions).copy();
 	}
 
@@ -48,6 +53,12 @@ public class BeanCopyUtils {
 	 * @return desc
 	 */
 	public static <T, V> List<V> listCopy(List<T> sourceList, CopyOptions copyOptions, Class<V> desc) {
+		if (ObjectUtil.isNull(sourceList)) {
+			return null;
+		}
+		if (CollUtil.isEmpty(sourceList)) {
+			return CollUtil.newArrayList();
+		}
 		return sourceList.stream()
 			.map(source -> oneCopy(source, copyOptions, desc))
 			.collect(Collectors.toList());

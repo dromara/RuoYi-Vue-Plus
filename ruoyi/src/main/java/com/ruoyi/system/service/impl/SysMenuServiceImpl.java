@@ -226,7 +226,7 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu, 
      */
     @Override
     public boolean hasChildByMenuId(Long menuId) {
-        int result = count(new LambdaQueryWrapper<SysMenu>().eq(SysMenu::getParentId,menuId));
+        long result = count(new LambdaQueryWrapper<SysMenu>().eq(SysMenu::getParentId,menuId));
         return result > 0;
     }
 
@@ -238,7 +238,7 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu, 
      */
     @Override
     public boolean checkMenuExistRole(Long menuId) {
-        int result = roleMenuMapper.selectCount(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getMenuId,menuId));
+        long result = roleMenuMapper.selectCount(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getMenuId,menuId));
         return result > 0;
     }
 

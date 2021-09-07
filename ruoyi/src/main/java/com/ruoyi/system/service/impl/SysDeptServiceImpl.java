@@ -11,7 +11,9 @@ import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
@@ -118,7 +120,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      * @return 子部门数
      */
     @Override
-    public int selectNormalChildrenDeptById(Long deptId) {
+    public long selectNormalChildrenDeptById(Long deptId) {
         return count(new LambdaQueryWrapper<SysDept>()
                 .eq(SysDept::getStatus, 0)
                 .apply("find_in_set({0}, ancestors)", deptId));
@@ -132,7 +134,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public boolean hasChildByDeptId(Long deptId) {
-        int result = count(new LambdaQueryWrapper<SysDept>()
+        long result = count(new LambdaQueryWrapper<SysDept>()
                 .eq(SysDept::getParentId, deptId)
                 .last("limit 1"));
         return result > 0;
@@ -146,7 +148,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public boolean checkDeptExistUser(Long deptId) {
-        int result = userMapper.selectCount(new LambdaQueryWrapper<SysUser>()
+        long result = userMapper.selectCount(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getDeptId, deptId));
         return result > 0;
     }
@@ -168,6 +170,23 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
+    }
+
+    /**
+     * 校验部门是否有数据权限
+     *
+     * @param deptId 部门id
+     */
+    @Override
+    public void checkDeptDataScope(Long deptId) {
+        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
+            SysDept dept = new SysDept();
+            dept.setDeptId(deptId);
+            List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
+            if (StringUtils.isEmpty(depts)) {
+                throw new ServiceException("没有权限访问部门数据！");
+            }
+        }
     }
 
     /**
