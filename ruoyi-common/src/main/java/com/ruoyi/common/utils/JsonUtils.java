@@ -4,6 +4,9 @@ import cn.hutool.core.util.ArrayUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ruoyi.common.utils.spring.SpringUtils;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,20 +18,10 @@ import java.util.Map;
  *
  * @author 芋道源码
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JsonUtils {
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
-    /**
-     * 初始化 objectMapper 属性
-     * <p>
-     * 通过这样的方式，使用 Spring 创建的 ObjectMapper Bean
-     *
-     * @param objectMapper ObjectMapper 对象
-     */
-    public static void init(ObjectMapper objectMapper) {
-        JsonUtils.objectMapper = objectMapper;
-    }
+    private static ObjectMapper objectMapper = SpringUtils.getBean(ObjectMapper.class);
 
     public static String toJsonString(Object object) {
 		if (StringUtils.isNull(object)) {
