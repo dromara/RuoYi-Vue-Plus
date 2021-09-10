@@ -28,7 +28,7 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期�
 * 序列化框架 统一使用 jackson 高效可靠
 * 网络框架 Feign、OkHttp3 接口化管理 HTTP 请求
 * 分布式锁 Lock4j 注解锁、工具锁 多种多样
-* 文件存储 OSS 对象存储模块 支持(Minio、七牛、阿里、腾讯)
+* 文件存储 OSS 对象存储模块 支持 本地存储(Minio)与云存储(七牛、阿里、腾讯)
 * 监控框架 spring-boot-admin 全方位服务监控
 * 校验框架 validation 增强接口安全性 严谨性
 * Excel框架 Alibaba EasyExcel 性能优异 扩展性强
