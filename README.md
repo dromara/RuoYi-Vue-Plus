@@ -19,8 +19,8 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级 定期�
 * 后端开发框架 Spring Boot、Redis
 * 容器框架 Undertow 基于 Netty 的高性能容器
 * 权限认证框架 Spring Security、Jwt，支持多终端认证系统
-* 关系数据库 MySQL 适配 8.X 
-* 缓存数据库 Redis 适配 6.X
+* 关系数据库 MySQL 适配 8.X 最低 5.7
+* 缓存数据库 Redis 适配 6.X 最低 4.X
 * 数据库框架 Mybatis-Plus 快速 CRUD 增加开发效率 插件化支持各类需求
 * 数据库框架 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构
 * 数据库框架 Redis客户端 采用 Redisson 性能更强
