@@ -120,7 +120,7 @@
 
     <el-table v-loading="loading" :data="ossList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="云存储主键" align="center" prop="ossId" v-if="false"/>
+      <el-table-column label="对象存储主键" align="center" prop="ossId" v-if="false"/>
       <el-table-column label="文件名" align="center" prop="fileName" />
       <el-table-column label="原名" align="center" prop="originalName" />
       <el-table-column label="文件后缀" align="center" prop="fileSuffix" />
@@ -170,7 +170,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改OSS云存储对话框 -->
+    <!-- 添加或修改OSS对象存储对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="文件名">
@@ -210,7 +210,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // OSS云存储表格数据
+      // OSS对象存储表格数据
       ossList: [],
       // 弹出层标题
       title: "",
@@ -248,7 +248,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询OSS云存储列表 */
+    /** 查询OSS对象存储列表 */
     getList() {
       this.loading = true;
       this.queryParams.params = {};
@@ -330,7 +330,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ossIds = row.ossId || this.ids;
-      this.$confirm('是否确认删除OSS云存储编号为"' + ossIds + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除OSS对象存储编号为"' + ossIds + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"

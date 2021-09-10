@@ -9,7 +9,7 @@ import com.ruoyi.system.domain.vo.SysOssConfigVo;
 import java.util.Collection;
 
 /**
- * 云存储配置Service接口
+ * 对象存储配置Service接口
  *
  * @author Lion Li
  * @author 孤舟烟雨
@@ -29,15 +29,15 @@ public interface ISysOssConfigService extends IServicePlus<SysOssConfig, SysOssC
 
 
 	/**
-	 * 根据新增业务对象插入云存储配置
-	 * @param bo 云存储配置新增业务对象
+	 * 根据新增业务对象插入对象存储配置
+	 * @param bo 对象存储配置新增业务对象
 	 * @return
 	 */
 	Boolean insertByBo(SysOssConfigBo bo);
 
 	/**
-	 * 根据编辑业务对象修改云存储配置
-	 * @param bo 云存储配置编辑业务对象
+	 * 根据编辑业务对象修改对象存储配置
+	 * @param bo 对象存储配置编辑业务对象
 	 * @return
 	 */
 	Boolean updateByBo(SysOssConfigBo bo);

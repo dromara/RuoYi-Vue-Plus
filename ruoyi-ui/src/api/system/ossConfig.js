@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 查询云存储配置列表
+// 查询对象存储配置列表
 export function listOssConfig(query) {
   return request({
     url: '/system/oss/config/list',
@@ -9,7 +9,7 @@ export function listOssConfig(query) {
   })
 }
 
-// 查询云存储配置详细
+// 查询对象存储配置详细
 export function getOssConfig(ossConfigId) {
   return request({
     url: '/system/oss/config/' + ossConfigId,
@@ -17,7 +17,7 @@ export function getOssConfig(ossConfigId) {
   })
 }
 
-// 新增云存储配置
+// 新增对象存储配置
 export function addOssConfig(data) {
   return request({
     url: '/system/oss/config',
@@ -26,7 +26,7 @@ export function addOssConfig(data) {
   })
 }
 
-// 修改云存储配置
+// 修改对象存储配置
 export function updateOssConfig(data) {
   return request({
     url: '/system/oss/config',
@@ -35,7 +35,7 @@ export function updateOssConfig(data) {
   })
 }
 
-// 删除云存储配置
+// 删除对象存储配置
 export function delOssConfig(ossConfigId) {
   return request({
     url: '/system/oss/config/' + ossConfigId,

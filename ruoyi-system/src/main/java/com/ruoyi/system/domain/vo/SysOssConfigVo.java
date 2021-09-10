@@ -8,14 +8,14 @@ import lombok.Data;
 
 
 /**
- * 云存储配置视图对象 sys_oss_config
+ * 对象存储配置视图对象 sys_oss_config
  *
  * @author Lion Li
  * @author 孤舟烟雨
  * @date 2021-08-13
  */
 @Data
-@ApiModel("云存储配置视图对象")
+@ApiModel("对象存储配置视图对象")
 @ExcelIgnoreUnannotated
 public class SysOssConfigVo {
 

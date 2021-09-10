@@ -118,7 +118,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改云存储配置对话框 -->
+    <!-- 添加或修改对象存储配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="配置key" prop="configKey">
@@ -201,7 +201,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 云存储配置表格数据
+      // 对象存储配置表格数据
       ossConfigList: [],
       // configKeyOptions
       configKeyOptions: [],
@@ -284,7 +284,7 @@ export default {
     this.configKeyOptions = this.configKeyDatas;
   },
   methods: {
-    /** 查询云存储配置列表 */
+    /** 查询对象存储配置列表 */
     getList() {
       this.loading = true;
       listOssConfig(this.queryParams).then((response) => {
@@ -335,7 +335,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加云存储配置";
+      this.title = "添加对象存储配置";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -346,7 +346,7 @@ export default {
         this.loading = false;
         this.form = response.data;
         this.open = true;
-        this.title = "修改云存储配置";
+        this.title = "修改对象存储配置";
       });
     },
     /** 提交按钮 */
@@ -377,7 +377,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ossConfigIds = row.ossConfigId || this.ids;
-      this.$confirm('是否确认删除云存储配置编号为"' + ossConfigIds + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除对象存储配置编号为"' + ossConfigIds + '"的数据项?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -392,7 +392,7 @@ export default {
         this.loading = false;
       });
     },
-    // 云存储配置状态修改
+    // 对象存储配置状态修改
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
       this.$confirm(

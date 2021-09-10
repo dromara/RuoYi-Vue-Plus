@@ -1,9 +1,9 @@
 -- ----------------------------
--- OSS云存储表
+-- OSS对象存储表
 -- ----------------------------
 drop table if exists sys_oss;
 create table sys_oss (
-    oss_id          bigint(20)   not null auto_increment    comment '云存储主键',
+    oss_id          bigint(20)   not null auto_increment    comment '对象存储主键',
     file_name       varchar(64)  not null default ''        comment '文件名',
     original_name   varchar(64)  not null default ''        comment '原名',
     file_suffix     varchar(10)  not null default ''        comment '文件后缀名',
@@ -14,10 +14,10 @@ create table sys_oss (
     update_by       varchar(64)           default ''        comment '更新人',
     service         varchar(10)  not null default 'minio'   comment '服务商',
     primary key (oss_id)
-) engine=innodb comment ='OSS云存储表';
+) engine=innodb comment ='OSS对象存储表';
 
 -- ----------------------------
--- OSS云存储动态配置表
+-- OSS对象存储动态配置表
 -- ----------------------------
 drop table if exists sys_oss_config;
 create table sys_oss_config (
@@ -38,7 +38,7 @@ create table sys_oss_config (
     update_time     datetime                default null    comment '更新时间',
     remark           varchar(500)           default null    comment '备注',
     primary key (oss_config_id)
-) engine=innodb comment='云存储配置表';
+) engine=innodb comment='对象存储配置表';
 
 insert into sys_config values(11, 'OSS预览列表资源开关',   'sys.oss.previewListResource',      'true',           'Y', 'admin', sysdate(), '', null, 'true:开启, false:关闭');
 

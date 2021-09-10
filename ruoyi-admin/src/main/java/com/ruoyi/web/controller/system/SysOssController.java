@@ -49,7 +49,7 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Api(value = "OSS云存储控制器", tags = {"OSS云存储管理"})
+@Api(value = "OSS对象存储控制器", tags = {"OSS对象存储管理"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
 @RequestMapping("/system/oss")
@@ -59,9 +59,9 @@ public class SysOssController extends BaseController {
 	private final ISysConfigService iSysConfigService;
 
 	/**
-	 * 查询OSS云存储列表
+	 * 查询OSS对象存储列表
 	 */
-	@ApiOperation("查询OSS云存储列表")
+	@ApiOperation("查询OSS对象存储列表")
 	@PreAuthorize("@ss.hasPermi('system:oss:list')")
 	@GetMapping("/list")
 	public TableDataInfo<SysOssVo> list(@Validated(QueryGroup.class) SysOssBo bo) {
@@ -69,14 +69,14 @@ public class SysOssController extends BaseController {
 	}
 
 	/**
-	 * 上传OSS云存储
+	 * 上传OSS对象存储
 	 */
-	@ApiOperation("上传OSS云存储")
+	@ApiOperation("上传OSS对象存储")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "file", value = "文件", dataType = "java.io.File", required = true),
 	})
 	@PreAuthorize("@ss.hasPermi('system:oss:upload')")
-	@Log(title = "OSS云存储", businessType = BusinessType.INSERT)
+	@Log(title = "OSS对象存储", businessType = BusinessType.INSERT)
 	@RepeatSubmit
 	@PostMapping("/upload")
 	public AjaxResult<Map<String, String>> upload(@RequestPart("file") MultipartFile file) {
@@ -90,7 +90,7 @@ public class SysOssController extends BaseController {
 		return AjaxResult.success(map);
 	}
 
-	@ApiOperation("下载OSS云存储")
+	@ApiOperation("下载OSS对象存储")
 	@PreAuthorize("@ss.hasPermi('system:oss:download')")
 	@GetMapping("/download/{ossId}")
 	public void download(@PathVariable Long ossId, HttpServletResponse response) throws IOException {
@@ -108,11 +108,11 @@ public class SysOssController extends BaseController {
 	}
 
 	/**
-	 * 删除OSS云存储
+	 * 删除OSS对象存储
 	 */
-	@ApiOperation("删除OSS云存储")
+	@ApiOperation("删除OSS对象存储")
 	@PreAuthorize("@ss.hasPermi('system:oss:remove')")
-	@Log(title = "OSS云存储" , businessType = BusinessType.DELETE)
+	@Log(title = "OSS对象存储" , businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ossIds}")
 	public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
 								   @PathVariable Long[] ossIds) {
@@ -124,7 +124,7 @@ public class SysOssController extends BaseController {
 	 */
 	@ApiOperation("变更图片列表预览状态")
 	@PreAuthorize("@ss.hasPermi('system:oss:edit')")
-	@Log(title = "OSS云存储" , businessType = BusinessType.UPDATE)
+	@Log(title = "OSS对象存储" , businessType = BusinessType.UPDATE)
 	@PutMapping("/changePreviewListResource")
 	public AjaxResult<Void> changePreviewListResource(@RequestBody String body) {
 		Map<String, Boolean> map = JsonUtils.parseMap(body);

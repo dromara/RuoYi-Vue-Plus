@@ -7,20 +7,20 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * OSS云存储视图对象 sys_oss
+ * OSS对象存储视图对象 sys_oss
  *
  * @author Lion Li
  */
 @Data
-@ApiModel("OSS云存储视图对象")
+@ApiModel("OSS对象存储视图对象")
 public class SysOssVo {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 *  云存储主键
+	 *  对象存储主键
 	 */
-	@ApiModelProperty("云存储主键")
+	@ApiModelProperty("对象存储主键")
 	private Long ossId;
 
 	/**

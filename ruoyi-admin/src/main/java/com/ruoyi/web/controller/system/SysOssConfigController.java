@@ -25,14 +25,14 @@ import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 
 /**
- * 云存储配置Controller
+ * 对象存储配置Controller
  *
  * @author Lion Li
  * @author 孤舟烟雨
  * @date 2021-08-13
  */
 @Validated
-@Api(value = "云存储配置控制器", tags = {"云存储配置管理"})
+@Api(value = "对象存储配置控制器", tags = {"对象存储配置管理"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
 @RequestMapping("/system/oss/config")
@@ -41,9 +41,9 @@ public class SysOssConfigController extends BaseController {
 	private final ISysOssConfigService iSysOssConfigService;
 
 	/**
-	 * 查询云存储配置列表
+	 * 查询对象存储配置列表
 	 */
-	@ApiOperation("查询云存储配置列表")
+	@ApiOperation("查询对象存储配置列表")
 	@PreAuthorize("@ss.hasPermi('system:oss:list')")
 	@GetMapping("/list")
 	public TableDataInfo<SysOssConfigVo> list(@Validated(QueryGroup.class) SysOssConfigBo bo) {
@@ -51,9 +51,9 @@ public class SysOssConfigController extends BaseController {
 	}
 
 	/**
-	 * 获取云存储配置详细信息
+	 * 获取对象存储配置详细信息
 	 */
-	@ApiOperation("获取云存储配置详细信息")
+	@ApiOperation("获取对象存储配置详细信息")
 	@PreAuthorize("@ss.hasPermi('system:oss:query')")
 	@GetMapping("/{ossConfigId}")
 	public AjaxResult<SysOssConfigVo> getInfo(@NotNull(message = "主键不能为空")
@@ -62,11 +62,11 @@ public class SysOssConfigController extends BaseController {
 	}
 
 	/**
-	 * 新增云存储配置
+	 * 新增对象存储配置
 	 */
-	@ApiOperation("新增云存储配置")
+	@ApiOperation("新增对象存储配置")
 	@PreAuthorize("@ss.hasPermi('system:oss:add')")
-	@Log(title = "云存储配置", businessType = BusinessType.INSERT)
+	@Log(title = "对象存储配置", businessType = BusinessType.INSERT)
 	@RepeatSubmit()
 	@PostMapping()
 	public AjaxResult<Void> add(@Validated(AddGroup.class) @RequestBody SysOssConfigBo bo) {
@@ -74,11 +74,11 @@ public class SysOssConfigController extends BaseController {
 	}
 
 	/**
-	 * 修改云存储配置
+	 * 修改对象存储配置
 	 */
-	@ApiOperation("修改云存储配置")
+	@ApiOperation("修改对象存储配置")
 	@PreAuthorize("@ss.hasPermi('system:oss:edit')")
-	@Log(title = "云存储配置", businessType = BusinessType.UPDATE)
+	@Log(title = "对象存储配置", businessType = BusinessType.UPDATE)
 	@RepeatSubmit()
 	@PutMapping()
 	public AjaxResult<Void> edit(@Validated(EditGroup.class) @RequestBody SysOssConfigBo bo) {
@@ -86,11 +86,11 @@ public class SysOssConfigController extends BaseController {
 	}
 
 	/**
-	 * 删除云存储配置
+	 * 删除对象存储配置
 	 */
-	@ApiOperation("删除云存储配置")
+	@ApiOperation("删除对象存储配置")
 	@PreAuthorize("@ss.hasPermi('system:oss:remove')")
-	@Log(title = "云存储配置", businessType = BusinessType.DELETE)
+	@Log(title = "对象存储配置", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ossConfigIds}")
 	public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
 								   @PathVariable Long[] ossConfigIds) {
@@ -101,7 +101,7 @@ public class SysOssConfigController extends BaseController {
 	 * 状态修改
 	 */
 	@PreAuthorize("@ss.hasPermi('system:oss:edit')")
-	@Log(title = "云存储状态修改", businessType = BusinessType.UPDATE)
+	@Log(title = "对象存储状态修改", businessType = BusinessType.UPDATE)
 	@PutMapping("/changeStatus")
 	public AjaxResult changeStatus(@RequestBody SysOssConfigBo bo) {
 		return toAjax(iSysOssConfigService.updateOssConfigStatus(bo));

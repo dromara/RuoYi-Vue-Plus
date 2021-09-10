@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 云存储配置Service业务层处理
+ * 对象存储配置Service业务层处理
  *
  * @author Lion Li
  * @author 孤舟烟雨

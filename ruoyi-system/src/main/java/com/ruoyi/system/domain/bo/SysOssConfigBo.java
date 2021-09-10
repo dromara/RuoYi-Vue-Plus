@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- * 云存储配置业务对象 sys_oss_config
+ * 对象存储配置业务对象 sys_oss_config
  *
  * @author Lion Li
  * @author 孤舟烟雨
@@ -22,7 +22,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ApiModel("云存储配置业务对象")
+@ApiModel("对象存储配置业务对象")
 public class SysOssConfigBo extends BaseEntity {
 
 	/**

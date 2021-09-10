@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * OSS云存储 配置属性
+ * OSS对象存储 配置属性
  *
  * @author Lion Li
  */
