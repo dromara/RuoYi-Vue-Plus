@@ -48,7 +48,7 @@
         <docker.namespace>ruoyi</docker.namespace>
         <docker.plugin.version>1.2.2</docker.plugin.version>
     </properties>
-
+	
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>

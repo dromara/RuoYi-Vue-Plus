@@ -18,7 +18,7 @@
     >
       <i class="el-icon-plus"></i>
     </el-upload>
-
+    
     <!-- 上传提示 -->
     <div class="el-upload__tip" slot="tip" v-if="showTip">
       请上传
@@ -113,8 +113,10 @@ export default {
     // 删除图片
     handleRemove(file, fileList) {
       const findex = this.fileList.map(f => f.name).indexOf(file.name);
-      this.fileList.splice(findex, 1);
-      this.$emit("input", this.listToString(this.fileList));
+      if(findex > -1) {
+        this.fileList.splice(findex, 1);
+        this.$emit("input", this.listToString(this.fileList));
+      }
     },
     // 上传成功回调
     handleUploadSuccess(res) {
@@ -187,24 +189,23 @@ export default {
       for (let i in list) {
         strs += list[i].url + separator;
       }
-      return strs != "" ? strs.substr(0, strs.length - 1) : "";
-    },
-  },
+      return strs != '' ? strs.substr(0, strs.length - 1) : '';
+    }
+  }
 };
 </script>
 <style scoped lang="scss">
 // .el-upload--picture-card 控制加号部分
 ::v-deep.hide .el-upload--picture-card {
-  display: none;
+    display: none;
 }
 // 去掉动画效果
 ::v-deep .el-list-enter-active,
 ::v-deep .el-list-leave-active {
-  transition: all 0s;
+    transition: all 0s;
 }
 
-::v-deep .el-list-enter,
-.el-list-leave-active {
+::v-deep .el-list-enter, .el-list-leave-active {
   opacity: 0;
   transform: translateY(0);
 }
