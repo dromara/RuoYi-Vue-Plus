@@ -326,7 +326,7 @@
             <properties>
                 <profiles.active>prod</profiles.active>
                 <logging.level>warn</logging.level>
-                <endpoints.include>health,info</endpoints.include>
+                <endpoints.include>health, info, logfile</endpoints.include>
             </properties>
         </profile>
     </profiles>
