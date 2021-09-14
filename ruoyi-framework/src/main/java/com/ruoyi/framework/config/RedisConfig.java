@@ -1,5 +1,6 @@
 package com.ruoyi.framework.config;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.RedissonProperties;
@@ -58,23 +59,52 @@ public class RedisConfig extends CachingConfigurerSupport {
 			.setTransportMode(redissonProperties.getTransportMode());
 
 		RedissonProperties.SingleServerConfig singleServerConfig = redissonProperties.getSingleServerConfig();
-		// 使用单机模式
-		config.useSingleServer()
-			.setAddress(prefix + redisProperties.getHost() + ":" + redisProperties.getPort())
-			.setConnectTimeout(((Long) redisProperties.getTimeout().toMillis()).intValue())
-			.setDatabase(redisProperties.getDatabase())
-			.setPassword(StringUtils.isNotBlank(redisProperties.getPassword()) ? redisProperties.getPassword() : null)
-			.setTimeout(singleServerConfig.getTimeout())
-			.setRetryAttempts(singleServerConfig.getRetryAttempts())
-			.setRetryInterval(singleServerConfig.getRetryInterval())
-			.setSubscriptionsPerConnection(singleServerConfig.getSubscriptionsPerConnection())
-			.setClientName(singleServerConfig.getClientName())
-			.setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
-			.setSubscriptionConnectionMinimumIdleSize(singleServerConfig.getSubscriptionConnectionMinimumIdleSize())
-			.setSubscriptionConnectionPoolSize(singleServerConfig.getSubscriptionConnectionPoolSize())
-			.setConnectionMinimumIdleSize(singleServerConfig.getConnectionMinimumIdleSize())
-			.setConnectionPoolSize(singleServerConfig.getConnectionPoolSize())
-			.setDnsMonitoringInterval(singleServerConfig.getDnsMonitoringInterval());
+		if (ObjectUtil.isNotNull(singleServerConfig)) {
+			// 使用单机模式
+			config.useSingleServer()
+					.setAddress(prefix + redisProperties.getHost() + ":" + redisProperties.getPort())
+					.setConnectTimeout(((Long) redisProperties.getTimeout().toMillis()).intValue())
+					.setDatabase(redisProperties.getDatabase())
+					.setPassword(StringUtils.isNotBlank(redisProperties.getPassword()) ? redisProperties.getPassword() : null)
+					.setTimeout(singleServerConfig.getTimeout())
+					.setRetryAttempts(singleServerConfig.getRetryAttempts())
+					.setRetryInterval(singleServerConfig.getRetryInterval())
+					.setSubscriptionsPerConnection(singleServerConfig.getSubscriptionsPerConnection())
+					.setClientName(singleServerConfig.getClientName())
+					.setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
+					.setSubscriptionConnectionMinimumIdleSize(singleServerConfig.getSubscriptionConnectionMinimumIdleSize())
+					.setSubscriptionConnectionPoolSize(singleServerConfig.getSubscriptionConnectionPoolSize())
+					.setConnectionMinimumIdleSize(singleServerConfig.getConnectionMinimumIdleSize())
+					.setConnectionPoolSize(singleServerConfig.getConnectionPoolSize())
+					.setDnsMonitoringInterval(singleServerConfig.getDnsMonitoringInterval());
+		}
+
+		RedissonProperties.ClusterServersConfig clusterServersConfig = redissonProperties.getClusterServersConfig();
+		if (ObjectUtil.isNotNull(clusterServersConfig)) {
+			// 使用集群模式
+			config.useClusterServers()
+					.setConnectTimeout(((Long) redisProperties.getTimeout().toMillis()).intValue())
+					.setPassword(StringUtils.isNotBlank(redisProperties.getPassword()) ? redisProperties.getPassword() : null)
+					.setTimeout(clusterServersConfig.getTimeout())
+					.setRetryAttempts(clusterServersConfig.getRetryAttempts())
+					.setRetryInterval(clusterServersConfig.getRetryInterval())
+					.setSubscriptionsPerConnection(clusterServersConfig.getSubscriptionsPerConnection())
+					.setClientName(clusterServersConfig.getClientName())
+					.setIdleConnectionTimeout(clusterServersConfig.getIdleConnectionTimeout())
+					.setPingConnectionInterval(clusterServersConfig.getPingConnectionInterval())
+					.setSubscriptionConnectionMinimumIdleSize(clusterServersConfig.getSubscriptionConnectionMinimumIdleSize())
+					.setSubscriptionConnectionPoolSize(clusterServersConfig.getSubscriptionConnectionPoolSize())
+					.setMasterConnectionMinimumIdleSize(clusterServersConfig.getMasterConnectionMinimumIdleSize())
+					.setMasterConnectionPoolSize(clusterServersConfig.getMasterConnectionPoolSize())
+					.setSlaveConnectionMinimumIdleSize(clusterServersConfig.getSlaveConnectionMinimumIdleSize())
+					.setSlaveConnectionPoolSize(clusterServersConfig.getSlaveConnectionPoolSize())
+					.setDnsMonitoringInterval(clusterServersConfig.getDnsMonitoringInterval())
+					.setFailedSlaveReconnectionInterval(clusterServersConfig.getFailedSlaveReconnectionInterval())
+					.setScanInterval(clusterServersConfig.getScanInterval())
+					.setReadMode(clusterServersConfig.getReadMode())
+					.setSubscriptionMode(clusterServersConfig.getSubscriptionMode())
+					.setNodeAddresses(redisProperties.getCluster().getNodes());
+		}
 		RedissonClient redissonClient = Redisson.create(config);
 		log.info("初始化 redis 配置");
 		return redissonClient;
