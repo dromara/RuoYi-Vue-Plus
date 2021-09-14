@@ -36,6 +36,9 @@
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.4.1</dynamic-ds.version>
 
+        <!-- jdk11 缺失依赖 jaxb-->
+        <jaxb.version>3.0.1</jaxb.version>
+
         <!-- OSS 配置 -->
         <qiniu.version>7.8.0</qiniu.version>
         <aliyun.oss.version>3.13.1</aliyun.oss.version>
@@ -239,7 +242,12 @@
 
 
     <dependencies>
-
+        <!-- jdk11 缺失依赖 jaxb-->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -320,45 +328,6 @@
                 <logging.level>warn</logging.level>
                 <endpoints.include>health,info</endpoints.include>
             </properties>
-        </profile>
-
-        <!-- jdk多版本配置 -->
-        <profile>
-            <id>jdk8</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <java.version>1.8</java.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>jdk11</id>
-            <activation>
-                <jdk>11</jdk>
-            </activation>
-            <properties>
-                <java.version>11</java.version>
-                <jaxb.version>3.0.1</jaxb.version>
-            </properties>
-            <dependencyManagement>
-                <dependencies>
-                    <!-- jdk11 缺失依赖 jaxb-->
-                    <dependency>
-                        <groupId>com.sun.xml.bind</groupId>
-                        <artifactId>jaxb-impl</artifactId>
-                        <version>${jaxb.version}</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-            <dependencies>
-                <!--jaxb-->
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
 
