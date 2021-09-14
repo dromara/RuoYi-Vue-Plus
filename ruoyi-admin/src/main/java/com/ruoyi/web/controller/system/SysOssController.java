@@ -3,6 +3,7 @@ package com.ruoyi.web.controller.system;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
@@ -103,7 +104,16 @@ public class SysOssController extends BaseController {
 		response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
 		FileUtils.setAttachmentResponseHeader(response, URLEncoder.encode(sysOss.getOriginalName(), StandardCharsets.UTF_8.toString()));
 		response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
-		long data = HttpUtil.download(sysOss.getUrl(), response.getOutputStream(), false);
+		long data;
+		try {
+			data = HttpUtil.download(sysOss.getUrl(), response.getOutputStream(), false);
+		} catch (HttpException e) {
+			if (e.getMessage().contains("403")) {
+				throw new ServiceException("无读取权限, 请在对应的OSS开启'公有读'权限!");
+			} else {
+				throw new ServiceException(e.getMessage());
+			}
+		}
 		response.setContentLength(Convert.toInt(data));
 	}
 
