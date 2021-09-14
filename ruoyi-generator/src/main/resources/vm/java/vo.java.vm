@@ -26,13 +26,13 @@ import java.util.Date;
 public class ${ClassName}Vo {
 
 	private static final long serialVersionUID = 1L;
-
+#if($pkColumn.isPk == 1)
 	/**
      *  $pkColumn.columnComment
      */
 	@ApiModelProperty("$pkColumn.columnComment")
 	private ${pkColumn.javaType} ${pkColumn.javaField};
-
+#end
 #foreach ($column in $columns)
 #if($column.isList && $column.isPk!=1)
     /**
