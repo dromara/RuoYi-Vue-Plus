@@ -57,7 +57,7 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 		try {
 			loginUser = SecurityUtils.getLoginUser();
 		} catch (Exception e) {
-			log.error("自动注入警告 => 用户未登录");
+			log.warn("自动注入警告 => 用户未登录");
 			return null;
 		}
 		return loginUser.getUsername();
