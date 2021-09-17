@@ -33,7 +33,7 @@ import java.util.Map;
 
 /**
  * 操作日志记录处理
- *
+ * 
  * @author ruoyi
  */
 @Aspect
@@ -61,7 +61,7 @@ public class LogAspect
 
     /**
      * 拦截异常操作
-     *
+     * 
      * @param joinPoint 切点
      * @param e 异常
      */
@@ -91,9 +91,6 @@ public class LogAspect
             // 请求的地址
             String ip = ServletUtils.getClientIP();
             operLog.setOperIp(ip);
-            // 返回参数
-            operLog.setJsonResult(JsonUtils.toJsonString(jsonResult));
-
             operLog.setOperUrl(ServletUtils.getRequest().getRequestURI());
             if (loginUser != null)
             {
@@ -112,7 +109,7 @@ public class LogAspect
             // 设置请求方式
             operLog.setRequestMethod(ServletUtils.getRequest().getMethod());
             // 处理设置注解上的参数
-            getControllerMethodDescription(joinPoint, controllerLog, operLog);
+            getControllerMethodDescription(joinPoint, controllerLog, operLog, jsonResult);
             // 保存数据库
 			SpringUtils.getBean(AsyncService.class).recordOper(operLog);
         }
@@ -127,12 +124,12 @@ public class LogAspect
 
     /**
      * 获取注解中对方法的描述信息 用于Controller层注解
-     *
+     * 
      * @param log 日志
      * @param operLog 操作日志
      * @throws Exception
      */
-    public void getControllerMethodDescription(JoinPoint joinPoint, Log log, SysOperLog operLog) throws Exception
+    public void getControllerMethodDescription(JoinPoint joinPoint, Log log, SysOperLog operLog, Object jsonResult) throws Exception
     {
         // 设置action动作
         operLog.setBusinessType(log.businessType().ordinal());
@@ -146,11 +143,16 @@ public class LogAspect
             // 获取参数的信息，传入到数据库中。
             setRequestValue(joinPoint, operLog);
         }
+        // 是否需要保存response，参数和值
+        if (log.isSaveResponseData() && StringUtils.isNotNull(jsonResult))
+        {
+            operLog.setJsonResult(StringUtils.substring(JsonUtils.toJsonString(jsonResult), 0, 2000));
+        }
     }
 
     /**
      * 获取请求的参数，放到log中
-     *
+     * 
      * @param operLog 操作日志
      * @throws Exception 异常
      */
