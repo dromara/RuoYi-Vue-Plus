@@ -1,9 +1,9 @@
 package com.ruoyi.framework.security.filter;
 
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.service.TokenService;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.framework.web.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

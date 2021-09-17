@@ -9,7 +9,7 @@ import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.RepeatSubmitProperties;
-import com.ruoyi.framework.config.properties.TokenProperties;
+import com.ruoyi.common.properties.TokenProperties;
 import com.ruoyi.framework.interceptor.RepeatSubmitInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

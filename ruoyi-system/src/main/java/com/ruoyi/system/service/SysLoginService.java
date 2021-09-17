@@ -1,8 +1,10 @@
-package com.ruoyi.framework.web.service;
+package com.ruoyi.system.service;
 
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.service.LogininforService;
+import com.ruoyi.common.core.service.TokenService;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
@@ -11,8 +13,6 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.system.service.ISysConfigService;
-import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -44,7 +44,7 @@ public class SysLoginService
 	private ISysConfigService configService;
 
 	@Autowired
-	private AsyncService asyncService;
+	private LogininforService asyncService;
 
     /**
      * 登录验证

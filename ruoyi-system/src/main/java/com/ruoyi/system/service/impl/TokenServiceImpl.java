@@ -1,15 +1,16 @@
-package com.ruoyi.framework.web.service;
+package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.service.TokenService;
+import com.ruoyi.common.properties.TokenProperties;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
-import com.ruoyi.framework.config.properties.TokenProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * @author Lion Li
  */
 @Component
-public class TokenService {
+public class TokenServiceImpl implements TokenService {
 
     protected static final long MILLIS_SECOND = 1000;
 

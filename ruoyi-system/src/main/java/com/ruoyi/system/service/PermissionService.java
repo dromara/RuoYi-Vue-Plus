@@ -1,4 +1,4 @@
-package com.ruoyi.framework.web.service;
+package com.ruoyi.system.service;
 
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.model.LoginUser;

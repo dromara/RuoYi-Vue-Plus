@@ -4,13 +4,14 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.BusinessStatus;
 import com.ruoyi.common.enums.HttpMethod;
+import com.ruoyi.common.core.service.OperLogService;
+import com.ruoyi.common.core.domain.dto.OperLogDTO;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.framework.web.service.AsyncService;
-import com.ruoyi.system.domain.SysOperLog;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -18,8 +19,6 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,11 +35,11 @@ import java.util.Map;
  * 
  * @author ruoyi
  */
+@Slf4j
 @Aspect
 @Component
 public class LogAspect
 {
-    private static final Logger log = LoggerFactory.getLogger(LogAspect.class);
 
     // 配置织入点
     @Pointcut("@annotation(com.ruoyi.common.annotation.Log)")
@@ -86,7 +85,7 @@ public class LogAspect
             LoginUser loginUser = SecurityUtils.getLoginUser();
 
             // *========数据库日志=========*//
-            SysOperLog operLog = new SysOperLog();
+            OperLogDTO operLog = new OperLogDTO();
             operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
             // 请求的地址
             String ip = ServletUtils.getClientIP();
@@ -111,7 +110,7 @@ public class LogAspect
             // 处理设置注解上的参数
             getControllerMethodDescription(joinPoint, controllerLog, operLog, jsonResult);
             // 保存数据库
-			SpringUtils.getBean(AsyncService.class).recordOper(operLog);
+			SpringUtils.getBean(OperLogService.class).recordOper(operLog);
         }
         catch (Exception exp)
         {
@@ -129,7 +128,7 @@ public class LogAspect
      * @param operLog 操作日志
      * @throws Exception
      */
-    public void getControllerMethodDescription(JoinPoint joinPoint, Log log, SysOperLog operLog, Object jsonResult) throws Exception
+    public void getControllerMethodDescription(JoinPoint joinPoint, Log log, OperLogDTO operLog, Object jsonResult) throws Exception
     {
         // 设置action动作
         operLog.setBusinessType(log.businessType().ordinal());
@@ -156,7 +155,7 @@ public class LogAspect
      * @param operLog 操作日志
      * @throws Exception 异常
      */
-    private void setRequestValue(JoinPoint joinPoint, SysOperLog operLog) throws Exception
+    private void setRequestValue(JoinPoint joinPoint, OperLogDTO operLog) throws Exception
     {
         String requestMethod = operLog.getRequestMethod();
         if (HttpMethod.PUT.name().equals(requestMethod) || HttpMethod.POST.name().equals(requestMethod))
