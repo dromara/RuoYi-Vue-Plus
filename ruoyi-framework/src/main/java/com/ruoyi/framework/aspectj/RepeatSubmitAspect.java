@@ -14,16 +14,12 @@ import com.ruoyi.framework.config.properties.RepeatSubmitProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
 
 /**
  * 防止重复提交
@@ -40,14 +36,8 @@ public class RepeatSubmitAspect {
     private final RepeatSubmitProperties repeatSubmitProperties;
     private final LockTemplate lockTemplate;
 
-    // 配置织入点
-    @Pointcut("@annotation(com.ruoyi.common.annotation.RepeatSubmit)")
-    public void repeatSubmitPointCut() {
-    }
-
-    @Before("repeatSubmitPointCut()")
-    public void doBefore(JoinPoint point) throws Throwable {
-        RepeatSubmit repeatSubmit = getAnnotationRateLimiter(point);
+    @Before("@annotation(repeatSubmit)")
+    public void doBefore(JoinPoint point, RepeatSubmit repeatSubmit) throws Throwable {
         // 如果注解不为0 则使用注解数值
         long intervalTime = repeatSubmitProperties.getIntervalTime();
         if (repeatSubmit.intervalTime() > 0) {
@@ -74,20 +64,6 @@ public class RepeatSubmitAspect {
         if (lock == null) {
             throw new ServiceException("不允许重复提交，请稍后再试!");
         }
-    }
-
-    /**
-     * 是否存在注解，如果存在就获取
-     */
-    private RepeatSubmit getAnnotationRateLimiter(JoinPoint joinPoint) {
-        Signature signature = joinPoint.getSignature();
-        MethodSignature methodSignature = (MethodSignature) signature;
-        Method method = methodSignature.getMethod();
-
-        if (method != null) {
-            return method.getAnnotation(RepeatSubmit.class);
-        }
-        return null;
     }
 
 }

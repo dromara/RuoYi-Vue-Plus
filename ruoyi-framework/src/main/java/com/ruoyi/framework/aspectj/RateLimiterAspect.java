@@ -7,10 +7,8 @@ import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.redisson.api.RateType;
 import org.springframework.stereotype.Component;
@@ -27,14 +25,8 @@ import java.lang.reflect.Method;
 @Component
 public class RateLimiterAspect {
 
-    // 配置织入点
-    @Pointcut("@annotation(com.ruoyi.common.annotation.RateLimiter)")
-    public void rateLimiterPointCut() {
-    }
-
-    @Before("rateLimiterPointCut()")
-    public void doBefore(JoinPoint point) throws Throwable {
-        RateLimiter rateLimiter = getAnnotationRateLimiter(point);
+    @Before("@annotation(rateLimiter)")
+    public void doBefore(JoinPoint point, RateLimiter rateLimiter) throws Throwable {
         int time = rateLimiter.time();
         int count = rateLimiter.count();
         String combineKey = getCombineKey(rateLimiter, point);
@@ -53,20 +45,6 @@ public class RateLimiterAspect {
         } catch (Exception e) {
             throw new RuntimeException("服务器限流异常，请稍后再试");
         }
-    }
-
-    /**
-     * 是否存在注解，如果存在就获取
-     */
-    private RateLimiter getAnnotationRateLimiter(JoinPoint joinPoint) {
-        Signature signature = joinPoint.getSignature();
-        MethodSignature methodSignature = (MethodSignature) signature;
-        Method method = methodSignature.getMethod();
-
-        if (method != null) {
-            return method.getAnnotation(RateLimiter.class);
-        }
-        return null;
     }
 
     public String getCombineKey(RateLimiter rateLimiter, JoinPoint point) {
