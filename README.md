@@ -24,11 +24,12 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级(不兼�
 | 数据库框架 | Mybatis-Plus | [Mybatis-Plus文档](https://baomidou.com/guide/) | 快速 CRUD 增加开发效率 |
 | 数据库框架 | p6spy | [p6spy官网](https://p6spy.readthedocs.io/) | 更强劲的 SQL 分析 |
 | 多数据源框架 | dynamic-datasource | [dynamic-ds文档](https://www.kancloud.cn/tracy5546/dynamic-datasource/content) | 支持主从与多种类数据库异构 |
-| Redis客户端 | Redisson | [Redisson文档](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95) | 性能强劲、API丰富 |
 | 序列化框架 | Jackson | [Jackson官网](https://github.com/FasterXML/jackson) | 统一使用 jackson 高效可靠 |
 | 网络框架 | Feign、OkHttp3 | [Feign官网](https://github.com/OpenFeign/feign) | 接口化管理 HTTP 请求 |
-| 分布式锁 | Lock4j | [Lock4j官网](https://gitee.com/baomidou/lock4j) | 注解锁、工具锁 多种多样 |
+| Redis客户端 | Redisson | [Redisson文档](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95) | 支持单机、集群配置 |
 | 分布式限流 | Redisson | [Redisson文档](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95) | 全局、请求IP、集群ID 多种限流 |
+| 分布式锁 | Lock4j | [Lock4j官网](https://gitee.com/baomidou/lock4j) | 注解锁、工具锁 多种多样 |
+| 分布式幂等 | Lock4j | [Lock4j文档](https://gitee.com/baomidou/lock4j) | 基于分布式锁实现 |
 | 文件存储 | Minio | [Minio文档](https://docs.min.io/) | 本地存储 |
 | 文件存储 | 七牛、阿里、腾讯 | [OSS使用文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4359146&doc_id=1469725) | 云存储 |
 | 监控框架 | SpringBoot-Admin | [SpringBoot-Admin文档](https://codecentric.github.io/spring-boot-admin/current/) | 全方位服务监控 |
