@@ -22,12 +22,12 @@
         <druid.version>1.2.6</druid.version>
         <knife4j.version>3.0.3</knife4j.version>
         <poi.version>4.1.2</poi.version>
-        <easyexcel.version>2.2.10</easyexcel.version>
+        <easyexcel.version>2.2.11</easyexcel.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
         <mybatis-plus.version>3.4.3.3</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.7.11</hutool.version>
+        <hutool.version>5.7.13</hutool.version>
         <feign.version>3.0.3</feign.version>
         <feign-okhttp.version>11.6</feign-okhttp.version>
         <okhttp.version>4.9.1</okhttp.version>
