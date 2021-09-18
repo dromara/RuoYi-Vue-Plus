@@ -44,6 +44,7 @@ public class TokenServiceImpl implements TokenService {
      *
      * @return 用户信息
      */
+    @Override
     public LoginUser getLoginUser(HttpServletRequest request) {
         // 获取请求携带的令牌
         String token = getToken(request);
@@ -65,6 +66,7 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 设置用户身份信息
      */
+    @Override
     public void setLoginUser(LoginUser loginUser) {
         if (StringUtils.isNotNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken())) {
             refreshToken(loginUser);
@@ -74,6 +76,7 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 删除用户身份信息
      */
+    @Override
     public void delLoginUser(String token) {
         if (StringUtils.isNotEmpty(token)) {
             String userKey = getTokenKey(token);
@@ -87,6 +90,7 @@ public class TokenServiceImpl implements TokenService {
      * @param loginUser 用户信息
      * @return 令牌
      */
+    @Override
     public String createToken(LoginUser loginUser) {
         String token = IdUtil.fastUUID();
         loginUser.setToken(token);
@@ -104,6 +108,7 @@ public class TokenServiceImpl implements TokenService {
      * @param loginUser
      * @return 令牌
      */
+    @Override
     public void verifyToken(LoginUser loginUser) {
         long expireTime = loginUser.getExpireTime();
         long currentTime = System.currentTimeMillis();
@@ -117,6 +122,7 @@ public class TokenServiceImpl implements TokenService {
      *
      * @param loginUser 登录信息
      */
+    @Override
     public void refreshToken(LoginUser loginUser) {
         loginUser.setLoginTime(System.currentTimeMillis());
         loginUser.setExpireTime(loginUser.getLoginTime() + tokenProperties.getExpireTime() * MILLIS_MINUTE);
@@ -130,6 +136,7 @@ public class TokenServiceImpl implements TokenService {
      *
      * @param loginUser 登录信息
      */
+    @Override
     public void setUserAgent(LoginUser loginUser) {
         UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
         String ip = ServletUtils.getClientIP();
@@ -171,6 +178,7 @@ public class TokenServiceImpl implements TokenService {
      * @param token 令牌
      * @return 用户名
      */
+    @Override
     public String getUsernameFromToken(String token) {
         Claims claims = parseToken(token);
         return claims.getSubject();
