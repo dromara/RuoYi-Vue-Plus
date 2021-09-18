@@ -23,10 +23,10 @@
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
           <el-option
-            v-for="dict in statusOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.sys_normal_disable"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -149,10 +149,10 @@
         <el-form-item label="是否HTTPS">
           <el-radio-group v-model="form.isHttps">
             <el-radio
-              v-for="dict in isHttpsOptions"
-              :key="dict.dictValue"
-              :label="dict.dictValue"
-            >{{dict.dictLabel}}</el-radio>
+              v-for="dict in dict.type.sys_yes_no"
+              :key="dict.value"
+              :label="dict.value"
+            >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="域" prop="region">
@@ -183,6 +183,7 @@ import {
 
 export default {
   name: "OssConfig",
+  dicts: ['sys_yes_no', 'sys_normal_disable'],
   data() {
     return {
       // 按钮loading
@@ -275,12 +276,6 @@ export default {
   },
   created() {
     this.getList();
-    this.getDicts("sys_yes_no").then(response => {
-      this.isHttpsOptions = response.data;
-    });
-    this.getDicts("sys_normal_disable").then(response => {
-      this.statusOptions = response.data;
-    });
     this.configKeyOptions = this.configKeyDatas;
   },
   methods: {
