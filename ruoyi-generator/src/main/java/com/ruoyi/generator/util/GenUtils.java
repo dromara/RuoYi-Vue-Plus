@@ -33,8 +33,7 @@ public class GenUtils
     /**
      * 初始化列属性字段
      */
-    public static void initColumnField(GenTableColumn column, GenTable table)
-    {
+    public static void initColumnField(GenTableColumn column, GenTable table) {
         String dataType = getDbType(column.getColumnType());
         String columnName = column.getColumnName();
         column.setTableId(table.getTableId());
@@ -44,47 +43,47 @@ public class GenUtils
         // 设置默认类型
         column.setJavaType(GenConstants.TYPE_STRING);
 
-        if (arraysContains(GenConstants.COLUMNTYPE_STR, dataType) || arraysContains(GenConstants.COLUMNTYPE_TEXT, dataType))
-        {
+        if (arraysContains(GenConstants.COLUMNTYPE_STR, dataType) || arraysContains(GenConstants.COLUMNTYPE_TEXT, dataType)) {
             // 字符串长度超过500设置为文本域
             Integer columnLength = getColumnLength(column.getColumnType());
             String htmlType = columnLength >= 500 || arraysContains(GenConstants.COLUMNTYPE_TEXT, dataType) ? GenConstants.HTML_TEXTAREA : GenConstants.HTML_INPUT;
             column.setHtmlType(htmlType);
-        }
-        else if (arraysContains(GenConstants.COLUMNTYPE_TIME, dataType))
-        {
+        } else if (arraysContains(GenConstants.COLUMNTYPE_TIME, dataType)) {
             column.setJavaType(GenConstants.TYPE_DATE);
             column.setHtmlType(GenConstants.HTML_DATETIME);
-        }
-        else if (arraysContains(GenConstants.COLUMNTYPE_NUMBER, dataType))
-        {
+        } else if (arraysContains(GenConstants.COLUMNTYPE_NUMBER, dataType)) {
             column.setHtmlType(GenConstants.HTML_INPUT);
 
             // 如果是浮点型 统一用BigDecimal
             String[] str = StringUtils.split(StringUtils.substringBetween(column.getColumnType(), "(", ")"), ",");
-            if (str != null && str.length == 2 && Integer.parseInt(str[1]) > 0)
-            {
+            if (str != null && str.length == 2 && Integer.parseInt(str[1]) > 0) {
                 column.setJavaType(GenConstants.TYPE_BIGDECIMAL);
             }
             // 如果是整形
-            else if (str != null && str.length == 1 && Integer.parseInt(str[0]) <= 10)
-            {
+            else if (str != null && str.length == 1 && Integer.parseInt(str[0]) <= 10) {
                 column.setJavaType(GenConstants.TYPE_INTEGER);
             }
             // 长整形
-            else
-            {
+            else {
                 column.setJavaType(GenConstants.TYPE_LONG);
             }
         }
 
         // 插入字段（默认所有字段都需要插入）
-        column.setIsInsert(GenConstants.REQUIRE);
-
+        // 主键不需要添加
+        if (!arraysContains(GenConstants.COLUMNNAME_NOT_ADD, columnName) && !column.isPk()) {
+            column.setIsInsert(GenConstants.REQUIRE);
+        }
         // 编辑字段
-        if (!arraysContains(GenConstants.COLUMNNAME_NOT_EDIT, columnName) && !column.isPk())
+        // 编辑需要主键
+        if (!arraysContains(GenConstants.COLUMNNAME_NOT_EDIT, columnName))
         {
             column.setIsEdit(GenConstants.REQUIRE);
+        }
+        // 编辑需要的设置必选
+        if (!arraysContains(GenConstants.COLUMNNAME_NOT_EDIT, columnName))
+        {
+            column.setIsRequired(GenConstants.REQUIRE);
         }
         // 列表字段
         if (!arraysContains(GenConstants.COLUMNNAME_NOT_LIST, columnName) && !column.isPk())
