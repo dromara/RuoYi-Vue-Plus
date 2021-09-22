@@ -39,11 +39,11 @@ public class RepeatSubmitAspect {
     @Before("@annotation(repeatSubmit)")
     public void doBefore(JoinPoint point, RepeatSubmit repeatSubmit) throws Throwable {
         // 如果注解不为0 则使用注解数值
-        long intervalTime = repeatSubmitProperties.getIntervalTime();
-        if (repeatSubmit.intervalTime() > 0) {
-            intervalTime = repeatSubmit.timeUnit().toMillis(repeatSubmit.intervalTime());
+        long interval = repeatSubmitProperties.getInterval();
+        if (repeatSubmit.interval() > 0) {
+            interval = repeatSubmit.timeUnit().toMillis(repeatSubmit.interval());
         }
-        if (intervalTime < 1000) {
+        if (interval < 1000) {
             throw new ServiceException("重复提交间隔时间不能小于'1'秒");
         }
         HttpServletRequest request = ServletUtils.getRequest();
@@ -60,9 +60,9 @@ public class RepeatSubmitAspect {
         submitKey = SecureUtil.md5(submitKey + ":" + nowParams);
         // 唯一标识（指定key + 消息头）
         String cacheRepeatKey = Constants.REPEAT_SUBMIT_KEY + submitKey;
-        LockInfo lock = lockTemplate.lock(cacheRepeatKey, intervalTime, intervalTime / 2);
+        LockInfo lock = lockTemplate.lock(cacheRepeatKey, interval, interval / 2);
         if (lock == null) {
-            throw new ServiceException("不允许重复提交，请稍后再试!");
+            throw new ServiceException(repeatSubmit.message());
         }
     }
 

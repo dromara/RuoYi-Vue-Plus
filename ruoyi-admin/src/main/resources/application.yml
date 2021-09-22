@@ -109,7 +109,7 @@ token:
 # 重复提交
 repeat-submit:
   # 全局间隔时间(毫秒)
-  intervalTime: 1000
+  interval: 5000
 
 # MyBatisPlus配置
 # https://baomidou.com/config/
