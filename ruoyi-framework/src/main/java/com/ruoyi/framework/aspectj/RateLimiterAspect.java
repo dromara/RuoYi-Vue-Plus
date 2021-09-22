@@ -62,5 +62,4 @@ public class RateLimiterAspect {
         stringBuffer.append(targetClass.getName()).append("-").append(method.getName());
         return stringBuffer.toString();
     }
-
 }

@@ -146,7 +146,11 @@ public class LogAspect {
         if (paramsArray != null && paramsArray.length > 0) {
             for (Object o : paramsArray) {
                 if (StringUtils.isNotNull(o) && !isFilterObject(o)) {
-                    params.append(JsonUtils.toJsonString(o)).append(" ");
+                    try {
+                        params.append(JsonUtils.toJsonString(o)).append(" ");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
