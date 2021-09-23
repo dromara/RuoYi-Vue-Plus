@@ -1,14 +1,17 @@
 package com.ruoyi.web.controller.system;
 
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.system.service.ISysMenuService;
+import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysLoginService;
 import com.ruoyi.system.service.SysPermissionService;
-import com.ruoyi.system.service.ISysMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +40,9 @@ public class SysLoginController
     @Autowired
     private SysPermissionService permissionService;
 
+    @Autowired
+    private ISysUserService iSysUserService;
+
     /**
      * 登录方法
      *
@@ -54,6 +60,15 @@ public class SysLoginController
         return AjaxResult.success(ajax);
     }
 
+    @PostMapping("/logout")
+    public AjaxResult logout(){
+        try {
+            StpUtil.logout();
+        } catch (NotLoginException e) {
+        }
+        return AjaxResult.success("退出成功");
+    }
+
     /**
      * 获取用户信息
      *
@@ -62,7 +77,7 @@ public class SysLoginController
     @GetMapping("getInfo")
     public AjaxResult getInfo()
     {
-        SysUser user = SecurityUtils.getLoginUser().getUser();
+        SysUser user = SecurityUtils.getUser();
         // 角色集合
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合
@@ -82,8 +97,7 @@ public class SysLoginController
     @GetMapping("getRouters")
     public AjaxResult getRouters()
     {
-        Long userId = SecurityUtils.getUserId();
-        List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
+        List<SysMenu> menus = menuService.selectMenuTreeByUserId(SecurityUtils.getUserId());
         return AjaxResult.success(menuService.buildMenus(menus));
     }
 }

@@ -1,5 +1,6 @@
 package com.ruoyi.framework.aspectj;
 
+import cn.dev33.satoken.SaManager;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.lock.LockInfo;
@@ -7,7 +8,6 @@ import com.baomidou.lock.LockTemplate;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.properties.TokenProperties;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.RepeatSubmitProperties;
@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class RepeatSubmitAspect {
 
-    private final TokenProperties tokenProperties;
     private final RepeatSubmitProperties repeatSubmitProperties;
     private final LockTemplate lockTemplate;
 
@@ -53,7 +52,7 @@ public class RepeatSubmitAspect {
         String url = request.getRequestURI();
 
         // 唯一值（没有消息头则使用请求地址）
-        String submitKey = request.getHeader(tokenProperties.getHeader());
+        String submitKey = request.getHeader(SaManager.getConfig().getTokenName());
         if (StringUtils.isEmpty(submitKey)) {
             submitKey = url;
         }

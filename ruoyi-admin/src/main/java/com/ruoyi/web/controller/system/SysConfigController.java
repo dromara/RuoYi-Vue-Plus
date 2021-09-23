@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.constant.UserConstants;
@@ -11,7 +12,6 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +33,7 @@ public class SysConfigController extends BaseController
     /**
      * 获取参数配置列表
      */
-    @PreAuthorize("@ss.hasPermi('system:config:list')")
+    @SaCheckPermission("system:config:list")
     @GetMapping("/list")
     public TableDataInfo list(SysConfig config)
     {
@@ -41,7 +41,7 @@ public class SysConfigController extends BaseController
     }
 
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:config:export')")
+    @SaCheckPermission("system:config:export")
     @GetMapping("/export")
     public void export(SysConfig config, HttpServletResponse response)
     {
@@ -52,7 +52,7 @@ public class SysConfigController extends BaseController
     /**
      * 根据参数编号获取详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:config:query')")
+    @SaCheckPermission("system:config:query")
     @GetMapping(value = "/{configId}")
     public AjaxResult getInfo(@PathVariable Long configId)
     {
@@ -71,7 +71,7 @@ public class SysConfigController extends BaseController
     /**
      * 新增参数配置
      */
-    @PreAuthorize("@ss.hasPermi('system:config:add')")
+    @SaCheckPermission("system:config:add")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
     @RepeatSubmit
@@ -81,14 +81,13 @@ public class SysConfigController extends BaseController
         {
             return AjaxResult.error("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
-        config.setCreateBy(getUsername());
         return toAjax(configService.insertConfig(config));
     }
 
     /**
      * 修改参数配置
      */
-    @PreAuthorize("@ss.hasPermi('system:config:edit')")
+    @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysConfig config)
@@ -97,14 +96,13 @@ public class SysConfigController extends BaseController
         {
             return AjaxResult.error("修改参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
-        config.setUpdateBy(getUsername());
         return toAjax(configService.updateConfig(config));
     }
 
     /**
      * 删除参数配置
      */
-    @PreAuthorize("@ss.hasPermi('system:config:remove')")
+    @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
     public AjaxResult remove(@PathVariable Long[] configIds)
@@ -116,7 +114,7 @@ public class SysConfigController extends BaseController
     /**
      * 刷新参数缓存
      */
-    @PreAuthorize("@ss.hasPermi('system:config:remove')")
+    @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
     public AjaxResult refreshCache()

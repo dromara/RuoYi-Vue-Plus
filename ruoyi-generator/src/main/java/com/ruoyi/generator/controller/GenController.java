@@ -1,5 +1,6 @@
 package com.ruoyi.generator.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.convert.Convert;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
@@ -12,7 +13,6 @@ import com.ruoyi.generator.service.IGenTableColumnService;
 import com.ruoyi.generator.service.IGenTableService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +40,7 @@ public class GenController extends BaseController
     /**
      * 查询代码生成列表
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:list')")
+    @SaCheckPermission("tool:gen:list")
     @GetMapping("/list")
     public TableDataInfo genList(GenTable genTable)
     {
@@ -50,7 +50,7 @@ public class GenController extends BaseController
     /**
      * 修改代码生成业务
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:query')")
+    @SaCheckPermission("tool:gen:query")
     @GetMapping(value = "/{talbleId}")
     public AjaxResult getInfo(@PathVariable Long talbleId)
     {
@@ -67,7 +67,7 @@ public class GenController extends BaseController
     /**
      * 查询数据库列表
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:list')")
+    @SaCheckPermission("tool:gen:list")
     @GetMapping("/db/list")
     public TableDataInfo dataList(GenTable genTable)
     {
@@ -77,7 +77,7 @@ public class GenController extends BaseController
     /**
      * 查询数据表字段列表
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:list')")
+    @SaCheckPermission("tool:gen:list")
     @GetMapping(value = "/column/{talbleId}")
     public TableDataInfo columnList(Long tableId)
     {
@@ -91,7 +91,7 @@ public class GenController extends BaseController
     /**
      * 导入表结构（保存）
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:import')")
+    @SaCheckPermission("tool:gen:import")
     @Log(title = "代码生成", businessType = BusinessType.IMPORT)
     @PostMapping("/importTable")
     public AjaxResult importTableSave(String tables)
@@ -106,7 +106,7 @@ public class GenController extends BaseController
     /**
      * 修改保存代码生成业务
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:edit')")
+    @SaCheckPermission("tool:gen:edit")
     @Log(title = "代码生成", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult editSave(@Validated @RequestBody GenTable genTable)
@@ -119,7 +119,7 @@ public class GenController extends BaseController
     /**
      * 删除代码生成
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:remove')")
+    @SaCheckPermission("tool:gen:remove")
     @Log(title = "代码生成", businessType = BusinessType.DELETE)
     @DeleteMapping("/{tableIds}")
     public AjaxResult remove(@PathVariable Long[] tableIds)
@@ -131,7 +131,7 @@ public class GenController extends BaseController
     /**
      * 预览代码
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:preview')")
+    @SaCheckPermission("tool:gen:preview")
     @GetMapping("/preview/{tableId}")
     public AjaxResult preview(@PathVariable("tableId") Long tableId) throws IOException
     {
@@ -142,7 +142,7 @@ public class GenController extends BaseController
     /**
      * 生成代码（下载方式）
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:code')")
+    @SaCheckPermission("tool:gen:code")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
     @GetMapping("/download/{tableName}")
     public void download(HttpServletResponse response, @PathVariable("tableName") String tableName) throws IOException
@@ -154,7 +154,7 @@ public class GenController extends BaseController
     /**
      * 生成代码（自定义路径）
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:code')")
+    @SaCheckPermission("tool:gen:code")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
     @GetMapping("/genCode/{tableName}")
     public AjaxResult genCode(@PathVariable("tableName") String tableName)
@@ -166,7 +166,7 @@ public class GenController extends BaseController
     /**
      * 同步数据库
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:edit')")
+    @SaCheckPermission("tool:gen:edit")
     @Log(title = "代码生成", businessType = BusinessType.UPDATE)
     @GetMapping("/synchDb/{tableName}")
     public AjaxResult synchDb(@PathVariable("tableName") String tableName)
@@ -178,7 +178,7 @@ public class GenController extends BaseController
     /**
      * 批量生成代码
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:code')")
+    @SaCheckPermission("tool:gen:code")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
     @GetMapping("/batchGenCode")
     public void batchGenCode(HttpServletResponse response, String tables) throws IOException

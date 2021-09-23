@@ -1,26 +1,20 @@
 package com.ruoyi.system.service;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.service.LogininforService;
-import com.ruoyi.common.core.service.TokenService;
+import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
 import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
-import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.MessageUtils;
-import com.ruoyi.common.utils.RedisUtils;
-import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -28,14 +22,10 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author ruoyi
  */
+@Slf4j
 @Component
 public class SysLoginService
 {
-    @Autowired
-    private TokenService tokenService;
-
-    @Resource
-    private AuthenticationManager authenticationManager;
 
 	@Autowired
     private ISysUserService userService;
@@ -64,32 +54,35 @@ public class SysLoginService
         {
             validateCaptcha(username, code, uuid, request);
         }
-        // 用户验证
-        Authentication authentication = null;
-        try
+        SysUser user = userService.selectUserByUserName(username);
+        if (StringUtils.isNull(user))
         {
-            // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
-            authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            log.info("登录用户：{} 不存在.", username);
+            throw new ServiceException("登录用户：" + username + " 不存在");
         }
-        catch (Exception e)
+        else if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
         {
-            if (e instanceof BadCredentialsException)
-            {
-				asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match"), request);
-                throw new UserPasswordNotMatchException();
-            }
-            else
-            {
-				asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage(), request);
-                throw new ServiceException(e.getMessage());
-            }
+            log.info("登录用户：{} 已被删除.", username);
+            throw new ServiceException("对不起，您的账号：" + username + " 已被删除");
         }
+        else if (UserStatus.DISABLE.getCode().equals(user.getStatus()))
+        {
+            log.info("登录用户：{} 已被停用.", username);
+            throw new ServiceException("对不起，您的账号：" + username + " 已停用");
+        }
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodePassword = passwordEncoder.encode(password);
+        if (SecurityUtils.matchesPassword(user.getPassword(), encodePassword))
+        {
+            asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match"), request);
+            throw new UserPasswordNotMatchException();
+        }
+
 		asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
-        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        recordLoginInfo(loginUser.getUser());
+        recordLoginInfo(user);
         // 生成token
-        return tokenService.createToken(loginUser);
+        StpUtil.login(user.getUserId(), "PC");
+        return StpUtil.getTokenValue();
     }
 
     /**

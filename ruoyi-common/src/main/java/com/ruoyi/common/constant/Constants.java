@@ -1,7 +1,5 @@
 package com.ruoyi.common.constant;
 
-import io.jsonwebtoken.Claims;
-
 /**
  * 通用常量信息
  *
@@ -70,6 +68,11 @@ public class Constants
     public static final String LOGIN_TOKEN_KEY = "login_tokens:";
 
     /**
+     * 在线用户 redis key
+     */
+    public static final String ONLINE_TOKEN_KEY = "online_tokens:";
+
+    /**
      * 防重提交 redis key
      */
     public static final String REPEAT_SUBMIT_KEY = "repeat_submit:";
@@ -92,37 +95,7 @@ public class Constants
     /**
      * 令牌前缀
      */
-    public static final String TOKEN_PREFIX = "Bearer ";
-
-    /**
-     * 令牌前缀
-     */
     public static final String LOGIN_USER_KEY = "login_user_key";
-
-    /**
-     * 用户ID
-     */
-    public static final String JWT_USERID = "userid";
-
-    /**
-     * 用户名称
-     */
-    public static final String JWT_USERNAME = Claims.SUBJECT;
-
-    /**
-     * 用户头像
-     */
-    public static final String JWT_AVATAR = "avatar";
-
-    /**
-     * 创建时间
-     */
-    public static final String JWT_CREATED = "created";
-
-    /**
-     * 用户权限
-     */
-    public static final String JWT_AUTHORITIES = "authorities";
 
     /**
      * 参数管理 cache key

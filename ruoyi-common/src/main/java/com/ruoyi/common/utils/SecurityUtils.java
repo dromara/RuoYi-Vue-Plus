@@ -1,11 +1,12 @@
 package com.ruoyi.common.utils;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.service.IUserService;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.spring.SpringUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * 安全服务工具类
@@ -19,14 +20,7 @@ public class SecurityUtils
      **/
     public static Long getUserId()
     {
-        try
-        {
-            return getLoginUser().getUserId();
-        }
-        catch (Exception e)
-        {
-            throw new ServiceException("获取用户ID异常", HttpStatus.HTTP_UNAUTHORIZED);
-        }
+        return StpUtil.getLoginIdAsLong();
     }
 
     /**
@@ -36,7 +30,7 @@ public class SecurityUtils
     {
         try
         {
-            return getLoginUser().getDeptId();
+            return getUser().getDeptId();
         }
         catch (Exception e)
         {
@@ -51,7 +45,7 @@ public class SecurityUtils
     {
         try
         {
-            return getLoginUser().getUsername();
+            return getUser().getUserName();
         }
         catch (Exception e)
         {
@@ -62,24 +56,16 @@ public class SecurityUtils
     /**
      * 获取用户
      **/
-    public static LoginUser getLoginUser()
+    public static SysUser getUser()
     {
         try
         {
-            return (LoginUser) getAuthentication().getPrincipal();
+            return SpringUtils.getBean(IUserService.class).selectUserById(getUserId());
         }
         catch (Exception e)
         {
             throw new ServiceException("获取用户信息异常", HttpStatus.HTTP_UNAUTHORIZED);
         }
-    }
-
-    /**
-     * 获取Authentication
-     */
-    public static Authentication getAuthentication()
-    {
-        return SecurityContextHolder.getContext().getAuthentication();
     }
 
     /**

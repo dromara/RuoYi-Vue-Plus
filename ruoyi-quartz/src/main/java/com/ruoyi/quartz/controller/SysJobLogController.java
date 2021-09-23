@@ -1,5 +1,6 @@
 package com.ruoyi.quartz.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -9,7 +10,6 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.quartz.domain.SysJobLog;
 import com.ruoyi.quartz.service.ISysJobLogService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -30,7 +30,8 @@ public class SysJobLogController extends BaseController
     /**
      * 查询定时任务调度日志列表
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:list')")
+
+    @SaCheckPermission("monitor:job:list")
     @GetMapping("/list")
     public TableDataInfo list(SysJobLog sysJobLog)
     {
@@ -40,7 +41,7 @@ public class SysJobLogController extends BaseController
     /**
      * 导出定时任务调度日志列表
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:export')")
+    @SaCheckPermission("monitor:job:export")
     @Log(title = "任务调度日志", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public void export(SysJobLog sysJobLog, HttpServletResponse response)
@@ -52,7 +53,7 @@ public class SysJobLogController extends BaseController
     /**
      * 根据调度编号获取详细信息
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:query')")
+    @SaCheckPermission("monitor:job:query")
     @GetMapping(value = "/{configId}")
     public AjaxResult getInfo(@PathVariable Long jobLogId)
     {
@@ -63,7 +64,7 @@ public class SysJobLogController extends BaseController
     /**
      * 删除定时任务调度日志
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:remove')")
+    @SaCheckPermission("monitor:job:remove")
     @Log(title = "定时任务调度日志", businessType = BusinessType.DELETE)
     @DeleteMapping("/{jobLogIds}")
     public AjaxResult remove(@PathVariable Long[] jobLogIds)
@@ -74,7 +75,7 @@ public class SysJobLogController extends BaseController
     /**
      * 清空定时任务调度日志
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:remove')")
+    @SaCheckPermission("monitor:job:remove")
     @Log(title = "调度日志", businessType = BusinessType.CLEAN)
     @DeleteMapping("/clean")
     public AjaxResult clean()

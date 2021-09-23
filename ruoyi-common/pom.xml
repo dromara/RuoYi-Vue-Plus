@@ -29,10 +29,20 @@
             <artifactId>spring-web</artifactId>
         </dependency>
 
-        <!-- spring security 安全认证 -->
+        <!-- Sa-Token 权限认证, 在线文档：http://sa-token.dev33.cn/ -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- Sa-Token 整合 Redis （使用jackson序列化方式） -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-dao-redis-jackson</artifactId>
+        </dependency>
+        <!-- Sa-Token整合SpringAOP实现注解鉴权 -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-aop</artifactId>
         </dependency>
 
         <!-- 自定义验证注解 -->
@@ -70,11 +80,11 @@
             <artifactId>snakeyaml</artifactId>
         </dependency>
 
-        <!--Token生成与解析-->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-        </dependency>
+<!--        &lt;!&ndash;Token生成与解析&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>io.jsonwebtoken</groupId>-->
+<!--            <artifactId>jjwt</artifactId>-->
+<!--        </dependency>-->
 
         <!-- redis 缓存操作 -->
         <dependency>

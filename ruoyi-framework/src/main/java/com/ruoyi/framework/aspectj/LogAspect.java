@@ -2,7 +2,7 @@ package com.ruoyi.framework.aspectj;
 
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.domain.dto.OperLogDTO;
-import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.service.OperLogService;
 import com.ruoyi.common.enums.BusinessStatus;
 import com.ruoyi.common.enums.HttpMethod;
@@ -61,7 +61,7 @@ public class LogAspect {
         try {
 
             // 获取当前的用户
-            LoginUser loginUser = SecurityUtils.getLoginUser();
+            SysUser sysUser = SecurityUtils.getUser();
 
             // *========数据库日志=========*//
             OperLogDTO operLog = new OperLogDTO();
@@ -70,8 +70,8 @@ public class LogAspect {
             String ip = ServletUtils.getClientIP();
             operLog.setOperIp(ip);
             operLog.setOperUrl(ServletUtils.getRequest().getRequestURI());
-            if (loginUser != null) {
-                operLog.setOperName(loginUser.getUsername());
+            if (sysUser != null) {
+                operLog.setOperName(sysUser.getUserName());
             }
 
             if (e != null) {

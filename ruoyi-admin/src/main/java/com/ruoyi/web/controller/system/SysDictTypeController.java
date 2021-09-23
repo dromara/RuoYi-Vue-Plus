@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -10,7 +11,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.service.ISysDictTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +29,7 @@ public class SysDictTypeController extends BaseController
     @Autowired
     private ISysDictTypeService dictTypeService;
 
-    @PreAuthorize("@ss.hasPermi('system:dict:list')")
+    @SaCheckPermission("system:dict:list")
     @GetMapping("/list")
     public TableDataInfo list(SysDictType dictType)
     {
@@ -37,7 +37,7 @@ public class SysDictTypeController extends BaseController
     }
 
     @Log(title = "字典类型", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:dict:export')")
+    @SaCheckPermission("system:dict:export")
     @GetMapping("/export")
     public void export(SysDictType dictType, HttpServletResponse response)
     {
@@ -48,7 +48,7 @@ public class SysDictTypeController extends BaseController
     /**
      * 查询字典类型详细
      */
-    @PreAuthorize("@ss.hasPermi('system:dict:query')")
+    @SaCheckPermission("system:dict:query")
     @GetMapping(value = "/{dictId}")
     public AjaxResult getInfo(@PathVariable Long dictId)
     {
@@ -58,7 +58,7 @@ public class SysDictTypeController extends BaseController
     /**
      * 新增字典类型
      */
-    @PreAuthorize("@ss.hasPermi('system:dict:add')")
+    @SaCheckPermission("system:dict:add")
     @Log(title = "字典类型", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysDictType dict)
@@ -67,14 +67,13 @@ public class SysDictTypeController extends BaseController
         {
             return AjaxResult.error("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-        dict.setCreateBy(getUsername());
         return toAjax(dictTypeService.insertDictType(dict));
     }
 
     /**
      * 修改字典类型
      */
-    @PreAuthorize("@ss.hasPermi('system:dict:edit')")
+    @SaCheckPermission("system:dict:edit")
     @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysDictType dict)
@@ -83,14 +82,13 @@ public class SysDictTypeController extends BaseController
         {
             return AjaxResult.error("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-        dict.setUpdateBy(getUsername());
         return toAjax(dictTypeService.updateDictType(dict));
     }
 
     /**
      * 删除字典类型
      */
-    @PreAuthorize("@ss.hasPermi('system:dict:remove')")
+    @SaCheckPermission("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping("/{dictIds}")
     public AjaxResult remove(@PathVariable Long[] dictIds)
@@ -102,7 +100,7 @@ public class SysDictTypeController extends BaseController
     /**
      * 刷新字典缓存
      */
-    @PreAuthorize("@ss.hasPermi('system:dict:remove')")
+    @SaCheckPermission("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
     public AjaxResult refreshCache()

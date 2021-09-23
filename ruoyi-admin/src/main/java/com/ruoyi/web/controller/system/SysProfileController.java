@@ -5,9 +5,7 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.core.service.TokenService;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysOss;
@@ -34,9 +32,6 @@ public class SysProfileController extends BaseController
     private ISysUserService userService;
 
     @Autowired
-    private TokenService tokenService;
-
-    @Autowired
 	private ISysOssService iSysOssService;
 
     /**
@@ -45,12 +40,11 @@ public class SysProfileController extends BaseController
     @GetMapping
     public AjaxResult profile()
     {
-        LoginUser loginUser = getLoginUser();
-        SysUser user = loginUser.getUser();
+        SysUser user = userService.getById(getUserId());
 		Map<String,Object> ajax = new HashMap<>();
 		ajax.put("user", user);
-        ajax.put("roleGroup", userService.selectUserRoleGroup(loginUser.getUsername()));
-        ajax.put("postGroup", userService.selectUserPostGroup(loginUser.getUsername()));
+        ajax.put("roleGroup", userService.selectUserRoleGroup(user.getUserName()));
+        ajax.put("postGroup", userService.selectUserPostGroup(user.getUserName()));
         return AjaxResult.success(ajax);
     }
 
@@ -71,18 +65,10 @@ public class SysProfileController extends BaseController
         {
             return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
-        LoginUser loginUser = getLoginUser();
-        SysUser sysUser = loginUser.getUser();
-        user.setUserId(sysUser.getUserId());
+        user.setUserId(getUserId());
         user.setPassword(null);
         if (userService.updateUserProfile(user) > 0)
         {
-            // 更新缓存用户信息
-            sysUser.setNickName(user.getNickName());
-            sysUser.setPhonenumber(user.getPhonenumber());
-            sysUser.setEmail(user.getEmail());
-            sysUser.setSex(user.getSex());
-            tokenService.setLoginUser(loginUser);
             return AjaxResult.success();
         }
         return AjaxResult.error("修改个人信息异常，请联系管理员");
@@ -95,9 +81,9 @@ public class SysProfileController extends BaseController
     @PutMapping("/updatePwd")
     public AjaxResult updatePwd(String oldPassword, String newPassword)
     {
-        LoginUser loginUser = getLoginUser();
-        String userName = loginUser.getUsername();
-        String password = loginUser.getPassword();
+        SysUser user = SecurityUtils.getUser();
+        String userName = user.getUserName();
+        String password = user.getPassword();
         if (!SecurityUtils.matchesPassword(oldPassword, password))
         {
             return AjaxResult.error("修改密码失败，旧密码错误");
@@ -108,9 +94,6 @@ public class SysProfileController extends BaseController
         }
         if (userService.resetUserPwd(userName, SecurityUtils.encryptPassword(newPassword)) > 0)
         {
-            // 更新缓存用户密码
-            loginUser.getUser().setPassword(SecurityUtils.encryptPassword(newPassword));
-            tokenService.setLoginUser(loginUser);
             return AjaxResult.success();
         }
         return AjaxResult.error("修改密码异常，请联系管理员");
@@ -125,16 +108,13 @@ public class SysProfileController extends BaseController
     {
         if (!file.isEmpty())
         {
-            LoginUser loginUser = getLoginUser();
+            SysUser user = SecurityUtils.getUser();
 			SysOss oss = iSysOssService.upload(file);
 			String avatar = oss.getUrl();
-            if (userService.updateUserAvatar(loginUser.getUsername(), avatar))
+            if (userService.updateUserAvatar(user.getUserName(), avatar))
             {
 				Map<String,Object> ajax = new HashMap<>();
                 ajax.put("imgUrl", avatar);
-                // 更新缓存用户头像
-                loginUser.getUser().setAvatar(avatar);
-                tokenService.setLoginUser(loginUser);
                 return AjaxResult.success(ajax);
             }
         }
