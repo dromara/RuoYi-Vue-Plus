@@ -351,7 +351,7 @@ export default {
           this.buttonLoading = true;
           if (this.form.ossConfigId != null) {
             updateOssConfig(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             }).finally(() => {
@@ -359,7 +359,7 @@ export default {
             });
           } else {
             addOssConfig(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             }).finally(() => {
@@ -372,17 +372,13 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ossConfigIds = row.ossConfigId || this.ids;
-      this.$confirm('是否确认删除对象存储配置编号为"' + ossConfigIds + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
+      this.$modal.confirm('是否确认删除对象存储配置编号为"' + ossConfigIds + '"的数据项?').then(() => {
         this.loading = true;
         return delOssConfig(ossConfigIds);
       }).then(() => {
         this.loading = false;
         this.getList();
-        this.msgSuccess("删除成功");
+        this.$modal.msgSuccess("删除成功");
       }).finally(() => {
         this.loading = false;
       });
@@ -390,16 +386,11 @@ export default {
     // 对象存储配置状态修改
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
-      this.$confirm(
-        '确认要"' + text + '""' + row.configKey + '"配置吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-      }).then(() => {
+      this.$modal.confirm('确认要"' + text + '""' + row.configKey + '"配置吗?').then(() => {
         return changeOssConfigStatus(row.ossConfigId, row.status, row.configKey);
       }).then(() => {
         this.getList()
-        this.msgSuccess(text + "成功");
+        this.$modal.msgSuccess(text + "成功");
       }).catch(() => {
         row.status = row.status === "0" ? "1" : "0";
       })

@@ -330,17 +330,13 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ossIds = row.ossId || this.ids;
-      this.$confirm('是否确认删除OSS对象存储编号为"' + ossIds + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-      }).then(() => {
+      this.$modal.confirm('是否确认删除OSS对象存储编号为"' + ossIds + '"的数据项?').then(() => {
         this.loading = true;
         return delOss(ossIds);
       }).then(() => {
         this.loading = false;
         this.getList();
-        this.msgSuccess("删除成功");
+        this.$modal.msgSuccess("删除成功");
       }).finally(() => {
         this.loading = false;
       });
@@ -348,16 +344,11 @@ export default {
     // 预览列表图片状态修改
     handlePreviewListResource(previewListResource) {
       let text = previewListResource ? "启用" : "停用";
-      this.$confirm(
-        '确认要"' + text + '""预览列表图片"配置吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-      }).then(() => {
+      this.$modal.confirm('确认要"' + text + '""预览列表图片"配置吗?').then(() => {
         return changePreviewListResource(previewListResource);
       }).then(() => {
         this.getList()
-        this.msgSuccess(text + "成功");
+        this.$modal.msgSuccess(text + "成功");
       }).catch(() => {
         this.previewListResource = previewListResource !== true;
       })
