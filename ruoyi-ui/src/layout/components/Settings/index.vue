@@ -41,7 +41,7 @@
       <el-divider/>
 
       <h3 class="drawer-title">系统布局配置</h3>
-
+      
       <div class="drawer-item">
         <span>开启 TopNav</span>
         <el-switch v-model="topNav" class="drawer-switch" />
@@ -162,14 +162,8 @@ export default {
       this.sideTheme = val;
     },
     saveSetting() {
-      const loading = this.$loading({
-        lock: true,
-        fullscreen: false,
-        text: "正在保存到本地，请稍后...",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)"
-      });
-      localStorage.setItem(
+      this.$modal.loading("正在保存到本地，请稍后...");
+      this.$cache.local.set(
         "layout-setting",
         `{
             "topNav":${this.topNav},
@@ -181,17 +175,11 @@ export default {
             "theme":"${this.theme}"
           }`
       );
-      setTimeout(loading.close(), 1000)
+      setTimeout(this.$modal.closeLoading(), 1000)
     },
     resetSetting() {
-      this.$loading({
-        lock: true,
-        fullscreen: false,
-        text: "正在清除设置缓存并刷新，请稍后...",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)"
-      });
-      localStorage.removeItem("layout-setting")
+      this.$modal.loading("正在清除设置缓存并刷新，请稍后...");
+      this.$cache.local.remove("layout-setting")
       setTimeout("window.location.reload()", 1000)
     }
   }
