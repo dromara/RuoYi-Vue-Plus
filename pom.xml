@@ -14,7 +14,7 @@
 
     <properties>
         <ruoyi-vue-plus.version>3.1.0</ruoyi-vue-plus.version>
-        <spring-boot.version>2.5.4</spring-boot.version>
+        <spring-boot.version>2.5.5</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -26,14 +26,14 @@
         <easyexcel.version>2.2.11</easyexcel.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
-        <mybatis-plus.version>3.4.3.3</mybatis-plus.version>
+        <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.7.13</hutool.version>
         <feign.version>3.0.3</feign.version>
         <feign-okhttp.version>11.6</feign-okhttp.version>
         <okhttp.version>4.9.1</okhttp.version>
         <spring-boot-admin.version>2.5.1</spring-boot-admin.version>
-        <redisson.version>3.16.2</redisson.version>
+        <redisson.version>3.16.3</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.4.1</dynamic-ds.version>
 
@@ -43,7 +43,7 @@
         <!-- OSS 配置 -->
         <qiniu.version>7.8.0</qiniu.version>
         <aliyun.oss.version>3.13.1</aliyun.oss.version>
-        <qcloud.cos.version>5.6.51</qcloud.cos.version>
+        <qcloud.cos.version>5.6.55</qcloud.cos.version>
         <minio.version>8.3.0</minio.version>
 
         <!-- docker 配置 -->
