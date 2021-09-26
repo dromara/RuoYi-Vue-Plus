@@ -108,6 +108,9 @@ token:
 
 # security配置
 security:
+  # 登出路径
+  logout-url: /logout
+  # 匿名路径
   anonymous:
     - /login
     - /register
@@ -122,6 +125,8 @@ security:
     # actuator 监控配置
     - /actuator
     - /actuator/**
+  # 用户放行
+  permit-all:
 
 # 重复提交
 repeat-submit:

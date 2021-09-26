@@ -15,8 +15,18 @@ import org.springframework.stereotype.Component;
 public class SecurityProperties {
 
     /**
+     * 退出登录url
+     */
+    private String logoutUrl;
+
+    /**
      * 匿名放行路径
      */
     private String[] anonymous;
+
+    /**
+     * 用户任意访问放行路径
+     */
+    private String[] permitAll;
 
 }
