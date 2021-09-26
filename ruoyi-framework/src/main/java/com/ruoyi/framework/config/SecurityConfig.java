@@ -1,5 +1,6 @@
 package com.ruoyi.framework.config;
 
+import com.ruoyi.framework.config.properties.SecurityProperties;
 import com.ruoyi.framework.security.filter.JwtAuthenticationTokenFilter;
 import com.ruoyi.framework.security.handle.AuthenticationEntryPointImpl;
 import com.ruoyi.framework.security.handle.LogoutSuccessHandlerImpl;
@@ -56,6 +57,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     @Autowired
     private CorsFilter corsFilter;
 
+    @Autowired
+    private SecurityProperties securityProperties;
+
     /**
      * 解决 无法直接注入 AuthenticationManager
      *
@@ -96,8 +100,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 过滤请求
                 .authorizeRequests()
-                // 对于登录login 注册register 验证码captchaImage 允许匿名访问
-                .antMatchers("/login", "/register", "/captchaImage").anonymous()
                 .antMatchers(
                         HttpMethod.GET,
                         "/",
@@ -106,14 +108,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                         "/**/*.css",
                         "/**/*.js"
                 ).permitAll()
-                .antMatchers("/doc.html").anonymous()
-                .antMatchers("/swagger-resources/**").anonymous()
-                .antMatchers("/webjars/**").anonymous()
-                .antMatchers("/*/api-docs").anonymous()
-                .antMatchers("/druid/**").anonymous()
-                // Spring Boot Actuator 的安全配置
-                .antMatchers("/actuator").anonymous()
-                .antMatchers("/actuator/**").anonymous()
+                .antMatchers(securityProperties.getAnonymous()).anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()
