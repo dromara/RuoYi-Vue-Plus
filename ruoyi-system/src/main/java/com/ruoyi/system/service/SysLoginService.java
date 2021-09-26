@@ -77,11 +77,6 @@ public class SysLoginService
             asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match"), request);
             throw new UserPasswordNotMatchException();
         }
-        else
-        {
-            asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage(), request);
-            throw new ServiceException(e.getMessage());
-        }
 
 		asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
         recordLoginInfo(user.getUserId());
