@@ -39,14 +39,13 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter
             throws ServletException, IOException
     {
         // 匿名路径放行 默认拦截
-        boolean flag = false;
+        boolean flag = true;
         for (String anonymou : securityProperties.getAnonymous()) {
             PathMatcher pm = new AntPathMatcher();
-            if (pm.matchStart(anonymou, request.getRequestURI())) {
-                flag = true;
+            if (pm.match(anonymou, request.getRequestURI())) {
+                flag = false;
                 break;
             }
-
         }
         if (flag) {
             LoginUser loginUser = tokenService.getLoginUser(request);
