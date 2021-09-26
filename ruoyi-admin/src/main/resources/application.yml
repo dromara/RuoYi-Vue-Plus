@@ -124,13 +124,17 @@ sa-token:
 
 # security配置
 security:
-  # 登出路径
-  logout-url: /logout
-  # 匿名路径
-  anonymous:
+  # 排除路径
+  excludes:
     - /login
+    - /logout
     - /register
     - /captchaImage
+    # 静态资源
+    - /*.html
+    - /**/*.html
+    - /**/*.css
+    - /**/*.js
     # swagger 文档配置
     - /doc.html
     - /swagger-resources/**
@@ -141,8 +145,6 @@ security:
     # actuator 监控配置
     - /actuator
     - /actuator/**
-  # 用户放行
-  permit-all:
 
 # 重复提交
 repeat-submit:

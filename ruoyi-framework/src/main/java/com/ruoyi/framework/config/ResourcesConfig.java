@@ -6,6 +6,8 @@ import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.config.properties.SecurityProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -17,7 +19,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * 通用配置
@@ -27,26 +28,12 @@ import java.util.List;
 @Configuration
 public class ResourcesConfig implements WebMvcConfigurer {
 
+    @Autowired
+    private SecurityProperties securityProperties;
+
     // 注册sa-token的拦截器
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        List<String> urlPath = Arrays.asList(
-                "/login",
-                "/logout",
-                "/register",
-                "/captchaImage",
-                "/*.html",
-                "/**/*.html",
-                "/**/*.css",
-                "/**/*.js",
-                "/doc.html",
-                "/swagger-resources/**",
-                "/webjars/**",
-                "/*/api-docs",
-                "/druid/**",
-                "/actuator",
-                "/actuator/**"
-        );
         // 注册路由拦截器，自定义验证规则
         registry.addInterceptor(new SaRouteInterceptor((request, response, handler) -> {
             // 登录验证 -- 排除多个路径
@@ -54,7 +41,7 @@ public class ResourcesConfig implements WebMvcConfigurer {
                     //获取所有的
                     Collections.singletonList("/**"),
                     //排除下不需要拦截的
-                    urlPath,
+                    Arrays.asList(securityProperties.getExcludes()),
                     () -> {
                         Long userId = SecurityUtils.getUserId();
                         if(StringUtils.isNotNull(userId) ) {
