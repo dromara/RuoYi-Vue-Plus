@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 登录校验方法
- *
+ * 
  * @author ruoyi
  */
 @Component
@@ -48,7 +48,7 @@ public class SysLoginService
 
     /**
      * 登录验证
-     *
+     * 
      * @param username 用户名
      * @param password 密码
      * @param code 验证码
@@ -81,20 +81,20 @@ public class SysLoginService
             }
             else
             {
-				asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage(), request);
+                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage()));
                 throw new ServiceException(e.getMessage());
             }
         }
 		asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        recordLoginInfo(loginUser.getUser());
+        recordLoginInfo(loginUser.getUserId());
         // 生成token
         return tokenService.createToken(loginUser);
     }
 
     /**
      * 校验验证码
-     *
+     * 
      * @param username 用户名
      * @param code 验证码
      * @param uuid 唯一标识
@@ -116,12 +116,15 @@ public class SysLoginService
 
     /**
      * 记录登录信息
+     *
+     * @param userId 用户ID
      */
-    public void recordLoginInfo(SysUser user)
+    public void recordLoginInfo(Long userId)
     {
-        user.setLoginIp(ServletUtils.getClientIP());
-        user.setLoginDate(DateUtils.getNowDate());
-		user.setUpdateBy(user.getUserName());
-        userService.updateUserProfile(user);
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(userId);
+        sysUser.setLoginIp(IpUtils.getIpAddr(ServletUtils.getRequest()));
+        sysUser.setLoginDate(DateUtils.getNowDate());
+        userService.updateUserProfile(sysUser);
     }
 }
