@@ -38,20 +38,24 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException
     {
-        // 匿名路径放行
+        // 匿名路径放行 默认拦截
+        boolean flag = true;
         for (String anonymou : securityProperties.getAnonymous()) {
             PathMatcher pm = new AntPathMatcher();
             if (pm.matchStart(anonymou, request.getRequestURI())) {
-                chain.doFilter(request, response);
+                flag = false;
+                break;
             }
+
         }
-        LoginUser loginUser = tokenService.getLoginUser(request);
-        if (StringUtils.isNotNull(loginUser) && StringUtils.isNull(SecurityUtils.getAuthentication()))
-        {
-            tokenService.verifyToken(loginUser);
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        if (flag) {
+            LoginUser loginUser = tokenService.getLoginUser(request);
+            if (StringUtils.isNotNull(loginUser) && StringUtils.isNull(SecurityUtils.getAuthentication())) {
+                tokenService.verifyToken(loginUser);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
         }
         chain.doFilter(request, response);
     }
