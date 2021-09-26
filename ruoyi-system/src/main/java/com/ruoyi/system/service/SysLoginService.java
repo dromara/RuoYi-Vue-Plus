@@ -81,7 +81,7 @@ public class SysLoginService
             }
             else
             {
-                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage()));
+                asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage(), request);
                 throw new ServiceException(e.getMessage());
             }
         }
@@ -123,7 +123,7 @@ public class SysLoginService
     {
         SysUser sysUser = new SysUser();
         sysUser.setUserId(userId);
-        sysUser.setLoginIp(IpUtils.getIpAddr(ServletUtils.getRequest()));
+        sysUser.setLoginIp(ServletUtils.getClientIP());
         sysUser.setLoginDate(DateUtils.getNowDate());
         userService.updateUserProfile(sysUser);
     }
