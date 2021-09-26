@@ -77,9 +77,14 @@ public class SysLoginService
             asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match"), request);
             throw new UserPasswordNotMatchException();
         }
+        else
+        {
+            asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage(), request);
+            throw new ServiceException(e.getMessage());
+        }
 
 		asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
-        recordLoginInfo(user);
+        recordLoginInfo(user.getUserId());
         // 生成token
         StpUtil.login(user.getUserId(), "PC");
         return StpUtil.getTokenValue();
@@ -109,12 +114,15 @@ public class SysLoginService
 
     /**
      * 记录登录信息
+     *
+     * @param userId 用户ID
      */
-    public void recordLoginInfo(SysUser user)
+    public void recordLoginInfo(Long userId)
     {
-        user.setLoginIp(ServletUtils.getClientIP());
-        user.setLoginDate(DateUtils.getNowDate());
-		user.setUpdateBy(user.getUserName());
-        userService.updateUserProfile(user);
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(userId);
+        sysUser.setLoginIp(ServletUtils.getClientIP());
+        sysUser.setLoginDate(DateUtils.getNowDate());
+        userService.updateUserProfile(sysUser);
     }
 }
