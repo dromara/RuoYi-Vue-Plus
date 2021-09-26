@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * swagger 配置属性
  *
@@ -41,22 +43,45 @@ public class SwaggerProperties {
 	 */
     private Contact contact;
 
+	/**
+	 * 组配置
+	 */
+	private List<Groups> groups;
+
     @Data
 	@NoArgsConstructor
-	public static class Contact{
+	public static class Contact {
 
 		/**
 		 * 联系人
-		 **/
+		 */
 		private String name;
+
 		/**
 		 * 联系人url
-		 **/
+		 */
 		private String url;
+
 		/**
 		 * 联系人email
-		 **/
+		 */
 		private String email;
+
+	}
+
+	@Data
+	@NoArgsConstructor
+	public static class Groups {
+
+		/**
+		 * 组名
+		 */
+		private String name;
+
+		/**
+		 * 基础包路径
+		 */
+		private String basePackage;
 
 	}
 
