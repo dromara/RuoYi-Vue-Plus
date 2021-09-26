@@ -40,8 +40,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter
     {
         // 匿名路径放行 默认拦截
         boolean flag = true;
+        PathMatcher pm = new AntPathMatcher();
         for (String anonymou : securityProperties.getAnonymous()) {
-            PathMatcher pm = new AntPathMatcher();
             if (pm.match(anonymou, request.getRequestURI())) {
                 flag = false;
                 break;
