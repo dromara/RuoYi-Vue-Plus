@@ -380,7 +380,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/system/dict/data/export', this.queryParams);
+      this.$download.excel('/system/dict/data/export', this.queryParams);
     }
   }
 };

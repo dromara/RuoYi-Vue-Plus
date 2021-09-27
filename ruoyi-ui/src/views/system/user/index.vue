@@ -643,7 +643,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/system/user/export', this.queryParams);
+      this.$download.excel('/system/user/export', this.queryParams);
     },
     /** 导入按钮操作 */
     handleImport() {
@@ -652,7 +652,7 @@ export default {
     },
     /** 下载模板操作 */
     importTemplate() {
-      this.downLoadExcel('/system/user/importTemplate');
+      this.$download.excel('/system/user/importTemplate');
     },
     // 文件上传中处理
     handleFileUploadProgress(event, file, fileList) {

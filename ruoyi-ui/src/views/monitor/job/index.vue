@@ -510,7 +510,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/monitor/job/export', this.queryParams);
+      this.$download.excel('/monitor/job/export', this.queryParams);
     }
   }
 };

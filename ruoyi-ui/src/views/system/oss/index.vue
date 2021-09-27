@@ -188,7 +188,6 @@
 
 <script>
 import { listOss, delOss, changePreviewListResource } from "@/api/system/oss";
-import { downLoadOss } from "@/utils/download";
 
 export default {
   name: "Oss",
@@ -325,7 +324,7 @@ export default {
     },
     /** 下载按钮操作 */
     handleDownload(row) {
-      downLoadOss(row.ossId)
+      this.$download.oss(row.ossId)
     },
     /** 删除按钮操作 */
     handleDelete(row) {

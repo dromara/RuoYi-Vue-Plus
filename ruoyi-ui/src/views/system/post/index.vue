@@ -305,7 +305,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/system/post/export', this.queryParams);
+      this.$download.excel('/system/post/export', this.queryParams);
     }
   }
 };

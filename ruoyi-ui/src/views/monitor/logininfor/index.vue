@@ -216,7 +216,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/monitor/logininfor/export', this.queryParams);
+      this.$download.excel('/monitor/logininfor/export', this.queryParams);
     }
   }
 };
