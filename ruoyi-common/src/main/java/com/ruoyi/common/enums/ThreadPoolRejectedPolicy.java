@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @AllArgsConstructor
 public enum ThreadPoolRejectedPolicy {
 
-    CALLER_RUNS_POLICY("等待", ThreadPoolExecutor.CallerRunsPolicy.class),
+    CALLER_RUNS_POLICY("调用方执行", ThreadPoolExecutor.CallerRunsPolicy.class),
     DISCARD_OLDEST_POLICY("放弃最旧的", ThreadPoolExecutor.DiscardOldestPolicy.class),
     DISCARD_POLICY("丢弃", ThreadPoolExecutor.DiscardPolicy.class),
     ABORT_POLICY("中止", ThreadPoolExecutor.AbortPolicy.class);

@@ -271,7 +271,7 @@ thread-pool:
   # 线程池维护线程所允许的空闲时间
   keepAliveSeconds: 300
   # 线程池对拒绝任务(无线程可用)的处理策略
-  # CALLER_RUNS_POLICY 等待
+  # CALLER_RUNS_POLICY 调用方执行
   # DISCARD_OLDEST_POLICY 放弃最旧的
   # DISCARD_POLICY 丢弃
   # ABORT_POLICY 中止
