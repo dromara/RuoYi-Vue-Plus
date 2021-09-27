@@ -358,7 +358,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/demo/demo/export', this.queryParams);
+      this.$download.excel('/demo/demo/export', this.queryParams);
     }
   }
 };

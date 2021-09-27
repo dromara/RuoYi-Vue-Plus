@@ -573,7 +573,7 @@ export default {
 #end
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/${moduleName}/${businessName}/export', this.queryParams);
+        this.#[[$download]]#.excel('/${moduleName}/${businessName}/export', this.queryParams);
     }
   }
 };

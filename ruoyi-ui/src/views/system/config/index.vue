@@ -334,7 +334,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/system/config/export', this.queryParams);
+      this.$download.excel('/system/config/export', this.queryParams);
     },
     /** 刷新缓存按钮操作 */
     handleRefreshCache() {

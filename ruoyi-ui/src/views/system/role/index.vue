@@ -613,7 +613,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/system/role/export', this.queryParams);
+      this.$download.excel('/system/role/export', this.queryParams);
     }
   }
 };

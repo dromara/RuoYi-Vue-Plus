@@ -303,7 +303,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/monitor/operlog/export', this.queryParams);
+      this.$download.excel('/monitor/operlog/export', this.queryParams);
     }
   }
 };
