@@ -15,7 +15,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Lion Li
  */
-@Component
+@Service
 public class TokenServiceImpl implements TokenService {
 
     protected static final long MILLIS_SECOND = 1000;
