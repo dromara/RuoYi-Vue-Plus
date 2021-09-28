@@ -70,7 +70,7 @@ spring:
           config:
             multi-statement-allow: true
 
---- # redis 配置
+--- # redis 单机配置(单机与集群只能开启一个另一个需要注释掉)
 spring:
   redis:
     # 地址
@@ -117,6 +117,67 @@ redisson:
     subscriptionsPerConnection: 5
     # DNS监测时间间隔，单位：毫秒
     dnsMonitoringInterval: 5000
+
+#--- # redis 集群配置(单机与集群只能开启一个另一个需要注释掉)
+#spring:
+#  redis:
+#    cluster:
+#      nodes:
+#        - 192.168.0.100:6379
+#        - 192.168.0.101:6379
+#        - 192.168.0.102:6379
+#    # 密码
+#    password:
+#    # 连接超时时间
+#    timeout: 10s
+#    # 是否开启ssl
+#    ssl: false
+#
+#redisson:
+#  # 线程池数量
+#  threads: 16
+#  # Netty线程池数量
+#  nettyThreads: 32
+#  # 传输模式
+#  transportMode: "NIO"
+#  # 集群配置
+#  clusterServersConfig:
+#    # 客户端名称
+#    clientName: ${ruoyi.name}
+#    # master最小空闲连接数
+#    masterConnectionMinimumIdleSize: 32
+#    # master连接池大小
+#    masterConnectionPoolSize: 64
+#    # slave最小空闲连接数
+#    slaveConnectionMinimumIdleSize: 32
+#    # slave连接池大小
+#    slaveConnectionPoolSize: 64
+#    # 连接空闲超时，单位：毫秒
+#    idleConnectionTimeout: 10000
+#    # ping连接间隔
+#    pingConnectionInterval: 1000
+#    # 命令等待超时，单位：毫秒
+#    timeout: 3000
+#    # 如果尝试在此限制之内发送成功，则开始启用 timeout 计时。
+#    retryAttempts: 3
+#    # 命令重试发送时间间隔，单位：毫秒
+#    retryInterval: 1500
+#    # 从可用服务器的内部列表中排除 Redis Slave 重新连接尝试的间隔。
+#    failedSlaveReconnectionInterval: 3000
+#    # 发布和订阅连接池最小空闲连接数
+#    subscriptionConnectionMinimumIdleSize: 1
+#    # 发布和订阅连接池大小
+#    subscriptionConnectionPoolSize: 50
+#    # 单个连接最大订阅数量
+#    subscriptionsPerConnection: 5
+#    # 扫描间隔
+#    scanInterval: 1000
+#    # DNS监测时间间隔，单位：毫秒
+#    dnsMonitoringInterval: 5000
+#    # 读取模式
+#    readMode: "SLAVE"
+#    # 订阅模式
+#    subscriptionMode: "MASTER"
 
 --- # 监控配置
 spring:

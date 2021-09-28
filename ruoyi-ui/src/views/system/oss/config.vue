@@ -23,10 +23,10 @@
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
           <el-option
-            v-for="dict in statusOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.sys_normal_disable"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -118,7 +118,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改云存储配置对话框 -->
+    <!-- 添加或修改对象存储配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="配置key" prop="configKey">
@@ -149,10 +149,10 @@
         <el-form-item label="是否HTTPS">
           <el-radio-group v-model="form.isHttps">
             <el-radio
-              v-for="dict in isHttpsOptions"
-              :key="dict.dictValue"
-              :label="dict.dictValue"
-            >{{dict.dictLabel}}</el-radio>
+              v-for="dict in dict.type.sys_yes_no"
+              :key="dict.value"
+              :label="dict.value"
+            >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="域" prop="region">
@@ -183,6 +183,7 @@ import {
 
 export default {
   name: "OssConfig",
+  dicts: ['sys_yes_no', 'sys_normal_disable'],
   data() {
     return {
       // 按钮loading
@@ -201,7 +202,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 云存储配置表格数据
+      // 对象存储配置表格数据
       ossConfigList: [],
       // configKeyOptions
       configKeyOptions: [],
@@ -275,16 +276,10 @@ export default {
   },
   created() {
     this.getList();
-    this.getDicts("sys_yes_no").then(response => {
-      this.isHttpsOptions = response.data;
-    });
-    this.getDicts("sys_normal_disable").then(response => {
-      this.statusOptions = response.data;
-    });
     this.configKeyOptions = this.configKeyDatas;
   },
   methods: {
-    /** 查询云存储配置列表 */
+    /** 查询对象存储配置列表 */
     getList() {
       this.loading = true;
       listOssConfig(this.queryParams).then((response) => {
@@ -335,7 +330,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加云存储配置";
+      this.title = "添加对象存储配置";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -346,7 +341,7 @@ export default {
         this.loading = false;
         this.form = response.data;
         this.open = true;
-        this.title = "修改云存储配置";
+        this.title = "修改对象存储配置";
       });
     },
     /** 提交按钮 */
@@ -356,7 +351,7 @@ export default {
           this.buttonLoading = true;
           if (this.form.ossConfigId != null) {
             updateOssConfig(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             }).finally(() => {
@@ -364,7 +359,7 @@ export default {
             });
           } else {
             addOssConfig(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             }).finally(() => {
@@ -377,34 +372,25 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ossConfigIds = row.ossConfigId || this.ids;
-      this.$confirm('是否确认删除云存储配置编号为"' + ossConfigIds + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
+      this.$modal.confirm('是否确认删除对象存储配置编号为"' + ossConfigIds + '"的数据项?').then(() => {
         this.loading = true;
         return delOssConfig(ossConfigIds);
       }).then(() => {
         this.loading = false;
         this.getList();
-        this.msgSuccess("删除成功");
+        this.$modal.msgSuccess("删除成功");
       }).finally(() => {
         this.loading = false;
       });
     },
-    // 云存储配置状态修改
+    // 对象存储配置状态修改
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
-      this.$confirm(
-        '确认要"' + text + '""' + row.configKey + '"配置吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-      }).then(() => {
+      this.$modal.confirm('确认要"' + text + '""' + row.configKey + '"配置吗?').then(() => {
         return changeOssConfigStatus(row.ossConfigId, row.status, row.configKey);
       }).then(() => {
         this.getList()
-        this.msgSuccess(text + "成功");
+        this.$modal.msgSuccess(text + "成功");
       }).catch(() => {
         row.status = row.status === "0" ? "1" : "0";
       })

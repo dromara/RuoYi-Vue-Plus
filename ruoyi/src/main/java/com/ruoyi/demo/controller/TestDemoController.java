@@ -96,7 +96,7 @@ public class TestDemoController extends BaseController {
     @ApiOperation("新增测试单表")
     @PreAuthorize("@ss.hasPermi('demo:demo:add')")
     @Log(title = "测试单表", businessType = BusinessType.INSERT)
-    @RepeatSubmit(intervalTime = 2, timeUnit = TimeUnit.SECONDS)
+    @RepeatSubmit(interval = 2, timeUnit = TimeUnit.SECONDS, message = "不允许重复提交")
     @PostMapping()
     public AjaxResult<Void> add(@Validated(AddGroup.class) @RequestBody TestDemoBo bo) {
         return toAjax(iTestDemoService.insertByBo(bo) ? 1 : 0);

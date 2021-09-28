@@ -27,14 +27,8 @@ public class ${ClassName}Vo {
 
 	private static final long serialVersionUID = 1L;
 
-	/**
-     *  $pkColumn.columnComment
-     */
-	@ApiModelProperty("$pkColumn.columnComment")
-	private ${pkColumn.javaType} ${pkColumn.javaField};
-
 #foreach ($column in $columns)
-#if($column.isList && $column.isPk!=1)
+#if($column.isList)
     /**
      * $column.columnComment
      */

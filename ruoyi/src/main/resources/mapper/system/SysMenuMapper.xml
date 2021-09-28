@@ -12,7 +12,8 @@
         <result property="orderNum" column="order_num"/>
         <result property="path" column="path"/>
         <result property="component" column="component"/>
-        <result property="isFrame" column="is_frame"/>
+		<result property="query" column="query"/>
+		<result property="isFrame" column="is_frame"/>
         <result property="isCache" column="is_cache"/>
         <result property="menuType" column="menu_type"/>
         <result property="visible" column="visible"/>
@@ -33,6 +34,7 @@
                order_num,
                path,
                component,
+			   query,
                is_frame,
                is_cache,
                menu_type,
@@ -51,7 +53,8 @@
                         m.menu_name,
                         m.path,
                         m.component,
-                        m.visible,
+						m.query,
+						m.visible,
                         m.status,
                         ifnull(m.perms, '') as perms,
                         m.is_frame,
@@ -67,7 +70,7 @@
     </select>
 
     <select id="selectMenuListByUserId" parameterType="SysMenu" resultMap="SysMenuResult">
-        select distinct m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.visible, m.status,
+        select distinct m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.query, m.visible, m.status,
         ifnull(m.perms,'') as perms, m.is_frame, m.is_cache, m.menu_type, m.icon, m.order_num, m.create_time
         from sys_menu m
         left join sys_role_menu rm on m.menu_id = rm.menu_id
@@ -92,6 +95,7 @@
                         m.menu_name,
                         m.path,
                         m.component,
+					    m.query,
                         m.visible,
                         m.status,
                         ifnull(m.perms, '') as perms,

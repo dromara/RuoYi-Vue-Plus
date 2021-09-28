@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 云存储服务商枚举
+ * 对象存储服务商枚举
  *
  * @author Lion Li
  */

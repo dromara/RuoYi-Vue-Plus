@@ -46,56 +46,56 @@ export default {
 			checkNum: this.check
 		}
 	},
-	name: 'crontab-mouth',
+	name: 'crontab-month',
 	props: ['check', 'cron'],
 	methods: {
 		// 单选按钮值变化时
 		radioChange() {
 			if (this.radioValue === 1) {
-				this.$emit('update', 'mouth', '*');
+				this.$emit('update', 'month', '*');
 				this.$emit('update', 'year', '*');
 			} else {
 				if (this.cron.day === '*') {
-					this.$emit('update', 'day', '0', 'mouth');
+					this.$emit('update', 'day', '0', 'month');
 				}
 				if (this.cron.hour === '*') {
-					this.$emit('update', 'hour', '0', 'mouth');
+					this.$emit('update', 'hour', '0', 'month');
 				}
 				if (this.cron.min === '*') {
-					this.$emit('update', 'min', '0', 'mouth');
+					this.$emit('update', 'min', '0', 'month');
 				}
 				if (this.cron.second === '*') {
-					this.$emit('update', 'second', '0', 'mouth');
+					this.$emit('update', 'second', '0', 'month');
 				}
 			}
 			switch (this.radioValue) {
 				case 2:
-					this.$emit('update', 'mouth', this.cycle01 + '-' + this.cycle02);
+					this.$emit('update', 'month', this.cycle01 + '-' + this.cycle02);
 					break;
 				case 3:
-					this.$emit('update', 'mouth', this.average01 + '/' + this.average02);
+					this.$emit('update', 'month', this.average01 + '/' + this.average02);
 					break;
 				case 4:
-					this.$emit('update', 'mouth', this.checkboxString);
+					this.$emit('update', 'month', this.checkboxString);
 					break;
 			}
 		},
 		// 周期两个值变化时
 		cycleChange() {
 			if (this.radioValue == '2') {
-				this.$emit('update', 'mouth', this.cycleTotal);
+				this.$emit('update', 'month', this.cycleTotal);
 			}
 		},
 		// 平均两个值变化时
 		averageChange() {
 			if (this.radioValue == '3') {
-				this.$emit('update', 'mouth', this.averageTotal);
+				this.$emit('update', 'month', this.averageTotal);
 			}
 		},
 		// checkbox值变化时
 		checkboxChange() {
 			if (this.radioValue == '4') {
-				this.$emit('update', 'mouth', this.checkboxString);
+				this.$emit('update', 'month', this.checkboxString);
 			}
 		}
 	},

@@ -34,6 +34,9 @@ public class RedisCacheController {
 	 * 如果没有,就调用方法,然后把结果缓存起来
 	 * 这个注解「一般用在查询方法上」
 	 *
+	 * 重点说明: 缓存注解严谨与其他筛选数据功能一起使用
+	 * 例如: 数据权限注解 会造成 缓存击穿 与 数据不一致问题
+	 *
 	 * cacheNames 为配置文件内 groupId
 	 */
 	@ApiOperation("测试 @Cacheable")

@@ -75,7 +75,11 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 	public Boolean insertByBo(TestDemoBo bo) {
 		TestDemo add = BeanUtil.toBean(bo, TestDemo.class);
 		validEntityBeforeSave(add);
-		return save(add);
+		boolean flag = save(add);
+		if (flag) {
+			bo.setId(add.getId());
+		}
+		return flag;
 	}
 
 	@Override

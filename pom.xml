@@ -6,40 +6,44 @@
 
     <groupId>com.ruoyi</groupId>
     <artifactId>ruoyi-vue-plus</artifactId>
-    <version>3.1.0</version>
+    <version>3.2.0</version>
 
     <name>RuoYi-Vue-Plus</name>
     <url>https://gitee.com/JavaLionLi/RuoYi-Vue-Plus</url>
     <description>RuoYi-Vue-Plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>3.1.0</ruoyi-vue-plus.version>
-        <spring-boot.version>2.5.4</spring-boot.version>
+        <ruoyi-vue-plus.version>3.2.0</ruoyi-vue-plus.version>
+        <spring-boot.version>2.5.5</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <druid.version>1.2.6</druid.version>
         <knife4j.version>3.0.3</knife4j.version>
+        <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <poi.version>4.1.2</poi.version>
-        <easyexcel.version>2.2.10</easyexcel.version>
+        <easyexcel.version>2.2.11</easyexcel.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
-        <mybatis-plus.version>3.4.3.3</mybatis-plus.version>
+        <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.7.11</hutool.version>
+        <hutool.version>5.7.13</hutool.version>
         <feign.version>3.0.3</feign.version>
         <feign-okhttp.version>11.6</feign-okhttp.version>
         <okhttp.version>4.9.1</okhttp.version>
         <spring-boot-admin.version>2.5.1</spring-boot-admin.version>
-        <redisson.version>3.16.2</redisson.version>
+        <redisson.version>3.16.3</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.4.1</dynamic-ds.version>
+
+        <!-- jdk11 缺失依赖 jaxb-->
+        <jaxb.version>3.0.1</jaxb.version>
 
         <!-- OSS 配置 -->
         <qiniu.version>7.8.0</qiniu.version>
         <aliyun.oss.version>3.13.1</aliyun.oss.version>
-        <qcloud.cos.version>5.6.51</qcloud.cos.version>
+        <qcloud.cos.version>5.6.55</qcloud.cos.version>
         <minio.version>8.3.0</minio.version>
 
         <!-- docker 配置 -->
@@ -48,7 +52,7 @@
         <docker.namespace>ruoyi</docker.namespace>
         <docker.plugin.version>1.2.2</docker.plugin.version>
     </properties>
-
+	
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
@@ -73,6 +77,18 @@
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>swagger-annotations</artifactId>
+                        <groupId>io.swagger</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger-annotations.version}</version>
             </dependency>
 
             <!-- excel工具 -->
@@ -86,6 +102,16 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
                 <version>${easyexcel.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.poi</groupId>
+                        <artifactId>poi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.poi</groupId>
+                        <artifactId>poi-ooxml-schemas</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- velocity代码生成使用模板 -->
@@ -136,6 +162,12 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-openfeign</artifactId>
                 <version>${feign.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>feign-core</artifactId>
+                        <groupId>io.github.openfeign</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -184,7 +216,12 @@
 
 
     <dependencies>
-
+        <!-- jdk11 缺失依赖 jaxb-->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -263,47 +300,8 @@
             <properties>
                 <profiles.active>prod</profiles.active>
                 <logging.level>warn</logging.level>
-                <endpoints.include>health,info</endpoints.include>
+                <endpoints.include>health, info, logfile</endpoints.include>
             </properties>
-        </profile>
-
-        <!-- jdk多版本配置 -->
-        <profile>
-            <id>jdk8</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <java.version>1.8</java.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>jdk11</id>
-            <activation>
-                <jdk>11</jdk>
-            </activation>
-            <properties>
-                <java.version>11</java.version>
-                <jaxb.version>3.0.1</jaxb.version>
-            </properties>
-            <dependencyManagement>
-                <dependencies>
-                    <!-- jdk11 缺失依赖 jaxb-->
-                    <dependency>
-                        <groupId>com.sun.xml.bind</groupId>
-                        <artifactId>jaxb-impl</artifactId>
-                        <version>${jaxb.version}</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-            <dependencies>
-                <!--jaxb-->
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
 

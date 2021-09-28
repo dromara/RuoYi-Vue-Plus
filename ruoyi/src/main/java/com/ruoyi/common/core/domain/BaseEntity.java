@@ -1,5 +1,6 @@
 package com.ruoyi.common.core.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -62,6 +63,7 @@ public class BaseEntity implements Serializable {
 	/**
 	 * 请求参数
 	 */
+	@JsonIgnore
 	@ApiModelProperty(value = "请求参数")
 	private Map<String, Object> params = new HashMap<>();
 

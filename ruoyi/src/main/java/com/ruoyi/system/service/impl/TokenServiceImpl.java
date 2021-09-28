@@ -1,20 +1,21 @@
-package com.ruoyi.framework.web.service;
+package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.service.TokenService;
+import com.ruoyi.common.properties.TokenProperties;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
-import com.ruoyi.framework.config.properties.TokenProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -26,8 +27,8 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Lion Li
  */
-@Component
-public class TokenService {
+@Service
+public class TokenServiceImpl implements TokenService {
 
     protected static final long MILLIS_SECOND = 1000;
 
@@ -43,6 +44,7 @@ public class TokenService {
      *
      * @return 用户信息
      */
+    @Override
     public LoginUser getLoginUser(HttpServletRequest request) {
         // 获取请求携带的令牌
         String token = getToken(request);
@@ -64,6 +66,7 @@ public class TokenService {
     /**
      * 设置用户身份信息
      */
+    @Override
     public void setLoginUser(LoginUser loginUser) {
         if (StringUtils.isNotNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken())) {
             refreshToken(loginUser);
@@ -73,6 +76,7 @@ public class TokenService {
     /**
      * 删除用户身份信息
      */
+    @Override
     public void delLoginUser(String token) {
         if (StringUtils.isNotEmpty(token)) {
             String userKey = getTokenKey(token);
@@ -86,6 +90,7 @@ public class TokenService {
      * @param loginUser 用户信息
      * @return 令牌
      */
+    @Override
     public String createToken(LoginUser loginUser) {
         String token = IdUtil.fastUUID();
         loginUser.setToken(token);
@@ -103,6 +108,7 @@ public class TokenService {
      * @param loginUser
      * @return 令牌
      */
+    @Override
     public void verifyToken(LoginUser loginUser) {
         long expireTime = loginUser.getExpireTime();
         long currentTime = System.currentTimeMillis();
@@ -116,6 +122,7 @@ public class TokenService {
      *
      * @param loginUser 登录信息
      */
+    @Override
     public void refreshToken(LoginUser loginUser) {
         loginUser.setLoginTime(System.currentTimeMillis());
         loginUser.setExpireTime(loginUser.getLoginTime() + tokenProperties.getExpireTime() * MILLIS_MINUTE);
@@ -129,6 +136,7 @@ public class TokenService {
      *
      * @param loginUser 登录信息
      */
+    @Override
     public void setUserAgent(LoginUser loginUser) {
         UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
         String ip = ServletUtils.getClientIP();
@@ -170,6 +178,7 @@ public class TokenService {
      * @param token 令牌
      * @return 用户名
      */
+    @Override
     public String getUsernameFromToken(String token) {
         Claims claims = parseToken(token);
         return claims.getSubject();

@@ -4,11 +4,11 @@ import cn.hutool.http.HttpStatus;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.service.LogininforService;
+import com.ruoyi.common.core.service.TokenService;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.framework.web.service.AsyncService;
-import com.ruoyi.framework.web.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
@@ -31,7 +31,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
 	private TokenService tokenService;
 
 	@Autowired
-	private AsyncService asyncService;
+	private LogininforService asyncService;
 
 	/**
 	 * 退出处理

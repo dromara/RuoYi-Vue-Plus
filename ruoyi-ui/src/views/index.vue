@@ -93,6 +93,47 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v3.2.0 - 2021-9-28">
+              <ol>
+                <li>update [重大改动]接口文档 支持分组配置</li>
+                <li>update [重大改动]security 路径配置抽取到配置文件</li>
+                <li>update [重大改动] 将 framework 与 system 模块 解耦 调整依赖结构 解决依赖冲突</li>
+                <li>update [重大改动]重写 防重提交实现 使用分布式锁 解决并发问题 压测通过</li>
+                <li>update springboot 2.5.4 => 2.5.5 bugfix版本</li>
+                <li>update mybatis-plus 3.4.3.3 => 3.4.3.4 bugfix版本</li>
+                <li>update redisson 3.16.2 => 3.16.3 bugfix版本</li>
+                <li>update easyexcel 2.2.10 => 2.2.11</li>
+                <li>update hutool 5.7.11 => 5.7.13</li>
+                <li>update file-saver 2.0.4 => 2.0.5</li>
+                <li>update dart-sass 1.32.0 => 1.32.13</li>
+                <li>update sass-loader 10.1.0 => 10.1.1</li>
+                <li>update 优化代码生成 根据MP生成特性 调整导入表结构默认值合理化</li>
+                <li>update 将所有 云存储字样 改为 对象存储 避免误解</li>
+                <li>update 更新 @Cacheable 错误用法 注意事项</li>
+                <li>update 优化 AddressUtils 空校验处理</li>
+                <li>update 菜单管理支持配置路由参数</li>
+                <li>update 优化aop语法 使用spring自动注入注解</li>
+                <li>update 使用 Redisson 限流工具 重写限流实现</li>
+                <li>update 使用 vue-data-dict 简化数据字典使用</li>
+                <li>update 增加日志注解新增是否保存响应参数开关</li>
+                <li>update 用户未登录日志改为 warn 级别</li>
+                <li>update OSS模块 关于下载403报错信息优化</li>
+                <li>update 更新 Actuator prod 默认暴漏端点 增加暴漏 logfile 日志端点</li>
+                <li>update 默认适配jdk11 测试 jdk17 无异常</li>
+                <li>update 封装通用下载方法简化下载使用</li>
+                <li>add 新增通用方法简化模态/缓存使用</li>
+                <li>add 增加 限流演示案例</li>
+                <li>add 增加 redis redisson 集群配置</li>
+                <li>fix Cron表达式生成器关闭时销毁，避免再次打开时存在上一次修改的数据</li>
+                <li>fix 全局限流key会多出一个"-" 将其移动到IP后面 去除多余的空格</li>
+                <li>fix 修复多主键代码生成bug</li>
+                <li>fix 修复 @Cacheable 与 @DataScope 冲突问题</li>
+                <li>fix 修复代码生成页面数据编辑保存之后总是跳转第一页的问题</li>
+                <li>remove 移除过期工具 RedisCache</li>
+                <li>remove 移除无用配置类 ServerConfig</li>
+                <li>remove 移除 SysUser 无用字段 salt</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v3.1.0 - 2021-9-7">
               <ol>
                 <li>add [重大改动] 过期 RedisCache 新增 RedisUtils 工具类 新增 发布订阅功能 更灵巧便于使用</li>

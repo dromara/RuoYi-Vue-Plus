@@ -7,13 +7,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * OSS云存储分页查询对象 sys_oss
+ * OSS对象存储分页查询对象 sys_oss
  *
  * @author Lion Li
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ApiModel("OSS云存储分页查询对象")
+@ApiModel("OSS对象存储分页查询对象")
 public class SysOssBo extends BaseEntity {
 
 	/**

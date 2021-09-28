@@ -1,14 +1,19 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ArrayUtil;
-import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.service.OperLogService;
+import com.ruoyi.common.core.domain.dto.OperLogDTO;
 import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.ip.AddressUtils;
 import com.ruoyi.system.domain.SysOperLog;
 import com.ruoyi.system.mapper.SysOperLogMapper;
 import com.ruoyi.system.service.ISysOperLogService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -22,7 +27,21 @@ import java.util.Map;
  * @author ruoyi
  */
 @Service
-public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, SysOperLog, SysOperLog> implements ISysOperLogService {
+public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, SysOperLog, SysOperLog> implements ISysOperLogService, OperLogService {
+
+    /**
+     * 操作日志记录
+     *
+     * @param operLogDTO 操作日志信息
+     */
+    @Async
+    @Override
+    public void recordOper(final OperLogDTO operLogDTO) {
+        SysOperLog operLog = BeanUtil.toBean(operLogDTO, SysOperLog.class);
+        // 远程查询操作地点
+        operLog.setOperLocation(AddressUtils.getRealAddressByIP(operLog.getOperIp()));
+        insertOperlog(operLog);
+    }
 
     @Override
     public TableDataInfo<SysOperLog> selectPageOperLogList(SysOperLog operLog) {

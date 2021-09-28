@@ -33,7 +33,7 @@
         </template>
       </el-table-column>
     </el-table>
-
+    
     <pagination v-show="total>0" :total="total" :page.sync="pageNum" :limit.sync="pageSize" />
 
     <el-form label-width="100px">
@@ -103,7 +103,7 @@ export default {
       const userId = this.form.userId;
       const roleIds = this.roleIds.join(",");
       updateAuthRole({ userId: userId, roleIds: roleIds }).then((response) => {
-        this.msgSuccess("授权成功");
+        this.$modal.msgSuccess("授权成功");
         this.close();
       });
     },

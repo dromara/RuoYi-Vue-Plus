@@ -4,7 +4,7 @@ import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import com.ruoyi.system.domain.SysOssConfig;
 
 /**
- * 云存储配置Mapper接口
+ * 对象存储配置Mapper接口
  *
  * @author Lion Li
  * @author 孤舟烟雨
