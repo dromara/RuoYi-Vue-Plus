@@ -86,7 +86,7 @@ public class GenUtils
             column.setIsRequired(GenConstants.REQUIRE);
         }
         // 列表字段
-        if (!arraysContains(GenConstants.COLUMNNAME_NOT_LIST, columnName) && !column.isPk())
+        if (!arraysContains(GenConstants.COLUMNNAME_NOT_LIST, columnName))
         {
             column.setIsList(GenConstants.REQUIRE);
         }
