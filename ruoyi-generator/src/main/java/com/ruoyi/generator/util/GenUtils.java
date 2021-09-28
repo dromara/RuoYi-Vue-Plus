@@ -69,28 +69,26 @@ public class GenUtils
             }
         }
 
-        // 插入字段（默认所有字段都需要插入）
-        // 主键不需要添加
+        // BO对象 默认插入勾选
         if (!arraysContains(GenConstants.COLUMNNAME_NOT_ADD, columnName) && !column.isPk()) {
             column.setIsInsert(GenConstants.REQUIRE);
         }
-        // 编辑字段
-        // 编辑需要主键
+        // BO对象 默认编辑勾选
         if (!arraysContains(GenConstants.COLUMNNAME_NOT_EDIT, columnName))
         {
             column.setIsEdit(GenConstants.REQUIRE);
         }
-        // 编辑需要的设置必选
+        // BO对象 默认是否必填勾选
         if (!arraysContains(GenConstants.COLUMNNAME_NOT_EDIT, columnName))
         {
             column.setIsRequired(GenConstants.REQUIRE);
         }
-        // 列表字段
+        // VO对象 默认返回勾选
         if (!arraysContains(GenConstants.COLUMNNAME_NOT_LIST, columnName))
         {
             column.setIsList(GenConstants.REQUIRE);
         }
-        // 查询字段
+        // BO对象 默认查询勾选
         if (!arraysContains(GenConstants.COLUMNNAME_NOT_QUERY, columnName) && !column.isPk())
         {
             column.setIsQuery(GenConstants.REQUIRE);
