@@ -1,11 +1,11 @@
 package com.ruoyi.demo.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.demo.domain.TestTree;
 import com.ruoyi.demo.domain.bo.TestTreeBo;
 import com.ruoyi.demo.domain.vo.TestTreeVo;
@@ -23,6 +23,7 @@ import java.util.Map;
  * @author Lion Li
  * @date 2021-07-26
  */
+//@DataSource(DataSourceType.SLAVE) // 切换从库查询
 @Service
 public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTree, TestTreeVo> implements ITestTreeService {
 
