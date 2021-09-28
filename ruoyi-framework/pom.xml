@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ruoyi-vue-plus</artifactId>
         <groupId>com.ruoyi</groupId>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -61,10 +61,21 @@
             <artifactId>druid-spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- dynamic-datasource 多数据源-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- sql性能分析插件 -->
+        <dependency>
+            <groupId>p6spy</groupId>
+            <artifactId>p6spy</artifactId>
+        </dependency>
+
         <!-- 系统模块-->
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-system</artifactId>
+            <artifactId>ruoyi-common</artifactId>
         </dependency>
 
     </dependencies>

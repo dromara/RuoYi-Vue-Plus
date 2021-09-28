@@ -17,6 +17,6 @@ public class RepeatSubmitProperties {
     /**
      * 间隔时间(毫秒)
      */
-    private int intervalTime;
+    private int interval;
 
 }

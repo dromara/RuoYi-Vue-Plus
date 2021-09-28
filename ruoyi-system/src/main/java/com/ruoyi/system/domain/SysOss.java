@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * OSS云存储对象
+ * OSS对象存储对象
  *
  * @author Lion Li
  */
@@ -23,7 +23,7 @@ public class SysOss implements Serializable {
 
 
 	/**
-	 * 云存储主键
+	 * 对象存储主键
 	 */
 	@TableId(value = "oss_id", type = IdType.AUTO)
 	private Long ossId;

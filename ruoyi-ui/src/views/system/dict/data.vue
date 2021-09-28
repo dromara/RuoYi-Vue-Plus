@@ -23,10 +23,10 @@
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="数据状态" clearable size="small">
           <el-option
-            v-for="dict in statusOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.sys_normal_disable"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -96,7 +96,7 @@
       <el-table-column label="字典排序" align="center" prop="dictSort" />
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
-          <dict-tag :options="statusOptions" :value="scope.row.status"/>
+          <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
@@ -164,10 +164,10 @@
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
             <el-radio
-              v-for="dict in statusOptions"
-              :key="dict.dictValue"
-              :label="dict.dictValue"
-            >{{dict.dictLabel}}</el-radio>
+              v-for="dict in dict.type.sys_normal_disable"
+              :key="dict.value"
+              :label="dict.value"
+            >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
@@ -188,6 +188,7 @@ import { listType, getType } from "@/api/system/dict/type";
 
 export default {
   name: "Data",
+  dicts: ['sys_normal_disable'],
   data() {
     return {
       // 遮罩层
@@ -239,8 +240,6 @@ export default {
           label: "危险"
         }
       ],
-      // 状态数据字典
-      statusOptions: [],
       // 类型数据字典
       typeOptions: [],
       // 查询参数
@@ -271,9 +270,6 @@ export default {
     const dictId = this.$route.params && this.$route.params.dictId;
     this.getType(dictId);
     this.getTypeList();
-    this.getDicts("sys_normal_disable").then(response => {
-      this.statusOptions = response.data;
-    });
   },
   methods: {
     /** 查询字典类型详细 */
@@ -358,13 +354,13 @@ export default {
         if (valid) {
           if (this.form.dictCode != undefined) {
             updateData(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addData(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -375,20 +371,16 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const dictCodes = row.dictCode || this.ids;
-      this.$confirm('是否确认删除字典编码为"' + dictCodes + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delData(dictCodes);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        }).catch(() => {});
+      this.$modal.confirm('是否确认删除字典编码为"' + dictCodes + '"的数据项？').then(function() {
+        return delData(dictCodes);
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/system/dict/data/export', this.queryParams);
+      this.$download.excel('/system/dict/data/export', this.queryParams);
     }
   }
 };

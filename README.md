@@ -4,16 +4,19 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/blob/master/LICENSE)
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
 <br>
-[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-3.1.0-success.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
+[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-3.2.0-success.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.5-blue.svg)]()
-[![JDK-8+](https://img.shields.io/badge/JDK-8+-green.svg)]()
+[![JDK-8+](https://img.shields.io/badge/JDK-8-green.svg)]()
 [![JDK-11](https://img.shields.io/badge/JDK-11-green.svg)]()
+[![JDK-17](https://img.shields.io/badge/JDK-17-green.svg)]()
 
 RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级(不兼容原框架)
 
 | 功能介绍 | 使用技术 | 文档地址 | 特性注意事项 |
 |---|---|---|---|
 | 当前框架 | RuoYi-Vue-Plus | [RuoYi-Vue-Plus文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages) | 重写RuoYi-Vue全方位升级(不兼容原框架) |
+| satoken分支 | RuoYi-Vue-Plus-satoken | [satoken分支地址](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/satoken/) | 使用satoken重构权限鉴权(仅供学习不推荐上生产) |
+| 单体分支 | RuoYi-Vue-Plus-fast | [fast分支地址](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/) | 单体应用结构 |
 | 原框架 | RuoYi-Vue | [RuoYi-Vue官网](http://ruoyi.vip/) | 定期同步需要的功能 |
 | 前端开发框架 | Vue、Element UI | [Element UI官网](https://element.eleme.cn/#/zh-CN) | |
 | 后端开发框架 | SpringBoot | [SpringBoot官网](https://spring.io/projects/spring-boot/#learn) | |
@@ -24,10 +27,12 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级(不兼�
 | 数据库框架 | Mybatis-Plus | [Mybatis-Plus文档](https://baomidou.com/guide/) | 快速 CRUD 增加开发效率 |
 | 数据库框架 | p6spy | [p6spy官网](https://p6spy.readthedocs.io/) | 更强劲的 SQL 分析 |
 | 多数据源框架 | dynamic-datasource | [dynamic-ds文档](https://www.kancloud.cn/tracy5546/dynamic-datasource/content) | 支持主从与多种类数据库异构 |
-| Redis客户端 | Redisson | [Redisson文档](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95) | 性能强劲、API丰富 |
 | 序列化框架 | Jackson | [Jackson官网](https://github.com/FasterXML/jackson) | 统一使用 jackson 高效可靠 |
 | 网络框架 | Feign、OkHttp3 | [Feign官网](https://github.com/OpenFeign/feign) | 接口化管理 HTTP 请求 |
+| Redis客户端 | Redisson | [Redisson文档](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95) | 支持单机、集群配置 |
+| 分布式限流 | Redisson | [Redisson文档](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95) | 全局、请求IP、集群ID 多种限流 |
 | 分布式锁 | Lock4j | [Lock4j官网](https://gitee.com/baomidou/lock4j) | 注解锁、工具锁 多种多样 |
+| 分布式幂等 | Lock4j | [Lock4j文档](https://gitee.com/baomidou/lock4j) | 基于分布式锁实现 |
 | 文件存储 | Minio | [Minio文档](https://docs.min.io/) | 本地存储 |
 | 文件存储 | 七牛、阿里、腾讯 | [OSS使用文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4359146&doc_id=1469725) | 云存储 |
 | 监控框架 | SpringBoot-Admin | [SpringBoot-Admin文档](https://codecentric.github.io/spring-boot-admin/current/) | 全方位服务监控 |
@@ -67,6 +72,7 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级(不兼�
 * 同步升级 RuoYi-Vue
 * GitHub 地址 [RuoYi-Vue-Plus-github](https://github.com/JavaLionLi/RuoYi-Vue-Plus)
 * 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
+* satoken 分支 [RuoYi-Vue-Plus-satoken](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/satoken/)
 * 用户扩展项目 [扩展项目列表](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4478302&doc_id=1469725)
 
 ## 加群与捐献

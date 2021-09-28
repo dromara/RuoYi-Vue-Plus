@@ -26,6 +26,32 @@ public class RedisUtils {
     private static RedissonClient client = SpringUtils.getBean(RedissonClient.class);
 
     /**
+     * 限流
+     *
+     * @param key          限流key
+     * @param rateType     限流类型
+     * @param rate         速率
+     * @param rateInterval 速率间隔
+     * @return -1 表示失败
+     */
+    public static long rateLimiter(String key, RateType rateType, int rate, int rateInterval) {
+        RRateLimiter rateLimiter = client.getRateLimiter(key);
+        rateLimiter.trySetRate(rateType, rate, rateInterval, RateIntervalUnit.SECONDS);
+        if (rateLimiter.tryAcquire()) {
+            return rateLimiter.availablePermits();
+        } else {
+            return -1L;
+        }
+    }
+
+    /**
+     * 获取实例id
+     */
+    public static String getClientId() {
+        return client.getId();
+    }
+
+    /**
      * 发布通道消息
      *
      * @param channelKey 通道key

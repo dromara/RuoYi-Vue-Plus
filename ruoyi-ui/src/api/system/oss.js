@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 查询OSS云存储列表
+// 查询OSS对象存储列表
 export function listOss(query) {
   return request({
     url: '/system/oss/list',
@@ -9,7 +9,7 @@ export function listOss(query) {
   })
 }
 
-// 删除OSS云存储
+// 删除OSS对象存储
 export function delOss(ossId) {
   return request({
     url: '/system/oss/' + ossId,

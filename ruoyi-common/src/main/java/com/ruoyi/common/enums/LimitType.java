@@ -16,5 +16,10 @@ public enum LimitType
     /**
      * 根据请求者IP进行限流
      */
-    IP
+    IP,
+
+    /**
+     * 实例限流(集群多后端实例)
+     */
+    CLUSTER
 }

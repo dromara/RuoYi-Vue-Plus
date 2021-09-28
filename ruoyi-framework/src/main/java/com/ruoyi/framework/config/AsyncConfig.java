@@ -1,5 +1,6 @@
 package com.ruoyi.framework.config;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.ruoyi.common.exception.ServiceException;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +42,13 @@ public class AsyncConfig extends AsyncConfigurerSupport {
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (throwable, method, objects) -> {
             throwable.printStackTrace();
-            throw new ServiceException(
-                    "Exception message - " + throwable.getMessage()
-                    + ", Method name - " + method.getName()
-                    + ", Parameter value - " + Arrays.toString(objects));
+            StringBuilder sb = new StringBuilder();
+            sb.append("Exception message - ").append(throwable.getMessage())
+                    .append(", Method name - ").append(method.getName());
+            if (ArrayUtil.isNotEmpty(objects)) {
+                sb.append(", Parameter value - ").append(Arrays.toString(objects));
+            }
+            throw new ServiceException(sb.toString());
         };
     }
 

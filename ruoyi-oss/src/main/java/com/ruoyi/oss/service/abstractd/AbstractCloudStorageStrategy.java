@@ -11,7 +11,7 @@ import com.ruoyi.oss.service.ICloudStorageStrategy;
 import java.io.InputStream;
 
 /**
- * 云存储策略(支持七牛、阿里云、腾讯云、minio)
+ * 对象存储策略(支持七牛、阿里云、腾讯云、minio)
  *
  * @author Lion Li
  */

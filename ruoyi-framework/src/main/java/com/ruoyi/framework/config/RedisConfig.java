@@ -1,6 +1,6 @@
 package com.ruoyi.framework.config;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.RedissonProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,6 @@ import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.script.DefaultRedisScript;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -58,23 +57,52 @@ public class RedisConfig extends CachingConfigurerSupport {
 			.setTransportMode(redissonProperties.getTransportMode());
 
 		RedissonProperties.SingleServerConfig singleServerConfig = redissonProperties.getSingleServerConfig();
-		// 使用单机模式
-		config.useSingleServer()
-			.setAddress(prefix + redisProperties.getHost() + ":" + redisProperties.getPort())
-			.setConnectTimeout(((Long) redisProperties.getTimeout().toMillis()).intValue())
-			.setDatabase(redisProperties.getDatabase())
-			.setPassword(StringUtils.isNotBlank(redisProperties.getPassword()) ? redisProperties.getPassword() : null)
-			.setTimeout(singleServerConfig.getTimeout())
-			.setRetryAttempts(singleServerConfig.getRetryAttempts())
-			.setRetryInterval(singleServerConfig.getRetryInterval())
-			.setSubscriptionsPerConnection(singleServerConfig.getSubscriptionsPerConnection())
-			.setClientName(singleServerConfig.getClientName())
-			.setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
-			.setSubscriptionConnectionMinimumIdleSize(singleServerConfig.getSubscriptionConnectionMinimumIdleSize())
-			.setSubscriptionConnectionPoolSize(singleServerConfig.getSubscriptionConnectionPoolSize())
-			.setConnectionMinimumIdleSize(singleServerConfig.getConnectionMinimumIdleSize())
-			.setConnectionPoolSize(singleServerConfig.getConnectionPoolSize())
-			.setDnsMonitoringInterval(singleServerConfig.getDnsMonitoringInterval());
+		if (ObjectUtil.isNotNull(singleServerConfig)) {
+			// 使用单机模式
+			config.useSingleServer()
+					.setAddress(prefix + redisProperties.getHost() + ":" + redisProperties.getPort())
+					.setConnectTimeout(((Long) redisProperties.getTimeout().toMillis()).intValue())
+					.setDatabase(redisProperties.getDatabase())
+					.setPassword(StringUtils.isNotBlank(redisProperties.getPassword()) ? redisProperties.getPassword() : null)
+					.setTimeout(singleServerConfig.getTimeout())
+					.setRetryAttempts(singleServerConfig.getRetryAttempts())
+					.setRetryInterval(singleServerConfig.getRetryInterval())
+					.setSubscriptionsPerConnection(singleServerConfig.getSubscriptionsPerConnection())
+					.setClientName(singleServerConfig.getClientName())
+					.setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
+					.setSubscriptionConnectionMinimumIdleSize(singleServerConfig.getSubscriptionConnectionMinimumIdleSize())
+					.setSubscriptionConnectionPoolSize(singleServerConfig.getSubscriptionConnectionPoolSize())
+					.setConnectionMinimumIdleSize(singleServerConfig.getConnectionMinimumIdleSize())
+					.setConnectionPoolSize(singleServerConfig.getConnectionPoolSize())
+					.setDnsMonitoringInterval(singleServerConfig.getDnsMonitoringInterval());
+		}
+
+		RedissonProperties.ClusterServersConfig clusterServersConfig = redissonProperties.getClusterServersConfig();
+		if (ObjectUtil.isNotNull(clusterServersConfig)) {
+			// 使用集群模式
+			config.useClusterServers()
+					.setConnectTimeout(((Long) redisProperties.getTimeout().toMillis()).intValue())
+					.setPassword(StringUtils.isNotBlank(redisProperties.getPassword()) ? redisProperties.getPassword() : null)
+					.setTimeout(clusterServersConfig.getTimeout())
+					.setRetryAttempts(clusterServersConfig.getRetryAttempts())
+					.setRetryInterval(clusterServersConfig.getRetryInterval())
+					.setSubscriptionsPerConnection(clusterServersConfig.getSubscriptionsPerConnection())
+					.setClientName(clusterServersConfig.getClientName())
+					.setIdleConnectionTimeout(clusterServersConfig.getIdleConnectionTimeout())
+					.setPingConnectionInterval(clusterServersConfig.getPingConnectionInterval())
+					.setSubscriptionConnectionMinimumIdleSize(clusterServersConfig.getSubscriptionConnectionMinimumIdleSize())
+					.setSubscriptionConnectionPoolSize(clusterServersConfig.getSubscriptionConnectionPoolSize())
+					.setMasterConnectionMinimumIdleSize(clusterServersConfig.getMasterConnectionMinimumIdleSize())
+					.setMasterConnectionPoolSize(clusterServersConfig.getMasterConnectionPoolSize())
+					.setSlaveConnectionMinimumIdleSize(clusterServersConfig.getSlaveConnectionMinimumIdleSize())
+					.setSlaveConnectionPoolSize(clusterServersConfig.getSlaveConnectionPoolSize())
+					.setDnsMonitoringInterval(clusterServersConfig.getDnsMonitoringInterval())
+					.setFailedSlaveReconnectionInterval(clusterServersConfig.getFailedSlaveReconnectionInterval())
+					.setScanInterval(clusterServersConfig.getScanInterval())
+					.setReadMode(clusterServersConfig.getReadMode())
+					.setSubscriptionMode(clusterServersConfig.getSubscriptionMode())
+					.setNodeAddresses(redisProperties.getCluster().getNodes());
+		}
 		RedissonClient redissonClient = Redisson.create(config);
 		log.info("初始化 redis 配置");
 		return redissonClient;
@@ -93,34 +121,6 @@ public class RedisConfig extends CachingConfigurerSupport {
 			config.put(group.getGroupId(), cacheConfig);
 		}
 		return new RedissonSpringCacheManager(redissonClient, config, JsonJacksonCodec.INSTANCE);
-	}
-
-	@Bean
-	public DefaultRedisScript<Long> limitScript() {
-		DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
-		redisScript.setScriptText(limitScriptText());
-		redisScript.setResultType(Long.class);
-		return redisScript;
-	}
-
-	/**
-	 * 限流脚本
-	 */
-	private String limitScriptText() {
-		return StrUtil.builder()
-			.append("local key = KEYS[1]\n")
-			.append("local count = tonumber(ARGV[1])\n")
-			.append("local time = tonumber(ARGV[2])\n")
-			.append("local current = redis.call('get', key);\n")
-			.append("if current and tonumber(current) > count then\n")
-			.append("    return current;\n")
-			.append("end\n")
-			.append("current = redis.call('incr', key)\n")
-			.append("if tonumber(current) == 1 then\n")
-			.append("    redis.call('expire', key, time)\n")
-			.append("end\n")
-			.append("return current;")
-			.toString();
 	}
 
 }

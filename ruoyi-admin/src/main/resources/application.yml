@@ -106,10 +106,32 @@ token:
   # 令牌有效期（默认30分钟）
   expireTime: 30
 
+# security配置
+security:
+  # 登出路径
+  logout-url: /logout
+  # 匿名路径
+  anonymous:
+    - /login
+    - /register
+    - /captchaImage
+    # swagger 文档配置
+    - /doc.html
+    - /swagger-resources/**
+    - /webjars/**
+    - /*/api-docs
+    # druid 监控配置
+    - /druid/**
+    # actuator 监控配置
+    - /actuator
+    - /actuator/**
+  # 用户放行
+  permit-all:
+
 # 重复提交
 repeat-submit:
   # 全局间隔时间(毫秒)
-  intervalTime: 1000
+  interval: 5000
 
 # MyBatisPlus配置
 # https://baomidou.com/config/
@@ -221,6 +243,11 @@ swagger:
     name: Lion Li
     email: crazylionli@163.com
     url: https://gitee.com/JavaLionLi/RuoYi-Vue-Plus
+  groups:
+    - name: 演示案例
+      basePackage: com.ruoyi.demo
+    - name: 系统模块
+      basePackage: com.ruoyi.admin
 
 # 防止XSS攻击
 xss:
@@ -244,7 +271,7 @@ thread-pool:
   # 线程池维护线程所允许的空闲时间
   keepAliveSeconds: 300
   # 线程池对拒绝任务(无线程可用)的处理策略
-  # CALLER_RUNS_POLICY 等待
+  # CALLER_RUNS_POLICY 调用方执行
   # DISCARD_OLDEST_POLICY 放弃最旧的
   # DISCARD_POLICY 丢弃
   # ABORT_POLICY 中止

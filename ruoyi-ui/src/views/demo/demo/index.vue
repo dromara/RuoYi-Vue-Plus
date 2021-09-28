@@ -324,7 +324,7 @@ export default {
           this.buttonLoading = true;
           if (this.form.id != null) {
             updateDemo(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             }).finally(() => {
@@ -332,7 +332,7 @@ export default {
             });
           } else {
             addDemo(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             }).finally(() => {
@@ -345,22 +345,20 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除测试单表编号为"' + ids + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
+      this.$modal.confirm('是否确认删除测试单表编号为"' + ids + '"的数据项？').then(() => {
         this.loading = true;
         return delDemo(ids);
       }).then(() => {
         this.loading = false;
         this.getList();
-        this.msgSuccess("删除成功");
-      })
+        this.$modal.msgSuccess("删除成功");
+      }).finally(() => {
+        this.loading = false;
+      });
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/demo/demo/export', this.queryParams);
+      this.$download.excel('/demo/demo/export', this.queryParams);
     }
   }
 };

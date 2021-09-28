@@ -13,20 +13,20 @@
       <el-form-item label="任务组名" prop="jobGroup">
         <el-select v-model="queryParams.jobGroup" placeholder="请选择任务组名" clearable size="small">
           <el-option
-            v-for="dict in jobGroupOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.sys_job_group"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
       <el-form-item label="任务状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择任务状态" clearable size="small">
           <el-option
-            v-for="dict in statusOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.sys_job_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -99,7 +99,7 @@
       <el-table-column label="任务名称" align="center" prop="jobName" :show-overflow-tooltip="true" />
       <el-table-column label="任务组名" align="center" prop="jobGroup">
         <template slot-scope="scope">
-          <dict-tag :options="jobGroupOptions" :value="scope.row.jobGroup"/>
+          <dict-tag :options="dict.type.sys_job_group" :value="scope.row.jobGroup"/>
         </template>
       </el-table-column>
       <el-table-column label="调用目标字符串" align="center" prop="invokeTarget" :show-overflow-tooltip="true" />
@@ -168,10 +168,10 @@
             <el-form-item label="任务分组" prop="jobGroup">
               <el-select v-model="form.jobGroup" placeholder="请选择">
                 <el-option
-                  v-for="dict in jobGroupOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="dict.dictValue"
+                  v-for="dict in dict.type.sys_job_group"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="dict.value"
                 ></el-option>
               </el-select>
             </el-form-item>
@@ -225,10 +225,10 @@
             <el-form-item label="状态">
               <el-radio-group v-model="form.status">
                 <el-radio
-                  v-for="dict in statusOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictValue"
-                >{{dict.dictLabel}}</el-radio>
+                  v-for="dict in dict.type.sys_job_status"
+                  :key="dict.value"
+                  :label="dict.value"
+                >{{dict.label}}</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -240,7 +240,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="Cron表达式生成器" :visible.sync="openCron" append-to-body class="scrollbar">
+    <el-dialog title="Cron表达式生成器" :visible.sync="openCron" append-to-body destroy-on-close class="scrollbar">
       <crontab @hide="openCron=false" @fill="crontabFill" :expression="expression"></crontab>
     </el-dialog>
 
@@ -301,6 +301,7 @@ import Crontab from '@/components/Crontab'
 export default {
   components: { Crontab },
   name: "Job",
+  dicts: ['sys_job_group', 'sys_job_status'],
   data() {
     return {
       // 遮罩层
@@ -329,10 +330,6 @@ export default {
       openCron: false,
       // 传入的表达式
       expression: "",
-      // 任务组名字典
-      jobGroupOptions: [],
-      // 状态字典
-      statusOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -359,12 +356,6 @@ export default {
   },
   created() {
     this.getList();
-    this.getDicts("sys_job_group").then(response => {
-      this.jobGroupOptions = response.data;
-    });
-    this.getDicts("sys_job_status").then(response => {
-      this.statusOptions = response.data;
-    });
   },
   methods: {
     /** 查询定时任务列表 */
@@ -378,7 +369,7 @@ export default {
     },
     // 任务组名字典翻译
     jobGroupFormat(row, column) {
-      return this.selectDictLabel(this.jobGroupOptions, row.jobGroup);
+      return this.selectDictLabel(this.dict.type.sys_job_group, row.jobGroup);
     },
     // 取消按钮
     cancel() {
@@ -434,29 +425,21 @@ export default {
     // 任务状态修改
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
-      this.$confirm('确认要"' + text + '""' + row.jobName + '"任务吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return changeJobStatus(row.jobId, row.status);
-        }).then(() => {
-          this.msgSuccess(text + "成功");
-        }).catch(function() {
-          row.status = row.status === "0" ? "1" : "0";
-        });
+      this.$modal.confirm('确认要"' + text + '""' + row.jobName + '"任务吗？').then(function() {
+        return changeJobStatus(row.jobId, row.status);
+      }).then(() => {
+        this.$modal.msgSuccess(text + "成功");
+      }).catch(function() {
+        row.status = row.status === "0" ? "1" : "0";
+      });
     },
     /* 立即执行一次 */
     handleRun(row) {
-      this.$confirm('确认要立即执行一次"' + row.jobName + '"任务吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return runJob(row.jobId, row.jobGroup);
-        }).then(() => {
-          this.msgSuccess("执行成功");
-        }).catch(() => {});
+      this.$modal.confirm('确认要立即执行一次"' + row.jobName + '"任务吗？').then(function() {
+        return runJob(row.jobId, row.jobGroup);
+      }).then(() => {
+        this.$modal.msgSuccess("执行成功");
+      }).catch(() => {});
     },
     /** 任务详细信息 */
     handleView(row) {
@@ -501,13 +484,13 @@ export default {
         if (valid) {
           if (this.form.jobId != undefined) {
             updateJob(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addJob(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -518,20 +501,16 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const jobIds = row.jobId || this.ids;
-      this.$confirm('是否确认删除定时任务编号为"' + jobIds + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delJob(jobIds);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        }).catch(() => {});
+      this.$modal.confirm('是否确认删除定时任务编号为"' + jobIds + '"的数据项？').then(function() {
+        return delJob(jobIds);
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/monitor/job/export', this.queryParams);
+      this.$download.excel('/monitor/job/export', this.queryParams);
     }
   }
 };

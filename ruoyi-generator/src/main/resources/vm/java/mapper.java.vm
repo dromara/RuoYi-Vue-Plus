@@ -2,8 +2,6 @@ package ${packageName}.mapper;
 
 import ${packageName}.domain.${ClassName};
 import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
-import com.ruoyi.common.core.mybatisplus.cache.MybatisPlusRedisCache;
-import org.apache.ibatis.annotations.CacheNamespace;
 
 /**
  * ${functionName}Mapper接口

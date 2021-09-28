@@ -9,7 +9,7 @@ import java.util.Date;
 import java.math.BigDecimal;
 
 /**
- * 云存储配置对象 sys_oss_config
+ * 对象存储配置对象 sys_oss_config
  *
  * @author ruoyi
  * @date 2021-08-11

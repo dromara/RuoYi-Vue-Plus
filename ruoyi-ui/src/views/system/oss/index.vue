@@ -120,7 +120,7 @@
 
     <el-table v-loading="loading" :data="ossList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="云存储主键" align="center" prop="ossId" v-if="false"/>
+      <el-table-column label="对象存储主键" align="center" prop="ossId" v-if="false"/>
       <el-table-column label="文件名" align="center" prop="fileName" />
       <el-table-column label="原名" align="center" prop="originalName" />
       <el-table-column label="文件后缀" align="center" prop="fileSuffix" />
@@ -170,7 +170,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改OSS云存储对话框 -->
+    <!-- 添加或修改OSS对象存储对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="文件名">
@@ -188,7 +188,6 @@
 
 <script>
 import { listOss, delOss, changePreviewListResource } from "@/api/system/oss";
-import { downLoadOss } from "@/utils/download";
 
 export default {
   name: "Oss",
@@ -210,7 +209,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // OSS云存储表格数据
+      // OSS对象存储表格数据
       ossList: [],
       // 弹出层标题
       title: "",
@@ -248,7 +247,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询OSS云存储列表 */
+    /** 查询OSS对象存储列表 */
     getList() {
       this.loading = true;
       this.queryParams.params = {};
@@ -325,22 +324,18 @@ export default {
     },
     /** 下载按钮操作 */
     handleDownload(row) {
-      downLoadOss(row.ossId)
+      this.$download.oss(row.ossId)
     },
     /** 删除按钮操作 */
     handleDelete(row) {
       const ossIds = row.ossId || this.ids;
-      this.$confirm('是否确认删除OSS云存储编号为"' + ossIds + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-      }).then(() => {
+      this.$modal.confirm('是否确认删除OSS对象存储编号为"' + ossIds + '"的数据项?').then(() => {
         this.loading = true;
         return delOss(ossIds);
       }).then(() => {
         this.loading = false;
         this.getList();
-        this.msgSuccess("删除成功");
+        this.$modal.msgSuccess("删除成功");
       }).finally(() => {
         this.loading = false;
       });
@@ -348,16 +343,11 @@ export default {
     // 预览列表图片状态修改
     handlePreviewListResource(previewListResource) {
       let text = previewListResource ? "启用" : "停用";
-      this.$confirm(
-        '确认要"' + text + '""预览列表图片"配置吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-      }).then(() => {
+      this.$modal.confirm('确认要"' + text + '""预览列表图片"配置吗?').then(() => {
         return changePreviewListResource(previewListResource);
       }).then(() => {
         this.getList()
-        this.msgSuccess(text + "成功");
+        this.$modal.msgSuccess(text + "成功");
       }).catch(() => {
         this.previewListResource = previewListResource !== true;
       })

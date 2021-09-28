@@ -54,7 +54,11 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
 	public Boolean insertByBo(TestTreeBo bo) {
 		TestTree add = BeanUtil.toBean(bo, TestTree.class);
 		validEntityBeforeSave(add);
-		return save(add);
+		boolean flag = save(add);
+		if (flag) {
+			bo.setId(add.getId());
+		}
+		return flag;
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 云存储常量
+ * 对象存储常量
  *
  * @author Lion Li
  */
@@ -16,7 +16,7 @@ public class CloudConstant {
 	public static final String SYS_OSS_KEY = "sys_oss:";
 
 	/**
-	 * 云存储配置KEY
+	 * 对象存储配置KEY
 	 */
 	public static final String CLOUD_STORAGE_CONFIG_KEY = "CloudStorageConfig";
 

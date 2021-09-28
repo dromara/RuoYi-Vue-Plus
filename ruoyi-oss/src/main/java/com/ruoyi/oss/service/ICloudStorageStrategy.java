@@ -5,7 +5,7 @@ import com.ruoyi.oss.entity.UploadResult;
 import java.io.InputStream;
 
 /**
- * 云存储策略
+ * 对象存储策略
  *
  * @author Lion Li
  */

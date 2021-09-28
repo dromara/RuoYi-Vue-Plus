@@ -1,5 +1,6 @@
 package com.ruoyi.framework.config;
 
+import com.ruoyi.framework.config.properties.SecurityProperties;
 import com.ruoyi.framework.security.filter.JwtAuthenticationTokenFilter;
 import com.ruoyi.framework.security.handle.AuthenticationEntryPointImpl;
 import com.ruoyi.framework.security.handle.LogoutSuccessHandlerImpl;
@@ -20,7 +21,7 @@ import org.springframework.web.filter.CorsFilter;
 
 /**
  * spring security配置
- *
+ * 
  * @author ruoyi
  */
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
@@ -31,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
      */
     @Autowired
     private UserDetailsService userDetailsService;
-
+    
     /**
      * 认证失败处理类
      */
@@ -49,12 +50,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
      */
     @Autowired
     private JwtAuthenticationTokenFilter authenticationTokenFilter;
-
+    
     /**
      * 跨域过滤器
      */
     @Autowired
     private CorsFilter corsFilter;
+
+    @Autowired
+    private SecurityProperties securityProperties;
 
     /**
      * 解决 无法直接注入 AuthenticationManager
@@ -96,8 +100,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 过滤请求
                 .authorizeRequests()
-                // 对于登录login 注册register 验证码captchaImage 允许匿名访问
-                .antMatchers("/login", "/register", "/captchaImage").anonymous()
                 .antMatchers(
                         HttpMethod.GET,
                         "/",
@@ -106,19 +108,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                         "/**/*.css",
                         "/**/*.js"
                 ).permitAll()
-                .antMatchers("/doc.html").anonymous()
-                .antMatchers("/swagger-resources/**").anonymous()
-                .antMatchers("/webjars/**").anonymous()
-                .antMatchers("/*/api-docs").anonymous()
-                .antMatchers("/druid/**").anonymous()
-                // Spring Boot Actuator 的安全配置
-                .antMatchers("/actuator").anonymous()
-                .antMatchers("/actuator/**").anonymous()
+                .antMatchers(securityProperties.getAnonymous()).anonymous()
+                .antMatchers(securityProperties.getPermitAll()).permitAll()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable();
-        httpSecurity.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);
+        httpSecurity.logout().logoutUrl(securityProperties.getLogoutUrl()).logoutSuccessHandler(logoutSuccessHandler);
         // 添加JWT filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
         // 添加CORS filter

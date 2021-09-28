@@ -27,6 +27,9 @@ public class AddressUtils {
 
 	public static String getRealAddressByIP(String ip) {
 		String address = UNKNOWN;
+		if (StringUtils.isBlank(ip)){
+			return address;
+		}
 		// 内网不查询
 		ip = "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : HtmlUtil.cleanHtmlTag(ip);
 		if (NetUtil.isInnerIP(ip)) {
