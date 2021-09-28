@@ -4,7 +4,9 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.service.LogininforService;
+import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.UserStatus;
+import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
@@ -72,7 +74,7 @@ public class SysLoginService {
 		asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
         recordLoginInfo(user.getUserId());
         // 生成token
-        StpUtil.login(user.getUserId(), "PC");
+        LoginUtils.loginByDevice(user.getUserId(), UserType.SYS_USER, DeviceType.PC);
         return StpUtil.getTokenValue();
     }
 

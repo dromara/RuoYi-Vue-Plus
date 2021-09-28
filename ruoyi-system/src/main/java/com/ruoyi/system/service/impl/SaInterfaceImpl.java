@@ -2,6 +2,8 @@ package com.ruoyi.system.service.impl;
 
 import cn.dev33.satoken.stp.StpInterface;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.enums.UserType;
+import com.ruoyi.common.utils.LoginUtils;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysPermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +23,30 @@ public class SaInterfaceImpl implements StpInterface {
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
-        SysUser user = iSysUserService.getById(loginId.toString());
-        Set<String> menuPermission = sysPermissionService.getMenuPermission(user);
-        //采用的是用户里自带的权限，实现一次性访问reids,进行判断是否可以访问
-        return new ArrayList<>(menuPermission);
+        UserType userType = LoginUtils.getUserType(loginId);
+        if (userType == UserType.SYS_USER) {
+            Long userId = LoginUtils.getUserId();
+            SysUser user = iSysUserService.getById(userId);
+            Set<String> menuPermission = sysPermissionService.getMenuPermission(user);
+            //采用的是用户里自带的权限，实现一次性访问reids,进行判断是否可以访问
+            return new ArrayList<>(menuPermission);
+        } else if (userType == UserType.APP_USER) {
+            // app端权限返回 自行根据业务编写
+        }
+        return new ArrayList<>();
     }
 
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
-        SysUser user = iSysUserService.getById(loginId.toString());
-        Set<String> rolePermission = sysPermissionService.getRolePermission(user);
-        return new ArrayList<>(rolePermission);
+        UserType userType = LoginUtils.getUserType(loginId);
+        if (userType == UserType.SYS_USER) {
+            Long userId = LoginUtils.getUserId();
+            SysUser user = iSysUserService.getById(userId);
+            Set<String> rolePermission = sysPermissionService.getRolePermission(user);
+            return new ArrayList<>(rolePermission);
+        } else if (userType == UserType.APP_USER) {
+            // app端权限返回 自行根据业务编写
+        }
+        return new ArrayList<>();
     }
 }
