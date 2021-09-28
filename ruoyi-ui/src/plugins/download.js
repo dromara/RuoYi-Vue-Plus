@@ -40,7 +40,7 @@ export default {
       this.saveAs(blob, decodeURI(res.headers['download-filename']))
     })
   },
-  oss(ossId, name) {
+  oss(ossId) {
     var url = baseURL + '/system/oss/download/' + ossId
     axios({
       method: 'get',
@@ -49,7 +49,7 @@ export default {
       headers: { 'Authorization': 'Bearer ' + getToken() }
     }).then(res => {
       const blob = new Blob([res.data], { type: 'application/octet-stream' })
-      this.saveAs(blob, name)
+      this.saveAs(blob, decodeURI(res.headers['download-filename']))
     })
   },
   zip(url, name) {

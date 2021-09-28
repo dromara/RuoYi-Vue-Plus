@@ -102,7 +102,7 @@ public class SysOssController extends BaseController {
 		response.reset();
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
-		FileUtils.setAttachmentResponseHeader(response, URLEncoder.encode(sysOss.getOriginalName(), StandardCharsets.UTF_8.toString()));
+		FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
 		response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
 		long data;
 		try {
