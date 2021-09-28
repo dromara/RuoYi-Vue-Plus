@@ -44,19 +44,19 @@ public class GenConstants
     public static final String[] COLUMNTYPE_NUMBER = { "tinyint", "smallint", "mediumint", "int", "number", "integer",
             "bit", "bigint", "float", "double", "decimal" };
 
-    /** 页面不需要添加字段 */
+    /** BO对象 不需要添加字段 */
     public static final String[] COLUMNNAME_NOT_ADD = { "create_by", "create_time", "del_flag", "update_by",
             "update_time", "version" };
 
-    /** 页面不需要编辑字段 */
+    /** BO对象 不需要编辑字段 */
     public static final String[] COLUMNNAME_NOT_EDIT = { "create_by", "create_time", "del_flag", "update_by",
             "update_time", "version" };
 
-    /** 页面不需要显示的列表字段 */
-    public static final String[] COLUMNNAME_NOT_LIST = { "id", "create_by", "create_time", "del_flag", "update_by",
+    /** VO对象 不需要返回字段 */
+    public static final String[] COLUMNNAME_NOT_LIST = { "create_by", "create_time", "del_flag", "update_by",
             "update_time", "version" };
 
-    /** 页面不需要查询字段 */
+    /** BO对象 不需要查询字段 */
     public static final String[] COLUMNNAME_NOT_QUERY = { "id", "create_by", "create_time", "del_flag", "update_by",
             "update_time", "remark", "version" };
 
