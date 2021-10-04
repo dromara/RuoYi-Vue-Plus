@@ -64,9 +64,7 @@ public class SysLoginService {
             log.info("登录用户：{} 已被停用.", username);
             throw new ServiceException("对不起，您的账号：" + username + " 已停用");
         }
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String encodePassword = passwordEncoder.encode(password);
-        if (SecurityUtils.matchesPassword(user.getPassword(), encodePassword)) {
+        if (!SecurityUtils.matchesPassword(password, user.getPassword())) {
             asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match"), request);
             throw new UserPasswordNotMatchException();
         }
