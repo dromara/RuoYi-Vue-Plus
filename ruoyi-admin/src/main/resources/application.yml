@@ -59,6 +59,10 @@ logging:
     org.springframework: warn
   config: classpath:logback.xml
 
+# tlog 全局访问性能拦截
+tlog:
+  enable-invoke-time-print: true
+
 # Spring配置
 spring:
   application:
