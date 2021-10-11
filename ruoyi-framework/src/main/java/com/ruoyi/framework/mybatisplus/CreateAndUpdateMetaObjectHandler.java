@@ -27,7 +27,9 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 				this.setFieldValByName("createTime", new Date(), metaObject);
 			}
 			if (metaObject.hasGetter("createBy")) {
-				this.setFieldValByName("createBy", getLoginUsername(), metaObject);
+				if (metaObject.getValue("createBy") == null) {
+					this.setFieldValByName("createBy", getLoginUsername(), metaObject);
+				}
 			}
 		} catch (Exception e) {
 			throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
@@ -39,7 +41,9 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 	public void updateFill(MetaObject metaObject) {
 		try {
 			if (metaObject.hasGetter("updateBy")) {
-				this.setFieldValByName("updateBy", getLoginUsername(), metaObject);
+				if (metaObject.getValue("updateBy") == null) {
+					this.setFieldValByName("updateBy", getLoginUsername(), metaObject);
+				}
 			}
 			if (metaObject.hasGetter("updateTime")) {
 				this.setFieldValByName("updateTime", new Date(), metaObject);

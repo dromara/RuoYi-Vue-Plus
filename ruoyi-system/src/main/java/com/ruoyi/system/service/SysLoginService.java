@@ -78,7 +78,7 @@ public class SysLoginService {
         }
         asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        recordLoginInfo(loginUser.getUserId());
+        recordLoginInfo(loginUser.getUserId(), username);
         // 生成token
         return tokenService.createToken(loginUser);
     }
@@ -110,11 +110,12 @@ public class SysLoginService {
      *
      * @param userId 用户ID
      */
-    public void recordLoginInfo(Long userId) {
+    public void recordLoginInfo(Long userId, String username) {
         SysUser sysUser = new SysUser();
         sysUser.setUserId(userId);
         sysUser.setLoginIp(ServletUtils.getClientIP());
         sysUser.setLoginDate(DateUtils.getNowDate());
+        sysUser.setUpdateBy(username);
         userService.updateUserProfile(sysUser);
     }
 }
