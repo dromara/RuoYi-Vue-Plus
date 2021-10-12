@@ -60,7 +60,7 @@ public class MySaTokenListener implements SaTokenListener {
      * 每次被踢下线时触发
      */
     @Override
-    public void doLogoutByLoginId(String loginType, Object loginId, String tokenValue, String device) {
+    public void doKickout(String loginType, Object loginId, String tokenValue) {
         RedisUtils.deleteObject(Constants.ONLINE_TOKEN_KEY + tokenValue);
         log.info("user doLogoutByLoginId, useId:{}, token:{}", loginId, tokenValue);
     }
@@ -69,7 +69,7 @@ public class MySaTokenListener implements SaTokenListener {
      * 每次被顶下线时触发
      */
     @Override
-    public void doReplaced(String loginType, Object loginId, String tokenValue, String device) {
+    public void doReplaced(String loginType, Object loginId, String tokenValue) {
         RedisUtils.deleteObject(Constants.ONLINE_TOKEN_KEY + tokenValue);
         log.info("user doReplaced, useId:{}, token:{}", loginId, tokenValue);
     }
