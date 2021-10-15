@@ -1,10 +1,13 @@
 package com.ruoyi.framework.handler;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 
@@ -22,31 +25,50 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 	@Override
 	public void insertFill(MetaObject metaObject) {
 		try {
-			//根据属性名字设置要填充的值
-			if (metaObject.hasGetter("createTime")) {
-				this.setFieldValByName("createTime", new Date(), metaObject);
-			}
-			if (metaObject.hasGetter("createBy")) {
-				if (metaObject.getValue("createBy") == null) {
-					this.setFieldValByName("createBy", getLoginUsername(), metaObject);
+			if (ObjectUtil.isNotNull(metaObject) && metaObject.getOriginalObject() instanceof BaseEntity) {
+				BaseEntity baseEntity = (BaseEntity) metaObject.getOriginalObject();
+				Date current = new Date();
+				// 创建时间为空 则填充
+				if (ObjectUtil.isNull(baseEntity.getCreateTime())) {
+					baseEntity.setCreateTime(current);
+				}
+				// 更新时间为空 则填充
+				if (ObjectUtil.isNull(baseEntity.getUpdateTime())) {
+					baseEntity.setUpdateTime(current);
+				}
+				String username = getLoginUsername();
+				// 当前已登录 且 创建人为空 则填充
+				if (StringUtils.isNotBlank(username)
+						&& StringUtils.isBlank(baseEntity.getCreateBy())) {
+					baseEntity.setCreateBy(username);
+				}
+				// 当前已登录 且 更信任为空 则填充
+				if (StringUtils.isNotBlank(username)
+						&& StringUtils.isBlank(baseEntity.getUpdateBy())) {
+					baseEntity.setUpdateBy(username);
 				}
 			}
 		} catch (Exception e) {
 			throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
 		}
-		updateFill(metaObject);
 	}
 
 	@Override
 	public void updateFill(MetaObject metaObject) {
 		try {
-			if (metaObject.hasGetter("updateBy")) {
-				if (metaObject.getValue("updateBy") == null) {
-					this.setFieldValByName("updateBy", getLoginUsername(), metaObject);
+			if (ObjectUtil.isNotNull(metaObject) && metaObject.getOriginalObject() instanceof BaseEntity) {
+				BaseEntity baseEntity = (BaseEntity) metaObject.getOriginalObject();
+				Date current = new Date();
+				// 更新时间为空 则填充
+				if (ObjectUtil.isNull(baseEntity.getUpdateTime())) {
+					baseEntity.setUpdateTime(current);
 				}
-			}
-			if (metaObject.hasGetter("updateTime")) {
-				this.setFieldValByName("updateTime", new Date(), metaObject);
+				String username = getLoginUsername();
+				// 当前已登录 且 更信任为空 则填充
+				if (StringUtils.isNotBlank(username)
+						&& StringUtils.isBlank(baseEntity.getUpdateBy())) {
+					baseEntity.setUpdateBy(username);
+				}
 			}
 		} catch (Exception e) {
 			throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
