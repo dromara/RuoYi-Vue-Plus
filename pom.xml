@@ -159,6 +159,7 @@
                 <version>${hutool.version}</version>
             </dependency>
 
+            <!-- @deprecated 由于使用人数较少 决定与 3.4.0 版本移除 -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -170,7 +171,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
+            <!-- @deprecated 由于使用人数较少 决定与 3.4.0 版本移除 -->
             <dependency>
                 <groupId>io.github.openfeign</groupId>
                 <artifactId>feign-okhttp</artifactId>

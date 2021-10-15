@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
  *
  * @see {com.ruoyi.framework.config.FeignConfig#errorDecoder()}
  * @author Lion Li
+ * @deprecated 由于使用人数较少 决定与 3.4.0 版本移除
  */
 @Slf4j
 @Component

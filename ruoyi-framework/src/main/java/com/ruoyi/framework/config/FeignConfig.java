@@ -17,7 +17,9 @@ import java.util.concurrent.TimeUnit;
  * openfeign配置类
  *
  * @author Lion Li
+ * @deprecated 由于使用人数较少 决定与 3.4.0 版本移除
  */
+@Deprecated
 @EnableFeignClients("${feign.package}")
 @Configuration
 @ConditionalOnClass(Feign.class)
