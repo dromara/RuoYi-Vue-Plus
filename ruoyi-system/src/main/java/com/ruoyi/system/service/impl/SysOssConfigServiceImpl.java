@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Lists;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
@@ -113,14 +114,18 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
 				throw new ServiceException("系统内置, 不可删除!");
 			}
 		}
+        List<SysOssConfig> list = Lists.newArrayList();
+        for (Long configId : ids) {
+            SysOssConfig config = getById(configId);
+            list.add(config);
+        }
         boolean flag = removeByIds(ids);
-    	if (flag) {
-			for (Long configId : ids) {
-				SysOssConfig config = getById(configId);
-				RedisUtils.deleteObject(getCacheKey(config.getConfigKey()));
-			}
-		}
-    	return flag;
+        if (flag) {
+            list.stream().forEach(sysOssConfig -> {
+                RedisUtils.deleteObject(getCacheKey(sysOssConfig.getConfigKey()));
+            });
+        }
+        return flag;
     }
 
 	/**
