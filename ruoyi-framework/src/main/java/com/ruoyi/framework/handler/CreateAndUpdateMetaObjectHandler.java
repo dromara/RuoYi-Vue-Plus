@@ -1,4 +1,4 @@
-package com.ruoyi.framework.mybatisplus;
+package com.ruoyi.framework.handler;
 
 import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
