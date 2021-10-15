@@ -36,12 +36,6 @@ public class TreeEntity extends BaseEntity {
 	private Long parentId;
 
 	/**
-	 * 显示顺序
-	 */
-	@ApiModelProperty(value = "显示顺序")
-	private String orderNum;
-
-	/**
 	 * 子部门
 	 */
 	@TableField(exist = false)
