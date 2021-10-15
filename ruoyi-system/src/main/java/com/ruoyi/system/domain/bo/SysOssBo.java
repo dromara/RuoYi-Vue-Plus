@@ -16,52 +16,52 @@ import lombok.EqualsAndHashCode;
 @ApiModel("OSS对象存储分页查询对象")
 public class SysOssBo extends BaseEntity {
 
-	/**
-	 * 分页大小
-	 */
-	@ApiModelProperty("分页大小")
-	private Integer pageSize;
-	/**
-	 * 当前页数
-	 */
-	@ApiModelProperty("当前页数")
-	private Integer pageNum;
-	/**
-	 * 排序列
-	 */
-	@ApiModelProperty("排序列")
-	private String orderByColumn;
-	/**
-	 * 排序的方向desc或者asc
-	 */
-	@ApiModelProperty(value = "排序的方向", example = "asc,desc")
-	private String isAsc;
+    /**
+     * 分页大小
+     */
+    @ApiModelProperty("分页大小")
+    private Integer pageSize;
+    /**
+     * 当前页数
+     */
+    @ApiModelProperty("当前页数")
+    private Integer pageNum;
+    /**
+     * 排序列
+     */
+    @ApiModelProperty("排序列")
+    private String orderByColumn;
+    /**
+     * 排序的方向desc或者asc
+     */
+    @ApiModelProperty(value = "排序的方向", example = "asc,desc")
+    private String isAsc;
 
 
-	/**
-	 * 文件名
-	 */
-	@ApiModelProperty("文件名")
-	private String fileName;
-	/**
-	 * 原名
-	 */
-	@ApiModelProperty("原名")
-	private String originalName;
-	/**
-	 * 文件后缀名
-	 */
-	@ApiModelProperty("文件后缀名")
-	private String fileSuffix;
-	/**
-	 * URL地址
-	 */
-	@ApiModelProperty("URL地址")
-	private String url;
-	/**
-	 * 服务商
-	 */
-	@ApiModelProperty("服务商")
-	private String service;
+    /**
+     * 文件名
+     */
+    @ApiModelProperty("文件名")
+    private String fileName;
+    /**
+     * 原名
+     */
+    @ApiModelProperty("原名")
+    private String originalName;
+    /**
+     * 文件后缀名
+     */
+    @ApiModelProperty("文件后缀名")
+    private String fileSuffix;
+    /**
+     * URL地址
+     */
+    @ApiModelProperty("URL地址")
+    private String url;
+    /**
+     * 服务商
+     */
+    @ApiModelProperty("服务商")
+    private String service;
 
 }

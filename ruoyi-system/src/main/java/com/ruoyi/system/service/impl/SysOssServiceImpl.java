@@ -32,59 +32,59 @@ import java.util.Map;
 @Service
 public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, SysOssVo> implements ISysOssService {
 
-	@Override
-	public TableDataInfo<SysOssVo> queryPageList(SysOssBo bo) {
-		PagePlus<SysOss, SysOssVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
-		return PageUtils.buildDataInfo(result);
-	}
+    @Override
+    public TableDataInfo<SysOssVo> queryPageList(SysOssBo bo) {
+        PagePlus<SysOss, SysOssVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
+        return PageUtils.buildDataInfo(result);
+    }
 
-	private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {
-		Map<String, Object> params = bo.getParams();
-		LambdaQueryWrapper<SysOss> lqw = Wrappers.lambdaQuery();
-		lqw.like(StringUtils.isNotBlank(bo.getFileName()), SysOss::getFileName, bo.getFileName());
-		lqw.like(StringUtils.isNotBlank(bo.getOriginalName()), SysOss::getOriginalName, bo.getOriginalName());
-		lqw.eq(StringUtils.isNotBlank(bo.getFileSuffix()), SysOss::getFileSuffix, bo.getFileSuffix());
-		lqw.eq(StringUtils.isNotBlank(bo.getUrl()), SysOss::getUrl, bo.getUrl());
-		lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
-			SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
-		lqw.eq(StringUtils.isNotBlank(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
-		lqw.eq(StringUtils.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
-		return lqw;
-	}
+    private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {
+        Map<String, Object> params = bo.getParams();
+        LambdaQueryWrapper<SysOss> lqw = Wrappers.lambdaQuery();
+        lqw.like(StringUtils.isNotBlank(bo.getFileName()), SysOss::getFileName, bo.getFileName());
+        lqw.like(StringUtils.isNotBlank(bo.getOriginalName()), SysOss::getOriginalName, bo.getOriginalName());
+        lqw.eq(StringUtils.isNotBlank(bo.getFileSuffix()), SysOss::getFileSuffix, bo.getFileSuffix());
+        lqw.eq(StringUtils.isNotBlank(bo.getUrl()), SysOss::getUrl, bo.getUrl());
+        lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
+                SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
+        lqw.eq(StringUtils.isNotBlank(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
+        lqw.eq(StringUtils.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
+        return lqw;
+    }
 
-	@Override
-	public SysOss upload(MultipartFile file) {
-		String originalfileName = file.getOriginalFilename();
-		String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
-		ICloudStorageStrategy storage = OssFactory.instance();
-		UploadResult uploadResult;
-		try {
-			uploadResult = storage.uploadSuffix(file.getBytes(), suffix, file.getContentType());
-		} catch (IOException e) {
-			throw new ServiceException(e.getMessage());
-		}
-		// 保存文件信息
-		SysOss oss = new SysOss()
-			.setUrl(uploadResult.getUrl())
-			.setFileSuffix(suffix)
-			.setFileName(uploadResult.getFilename())
-			.setOriginalName(originalfileName)
-			.setService(storage.getServiceType());
-		save(oss);
-		return oss;
-	}
+    @Override
+    public SysOss upload(MultipartFile file) {
+        String originalfileName = file.getOriginalFilename();
+        String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
+        ICloudStorageStrategy storage = OssFactory.instance();
+        UploadResult uploadResult;
+        try {
+            uploadResult = storage.uploadSuffix(file.getBytes(), suffix, file.getContentType());
+        } catch (IOException e) {
+            throw new ServiceException(e.getMessage());
+        }
+        // 保存文件信息
+        SysOss oss = new SysOss()
+                .setUrl(uploadResult.getUrl())
+                .setFileSuffix(suffix)
+                .setFileName(uploadResult.getFilename())
+                .setOriginalName(originalfileName)
+                .setService(storage.getServiceType());
+        save(oss);
+        return oss;
+    }
 
-	@Override
-	public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-		if (isValid) {
-			// 做一些业务上的校验,判断是否需要校验
-		}
-		List<SysOss> list = listByIds(ids);
-		for (SysOss sysOss : list) {
-			ICloudStorageStrategy storage = OssFactory.instance(sysOss.getService());
-			storage.delete(sysOss.getUrl());
-		}
-		return removeByIds(ids);
-	}
+    @Override
+    public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
+        if (isValid) {
+            // 做一些业务上的校验,判断是否需要校验
+        }
+        List<SysOss> list = listByIds(ids);
+        for (SysOss sysOss : list) {
+            ICloudStorageStrategy storage = OssFactory.instance(sysOss.getService());
+            storage.delete(sysOss.getUrl());
+        }
+        return removeByIds(ids);
+    }
 
 }

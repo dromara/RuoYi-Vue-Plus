@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 角色表 数据层
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public interface SysRoleMapper extends BaseMapperPlus<SysRole> {
 
@@ -22,7 +22,7 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRole> {
      * @param role 角色信息
      * @return 角色数据集合信息
      */
-    public List<SysRole> selectRoleList(SysRole role);
+    List<SysRole> selectRoleList(SysRole role);
 
     /**
      * 根据用户ID查询角色
@@ -30,7 +30,7 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRole> {
      * @param userId 用户ID
      * @return 角色列表
      */
-    public List<SysRole> selectRolePermissionByUserId(Long userId);
+    List<SysRole> selectRolePermissionByUserId(Long userId);
 
 
     /**
@@ -39,7 +39,7 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRole> {
      * @param userId 用户ID
      * @return 选中角色ID列表
      */
-    public List<Integer> selectRoleListByUserId(Long userId);
+    List<Integer> selectRoleListByUserId(Long userId);
 
     /**
      * 根据用户ID查询角色
@@ -47,6 +47,6 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRole> {
      * @param userName 用户名
      * @return 角色列表
      */
-    public List<SysRole> selectRolesByUserName(String userName);
+    List<SysRole> selectRolesByUserName(String userName);
 
 }

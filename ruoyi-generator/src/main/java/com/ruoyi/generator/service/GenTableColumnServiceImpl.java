@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 业务字段 服务层实现
  *
- * @author ruoyi
+ * @author Lion Li
  */
 @Service
 public class GenTableColumnServiceImpl extends ServicePlusImpl<GenTableColumnMapper, GenTableColumn, GenTableColumn> implements IGenTableColumnService {
@@ -26,7 +26,7 @@ public class GenTableColumnServiceImpl extends ServicePlusImpl<GenTableColumnMap
     @Override
     public List<GenTableColumn> selectGenTableColumnListByTableId(Long tableId) {
         return list(new LambdaQueryWrapper<GenTableColumn>()
-                .eq(GenTableColumn::getTableId,tableId)
+                .eq(GenTableColumn::getTableId, tableId)
                 .orderByAsc(GenTableColumn::getSort));
     }
 

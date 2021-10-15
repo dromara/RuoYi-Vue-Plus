@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 用户表 数据层
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public interface SysUserMapper extends BaseMapperPlus<SysUser> {
 
@@ -22,7 +22,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser> {
      * @param sysUser 用户信息
      * @return 用户信息集合信息
      */
-    public List<SysUser> selectUserList(SysUser sysUser);
+    List<SysUser> selectUserList(SysUser sysUser);
 
     /**
      * 根据条件分页查询未已配用户角色列表
@@ -30,7 +30,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser> {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    public Page<SysUser> selectAllocatedList(@Param("page") Page<SysUser> page, @Param("user") SysUser user);
+    Page<SysUser> selectAllocatedList(@Param("page") Page<SysUser> page, @Param("user") SysUser user);
 
     /**
      * 根据条件分页查询未分配用户角色列表
@@ -38,7 +38,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser> {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    public Page<SysUser> selectUnallocatedList(@Param("page") Page<SysUser> page, @Param("user") SysUser user);
+    Page<SysUser> selectUnallocatedList(@Param("page") Page<SysUser> page, @Param("user") SysUser user);
 
     /**
      * 通过用户名查询用户
@@ -46,7 +46,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser> {
      * @param userName 用户名
      * @return 用户对象信息
      */
-    public SysUser selectUserByUserName(String userName);
+    SysUser selectUserByUserName(String userName);
 
     /**
      * 通过用户ID查询用户
@@ -54,6 +54,6 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser> {
      * @param userId 用户ID
      * @return 用户对象信息
      */
-    public SysUser selectUserById(Long userId);
+    SysUser selectUserById(Long userId);
 
 }

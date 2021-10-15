@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * 岗位信息 服务层处理
  *
- * @author ruoyi
+ * @author Lion Li
  */
 @Service
 public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, SysPost> implements ISysPostService {
@@ -35,7 +35,7 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
                 .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
                 .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
                 .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage(),lqw));
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
     }
 
     /**
@@ -126,7 +126,7 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
      */
     @Override
     public long countUserPostById(Long postId) {
-        return userPostMapper.selectCount(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getPostId,postId));
+        return userPostMapper.selectCount(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getPostId, postId));
     }
 
     /**

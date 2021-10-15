@@ -6,7 +6,7 @@ import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 /**
  * 字典表 数据层
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public interface SysDictTypeMapper extends BaseMapperPlus<SysDictType> {
 

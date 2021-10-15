@@ -16,9 +16,9 @@ import java.util.Collection;
  */
 public interface ISysOssService extends IServicePlus<SysOss, SysOssVo> {
 
-	TableDataInfo<SysOssVo> queryPageList(SysOssBo sysOss);
+    TableDataInfo<SysOssVo> queryPageList(SysOssBo sysOss);
 
-	SysOss upload(MultipartFile file);
+    SysOss upload(MultipartFile file);
 
-	Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+    Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
 }

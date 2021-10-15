@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
@@ -29,7 +29,7 @@ import java.util.*;
 /**
  * 角色 业务层处理
  *
- * @author ruoyi
+ * @author Lion Li
  */
 @Service
 public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, SysRole> implements ISysRoleService {
@@ -280,7 +280,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
             list.add(rm);
         }
         if (list.size() > 0) {
-			rows = roleMenuMapper.insertAll(list);
+            rows = roleMenuMapper.insertAll(list);
         }
         return rows;
     }
@@ -301,7 +301,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
             list.add(rd);
         }
         if (list.size() > 0) {
-			rows = roleDeptMapper.insertAll(list);
+            rows = roleDeptMapper.insertAll(list);
         }
         return rows;
     }
@@ -355,45 +355,45 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
     @Override
     public int deleteAuthUser(SysUserRole userRole) {
         return userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
-			.eq(SysUserRole::getRoleId, userRole.getRoleId())
-			.eq(SysUserRole::getUserId, userRole.getUserId()));
+                .eq(SysUserRole::getRoleId, userRole.getRoleId())
+                .eq(SysUserRole::getUserId, userRole.getUserId()));
     }
 
     /**
      * 批量取消授权用户角色
      *
-     * @param roleId 角色ID
+     * @param roleId  角色ID
      * @param userIds 需要取消授权的用户数据ID
      * @return 结果
      */
     @Override
     public int deleteAuthUsers(Long roleId, Long[] userIds) {
-		return userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
-			.eq(SysUserRole::getRoleId, roleId)
-			.in(SysUserRole::getUserId, Arrays.asList(userIds)));
+        return userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
+                .eq(SysUserRole::getRoleId, roleId)
+                .in(SysUserRole::getUserId, Arrays.asList(userIds)));
     }
 
     /**
      * 批量选择授权用户角色
      *
-     * @param roleId 角色ID
+     * @param roleId  角色ID
      * @param userIds 需要删除的用户数据ID
      * @return 结果
      */
     @Override
     public int insertAuthUsers(Long roleId, Long[] userIds) {
         // 新增用户与角色管理
-		int rows = 1;
-		List<SysUserRole> list = new ArrayList<SysUserRole>();
+        int rows = 1;
+        List<SysUserRole> list = new ArrayList<SysUserRole>();
         for (Long userId : userIds) {
             SysUserRole ur = new SysUserRole();
             ur.setUserId(userId);
             ur.setRoleId(roleId);
             list.add(ur);
         }
-		if (list.size() > 0) {
-			rows = userRoleMapper.insertAll(list);
-		}
+        if (list.size() > 0) {
+            rows = userRoleMapper.insertAll(list);
+        }
         return rows;
     }
 }
