@@ -193,7 +193,7 @@ public class GenTableColumn extends BaseEntity {
                 // BaseEntity
                 "createBy", "createTime", "updateBy", "updateTime",
                 // TreeEntity
-                "parentName", "parentId", "orderNum");
+                "parentName", "parentId");
     }
 
     public boolean isUsableColumn() {
