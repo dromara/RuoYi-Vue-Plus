@@ -17,6 +17,7 @@ import java.util.Map;
 /**
  * 定时任务调度日志信息 服务层
  *
+ * @deprecated 3.5.0删除 迁移至xxl-job
  * @author ruoyi
  */
 @Service

@@ -6,6 +6,7 @@ import com.ruoyi.quartz.domain.SysJob;
 /**
  * 调度任务信息 数据层
  *
+ * @deprecated 3.5.0删除 迁移至xxl-job
  * @author ruoyi
  */
 public interface SysJobMapper extends BaseMapperPlus<SysJob> {

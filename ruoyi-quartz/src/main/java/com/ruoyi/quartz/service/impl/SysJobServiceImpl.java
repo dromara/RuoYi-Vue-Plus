@@ -26,6 +26,7 @@ import java.util.List;
 /**
  * 定时任务调度信息 服务层
  *
+ * @deprecated 3.5.0删除 迁移至xxl-job
  * @author ruoyi
  */
 @Service

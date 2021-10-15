@@ -18,6 +18,7 @@ import java.util.List;
 /**
  * 调度日志操作处理
  *
+ * @deprecated 3.5.0删除 迁移至xxl-job
  * @author ruoyi
  */
 @RestController
