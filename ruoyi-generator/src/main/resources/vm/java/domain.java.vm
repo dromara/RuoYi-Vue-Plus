@@ -8,31 +8,38 @@ import java.io.Serializable;
 import java.util.Date;
 import java.math.BigDecimal;
 
+#foreach ($import in $importList)
+import ${import};
+#end
+#if($table.crud || $table.sub)
+import com.ruoyi.common.core.domain.BaseEntity;
+#elseif($table.tree)
+import com.ruoyi.common.core.domain.TreeEntity;
+#end
+
 /**
  * ${functionName}对象 ${tableName}
  *
  * @author ${author}
  * @date ${datetime}
  */
+#if($table.crud || $table.sub)
+    #set($Entity="BaseEntity")
+#elseif($table.tree)
+    #set($Entity="TreeEntity")
+#end
 @Data
-@NoArgsConstructor
 @Accessors(chain = true)
 @TableName("${tableName}")
-public class ${ClassName} implements Serializable {
+public class ${ClassName} extends ${Entity} {
 
     private static final long serialVersionUID=1L;
 
 #foreach ($column in $columns)
-
+#if(!$table.isSuperColumn($column.javaField))
     /**
      * $column.columnComment
      */
-#if($column.javaField=="createBy"||$column.javaField=="createTime")
-    @TableField(fill = FieldFill.INSERT)
-#end
-#if($column.javaField=="updateBy"||$column.javaField=="updateTime")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-#end
 #if($column.javaField=='delFlag')
     @TableLogic
 #end
@@ -43,6 +50,7 @@ public class ${ClassName} implements Serializable {
     @TableId(value = "$column.columnName")
 #end
     private $column.javaType $column.javaField;
+#end
 #end
 
 }
