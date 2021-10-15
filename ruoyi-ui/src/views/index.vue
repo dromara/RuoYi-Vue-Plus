@@ -478,14 +478,13 @@
 </template>
 
 <script>
-import config from '@/../package.json'
 
 export default {
   name: "Index",
   data() {
     return {
       // 版本号
-      version: config.version,
+      version: "3.2.0",
     };
   },
   methods: {
