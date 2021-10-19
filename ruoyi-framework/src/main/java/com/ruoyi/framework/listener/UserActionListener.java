@@ -1,4 +1,4 @@
-package com.ruoyi.framework.satoken;
+package com.ruoyi.framework.listener;
 
 import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.stp.SaLoginModel;
@@ -8,43 +8,46 @@ import cn.hutool.http.useragent.UserAgentUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.dto.UserOnlineDTO;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.utils.RedisUtils;
-import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.enums.UserType;
+import com.ruoyi.common.utils.*;
 import com.ruoyi.common.utils.ip.AddressUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * 自定义侦听器的实现
+ * 用户行为 侦听器的实现
  */
 @Component
 @Slf4j
-public class MySaTokenListener implements SaTokenListener {
+public class UserActionListener implements SaTokenListener {
 
     /**
      * 每次登录时触发
      */
     @Override
     public void doLogin(String loginType, Object loginId, SaLoginModel loginModel) {
-        UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
-        String ip = ServletUtils.getClientIP();
-        SysUser user = SecurityUtils.getUser();
-        String tokenValue = StpUtil.getTokenValue();
-        UserOnlineDTO userOnlineDTO = new UserOnlineDTO()
-                .setIpaddr(ip)
-                .setLoginLocation(AddressUtils.getRealAddressByIP(ip))
-                .setBrowser(userAgent.getBrowser().getName())
-                .setOs(userAgent.getOs().getName())
-                .setLoginTime(System.currentTimeMillis())
-                .setTokenId(tokenValue)
-                .setUserName(user.getUserName());
-        if (StringUtils.isNotNull(user.getDept())) {
-            userOnlineDTO.setDeptName(user.getDept().getDeptName());
+        UserType userType = LoginUtils.getUserType(loginId);
+        if (userType == UserType.SYS_USER) {
+            UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
+            String ip = ServletUtils.getClientIP();
+            SysUser user = SecurityUtils.getUser();
+            String tokenValue = StpUtil.getTokenValue();
+            UserOnlineDTO userOnlineDTO = new UserOnlineDTO()
+                    .setIpaddr(ip)
+                    .setLoginLocation(AddressUtils.getRealAddressByIP(ip))
+                    .setBrowser(userAgent.getBrowser().getName())
+                    .setOs(userAgent.getOs().getName())
+                    .setLoginTime(System.currentTimeMillis())
+                    .setTokenId(tokenValue)
+                    .setUserName(user.getUserName());
+            if (StringUtils.isNotNull(user.getDept())) {
+                userOnlineDTO.setDeptName(user.getDept().getDeptName());
+            }
+            RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, userOnlineDTO);
+            log.info("user doLogin, useId:{}, token:{}", loginId, tokenValue);
+        } else if (userType == UserType.APP_USER) {
+            // app端 自行根据业务编写
         }
-        RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, userOnlineDTO);
-        log.info("user doLogin, useId:{}, token:{}", loginId, tokenValue);
     }
 
     /**

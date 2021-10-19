@@ -28,7 +28,6 @@ public class SaInterfaceImpl implements StpInterface {
             Long userId = LoginUtils.getUserId();
             SysUser user = iSysUserService.getById(userId);
             Set<String> menuPermission = sysPermissionService.getMenuPermission(user);
-            //采用的是用户里自带的权限，实现一次性访问reids,进行判断是否可以访问
             return new ArrayList<>(menuPermission);
         } else if (userType == UserType.APP_USER) {
             // app端权限返回 自行根据业务编写
