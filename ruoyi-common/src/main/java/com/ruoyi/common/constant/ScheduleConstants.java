@@ -3,7 +3,7 @@ package com.ruoyi.common.constant;
 /**
  * 任务调度通用常量
  *
- * @deprecated 3.5.0删除 迁移至xxl-job
+ * @deprecated 3.4.0删除 迁移至xxl-job
  * @author ruoyi
  */
 public class ScheduleConstants

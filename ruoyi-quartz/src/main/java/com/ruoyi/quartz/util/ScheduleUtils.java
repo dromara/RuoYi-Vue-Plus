@@ -18,7 +18,7 @@ import com.ruoyi.quartz.domain.SysJob;
 /**
  * 定时任务工具类
  *
- * @deprecated 3.5.0删除 迁移至xxl-job
+ * @deprecated 3.4.0删除 迁移至xxl-job
  * @author ruoyi
  *
  */

@@ -3,7 +3,7 @@ package com.ruoyi.common.exception.job;
 /**
  * 计划策略异常
  *
- * @deprecated 3.5.0删除 迁移至xxl-job
+ * @deprecated 3.4.0删除 迁移至xxl-job
  * @author ruoyi
  */
 public class TaskException extends Exception

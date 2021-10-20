@@ -11,7 +11,7 @@ import com.ruoyi.quartz.domain.SysJob;
 /**
  * 任务执行工具
  *
- * @deprecated 3.5.0删除 迁移至xxl-job
+ * @deprecated 3.4.0删除 迁移至xxl-job
  * @author ruoyi
  */
 public class JobInvokeUtil
