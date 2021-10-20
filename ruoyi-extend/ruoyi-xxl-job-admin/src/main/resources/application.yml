@@ -25,7 +25,7 @@ spring:
       pool-name: HikariCP
       validation-timeout: 1000
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://192.168.199.15:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
     username: root
     password: root
   freemarker:
@@ -36,9 +36,9 @@ spring:
     suffix: .ftl
     templateLoaderPath: classpath:/templates/
   mail:
-    from: 943887556@qq.com
+    from: xx@qq.com
     host: smtp.qq.com
-    password: tianque887556
+    password: XXXXXXXX
     port: 25
     properties:
       mail:
@@ -49,7 +49,7 @@ spring:
           starttls:
             enable: true
             required: true
-    username: 943887556@qq.com
+    username: XXXXXX@qq.com
   mvc:
     servlet:
       load-on-startup: 0
