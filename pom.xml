@@ -209,6 +209,13 @@
                 <version>${lock4j.version}</version>
             </dependency>
 
+            <!-- xxl-job-core -->
+            <dependency>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-job-core</artifactId>
+                <version>${xxl-job-core-version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.yomahub</groupId>
                 <artifactId>tlog-spring-boot-configuration</artifactId>
@@ -237,10 +244,23 @@
                 <version>${tlog.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.yomahub</groupId>
+                <artifactId>tlog-xxl-job</artifactId>
+                <version>${tlog.version}</version>
+            </dependency>
+
             <!-- 定时任务 @deprecated 3.5.0删除 迁移至xxl-job -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-quartz</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+
+            <!-- 定时任务 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-job</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
@@ -294,6 +314,7 @@
         <module>ruoyi-framework</module>
         <module>ruoyi-system</module>
         <module>ruoyi-quartz</module>
+        <module>ruoyi-job</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>ruoyi-demo</module>
