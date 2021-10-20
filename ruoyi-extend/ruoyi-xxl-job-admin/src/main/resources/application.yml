@@ -4,34 +4,19 @@ server:
   servlet:
     context-path: /xxl-job-admin
 spring:
-    mvc:
-      servlet:
-        load-on-startup: 0
-      static-path-pattern: /static/**
-    web:
-      resources:
-        static-locations: classpath:/static/
+  profiles:
+    active: @profiles.active@
+  mvc:
+    servlet:
+      load-on-startup: 0
+    static-path-pattern: /static/**
+  web:
+    resources:
+      static-locations: classpath:/static/
 
---- # 数据库配置
+--- # mybatis 配置
 mybatis:
   mapper-locations: classpath:/mybatis-mapper/*Mapper.xml
-spring:
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
-    username: root
-    password: root
-    hikari:
-      auto-commit: true
-      connection-test-query: SELECT 1
-      connection-timeout: 10000
-      idle-timeout: 30000
-      max-lifetime: 900000
-      maximum-pool-size: 30
-      minimum-idle: 10
-      pool-name: HikariCP
-      validation-timeout: 1000
 
 --- # 页面配置
 spring:
@@ -42,24 +27,6 @@ spring:
       number_format: 0.##########
     suffix: .ftl
     templateLoaderPath: classpath:/templates/
-
---- # 邮件配置
-spring:
-  mail:
-    from: xxx@qq.com
-    host: smtp.qq.com
-    username: xxx@qq.com
-    password: xxx
-    port: 25
-    properties:
-      mail:
-        smtp:
-          auth: true
-          socketFactory:
-            class: javax.net.ssl.SSLSocketFactory
-          starttls:
-            enable: true
-            required: true
 
 --- # 监控配置
 management:
