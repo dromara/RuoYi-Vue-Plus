@@ -13,6 +13,7 @@
 
     <modules>
         <module>ruoyi-monitor-admin</module>
+        <module>ruoyi-xxl-job-admin</module>
     </modules>
 
 </project>
