@@ -138,11 +138,29 @@ services:
     environment:
       # 时区上海
       TZ: Asia/Shanghai
+    volumes:
+      # 配置文件
+      - /docker/monitor/logs/:/ruoyi/monitor/logs
     privileged: true
     restart: always
     networks:
       ruoyi_net:
         ipv4_address: 172.30.0.90
+
+  ruoyi-xxl-job-admin:
+    image: "ruoyi/ruoyi-xxl-job-admin:3.2.0"
+    container_name: ruoyi-xxl-job-admin
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+    volumes:
+      # 配置文件
+      - /docker/xxljob/logs/:/ruoyi/xxljob/logs
+    privileged: true
+    restart: always
+    networks:
+      ruoyi_net:
+        ipv4_address: 172.30.0.92
 
 networks:
   ruoyi_net:
