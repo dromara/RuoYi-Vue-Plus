@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * xxl-job config
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Bean;
  * @author Lion Li
  */
 @Slf4j
+@Configuration
 @EnableConfigurationProperties(XxlJobProperties.class)
 @AllArgsConstructor
 public class XxlJobConfig {
