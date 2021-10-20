@@ -1,19 +1,27 @@
-management:
-  health:
-    mail:
-      enabled: false
-  server:
-    servlet:
-      context-path: /actuator
-mybatis:
-  mapper-locations: classpath:/mybatis-mapper/*Mapper.xml
+--- # server 配置
 server:
   port: 9100
   servlet:
     context-path: /xxl-job-admin
 spring:
+    mvc:
+      servlet:
+        load-on-startup: 0
+      static-path-pattern: /static/**
+    web:
+      resources:
+        static-locations: classpath:/static/
+
+--- # 数据库配置
+mybatis:
+  mapper-locations: classpath:/mybatis-mapper/*Mapper.xml
+spring:
   datasource:
+    type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
     hikari:
       auto-commit: true
       connection-test-query: SELECT 1
@@ -24,10 +32,9 @@ spring:
       minimum-idle: 10
       pool-name: HikariCP
       validation-timeout: 1000
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://localhost:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
-    username: root
-    password: root
+
+--- # 页面配置
+spring:
   freemarker:
     charset: UTF-8
     request-context-attribute: request
@@ -35,10 +42,14 @@ spring:
       number_format: 0.##########
     suffix: .ftl
     templateLoaderPath: classpath:/templates/
+
+--- # 邮件配置
+spring:
   mail:
-    from: xx@qq.com
+    from: xxx@qq.com
     host: smtp.qq.com
-    password: XXXXXXXX
+    username: xxx@qq.com
+    password: xxx
     port: 25
     properties:
       mail:
@@ -49,17 +60,23 @@ spring:
           starttls:
             enable: true
             required: true
-    username: XXXXXX@qq.com
-  mvc:
-    servlet:
-      load-on-startup: 0
-    static-path-pattern: /static/**
-  resources:
-    static-locations: classpath:/static/
+
+--- # 监控配置
+management:
+  health:
+    mail:
+      enabled: false
+  server:
+    base-path: /actuator
+
+--- # xxljob系统配置
 xxl:
   job:
-    accessToken: ''
+    # 鉴权token
+    accessToken: xxl-job
+    # 国际化
     i18n: zh_CN
+    # 日志清理
     logretentiondays: 30
     triggerpool:
       fast:
