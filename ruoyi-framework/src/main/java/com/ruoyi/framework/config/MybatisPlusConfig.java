@@ -18,13 +18,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.util.List;
 
 /**
- * mybatis-plus配置类
+ * mybatis-plus配置类(下方注释有插件介绍)
  *
  * @author Lion Li
  */
 @EnableTransactionManagement(proxyTargetClass = true)
 @Configuration
-// 指定要扫描的Mapper类的包的路径
 @MapperScan("${mybatis-plus.mapperPackage}")
 public class MybatisPlusConfig {
 
@@ -35,14 +34,11 @@ public class MybatisPlusConfig {
 		interceptor.addInnerInterceptor(paginationInnerInterceptor());
 		// 乐观锁插件
 		interceptor.addInnerInterceptor(optimisticLockerInnerInterceptor());
-		// 阻断插件
-//		interceptor.addInnerInterceptor(blockAttackInnerInterceptor());
 		return interceptor;
 	}
 
 	/**
 	 * 分页插件，自动识别数据库类型
-	 * https://baomidou.com/guide/interceptor-pagination.html
 	 */
 	public PaginationInnerInterceptor paginationInnerInterceptor() {
 		PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
@@ -55,41 +51,13 @@ public class MybatisPlusConfig {
 
 	/**
 	 * 乐观锁插件
-	 * https://baomidou.com/guide/interceptor-optimistic-locker.html
 	 */
 	public OptimisticLockerInnerInterceptor optimisticLockerInnerInterceptor() {
 		return new OptimisticLockerInnerInterceptor();
 	}
 
 	/**
-	 * 如果是对全表的删除或更新操作，就会终止该操作
-	 * https://baomidou.com/guide/interceptor-block-attack.html
-	 */
-//	public BlockAttackInnerInterceptor blockAttackInnerInterceptor() {
-//		return new BlockAttackInnerInterceptor();
-//	}
-
-	/**
-	 * sql性能规范插件(垃圾SQL拦截)
-	 * 如有需要可以启用
-	 */
-//	public IllegalSQLInnerInterceptor illegalSQLInnerInterceptor() {
-//		return new IllegalSQLInnerInterceptor();
-//	}
-
-
-	/**
-	 * 自定义主键策略
-	 * https://baomidou.com/guide/id-generator.html
-	 */
-//	@Bean
-//	public IdentifierGenerator idGenerator() {
-//		return new CustomIdGenerator();
-//	}
-
-	/**
 	 * 元对象字段填充控制器
-	 * https://baomidou.com/guide/auto-fill-metainfo.html
 	 */
 	@Bean
 	public MetaObjectHandler metaObjectHandler() {
@@ -98,7 +66,6 @@ public class MybatisPlusConfig {
 
 	/**
 	 * sql注入器配置
-	 * https://baomidou.com/guide/sql-injector.html
 	 */
 	@Bean
 	public ISqlInjector sqlInjector() {
@@ -113,6 +80,19 @@ public class MybatisPlusConfig {
 	}
 
 	/**
+	 * PaginationInnerInterceptor 分页插件，自动识别数据库类型
+	 * https://baomidou.com/guide/interceptor-pagination.html
+	 * OptimisticLockerInnerInterceptor 乐观锁插件
+	 * https://baomidou.com/guide/interceptor-optimistic-locker.html
+	 * MetaObjectHandler 元对象字段填充控制器
+	 * https://baomidou.com/guide/auto-fill-metainfo.html
+	 * ISqlInjector sql注入器
+	 * https://baomidou.com/guide/sql-injector.html
+	 * BlockAttackInnerInterceptor 如果是对全表的删除或更新操作，就会终止该操作
+	 * https://baomidou.com/guide/interceptor-block-attack.html
+	 * IllegalSQLInnerInterceptor sql性能规范插件(垃圾SQL拦截)
+	 * IdentifierGenerator 自定义主键策略
+	 * https://baomidou.com/guide/id-generator.html
 	 * TenantLineInnerInterceptor 多租户插件
 	 * https://baomidou.com/guide/interceptor-tenant-line.html
 	 * DynamicTableNameInnerInterceptor 动态表名插件
