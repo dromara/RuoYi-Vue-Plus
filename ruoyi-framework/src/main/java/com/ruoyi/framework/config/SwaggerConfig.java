@@ -1,6 +1,7 @@
 package com.ruoyi.framework.config;
 
 import cn.dev33.satoken.SaManager;
+import cn.dev33.satoken.config.SaTokenConfig;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -31,6 +32,8 @@ public class SwaggerConfig {
 
     @Autowired
     private SwaggerProperties swaggerProperties;
+    @Autowired
+    private SaTokenConfig saTokenConfig;
 
     /**
      * 创建API
@@ -67,7 +70,7 @@ public class SwaggerConfig {
      */
     private List<SecurityScheme> securitySchemes() {
         List<SecurityScheme> apiKeyList = new ArrayList<SecurityScheme>();
-		String header = SaManager.getConfig().getTokenName();
+        String header = saTokenConfig.getTokenName();
 		apiKeyList.add(new ApiKey(header, header, In.HEADER.toValue()));
         return apiKeyList;
     }
