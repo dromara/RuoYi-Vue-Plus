@@ -292,7 +292,7 @@
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
-            <!-- demo模块 -->
+            <!-- OSS对象存储模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-oss</artifactId>
