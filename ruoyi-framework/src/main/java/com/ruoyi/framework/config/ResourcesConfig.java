@@ -37,12 +37,12 @@ public class ResourcesConfig implements WebMvcConfigurer {
         // 注册路由拦截器，自定义验证规则
         registry.addInterceptor(new SaRouteInterceptor((request, response, handler) -> {
             // 登录验证 -- 排除多个路径
-            SaRouter.match(
-                    //获取所有的
-                    Collections.singletonList("/**"),
-                    //排除下不需要拦截的
-                    Arrays.asList(securityProperties.getExcludes()),
-                    () -> {
+            SaRouter
+                    // 获取所有的
+                    .match(Collections.singletonList("/**"))
+                    // 排除下不需要拦截的
+                    .notMatch(Arrays.asList(securityProperties.getExcludes()))
+                    .check(() -> {
                         Long userId = SecurityUtils.getUserId();
                         if(StringUtils.isNotNull(userId) ) {
                             long tokenTimeout = StpUtil.getTokenTimeout();
