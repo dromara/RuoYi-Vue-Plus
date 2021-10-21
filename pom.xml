@@ -28,7 +28,7 @@
         <jwt.version>0.9.1</jwt.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.7.13</hutool.version>
+        <hutool.version>5.7.14</hutool.version>
         <feign.version>3.0.3</feign.version>
         <feign-okhttp.version>11.6</feign-okhttp.version>
         <okhttp.version>4.9.1</okhttp.version>
@@ -45,8 +45,8 @@
         <!-- OSS 配置 -->
         <qiniu.version>7.8.0</qiniu.version>
         <aliyun.oss.version>3.13.1</aliyun.oss.version>
-        <qcloud.cos.version>5.6.55</qcloud.cos.version>
-        <minio.version>8.3.0</minio.version>
+        <qcloud.cos.version>5.6.58</qcloud.cos.version>
+        <minio.version>8.3.1</minio.version>
 
         <!-- docker 配置 -->
         <docker.registry.url>localhost</docker.registry.url>
