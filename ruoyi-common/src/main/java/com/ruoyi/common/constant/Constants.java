@@ -7,8 +7,7 @@ import io.jsonwebtoken.Claims;
  *
  * @author ruoyi
  */
-public class Constants
-{
+public class Constants {
     /**
      * UTF-8 字符集
      */
@@ -134,13 +133,13 @@ public class Constants
      */
     public static final String SYS_DICT_KEY = "sys_dict:";
 
-	/**
-	 * RMI 远程方法调用
-	 */
-	public static final String LOOKUP_RMI = "rmi://";
+    /**
+     * RMI 远程方法调用
+     */
+    public static final String LOOKUP_RMI = "rmi://";
 
-	/**
-	 * LDAP 远程方法调用
-	 */
-	public static final String LOOKUP_LDAP = "ldap://";
+    /**
+     * LDAP 远程方法调用
+     */
+    public static final String LOOKUP_LDAP = "ldap://";
 }

@@ -48,6 +48,7 @@ public class PageUtils {
 
     /**
      * 构建 plus 分页对象
+     *
      * @param <T> domain 实体
      * @param <K> vo 实体
      * @return 分页对象
@@ -66,12 +67,13 @@ public class PageUtils {
         return page;
     }
 
-	public static <T> Page<T> buildPage() {
-		return buildPage(null, null);
-	}
+    public static <T> Page<T> buildPage() {
+        return buildPage(null, null);
+    }
 
     /**
      * 构建 MP 普通分页对象
+     *
      * @param <T> domain 实体
      * @return 分页对象
      */
@@ -98,8 +100,8 @@ public class PageUtils {
         }
         if (StringUtils.isNotBlank(orderByColumn)) {
             String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
-			orderBy = StringUtils.toUnderScoreCase(orderBy);
-			if ("asc".equals(isAsc)) {
+            orderBy = StringUtils.toUnderScoreCase(orderBy);
+            if ("asc".equals(isAsc)) {
                 return OrderItem.asc(orderBy);
             } else if ("desc".equals(isAsc)) {
                 return OrderItem.desc(orderBy);

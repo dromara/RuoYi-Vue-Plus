@@ -12,14 +12,12 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
  * Excel相关处理
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public class ExcelUtil {
 

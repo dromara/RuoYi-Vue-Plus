@@ -1,11 +1,6 @@
 package com.ruoyi.common.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,12 +14,12 @@ import java.util.concurrent.TimeUnit;
 @Documented
 public @interface RepeatSubmit {
 
-	/**
-	 * 间隔时间(ms)，小于此时间视为重复提交
-	 */
-	int interval() default 5000;
+    /**
+     * 间隔时间(ms)，小于此时间视为重复提交
+     */
+    int interval() default 5000;
 
-	TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
+    TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
 
     /**
      * 提示消息

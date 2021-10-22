@@ -19,26 +19,21 @@ import java.nio.charset.StandardCharsets;
  *
  * @author ruoyi
  */
-public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
-{
+public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     /**
      * @param request
      */
-    public XssHttpServletRequestWrapper(HttpServletRequest request)
-    {
+    public XssHttpServletRequestWrapper(HttpServletRequest request) {
         super(request);
     }
 
     @Override
-    public String[] getParameterValues(String name)
-    {
+    public String[] getParameterValues(String name) {
         String[] values = super.getParameterValues(name);
-        if (values != null)
-        {
+        if (values != null) {
             int length = values.length;
             String[] escapseValues = new String[length];
-            for (int i = 0; i < length; i++)
-            {
+            for (int i = 0; i < length; i++) {
                 // 防xss攻击和过滤前后空格
                 escapseValues[i] = HtmlUtil.cleanHtmlTag(values[i]).trim();
             }
@@ -48,18 +43,15 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
     }
 
     @Override
-    public ServletInputStream getInputStream() throws IOException
-    {
+    public ServletInputStream getInputStream() throws IOException {
         // 非json类型，直接返回
-        if (!isJsonRequest())
-        {
+        if (!isJsonRequest()) {
             return super.getInputStream();
         }
 
         // 为空，直接返回
         String json = IoUtil.read(super.getInputStream(), StandardCharsets.UTF_8);
-        if (StringUtils.isEmpty(json))
-        {
+        if (StringUtils.isEmpty(json)) {
             return super.getInputStream();
         }
 
@@ -67,34 +59,28 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
         json = HtmlUtil.cleanHtmlTag(json).trim();
         byte[] jsonBytes = json.getBytes(StandardCharsets.UTF_8);
         final ByteArrayInputStream bis = IoUtil.toStream(jsonBytes);
-        return new ServletInputStream()
-        {
+        return new ServletInputStream() {
             @Override
-            public boolean isFinished()
-            {
+            public boolean isFinished() {
                 return true;
             }
 
             @Override
-            public boolean isReady()
-            {
+            public boolean isReady() {
                 return true;
             }
 
             @Override
-            public int available() throws IOException
-            {
+            public int available() throws IOException {
                 return jsonBytes.length;
             }
 
             @Override
-            public void setReadListener(ReadListener readListener)
-            {
+            public void setReadListener(ReadListener readListener) {
             }
 
             @Override
-            public int read() throws IOException
-            {
+            public int read() throws IOException {
                 return bis.read();
             }
         };
@@ -105,8 +91,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
      *
      * @param request
      */
-    public boolean isJsonRequest()
-    {
+    public boolean isJsonRequest() {
         String header = super.getHeader(HttpHeaders.CONTENT_TYPE);
         return StringUtils.startsWithIgnoreCase(header, MediaType.APPLICATION_JSON_VALUE);
     }
