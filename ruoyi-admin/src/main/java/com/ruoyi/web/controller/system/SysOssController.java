@@ -98,8 +98,6 @@ public class SysOssController extends BaseController {
             throw new ServiceException("文件数据不存在!");
         }
         response.reset();
-        response.addHeader("Access-Control-Allow-Origin", "*");
-        response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
         FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
         long data;
