@@ -102,7 +102,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.$store.dispatch('LogOut').then(() => {
-          this.$router.push({ path: "/login" })
+          location.href = this.$router.options.base + '/index';
         })
       }).catch(() => {});
     }
