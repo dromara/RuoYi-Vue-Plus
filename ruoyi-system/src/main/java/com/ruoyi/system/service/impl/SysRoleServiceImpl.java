@@ -117,7 +117,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
      * @return 选中角色ID列表
      */
     @Override
-    public List<Integer> selectRoleListByUserId(Long userId) {
+    public List<Long> selectRoleListByUserId(Long userId) {
         return baseMapper.selectRoleListByUserId(userId);
     }
 
