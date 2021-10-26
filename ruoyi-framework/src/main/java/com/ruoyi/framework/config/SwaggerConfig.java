@@ -1,6 +1,5 @@
 package com.ruoyi.framework.config;
 
-import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.config.SaTokenConfig;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.ruoyi.common.utils.StringUtils;
@@ -96,7 +95,7 @@ public class SwaggerConfig {
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
         List<SecurityReference> securityReferences = new ArrayList<>();
-        securityReferences.add(new SecurityReference(SaManager.getConfig().getTokenName(), authorizationScopes));
+        securityReferences.add(new SecurityReference(saTokenConfig.getTokenName(), authorizationScopes));
         return securityReferences;
     }
 
