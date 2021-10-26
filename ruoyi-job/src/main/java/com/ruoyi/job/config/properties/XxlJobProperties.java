@@ -13,6 +13,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "xxl.job")
 public class XxlJobProperties {
 
+    private Boolean enabled;
+
     private String adminAddresses;
 
     private String accessToken;
