@@ -15,6 +15,9 @@ import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysUserOnline;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,15 +29,18 @@ import java.util.stream.Collectors;
 /**
  * 在线用户监控
  *
- * @author ruoyi
+ * @author Lion Li
  */
+@Api(value = "在线用户监控", tags = {"在线用户监控管理"})
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
 @RequestMapping("/monitor/online")
 public class SysUserOnlineController extends BaseController {
 
+    @ApiOperation("在线用户列表")
     @SaCheckPermission("monitor:online:list")
     @GetMapping("/list")
-    public TableDataInfo list(String ipaddr, String userName) {
+    public TableDataInfo<SysUserOnline> list(String ipaddr, String userName) {
         Collection<String> keys = RedisUtils.keys(Constants.ONLINE_TOKEN_KEY + "*");
         List<UserOnlineDTO> userOnlineDTOList = new ArrayList<>();
         for (String key : keys) {
@@ -42,16 +48,16 @@ public class SysUserOnlineController extends BaseController {
         }
         if (StringUtils.isNotEmpty(ipaddr) && StringUtils.isNotEmpty(userName)) {
             userOnlineDTOList = userOnlineDTOList.stream().filter(userOnline ->
-                    StringUtils.equals(ipaddr, userOnline.getIpaddr()) &&
-                            StringUtils.equals(userName, userOnline.getUserName())
+                StringUtils.equals(ipaddr, userOnline.getIpaddr()) &&
+                    StringUtils.equals(userName, userOnline.getUserName())
             ).collect(Collectors.toList());
         } else if (StringUtils.isNotEmpty(ipaddr)) {
             userOnlineDTOList = userOnlineDTOList.stream().filter(userOnline ->
-                    StringUtils.equals(ipaddr, userOnline.getIpaddr()))
-                    .collect(Collectors.toList());
+                StringUtils.equals(ipaddr, userOnline.getIpaddr()))
+                .collect(Collectors.toList());
         } else if (StringUtils.isNotEmpty(userName)) {
             userOnlineDTOList = userOnlineDTOList.stream().filter(userOnline ->
-                    StringUtils.equals(userName, userOnline.getUserName())
+                StringUtils.equals(userName, userOnline.getUserName())
             ).collect(Collectors.toList());
         }
         Collections.reverse(userOnlineDTOList);
@@ -63,10 +69,11 @@ public class SysUserOnlineController extends BaseController {
     /**
      * 强退用户
      */
+    @ApiOperation("强退用户")
     @SaCheckPermission("monitor:online:forceLogout")
     @Log(title = "在线用户", businessType = BusinessType.FORCE)
     @DeleteMapping("/{tokenId}")
-    public AjaxResult forceLogout(@PathVariable String tokenId) {
+    public AjaxResult<Void> forceLogout(@PathVariable String tokenId) {
         try {
             StpUtil.logoutByTokenValue(tokenId);
         } catch (NotLoginException e) {

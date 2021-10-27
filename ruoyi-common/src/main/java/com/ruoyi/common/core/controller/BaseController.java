@@ -4,58 +4,49 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * web层通用数据处理
  *
  * @author ruoyi
  */
-public class BaseController
-{
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+public class BaseController {
 
     /**
      * 返回成功
      */
-    public AjaxResult<Void> success()
-    {
+    public AjaxResult<Void> success() {
         return AjaxResult.success();
     }
 
     /**
      * 返回失败消息
      */
-    public AjaxResult<Void> error()
-    {
+    public AjaxResult<Void> error() {
         return AjaxResult.error();
     }
 
     /**
      * 返回成功消息
      */
-    public AjaxResult<Void> success(String message)
-    {
+    public AjaxResult<Void> success(String message) {
         return AjaxResult.success(message);
     }
 
     /**
      * 返回失败消息
      */
-    public AjaxResult<Void> error(String message)
-    {
+    public AjaxResult<Void> error(String message) {
         return AjaxResult.error(message);
     }
 
     /**
      * 响应返回结果
-     * 
+     *
      * @param rows 影响行数
      * @return 操作结果
      */
-    protected AjaxResult<Void> toAjax(int rows)
-    {
+    protected AjaxResult<Void> toAjax(int rows) {
         return rows > 0 ? AjaxResult.success() : AjaxResult.error();
     }
 
@@ -65,24 +56,21 @@ public class BaseController
      * @param result 结果
      * @return 操作结果
      */
-    protected AjaxResult<Void> toAjax(boolean result)
-    {
+    protected AjaxResult<Void> toAjax(boolean result) {
         return result ? success() : error();
     }
 
     /**
      * 页面跳转
      */
-    public String redirect(String url)
-    {
+    public String redirect(String url) {
         return StringUtils.format("redirect:{}", url);
     }
 
     /**
      * 获取用户缓存信息
      */
-    public SysUser getUser()
-    {
+    public SysUser getUser() {
         return SecurityUtils.getUser();
     }
 
@@ -96,16 +84,14 @@ public class BaseController
     /**
      * 获取登录部门id
      */
-    public Long getDeptId()
-    {
+    public Long getDeptId() {
         return SecurityUtils.getDeptId();
     }
 
     /**
      * 获取登录用户名
      */
-    public String getUsername()
-    {
+    public String getUsername() {
         return SecurityUtils.getUsername();
     }
 }

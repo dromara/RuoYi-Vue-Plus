@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * 登录校验方法
  *
- * @author ruoyi
+ * @author Lion Li
  */
 @Slf4j
 @Service
@@ -70,7 +70,7 @@ public class SysLoginService {
         }
 
 		asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
-        recordLoginInfo(user.getUserId());
+        recordLoginInfo(user.getUserId(), username);
         // 生成token
         LoginUtils.loginByDevice(user.getUserId(), UserType.SYS_USER, DeviceType.PC);
         return StpUtil.getTokenValue();
@@ -103,11 +103,12 @@ public class SysLoginService {
      *
      * @param userId 用户ID
      */
-    public void recordLoginInfo(Long userId) {
+    public void recordLoginInfo(Long userId, String username) {
         SysUser sysUser = new SysUser();
         sysUser.setUserId(userId);
         sysUser.setLoginIp(ServletUtils.getClientIP());
         sysUser.setLoginDate(DateUtils.getNowDate());
+        sysUser.setUpdateBy(username);
         userService.updateUserProfile(sysUser);
     }
 }

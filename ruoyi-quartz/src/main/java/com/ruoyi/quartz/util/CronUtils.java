@@ -1,12 +1,14 @@
 package com.ruoyi.quartz.util;
 
+import org.quartz.CronExpression;
+
 import java.text.ParseException;
 import java.util.Date;
-import org.quartz.CronExpression;
 
 /**
  * cron表达式工具类
- * 
+ *
+ * @deprecated 3.4.0删除 迁移至xxl-job
  * @author ruoyi
  *
  */

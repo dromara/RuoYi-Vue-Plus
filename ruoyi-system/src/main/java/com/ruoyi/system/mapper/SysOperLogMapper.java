@@ -6,7 +6,7 @@ import com.ruoyi.system.domain.SysOperLog;
 /**
  * 操作日志 数据层
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public interface SysOperLogMapper extends BaseMapperPlus<SysOperLog> {
 

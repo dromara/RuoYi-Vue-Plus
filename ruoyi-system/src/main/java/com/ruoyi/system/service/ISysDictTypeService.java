@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 字典 业务层
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public interface ISysDictTypeService extends IService<SysDictType> {
 
@@ -23,14 +23,14 @@ public interface ISysDictTypeService extends IService<SysDictType> {
      * @param dictType 字典类型信息
      * @return 字典类型集合信息
      */
-    public List<SysDictType> selectDictTypeList(SysDictType dictType);
+    List<SysDictType> selectDictTypeList(SysDictType dictType);
 
     /**
      * 根据所有字典类型
      *
      * @return 字典类型集合信息
      */
-    public List<SysDictType> selectDictTypeAll();
+    List<SysDictType> selectDictTypeAll();
 
     /**
      * 根据字典类型查询字典数据
@@ -38,7 +38,7 @@ public interface ISysDictTypeService extends IService<SysDictType> {
      * @param dictType 字典类型
      * @return 字典数据集合信息
      */
-    public List<SysDictData> selectDictDataByType(String dictType);
+    List<SysDictData> selectDictDataByType(String dictType);
 
     /**
      * 根据字典类型ID查询信息
@@ -46,7 +46,7 @@ public interface ISysDictTypeService extends IService<SysDictType> {
      * @param dictId 字典类型ID
      * @return 字典类型
      */
-    public SysDictType selectDictTypeById(Long dictId);
+    SysDictType selectDictTypeById(Long dictId);
 
     /**
      * 根据字典类型查询信息
@@ -54,7 +54,7 @@ public interface ISysDictTypeService extends IService<SysDictType> {
      * @param dictType 字典类型
      * @return 字典类型
      */
-    public SysDictType selectDictTypeByType(String dictType);
+    SysDictType selectDictTypeByType(String dictType);
 
     /**
      * 批量删除字典信息
@@ -62,22 +62,22 @@ public interface ISysDictTypeService extends IService<SysDictType> {
      * @param dictIds 需要删除的字典ID
      * @return 结果
      */
-    public void deleteDictTypeByIds(Long[] dictIds);
+    void deleteDictTypeByIds(Long[] dictIds);
 
     /**
      * 加载字典缓存数据
      */
-    public void loadingDictCache();
+    void loadingDictCache();
 
     /**
      * 清空字典缓存数据
      */
-    public void clearDictCache();
+    void clearDictCache();
 
     /**
      * 重置字典缓存数据
      */
-    public void resetDictCache();
+    void resetDictCache();
 
     /**
      * 新增保存字典类型信息
@@ -85,7 +85,7 @@ public interface ISysDictTypeService extends IService<SysDictType> {
      * @param dictType 字典类型信息
      * @return 结果
      */
-    public int insertDictType(SysDictType dictType);
+    int insertDictType(SysDictType dictType);
 
     /**
      * 修改保存字典类型信息
@@ -93,7 +93,7 @@ public interface ISysDictTypeService extends IService<SysDictType> {
      * @param dictType 字典类型信息
      * @return 结果
      */
-    public int updateDictType(SysDictType dictType);
+    int updateDictType(SysDictType dictType);
 
     /**
      * 校验字典类型称是否唯一
@@ -101,5 +101,5 @@ public interface ISysDictTypeService extends IService<SysDictType> {
      * @param dictType 字典类型
      * @return 结果
      */
-    public String checkDictTypeUnique(SysDictType dictType);
+    String checkDictTypeUnique(SysDictType dictType);
 }

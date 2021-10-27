@@ -38,72 +38,73 @@ import java.util.Arrays;
 @RequestMapping("/system/oss/config")
 public class SysOssConfigController extends BaseController {
 
-	private final ISysOssConfigService iSysOssConfigService;
+    private final ISysOssConfigService iSysOssConfigService;
 
-	/**
-	 * 查询对象存储配置列表
-	 */
-	@ApiOperation("查询对象存储配置列表")
-	@SaCheckPermission("system:oss:list")
-	@GetMapping("/list")
-	public TableDataInfo<SysOssConfigVo> list(@Validated(QueryGroup.class) SysOssConfigBo bo) {
-		return iSysOssConfigService.queryPageList(bo);
-	}
+    /**
+     * 查询对象存储配置列表
+     */
+    @ApiOperation("查询对象存储配置列表")
+    @SaCheckPermission("system:oss:list")
+    @GetMapping("/list")
+    public TableDataInfo<SysOssConfigVo> list(@Validated(QueryGroup.class) SysOssConfigBo bo) {
+        return iSysOssConfigService.queryPageList(bo);
+    }
 
-	/**
-	 * 获取对象存储配置详细信息
-	 */
-	@ApiOperation("获取对象存储配置详细信息")
-	@SaCheckPermission("system:oss:query")
-	@GetMapping("/{ossConfigId}")
-	public AjaxResult<SysOssConfigVo> getInfo(@NotNull(message = "主键不能为空")
-											  @PathVariable("ossConfigId") Integer ossConfigId) {
-		return AjaxResult.success(iSysOssConfigService.queryById(ossConfigId));
-	}
+    /**
+     * 获取对象存储配置详细信息
+     */
+    @ApiOperation("获取对象存储配置详细信息")
+    @SaCheckPermission("system:oss:query")
+    @GetMapping("/{ossConfigId}")
+    public AjaxResult<SysOssConfigVo> getInfo(@NotNull(message = "主键不能为空")
+                                              @PathVariable("ossConfigId") Integer ossConfigId) {
+        return AjaxResult.success(iSysOssConfigService.queryById(ossConfigId));
+    }
 
-	/**
-	 * 新增对象存储配置
-	 */
-	@ApiOperation("新增对象存储配置")
-	@SaCheckPermission("system:oss:add")
-	@Log(title = "对象存储配置", businessType = BusinessType.INSERT)
-	@RepeatSubmit()
-	@PostMapping()
-	public AjaxResult<Void> add(@Validated(AddGroup.class) @RequestBody SysOssConfigBo bo) {
-		return toAjax(iSysOssConfigService.insertByBo(bo) ? 1 : 0);
-	}
+    /**
+     * 新增对象存储配置
+     */
+    @ApiOperation("新增对象存储配置")
+    @SaCheckPermission("system:oss:add")
+    @Log(title = "对象存储配置", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
+    @PostMapping()
+    public AjaxResult<Void> add(@Validated(AddGroup.class) @RequestBody SysOssConfigBo bo) {
+        return toAjax(iSysOssConfigService.insertByBo(bo) ? 1 : 0);
+    }
 
-	/**
-	 * 修改对象存储配置
-	 */
-	@ApiOperation("修改对象存储配置")
-	@SaCheckPermission("system:oss:edit")
-	@Log(title = "对象存储配置", businessType = BusinessType.UPDATE)
-	@RepeatSubmit()
-	@PutMapping()
-	public AjaxResult<Void> edit(@Validated(EditGroup.class) @RequestBody SysOssConfigBo bo) {
-		return toAjax(iSysOssConfigService.updateByBo(bo) ? 1 : 0);
-	}
+    /**
+     * 修改对象存储配置
+     */
+    @ApiOperation("修改对象存储配置")
+    @SaCheckPermission("system:oss:edit")
+    @Log(title = "对象存储配置", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @PutMapping()
+    public AjaxResult<Void> edit(@Validated(EditGroup.class) @RequestBody SysOssConfigBo bo) {
+        return toAjax(iSysOssConfigService.updateByBo(bo) ? 1 : 0);
+    }
 
-	/**
-	 * 删除对象存储配置
-	 */
-	@ApiOperation("删除对象存储配置")
-	@SaCheckPermission("system:oss:remove")
-	@Log(title = "对象存储配置", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ossConfigIds}")
-	public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
-								   @PathVariable Long[] ossConfigIds) {
-		return toAjax(iSysOssConfigService.deleteWithValidByIds(Arrays.asList(ossConfigIds), true) ? 1 : 0);
-	}
+    /**
+     * 删除对象存储配置
+     */
+    @ApiOperation("删除对象存储配置")
+    @SaCheckPermission("system:oss:remove")
+    @Log(title = "对象存储配置", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{ossConfigIds}")
+    public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
+                                   @PathVariable Long[] ossConfigIds) {
+        return toAjax(iSysOssConfigService.deleteWithValidByIds(Arrays.asList(ossConfigIds), true) ? 1 : 0);
+    }
 
-	/**
-	 * 状态修改
-	 */
-	@SaCheckPermission("system:oss:edit")
-	@Log(title = "对象存储状态修改", businessType = BusinessType.UPDATE)
-	@PutMapping("/changeStatus")
-	public AjaxResult changeStatus(@RequestBody SysOssConfigBo bo) {
-		return toAjax(iSysOssConfigService.updateOssConfigStatus(bo));
-	}
+    /**
+     * 状态修改
+     */
+    @ApiOperation("状态修改")
+    @SaCheckPermission("system:oss:edit")
+    @Log(title = "对象存储状态修改", businessType = BusinessType.UPDATE)
+    @PutMapping("/changeStatus")
+    public AjaxResult<Void> changeStatus(@RequestBody SysOssConfigBo bo) {
+        return toAjax(iSysOssConfigService.updateOssConfigStatus(bo));
+    }
 }

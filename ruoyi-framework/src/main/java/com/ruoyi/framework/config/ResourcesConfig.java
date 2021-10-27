@@ -7,6 +7,8 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.SecurityProperties;
+import com.ruoyi.framework.Interceptor.PlusWebInvokeTimeInterceptor;
+import com.yomahub.tlog.web.interceptor.TLogWebInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +36,10 @@ public class ResourcesConfig implements WebMvcConfigurer {
     // 注册sa-token的拦截器
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // 全局链路跟踪拦截器
+        registry.addInterceptor(new TLogWebInterceptor());
+        // 全局访问性能拦截
+        registry.addInterceptor(new PlusWebInvokeTimeInterceptor());
         // 注册路由拦截器，自定义验证规则
         registry.addInterceptor(new SaRouteInterceptor((request, response, handler) -> {
             // 登录验证 -- 排除多个路径
@@ -64,7 +70,6 @@ public class ResourcesConfig implements WebMvcConfigurer {
      */
     @Bean
     public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         // 设置访问源地址
@@ -73,8 +78,12 @@ public class ResourcesConfig implements WebMvcConfigurer {
         config.addAllowedHeader("*");
         // 设置访问源请求方法
         config.addAllowedMethod("*");
-        // 对接口配置跨域设置
+        // 有效期 1800秒
+        config.setMaxAge(1800L);
+        // 添加映射路径，拦截一切请求
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+        // 返回新的CorsFilter
         return new CorsFilter(source);
     }
 }

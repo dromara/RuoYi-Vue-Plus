@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 /**
  * 注册校验方法
  *
- * @author ruoyi
+ * @author Lion Li
  */
 @Service
 public class SysRegisterService {

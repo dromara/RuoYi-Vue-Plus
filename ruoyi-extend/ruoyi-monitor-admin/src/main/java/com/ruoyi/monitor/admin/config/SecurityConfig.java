@@ -9,9 +9,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 /**
- * spring security配置
+ * admin 监控 安全配置
  *
- * @author ruoyi
+ * @author Lion Li
  */
 @Configuration
 @EnableWebSecurity
@@ -29,7 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
 		successHandler.setTargetUrlParameter("redirectTo");
 		successHandler.setDefaultTargetUrl(adminContextPath + "/");
-
+		// admin监控 用户鉴权
 		httpSecurity.authorizeRequests()
 			//授予对所有静态资产和登录页面的公共访问权限。
 			.antMatchers(adminContextPath + "/assets/**").permitAll()

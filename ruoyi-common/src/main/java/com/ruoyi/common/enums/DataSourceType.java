@@ -10,16 +10,16 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 public enum DataSourceType {
-	/**
-	 * 主库
-	 */
-	MASTER("master"),
+    /**
+     * 主库
+     */
+    MASTER("master"),
 
-	/**
-	 * 从库
-	 */
-	SLAVE("slave");
+    /**
+     * 从库
+     */
+    SLAVE("slave");
 
-	@Getter
-	private final String source;
+    @Getter
+    private final String source;
 }

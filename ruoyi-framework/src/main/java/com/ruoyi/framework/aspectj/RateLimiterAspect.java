@@ -37,13 +37,13 @@ public class RateLimiterAspect {
             }
             long number = RedisUtils.rateLimiter(combineKey, rateType, count, time);
             if (number == -1) {
-                throw new ServiceException("访问过于频繁，请稍后再试");
+                throw new ServiceException("访问过于频繁，请稍候再试");
             }
             log.info("限制令牌 => {}, 剩余令牌 => {}, 缓存key => '{}'", count, number, combineKey);
         } catch (ServiceException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("服务器限流异常，请稍后再试");
+            throw new RuntimeException("服务器限流异常，请稍候再试");
         }
     }
 

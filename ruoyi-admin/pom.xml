@@ -41,10 +41,15 @@
             <artifactId>ruoyi-system</artifactId>
         </dependency>
 
-        <!-- 定时任务-->
+        <!-- 定时任务 @deprecated 3.4.0删除 迁移至xxl-job -->
+<!--        <dependency>-->
+<!--            <groupId>com.ruoyi</groupId>-->
+<!--            <artifactId>ruoyi-quartz</artifactId>-->
+<!--        </dependency>-->
+
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-quartz</artifactId>
+            <artifactId>ruoyi-job</artifactId>
         </dependency>
 
         <dependency>

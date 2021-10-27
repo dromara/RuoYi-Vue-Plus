@@ -5,7 +5,8 @@ import com.ruoyi.quartz.domain.SysJob;
 
 /**
  * 定时任务处理（允许并发执行）
- * 
+ *
+ * @deprecated 3.4.0删除 迁移至xxl-job
  * @author ruoyi
  *
  */
