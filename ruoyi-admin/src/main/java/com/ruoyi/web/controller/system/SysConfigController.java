@@ -85,7 +85,6 @@ public class SysConfigController extends BaseController {
         if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(config))) {
             return AjaxResult.error("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
-        config.setCreateBy(getUsername());
         return toAjax(configService.insertConfig(config));
     }
 
@@ -100,7 +99,6 @@ public class SysConfigController extends BaseController {
         if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(config))) {
             return AjaxResult.error("修改参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
-        config.setUpdateBy(getUsername());
         return toAjax(configService.updateConfig(config));
     }
 

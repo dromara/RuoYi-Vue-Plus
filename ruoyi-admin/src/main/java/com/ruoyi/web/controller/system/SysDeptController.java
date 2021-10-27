@@ -105,7 +105,6 @@ public class SysDeptController extends BaseController {
         if (UserConstants.NOT_UNIQUE.equals(deptService.checkDeptNameUnique(dept))) {
             return AjaxResult.error("新增部门'" + dept.getDeptName() + "'失败，部门名称已存在");
         }
-        dept.setCreateBy(getUsername());
         return toAjax(deptService.insertDept(dept));
     }
 
@@ -125,7 +124,6 @@ public class SysDeptController extends BaseController {
                 && deptService.selectNormalChildrenDeptById(dept.getDeptId()) > 0) {
             return AjaxResult.error("该部门包含未停用的子部门！");
         }
-        dept.setUpdateBy(getUsername());
         return toAjax(deptService.updateDept(dept));
     }
 

@@ -57,7 +57,6 @@ public class SysNoticeController extends BaseController {
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult<Void> add(@Validated @RequestBody SysNotice notice) {
-        notice.setCreateBy(getUsername());
         return toAjax(noticeService.insertNotice(notice));
     }
 
@@ -69,7 +68,6 @@ public class SysNoticeController extends BaseController {
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult<Void> edit(@Validated @RequestBody SysNotice notice) {
-        notice.setUpdateBy(getUsername());
         return toAjax(noticeService.updateNotice(notice));
     }
 

@@ -140,7 +140,6 @@ public class SysUserController extends BaseController {
                 && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
             return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
-        user.setCreateBy(getUsername());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
         return toAjax(userService.insertUser(user));
     }
@@ -161,7 +160,6 @@ public class SysUserController extends BaseController {
                 && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
             return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
-        user.setUpdateBy(getUsername());
         return toAjax(userService.updateUser(user));
     }
 
@@ -189,7 +187,6 @@ public class SysUserController extends BaseController {
     public AjaxResult<Void> resetPwd(@RequestBody SysUser user) {
         userService.checkUserAllowed(user);
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-        user.setUpdateBy(getUsername());
         return toAjax(userService.resetPwd(user));
     }
 
@@ -202,7 +199,6 @@ public class SysUserController extends BaseController {
     @PutMapping("/changeStatus")
     public AjaxResult<Void> changeStatus(@RequestBody SysUser user) {
         userService.checkUserAllowed(user);
-        user.setUpdateBy(getUsername());
         return toAjax(userService.updateUserStatus(user));
     }
 
