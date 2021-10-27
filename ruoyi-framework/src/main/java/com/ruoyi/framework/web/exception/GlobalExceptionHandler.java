@@ -9,7 +9,6 @@ import com.ruoyi.common.exception.DemoModeException;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -42,8 +41,7 @@ public class GlobalExceptionHandler {
      * 角色校验异常
      */
     @ExceptionHandler(NotRoleException.class)
-    public AjaxResult handleAccessDeniedException(NotRoleException e, HttpServletRequest request)
-    {
+    public AjaxResult<Void> handleAccessDeniedException(NotRoleException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',角色校验失败'{}'", requestURI, e.getMessage());
         return AjaxResult.error(HttpStatus.HTTP_FORBIDDEN, "没有角色，请联系管理员授权");
@@ -53,11 +51,10 @@ public class GlobalExceptionHandler {
      * 认证失败
      */
     @ExceptionHandler(NotLoginException.class)
-    public AjaxResult handleAccessDeniedException(NotLoginException e, HttpServletRequest request)
-    {
+    public AjaxResult<Void> handleAccessDeniedException(NotLoginException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("请求访问：{}，认证失败，无法访问系统资源", requestURI, e.getMessage());
-        return AjaxResult.error(HttpStatus.HTTP_UNAUTHORIZED, StringUtils.format("请求访问：{}，认证失败，无法访问系统资源", requestURI));
+        log.error("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI, e.getMessage());
+        return AjaxResult.error(HttpStatus.HTTP_UNAUTHORIZED, StringUtils.format("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI));
     }
 
     /**

@@ -10,7 +10,6 @@ import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
-import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysLoginService;
 import com.ruoyi.system.service.SysPermissionService;
 import io.swagger.annotations.Api;
@@ -42,7 +41,6 @@ public class SysLoginController {
     private final SysLoginService loginService;
     private final ISysMenuService menuService;
     private final SysPermissionService permissionService;
-    private final ISysUserService iSysUserService;
 
     /**
      * 登录方法
@@ -63,7 +61,7 @@ public class SysLoginController {
 
     @ApiOperation("登出方法")
     @PostMapping("/logout")
-    public AjaxResult logout(){
+    public AjaxResult<Void> logout(){
         try {
             StpUtil.logout();
         } catch (NotLoginException e) {

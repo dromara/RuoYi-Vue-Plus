@@ -33,6 +33,7 @@ import java.util.Map;
 @RequestMapping("/system/user/profile")
 public class SysProfileController extends BaseController {
 
+    private final ISysUserService userService;
 	private final ISysOssService iSysOssService;
 
     /**
@@ -104,12 +105,12 @@ public class SysProfileController extends BaseController {
     @Log(title = "用户头像", businessType = BusinessType.UPDATE)
     @PostMapping("/avatar")
     public AjaxResult<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile file) {
+        Map<String,Object> ajax = new HashMap<>();
         if (!file.isEmpty()) {
             SysUser user = SecurityUtils.getUser();
 			SysOss oss = iSysOssService.upload(file);
 			String avatar = oss.getUrl();
             if (userService.updateUserAvatar(user.getUserName(), avatar)) {
-				Map<String,Object> ajax = new HashMap<>();
                 ajax.put("imgUrl", avatar);
                 return AjaxResult.success(ajax);
             }

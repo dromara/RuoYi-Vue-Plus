@@ -4,7 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.ruoyi.common.core.domain.BaseEntity;
-import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -76,14 +76,14 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 	 * 获取登录用户名
 	 */
 	private String getLoginUsername() {
-		LoginUser loginUser;
+		SysUser user;
 		try {
-			loginUser = SecurityUtils.getLoginUser();
+            user = SecurityUtils.getUser();
 		} catch (Exception e) {
 			log.warn("自动注入警告 => 用户未登录");
 			return null;
 		}
-		return loginUser.getUsername();
+		return user.getUserName();
 	}
 
 }
