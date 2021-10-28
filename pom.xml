@@ -131,6 +131,13 @@
                 <version>${jwt.version}</version>
             </dependency>
 
+            <!-- jdk11 缺失依赖 jaxb-->
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${jaxb.version}</version>
+            </dependency>
+
             <!-- dynamic-datasource 多数据源-->
             <dependency>
                 <groupId>com.baomidou</groupId>
@@ -322,16 +329,6 @@
         <module>ruoyi-oss</module>
     </modules>
     <packaging>pom</packaging>
-
-
-    <dependencies>
-        <!-- jdk11 缺失依赖 jaxb-->
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>${jaxb.version}</version>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>

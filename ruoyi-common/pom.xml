@@ -76,10 +76,10 @@
             <artifactId>jjwt</artifactId>
         </dependency>
 
-        <!-- Jaxb -->
+        <!-- jdk11 缺失依赖 jaxb-->
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
         </dependency>
 
         <!-- redis 缓存操作 -->
