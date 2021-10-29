@@ -93,6 +93,48 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v3.3.0 - 2021-10-29">
+              <ol>
+                <li>add [重磅更新] 增加分布式日志框架 TLog</li>
+                <li>add [重磅更新] 增加分布式任务调度系统 Xxl-Job</li>
+                <li>add [重大更新] 增加 ruoyi-job 任务调度模块(基于xxl-job)</li>
+                <li>update [重大更新]全业务 增加 接口文档注解 格式化代码</li>
+                <li>update springboot 2.5.5 => 2.5.6</li>
+                <li>update springboot-admin 2.5.1 => 2.5.2</li>
+                <li>update element-ui 2.15.5 => 2.15.6</li>
+                <li>update hutool 5.7.13 => 5.7.15</li>
+                <li>update qcloud.cos 5.6.55 => 5.6.58</li>
+                <li>update minio 8.3.0 => 8.3.3</li>
+                <li>update 更新 element 2.15.6 表格样式</li>
+                <li>update 优化 代码生成常量 关于 BO VO 注释</li>
+                <li>update 优化代码生成 导入表 列表返回 主键默认选中</li>
+                <li>update MybatisPlusRedisCache 标记过期 推荐使用 spring-cache</li>
+                <li>update Quartz 标记过期 推荐迁移至新框架 xxl-job</li>
+                <li>update Feign 标记过期</li>
+                <li>update 前端增加默认国际化参数</li>
+                <li>update 更新 Admin 监控 注释 避免错误使用</li>
+                <li>update Admin 监控增加日志文件输出</li>
+                <li>update 优化 xxl-job-admin 增加格式化日志输出与 docker 镜像</li>
+                <li>update 更新 xxl-job 执行器开关功能</li>
+                <li>update 代码生成 改为生成抽象实体</li>
+                <li>update 代码生成 搜索框 更新文本域生成 用于模糊查询</li>
+                <li>update 通用数据注入改为适配通用实体类</li>
+                <li>update 使用路由懒加载提升页面响应速度</li>
+                <li>update 迁移所有脚本文件至 script 目录</li>
+                <li>update swagger 组顺序配置</li>
+                <li>update sql 文件更新 xxljob 控制台菜单</li>
+                <li>update 前端增加 任务调度中心页面与环境及 nginx 配置</li>
+                <li>update 合并 oss.sql 至主 sql</li>
+                <li>update 补全国际化文件(英文)</li>
+                <li>update 更新关于全局路径设置与文档链接</li>
+                <li>update 删除无用 setUsername 使用自动注入</li>
+                <li>update RedisUtils 更新删除 hash 数据方法</li>
+                <li>fix 修复 多数据源 aop 语法错误</li>
+                <li>fix 修复 子菜单无 query 参数问题</li>
+                <li>fix 修复 oss 配置删除时删除缓存 bug</li>
+                <li>fix 修复无权限获取请求头 download-filename 导致文件名为空问题</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v3.2.0 - 2021-9-28">
               <ol>
                 <li>update [重大改动]接口文档 支持分组配置</li>
@@ -483,7 +525,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "3.2.0",
+      version: "3.3.0",
     };
   },
   methods: {
