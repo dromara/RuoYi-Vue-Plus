@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * 增加 feign 的目的为使 http 请求接口化
  *
  * @author Lion Li
+ * @deprecated 由于使用人数较少 决定与 3.4.0 版本移除
  */
 @FeignClient(
 	name = FeignTestConstant.BAIDU_NAME,

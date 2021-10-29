@@ -24,9 +24,9 @@ public class JsonUtils {
     private static ObjectMapper objectMapper = SpringUtils.getBean(ObjectMapper.class);
 
     public static String toJsonString(Object object) {
-		if (StringUtils.isNull(object)) {
-			return null;
-		}
+        if (StringUtils.isNull(object)) {
+            return null;
+        }
         try {
             return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
@@ -57,9 +57,9 @@ public class JsonUtils {
     }
 
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
-		if (StringUtils.isBlank(text)) {
-			return null;
-		}
+        if (StringUtils.isBlank(text)) {
+            return null;
+        }
         try {
             return objectMapper.readValue(text, typeReference);
         } catch (IOException e) {
@@ -67,16 +67,17 @@ public class JsonUtils {
         }
     }
 
-	public static <T> Map<String, T> parseMap(String text) {
-		if (StringUtils.isBlank(text)) {
-			return null;
-		}
-		try {
-			return objectMapper.readValue(text, new TypeReference<Map<String, T>>() {});
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    public static <T> Map<String, T> parseMap(String text) {
+        if (StringUtils.isBlank(text)) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(text, new TypeReference<Map<String, T>>() {
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static <T> List<T> parseArray(String text, Class<T> clazz) {
         if (StringUtils.isEmpty(text)) {

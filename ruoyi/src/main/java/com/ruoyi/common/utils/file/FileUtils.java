@@ -10,20 +10,18 @@ import java.nio.charset.StandardCharsets;
 /**
  * 文件处理工具类
  *
- * @author ruoyi
+ * @author Lion Li
  */
-public class FileUtils extends FileUtil
-{
+public class FileUtils extends FileUtil {
 
     /**
      * 下载文件名重新编码
      *
-     * @param response 响应对象
+     * @param response     响应对象
      * @param realFileName 真实文件名
      * @return
      */
-    public static void setAttachmentResponseHeader(HttpServletResponse response, String realFileName) throws UnsupportedEncodingException
-    {
+    public static void setAttachmentResponseHeader(HttpServletResponse response, String realFileName) throws UnsupportedEncodingException {
         String percentEncodedFileName = percentEncode(realFileName);
 
         StringBuilder contentDispositionValue = new StringBuilder();
@@ -34,6 +32,8 @@ public class FileUtils extends FileUtil
                 .append("utf-8''")
                 .append(percentEncodedFileName);
 
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Expose-Headers", "Content-Disposition,download-filename");
         response.setHeader("Content-disposition", contentDispositionValue.toString());
         response.setHeader("download-filename", percentEncodedFileName);
     }
@@ -44,8 +44,7 @@ public class FileUtils extends FileUtil
      * @param s 需要百分号编码的字符串
      * @return 百分号编码后的字符串
      */
-    public static String percentEncode(String s) throws UnsupportedEncodingException
-    {
+    public static String percentEncode(String s) throws UnsupportedEncodingException {
         String encode = URLEncoder.encode(s, StandardCharsets.UTF_8.toString());
         return encode.replaceAll("\\+", "%20");
     }

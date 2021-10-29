@@ -148,7 +148,7 @@ export default {
     handleUploadSuccess(res, file) {
       if (res.code === 200) {
         this.$message.success("上传成功");
-        this.fileList.push({ name: res.data.fileName, url: res.data.fileName });
+        this.fileList.push({ name: res.data.fileName, url: res.data.url });
         this.$emit("input", this.listToString(this.fileList));
       } else {
         this.$message.error(res.msg);

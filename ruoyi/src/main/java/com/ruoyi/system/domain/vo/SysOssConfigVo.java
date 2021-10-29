@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 
-
 /**
  * 对象存储配置视图对象 sys_oss_config
  *
@@ -19,78 +18,78 @@ import lombok.Data;
 @ExcelIgnoreUnannotated
 public class SysOssConfigVo {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
+    /**
      * 主建
      */
-	@ApiModelProperty("主建")
-	private Long ossConfigId;
+    @ApiModelProperty("主建")
+    private Long ossConfigId;
 
     /**
      * 配置key
      */
-	@ApiModelProperty("配置key")
-	private String configKey;
+    @ApiModelProperty("配置key")
+    private String configKey;
 
     /**
      * accessKey
      */
-	@ApiModelProperty("accessKey")
-	private String accessKey;
+    @ApiModelProperty("accessKey")
+    private String accessKey;
 
     /**
      * 秘钥
      */
-	@ApiModelProperty("secretKey")
-	private String secretKey;
+    @ApiModelProperty("secretKey")
+    private String secretKey;
 
     /**
      * 桶名称
      */
-	@ApiModelProperty("桶名称")
-	private String bucketName;
+    @ApiModelProperty("桶名称")
+    private String bucketName;
 
     /**
      * 前缀
      */
-	@ApiModelProperty("前缀")
-	private String prefix;
+    @ApiModelProperty("前缀")
+    private String prefix;
 
     /**
      * 访问站点
      */
-	@ApiModelProperty("访问站点")
-	private String endpoint;
+    @ApiModelProperty("访问站点")
+    private String endpoint;
 
     /**
      * 是否https（Y=是,N=否）
      */
-	@ApiModelProperty("是否https（Y=是,N=否）")
-	private String isHttps;
+    @ApiModelProperty("是否https（Y=是,N=否）")
+    private String isHttps;
 
     /**
      * 域
      */
-	@ApiModelProperty("域")
-	private String region;
+    @ApiModelProperty("域")
+    private String region;
 
     /**
      * 状态（0=正常,1=停用）
      */
-	@ApiModelProperty("状态（0=正常,1=停用）")
-	private String status;
+    @ApiModelProperty("状态（0=正常,1=停用）")
+    private String status;
 
     /**
      * 扩展字段
      */
-	@ApiModelProperty("扩展字段")
-	private String ext1;
+    @ApiModelProperty("扩展字段")
+    private String ext1;
 
-	/**
-	 * 备注
-	 */
-	@ApiModelProperty("备注")
-	private String remark;
+    /**
+     * 备注
+     */
+    @ApiModelProperty("备注")
+    private String remark;
 
 }

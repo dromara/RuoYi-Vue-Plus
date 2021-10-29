@@ -25,43 +25,43 @@ import javax.validation.constraints.Size;
 @ApiModel("对象存储配置业务对象")
 public class SysOssConfigBo extends BaseEntity {
 
-	/**
-	 * 主建
-	 */
-	@ApiModelProperty(value = "主建", required = true)
-	@NotNull(message = "主建不能为空", groups = { EditGroup.class })
-	private Long ossConfigId;
+    /**
+     * 主建
+     */
+    @ApiModelProperty(value = "主建", required = true)
+    @NotNull(message = "主建不能为空", groups = {EditGroup.class})
+    private Long ossConfigId;
 
     /**
      * 配置key
      */
     @ApiModelProperty(value = "configKey", required = true)
-    @NotBlank(message = "configKey不能为空", groups = { AddGroup.class, EditGroup.class })
-	@Size(min = 2, max = 100, message = "configKey长度必须介于2和20 之间")
+    @NotBlank(message = "configKey不能为空", groups = {AddGroup.class, EditGroup.class})
+    @Size(min = 2, max = 100, message = "configKey长度必须介于2和20 之间")
     private String configKey;
 
     /**
      * accessKey
      */
     @ApiModelProperty(value = "accessKey", required = true)
-	@NotBlank(message = "accessKey不能为空", groups = { AddGroup.class, EditGroup.class })
-	@Size(min = 2, max = 100, message = "accessKey长度必须介于2和100 之间")
+    @NotBlank(message = "accessKey不能为空", groups = {AddGroup.class, EditGroup.class})
+    @Size(min = 2, max = 100, message = "accessKey长度必须介于2和100 之间")
     private String accessKey;
 
     /**
      * 秘钥
      */
     @ApiModelProperty(value = "secretKey", required = true)
-	@NotBlank(message = "secretKey不能为空", groups = { AddGroup.class, EditGroup.class })
-	@Size(min = 2, max = 100, message = "secretKey长度必须介于2和100 之间")
+    @NotBlank(message = "secretKey不能为空", groups = {AddGroup.class, EditGroup.class})
+    @Size(min = 2, max = 100, message = "secretKey长度必须介于2和100 之间")
     private String secretKey;
 
     /**
      * 桶名称
      */
     @ApiModelProperty(value = "bucketName", required = true)
-	@NotBlank(message = "bucketName不能为空", groups = { AddGroup.class, EditGroup.class })
-	@Size(min = 2, max = 100, message = "bucketName长度必须介于2和100之间")
+    @NotBlank(message = "bucketName不能为空", groups = {AddGroup.class, EditGroup.class})
+    @Size(min = 2, max = 100, message = "bucketName长度必须介于2和100之间")
     private String bucketName;
 
     /**
@@ -74,21 +74,21 @@ public class SysOssConfigBo extends BaseEntity {
      * 访问站点
      */
     @ApiModelProperty(value = "endpoint", required = true)
-	@NotBlank(message = "endpoint不能为空", groups = { AddGroup.class, EditGroup.class })
-	@Size(min = 2, max = 100, message = "endpoint长度必须介于2和100之间")
+    @NotBlank(message = "endpoint不能为空", groups = {AddGroup.class, EditGroup.class})
+    @Size(min = 2, max = 100, message = "endpoint长度必须介于2和100之间")
     private String endpoint;
 
-	/**
-	 * 是否https（Y=是,N=否）
-	 */
-	@ApiModelProperty("是否https（Y=是,N=否）")
-	private String isHttps;
+    /**
+     * 是否https（Y=是,N=否）
+     */
+    @ApiModelProperty("是否https（Y=是,N=否）")
+    private String isHttps;
 
-	/**
-	 * 状态（0=正常,1=停用）
-	 */
-	@ApiModelProperty("状态（0=正常,1=停用）")
-	private String status;
+    /**
+     * 状态（0=正常,1=停用）
+     */
+    @ApiModelProperty("状态（0=正常,1=停用）")
+    private String status;
 
     /**
      * 域

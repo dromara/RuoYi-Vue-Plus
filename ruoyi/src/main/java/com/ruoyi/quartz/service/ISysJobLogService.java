@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * 定时任务调度日志信息信息 服务层
  *
+ * @deprecated 3.4.0删除 迁移至xxl-job
  * @author ruoyi
  */
 public interface ISysJobLogService extends IService<SysJobLog> {

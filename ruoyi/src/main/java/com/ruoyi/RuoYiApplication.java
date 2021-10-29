@@ -10,12 +10,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 
 @SpringBootApplication
-public class RuoYiApplication
-{
-    public static void main(String[] args)
-    {
+public class RuoYiApplication {
+
+    public static void main(String[] args) {
         System.setProperty("spring.devtools.restart.enabled", "false");
         SpringApplication.run(RuoYiApplication.class, args);
         System.out.println("(♥◠‿◠)ﾉﾞ  RuoYi-Vue-Plus启动成功   ლ(´ڡ`ლ)ﾞ");
     }
+
 }

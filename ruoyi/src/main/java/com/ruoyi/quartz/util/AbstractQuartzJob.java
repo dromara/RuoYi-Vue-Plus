@@ -20,6 +20,7 @@ import java.util.Date;
 /**
  * 抽象quartz调用
  *
+ * @deprecated 3.4.0删除 迁移至xxl-job
  * @author ruoyi
  */
 public abstract class AbstractQuartzJob implements Job

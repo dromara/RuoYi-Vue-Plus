@@ -2,7 +2,8 @@ package com.ruoyi.common.core.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,14 +14,14 @@ import java.util.Set;
 /**
  * 登录用户身份权限
  *
- * @author ruoyi
+ * @author Lion Li
  */
 
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class LoginUser implements UserDetails
-{
+public class LoginUser implements UserDetails {
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -78,14 +79,12 @@ public class LoginUser implements UserDetails
      */
     private SysUser user;
 
-    public LoginUser(SysUser user, Set<String> permissions)
-    {
+    public LoginUser(SysUser user, Set<String> permissions) {
         this.user = user;
         this.permissions = permissions;
     }
 
-    public LoginUser(Long userId, Long deptId, SysUser user, Set<String> permissions)
-    {
+    public LoginUser(Long userId, Long deptId, SysUser user, Set<String> permissions) {
         this.userId = userId;
         this.deptId = deptId;
         this.user = user;
@@ -94,14 +93,12 @@ public class LoginUser implements UserDetails
 
     @JsonIgnore
     @Override
-    public String getPassword()
-    {
+    public String getPassword() {
         return user.getPassword();
     }
 
     @Override
-    public String getUsername()
-    {
+    public String getUsername() {
         return user.getUserName();
     }
 
@@ -110,50 +107,39 @@ public class LoginUser implements UserDetails
      */
     @JsonIgnore
     @Override
-    public boolean isAccountNonExpired()
-    {
+    public boolean isAccountNonExpired() {
         return true;
     }
 
     /**
      * 指定用户是否解锁,锁定的用户无法进行身份验证
-     *
-     * @return
      */
     @JsonIgnore
     @Override
-    public boolean isAccountNonLocked()
-    {
+    public boolean isAccountNonLocked() {
         return true;
     }
 
     /**
      * 指示是否已过期的用户的凭据(密码),过期的凭据防止认证
-     *
-     * @return
      */
     @JsonIgnore
     @Override
-    public boolean isCredentialsNonExpired()
-    {
+    public boolean isCredentialsNonExpired() {
         return true;
     }
 
     /**
      * 是否可用 ,禁用的用户不能身份验证
-     *
-     * @return
      */
     @JsonIgnore
     @Override
-    public boolean isEnabled()
-    {
+    public boolean isEnabled() {
         return true;
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities()
-    {
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
     }
 }

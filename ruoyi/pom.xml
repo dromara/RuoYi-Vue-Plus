@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ruoyi-vue-plus</artifactId>
         <groupId>com.ruoyi</groupId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
@@ -16,7 +16,6 @@
     </description>
 
     <dependencies>
-        <!-- BEGIN 如果想使用 Tomcat 注释掉以下代码 -->
         <!-- SpringBoot Web容器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -33,14 +32,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
-        <!-- END -->
-
-        <!-- BEGIN 如果想使用 Tomcat 解除以下代码注释 -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-web</artifactId>-->
-<!--        </dependency>-->
-        <!-- END -->
 
         <!-- SpringBoot 拦截器 -->
         <dependency>
@@ -60,7 +51,7 @@
             <artifactId>velocity</artifactId>
         </dependency>
 
-        <!-- 定时任务 -->
+        <!-- 定时任务 @deprecated 3.4.0删除 迁移至xxl-job -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
@@ -139,6 +130,12 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
+        </dependency>
+
+        <!-- jdk11 缺失依赖 jaxb-->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
         </dependency>
 
         <!-- redis 缓存操作 -->
@@ -222,6 +219,32 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- xxl-job-core -->
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>tlog-spring-boot-configuration</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>tlog-webroot</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>tlog-feign</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>tlog-xxl-job</artifactId>
         </dependency>
 
 		<dependency>

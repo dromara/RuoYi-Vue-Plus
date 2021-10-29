@@ -15,55 +15,55 @@ import java.util.Date;
 @ApiModel("OSS对象存储视图对象")
 public class SysOssVo {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 *  对象存储主键
-	 */
-	@ApiModelProperty("对象存储主键")
-	private Long ossId;
+    /**
+     * 对象存储主键
+     */
+    @ApiModelProperty("对象存储主键")
+    private Long ossId;
 
-	/**
-	 * 文件名
-	 */
-	@ApiModelProperty("文件名")
-	private String fileName;
+    /**
+     * 文件名
+     */
+    @ApiModelProperty("文件名")
+    private String fileName;
 
-	/**
-	 * 原名
-	 */
-	@ApiModelProperty("原名")
-	private String originalName;
+    /**
+     * 原名
+     */
+    @ApiModelProperty("原名")
+    private String originalName;
 
-	/**
-	 * 文件后缀名
-	 */
-	@ApiModelProperty("文件后缀名")
-	private String fileSuffix;
+    /**
+     * 文件后缀名
+     */
+    @ApiModelProperty("文件后缀名")
+    private String fileSuffix;
 
-	/**
-	 * URL地址
-	 */
-	@ApiModelProperty("URL地址")
-	private String url;
+    /**
+     * URL地址
+     */
+    @ApiModelProperty("URL地址")
+    private String url;
 
-	/**
-	 * 创建时间
-	 */
-	@ApiModelProperty("创建时间")
-	private Date createTime;
+    /**
+     * 创建时间
+     */
+    @ApiModelProperty("创建时间")
+    private Date createTime;
 
-	/**
-	 * 上传人
-	 */
-	@ApiModelProperty("上传人")
-	private String createBy;
+    /**
+     * 上传人
+     */
+    @ApiModelProperty("上传人")
+    private String createBy;
 
-	/**
-	 * 服务商
-	 */
-	@ApiModelProperty("服务商")
-	private String service;
+    /**
+     * 服务商
+     */
+    @ApiModelProperty("服务商")
+    private String service;
 
 
 }

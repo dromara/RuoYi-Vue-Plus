@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 /**
  * 定时任务调度测试
  *
+ * @deprecated 3.4.0删除 迁移至xxl-job
  * @author ruoyi
  */
 @Component("ryTask")

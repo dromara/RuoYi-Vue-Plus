@@ -6,7 +6,7 @@ import com.ruoyi.system.domain.SysRoleMenu;
 /**
  * 角色与菜单关联表 数据层
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public interface SysRoleMenuMapper extends BaseMapperPlus<SysRoleMenu> {
 

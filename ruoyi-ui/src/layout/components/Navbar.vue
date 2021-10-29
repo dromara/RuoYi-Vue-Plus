@@ -56,7 +56,6 @@ import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
 import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
-import config from '@/../vue.config'
 
 export default {
   components: {
@@ -103,7 +102,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.$store.dispatch('LogOut').then(() => {
-          location.href = config.publicPath + 'index';
+          location.href = this.$router.options.base + '/index';
         })
       }).catch(() => {});
     }
