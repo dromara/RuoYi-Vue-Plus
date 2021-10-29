@@ -16,8 +16,8 @@ public class RuoYiApplication {
     public static void main(String[] args) {
         System.setProperty("spring.devtools.restart.enabled", "false");
         SpringApplication application = new SpringApplication(RuoYiApplication.class);
-          application.setApplicationStartup(new BufferingApplicationStartup(2048));
-          application.run(args);
+        application.setApplicationStartup(new BufferingApplicationStartup(2048));
+        application.run(args);
         System.out.println("(♥◠‿◠)ﾉﾞ  RuoYi-Vue-Plus启动成功   ლ(´ڡ`ლ)ﾞ");
     }
 
