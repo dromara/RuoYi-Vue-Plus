@@ -15,8 +15,6 @@ public class RuoYiApplication {
 
     public static void main(String[] args) {
         System.setProperty("spring.devtools.restart.enabled", "false");
-        System.setProperty("StartFlightRecording:filename", "recording.jfr");
-        System.setProperty("duration", "10s");
         SpringApplication application = new SpringApplication(RuoYiApplication.class);
           application.setApplicationStartup(new BufferingApplicationStartup(2048));
           application.run(args);
