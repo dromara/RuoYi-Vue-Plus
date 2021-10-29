@@ -260,6 +260,18 @@ public class RedisUtils {
     }
 
     /**
+     * 删除Hash中的数据
+     *
+     * @param key  Redis键
+     * @param hKey Hash键
+     * @return Hash中的对象
+     */
+    public static <T> T delCacheMapValue(final String key, final String hKey) {
+        RMap<String, T> rMap = client.getMap(key);
+        return rMap.remove(hKey);
+    }
+
+    /**
      * 获取多个Hash中的数据
      *
      * @param key   Redis键
