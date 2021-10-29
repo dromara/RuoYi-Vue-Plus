@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  * feign测试controller
  *
  * @author Lion Li
+ * @deprecated 由于使用人数较少 决定与 3.4.0 版本移除
  */
 @Api(value = "feign测试", tags = {"feign测试"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)

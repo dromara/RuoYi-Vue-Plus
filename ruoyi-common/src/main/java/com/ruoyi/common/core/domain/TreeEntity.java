@@ -1,9 +1,9 @@
 package com.ruoyi.common.core.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
@@ -12,12 +12,11 @@ import java.util.List;
 /**
  * Tree基类
  *
- * @author ruoyi
+ * @author Lion Li
  */
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 public class TreeEntity extends BaseEntity {
 
@@ -26,6 +25,7 @@ public class TreeEntity extends BaseEntity {
 	/**
 	 * 父菜单名称
 	 */
+	@TableField(exist = false)
 	@ApiModelProperty(value = "父菜单名称")
 	private String parentName;
 
@@ -36,20 +36,9 @@ public class TreeEntity extends BaseEntity {
 	private Long parentId;
 
 	/**
-	 * 显示顺序
-	 */
-	@ApiModelProperty(value = "显示顺序")
-	private Integer orderNum;
-
-	/**
-	 * 祖级列表
-	 */
-	@ApiModelProperty(value = "祖级列表")
-	private String ancestors;
-
-	/**
 	 * 子部门
 	 */
+	@TableField(exist = false)
 	@ApiModelProperty(value = "子部门")
 	private List<?> children = new ArrayList<>();
 

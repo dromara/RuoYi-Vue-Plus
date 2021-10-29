@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 岗位信息 数据层
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public interface SysPostMapper extends BaseMapperPlus<SysPost> {
 
@@ -18,7 +18,7 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost> {
      * @param userId 用户ID
      * @return 选中岗位ID列表
      */
-    public List<Integer> selectPostListByUserId(Long userId);
+    List<Integer> selectPostListByUserId(Long userId);
 
     /**
      * 查询用户所属岗位组
@@ -26,6 +26,6 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost> {
      * @param userName 用户名
      * @return 结果
      */
-    public List<SysPost> selectPostsByUserName(String userName);
+    List<SysPost> selectPostsByUserName(String userName);
 
 }

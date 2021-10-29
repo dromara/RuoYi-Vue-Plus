@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * 部门管理 服务实现
  *
- * @author ruoyi
+ * @author Lion Li
  */
 @Service
 public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, SysDept> implements ISysDeptService {
@@ -65,13 +65,13 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
         for (SysDept dept : depts) {
             tempList.add(dept.getDeptId());
         }
-		for (SysDept dept : depts) {
-			// 如果是顶级节点, 遍历该父节点的所有子节点
-			if (!tempList.contains(dept.getParentId())) {
-				recursionFn(depts, dept);
-				returnList.add(dept);
-			}
-		}
+        for (SysDept dept : depts) {
+            // 如果是顶级节点, 遍历该父节点的所有子节点
+            if (!tempList.contains(dept.getParentId())) {
+                recursionFn(depts, dept);
+                returnList.add(dept);
+            }
+        }
         if (returnList.isEmpty()) {
             returnList = depts;
         }
@@ -224,7 +224,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
         }
         int result = baseMapper.updateById(dept);
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
-			&& !StringUtils.equals("0", dept.getAncestors())) {
+                && !StringUtils.equals("0", dept.getAncestors())) {
             // 如果该部门是启用状态，则启用该部门的所有上级部门
             updateParentDeptStatusNormal(dept);
         }
@@ -237,8 +237,8 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      * @param dept 当前部门
      */
     private void updateParentDeptStatusNormal(SysDept dept) {
-		String ancestors = dept.getAncestors();
-		Long[] deptIds = Convert.toLongArray(ancestors);
+        String ancestors = dept.getAncestors();
+        Long[] deptIds = Convert.toLongArray(ancestors);
         update(null, new LambdaUpdateWrapper<SysDept>()
                 .set(SysDept::getStatus, "0")
                 .in(SysDept::getDeptId, Arrays.asList(deptIds)));
@@ -247,13 +247,13 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     /**
      * 修改子元素关系
      *
-     * @param deptId 被修改的部门ID
+     * @param deptId       被修改的部门ID
      * @param newAncestors 新的父ID集合
      * @param oldAncestors 旧的父ID集合
      */
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors) {
         List<SysDept> children = list(new LambdaQueryWrapper<SysDept>()
-                .apply("find_in_set({0},ancestors)",deptId));
+                .apply("find_in_set({0},ancestors)", deptId));
         for (SysDept child : children) {
             child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
         }
@@ -292,11 +292,11 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     private List<SysDept> getChildList(List<SysDept> list, SysDept t) {
         List<SysDept> tlist = new ArrayList<SysDept>();
-		for (SysDept n : list) {
-			if (StringUtils.isNotNull(n.getParentId()) && n.getParentId().longValue() == t.getDeptId().longValue()) {
-				tlist.add(n);
-			}
-		}
+        for (SysDept n : list) {
+            if (StringUtils.isNotNull(n.getParentId()) && n.getParentId().longValue() == t.getDeptId().longValue()) {
+                tlist.add(n);
+            }
+        }
         return tlist;
     }
 

@@ -1,12 +1,13 @@
 package com.ruoyi.demo.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
+import com.ruoyi.common.core.domain.TreeEntity;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 测试树表对象 test_tree
@@ -15,10 +16,10 @@ import java.util.Date;
  * @date 2021-07-26
  */
 @Data
-@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("test_tree")
-public class TestTree implements Serializable {
+public class TestTree extends TreeEntity {
 
     private static final long serialVersionUID=1L;
 
@@ -28,11 +29,6 @@ public class TestTree implements Serializable {
      */
     @TableId(value = "id")
     private Long id;
-
-    /**
-     * 父id
-     */
-    private Long parentId;
 
     /**
      * 部门id
@@ -54,30 +50,6 @@ public class TestTree implements Serializable {
      */
     @Version
     private Long version;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
-
-    /**
-     * 创建人
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private String createBy;
-
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date updateTime;
-
-    /**
-     * 更新人
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updateBy;
 
     /**
      * 删除标志

@@ -59,7 +59,7 @@ public class TestDemoController extends BaseController {
 	@ApiOperation("自定义分页查询")
 	@PreAuthorize("@ss.hasPermi('demo:demo:list')")
 	@GetMapping("/page")
-	public TableDataInfo<TestDemoVo> page(@Validated TestDemoBo bo) {
+	public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo) {
 		return iTestDemoService.customPageList(bo);
 	}
 

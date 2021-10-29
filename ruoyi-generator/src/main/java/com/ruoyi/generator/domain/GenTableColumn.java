@@ -1,34 +1,33 @@
 package com.ruoyi.generator.domain;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.utils.StringUtils;
-import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 代码生成业务字段表 gen_table_column
  *
- * @author ruoyi
+ * @author Lion Li
  */
 
 @Data
-@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("gen_table_column")
-public class GenTableColumn implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class GenTableColumn extends BaseEntity {
 
     /**
      * 编号
      */
-    @TableId(value = "column_id", type = IdType.AUTO)
+    @TableId(value = "column_id")
     private Long columnId;
 
     /**
@@ -125,38 +124,6 @@ public class GenTableColumn implements Serializable {
      */
     private Integer sort;
 
-    /**
-     * 创建者
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private String createBy;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
-
-    /**
-     * 更新者
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updateBy;
-
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
-
-    /**
-     * 请求参数
-     */
-    @TableField(exist = false)
-    private Map<String, Object> params = new HashMap<>();
-
     public String getCapJavaField() {
         return StringUtils.uncapitalize(javaField);
     }
@@ -224,9 +191,9 @@ public class GenTableColumn implements Serializable {
     public static boolean isSuperColumn(String javaField) {
         return StringUtils.equalsAnyIgnoreCase(javaField,
                 // BaseEntity
-                "createBy", "createTime", "updateBy", "updateTime", "remark",
+                "createBy", "createTime", "updateBy", "updateTime",
                 // TreeEntity
-                "parentName", "parentId", "orderNum", "ancestors");
+                "parentName", "parentId");
     }
 
     public boolean isUsableColumn() {

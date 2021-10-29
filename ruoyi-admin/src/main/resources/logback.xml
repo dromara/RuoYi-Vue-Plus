@@ -7,7 +7,7 @@
 
 	<!-- 控制台输出 -->
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
+        <encoder class="com.yomahub.tlog.core.enhance.logback.AspectLogbackEncoder">
 			<pattern>${console.log.pattern}</pattern>
             <charset>utf-8</charset>
 		</encoder>
@@ -22,7 +22,7 @@
             <!-- 日志最大 1天 -->
             <maxHistory>1</maxHistory>
         </rollingPolicy>
-        <encoder>
+        <encoder class="com.yomahub.tlog.core.enhance.logback.AspectLogbackEncoder">
             <pattern>${log.pattern}</pattern>
             <charset>utf-8</charset>
         </encoder>
@@ -42,7 +42,7 @@
 			<!-- 日志最大的历史 60天 -->
 			<maxHistory>60</maxHistory>
 		</rollingPolicy>
-		<encoder>
+        <encoder class="com.yomahub.tlog.core.enhance.logback.AspectLogbackEncoder">
 			<pattern>${log.pattern}</pattern>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -64,7 +64,7 @@
 			<!-- 日志最大的历史 60天 -->
 			<maxHistory>60</maxHistory>
         </rollingPolicy>
-        <encoder>
+        <encoder class="com.yomahub.tlog.core.enhance.logback.AspectLogbackEncoder">
             <pattern>${log.pattern}</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -86,7 +86,7 @@
             <!-- 日志最大的历史 60天 -->
             <maxHistory>60</maxHistory>
         </rollingPolicy>
-        <encoder>
+        <encoder class="com.yomahub.tlog.core.enhance.logback.AspectLogbackEncoder">
             <pattern>${log.pattern}</pattern>
         </encoder>
     </appender>

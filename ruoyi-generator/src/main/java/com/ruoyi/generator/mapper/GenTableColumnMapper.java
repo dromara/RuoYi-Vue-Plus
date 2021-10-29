@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 业务字段 数据层
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public interface GenTableColumnMapper extends BaseMapperPlus<GenTableColumn> {
     /**
@@ -17,6 +17,6 @@ public interface GenTableColumnMapper extends BaseMapperPlus<GenTableColumn> {
      * @param tableName 表名称
      * @return 列信息
      */
-    public List<GenTableColumn> selectDbTableColumnsByName(String tableName);
+    List<GenTableColumn> selectDbTableColumnsByName(String tableName);
 
 }

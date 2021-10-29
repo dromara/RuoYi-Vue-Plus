@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ruoyi-vue-plus</artifactId>
         <groupId>com.ruoyi</groupId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -37,8 +37,8 @@
 
         <!-- 自定义验证注解 -->
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
         <!--常用工具类 -->
@@ -70,10 +70,16 @@
             <artifactId>snakeyaml</artifactId>
         </dependency>
 
-        <!--Token生成与解析-->
+        <!-- Token生成与解析-->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
+        </dependency>
+
+        <!-- jdk11 缺失依赖 jaxb-->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
         </dependency>
 
         <!-- redis 缓存操作 -->
@@ -111,11 +117,13 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
+        <!-- @deprecated 由于使用人数较少 决定与 3.4.0 版本移除 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
+        <!-- @deprecated 由于使用人数较少 决定与 3.4.0 版本移除 -->
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-okhttp</artifactId>
@@ -155,6 +163,21 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>tlog-spring-boot-configuration</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>tlog-webroot</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>tlog-feign</artifactId>
         </dependency>
     </dependencies>
 

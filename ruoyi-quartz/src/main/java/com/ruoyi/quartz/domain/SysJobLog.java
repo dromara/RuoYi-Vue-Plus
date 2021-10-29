@@ -16,6 +16,7 @@ import java.util.Map;
 /**
  * 定时任务调度日志表 sys_job_log
  *
+ * @deprecated 3.4.0删除 迁移至xxl-job
  * @author ruoyi
  */
 

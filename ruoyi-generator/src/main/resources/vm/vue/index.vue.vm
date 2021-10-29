@@ -11,7 +11,7 @@
 #else
 #set($comment=$column.columnComment)
 #end
-#if($column.htmlType == "input")
+#if($column.htmlType == "input" || $column.htmlType == "textarea")
       <el-form-item label="${comment}" prop="${column.javaField}">
         <el-input
           v-model="queryParams.${column.javaField}"
@@ -163,7 +163,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"

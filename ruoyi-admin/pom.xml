@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ruoyi-vue-plus</artifactId>
         <groupId>com.ruoyi</groupId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
@@ -41,10 +41,15 @@
             <artifactId>ruoyi-system</artifactId>
         </dependency>
 
-        <!-- 定时任务-->
+        <!-- 定时任务 @deprecated 3.4.0删除 迁移至xxl-job -->
+<!--        <dependency>-->
+<!--            <groupId>com.ruoyi</groupId>-->
+<!--            <artifactId>ruoyi-quartz</artifactId>-->
+<!--        </dependency>-->
+
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-quartz</artifactId>
+            <artifactId>ruoyi-job</artifactId>
         </dependency>
 
         <dependency>

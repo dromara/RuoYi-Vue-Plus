@@ -6,7 +6,7 @@ import com.ruoyi.system.domain.SysNotice;
 /**
  * 通知公告表 数据层
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public interface SysNoticeMapper extends BaseMapperPlus<SysNotice> {
 
