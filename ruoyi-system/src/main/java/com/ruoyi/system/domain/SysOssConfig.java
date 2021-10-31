@@ -1,27 +1,22 @@
 package com.ruoyi.system.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import java.io.Serializable;
-import java.util.Date;
-import java.math.BigDecimal;
 
 /**
  * 对象存储配置对象 sys_oss_config
  *
- * @author ruoyi
- * @date 2021-08-11
+ * @author Lion Li
  */
 @Data
-@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("sys_oss_config")
-public class SysOssConfig implements Serializable {
-
-    private static final long serialVersionUID=1L;
-
+public class SysOssConfig extends BaseEntity {
 
     /**
      * 主建
@@ -78,30 +73,6 @@ public class SysOssConfig implements Serializable {
      * 扩展字段
      */
     private String ext1;
-
-    /**
-     * 创建者
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private String createBy;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
-
-    /**
-     * 更新者
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updateBy;
-
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date updateTime;
 
     /**
      * 备注
