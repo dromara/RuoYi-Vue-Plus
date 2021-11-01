@@ -16,6 +16,10 @@ port(){
 	firewall-cmd --add-port=9000/tcp --permanent
 	# minio 控制台端口
 	firewall-cmd --add-port=9001/tcp --permanent
+	# 监控中心端口
+	firewall-cmd --add-port=9090/tcp --permanent
+	# 任务调度中心端口
+	firewall-cmd --add-port=9100/tcp --permanent
 	# 重启防火墙
 	service firewalld restart
 }
@@ -39,19 +43,19 @@ base(){
 	docker-compose up -d mysql nginx-web redis minio
 }
 
-#启动基础模块
+#启动监控模块
 monitor(){
 	docker-compose up -d ruoyi-monitor-admin
 }
 
 #启动程序模块
 start(){
-	docker-compose up -d ruoyi-server1 ruoyi-server2
+	docker-compose up -d ruoyi-xxl-job-admin ruoyi-server1 ruoyi-server2
 }
 
 #停止程序模块
 stop(){
-	docker-compose stop ruoyi-server1 ruoyi-server2
+	docker-compose stop ruoyi-xxl-job-admin ruoyi-server1 ruoyi-server2
 }
 
 #关闭所有模块
