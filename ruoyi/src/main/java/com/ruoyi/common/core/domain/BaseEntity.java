@@ -62,7 +62,6 @@ public class BaseEntity implements Serializable {
 	/**
 	 * 请求参数
 	 */
-	@JsonIgnore
 	@ApiModelProperty(value = "请求参数")
 	@TableField(exist = false)
 	private Map<String, Object> params = new HashMap<>();
