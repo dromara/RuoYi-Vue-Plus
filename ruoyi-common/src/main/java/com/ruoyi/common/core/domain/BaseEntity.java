@@ -2,7 +2,6 @@ package com.ruoyi.common.core.domain;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -62,7 +61,6 @@ public class BaseEntity implements Serializable {
 	/**
 	 * 请求参数
 	 */
-	@JsonIgnore
 	@ApiModelProperty(value = "请求参数")
 	@TableField(exist = false)
 	private Map<String, Object> params = new HashMap<>();
