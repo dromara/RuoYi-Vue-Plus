@@ -9,6 +9,7 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.ValidatorUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.demo.domain.bo.TestDemoBo;
 import com.ruoyi.demo.domain.vo.TestDemoVo;
@@ -98,7 +99,10 @@ public class TestDemoController extends BaseController {
     @Log(title = "测试单表", businessType = BusinessType.INSERT)
     @RepeatSubmit(interval = 2, timeUnit = TimeUnit.SECONDS, message = "不允许重复提交")
     @PostMapping()
-    public AjaxResult<Void> add(@Validated(AddGroup.class) @RequestBody TestDemoBo bo) {
+    public AjaxResult<Void> add(@RequestBody TestDemoBo bo) {
+        // 使用校验工具对标 @Validated(AddGroup.class) 注解
+        // 用于在非 Controller 的地方校验对象
+        ValidatorUtils.validate(bo, AddGroup.class);
         return toAjax(iTestDemoService.insertByBo(bo) ? 1 : 0);
     }
 
