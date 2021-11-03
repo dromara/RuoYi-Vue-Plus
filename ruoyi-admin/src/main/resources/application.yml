@@ -242,22 +242,6 @@ thread-pool:
   # ABORT_POLICY 中止
   rejectedExecutionHandler: CALLER_RUNS_POLICY
 
-# feign 相关配置
-feign:
-  # 不支持多包, 如有需要可在注解配置 或 提升扫包等级
-  # 例如 com.**.**.feign
-  package: com.ruoyi.**.feign
-  # 开启压缩
-  compression:
-    request:
-      enabled: true
-    response:
-      enabled: true
-  okhttp:
-    enabled: true
-  circuitbreaker:
-    enabled: true
-
 --- # redisson 缓存配置
 redisson:
   cacheGroup:

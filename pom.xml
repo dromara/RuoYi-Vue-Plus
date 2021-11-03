@@ -29,8 +29,6 @@
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.7.15</hutool.version>
-        <feign.version>3.0.3</feign.version>
-        <feign-okhttp.version>11.6</feign-okhttp.version>
         <okhttp.version>4.9.1</okhttp.version>
         <spring-boot-admin.version>2.5.2</spring-boot-admin.version>
         <redisson.version>3.16.3</redisson.version>
@@ -168,25 +166,6 @@
                 <version>${hutool.version}</version>
             </dependency>
 
-            <!-- @deprecated 由于使用人数较少 决定与 3.4.0 版本移除 -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-openfeign</artifactId>
-                <version>${feign.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>feign-core</artifactId>
-                        <groupId>io.github.openfeign</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <!-- @deprecated 由于使用人数较少 决定与 3.4.0 版本移除 -->
-            <dependency>
-                <groupId>io.github.openfeign</groupId>
-                <artifactId>feign-okhttp</artifactId>
-                <version>${feign-okhttp.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
@@ -243,12 +222,6 @@
                         <groupId>com.google.guava</groupId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.yomahub</groupId>
-                <artifactId>tlog-feign</artifactId>
-                <version>${tlog.version}</version>
             </dependency>
 
             <dependency>
