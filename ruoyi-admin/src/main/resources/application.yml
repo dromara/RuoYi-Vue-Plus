@@ -293,34 +293,3 @@ management:
   endpoint:
     logfile:
       external-file: ./logs/sys-console.log
-
---- # 定时任务配置
-spring:
-  quartz:
-    scheduler-name: RuoyiScheduler
-    startup-delay: 1s
-    overwrite-existing-jobs: true
-    auto-startup: true
-    job-store-type: jdbc
-    properties:
-      org:
-        quartz:
-          # Scheduler 相关配置
-          scheduler:
-            instanceName: RuoyiScheduler
-            instanceId: AUTO
-          # 线程池相关配置
-          threadPool:
-            class: org.quartz.simpl.SimpleThreadPool
-            threadCount: 20
-            threadPriority: 5
-          # JobStore 集群配置
-          jobStore:
-            class: org.quartz.impl.jdbcjobstore.JobStoreTX
-            isClustered: true
-            clusterCheckinInterval: 15000
-            txIsolationLevelSerializable: true
-            misfireThreshold: 60000
-            tablePrefix: QRTZ_
-            # sqlserver 启用
-            # selectWithLockSQL: SELECT * FROM {0}LOCKS UPDLOCK WHERE LOCK_NAME = ?

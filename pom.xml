@@ -257,13 +257,6 @@
                 <version>${tlog.version}</version>
             </dependency>
 
-            <!-- 定时任务 @deprecated 3.4.0删除 迁移至xxl-job -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-quartz</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
-            </dependency>
-
             <!-- 定时任务 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
@@ -320,7 +313,6 @@
         <module>ruoyi-admin</module>
         <module>ruoyi-framework</module>
         <module>ruoyi-system</module>
-        <module>ruoyi-quartz</module>
         <module>ruoyi-job</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
