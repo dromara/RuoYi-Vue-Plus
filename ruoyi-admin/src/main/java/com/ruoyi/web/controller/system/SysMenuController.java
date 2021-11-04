@@ -1,10 +1,10 @@
 package com.ruoyi.web.controller.system;
 
+import cn.hutool.core.lang.tree.Tree;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.StringUtils;
@@ -61,7 +61,7 @@ public class SysMenuController extends BaseController {
      */
     @ApiOperation("获取菜单下拉树列表")
     @GetMapping("/treeselect")
-    public AjaxResult<List<TreeSelect>> treeselect(SysMenu menu) {
+    public AjaxResult<List<Tree<Long>>> treeselect(SysMenu menu) {
         List<SysMenu> menus = menuService.selectMenuList(menu, getUserId());
         return AjaxResult.success(menuService.buildMenuTreeSelect(menus));
     }

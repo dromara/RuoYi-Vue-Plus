@@ -1,11 +1,11 @@
 package com.ruoyi.web.controller.system;
 
+import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ArrayUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.StringUtils;
@@ -76,7 +76,7 @@ public class SysDeptController extends BaseController {
      */
     @ApiOperation("获取部门下拉树列表")
     @GetMapping("/treeselect")
-    public AjaxResult<List<TreeSelect>> treeselect(SysDept dept) {
+    public AjaxResult<List<Tree<Long>>> treeselect(SysDept dept) {
         List<SysDept> depts = deptService.selectDeptList(dept);
         return AjaxResult.success(deptService.buildDeptTreeSelect(depts));
     }
