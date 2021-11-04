@@ -31,7 +31,7 @@ import java.util.Set;
  * @author Lion Li
  */
 @Validated
-@Api(value = "数据字典信息控制器", tags = {"数据字典信息管理"})
+@Api(value = "登录验证控制器", tags = {"登录验证管理"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
 public class SysLoginController {
