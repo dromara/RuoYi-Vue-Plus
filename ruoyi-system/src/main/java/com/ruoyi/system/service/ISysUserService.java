@@ -47,6 +47,7 @@ public interface ISysUserService extends IService<SysUser>, IUserService {
      * @param userName 用户名
      * @return 用户对象信息
      */
+    @Override
     SysUser selectUserByUserName(String userName);
 
     /**
@@ -55,6 +56,7 @@ public interface ISysUserService extends IService<SysUser>, IUserService {
      * @param userId 用户ID
      * @return 用户对象信息
      */
+    @Override
     SysUser selectUserById(Long userId);
 
     /**

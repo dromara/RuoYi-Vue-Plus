@@ -3,9 +3,9 @@ package com.ruoyi.common.core.service;
 import com.ruoyi.common.core.domain.entity.SysUser;
 
 /**
- * 用户 业务层
+ * 通用 用户业务
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public interface IUserService {
 
@@ -15,7 +15,7 @@ public interface IUserService {
      * @param userName 用户名
      * @return 用户对象信息
      */
-    public SysUser selectUserByUserName(String userName);
+    SysUser selectUserByUserName(String userName);
 
     /**
      * 通过用户ID查询用户
@@ -23,6 +23,6 @@ public interface IUserService {
      * @param userId 用户ID
      * @return 用户对象信息
      */
-    public SysUser selectUserById(Long userId);
+    SysUser selectUserById(Long userId);
 
 }
