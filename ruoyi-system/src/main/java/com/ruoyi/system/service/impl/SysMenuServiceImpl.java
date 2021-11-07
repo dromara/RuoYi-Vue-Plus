@@ -262,11 +262,11 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu, 
     @Override
     public String checkMenuNameUnique(SysMenu menu) {
         Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
-        SysMenu info = getOne(new LambdaQueryWrapper<SysMenu>()
+        long count = count(new LambdaQueryWrapper<SysMenu>()
             .eq(SysMenu::getMenuName, menu.getMenuName())
             .eq(SysMenu::getParentId, menu.getParentId())
-            .last("limit 1"));
-        if (StringUtils.isNotNull(info) && info.getMenuId().longValue() != menuId.longValue()) {
+            .ne(SysMenu::getMenuId, menuId));
+        if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;

@@ -111,8 +111,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     @Override
     public boolean hasChildByDeptId(Long deptId) {
         long result = count(new LambdaQueryWrapper<SysDept>()
-            .eq(SysDept::getParentId, deptId)
-            .last("limit 1"));
+            .eq(SysDept::getParentId, deptId));
         return result > 0;
     }
 
@@ -138,11 +137,11 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     @Override
     public String checkDeptNameUnique(SysDept dept) {
         Long deptId = StringUtils.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
-        SysDept info = getOne(new LambdaQueryWrapper<SysDept>()
+        long count = count(new LambdaQueryWrapper<SysDept>()
             .eq(SysDept::getDeptName, dept.getDeptName())
             .eq(SysDept::getParentId, dept.getParentId())
-            .last("limit 1"));
-        if (StringUtils.isNotNull(info) && info.getDeptId().longValue() != deptId.longValue()) {
+            .ne(SysDept::getDeptId, deptId));
+        if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;

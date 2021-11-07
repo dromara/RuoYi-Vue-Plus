@@ -225,10 +225,10 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
     @Override
     public String checkDictTypeUnique(SysDictType dict) {
         Long dictId = StringUtils.isNull(dict.getDictId()) ? -1L : dict.getDictId();
-        SysDictType dictType = getOne(new LambdaQueryWrapper<SysDictType>()
+        long count = count(new LambdaQueryWrapper<SysDictType>()
                 .eq(SysDictType::getDictType, dict.getDictType())
-                .last("limit 1"));
-        if (StringUtils.isNotNull(dictType) && dictType.getDictId().longValue() != dictId.longValue()) {
+                .ne(SysDictType::getDictId, dictId));
+        if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
