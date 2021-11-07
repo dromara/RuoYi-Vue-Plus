@@ -162,7 +162,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     @Override
     public String checkUserNameUnique(String userName) {
-        long count = count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName).last("limit 1"));
+        long count = count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName));
         if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -178,10 +178,11 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     @Override
     public String checkPhoneUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-        SysUser info = getOne(new LambdaQueryWrapper<SysUser>()
+        long count = count(new LambdaQueryWrapper<SysUser>()
                 .select(SysUser::getUserId, SysUser::getPhonenumber)
-                .eq(SysUser::getPhonenumber, user.getPhonenumber()).last("limit 1"));
-        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
+                .eq(SysUser::getPhonenumber, user.getPhonenumber())
+                .ne(SysUser::getUserId, userId));
+        if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -196,10 +197,11 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     @Override
     public String checkEmailUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-        SysUser info = getOne(new LambdaQueryWrapper<SysUser>()
+        long count = count(new LambdaQueryWrapper<SysUser>()
                 .select(SysUser::getUserId, SysUser::getEmail)
-                .eq(SysUser::getEmail, user.getEmail()).last("limit 1"));
-        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
+                .eq(SysUser::getEmail, user.getEmail())
+                .ne(SysUser::getUserId, userId));
+        if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
