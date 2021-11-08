@@ -102,7 +102,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.$store.dispatch('LogOut').then(() => {
-          location.href = this.$router.options.base + '/index';
+          location.href = process.env.VUE_APP_CONTEXT_PATH;
         })
       }).catch(() => {});
     }

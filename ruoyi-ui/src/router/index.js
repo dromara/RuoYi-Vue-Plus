@@ -167,7 +167,6 @@ export const constantRoutes = [
 ]
 
 export default new Router({
-  base: "", // 项目前缀 与 publicPath 同步 例如 /api
   mode: 'history', // 去掉url中的#
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
