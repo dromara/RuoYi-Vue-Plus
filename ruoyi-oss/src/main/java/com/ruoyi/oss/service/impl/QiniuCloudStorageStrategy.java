@@ -24,7 +24,7 @@ public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
 	private UploadManager uploadManager;
 	private BucketManager bucketManager;
-	private String token;
+	private Auth auth;
 
 	@Override
 	public void init(CloudStorageProperties cloudStorageProperties) {
@@ -35,9 +35,8 @@ public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			config.useHttpsDomains = false;
 			config.useHttpsDomains = "Y".equals(properties.getIsHttps());
 			uploadManager = new UploadManager(config);
-			Auth auth = Auth.create(properties.getAccessKey(), properties.getSecretKey());
+			auth = Auth.create(properties.getAccessKey(), properties.getSecretKey());
 			String bucketName = properties.getBucketName();
-			token = auth.uploadToken(bucketName);
 			bucketManager = new BucketManager(auth, config);
 
 			if (!ArrayUtil.contains(bucketManager.buckets(), bucketName)) {
@@ -69,9 +68,10 @@ public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
 	@Override
 	public UploadResult upload(byte[] data, String path, String contentType) {
 		try {
-			Response res = uploadManager.put(data, path, token, null, contentType, false);
+            String token = auth.uploadToken(properties.getBucketName());
+            Response res = uploadManager.put(data, path, token, null, contentType, false);
 			if (!res.isOK()) {
-				throw new RuntimeException("上传七牛出错：" + res.toString());
+				throw new RuntimeException("上传七牛出错：" + res.error);
 			}
 		} catch (Exception e) {
 			throw new OssException("上传文件失败，请核对七牛配置信息:[" + e.getMessage() + "]");
@@ -85,7 +85,7 @@ public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			path = path.replace(getEndpointLink() + "/", "");
 			Response res = bucketManager.delete(properties.getBucketName(), path);
 			if (!res.isOK()) {
-				throw new RuntimeException("删除七牛文件出错：" + res.toString());
+				throw new RuntimeException("删除七牛文件出错：" + res.error);
 			}
 		} catch (Exception e) {
 			throw new OssException(e.getMessage());
