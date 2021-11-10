@@ -114,7 +114,9 @@ sa-token:
   # token前缀
   token-prefix: "Bearer"
   # token风格
-  token-style: random-128
+  token-style: uuid
+  # jwt秘钥
+  jwt-secret-key: abcdefghijklmnopqrstuvwxyz
   # 是否输出操作日志
   is-log: true
 
