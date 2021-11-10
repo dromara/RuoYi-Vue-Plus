@@ -248,13 +248,6 @@ insert into sys_menu values('1045', '日志导出', '501', '3', '#', '', '', 1, 
 insert into sys_menu values('1046', '在线查询', '109', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:query',       '#', 'admin', sysdate(), '', null, '');
 insert into sys_menu values('1047', '批量强退', '109', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:batchLogout', '#', 'admin', sysdate(), '', null, '');
 insert into sys_menu values('1048', '单条强退', '109', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:forceLogout', '#', 'admin', sysdate(), '', null, '');
--- 定时任务按钮
-# insert into sys_menu values('1049', '任务查询', '110', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:query',          '#', 'admin', sysdate(), '', null, '');
-# insert into sys_menu values('1050', '任务新增', '110', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:add',            '#', 'admin', sysdate(), '', null, '');
-# insert into sys_menu values('1051', '任务修改', '110', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:edit',           '#', 'admin', sysdate(), '', null, '');
-# insert into sys_menu values('1052', '任务删除', '110', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:remove',         '#', 'admin', sysdate(), '', null, '');
-# insert into sys_menu values('1053', '状态修改', '110', '5', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:changeStatus',   '#', 'admin', sysdate(), '', null, '');
-# insert into sys_menu values('1054', '任务导出', '110', '7', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:export',         '#', 'admin', sysdate(), '', null, '');
 -- 代码生成按钮
 insert into sys_menu values('1055', '生成查询', '115', '1', '#', '', '', 1, 0, 'F', '0', '0', 'tool:gen:query',             '#', 'admin', sysdate(), '', null, '');
 insert into sys_menu values('1056', '生成修改', '115', '2', '#', '', '', 1, 0, 'F', '0', '0', 'tool:gen:edit',              '#', 'admin', sysdate(), '', null, '');
@@ -373,12 +366,6 @@ insert into sys_role_menu values ('2', '1045');
 insert into sys_role_menu values ('2', '1046');
 insert into sys_role_menu values ('2', '1047');
 insert into sys_role_menu values ('2', '1048');
-insert into sys_role_menu values ('2', '1049');
-insert into sys_role_menu values ('2', '1050');
-insert into sys_role_menu values ('2', '1051');
-insert into sys_role_menu values ('2', '1052');
-insert into sys_role_menu values ('2', '1053');
-insert into sys_role_menu values ('2', '1054');
 insert into sys_role_menu values ('2', '1055');
 insert into sys_role_menu values ('2', '1056');
 insert into sys_role_menu values ('2', '1057');
@@ -576,49 +563,6 @@ create table sys_logininfor (
 
 
 -- ----------------------------
--- 15、定时任务调度表
--- ----------------------------
-drop table if exists sys_job;
-create table sys_job (
-  job_id              bigint(20)    not null auto_increment    comment '任务ID',
-  job_name            varchar(64)   default ''                 comment '任务名称',
-  job_group           varchar(64)   default 'DEFAULT'          comment '任务组名',
-  invoke_target       varchar(500)  not null                   comment '调用目标字符串',
-  cron_expression     varchar(255)  default ''                 comment 'cron执行表达式',
-  misfire_policy      varchar(20)   default '3'                comment '计划执行错误策略（1立即执行 2执行一次 3放弃执行）',
-  concurrent          char(1)       default '1'                comment '是否并发执行（0允许 1禁止）',
-  status              char(1)       default '0'                comment '状态（0正常 1暂停）',
-  create_by           varchar(64)   default ''                 comment '创建者',
-  create_time         datetime                                 comment '创建时间',
-  update_by           varchar(64)   default ''                 comment '更新者',
-  update_time         datetime                                 comment '更新时间',
-  remark              varchar(500)  default ''                 comment '备注信息',
-  primary key (job_id, job_name, job_group)
-) engine=innodb auto_increment=100 comment = '定时任务调度表';
-
-insert into sys_job values(1, '系统默认（无参）', 'DEFAULT', 'ryTask.ryNoParams',        '0/10 * * * * ?', '3', '1', '1', 'admin', sysdate(), '', null, '');
-insert into sys_job values(2, '系统默认（有参）', 'DEFAULT', 'ryTask.ryParams(\'ry\')',  '0/15 * * * * ?', '3', '1', '1', 'admin', sysdate(), '', null, '');
-insert into sys_job values(3, '系统默认（多参）', 'DEFAULT', 'ryTask.ryMultipleParams(\'ry\', true, 2000L, 316.50D, 100)',  '0/20 * * * * ?', '3', '1', '1', 'admin', sysdate(), '', null, '');
-
-
--- ----------------------------
--- 16、定时任务调度日志表
--- ----------------------------
-drop table if exists sys_job_log;
-create table sys_job_log (
-  job_log_id          bigint(20)     not null auto_increment    comment '任务日志ID',
-  job_name            varchar(64)    not null                   comment '任务名称',
-  job_group           varchar(64)    not null                   comment '任务组名',
-  invoke_target       varchar(500)   not null                   comment '调用目标字符串',
-  job_message         varchar(500)                              comment '日志信息',
-  status              char(1)        default '0'                comment '执行状态（0正常 1失败）',
-  exception_info      varchar(2000)  default ''                 comment '异常信息',
-  create_time         datetime                                  comment '创建时间',
-  primary key (job_log_id)
-) engine=innodb comment = '定时任务调度日志表';
-
-
--- ----------------------------
 -- 17、通知公告表
 -- ----------------------------
 drop table if exists sys_notice;
@@ -639,8 +583,8 @@ create table sys_notice (
 -- ----------------------------
 -- 初始化-公告信息表数据
 -- ----------------------------
-insert into sys_notice values('1', '温馨提醒：2018-07-01 若依新版本发布啦', '2', '新版本内容', '0', 'admin', sysdate(), '', null, '管理员');
-insert into sys_notice values('2', '维护通知：2018-07-01 若依系统凌晨维护', '1', '维护内容',   '0', 'admin', sysdate(), '', null, '管理员');
+insert into sys_notice values('1', '温馨提醒：2018-07-01 新版本发布啦', '2', '新版本内容', '0', 'admin', sysdate(), '', null, '管理员');
+insert into sys_notice values('2', '维护通知：2018-07-01 系统凌晨维护', '1', '维护内容',   '0', 'admin', sysdate(), '', null, '管理员');
 
 
 -- ----------------------------
