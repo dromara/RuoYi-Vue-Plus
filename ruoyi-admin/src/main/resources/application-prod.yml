@@ -3,7 +3,7 @@ spring:
   servlet:
     multipart:
       # 临时文件存储位置 避免临时文件被系统清理报错
-      location: ./temp
+      location: /ruoyi/server/temp
 
 --- # 监控配置
 spring:
