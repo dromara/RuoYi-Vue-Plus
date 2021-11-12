@@ -65,7 +65,7 @@ service.interceptors.response.use(res => {
         }
       ).then(() => {
         store.dispatch('LogOut').then(() => {
-          location.href = process.env.VUE_APP_CONTEXT_PATH;
+          location.href = process.env.VUE_APP_CONTEXT_PATH + "index";
         })
       }).catch(() => {});
       return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
