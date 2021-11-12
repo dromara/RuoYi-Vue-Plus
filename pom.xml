@@ -350,6 +350,7 @@
                 <!-- 环境标识，需要与配置文件的名称相对应 -->
                 <profiles.active>local</profiles.active>
                 <logging.level>debug</logging.level>
+                <knife4j.production>false</knife4j.production>
                 <endpoints.include>'*'</endpoints.include>
             </properties>
         </profile>
@@ -359,6 +360,7 @@
                 <!-- 环境标识，需要与配置文件的名称相对应 -->
                 <profiles.active>dev</profiles.active>
                 <logging.level>debug</logging.level>
+                <knife4j.production>false</knife4j.production>
                 <endpoints.include>'*'</endpoints.include>
             </properties>
             <activation>
@@ -371,6 +373,7 @@
             <properties>
                 <profiles.active>prod</profiles.active>
                 <logging.level>warn</logging.level>
+                <knife4j.production>true</knife4j.production>
                 <endpoints.include>health, info, logfile</endpoints.include>
             </properties>
         </profile>
