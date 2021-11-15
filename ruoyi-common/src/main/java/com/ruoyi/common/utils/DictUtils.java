@@ -36,9 +36,8 @@ public class DictUtils {
      * @return dictDatas 字典数据列表
      */
     public static List<SysDictData> getDictCache(String key) {
-        Object cacheObj = RedisUtils.getCacheObject(getCacheKey(key));
-        if (StringUtils.isNotNull(cacheObj)) {
-            List<SysDictData> dictDatas = (List<SysDictData>) cacheObj;
+        List<SysDictData> dictDatas = RedisUtils.getCacheObject(getCacheKey(key));
+        if (StringUtils.isNotNull(dictDatas)) {
             return dictDatas;
         }
         return null;
