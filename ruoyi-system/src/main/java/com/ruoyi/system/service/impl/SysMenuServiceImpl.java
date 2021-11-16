@@ -114,7 +114,7 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu, 
      * @return 选中菜单列表
      */
     @Override
-    public List<Integer> selectMenuListByRoleId(Long roleId) {
+    public List<Long> selectMenuListByRoleId(Long roleId) {
         SysRole role = roleMapper.selectById(roleId);
         return baseMapper.selectMenuListByRoleId(roleId, role.isMenuCheckStrictly());
     }
