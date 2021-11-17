@@ -83,7 +83,6 @@
           plain
           icon="el-icon-download"
           size="mini"
-          :loading="exportLoading"
           @click="handleExport"
           v-hasPermi="['monitor:logininfor:export']"
         >导出</el-button>
@@ -132,8 +131,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 选中数组
       ids: [],
       // 非多个禁用
@@ -216,7 +213,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.$download.excel('/monitor/logininfor/export', this.queryParams);
+      this.download('monitor/logininfor/export', {
+        ...this.queryParams
+      }, `logininfor_${new Date().getTime()}.xlsx`)
     }
   }
 };

@@ -99,7 +99,6 @@
           plain
           icon="el-icon-download"
           size="mini"
-          :loading="exportLoading"
           @click="handleExport"
           v-hasPermi="['monitor:operlog:export']"
         >导出</el-button>
@@ -205,8 +204,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 选中数组
       ids: [],
       // 非多个禁用
@@ -303,7 +300,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.$download.excel('/monitor/operlog/export', this.queryParams);
+      this.download('monitor/operlog/export', {
+        ...this.queryParams
+      }, `operlog_${new Date().getTime()}.xlsx`)
     }
   }
 };

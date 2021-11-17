@@ -131,7 +131,6 @@
               plain
               icon="el-icon-download"
               size="mini"
-              :loading="exportLoading"
               @click="handleExport"
               v-hasPermi="['system:user:export']"
             >导出</el-button>
@@ -360,8 +359,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -643,7 +640,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.$download.excel('/system/user/export', this.queryParams);
+      this.download('system/user/export', {
+        ...this.queryParams
+      }, `user_${new Date().getTime()}.xlsx`)
     },
     /** 导入按钮操作 */
     handleImport() {
@@ -652,7 +651,9 @@ export default {
     },
     /** 下载模板操作 */
     importTemplate() {
-      this.$download.excel('/system/user/importTemplate');
+      this.download('system/user/importTemplate', {
+        ...this.queryParams
+      }, `user_template_${new Date().getTime()}.xlsx`)
     },
     // 文件上传中处理
     handleFileUploadProgress(event, file, fileList) {

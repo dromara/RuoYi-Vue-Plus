@@ -108,7 +108,6 @@
           plain
           icon="el-icon-download"
           size="mini"
-          :loading="exportLoading"
           @click="handleExport"
           v-hasPermi="['${moduleName}:${businessName}:export']"
         >导出</el-button>
@@ -324,8 +323,6 @@ export default {
       buttonLoading: false,
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 选中数组
       ids: [],
 #if($table.sub)
@@ -573,7 +570,9 @@ export default {
 #end
     /** 导出按钮操作 */
     handleExport() {
-        this.#[[$download]]#.excel('/${moduleName}/${businessName}/export', this.queryParams);
+      this.download('${moduleName}/${businessName}/export', {
+        ...this.queryParams
+      }, `${businessName}_#[[${new Date().getTime()}]]#.xlsx`)
     }
   }
 };

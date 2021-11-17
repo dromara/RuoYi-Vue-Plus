@@ -1,7 +1,6 @@
 package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -80,7 +79,6 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:add')")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
-    @RepeatSubmit
     public AjaxResult<Void> add(@Validated @RequestBody SysConfig config) {
         if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(config))) {
             return AjaxResult.error("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
