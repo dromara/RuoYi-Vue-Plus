@@ -139,19 +139,6 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/monitor/job-log',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: 'index',
-        component: (resolve) => require(['@/views/monitor/job/log'], resolve),
-        name: 'JobLog',
-        meta: { title: '调度日志', activeMenu: '/monitor/job'}
-      }
-    ]
-  },
-  {
     path: '/tool/gen-edit',
     component: Layout,
     hidden: true,

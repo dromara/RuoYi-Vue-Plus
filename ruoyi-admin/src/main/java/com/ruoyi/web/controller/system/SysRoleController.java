@@ -54,7 +54,7 @@ public class SysRoleController extends BaseController {
     @ApiOperation("导出角色信息列表")
     @Log(title = "角色管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:role:export')")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysRole role, HttpServletResponse response) {
         List<SysRole> list = roleService.selectRoleList(role);
         ExcelUtil.exportExcel(list, "角色数据", SysRole.class, response);

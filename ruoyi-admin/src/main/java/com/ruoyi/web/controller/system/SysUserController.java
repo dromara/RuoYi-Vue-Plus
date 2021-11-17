@@ -67,7 +67,7 @@ public class SysUserController extends BaseController {
     @ApiOperation("导出用户列表")
     @Log(title = "用户管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:user:export')")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysUser user, HttpServletResponse response) {
         List<SysUser> list = userService.selectUserList(user);
         List<SysUserExportVo> listVo = BeanUtil.copyToList(list, SysUserExportVo.class);
@@ -98,7 +98,7 @@ public class SysUserController extends BaseController {
     }
 
     @ApiOperation("下载导入模板")
-    @GetMapping("/importTemplate")
+    @PostMapping("/importTemplate")
     public void importTemplate(HttpServletResponse response) {
         ExcelUtil.exportExcel(new ArrayList<>(), "用户数据", SysUserImportVo.class, response);
     }

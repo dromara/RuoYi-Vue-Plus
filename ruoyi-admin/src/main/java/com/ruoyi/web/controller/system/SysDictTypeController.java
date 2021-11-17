@@ -44,7 +44,7 @@ public class SysDictTypeController extends BaseController {
     @ApiOperation("导出字典类型列表")
     @Log(title = "字典类型", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:dict:export')")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysDictType dictType, HttpServletResponse response) {
         List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
         ExcelUtil.exportExcel(list, "字典类型", SysDictType.class, response);

@@ -47,7 +47,7 @@ public class SysDictDataController extends BaseController {
     @ApiOperation("导出字典数据列表")
     @Log(title = "字典数据", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:dict:export')")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysDictData dictData, HttpServletResponse response) {
         List<SysDictData> list = dictDataService.selectDictDataList(dictData);
         ExcelUtil.exportExcel(list, "字典数据", SysDictData.class, response);

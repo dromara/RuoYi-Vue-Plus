@@ -47,7 +47,7 @@ public class SysConfigController extends BaseController {
     @ApiOperation("导出参数配置列表")
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:config:export')")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysConfig config, HttpServletResponse response) {
         List<SysConfig> list = configService.selectConfigList(config);
         ExcelUtil.exportExcel(list, "参数数据", SysConfig.class, response);

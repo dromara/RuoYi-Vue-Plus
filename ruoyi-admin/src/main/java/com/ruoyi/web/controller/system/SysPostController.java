@@ -47,7 +47,7 @@ public class SysPostController extends BaseController {
     @ApiOperation("导出岗位列表")
     @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:post:export')")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysPost post, HttpServletResponse response) {
         List<SysPost> list = postService.selectPostList(post);
         ExcelUtil.exportExcel(list, "岗位数据", SysPost.class, response);

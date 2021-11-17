@@ -70,7 +70,7 @@ public class TestDemoController extends BaseController {
     @ApiOperation("导出测试单表列表")
     @PreAuthorize("@ss.hasPermi('demo:demo:export')")
     @Log(title = "测试单表", businessType = BusinessType.EXPORT)
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(@Validated TestDemoBo bo, HttpServletResponse response) {
         List<TestDemoVo> list = iTestDemoService.queryList(bo);
 		// 测试雪花id导出
