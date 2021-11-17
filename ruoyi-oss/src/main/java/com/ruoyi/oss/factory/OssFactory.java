@@ -24,17 +24,21 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class OssFactory {
 
-	static {
-		RedisUtils.subscribe(CloudConstant.CACHE_CONFIG_KEY, String.class, msg -> {
-			refreshService(msg);
-			log.info("订阅刷新OSS配置 => " + msg);
-		});
-	}
-
 	/**
 	 * 服务实例缓存
 	 */
 	private static final Map<String, ICloudStorageStrategy> SERVICES = new ConcurrentHashMap<>();
+
+    /**
+     * 初始化工厂
+     */
+    public static void init() {
+        log.info("初始化OSS工厂");
+        RedisUtils.subscribe(CloudConstant.CACHE_CONFIG_KEY, String.class, msg -> {
+            refreshService(msg);
+            log.info("订阅刷新OSS配置 => " + msg);
+        });
+    }
 
 	/**
 	 * 获取默认实例

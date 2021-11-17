@@ -16,6 +16,7 @@ import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.constant.CloudConstant;
+import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.system.domain.SysOssConfig;
 import com.ruoyi.system.domain.bo.SysOssConfigBo;
 import com.ruoyi.system.domain.vo.SysOssConfigVo;
@@ -49,6 +50,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     @PostConstruct
     public void init() {
         List<SysOssConfig> list = list();
+        // 加载OSS初始化配置
         for (SysOssConfig config : list) {
             String configKey = config.getConfigKey();
             if ("0".equals(config.getStatus())) {
@@ -56,6 +58,8 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
             }
             setConfigCache(true, config);
         }
+        // 初始化OSS工厂
+        OssFactory.init();
     }
 
     @Override
