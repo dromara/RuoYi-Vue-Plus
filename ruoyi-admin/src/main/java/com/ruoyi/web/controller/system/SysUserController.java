@@ -20,10 +20,7 @@ import com.ruoyi.system.domain.vo.SysUserImportVo;
 import com.ruoyi.system.service.ISysPostService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -109,7 +106,7 @@ public class SysUserController extends BaseController {
     @ApiOperation("根据用户编号获取详细信息")
     @PreAuthorize("@ss.hasPermi('system:user:query')")
     @GetMapping(value = {"/", "/{userId}"})
-    public AjaxResult<Map<String, Object>> getInfo(@PathVariable(value = "userId", required = false) Long userId) {
+    public AjaxResult<Map<String, Object>> getInfo(@ApiParam("用户ID") @PathVariable(value = "userId", required = false) Long userId) {
         userService.checkUserDataScope(userId);
         Map<String, Object> ajax = new HashMap<>();
         List<SysRole> roles = roleService.selectRoleAll();
@@ -170,7 +167,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:remove')")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
-    public AjaxResult<Void> remove(@PathVariable Long[] userIds) {
+    public AjaxResult<Void> remove(@ApiParam("角色ID串") @PathVariable Long[] userIds) {
         if (ArrayUtil.contains(userIds, getUserId())) {
             return error("当前用户不能删除");
         }
@@ -208,7 +205,7 @@ public class SysUserController extends BaseController {
     @ApiOperation("根据用户编号获取授权角色")
     @PreAuthorize("@ss.hasPermi('system:user:query')")
     @GetMapping("/authRole/{userId}")
-    public AjaxResult<Map<String, Object>> authRole(@PathVariable("userId") Long userId) {
+    public AjaxResult<Map<String, Object>> authRole(@ApiParam("用户ID") @PathVariable("userId") Long userId) {
         SysUser user = userService.selectUserById(userId);
         List<SysRole> roles = roleService.selectRolesByUserId(userId);
         Map<String, Object> ajax = new HashMap<>();
@@ -221,6 +218,10 @@ public class SysUserController extends BaseController {
      * 用户授权角色
      */
     @ApiOperation("用户授权角色")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "用户Id", paramType = "query"),
+        @ApiImplicitParam(name = "roleIds", value = "角色ID串", paramType = "query")
+    })
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
     @Log(title = "用户管理", businessType = BusinessType.GRANT)
     @PutMapping("/authRole")

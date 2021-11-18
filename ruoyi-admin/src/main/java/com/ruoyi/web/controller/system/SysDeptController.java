@@ -12,6 +12,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysDeptService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,7 +54,7 @@ public class SysDeptController extends BaseController {
     @ApiOperation("查询部门列表（排除节点）")
     @PreAuthorize("@ss.hasPermi('system:dept:list')")
     @GetMapping("/list/exclude/{deptId}")
-    public AjaxResult<List<SysDept>> excludeChild(@PathVariable(value = "deptId", required = false) Long deptId) {
+    public AjaxResult<List<SysDept>> excludeChild(@ApiParam("部门ID") @PathVariable(value = "deptId", required = false) Long deptId) {
         List<SysDept> depts = deptService.selectDeptList(new SysDept());
         depts.removeIf(d -> d.getDeptId().equals(deptId)
                 || ArrayUtil.contains(StringUtils.split(d.getAncestors(), ","), deptId + ""));
@@ -66,7 +67,7 @@ public class SysDeptController extends BaseController {
     @ApiOperation("根据部门编号获取详细信息")
     @PreAuthorize("@ss.hasPermi('system:dept:query')")
     @GetMapping(value = "/{deptId}")
-    public AjaxResult<SysDept> getInfo(@PathVariable Long deptId) {
+    public AjaxResult<SysDept> getInfo(@ApiParam("部门ID") @PathVariable Long deptId) {
         deptService.checkDeptDataScope(deptId);
         return AjaxResult.success(deptService.selectDeptById(deptId));
     }
@@ -86,7 +87,7 @@ public class SysDeptController extends BaseController {
      */
     @ApiOperation("加载对应角色部门列表树")
     @GetMapping(value = "/roleDeptTreeselect/{roleId}")
-    public AjaxResult<Map<String, Object>> roleDeptTreeselect(@PathVariable("roleId") Long roleId) {
+    public AjaxResult<Map<String, Object>> roleDeptTreeselect(@ApiParam("角色ID") @PathVariable("roleId") Long roleId) {
         List<SysDept> depts = deptService.selectDeptList(new SysDept());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("checkedKeys", deptService.selectDeptListByRoleId(roleId));
@@ -134,7 +135,7 @@ public class SysDeptController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dept:remove')")
     @Log(title = "部门管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{deptId}")
-    public AjaxResult<Void> remove(@PathVariable Long deptId) {
+    public AjaxResult<Void> remove(@ApiParam("部门ID串") @PathVariable Long deptId) {
         if (deptService.hasChildByDeptId(deptId)) {
             return AjaxResult.error("存在下级部门,不允许删除");
         }

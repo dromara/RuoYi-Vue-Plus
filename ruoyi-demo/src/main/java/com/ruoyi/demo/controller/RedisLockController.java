@@ -28,59 +28,59 @@ import java.time.LocalTime;
 @RequestMapping("/demo/redisLock")
 public class RedisLockController {
 
-	@Autowired
-	private LockTemplate lockTemplate;
+    @Autowired
+    private LockTemplate lockTemplate;
 
-	/**
-	 * 测试lock4j 注解
-	 */
-	@ApiOperation("测试lock4j 注解")
-	@Lock4j(keys = {"#key"})
-	@GetMapping("/testLock4j")
-	public  AjaxResult<String> testLock4j(String key,String value){
-		System.out.println("start:"+key+",time:"+ LocalTime.now().toString());
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		System.out.println("end :"+key+",time:"+LocalTime.now().toString());
-		return AjaxResult.success("操作成功",value);
-	}
+    /**
+     * 测试lock4j 注解
+     */
+    @ApiOperation("测试lock4j 注解")
+    @Lock4j(keys = {"#key"})
+    @GetMapping("/testLock4j")
+    public AjaxResult<String> testLock4j(String key, String value) {
+        System.out.println("start:" + key + ",time:" + LocalTime.now().toString());
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("end :" + key + ",time:" + LocalTime.now().toString());
+        return AjaxResult.success("操作成功", value);
+    }
 
-	/**
-	 * 测试lock4j 工具
-	 */
-	@ApiOperation("测试lock4j 工具")
-	@GetMapping("/testLock4jLockTemaplate")
-	public  AjaxResult<String> testLock4jLockTemaplate(String key,String value){
-		final LockInfo lockInfo = lockTemplate.lock(key, 30000L, 5000L, RedissonLockExecutor.class);
-		if (null == lockInfo) {
-			throw new RuntimeException("业务处理中,请稍后再试");
-		}
-		// 获取锁成功，处理业务
-		try {
-			try {
-				Thread.sleep(8000);
-			} catch (InterruptedException e) {
-				//
-			}
-			System.out.println("执行简单方法1 , 当前线程:" + Thread.currentThread().getName());
-		} finally {
-			//释放锁
-			lockTemplate.releaseLock(lockInfo);
-		}
-		//结束
-		return AjaxResult.success("操作成功",value);
-	}
+    /**
+     * 测试lock4j 工具
+     */
+    @ApiOperation("测试lock4j 工具")
+    @GetMapping("/testLock4jLockTemaplate")
+    public AjaxResult<String> testLock4jLockTemaplate(String key, String value) {
+        final LockInfo lockInfo = lockTemplate.lock(key, 30000L, 5000L, RedissonLockExecutor.class);
+        if (null == lockInfo) {
+            throw new RuntimeException("业务处理中,请稍后再试");
+        }
+        // 获取锁成功，处理业务
+        try {
+            try {
+                Thread.sleep(8000);
+            } catch (InterruptedException e) {
+                //
+            }
+            System.out.println("执行简单方法1 , 当前线程:" + Thread.currentThread().getName());
+        } finally {
+            //释放锁
+            lockTemplate.releaseLock(lockInfo);
+        }
+        //结束
+        return AjaxResult.success("操作成功", value);
+    }
 
-	/**
-	 * 测试spring-cache注解
-	 */
-	@ApiOperation("测试spring-cache注解")
-	@Cacheable(value = "test", key = "#key")
-	@GetMapping("/testCache")
-	public AjaxResult<String> testCache(String key) {
-		return AjaxResult.success("操作成功", key);
-	}
+    /**
+     * 测试spring-cache注解
+     */
+    @ApiOperation("测试spring-cache注解")
+    @Cacheable(value = "test", key = "#key")
+    @GetMapping("/testCache")
+    public AjaxResult<String> testCache(String key) {
+        return AjaxResult.success("操作成功", key);
+    }
 }

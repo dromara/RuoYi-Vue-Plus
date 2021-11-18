@@ -11,6 +11,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysMenuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,7 +53,7 @@ public class SysMenuController extends BaseController {
     @ApiOperation("根据菜单编号获取详细信息")
     @PreAuthorize("@ss.hasPermi('system:menu:query')")
     @GetMapping(value = "/{menuId}")
-    public AjaxResult<SysMenu> getInfo(@PathVariable Long menuId) {
+    public AjaxResult<SysMenu> getInfo(@ApiParam("菜单ID") @PathVariable Long menuId) {
         return AjaxResult.success(menuService.selectMenuById(menuId));
     }
 
@@ -71,7 +72,7 @@ public class SysMenuController extends BaseController {
      */
     @ApiOperation("加载对应角色菜单列表树")
     @GetMapping(value = "/roleMenuTreeselect/{roleId}")
-    public AjaxResult<Map<String, Object>> roleMenuTreeselect(@PathVariable("roleId") Long roleId) {
+    public AjaxResult<Map<String, Object>> roleMenuTreeselect(@ApiParam("角色ID") @PathVariable("roleId") Long roleId) {
         List<SysMenu> menus = menuService.selectMenuList(getUserId());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("checkedKeys", menuService.selectMenuListByRoleId(roleId));
@@ -120,7 +121,7 @@ public class SysMenuController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:menu:remove')")
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{menuId}")
-    public AjaxResult<Void> remove(@PathVariable("menuId") Long menuId) {
+    public AjaxResult<Void> remove(@ApiParam("菜单ID") @PathVariable("menuId") Long menuId) {
         if (menuService.hasChildByMenuId(menuId)) {
             return AjaxResult.error("存在子菜单,不允许删除");
         }

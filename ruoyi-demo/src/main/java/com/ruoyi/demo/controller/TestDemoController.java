@@ -16,6 +16,7 @@ import com.ruoyi.demo.domain.vo.TestDemoVo;
 import com.ruoyi.demo.service.ITestDemoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,17 +55,17 @@ public class TestDemoController extends BaseController {
         return iTestDemoService.queryPageList(bo);
     }
 
-	/**
-	 * 自定义分页查询
-	 */
-	@ApiOperation("自定义分页查询")
-	@PreAuthorize("@ss.hasPermi('demo:demo:list')")
-	@GetMapping("/page")
-	public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo) {
-		return iTestDemoService.customPageList(bo);
-	}
+    /**
+     * 自定义分页查询
+     */
+    @ApiOperation("自定义分页查询")
+    @PreAuthorize("@ss.hasPermi('demo:demo:list')")
+    @GetMapping("/page")
+    public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo) {
+        return iTestDemoService.customPageList(bo);
+    }
 
-	/**
+    /**
      * 导出测试单表列表
      */
     @ApiOperation("导出测试单表列表")
@@ -73,11 +74,11 @@ public class TestDemoController extends BaseController {
     @PostMapping("/export")
     public void export(@Validated TestDemoBo bo, HttpServletResponse response) {
         List<TestDemoVo> list = iTestDemoService.queryList(bo);
-		// 测试雪花id导出
+        // 测试雪花id导出
 //        for (TestDemoVo vo : list) {
 //			vo.setId(1234567891234567893L);
 //		}
-		ExcelUtil.exportExcel(list, "测试单表", TestDemoVo.class, response);
+        ExcelUtil.exportExcel(list, "测试单表", TestDemoVo.class, response);
     }
 
     /**
@@ -86,8 +87,9 @@ public class TestDemoController extends BaseController {
     @ApiOperation("获取测试单表详细信息")
     @PreAuthorize("@ss.hasPermi('demo:demo:query')")
     @GetMapping("/{id}")
-    public AjaxResult<TestDemoVo> getInfo(@NotNull(message = "主键不能为空")
-                                                  @PathVariable("id") Long id) {
+    public AjaxResult<TestDemoVo> getInfo(@ApiParam("测试ID")
+                                          @NotNull(message = "主键不能为空")
+                                          @PathVariable("id") Long id) {
         return AjaxResult.success(iTestDemoService.queryById(id));
     }
 
@@ -123,10 +125,11 @@ public class TestDemoController extends BaseController {
      */
     @ApiOperation("删除测试单表")
     @PreAuthorize("@ss.hasPermi('demo:demo:remove')")
-    @Log(title = "测试单表" , businessType = BusinessType.DELETE)
+    @Log(title = "测试单表", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
-    public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
-                                       @PathVariable Long[] ids) {
+    public AjaxResult<Void> remove(@ApiParam("测试ID串")
+                                   @NotEmpty(message = "主键不能为空")
+                                   @PathVariable Long[] ids) {
         return toAjax(iTestDemoService.deleteWithValidByIds(Arrays.asList(ids), true) ? 1 : 0);
     }
 }

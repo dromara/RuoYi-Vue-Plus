@@ -11,6 +11,7 @@ import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.service.ISysConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -59,7 +60,7 @@ public class SysConfigController extends BaseController {
     @ApiOperation("根据参数编号获取详细信息")
     @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping(value = "/{configId}")
-    public AjaxResult<SysConfig> getInfo(@PathVariable Long configId) {
+    public AjaxResult<SysConfig> getInfo(@ApiParam("参数ID") @PathVariable Long configId) {
         return AjaxResult.success(configService.selectConfigById(configId));
     }
 
@@ -68,7 +69,7 @@ public class SysConfigController extends BaseController {
      */
     @ApiOperation("根据参数键名查询参数值")
     @GetMapping(value = "/configKey/{configKey}")
-    public AjaxResult<Void> getConfigKey(@PathVariable String configKey) {
+    public AjaxResult<Void> getConfigKey(@ApiParam("参数Key") @PathVariable String configKey) {
         return AjaxResult.success(configService.selectConfigByKey(configKey));
     }
 
@@ -107,7 +108,7 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
-    public AjaxResult<Void> remove(@PathVariable Long[] configIds) {
+    public AjaxResult<Void> remove(@ApiParam("参数ID串") @PathVariable Long[] configIds) {
         configService.deleteConfigByIds(configIds);
         return success();
     }

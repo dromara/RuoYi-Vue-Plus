@@ -4,6 +4,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.MessageUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +28,7 @@ public class TestI18nController {
 	 */
 	@ApiOperation("通过code获取国际化内容")
 	@GetMapping()
-	public AjaxResult<Void> get(String code) {
+	public AjaxResult<Void> get(@ApiParam("国际化code") String code) {
 		return AjaxResult.success(MessageUtils.message(code));
 	}
 }

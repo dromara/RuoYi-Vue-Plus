@@ -9,6 +9,7 @@ import com.ruoyi.system.domain.SysNotice;
 import com.ruoyi.system.service.ISysNoticeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,7 +46,7 @@ public class SysNoticeController extends BaseController {
     @ApiOperation("根据通知公告编号获取详细信息")
     @PreAuthorize("@ss.hasPermi('system:notice:query')")
     @GetMapping(value = "/{noticeId}")
-    public AjaxResult<SysNotice> getInfo(@PathVariable Long noticeId) {
+    public AjaxResult<SysNotice> getInfo(@ApiParam("公告ID") @PathVariable Long noticeId) {
         return AjaxResult.success(noticeService.selectNoticeById(noticeId));
     }
 
@@ -78,7 +79,7 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:remove')")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
-    public AjaxResult<Void> remove(@PathVariable Long[] noticeIds) {
+    public AjaxResult<Void> remove(@ApiParam("公告ID串") @PathVariable Long[] noticeIds) {
         return toAjax(noticeService.deleteNoticeByIds(noticeIds));
     }
 }
