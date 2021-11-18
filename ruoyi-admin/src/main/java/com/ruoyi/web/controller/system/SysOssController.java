@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,7 +70,7 @@ public class SysOssController extends BaseController {
      */
     @ApiOperation("上传OSS对象存储")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "file", value = "文件", dataType = "java.io.File", required = true),
+        @ApiImplicitParam(name = "file", value = "文件", dataTypeClass = File.class, required = true),
     })
     @PreAuthorize("@ss.hasPermi('system:oss:upload')")
     @Log(title = "OSS对象存储", businessType = BusinessType.INSERT)

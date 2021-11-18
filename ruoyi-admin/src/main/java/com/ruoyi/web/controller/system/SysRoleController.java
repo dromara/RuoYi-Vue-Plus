@@ -196,8 +196,8 @@ public class SysRoleController extends BaseController {
      */
     @ApiOperation("批量取消授权用户")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "roleId", value = "角色ID", paramType = "query"),
-        @ApiImplicitParam(name = "userIds", value = "用户ID串", paramType = "query")
+        @ApiImplicitParam(name = "roleId", value = "角色ID", paramType = "query", dataTypeClass = String.class),
+        @ApiImplicitParam(name = "userIds", value = "用户ID串", paramType = "query", dataTypeClass = String.class)
     })
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
@@ -211,8 +211,8 @@ public class SysRoleController extends BaseController {
      */
     @ApiOperation("批量选择用户授权")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "roleId", value = "角色ID", paramType = "query"),
-        @ApiImplicitParam(name = "userIds", value = "用户ID串", paramType = "query")
+        @ApiImplicitParam(name = "roleId", value = "角色ID", paramType = "query", dataTypeClass = String.class),
+        @ApiImplicitParam(name = "userIds", value = "用户ID串", paramType = "query", dataTypeClass = String.class)
     })
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)

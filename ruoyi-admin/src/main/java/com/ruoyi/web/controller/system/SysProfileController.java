@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,8 +91,8 @@ public class SysProfileController extends BaseController {
      */
     @ApiOperation("重置密码")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "oldPassword", value = "旧密码", paramType = "query"),
-        @ApiImplicitParam(name = "newPassword", value = "新密码", paramType = "query")
+        @ApiImplicitParam(name = "oldPassword", value = "旧密码", paramType = "query", dataTypeClass = String.class),
+        @ApiImplicitParam(name = "newPassword", value = "新密码", paramType = "query", dataTypeClass = String.class)
     })
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
@@ -119,7 +120,7 @@ public class SysProfileController extends BaseController {
      */
     @ApiOperation("头像上传")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "avatarfile", value = "用户头像", dataType = "java.io.File", required = true),
+        @ApiImplicitParam(name = "avatarfile", value = "用户头像", dataTypeClass = File.class, required = true),
     })
     @Log(title = "用户头像", businessType = BusinessType.UPDATE)
     @PostMapping("/avatar")

@@ -219,8 +219,8 @@ public class SysUserController extends BaseController {
      */
     @ApiOperation("用户授权角色")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "用户Id", paramType = "query"),
-        @ApiImplicitParam(name = "roleIds", value = "角色ID串", paramType = "query")
+        @ApiImplicitParam(name = "userId", value = "用户Id", paramType = "query", dataTypeClass = String.class),
+        @ApiImplicitParam(name = "roleIds", value = "角色ID串", paramType = "query", dataTypeClass = String.class)
     })
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
     @Log(title = "用户管理", businessType = BusinessType.GRANT)
