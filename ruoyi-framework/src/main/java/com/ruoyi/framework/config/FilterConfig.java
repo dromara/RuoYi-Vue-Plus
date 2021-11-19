@@ -20,7 +20,6 @@ import java.util.Map;
  * @author Lion Li
  */
 @Configuration
-@ConditionalOnProperty(value = "xss.enabled", havingValue = "true")
 public class FilterConfig {
 
     @Autowired
@@ -28,6 +27,7 @@ public class FilterConfig {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Bean
+    @ConditionalOnProperty(value = "xss.enabled", havingValue = "true")
     public FilterRegistrationBean xssFilterRegistration() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setDispatcherTypes(DispatcherType.REQUEST);
