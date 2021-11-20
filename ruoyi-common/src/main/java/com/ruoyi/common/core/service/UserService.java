@@ -7,7 +7,7 @@ import com.ruoyi.common.core.domain.entity.SysUser;
  *
  * @author Lion Li
  */
-public interface IUserService {
+public interface UserService {
 
     /**
      * 通过用户名查询用户
