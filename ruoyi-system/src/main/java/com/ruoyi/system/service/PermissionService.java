@@ -1,9 +1,12 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.common.core.domain.entity.SysRole;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -91,10 +94,14 @@ public class PermissionService {
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles())) {
+        if (StringUtils.isNull(loginUser)) {
             return false;
         }
-        for (SysRole sysRole : loginUser.getUser().getRoles()) {
+        SysUser sysUser = SpringUtils.getBean(UserService.class).selectUserById(loginUser.getUserId());
+        if (CollectionUtils.isEmpty(sysUser.getRoles())) {
+            return false;
+        }
+        for (SysRole sysRole : sysUser.getRoles()) {
             String roleKey = sysRole.getRoleKey();
             if (SUPER_ADMIN.equals(roleKey) || roleKey.equals(StringUtils.trim(role))) {
                 return true;
@@ -124,7 +131,11 @@ public class PermissionService {
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles())) {
+        if (StringUtils.isNull(loginUser)) {
+            return false;
+        }
+        SysUser sysUser = SpringUtils.getBean(UserService.class).selectUserById(loginUser.getUserId());
+        if (CollectionUtils.isEmpty(sysUser.getRoles())) {
             return false;
         }
         for (String role : roles.split(ROLE_DELIMETER)) {

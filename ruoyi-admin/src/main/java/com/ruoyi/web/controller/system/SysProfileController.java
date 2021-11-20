@@ -47,7 +47,7 @@ public class SysProfileController extends BaseController {
     @GetMapping
     public AjaxResult<Map<String, Object>> profile() {
         LoginUser loginUser = getLoginUser();
-        SysUser user = loginUser.getUser();
+        SysUser user = userService.selectUserById(loginUser.getUserId());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("user", user);
         ajax.put("roleGroup", userService.selectUserRoleGroup(loginUser.getUsername()));
@@ -71,16 +71,10 @@ public class SysProfileController extends BaseController {
             return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         LoginUser loginUser = getLoginUser();
-        SysUser sysUser = loginUser.getUser();
+        SysUser sysUser = userService.selectUserById(loginUser.getUserId());
         user.setUserId(sysUser.getUserId());
         user.setPassword(null);
         if (userService.updateUserProfile(user) > 0) {
-            // 更新缓存用户信息
-            sysUser.setNickName(user.getNickName());
-            sysUser.setPhonenumber(user.getPhonenumber());
-            sysUser.setEmail(user.getEmail());
-            sysUser.setSex(user.getSex());
-            tokenService.setLoginUser(loginUser);
             return AjaxResult.success();
         }
         return AjaxResult.error("修改个人信息异常，请联系管理员");
@@ -108,7 +102,7 @@ public class SysProfileController extends BaseController {
         }
         if (userService.resetUserPwd(userName, SecurityUtils.encryptPassword(newPassword)) > 0) {
             // 更新缓存用户密码
-            loginUser.getUser().setPassword(SecurityUtils.encryptPassword(newPassword));
+            loginUser.setPassword(SecurityUtils.encryptPassword(newPassword));
             tokenService.setLoginUser(loginUser);
             return AjaxResult.success();
         }
@@ -132,9 +126,6 @@ public class SysProfileController extends BaseController {
             String avatar = oss.getUrl();
             if (userService.updateUserAvatar(loginUser.getUsername(), avatar)) {
                 ajax.put("imgUrl", avatar);
-                // 更新缓存用户头像
-                loginUser.getUser().setAvatar(avatar);
-                tokenService.setLoginUser(loginUser);
                 return AjaxResult.success(ajax);
             }
         }

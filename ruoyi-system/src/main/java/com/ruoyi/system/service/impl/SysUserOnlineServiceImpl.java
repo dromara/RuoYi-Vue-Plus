@@ -1,9 +1,12 @@
 package com.ruoyi.system.service.impl;
 
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysUserOnline;
 import com.ruoyi.system.service.ISysUserOnlineService;
+import com.ruoyi.system.service.ISysUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,6 +16,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
+
+    @Autowired
+    private ISysUserService userService;
 
     /**
      * 通过登录地址查询信息
@@ -68,9 +74,10 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
      */
     @Override
     public SysUserOnline loginUserToUserOnline(LoginUser user) {
-        if (StringUtils.isNull(user) || StringUtils.isNull(user.getUser())) {
+        if (StringUtils.isNull(user)) {
             return null;
         }
+        SysUser sysUser = userService.selectUserById(user.getUserId());
         SysUserOnline sysUserOnline = new SysUserOnline();
         sysUserOnline.setTokenId(user.getToken());
         sysUserOnline.setUserName(user.getUsername());
@@ -79,8 +86,8 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
         sysUserOnline.setBrowser(user.getBrowser());
         sysUserOnline.setOs(user.getOs());
         sysUserOnline.setLoginTime(user.getLoginTime());
-        if (StringUtils.isNotNull(user.getUser().getDept())) {
-            sysUserOnline.setDeptName(user.getUser().getDept().getDeptName());
+        if (StringUtils.isNotNull(sysUser.getDept())) {
+            sysUserOnline.setDeptName(sysUser.getDept().getDeptName());
         }
         return sysUserOnline;
     }

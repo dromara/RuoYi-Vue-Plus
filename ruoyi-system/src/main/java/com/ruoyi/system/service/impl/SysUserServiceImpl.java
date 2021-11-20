@@ -8,6 +8,7 @@ import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
@@ -35,7 +36,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, SysUser> implements ISysUserService {
+public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, SysUser> implements ISysUserService, UserService {
 
     @Autowired
     private SysRoleMapper roleMapper;

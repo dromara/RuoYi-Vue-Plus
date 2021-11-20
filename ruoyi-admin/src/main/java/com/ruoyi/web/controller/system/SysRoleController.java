@@ -105,9 +105,9 @@ public class SysRoleController extends BaseController {
         if (roleService.updateRole(role) > 0) {
             // 更新缓存用户权限
             LoginUser loginUser = getLoginUser();
-            if (StringUtils.isNotNull(loginUser.getUser()) && !loginUser.getUser().isAdmin()) {
-                loginUser.setPermissions(permissionService.getMenuPermission(loginUser.getUser()));
-                loginUser.setUser(userService.selectUserByUserName(loginUser.getUser().getUserName()));
+            SysUser sysUser = userService.selectUserById(loginUser.getUserId());
+            if (StringUtils.isNotNull(sysUser) && !sysUser.isAdmin()) {
+                loginUser.setPermissions(permissionService.getMenuPermission(sysUser));
                 tokenService.setLoginUser(loginUser);
             }
             return AjaxResult.success();
