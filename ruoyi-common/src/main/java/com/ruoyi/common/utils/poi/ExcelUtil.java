@@ -4,7 +4,6 @@ import cn.hutool.core.util.IdUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.ruoyi.common.convert.ExcelBigNumberConvert;
-import com.ruoyi.common.utils.DictUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 
@@ -113,30 +112,6 @@ public class ExcelUtil {
 			}
 		}
 		return StringUtils.stripEnd(propertyString.toString(), separator);
-	}
-
-	/**
-	 * 解析字典值
-	 *
-	 * @param dictValue 字典值
-	 * @param dictType  字典类型
-	 * @param separator 分隔符
-	 * @return 字典标签
-	 */
-	public static String convertDictByExp(String dictValue, String dictType, String separator) {
-		return DictUtils.getDictLabel(dictType, dictValue, separator);
-	}
-
-	/**
-	 * 反向解析值字典值
-	 *
-	 * @param dictLabel 字典标签
-	 * @param dictType  字典类型
-	 * @param separator 分隔符
-	 * @return 字典值
-	 */
-	public static String reverseDictByExp(String dictLabel, String dictType, String separator) {
-		return DictUtils.getDictValue(dictType, dictLabel, separator);
 	}
 
 	/**
