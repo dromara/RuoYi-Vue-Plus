@@ -3,10 +3,12 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.DataSource;
+import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.service.ConfigService;
 import com.ruoyi.common.enums.DataSourceType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.PageUtils;
@@ -15,6 +17,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.mapper.SysConfigMapper;
 import com.ruoyi.system.service.ISysConfigService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -29,13 +32,19 @@ import java.util.Map;
  * @author Lion Li
  */
 @Service
-public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysConfig, SysConfig> implements ISysConfigService {
+public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysConfig, SysConfig> implements ISysConfigService, ConfigService {
+
+    @Autowired
+    private RuoYiConfig ruoyiConfig;
 
     /**
      * 项目启动时，初始化参数到缓存
      */
     @PostConstruct
     public void init() {
+        if (ruoyiConfig.isCacheLazy()){
+            return;
+        }
         loadingConfigCache();
     }
 
@@ -75,7 +84,7 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
      */
     @Override
     public String selectConfigByKey(String configKey) {
-        String configValue = Convert.toStr(RedisUtils.getCacheObject(getCacheKey(configKey)));
+        String configValue = RedisUtils.getCacheObject(getCacheKey(configKey));
         if (StringUtils.isNotEmpty(configValue)) {
             return configValue;
         }
@@ -215,6 +224,17 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
+    }
+
+    /**
+     * 根据参数 key 获取参数值
+     *
+     * @param configKey 参数 key
+     * @return 参数值
+     */
+    @Override
+    public String getConfigValue(String configKey) {
+        return selectConfigByKey(configKey);
     }
 
     /**
