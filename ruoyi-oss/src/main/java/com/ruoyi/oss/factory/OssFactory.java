@@ -1,6 +1,5 @@
 package com.ruoyi.oss.factory;
 
-import cn.hutool.core.convert.Convert;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -45,7 +44,7 @@ public class OssFactory {
 	 */
 	public static ICloudStorageStrategy instance() {
 		// 获取redis 默认类型
-		String type = Convert.toStr(RedisUtils.getCacheObject(CloudConstant.CACHE_CONFIG_KEY));
+		String type = RedisUtils.getCacheObject(CloudConstant.CACHE_CONFIG_KEY);
 		if (StringUtils.isEmpty(type)) {
 			throw new OssException("文件存储服务类型无法找到!");
 		}
