@@ -3,14 +3,17 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.domain.entity.SysDictType;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.service.DictService;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.DictUtils;
 import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
 import com.ruoyi.system.mapper.SysDictTypeMapper;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,16 +34,21 @@ import java.util.Map;
  * @author Lion Li
  */
 @Service
-public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, SysDictType, SysDictType> implements ISysDictTypeService {
+public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, SysDictType, SysDictType> implements ISysDictTypeService, DictService {
 
     @Autowired
     private SysDictDataMapper dictDataMapper;
+    @Autowired
+    private RuoYiConfig ruoyiConfig;
 
     /**
      * 项目启动时，初始化字典到缓存
      */
     @PostConstruct
     public void init() {
+        if (ruoyiConfig.isCacheLazy()){
+            return;
+        }
         loadingDictCache();
     }
 
@@ -98,13 +107,13 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
      */
     @Override
     public List<SysDictData> selectDictDataByType(String dictType) {
-        List<SysDictData> dictDatas = DictUtils.getDictCache(dictType);
-        if (CollUtil.isNotEmpty(dictDatas)) {
+        List<SysDictData> dictDatas = RedisUtils.getCacheObject(getCacheKey(dictType));
+        if (StringUtils.isNotEmpty(dictDatas)) {
             return dictDatas;
         }
         dictDatas = dictDataMapper.selectDictDataByType(dictType);
         if (CollUtil.isNotEmpty(dictDatas)) {
-            DictUtils.setDictCache(dictType, dictDatas);
+            RedisUtils.setCacheObject(getCacheKey(dictType), dictDatas);
             return dictDatas;
         }
         return null;
@@ -146,7 +155,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
                     .eq(SysDictData::getDictType, dictType.getDictType())) > 0) {
                 throw new ServiceException(String.format("%1$s已分配,不能删除", dictType.getDictName()));
             }
-            DictUtils.removeDictCache(dictType.getDictType());
+            RedisUtils.deleteObject(getCacheKey(dictType.getDictType()));
         }
         baseMapper.deleteBatchIds(Arrays.asList(dictIds));
     }
@@ -159,7 +168,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
         List<SysDictType> dictTypeList = list();
         for (SysDictType dictType : dictTypeList) {
             List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dictType.getDictType());
-            DictUtils.setDictCache(dictType.getDictType(), dictDatas);
+            RedisUtils.setCacheObject(getCacheKey(dictType.getDictType()), dictDatas);
         }
     }
 
@@ -168,7 +177,8 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
      */
     @Override
     public void clearDictCache() {
-        DictUtils.clearDictCache();
+        Collection<String> keys = RedisUtils.keys(Constants.SYS_DICT_KEY + "*");
+        RedisUtils.deleteObject(keys);
     }
 
     /**
@@ -190,7 +200,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
     public int insertDictType(SysDictType dict) {
         int row = baseMapper.insert(dict);
         if (row > 0) {
-            DictUtils.setDictCache(dict.getDictType(), null);
+            RedisUtils.setCacheObject(getCacheKey(dict.getDictType()), null);
         }
         return row;
     }
@@ -211,7 +221,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
         int row = baseMapper.updateById(dict);
         if (row > 0) {
             List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dict.getDictType());
-            DictUtils.setDictCache(dict.getDictType(), dictDatas);
+            RedisUtils.setCacheObject(getCacheKey(dict.getDictType()), dictDatas);
         }
         return row;
     }
@@ -232,5 +242,79 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
+    }
+
+    /**
+     * 根据字典类型和字典值获取字典标签
+     *
+     * @param dictType  字典类型
+     * @param dictValue 字典值
+     * @param separator 分隔符
+     * @return 字典标签
+     */
+    @Override
+    public String getDictLabel(String dictType, String dictValue, String separator) {
+        StringBuilder propertyString = new StringBuilder();
+        List<SysDictData> datas = selectDictDataByType(dictType);
+
+        if (StringUtils.containsAny(dictValue, separator) && CollUtil.isNotEmpty(datas)) {
+            for (SysDictData dict : datas) {
+                for (String value : dictValue.split(separator)) {
+                    if (value.equals(dict.getDictValue())) {
+                        propertyString.append(dict.getDictLabel() + separator);
+                        break;
+                    }
+                }
+            }
+        } else {
+            for (SysDictData dict : datas) {
+                if (dictValue.equals(dict.getDictValue())) {
+                    return dict.getDictLabel();
+                }
+            }
+        }
+        return StringUtils.stripEnd(propertyString.toString(), separator);
+    }
+
+    /**
+     * 根据字典类型和字典标签获取字典值
+     *
+     * @param dictType  字典类型
+     * @param dictLabel 字典标签
+     * @param separator 分隔符
+     * @return 字典值
+     */
+    @Override
+    public String getDictValue(String dictType, String dictLabel, String separator) {
+        StringBuilder propertyString = new StringBuilder();
+        List<SysDictData> datas = selectDictDataByType(dictType);
+
+        if (StringUtils.containsAny(dictLabel, separator) && CollUtil.isNotEmpty(datas)) {
+            for (SysDictData dict : datas) {
+                for (String label : dictLabel.split(separator)) {
+                    if (label.equals(dict.getDictLabel())) {
+                        propertyString.append(dict.getDictValue() + separator);
+                        break;
+                    }
+                }
+            }
+        } else {
+            for (SysDictData dict : datas) {
+                if (dictLabel.equals(dict.getDictLabel())) {
+                    return dict.getDictValue();
+                }
+            }
+        }
+        return StringUtils.stripEnd(propertyString.toString(), separator);
+    }
+
+    /**
+     * 设置cache key
+     *
+     * @param configKey 参数键
+     * @return 缓存键key
+     */
+    String getCacheKey(String configKey) {
+        return Constants.SYS_DICT_KEY + configKey;
     }
 }

@@ -1,11 +1,12 @@
 package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.utils.DictUtils;
 import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
 import com.ruoyi.system.service.ISysDictDataService;
@@ -85,7 +86,7 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
             SysDictData data = selectDictDataById(dictCode);
             removeById(dictCode);
             List<SysDictData> dictDatas = baseMapper.selectDictDataByType(data.getDictType());
-            DictUtils.setDictCache(data.getDictType(), dictDatas);
+            RedisUtils.setCacheObject(getCacheKey(data.getDictType()), dictDatas);
         }
     }
 
@@ -100,7 +101,7 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
         int row = baseMapper.insert(data);
         if (row > 0) {
             List<SysDictData> dictDatas = baseMapper.selectDictDataByType(data.getDictType());
-            DictUtils.setDictCache(data.getDictType(), dictDatas);
+            RedisUtils.setCacheObject(getCacheKey(data.getDictType()), dictDatas);
         }
         return row;
     }
@@ -116,8 +117,18 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
         int row = baseMapper.updateById(data);
         if (row > 0) {
             List<SysDictData> dictDatas = baseMapper.selectDictDataByType(data.getDictType());
-            DictUtils.setDictCache(data.getDictType(), dictDatas);
+            RedisUtils.setCacheObject(getCacheKey(data.getDictType()), dictDatas);
         }
         return row;
+    }
+
+    /**
+     * 设置cache key
+     *
+     * @param configKey 参数键
+     * @return 缓存键key
+     */
+    String getCacheKey(String configKey) {
+        return Constants.SYS_DICT_KEY + configKey;
     }
 }
