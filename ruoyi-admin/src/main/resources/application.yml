@@ -10,6 +10,8 @@ ruoyi:
   demoEnabled: true
   # 获取ip地址开关
   addressEnabled: true
+  # 缓存懒加载
+  cacheLazy: true
 
 captcha:
   # 页面 <参数设置> 可开启关闭 验证码校验
