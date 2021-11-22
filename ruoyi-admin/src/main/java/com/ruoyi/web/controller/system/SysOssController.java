@@ -16,7 +16,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.oss.constant.CloudConstant;
+import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.bo.SysOssBo;
@@ -134,7 +134,7 @@ public class SysOssController extends BaseController {
     public AjaxResult<Void> changePreviewListResource(@RequestBody String body) {
         Map<String, Boolean> map = JsonUtils.parseMap(body);
         SysConfig config = iSysConfigService.getOne(new LambdaQueryWrapper<SysConfig>()
-            .eq(SysConfig::getConfigKey, CloudConstant.PEREVIEW_LIST_RESOURCE_KEY));
+            .eq(SysConfig::getConfigKey, OssConstant.PEREVIEW_LIST_RESOURCE_KEY));
         config.setConfigValue(map.get("previewListResource").toString());
         return toAjax(iSysConfigService.updateConfig(config));
     }
