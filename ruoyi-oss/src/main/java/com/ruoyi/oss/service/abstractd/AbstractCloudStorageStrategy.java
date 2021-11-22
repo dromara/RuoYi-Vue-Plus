@@ -27,7 +27,6 @@ public abstract class AbstractCloudStorageStrategy implements ICloudStorageStrat
 	@Override
 	public abstract String getServiceType();
 
-	@Override
 	public String getPath(String prefix, String suffix) {
 		// 生成uuid
 		String uuid = IdUtil.fastSimpleUUID();
@@ -57,6 +56,5 @@ public abstract class AbstractCloudStorageStrategy implements ICloudStorageStrat
 	@Override
 	public abstract UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType);
 
-	@Override
 	public abstract String getEndpointLink();
 }

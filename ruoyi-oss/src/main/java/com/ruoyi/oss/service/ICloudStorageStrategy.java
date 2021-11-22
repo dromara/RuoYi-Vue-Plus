@@ -19,15 +19,6 @@ public interface ICloudStorageStrategy {
 	String getServiceType();
 
 	/**
-	 * 文件路径
-	 *
-	 * @param prefix 前缀
-	 * @param suffix 后缀
-	 * @return 返回上传路径
-	 */
-	String getPath(String prefix, String suffix);
-
-	/**
 	 * 文件上传
 	 *
 	 * @param data 文件字节数组
@@ -70,5 +61,4 @@ public interface ICloudStorageStrategy {
 	 */
 	UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType);
 
-	String getEndpointLink();
 }
