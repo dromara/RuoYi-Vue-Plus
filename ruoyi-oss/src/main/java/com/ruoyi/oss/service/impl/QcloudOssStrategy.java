@@ -1,42 +1,50 @@
 package com.ruoyi.oss.service.impl;
 
-import com.aliyun.oss.ClientConfiguration;
-import com.aliyun.oss.OSSClient;
-import com.aliyun.oss.common.auth.DefaultCredentialProvider;
-import com.aliyun.oss.model.CannedAccessControlList;
-import com.aliyun.oss.model.CreateBucketRequest;
-import com.aliyun.oss.model.ObjectMetadata;
-import com.aliyun.oss.model.PutObjectRequest;
+import com.qcloud.cos.COSClient;
+import com.qcloud.cos.ClientConfig;
+import com.qcloud.cos.auth.BasicCOSCredentials;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.http.HttpProtocol;
+import com.qcloud.cos.model.*;
+import com.qcloud.cos.region.Region;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.entity.UploadResult;
-import com.ruoyi.oss.enumd.CloudServiceEnumd;
+import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.exception.OssException;
-import com.ruoyi.oss.properties.CloudStorageProperties;
-import com.ruoyi.oss.service.abstractd.AbstractCloudStorageStrategy;
+import com.ruoyi.oss.properties.OssProperties;
+import com.ruoyi.oss.service.abstractd.AbstractOssStrategy;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
- * 阿里云存储策略
+ * 腾讯云存储策略
  *
  * @author Lion Li
  */
-public class AliyunCloudStorageStrategy extends AbstractCloudStorageStrategy {
+public class QcloudOssStrategy extends AbstractOssStrategy {
 
-	private OSSClient client;
+	private COSClient client;
 
 	@Override
-	public void init(CloudStorageProperties cloudStorageProperties) {
+	public void init(OssProperties cloudStorageProperties) {
 		properties = cloudStorageProperties;
 		try {
-			ClientConfiguration configuration = new ClientConfiguration();
-			DefaultCredentialProvider credentialProvider = new DefaultCredentialProvider(
+			COSCredentials credentials = new BasicCOSCredentials(
 				properties.getAccessKey(), properties.getSecretKey());
-			client = new OSSClient(properties.getEndpoint(), credentialProvider, configuration);
+			// 初始化客户端配置
+			ClientConfig clientConfig = new ClientConfig();
+			// 设置bucket所在的区域，华南：gz 华北：tj 华东：sh
+			clientConfig.setRegion(new Region(properties.getRegion()));
+			if ("Y".equals(properties.getIsHttps())) {
+				clientConfig.setHttpProtocol(HttpProtocol.https);
+			} else {
+				clientConfig.setHttpProtocol(HttpProtocol.http);
+			}
+			client = new COSClient(credentials, clientConfig);
 			createBucket();
 		} catch (Exception e) {
-			throw new OssException("阿里云存储配置错误! 请检查系统配置:[" + e.getMessage() + "]");
+			throw new OssException("腾讯云存储配置错误! 请检查系统配置:[" + e.getMessage() + "]");
 		}
 	}
 
@@ -48,16 +56,16 @@ public class AliyunCloudStorageStrategy extends AbstractCloudStorageStrategy {
 				return;
 			}
 			CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
-			createBucketRequest.setCannedACL(CannedAccessControlList.PublicRead);
+			createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
 			client.createBucket(createBucketRequest);
 		} catch (Exception e) {
-			throw new OssException("创建Bucket失败, 请核对阿里云配置信息:[" + e.getMessage() + "]");
+			throw new OssException("创建Bucket失败, 请核对腾讯云配置信息:[" + e.getMessage() + "]");
 		}
 	}
 
 	@Override
 	public String getServiceType() {
-		return CloudServiceEnumd.ALIYUN.getValue();
+		return OssEnumd.QCLOUD.getValue();
 	}
 
 	@Override
@@ -72,7 +80,7 @@ public class AliyunCloudStorageStrategy extends AbstractCloudStorageStrategy {
 			metadata.setContentType(contentType);
 			client.putObject(new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata));
 		} catch (Exception e) {
-			throw new OssException("上传文件失败，请检查阿里云配置信息:[" + e.getMessage() + "]");
+			throw new OssException("上传文件失败，请检查腾讯云配置信息:[" + e.getMessage() + "]");
 		}
 		return new UploadResult().setUrl(getEndpointLink() + "/" + path).setFilename(path);
 	}
@@ -81,9 +89,9 @@ public class AliyunCloudStorageStrategy extends AbstractCloudStorageStrategy {
 	public void delete(String path) {
 		path = path.replace(getEndpointLink() + "/", "");
 		try {
-			client.deleteObject(properties.getBucketName(), path);
+			client.deleteObject(new DeleteObjectRequest(properties.getBucketName(), path));
 		} catch (Exception e) {
-			throw new OssException("上传文件失败，请检查阿里云配置信息:[" + e.getMessage() + "]");
+			throw new OssException("上传文件失败，请检腾讯云查配置信息:[" + e.getMessage() + "]");
 		}
 	}
 

@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public class CloudConstant {
+public class OssConstant {
 
 	/**
 	 * OSS模块KEY
@@ -18,12 +18,12 @@ public class CloudConstant {
 	/**
 	 * 对象存储配置KEY
 	 */
-	public static final String CLOUD_STORAGE_CONFIG_KEY = "CloudStorageConfig";
+	public static final String OSS_CONFIG_KEY = "OssConfig";
 
 	/**
 	 * 缓存配置KEY
 	 */
-	public static final String CACHE_CONFIG_KEY = SYS_OSS_KEY + CLOUD_STORAGE_CONFIG_KEY;
+	public static final String CACHE_CONFIG_KEY = SYS_OSS_KEY + OSS_CONFIG_KEY;
 
 	/**
 	 * 预览列表资源开关Key

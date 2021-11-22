@@ -9,7 +9,7 @@ import java.io.InputStream;
  *
  * @author Lion Li
  */
-public interface ICloudStorageStrategy {
+public interface IOssStrategy {
 
 	void createBucket();
 

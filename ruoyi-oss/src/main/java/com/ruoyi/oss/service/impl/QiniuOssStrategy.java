@@ -8,10 +8,10 @@ import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
 import com.ruoyi.oss.entity.UploadResult;
-import com.ruoyi.oss.enumd.CloudServiceEnumd;
+import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.exception.OssException;
-import com.ruoyi.oss.properties.CloudStorageProperties;
-import com.ruoyi.oss.service.abstractd.AbstractCloudStorageStrategy;
+import com.ruoyi.oss.properties.OssProperties;
+import com.ruoyi.oss.service.abstractd.AbstractOssStrategy;
 
 import java.io.InputStream;
 
@@ -20,14 +20,14 @@ import java.io.InputStream;
  *
  * @author Lion Li
  */
-public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
+public class QiniuOssStrategy extends AbstractOssStrategy {
 
 	private UploadManager uploadManager;
 	private BucketManager bucketManager;
 	private Auth auth;
 
 	@Override
-	public void init(CloudStorageProperties cloudStorageProperties) {
+	public void init(OssProperties cloudStorageProperties) {
 		properties = cloudStorageProperties;
 		try {
 			Configuration config = new Configuration(getRegion(properties.getRegion()));
@@ -62,7 +62,7 @@ public class QiniuCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
 	@Override
 	public String getServiceType() {
-		return CloudServiceEnumd.QINIU.getValue();
+		return OssEnumd.QINIU.getValue();
 	}
 
 	@Override

@@ -2,11 +2,11 @@ package com.ruoyi.oss.service.impl;
 
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.entity.UploadResult;
-import com.ruoyi.oss.enumd.CloudServiceEnumd;
+import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.enumd.PolicyType;
 import com.ruoyi.oss.exception.OssException;
-import com.ruoyi.oss.properties.CloudStorageProperties;
-import com.ruoyi.oss.service.abstractd.AbstractCloudStorageStrategy;
+import com.ruoyi.oss.properties.OssProperties;
+import com.ruoyi.oss.service.abstractd.AbstractOssStrategy;
 import io.minio.*;
 import org.springframework.http.MediaType;
 
@@ -18,12 +18,12 @@ import java.io.InputStream;
  *
  * @author Lion Li
  */
-public class MinioCloudStorageStrategy extends AbstractCloudStorageStrategy {
+public class MinioOssStrategy extends AbstractOssStrategy {
 
 	private MinioClient minioClient;
 
 	@Override
-	public void init(CloudStorageProperties cloudStorageProperties) {
+	public void init(OssProperties cloudStorageProperties) {
 		properties = cloudStorageProperties;
 		try {
 			minioClient = MinioClient.builder()
@@ -57,7 +57,7 @@ public class MinioCloudStorageStrategy extends AbstractCloudStorageStrategy {
 
 	@Override
 	public String getServiceType() {
-		return CloudServiceEnumd.MINIO.getValue();
+		return OssEnumd.MINIO.getValue();
 	}
 
 	@Override

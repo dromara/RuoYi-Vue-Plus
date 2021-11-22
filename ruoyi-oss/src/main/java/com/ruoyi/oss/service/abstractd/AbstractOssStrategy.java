@@ -5,8 +5,8 @@ import cn.hutool.core.util.IdUtil;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.entity.UploadResult;
-import com.ruoyi.oss.properties.CloudStorageProperties;
-import com.ruoyi.oss.service.ICloudStorageStrategy;
+import com.ruoyi.oss.properties.OssProperties;
+import com.ruoyi.oss.service.IOssStrategy;
 
 import java.io.InputStream;
 
@@ -15,11 +15,11 @@ import java.io.InputStream;
  *
  * @author Lion Li
  */
-public abstract class AbstractCloudStorageStrategy implements ICloudStorageStrategy {
+public abstract class AbstractOssStrategy implements IOssStrategy {
 
-	protected CloudStorageProperties properties;
+	protected OssProperties properties;
 
-	public abstract void init(CloudStorageProperties properties);
+	public abstract void init(OssProperties properties);
 
 	@Override
 	public abstract void createBucket();

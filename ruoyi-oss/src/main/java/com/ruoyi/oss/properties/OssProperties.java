@@ -10,7 +10,7 @@ import java.util.Date;
  * @author Lion Li
  */
 @Data
-public class CloudStorageProperties {
+public class OssProperties {
 
 	/**
 	 * 域名

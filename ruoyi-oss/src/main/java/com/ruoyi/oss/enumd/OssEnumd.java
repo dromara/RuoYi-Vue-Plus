@@ -1,10 +1,10 @@
 package com.ruoyi.oss.enumd;
 
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.oss.service.impl.AliyunCloudStorageStrategy;
-import com.ruoyi.oss.service.impl.MinioCloudStorageStrategy;
-import com.ruoyi.oss.service.impl.QcloudCloudStorageStrategy;
-import com.ruoyi.oss.service.impl.QiniuCloudStorageStrategy;
+import com.ruoyi.oss.service.impl.AliyunOssStrategy;
+import com.ruoyi.oss.service.impl.MinioOssStrategy;
+import com.ruoyi.oss.service.impl.QcloudOssStrategy;
+import com.ruoyi.oss.service.impl.QiniuOssStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,34 +15,34 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum CloudServiceEnumd {
+public enum OssEnumd {
 
 	/**
 	 * 七牛云
 	 */
-	QINIU("qiniu", QiniuCloudStorageStrategy.class),
+	QINIU("qiniu", QiniuOssStrategy.class),
 
 	/**
 	 * 阿里云
 	 */
-	ALIYUN("aliyun", AliyunCloudStorageStrategy.class),
+	ALIYUN("aliyun", AliyunOssStrategy.class),
 
 	/**
 	 * 腾讯云
 	 */
-	QCLOUD("qcloud", QcloudCloudStorageStrategy.class),
+	QCLOUD("qcloud", QcloudOssStrategy.class),
 
 	/**
 	 * minio
 	 */
-	MINIO("minio", MinioCloudStorageStrategy.class);
+	MINIO("minio", MinioOssStrategy.class);
 
 	private final String value;
 
 	private final Class<?> serviceClass;
 
 	public static Class<?> getServiceClass(String value) {
-		for (CloudServiceEnumd clazz : values()) {
+		for (OssEnumd clazz : values()) {
 			if (clazz.getValue().equals(value)) {
 				return clazz.getServiceClass();
 			}
@@ -51,7 +51,7 @@ public enum CloudServiceEnumd {
 	}
 
 	public static String getServiceName(String value) {
-		for (CloudServiceEnumd clazz : values()) {
+		for (OssEnumd clazz : values()) {
 			if (clazz.getValue().equals(value)) {
 				return StringUtils.uncapitalize(clazz.getServiceClass().getSimpleName());
 			}
