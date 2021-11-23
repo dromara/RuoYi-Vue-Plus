@@ -88,7 +88,24 @@ public class RedisUtils {
      * @param value 缓存的值
      */
     public static <T> void setCacheObject(final String key, final T value) {
-        client.getBucket(key).set(value);
+        setCacheObject(key, value, false);
+    }
+
+    /**
+     * 缓存基本的对象，保留当前对象 TTL 有效期
+     *
+     * @param key   缓存的键值
+     * @param value 缓存的值
+     * @param isSaveTtl 是否保留TTL有效期(例如: set之前ttl剩余90 set之后还是为90)
+     * @since Redis 6.0.0 以上有效
+     */
+    public static <T> void setCacheObject(final String key, final T value, final boolean isSaveTtl) {
+        RBucket<Object> bucket = client.getBucket(key);
+        if (isSaveTtl) {
+            bucket.setAndKeepTTL(value);
+        } else {
+            bucket.set(value);
+        }
     }
 
     /**
