@@ -66,8 +66,8 @@ services:
       # 配置文件
       - /docker/redis/conf:/redis/config:rw
       # 数据文件
-      - /docker/redis/data:/redis/data:rw
-    command: "redis-server /redis/config/redis.conf --appendonly yes"
+      - /docker/redis/data/:/redis/data/:rw
+    command: "redis-server /redis/config/redis.conf"
     privileged: true
     restart: always
     networks:
