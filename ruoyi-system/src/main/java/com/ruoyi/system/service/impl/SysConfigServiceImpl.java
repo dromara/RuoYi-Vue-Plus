@@ -3,7 +3,6 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.DataSource;
-import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
@@ -17,10 +16,8 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.mapper.SysConfigMapper;
 import com.ruoyi.system.service.ISysConfigService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -33,20 +30,6 @@ import java.util.Map;
  */
 @Service
 public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysConfig, SysConfig> implements ISysConfigService, ConfigService {
-
-    @Autowired
-    private RuoYiConfig ruoyiConfig;
-
-    /**
-     * 项目启动时，初始化参数到缓存
-     */
-    @PostConstruct
-    public void init() {
-        if (ruoyiConfig.isCacheLazy()){
-            return;
-        }
-        loadingConfigCache();
-    }
 
     @Override
     public TableDataInfo<SysConfig> selectPageConfigList(SysConfig config) {

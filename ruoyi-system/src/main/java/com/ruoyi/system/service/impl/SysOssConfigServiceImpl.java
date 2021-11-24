@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.List;
 
@@ -47,7 +46,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     /**
      * 项目启动时，初始化参数到缓存，加载配置类
      */
-    @PostConstruct
+    @Override
     public void init() {
         List<SysOssConfig> list = list();
         // 加载OSS初始化配置

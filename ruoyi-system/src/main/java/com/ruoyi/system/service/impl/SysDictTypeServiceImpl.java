@@ -3,7 +3,6 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
@@ -22,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -38,19 +36,6 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
 
     @Autowired
     private SysDictDataMapper dictDataMapper;
-    @Autowired
-    private RuoYiConfig ruoyiConfig;
-
-    /**
-     * 项目启动时，初始化字典到缓存
-     */
-    @PostConstruct
-    public void init() {
-        if (ruoyiConfig.isCacheLazy()){
-            return;
-        }
-        loadingDictCache();
-    }
 
     @Override
     public TableDataInfo<SysDictType> selectPageDictTypeList(SysDictType dictType) {
