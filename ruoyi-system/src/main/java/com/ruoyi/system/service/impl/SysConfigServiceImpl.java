@@ -35,15 +35,11 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
     public TableDataInfo<SysConfig> selectPageConfigList(SysConfig config) {
         Map<String, Object> params = config.getParams();
         LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
-                .like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
-                .eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
-                .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
-                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
-                        params.get("beginTime"))
-                .apply(StringUtils.isNotEmpty(params.get("endTime")),
-                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
-                        params.get("endTime"));
+            .like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
+            .eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
+            .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"));
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
     }
 
@@ -72,7 +68,7 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
             return configValue;
         }
         SysConfig retConfig = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>()
-                .eq(SysConfig::getConfigKey, configKey));
+            .eq(SysConfig::getConfigKey, configKey));
         if (StringUtils.isNotNull(retConfig)) {
             RedisUtils.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
             return retConfig.getConfigValue();
@@ -104,15 +100,11 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
     public List<SysConfig> selectConfigList(SysConfig config) {
         Map<String, Object> params = config.getParams();
         LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
-                .like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
-                .eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
-                .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
-                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
-                        params.get("beginTime"))
-                .apply(StringUtils.isNotEmpty(params.get("endTime")),
-                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
-                        params.get("endTime"));
+            .like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
+            .eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
+            .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"));
         return baseMapper.selectList(lqw);
     }
 

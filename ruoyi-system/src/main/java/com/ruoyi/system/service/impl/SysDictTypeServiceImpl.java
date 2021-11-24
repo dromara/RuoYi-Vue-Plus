@@ -41,15 +41,11 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
     public TableDataInfo<SysDictType> selectPageDictTypeList(SysDictType dictType) {
         Map<String, Object> params = dictType.getParams();
         LambdaQueryWrapper<SysDictType> lqw = new LambdaQueryWrapper<SysDictType>()
-                .like(StringUtils.isNotBlank(dictType.getDictName()), SysDictType::getDictName, dictType.getDictName())
-                .eq(StringUtils.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
-                .like(StringUtils.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
-                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
-                        params.get("beginTime"))
-                .apply(StringUtils.isNotEmpty(params.get("endTime")),
-                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
-                        params.get("endTime"));
+            .like(StringUtils.isNotBlank(dictType.getDictName()), SysDictType::getDictName, dictType.getDictName())
+            .eq(StringUtils.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
+            .like(StringUtils.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                SysDictType::getCreateTime, params.get("beginTime"), params.get("endTime"));
         return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
     }
 
@@ -63,15 +59,11 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
     public List<SysDictType> selectDictTypeList(SysDictType dictType) {
         Map<String, Object> params = dictType.getParams();
         return list(new LambdaQueryWrapper<SysDictType>()
-                .like(StringUtils.isNotBlank(dictType.getDictName()), SysDictType::getDictName, dictType.getDictName())
-                .eq(StringUtils.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
-                .like(StringUtils.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
-                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
-                        "date_format(create_time,'%y%m%d') >= date_format({0},'%y%m%d')",
-                        params.get("beginTime"))
-                .apply(StringUtils.isNotEmpty(params.get("endTime")),
-                        "date_format(create_time,'%y%m%d') <= date_format({0},'%y%m%d')",
-                        params.get("endTime")));
+            .like(StringUtils.isNotBlank(dictType.getDictName()), SysDictType::getDictName, dictType.getDictName())
+            .eq(StringUtils.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
+            .like(StringUtils.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                SysDictType::getCreateTime, params.get("beginTime"), params.get("endTime")));
     }
 
     /**
@@ -137,7 +129,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
         for (Long dictId : dictIds) {
             SysDictType dictType = selectDictTypeById(dictId);
             if (dictDataMapper.selectCount(new LambdaQueryWrapper<SysDictData>()
-                    .eq(SysDictData::getDictType, dictType.getDictType())) > 0) {
+                .eq(SysDictData::getDictType, dictType.getDictType())) > 0) {
                 throw new ServiceException(String.format("%1$s已分配,不能删除", dictType.getDictName()));
             }
             RedisUtils.deleteObject(getCacheKey(dictType.getDictType()));
@@ -201,8 +193,8 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
     public int updateDictType(SysDictType dict) {
         SysDictType oldDict = getById(dict.getDictId());
         dictDataMapper.update(null, new LambdaUpdateWrapper<SysDictData>()
-                .set(SysDictData::getDictType, dict.getDictType())
-                .eq(SysDictData::getDictType, oldDict.getDictType()));
+            .set(SysDictData::getDictType, dict.getDictType())
+            .eq(SysDictData::getDictType, oldDict.getDictType()));
         int row = baseMapper.updateById(dict);
         if (row > 0) {
             List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dict.getDictType());
@@ -221,8 +213,8 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
     public String checkDictTypeUnique(SysDictType dict) {
         Long dictId = StringUtils.isNull(dict.getDictId()) ? -1L : dict.getDictId();
         long count = count(new LambdaQueryWrapper<SysDictType>()
-                .eq(SysDictType::getDictType, dict.getDictType())
-                .ne(SysDictType::getDictId, dictId));
+            .eq(SysDictType::getDictType, dict.getDictType())
+            .ne(SysDictType::getDictId, dictId));
         if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
