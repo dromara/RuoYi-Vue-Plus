@@ -1,12 +1,56 @@
 package com.ruoyi.framework.config;
 
+import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
+import cn.dev33.satoken.interceptor.SaRouteInterceptor;
 import cn.dev33.satoken.jwt.StpLogicJwtForStyle;
+import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
+import cn.dev33.satoken.stp.StpUtil;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.config.properties.SecurityProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * sa-token 配置
+ *
+ * @author Lion Li
+ */
 @Configuration
-public class SaTokenConfig {
+public class SaTokenConfig implements WebMvcConfigurer {
+
+    @Autowired
+    private SecurityProperties securityProperties;
+
+    /**
+     * 注册sa-token的拦截器
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // 注册路由拦截器，自定义验证规则
+        registry.addInterceptor(new SaRouteInterceptor((request, response, handler) -> {
+            // 登录验证 -- 排除多个路径
+            SaRouter
+                // 获取所有的
+                .match("/**")
+                // 排除下不需要拦截的
+                .notMatch(securityProperties.getExcludes())
+                .check(() -> {
+                    Long userId = SecurityUtils.getUserId();
+                    if (StringUtils.isNotNull(userId)) {
+                        long tokenTimeout = StpUtil.getTokenTimeout();
+                        long tokenActivityTimeout = StpUtil.getTokenActivityTimeout();
+                        System.out.println("剩余有效时间: " + tokenTimeout);
+                        System.out.println("临时有效时间: " + tokenActivityTimeout);
+                    }
+                });
+        })).addPathPatterns("/**");
+        registry.addInterceptor(new SaAnnotationInterceptor()).addPathPatterns("/**");
+    }
 
     @Bean
     public StpLogic getStpLogicJwt() {

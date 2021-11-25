@@ -1,15 +1,7 @@
 package com.ruoyi.framework.config;
 
-import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
-import cn.dev33.satoken.interceptor.SaRouteInterceptor;
-import cn.dev33.satoken.router.SaRouter;
-import cn.dev33.satoken.stp.StpUtil;
-import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.framework.config.properties.SecurityProperties;
 import com.ruoyi.framework.Interceptor.PlusWebInvokeTimeInterceptor;
 import com.yomahub.tlog.web.interceptor.TLogWebInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -19,9 +11,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 /**
  * 通用配置
  *
@@ -30,35 +19,12 @@ import java.util.Collections;
 @Configuration
 public class ResourcesConfig implements WebMvcConfigurer {
 
-    @Autowired
-    private SecurityProperties securityProperties;
-
-    // 注册sa-token的拦截器
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 全局链路跟踪拦截器
         registry.addInterceptor(new TLogWebInterceptor());
         // 全局访问性能拦截
         registry.addInterceptor(new PlusWebInvokeTimeInterceptor());
-        // 注册路由拦截器，自定义验证规则
-        registry.addInterceptor(new SaRouteInterceptor((request, response, handler) -> {
-            // 登录验证 -- 排除多个路径
-            SaRouter
-                    // 获取所有的
-                    .match(Collections.singletonList("/**"))
-                    // 排除下不需要拦截的
-                    .notMatch(Arrays.asList(securityProperties.getExcludes()))
-                    .check(() -> {
-                        Long userId = SecurityUtils.getUserId();
-                        if(StringUtils.isNotNull(userId) ) {
-                            long tokenTimeout = StpUtil.getTokenTimeout();
-                            long tokenActivityTimeout = StpUtil.getTokenActivityTimeout();
-                            System.out.println("剩余有效时间: " + tokenTimeout);
-                            System.out.println("临时有效时间: " + tokenActivityTimeout);
-                        }
-                    });
-        })).addPathPatterns("/**");
-        registry.addInterceptor(new SaAnnotationInterceptor()).addPathPatterns("/**");
     }
 
     @Override
