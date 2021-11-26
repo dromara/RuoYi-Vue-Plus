@@ -78,9 +78,9 @@ public class TestDemoController extends BaseController {
     @PostMapping("/importData")
     public AjaxResult<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
         ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true, true);
-        List<TestDemoImportVo> testDemoImportVoList = excelResult.getList();
-        List<TestDemo> TestDemoList = BeanUtil.copyToList(testDemoImportVoList, TestDemo.class);
-        iTestDemoService.saveAll(TestDemoList);
+        List<TestDemoImportVo> volist = excelResult.getList();
+        List<TestDemo> list = BeanUtil.copyToList(volist, TestDemo.class);
+        iTestDemoService.saveAll(list);
         return AjaxResult.success(excelResult.getAnalysis());
     }
 
