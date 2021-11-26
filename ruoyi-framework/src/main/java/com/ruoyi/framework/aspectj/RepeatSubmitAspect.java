@@ -1,13 +1,12 @@
 package com.ruoyi.framework.aspectj;
 
 import cn.hutool.crypto.SecureUtil;
-import com.baomidou.lock.LockInfo;
-import com.baomidou.lock.LockTemplate;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.properties.TokenProperties;
 import com.ruoyi.common.utils.JsonUtils;
+import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.RepeatSubmitProperties;
@@ -25,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 防止重复提交
@@ -39,7 +39,6 @@ public class RepeatSubmitAspect {
 
     private final TokenProperties tokenProperties;
     private final RepeatSubmitProperties repeatSubmitProperties;
-    private final LockTemplate lockTemplate;
 
     @Before("@annotation(repeatSubmit)")
     public void doBefore(JoinPoint point, RepeatSubmit repeatSubmit) throws Throwable {
@@ -65,8 +64,10 @@ public class RepeatSubmitAspect {
         submitKey = SecureUtil.md5(submitKey + ":" + nowParams);
         // 唯一标识（指定key + 消息头）
         String cacheRepeatKey = Constants.REPEAT_SUBMIT_KEY + submitKey;
-        LockInfo lock = lockTemplate.lock(cacheRepeatKey, interval, interval / 2);
-        if (lock == null) {
+        String key = RedisUtils.getCacheObject(cacheRepeatKey);
+        if (key == null) {
+            RedisUtils.setCacheObject(cacheRepeatKey, "", interval, TimeUnit.MILLISECONDS);
+        } else {
             throw new ServiceException(repeatSubmit.message());
         }
     }
