@@ -130,12 +130,6 @@
                 <artifactId>sa-token-spring-boot-starter</artifactId>
                 <version>${satoken.version}</version>
             </dependency>
-            <!-- Sa-Token整合SpringAOP实现注解鉴权 -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-aop</artifactId>
-                <version>${satoken.version}</version>
-            </dependency>
             <!-- Sa-Token 整合 jwt -->
             <dependency>
                 <groupId>cn.dev33</groupId>
