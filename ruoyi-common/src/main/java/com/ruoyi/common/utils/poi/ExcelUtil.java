@@ -6,6 +6,7 @@ import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy
 import com.ruoyi.common.convert.ExcelBigNumberConvert;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
+import org.apache.poi.ss.formula.functions.T;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +30,19 @@ public class ExcelUtil {
 	public static <T> List<T> importExcel(InputStream is, Class<T> clazz) {
 		return EasyExcel.read(is).head(clazz).autoCloseStream(false).sheet().doReadSync();
 	}
+
+
+    /**
+     * 对excel表单默认第一个索引名转换成list（EasyExcel）
+     *
+     * @param is 输入流
+     * @return 转换后集合
+     */
+    public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, boolean isValidate, boolean skipException) {
+        ExcelListener<T> listener = new ExcelListener<>(isValidate, skipException);
+        EasyExcel.read(is, clazz, listener).sheet().doRead();
+        return listener.getExcelResult();
+    }
 
 	/**
 	 * 对list数据源将其里面的数据导入到excel表单（EasyExcel）
