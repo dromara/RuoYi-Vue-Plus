@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,10 +41,12 @@ public class SysUserOnlineController extends BaseController {
     @SaCheckPermission("monitor:online:list")
     @GetMapping("/list")
     public TableDataInfo<SysUserOnline> list(String ipaddr, String userName) {
-        Collection<String> keys = RedisUtils.keys(Constants.ONLINE_TOKEN_KEY + "*");
+        // 获取所有未过期的 token
+        List<String> keys = StpUtil.searchTokenValue("", -1, 0);
         List<UserOnlineDTO> userOnlineDTOList = new ArrayList<>();
         for (String key : keys) {
-            userOnlineDTOList.add(RedisUtils.getCacheObject(key));
+            String onlineKey = key.replace(Constants.LOGIN_TOKEN_KEY, Constants.ONLINE_TOKEN_KEY);
+            userOnlineDTOList.add(RedisUtils.getCacheObject(onlineKey));
         }
         if (StringUtils.isNotEmpty(ipaddr) && StringUtils.isNotEmpty(userName)) {
             userOnlineDTOList = userOnlineDTOList.stream().filter(userOnline ->

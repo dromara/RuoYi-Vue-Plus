@@ -1,5 +1,6 @@
 package com.ruoyi.framework.listener;
 
+import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
@@ -12,7 +13,10 @@ import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.utils.*;
 import com.ruoyi.common.utils.ip.AddressUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 用户行为 侦听器的实现
@@ -20,6 +24,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class UserActionListener implements SaTokenListener {
+
+    @Autowired
+    private SaTokenConfig saTokenConfig;
 
     /**
      * 每次登录时触发
@@ -43,7 +50,7 @@ public class UserActionListener implements SaTokenListener {
             if (StringUtils.isNotNull(user.getDept())) {
                 userOnlineDTO.setDeptName(user.getDept().getDeptName());
             }
-            RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, userOnlineDTO);
+            RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, userOnlineDTO, saTokenConfig.getTimeout(), TimeUnit.SECONDS);
             log.info("user doLogin, useId:{}, token:{}", loginId, tokenValue);
         } else if (userType == UserType.APP_USER) {
             // app端 自行根据业务编写

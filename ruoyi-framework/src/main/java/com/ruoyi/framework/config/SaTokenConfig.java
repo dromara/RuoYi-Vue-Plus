@@ -9,6 +9,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.SecurityProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  *
  * @author Lion Li
  */
+@Slf4j
 @Configuration
 public class SaTokenConfig implements WebMvcConfigurer {
 
@@ -40,12 +42,12 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 // 排除下不需要拦截的
                 .notMatch(securityProperties.getExcludes())
                 .check(() -> {
-                    Long userId = SecurityUtils.getUserId();
-                    if (StringUtils.isNotNull(userId)) {
-                        long tokenTimeout = StpUtil.getTokenTimeout();
-                        long tokenActivityTimeout = StpUtil.getTokenActivityTimeout();
-                        System.out.println("剩余有效时间: " + tokenTimeout);
-                        System.out.println("临时有效时间: " + tokenActivityTimeout);
+                    if (log.isDebugEnabled()) {
+                        Long userId = SecurityUtils.getUserId();
+                        if (StringUtils.isNotNull(userId)) {
+                            log.debug("剩余有效时间: {}", StpUtil.getTokenTimeout());
+                            log.debug("临时有效时间: {}", StpUtil.getTokenActivityTimeout());
+                        }
                     }
                 });
         })).addPathPatterns("/**");
