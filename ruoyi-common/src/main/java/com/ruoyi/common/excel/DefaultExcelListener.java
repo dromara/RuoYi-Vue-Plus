@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @NoArgsConstructor
-public class DefaultExcelListener<T> extends AnalysisEventListener<T> {
+public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements ExcelListener<T> {
 
     /**
      * 是否Validator检验，默认为是
@@ -94,6 +94,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> {
         log.debug("所有数据解析完成！");
     }
 
+    @Override
     public ExcelResult<T> getExcelResult() {
         return excelResult;
     }

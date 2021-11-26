@@ -5,6 +5,7 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.ruoyi.common.convert.ExcelBigNumberConvert;
 import com.ruoyi.common.excel.DefaultExcelListener;
+import com.ruoyi.common.excel.ExcelListener;
 import com.ruoyi.common.excel.ExcelResult;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
@@ -36,9 +37,9 @@ public class ExcelUtil {
     /**
      * 使用校验监听器处理导入
      *
-     * @param is            输入流
-     * @param clazz         对象类型
-     * @param isValidate    是否 Validator 检验 默认为是
+     * @param is         输入流
+     * @param clazz      对象类型
+     * @param isValidate 是否 Validator 检验 默认为是
      * @return 转换后集合
      */
     public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, boolean isValidate) {
@@ -50,14 +51,14 @@ public class ExcelUtil {
     /**
      * 使用自定义监听器导入
      *
-     * @param is            输入流
-     * @param clazz         对象类型
-     * @param readListener  自定义监听器
+     * @param is       输入流
+     * @param clazz    对象类型
+     * @param listener 自定义监听器
      * @return 转换后集合
      */
-    public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, DefaultExcelListener<T> readListener) {
-        EasyExcel.read(is, clazz, readListener).sheet().doRead();
-        return readListener.getExcelResult();
+    public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, ExcelListener<T> listener) {
+        EasyExcel.read(is, clazz, listener).sheet().doRead();
+        return listener.getExcelResult();
     }
 
     /**
