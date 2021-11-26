@@ -5,14 +5,13 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.ValidatorUtils;
-import com.ruoyi.common.utils.poi.ExcelResult;
+import com.ruoyi.common.excel.ExcelResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.domain.bo.TestDemoBo;
@@ -69,7 +68,7 @@ public class TestDemoController extends BaseController {
         return iTestDemoService.customPageList(bo);
     }
 
-    @ApiOperation("导入测试单表")
+    @ApiOperation("导入测试-校验")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "file", value = "导入文件", dataType = "java.io.File", required = true),
     })
@@ -77,7 +76,7 @@ public class TestDemoController extends BaseController {
     @PreAuthorize("@ss.hasPermi('demo:demo:import')")
     @PostMapping("/importData")
     public AjaxResult<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
-        ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true, true);
+        ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
         List<TestDemoImportVo> volist = excelResult.getList();
         List<TestDemo> list = BeanUtil.copyToList(volist, TestDemo.class);
         iTestDemoService.saveAll(list);

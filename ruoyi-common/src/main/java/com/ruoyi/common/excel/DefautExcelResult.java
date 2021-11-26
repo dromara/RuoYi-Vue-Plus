@@ -1,25 +1,63 @@
-package com.ruoyi.common.utils.poi;
+package com.ruoyi.common.excel;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.Data;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
-public class ExcelResult<T> {
+/**
+ * 默认excel返回对象
+ *
+ * @author Yjoioooo
+ * @author Lion Li
+ */
+public class DefautExcelResult<T> implements ExcelResult<T> {
 
-    /** 数据对象list
+    /**
+     * 数据对象list
      */
+    @Setter
     private List<T> list;
-    /** 错误信息列表 */
+
+    /**
+     * 错误信息列表
+     */
+    @Setter
     private List<String> errorList;
+
+    public DefautExcelResult() {
+        this.list = new ArrayList<>();
+        this.errorList = new ArrayList<>();
+    }
+
+    public DefautExcelResult(List<T> list, List<String> errorList) {
+        this.list = list;
+        this.errorList = errorList;
+    }
+
+    public DefautExcelResult(ExcelResult<T> excelResult) {
+        this.list = excelResult.getList();
+        this.errorList = excelResult.getErrorList();
+    }
+
+    @Override
+    public List<T> getList() {
+        return list;
+    }
+
+    @Override
+    public List<String> getErrorList() {
+        return errorList;
+    }
 
     /**
      * 获取导入回执
+     *
      * @return 导入回执
      */
+    @Override
     public String getAnalysis() {
         int successCount = list.size();
         int errorCount = errorList.size();
