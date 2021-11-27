@@ -24,7 +24,7 @@ import java.util.List;
 public class ExcelUtil {
 
     /**
-     * 同步导入
+     * 同步导入(适用于小数据量)
      *
      * @param is 输入流
      * @return 转换后集合
@@ -35,7 +35,7 @@ public class ExcelUtil {
 
 
     /**
-     * 使用校验监听器处理导入
+     * 使用校验监听器 异步导入 同步返回
      *
      * @param is         输入流
      * @param clazz      对象类型
@@ -49,7 +49,7 @@ public class ExcelUtil {
     }
 
     /**
-     * 使用自定义监听器导入
+     * 使用自定义监听器 异步导入 自定义返回
      *
      * @param is       输入流
      * @param clazz    对象类型
