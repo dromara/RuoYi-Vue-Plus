@@ -32,6 +32,11 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
     private Boolean isValidate = Boolean.TRUE;
 
     /**
+     * excel 表头数据
+     */
+    private Map<Integer, String> headMap;
+
+    /**
      * 导入回执
      */
     private ExcelResult<T> excelResult;
@@ -52,11 +57,11 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
         String errMsg = null;
         if (exception instanceof ExcelDataConvertException) {
             // 如果是某一个单元格的转换异常 能获取到具体行号
-            // 如果要获取头的信息 配合doAfterAllAnalysedHeadMap使用
             ExcelDataConvertException excelDataConvertException = (ExcelDataConvertException) exception;
-            errMsg = StrUtil.format("第{}行-第{}列解析异常<br/>",
-                excelDataConvertException.getRowIndex() + 1,
-                excelDataConvertException.getColumnIndex() + 1);
+            Integer rowIndex = excelDataConvertException.getRowIndex();
+            Integer columnIndex = excelDataConvertException.getColumnIndex();
+            errMsg = StrUtil.format("第{}行-第{}列-表头{}: 解析异常<br/>",
+                rowIndex + 1, columnIndex + 1, headMap.get(columnIndex));
             if (log.isDebugEnabled()) {
                 log.error(errMsg);
             }
@@ -78,7 +83,8 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
 
     @Override
     public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
-        log.debug("解析到一条头数据: {}", JSON.toJSONString(headMap));
+        this.headMap = headMap;
+        log.debug("解析到一条表头数据: {}", JSON.toJSONString(headMap));
     }
 
     @Override
