@@ -33,9 +33,12 @@ public class OssFactory {
      */
     public static void init() {
         log.info("初始化OSS工厂");
-        RedisUtils.subscribe(OssConstant.CACHE_CONFIG_KEY, String.class, msg -> {
-            refreshService(msg);
-            log.info("订阅刷新OSS配置 => " + msg);
+        RedisUtils.subscribe(OssConstant.CACHE_CONFIG_KEY, String.class, type -> {
+            // 没有的实例不处理
+            if (SERVICES.containsKey(type)) {
+                refreshService(type);
+                log.info("订阅刷新OSS配置 => " + type);
+            }
         });
     }
 
