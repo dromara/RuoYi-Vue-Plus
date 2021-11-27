@@ -12,11 +12,13 @@ import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.excel.ExcelResult;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.vo.SysUserExportVo;
 import com.ruoyi.system.domain.vo.SysUserImportVo;
+import com.ruoyi.system.listener.SysUserImportListener;
 import com.ruoyi.system.service.ISysPostService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
@@ -87,11 +89,8 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:import')")
     @PostMapping("/importData")
     public AjaxResult<Void> importData(@RequestPart("file") MultipartFile file, boolean updateSupport) throws Exception {
-        List<SysUserImportVo> userListVo = ExcelUtil.importExcel(file.getInputStream(), SysUserImportVo.class);
-        List<SysUser> userList = BeanUtil.copyToList(userListVo, SysUser.class);
-        String operName = getUsername();
-        String message = userService.importUser(userList, updateSupport, operName);
-        return AjaxResult.success(message);
+        ExcelResult<SysUserImportVo> result = ExcelUtil.importExcel(file.getInputStream(), SysUserImportVo.class, new SysUserImportListener(updateSupport));
+        return AjaxResult.success(result.getAnalysis());
     }
 
     @ApiOperation("下载导入模板")
