@@ -142,7 +142,7 @@ public class PlusSaTokenDao implements SaTokenDao {
      */
     @Override
     public long getObjectTimeout(String key) {
-        return RedisUtils.getTimeToLive(key);
+        return RedisUtils.getTimeToLive(key) / 1000;
     }
 
     /**
