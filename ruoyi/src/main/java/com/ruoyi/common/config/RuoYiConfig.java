@@ -39,6 +39,11 @@ public class RuoYiConfig {
     private boolean demoEnabled;
 
     /**
+     * 缓存懒加载
+     */
+    private boolean cacheLazy;
+
+    /**
      * 获取地址开关
      */
     @Getter

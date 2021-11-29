@@ -4,26 +4,34 @@
       <el-col :sm="24" :lg="12" style="padding-left: 20px">
         <h2>RuoYi-Vue-Plus后台管理框架</h2>
         <p>
-          基于 RuoYi-Vue 集成 Mybatis-Plus Lombok Hutool 等便捷开发工具 适配重写相关业务 便于开发 定期与 RuoYi-Vue 同步
+          RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 分布式集群 场景升级(不兼容原框架)
           <br/>
           * 前端开发框架 Vue、Element UI<br/>
-          * 后端开发框架 Spring Boot、Redis<br/>
+          * 后端开发框架 Spring Boot<br/>
           * 容器框架 Undertow 基于 Netty 的高性能容器<br/>
-          * 权限认证框架 Spring Security、Jwt，支持多终端认证系统<br/>
-          * 关系数据库 MySQL 适配 8.X<br/>
-          * 缓存数据库 Redis 适配 6.X<br/>
-          * 数据库开发框架 Mybatis-Plus 快速 CRUD 增加开发效率 插件化支持各类需求<br/>
-          * 网络框架 Feign、OkHttp3 接口化管理 HTTP 请求<br/>
-          * 工具类框架 Hutool、Lombok 减少代码冗余 增加安全性<br/>
-          * 监控框架 spring-boot-admin 全方位服务监控<br/>
-          * 校验框架 validation 增强接口安全性 严谨性<br/>
-          * 文档框架 knife4j 美化接口文档<br/>
-          * 代码生成器 一键生成前后端代码<br/>
+          * 权限认证框架 Spring Security、Jwt 支持多终端认证系统<br/>
+          * 关系数据库 MySQL 适配 8.X 最低 5.7<br/>
+          * 缓存数据库 Redis 适配 6.X 最低 4.X<br/>
+          * 数据库框架 Mybatis-Plus 快速 CRUD 增加开发效率<br/>
+          * 数据库框架 p6spy 更强劲的 SQL 分析<br/>
           * 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构<br/>
-          * Redis客户端 采用 Redisson 性能更强<br/>
+          * 序列化框架 Jackson 统一使用 jackson 高效可靠<br/>
+          * Redis客户端 Redisson 性能强劲、API丰富<br/>
+          * 分布式限流 Redisson 全局、请求IP、集群ID 多种限流<br/>
           * 分布式锁 Lock4j 注解锁、工具锁 多种多样<br/>
+          * 分布式幂等 Lock4j 基于分布式锁实现<br/>
+          * 分布式日志 TLog 支持跟踪链路日志记录、性能分析、链路排查<br/>
+          * 分布式任务调度 Xxl-Job 高性能 高可靠 易扩展<br/>
+          * 文件存储 Minio 本地存储<br/>
+          * 文件存储 七牛、阿里、腾讯	云存储<br/>
+          * 监控框架 SpringBoot-Admin 全方位服务监控<br/>
+          * 校验框架 Validation 增强接口安全性 严谨性<br/>
+          * Excel框架 Alibaba EasyExcel 性能优异 扩展性强<br/>
+          * 文档框架 knife4j 美化接口文档<br/>
+          * 工具类框架 Hutool、Lombok 减少代码冗余 增加安全性<br/>
+          * 代码生成器 适配MP、Knife4j规范化代码 一键生成前后端代码<br/>
           * 部署方式 Docker 容器编排 一键部署业务集群<br/>
-          * 文件存储 OSS 对象存储模块 支持(Minio、七牛、阿里、腾讯)<br/>
+          * 国际化 SpringMessage Spring标准国际化方案<br/>
         </p>
         <p>
           <b>当前版本:</b> <span>v{{ version }}</span>
@@ -93,6 +101,61 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v3.4.0 - 2021-11-29">
+              <ol>
+                <li>update [重磅更新] 重构 Excel 导入 支持 Validator 校验 支持自定义监听器</li>
+                <li>update [重磅更新] Validator 校验框架支持国际化</li>
+                <li>update springboot 2.5.6 => 2.5.7</li>
+                <li>update hutool 5.7.15 => 5.7.16</li>
+                <li>update okhttp 4.9.1 => 4.9.2</li>
+                <li>update spring-boot-admin 2.5.2 => 2.5.4</li>
+                <li>update redisson 3.16.3 => 3.16.4</li>
+                <li>update tlog 1.3.3 => 1.3.4</li>
+                <li>update axios 0.21.0 => 0.24.0</li>
+                <li>update core-js 3.8.1 => 3.19.1</li>
+                <li>update js-cookie 2.2.1 => 3.0.1</li>
+                <li>update velocity 1.7 => 2.3</li>
+                <li>update 升级 docker 基础镜像</li>
+                <li>update 基于 hutool 封装树构建工具 重构部门与菜单树结构返回</li>
+                <li>update 减少使用特定数据库函数</li>
+                <li>update 配置应用前缀路径 改为配置文件统一配置</li>
+                <li>update 升级 swagger 配置 使用 knife4j 增强模式</li>
+                <li>update 监控中心 集成监控客户端 实现自监控</li>
+                <li>update 调度中心 集成监控客户端 注册到监控中心</li>
+                <li>update 优化 tab 对象简化页签操作</li>
+                <li>update 解耦 LoginUser 与 SysUser 强关联</li>
+                <li>update 更新 RepeatSubmit 注解 aop 处理 针对特殊参数进行过滤</li>
+                <li>update DictUtils 字典工具类 标记过期 3.5.0 版本移除 使用 DictService 代替</li>
+                <li>update 抽象 DictService 通用 字典服务</li>
+                <li>update 抽象 ConfigService 通用 参数配置服务</li>
+                <li>update 基于 DictService 重构 Excel 内字典查询功能</li>
+                <li>update OSS 模块 整体重命名 消除歧义</li>
+                <li>update 更新 redis.conf 存储策略 aof 与 rdb 配置参数</li>
+                <li>update 初始化数据转移到 ApplicationRunner 统一处理</li>
+                <li>update 优化时间查询语句</li>
+                <li>add 增加 框架缓存懒加载 开关</li>
+                <li>add 新增 监控中心 Bean 初始化 startup trace 监控插件</li>
+                <li>add 增加 ValidatorUtils 校验框架工具 用于在非 Controller 的地方校验对象</li>
+                <li>fix 修复 SysOss、SysOssConfig 未继承 BaseEntity 基础实体问题</li>
+                <li>fix 修复 xxl-job-admin 部署问题</li>
+                <li>fix 修复 回显数据字典键值修正</li>
+                <li>fix 修复 Linux 清除临时目录 导致上传找不到目录报错问题</li>
+                <li>fix 修复通用实体 传参无法接收问题</li>
+                <li>fix 修复 SysLoginController 接口文档书写错误问题</li>
+                <li>fix 修复 用户逻辑删除 差异问题</li>
+                <li>fix 修复 OSS 七牛云 token 过期未刷新问题</li>
+                <li>fix 修复 分页工具 排序字段 null 处理</li>
+                <li>fix 修复 用户导入字典使用错误</li>
+                <li>fix 修复 关闭 xss 功能导致可重复读 RepeatableFilter 失效</li>
+                <li>fix 修复 使用 this.$options.data 报错问题</li>
+                <li>fix 修复 代码生成复选框字典遗漏问题</li>
+                <li>fix 修复 重复提交不生效问题 由于概念不同 使用 RedisUtils 重构</li>
+                <li>fix 修复 OSS 工厂 未实例化服务更新加载问题</li>
+                <li>remove 移除 quartz 相关代码与依赖</li>
+                <li>remove 移除 feign 相关代码与依赖</li>
+                <li>remove 移除 MybatisPlusRedisCache 二级缓存</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v3.3.0 - 2021-10-29">
               <ol>
                 <li>add [重磅更新] 增加分布式日志框架 TLog</li>
@@ -525,7 +588,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "3.3.0",
+      version: "3.4.0",
     };
   },
   methods: {

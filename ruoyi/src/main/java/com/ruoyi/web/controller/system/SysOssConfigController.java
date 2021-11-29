@@ -14,6 +14,7 @@ import com.ruoyi.system.domain.vo.SysOssConfigVo;
 import com.ruoyi.system.service.ISysOssConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,7 +57,8 @@ public class SysOssConfigController extends BaseController {
     @ApiOperation("获取对象存储配置详细信息")
     @PreAuthorize("@ss.hasPermi('system:oss:query')")
     @GetMapping("/{ossConfigId}")
-    public AjaxResult<SysOssConfigVo> getInfo(@NotNull(message = "主键不能为空")
+    public AjaxResult<SysOssConfigVo> getInfo(@ApiParam("OSS配置ID")
+                                              @NotNull(message = "主键不能为空")
                                               @PathVariable("ossConfigId") Integer ossConfigId) {
         return AjaxResult.success(iSysOssConfigService.queryById(ossConfigId));
     }
@@ -92,7 +94,8 @@ public class SysOssConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:oss:remove')")
     @Log(title = "对象存储配置", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ossConfigIds}")
-    public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
+    public AjaxResult<Void> remove(@ApiParam("OSS配置ID串")
+                                   @NotEmpty(message = "主键不能为空")
                                    @PathVariable Long[] ossConfigIds) {
         return toAjax(iSysOssConfigService.deleteWithValidByIds(Arrays.asList(ossConfigIds), true) ? 1 : 0);
     }

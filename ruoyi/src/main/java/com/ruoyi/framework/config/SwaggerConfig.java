@@ -1,6 +1,7 @@
 package com.ruoyi.framework.config;
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
+import com.github.xiaoymin.knife4j.spring.extension.OpenApiExtensionResolver;
 import com.ruoyi.common.properties.TokenProperties;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -35,6 +36,9 @@ public class SwaggerConfig {
     @Autowired
 	private TokenProperties tokenProperties;
 
+    @Autowired
+    private OpenApiExtensionResolver openApiExtensionResolver;
+
     /**
      * 创建API
      */
@@ -59,6 +63,7 @@ public class SwaggerConfig {
 					// 设置安全模式，swagger可以设置访问token
 					.securitySchemes(securitySchemes())
 					.securityContexts(securityContexts())
+                    .extensions(openApiExtensionResolver.buildExtensions(group.getName()))
 					.pathMapping(swaggerProperties.getPathMapping());
 			String beanName = StringUtils.substringAfterLast(basePackage, ".") + "Docket";
 			SpringUtils.registerBean(beanName, docket);

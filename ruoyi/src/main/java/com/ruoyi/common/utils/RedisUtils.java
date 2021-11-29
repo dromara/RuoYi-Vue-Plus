@@ -88,7 +88,30 @@ public class RedisUtils {
      * @param value 缓存的值
      */
     public static <T> void setCacheObject(final String key, final T value) {
-        client.getBucket(key).set(value);
+        setCacheObject(key, value, false);
+    }
+
+    /**
+     * 缓存基本的对象，保留当前对象 TTL 有效期
+     *
+     * @param key   缓存的键值
+     * @param value 缓存的值
+     * @param isSaveTtl 是否保留TTL有效期(例如: set之前ttl剩余90 set之后还是为90)
+     * @since Redis 6.X 以上使用 setAndKeepTTL 兼容 5.X 方案
+     */
+    public static <T> void setCacheObject(final String key, final T value, final boolean isSaveTtl) {
+        RBucket<Object> bucket = client.getBucket(key);
+        if (isSaveTtl) {
+            try {
+                bucket.setAndKeepTTL(value);
+            } catch (Exception e) {
+                long timeToLive = bucket.remainTimeToLive();
+                bucket.set(value);
+                bucket.expire(timeToLive, TimeUnit.MILLISECONDS);
+            }
+        } else {
+            bucket.set(value);
+        }
     }
 
     /**
@@ -99,7 +122,7 @@ public class RedisUtils {
      * @param timeout  时间
      * @param timeUnit 时间颗粒度
      */
-    public static <T> void setCacheObject(final String key, final T value, final Integer timeout, final TimeUnit timeUnit) {
+    public static <T> void setCacheObject(final String key, final T value, final long timeout, final TimeUnit timeUnit) {
         RBucket<T> result = client.getBucket(key);
         result.set(value);
         result.expire(timeout, timeUnit);
@@ -138,6 +161,17 @@ public class RedisUtils {
     public static <T> T getCacheObject(final String key) {
         RBucket<T> rBucket = client.getBucket(key);
         return rBucket.get();
+    }
+
+    /**
+     * 获得key剩余存活时间
+     *
+     * @param key 缓存键值
+     * @return 剩余存活时间
+     */
+    public static <T> long getTimeToLive(final String key) {
+        RBucket<T> rBucket = client.getBucket(key);
+        return rBucket.remainTimeToLive();
     }
 
     /**

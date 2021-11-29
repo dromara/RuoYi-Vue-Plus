@@ -11,6 +11,7 @@ import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.service.ISysPostService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,7 +48,7 @@ public class SysPostController extends BaseController {
     @ApiOperation("导出岗位列表")
     @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:post:export')")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysPost post, HttpServletResponse response) {
         List<SysPost> list = postService.selectPostList(post);
         ExcelUtil.exportExcel(list, "岗位数据", SysPost.class, response);
@@ -59,7 +60,7 @@ public class SysPostController extends BaseController {
     @ApiOperation("根据岗位编号获取详细信息")
     @PreAuthorize("@ss.hasPermi('system:post:query')")
     @GetMapping(value = "/{postId}")
-    public AjaxResult<SysPost> getInfo(@PathVariable Long postId) {
+    public AjaxResult<SysPost> getInfo(@ApiParam("岗位ID") @PathVariable Long postId) {
         return AjaxResult.success(postService.selectPostById(postId));
     }
 
@@ -102,7 +103,7 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:remove')")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{postIds}")
-    public AjaxResult<Void> remove(@PathVariable Long[] postIds) {
+    public AjaxResult<Void> remove(@ApiParam("岗位ID串") @PathVariable Long[] postIds) {
         return toAjax(postService.deletePostByIds(postIds));
     }
 

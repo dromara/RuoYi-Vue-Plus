@@ -4,7 +4,7 @@
 	<parent>
         <artifactId>ruoyi-extend</artifactId>
         <groupId>com.ruoyi</groupId>
-        <version>3.3.0</version>
+        <version>3.4.0</version>
 	</parent>
 	<artifactId>ruoyi-xxl-job-admin</artifactId>
 	<packaging>jar</packaging>
@@ -70,6 +70,11 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>${mysql-connector-java.version}</version>
 		</dependency>
+
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+        </dependency>
 
 		<!-- xxl-job-core -->
 		<dependency>

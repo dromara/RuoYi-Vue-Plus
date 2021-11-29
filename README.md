@@ -4,18 +4,20 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/blob/master/LICENSE)
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
 <br>
-[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-3.3.0-success.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
+[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-3.4.0-success.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.5-blue.svg)]()
 [![JDK-8+](https://img.shields.io/badge/JDK-8-green.svg)]()
 [![JDK-11](https://img.shields.io/badge/JDK-11-green.svg)]()
 [![JDK-17](https://img.shields.io/badge/JDK-17-green.svg)]()
 
-RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级(不兼容原框架)
+> RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级(不兼容原框架)
+
+> 系统演示: [传送门](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/系统演示?sort_id=4836388)
 
 | 功能介绍 | 使用技术 | 文档地址 | 特性注意事项 |
 |---|---|---|---|
 | 当前框架 | RuoYi-Vue-Plus | [RuoYi-Vue-Plus文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages) | 重写RuoYi-Vue全方位升级(不兼容原框架) |
-| satoken分支 | RuoYi-Vue-Plus-satoken | [satoken分支地址](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/satoken/) | 使用satoken重构权限鉴权(仅供学习不推荐上生产) |
+| satoken分支 | RuoYi-Vue-Plus-satoken | [satoken分支地址](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/satoken/) | 使用satoken重构权限鉴权(公测 可尝试上生产) |
 | 单体分支 | RuoYi-Vue-Plus-fast | [fast分支地址](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/) | 单体应用结构 |
 | 原框架 | RuoYi-Vue | [RuoYi-Vue官网](http://ruoyi.vip/) | 定期同步需要的功能 |
 | 前端开发框架 | Vue、Element UI | [Element UI官网](https://element.eleme.cn/#/zh-CN) | |
@@ -28,17 +30,16 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级(不兼�
 | 数据库框架 | p6spy | [p6spy官网](https://p6spy.readthedocs.io/) | 更强劲的 SQL 分析 |
 | 多数据源框架 | dynamic-datasource | [dynamic-ds文档](https://www.kancloud.cn/tracy5546/dynamic-datasource/content) | 支持主从与多种类数据库异构 |
 | 序列化框架 | Jackson | [Jackson官网](https://github.com/FasterXML/jackson) | 统一使用 jackson 高效可靠 |
-| 网络框架 | Feign、OkHttp3 | [Feign官网](https://github.com/OpenFeign/feign) | 接口化管理 HTTP 请求 |
 | Redis客户端 | Redisson | [Redisson文档](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95) | 支持单机、集群配置 |
 | 分布式限流 | Redisson | [Redisson文档](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95) | 全局、请求IP、集群ID 多种限流 |
 | 分布式锁 | Lock4j | [Lock4j官网](https://gitee.com/baomidou/lock4j) | 注解锁、工具锁 多种多样 |
-| 分布式幂等 | Lock4j | [Lock4j文档](https://gitee.com/baomidou/lock4j) | 基于分布式锁实现 |
+| 分布式幂等 | Redisson | [Lock4j文档](https://gitee.com/baomidou/lock4j) | 拦截重复提交 |
 | 分布式日志 | TLog | [TLog文档](https://yomahub.com/tlog/docs) | 支持跟踪链路日志记录、性能分析、链路排查 |
 | 分布式任务调度 | Xxl-Job | [Xxl-Job官网](https://www.xuxueli.com/xxl-job/) | 高性能 高可靠 易扩展 |
 | 文件存储 | Minio | [Minio文档](https://docs.min.io/) | 本地存储 |
 | 文件存储 | 七牛、阿里、腾讯 | [OSS使用文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4359146&doc_id=1469725) | 云存储 |
 | 监控框架 | SpringBoot-Admin | [SpringBoot-Admin文档](https://codecentric.github.io/spring-boot-admin/current/) | 全方位服务监控 |
-| 校验框架 | Validation | [Validation文档](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/) | 增强接口安全性、严谨性 |
+| 校验框架 | Validation | [Validation文档](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/) | 增强接口安全性、严谨性 支持国际化 |
 | Excel框架 | Alibaba EasyExcel | [EasyExcel文档](https://www.yuque.com/easyexcel/doc/easyexcel) | 性能优异 扩展性强 |
 | 文档框架 | Knife4j | [Knife4j文档](https://doc.xiaominfo.com/knife4j/documentation/) | 美化接口文档 |
 | 工具类框架 | Hutool、Lombok | [Hutool文档](https://www.hutool.cn/docs/) | 减少代码冗余 增加安全性 |
@@ -61,8 +62,7 @@ RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级(不兼�
 
 ## 软件架构图
 
-![Plus部署架构图](https://images.gitee.com/uploads/images/2021/0729/112230_4295e5ce_1766278.png "Plus部署架构图.png")
-
+![Plus部署架构图](https://images.gitee.com/uploads/images/2021/1112/202137_673ac5d2_1766278.png "Plus部署架构图.png")
 ## 贡献代码
 
 欢迎各路英雄豪杰 `PR` 代码 请提交到 `dev` 开发分支 统一测试发版

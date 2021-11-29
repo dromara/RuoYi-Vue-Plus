@@ -6,6 +6,7 @@ import com.ruoyi.common.exception.DemoModeException;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.util.stream.Collectors;
 
 /**
  * 全局异常处理器
@@ -82,7 +85,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BindException.class)
     public AjaxResult<Void> handleBindException(BindException e) {
         log.error(e.getMessage(), e);
-        String message = e.getAllErrors().get(0).getDefaultMessage();
+        String message = e.getAllErrors().stream()
+            .map(DefaultMessageSourceResolvable::getDefaultMessage)
+            .collect(Collectors.joining(", "));
         return AjaxResult.error(message);
     }
 
@@ -92,7 +97,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public AjaxResult<Void> constraintViolationException(ConstraintViolationException e) {
         log.error(e.getMessage(), e);
-        String message = e.getConstraintViolations().iterator().next().getMessage();
+        String message = e.getConstraintViolations().stream()
+            .map(ConstraintViolation::getMessage)
+            .collect(Collectors.joining(", "));
         return AjaxResult.error(message);
     }
 

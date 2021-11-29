@@ -14,7 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
  *
  * @author Lion Li
  */
-@Slf4j(topic = "sys-user")
+@Slf4j
 @Component
 public class ShutdownManager {
 

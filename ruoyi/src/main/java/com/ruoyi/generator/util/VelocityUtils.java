@@ -247,7 +247,8 @@ public class VelocityUtils {
         List<String> dicts = new ArrayList<String>();
         for (GenTableColumn column : columns) {
             if (!column.isSuperColumn() && StringUtils.isNotEmpty(column.getDictType()) && StringUtils.equalsAny(
-                    column.getHtmlType(), new String[]{GenConstants.HTML_SELECT, GenConstants.HTML_RADIO})) {
+                    column.getHtmlType(),
+                new String[] { GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_CHECKBOX })) {
                 dicts.add("'" + column.getDictType() + "'");
             }
         }

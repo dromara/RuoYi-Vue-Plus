@@ -1,5 +1,6 @@
 package com.ruoyi.common.utils;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -63,7 +64,9 @@ public class PageUtils {
         }
         PagePlus<T, K> page = new PagePlus<>(pageNum, pageSize);
         OrderItem orderItem = buildOrderItem(orderByColumn, isAsc);
-        page.addOrder(orderItem);
+        if (ObjectUtil.isNotNull(orderItem)) {
+            page.addOrder(orderItem);
+        }
         return page;
     }
 
@@ -87,7 +90,9 @@ public class PageUtils {
         }
         Page<T> page = new Page<>(pageNum, pageSize);
         OrderItem orderItem = buildOrderItem(orderByColumn, isAsc);
-        page.addOrder(orderItem);
+        if (ObjectUtil.isNotNull(orderItem)) {
+            page.addOrder(orderItem);
+        }
         return page;
     }
 

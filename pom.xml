@@ -6,15 +6,15 @@
 
     <groupId>com.ruoyi</groupId>
     <artifactId>ruoyi-vue-plus</artifactId>
-    <version>3.3.0</version>
+    <version>3.4.0</version>
 
     <name>RuoYi-Vue-Plus</name>
     <url>https://gitee.com/JavaLionLi/RuoYi-Vue-Plus</url>
     <description>RuoYi-Vue-Plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>3.3.0</ruoyi-vue-plus.version>
-        <spring-boot.version>2.5.6</spring-boot.version>
+        <ruoyi-vue-plus.version>3.4.0</ruoyi-vue-plus.version>
+        <spring-boot.version>2.5.7</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -24,19 +24,17 @@
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <poi.version>4.1.2</poi.version>
         <easyexcel.version>2.2.11</easyexcel.version>
-        <velocity.version>1.7</velocity.version>
+        <velocity.version>2.3</velocity.version>
         <jwt.version>0.9.1</jwt.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.7.15</hutool.version>
-        <feign.version>3.0.3</feign.version>
-        <feign-okhttp.version>11.6</feign-okhttp.version>
-        <okhttp.version>4.9.1</okhttp.version>
-        <spring-boot-admin.version>2.5.2</spring-boot-admin.version>
-        <redisson.version>3.16.3</redisson.version>
+        <hutool.version>5.7.16</hutool.version>
+        <okhttp.version>4.9.2</okhttp.version>
+        <spring-boot-admin.version>2.5.4</spring-boot-admin.version>
+        <redisson.version>3.16.4</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.4.1</dynamic-ds.version>
-        <tlog.version>1.3.3</tlog.version>
+        <tlog.version>1.3.4</tlog.version>
         <xxl-job.version>2.3.0</xxl-job.version>
 
         <!-- jdk11 缺失依赖 jaxb-->
@@ -120,7 +118,7 @@
             <!-- velocity代码生成使用模板 -->
             <dependency>
                 <groupId>org.apache.velocity</groupId>
-                <artifactId>velocity</artifactId>
+                <artifactId>velocity-engine-core</artifactId>
                 <version>${velocity.version}</version>
             </dependency>
 
@@ -166,25 +164,6 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
-            </dependency>
-
-            <!-- @deprecated 由于使用人数较少 决定与 3.4.0 版本移除 -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-openfeign</artifactId>
-                <version>${feign.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>feign-core</artifactId>
-                        <groupId>io.github.openfeign</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <!-- @deprecated 由于使用人数较少 决定与 3.4.0 版本移除 -->
-            <dependency>
-                <groupId>io.github.openfeign</groupId>
-                <artifactId>feign-okhttp</artifactId>
-                <version>${feign-okhttp.version}</version>
             </dependency>
 
             <dependency>
@@ -243,12 +222,6 @@
                         <groupId>com.google.guava</groupId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.yomahub</groupId>
-                <artifactId>tlog-feign</artifactId>
-                <version>${tlog.version}</version>
             </dependency>
 
             <dependency>
@@ -321,6 +294,7 @@
                 <!-- 环境标识，需要与配置文件的名称相对应 -->
                 <profiles.active>local</profiles.active>
                 <logging.level>debug</logging.level>
+                <knife4j.production>false</knife4j.production>
                 <endpoints.include>'*'</endpoints.include>
             </properties>
         </profile>
@@ -330,6 +304,7 @@
                 <!-- 环境标识，需要与配置文件的名称相对应 -->
                 <profiles.active>dev</profiles.active>
                 <logging.level>debug</logging.level>
+                <knife4j.production>false</knife4j.production>
                 <endpoints.include>'*'</endpoints.include>
             </properties>
             <activation>
@@ -342,6 +317,7 @@
             <properties>
                 <profiles.active>prod</profiles.active>
                 <logging.level>warn</logging.level>
+                <knife4j.production>true</knife4j.production>
                 <endpoints.include>health, info, logfile</endpoints.include>
             </properties>
         </profile>

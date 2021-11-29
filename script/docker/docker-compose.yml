@@ -2,7 +2,7 @@ version: '3'
 
 services:
   mysql:
-    image: mysql:8.0.24
+    image: mysql:8.0.27
     container_name: mysql
     environment:
       # 时区上海
@@ -32,8 +32,7 @@ services:
         ipv4_address: 172.30.0.36
 
   nginx-web:
-    # 如果需要指定版本 就把 latest 换成版本号
-    image: nginx:latest
+    image: nginx:1.21.3
     container_name: nginx-web
     environment:
       # 时区上海
@@ -56,7 +55,7 @@ services:
       - ruoyi_net
 
   redis:
-    image: redis:6.2.1
+    image: redis:6.2.6
     container_name: redis
     ports:
       - 6379:6379
@@ -67,8 +66,8 @@ services:
       # 配置文件
       - /docker/redis/conf:/redis/config:rw
       # 数据文件
-      - /docker/redis/data:/redis/data:rw
-    command: "redis-server /redis/config/redis.conf --appendonly yes"
+      - /docker/redis/data/:/redis/data/:rw
+    command: "redis-server /redis/config/redis.conf"
     privileged: true
     restart: always
     networks:
@@ -76,7 +75,7 @@ services:
         ipv4_address: 172.30.0.48
 
   minio:
-    image: minio/minio:RELEASE.2021-07-08T01-15-01Z
+    image: minio/minio:RELEASE.2021-10-27T16-29-42Z
     container_name: minio
     ports:
       # api 端口
@@ -103,7 +102,7 @@ services:
         ipv4_address: 172.30.0.54
 
   ruoyi-server1:
-    image: "ruoyi/ruoyi-server:3.3.0"
+    image: "ruoyi/ruoyi-server:3.4.0"
     container_name: ruoyi-server1
     environment:
       # 时区上海
@@ -118,7 +117,7 @@ services:
         ipv4_address: 172.30.0.60
 
   ruoyi-server2:
-    image: "ruoyi/ruoyi-server:3.3.0"
+    image: "ruoyi/ruoyi-server:3.4.0"
     container_name: ruoyi-server2
     environment:
       # 时区上海
@@ -133,7 +132,7 @@ services:
         ipv4_address: 172.30.0.61
 
   ruoyi-monitor-admin:
-    image: "ruoyi/ruoyi-monitor-admin:3.3.0"
+    image: "ruoyi/ruoyi-monitor-admin:3.4.0"
     container_name: ruoyi-monitor-admin
     environment:
       # 时区上海
@@ -148,7 +147,7 @@ services:
         ipv4_address: 172.30.0.90
 
   ruoyi-xxl-job-admin:
-    image: "ruoyi/ruoyi-xxl-job-admin:3.3.0"
+    image: "ruoyi/ruoyi-xxl-job-admin:3.4.0"
     container_name: ruoyi-xxl-job-admin
     environment:
       # 时区上海

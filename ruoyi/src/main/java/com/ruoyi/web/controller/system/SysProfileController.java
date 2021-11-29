@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class SysProfileController extends BaseController {
     @GetMapping
     public AjaxResult<Map<String, Object>> profile() {
         LoginUser loginUser = getLoginUser();
-        SysUser user = loginUser.getUser();
+        SysUser user = userService.selectUserById(loginUser.getUserId());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("user", user);
         ajax.put("roleGroup", userService.selectUserRoleGroup(loginUser.getUsername()));
@@ -70,16 +71,11 @@ public class SysProfileController extends BaseController {
             return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         LoginUser loginUser = getLoginUser();
-        SysUser sysUser = loginUser.getUser();
+        SysUser sysUser = userService.selectUserById(loginUser.getUserId());
         user.setUserId(sysUser.getUserId());
+        user.setUserName(null);
         user.setPassword(null);
         if (userService.updateUserProfile(user) > 0) {
-            // 更新缓存用户信息
-            sysUser.setNickName(user.getNickName());
-            sysUser.setPhonenumber(user.getPhonenumber());
-            sysUser.setEmail(user.getEmail());
-            sysUser.setSex(user.getSex());
-            tokenService.setLoginUser(loginUser);
             return AjaxResult.success();
         }
         return AjaxResult.error("修改个人信息异常，请联系管理员");
@@ -89,6 +85,10 @@ public class SysProfileController extends BaseController {
      * 重置密码
      */
     @ApiOperation("重置密码")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "oldPassword", value = "旧密码", paramType = "query", dataTypeClass = String.class),
+        @ApiImplicitParam(name = "newPassword", value = "新密码", paramType = "query", dataTypeClass = String.class)
+    })
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
     public AjaxResult<Void> updatePwd(String oldPassword, String newPassword) {
@@ -103,7 +103,7 @@ public class SysProfileController extends BaseController {
         }
         if (userService.resetUserPwd(userName, SecurityUtils.encryptPassword(newPassword)) > 0) {
             // 更新缓存用户密码
-            loginUser.getUser().setPassword(SecurityUtils.encryptPassword(newPassword));
+            loginUser.setPassword(SecurityUtils.encryptPassword(newPassword));
             tokenService.setLoginUser(loginUser);
             return AjaxResult.success();
         }
@@ -115,7 +115,7 @@ public class SysProfileController extends BaseController {
      */
     @ApiOperation("头像上传")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "file", value = "用户头像", dataType = "java.io.File", required = true),
+        @ApiImplicitParam(name = "avatarfile", value = "用户头像", dataTypeClass = File.class, required = true),
     })
     @Log(title = "用户头像", businessType = BusinessType.UPDATE)
     @PostMapping("/avatar")
@@ -127,9 +127,6 @@ public class SysProfileController extends BaseController {
             String avatar = oss.getUrl();
             if (userService.updateUserAvatar(loginUser.getUsername(), avatar)) {
                 ajax.put("imgUrl", avatar);
-                // 更新缓存用户头像
-                loginUser.getUser().setAvatar(avatar);
-                tokenService.setLoginUser(loginUser);
                 return AjaxResult.success(ajax);
             }
         }
