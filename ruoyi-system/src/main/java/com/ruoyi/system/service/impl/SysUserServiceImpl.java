@@ -180,7 +180,6 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     public String checkPhoneUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         long count = count(new LambdaQueryWrapper<SysUser>()
-                .select(SysUser::getUserId, SysUser::getPhonenumber)
                 .eq(SysUser::getPhonenumber, user.getPhonenumber())
                 .ne(SysUser::getUserId, userId));
         if (count > 0) {
@@ -199,7 +198,6 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     public String checkEmailUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         long count = count(new LambdaQueryWrapper<SysUser>()
-                .select(SysUser::getUserId, SysUser::getEmail)
                 .eq(SysUser::getEmail, user.getEmail())
                 .ne(SysUser::getUserId, userId));
         if (count > 0) {
