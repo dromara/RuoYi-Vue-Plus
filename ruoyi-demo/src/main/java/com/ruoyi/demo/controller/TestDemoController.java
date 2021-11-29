@@ -73,7 +73,7 @@ public class TestDemoController extends BaseController {
         @ApiImplicitParam(name = "file", value = "导入文件", dataType = "java.io.File", required = true),
     })
     @Log(title = "测试单表", businessType = BusinessType.IMPORT)
-    @PreAuthorize("@ss.hasPermi('demo:demo:import')")
+    @SaCheckPermission("demo:demo:import")
     @PostMapping("/importData")
     public AjaxResult<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
         ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
