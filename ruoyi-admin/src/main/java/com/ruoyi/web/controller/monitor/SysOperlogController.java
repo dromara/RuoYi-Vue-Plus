@@ -43,7 +43,7 @@ public class SysOperlogController extends BaseController {
     @ApiOperation("导出操作日志记录列表")
     @Log(title = "操作日志", businessType = BusinessType.EXPORT)
     @SaCheckPermission("monitor:operlog:export")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysOperLog operLog, HttpServletResponse response) {
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
         ExcelUtil.exportExcel(list, "操作日志", SysOperLog.class, response);

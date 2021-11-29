@@ -43,7 +43,7 @@ public class SysLogininforController extends BaseController {
     @ApiOperation("导出系统访问记录列表")
     @Log(title = "登录日志", businessType = BusinessType.EXPORT)
     @SaCheckPermission("monitor:logininfor:export")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysLogininfor logininfor, HttpServletResponse response) {
         List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
         ExcelUtil.exportExcel(list, "登录日志", SysLogininfor.class, response);

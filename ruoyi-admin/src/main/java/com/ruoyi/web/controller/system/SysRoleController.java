@@ -13,8 +13,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -48,7 +47,7 @@ public class SysRoleController extends BaseController {
     @ApiOperation("导出角色信息列表")
     @Log(title = "角色管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:role:export")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysRole role, HttpServletResponse response) {
         List<SysRole> list = roleService.selectRoleList(role);
         ExcelUtil.exportExcel(list, "角色数据", SysRole.class, response);
@@ -60,7 +59,7 @@ public class SysRoleController extends BaseController {
     @ApiOperation("根据角色编号获取详细信息")
     @SaCheckPermission("system:role:query")
     @GetMapping(value = "/{roleId}")
-    public AjaxResult<SysRole> getInfo(@PathVariable Long roleId) {
+    public AjaxResult<SysRole> getInfo(@ApiParam("角色ID") @PathVariable Long roleId) {
         roleService.checkRoleDataScope(roleId);
         return AjaxResult.success(roleService.selectRoleById(roleId));
     }
@@ -134,7 +133,7 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:remove")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{roleIds}")
-    public AjaxResult<Void> remove(@PathVariable Long[] roleIds) {
+    public AjaxResult<Void> remove(@ApiParam("岗位ID串") @PathVariable Long[] roleIds) {
         return toAjax(roleService.deleteRoleByIds(roleIds));
     }
 
@@ -183,6 +182,10 @@ public class SysRoleController extends BaseController {
      * 批量取消授权用户
      */
     @ApiOperation("批量取消授权用户")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "roleId", value = "角色ID", paramType = "query", dataTypeClass = String.class),
+        @ApiImplicitParam(name = "userIds", value = "用户ID串", paramType = "query", dataTypeClass = String.class)
+    })
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancelAll")
@@ -194,6 +197,10 @@ public class SysRoleController extends BaseController {
      * 批量选择用户授权
      */
     @ApiOperation("批量选择用户授权")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "roleId", value = "角色ID", paramType = "query", dataTypeClass = String.class),
+        @ApiImplicitParam(name = "userIds", value = "用户ID串", paramType = "query", dataTypeClass = String.class)
+    })
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/selectAll")

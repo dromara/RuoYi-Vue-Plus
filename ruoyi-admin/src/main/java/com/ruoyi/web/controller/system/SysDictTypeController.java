@@ -12,6 +12,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.service.ISysDictTypeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -44,7 +45,7 @@ public class SysDictTypeController extends BaseController {
     @ApiOperation("导出字典类型列表")
     @Log(title = "字典类型", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:dict:export")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysDictType dictType, HttpServletResponse response) {
         List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
         ExcelUtil.exportExcel(list, "字典类型", SysDictType.class, response);
@@ -56,7 +57,7 @@ public class SysDictTypeController extends BaseController {
     @ApiOperation("查询字典类型详细")
     @SaCheckPermission("system:dict:query")
     @GetMapping(value = "/{dictId}")
-    public AjaxResult<SysDictType> getInfo(@PathVariable Long dictId) {
+    public AjaxResult<SysDictType> getInfo(@ApiParam("字典ID") @PathVariable Long dictId) {
         return AjaxResult.success(dictTypeService.selectDictTypeById(dictId));
     }
 
@@ -95,7 +96,7 @@ public class SysDictTypeController extends BaseController {
     @SaCheckPermission("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping("/{dictIds}")
-    public AjaxResult<Void> remove(@PathVariable Long[] dictIds) {
+    public AjaxResult<Void> remove(@ApiParam("字典ID串") @PathVariable Long[] dictIds) {
         dictTypeService.deleteDictTypeByIds(dictIds);
         return success();
     }

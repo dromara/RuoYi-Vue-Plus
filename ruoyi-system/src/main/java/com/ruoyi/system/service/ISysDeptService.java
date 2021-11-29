@@ -1,7 +1,7 @@
 package com.ruoyi.system.service;
 
+import cn.hutool.core.lang.tree.Tree;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysDept;
 
 import java.util.List;
@@ -21,20 +21,12 @@ public interface ISysDeptService extends IService<SysDept> {
     List<SysDept> selectDeptList(SysDept dept);
 
     /**
-     * 构建前端所需要树结构
-     *
-     * @param depts 部门列表
-     * @return 树结构列表
-     */
-    List<SysDept> buildDeptTree(List<SysDept> depts);
-
-    /**
      * 构建前端所需要下拉树结构
      *
      * @param depts 部门列表
      * @return 下拉树结构列表
      */
-    List<TreeSelect> buildDeptTreeSelect(List<SysDept> depts);
+    List<Tree<Long>> buildDeptTreeSelect(List<SysDept> depts);
 
     /**
      * 根据角色ID查询部门树信息

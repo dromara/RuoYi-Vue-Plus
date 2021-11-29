@@ -6,8 +6,8 @@
           v-model="queryParams.ipaddr"
           placeholder="请输入登录地址"
           clearable
+		  size="small"
           style="width: 240px;"
-          size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -16,8 +16,8 @@
           v-model="queryParams.userName"
           placeholder="请输入用户名称"
           clearable
+		  size="small"
           style="width: 240px;"
-          size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -83,7 +83,6 @@
           plain
           icon="el-icon-download"
           size="mini"
-          :loading="exportLoading"
           @click="handleExport"
           v-hasPermi="['monitor:logininfor:export']"
         >导出</el-button>
@@ -132,8 +131,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 选中数组
       ids: [],
       // 非多个禁用
@@ -216,7 +213,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.$download.excel('/monitor/logininfor/export', this.queryParams);
+      this.download('monitor/logininfor/export', {
+        ...this.queryParams
+      }, `logininfor_${new Date().getTime()}.xlsx`)
     }
   }
 };

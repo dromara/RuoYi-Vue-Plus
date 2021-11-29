@@ -28,6 +28,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 #elseif($table.tree)
 #end
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiOperation;
 
 /**
@@ -80,7 +81,8 @@ public class ${ClassName}Controller extends BaseController {
     @ApiOperation("获取${functionName}详细信息")
     @SaCheckPermission("${permissionPrefix}:query")
     @GetMapping("/{${pkColumn.javaField}}")
-    public AjaxResult<${ClassName}Vo> getInfo(@NotNull(message = "主键不能为空")
+    public AjaxResult<${ClassName}Vo> getInfo(@ApiParam("主键")
+                                                  @NotNull(message = "主键不能为空")
                                                   @PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField}) {
         return AjaxResult.success(i${ClassName}Service.queryById(${pkColumn.javaField}));
     }
@@ -116,7 +118,8 @@ public class ${ClassName}Controller extends BaseController {
     @SaCheckPermission("${permissionPrefix}:remove")
     @Log(title = "${functionName}" , businessType = BusinessType.DELETE)
     @DeleteMapping("/{${pkColumn.javaField}s}")
-    public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
+    public AjaxResult<Void> remove(@ApiParam("主键串")
+                                       @NotEmpty(message = "主键不能为空")
                                        @PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
         return toAjax(i${ClassName}Service.deleteWithValidByIds(Arrays.asList(${pkColumn.javaField}s), true) ? 1 : 0);
     }

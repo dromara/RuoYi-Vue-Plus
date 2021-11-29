@@ -108,7 +108,6 @@
           plain
           icon="el-icon-download"
           size="mini"
-          :loading="exportLoading"
           @click="handleExport"
           v-hasPermi="['${moduleName}:${businessName}:export']"
         >导出</el-button>
@@ -137,7 +136,11 @@
 #elseif($column.list && $column.dictType && "" != $column.dictType)
       <el-table-column label="${comment}" align="center" prop="${javaField}">
         <template slot-scope="scope">
+#if($column.htmlType == "checkbox")
+          <dict-tag :options="dict.type.${column.dictType}" :value="scope.row.${javaField} ? scope.row.${javaField}.split(',') : []"/>
+#else
           <dict-tag :options="dict.type.${column.dictType}" :value="scope.row.${javaField}"/>
+#end
         </template>
       </el-table-column>
 #elseif($column.list && "" != $javaField)
@@ -324,8 +327,6 @@ export default {
       buttonLoading: false,
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 选中数组
       ids: [],
 #if($table.sub)
@@ -363,8 +364,7 @@ export default {
         pageSize: 10,
 #foreach ($column in $columns)
 #if($column.query)
-        $column.javaField: undefined#if($velocityCount != $columns.size()),#end
-
+        $column.javaField: undefined#if($foreach.count != $columns.size()),#end
 #end
 #end
       },
@@ -382,8 +382,7 @@ export default {
 #end
         $column.javaField: [
           { required: true, message: "$comment不能为空", trigger: #if($column.htmlType == "select")"change"#else"blur"#end }
-        ]#if($velocityCount != $columns.size()),#end
-
+        ]#if($foreach.count != $columns.size()),#end
 #end
 #end
       }
@@ -427,14 +426,11 @@ export default {
       this.form = {
 #foreach ($column in $columns)
 #if($column.htmlType == "radio")
-        $column.javaField: #if($column.javaType == "Integer" || $column.javaType == "Long")0#else"0"#end#if($velocityCount != $columns.size()),#end
-
+        $column.javaField: #if($column.javaType == "Integer" || $column.javaType == "Long")0#else"0"#end#if($foreach.count != $columns.size()),#end
 #elseif($column.htmlType == "checkbox")
-        $column.javaField: []#if($velocityCount != $columns.size()),#end
-
+        $column.javaField: []#if($foreach.count != $columns.size()),#end
 #else
-        $column.javaField: undefined#if($velocityCount != $columns.size()),#end
-
+        $column.javaField: undefined#if($foreach.count != $columns.size()),#end
 #end
 #end
       };
@@ -573,7 +569,9 @@ export default {
 #end
     /** 导出按钮操作 */
     handleExport() {
-        this.#[[$download]]#.excel('/${moduleName}/${businessName}/export', this.queryParams);
+      this.download('${moduleName}/${businessName}/export', {
+        ...this.queryParams
+      }, `${businessName}_#[[${new Date().getTime()}]]#.xlsx`)
     }
   }
 };

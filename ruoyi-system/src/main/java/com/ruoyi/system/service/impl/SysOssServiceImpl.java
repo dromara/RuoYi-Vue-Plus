@@ -10,7 +10,7 @@ import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.factory.OssFactory;
-import com.ruoyi.oss.service.ICloudStorageStrategy;
+import com.ruoyi.oss.service.IOssStrategy;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.vo.SysOssVo;
@@ -56,7 +56,7 @@ public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, Sys
     public SysOss upload(MultipartFile file) {
         String originalfileName = file.getOriginalFilename();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
-        ICloudStorageStrategy storage = OssFactory.instance();
+        IOssStrategy storage = OssFactory.instance();
         UploadResult uploadResult;
         try {
             uploadResult = storage.uploadSuffix(file.getBytes(), suffix, file.getContentType());
@@ -81,7 +81,7 @@ public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, Sys
         }
         List<SysOss> list = listByIds(ids);
         for (SysOss sysOss : list) {
-            ICloudStorageStrategy storage = OssFactory.instance(sysOss.getService());
+            IOssStrategy storage = OssFactory.instance(sysOss.getService());
             storage.delete(sysOss.getUrl());
         }
         return removeByIds(ids);

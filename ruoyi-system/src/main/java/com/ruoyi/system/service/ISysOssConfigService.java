@@ -18,6 +18,11 @@ import java.util.Collection;
 public interface ISysOssConfigService extends IServicePlus<SysOssConfig, SysOssConfigVo> {
 
     /**
+     * 初始化OSS配置
+     */
+    void init();
+
+    /**
      * 查询单个
      */
     SysOssConfigVo queryById(Integer ossConfigId);

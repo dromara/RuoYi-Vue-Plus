@@ -10,6 +10,8 @@ ruoyi:
   demoEnabled: true
   # 获取ip地址开关
   addressEnabled: true
+  # 缓存懒加载
+  cacheLazy: true
 
 captcha:
   # 页面 <参数设置> 可开启关闭 验证码校验
@@ -234,6 +236,22 @@ swagger:
     - name: 3.代码生成模块
       basePackage: com.ruoyi.generator
 
+knife4j:
+  # 是否开启Knife4j增强模式
+  enable: true
+  # 是否开启生产环境保护策略
+  production: @knife4j.production@
+  # 前端Ui的个性化配置属性
+  setting:
+    # 默认语言
+    language: zh-CN
+    # 是否显示Footer
+    enableFooter: false
+    # 是否开启动态参数调试功能
+    enableDynamicParameter: true
+    # 是否在每个Debug调试栏后显示刷新变量按钮
+    enableReloadCacheParameter: true
+
 # 防止XSS攻击
 xss:
   # 过滤开关
@@ -261,22 +279,6 @@ thread-pool:
   # DISCARD_POLICY 丢弃
   # ABORT_POLICY 中止
   rejectedExecutionHandler: CALLER_RUNS_POLICY
-
-# feign 相关配置
-feign:
-  # 不支持多包, 如有需要可在注解配置 或 提升扫包等级
-  # 例如 com.**.**.feign
-  package: com.ruoyi.**.feign
-  # 开启压缩
-  compression:
-    request:
-      enabled: true
-    response:
-      enabled: true
-  okhttp:
-    enabled: true
-  circuitbreaker:
-    enabled: true
 
 --- # redisson 缓存配置
 redisson:
@@ -313,34 +315,3 @@ management:
   endpoint:
     logfile:
       external-file: ./logs/sys-console.log
-
---- # 定时任务配置
-spring:
-  quartz:
-    scheduler-name: RuoyiScheduler
-    startup-delay: 1s
-    overwrite-existing-jobs: true
-    auto-startup: true
-    job-store-type: jdbc
-    properties:
-      org:
-        quartz:
-          # Scheduler 相关配置
-          scheduler:
-            instanceName: RuoyiScheduler
-            instanceId: AUTO
-          # 线程池相关配置
-          threadPool:
-            class: org.quartz.simpl.SimpleThreadPool
-            threadCount: 20
-            threadPriority: 5
-          # JobStore 集群配置
-          jobStore:
-            class: org.quartz.impl.jdbcjobstore.JobStoreTX
-            isClustered: true
-            clusterCheckinInterval: 15000
-            txIsolationLevelSerializable: true
-            misfireThreshold: 60000
-            tablePrefix: QRTZ_
-            # sqlserver 启用
-            # selectWithLockSQL: SELECT * FROM {0}LOCKS UPDLOCK WHERE LOCK_NAME = ?

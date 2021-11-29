@@ -106,13 +106,4 @@ public class Constants {
      */
     public static final String SYS_DICT_KEY = "sys_dict:";
 
-    /**
-     * RMI 远程方法调用
-     */
-    public static final String LOOKUP_RMI = "rmi://";
-
-    /**
-     * LDAP 远程方法调用
-     */
-    public static final String LOOKUP_LDAP = "ldap://";
 }

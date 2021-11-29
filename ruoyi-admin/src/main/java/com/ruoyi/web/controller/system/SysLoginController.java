@@ -10,6 +10,7 @@ import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
+import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysLoginService;
 import com.ruoyi.system.service.SysPermissionService;
 import io.swagger.annotations.Api;
@@ -33,13 +34,14 @@ import java.util.Set;
  * @author Lion Li
  */
 @Validated
-@Api(value = "数据字典信息控制器", tags = {"数据字典信息管理"})
+@Api(value = "登录验证控制器", tags = {"登录验证管理"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
 public class SysLoginController {
 
     private final SysLoginService loginService;
     private final ISysMenuService menuService;
+    private final ISysUserService userService;
     private final SysPermissionService permissionService;
 
     /**

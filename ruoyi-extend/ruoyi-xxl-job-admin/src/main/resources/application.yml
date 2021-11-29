@@ -4,6 +4,8 @@ server:
   servlet:
     context-path: /xxl-job-admin
 spring:
+  application:
+    name: ruoyi-xxl-job-admin
   profiles:
     active: @profiles.active@
   mvc:
@@ -28,13 +30,22 @@ spring:
     suffix: .ftl
     templateLoaderPath: classpath:/templates/
 
---- # 监控配置
+--- # Actuator 监控端点的配置项
 management:
   health:
     mail:
       enabled: false
-  server:
-    base-path: /actuator
+  endpoints:
+    web:
+      # Actuator 提供的 API 接口的根目录。默认为 /actuator
+      base-path: /actuator
+      exposure:
+        # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+        # 生产环境不建议放开所有 根据项目需求放开即可
+        include: @endpoints.include@
+  endpoint:
+    logfile:
+      external-file: ./logs/ruoyi-xxl-job-admin.log
 
 --- # xxljob系统配置
 xxl:

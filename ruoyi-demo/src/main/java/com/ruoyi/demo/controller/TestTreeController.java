@@ -15,6 +15,7 @@ import com.ruoyi.demo.domain.vo.TestTreeVo;
 import com.ruoyi.demo.service.ITestTreeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -61,7 +62,7 @@ public class TestTreeController extends BaseController {
     @GetMapping("/export")
     public void export(@Validated TestTreeBo bo, HttpServletResponse response) {
         List<TestTreeVo> list = iTestTreeService.queryList(bo);
-		ExcelUtil.exportExcel(list, "测试树表", TestTreeVo.class, response);
+        ExcelUtil.exportExcel(list, "测试树表", TestTreeVo.class, response);
     }
 
     /**
@@ -70,8 +71,9 @@ public class TestTreeController extends BaseController {
     @ApiOperation("获取测试树表详细信息")
     @SaCheckPermission("demo:tree:query")
     @GetMapping("/{id}")
-    public AjaxResult<TestTreeVo> getInfo(@NotNull(message = "主键不能为空")
-                                                  @PathVariable("id") Long id) {
+    public AjaxResult<TestTreeVo> getInfo(@ApiParam("测试树ID")
+                                          @NotNull(message = "主键不能为空")
+                                          @PathVariable("id") Long id) {
         return AjaxResult.success(iTestTreeService.queryById(id));
     }
 
@@ -106,8 +108,9 @@ public class TestTreeController extends BaseController {
     @SaCheckPermission("demo:tree:remove")
     @Log(title = "测试树表" , businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
-    public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
-                                       @PathVariable Long[] ids) {
+    public AjaxResult<Void> remove(@ApiParam("测试树ID串")
+                                   @NotEmpty(message = "主键不能为空")
+                                   @PathVariable Long[] ids) {
         return toAjax(iTestTreeService.deleteWithValidByIds(Arrays.asList(ids), true) ? 1 : 0);
     }
 }
