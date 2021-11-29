@@ -101,6 +101,61 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v3.4.0 - 2021-11-29">
+              <ol>
+                <li>update [重磅更新] 重构 Excel 导入 支持 Validator 校验 支持自定义监听器</li>
+                <li>update [重磅更新] Validator 校验框架支持国际化</li>
+                <li>update springboot 2.5.6 => 2.5.7</li>
+                <li>update hutool 5.7.15 => 5.7.16</li>
+                <li>update okhttp 4.9.1 => 4.9.2</li>
+                <li>update spring-boot-admin 2.5.2 => 2.5.4</li>
+                <li>update redisson 3.16.3 => 3.16.4</li>
+                <li>update tlog 1.3.3 => 1.3.4</li>
+                <li>update axios 0.21.0 => 0.24.0</li>
+                <li>update core-js 3.8.1 => 3.19.1</li>
+                <li>update js-cookie 2.2.1 => 3.0.1</li>
+                <li>update velocity 1.7 => 2.3</li>
+                <li>update 升级 docker 基础镜像</li>
+                <li>update 基于 hutool 封装树构建工具 重构部门与菜单树结构返回</li>
+                <li>update 减少使用特定数据库函数</li>
+                <li>update 配置应用前缀路径 改为配置文件统一配置</li>
+                <li>update 升级 swagger 配置 使用 knife4j 增强模式</li>
+                <li>update 监控中心 集成监控客户端 实现自监控</li>
+                <li>update 调度中心 集成监控客户端 注册到监控中心</li>
+                <li>update 优化 tab 对象简化页签操作</li>
+                <li>update 解耦 LoginUser 与 SysUser 强关联</li>
+                <li>update 更新 RepeatSubmit 注解 aop 处理 针对特殊参数进行过滤</li>
+                <li>update DictUtils 字典工具类 标记过期 3.5.0 版本移除 使用 DictService 代替</li>
+                <li>update 抽象 DictService 通用 字典服务</li>
+                <li>update 抽象 ConfigService 通用 参数配置服务</li>
+                <li>update 基于 DictService 重构 Excel 内字典查询功能</li>
+                <li>update OSS 模块 整体重命名 消除歧义</li>
+                <li>update 更新 redis.conf 存储策略 aof 与 rdb 配置参数</li>
+                <li>update 初始化数据转移到 ApplicationRunner 统一处理</li>
+                <li>update 优化时间查询语句</li>
+                <li>add 增加 框架缓存懒加载 开关</li>
+                <li>add 新增 监控中心 Bean 初始化 startup trace 监控插件</li>
+                <li>add 增加 ValidatorUtils 校验框架工具 用于在非 Controller 的地方校验对象</li>
+                <li>fix 修复 SysOss、SysOssConfig 未继承 BaseEntity 基础实体问题</li>
+                <li>fix 修复 xxl-job-admin 部署问题</li>
+                <li>fix 修复 回显数据字典键值修正</li>
+                <li>fix 修复 Linux 清除临时目录 导致上传找不到目录报错问题</li>
+                <li>fix 修复通用实体 传参无法接收问题</li>
+                <li>fix 修复 SysLoginController 接口文档书写错误问题</li>
+                <li>fix 修复 用户逻辑删除 差异问题</li>
+                <li>fix 修复 OSS 七牛云 token 过期未刷新问题</li>
+                <li>fix 修复 分页工具 排序字段 null 处理</li>
+                <li>fix 修复 用户导入字典使用错误</li>
+                <li>fix 修复 关闭 xss 功能导致可重复读 RepeatableFilter 失效</li>
+                <li>fix 修复 使用 this.$options.data 报错问题</li>
+                <li>fix 修复 代码生成复选框字典遗漏问题</li>
+                <li>fix 修复 重复提交不生效问题 由于概念不同 使用 RedisUtils 重构</li>
+                <li>fix 修复 OSS 工厂 未实例化服务更新加载问题</li>
+                <li>remove 移除 quartz 相关代码与依赖</li>
+                <li>remove 移除 feign 相关代码与依赖</li>
+                <li>remove 移除 MybatisPlusRedisCache 二级缓存</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v3.3.0 - 2021-10-29">
               <ol>
                 <li>add [重磅更新] 增加分布式日志框架 TLog</li>
@@ -533,7 +588,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "3.3.0",
+      version: "3.4.0",
     };
   },
   methods: {
