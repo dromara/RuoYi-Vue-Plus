@@ -1,11 +1,11 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.tree.Tree;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
@@ -13,6 +13,7 @@ import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.TreeBuildUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
@@ -21,10 +22,8 @@ import com.ruoyi.system.service.ISysDeptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 部门管理 服务实现
@@ -53,41 +52,18 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     }
 
     /**
-     * 构建前端所需要树结构
-     *
-     * @param depts 部门列表
-     * @return 树结构列表
-     */
-    @Override
-    public List<SysDept> buildDeptTree(List<SysDept> depts) {
-        List<SysDept> returnList = new ArrayList<SysDept>();
-        List<Long> tempList = new ArrayList<Long>();
-        for (SysDept dept : depts) {
-            tempList.add(dept.getDeptId());
-        }
-        for (SysDept dept : depts) {
-            // 如果是顶级节点, 遍历该父节点的所有子节点
-            if (!tempList.contains(dept.getParentId())) {
-                recursionFn(depts, dept);
-                returnList.add(dept);
-            }
-        }
-        if (returnList.isEmpty()) {
-            returnList = depts;
-        }
-        return returnList;
-    }
-
-    /**
      * 构建前端所需要下拉树结构
      *
      * @param depts 部门列表
      * @return 下拉树结构列表
      */
     @Override
-    public List<TreeSelect> buildDeptTreeSelect(List<SysDept> depts) {
-        List<SysDept> deptTrees = buildDeptTree(depts);
-        return deptTrees.stream().map(TreeSelect::new).collect(Collectors.toList());
+    public List<Tree<Long>> buildDeptTreeSelect(List<SysDept> depts) {
+        return TreeBuildUtils.build(depts, (dept, tree) ->
+            tree.setId(dept.getDeptId())
+                .setParentId(dept.getParentId())
+                .setName(dept.getDeptName())
+                .setWeight(dept.getOrderNum()));
     }
 
     /**
@@ -122,8 +98,8 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     @Override
     public long selectNormalChildrenDeptById(Long deptId) {
         return count(new LambdaQueryWrapper<SysDept>()
-                .eq(SysDept::getStatus, 0)
-                .apply("find_in_set({0}, ancestors)", deptId));
+            .eq(SysDept::getStatus, 0)
+            .apply("find_in_set({0}, ancestors)", deptId));
     }
 
     /**
@@ -135,8 +111,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     @Override
     public boolean hasChildByDeptId(Long deptId) {
         long result = count(new LambdaQueryWrapper<SysDept>()
-                .eq(SysDept::getParentId, deptId)
-                .last("limit 1"));
+            .eq(SysDept::getParentId, deptId));
         return result > 0;
     }
 
@@ -149,7 +124,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     @Override
     public boolean checkDeptExistUser(Long deptId) {
         long result = userMapper.selectCount(new LambdaQueryWrapper<SysUser>()
-                .eq(SysUser::getDeptId, deptId));
+            .eq(SysUser::getDeptId, deptId));
         return result > 0;
     }
 
@@ -162,11 +137,11 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     @Override
     public String checkDeptNameUnique(SysDept dept) {
         Long deptId = StringUtils.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
-        SysDept info = getOne(new LambdaQueryWrapper<SysDept>()
-                .eq(SysDept::getDeptName, dept.getDeptName())
-                .eq(SysDept::getParentId, dept.getParentId())
-                .last("limit 1"));
-        if (StringUtils.isNotNull(info) && info.getDeptId().longValue() != deptId.longValue()) {
+        long count = count(new LambdaQueryWrapper<SysDept>()
+            .eq(SysDept::getDeptName, dept.getDeptName())
+            .eq(SysDept::getParentId, dept.getParentId())
+            .ne(SysDept::getDeptId, deptId));
+        if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -224,7 +199,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
         }
         int result = baseMapper.updateById(dept);
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
-                && !StringUtils.equals("0", dept.getAncestors())) {
+            && !StringUtils.equals("0", dept.getAncestors())) {
             // 如果该部门是启用状态，则启用该部门的所有上级部门
             updateParentDeptStatusNormal(dept);
         }
@@ -240,8 +215,8 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
         String ancestors = dept.getAncestors();
         Long[] deptIds = Convert.toLongArray(ancestors);
         update(null, new LambdaUpdateWrapper<SysDept>()
-                .set(SysDept::getStatus, "0")
-                .in(SysDept::getDeptId, Arrays.asList(deptIds)));
+            .set(SysDept::getStatus, "0")
+            .in(SysDept::getDeptId, Arrays.asList(deptIds)));
     }
 
     /**
@@ -253,7 +228,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors) {
         List<SysDept> children = list(new LambdaQueryWrapper<SysDept>()
-                .apply("find_in_set({0},ancestors)", deptId));
+            .apply("find_in_set({0},ancestors)", deptId));
         for (SysDept child : children) {
             child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
         }
@@ -273,37 +248,4 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
         return baseMapper.deleteById(deptId);
     }
 
-    /**
-     * 递归列表
-     */
-    private void recursionFn(List<SysDept> list, SysDept t) {
-        // 得到子节点列表
-        List<SysDept> childList = getChildList(list, t);
-        t.setChildren(childList);
-        for (SysDept tChild : childList) {
-            if (hasChild(list, tChild)) {
-                recursionFn(list, tChild);
-            }
-        }
-    }
-
-    /**
-     * 得到子节点列表
-     */
-    private List<SysDept> getChildList(List<SysDept> list, SysDept t) {
-        List<SysDept> tlist = new ArrayList<SysDept>();
-        for (SysDept n : list) {
-            if (StringUtils.isNotNull(n.getParentId()) && n.getParentId().longValue() == t.getDeptId().longValue()) {
-                tlist.add(n);
-            }
-        }
-        return tlist;
-    }
-
-    /**
-     * 判断是否有子节点
-     */
-    private boolean hasChild(List<SysDept> list, SysDept t) {
-        return getChildList(list, t).size() > 0;
-    }
 }

@@ -1,7 +1,6 @@
 package com.ruoyi.framework.config;
 
 import cn.hutool.core.util.StrUtil;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
@@ -28,7 +27,6 @@ public class I18nConfig {
 	 */
 	static class I18nLocaleResolver implements LocaleResolver {
 
-		@NotNull
 		@Override
 		public Locale resolveLocale(HttpServletRequest httpServletRequest) {
 			String language = httpServletRequest.getHeader("content-language");
@@ -41,7 +39,7 @@ public class I18nConfig {
 		}
 
 		@Override
-		public void setLocale(@NotNull HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Locale locale) {
+		public void setLocale(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Locale locale) {
 
 		}
 	}

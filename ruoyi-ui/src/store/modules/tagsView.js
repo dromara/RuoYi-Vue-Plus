@@ -14,7 +14,7 @@ const mutations = {
   },
   ADD_CACHED_VIEW: (state, view) => {
     if (state.cachedViews.includes(view.name)) return
-    if (!view.meta.noCache) {
+    if (view.meta && !view.meta.noCache) {
       state.cachedViews.push(view.name)
     }
   },
@@ -63,7 +63,7 @@ const mutations = {
       }
     }
   },
-  
+
   DEL_RIGHT_VIEWS: (state, view) => {
     const index = state.visitedViews.findIndex(v => v.path === view.path)
     if (index === -1) {

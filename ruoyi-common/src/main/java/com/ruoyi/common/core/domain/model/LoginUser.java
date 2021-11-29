@@ -1,7 +1,6 @@
 package com.ruoyi.common.core.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ruoyi.common.core.domain.entity.SysUser;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -75,31 +74,38 @@ public class LoginUser implements UserDetails {
     private Set<String> permissions;
 
     /**
-     * 用户信息
+     * 用户名
      */
-    private SysUser user;
+    private String username;
 
-    public LoginUser(SysUser user, Set<String> permissions) {
-        this.user = user;
+    /**
+     * 密码
+     */
+    private String password;
+
+    public LoginUser(String username, String password, Set<String> permissions) {
+        this.username = username;
+        this.password = password;
         this.permissions = permissions;
     }
 
-    public LoginUser(Long userId, Long deptId, SysUser user, Set<String> permissions) {
+    public LoginUser(Long userId, Long deptId, String username, String password, Set<String> permissions) {
         this.userId = userId;
         this.deptId = deptId;
-        this.user = user;
+        this.username = username;
+        this.password = password;
         this.permissions = permissions;
     }
 
     @JsonIgnore
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return user.getUserName();
+        return username;
     }
 
     /**

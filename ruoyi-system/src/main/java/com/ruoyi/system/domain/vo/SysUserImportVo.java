@@ -67,7 +67,7 @@ public class SysUserImportVo implements Serializable {
      * 帐号状态（0正常 1停用）
      */
     @ExcelProperty(value = "帐号状态", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(dictType = "sys_common_status")
+    @ExcelDictFormat(dictType = "sys_normal_disable")
     private String status;
 
 }

@@ -90,16 +90,12 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
     public TableDataInfo<SysLogininfor> selectPageLogininforList(SysLogininfor logininfor) {
         Map<String, Object> params = logininfor.getParams();
         LambdaQueryWrapper<SysLogininfor> lqw = new LambdaQueryWrapper<SysLogininfor>()
-                .like(StringUtils.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
-                .eq(StringUtils.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
-                .like(StringUtils.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
-                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
-                        "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
-                        params.get("beginTime"))
-                .apply(StringUtils.isNotEmpty(params.get("endTime")),
-                        "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
-                        params.get("endTime"));
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage("info_id","desc"), lqw));
+            .like(StringUtils.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
+            .eq(StringUtils.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
+            .like(StringUtils.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                SysLogininfor::getLoginTime, params.get("beginTime"), params.get("endTime"));
+        return PageUtils.buildDataInfo(page(PageUtils.buildPage("info_id", "desc"), lqw));
     }
 
     /**
@@ -123,16 +119,12 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
     public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor) {
         Map<String, Object> params = logininfor.getParams();
         return list(new LambdaQueryWrapper<SysLogininfor>()
-                .like(StringUtils.isNotBlank(logininfor.getIpaddr()),SysLogininfor::getIpaddr,logininfor.getIpaddr())
-                .eq(StringUtils.isNotBlank(logininfor.getStatus()),SysLogininfor::getStatus,logininfor.getStatus())
-                .like(StringUtils.isNotBlank(logininfor.getUserName()),SysLogininfor::getUserName,logininfor.getUserName())
-                .apply(StringUtils.isNotEmpty(params.get("beginTime")),
-                        "date_format(login_time,'%y%m%d') >= date_format({0},'%y%m%d')",
-                        params.get("beginTime"))
-                .apply(StringUtils.isNotEmpty(params.get("endTime")),
-                        "date_format(login_time,'%y%m%d') <= date_format({0},'%y%m%d')",
-                        params.get("endTime"))
-                .orderByDesc(SysLogininfor::getInfoId));
+            .like(StringUtils.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
+            .eq(StringUtils.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
+            .like(StringUtils.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                SysLogininfor::getLoginTime, params.get("beginTime"), params.get("endTime"))
+            .orderByDesc(SysLogininfor::getInfoId));
     }
 
     /**

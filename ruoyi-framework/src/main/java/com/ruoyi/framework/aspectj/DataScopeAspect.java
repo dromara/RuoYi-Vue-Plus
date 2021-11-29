@@ -5,9 +5,11 @@ import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -64,8 +66,8 @@ public class DataScopeAspect {
 		// 获取当前的用户
 		LoginUser loginUser = SecurityUtils.getLoginUser();
 		if (StringUtils.isNotNull(loginUser)) {
-			SysUser currentUser = loginUser.getUser();
-			// 如果是超级管理员，则不过滤数据
+			SysUser currentUser = SpringUtils.getBean(UserService.class).selectUserById(loginUser.getUserId());
+            // 如果是超级管理员，则不过滤数据
 			if (StringUtils.isNotNull(currentUser) && !currentUser.isAdmin()) {
 				dataScopeFilter(joinPoint, currentUser, controllerDataScope.deptAlias(),
 					controllerDataScope.userAlias(), controllerDataScope.isUser());

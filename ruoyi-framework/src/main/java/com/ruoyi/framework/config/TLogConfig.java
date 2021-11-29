@@ -1,7 +1,6 @@
 package com.ruoyi.framework.config;
 
 import com.yomahub.tlog.core.aop.AspectLogAop;
-import com.yomahub.tlog.feign.filter.TLogFeignFilter;
 import com.yomahub.tlog.spring.TLogPropertyInit;
 import com.yomahub.tlog.spring.TLogSpringAware;
 import com.yomahub.tlog.springboot.property.TLogProperty;
@@ -39,11 +38,6 @@ public class TLogConfig {
     @Bean
     public AspectLogAop aspectLogAop() {
         return new AspectLogAop();
-    }
-
-    @Bean
-    public TLogFeignFilter tLogFeignFilter() {
-        return new TLogFeignFilter();
     }
 
 }

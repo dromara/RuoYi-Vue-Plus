@@ -11,7 +11,9 @@ import java.util.List;
  * 字典工具类
  *
  * @author ruoyi
+ * @deprecated 3.5.0 版本删除 迁移至 {@link com.ruoyi.common.core.service.DictService}
  */
+@Deprecated
 public class DictUtils {
 
     /**
@@ -36,9 +38,8 @@ public class DictUtils {
      * @return dictDatas 字典数据列表
      */
     public static List<SysDictData> getDictCache(String key) {
-        Object cacheObj = RedisUtils.getCacheObject(getCacheKey(key));
-        if (StringUtils.isNotNull(cacheObj)) {
-            List<SysDictData> dictDatas = (List<SysDictData>) cacheObj;
+        List<SysDictData> dictDatas = RedisUtils.getCacheObject(getCacheKey(key));
+        if (StringUtils.isNotNull(dictDatas)) {
             return dictDatas;
         }
         return null;

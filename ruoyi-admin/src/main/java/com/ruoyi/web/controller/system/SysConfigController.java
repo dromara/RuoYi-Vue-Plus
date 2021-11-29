@@ -1,7 +1,6 @@
 package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -12,6 +11,7 @@ import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.service.ISysConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,7 +48,7 @@ public class SysConfigController extends BaseController {
     @ApiOperation("导出参数配置列表")
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:config:export')")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysConfig config, HttpServletResponse response) {
         List<SysConfig> list = configService.selectConfigList(config);
         ExcelUtil.exportExcel(list, "参数数据", SysConfig.class, response);
@@ -60,7 +60,7 @@ public class SysConfigController extends BaseController {
     @ApiOperation("根据参数编号获取详细信息")
     @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping(value = "/{configId}")
-    public AjaxResult<SysConfig> getInfo(@PathVariable Long configId) {
+    public AjaxResult<SysConfig> getInfo(@ApiParam("参数ID") @PathVariable Long configId) {
         return AjaxResult.success(configService.selectConfigById(configId));
     }
 
@@ -69,7 +69,7 @@ public class SysConfigController extends BaseController {
      */
     @ApiOperation("根据参数键名查询参数值")
     @GetMapping(value = "/configKey/{configKey}")
-    public AjaxResult<Void> getConfigKey(@PathVariable String configKey) {
+    public AjaxResult<Void> getConfigKey(@ApiParam("参数Key") @PathVariable String configKey) {
         return AjaxResult.success(configService.selectConfigByKey(configKey));
     }
 
@@ -80,7 +80,6 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:add')")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
-    @RepeatSubmit
     public AjaxResult<Void> add(@Validated @RequestBody SysConfig config) {
         if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(config))) {
             return AjaxResult.error("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
@@ -109,7 +108,7 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
-    public AjaxResult<Void> remove(@PathVariable Long[] configIds) {
+    public AjaxResult<Void> remove(@ApiParam("参数ID串") @PathVariable Long[] configIds) {
         configService.deleteConfigByIds(configIds);
         return success();
     }

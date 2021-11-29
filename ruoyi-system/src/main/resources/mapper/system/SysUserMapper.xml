@@ -189,12 +189,12 @@
 
     <select id="selectUserByUserName" parameterType="String" resultMap="SysUserResult">
         <include refid="selectUserVo"/>
-        where u.user_name = #{userName}
+        where u.del_flag = '0' and u.user_name = #{userName}
     </select>
 
     <select id="selectUserById" parameterType="Long" resultMap="SysUserResult">
         <include refid="selectUserVo"/>
-        where u.user_id = #{userId}
+        where u.del_flag = '0' and u.user_id = #{userId}
     </select>
 
 

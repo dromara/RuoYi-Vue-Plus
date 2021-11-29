@@ -4,6 +4,7 @@ MAINTAINER Lion Li
 
 RUN mkdir -p /ruoyi/server
 RUN mkdir -p /ruoyi/server/logs
+RUN mkdir -p /ruoyi/server/temp
 
 WORKDIR /ruoyi/server
 

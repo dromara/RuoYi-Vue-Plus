@@ -21,18 +21,18 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/swagger/demo")
 public class Swagger3DemoController {
 
-	/**
-	 * 上传请求
-	 * 必须使用 @RequestPart 注解标注为文件
-	 * dataType 必须为 "java.io.File"
-	 */
-	@ApiOperation(value = "通用上传请求")
-	@ApiImplicitParams({
-		@ApiImplicitParam(name = "file", value = "文件", dataType = "java.io.File", required = true),
-	})
-	@PostMapping(value = "/upload")
-	public AjaxResult<String> upload(@RequestPart("file") MultipartFile file) {
-		return AjaxResult.success("操作成功", file.getOriginalFilename());
-	}
+    /**
+     * 上传请求
+     * 必须使用 @RequestPart 注解标注为文件
+     * dataType 必须为 "java.io.File"
+     */
+    @ApiOperation(value = "通用上传请求")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "file", value = "文件", dataType = "java.io.File", required = true),
+    })
+    @PostMapping(value = "/upload")
+    public AjaxResult<String> upload(@RequestPart("file") MultipartFile file) {
+        return AjaxResult.success("操作成功", file.getOriginalFilename());
+    }
 
 }

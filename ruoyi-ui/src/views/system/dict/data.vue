@@ -75,10 +75,18 @@
           plain
           icon="el-icon-download"
           size="mini"
-          :loading="exportLoading"
           @click="handleExport"
           v-hasPermi="['system:dict:export']"
         >导出</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          plain
+          icon="el-icon-close"
+          size="mini"
+          @click="handleClose"
+        >关闭</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -193,8 +201,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -319,6 +325,11 @@ export default {
       this.queryParams.pageNum = 1;
       this.getList();
     },
+    /** 返回按钮操作 */
+    handleClose() {
+      const obj = { path: "/system/dict" };
+      this.$tab.closeOpenPage(obj);
+    },
     /** 重置按钮操作 */
     resetQuery() {
       this.resetForm("queryForm");
@@ -380,7 +391,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.$download.excel('/system/dict/data/export', this.queryParams);
+      this.download('system/dict/data/export', {
+        ...this.queryParams
+      }, `data_${new Date().getTime()}.xlsx`)
     }
   }
 };

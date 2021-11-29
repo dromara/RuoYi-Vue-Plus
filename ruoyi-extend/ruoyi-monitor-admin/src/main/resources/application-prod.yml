@@ -1,0 +1,14 @@
+--- # 监控配置
+spring:
+  boot:
+    admin:
+      # Spring Boot Admin Client 客户端的相关配置
+      client:
+        # 增加客户端开关
+        enabled: true
+        # 设置 Spring Boot Admin Server 地址
+        url: http://172.30.0.90:9090/admin
+        instance:
+          prefer-ip: true # 注册实例时，优先使用 IP
+        username: ruoyi
+        password: 123456

@@ -141,9 +141,10 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
     @Override
     public String checkRoleNameUnique(SysRole role) {
         Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
-        SysRole info = getOne(new LambdaQueryWrapper<SysRole>()
-                .eq(SysRole::getRoleName, role.getRoleName()).last("limit 1"));
-        if (StringUtils.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
+        long count = count(new LambdaQueryWrapper<SysRole>()
+                .eq(SysRole::getRoleName, role.getRoleName())
+                .ne(SysRole::getRoleId, roleId));
+        if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -158,9 +159,10 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
     @Override
     public String checkRoleKeyUnique(SysRole role) {
         Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
-        SysRole info = getOne(new LambdaQueryWrapper<SysRole>()
-                .eq(SysRole::getRoleKey, role.getRoleKey()).last("limit 1"));
-        if (StringUtils.isNotNull(info) && info.getRoleId().longValue() != roleId.longValue()) {
+        long count = count(new LambdaQueryWrapper<SysRole>()
+                .eq(SysRole::getRoleKey, role.getRoleKey())
+                .ne(SysRole::getRoleId, roleId));
+        if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;

@@ -1,7 +1,7 @@
 package com.ruoyi.system.service;
 
+import cn.hutool.core.lang.tree.Tree;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.system.domain.vo.RouterVo;
 
@@ -54,7 +54,7 @@ public interface ISysMenuService extends IService<SysMenu> {
      * @param roleId 角色ID
      * @return 选中菜单列表
      */
-    List<Integer> selectMenuListByRoleId(Long roleId);
+    List<Long> selectMenuListByRoleId(Long roleId);
 
     /**
      * 构建前端路由所需要的菜单
@@ -65,20 +65,12 @@ public interface ISysMenuService extends IService<SysMenu> {
     List<RouterVo> buildMenus(List<SysMenu> menus);
 
     /**
-     * 构建前端所需要树结构
-     *
-     * @param menus 菜单列表
-     * @return 树结构列表
-     */
-    List<SysMenu> buildMenuTree(List<SysMenu> menus);
-
-    /**
      * 构建前端所需要下拉树结构
      *
      * @param menus 菜单列表
      * @return 下拉树结构列表
      */
-    List<TreeSelect> buildMenuTreeSelect(List<SysMenu> menus);
+    List<Tree<Long>> buildMenuTreeSelect(List<SysMenu> menus);
 
     /**
      * 根据菜单ID查询信息
