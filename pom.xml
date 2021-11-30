@@ -121,13 +121,6 @@
                 <version>${velocity.version}</version>
             </dependency>
 
-            <!-- Token生成与解析-->
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt</artifactId>
-                <version>${jwt.version}</version>
-            </dependency>
-
             <!-- jdk11 缺失依赖 jaxb-->
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
