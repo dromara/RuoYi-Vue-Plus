@@ -70,12 +70,6 @@
             <artifactId>snakeyaml</artifactId>
         </dependency>
 
-        <!-- Token生成与解析-->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-        </dependency>
-
         <!-- jdk11 缺失依赖 jaxb-->
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
