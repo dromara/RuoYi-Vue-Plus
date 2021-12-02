@@ -13,7 +13,10 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.service.ISysOssService;
 import com.ruoyi.system.service.ISysUserService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -92,9 +95,9 @@ public class SysProfileController extends BaseController {
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
     public AjaxResult<Void> updatePwd(String oldPassword, String newPassword) {
-        LoginUser loginUser = getLoginUser();
-        String userName = loginUser.getUsername();
-        String password = loginUser.getPassword();
+        SysUser user = userService.selectUserById(SecurityUtils.getUserId());
+        String userName = user.getUserName();
+        String password = user.getPassword();
         if (!SecurityUtils.matchesPassword(oldPassword, password)) {
             return AjaxResult.error("修改密码失败，旧密码错误");
         }
@@ -102,9 +105,6 @@ public class SysProfileController extends BaseController {
             return AjaxResult.error("新密码不能与旧密码相同");
         }
         if (userService.resetUserPwd(userName, SecurityUtils.encryptPassword(newPassword)) > 0) {
-            // 更新缓存用户密码
-            loginUser.setPassword(SecurityUtils.encryptPassword(newPassword));
-            tokenService.setLoginUser(loginUser);
             return AjaxResult.success();
         }
         return AjaxResult.error("修改密码异常，请联系管理员");
