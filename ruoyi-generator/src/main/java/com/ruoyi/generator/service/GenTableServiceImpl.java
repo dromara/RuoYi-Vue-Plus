@@ -125,7 +125,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = { Exception.class })
     public void updateGenTable(GenTable genTable) {
         String options = JsonUtils.toJsonString(genTable.getParams());
         genTable.setOptions(options);
@@ -144,7 +144,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = { Exception.class })
     public void deleteGenTableByIds(Long[] tableIds) {
         List<Long> ids = Arrays.asList(tableIds);
         removeByIds(ids);
@@ -157,7 +157,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      * @param tableList 导入表列表
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = { Exception.class })
     public void importGenTable(List<GenTable> tableList) {
         String operName = SecurityUtils.getUsername();
         try {
@@ -271,7 +271,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      * @param tableName 表名称
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = { Exception.class })
     public void synchDb(String tableName) {
         GenTable table = baseMapper.selectGenTableByName(tableName);
         List<GenTableColumn> tableColumns = table.getColumns();
