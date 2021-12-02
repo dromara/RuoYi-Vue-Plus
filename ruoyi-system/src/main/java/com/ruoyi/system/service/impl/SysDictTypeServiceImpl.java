@@ -189,7 +189,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = { Exception.class })
     public int updateDictType(SysDictType dict) {
         SysDictType oldDict = getById(dict.getDictId());
         dictDataMapper.update(null, new LambdaUpdateWrapper<SysDictData>()
