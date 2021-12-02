@@ -242,7 +242,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      * @return 结果
      */
     @Override
-    @Transactional(rollbackFor = { Exception.class })
+    @Transactional(rollbackFor = Exception.class)
     public int insertUser(SysUser user) {
         // 新增用户信息
         int rows = baseMapper.insert(user);
@@ -271,7 +271,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      * @return 结果
      */
     @Override
-    @Transactional(rollbackFor = { Exception.class })
+    @Transactional(rollbackFor = Exception.class)
     public int updateUser(SysUser user) {
         Long userId = user.getUserId();
         // 删除用户与角色关联
@@ -292,7 +292,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      * @param roleIds 角色组
      */
     @Override
-    @Transactional(rollbackFor = { Exception.class })
+    @Transactional(rollbackFor = Exception.class)
     public void insertUserAuth(Long userId, Long[] roleIds) {
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
                 .eq(SysUserRole::getUserId, userId));
@@ -435,7 +435,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      * @return 结果
      */
     @Override
-    @Transactional(rollbackFor = { Exception.class })
+    @Transactional(rollbackFor = Exception.class)
     public int deleteUserById(Long userId) {
         // 删除用户与角色关联
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userId));
@@ -451,7 +451,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      * @return 结果
      */
     @Override
-    @Transactional(rollbackFor = { Exception.class })
+    @Transactional(rollbackFor = Exception.class)
     public int deleteUserByIds(Long[] userIds) {
         for (Long userId : userIds) {
             checkUserAllowed(new SysUser(userId));
