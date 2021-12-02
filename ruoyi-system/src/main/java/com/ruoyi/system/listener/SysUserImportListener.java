@@ -39,9 +39,9 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
     private final StringBuilder failureMsg = new StringBuilder();
 
     public SysUserImportListener(Boolean isUpdateSupport) {
+        String initPassword = SpringUtils.getBean(ISysConfigService.class).selectConfigByKey("sys.user.initPassword");
         this.userService = SpringUtils.getBean(ISysUserService.class);
-        this.password = SpringUtils.getBean(ISysConfigService.class)
-            .selectConfigByKey("sys.user.initPassword");
+        this.password = SecurityUtils.encryptPassword(initPassword);
         this.isUpdateSupport = isUpdateSupport;
         this.operName = SecurityUtils.getUsername();
     }
@@ -53,7 +53,7 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
             // 验证是否存在这个用户
             if (StringUtils.isNull(user)) {
                 user = BeanUtil.toBean(userVo, SysUser.class);
-                user.setPassword(SecurityUtils.encryptPassword(password));
+                user.setPassword(password);
                 user.setCreateBy(operName);
                 userService.insertUser(user);
                 successNum++;
