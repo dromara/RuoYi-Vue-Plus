@@ -24,7 +24,7 @@ public class LoginUtils {
      */
     public static void login(LoginUser loginUser, UserType userType) {
         StpUtil.login(userType.getUserType() + loginUser.getUserId());
-        StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
+        setLoginUser(loginUser);
     }
 
     /**
@@ -34,6 +34,13 @@ public class LoginUtils {
      */
     public static void loginByDevice(LoginUser loginUser, UserType userType, DeviceType deviceType) {
         StpUtil.login(userType.getUserType() + loginUser.getUserId(), deviceType.getDevice());
+        setLoginUser(loginUser);
+    }
+
+    /**
+     * 设置用户数据
+     */
+    public static void setLoginUser(LoginUser loginUser) {
         StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
     }
 

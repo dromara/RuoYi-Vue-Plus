@@ -7,12 +7,16 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.LoginUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.system.service.SysPermissionService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +40,7 @@ public class SysRoleController extends BaseController {
 
     private final ISysRoleService roleService;
     private final ISysUserService userService;
+    private final SysPermissionService permissionService;
 
     @ApiOperation("查询角色信息列表")
     @SaCheckPermission("system:role:list")
@@ -97,6 +102,13 @@ public class SysRoleController extends BaseController {
         }
 
         if (roleService.updateRole(role) > 0) {
+            // 更新缓存用户权限
+            LoginUser loginUser = getLoginUser();
+            SysUser sysUser = userService.selectUserById(loginUser.getUserId());
+            if (StringUtils.isNotNull(sysUser) && !sysUser.isAdmin()) {
+                loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser));
+                LoginUtils.setLoginUser(loginUser);
+            }
             return AjaxResult.success();
         }
         return AjaxResult.error("修改角色'" + role.getRoleName() + "'失败，请联系管理员");

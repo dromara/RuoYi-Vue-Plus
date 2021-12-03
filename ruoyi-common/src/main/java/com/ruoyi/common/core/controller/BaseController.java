@@ -70,7 +70,7 @@ public class BaseController {
     /**
      * 获取用户缓存信息
      */
-    public LoginUser getUser() {
+    public LoginUser getLoginUser() {
         return LoginUtils.getLoginUser();
     }
 
