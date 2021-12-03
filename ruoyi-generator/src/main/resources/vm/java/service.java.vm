@@ -6,6 +6,7 @@ import ${packageName}.domain.bo.${ClassName}Bo;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 #if($table.crud || $table.sub)
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.domain.PageQuery;
 #end
 
 import java.util.Collection;
@@ -28,7 +29,7 @@ public interface I${ClassName}Service extends IServicePlus<${ClassName}, ${Class
 	/**
 	 * 查询列表
 	 */
-    TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo);
+    TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery);
 #end
 
 	/**
