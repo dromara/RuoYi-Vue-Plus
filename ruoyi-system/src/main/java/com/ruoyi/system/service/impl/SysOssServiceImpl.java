@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -33,8 +34,9 @@ import java.util.Map;
 public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, SysOssVo> implements ISysOssService {
 
     @Override
-    public TableDataInfo<SysOssVo> queryPageList(SysOssBo bo) {
-        PagePlus<SysOss, SysOssVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
+    public TableDataInfo<SysOssVo> queryPageList(SysOssBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<SysOss> lqw = buildQueryWrapper(bo);
+        PagePlus<SysOss, SysOssVo> result = pageVo(PageUtils.buildPagePlus(pageQuery), lqw);
         return PageUtils.buildDataInfo(result);
     }
 

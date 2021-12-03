@@ -1,5 +1,6 @@
 package com.ruoyi.system.service;
 
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysOssConfig;
@@ -30,7 +31,7 @@ public interface ISysOssConfigService extends IServicePlus<SysOssConfig, SysOssC
     /**
      * 查询列表
      */
-    TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo);
+    TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo, PageQuery pageQuery);
 
 
     /**

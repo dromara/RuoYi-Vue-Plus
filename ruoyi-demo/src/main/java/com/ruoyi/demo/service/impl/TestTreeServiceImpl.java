@@ -36,7 +36,8 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
 	@DataScope(isUser = true)
 	@Override
 	public List<TestTreeVo> queryList(TestTreeBo bo) {
-		return listVo(buildQueryWrapper(bo));
+        LambdaQueryWrapper<TestTree> lqw = buildQueryWrapper(bo);
+        return listVo(lqw);
 	}
 
 	private LambdaQueryWrapper<TestTree> buildQueryWrapper(TestTreeBo bo) {

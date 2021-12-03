@@ -3,8 +3,10 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.domain.entity.SysDictType;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
@@ -38,7 +40,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
     private SysDictDataMapper dictDataMapper;
 
     @Override
-    public TableDataInfo<SysDictType> selectPageDictTypeList(SysDictType dictType) {
+    public TableDataInfo<SysDictType> selectPageDictTypeList(SysDictType dictType, PageQuery pageQuery) {
         Map<String, Object> params = dictType.getParams();
         LambdaQueryWrapper<SysDictType> lqw = new LambdaQueryWrapper<SysDictType>()
             .like(StringUtils.isNotBlank(dictType.getDictName()), SysDictType::getDictName, dictType.getDictName())
@@ -46,7 +48,8 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
             .like(StringUtils.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysDictType::getCreateTime, params.get("beginTime"), params.get("endTime"));
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+        Page<SysDictType> page = page(PageUtils.buildPage(pageQuery), lqw);
+        return PageUtils.buildDataInfo(page);
     }
 
     /**

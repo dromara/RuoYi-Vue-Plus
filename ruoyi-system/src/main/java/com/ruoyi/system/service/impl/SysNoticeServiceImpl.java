@@ -1,6 +1,8 @@
 package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.PageUtils;
@@ -22,12 +24,13 @@ import java.util.List;
 public class SysNoticeServiceImpl extends ServicePlusImpl<SysNoticeMapper, SysNotice, SysNotice> implements ISysNoticeService {
 
     @Override
-    public TableDataInfo<SysNotice> selectPageNoticeList(SysNotice notice) {
+    public TableDataInfo<SysNotice> selectPageNoticeList(SysNotice notice, PageQuery pageQuery) {
         LambdaQueryWrapper<SysNotice> lqw = new LambdaQueryWrapper<SysNotice>()
                 .like(StringUtils.isNotBlank(notice.getNoticeTitle()), SysNotice::getNoticeTitle, notice.getNoticeTitle())
                 .eq(StringUtils.isNotBlank(notice.getNoticeType()), SysNotice::getNoticeType, notice.getNoticeType())
                 .like(StringUtils.isNotBlank(notice.getCreateBy()), SysNotice::getCreateBy, notice.getCreateBy());
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+        Page<SysNotice> page = page(PageUtils.buildPage(pageQuery), lqw);
+        return PageUtils.buildDataInfo(page);
     }
 
     /**

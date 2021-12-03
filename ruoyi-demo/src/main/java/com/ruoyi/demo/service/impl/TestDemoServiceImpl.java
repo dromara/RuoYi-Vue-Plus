@@ -1,6 +1,7 @@
 package com.ruoyi.demo.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -37,8 +38,9 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 
 	@DataScope(isUser = true)
 	@Override
-	public TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo) {
-		PagePlus<TestDemo, TestDemoVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
+	public TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
+        PagePlus<TestDemo, TestDemoVo> result = pageVo(PageUtils.buildPagePlus(pageQuery), lqw);
 		return PageUtils.buildDataInfo(result);
 	}
 
@@ -47,8 +49,9 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 	 */
 	@DataScope(isUser = true)
 	@Override
-	public TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo) {
-		Page<TestDemoVo> result = baseMapper.customPageList(PageUtils.buildPage(), buildQueryWrapper(bo));
+	public TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
+		Page<TestDemoVo> result = baseMapper.customPageList(PageUtils.buildPage(pageQuery), lqw);
 		return PageUtils.buildDataInfo(result);
 	}
 

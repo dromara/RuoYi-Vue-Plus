@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -67,8 +68,9 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     }
 
     @Override
-    public TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo) {
-        PagePlus<SysOssConfig, SysOssConfigVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
+    public TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<SysOssConfig> lqw = buildQueryWrapper(bo);
+        PagePlus<SysOssConfig, SysOssConfigVo> result = pageVo(PageUtils.buildPagePlus(pageQuery), lqw);
         return PageUtils.buildDataInfo(result);
     }
 

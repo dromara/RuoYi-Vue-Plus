@@ -1,7 +1,9 @@
 package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
@@ -30,12 +32,13 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
     private SysUserPostMapper userPostMapper;
 
     @Override
-    public TableDataInfo<SysPost> selectPagePostList(SysPost post) {
+    public TableDataInfo<SysPost> selectPagePostList(SysPost post, PageQuery pageQuery) {
         LambdaQueryWrapper<SysPost> lqw = new LambdaQueryWrapper<SysPost>()
                 .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
                 .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
                 .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+        Page<SysPost> page = page(PageUtils.buildPage(pageQuery), lqw);
+        return PageUtils.buildDataInfo(page);
     }
 
     /**
