@@ -73,7 +73,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      * @return 选中部门列表
      */
     @Override
-    public List<Integer> selectDeptListByRoleId(Long roleId) {
+    public List<Long> selectDeptListByRoleId(Long roleId) {
         SysRole role = roleMapper.selectById(roleId);
         return baseMapper.selectDeptListByRoleId(roleId, role.isDeptCheckStrictly());
     }
