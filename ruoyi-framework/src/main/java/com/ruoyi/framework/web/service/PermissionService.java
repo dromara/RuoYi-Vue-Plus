@@ -1,12 +1,8 @@
 package com.ruoyi.framework.web.service;
 
-import com.ruoyi.common.core.domain.entity.SysRole;
-import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.spring.SpringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -44,10 +40,10 @@ public class PermissionService {
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions())) {
+        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getMenuPermissions())) {
             return false;
         }
-        return hasPermissions(loginUser.getPermissions(), permission);
+        return hasPermissions(loginUser.getMenuPermissions(), permission);
     }
 
     /**
@@ -71,10 +67,10 @@ public class PermissionService {
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions())) {
+        if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getMenuPermissions())) {
             return false;
         }
-        Set<String> authorities = loginUser.getPermissions();
+        Set<String> authorities = loginUser.getMenuPermissions();
         for (String permission : permissions.split(PERMISSION_DELIMETER)) {
             if (permission != null && hasPermissions(authorities, permission)) {
                 return true;
@@ -97,12 +93,11 @@ public class PermissionService {
         if (StringUtils.isNull(loginUser)) {
             return false;
         }
-        SysUser sysUser = SpringUtils.getBean(UserService.class).selectUserById(loginUser.getUserId());
-        if (CollectionUtils.isEmpty(sysUser.getRoles())) {
+        Set<String> rolePermissions = loginUser.getRolePermissions();
+        if (CollectionUtils.isEmpty(rolePermissions)) {
             return false;
         }
-        for (SysRole sysRole : sysUser.getRoles()) {
-            String roleKey = sysRole.getRoleKey();
+        for (String roleKey : rolePermissions) {
             if (SUPER_ADMIN.equals(roleKey) || roleKey.equals(StringUtils.trim(role))) {
                 return true;
             }
@@ -134,13 +129,15 @@ public class PermissionService {
         if (StringUtils.isNull(loginUser)) {
             return false;
         }
-        SysUser sysUser = SpringUtils.getBean(UserService.class).selectUserById(loginUser.getUserId());
-        if (CollectionUtils.isEmpty(sysUser.getRoles())) {
+        Set<String> rolePermissions = loginUser.getRolePermissions();
+        if (CollectionUtils.isEmpty(rolePermissions)) {
             return false;
         }
         for (String role : roles.split(ROLE_DELIMETER)) {
-            if (hasRole(role)) {
-                return true;
+            for (String roleKey : rolePermissions) {
+                if (SUPER_ADMIN.equals(roleKey) || roleKey.equals(StringUtils.trim(role))) {
+                    return true;
+                }
             }
         }
         return false;

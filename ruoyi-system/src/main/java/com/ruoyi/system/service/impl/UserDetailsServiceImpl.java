@@ -47,6 +47,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public UserDetails createLoginUser(SysUser user) {
-        return new LoginUser(user.getUserId(), user.getDeptId(), user.getUserName(), user.getPassword(), permissionService.getMenuPermission(user));
+        return new LoginUser()
+            .setUserId(user.getUserId())
+            .setDeptId(user.getDeptId())
+            .setUsername(user.getUserName())
+            .setPassword(user.getPassword())
+            .setMenuPermissions(permissionService.getMenuPermission(user))
+            .setRolePermissions(permissionService.getRolePermission(user));
     }
 }
