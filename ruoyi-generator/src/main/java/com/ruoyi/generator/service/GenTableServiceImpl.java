@@ -9,10 +9,7 @@ import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.PageUtils;
-import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.*;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
@@ -159,7 +156,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
     @Override
     @Transactional
     public void importGenTable(List<GenTable> tableList) {
-        String operName = SecurityUtils.getUsername();
+        String operName = LoginUtils.getUsername();
         try {
             for (GenTable table : tableList) {
                 String tableName = table.getTableName();

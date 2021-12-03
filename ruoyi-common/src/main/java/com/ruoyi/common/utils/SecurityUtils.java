@@ -13,41 +13,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * @author Long Li
  */
 public class SecurityUtils {
-    /**
-     * 用户ID
-     **/
-    public static Long getUserId() {
-        return LoginUtils.getUserId();
-    }
-
-    /**
-     * 获取部门ID
-     **/
-    public static Long getDeptId() {
-        try {
-            return getUser().getDeptId();
-        } catch (Exception e) {
-            throw new ServiceException("获取部门ID异常", HttpStatus.HTTP_UNAUTHORIZED);
-        }
-    }
-
-    /**
-     * 获取用户账户
-     **/
-    public static String getUsername() {
-        try {
-            return getUser().getUserName();
-        } catch (Exception e) {
-            throw new ServiceException("获取用户账户异常", HttpStatus.HTTP_UNAUTHORIZED);
-        }
-    }
 
     /**
      * 获取用户
      **/
     public static SysUser getUser() {
         try {
-            return SpringUtils.getBean(UserService.class).selectUserById(getUserId());
+            return SpringUtils.getBean(UserService.class).selectUserById(LoginUtils.getUserId());
         } catch (Exception e) {
             throw new ServiceException("获取用户信息异常", HttpStatus.HTTP_UNAUTHORIZED);
         }

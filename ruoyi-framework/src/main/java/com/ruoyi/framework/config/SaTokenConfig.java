@@ -6,7 +6,7 @@ import cn.dev33.satoken.jwt.StpLogicJwtForStyle;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.LoginUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.SecurityProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 .notMatch(securityProperties.getExcludes())
                 .check(() -> {
                     if (log.isDebugEnabled()) {
-                        Long userId = SecurityUtils.getUserId();
+                        Long userId = LoginUtils.getUserId();
                         if (StringUtils.isNotNull(userId)) {
                             log.debug("剩余有效时间: {}", StpUtil.getTokenTimeout());
                             log.debug("临时有效时间: {}", StpUtil.getTokenActivityTimeout());

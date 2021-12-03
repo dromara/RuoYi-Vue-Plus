@@ -7,6 +7,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
+import com.ruoyi.common.utils.LoginUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
@@ -99,7 +100,7 @@ public class SysLoginController {
     @ApiOperation("获取路由信息")
     @GetMapping("getRouters")
     public AjaxResult<List<RouterVo>> getRouters() {
-        Long userId = SecurityUtils.getUserId();
+        Long userId = LoginUtils.getUserId();
         List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
         return AjaxResult.success(menuService.buildMenus(menus));
     }

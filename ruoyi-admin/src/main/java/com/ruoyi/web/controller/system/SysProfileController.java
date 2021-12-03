@@ -113,10 +113,9 @@ public class SysProfileController extends BaseController {
     public AjaxResult<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile file) {
         Map<String,Object> ajax = new HashMap<>();
         if (!file.isEmpty()) {
-            SysUser user = SecurityUtils.getUser();
 			SysOss oss = iSysOssService.upload(file);
 			String avatar = oss.getUrl();
-            if (userService.updateUserAvatar(user.getUserName(), avatar)) {
+            if (userService.updateUserAvatar(getUsername(), avatar)) {
                 ajax.put("imgUrl", avatar);
                 return AjaxResult.success(ajax);
             }

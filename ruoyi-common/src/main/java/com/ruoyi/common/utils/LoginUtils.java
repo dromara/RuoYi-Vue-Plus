@@ -1,6 +1,8 @@
 package com.ruoyi.common.utils;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.ObjectUtil;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.exception.UtilException;
@@ -13,39 +15,68 @@ import com.ruoyi.common.exception.UtilException;
  */
 public class LoginUtils {
 
+    private final static String LOGIN_USER_KEY = "loginUser";
+
     /**
      * 登录系统
      * 针对两套用户体系
-     * @param userId 用户id
+     * @param loginUser 登录用户信息
      */
-    public static void login(Long userId, UserType userType) {
-        StpUtil.login(userType.getUserType() + userId);
+    public static void login(LoginUser loginUser, UserType userType) {
+        StpUtil.login(userType.getUserType() + loginUser.getUserId());
+        StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
     }
 
     /**
      * 登录系统 基于 设备类型
      * 针对一套用户体系
-     * @param userId 用户id
+     * @param loginUser 登录用户信息
      */
-    public static void loginByDevice(Long userId, UserType userType, DeviceType deviceType) {
-        StpUtil.login(userType.getUserType() + userId, deviceType.getDevice());
+    public static void loginByDevice(LoginUser loginUser, UserType userType, DeviceType deviceType) {
+        StpUtil.login(userType.getUserType() + loginUser.getUserId(), deviceType.getDevice());
+        StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
+    }
+
+    /**
+     * 获取用户
+     **/
+    public static LoginUser getLoginUser() {
+        return (LoginUser) StpUtil.getTokenSession().get(LOGIN_USER_KEY);
     }
 
     /**
      * 获取用户id
      */
     public static Long getUserId() {
-        String loginId = StpUtil.getLoginIdAsString();
-        String userId;
-        String replace = "";
-        if (StringUtils.contains(loginId, UserType.SYS_USER.getUserType())) {
-            userId = StringUtils.replace(loginId, UserType.SYS_USER.getUserType(), replace);
-        } else if (StringUtils.contains(loginId, UserType.APP_USER.getUserType())){
-            userId = StringUtils.replace(loginId, UserType.APP_USER.getUserType(), replace);
-        } else {
-            throw new UtilException("登录用户: LoginId异常 => " + loginId);
+        LoginUser loginUser = getLoginUser();
+        if (ObjectUtil.isNull(loginUser)) {
+            String loginId = StpUtil.getLoginIdAsString();
+            String userId;
+            String replace = "";
+            if (StringUtils.contains(loginId, UserType.SYS_USER.getUserType())) {
+                userId = StringUtils.replace(loginId, UserType.SYS_USER.getUserType(), replace);
+            } else if (StringUtils.contains(loginId, UserType.APP_USER.getUserType())){
+                userId = StringUtils.replace(loginId, UserType.APP_USER.getUserType(), replace);
+            } else {
+                throw new UtilException("登录用户: LoginId异常 => " + loginId);
+            }
+            return Long.parseLong(userId);
         }
-        return Long.parseLong(userId);
+        return loginUser.getUserId();
+    }
+
+    /**
+     * 获取部门ID
+     **/
+    public static Long getDeptId() {
+        return getLoginUser().getDeptId();
+    }
+
+    /**
+     * 获取用户账户
+     **/
+    public static String getUsername() {
+        return getLoginUser().getUsername();
     }
 
     /**

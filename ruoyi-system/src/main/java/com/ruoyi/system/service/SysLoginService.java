@@ -3,6 +3,7 @@ package com.ruoyi.system.service;
 import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.service.LogininforService;
 import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.UserStatus;
@@ -14,7 +15,6 @@ import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
 import com.ruoyi.common.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +36,9 @@ public class SysLoginService {
 
     @Autowired
     private LogininforService asyncService;
+
+    @Autowired
+    private SysPermissionService permissionService;
 
     /**
      * 登录验证
@@ -68,11 +71,17 @@ public class SysLoginService {
             asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match"), request);
             throw new UserPasswordNotMatchException();
         }
+        LoginUser loginUser = new LoginUser();
+        loginUser.setUserId(user.getUserId());
+        loginUser.setDeptId(user.getDeptId());
+        loginUser.setUsername(user.getUserName());
+        loginUser.setMenuPermission(permissionService.getMenuPermission(user));
+        loginUser.setRolePermission(permissionService.getRolePermission(user));
 
 		asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
         recordLoginInfo(user.getUserId(), username);
         // 生成token
-        LoginUtils.loginByDevice(user.getUserId(), UserType.SYS_USER, DeviceType.PC);
+        LoginUtils.loginByDevice(loginUser, UserType.SYS_USER, DeviceType.PC);
         return StpUtil.getTokenValue();
     }
 

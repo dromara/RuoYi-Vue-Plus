@@ -1,8 +1,8 @@
 package com.ruoyi.common.core.controller;
 
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.utils.LoginUtils;
 import com.ruoyi.common.utils.StringUtils;
 
 /**
@@ -70,28 +70,28 @@ public class BaseController {
     /**
      * 获取用户缓存信息
      */
-    public SysUser getUser() {
-        return SecurityUtils.getUser();
+    public LoginUser getUser() {
+        return LoginUtils.getLoginUser();
     }
 
     /**
      * 获取登录用户id
      */
     public Long getUserId() {
-        return SecurityUtils.getUserId();
+        return LoginUtils.getUserId();
     }
 
     /**
      * 获取登录部门id
      */
     public Long getDeptId() {
-        return SecurityUtils.getDeptId();
+        return LoginUtils.getDeptId();
     }
 
     /**
      * 获取登录用户名
      */
     public String getUsername() {
-        return SecurityUtils.getUsername();
+        return LoginUtils.getUsername();
     }
 }

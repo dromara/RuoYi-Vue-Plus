@@ -1,4 +1,4 @@
-package com.ruoyi.framework.dao;
+package com.ruoyi.framework.satoken.dao;
 
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.util.SaFoxUtil;
