@@ -45,10 +45,10 @@ public class RedisUtils {
     }
 
     /**
-     * 获取实例id
+     * 获取客户端实例
      */
-    public static String getClientId() {
-        return CLIENT.getId();
+    public static RedissonClient getClient() {
+        return CLIENT;
     }
 
     /**

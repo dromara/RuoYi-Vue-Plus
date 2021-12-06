@@ -54,7 +54,7 @@ public class RateLimiterAspect {
             stringBuffer.append(ServletUtils.getClientIP()).append("-");
         } else if (rateLimiter.limitType() == LimitType.CLUSTER){
             // 获取客户端实例id
-            stringBuffer.append(RedisUtils.getClientId()).append("-");
+            stringBuffer.append(RedisUtils.getClient().getId()).append("-");
         }
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
