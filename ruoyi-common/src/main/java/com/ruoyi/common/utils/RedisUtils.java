@@ -94,8 +94,8 @@ public class RedisUtils {
     /**
      * 缓存基本的对象，保留当前对象 TTL 有效期
      *
-     * @param key   缓存的键值
-     * @param value 缓存的值
+     * @param key       缓存的键值
+     * @param value     缓存的值
      * @param isSaveTtl 是否保留TTL有效期(例如: set之前ttl剩余90 set之后还是为90)
      * @since Redis 6.X 以上使用 setAndKeepTTL 兼容 5.X 方案
      */
@@ -126,6 +126,19 @@ public class RedisUtils {
         RBucket<T> result = CLIENT.getBucket(key);
         result.set(value);
         result.expire(timeout, timeUnit);
+    }
+
+    /**
+     * 注册对象监听器
+     *
+     * key 监听器需开启 `notify-keyspace-events` 等 redis 相关配置
+     *
+     * @param key      缓存的键值
+     * @param listener 监听器配置
+     */
+    public static <T> void addObjectListener(final String key, final ObjectListener listener) {
+        RBucket<T> result = CLIENT.getBucket(key);
+        result.addListener(listener);
     }
 
     /**
@@ -177,19 +190,16 @@ public class RedisUtils {
     /**
      * 删除单个对象
      *
-     * @param key
+     * @param key 缓存的键值
      */
     public static boolean deleteObject(final String key) {
         return CLIENT.getBucket(key).delete();
     }
 
-    /* */
-
     /**
      * 删除集合对象
      *
      * @param collection 多个对象
-     * @return
      */
     public static void deleteObject(final Collection collection) {
         RBatch batch = CLIENT.createBatch();
@@ -209,6 +219,19 @@ public class RedisUtils {
     public static <T> boolean setCacheList(final String key, final List<T> dataList) {
         RList<T> rList = CLIENT.getList(key);
         return rList.addAll(dataList);
+    }
+
+    /**
+     * 注册List监听器
+     *
+     * key 监听器需开启 `notify-keyspace-events` 等 redis 相关配置
+     *
+     * @param key      缓存的键值
+     * @param listener 监听器配置
+     */
+    public static <T> void addListListener(final String key, final ObjectListener listener) {
+        RList<T> rList = CLIENT.getList(key);
+        rList.addListener(listener);
     }
 
     /**
@@ -235,10 +258,23 @@ public class RedisUtils {
     }
 
     /**
+     * 注册Set监听器
+     *
+     * key 监听器需开启 `notify-keyspace-events` 等 redis 相关配置
+     *
+     * @param key      缓存的键值
+     * @param listener 监听器配置
+     */
+    public static <T> void addSetListener(final String key, final ObjectListener listener) {
+        RSet<T> rSet = CLIENT.getSet(key);
+        rSet.addListener(listener);
+    }
+
+    /**
      * 获得缓存的set
      *
-     * @param key
-     * @return
+     * @param key 缓存的key
+     * @return set对象
      */
     public static <T> Set<T> getCacheSet(final String key) {
         RSet<T> rSet = CLIENT.getSet(key);
@@ -248,8 +284,8 @@ public class RedisUtils {
     /**
      * 缓存Map
      *
-     * @param key
-     * @param dataMap
+     * @param key     缓存的键值
+     * @param dataMap 缓存的数据
      */
     public static <T> void setCacheMap(final String key, final Map<String, T> dataMap) {
         if (dataMap != null) {
@@ -259,10 +295,23 @@ public class RedisUtils {
     }
 
     /**
+     * 注册Map监听器
+     *
+     * key 监听器需开启 `notify-keyspace-events` 等 redis 相关配置
+     *
+     * @param key      缓存的键值
+     * @param listener 监听器配置
+     */
+    public static <T> void addMapListener(final String key, final ObjectListener listener) {
+        RMap<String, T> rMap = CLIENT.getMap(key);
+        rMap.addListener(listener);
+    }
+
+    /**
      * 获得缓存的Map
      *
-     * @param key
-     * @return
+     * @param key 缓存的键值
+     * @return map对象
      */
     public static <T> Map<String, T> getCacheMap(final String key) {
         RMap<String, T> rMap = CLIENT.getMap(key);
