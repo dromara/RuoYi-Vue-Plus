@@ -4,6 +4,8 @@ import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.lang.tree.parser.NodeParser;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -12,6 +14,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TreeBuildUtils extends TreeUtil {
 
     /**

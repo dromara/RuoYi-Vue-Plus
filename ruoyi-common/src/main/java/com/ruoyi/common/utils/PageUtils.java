@@ -8,6 +8,8 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.sql.SqlUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -16,6 +18,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PageUtils {
 
     /**

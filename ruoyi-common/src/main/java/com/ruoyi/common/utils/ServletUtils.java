@@ -3,6 +3,8 @@ package com.ruoyi.common.utils;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HttpStatus;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -19,6 +21,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author ruoyi
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ServletUtils extends ServletUtil {
 
     /**

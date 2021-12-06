@@ -1,5 +1,8 @@
 package com.ruoyi.common.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
@@ -11,6 +14,7 @@ import java.util.Set;
  *
  * @author Lion Li
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ValidatorUtils {
 
 	private static final Validator VALID = Validation.buildDefaultValidatorFactory().getValidator();
