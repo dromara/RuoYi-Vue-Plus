@@ -1,6 +1,5 @@
 package com.ruoyi.common.core.mybatisplus.core;
 
-import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -165,9 +164,9 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 	 * @param id 主键ID
 	 */
 	@Override
-	public V getVoById(Serializable id, CopyOptions copyOptions) {
+	public V getVoById(Serializable id) {
 		T t = getBaseMapper().selectById(id);
-		return BeanCopyUtils.oneCopy(t, copyOptions, voClass);
+		return BeanCopyUtils.copy(t, voClass);
 	}
 
 	/**
@@ -176,12 +175,12 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 	 * @param idList 主键ID列表
 	 */
 	@Override
-	public List<V> listVoByIds(Collection<? extends Serializable> idList, CopyOptions copyOptions) {
+	public List<V> listVoByIds(Collection<? extends Serializable> idList) {
 		List<T> list = getBaseMapper().selectBatchIds(idList);
 		if (list == null) {
 			return null;
 		}
-		return BeanCopyUtils.listCopy(list, copyOptions, voClass);
+		return BeanCopyUtils.copyList(list, voClass);
 	}
 
 	/**
@@ -190,12 +189,12 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 	 * @param columnMap 表字段 map 对象
 	 */
 	@Override
-	public List<V> listVoByMap(Map<String, Object> columnMap, CopyOptions copyOptions) {
+	public List<V> listVoByMap(Map<String, Object> columnMap) {
 		List<T> list = getBaseMapper().selectByMap(columnMap);
 		if (list == null) {
 			return null;
 		}
-		return BeanCopyUtils.listCopy(list, copyOptions, voClass);
+		return BeanCopyUtils.copyList(list, voClass);
 	}
 
 	/**
@@ -205,9 +204,9 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 	 * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
 	 */
 	@Override
-	public V getVoOne(Wrapper<T> queryWrapper, CopyOptions copyOptions) {
+	public V getVoOne(Wrapper<T> queryWrapper) {
 		T t = getOne(queryWrapper, true);
-		return BeanCopyUtils.oneCopy(t, copyOptions, voClass);
+		return BeanCopyUtils.copy(t, voClass);
 	}
 
 	/**
@@ -216,12 +215,12 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 	 * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
 	 */
 	@Override
-	public List<V> listVo(Wrapper<T> queryWrapper, CopyOptions copyOptions) {
+	public List<V> listVo(Wrapper<T> queryWrapper) {
 		List<T> list = getBaseMapper().selectList(queryWrapper);
 		if (list == null) {
 			return null;
 		}
-		return BeanCopyUtils.listCopy(list, copyOptions, voClass);
+		return BeanCopyUtils.copyList(list, voClass);
 	}
 
 	/**
@@ -231,9 +230,9 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 	 * @param queryWrapper 实体对象封装操作类
 	 */
 	@Override
-	public PagePlus<T, V> pageVo(PagePlus<T, V> page, Wrapper<T> queryWrapper, CopyOptions copyOptions) {
+	public PagePlus<T, V> pageVo(PagePlus<T, V> page, Wrapper<T> queryWrapper) {
 		PagePlus<T, V> result = getBaseMapper().selectPage(page, queryWrapper);
-		List<V> volist = BeanCopyUtils.listCopy(result.getRecords(), copyOptions, voClass);
+		List<V> volist = BeanCopyUtils.copyList(result.getRecords(), voClass);
 		result.setRecordsVo(volist);
 		return result;
 	}

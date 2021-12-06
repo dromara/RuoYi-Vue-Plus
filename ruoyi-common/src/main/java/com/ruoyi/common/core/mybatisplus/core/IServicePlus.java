@@ -1,6 +1,5 @@
 package com.ruoyi.common.core.mybatisplus.core;
 
-import cn.hutool.core.bean.copier.CopyOptions;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -23,14 +22,9 @@ public interface IServicePlus<T, V> extends IService<T> {
 
 	/**
 	 * @param id          主键id
-	 * @param copyOptions copy条件
 	 * @return V对象
 	 */
-	V getVoById(Serializable id, CopyOptions copyOptions);
-
-	default V getVoById(Serializable id) {
-		return getVoById(id, new CopyOptions());
-	}
+	V getVoById(Serializable id);
 
 	/**
 	 * @param convertor 自定义转换器
@@ -41,14 +35,9 @@ public interface IServicePlus<T, V> extends IService<T> {
 
 	/**
 	 * @param idList      id列表
-	 * @param copyOptions copy条件
 	 * @return V对象
 	 */
-	List<V> listVoByIds(Collection<? extends Serializable> idList, CopyOptions copyOptions);
-
-	default List<V> listVoByIds(Collection<? extends Serializable> idList) {
-		return listVoByIds(idList, new CopyOptions());
-	}
+	List<V> listVoByIds(Collection<? extends Serializable> idList);
 
 	/**
 	 * @param convertor 自定义转换器
@@ -64,14 +53,9 @@ public interface IServicePlus<T, V> extends IService<T> {
 
 	/**
 	 * @param columnMap   表字段 map 对象
-	 * @param copyOptions copy条件
 	 * @return V对象
 	 */
-	List<V> listVoByMap(Map<String, Object> columnMap, CopyOptions copyOptions);
-
-	default List<V> listVoByMap(Map<String, Object> columnMap) {
-		return listVoByMap(columnMap, new CopyOptions());
-	}
+	List<V> listVoByMap(Map<String, Object> columnMap);
 
 	/**
 	 * @param convertor 自定义转换器
@@ -87,14 +71,9 @@ public interface IServicePlus<T, V> extends IService<T> {
 
 	/**
 	 * @param queryWrapper 查询条件
-	 * @param copyOptions  copy条件
 	 * @return V对象
 	 */
-	V getVoOne(Wrapper<T> queryWrapper, CopyOptions copyOptions);
-
-	default V getVoOne(Wrapper<T> queryWrapper) {
-		return getVoOne(queryWrapper, new CopyOptions());
-	}
+	V getVoOne(Wrapper<T> queryWrapper);
 
 	/**
 	 * @param convertor 自定义转换器
@@ -105,14 +84,9 @@ public interface IServicePlus<T, V> extends IService<T> {
 
 	/**
 	 * @param queryWrapper 查询条件
-	 * @param copyOptions  copy条件
 	 * @return V对象
 	 */
-	List<V> listVo(Wrapper<T> queryWrapper, CopyOptions copyOptions);
-
-	default List<V> listVo(Wrapper<T> queryWrapper) {
-		return listVo(queryWrapper, new CopyOptions());
-	}
+	List<V> listVo(Wrapper<T> queryWrapper);
 
 	/**
 	 * @param convertor 自定义转换器
@@ -139,14 +113,9 @@ public interface IServicePlus<T, V> extends IService<T> {
 	/**
 	 * @param page         分页对象
 	 * @param queryWrapper 查询条件
-	 * @param copyOptions  copy条件
 	 * @return V对象
 	 */
-	PagePlus<T, V> pageVo(PagePlus<T, V> page, Wrapper<T> queryWrapper, CopyOptions copyOptions);
-
-	default PagePlus<T, V> pageVo(PagePlus<T, V> page, Wrapper<T> queryWrapper) {
-		return pageVo(page, queryWrapper, new CopyOptions());
-	}
+	PagePlus<T, V> pageVo(PagePlus<T, V> page, Wrapper<T> queryWrapper);
 
 	/**
 	 * @param convertor 自定义转换器
