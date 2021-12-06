@@ -34,7 +34,7 @@
         <redisson.version>3.16.4</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.4.1</dynamic-ds.version>
-        <tlog.version>1.3.4</tlog.version>
+        <tlog.version>1.3.5</tlog.version>
         <xxl-job.version>2.3.0</xxl-job.version>
 
         <!-- jdk11 缺失依赖 jaxb-->
@@ -203,29 +203,13 @@
 
             <dependency>
                 <groupId>com.yomahub</groupId>
-                <artifactId>tlog-spring-boot-configuration</artifactId>
+                <artifactId>tlog-web-spring-boot-starter</artifactId>
                 <version>${tlog.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.yomahub</groupId>
-                <artifactId>tlog-webroot</artifactId>
-                <version>${tlog.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>javassist</artifactId>
-                        <groupId>org.javassist</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>guava</artifactId>
-                        <groupId>com.google.guava</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.yomahub</groupId>
-                <artifactId>tlog-xxl-job</artifactId>
+                <artifactId>tlog-xxljob-spring-boot-starter</artifactId>
                 <version>${tlog.version}</version>
             </dependency>
 

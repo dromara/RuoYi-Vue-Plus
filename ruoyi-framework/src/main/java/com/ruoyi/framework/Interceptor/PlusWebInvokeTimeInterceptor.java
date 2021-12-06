@@ -35,14 +35,14 @@ public class PlusWebInvokeTimeInterceptor extends AbsTLogWebHandlerMethodInterce
             // 打印请求参数
             if (isJsonRequest(request)) {
                     String jsonParam = new RequestWrapper(request).getBodyString();
-                    log.info("[PLUS]开始请求 => URL[{}],参数类型[json],参数:[{}]", url, jsonParam);
+                    log.debug("[PLUS]开始请求 => URL[{}],参数类型[json],参数:[{}]", url, jsonParam);
             } else {
                 Map<String, String[]> parameterMap = request.getParameterMap();
                 if (MapUtil.isNotEmpty(parameterMap)) {
                     String parameters = JsonUtils.toJsonString(parameterMap);
-                    log.info("[PLUS]开始请求 => URL[{}],参数类型[param],参数:[{}]", url, parameters);
+                    log.debug("[PLUS]开始请求 => URL[{}],参数类型[param],参数:[{}]", url, parameters);
                 } else {
-                    log.info("[PLUS]开始请求 => URL[{}],无参数", url);
+                    log.debug("[PLUS]开始请求 => URL[{}],无参数", url);
                 }
             }
 
@@ -63,7 +63,7 @@ public class PlusWebInvokeTimeInterceptor extends AbsTLogWebHandlerMethodInterce
         if (TLogContext.enableInvokeTimePrint()) {
             StopWatch stopWatch = invokeTimeTL.get();
             stopWatch.stop();
-            log.info("[PLUS]结束请求 => URL[{}],耗时:[{}]毫秒", request.getMethod() + " " + request.getRequestURI(), stopWatch.getTime());
+            log.debug("[PLUS]结束请求 => URL[{}],耗时:[{}]毫秒", request.getMethod() + " " + request.getRequestURI(), stopWatch.getTime());
             invokeTimeTL.remove();
         }
     }

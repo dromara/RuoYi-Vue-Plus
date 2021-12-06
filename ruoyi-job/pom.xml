@@ -31,7 +31,7 @@
 
         <dependency>
             <groupId>com.yomahub</groupId>
-            <artifactId>tlog-xxl-job</artifactId>
+            <artifactId>tlog-xxljob-spring-boot-starter</artifactId>
         </dependency>
 
     </dependencies>
