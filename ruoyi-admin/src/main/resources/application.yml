@@ -120,11 +120,11 @@ security:
     - /*/api-docs
     # druid 监控配置
     - /druid/**
+  # 用户放行
+  permit-all:
     # actuator 监控配置
     - /actuator
     - /actuator/**
-  # 用户放行
-  permit-all:
 
 # 重复提交
 repeat-submit:
