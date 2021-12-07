@@ -21,7 +21,7 @@
 | 原框架 | RuoYi-Vue | [RuoYi-Vue官网](http://ruoyi.vip/) | 定期同步需要的功能 |
 | 前端开发框架 | Vue、Element UI | [Element UI官网](https://element.eleme.cn/#/zh-CN) | |
 | 后端开发框架 | SpringBoot | [SpringBoot官网](https://spring.io/projects/spring-boot/#learn) | |
-| 容器框架 | Undertow | [Undertow官网](https://undertow.io/) | 基于 Netty 的高性能容器 |
+| 容器框架 | Undertow | [Undertow官网](https://undertow.io/) | 基于 XNIO 的高性能容器 |
 | 权限认证框架 | Spring Security、Jwt | [SpringSecurity官网](https://spring.io/projects/spring-security#learn) | 支持多终端认证系统 |
 | 关系数据库 | MySQL | [MySQL官网](https://dev.mysql.com/) | 适配 8.X 最低 5.7 |
 | 缓存数据库 | Redis | [Redis官网](https://redis.io/) | 适配 6.X 最低 4.X |
