@@ -178,7 +178,11 @@ public class SysMenuServiceImpl extends ServicePlusImpl<SysMenuMapper, SysMenu, 
      */
     @Override
     public List<Tree<Long>> buildMenuTreeSelect(List<SysMenu> menus) {
-        return TreeBuildUtils.build(menus, (menu, tree) ->
+        if (CollUtil.isEmpty(menus)) {
+            return CollUtil.newArrayList();
+        }
+        Long parentId = menus.get(0).getParentId();
+        return TreeBuildUtils.build(menus, parentId, (menu, tree) ->
             tree.setId(menu.getMenuId())
                 .setParentId(menu.getParentId())
                 .setName(menu.getMenuName())

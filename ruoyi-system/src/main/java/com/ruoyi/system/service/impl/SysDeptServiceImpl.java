@@ -59,7 +59,11 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public List<Tree<Long>> buildDeptTreeSelect(List<SysDept> depts) {
-        return TreeBuildUtils.build(depts, (dept, tree) ->
+        if (CollUtil.isEmpty(depts)) {
+            return CollUtil.newArrayList();
+        }
+        Long parentId = depts.get(0).getParentId();
+        return TreeBuildUtils.build(depts, parentId, (dept, tree) ->
             tree.setId(dept.getDeptId())
                 .setParentId(dept.getParentId())
                 .setName(dept.getDeptName())

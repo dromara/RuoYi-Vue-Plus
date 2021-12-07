@@ -22,13 +22,8 @@ public class TreeBuildUtils extends TreeUtil {
      */
     public static final TreeNodeConfig DEFAULT_CONFIG = TreeNodeConfig.DEFAULT_CONFIG.setNameKey("label");
 
-    /**
-     * 默认树父节点id
-     */
-    public static final Long DEFAULT_PARENT_ID = 0L;
-
-    public static <T> List<Tree<Long>> build(List<T> list, NodeParser<T, Long> nodeParser) {
-        return TreeUtil.build(list, DEFAULT_PARENT_ID, DEFAULT_CONFIG, nodeParser);
+    public static <T> List<Tree<Long>> build(List<T> list, Long parentId, NodeParser<T, Long> nodeParser) {
+        return TreeUtil.build(list, parentId, DEFAULT_CONFIG, nodeParser);
     }
 
 }
