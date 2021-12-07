@@ -1,5 +1,6 @@
 package com.ruoyi.common.core.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.common.core.domain.TreeEntity;
@@ -65,6 +66,7 @@ public class SysMenu extends TreeEntity {
      * 路由参数
      */
 	@ApiModelProperty(value = "路由参数")
+    @TableField("`query`")
     private String query;
 
 	/**
