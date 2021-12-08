@@ -23,7 +23,7 @@ import java.util.Map;
  * @author Lion Li
  * @date 2021-07-26
  */
-//@DataSource(DataSourceType.SLAVE) // 切换从库查询
+// @DS("slave") // 切换从库查询
 @Service
 public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTree, TestTreeVo> implements ITestTreeService {
 
@@ -32,8 +32,8 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
 		return getVoById(id);
 	}
 
-//	@DataSource(DataSourceType.SLAVE) // 切换从库查询
-	@DataScope(isUser = true)
+//	@DS("slave") // 切换从库查询
+    @DataScope(isUser = true)
 	@Override
 	public List<TestTreeVo> queryList(TestTreeBo bo) {
         LambdaQueryWrapper<TestTree> lqw = buildQueryWrapper(bo);

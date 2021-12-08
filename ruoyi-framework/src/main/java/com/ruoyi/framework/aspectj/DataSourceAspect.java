@@ -18,10 +18,12 @@ import java.util.Objects;
  * 多数据源处理
  *
  * @author Lion Li
+ * @deprecated 3.6.0 移除 使用原生方法处理 功能更全
  */
 @Aspect
 @Order(-500)
 @Component
+@Deprecated
 public class DataSourceAspect {
 
 	@Pointcut("@annotation(com.ruoyi.common.annotation.DataSource)"
