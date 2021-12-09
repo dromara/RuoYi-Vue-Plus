@@ -3,6 +3,7 @@ package com.ruoyi.framework.web.exception;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.http.HttpStatus;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -59,7 +60,7 @@ public class GlobalExceptionHandler {
     public AjaxResult<Void> handleAccessDeniedException(NotLoginException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         String token = e.getMessage().split("：")[1];
-        RedisUtils.deleteObject(Constants.ONLINE_TOKEN_KEY + token);
+        StpUtil.kickoutByTokenValue(token);
         log.error("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI, e.getMessage());
         return AjaxResult.error(HttpStatus.HTTP_UNAUTHORIZED, StringUtils.format("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI));
     }
