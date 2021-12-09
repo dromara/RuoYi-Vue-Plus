@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.monitor;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.annotation.Log;
@@ -45,6 +46,10 @@ public class SysUserOnlineController extends BaseController {
         List<String> keys = StpUtil.searchTokenValue("", -1, 0);
         List<UserOnlineDTO> userOnlineDTOList = new ArrayList<>();
         for (String key : keys) {
+            // 如果已经过期则踢下线
+            if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(key) < 0) {
+                StpUtil.kickoutByTokenValue(key);
+            }
             String onlineKey = key.replace(Constants.LOGIN_TOKEN_KEY, Constants.ONLINE_TOKEN_KEY);
             userOnlineDTOList.add(RedisUtils.getCacheObject(onlineKey));
         }
@@ -77,7 +82,7 @@ public class SysUserOnlineController extends BaseController {
     @DeleteMapping("/{tokenId}")
     public AjaxResult<Void> forceLogout(@PathVariable String tokenId) {
         try {
-            StpUtil.logoutByTokenValue(tokenId);
+            StpUtil.kickoutByTokenValue(tokenId);
         } catch (NotLoginException e) {
         }
         return AjaxResult.success();
