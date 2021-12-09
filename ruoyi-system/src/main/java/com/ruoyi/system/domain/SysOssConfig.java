@@ -22,7 +22,7 @@ public class SysOssConfig extends BaseEntity {
      * 主建
      */
     @TableId(value = "oss_config_id")
-    private Integer ossConfigId;
+    private Long ossConfigId;
 
     /**
      * 配置key
