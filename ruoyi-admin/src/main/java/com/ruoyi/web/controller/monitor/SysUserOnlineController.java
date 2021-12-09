@@ -46,12 +46,12 @@ public class SysUserOnlineController extends BaseController {
         List<String> keys = StpUtil.searchTokenValue("", -1, 0);
         List<UserOnlineDTO> userOnlineDTOList = new ArrayList<>();
         for (String key : keys) {
+            String token = key.replace(Constants.LOGIN_TOKEN_KEY, "");
             // 如果已经过期则踢下线
-            if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(key) < 0) {
+            if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(token) < 0) {
                 continue;
             }
-            String onlineKey = key.replace(Constants.LOGIN_TOKEN_KEY, Constants.ONLINE_TOKEN_KEY);
-            userOnlineDTOList.add(RedisUtils.getCacheObject(onlineKey));
+            userOnlineDTOList.add(RedisUtils.getCacheObject(Constants.ONLINE_TOKEN_KEY + token));
         }
         if (StringUtils.isNotEmpty(ipaddr) && StringUtils.isNotEmpty(userName)) {
             userOnlineDTOList = userOnlineDTOList.stream().filter(userOnline ->
