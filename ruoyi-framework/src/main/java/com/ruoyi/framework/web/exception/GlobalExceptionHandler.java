@@ -59,8 +59,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotLoginException.class)
     public AjaxResult<Void> handleAccessDeniedException(NotLoginException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        String token = e.getMessage().split("：")[1];
-        StpUtil.kickoutByTokenValue(token);
         log.error("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI, e.getMessage());
         return AjaxResult.error(HttpStatus.HTTP_UNAUTHORIZED, StringUtils.format("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI));
     }
