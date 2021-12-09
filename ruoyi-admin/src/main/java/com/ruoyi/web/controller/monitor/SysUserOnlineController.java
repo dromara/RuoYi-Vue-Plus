@@ -49,6 +49,7 @@ public class SysUserOnlineController extends BaseController {
             // 如果已经过期则踢下线
             if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(key) < 0) {
                 StpUtil.kickoutByTokenValue(key);
+                continue;
             }
             String onlineKey = key.replace(Constants.LOGIN_TOKEN_KEY, Constants.ONLINE_TOKEN_KEY);
             userOnlineDTOList.add(RedisUtils.getCacheObject(onlineKey));

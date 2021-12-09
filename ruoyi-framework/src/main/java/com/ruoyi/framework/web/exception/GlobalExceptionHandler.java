@@ -4,9 +4,11 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.hutool.http.HttpStatus;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.exception.DemoModeException;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -56,6 +58,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotLoginException.class)
     public AjaxResult<Void> handleAccessDeniedException(NotLoginException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
+        String token = e.getMessage().split("：")[1];
+        RedisUtils.deleteObject(Constants.ONLINE_TOKEN_KEY + token);
         log.error("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI, e.getMessage());
         return AjaxResult.error(HttpStatus.HTTP_UNAUTHORIZED, StringUtils.format("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI));
     }
