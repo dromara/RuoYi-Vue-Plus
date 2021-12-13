@@ -69,7 +69,7 @@ public class ${ClassName}Controller extends BaseController {
     @ApiOperation("导出${functionName}列表")
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:export')")
     @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(@Validated ${ClassName}Bo bo, HttpServletResponse response) {
         List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
         ExcelUtil.exportExcel(list, "${functionName}", ${ClassName}Vo.class, response);
