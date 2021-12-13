@@ -18,9 +18,11 @@ import org.springframework.stereotype.Component;
  * 数据过滤处理
  *
  * @author Lion Li
+ * @deprecated 3.6.0 移除 {@link com.ruoyi.framework.handler.PlusDataPermissionHandler}
  */
 @Aspect
 @Component
+@Deprecated
 public class DataScopeAspect {
 
 	/**

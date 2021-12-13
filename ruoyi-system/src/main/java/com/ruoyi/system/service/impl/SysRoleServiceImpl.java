@@ -2,7 +2,6 @@ package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysRole;
@@ -46,7 +45,6 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
     private SysRoleDeptMapper roleDeptMapper;
 
     @Override
-    @DataScope(deptAlias = "d")
     public TableDataInfo<SysRole> selectPageRoleList(SysRole role, PageQuery pageQuery) {
         Page<SysRole> page = baseMapper.selectPageRoleList(PageUtils.buildPage(pageQuery), role);
         return PageUtils.buildDataInfo(page);
@@ -59,7 +57,6 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
      * @return 角色数据集合信息
      */
     @Override
-    @DataScope(deptAlias = "d")
     public List<SysRole> selectRoleList(SysRole role) {
         return baseMapper.selectRoleList(role);
     }

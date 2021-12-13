@@ -5,7 +5,6 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
@@ -47,8 +46,9 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      * @return 部门信息集合
      */
     @Override
-    @DataScope(deptAlias = "d")
     public List<SysDept> selectDeptList(SysDept dept) {
+//        return baseMapper.selectList();
+//        return baseMapper.selectList(new LambdaQueryWrapper<>());
         return baseMapper.selectDeptList(dept);
     }
 

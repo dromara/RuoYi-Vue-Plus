@@ -1,6 +1,8 @@
 package com.ruoyi.system.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.annotation.DataColumn;
+import com.ruoyi.common.annotation.DataPermission;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import org.apache.ibatis.annotations.Param;
@@ -14,6 +16,9 @@ import java.util.List;
  */
 public interface SysRoleMapper extends BaseMapperPlus<SysRole> {
 
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "d.dept_id")
+    })
     Page<SysRole> selectPageRoleList(@Param("page") Page<SysRole> page, @Param("role") SysRole role);
 
     /**
@@ -22,6 +27,9 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRole> {
      * @param role 角色信息
      * @return 角色数据集合信息
      */
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "d.dept_id")
+    })
     List<SysRole> selectRoleList(SysRole role);
 
     /**

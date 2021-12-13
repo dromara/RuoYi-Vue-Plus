@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.ruoyi.common.core.mybatisplus.methods.InsertAll;
+import com.ruoyi.framework.Interceptor.PlusDataPermissionInterceptor;
 import com.ruoyi.framework.handler.CreateAndUpdateMetaObjectHandler;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
@@ -30,12 +31,21 @@ public class MybatisPlusConfig {
 	@Bean
 	public MybatisPlusInterceptor mybatisPlusInterceptor() {
 		MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        // 数据权限处理
+        interceptor.addInnerInterceptor(dataPermissionInterceptor());
 		// 分页插件
 		interceptor.addInnerInterceptor(paginationInnerInterceptor());
 		// 乐观锁插件
 		interceptor.addInnerInterceptor(optimisticLockerInnerInterceptor());
 		return interceptor;
 	}
+
+    /**
+     * 数据权限拦截器
+     */
+    public PlusDataPermissionInterceptor dataPermissionInterceptor() {
+        return new PlusDataPermissionInterceptor();
+    }
 
 	/**
 	 * 分页插件，自动识别数据库类型

@@ -1,5 +1,7 @@
 package com.ruoyi.system.mapper;
 
+import com.ruoyi.common.annotation.DataColumn;
+import com.ruoyi.common.annotation.DataPermission;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import org.apache.ibatis.annotations.Param;
@@ -19,6 +21,9 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept> {
      * @param dept 部门信息
      * @return 部门信息集合
      */
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "d.dept_id")
+    })
     List<SysDept> selectDeptList(SysDept dept);
 
     /**

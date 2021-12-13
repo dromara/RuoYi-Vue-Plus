@@ -162,7 +162,7 @@ public class SysUser extends BaseEntity {
 	private Long[] postIds;
 
 	/**
-	 * 角色ID
+	 * 数据权限 当前角色ID
 	 */
 	@ApiModelProperty(value = "角色ID")
 	@TableField(exist = false)
