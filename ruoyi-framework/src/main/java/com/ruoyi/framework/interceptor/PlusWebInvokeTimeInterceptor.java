@@ -1,4 +1,4 @@
-package com.ruoyi.framework.Interceptor;
+package com.ruoyi.framework.interceptor;
 
 import cn.hutool.core.map.MapUtil;
 import com.alibaba.ttl.TransmittableThreadLocal;
