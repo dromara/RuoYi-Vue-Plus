@@ -23,34 +23,39 @@ public enum DataScopeType {
     /**
      * 全部数据权限
      */
-    ALL("1", ""),
+    ALL("1", "", ""),
 
     /**
      * 自定数据权限
      */
-    CUSTOM("2", " #{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} ) "),
+    CUSTOM("2", " #{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} ) ", ""),
 
     /**
      * 部门数据权限
      */
-    DEPT("3", " #{#deptName} = #{#user.deptId} "),
+    DEPT("3", " #{#deptName} = #{#user.deptId} ", ""),
 
     /**
      * 部门及以下数据权限
      */
-    DEPT_AND_CHILD("4", " #{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )} )"),
+    DEPT_AND_CHILD("4", " #{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )} )", ""),
 
     /**
      * 仅本人数据权限
      */
-    SELF("5", " #{#userName?:1} = #{#user.userId} ");
+    SELF("5", " #{#userName} = #{#user.userId} " , " 1 = 0 ");
 
     private final String code;
 
     /**
      * 语法 采用 spel 模板表达式
      */
-    private final String sql;
+    private final String sqlTemplate;
+
+    /**
+     * 不满足 sqlTemplate 则填充
+     */
+    private final String elseSql;
 
     public static DataScopeType findCode(String code) {
         if (StringUtils.isBlank(code)) {

@@ -96,13 +96,14 @@ public class PlusDataPermissionHandler {
                     return "";
                 }
                 // 不包含 key 变量 则不处理
-                if (!StringUtils.contains(type.getSql(), "#" + dataColumn.key())) {
+                if (!StringUtils.contains(type.getSqlTemplate(), "#" + dataColumn.key())) {
+                    sqlString.append(type.getElseSql());
                     continue;
                 }
                 // 更新或删除需满足所有条件
                 sqlString.append(isSelect ? " OR " : " AND ");
                 // 解析sql模板并填充
-                String sql = parser.parseExpression(type.getSql(), parserContext).getValue(context, String.class);
+                String sql = parser.parseExpression(type.getSqlTemplate(), parserContext).getValue(context, String.class);
                 sqlString.append(sql);
             }
         }
