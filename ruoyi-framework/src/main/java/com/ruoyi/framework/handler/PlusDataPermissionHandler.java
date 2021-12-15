@@ -75,41 +75,44 @@ public class PlusDataPermissionHandler {
      */
     private String buildDataFilter(SysUser user, DataColumn[] dataColumns, boolean isSelect) {
         StringBuilder sqlString = new StringBuilder();
-
+        // 更新或删除需满足所有条件
+        String joinStr = isSelect ? " OR " : " AND ";
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setBeanResolver(beanResolver);
         context.setVariable("user", user);
-
-        for (DataColumn dataColumn : dataColumns) {
-            // 设置注解变量 key 为表达式变量 value 为变量值
-            context.setVariable(dataColumn.key(), dataColumn.value());
-            for (SysRole role : user.getRoles()) {
-                user.setRoleId(role.getRoleId());
-
-                // 获取角色权限泛型
-                DataScopeType type = DataScopeType.findCode(role.getDataScope());
-                if (ObjectUtil.isNull(type)) {
-                    throw new ServiceException("角色数据范围异常 => " + role.getDataScope());
-                }
-                // 全部数据权限直接返回
-                if (type == DataScopeType.ALL) {
-                    return "";
-                }
+        for (SysRole role : user.getRoles()) {
+            user.setRoleId(role.getRoleId());
+            // 获取角色权限泛型
+            DataScopeType type = DataScopeType.findCode(role.getDataScope());
+            if (ObjectUtil.isNull(type)) {
+                throw new ServiceException("角色数据范围异常 => " + role.getDataScope());
+            }
+            // 全部数据权限直接返回
+            if (type == DataScopeType.ALL) {
+                return "";
+            }
+            boolean isSuccess = false;
+            for (DataColumn dataColumn : dataColumns) {
                 // 不包含 key 变量 则不处理
                 if (!StringUtils.contains(type.getSqlTemplate(), "#" + dataColumn.key())) {
-                    sqlString.append(type.getElseSql());
                     continue;
                 }
-                // 更新或删除需满足所有条件
-                sqlString.append(isSelect ? " OR " : " AND ");
+                // 设置注解变量 key 为表达式变量 value 为变量值
+                context.setVariable(dataColumn.key(), dataColumn.value());
+
                 // 解析sql模板并填充
                 String sql = parser.parseExpression(type.getSqlTemplate(), parserContext).getValue(context, String.class);
-                sqlString.append(sql);
+                sqlString.append(joinStr).append(sql);
+                isSuccess = true;
+            }
+            // 未处理成功则填充兜底方案
+            if (!isSuccess) {
+                sqlString.append(joinStr).append(type.getElseSql());
             }
         }
 
         if (StringUtils.isNotBlank(sqlString.toString())) {
-            return sqlString.substring(isSelect ? 4 : 5);
+            return sqlString.substring(joinStr.length());
         }
         return "";
     }
