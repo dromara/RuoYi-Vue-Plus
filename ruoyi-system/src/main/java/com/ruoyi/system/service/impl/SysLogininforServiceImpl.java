@@ -9,7 +9,6 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.LogininforService;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
@@ -100,8 +99,8 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
         if(StringUtils.isBlank(pageQuery.getOrderByColumn())) {
             pageQuery.setOrderByColumn("info_id").setIsAsc("desc");
         }
-        Page<SysLogininfor> page = page(PageUtils.buildPage(pageQuery), lqw);
-        return PageUtils.buildDataInfo(page);
+        Page<SysLogininfor> page = page(pageQuery.build(), lqw);
+        return TableDataInfo.build(page);
     }
 
     /**

@@ -6,9 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
-import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.domain.bo.TestDemoBo;
@@ -38,8 +36,8 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 	@Override
 	public TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
-        PagePlus<TestDemo, TestDemoVo> result = pageVo(PageUtils.buildPagePlus(pageQuery), lqw);
-		return PageUtils.buildDataInfo(result);
+        Page<TestDemoVo> result = pageVo(pageQuery.build(), lqw);
+		return TableDataInfo.build(result);
 	}
 
 	/**
@@ -48,8 +46,8 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 	@Override
 	public TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
-		Page<TestDemoVo> result = baseMapper.customPageList(PageUtils.buildPage(pageQuery), lqw);
-		return PageUtils.buildDataInfo(result);
+		Page<TestDemoVo> result = baseMapper.customPageList(pageQuery.build(), lqw);
+		return TableDataInfo.build(result);
 	}
 
 	@Override

@@ -7,7 +7,6 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
@@ -31,8 +30,8 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
                 .like(StringUtils.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
                 .eq(StringUtils.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
                 .orderByAsc(SysDictData::getDictSort);
-        Page<SysDictData> page = page(PageUtils.buildPage(pageQuery), lqw);
-        return PageUtils.buildDataInfo(page);
+        Page<SysDictData> page = page(pageQuery.build(), lqw);
+        return TableDataInfo.build(page);
     }
 
     /**

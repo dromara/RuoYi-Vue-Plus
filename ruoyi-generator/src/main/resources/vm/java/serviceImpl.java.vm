@@ -3,8 +3,6 @@ package ${packageName}.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.utils.StringUtils;
 #if($table.crud || $table.sub)
-import com.ruoyi.common.utils.PageUtils;
-import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.domain.PageQuery;
 #end
@@ -40,8 +38,8 @@ public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper,
     @Override
     public TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<${ClassName}> lqw = buildQueryWrapper(bo);
-        PagePlus<${ClassName}, ${ClassName}Vo> result = pageVo(PageUtils.buildPagePlus(pageQuery), lqw);
-        return PageUtils.buildDataInfo(result);
+        Page<${ClassName}Vo> result = pageVo(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
     }
 #end
 

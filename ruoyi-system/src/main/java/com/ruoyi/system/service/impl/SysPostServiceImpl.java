@@ -7,7 +7,6 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
@@ -37,8 +36,8 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
                 .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
                 .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
                 .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
-        Page<SysPost> page = page(PageUtils.buildPage(pageQuery), lqw);
-        return PageUtils.buildDataInfo(page);
+        Page<SysPost> page = page(pageQuery.build(), lqw);
+        return TableDataInfo.build(page);
     }
 
     /**
