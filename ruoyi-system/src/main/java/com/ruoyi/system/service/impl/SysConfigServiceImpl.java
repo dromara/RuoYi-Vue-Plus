@@ -11,7 +11,6 @@ import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.ConfigService;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysConfig;
@@ -41,8 +40,8 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
             .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"));
-        Page<SysConfig> page = page(PageUtils.buildPage(pageQuery), lqw);
-        return PageUtils.buildDataInfo(page);
+        Page<SysConfig> page = page(pageQuery.build(), lqw);
+        return TableDataInfo.build(page);
     }
 
     /**

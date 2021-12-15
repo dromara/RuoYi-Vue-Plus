@@ -77,11 +77,11 @@ public interface BaseMapperPlus<T> extends BaseMapper<T> {
     /**
      * 分页查询VO
      */
-    default <V> IPage<V> selectVoPage(IPage<T> page, Wrapper<T> wrapper, Class<V> voClass) {
+    default <V, P extends IPage<V>> P selectVoPage(IPage<T> page, Wrapper<T> wrapper, Class<V> voClass) {
         IPage<T> pageData = this.selectPage(page, wrapper);
         IPage<V> voPage = new Page<>(pageData.getCurrent(), pageData.getSize(), pageData.getTotal());
         voPage.setRecords(BeanCopyUtils.copyList(pageData.getRecords(), voClass));
-        return voPage;
+        return (P) voPage;
     }
 
 }

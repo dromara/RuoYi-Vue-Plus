@@ -202,8 +202,10 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 
 	/**
 	 * 翻页查询
+     * @deprecated 3.6.0 移除 请使用 {@link #pageVo(IPage, Wrapper)}
 	 */
 	@Override
+    @Deprecated
 	public PagePlus<T, V> pageVo(PagePlus<T, V> page, Wrapper<T> queryWrapper) {
 		PagePlus<T, V> result = getBaseMapper().selectPage(page, queryWrapper);
 		List<V> volist = BeanCopyUtils.copyList(result.getRecords(), voClass);
@@ -217,7 +219,7 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
      * @param page         翻页对象
      * @param queryWrapper 实体对象封装操作类
      */
-    public IPage<V> pageVo(IPage<T> page, Wrapper<T> queryWrapper) {
+    public <P extends IPage<V>> P pageVo(IPage<T> page, Wrapper<T> queryWrapper) {
         return getBaseMapper().selectVoPage(page, queryWrapper, voClass);
     }
 

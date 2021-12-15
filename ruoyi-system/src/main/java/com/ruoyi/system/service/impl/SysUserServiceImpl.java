@@ -12,7 +12,6 @@ import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -54,8 +53,8 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
 
     @Override
     public TableDataInfo<SysUser> selectPageUserList(SysUser user, PageQuery pageQuery) {
-        Page<SysUser> page = baseMapper.selectPageUserList(PageUtils.buildPage(pageQuery), user);
-        return PageUtils.buildDataInfo(page);
+        Page<SysUser> page = baseMapper.selectPageUserList(pageQuery.build(), user);
+        return TableDataInfo.build(page);
     }
 
     /**
@@ -77,8 +76,8 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     @Override
     public TableDataInfo<SysUser> selectAllocatedList(SysUser user, PageQuery pageQuery) {
-        Page<SysUser> page = baseMapper.selectAllocatedList(PageUtils.buildPage(pageQuery), user);
-        return PageUtils.buildDataInfo(page);
+        Page<SysUser> page = baseMapper.selectAllocatedList(pageQuery.build(), user);
+        return TableDataInfo.build(page);
     }
 
     /**
@@ -89,8 +88,8 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     @Override
     public TableDataInfo<SysUser> selectUnallocatedList(SysUser user, PageQuery pageQuery) {
-        Page<SysUser> page = baseMapper.selectUnallocatedList(PageUtils.buildPage(pageQuery), user);
-        return PageUtils.buildDataInfo(page);
+        Page<SysUser> page = baseMapper.selectUnallocatedList(pageQuery.build(), user);
+        return TableDataInfo.build(page);
     }
 
     /**

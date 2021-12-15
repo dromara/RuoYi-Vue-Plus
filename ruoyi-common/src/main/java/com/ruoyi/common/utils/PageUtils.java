@@ -2,6 +2,7 @@ package com.ruoyi.common.utils;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.PageQuery;
@@ -17,7 +18,9 @@ import java.util.List;
  * 分页工具
  *
  * @author Lion Li
+ * @deprecated 3.6.0 删除 请使用 {@link PageQuery} 与 {@link TableDataInfo}
  */
+@Deprecated
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PageUtils {
 
@@ -48,11 +51,13 @@ public class PageUtils {
     /**
      * 当前记录起始索引 默认值
      */
+    @Deprecated
     public static final int DEFAULT_PAGE_NUM = 1;
 
     /**
      * 每页显示记录数 默认值 默认查全部
      */
+    @Deprecated
     public static final int DEFAULT_PAGE_SIZE = Integer.MAX_VALUE;
 
     /**
@@ -61,7 +66,7 @@ public class PageUtils {
      * @param <T> domain 实体
      * @param <K> vo 实体
      * @return 分页对象
-     * @deprecated 3.6.0 删除 请使用 {@link PageUtils#buildPagePlus(PageQuery)}
+     * @deprecated 3.6.0 删除 请使用 {@link PageQuery#build()}
      * 由于使用 Servlet 获取只能从 param 获取 灵活性降低 故将传参操作交给用户
      */
     @Deprecated
@@ -70,22 +75,6 @@ public class PageUtils {
         Integer pageSize = ServletUtils.getParameterToInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
         String orderByColumn = ServletUtils.getParameter(ORDER_BY_COLUMN);
         String isAsc = ServletUtils.getParameter(IS_ASC);
-        if (pageNum <= 0) {
-            pageNum = DEFAULT_PAGE_NUM;
-        }
-        PagePlus<T, K> page = new PagePlus<>(pageNum, pageSize);
-        OrderItem orderItem = buildOrderItem(orderByColumn, isAsc);
-        if (ObjectUtil.isNotNull(orderItem)) {
-            page.addOrder(orderItem);
-        }
-        return page;
-    }
-
-    public static <T, K> PagePlus<T, K> buildPagePlus(PageQuery pageQuery) {
-        Integer pageNum = ObjectUtil.defaultIfNull(pageQuery.getPageNum(), DEFAULT_PAGE_NUM);
-        Integer pageSize = ObjectUtil.defaultIfNull(pageQuery.getPageSize(), DEFAULT_PAGE_SIZE);
-        String orderByColumn = pageQuery.getOrderByColumn();
-        String isAsc = pageQuery.getIsAsc();
         if (pageNum <= 0) {
             pageNum = DEFAULT_PAGE_NUM;
         }
@@ -107,7 +96,7 @@ public class PageUtils {
      *
      * @param <T> domain 实体
      * @return 分页对象
-     * @deprecated 3.6.0 删除 请使用 {@link PageUtils#buildPage(PageQuery)}
+     * @deprecated 3.6.0 删除 请使用 {@link PageQuery#build()}
      * 由于使用 Servlet 获取只能从 param 获取 灵活性降低 故将传参操作交给用户
      */
     @Deprecated
@@ -126,23 +115,6 @@ public class PageUtils {
         }
         return page;
     }
-
-    public static <T> Page<T> buildPage(PageQuery pageQuery) {
-        Integer pageNum = ObjectUtil.defaultIfNull(pageQuery.getPageNum(), DEFAULT_PAGE_NUM);
-        Integer pageSize = ObjectUtil.defaultIfNull(pageQuery.getPageSize(), DEFAULT_PAGE_SIZE);
-        String orderByColumn = pageQuery.getOrderByColumn();
-        String isAsc = pageQuery.getIsAsc();
-        if (pageNum <= 0) {
-            pageNum = DEFAULT_PAGE_NUM;
-        }
-        Page<T> page = new Page<>(pageNum, pageSize);
-        OrderItem orderItem = buildOrderItem(orderByColumn, isAsc);
-        if (ObjectUtil.isNotNull(orderItem)) {
-            page.addOrder(orderItem);
-        }
-        return page;
-    }
-
 
     private static OrderItem buildOrderItem(String orderByColumn, String isAsc) {
         // 兼容前端排序类型
@@ -163,6 +135,15 @@ public class PageUtils {
         return null;
     }
 
+    /**
+     * 构建 MP 普通分页对象
+     *
+     * @param <T> domain 实体
+     * @return 分页对象
+     * @deprecated 3.6.0 删除 请使用 {@link PageQuery#build()}
+     * 由于使用 Servlet 获取只能从 param 获取 灵活性降低 故将传参操作交给用户
+     */
+    @Deprecated
     public static <T, K> TableDataInfo<K> buildDataInfo(PagePlus<T, K> page) {
         TableDataInfo<K> rspData = new TableDataInfo<>();
         rspData.setCode(HttpStatus.HTTP_OK);
@@ -172,6 +153,10 @@ public class PageUtils {
         return rspData;
     }
 
+    /**
+     * @deprecated 3.6.0 删除 请使用 {@link TableDataInfo#build(IPage)}
+     */
+    @Deprecated
     public static <T> TableDataInfo<T> buildDataInfo(Page<T> page) {
         TableDataInfo<T> rspData = new TableDataInfo<>();
         rspData.setCode(HttpStatus.HTTP_OK);
@@ -181,6 +166,10 @@ public class PageUtils {
         return rspData;
     }
 
+    /**
+     * @deprecated 3.6.0 删除 请使用 {@link TableDataInfo#build(List)}
+     */
+    @Deprecated
     public static <T> TableDataInfo<T> buildDataInfo(List<T> list) {
         TableDataInfo<T> rspData = new TableDataInfo<>();
         rspData.setCode(HttpStatus.HTTP_OK);
@@ -190,6 +179,10 @@ public class PageUtils {
         return rspData;
     }
 
+    /**
+     * @deprecated 3.6.0 删除 请使用 {@link TableDataInfo#build()}
+     */
+    @Deprecated
     public static <T> TableDataInfo<T> buildDataInfo() {
         TableDataInfo<T> rspData = new TableDataInfo<>();
         rspData.setCode(HttpStatus.HTTP_OK);

@@ -9,7 +9,6 @@ import com.ruoyi.common.core.domain.dto.OperLogDTO;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.OperLogService;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
 import com.ruoyi.system.domain.SysOperLog;
@@ -65,8 +64,8 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
         if(StringUtils.isBlank(pageQuery.getOrderByColumn())) {
             pageQuery.setOrderByColumn("oper_id").setIsAsc("desc");
         }
-        Page<SysOperLog> page = page(PageUtils.buildPage(pageQuery), lqw);
-        return PageUtils.buildDataInfo(page);
+        Page<SysOperLog> page = page(pageQuery.build(), lqw);
+        return TableDataInfo.build(page);
     }
 
     /**

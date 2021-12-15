@@ -9,7 +9,6 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -46,8 +45,8 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
 
     @Override
     public TableDataInfo<SysRole> selectPageRoleList(SysRole role, PageQuery pageQuery) {
-        Page<SysRole> page = baseMapper.selectPageRoleList(PageUtils.buildPage(pageQuery), role);
-        return PageUtils.buildDataInfo(page);
+        Page<SysRole> page = baseMapper.selectPageRoleList(pageQuery.build(), role);
+        return TableDataInfo.build(page);
     }
 
     /**

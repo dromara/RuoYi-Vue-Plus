@@ -16,9 +16,11 @@ import java.util.List;
  * @param <T> 数据库实体
  * @param <K> vo实体
  * @author Lion Li
+ * @deprecated 3.6.0 删除 请使用 {@link com.ruoyi.common.core.domain.PageQuery#build()}
  */
 @Data
 @Accessors(chain = true)
+@Deprecated
 public class PagePlus<T,K> implements IPage<T> {
 
     /**

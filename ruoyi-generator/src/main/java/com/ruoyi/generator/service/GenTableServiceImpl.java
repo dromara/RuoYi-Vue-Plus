@@ -12,7 +12,6 @@ import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
@@ -69,14 +68,14 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
 
     @Override
     public TableDataInfo<GenTable> selectPageGenTableList(GenTable genTable, PageQuery pageQuery) {
-        Page<GenTable> page = baseMapper.selectPageGenTableList(PageUtils.buildPage(pageQuery), genTable);
-        return PageUtils.buildDataInfo(page);
+        Page<GenTable> page = baseMapper.selectPageGenTableList(pageQuery.build(), genTable);
+        return TableDataInfo.build(page);
     }
 
     @Override
     public TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable, PageQuery pageQuery) {
-        Page<GenTable> page = baseMapper.selectPageDbTableList(PageUtils.buildPage(pageQuery), genTable);
-        return PageUtils.buildDataInfo(page);
+        Page<GenTable> page = baseMapper.selectPageDbTableList(pageQuery.build(), genTable);
+        return TableDataInfo.build(page);
     }
 
     /**

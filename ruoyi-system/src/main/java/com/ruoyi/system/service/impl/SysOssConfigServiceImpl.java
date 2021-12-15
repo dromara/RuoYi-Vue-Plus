@@ -5,15 +5,14 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
-import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.constant.OssConstant;
@@ -70,8 +69,8 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     @Override
     public TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<SysOssConfig> lqw = buildQueryWrapper(bo);
-        PagePlus<SysOssConfig, SysOssConfigVo> result = pageVo(PageUtils.buildPagePlus(pageQuery), lqw);
-        return PageUtils.buildDataInfo(result);
+        Page<SysOssConfigVo> result = pageVo(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
     }
 
 

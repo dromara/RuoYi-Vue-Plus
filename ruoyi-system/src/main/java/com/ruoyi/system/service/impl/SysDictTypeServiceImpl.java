@@ -13,7 +13,6 @@ import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.DictService;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
@@ -48,8 +47,8 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
             .like(StringUtils.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysDictType::getCreateTime, params.get("beginTime"), params.get("endTime"));
-        Page<SysDictType> page = page(PageUtils.buildPage(pageQuery), lqw);
-        return PageUtils.buildDataInfo(page);
+        Page<SysDictType> page = page(pageQuery.build(), lqw);
+        return TableDataInfo.build(page);
     }
 
     /**
