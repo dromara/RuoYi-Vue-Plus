@@ -36,7 +36,7 @@ public class TestBatchController extends BaseController {
      */
     @ApiOperation(value = "新增批量方法")
     @PostMapping("/add")
-//	@DataSource(DataSourceType.SLAVE)
+//	@DS("slave")
     public AjaxResult<Void> add() {
         List<TestDemo> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
@@ -50,7 +50,7 @@ public class TestBatchController extends BaseController {
      */
     @ApiOperation(value = "新增或更新批量方法")
     @PostMapping("/addOrUpdate")
-//	@DataSource(DataSourceType.SLAVE)
+//	@DS("slave")
     public AjaxResult<Void> addOrUpdate() {
         List<TestDemo> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
@@ -72,7 +72,7 @@ public class TestBatchController extends BaseController {
      */
     @ApiOperation(value = "删除批量方法")
     @DeleteMapping()
-//	@DataSource(DataSourceType.SLAVE)
+//	@DS("slave")
     public AjaxResult<Void> remove() {
         return toAjax(iTestDemoService.remove(new LambdaQueryWrapper<TestDemo>()
             .eq(TestDemo::getOrderNum, -1L)) ? 1 : 0);
