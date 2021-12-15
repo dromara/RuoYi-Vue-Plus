@@ -34,7 +34,7 @@
         <redisson.version>3.16.6</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.5.0</dynamic-ds.version>
-        <tlog.version>1.3.5</tlog.version>
+        <tlog.version>1.3.6</tlog.version>
         <xxl-job.version>2.3.0</xxl-job.version>
 
         <!-- jdk11 缺失依赖 jaxb-->
