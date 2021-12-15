@@ -9,6 +9,7 @@ import com.ruoyi.common.excel.ExcelResult;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.ValidatorUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.vo.SysUserImportVo;
 import com.ruoyi.system.service.ISysConfigService;
@@ -53,12 +54,14 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
             // 验证是否存在这个用户
             if (StringUtils.isNull(user)) {
                 user = BeanUtil.toBean(userVo, SysUser.class);
+                ValidatorUtils.validate(user);
                 user.setPassword(password);
                 user.setCreateBy(operName);
                 userService.insertUser(user);
                 successNum++;
                 successMsg.append("<br/>").append(successNum).append("、账号 ").append(user.getUserName()).append(" 导入成功");
             } else if (isUpdateSupport) {
+                ValidatorUtils.validate(user);
                 user.setUpdateBy(operName);
                 userService.updateUser(user);
                 successNum++;
