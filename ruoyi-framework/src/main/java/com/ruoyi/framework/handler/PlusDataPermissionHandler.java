@@ -1,6 +1,7 @@
 package com.ruoyi.framework.handler;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -31,6 +32,9 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -41,13 +45,32 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PlusDataPermissionHandler {
 
+    /**
+     * 方法或类 与 注解的映射关系缓存
+     */
+    private final Map<Method, DataPermission> methodCacheMap = new ConcurrentHashMap<>();
+    private final Map<Class<?>, DataPermission> classCacheMap = new ConcurrentHashMap<>();
+
+    /**
+     * 无效注解方法缓存用于快速返回
+     */
+    private final Set<String> inavlidCacheSet = new ConcurrentHashSet<>();
+
+    /**
+     * spel 解析器
+     */
     private final ExpressionParser parser = new SpelExpressionParser();
     private final ParserContext parserContext = new TemplateParserContext();
+    /**
+     * bean解析器 用于处理 spel 表达式中对 bean 的调用
+     */
     private final BeanResolver beanResolver = new BeanFactoryResolver(SpringUtils.getBeanFactory());
+
 
     public Expression getSqlSegment(Expression where, String mappedStatementId, boolean isSelect) {
         DataColumn[] dataColumns = findAnnotation(mappedStatementId);
         if (ArrayUtil.isEmpty(dataColumns)) {
+            inavlidCacheSet.add(mappedStatementId);
             return where;
         }
         SysUser currentUser = SpringUtils.getBean(UserService.class).selectUserById(SecurityUtils.getUserId());
@@ -131,16 +154,33 @@ public class PlusDataPermissionHandler {
         DataPermission dataPermission;
         // 获取方法注解
         for (Method method : methods) {
-            if (AnnotationUtil.hasAnnotation(method, DataPermission.class)) {
-                dataPermission = AnnotationUtil.getAnnotation(method, DataPermission.class);
+            dataPermission = methodCacheMap.get(method);
+            if (ObjectUtil.isNotNull(dataPermission)) {
                 return dataPermission.value();
             }
+            if (AnnotationUtil.hasAnnotation(method, DataPermission.class)) {
+                dataPermission = AnnotationUtil.getAnnotation(method, DataPermission.class);
+                methodCacheMap.put(method, dataPermission);
+                return dataPermission.value();
+            }
+        }
+        dataPermission = classCacheMap.get(clazz);
+        if (ObjectUtil.isNotNull(dataPermission)) {
+            return dataPermission.value();
         }
         // 获取类注解
         if (AnnotationUtil.hasAnnotation(clazz, DataPermission.class)) {
             dataPermission = AnnotationUtil.getAnnotation(clazz, DataPermission.class);
+            classCacheMap.put(clazz, dataPermission);
             return dataPermission.value();
         }
         return null;
+    }
+
+    /**
+     * 是否为无效方法 无数据权限
+     */
+    public boolean isInvalid(String mappedStatementId) {
+        return inavlidCacheSet.contains(mappedStatementId);
     }
 }
