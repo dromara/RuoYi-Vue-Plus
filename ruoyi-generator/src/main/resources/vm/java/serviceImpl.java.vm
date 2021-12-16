@@ -31,14 +31,14 @@ public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper,
 
     @Override
     public ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField}){
-        return baseMapper.selectVoById(${pkColumn.javaField});
+        return getVoById(${pkColumn.javaField});
     }
 
 #if($table.crud || $table.sub)
     @Override
     public TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<${ClassName}> lqw = buildQueryWrapper(bo);
-        Page<${ClassName}Vo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<${ClassName}Vo> result = pageVo(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
 #end
@@ -46,7 +46,7 @@ public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper,
     @Override
     public List<${ClassName}Vo> queryList(${ClassName}Bo bo) {
         LambdaQueryWrapper<${ClassName}> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
+        return listVo(lqw);
     }
 
     private LambdaQueryWrapper<${ClassName}> buildQueryWrapper(${ClassName}Bo bo) {
@@ -80,19 +80,19 @@ public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper,
     public Boolean insertByBo(${ClassName}Bo bo) {
         ${ClassName} add = BeanUtil.toBean(bo, ${ClassName}.class);
         validEntityBeforeSave(add);
-        int rows = baseMapper.insert(add);
+        boolean flag = save(add);
 #set($pk=$pkColumn.javaField.substring(0,1).toUpperCase() + ${pkColumn.javaField.substring(1)})
-        if (rows > 0) {
+        if (flag) {
             bo.set$pk(add.get$pk());
         }
-        return rows > 0;
+        return flag;
     }
 
     @Override
     public Boolean updateByBo(${ClassName}Bo bo) {
         ${ClassName} update = BeanUtil.toBean(bo, ${ClassName}.class);
         validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        return updateById(update);
     }
 
     /**
@@ -109,6 +109,6 @@ public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper,
         if(isValid){
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return baseMapper.deleteBatchIds(ids) > 0;
+        return removeByIds(ids);
     }
 }
