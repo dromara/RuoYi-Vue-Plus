@@ -17,6 +17,7 @@ import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import org.springframework.context.expression.BeanFactoryResolver;
@@ -60,10 +61,12 @@ public class PlusDataPermissionHandler {
         }
         try {
             Expression expression = CCJSqlParserUtil.parseExpression(dataFilterSql);
+            // 数据权限使用单独的括号 防止与其他条件冲突
+            Parenthesis parenthesis = new Parenthesis(expression);
             if (ObjectUtil.isNotNull(where)) {
-                return new AndExpression(where, expression);
+                return new AndExpression(where, parenthesis);
             } else {
-                return expression;
+                return parenthesis;
             }
         } catch (JSQLParserException e) {
             throw new ServiceException("数据权限解析异常 => " + e.getMessage());
@@ -126,11 +129,17 @@ public class PlusDataPermissionHandler {
         List<Method> methods = Arrays.stream(ClassUtil.getDeclaredMethods(clazz))
             .filter(method -> method.getName().equals(methodName)).collect(Collectors.toList());
         DataPermission dataPermission;
+        // 获取方法注解
         for (Method method : methods) {
             if (AnnotationUtil.hasAnnotation(method, DataPermission.class)) {
                 dataPermission = AnnotationUtil.getAnnotation(method, DataPermission.class);
                 return dataPermission.value();
             }
+        }
+        // 获取类注解
+        if (AnnotationUtil.hasAnnotation(clazz, DataPermission.class)) {
+            dataPermission = AnnotationUtil.getAnnotation(clazz, DataPermission.class);
+            return dataPermission.value();
         }
         return null;
     }
