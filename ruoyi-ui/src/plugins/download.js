@@ -1,15 +1,17 @@
 import axios from 'axios'
-import { Message } from 'element-ui'
+import {Loading, Message} from 'element-ui'
 import { saveAs } from 'file-saver'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 import { blobValidate } from "@/utils/ruoyi";
 
 const baseURL = process.env.VUE_APP_BASE_API
+let downloadLoadingInstance;
 
 export default {
   oss(ossId) {
     var url = baseURL + '/system/oss/download/' + ossId
+    downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
     axios({
       method: 'get',
       url: url,
@@ -23,6 +25,11 @@ export default {
       } else {
         this.printErrMsg(res.data);
       }
+      downloadLoadingInstance.close();
+    }).catch((r) => {
+      console.error(r)
+      Message.error('下载文件出现错误，请联系管理员！')
+      downloadLoadingInstance.close();
     })
   },
   zip(url, name) {
