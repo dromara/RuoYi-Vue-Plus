@@ -12,6 +12,7 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.enums.DataScopeType;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.helper.DataPermissionHelper;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -73,12 +74,16 @@ public class PlusDataPermissionHandler {
             inavlidCacheSet.add(mappedStatementId);
             return where;
         }
-        SysUser currentUser = SpringUtils.getBean(UserService.class).selectUserById(SecurityUtils.getUserId());
+        SysUser currentUser = DataPermissionHelper.getVariable("user");
+        if (ObjectUtil.isNull(currentUser)) {
+            currentUser = SpringUtils.getBean(UserService.class).selectUserById(SecurityUtils.getUserId());
+            DataPermissionHelper.setVariable("user", currentUser);
+        }
         // 如果是超级管理员，则不过滤数据
-        if (StringUtils.isNull(currentUser) || currentUser.isAdmin()) {
+        if (ObjectUtil.isNull(currentUser) || currentUser.isAdmin()) {
             return where;
         }
-        String dataFilterSql = buildDataFilter(currentUser, dataColumns, isSelect);
+        String dataFilterSql = buildDataFilter(dataColumns, isSelect);
         if (StringUtils.isBlank(dataFilterSql)) {
             return where;
         }
@@ -99,13 +104,14 @@ public class PlusDataPermissionHandler {
     /**
      * 构造数据过滤sql
      */
-    private String buildDataFilter(SysUser user, DataColumn[] dataColumns, boolean isSelect) {
+    private String buildDataFilter(DataColumn[] dataColumns, boolean isSelect) {
         StringBuilder sqlString = new StringBuilder();
         // 更新或删除需满足所有条件
         String joinStr = isSelect ? " OR " : " AND ";
+        SysUser user = DataPermissionHelper.getVariable("user");
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setBeanResolver(beanResolver);
-        context.setVariable("user", user);
+        DataPermissionHelper.getContext().forEach(context::setVariable);
         for (SysRole role : user.getRoles()) {
             user.setRoleId(role.getRoleId());
             // 获取角色权限泛型

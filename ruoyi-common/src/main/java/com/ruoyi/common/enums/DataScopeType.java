@@ -10,7 +10,7 @@ import lombok.Getter;
  * 语法支持 spel 模板表达式
  *
  * 内置数据 user 当前用户 内容参考 SysUser
- * 如需扩展数据 需往 SysUser 内注入
+ * 如需扩展数据 可使用 {@link com.ruoyi.common.helper.DataPermissionHelper} 操作
  * 内置服务 sdss 系统数据权限服务 内容参考 SysDataScopeService
  * 如需扩展更多自定义服务 可以参考 sdss 自行编写
  *
