@@ -24,6 +24,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * 数据权限拦截器
+ *
+ * @author Lion Li
+ * @version 3.5.0
+ */
 public class PlusDataPermissionInterceptor extends JsqlParserSupport implements InnerInterceptor {
 
     private final PlusDataPermissionHandler dataPermissionHandler = new PlusDataPermissionHandler();

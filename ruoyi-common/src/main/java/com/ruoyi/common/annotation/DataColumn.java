@@ -6,6 +6,7 @@ import java.lang.annotation.*;
  * 数据权限
  *
  * @author Lion Li
+ * @version 3.5.0
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

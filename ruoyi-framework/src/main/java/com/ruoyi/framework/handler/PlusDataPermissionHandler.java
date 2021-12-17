@@ -41,15 +41,15 @@ import java.util.stream.Collectors;
  * 数据权限过滤
  *
  * @author Lion Li
+ * @version 3.5.0
  */
 @Slf4j
 public class PlusDataPermissionHandler {
 
     /**
-     * 方法或类 与 注解的映射关系缓存
+     * 方法或类(名称) 与 注解的映射关系缓存
      */
-    private final Map<Method, DataPermission> methodCacheMap = new ConcurrentHashMap<>();
-    private final Map<Class<?>, DataPermission> classCacheMap = new ConcurrentHashMap<>();
+    private final Map<String, DataPermission> dataPermissionCacheMap = new ConcurrentHashMap<>();
 
     /**
      * 无效注解方法缓存用于快速返回
@@ -154,24 +154,24 @@ public class PlusDataPermissionHandler {
         DataPermission dataPermission;
         // 获取方法注解
         for (Method method : methods) {
-            dataPermission = methodCacheMap.get(method);
+            dataPermission = dataPermissionCacheMap.get(method.getName());
             if (ObjectUtil.isNotNull(dataPermission)) {
                 return dataPermission.value();
             }
             if (AnnotationUtil.hasAnnotation(method, DataPermission.class)) {
                 dataPermission = AnnotationUtil.getAnnotation(method, DataPermission.class);
-                methodCacheMap.put(method, dataPermission);
+                dataPermissionCacheMap.put(method.getName(), dataPermission);
                 return dataPermission.value();
             }
         }
-        dataPermission = classCacheMap.get(clazz);
+        dataPermission = dataPermissionCacheMap.get(clazz.getName());
         if (ObjectUtil.isNotNull(dataPermission)) {
             return dataPermission.value();
         }
         // 获取类注解
         if (AnnotationUtil.hasAnnotation(clazz, DataPermission.class)) {
             dataPermission = AnnotationUtil.getAnnotation(clazz, DataPermission.class);
-            classCacheMap.put(clazz, dataPermission);
+            dataPermissionCacheMap.put(clazz.getName(), dataPermission);
             return dataPermission.value();
         }
         return null;

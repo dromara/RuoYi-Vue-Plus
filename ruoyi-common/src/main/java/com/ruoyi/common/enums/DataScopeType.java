@@ -15,6 +15,7 @@ import lombok.Getter;
  * 如需扩展更多自定义服务 可以参考 sdss 自行编写
  *
  * @author Lion Li
+ * @version 3.5.0
  */
 @Getter
 @AllArgsConstructor
