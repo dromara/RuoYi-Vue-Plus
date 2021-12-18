@@ -1,5 +1,6 @@
 package ${packageName}.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.utils.StringUtils;
 #if($table.crud || $table.sub)
