@@ -1,6 +1,5 @@
 package ${packageName}.service.impl;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.utils.StringUtils;
 #if($table.crud || $table.sub)
@@ -9,6 +8,7 @@ import com.ruoyi.common.core.domain.PageQuery;
 #end
 import org.springframework.stereotype.Service;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import ${packageName}.domain.bo.${ClassName}Bo;
