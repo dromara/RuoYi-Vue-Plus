@@ -33,6 +33,8 @@ public class TestBatchController extends BaseController {
 
     /**
      * 新增批量方法 可完美替代 saveBatch 秒级插入上万数据 (对mysql负荷较大)
+     *
+     * 3.5.0 版本 增加 rewriteBatchedStatements=true 批处理参数 使 MP 原生批处理可以达到同样的速度
      */
     @ApiOperation(value = "新增批量方法")
     @PostMapping("/add")
@@ -47,6 +49,8 @@ public class TestBatchController extends BaseController {
 
     /**
      * 新增或更新 可完美替代 saveOrUpdateBatch 高性能
+     *
+     * 3.5.0 版本 增加 rewriteBatchedStatements=true 批处理参数 使 MP 原生批处理可以达到同样的速度
      */
     @ApiOperation(value = "新增或更新批量方法")
     @PostMapping("/addOrUpdate")
