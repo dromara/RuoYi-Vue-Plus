@@ -52,11 +52,18 @@ public class QueueUtils {
     public static <T> void addDelayedQueueObject(String queueName, T data, long time, TimeUnit timeUnit) {
         RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
         RDelayedQueue<T> delayedQueue = CLIENT.getDelayedQueue(queue);
-        // 已存在则无视
-        if (delayedQueue.contains(data)) {
-            return;
-        }
         delayedQueue.offer(data, time, timeUnit);
+    }
+
+    /**
+     * 获取一个延迟队列数据 没有数据返回 null
+     *
+     * @param queueName 队列名
+     */
+    public static <T> T getDelayedQueueObject(String queueName) {
+        RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
+        RDelayedQueue<T> delayedQueue = CLIENT.getDelayedQueue(queue);
+        return delayedQueue.poll();
     }
 
     /**
