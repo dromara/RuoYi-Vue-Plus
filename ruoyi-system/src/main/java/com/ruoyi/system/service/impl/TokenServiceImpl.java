@@ -11,7 +11,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.service.TokenService;
 import com.ruoyi.common.properties.TokenProperties;
-import com.ruoyi.common.utils.RedisUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;

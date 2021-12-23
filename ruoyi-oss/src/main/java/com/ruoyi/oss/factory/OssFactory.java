@@ -1,7 +1,7 @@
 package com.ruoyi.oss.factory;
 
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.RedisUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.oss.constant.OssConstant;

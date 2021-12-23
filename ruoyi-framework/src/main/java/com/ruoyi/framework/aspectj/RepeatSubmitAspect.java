@@ -6,7 +6,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.properties.TokenProperties;
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.RedisUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.RepeatSubmitProperties;
