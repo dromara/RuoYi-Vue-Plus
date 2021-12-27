@@ -6,6 +6,7 @@ import cn.hutool.core.io.IoUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.generator.domain.GenTable;
@@ -46,8 +47,8 @@ public class GenController extends BaseController {
     @ApiOperation("查询代码生成列表")
     @SaCheckPermission("tool:gen:list")
     @GetMapping("/list")
-    public TableDataInfo<GenTable> genList(GenTable genTable) {
-        return genTableService.selectPageGenTableList(genTable);
+    public TableDataInfo<GenTable> genList(GenTable genTable, PageQuery pageQuery) {
+        return genTableService.selectPageGenTableList(genTable, pageQuery);
     }
 
     /**
@@ -73,8 +74,8 @@ public class GenController extends BaseController {
     @ApiOperation("查询数据库列表")
     @SaCheckPermission("tool:gen:list")
     @GetMapping("/db/list")
-    public TableDataInfo<GenTable> dataList(GenTable genTable) {
-        return genTableService.selectPageDbTableList(genTable);
+    public TableDataInfo<GenTable> dataList(GenTable genTable, PageQuery pageQuery) {
+        return genTableService.selectPageDbTableList(genTable, pageQuery);
     }
 
     /**

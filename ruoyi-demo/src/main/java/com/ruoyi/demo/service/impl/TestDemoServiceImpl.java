@@ -1,15 +1,13 @@
 package com.ruoyi.demo.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.ruoyi.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.common.annotation.DataScope;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
-import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.domain.bo.TestDemoBo;
 import com.ruoyi.demo.domain.vo.TestDemoVo;
@@ -35,24 +33,23 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 		return getVoById(id);
 	}
 
-	@DataScope(isUser = true)
 	@Override
-	public TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo) {
-		PagePlus<TestDemo, TestDemoVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
-		return PageUtils.buildDataInfo(result);
+	public TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
+        Page<TestDemoVo> result = pageVo(pageQuery.build(), lqw);
+		return TableDataInfo.build(result);
 	}
 
 	/**
 	 * 自定义分页查询
 	 */
-	@DataScope(isUser = true)
 	@Override
-	public TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo) {
-		Page<TestDemoVo> result = baseMapper.customPageList(PageUtils.buildPage(), buildQueryWrapper(bo));
-		return PageUtils.buildDataInfo(result);
+	public TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
+		Page<TestDemoVo> result = baseMapper.customPageList(pageQuery.build(), lqw);
+		return TableDataInfo.build(result);
 	}
 
-	@DataScope(isUser = true)
 	@Override
 	public List<TestDemoVo> queryList(TestDemoBo bo) {
 		return listVo(buildQueryWrapper(bo));
@@ -60,14 +57,11 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 
 	private LambdaQueryWrapper<TestDemo> buildQueryWrapper(TestDemoBo bo) {
 		Map<String, Object> params = bo.getParams();
-		Object dataScope = params.get("dataScope");
 		LambdaQueryWrapper<TestDemo> lqw = Wrappers.lambdaQuery();
 		lqw.like(StringUtils.isNotBlank(bo.getTestKey()), TestDemo::getTestKey, bo.getTestKey());
 		lqw.eq(StringUtils.isNotBlank(bo.getValue()), TestDemo::getValue, bo.getValue());
 		lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
 			TestDemo::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
-		lqw.apply(dataScope != null && StringUtils.isNotBlank(dataScope.toString()),
-			dataScope != null ? dataScope.toString() : null);
 		return lqw;
 	}
 

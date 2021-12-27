@@ -14,7 +14,7 @@
 
     <properties>
         <ruoyi-vue-plus.version>3.4.0</ruoyi-vue-plus.version>
-        <spring-boot.version>2.5.7</spring-boot.version>
+        <spring-boot.version>2.5.8</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -24,27 +24,28 @@
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <poi.version>4.1.2</poi.version>
         <easyexcel.version>2.2.11</easyexcel.version>
+        <cglib.version>3.3.0</cglib.version>
         <velocity.version>2.3</velocity.version>
         <satoken.version>1.28.0</satoken.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.7.16</hutool.version>
+        <hutool.version>5.7.17</hutool.version>
         <okhttp.version>4.9.2</okhttp.version>
-        <spring-boot-admin.version>2.5.4</spring-boot-admin.version>
-        <redisson.version>3.16.4</redisson.version>
+        <spring-boot-admin.version>2.5.5</spring-boot-admin.version>
+        <redisson.version>3.16.6</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
-        <dynamic-ds.version>3.4.1</dynamic-ds.version>
-        <tlog.version>1.3.4</tlog.version>
+        <dynamic-ds.version>3.5.0</dynamic-ds.version>
+        <tlog.version>1.3.6</tlog.version>
         <xxl-job.version>2.3.0</xxl-job.version>
 
         <!-- jdk11 缺失依赖 jaxb-->
         <jaxb.version>3.0.1</jaxb.version>
 
         <!-- OSS 配置 -->
-        <qiniu.version>7.8.0</qiniu.version>
+        <qiniu.version>7.9.0</qiniu.version>
         <aliyun.oss.version>3.13.1</aliyun.oss.version>
         <qcloud.cos.version>5.6.58</qcloud.cos.version>
-        <minio.version>8.3.3</minio.version>
+        <minio.version>8.3.4</minio.version>
 
         <!-- docker 配置 -->
         <docker.registry.url>localhost</docker.registry.url>
@@ -115,6 +116,12 @@
                 </exclusions>
             </dependency>
 
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib</artifactId>
+                <version>${cglib.version}</version>
+            </dependency>
+
             <!-- velocity代码生成使用模板 -->
             <dependency>
                 <groupId>org.apache.velocity</groupId>
@@ -168,7 +175,31 @@
 
             <dependency>
                 <groupId>cn.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
+                <artifactId>hutool-core</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-http</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-captcha</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-extra</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-jwt</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
 
@@ -210,29 +241,13 @@
 
             <dependency>
                 <groupId>com.yomahub</groupId>
-                <artifactId>tlog-spring-boot-configuration</artifactId>
+                <artifactId>tlog-web-spring-boot-starter</artifactId>
                 <version>${tlog.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.yomahub</groupId>
-                <artifactId>tlog-webroot</artifactId>
-                <version>${tlog.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>javassist</artifactId>
-                        <groupId>org.javassist</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>guava</artifactId>
-                        <groupId>com.google.guava</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.yomahub</groupId>
-                <artifactId>tlog-xxl-job</artifactId>
+                <artifactId>tlog-xxljob-spring-boot-starter</artifactId>
                 <version>${tlog.version}</version>
             </dependency>
 

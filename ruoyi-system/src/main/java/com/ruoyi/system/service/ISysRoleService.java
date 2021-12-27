@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysUserRole;
@@ -16,7 +17,7 @@ import java.util.Set;
 public interface ISysRoleService extends IService<SysRole> {
 
 
-    TableDataInfo<SysRole> selectPageRoleList(SysRole role);
+    TableDataInfo<SysRole> selectPageRoleList(SysRole role, PageQuery pageQuery);
 
     /**
      * 根据条件分页查询角色数据

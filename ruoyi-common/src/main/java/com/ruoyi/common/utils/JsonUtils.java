@@ -21,14 +21,18 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JsonUtils {
 
-    private static ObjectMapper objectMapper = SpringUtils.getBean(ObjectMapper.class);
+    private static final ObjectMapper OBJECT_MAPPER = SpringUtils.getBean(ObjectMapper.class);
+
+    public static ObjectMapper getObjectMapper() {
+        return OBJECT_MAPPER;
+    }
 
     public static String toJsonString(Object object) {
         if (StringUtils.isNull(object)) {
             return null;
         }
         try {
-            return objectMapper.writeValueAsString(object);
+            return OBJECT_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -39,7 +43,7 @@ public class JsonUtils {
             return null;
         }
         try {
-            return objectMapper.readValue(text, clazz);
+            return OBJECT_MAPPER.readValue(text, clazz);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -50,7 +54,7 @@ public class JsonUtils {
             return null;
         }
         try {
-            return objectMapper.readValue(bytes, clazz);
+            return OBJECT_MAPPER.readValue(bytes, clazz);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -61,7 +65,7 @@ public class JsonUtils {
             return null;
         }
         try {
-            return objectMapper.readValue(text, typeReference);
+            return OBJECT_MAPPER.readValue(text, typeReference);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -72,7 +76,7 @@ public class JsonUtils {
             return null;
         }
         try {
-            return objectMapper.readValue(text, new TypeReference<Map<String, T>>() {
+            return OBJECT_MAPPER.readValue(text, new TypeReference<Map<String, T>>() {
             });
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -84,7 +88,7 @@ public class JsonUtils {
             return new ArrayList<>();
         }
         try {
-            return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+            return OBJECT_MAPPER.readValue(text, OBJECT_MAPPER.getTypeFactory().constructCollectionType(List.class, clazz));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

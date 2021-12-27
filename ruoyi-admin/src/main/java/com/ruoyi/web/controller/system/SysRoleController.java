@@ -5,6 +5,7 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
@@ -45,8 +46,8 @@ public class SysRoleController extends BaseController {
     @ApiOperation("查询角色信息列表")
     @SaCheckPermission("system:role:list")
     @GetMapping("/list")
-    public TableDataInfo<SysRole> list(SysRole role) {
-        return roleService.selectPageRoleList(role);
+    public TableDataInfo<SysRole> list(SysRole role, PageQuery pageQuery) {
+        return roleService.selectPageRoleList(role, pageQuery);
     }
 
     @ApiOperation("导出角色信息列表")
@@ -165,8 +166,8 @@ public class SysRoleController extends BaseController {
     @ApiOperation("查询已分配用户角色列表")
     @SaCheckPermission("system:role:list")
     @GetMapping("/authUser/allocatedList")
-    public TableDataInfo<SysUser> allocatedList(SysUser user) {
-        return userService.selectAllocatedList(user);
+    public TableDataInfo<SysUser> allocatedList(SysUser user, PageQuery pageQuery) {
+        return userService.selectAllocatedList(user, pageQuery);
     }
 
     /**
@@ -175,8 +176,8 @@ public class SysRoleController extends BaseController {
     @ApiOperation("查询未分配用户角色列表")
     @SaCheckPermission("system:role:list")
     @GetMapping("/authUser/unallocatedList")
-    public TableDataInfo<SysUser> unallocatedList(SysUser user) {
-        return userService.selectUnallocatedList(user);
+    public TableDataInfo<SysUser> unallocatedList(SysUser user, PageQuery pageQuery) {
+        return userService.selectUnallocatedList(user, pageQuery);
     }
 
     /**

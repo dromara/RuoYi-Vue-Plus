@@ -2,11 +2,11 @@ package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
-import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.factory.OssFactory;
@@ -33,9 +33,10 @@ import java.util.Map;
 public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, SysOssVo> implements ISysOssService {
 
     @Override
-    public TableDataInfo<SysOssVo> queryPageList(SysOssBo bo) {
-        PagePlus<SysOss, SysOssVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
-        return PageUtils.buildDataInfo(result);
+    public TableDataInfo<SysOssVo> queryPageList(SysOssBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<SysOss> lqw = buildQueryWrapper(bo);
+        Page<SysOssVo> result = pageVo(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
     }
 
     private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {

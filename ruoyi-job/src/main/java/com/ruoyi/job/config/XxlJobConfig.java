@@ -2,7 +2,6 @@ package com.ruoyi.job.config;
 
 import com.ruoyi.job.config.properties.XxlJobProperties;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
-import com.yomahub.tlog.springboot.lifecircle.TLogXxljobEnhanceInit;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -38,11 +37,6 @@ public class XxlJobConfig {
         xxlJobSpringExecutor.setLogPath(executor.getLogPath());
         xxlJobSpringExecutor.setLogRetentionDays(executor.getLogRetentionDays());
         return xxlJobSpringExecutor;
-    }
-
-    @Bean
-    public TLogXxljobEnhanceInit tLogXxljobEnhanceInit(){
-        return new TLogXxljobEnhanceInit();
     }
 
 }

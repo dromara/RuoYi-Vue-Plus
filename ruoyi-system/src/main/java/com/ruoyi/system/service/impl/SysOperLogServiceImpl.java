@@ -3,11 +3,12 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.dto.OperLogDTO;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.OperLogService;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
 import com.ruoyi.system.domain.SysOperLog;
@@ -44,7 +45,7 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
     }
 
     @Override
-    public TableDataInfo<SysOperLog> selectPageOperLogList(SysOperLog operLog) {
+    public TableDataInfo<SysOperLog> selectPageOperLogList(SysOperLog operLog, PageQuery pageQuery) {
         Map<String, Object> params = operLog.getParams();
         LambdaQueryWrapper<SysOperLog> lqw = new LambdaQueryWrapper<SysOperLog>()
             .like(StringUtils.isNotBlank(operLog.getTitle()), SysOperLog::getTitle, operLog.getTitle())
@@ -60,7 +61,11 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
             .like(StringUtils.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysOperLog::getOperTime, params.get("beginTime"), params.get("endTime"));
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage("oper_id", "desc"), lqw));
+        if(StringUtils.isBlank(pageQuery.getOrderByColumn())) {
+            pageQuery.setOrderByColumn("oper_id").setIsAsc("desc");
+        }
+        Page<SysOperLog> page = page(pageQuery.build(), lqw);
+        return TableDataInfo.build(page);
     }
 
     /**

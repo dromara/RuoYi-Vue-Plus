@@ -1,16 +1,16 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ruoyi.common.annotation.DataSource;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.ConfigService;
-import com.ruoyi.common.enums.DataSourceType;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysConfig;
@@ -32,7 +32,7 @@ import java.util.Map;
 public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysConfig, SysConfig> implements ISysConfigService, ConfigService {
 
     @Override
-    public TableDataInfo<SysConfig> selectPageConfigList(SysConfig config) {
+    public TableDataInfo<SysConfig> selectPageConfigList(SysConfig config, PageQuery pageQuery) {
         Map<String, Object> params = config.getParams();
         LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
             .like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
@@ -40,7 +40,8 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
             .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"));
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+        Page<SysConfig> page = page(pageQuery.build(), lqw);
+        return TableDataInfo.build(page);
     }
 
     /**
@@ -50,7 +51,7 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
      * @return 参数配置信息
      */
     @Override
-    @DataSource(DataSourceType.MASTER)
+    @DS("master")
     public SysConfig selectConfigById(Long configId) {
         return baseMapper.selectById(configId);
     }

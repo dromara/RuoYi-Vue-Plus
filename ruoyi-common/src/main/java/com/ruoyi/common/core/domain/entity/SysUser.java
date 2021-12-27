@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ruoyi.common.core.domain.BaseEntity;
+import com.ruoyi.common.xss.Xss;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -48,15 +49,17 @@ public class SysUser extends BaseEntity {
 	 * 用户账号
 	 */
 	@ApiModelProperty(value = "用户账号")
-	@NotBlank(message = "用户账号不能为空")
+    @Xss(message = "用户账号不能包含脚本字符")
+    @NotBlank(message = "用户账号不能为空")
 	@Size(min = 0, max = 30, message = "用户账号长度不能超过30个字符")
 	private String userName;
 
 	/**
 	 * 用户昵称
 	 */
-	@ApiModelProperty(value = "用户昵称")
-	@Size(min = 0, max = 30, message = "用户昵称长度不能超过30个字符")
+    @ApiModelProperty(value = "用户昵称")
+    @Xss(message = "用户昵称不能包含脚本字符")
+    @Size(min = 0, max = 30, message = "用户昵称长度不能超过30个字符")
 	private String nickName;
 
 	/**
@@ -162,7 +165,7 @@ public class SysUser extends BaseEntity {
 	private Long[] postIds;
 
 	/**
-	 * 角色ID
+	 * 数据权限 当前角色ID
 	 */
 	@ApiModelProperty(value = "角色ID")
 	@TableField(exist = false)

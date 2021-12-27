@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
@@ -53,8 +54,8 @@ public class ${ClassName}Controller extends BaseController {
     @SaCheckPermission("${permissionPrefix}:list")
     @GetMapping("/list")
 #if($table.crud || $table.sub)
-    public TableDataInfo<${ClassName}Vo> list(@Validated(QueryGroup.class) ${ClassName}Bo bo) {
-        return i${ClassName}Service.queryPageList(bo);
+    public TableDataInfo<${ClassName}Vo> list(@Validated(QueryGroup.class) ${ClassName}Bo bo, PageQuery pageQuery) {
+        return i${ClassName}Service.queryPageList(bo, pageQuery);
     }
 #elseif($table.tree)
     public AjaxResult<List<${ClassName}Vo>> list(@Validated(QueryGroup.class) ${ClassName}Bo bo) {

@@ -1,5 +1,6 @@
 package com.ruoyi.system.service;
 
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysOss;
@@ -16,7 +17,7 @@ import java.util.Collection;
  */
 public interface ISysOssService extends IServicePlus<SysOss, SysOssVo> {
 
-    TableDataInfo<SysOssVo> queryPageList(SysOssBo sysOss);
+    TableDataInfo<SysOssVo> queryPageList(SysOssBo sysOss, PageQuery pageQuery);
 
     SysOss upload(MultipartFile file);
 

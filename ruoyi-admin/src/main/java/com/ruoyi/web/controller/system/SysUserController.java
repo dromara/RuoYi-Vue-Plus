@@ -8,6 +8,7 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
@@ -59,8 +60,8 @@ public class SysUserController extends BaseController {
     @ApiOperation("获取用户列表")
     @SaCheckPermission("system:user:list")
     @GetMapping("/list")
-    public TableDataInfo<SysUser> list(SysUser user) {
-        return userService.selectPageUserList(user);
+    public TableDataInfo<SysUser> list(SysUser user, PageQuery pageQuery) {
+        return userService.selectPageUserList(user, pageQuery);
     }
 
     @ApiOperation("导出用户列表")

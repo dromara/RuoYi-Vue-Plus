@@ -5,6 +5,7 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -41,8 +42,8 @@ public class SysPostController extends BaseController {
     @ApiOperation("获取岗位列表")
     @SaCheckPermission("system:post:list")
     @GetMapping("/list")
-    public TableDataInfo<SysPost> list(SysPost post) {
-        return postService.selectPagePostList(post);
+    public TableDataInfo<SysPost> list(SysPost post, PageQuery pageQuery) {
+        return postService.selectPagePostList(post, pageQuery);
     }
 
     @ApiOperation("导出岗位列表")

@@ -6,6 +6,7 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
@@ -54,8 +55,8 @@ public class TestDemoController extends BaseController {
     @ApiOperation("查询测试单表列表")
     @SaCheckPermission("demo:demo:list")
     @GetMapping("/list")
-    public TableDataInfo<TestDemoVo> list(@Validated(QueryGroup.class) TestDemoBo bo) {
-        return iTestDemoService.queryPageList(bo);
+    public TableDataInfo<TestDemoVo> list(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
+        return iTestDemoService.queryPageList(bo, pageQuery);
     }
 
 	/**
@@ -65,7 +66,7 @@ public class TestDemoController extends BaseController {
 	@SaCheckPermission("demo:demo:list")
 	@GetMapping("/page")
 	public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo) {
-		return iTestDemoService.customPageList(bo);
+		return iTestDemoService.customPageList(bo, pageQuery);
 	}
 
     @ApiOperation("导入测试-校验")

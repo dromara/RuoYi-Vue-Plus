@@ -4,8 +4,10 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
@@ -63,13 +65,15 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
     }
 
     @Override
-    public TableDataInfo<GenTable> selectPageGenTableList(GenTable genTable) {
-        return PageUtils.buildDataInfo(baseMapper.selectPageGenTableList(PageUtils.buildPage(), genTable));
+    public TableDataInfo<GenTable> selectPageGenTableList(GenTable genTable, PageQuery pageQuery) {
+        Page<GenTable> page = baseMapper.selectPageGenTableList(pageQuery.build(), genTable);
+        return TableDataInfo.build(page);
     }
 
     @Override
-    public TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable) {
-        return PageUtils.buildDataInfo(baseMapper.selectPageDbTableList(PageUtils.buildPage(), genTable));
+    public TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable, PageQuery pageQuery) {
+        Page<GenTable> page = baseMapper.selectPageDbTableList(pageQuery.build(), genTable);
+        return TableDataInfo.build(page);
     }
 
     /**
@@ -122,7 +126,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateGenTable(GenTable genTable) {
         String options = JsonUtils.toJsonString(genTable.getParams());
         genTable.setOptions(options);
@@ -141,7 +145,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteGenTableByIds(Long[] tableIds) {
         List<Long> ids = Arrays.asList(tableIds);
         removeByIds(ids);
@@ -154,7 +158,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      * @param tableList 导入表列表
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void importGenTable(List<GenTable> tableList) {
         String operName = LoginUtils.getUsername();
         try {
@@ -268,7 +272,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      * @param tableName 表名称
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void synchDb(String tableName) {
         GenTable table = baseMapper.selectGenTableByName(tableName);
         List<GenTableColumn> tableColumns = table.getColumns();

@@ -12,15 +12,15 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 /**
  * 数据过滤处理
  *
  * @author Lion Li
+ * @deprecated 3.6.0 移除 {@link com.ruoyi.framework.handler.PlusDataPermissionHandler}
  */
 @Aspect
 @Component
+@Deprecated
 public class DataScopeAspect {
 
 	/**
@@ -131,9 +131,6 @@ public class DataScopeAspect {
 			if (params instanceof BaseEntity) {
 				BaseEntity baseEntity = (BaseEntity) params;
 				baseEntity.getParams().put(DATA_SCOPE, sql);
-			} else {
-				Map<String, Object> invoke = ReflectUtils.invokeGetter(params, "params");
-				invoke.put(DATA_SCOPE, sql);
 			}
 		}
 	}
