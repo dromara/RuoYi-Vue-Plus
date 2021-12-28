@@ -13,7 +13,7 @@ import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.enums.DataScopeType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.DataPermissionHelper;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.LoginUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +76,7 @@ public class PlusDataPermissionHandler {
         }
         SysUser currentUser = DataPermissionHelper.getVariable("user");
         if (ObjectUtil.isNull(currentUser)) {
-            currentUser = SpringUtils.getBean(UserService.class).selectUserById(SecurityUtils.getUserId());
+            currentUser = SpringUtils.getBean(UserService.class).selectUserById(LoginUtils.getUserId());
             DataPermissionHelper.setVariable("user", currentUser);
         }
         // 如果是超级管理员，则不过滤数据

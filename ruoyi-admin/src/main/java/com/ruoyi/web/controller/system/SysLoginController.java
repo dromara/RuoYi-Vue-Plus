@@ -7,8 +7,9 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
+import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.utils.LoginUtils;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
 import com.ruoyi.system.service.SysLoginService;
@@ -78,7 +79,7 @@ public class SysLoginController {
     @ApiOperation("获取用户信息")
     @GetMapping("getInfo")
     public AjaxResult<Map<String, Object>> getInfo() {
-        SysUser user = SecurityUtils.getUser();
+        SysUser user = SpringUtils.getBean(UserService.class).selectUserById(LoginUtils.getUserId());
         // 角色集合
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合

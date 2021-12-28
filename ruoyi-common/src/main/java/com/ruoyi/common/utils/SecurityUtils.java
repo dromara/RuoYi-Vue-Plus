@@ -1,14 +1,7 @@
 package com.ruoyi.common.utils;
 
-import cn.hutool.http.HttpStatus;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.service.UserService;
-import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
@@ -18,17 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SecurityUtils {
-
-    /**
-     * 获取用户
-     **/
-    public static SysUser getUser() {
-        try {
-            return SpringUtils.getBean(UserService.class).selectUserById(LoginUtils.getUserId());
-        } catch (Exception e) {
-            throw new ServiceException("获取用户信息异常", HttpStatus.HTTP_UNAUTHORIZED);
-        }
-    }
 
     /**
      * 生成BCryptPasswordEncoder密码

@@ -9,9 +9,14 @@ import cn.hutool.http.useragent.UserAgentUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.dto.UserOnlineDTO;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.enums.UserType;
-import com.ruoyi.common.utils.*;
+import com.ruoyi.common.utils.LoginUtils;
+import com.ruoyi.common.utils.RedisUtils;
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,7 +42,7 @@ public class UserActionListener implements SaTokenListener {
         if (userType == UserType.SYS_USER) {
             UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
             String ip = ServletUtils.getClientIP();
-            SysUser user = SecurityUtils.getUser();
+            SysUser user = SpringUtils.getBean(UserService.class).selectUserById(LoginUtils.getUserId());
             String tokenValue = StpUtil.getTokenValue();
             UserOnlineDTO userOnlineDTO = new UserOnlineDTO()
                     .setIpaddr(ip)

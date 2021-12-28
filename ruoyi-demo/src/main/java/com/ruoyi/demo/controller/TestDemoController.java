@@ -65,7 +65,7 @@ public class TestDemoController extends BaseController {
 	@ApiOperation("自定义分页查询")
 	@SaCheckPermission("demo:demo:list")
 	@GetMapping("/page")
-	public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo) {
+	public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
 		return iTestDemoService.customPageList(bo, pageQuery);
 	}
 
