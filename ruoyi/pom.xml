@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ruoyi-vue-plus</artifactId>
         <groupId>com.ruoyi</groupId>
-        <version>3.4.0</version>
+        <version>3.5.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
@@ -31,12 +31,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
-        </dependency>
-
-        <!-- SpringBoot 拦截器 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
         <!--阿里数据库连接池 -->
@@ -66,6 +60,11 @@
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
         </dependency>
 
         <!-- Mysql驱动包 -->
@@ -108,12 +107,6 @@
             <artifactId>easyexcel</artifactId>
         </dependency>
 
-        <!--Token生成与解析-->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-        </dependency>
-
         <!-- jdk11 缺失依赖 jaxb-->
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
@@ -148,7 +141,27 @@
 
         <dependency>
             <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
+            <artifactId>hutool-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-http</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-captcha</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-jwt</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-extra</artifactId>
         </dependency>
 
         <dependency>
@@ -189,17 +202,12 @@
 
         <dependency>
             <groupId>com.yomahub</groupId>
-            <artifactId>tlog-spring-boot-configuration</artifactId>
+            <artifactId>tlog-web-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.yomahub</groupId>
-            <artifactId>tlog-webroot</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.yomahub</groupId>
-            <artifactId>tlog-xxl-job</artifactId>
+            <artifactId>tlog-xxljob-spring-boot-starter</artifactId>
         </dependency>
 
 		<dependency>

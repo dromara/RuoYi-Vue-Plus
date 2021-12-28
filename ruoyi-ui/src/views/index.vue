@@ -101,6 +101,62 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v3.5.0 - 2021-12-28">
+              <ol>
+                <li>[重大更新] 重写数据权限实现</li>
+                <li>[重磅更新] 重构分页 简化使用</li>
+                <li>[重磅更新] 用户登录 支持校验错误次数锁定登录</li>
+                <li>[重磅更新] 增加 jdbc 批处理参数 大幅提升批量操作性能 对原生语句与 MP 均有效</li>
+                <li>update springboot 2.5.7 => 2.5.8 升级预防 log4j2 问题</li>
+                <li>update springboot-admin 2.5.4 => 2.5.5</li>
+                <li>update hutool 5.7.16 => 5.7.18</li>
+                <li>update redisson 3.16.4 => 3.16.7</li>
+                <li>update dynamic-ds 3.4.1 => 3.5.0</li>
+                <li>update qiniu 7.8.0 => 7.9.0</li>
+                <li>update minio 8.3.3 => 8.3.4</li>
+                <li>update tlog 1.3.4 => 1.3.6 启用 tlog 自动配置</li>
+                <li>update clipboard 2.0.6 => 2.0.8</li>
+                <li>update 多数据源切换标注过期 3.6.0 移除 推荐使用原生注解</li>
+                <li>update 通用权限服务 迁移回 ruoyi-framework 模块</li>
+                <li>update 使用 hutool-jwt 替换老旧 jjwt 依赖</li>
+                <li>update 调整 OSS 表字段内容长度</li>
+                <li>update LoginUser 增加角色缓存 优化角色权限代码</li>
+                <li>update 使用 Cglib 重构 BeanCopyUtils 性能优异</li>
+                <li>update 禁止所有工具类实例化 优化代码书写规范</li>
+                <li>update 优化查询用户的角色组、岗位组代码</li>
+                <li>update 更新 RedisUtils 返回客户端实例</li>
+                <li>update 修改 健康检查权限 改为用户放行 提高安全性</li>
+                <li>update hutool 工具 改为单包引入 减少无用依赖</li>
+                <li>update ServicePlusImpl 功能 下沉到 BaseMapperPlus</li>
+                <li>update 去除 jdk17 标签 由于很多组件还未适配 导致一些问题</li>
+                <li>udpate 代码生成预览支持复制内容</li>
+                <li>update 用户导入提示溢出则显示滚动条</li>
+                <li>update 路由支持单独配置菜单或角色权限</li>
+                <li>update 优化web拦截器 使用原生接口处理 默认非生产环境开启</li>
+                <li>update 调整监控依赖 从 common 迁移到 framework</li>
+                <li>add 新增 Vue3 分支 与 代码生成模板(由于组件还未完善 仅供学习)</li>
+                <li>add 增加 RedisUtils 注册监听器方法</li>
+                <li>add 增加 自定义 Xss 校验注解 用户导入增加 Bean 校验</li>
+                <li>add oss下载增加 loading 层</li>
+                <li>add 新增图片预览组件</li>
+                <li>add 集成compression-webpack-plugin插件实现打包Gzip压缩</li>
+                <li>add 新增 SqlUtils 检查关键字方法</li>
+                <li>fix 修复 集群雪花id重复问题 使用网卡信息绑定生成</li>
+                <li>fix 修复 count 语法异常</li>
+                <li>fix 修复更改密码问题</li>
+                <li>fix 修复sql关键字处理 防止解析器报错</li>
+                <li>fix 修复 TreeBuildUtils 顶节点不为 0 问题</li>
+                <li>fix 修复 SysOssConfig 主键类型错误</li>
+                <li>fix 修复代码生成 导出注解错误</li>
+                <li>fix 修复 redisson 集群模式 路径未匹配协议头问题</li>
+                <li>fix 修复打包后字体图标偶现的乱码问题</li>
+                <li>fix 修复版本差异导致的懒加载报错问题</li>
+                <li>fix 修复代码生成字典组重复问题</li>
+                <li>remove 删除 jjwt 无用依赖</li>
+                <li>remove 移除过期 用户导入</li>
+                <li>remove 移除过期工具 DictUtils</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v3.4.0 - 2021-11-29">
               <ol>
                 <li>update [重磅更新] 重构 Excel 导入 支持 Validator 校验 支持自定义监听器</li>
@@ -588,7 +644,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "3.4.0",
+      version: "3.5.0",
     };
   },
   methods: {

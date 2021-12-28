@@ -33,10 +33,12 @@ public class TestBatchController extends BaseController {
 
     /**
      * 新增批量方法 可完美替代 saveBatch 秒级插入上万数据 (对mysql负荷较大)
+     *
+     * 3.5.0 版本 增加 rewriteBatchedStatements=true 批处理参数 使 MP 原生批处理可以达到同样的速度
      */
     @ApiOperation(value = "新增批量方法")
     @PostMapping("/add")
-//	@DataSource(DataSourceType.SLAVE)
+//	@DS("slave")
     public AjaxResult<Void> add() {
         List<TestDemo> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
@@ -47,10 +49,12 @@ public class TestBatchController extends BaseController {
 
     /**
      * 新增或更新 可完美替代 saveOrUpdateBatch 高性能
+     *
+     * 3.5.0 版本 增加 rewriteBatchedStatements=true 批处理参数 使 MP 原生批处理可以达到同样的速度
      */
     @ApiOperation(value = "新增或更新批量方法")
     @PostMapping("/addOrUpdate")
-//	@DataSource(DataSourceType.SLAVE)
+//	@DS("slave")
     public AjaxResult<Void> addOrUpdate() {
         List<TestDemo> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
@@ -72,7 +76,7 @@ public class TestBatchController extends BaseController {
      */
     @ApiOperation(value = "删除批量方法")
     @DeleteMapping()
-//	@DataSource(DataSourceType.SLAVE)
+//	@DS("slave")
     public AjaxResult<Void> remove() {
         return toAjax(iTestDemoService.remove(new LambdaQueryWrapper<TestDemo>()
             .eq(TestDemo::getOrderNum, -1L)) ? 1 : 0);

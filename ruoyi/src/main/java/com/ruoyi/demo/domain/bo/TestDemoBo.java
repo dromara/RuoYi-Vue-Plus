@@ -1,16 +1,15 @@
 package com.ruoyi.demo.domain.bo;
 
+import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import javax.validation.constraints.*;
 
-import java.util.Date;
-
-import com.ruoyi.common.core.domain.BaseEntity;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 测试单表业务对象 test_demo
@@ -65,30 +64,5 @@ public class TestDemoBo extends BaseEntity {
 	@ApiModelProperty("值")
     @NotBlank(message = "值不能为空", groups = { AddGroup.class, EditGroup.class })
     private String value;
-
-
-    /**
-     * 分页大小
-     */
-    @ApiModelProperty("分页大小")
-    private Integer pageSize;
-
-    /**
-     * 当前页数
-     */
-    @ApiModelProperty("当前页数")
-    private Integer pageNum;
-
-    /**
-     * 排序列
-     */
-    @ApiModelProperty("排序列")
-    private String orderByColumn;
-
-    /**
-     * 排序的方向desc或者asc
-     */
-    @ApiModelProperty(value = "排序的方向", example = "asc,desc")
-    private String isAsc;
 
 }

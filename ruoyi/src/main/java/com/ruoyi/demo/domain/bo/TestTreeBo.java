@@ -51,29 +51,4 @@ public class TestTreeBo extends TreeEntity {
     @NotBlank(message = "树节点名不能为空", groups = { AddGroup.class, EditGroup.class })
     private String treeName;
 
-
-    /**
-     * 分页大小
-     */
-    @ApiModelProperty("分页大小")
-    private Integer pageSize;
-
-    /**
-     * 当前页数
-     */
-    @ApiModelProperty("当前页数")
-    private Integer pageNum;
-
-    /**
-     * 排序列
-     */
-    @ApiModelProperty("排序列")
-    private String orderByColumn;
-
-    /**
-     * 排序的方向desc或者asc
-     */
-    @ApiModelProperty(value = "排序的方向", example = "asc,desc")
-    private String isAsc;
-
 }

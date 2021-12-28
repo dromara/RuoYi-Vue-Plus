@@ -42,17 +42,17 @@
         <if test="status != null and status != ''">
             AND status = #{status}
         </if>
-        <!-- 数据范围过滤 -->
-        <if test="params.dataScope != null and params.dataScope != ''">
-            AND ( ${params.dataScope} )
-        </if>
+<!--        &lt;!&ndash; 数据范围过滤 &ndash;&gt;-->
+<!--        <if test="params.dataScope != null and params.dataScope != ''">-->
+<!--            AND ( ${params.dataScope} )-->
+<!--        </if>-->
         order by d.parent_id, d.order_num
     </select>
 
-    <select id="selectDeptListByRoleId" resultType="Integer">
+    <select id="selectDeptListByRoleId" resultType="Long">
         select d.dept_id
         from sys_dept d
-        left join sys_role_dept rd on d.dept_id = rd.dept_id
+            left join sys_role_dept rd on d.dept_id = rd.dept_id
         where rd.role_id = #{roleId}
             <if test="deptCheckStrictly">
                 and d.dept_id not in (select d.parent_id from sys_dept d inner join sys_role_dept rd on d.dept_id = rd.dept_id and rd.role_id = #{roleId})

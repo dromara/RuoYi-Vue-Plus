@@ -3,12 +3,12 @@ package ${packageName}.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.utils.StringUtils;
 #if($table.crud || $table.sub)
-import com.ruoyi.common.utils.PageUtils;
-import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.domain.PageQuery;
 #end
 import org.springframework.stereotype.Service;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import ${packageName}.domain.bo.${ClassName}Bo;
@@ -37,15 +37,17 @@ public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper,
 
 #if($table.crud || $table.sub)
     @Override
-    public TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo) {
-        PagePlus<${ClassName}, ${ClassName}Vo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
-        return PageUtils.buildDataInfo(result);
+    public TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<${ClassName}> lqw = buildQueryWrapper(bo);
+        Page<${ClassName}Vo> result = pageVo(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
     }
 #end
 
     @Override
     public List<${ClassName}Vo> queryList(${ClassName}Bo bo) {
-        return listVo(buildQueryWrapper(bo));
+        LambdaQueryWrapper<${ClassName}> lqw = buildQueryWrapper(bo);
+        return listVo(lqw);
     }
 
     private LambdaQueryWrapper<${ClassName}> buildQueryWrapper(${ClassName}Bo bo) {

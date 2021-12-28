@@ -1,6 +1,6 @@
 package com.ruoyi.framework.config;
 
-import com.ruoyi.framework.Interceptor.PlusWebInvokeTimeInterceptor;
+import com.ruoyi.framework.interceptor.PlusWebInvokeTimeInterceptor;
 import com.yomahub.tlog.web.interceptor.TLogWebInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

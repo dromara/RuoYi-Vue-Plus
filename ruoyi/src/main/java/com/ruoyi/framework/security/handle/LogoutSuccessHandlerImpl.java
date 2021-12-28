@@ -7,6 +7,7 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.service.LogininforService;
 import com.ruoyi.common.core.service.TokenService;
 import com.ruoyi.common.utils.JsonUtils;
+import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +41,15 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
 	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 		throws IOException, ServletException {
 		LoginUser loginUser = tokenService.getLoginUser(request);
-		if (StringUtils.isNotNull(loginUser)) {
+        String message = MessageUtils.message("user.logout.success");
+        if (StringUtils.isNotNull(loginUser)) {
 			String userName = loginUser.getUsername();
 			// 删除用户缓存记录
 			tokenService.delLoginUser(loginUser.getToken());
 			// 记录用户退出日志
-			asyncService.recordLogininfor(userName, Constants.LOGOUT, "退出成功", request);
+			asyncService.recordLogininfor(userName, Constants.LOGOUT, message, request);
 		}
-		ServletUtils.renderString(response, JsonUtils.toJsonString(AjaxResult.error(HttpStatus.HTTP_OK, "退出成功")));
+		ServletUtils.renderString(response, JsonUtils.toJsonString(AjaxResult.error(HttpStatus.HTTP_OK, message)));
 	}
 
 }

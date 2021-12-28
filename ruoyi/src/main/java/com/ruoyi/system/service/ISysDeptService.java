@@ -34,7 +34,7 @@ public interface ISysDeptService extends IService<SysDept> {
      * @param roleId 角色ID
      * @return 选中部门列表
      */
-    List<Integer> selectDeptListByRoleId(Long roleId);
+    List<Long> selectDeptListByRoleId(Long roleId);
 
     /**
      * 根据部门ID查询信息

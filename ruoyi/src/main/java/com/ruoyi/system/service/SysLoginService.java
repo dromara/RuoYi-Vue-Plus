@@ -1,5 +1,6 @@
 package com.ruoyi.system.service;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
@@ -8,7 +9,7 @@ import com.ruoyi.common.core.service.TokenService;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
-import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
+import com.ruoyi.common.exception.user.UserException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.RedisUtils;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 登录校验方法
@@ -62,6 +64,13 @@ public class SysLoginService {
         if (captchaOnOff) {
             validateCaptcha(username, code, uuid, request);
         }
+        // 获取用户登录错误次数(可自定义限制策略 例如: key + username + ip)
+        Integer errorNumber = RedisUtils.getCacheObject(Constants.LOGIN_ERROR + username);
+        // 锁定时间内登录 则踢出
+        if (ObjectUtil.isNotNull(errorNumber) && errorNumber.equals(Constants.LOGIN_ERROR_NUMBER)) {
+            asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME), request);
+            throw new UserException("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME);
+        }
         // 用户验证
         Authentication authentication = null;
         try {
@@ -70,13 +79,26 @@ public class SysLoginService {
                     .authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (Exception e) {
             if (e instanceof BadCredentialsException) {
-                asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match"), request);
-                throw new UserPasswordNotMatchException();
+                // 是否第一次
+                errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
+                // 达到规定错误次数 则锁定登录
+                if (errorNumber.equals(Constants.LOGIN_ERROR_NUMBER)) {
+                    RedisUtils.setCacheObject(Constants.LOGIN_ERROR + username, errorNumber, Constants.LOGIN_ERROR_LIMIT_TIME, TimeUnit.MINUTES);
+                    asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME), request);
+                    throw new UserException("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME);
+                } else {
+                    // 未达到规定错误次数 则递增
+                    RedisUtils.setCacheObject(Constants.LOGIN_ERROR + username, errorNumber);
+                    asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.count", errorNumber), request);
+                    throw new UserException("user.password.retry.limit.count", errorNumber);
+                }
             } else {
                 asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage(), request);
                 throw new ServiceException(e.getMessage());
             }
         }
+        // 登录成功 清空错误次数
+        RedisUtils.deleteObject(Constants.LOGIN_ERROR + username);
         asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         recordLoginInfo(loginUser.getUserId(), username);

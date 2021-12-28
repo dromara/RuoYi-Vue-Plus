@@ -1,5 +1,6 @@
 package com.ruoyi.generator.mapper;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import com.ruoyi.generator.domain.GenTable;
@@ -12,6 +13,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
+@InterceptorIgnore(dataPermission = "true")
 public interface GenTableMapper extends BaseMapperPlus<GenTable> {
 
 

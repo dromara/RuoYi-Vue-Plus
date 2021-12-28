@@ -69,9 +69,14 @@ public class LoginUser implements UserDetails {
     private String os;
 
     /**
-     * 权限列表
+     * 菜单权限
      */
-    private Set<String> permissions;
+    private Set<String> menuPermissions;
+
+    /**
+     * 角色权限
+     */
+    private Set<String> rolePermissions;
 
     /**
      * 用户名
@@ -82,20 +87,6 @@ public class LoginUser implements UserDetails {
      * 密码
      */
     private String password;
-
-    public LoginUser(String username, String password, Set<String> permissions) {
-        this.username = username;
-        this.password = password;
-        this.permissions = permissions;
-    }
-
-    public LoginUser(Long userId, Long deptId, String username, String password, Set<String> permissions) {
-        this.userId = userId;
-        this.deptId = deptId;
-        this.username = username;
-        this.password = password;
-        this.permissions = permissions;
-    }
 
     @JsonIgnore
     @Override

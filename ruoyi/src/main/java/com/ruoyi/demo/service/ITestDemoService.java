@@ -1,5 +1,6 @@
 package com.ruoyi.demo.service;
 
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.domain.vo.TestDemoVo;
 import com.ruoyi.demo.domain.bo.TestDemoBo;
@@ -26,12 +27,12 @@ public interface ITestDemoService extends IServicePlus<TestDemo, TestDemoVo> {
 	/**
 	 * 查询列表
 	 */
-    TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo);
+    TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery);
 
 	/**
 	 * 自定义分页查询
 	 */
-	TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo);
+	TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery);
 
     /**
 	 * 查询列表
