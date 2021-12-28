@@ -7,8 +7,9 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.ruoyi.common.annotation.Sensitive;
+import com.ruoyi.common.core.service.SensitiveService;
 import com.ruoyi.common.enums.SensitiveStrategy;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -23,7 +24,8 @@ public class SensitiveJsonSerializer extends JsonSerializer<String> implements C
 
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        if (SecurityUtils.isAdmin(SecurityUtils.getLoginUser().getUserId()) || SecurityUtils.getLoginUser().getMenuPermissions().contains("Sensitive")){
+        SensitiveService sensitiveService = SpringUtils.getBean(SensitiveService.class);
+        if (sensitiveService.isSensitive()){
             gen.writeString(value);
         } else {
             gen.writeString(strategy.desensitizer().apply(value));
