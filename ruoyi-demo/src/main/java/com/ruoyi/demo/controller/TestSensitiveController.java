@@ -34,9 +34,11 @@ public class TestSensitiveController extends BaseController {
     @GetMapping("/test")
     public AjaxResult<TestSensitive> test() {
         TestSensitive testSensitive = new TestSensitive()
-            .setIdCard("3333199910101212")
-            .setPhone("18888888888")
-            .setAddress("北京市朝阳区某某四合院1203室");
+            .setIdCard("210397198608215431")
+            .setPhone("17640125371")
+            .setAddress("北京市朝阳区某某四合院1203室")
+            .setEmail("17640125371@163.com")
+            .setBankCard("6226456952351452853");
         return AjaxResult.success(testSensitive);
     }
 
@@ -61,6 +63,18 @@ public class TestSensitiveController extends BaseController {
          */
         @Sensitive(strategy = SensitiveStrategy.ADDRESS)
         private String address;
+
+        /**
+         * 邮箱
+         */
+        @Sensitive(strategy = SensitiveStrategy.EMAIL)
+        private String email;
+
+        /**
+         * 银行卡
+         */
+        @Sensitive(strategy = SensitiveStrategy.BANK_CARD)
+        private String bankCard;
 
     }
 

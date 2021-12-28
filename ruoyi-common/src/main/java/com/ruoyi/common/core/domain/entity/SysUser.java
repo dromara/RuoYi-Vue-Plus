@@ -3,7 +3,9 @@ package com.ruoyi.common.core.domain.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ruoyi.common.annotation.Sensitive;
 import com.ruoyi.common.core.domain.BaseEntity;
+import com.ruoyi.common.enums.SensitiveStrategy;
 import com.ruoyi.common.xss.Xss;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -65,6 +67,7 @@ public class SysUser extends BaseEntity {
 	/**
 	 * 用户邮箱
 	 */
+    @Sensitive(strategy = SensitiveStrategy.EMAIL)
 	@ApiModelProperty(value = "用户邮箱")
 	@Email(message = "邮箱格式不正确")
 	@Size(min = 0, max = 50, message = "邮箱长度不能超过50个字符")
@@ -73,6 +76,7 @@ public class SysUser extends BaseEntity {
 	/**
 	 * 手机号码
 	 */
+    @Sensitive(strategy = SensitiveStrategy.PHONE)
 	@ApiModelProperty(value = "手机号码")
 	private String phonenumber;
 
