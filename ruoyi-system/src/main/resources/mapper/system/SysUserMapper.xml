@@ -161,10 +161,10 @@
         <if test="user.phonenumber != null and user.phonenumber != ''">
             AND u.phonenumber like concat('%', #{user.phonenumber}, '%')
         </if>
-        <!-- 数据范围过滤 -->
-        <if test="user.params.dataScope != null and user.params.dataScope != ''">
-            AND ( ${user.params.dataScope} )
-        </if>
+<!--        &lt;!&ndash; 数据范围过滤 &ndash;&gt;-->
+<!--        <if test="user.params.dataScope != null and user.params.dataScope != ''">-->
+<!--            AND ( ${user.params.dataScope} )-->
+<!--        </if>-->
     </select>
 
     <select id="selectUnallocatedList" parameterType="SysUser" resultMap="SysUserResult">
@@ -181,10 +181,10 @@
         <if test="user.phonenumber != null and user.phonenumber != ''">
             AND u.phonenumber like concat('%', #{user.phonenumber}, '%')
         </if>
-        <!-- 数据范围过滤 -->
-        <if test="user.params.dataScope != null and user.params.dataScope != ''">
-            AND ( ${user.params.dataScope} )
-        </if>
+<!--        &lt;!&ndash; 数据范围过滤 &ndash;&gt;-->
+<!--        <if test="user.params.dataScope != null and user.params.dataScope != ''">-->
+<!--            AND ( ${user.params.dataScope} )-->
+<!--        </if>-->
     </select>
 
     <select id="selectUserByUserName" parameterType="String" resultMap="SysUserResult">
