@@ -4,7 +4,7 @@
 	<parent>
         <artifactId>ruoyi-extend</artifactId>
         <groupId>com.ruoyi</groupId>
-        <version>3.4.0</version>
+        <version>3.5.0</version>
 	</parent>
 	<artifactId>ruoyi-xxl-job-admin</artifactId>
 	<packaging>jar</packaging>
@@ -102,6 +102,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
 				<configuration>
 					<nonFilteredFileExtensions>
 						<nonFilteredFileExtension>ttf</nonFilteredFileExtension>

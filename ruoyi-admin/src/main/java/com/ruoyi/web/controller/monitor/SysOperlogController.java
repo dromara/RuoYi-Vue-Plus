@@ -3,6 +3,7 @@ package com.ruoyi.web.controller.monitor;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -36,8 +37,8 @@ public class SysOperlogController extends BaseController {
     @ApiOperation("查询操作日志记录列表")
     @PreAuthorize("@ss.hasPermi('monitor:operlog:list')")
     @GetMapping("/list")
-    public TableDataInfo<SysOperLog> list(SysOperLog operLog) {
-        return operLogService.selectPageOperLogList(operLog);
+    public TableDataInfo<SysOperLog> list(SysOperLog operLog, PageQuery pageQuery) {
+        return operLogService.selectPageOperLogList(operLog, pageQuery);
     }
 
     @ApiOperation("导出操作日志记录列表")

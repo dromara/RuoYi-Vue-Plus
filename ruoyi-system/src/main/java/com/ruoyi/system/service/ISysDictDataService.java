@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.page.TableDataInfo;
 
@@ -14,7 +15,7 @@ import java.util.List;
 public interface ISysDictDataService extends IService<SysDictData> {
 
 
-    TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData);
+    TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData, PageQuery pageQuery);
 
     /**
      * 根据条件分页查询字典数据

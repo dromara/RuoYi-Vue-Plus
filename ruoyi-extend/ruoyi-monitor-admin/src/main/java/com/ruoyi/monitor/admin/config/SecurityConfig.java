@@ -2,7 +2,6 @@ package com.ruoyi.monitor.admin.config;
 
 import de.codecentric.boot.admin.server.config.AdminServerProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -15,7 +14,6 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, proxyTargetClass = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private final String adminContextPath;
@@ -34,8 +32,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			//授予对所有静态资产和登录页面的公共访问权限。
 			.antMatchers(adminContextPath + "/assets/**").permitAll()
 			.antMatchers(adminContextPath + "/login").permitAll()
-            .antMatchers("/actuator").anonymous()
-            .antMatchers("/actuator/**").anonymous()
+            .antMatchers("/actuator").permitAll()
+            .antMatchers("/actuator/**").permitAll()
 			//必须对每个其他请求进行身份验证
 			.anyRequest().authenticated().and()
 			//配置登录和注销

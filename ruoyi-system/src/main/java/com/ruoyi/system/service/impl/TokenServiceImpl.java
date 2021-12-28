@@ -3,6 +3,10 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.jwt.JWTUtil;
+import cn.hutool.jwt.signers.JWTSigner;
+import cn.hutool.jwt.signers.JWTSignerUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.service.TokenService;
@@ -11,9 +15,6 @@ import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,9 +51,9 @@ public class TokenServiceImpl implements TokenService {
         String token = getToken(request);
         if (StringUtils.isNotEmpty(token)) {
             try {
-                Claims claims = parseToken(token);
+                JSONObject claims = parseToken(token);
                 // 解析对应的权限以及用户信息
-                String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
+                String uuid = claims.getStr(Constants.LOGIN_USER_KEY);
                 String userKey = getTokenKey(uuid);
                 LoginUser user = RedisUtils.getCacheObject(userKey);
                 return user;
@@ -153,9 +154,8 @@ public class TokenServiceImpl implements TokenService {
      * @return 令牌
      */
     private String createToken(Map<String, Object> claims) {
-        String token = Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, tokenProperties.getSecret()).compact();
+        JWTSigner signer = JWTSignerUtil.hs512(tokenProperties.getSecret().getBytes());
+        String token = JWTUtil.createToken(claims, signer);
         return token;
     }
 
@@ -165,11 +165,9 @@ public class TokenServiceImpl implements TokenService {
      * @param token 令牌
      * @return 数据声明
      */
-    private Claims parseToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(tokenProperties.getSecret())
-                .parseClaimsJws(token)
-                .getBody();
+    private JSONObject parseToken(String token) {
+        JWTSigner signer = JWTSignerUtil.hs512(tokenProperties.getSecret().getBytes());
+        return JWTUtil.parseToken(token).setSigner(signer).getPayload().getClaimsJson();
     }
 
     /**
@@ -180,8 +178,8 @@ public class TokenServiceImpl implements TokenService {
      */
     @Override
     public String getUsernameFromToken(String token) {
-        Claims claims = parseToken(token);
-        return claims.getSubject();
+        JSONObject claims = parseToken(token);
+        return claims.getStr("sub");
     }
 
     /**

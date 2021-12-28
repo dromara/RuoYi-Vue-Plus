@@ -1,11 +1,12 @@
 package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
@@ -23,13 +24,14 @@ import java.util.List;
 public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, SysDictData, SysDictData> implements ISysDictDataService {
 
     @Override
-    public TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData) {
+    public TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData, PageQuery pageQuery) {
         LambdaQueryWrapper<SysDictData> lqw = new LambdaQueryWrapper<SysDictData>()
                 .eq(StringUtils.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
                 .like(StringUtils.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
                 .eq(StringUtils.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
                 .orderByAsc(SysDictData::getDictSort);
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+        Page<SysDictData> page = page(pageQuery.build(), lqw);
+        return TableDataInfo.build(page);
     }
 
     /**

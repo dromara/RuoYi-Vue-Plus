@@ -60,10 +60,10 @@
         <if test="role.params.endTime != null and role.params.endTime != ''"><!-- 结束时间检索 -->
             and date_format(r.create_time,'%y%m%d') &lt;= date_format(#{role.params.endTime},'%y%m%d')
         </if>
-        <!-- 数据范围过滤 -->
-        <if test="role.params.dataScope != null and role.params.dataScope != ''">
-            AND ( ${role.params.dataScope} )
-        </if>
+<!--        &lt;!&ndash; 数据范围过滤 &ndash;&gt;-->
+<!--        <if test="role.params.dataScope != null and role.params.dataScope != ''">-->
+<!--            AND ( ${role.params.dataScope} )-->
+<!--        </if>-->
         order by r.role_sort
     </select>
 
@@ -88,10 +88,10 @@
         <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
             and date_format(r.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
         </if>
-        <!-- 数据范围过滤 -->
-        <if test="params.dataScope != null and params.dataScope != ''">
-            AND ( ${params.dataScope} )
-        </if>
+<!--        &lt;!&ndash; 数据范围过滤 &ndash;&gt;-->
+<!--        <if test="params.dataScope != null and params.dataScope != ''">-->
+<!--            AND ( ${params.dataScope} )-->
+<!--        </if>-->
         order by r.role_sort
     </select>
 

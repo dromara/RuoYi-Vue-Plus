@@ -3,6 +3,7 @@ package com.ruoyi.web.controller.system;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
@@ -41,8 +42,8 @@ public class SysDictDataController extends BaseController {
     @ApiOperation("查询字典数据列表")
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
-    public TableDataInfo<SysDictData> list(SysDictData dictData) {
-        return dictDataService.selectPageDictDataList(dictData);
+    public TableDataInfo<SysDictData> list(SysDictData dictData, PageQuery pageQuery) {
+        return dictDataService.selectPageDictDataList(dictData, pageQuery);
     }
 
     @ApiOperation("导出字典数据列表")

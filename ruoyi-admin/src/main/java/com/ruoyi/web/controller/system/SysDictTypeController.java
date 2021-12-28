@@ -4,6 +4,7 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictType;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
@@ -38,8 +39,8 @@ public class SysDictTypeController extends BaseController {
     @ApiOperation("查询字典类型列表")
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
-    public TableDataInfo<SysDictType> list(SysDictType dictType) {
-        return dictTypeService.selectPageDictTypeList(dictType);
+    public TableDataInfo<SysDictType> list(SysDictType dictType, PageQuery pageQuery) {
+        return dictTypeService.selectPageDictTypeList(dictType, pageQuery);
     }
 
     @ApiOperation("导出字典类型列表")
