@@ -9,8 +9,6 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ruoyi.common.core.page.PagePlus;
-import com.ruoyi.common.utils.BeanCopyUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,19 +196,6 @@ public class ServicePlusImpl<M extends BaseMapperPlus<T>, T, V> extends ServiceI
 	@Override
 	public List<V> listVo(Wrapper<T> queryWrapper) {
         return getBaseMapper().selectVoList(queryWrapper, voClass);
-	}
-
-	/**
-	 * 翻页查询
-     * @deprecated 3.6.0 移除 请使用 {@link #pageVo(IPage, Wrapper)}
-	 */
-	@Override
-    @Deprecated
-	public PagePlus<T, V> pageVo(PagePlus<T, V> page, Wrapper<T> queryWrapper) {
-		PagePlus<T, V> result = getBaseMapper().selectPage(page, queryWrapper);
-		List<V> volist = BeanCopyUtils.copyList(result.getRecords(), voClass);
-		result.setRecordsVo(volist);
-		return result;
 	}
 
     /**

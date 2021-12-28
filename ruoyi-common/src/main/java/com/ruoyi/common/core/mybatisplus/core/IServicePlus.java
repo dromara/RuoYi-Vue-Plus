@@ -1,10 +1,8 @@
 package com.ruoyi.common.core.mybatisplus.core;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.ruoyi.common.core.page.PagePlus;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -109,43 +107,6 @@ public interface IServicePlus<T, V> extends IService<T> {
 	 */
 	default List<V> listVo(Function<Collection<T>, List<V>> convertor) {
 		return listVo(Wrappers.emptyWrapper(), convertor);
-	}
-
-	/**
-	 * @param page         分页对象
-	 * @param queryWrapper 查询条件
-	 * @return V对象
-     * @deprecated 3.6.0 移除 请使用 {@link ServicePlusImpl#pageVo(IPage, Wrapper)}
-	 */
-    @Deprecated
-	PagePlus<T, V> pageVo(PagePlus<T, V> page, Wrapper<T> queryWrapper);
-
-    /**
-     * @param convertor 自定义转换器
-     * @deprecated 3.6.0 移除 请使用 {@link ServicePlusImpl#pageVo(IPage, Wrapper)}
-     */
-    @Deprecated
-	default PagePlus<T, V> pageVo(PagePlus<T, V> page, Wrapper<T> queryWrapper,
-								  Function<Collection<T>, List<V>> convertor) {
-		PagePlus<T, V> result = getBaseMapper().selectPage(page, queryWrapper);
-		return result.setRecordsVo(convertor.apply(result.getRecords()));
-	}
-
-    /**
-     * @deprecated 3.6.0 移除 请使用 {@link ServicePlusImpl#pageVo(IPage, Wrapper)}
-     */
-    @Deprecated
-	default PagePlus<T, V> pageVo(PagePlus<T, V> page) {
-		return pageVo(page, Wrappers.emptyWrapper());
-	}
-
-	/**
-	 * @param convertor 自定义转换器
-     * @deprecated 3.6.0 移除 请使用 {@link ServicePlusImpl#pageVo(IPage, Wrapper)}
-	 */
-    @Deprecated
-	default PagePlus<T, V> pageVo(PagePlus<T, V> page, Function<Collection<T>, List<V>> convertor) {
-		return pageVo(page, Wrappers.emptyWrapper(), convertor);
 	}
 
 	boolean saveAll(Collection<T> entityList);
