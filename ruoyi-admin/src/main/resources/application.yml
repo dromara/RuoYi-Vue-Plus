@@ -217,6 +217,10 @@ knife4j:
   enable: true
   # 是否开启生产环境保护策略
   production: @knife4j.production@
+  basic:
+    enable: true
+    username: ruoyi
+    password: 123456
   # 前端Ui的个性化配置属性
   setting:
     # 默认语言
