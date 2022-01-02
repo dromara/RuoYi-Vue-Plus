@@ -11,7 +11,6 @@ import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.domain.vo.TestDemoVo;
 import org.apache.ibatis.annotations.Param;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,5 +54,5 @@ public interface TestDemoMapper extends BaseMapperPlus<TestDemo> {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "user_id")
     })
-    int deleteBatchIds(@Param(Constants.COLLECTION) Collection<? extends Serializable> idList);
+    int deleteBatchIds(@Param(Constants.COLLECTION) Collection<?> idList);
 }
