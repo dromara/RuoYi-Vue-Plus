@@ -376,4 +376,14 @@ public class RedisUtils {
         Iterable<String> iterable = CLIENT.getKeys().getKeysByPattern(pattern);
         return IterUtil.toList(iterable);
     }
+
+    /**
+     * 检查redis中是否存在key
+     *
+     * @param key 键
+     */
+    public static Boolean hasKey(String key) {
+        RKeys rKeys = CLIENT.getKeys();
+        return rKeys.countExists(key) > 0;
+    }
 }
