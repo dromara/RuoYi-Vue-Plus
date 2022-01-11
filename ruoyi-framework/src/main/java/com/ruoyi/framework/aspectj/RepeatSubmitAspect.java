@@ -57,13 +57,11 @@ public class RepeatSubmitAspect {
         String url = request.getRequestURI();
 
         // 唯一值（没有消息头则使用请求地址）
-        String submitKey = request.getHeader(tokenProperties.getHeader());
-        if (StringUtils.isEmpty(submitKey)) {
-            submitKey = url;
-        }
+        String submitKey = StringUtils.trimToEmpty(request.getHeader(tokenProperties.getHeader()));
+
         submitKey = SecureUtil.md5(submitKey + ":" + nowParams);
-        // 唯一标识（指定key + 消息头）
-        String cacheRepeatKey = Constants.REPEAT_SUBMIT_KEY + submitKey;
+        // 唯一标识（指定key + url + 消息头）
+        String cacheRepeatKey = Constants.REPEAT_SUBMIT_KEY + url + submitKey;
         String key = RedisUtils.getCacheObject(cacheRepeatKey);
         if (key == null) {
             RedisUtils.setCacheObject(cacheRepeatKey, "", interval, TimeUnit.MILLISECONDS);
