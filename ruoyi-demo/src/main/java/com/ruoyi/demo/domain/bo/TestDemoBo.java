@@ -26,43 +26,43 @@ public class TestDemoBo extends BaseEntity {
     /**
      * 主键
      */
-	@ApiModelProperty("主键")
-    @NotNull(message = "主键不能为空", groups = { EditGroup.class })
+    @ApiModelProperty("主键")
+    @NotNull(message = "主键不能为空", groups = {EditGroup.class})
     private Long id;
 
     /**
      * 部门id
      */
-	@ApiModelProperty("部门id")
-    @NotNull(message = "部门id不能为空", groups = { AddGroup.class, EditGroup.class })
+    @ApiModelProperty("部门id")
+    @NotNull(message = "部门id不能为空", groups = {AddGroup.class, EditGroup.class})
     private Long deptId;
 
     /**
      * 用户id
      */
-	@ApiModelProperty("用户id")
-    @NotNull(message = "用户id不能为空", groups = { AddGroup.class, EditGroup.class })
+    @ApiModelProperty("用户id")
+    @NotNull(message = "用户id不能为空", groups = {AddGroup.class, EditGroup.class})
     private Long userId;
 
     /**
      * 排序号
      */
-	@ApiModelProperty("排序号")
-    @NotNull(message = "排序号不能为空", groups = { AddGroup.class, EditGroup.class })
+    @ApiModelProperty("排序号")
+    @NotNull(message = "排序号不能为空", groups = {AddGroup.class, EditGroup.class})
     private Long orderNum;
 
     /**
      * key键
      */
-	@ApiModelProperty("key键")
-    @NotBlank(message = "key键不能为空", groups = { AddGroup.class, EditGroup.class })
+    @ApiModelProperty("key键")
+    @NotBlank(message = "key键不能为空", groups = {AddGroup.class, EditGroup.class})
     private String testKey;
 
     /**
      * 值
      */
-	@ApiModelProperty("值")
-    @NotBlank(message = "值不能为空", groups = { AddGroup.class, EditGroup.class })
+    @ApiModelProperty("值")
+    @NotBlank(message = "值不能为空", groups = {AddGroup.class, EditGroup.class})
     private String value;
 
 }

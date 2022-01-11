@@ -21,10 +21,10 @@ public class SwaggerProperties {
      * 验证码类型
      */
     private Boolean enabled;
-	/**
-	 * 设置请求的统一前缀
-	 */
-	private String pathMapping;
+    /**
+     * 设置请求的统一前缀
+     */
+    private String pathMapping;
     /**
      * 验证码类别
      */
@@ -38,51 +38,51 @@ public class SwaggerProperties {
      */
     private String version;
 
-	/**
-	 * 联系方式
-	 */
+    /**
+     * 联系方式
+     */
     private Contact contact;
 
-	/**
-	 * 组配置
-	 */
-	private List<Groups> groups;
+    /**
+     * 组配置
+     */
+    private List<Groups> groups;
 
     @Data
-	@NoArgsConstructor
-	public static class Contact {
+    @NoArgsConstructor
+    public static class Contact {
 
-		/**
-		 * 联系人
-		 */
-		private String name;
+        /**
+         * 联系人
+         */
+        private String name;
 
-		/**
-		 * 联系人url
-		 */
-		private String url;
+        /**
+         * 联系人url
+         */
+        private String url;
 
-		/**
-		 * 联系人email
-		 */
-		private String email;
+        /**
+         * 联系人email
+         */
+        private String email;
 
-	}
+    }
 
-	@Data
-	@NoArgsConstructor
-	public static class Groups {
+    @Data
+    @NoArgsConstructor
+    public static class Groups {
 
-		/**
-		 * 组名
-		 */
-		private String name;
+        /**
+         * 组名
+         */
+        private String name;
 
-		/**
-		 * 基础包路径
-		 */
-		private String basePackage;
+        /**
+         * 基础包路径
+         */
+        private String basePackage;
 
-	}
+    }
 
 }

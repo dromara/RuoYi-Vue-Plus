@@ -20,32 +20,32 @@ import java.math.BigDecimal;
 @Slf4j
 public class ExcelBigNumberConvert implements Converter<Long> {
 
-	@Override
-	public Class<Long> supportJavaTypeKey() {
-		return Long.class;
-	}
+    @Override
+    public Class<Long> supportJavaTypeKey() {
+        return Long.class;
+    }
 
-	@Override
-	public CellDataTypeEnum supportExcelTypeKey() {
-		return CellDataTypeEnum.STRING;
-	}
+    @Override
+    public CellDataTypeEnum supportExcelTypeKey() {
+        return CellDataTypeEnum.STRING;
+    }
 
-	@Override
-	public Long convertToJavaData(CellData cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-		return Convert.toLong(cellData.getData());
-	}
+    @Override
+    public Long convertToJavaData(CellData cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
+        return Convert.toLong(cellData.getData());
+    }
 
-	@Override
-	public CellData<Object> convertToExcelData(Long object, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-		if (ObjectUtil.isNotNull(object)) {
-			String str = Convert.toStr(object);
-			if (str.length() > 15) {
-				return new CellData<>(str);
-			}
-		}
-		CellData<Object> cellData = new CellData<>(new BigDecimal(object));
-		cellData.setType(CellDataTypeEnum.NUMBER);
-		return cellData;
-	}
+    @Override
+    public CellData<Object> convertToExcelData(Long object, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
+        if (ObjectUtil.isNotNull(object)) {
+            String str = Convert.toStr(object);
+            if (str.length() > 15) {
+                return new CellData<>(str);
+            }
+        }
+        CellData<Object> cellData = new CellData<>(new BigDecimal(object));
+        cellData.setType(CellDataTypeEnum.NUMBER);
+        return cellData;
+    }
 
 }

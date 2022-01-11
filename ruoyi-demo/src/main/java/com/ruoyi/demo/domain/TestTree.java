@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
 @TableName("test_tree")
 public class TestTree extends TreeEntity {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
 
     /**

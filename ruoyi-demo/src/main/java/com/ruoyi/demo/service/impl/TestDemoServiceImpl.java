@@ -28,75 +28,75 @@ import java.util.Map;
 @Service
 public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDemo, TestDemoVo> implements ITestDemoService {
 
-	@Override
-	public TestDemoVo queryById(Long id) {
-		return getVoById(id);
-	}
+    @Override
+    public TestDemoVo queryById(Long id) {
+        return getVoById(id);
+    }
 
-	@Override
-	public TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery) {
+    @Override
+    public TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
         Page<TestDemoVo> result = pageVo(pageQuery.build(), lqw);
-		return TableDataInfo.build(result);
-	}
+        return TableDataInfo.build(result);
+    }
 
-	/**
-	 * 自定义分页查询
-	 */
-	@Override
-	public TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery) {
+    /**
+     * 自定义分页查询
+     */
+    @Override
+    public TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
-		Page<TestDemoVo> result = baseMapper.customPageList(pageQuery.build(), lqw);
-		return TableDataInfo.build(result);
-	}
+        Page<TestDemoVo> result = baseMapper.customPageList(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
+    }
 
-	@Override
-	public List<TestDemoVo> queryList(TestDemoBo bo) {
-		return listVo(buildQueryWrapper(bo));
-	}
+    @Override
+    public List<TestDemoVo> queryList(TestDemoBo bo) {
+        return listVo(buildQueryWrapper(bo));
+    }
 
-	private LambdaQueryWrapper<TestDemo> buildQueryWrapper(TestDemoBo bo) {
-		Map<String, Object> params = bo.getParams();
-		LambdaQueryWrapper<TestDemo> lqw = Wrappers.lambdaQuery();
-		lqw.like(StringUtils.isNotBlank(bo.getTestKey()), TestDemo::getTestKey, bo.getTestKey());
-		lqw.eq(StringUtils.isNotBlank(bo.getValue()), TestDemo::getValue, bo.getValue());
-		lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
-			TestDemo::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
-		return lqw;
-	}
+    private LambdaQueryWrapper<TestDemo> buildQueryWrapper(TestDemoBo bo) {
+        Map<String, Object> params = bo.getParams();
+        LambdaQueryWrapper<TestDemo> lqw = Wrappers.lambdaQuery();
+        lqw.like(StringUtils.isNotBlank(bo.getTestKey()), TestDemo::getTestKey, bo.getTestKey());
+        lqw.eq(StringUtils.isNotBlank(bo.getValue()), TestDemo::getValue, bo.getValue());
+        lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
+            TestDemo::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
+        return lqw;
+    }
 
-	@Override
-	public Boolean insertByBo(TestDemoBo bo) {
-		TestDemo add = BeanUtil.toBean(bo, TestDemo.class);
-		validEntityBeforeSave(add);
-		boolean flag = save(add);
-		if (flag) {
-			bo.setId(add.getId());
-		}
-		return flag;
-	}
+    @Override
+    public Boolean insertByBo(TestDemoBo bo) {
+        TestDemo add = BeanUtil.toBean(bo, TestDemo.class);
+        validEntityBeforeSave(add);
+        boolean flag = save(add);
+        if (flag) {
+            bo.setId(add.getId());
+        }
+        return flag;
+    }
 
-	@Override
-	public Boolean updateByBo(TestDemoBo bo) {
-		TestDemo update = BeanUtil.toBean(bo, TestDemo.class);
-		validEntityBeforeSave(update);
-		return updateById(update);
-	}
+    @Override
+    public Boolean updateByBo(TestDemoBo bo) {
+        TestDemo update = BeanUtil.toBean(bo, TestDemo.class);
+        validEntityBeforeSave(update);
+        return updateById(update);
+    }
 
-	/**
-	 * 保存前的数据校验
-	 *
-	 * @param entity 实体类数据
-	 */
-	private void validEntityBeforeSave(TestDemo entity) {
-		//TODO 做一些数据校验,如唯一约束
-	}
+    /**
+     * 保存前的数据校验
+     *
+     * @param entity 实体类数据
+     */
+    private void validEntityBeforeSave(TestDemo entity) {
+        //TODO 做一些数据校验,如唯一约束
+    }
 
-	@Override
-	public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-		if (isValid) {
-			//TODO 做一些业务上的校验,判断是否需要校验
-		}
-		return removeByIds(ids);
-	}
+    @Override
+    public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
+        if (isValid) {
+            //TODO 做一些业务上的校验,判断是否需要校验
+        }
+        return removeByIds(ids);
+    }
 }

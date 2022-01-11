@@ -28,28 +28,28 @@ import java.io.IOException;
 @Configuration
 public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
 
-	@Autowired
-	private TokenService tokenService;
+    @Autowired
+    private TokenService tokenService;
 
-	@Autowired
-	private LogininforService asyncService;
+    @Autowired
+    private LogininforService asyncService;
 
-	/**
-	 * 退出处理
-	 */
-	@Override
-	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
-		throws IOException, ServletException {
-		LoginUser loginUser = tokenService.getLoginUser(request);
+    /**
+     * 退出处理
+     */
+    @Override
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+        throws IOException, ServletException {
+        LoginUser loginUser = tokenService.getLoginUser(request);
         String message = MessageUtils.message("user.logout.success");
         if (StringUtils.isNotNull(loginUser)) {
-			String userName = loginUser.getUsername();
-			// 删除用户缓存记录
-			tokenService.delLoginUser(loginUser.getToken());
-			// 记录用户退出日志
-			asyncService.recordLogininfor(userName, Constants.LOGOUT, message, request);
-		}
-		ServletUtils.renderString(response, JsonUtils.toJsonString(AjaxResult.error(HttpStatus.HTTP_OK, message)));
-	}
+            String userName = loginUser.getUsername();
+            // 删除用户缓存记录
+            tokenService.delLoginUser(loginUser.getToken());
+            // 记录用户退出日志
+            asyncService.recordLogininfor(userName, Constants.LOGOUT, message, request);
+        }
+        ServletUtils.renderString(response, JsonUtils.toJsonString(AjaxResult.error(HttpStatus.HTTP_OK, message)));
+    }
 
 }

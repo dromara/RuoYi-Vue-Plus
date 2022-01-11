@@ -27,22 +27,22 @@ import javax.validation.constraints.NotNull;
 @RequestMapping("/demo/i18n")
 public class TestI18nController {
 
-	/**
-	 * 通过code获取国际化内容
-	 * code为 messages.properties 中的 key
-	 *
-	 * 测试使用 user.register.success
-	 */
-	@ApiOperation("通过code获取国际化内容")
-	@GetMapping()
-	public AjaxResult<Void> get(@ApiParam("国际化code") String code) {
-		return AjaxResult.success(MessageUtils.message(code));
-	}
+    /**
+     * 通过code获取国际化内容
+     * code为 messages.properties 中的 key
+     * <p>
+     * 测试使用 user.register.success
+     */
+    @ApiOperation("通过code获取国际化内容")
+    @GetMapping()
+    public AjaxResult<Void> get(@ApiParam("国际化code") String code) {
+        return AjaxResult.success(MessageUtils.message(code));
+    }
 
     /**
      * Validator 校验国际化
      * 不传值 分别查看异常返回
-     *
+     * <p>
      * 测试使用 not.null
      */
     @ApiOperation("Validator 校验国际化")
@@ -54,7 +54,7 @@ public class TestI18nController {
     /**
      * Bean 校验国际化
      * 不传值 分别查看异常返回
-     *
+     * <p>
      * 测试使用 not.null
      */
     @ApiOperation("Bean 校验国际化")

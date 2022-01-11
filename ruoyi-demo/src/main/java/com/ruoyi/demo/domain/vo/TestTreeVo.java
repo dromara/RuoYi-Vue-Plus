@@ -9,7 +9,6 @@ import lombok.Data;
 import java.util.Date;
 
 
-
 /**
  * 测试树表视图对象 test_tree
  *
@@ -21,48 +20,48 @@ import java.util.Date;
 @ExcelIgnoreUnannotated
 public class TestTreeVo {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-     *  主键
+    /**
+     * 主键
      */
-	@ApiModelProperty("主键")
-	private Long id;
+    @ApiModelProperty("主键")
+    private Long id;
 
     /**
      * 父id
      */
-	@ExcelProperty(value = "父id")
-	@ApiModelProperty("父id")
-	private Long parentId;
+    @ExcelProperty(value = "父id")
+    @ApiModelProperty("父id")
+    private Long parentId;
 
     /**
      * 部门id
      */
-	@ExcelProperty(value = "部门id")
-	@ApiModelProperty("部门id")
-	private Long deptId;
+    @ExcelProperty(value = "部门id")
+    @ApiModelProperty("部门id")
+    private Long deptId;
 
     /**
      * 用户id
      */
-	@ExcelProperty(value = "用户id")
-	@ApiModelProperty("用户id")
-	private Long userId;
+    @ExcelProperty(value = "用户id")
+    @ApiModelProperty("用户id")
+    private Long userId;
 
     /**
      * 树节点名
      */
-	@ExcelProperty(value = "树节点名")
-	@ApiModelProperty("树节点名")
-	private String treeName;
+    @ExcelProperty(value = "树节点名")
+    @ApiModelProperty("树节点名")
+    private String treeName;
 
     /**
      * 创建时间
      */
-	@ExcelProperty(value = "创建时间")
-	@ApiModelProperty("创建时间")
-	private Date createTime;
+    @ExcelProperty(value = "创建时间")
+    @ApiModelProperty("创建时间")
+    private Date createTime;
 
 
 }

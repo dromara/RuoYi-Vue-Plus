@@ -69,8 +69,8 @@ public class SysPost extends BaseEntity {
      * 状态（0正常 1停用）
      */
     @ApiModelProperty(value = "状态（0正常 1停用）")
-	@ExcelProperty(value = "状态", converter = ExcelDictConvert.class)
-	@ExcelDictFormat(dictType = "sys_common_status")
+    @ExcelProperty(value = "状态", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "sys_common_status")
     private String status;
 
     /**

@@ -21,7 +21,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class PageQuery implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * 分页大小

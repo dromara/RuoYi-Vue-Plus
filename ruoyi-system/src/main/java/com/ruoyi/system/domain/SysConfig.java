@@ -70,7 +70,7 @@ public class SysConfig extends BaseEntity {
      */
     @ApiModelProperty(value = "系统内置（Y是 N否）")
     @ExcelProperty(value = "系统内置", converter = ExcelDictConvert.class)
-	@ExcelDictFormat(dictType = "sys_yes_no")
+    @ExcelDictFormat(dictType = "sys_yes_no")
     private String configType;
 
     /**

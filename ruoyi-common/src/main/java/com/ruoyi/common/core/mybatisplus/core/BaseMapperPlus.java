@@ -22,15 +22,15 @@ import java.util.Map;
  */
 public interface BaseMapperPlus<T> extends BaseMapper<T> {
 
-	/**
-	 * 单sql批量插入( 全量填充 )
-	 */
-	int insertAll(@Param("list") Collection<T> batchList);
+    /**
+     * 单sql批量插入( 全量填充 )
+     */
+    int insertAll(@Param("list") Collection<T> batchList);
 
     /**
      * 根据 ID 查询
      */
-    default <V> V selectVoById(Serializable id, Class<V> voClass){
+    default <V> V selectVoById(Serializable id, Class<V> voClass) {
         T obj = this.selectById(id);
         if (ObjectUtil.isNull(obj)) {
             return null;
@@ -41,7 +41,7 @@ public interface BaseMapperPlus<T> extends BaseMapper<T> {
     /**
      * 查询（根据ID 批量查询）
      */
-    default <V> List<V> selectVoBatchIds(Collection<? extends Serializable> idList, Class<V> voClass){
+    default <V> List<V> selectVoBatchIds(Collection<? extends Serializable> idList, Class<V> voClass) {
         List<T> list = this.selectBatchIds(idList);
         if (CollUtil.isEmpty(list)) {
             return CollUtil.newArrayList();
@@ -52,7 +52,7 @@ public interface BaseMapperPlus<T> extends BaseMapper<T> {
     /**
      * 查询（根据 columnMap 条件）
      */
-    default <V> List<V> selectVoByMap(Map<String, Object> map, Class<V> voClass){
+    default <V> List<V> selectVoByMap(Map<String, Object> map, Class<V> voClass) {
         List<T> list = this.selectByMap(map);
         if (CollUtil.isEmpty(list)) {
             return CollUtil.newArrayList();

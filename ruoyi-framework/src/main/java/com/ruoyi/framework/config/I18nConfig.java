@@ -17,30 +17,30 @@ import java.util.Locale;
 @Configuration
 public class I18nConfig {
 
-	@Bean
-	public LocaleResolver localeResolver() {
-		return new I18nLocaleResolver();
-	}
+    @Bean
+    public LocaleResolver localeResolver() {
+        return new I18nLocaleResolver();
+    }
 
-	/**
-	 * 获取请求头国际化信息
-	 */
-	static class I18nLocaleResolver implements LocaleResolver {
+    /**
+     * 获取请求头国际化信息
+     */
+    static class I18nLocaleResolver implements LocaleResolver {
 
-		@Override
-		public Locale resolveLocale(HttpServletRequest httpServletRequest) {
-			String language = httpServletRequest.getHeader("content-language");
-			Locale locale = Locale.getDefault();
-			if (StrUtil.isNotBlank(language)) {
-				String[] split = language.split("_");
-				locale = new Locale(split[0], split[1]);
-			}
-			return locale;
-		}
+        @Override
+        public Locale resolveLocale(HttpServletRequest httpServletRequest) {
+            String language = httpServletRequest.getHeader("content-language");
+            Locale locale = Locale.getDefault();
+            if (StrUtil.isNotBlank(language)) {
+                String[] split = language.split("_");
+                locale = new Locale(split[0], split[1]);
+            }
+            return locale;
+        }
 
-		@Override
-		public void setLocale(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Locale locale) {
+        @Override
+        public void setLocale(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Locale locale) {
 
-		}
-	}
+        }
+    }
 }

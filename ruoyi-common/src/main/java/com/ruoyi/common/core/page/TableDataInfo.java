@@ -22,42 +22,42 @@ import java.util.List;
 @Accessors(chain = true)
 @ApiModel("分页响应对象")
 public class TableDataInfo<T> implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * 总记录数
-	 */
-	@ApiModelProperty("总记录数")
-	private long total;
+    /**
+     * 总记录数
+     */
+    @ApiModelProperty("总记录数")
+    private long total;
 
-	/**
-	 * 列表数据
-	 */
-	@ApiModelProperty("列表数据")
-	private List<T> rows;
+    /**
+     * 列表数据
+     */
+    @ApiModelProperty("列表数据")
+    private List<T> rows;
 
-	/**
-	 * 消息状态码
-	 */
-	@ApiModelProperty("消息状态码")
-	private int code;
+    /**
+     * 消息状态码
+     */
+    @ApiModelProperty("消息状态码")
+    private int code;
 
-	/**
-	 * 消息内容
-	 */
-	@ApiModelProperty("消息内容")
-	private String msg;
+    /**
+     * 消息内容
+     */
+    @ApiModelProperty("消息内容")
+    private String msg;
 
-	/**
-	 * 分页
-	 *
-	 * @param list  列表数据
-	 * @param total 总记录数
-	 */
-	public TableDataInfo(List<T> list, long total) {
-		this.rows = list;
-		this.total = total;
-	}
+    /**
+     * 分页
+     *
+     * @param list  列表数据
+     * @param total 总记录数
+     */
+    public TableDataInfo(List<T> list, long total) {
+        this.rows = list;
+        this.total = total;
+    }
 
     public static <T> TableDataInfo<T> build(IPage<T> page) {
         TableDataInfo<T> rspData = new TableDataInfo<>();
