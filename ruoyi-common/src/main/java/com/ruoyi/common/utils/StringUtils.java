@@ -5,10 +5,10 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.util.AntPathMatcher;
 
 import java.util.*;
 
@@ -347,7 +347,8 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 	 * @return
 	 */
 	public static boolean isMatch(String pattern, String url) {
-		return ReUtil.isMatch(pattern, url);
+        AntPathMatcher matcher = new AntPathMatcher();
+        return matcher.match(pattern, url);
 	}
 
 	@SuppressWarnings("unchecked")
