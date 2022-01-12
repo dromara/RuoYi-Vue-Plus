@@ -5,7 +5,6 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
@@ -134,8 +133,7 @@ public class SysOssController extends BaseController {
     @PutMapping("/changePreviewListResource")
     public AjaxResult<Void> changePreviewListResource(@RequestBody String body) {
         Map<String, Boolean> map = JsonUtils.parseMap(body);
-        SysConfig config = iSysConfigService.getOne(new LambdaQueryWrapper<SysConfig>()
-            .eq(SysConfig::getConfigKey, OssConstant.PEREVIEW_LIST_RESOURCE_KEY));
+        SysConfig config = iSysConfigService.getOne(new SysConfig().setConfigKey(OssConstant.PEREVIEW_LIST_RESOURCE_KEY));
         config.setConfigValue(map.get("previewListResource").toString());
         return toAjax(iSysConfigService.updateConfig(config));
     }

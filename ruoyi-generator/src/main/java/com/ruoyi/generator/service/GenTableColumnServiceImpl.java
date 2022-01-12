@@ -1,9 +1,9 @@
 package com.ruoyi.generator.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.generator.domain.GenTableColumn;
 import com.ruoyi.generator.mapper.GenTableColumnMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -14,8 +14,11 @@ import java.util.List;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
-public class GenTableColumnServiceImpl extends ServicePlusImpl<GenTableColumnMapper, GenTableColumn, GenTableColumn> implements IGenTableColumnService {
+public class GenTableColumnServiceImpl implements IGenTableColumnService {
+
+    private final GenTableColumnMapper baseMapper;
 
     /**
      * 查询业务字段列表
@@ -25,7 +28,7 @@ public class GenTableColumnServiceImpl extends ServicePlusImpl<GenTableColumnMap
      */
     @Override
     public List<GenTableColumn> selectGenTableColumnListByTableId(Long tableId) {
-        return list(new LambdaQueryWrapper<GenTableColumn>()
+        return baseMapper.selectList(new LambdaQueryWrapper<GenTableColumn>()
                 .eq(GenTableColumn::getTableId, tableId)
                 .orderByAsc(GenTableColumn::getSort));
     }

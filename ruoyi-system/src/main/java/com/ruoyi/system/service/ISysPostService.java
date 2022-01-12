@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface ISysPostService extends IService<SysPost> {
+public interface ISysPostService {
 
 
     TableDataInfo<SysPost> selectPagePostList(SysPost post, PageQuery pageQuery);

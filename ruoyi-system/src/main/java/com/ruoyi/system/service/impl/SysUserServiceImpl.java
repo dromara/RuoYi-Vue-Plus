@@ -8,7 +8,6 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.exception.ServiceException;
@@ -20,8 +19,8 @@ import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.ISysUserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,20 +35,15 @@ import java.util.stream.Collectors;
  * @author Lion Li
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
-public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, SysUser> implements ISysUserService, UserService {
+public class SysUserServiceImpl implements ISysUserService, UserService {
 
-    @Autowired
-    private SysRoleMapper roleMapper;
-
-    @Autowired
-    private SysPostMapper postMapper;
-
-    @Autowired
-    private SysUserRoleMapper userRoleMapper;
-
-    @Autowired
-    private SysUserPostMapper userPostMapper;
+    private final SysUserMapper baseMapper;
+    private final SysRoleMapper roleMapper;
+    private final SysPostMapper postMapper;
+    private final SysUserRoleMapper userRoleMapper;
+    private final SysUserPostMapper userPostMapper;
 
     @Override
     public TableDataInfo<SysUser> selectPageUserList(SysUser user, PageQuery pageQuery) {
@@ -152,7 +146,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     @Override
     public String checkUserNameUnique(String userName) {
-        long count = count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName));
+        long count = baseMapper.selectCount(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName));
         if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -168,10 +162,10 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     @Override
     public String checkPhoneUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-        long count = count(new LambdaQueryWrapper<SysUser>()
+        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getPhonenumber, user.getPhonenumber())
                 .ne(SysUser::getUserId, userId));
-        if (count > 0) {
+        if (count) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -186,10 +180,10 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     @Override
     public String checkEmailUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-        long count = count(new LambdaQueryWrapper<SysUser>()
+        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getEmail, user.getEmail())
                 .ne(SysUser::getUserId, userId));
-        if (count > 0) {
+        if (count) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -368,7 +362,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
                 list.add(ur);
             }
             if (list.size() > 0) {
-                userRoleMapper.insertAll(list);
+                userRoleMapper.insertBatch(list);
             }
         }
     }
@@ -390,7 +384,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
                 list.add(up);
             }
             if (list.size() > 0) {
-                userPostMapper.insertAll(list);
+                userPostMapper.insertBatch(list);
             }
         }
     }
@@ -412,7 +406,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
                 list.add(ur);
             }
             if (list.size() > 0) {
-                userRoleMapper.insertAll(list);
+                userRoleMapper.insertBatch(list);
             }
         }
     }

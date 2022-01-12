@@ -1,7 +1,6 @@
 package com.ruoyi.demo.service;
 
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.domain.bo.TestDemoBo;
@@ -16,7 +15,7 @@ import java.util.List;
  * @author Lion Li
  * @date 2021-07-26
  */
-public interface ITestDemoService extends IServicePlus<TestDemo, TestDemoVo> {
+public interface ITestDemoService {
 
     /**
      * 查询单个
@@ -64,4 +63,9 @@ public interface ITestDemoService extends IServicePlus<TestDemo, TestDemoVo> {
      * @return
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 批量保存
+     */
+    Boolean saveBatch(List<TestDemo> list);
 }

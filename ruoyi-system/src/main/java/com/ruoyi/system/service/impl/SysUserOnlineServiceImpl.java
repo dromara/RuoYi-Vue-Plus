@@ -4,9 +4,9 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysUserOnline;
+import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysUserOnlineService;
-import com.ruoyi.system.service.ISysUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
 public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
 
-    @Autowired
-    private ISysUserService userService;
+    private final SysUserMapper userMapper;
 
     /**
      * 通过登录地址查询信息
@@ -77,7 +77,7 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
         if (StringUtils.isNull(user)) {
             return null;
         }
-        SysUser sysUser = userService.selectUserById(user.getUserId());
+        SysUser sysUser = userMapper.selectUserById(user.getUserId());
         SysUserOnline sysUserOnline = new SysUserOnline();
         sysUserOnline.setTokenId(user.getToken());
         sysUserOnline.setUserName(user.getUsername());

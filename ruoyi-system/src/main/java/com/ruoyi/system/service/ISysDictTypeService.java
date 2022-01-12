@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface ISysDictTypeService extends IService<SysDictType> {
+public interface ISysDictTypeService {
 
 
     TableDataInfo<SysDictType> selectPageDictTypeList(SysDictType dictType, PageQuery pageQuery);

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.demo.domain.TestDemo;
@@ -13,6 +12,7 @@ import com.ruoyi.demo.domain.bo.TestDemoBo;
 import com.ruoyi.demo.domain.vo.TestDemoVo;
 import com.ruoyi.demo.mapper.TestDemoMapper;
 import com.ruoyi.demo.service.ITestDemoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -25,18 +25,21 @@ import java.util.Map;
  * @author Lion Li
  * @date 2021-07-26
  */
+@RequiredArgsConstructor
 @Service
-public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDemo, TestDemoVo> implements ITestDemoService {
+public class TestDemoServiceImpl implements ITestDemoService {
+
+    private final TestDemoMapper baseMapper;
 
     @Override
     public TestDemoVo queryById(Long id) {
-        return getVoById(id);
+        return baseMapper.selectVoById(id);
     }
 
     @Override
     public TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
-        Page<TestDemoVo> result = pageVo(pageQuery.build(), lqw);
+        Page<TestDemoVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
 
@@ -52,7 +55,7 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 
     @Override
     public List<TestDemoVo> queryList(TestDemoBo bo) {
-        return listVo(buildQueryWrapper(bo));
+        return baseMapper.selectVoList(buildQueryWrapper(bo));
     }
 
     private LambdaQueryWrapper<TestDemo> buildQueryWrapper(TestDemoBo bo) {
@@ -69,7 +72,7 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
     public Boolean insertByBo(TestDemoBo bo) {
         TestDemo add = BeanUtil.toBean(bo, TestDemo.class);
         validEntityBeforeSave(add);
-        boolean flag = save(add);
+        boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
         }
@@ -80,7 +83,7 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
     public Boolean updateByBo(TestDemoBo bo) {
         TestDemo update = BeanUtil.toBean(bo, TestDemo.class);
         validEntityBeforeSave(update);
-        return updateById(update);
+        return baseMapper.updateById(update) > 0;
     }
 
     /**
@@ -97,6 +100,11 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
         if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return removeByIds(ids);
+        return baseMapper.deleteBatchIds(ids) > 0;
+    }
+
+    @Override
+    public Boolean saveBatch(List<TestDemo> list) {
+        return baseMapper.insertBatch(list);
     }
 }

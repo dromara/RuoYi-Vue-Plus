@@ -9,12 +9,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.system.domain.SysOssConfig;
@@ -24,7 +23,6 @@ import com.ruoyi.system.mapper.SysOssConfigMapper;
 import com.ruoyi.system.service.ISysOssConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,16 +37,18 @@ import java.util.List;
  * @date 2021-08-13
  */
 @Slf4j
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @Service
-public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper, SysOssConfig, SysOssConfigVo> implements ISysOssConfigService {
+public class SysOssConfigServiceImpl implements ISysOssConfigService {
+
+    private final SysOssConfigMapper baseMapper;
 
     /**
      * 项目启动时，初始化参数到缓存，加载配置类
      */
     @Override
     public void init() {
-        List<SysOssConfig> list = list();
+        List<SysOssConfig> list = baseMapper.selectList();
         // 加载OSS初始化配置
         for (SysOssConfig config : list) {
             String configKey = config.getConfigKey();
@@ -63,13 +63,13 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
 
     @Override
     public SysOssConfigVo queryById(Integer ossConfigId) {
-        return getVoById(ossConfigId);
+        return baseMapper.selectVoById(ossConfigId);
     }
 
     @Override
     public TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<SysOssConfig> lqw = buildQueryWrapper(bo);
-        Page<SysOssConfigVo> result = pageVo(pageQuery.build(), lqw);
+        Page<SysOssConfigVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
 
@@ -86,7 +86,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     public Boolean insertByBo(SysOssConfigBo bo) {
         SysOssConfig config = BeanUtil.toBean(bo, SysOssConfig.class);
         validEntityBeforeSave(config);
-        return setConfigCache(save(config), config);
+        return setConfigCache(baseMapper.insert(config) > 0, config);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
         luw.set(StringUtils.isBlank(config.getRegion()), SysOssConfig::getRegion, "");
         luw.set(StringUtils.isBlank(config.getExt1()), SysOssConfig::getExt1, "");
         luw.eq(SysOssConfig::getOssConfigId, config.getOssConfigId());
-        return setConfigCache(update(config, luw), config);
+        return setConfigCache(baseMapper.update(config, luw) > 0, config);
     }
 
     /**
@@ -120,10 +120,10 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
         }
         List<SysOssConfig> list = Lists.newArrayList();
         for (Long configId : ids) {
-            SysOssConfig config = getById(configId);
+            SysOssConfig config = baseMapper.selectById(configId);
             list.add(config);
         }
-        boolean flag = removeByIds(ids);
+        boolean flag = baseMapper.deleteBatchIds(ids) > 0;
         if (flag) {
             list.stream().forEach(sysOssConfig -> {
                 RedisUtils.deleteObject(getCacheKey(sysOssConfig.getConfigKey()));
@@ -137,7 +137,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
      */
     private String checkConfigKeyUnique(SysOssConfig sysOssConfig) {
         long ossConfigId = StringUtils.isNull(sysOssConfig.getOssConfigId()) ? -1L : sysOssConfig.getOssConfigId();
-        SysOssConfig info = getOne(new LambdaQueryWrapper<SysOssConfig>()
+        SysOssConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysOssConfig>()
                 .select(SysOssConfig::getOssConfigId, SysOssConfig::getConfigKey)
                 .eq(SysOssConfig::getConfigKey, sysOssConfig.getConfigKey()));
         if (StringUtils.isNotNull(info) && info.getOssConfigId() != ossConfigId) {

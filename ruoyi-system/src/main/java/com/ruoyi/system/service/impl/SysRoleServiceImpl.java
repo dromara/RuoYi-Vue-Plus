@@ -6,7 +6,6 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
@@ -20,7 +19,7 @@ import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysRoleMenuMapper;
 import com.ruoyi.system.mapper.SysUserRoleMapper;
 import com.ruoyi.system.service.ISysRoleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,17 +30,14 @@ import java.util.*;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
-public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, SysRole> implements ISysRoleService {
+public class SysRoleServiceImpl implements ISysRoleService {
 
-    @Autowired
-    private SysRoleMenuMapper roleMenuMapper;
-
-    @Autowired
-    private SysUserRoleMapper userRoleMapper;
-
-    @Autowired
-    private SysRoleDeptMapper roleDeptMapper;
+    private final SysRoleMapper baseMapper;
+    private final SysRoleMenuMapper roleMenuMapper;
+    private final SysUserRoleMapper userRoleMapper;
+    private final SysRoleDeptMapper roleDeptMapper;
 
     @Override
     public TableDataInfo<SysRole> selectPageRoleList(SysRole role, PageQuery pageQuery) {
@@ -128,7 +124,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
      */
     @Override
     public SysRole selectRoleById(Long roleId) {
-        return getById(roleId);
+        return baseMapper.selectById(roleId);
     }
 
     /**
@@ -140,10 +136,10 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
     @Override
     public String checkRoleNameUnique(SysRole role) {
         Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
-        long count = count(new LambdaQueryWrapper<SysRole>()
+        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
                 .eq(SysRole::getRoleName, role.getRoleName())
                 .ne(SysRole::getRoleId, roleId));
-        if (count > 0) {
+        if (count) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -158,10 +154,10 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
     @Override
     public String checkRoleKeyUnique(SysRole role) {
         Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
-        long count = count(new LambdaQueryWrapper<SysRole>()
+        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
                 .eq(SysRole::getRoleKey, role.getRoleKey())
                 .ne(SysRole::getRoleId, roleId));
-        if (count > 0) {
+        if (count) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -281,7 +277,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
             list.add(rm);
         }
         if (list.size() > 0) {
-            rows = roleMenuMapper.insertAll(list);
+            rows = roleMenuMapper.insertBatch(list) ? list.size() : 0;
         }
         return rows;
     }
@@ -302,7 +298,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
             list.add(rd);
         }
         if (list.size() > 0) {
-            rows = roleDeptMapper.insertAll(list);
+            rows = roleDeptMapper.insertBatch(list) ? list.size() : 0;
         }
         return rows;
     }
@@ -393,7 +389,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
             list.add(ur);
         }
         if (list.size() > 0) {
-            rows = userRoleMapper.insertAll(list);
+            rows = userRoleMapper.insertBatch(list) ? list.size() : 0;
         }
         return rows;
     }

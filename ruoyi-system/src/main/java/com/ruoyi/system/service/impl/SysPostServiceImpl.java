@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
@@ -13,7 +12,7 @@ import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.mapper.SysPostMapper;
 import com.ruoyi.system.mapper.SysUserPostMapper;
 import com.ruoyi.system.service.ISysPostService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -24,11 +23,12 @@ import java.util.List;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
-public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, SysPost> implements ISysPostService {
+public class SysPostServiceImpl implements ISysPostService {
 
-    @Autowired
-    private SysUserPostMapper userPostMapper;
+    private final SysPostMapper baseMapper;
+    private final SysUserPostMapper userPostMapper;
 
     @Override
     public TableDataInfo<SysPost> selectPagePostList(SysPost post, PageQuery pageQuery) {
@@ -36,7 +36,7 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
                 .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
                 .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
                 .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
-        Page<SysPost> page = page(pageQuery.build(), lqw);
+        Page<SysPost> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
 
@@ -48,7 +48,7 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
      */
     @Override
     public List<SysPost> selectPostList(SysPost post) {
-        return list(new LambdaQueryWrapper<SysPost>()
+        return baseMapper.selectList(new LambdaQueryWrapper<SysPost>()
                 .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
                 .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
                 .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName()));
@@ -61,7 +61,7 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
      */
     @Override
     public List<SysPost> selectPostAll() {
-        return list();
+        return baseMapper.selectList();
     }
 
     /**
@@ -72,7 +72,7 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
      */
     @Override
     public SysPost selectPostById(Long postId) {
-        return getById(postId);
+        return baseMapper.selectById(postId);
     }
 
     /**
@@ -95,10 +95,10 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
     @Override
     public String checkPostNameUnique(SysPost post) {
         Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
-        long count = count(new LambdaQueryWrapper<SysPost>()
+        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
                 .eq(SysPost::getPostName, post.getPostName())
                 .ne(SysPost::getPostId, postId));
-        if (count > 0) {
+        if (count) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -113,10 +113,10 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
     @Override
     public String checkPostCodeUnique(SysPost post) {
         Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
-        long count = count(new LambdaQueryWrapper<SysPost>()
+        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
                 .eq(SysPost::getPostCode, post.getPostCode())
                 .ne(SysPost::getPostId, postId));
-        if (count > 0) {
+        if (count) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;

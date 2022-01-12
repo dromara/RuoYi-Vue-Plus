@@ -9,7 +9,6 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -19,7 +18,7 @@ import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysDeptService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -30,14 +29,13 @@ import java.util.List;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
-public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, SysDept> implements ISysDeptService {
+public class SysDeptServiceImpl implements ISysDeptService {
 
-    @Autowired
-    private SysRoleMapper roleMapper;
-
-    @Autowired
-    private SysUserMapper userMapper;
+    private final SysDeptMapper baseMapper;
+    private final SysRoleMapper roleMapper;
+    private final SysUserMapper userMapper;
 
     /**
      * 查询部门管理数据
@@ -47,8 +45,6 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public List<SysDept> selectDeptList(SysDept dept) {
-//        return baseMapper.selectList();
-//        return baseMapper.selectList(new LambdaQueryWrapper<>());
         return baseMapper.selectDeptList(dept);
     }
 
@@ -91,7 +87,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public SysDept selectDeptById(Long deptId) {
-        return getById(deptId);
+        return baseMapper.selectById(deptId);
     }
 
     /**
@@ -102,7 +98,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public long selectNormalChildrenDeptById(Long deptId) {
-        return count(new LambdaQueryWrapper<SysDept>()
+        return baseMapper.selectCount(new LambdaQueryWrapper<SysDept>()
             .eq(SysDept::getStatus, 0)
             .apply("find_in_set({0}, ancestors)", deptId));
     }
@@ -115,9 +111,8 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public boolean hasChildByDeptId(Long deptId) {
-        long result = count(new LambdaQueryWrapper<SysDept>()
+        return baseMapper.exists(new LambdaQueryWrapper<SysDept>()
             .eq(SysDept::getParentId, deptId));
-        return result > 0;
     }
 
     /**
@@ -128,9 +123,8 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public boolean checkDeptExistUser(Long deptId) {
-        long result = userMapper.selectCount(new LambdaQueryWrapper<SysUser>()
+        return userMapper.exists(new LambdaQueryWrapper<SysUser>()
             .eq(SysUser::getDeptId, deptId));
-        return result > 0;
     }
 
     /**
@@ -142,11 +136,11 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     @Override
     public String checkDeptNameUnique(SysDept dept) {
         Long deptId = StringUtils.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
-        long count = count(new LambdaQueryWrapper<SysDept>()
+        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysDept>()
             .eq(SysDept::getDeptName, dept.getDeptName())
             .eq(SysDept::getParentId, dept.getParentId())
             .ne(SysDept::getDeptId, deptId));
-        if (count > 0) {
+        if (count) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -177,7 +171,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public int insertDept(SysDept dept) {
-        SysDept info = getById(dept.getParentId());
+        SysDept info = baseMapper.selectById(dept.getParentId());
         // 如果父节点不为正常状态,则不允许新增子节点
         if (!UserConstants.DEPT_NORMAL.equals(info.getStatus())) {
             throw new ServiceException("部门停用，不允许新增");
@@ -194,8 +188,8 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      */
     @Override
     public int updateDept(SysDept dept) {
-        SysDept newParentDept = getById(dept.getParentId());
-        SysDept oldDept = getById(dept.getDeptId());
+        SysDept newParentDept = baseMapper.selectById(dept.getParentId());
+        SysDept oldDept = baseMapper.selectById(dept.getDeptId());
         if (StringUtils.isNotNull(newParentDept) && StringUtils.isNotNull(oldDept)) {
             String newAncestors = newParentDept.getAncestors() + "," + newParentDept.getDeptId();
             String oldAncestors = oldDept.getAncestors();
@@ -219,7 +213,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
     private void updateParentDeptStatusNormal(SysDept dept) {
         String ancestors = dept.getAncestors();
         Long[] deptIds = Convert.toLongArray(ancestors);
-        update(null, new LambdaUpdateWrapper<SysDept>()
+        baseMapper.update(null, new LambdaUpdateWrapper<SysDept>()
             .set(SysDept::getStatus, "0")
             .in(SysDept::getDeptId, Arrays.asList(deptIds)));
     }
@@ -232,7 +226,7 @@ public class SysDeptServiceImpl extends ServicePlusImpl<SysDeptMapper, SysDept, 
      * @param oldAncestors 旧的父ID集合
      */
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors) {
-        List<SysDept> children = list(new LambdaQueryWrapper<SysDept>()
+        List<SysDept> children = baseMapper.selectList(new LambdaQueryWrapper<SysDept>()
             .apply("find_in_set({0},ancestors)", deptId));
         for (SysDept child : children) {
             child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));

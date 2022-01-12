@@ -5,12 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
 import com.ruoyi.system.service.ISysDictDataService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,8 +20,11 @@ import java.util.List;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
-public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, SysDictData, SysDictData> implements ISysDictDataService {
+public class SysDictDataServiceImpl implements ISysDictDataService {
+
+    private final SysDictDataMapper baseMapper;
 
     @Override
     public TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData, PageQuery pageQuery) {
@@ -30,7 +33,7 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
                 .like(StringUtils.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
                 .eq(StringUtils.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
                 .orderByAsc(SysDictData::getDictSort);
-        Page<SysDictData> page = page(pageQuery.build(), lqw);
+        Page<SysDictData> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
 
@@ -42,7 +45,7 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
      */
     @Override
     public List<SysDictData> selectDictDataList(SysDictData dictData) {
-        return list(new LambdaQueryWrapper<SysDictData>()
+        return baseMapper.selectList(new LambdaQueryWrapper<SysDictData>()
                 .eq(StringUtils.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
                 .like(StringUtils.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
                 .eq(StringUtils.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
@@ -58,7 +61,7 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
      */
     @Override
     public String selectDictLabel(String dictType, String dictValue) {
-        return getOne(new LambdaQueryWrapper<SysDictData>()
+        return baseMapper.selectOne(new LambdaQueryWrapper<SysDictData>()
                 .select(SysDictData::getDictLabel)
                 .eq(SysDictData::getDictType, dictType)
                 .eq(SysDictData::getDictValue, dictValue))
@@ -73,7 +76,7 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
      */
     @Override
     public SysDictData selectDictDataById(Long dictCode) {
-        return getById(dictCode);
+        return baseMapper.selectById(dictCode);
     }
 
     /**
@@ -86,7 +89,7 @@ public class SysDictDataServiceImpl extends ServicePlusImpl<SysDictDataMapper, S
     public void deleteDictDataByIds(Long[] dictCodes) {
         for (Long dictCode : dictCodes) {
             SysDictData data = selectDictDataById(dictCode);
-            removeById(dictCode);
+            baseMapper.deleteById(dictCode);
             List<SysDictData> dictDatas = baseMapper.selectDictDataByType(data.getDictType());
             RedisUtils.setCacheObject(getCacheKey(data.getDictType()), dictDatas);
         }

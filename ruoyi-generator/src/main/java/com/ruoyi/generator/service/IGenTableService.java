@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @author Lion Li
  */
-public interface IGenTableService extends IService<GenTable> {
+public interface IGenTableService {
 
 
     TableDataInfo<GenTable> selectPageGenTableList(GenTable genTable, PageQuery pageQuery);

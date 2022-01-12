@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
@@ -22,12 +21,11 @@ import com.ruoyi.generator.mapper.GenTableMapper;
 import com.ruoyi.generator.util.GenUtils;
 import com.ruoyi.generator.util.VelocityInitializer;
 import com.ruoyi.generator.util.VelocityUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.util.IOUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,11 +45,12 @@ import java.util.zip.ZipOutputStream;
  * @author Lion Li
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
-public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTable, GenTable> implements IGenTableService {
+public class GenTableServiceImpl implements IGenTableService {
 
-    @Autowired
-    private GenTableColumnMapper genTableColumnMapper;
+    private final GenTableMapper baseMapper;
+    private final GenTableColumnMapper genTableColumnMapper;
 
     /**
      * 查询业务信息
@@ -150,7 +149,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
     @Transactional(rollbackFor = Exception.class)
     public void deleteGenTableByIds(Long[] tableIds) {
         List<Long> ids = Arrays.asList(tableIds);
-        removeByIds(ids);
+        baseMapper.deleteBatchIds(ids);
         genTableColumnMapper.delete(new LambdaQueryWrapper<GenTableColumn>().in(GenTableColumn::getTableId, ids));
     }
 
@@ -177,7 +176,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
                         saveColumns.add(column);
                     }
                     if (CollUtil.isNotEmpty(saveColumns)) {
-                        genTableColumnMapper.insertAll(saveColumns);
+                        genTableColumnMapper.insertBatch(saveColumns);
                     }
                 }
             }
@@ -228,7 +227,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ZipOutputStream zip = new ZipOutputStream(outputStream);
         generatorCode(tableName, zip);
-        IOUtils.closeQuietly(zip);
+        IoUtil.close(zip);
         return outputStream.toByteArray();
     }
 
@@ -294,7 +293,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
             }
         });
         if (CollUtil.isNotEmpty(saveColumns)) {
-            genTableColumnMapper.insertAll(saveColumns);
+            genTableColumnMapper.insertBatch(saveColumns);
         }
 
         List<GenTableColumn> delColumns = tableColumns.stream().filter(column -> !dbTableColumnNames.contains(column.getColumnName())).collect(Collectors.toList());
@@ -317,7 +316,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         for (String tableName : tableNames) {
             generatorCode(tableName, zip);
         }
-        IOUtils.closeQuietly(zip);
+        IoUtil.close(zip);
         return outputStream.toByteArray();
     }
 

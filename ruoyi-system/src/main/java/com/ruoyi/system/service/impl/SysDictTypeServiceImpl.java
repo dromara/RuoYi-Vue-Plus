@@ -9,16 +9,15 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.domain.entity.SysDictType;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.DictService;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
 import com.ruoyi.system.mapper.SysDictTypeMapper;
 import com.ruoyi.system.service.ISysDictTypeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +31,12 @@ import java.util.Map;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
-public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, SysDictType, SysDictType> implements ISysDictTypeService, DictService {
+public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService {
 
-    @Autowired
-    private SysDictDataMapper dictDataMapper;
+    private final SysDictTypeMapper baseMapper;
+    private final SysDictDataMapper dictDataMapper;
 
     @Override
     public TableDataInfo<SysDictType> selectPageDictTypeList(SysDictType dictType, PageQuery pageQuery) {
@@ -47,7 +47,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
             .like(StringUtils.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysDictType::getCreateTime, params.get("beginTime"), params.get("endTime"));
-        Page<SysDictType> page = page(pageQuery.build(), lqw);
+        Page<SysDictType> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
 
@@ -60,7 +60,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
     @Override
     public List<SysDictType> selectDictTypeList(SysDictType dictType) {
         Map<String, Object> params = dictType.getParams();
-        return list(new LambdaQueryWrapper<SysDictType>()
+        return baseMapper.selectList(new LambdaQueryWrapper<SysDictType>()
             .like(StringUtils.isNotBlank(dictType.getDictName()), SysDictType::getDictName, dictType.getDictName())
             .eq(StringUtils.isNotBlank(dictType.getStatus()), SysDictType::getStatus, dictType.getStatus())
             .like(StringUtils.isNotBlank(dictType.getDictType()), SysDictType::getDictType, dictType.getDictType())
@@ -75,7 +75,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
      */
     @Override
     public List<SysDictType> selectDictTypeAll() {
-        return list();
+        return baseMapper.selectList();
     }
 
     /**
@@ -106,7 +106,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
      */
     @Override
     public SysDictType selectDictTypeById(Long dictId) {
-        return getById(dictId);
+        return baseMapper.selectById(dictId);
     }
 
     /**
@@ -117,7 +117,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
      */
     @Override
     public SysDictType selectDictTypeByType(String dictType) {
-        return getOne(new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, dictType));
+        return baseMapper.selectById(new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, dictType));
     }
 
     /**
@@ -144,7 +144,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
      */
     @Override
     public void loadingDictCache() {
-        List<SysDictType> dictTypeList = list();
+        List<SysDictType> dictTypeList = baseMapper.selectList();
         for (SysDictType dictType : dictTypeList) {
             List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dictType.getDictType());
             RedisUtils.setCacheObject(getCacheKey(dictType.getDictType()), dictDatas);
@@ -193,7 +193,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateDictType(SysDictType dict) {
-        SysDictType oldDict = getById(dict.getDictId());
+        SysDictType oldDict = baseMapper.selectById(dict.getDictId());
         dictDataMapper.update(null, new LambdaUpdateWrapper<SysDictData>()
             .set(SysDictData::getDictType, dict.getDictType())
             .eq(SysDictData::getDictType, oldDict.getDictType()));
@@ -214,7 +214,7 @@ public class SysDictTypeServiceImpl extends ServicePlusImpl<SysDictTypeMapper, S
     @Override
     public String checkDictTypeUnique(SysDictType dict) {
         Long dictId = StringUtils.isNull(dict.getDictId()) ? -1L : dict.getDictId();
-        long count = count(new LambdaQueryWrapper<SysDictType>()
+        long count = baseMapper.selectCount(new LambdaQueryWrapper<SysDictType>()
             .eq(SysDictType::getDictType, dict.getDictType())
             .ne(SysDictType::getDictId, dictId));
         if (count > 0) {

@@ -11,11 +11,11 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.service.TokenService;
 import com.ruoyi.common.properties.TokenProperties;
-import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ruoyi.common.utils.redis.RedisUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
 public class TokenServiceImpl implements TokenService {
 
@@ -37,8 +38,7 @@ public class TokenServiceImpl implements TokenService {
 
     private static final Long MILLIS_MINUTE_TEN = 20 * 60 * 1000L;
 
-    @Autowired
-    private TokenProperties tokenProperties;
+    private final TokenProperties tokenProperties;
 
     /**
      * 获取用户身份信息

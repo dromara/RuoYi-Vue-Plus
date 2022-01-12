@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.dto.OperLogDTO;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.OperLogService;
 import com.ruoyi.common.utils.StringUtils;
@@ -14,6 +13,7 @@ import com.ruoyi.common.utils.ip.AddressUtils;
 import com.ruoyi.system.domain.SysOperLog;
 import com.ruoyi.system.mapper.SysOperLogMapper;
 import com.ruoyi.system.service.ISysOperLogService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +27,11 @@ import java.util.Map;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
-public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, SysOperLog, SysOperLog> implements ISysOperLogService, OperLogService {
+public class SysOperLogServiceImpl implements ISysOperLogService, OperLogService {
+
+    private final SysOperLogMapper baseMapper;
 
     /**
      * 操作日志记录
@@ -64,7 +67,7 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
         if(StringUtils.isBlank(pageQuery.getOrderByColumn())) {
             pageQuery.setOrderByColumn("oper_id").setIsAsc("desc");
         }
-        Page<SysOperLog> page = page(pageQuery.build(), lqw);
+        Page<SysOperLog> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
 
@@ -76,7 +79,7 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
     @Override
     public void insertOperlog(SysOperLog operLog) {
         operLog.setOperTime(new Date());
-        save(operLog);
+        baseMapper.insert(operLog);
     }
 
     /**
@@ -88,7 +91,7 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
     @Override
     public List<SysOperLog> selectOperLogList(SysOperLog operLog) {
         Map<String, Object> params = operLog.getParams();
-        return list(new LambdaQueryWrapper<SysOperLog>()
+        return baseMapper.selectList(new LambdaQueryWrapper<SysOperLog>()
             .like(StringUtils.isNotBlank(operLog.getTitle()), SysOperLog::getTitle, operLog.getTitle())
             .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
                 SysOperLog::getBusinessType, operLog.getBusinessType())
@@ -124,7 +127,7 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
      */
     @Override
     public SysOperLog selectOperLogById(Long operId) {
-        return getById(operId);
+        return baseMapper.selectById(operId);
     }
 
     /**
@@ -132,6 +135,6 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
      */
     @Override
     public void cleanOperLog() {
-        remove(new LambdaQueryWrapper<>());
+        baseMapper.delete(new LambdaQueryWrapper<>());
     }
 }

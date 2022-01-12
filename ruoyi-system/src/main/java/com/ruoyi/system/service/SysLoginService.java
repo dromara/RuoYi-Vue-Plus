@@ -12,16 +12,15 @@ import com.ruoyi.common.exception.user.CaptchaExpireException;
 import com.ruoyi.common.exception.user.UserException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
-import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ruoyi.common.utils.redis.RedisUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.TimeUnit;
 
@@ -30,23 +29,15 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
 public class SysLoginService {
 
-    @Autowired
-    private TokenService tokenService;
-
-    @Resource
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private ISysUserService userService;
-
-    @Autowired
-    private ISysConfigService configService;
-
-    @Autowired
-    private LogininforService asyncService;
+    private final TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
+    private final ISysUserService userService;
+    private final ISysConfigService configService;
+    private final LogininforService asyncService;
 
     /**
      * 登录验证

@@ -1,9 +1,7 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.system.domain.SysOssConfig;
 import com.ruoyi.system.domain.bo.SysOssConfigBo;
 import com.ruoyi.system.domain.vo.SysOssConfigVo;
 
@@ -16,7 +14,7 @@ import java.util.Collection;
  * @author 孤舟烟雨
  * @date 2021-08-13
  */
-public interface ISysOssConfigService extends IServicePlus<SysOssConfig, SysOssConfigVo> {
+public interface ISysOssConfigService {
 
     /**
      * 初始化OSS配置

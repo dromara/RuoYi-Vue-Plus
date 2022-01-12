@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface ISysOperLogService extends IService<SysOperLog> {
+public interface ISysOperLogService {
 
     TableDataInfo<SysOperLog> selectPageOperLogList(SysOperLog operLog, PageQuery pageQuery);
 

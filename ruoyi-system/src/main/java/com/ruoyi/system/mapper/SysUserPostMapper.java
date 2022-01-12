@@ -1,6 +1,6 @@
 package com.ruoyi.system.mapper;
 
-import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
+import com.ruoyi.common.core.mapper.BaseMapperPlus;
 import com.ruoyi.system.domain.SysUserPost;
 
 /**
@@ -8,6 +8,6 @@ import com.ruoyi.system.domain.SysUserPost;
  *
  * @author Lion Li
  */
-public interface SysUserPostMapper extends BaseMapperPlus<SysUserPost> {
+public interface SysUserPostMapper extends BaseMapperPlus<SysUserPostMapper, SysUserPost, SysUserPost> {
 
 }

@@ -3,13 +3,13 @@ package com.ruoyi.demo.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.demo.domain.TestTree;
 import com.ruoyi.demo.domain.bo.TestTreeBo;
 import com.ruoyi.demo.domain.vo.TestTreeVo;
 import com.ruoyi.demo.mapper.TestTreeMapper;
 import com.ruoyi.demo.service.ITestTreeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -23,19 +23,22 @@ import java.util.Map;
  * @date 2021-07-26
  */
 // @DS("slave") // 切换从库查询
+@RequiredArgsConstructor
 @Service
-public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTree, TestTreeVo> implements ITestTreeService {
+public class TestTreeServiceImpl implements ITestTreeService {
+
+    private final TestTreeMapper baseMapper;
 
     @Override
     public TestTreeVo queryById(Long id) {
-        return getVoById(id);
+        return baseMapper.selectVoById(id);
     }
 
     // @DS("slave") // 切换从库查询
     @Override
     public List<TestTreeVo> queryList(TestTreeBo bo) {
         LambdaQueryWrapper<TestTree> lqw = buildQueryWrapper(bo);
-        return listVo(lqw);
+        return baseMapper.selectVoList(lqw);
     }
 
     private LambdaQueryWrapper<TestTree> buildQueryWrapper(TestTreeBo bo) {
@@ -51,7 +54,7 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
     public Boolean insertByBo(TestTreeBo bo) {
         TestTree add = BeanUtil.toBean(bo, TestTree.class);
         validEntityBeforeSave(add);
-        boolean flag = save(add);
+        boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
         }
@@ -62,7 +65,7 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
     public Boolean updateByBo(TestTreeBo bo) {
         TestTree update = BeanUtil.toBean(bo, TestTree.class);
         validEntityBeforeSave(update);
-        return updateById(update);
+        return baseMapper.updateById(update) > 0;
     }
 
     /**
@@ -79,6 +82,6 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
         if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return removeByIds(ids);
+        return baseMapper.deleteBatchIds(ids) > 0;
     }
 }

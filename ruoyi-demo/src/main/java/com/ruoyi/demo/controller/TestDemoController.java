@@ -80,7 +80,7 @@ public class TestDemoController extends BaseController {
         ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
         List<TestDemoImportVo> volist = excelResult.getList();
         List<TestDemo> list = BeanUtil.copyToList(volist, TestDemo.class);
-        iTestDemoService.saveAll(list);
+        iTestDemoService.saveBatch(list);
         return AjaxResult.success(excelResult.getAnalysis());
     }
 

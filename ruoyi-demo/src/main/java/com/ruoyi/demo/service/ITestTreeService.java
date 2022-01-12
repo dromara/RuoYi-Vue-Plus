@@ -1,7 +1,5 @@
 package com.ruoyi.demo.service;
 
-import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
-import com.ruoyi.demo.domain.TestTree;
 import com.ruoyi.demo.domain.bo.TestTreeBo;
 import com.ruoyi.demo.domain.vo.TestTreeVo;
 
@@ -14,7 +12,7 @@ import java.util.List;
  * @author Lion Li
  * @date 2021-07-26
  */
-public interface ITestTreeService extends IServicePlus<TestTree, TestTreeVo> {
+public interface ITestTreeService {
     /**
      * 查询单个
      *
