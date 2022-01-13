@@ -5,9 +5,6 @@ import cn.dev33.satoken.interceptor.SaRouteInterceptor;
 import cn.dev33.satoken.jwt.StpLogicJwtForStyle;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
-import cn.dev33.satoken.stp.StpUtil;
-import com.ruoyi.common.utils.LoginUtils;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.SecurityProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +39,14 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 // 排除下不需要拦截的
                 .notMatch(securityProperties.getExcludes())
                 .check(() -> {
-                    if (log.isDebugEnabled()) {
-                        Long userId = LoginUtils.getUserId();
-                        if (StringUtils.isNotNull(userId)) {
-                            log.debug("剩余有效时间: {}", StpUtil.getTokenTimeout());
-                            log.debug("临时有效时间: {}", StpUtil.getTokenActivityTimeout());
-                        }
-                    }
+                    // 做一些访问检查
+//                    if (log.isDebugEnabled()) {
+//                        Long userId = LoginUtils.getUserId();
+//                        if (StringUtils.isNotNull(userId)) {
+//                             log.debug("剩余有效时间: {}", StpUtil.getTokenTimeout());
+//                             log.debug("临时有效时间: {}", StpUtil.getTokenActivityTimeout());
+//                        }
+//                    }
                 });
         })).addPathPatterns("/**");
         registry.addInterceptor(new SaAnnotationInterceptor()).addPathPatterns("/**");
