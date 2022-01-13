@@ -1,14 +1,17 @@
 package com.ruoyi.web.controller.system;
 
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.core.service.UserService;
+import com.ruoyi.common.utils.LoginUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
-import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysLoginService;
 import com.ruoyi.system.service.SysPermissionService;
 import io.swagger.annotations.Api;
@@ -39,7 +42,6 @@ public class SysLoginController {
 
     private final SysLoginService loginService;
     private final ISysMenuService menuService;
-    private final ISysUserService userService;
     private final SysPermissionService permissionService;
 
     /**
@@ -59,6 +61,16 @@ public class SysLoginController {
         return AjaxResult.success(ajax);
     }
 
+    @ApiOperation("登出方法")
+    @PostMapping("/logout")
+    public AjaxResult<Void> logout(){
+        try {
+            StpUtil.logout();
+        } catch (NotLoginException e) {
+        }
+        return AjaxResult.success("退出成功");
+    }
+
     /**
      * 获取用户信息
      *
@@ -67,7 +79,7 @@ public class SysLoginController {
     @ApiOperation("获取用户信息")
     @GetMapping("getInfo")
     public AjaxResult<Map<String, Object>> getInfo() {
-        SysUser user = userService.selectUserById(SecurityUtils.getUserId());
+        SysUser user = SpringUtils.getBean(UserService.class).selectUserById(LoginUtils.getUserId());
         // 角色集合
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合
@@ -87,7 +99,7 @@ public class SysLoginController {
     @ApiOperation("获取路由信息")
     @GetMapping("getRouters")
     public AjaxResult<List<RouterVo>> getRouters() {
-        Long userId = SecurityUtils.getUserId();
+        Long userId = LoginUtils.getUserId();
         List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
         return AjaxResult.success(menuService.buildMenus(menus));
     }

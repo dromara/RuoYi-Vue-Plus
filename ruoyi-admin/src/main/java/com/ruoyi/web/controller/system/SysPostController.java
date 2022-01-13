@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -15,7 +16,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +40,7 @@ public class SysPostController extends BaseController {
      * 获取岗位列表
      */
     @ApiOperation("获取岗位列表")
-    @PreAuthorize("@ss.hasPermi('system:post:list')")
+    @SaCheckPermission("system:post:list")
     @GetMapping("/list")
     public TableDataInfo<SysPost> list(SysPost post, PageQuery pageQuery) {
         return postService.selectPagePostList(post, pageQuery);
@@ -48,7 +48,7 @@ public class SysPostController extends BaseController {
 
     @ApiOperation("导出岗位列表")
     @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:post:export')")
+    @SaCheckPermission("system:post:export")
     @PostMapping("/export")
     public void export(SysPost post, HttpServletResponse response) {
         List<SysPost> list = postService.selectPostList(post);
@@ -59,7 +59,7 @@ public class SysPostController extends BaseController {
      * 根据岗位编号获取详细信息
      */
     @ApiOperation("根据岗位编号获取详细信息")
-    @PreAuthorize("@ss.hasPermi('system:post:query')")
+    @SaCheckPermission("system:post:query")
     @GetMapping(value = "/{postId}")
     public AjaxResult<SysPost> getInfo(@ApiParam("岗位ID") @PathVariable Long postId) {
         return AjaxResult.success(postService.selectPostById(postId));
@@ -69,7 +69,7 @@ public class SysPostController extends BaseController {
      * 新增岗位
      */
     @ApiOperation("新增岗位")
-    @PreAuthorize("@ss.hasPermi('system:post:add')")
+    @SaCheckPermission("system:post:add")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult<Void> add(@Validated @RequestBody SysPost post) {
@@ -85,7 +85,7 @@ public class SysPostController extends BaseController {
      * 修改岗位
      */
     @ApiOperation("修改岗位")
-    @PreAuthorize("@ss.hasPermi('system:post:edit')")
+    @SaCheckPermission("system:post:edit")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult<Void> edit(@Validated @RequestBody SysPost post) {
@@ -101,7 +101,7 @@ public class SysPostController extends BaseController {
      * 删除岗位
      */
     @ApiOperation("删除岗位")
-    @PreAuthorize("@ss.hasPermi('system:post:remove')")
+    @SaCheckPermission("system:post:remove")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{postIds}")
     public AjaxResult<Void> remove(@ApiParam("岗位ID串") @PathVariable Long[] postIds) {

@@ -1,5 +1,6 @@
 package com.ruoyi.demo.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
@@ -22,7 +23,6 @@ import com.ruoyi.demo.service.ITestDemoService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,28 +53,28 @@ public class TestDemoController extends BaseController {
      * 查询测试单表列表
      */
     @ApiOperation("查询测试单表列表")
-    @PreAuthorize("@ss.hasPermi('demo:demo:list')")
+    @SaCheckPermission("demo:demo:list")
     @GetMapping("/list")
     public TableDataInfo<TestDemoVo> list(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
         return iTestDemoService.queryPageList(bo, pageQuery);
     }
 
-    /**
-     * 自定义分页查询
-     */
-    @ApiOperation("自定义分页查询")
-    @PreAuthorize("@ss.hasPermi('demo:demo:list')")
-    @GetMapping("/page")
-    public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
-        return iTestDemoService.customPageList(bo, pageQuery);
-    }
+	/**
+	 * 自定义分页查询
+	 */
+	@ApiOperation("自定义分页查询")
+	@SaCheckPermission("demo:demo:list")
+	@GetMapping("/page")
+	public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
+		return iTestDemoService.customPageList(bo, pageQuery);
+	}
 
     @ApiOperation("导入测试-校验")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "file", value = "导入文件", dataType = "java.io.File", required = true),
     })
     @Log(title = "测试单表", businessType = BusinessType.IMPORT)
-    @PreAuthorize("@ss.hasPermi('demo:demo:import')")
+    @SaCheckPermission("demo:demo:import")
     @PostMapping("/importData")
     public AjaxResult<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
         ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
@@ -88,7 +88,7 @@ public class TestDemoController extends BaseController {
      * 导出测试单表列表
      */
     @ApiOperation("导出测试单表列表")
-    @PreAuthorize("@ss.hasPermi('demo:demo:export')")
+    @SaCheckPermission("demo:demo:export")
     @Log(title = "测试单表", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(@Validated TestDemoBo bo, HttpServletResponse response) {
@@ -104,7 +104,7 @@ public class TestDemoController extends BaseController {
      * 获取测试单表详细信息
      */
     @ApiOperation("获取测试单表详细信息")
-    @PreAuthorize("@ss.hasPermi('demo:demo:query')")
+    @SaCheckPermission("demo:demo:query")
     @GetMapping("/{id}")
     public AjaxResult<TestDemoVo> getInfo(@ApiParam("测试ID")
                                           @NotNull(message = "主键不能为空")
@@ -116,7 +116,7 @@ public class TestDemoController extends BaseController {
      * 新增测试单表
      */
     @ApiOperation("新增测试单表")
-    @PreAuthorize("@ss.hasPermi('demo:demo:add')")
+    @SaCheckPermission("demo:demo:add")
     @Log(title = "测试单表", businessType = BusinessType.INSERT)
     @RepeatSubmit(interval = 2, timeUnit = TimeUnit.SECONDS, message = "不允许重复提交")
     @PostMapping()
@@ -131,7 +131,7 @@ public class TestDemoController extends BaseController {
      * 修改测试单表
      */
     @ApiOperation("修改测试单表")
-    @PreAuthorize("@ss.hasPermi('demo:demo:edit')")
+    @SaCheckPermission("demo:demo:edit")
     @Log(title = "测试单表", businessType = BusinessType.UPDATE)
     @RepeatSubmit
     @PutMapping()
@@ -143,8 +143,8 @@ public class TestDemoController extends BaseController {
      * 删除测试单表
      */
     @ApiOperation("删除测试单表")
-    @PreAuthorize("@ss.hasPermi('demo:demo:remove')")
-    @Log(title = "测试单表", businessType = BusinessType.DELETE)
+    @SaCheckPermission("demo:demo:remove")
+    @Log(title = "测试单表" , businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult<Void> remove(@ApiParam("测试ID串")
                                    @NotEmpty(message = "主键不能为空")

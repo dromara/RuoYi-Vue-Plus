@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -8,14 +9,13 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.SysNotice;
 import com.ruoyi.system.service.ISysNoticeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 
 /**
  * 公告 信息操作处理
@@ -35,7 +35,7 @@ public class SysNoticeController extends BaseController {
      * 获取通知公告列表
      */
     @ApiOperation("获取通知公告列表")
-    @PreAuthorize("@ss.hasPermi('system:notice:list')")
+    @SaCheckPermission("system:notice:list")
     @GetMapping("/list")
     public TableDataInfo<SysNotice> list(SysNotice notice, PageQuery pageQuery) {
         return noticeService.selectPageNoticeList(notice, pageQuery);
@@ -45,7 +45,7 @@ public class SysNoticeController extends BaseController {
      * 根据通知公告编号获取详细信息
      */
     @ApiOperation("根据通知公告编号获取详细信息")
-    @PreAuthorize("@ss.hasPermi('system:notice:query')")
+    @SaCheckPermission("system:notice:query")
     @GetMapping(value = "/{noticeId}")
     public AjaxResult<SysNotice> getInfo(@ApiParam("公告ID") @PathVariable Long noticeId) {
         return AjaxResult.success(noticeService.selectNoticeById(noticeId));
@@ -55,7 +55,7 @@ public class SysNoticeController extends BaseController {
      * 新增通知公告
      */
     @ApiOperation("新增通知公告")
-    @PreAuthorize("@ss.hasPermi('system:notice:add')")
+    @SaCheckPermission("system:notice:add")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult<Void> add(@Validated @RequestBody SysNotice notice) {
@@ -66,7 +66,7 @@ public class SysNoticeController extends BaseController {
      * 修改通知公告
      */
     @ApiOperation("修改通知公告")
-    @PreAuthorize("@ss.hasPermi('system:notice:edit')")
+    @SaCheckPermission("system:notice:edit")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult<Void> edit(@Validated @RequestBody SysNotice notice) {
@@ -77,7 +77,7 @@ public class SysNoticeController extends BaseController {
      * 删除通知公告
      */
     @ApiOperation("删除通知公告")
-    @PreAuthorize("@ss.hasPermi('system:notice:remove')")
+    @SaCheckPermission("system:notice:remove")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
     public AjaxResult<Void> remove(@ApiParam("公告ID串") @PathVariable Long[] noticeIds) {

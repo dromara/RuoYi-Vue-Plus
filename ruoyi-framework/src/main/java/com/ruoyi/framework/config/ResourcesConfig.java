@@ -20,15 +20,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class ResourcesConfig implements WebMvcConfigurer {
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    }
-
-    @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 全局链路跟踪拦截器
         registry.addInterceptor(new TLogWebInterceptor());
         // 全局访问性能拦截
         registry.addInterceptor(new PlusWebInvokeTimeInterceptor());
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
     }
 
     /**

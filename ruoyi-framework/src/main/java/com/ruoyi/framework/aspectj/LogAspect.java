@@ -2,12 +2,11 @@ package com.ruoyi.framework.aspectj;
 
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.domain.dto.OperLogDTO;
-import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.service.OperLogService;
 import com.ruoyi.common.enums.BusinessStatus;
 import com.ruoyi.common.enums.HttpMethod;
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.LoginUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -60,9 +59,6 @@ public class LogAspect {
     protected void handleLog(final JoinPoint joinPoint, Log controllerLog, final Exception e, Object jsonResult) {
         try {
 
-            // 获取当前的用户
-            LoginUser loginUser = SecurityUtils.getLoginUser();
-
             // *========数据库日志=========*//
             OperLogDTO operLog = new OperLogDTO();
             operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
@@ -70,9 +66,7 @@ public class LogAspect {
             String ip = ServletUtils.getClientIP();
             operLog.setOperIp(ip);
             operLog.setOperUrl(ServletUtils.getRequest().getRequestURI());
-            if (loginUser != null) {
-                operLog.setOperName(loginUser.getUsername());
-            }
+            operLog.setOperName(LoginUtils.getUsername());
 
             if (e != null) {
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());

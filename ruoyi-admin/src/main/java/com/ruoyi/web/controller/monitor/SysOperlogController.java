@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.monitor;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -13,7 +14,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +35,7 @@ public class SysOperlogController extends BaseController {
     private final ISysOperLogService operLogService;
 
     @ApiOperation("查询操作日志记录列表")
-    @PreAuthorize("@ss.hasPermi('monitor:operlog:list')")
+    @SaCheckPermission("monitor:operlog:list")
     @GetMapping("/list")
     public TableDataInfo<SysOperLog> list(SysOperLog operLog, PageQuery pageQuery) {
         return operLogService.selectPageOperLogList(operLog, pageQuery);
@@ -43,7 +43,7 @@ public class SysOperlogController extends BaseController {
 
     @ApiOperation("导出操作日志记录列表")
     @Log(title = "操作日志", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('monitor:operlog:export')")
+    @SaCheckPermission("monitor:operlog:export")
     @PostMapping("/export")
     public void export(SysOperLog operLog, HttpServletResponse response) {
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
@@ -52,7 +52,7 @@ public class SysOperlogController extends BaseController {
 
     @ApiOperation("删除操作日志记录")
     @Log(title = "操作日志", businessType = BusinessType.DELETE)
-    @PreAuthorize("@ss.hasPermi('monitor:operlog:remove')")
+    @SaCheckPermission("monitor:operlog:remove")
     @DeleteMapping("/{operIds}")
     public AjaxResult<Void> remove(@PathVariable Long[] operIds) {
         return toAjax(operLogService.deleteOperLogByIds(operIds));
@@ -60,7 +60,7 @@ public class SysOperlogController extends BaseController {
 
     @ApiOperation("清空操作日志记录")
     @Log(title = "操作日志", businessType = BusinessType.CLEAN)
-    @PreAuthorize("@ss.hasPermi('monitor:operlog:remove')")
+    @SaCheckPermission("monitor:operlog:remove")
     @DeleteMapping("/clean")
     public AjaxResult<Void> clean() {
         operLogService.cleanOperLog();

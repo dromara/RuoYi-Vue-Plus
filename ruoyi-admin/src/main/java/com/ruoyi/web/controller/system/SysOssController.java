@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.system;
 
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpException;
@@ -27,7 +28,6 @@ import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,7 +59,7 @@ public class SysOssController extends BaseController {
      * 查询OSS对象存储列表
      */
     @ApiOperation("查询OSS对象存储列表")
-    @PreAuthorize("@ss.hasPermi('system:oss:list')")
+    @SaCheckPermission("system:oss:list")
     @GetMapping("/list")
     public TableDataInfo<SysOssVo> list(@Validated(QueryGroup.class) SysOssBo bo, PageQuery pageQuery) {
         return iSysOssService.queryPageList(bo, pageQuery);
@@ -72,7 +72,7 @@ public class SysOssController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "file", value = "文件", dataTypeClass = File.class, required = true),
     })
-    @PreAuthorize("@ss.hasPermi('system:oss:upload')")
+    @SaCheckPermission("system:oss:upload")
     @Log(title = "OSS对象存储", businessType = BusinessType.INSERT)
     @RepeatSubmit
     @PostMapping("/upload")
@@ -88,7 +88,7 @@ public class SysOssController extends BaseController {
     }
 
     @ApiOperation("下载OSS对象存储")
-    @PreAuthorize("@ss.hasPermi('system:oss:download')")
+    @SaCheckPermission("system:oss:download")
     @GetMapping("/download/{ossId}")
     public void download(@ApiParam("OSS对象ID") @PathVariable Long ossId, HttpServletResponse response) throws IOException {
         SysOss sysOss = iSysOssService.getById(ossId);
@@ -115,7 +115,7 @@ public class SysOssController extends BaseController {
      * 删除OSS对象存储
      */
     @ApiOperation("删除OSS对象存储")
-    @PreAuthorize("@ss.hasPermi('system:oss:remove')")
+    @SaCheckPermission("system:oss:remove")
     @Log(title = "OSS对象存储", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ossIds}")
     public AjaxResult<Void> remove(@ApiParam("OSS对象ID串")
@@ -128,7 +128,7 @@ public class SysOssController extends BaseController {
      * 变更图片列表预览状态
      */
     @ApiOperation("变更图片列表预览状态")
-    @PreAuthorize("@ss.hasPermi('system:oss:edit')")
+    @SaCheckPermission("system:oss:edit")
     @Log(title = "OSS对象存储", businessType = BusinessType.UPDATE)
     @PutMapping("/changePreviewListResource")
     public AjaxResult<Void> changePreviewListResource(@RequestBody String body) {

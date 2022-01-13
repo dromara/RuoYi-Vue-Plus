@@ -10,7 +10,7 @@ import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.LoginUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.TreeBuildUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -153,7 +153,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public void checkDeptDataScope(Long deptId) {
-        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
+        if (!SysUser.isAdmin(LoginUtils.getUserId())) {
             SysDept dept = new SysDept();
             dept.setDeptId(deptId);
             List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);

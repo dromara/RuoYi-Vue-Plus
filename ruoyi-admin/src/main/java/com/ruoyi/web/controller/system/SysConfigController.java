@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -15,7 +16,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +40,7 @@ public class SysConfigController extends BaseController {
      * 获取参数配置列表
      */
     @ApiOperation("获取参数配置列表")
-    @PreAuthorize("@ss.hasPermi('system:config:list')")
+    @SaCheckPermission("system:config:list")
     @GetMapping("/list")
     public TableDataInfo<SysConfig> list(SysConfig config, PageQuery pageQuery) {
         return configService.selectPageConfigList(config, pageQuery);
@@ -48,7 +48,7 @@ public class SysConfigController extends BaseController {
 
     @ApiOperation("导出参数配置列表")
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:config:export')")
+    @SaCheckPermission("system:config:export")
     @PostMapping("/export")
     public void export(SysConfig config, HttpServletResponse response) {
         List<SysConfig> list = configService.selectConfigList(config);
@@ -59,7 +59,7 @@ public class SysConfigController extends BaseController {
      * 根据参数编号获取详细信息
      */
     @ApiOperation("根据参数编号获取详细信息")
-    @PreAuthorize("@ss.hasPermi('system:config:query')")
+    @SaCheckPermission("system:config:query")
     @GetMapping(value = "/{configId}")
     public AjaxResult<SysConfig> getInfo(@ApiParam("参数ID") @PathVariable Long configId) {
         return AjaxResult.success(configService.selectConfigById(configId));
@@ -78,7 +78,7 @@ public class SysConfigController extends BaseController {
      * 新增参数配置
      */
     @ApiOperation("新增参数配置")
-    @PreAuthorize("@ss.hasPermi('system:config:add')")
+    @SaCheckPermission("system:config:add")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult<Void> add(@Validated @RequestBody SysConfig config) {
@@ -92,7 +92,7 @@ public class SysConfigController extends BaseController {
      * 修改参数配置
      */
     @ApiOperation("修改参数配置")
-    @PreAuthorize("@ss.hasPermi('system:config:edit')")
+    @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult<Void> edit(@Validated @RequestBody SysConfig config) {
@@ -106,7 +106,7 @@ public class SysConfigController extends BaseController {
      * 删除参数配置
      */
     @ApiOperation("删除参数配置")
-    @PreAuthorize("@ss.hasPermi('system:config:remove')")
+    @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
     public AjaxResult<Void> remove(@ApiParam("参数ID串") @PathVariable Long[] configIds) {
@@ -118,7 +118,7 @@ public class SysConfigController extends BaseController {
      * 刷新参数缓存
      */
     @ApiOperation("刷新参数缓存")
-    @PreAuthorize("@ss.hasPermi('system:config:remove')")
+    @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
     public AjaxResult<Void> refreshCache() {

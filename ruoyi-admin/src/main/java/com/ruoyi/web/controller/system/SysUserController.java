@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -26,7 +27,6 @@ import com.ruoyi.system.service.ISysUserService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,7 +58,7 @@ public class SysUserController extends BaseController {
      * 获取用户列表
      */
     @ApiOperation("获取用户列表")
-    @PreAuthorize("@ss.hasPermi('system:user:list')")
+    @SaCheckPermission("system:user:list")
     @GetMapping("/list")
     public TableDataInfo<SysUser> list(SysUser user, PageQuery pageQuery) {
         return userService.selectPageUserList(user, pageQuery);
@@ -66,7 +66,7 @@ public class SysUserController extends BaseController {
 
     @ApiOperation("导出用户列表")
     @Log(title = "用户管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:user:export')")
+    @SaCheckPermission("system:user:export")
     @PostMapping("/export")
     public void export(SysUser user, HttpServletResponse response) {
         List<SysUser> list = userService.selectUserList(user);
@@ -87,7 +87,7 @@ public class SysUserController extends BaseController {
             @ApiImplicitParam(name = "file", value = "导入文件", dataType = "java.io.File", required = true),
     })
     @Log(title = "用户管理", businessType = BusinessType.IMPORT)
-    @PreAuthorize("@ss.hasPermi('system:user:import')")
+    @SaCheckPermission("system:user:import")
     @PostMapping("/importData")
     public AjaxResult<Void> importData(@RequestPart("file") MultipartFile file, boolean updateSupport) throws Exception {
         ExcelResult<SysUserImportVo> result = ExcelUtil.importExcel(file.getInputStream(), SysUserImportVo.class, new SysUserImportListener(updateSupport));
@@ -104,10 +104,10 @@ public class SysUserController extends BaseController {
      * 根据用户编号获取详细信息
      */
     @ApiOperation("根据用户编号获取详细信息")
-    @PreAuthorize("@ss.hasPermi('system:user:query')")
-    @GetMapping(value = {"/", "/{userId}"})
+    @SaCheckPermission("system:user:query")
+    @GetMapping(value = {"/", "/{userId}" })
     public AjaxResult<Map<String, Object>> getInfo(@ApiParam("用户ID") @PathVariable(value = "userId", required = false) Long userId) {
-        userService.checkUserDataScope(userId);
+		userService.checkUserDataScope(userId);
         Map<String, Object> ajax = new HashMap<>();
         List<SysRole> roles = roleService.selectRoleAll();
         ajax.put("roles", SysUser.isAdmin(userId) ? roles : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
@@ -125,7 +125,7 @@ public class SysUserController extends BaseController {
      * 新增用户
      */
     @ApiOperation("新增用户")
-    @PreAuthorize("@ss.hasPermi('system:user:add')")
+    @SaCheckPermission("system:user:add")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult<Void> add(@Validated @RequestBody SysUser user) {
@@ -146,7 +146,7 @@ public class SysUserController extends BaseController {
      * 修改用户
      */
     @ApiOperation("修改用户")
-    @PreAuthorize("@ss.hasPermi('system:user:edit')")
+    @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult<Void> edit(@Validated @RequestBody SysUser user) {
@@ -165,7 +165,7 @@ public class SysUserController extends BaseController {
      * 删除用户
      */
     @ApiOperation("删除用户")
-    @PreAuthorize("@ss.hasPermi('system:user:remove')")
+    @SaCheckPermission("system:user:remove")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
     public AjaxResult<Void> remove(@ApiParam("角色ID串") @PathVariable Long[] userIds) {
@@ -179,7 +179,7 @@ public class SysUserController extends BaseController {
      * 重置密码
      */
     @ApiOperation("重置密码")
-    @PreAuthorize("@ss.hasPermi('system:user:resetPwd')")
+    @SaCheckPermission("system:user:resetPwd")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/resetPwd")
     public AjaxResult<Void> resetPwd(@RequestBody SysUser user) {
@@ -192,7 +192,7 @@ public class SysUserController extends BaseController {
      * 状态修改
      */
     @ApiOperation("状态修改")
-    @PreAuthorize("@ss.hasPermi('system:user:edit')")
+    @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public AjaxResult<Void> changeStatus(@RequestBody SysUser user) {
@@ -204,7 +204,7 @@ public class SysUserController extends BaseController {
      * 根据用户编号获取授权角色
      */
     @ApiOperation("根据用户编号获取授权角色")
-    @PreAuthorize("@ss.hasPermi('system:user:query')")
+    @SaCheckPermission("system:user:query")
     @GetMapping("/authRole/{userId}")
     public AjaxResult<Map<String, Object>> authRole(@ApiParam("用户ID") @PathVariable("userId") Long userId) {
         SysUser user = userService.selectUserById(userId);
@@ -223,7 +223,7 @@ public class SysUserController extends BaseController {
         @ApiImplicitParam(name = "userId", value = "用户Id", paramType = "query", dataTypeClass = String.class),
         @ApiImplicitParam(name = "roleIds", value = "角色ID串", paramType = "query", dataTypeClass = String.class)
     })
-    @PreAuthorize("@ss.hasPermi('system:user:edit')")
+    @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.GRANT)
     @PutMapping("/authRole")
     public AjaxResult<Void> insertAuthRole(Long userId, Long[] roleIds) {

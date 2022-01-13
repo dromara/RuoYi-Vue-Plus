@@ -1,8 +1,8 @@
 package com.ruoyi.framework.config;
 
+import cn.dev33.satoken.config.SaTokenConfig;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.github.xiaoymin.knife4j.spring.extension.OpenApiExtensionResolver;
-import com.ruoyi.common.properties.TokenProperties;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.config.properties.SwaggerProperties;
@@ -40,7 +40,7 @@ import java.util.List;
 public class SwaggerConfig {
 
     private final SwaggerProperties swaggerProperties;
-    private final TokenProperties tokenProperties;
+    private final SaTokenConfig saTokenConfig;
     private final OpenApiExtensionResolver openApiExtensionResolver;
 
     /**
@@ -110,7 +110,7 @@ public class SwaggerConfig {
      */
     private List<SecurityScheme> securitySchemes() {
         List<SecurityScheme> apiKeyList = new ArrayList<SecurityScheme>();
-        String header = tokenProperties.getHeader();
+        String header = saTokenConfig.getTokenName();
         apiKeyList.add(new ApiKey(header, header, In.HEADER.toValue()));
         return apiKeyList;
     }
@@ -136,7 +136,7 @@ public class SwaggerConfig {
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
         List<SecurityReference> securityReferences = new ArrayList<>();
-        securityReferences.add(new SecurityReference(tokenProperties.getHeader(), authorizationScopes));
+        securityReferences.add(new SecurityReference(saTokenConfig.getTokenName(), authorizationScopes));
         return securityReferences;
     }
 
