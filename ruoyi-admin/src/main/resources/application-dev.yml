@@ -129,9 +129,9 @@ spring:
 
 redisson:
   # 线程池数量
-  threads: 16
+  threads: 4
   # Netty线程池数量
-  nettyThreads: 32
+  nettyThreads: 8
   # 传输模式
   transportMode: "NIO"
   # 单节点配置
@@ -139,9 +139,9 @@ redisson:
     # 客户端名称
     clientName: ${ruoyi.name}
     # 最小空闲连接数
-    connectionMinimumIdleSize: 32
+    connectionMinimumIdleSize: 8
     # 连接池大小
-    connectionPoolSize: 64
+    connectionPoolSize: 32
     # 连接空闲超时，单位：毫秒
     idleConnectionTimeout: 10000
     # 命令等待超时，单位：毫秒
