@@ -79,6 +79,10 @@ spring:
   thymeleaf:
     # 将系统模板放置到最前面 否则会与 springboot-admin 页面冲突
     template-resolver-order: 1
+  mvc:
+    pathmatch:
+      # 适配 boot 2.6 路由与 springfox 兼容
+      matching-strategy: ANT_PATH_MATCHER
   jackson:
     # 日期格式化
     date-format: yyyy-MM-dd HH:mm:ss
