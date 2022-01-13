@@ -84,7 +84,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     public Boolean insertByBo(${ClassName}Bo bo) {
         ${ClassName} add = BeanUtil.toBean(bo, ${ClassName}.class);
         validEntityBeforeSave(add);
-        boolean flag = baseMapper.insert(add);
+        boolean flag = baseMapper.insert(add) > 0;
 #set($pk=$pkColumn.javaField.substring(0,1).toUpperCase() + ${pkColumn.javaField.substring(1)})
         if (flag) {
             bo.set$pk(add.get$pk());
@@ -96,7 +96,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     public Boolean updateByBo(${ClassName}Bo bo) {
         ${ClassName} update = BeanUtil.toBean(bo, ${ClassName}.class);
         validEntityBeforeSave(update);
-        return baseMapper.updateById(update);
+        return baseMapper.updateById(update) > 0;
     }
 
     /**
