@@ -3,7 +3,6 @@ package ${packageName}.service;
 import ${packageName}.domain.${ClassName};
 import ${packageName}.domain.vo.${ClassName}Vo;
 import ${packageName}.domain.bo.${ClassName}Bo;
-import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 #if($table.crud || $table.sub)
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.domain.PageQuery;
@@ -18,44 +17,44 @@ import java.util.List;
  * @author ${author}
  * @date ${datetime}
  */
-public interface I${ClassName}Service extends IServicePlus<${ClassName}, ${ClassName}Vo> {
-	/**
-	 * 查询单个
-	 * @return
-	 */
-	${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField});
+public interface I${ClassName}Service {
+    /**
+     * 查询单个
+     * @return
+     */
+    ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField});
 
 #if($table.crud || $table.sub)
-	/**
-	 * 查询列表
-	 */
+    /**
+     * 查询列表
+     */
     TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery);
 #end
 
-	/**
-	 * 查询列表
-	 */
-	List<${ClassName}Vo> queryList(${ClassName}Bo bo);
+    /**
+     * 查询列表
+     */
+    List<${ClassName}Vo> queryList(${ClassName}Bo bo);
 
-	/**
-	 * 根据新增业务对象插入${functionName}
-	 * @param bo ${functionName}新增业务对象
-	 * @return
-	 */
-	Boolean insertByBo(${ClassName}Bo bo);
+    /**
+     * 根据新增业务对象插入${functionName}
+     * @param bo ${functionName}新增业务对象
+     * @return
+     */
+    Boolean insertByBo(${ClassName}Bo bo);
 
-	/**
-	 * 根据编辑业务对象修改${functionName}
-	 * @param bo ${functionName}编辑业务对象
-	 * @return
-	 */
-	Boolean updateByBo(${ClassName}Bo bo);
+    /**
+     * 根据编辑业务对象修改${functionName}
+     * @param bo ${functionName}编辑业务对象
+     * @return
+     */
+    Boolean updateByBo(${ClassName}Bo bo);
 
-	/**
-	 * 校验并删除数据
-	 * @param ids 主键集合
-	 * @param isValid 是否校验,true-删除前校验,false-不校验
-	 * @return
-	 */
-	Boolean deleteWithValidByIds(Collection<${pkColumn.javaType}> ids, Boolean isValid);
+    /**
+     * 校验并删除数据
+     * @param ids 主键集合
+     * @param isValid 是否校验,true-删除前校验,false-不校验
+     * @return
+     */
+    Boolean deleteWithValidByIds(Collection<${pkColumn.javaType}> ids, Boolean isValid);
 }

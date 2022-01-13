@@ -6,8 +6,8 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.domain.PageQuery;
 #end
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -27,19 +27,22 @@ import java.util.Collection;
  * @author ${author}
  * @date ${datetime}
  */
+@RequiredArgsConstructor
 @Service
-public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper, ${ClassName}, ${ClassName}Vo> implements I${ClassName}Service {
+public class ${ClassName}ServiceImpl implements I${ClassName}Service {
+
+    private final ${ClassName}Mapper baseMapper;
 
     @Override
     public ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField}){
-        return getVoById(${pkColumn.javaField});
+        return baseMapper.selectVoById(${pkColumn.javaField});
     }
 
 #if($table.crud || $table.sub)
     @Override
     public TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<${ClassName}> lqw = buildQueryWrapper(bo);
-        Page<${ClassName}Vo> result = pageVo(pageQuery.build(), lqw);
+        Page<${ClassName}Vo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
 #end
@@ -47,7 +50,7 @@ public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper,
     @Override
     public List<${ClassName}Vo> queryList(${ClassName}Bo bo) {
         LambdaQueryWrapper<${ClassName}> lqw = buildQueryWrapper(bo);
-        return listVo(lqw);
+        return baseMapper.selectVoList(lqw);
     }
 
     private LambdaQueryWrapper<${ClassName}> buildQueryWrapper(${ClassName}Bo bo) {
@@ -81,7 +84,7 @@ public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper,
     public Boolean insertByBo(${ClassName}Bo bo) {
         ${ClassName} add = BeanUtil.toBean(bo, ${ClassName}.class);
         validEntityBeforeSave(add);
-        boolean flag = save(add);
+        boolean flag = baseMapper.insert(add);
 #set($pk=$pkColumn.javaField.substring(0,1).toUpperCase() + ${pkColumn.javaField.substring(1)})
         if (flag) {
             bo.set$pk(add.get$pk());
@@ -93,7 +96,7 @@ public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper,
     public Boolean updateByBo(${ClassName}Bo bo) {
         ${ClassName} update = BeanUtil.toBean(bo, ${ClassName}.class);
         validEntityBeforeSave(update);
-        return updateById(update);
+        return baseMapper.updateById(update);
     }
 
     /**
@@ -110,6 +113,6 @@ public class ${ClassName}ServiceImpl extends ServicePlusImpl<${ClassName}Mapper,
         if(isValid){
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return removeByIds(ids);
+        return baseMapper.deleteBatchIds(ids) > 0;
     }
 }
