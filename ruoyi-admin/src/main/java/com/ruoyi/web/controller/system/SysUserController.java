@@ -107,7 +107,7 @@ public class SysUserController extends BaseController {
     @SaCheckPermission("system:user:query")
     @GetMapping(value = {"/", "/{userId}" })
     public AjaxResult<Map<String, Object>> getInfo(@ApiParam("用户ID") @PathVariable(value = "userId", required = false) Long userId) {
-		userService.checkUserDataScope(userId);
+        userService.checkUserDataScope(userId);
         Map<String, Object> ajax = new HashMap<>();
         List<SysRole> roles = roleService.selectRoleAll();
         ajax.put("roles", SysUser.isAdmin(userId) ? roles : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));

@@ -72,18 +72,18 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
         }
     }
 
-	/**
-	 * 获取登录用户名
-	 */
-	private String getLoginUsername() {
-		LoginUser loginUser;
-		try {
+    /**
+     * 获取登录用户名
+     */
+    private String getLoginUsername() {
+        LoginUser loginUser;
+        try {
             loginUser = LoginUtils.getLoginUser();
-		} catch (Exception e) {
-			log.warn("自动注入警告 => 用户未登录");
-			return null;
-		}
-		return loginUser.getUsername();
-	}
+        } catch (Exception e) {
+            log.warn("自动注入警告 => 用户未登录");
+            return null;
+        }
+        return loginUser.getUsername();
+    }
 
 }

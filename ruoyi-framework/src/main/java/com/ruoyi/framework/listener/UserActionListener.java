@@ -12,10 +12,10 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.utils.LoginUtils;
-import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,18 +45,18 @@ public class UserActionListener implements SaTokenListener {
             SysUser user = SpringUtils.getBean(UserService.class).selectUserById(LoginUtils.getUserId());
             String tokenValue = StpUtil.getTokenValue();
             UserOnlineDTO userOnlineDTO = new UserOnlineDTO()
-                    .setIpaddr(ip)
-                    .setLoginLocation(AddressUtils.getRealAddressByIP(ip))
-                    .setBrowser(userAgent.getBrowser().getName())
-                    .setOs(userAgent.getOs().getName())
-                    .setLoginTime(System.currentTimeMillis())
-                    .setTokenId(tokenValue)
-                    .setUserName(user.getUserName());
+                .setIpaddr(ip)
+                .setLoginLocation(AddressUtils.getRealAddressByIP(ip))
+                .setBrowser(userAgent.getBrowser().getName())
+                .setOs(userAgent.getOs().getName())
+                .setLoginTime(System.currentTimeMillis())
+                .setTokenId(tokenValue)
+                .setUserName(user.getUserName());
             if (StringUtils.isNotNull(user.getDept())) {
                 userOnlineDTO.setDeptName(user.getDept().getDeptName());
             }
             RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, userOnlineDTO, saTokenConfig.getTimeout(), TimeUnit.SECONDS);
-            log.info("user doLogin, useId:{}, token:{}", loginId, tokenValue);
+            log.info("user doLogin, useId:{}, token:{}" , loginId, tokenValue);
         } else if (userType == UserType.APP_USER) {
             // app端 自行根据业务编写
         }
@@ -68,7 +68,7 @@ public class UserActionListener implements SaTokenListener {
     @Override
     public void doLogout(String loginType, Object loginId, String tokenValue) {
         RedisUtils.deleteObject(Constants.ONLINE_TOKEN_KEY + tokenValue);
-        log.info("user doLogout, useId:{}, token:{}", loginId, tokenValue);
+        log.info("user doLogout, useId:{}, token:{}" , loginId, tokenValue);
     }
 
     /**
@@ -77,7 +77,7 @@ public class UserActionListener implements SaTokenListener {
     @Override
     public void doKickout(String loginType, Object loginId, String tokenValue) {
         RedisUtils.deleteObject(Constants.ONLINE_TOKEN_KEY + tokenValue);
-        log.info("user doLogoutByLoginId, useId:{}, token:{}", loginId, tokenValue);
+        log.info("user doLogoutByLoginId, useId:{}, token:{}" , loginId, tokenValue);
     }
 
     /**
@@ -86,7 +86,7 @@ public class UserActionListener implements SaTokenListener {
     @Override
     public void doReplaced(String loginType, Object loginId, String tokenValue) {
         RedisUtils.deleteObject(Constants.ONLINE_TOKEN_KEY + tokenValue);
-        log.info("user doReplaced, useId:{}, token:{}", loginId, tokenValue);
+        log.info("user doReplaced, useId:{}, token:{}" , loginId, tokenValue);
     }
 
     /**

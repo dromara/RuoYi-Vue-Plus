@@ -541,7 +541,7 @@ export default {
       });
     },
 #if($table.sub)
-	/** ${subTable.functionName}序号 */
+    /** ${subTable.functionName}序号 */
     row${subClassName}Index({ row, rowIndex }) {
       row.index = rowIndex + 1;
     },

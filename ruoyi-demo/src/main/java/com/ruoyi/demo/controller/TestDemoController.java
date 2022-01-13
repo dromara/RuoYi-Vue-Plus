@@ -59,15 +59,15 @@ public class TestDemoController extends BaseController {
         return iTestDemoService.queryPageList(bo, pageQuery);
     }
 
-	/**
-	 * 自定义分页查询
-	 */
-	@ApiOperation("自定义分页查询")
-	@SaCheckPermission("demo:demo:list")
-	@GetMapping("/page")
-	public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
-		return iTestDemoService.customPageList(bo, pageQuery);
-	}
+    /**
+     * 自定义分页查询
+     */
+    @ApiOperation("自定义分页查询")
+    @SaCheckPermission("demo:demo:list")
+    @GetMapping("/page")
+    public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
+        return iTestDemoService.customPageList(bo, pageQuery);
+    }
 
     @ApiOperation("导入测试-校验")
     @ApiImplicitParams({

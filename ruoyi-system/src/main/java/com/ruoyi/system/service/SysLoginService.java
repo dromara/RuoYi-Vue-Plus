@@ -9,13 +9,13 @@ import com.ruoyi.common.core.service.LogininforService;
 import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.enums.UserType;
-import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
 import com.ruoyi.common.exception.user.UserException;
 import com.ruoyi.common.utils.*;
-import lombok.extern.slf4j.Slf4j;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -110,7 +110,6 @@ public class SysLoginService {
      * @param username 用户名
      * @param code     验证码
      * @param uuid     唯一标识
-     * @return 结果
      */
     public void validateCaptcha(String username, String code, String uuid, HttpServletRequest request) {
         String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;

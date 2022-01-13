@@ -49,9 +49,9 @@ public class SysProfileController extends BaseController {
     @ApiOperation("个人信息")
     @GetMapping
     public AjaxResult<Map<String, Object>> profile() {
-        SysUser user = userService.getById(getUserId());
-		Map<String, Object> ajax = new HashMap<>();
-		ajax.put("user", user);
+        SysUser user = userService.selectUserById(getUserId());
+        Map<String, Object> ajax = new HashMap<>();
+        ajax.put("user", user);
         ajax.put("roleGroup", userService.selectUserRoleGroup(user.getUserName()));
         ajax.put("postGroup", userService.selectUserPostGroup(user.getUserName()));
         return AjaxResult.success(ajax);
@@ -119,8 +119,8 @@ public class SysProfileController extends BaseController {
     public AjaxResult<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile file) {
         Map<String,Object> ajax = new HashMap<>();
         if (!file.isEmpty()) {
-			SysOss oss = iSysOssService.upload(file);
-			String avatar = oss.getUrl();
+            SysOss oss = iSysOssService.upload(file);
+            String avatar = oss.getUrl();
             if (userService.updateUserAvatar(getUsername(), avatar)) {
                 ajax.put("imgUrl", avatar);
                 return AjaxResult.success(ajax);
