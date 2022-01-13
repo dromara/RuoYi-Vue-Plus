@@ -10,39 +10,39 @@ import lombok.Data;
 @Data
 public class OssProperties {
 
-	/**
-	 * 域名
-	 */
-	private String endpoint;
+    /**
+     * 域名
+     */
+    private String endpoint;
 
-	/**
-	 * 前缀
-	 */
-	private String prefix;
+    /**
+     * 前缀
+     */
+    private String prefix;
 
-	/**
-	 * ACCESS_KEY
-	 */
-	private String accessKey;
+    /**
+     * ACCESS_KEY
+     */
+    private String accessKey;
 
-	/**
-	 * SECRET_KEY
-	 */
-	private String secretKey;
+    /**
+     * SECRET_KEY
+     */
+    private String secretKey;
 
-	/**
-	 * 存储空间名
-	 */
-	private String bucketName;
+    /**
+     * 存储空间名
+     */
+    private String bucketName;
 
-	/**
-	 * 存储区域
-	 */
-	private String region;
+    /**
+     * 存储区域
+     */
+    private String region;
 
-	/**
-	 * 是否https（Y=是,N=否）
-	 */
-	private String isHttps;
+    /**
+     * 是否https（Y=是,N=否）
+     */
+    private String isHttps;
 
 }

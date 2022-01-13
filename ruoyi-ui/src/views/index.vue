@@ -23,7 +23,7 @@
           * 分布式日志 TLog 支持跟踪链路日志记录、性能分析、链路排查<br/>
           * 分布式任务调度 Xxl-Job 高性能 高可靠 易扩展<br/>
           * 文件存储 Minio 本地存储<br/>
-          * 文件存储 七牛、阿里、腾讯	云存储<br/>
+          * 文件存储 七牛、阿里、腾讯 云存储<br/>
           * 监控框架 SpringBoot-Admin 全方位服务监控<br/>
           * 校验框架 Validation 增强接口安全性 严谨性<br/>
           * Excel框架 Alibaba EasyExcel 性能优异 扩展性强<br/>

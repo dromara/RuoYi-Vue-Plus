@@ -6,7 +6,6 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.core.service.TokenService;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -40,7 +39,6 @@ import java.util.Map;
 public class SysProfileController extends BaseController {
 
     private final ISysUserService userService;
-    private final TokenService tokenService;
     private final ISysOssService iSysOssService;
 
     /**

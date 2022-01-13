@@ -75,9 +75,9 @@
                r.data_scope,
                r.status as role_status
         from sys_user u
-		    left join sys_dept d on u.dept_id = d.dept_id
-		    left join sys_user_role ur on u.user_id = ur.user_id
-		    left join sys_role r on r.role_id = ur.role_id
+            left join sys_dept d on u.dept_id = d.dept_id
+            left join sys_user_role ur on u.user_id = ur.user_id
+            left join sys_role r on r.role_id = ur.role_id
     </sql>
 
     <select id="selectPageUserList" parameterType="SysUser" resultMap="SysUserResult">

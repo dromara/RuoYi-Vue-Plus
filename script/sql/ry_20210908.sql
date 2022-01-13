@@ -14,7 +14,7 @@ create table sys_dept (
   status            char(1)         default '0'                comment '部门状态（0正常 1停用）',
   del_flag          char(1)         default '0'                comment '删除标志（0代表存在 2代表删除）',
   create_by         varchar(64)     default ''                 comment '创建者',
-  create_time 	    datetime                                   comment '创建时间',
+  create_time       datetime                                   comment '创建时间',
   update_by         varchar(64)     default ''                 comment '更新者',
   update_time       datetime                                   comment '更新时间',
   primary key (dept_id)
@@ -82,7 +82,7 @@ create table sys_post
   status        char(1)         not null                   comment '状态（0正常 1停用）',
   create_by     varchar(64)     default ''                 comment '创建者',
   create_time   datetime                                   comment '创建时间',
-  update_by     varchar(64)     default ''			       comment '更新者',
+  update_by     varchar(64)     default ''                   comment '更新者',
   update_time   datetime                                   comment '更新时间',
   remark        varchar(500)    default null               comment '备注',
   primary key (post_id)
@@ -600,7 +600,7 @@ create table gen_table (
   gen_path          varchar(200)    default '/'                comment '生成路径（不填默认项目路径）',
   options           varchar(1000)                              comment '其它生成选项',
   create_by         varchar(64)     default ''                 comment '创建者',
-  create_time 	    datetime                                   comment '创建时间',
+  create_time       datetime                                   comment '创建时间',
   update_by         varchar(64)     default ''                 comment '更新者',
   update_time       datetime                                   comment '更新时间',
   remark            varchar(500)    default null               comment '备注',
@@ -632,7 +632,7 @@ create table gen_table_column (
   dict_type         varchar(200)    default ''                 comment '字典类型',
   sort              int                                        comment '排序',
   create_by         varchar(64)     default ''                 comment '创建者',
-  create_time 	    datetime                                   comment '创建时间',
+  create_time       datetime                                   comment '创建时间',
   update_by         varchar(64)     default ''                 comment '更新者',
   update_time       datetime                                   comment '更新时间',
   primary key (column_id)

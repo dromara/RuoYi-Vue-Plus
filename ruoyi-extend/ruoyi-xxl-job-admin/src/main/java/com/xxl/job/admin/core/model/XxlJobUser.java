@@ -6,68 +6,68 @@ import org.springframework.util.StringUtils;
  * @author xuxueli 2019-05-04 16:43:12
  */
 public class XxlJobUser {
-	
-	private int id;
-	private String username;		// 账号
-	private String password;		// 密码
-	private int role;				// 角色：0-普通用户、1-管理员
-	private String permission;	// 权限：执行器ID列表，多个逗号分割
 
-	public int getId() {
-		return id;
-	}
+    private int id;
+    private String username;        // 账号
+    private String password;        // 密码
+    private int role;                // 角色：0-普通用户、1-管理员
+    private String permission;    // 权限：执行器ID列表，多个逗号分割
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public int getRole() {
-		return role;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setRole(int role) {
-		this.role = role;
-	}
+    public int getRole() {
+        return role;
+    }
 
-	public String getPermission() {
-		return permission;
-	}
+    public void setRole(int role) {
+        this.role = role;
+    }
 
-	public void setPermission(String permission) {
-		this.permission = permission;
-	}
+    public String getPermission() {
+        return permission;
+    }
 
-	// plugin
-	public boolean validPermission(int jobGroup){
-		if (this.role == 1) {
-			return true;
-		} else {
-			if (StringUtils.hasText(this.permission)) {
-				for (String permissionItem : this.permission.split(",")) {
-					if (String.valueOf(jobGroup).equals(permissionItem)) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
+    public void setPermission(String permission) {
+        this.permission = permission;
+    }
 
-	}
+    // plugin
+    public boolean validPermission(int jobGroup) {
+        if (this.role == 1) {
+            return true;
+        } else {
+            if (StringUtils.hasText(this.permission)) {
+                for (String permissionItem : this.permission.split(",")) {
+                    if (String.valueOf(jobGroup).equals(permissionItem)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+    }
 
 }
