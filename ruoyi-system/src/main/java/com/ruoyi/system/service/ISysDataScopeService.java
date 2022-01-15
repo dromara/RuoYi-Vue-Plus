@@ -5,7 +5,7 @@ package com.ruoyi.system.service;
  *
  * @author Lion Li
  */
-public interface SysDataScopeService {
+public interface ISysDataScopeService {
 
     /**
      * 获取角色自定义权限

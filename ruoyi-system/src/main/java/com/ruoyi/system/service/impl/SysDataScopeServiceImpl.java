@@ -7,7 +7,7 @@ import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleDeptMapper;
-import com.ruoyi.system.service.SysDataScopeService;
+import com.ruoyi.system.service.ISysDataScopeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service("sdss")
-public class SysDataScopeServiceImpl implements SysDataScopeService {
+public class SysDataScopeServiceImpl implements ISysDataScopeService {
 
     private final SysRoleDeptMapper roleDeptMapper;
     private final SysDeptMapper deptMapper;
