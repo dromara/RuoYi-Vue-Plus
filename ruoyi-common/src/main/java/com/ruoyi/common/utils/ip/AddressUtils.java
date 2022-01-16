@@ -41,9 +41,9 @@ public class AddressUtils {
         if (RuoYiConfig.isAddressEnabled()) {
             try {
                 String rspStr = HttpUtil.createGet(IP_URL)
-                        .body("ip=" + ip + "&json=true", Constants.GBK)
-                        .execute()
-                        .body();
+                    .body("ip=" + ip + "&json=true", Constants.GBK)
+                    .execute()
+                    .body();
                 if (StringUtils.isEmpty(rspStr)) {
                     log.error("获取地理位置异常 {}", ip);
                     return UNKNOWN;

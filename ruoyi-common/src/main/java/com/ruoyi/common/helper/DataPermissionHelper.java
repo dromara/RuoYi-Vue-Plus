@@ -24,7 +24,6 @@ public class DataPermissionHelper {
     }
 
 
-
     public static void setVariable(String key, Object value) {
         Map<String, Object> context = getContext();
         context.put(key, value);

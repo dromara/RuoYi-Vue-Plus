@@ -9,6 +9,7 @@ public interface ISysDataScopeService {
 
     /**
      * 获取角色自定义权限
+     *
      * @param roleId 角色id
      * @return 部门id组
      */
@@ -16,6 +17,7 @@ public interface ISysDataScopeService {
 
     /**
      * 获取部门及以下权限
+     *
      * @param deptId 部门id
      * @return 部门id组
      */

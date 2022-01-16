@@ -99,7 +99,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService, Logininf
             .like(StringUtils.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysLogininfor::getLoginTime, params.get("beginTime"), params.get("endTime"));
-        if(StringUtils.isBlank(pageQuery.getOrderByColumn())) {
+        if (StringUtils.isBlank(pageQuery.getOrderByColumn())) {
             pageQuery.setOrderByColumn("info_id").setIsAsc("desc");
         }
         Page<SysLogininfor> page = baseMapper.selectPage(pageQuery.build(), lqw);

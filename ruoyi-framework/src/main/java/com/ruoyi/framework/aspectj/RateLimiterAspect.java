@@ -3,8 +3,8 @@ package com.ruoyi.framework.aspectj;
 import com.ruoyi.common.annotation.RateLimiter;
 import com.ruoyi.common.enums.LimitType;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -52,7 +52,7 @@ public class RateLimiterAspect {
         if (rateLimiter.limitType() == LimitType.IP) {
             // 获取请求ip
             stringBuffer.append(ServletUtils.getClientIP()).append("-");
-        } else if (rateLimiter.limitType() == LimitType.CLUSTER){
+        } else if (rateLimiter.limitType() == LimitType.CLUSTER) {
             // 获取客户端实例id
             stringBuffer.append(RedisUtils.getClient().getId()).append("-");
         }

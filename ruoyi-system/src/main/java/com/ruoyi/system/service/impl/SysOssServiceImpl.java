@@ -50,7 +50,7 @@ public class SysOssServiceImpl implements ISysOssService {
         lqw.eq(StringUtils.isNotBlank(bo.getFileSuffix()), SysOss::getFileSuffix, bo.getFileSuffix());
         lqw.eq(StringUtils.isNotBlank(bo.getUrl()), SysOss::getUrl, bo.getUrl());
         lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
-                SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
+            SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
         lqw.eq(StringUtils.isNotBlank(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
         lqw.eq(StringUtils.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
         return lqw;
@@ -74,11 +74,11 @@ public class SysOssServiceImpl implements ISysOssService {
         }
         // 保存文件信息
         SysOss oss = new SysOss()
-                .setUrl(uploadResult.getUrl())
-                .setFileSuffix(suffix)
-                .setFileName(uploadResult.getFilename())
-                .setOriginalName(originalfileName)
-                .setService(storage.getServiceType());
+            .setUrl(uploadResult.getUrl())
+            .setFileSuffix(suffix)
+            .setFileName(uploadResult.getFilename())
+            .setOriginalName(originalfileName)
+            .setService(storage.getServiceType());
         baseMapper.insert(oss);
         return oss;
     }

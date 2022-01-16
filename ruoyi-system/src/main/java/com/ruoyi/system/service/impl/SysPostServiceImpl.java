@@ -33,9 +33,9 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public TableDataInfo<SysPost> selectPagePostList(SysPost post, PageQuery pageQuery) {
         LambdaQueryWrapper<SysPost> lqw = new LambdaQueryWrapper<SysPost>()
-                .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
-                .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
-                .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
+            .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
+            .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
+            .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
         Page<SysPost> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
@@ -49,9 +49,9 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public List<SysPost> selectPostList(SysPost post) {
         return baseMapper.selectList(new LambdaQueryWrapper<SysPost>()
-                .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
-                .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
-                .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName()));
+            .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
+            .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
+            .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName()));
     }
 
     /**
@@ -96,8 +96,8 @@ public class SysPostServiceImpl implements ISysPostService {
     public String checkPostNameUnique(SysPost post) {
         Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
         boolean count = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
-                .eq(SysPost::getPostName, post.getPostName())
-                .ne(SysPost::getPostId, postId));
+            .eq(SysPost::getPostName, post.getPostName())
+            .ne(SysPost::getPostId, postId));
         if (count) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -114,8 +114,8 @@ public class SysPostServiceImpl implements ISysPostService {
     public String checkPostCodeUnique(SysPost post) {
         Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
         boolean count = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
-                .eq(SysPost::getPostCode, post.getPostCode())
-                .ne(SysPost::getPostId, postId));
+            .eq(SysPost::getPostCode, post.getPostCode())
+            .ne(SysPost::getPostId, postId));
         if (count) {
             return UserConstants.NOT_UNIQUE;
         }

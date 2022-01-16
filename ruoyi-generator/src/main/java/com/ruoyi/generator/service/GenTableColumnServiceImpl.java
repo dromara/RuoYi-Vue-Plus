@@ -29,8 +29,8 @@ public class GenTableColumnServiceImpl implements IGenTableColumnService {
     @Override
     public List<GenTableColumn> selectGenTableColumnListByTableId(Long tableId) {
         return baseMapper.selectList(new LambdaQueryWrapper<GenTableColumn>()
-                .eq(GenTableColumn::getTableId, tableId)
-                .orderByAsc(GenTableColumn::getSort));
+            .eq(GenTableColumn::getTableId, tableId)
+            .orderByAsc(GenTableColumn::getSort));
     }
 
     /**

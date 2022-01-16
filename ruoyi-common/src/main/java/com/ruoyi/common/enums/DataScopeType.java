@@ -6,9 +6,9 @@ import lombok.Getter;
 
 /**
  * 数据权限类型
- *
+ * <p>
  * 语法支持 spel 模板表达式
- *
+ * <p>
  * 内置数据 user 当前用户 内容参考 SysUser
  * 如需扩展数据 可使用 {@link com.ruoyi.common.helper.DataPermissionHelper} 操作
  * 内置服务 sdss 系统数据权限服务 内容参考 SysDataScopeService
@@ -44,7 +44,7 @@ public enum DataScopeType {
     /**
      * 仅本人数据权限
      */
-    SELF("5", " #{#userName} = #{#user.userId} " , " 1 = 0 ");
+    SELF("5", " #{#userName} = #{#user.userId} ", " 1 = 0 ");
 
     private final String code;
 

@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 测试数据脱敏控制器
- *
+ * <p>
  * 默认管理员不过滤
  * 需自行根据业务重写实现
  *
- * @see com.ruoyi.common.core.service.SensitiveService
  * @author Lion Li
  * @version 3.6.0
+ * @see com.ruoyi.common.core.service.SensitiveService
  */
 @Api(value = "测试数据脱敏控制器", tags = {"测试数据脱敏管理"})
 @RestController

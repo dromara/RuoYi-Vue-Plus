@@ -79,7 +79,7 @@ public class AliyunOssStrategy extends AbstractOssStrategy {
 
     @Override
     public void delete(String path) {
-        path = path.replace(getEndpointLink() + "/" , "");
+        path = path.replace(getEndpointLink() + "/", "");
         try {
             client.deleteObject(properties.getBucketName(), path);
         } catch (Exception e) {

@@ -31,11 +31,11 @@ public class PlusSaTokenDao implements SaTokenDao {
      */
     @Override
     public void set(String key, String value, long timeout) {
-        if(timeout == 0 || timeout <= SaTokenDao.NOT_VALUE_EXPIRE)  {
+        if (timeout == 0 || timeout <= SaTokenDao.NOT_VALUE_EXPIRE) {
             return;
         }
         // 判断是否为永不过期
-        if(timeout == SaTokenDao.NEVER_EXPIRE) {
+        if (timeout == SaTokenDao.NEVER_EXPIRE) {
             RedisUtils.setCacheObject(key, value);
         } else {
             RedisUtils.setCacheObject(key, value, timeout, TimeUnit.SECONDS);
@@ -49,7 +49,7 @@ public class PlusSaTokenDao implements SaTokenDao {
     public void update(String key, String value) {
         long expire = getTimeout(key);
         // -2 = 无此键
-        if(expire == SaTokenDao.NOT_VALUE_EXPIRE) {
+        if (expire == SaTokenDao.NOT_VALUE_EXPIRE) {
             return;
         }
         this.set(key, value, expire);
@@ -77,9 +77,9 @@ public class PlusSaTokenDao implements SaTokenDao {
     @Override
     public void updateTimeout(String key, long timeout) {
         // 判断是否想要设置为永久
-        if(timeout == SaTokenDao.NEVER_EXPIRE) {
+        if (timeout == SaTokenDao.NEVER_EXPIRE) {
             long expire = getTimeout(key);
-            if(expire == SaTokenDao.NEVER_EXPIRE) {
+            if (expire == SaTokenDao.NEVER_EXPIRE) {
                 // 如果其已经被设置为永久，则不作任何处理
             } else {
                 // 如果尚未被设置为永久，那么再次set一次
@@ -89,7 +89,6 @@ public class PlusSaTokenDao implements SaTokenDao {
         }
         RedisUtils.expire(key, timeout, TimeUnit.SECONDS);
     }
-
 
 
     /**
@@ -105,11 +104,11 @@ public class PlusSaTokenDao implements SaTokenDao {
      */
     @Override
     public void setObject(String key, Object object, long timeout) {
-        if(timeout == 0 || timeout <= SaTokenDao.NOT_VALUE_EXPIRE)  {
+        if (timeout == 0 || timeout <= SaTokenDao.NOT_VALUE_EXPIRE) {
             return;
         }
         // 判断是否为永不过期
-        if(timeout == SaTokenDao.NEVER_EXPIRE) {
+        if (timeout == SaTokenDao.NEVER_EXPIRE) {
             RedisUtils.setCacheObject(key, object);
         } else {
             RedisUtils.setCacheObject(key, object, timeout, TimeUnit.SECONDS);
@@ -123,7 +122,7 @@ public class PlusSaTokenDao implements SaTokenDao {
     public void updateObject(String key, Object object) {
         long expire = getObjectTimeout(key);
         // -2 = 无此键
-        if(expire == SaTokenDao.NOT_VALUE_EXPIRE) {
+        if (expire == SaTokenDao.NOT_VALUE_EXPIRE) {
             return;
         }
         this.setObject(key, object, expire);
@@ -151,9 +150,9 @@ public class PlusSaTokenDao implements SaTokenDao {
     @Override
     public void updateObjectTimeout(String key, long timeout) {
         // 判断是否想要设置为永久
-        if(timeout == SaTokenDao.NEVER_EXPIRE) {
+        if (timeout == SaTokenDao.NEVER_EXPIRE) {
             long expire = getObjectTimeout(key);
-            if(expire == SaTokenDao.NEVER_EXPIRE) {
+            if (expire == SaTokenDao.NEVER_EXPIRE) {
                 // 如果其已经被设置为永久，则不作任何处理
             } else {
                 // 如果尚未被设置为永久，那么再次set一次

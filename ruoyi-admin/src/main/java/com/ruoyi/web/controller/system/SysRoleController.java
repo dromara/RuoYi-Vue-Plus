@@ -20,7 +20,6 @@ import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysPermissionService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +33,7 @@ import java.util.List;
  */
 @Validated
 @Api(value = "角色信息控制器", tags = {"角色信息管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/role")
 public class SysRoleController extends BaseController {

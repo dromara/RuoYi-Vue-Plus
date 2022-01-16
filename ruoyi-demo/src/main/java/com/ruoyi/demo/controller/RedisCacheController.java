@@ -5,7 +5,6 @@ import com.ruoyi.common.utils.redis.RedisUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 // 类级别 缓存统一配置
 //@CacheConfig(cacheNames = "redissonCacheMap")
 @Api(value = "spring-cache 演示案例", tags = {"spring-cache 演示案例"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/cache")
 public class RedisCacheController {

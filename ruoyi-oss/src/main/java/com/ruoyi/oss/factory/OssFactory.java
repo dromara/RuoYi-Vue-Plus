@@ -1,8 +1,8 @@
 package com.ruoyi.oss.factory;
 
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.enumd.OssEnumd;
@@ -74,7 +74,7 @@ public class OssFactory {
         }
         // 获取redis配置信息 创建对象 并缓存
         IOssStrategy service = (IOssStrategy) ReflectUtils.newInstance(OssEnumd.getServiceClass(type));
-        ((AbstractOssStrategy)service).init(properties);
+        ((AbstractOssStrategy) service).init(properties);
         SERVICES.put(type, service);
     }
 

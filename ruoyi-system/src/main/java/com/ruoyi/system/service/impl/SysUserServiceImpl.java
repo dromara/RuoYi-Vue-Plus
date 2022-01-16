@@ -12,7 +12,6 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.LoginUtils;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysPost;
@@ -164,8 +163,8 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     public String checkPhoneUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         boolean count = baseMapper.exists(new LambdaQueryWrapper<SysUser>()
-                .eq(SysUser::getPhonenumber, user.getPhonenumber())
-                .ne(SysUser::getUserId, userId));
+            .eq(SysUser::getPhonenumber, user.getPhonenumber())
+            .ne(SysUser::getUserId, userId));
         if (count) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -182,8 +181,8 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     public String checkEmailUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         boolean count = baseMapper.exists(new LambdaQueryWrapper<SysUser>()
-                .eq(SysUser::getEmail, user.getEmail())
-                .ne(SysUser::getUserId, userId));
+            .eq(SysUser::getEmail, user.getEmail())
+            .ne(SysUser::getUserId, userId));
         if (count) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -279,7 +278,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Transactional(rollbackFor = Exception.class)
     public void insertUserAuth(Long userId, Long[] roleIds) {
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
-                .eq(SysUserRole::getUserId, userId));
+            .eq(SysUserRole::getUserId, userId));
         insertUserRole(userId, roleIds);
     }
 
@@ -315,9 +314,9 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     public boolean updateUserAvatar(String userName, String avatar) {
         return baseMapper.update(null,
-                new LambdaUpdateWrapper<SysUser>()
-                        .set(SysUser::getAvatar, avatar)
-                        .eq(SysUser::getUserName, userName)) > 0;
+            new LambdaUpdateWrapper<SysUser>()
+                .set(SysUser::getAvatar, avatar)
+                .eq(SysUser::getUserName, userName)) > 0;
     }
 
     /**
@@ -341,9 +340,9 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     public int resetUserPwd(String userName, String password) {
         return baseMapper.update(null,
-                new LambdaUpdateWrapper<SysUser>()
-                        .set(SysUser::getPassword, password)
-                        .eq(SysUser::getUserName, userName));
+            new LambdaUpdateWrapper<SysUser>()
+                .set(SysUser::getPassword, password)
+                .eq(SysUser::getUserName, userName));
     }
 
     /**

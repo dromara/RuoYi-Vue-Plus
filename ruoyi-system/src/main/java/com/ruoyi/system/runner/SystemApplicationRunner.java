@@ -6,7 +6,6 @@ import com.ruoyi.system.service.ISysDictTypeService;
 import com.ruoyi.system.service.ISysOssConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Component;
  * @author Lion Li
  */
 @Slf4j
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @Component
 public class SystemApplicationRunner implements ApplicationRunner {
 
@@ -30,7 +29,7 @@ public class SystemApplicationRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         ossConfigService.init();
         log.info("初始化OSS配置成功");
-        if (ruoyiConfig.isCacheLazy()){
+        if (ruoyiConfig.isCacheLazy()) {
             return;
         }
         configService.loadingConfigCache();

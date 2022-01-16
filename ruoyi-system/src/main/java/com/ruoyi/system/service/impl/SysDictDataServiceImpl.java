@@ -29,10 +29,10 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     @Override
     public TableDataInfo<SysDictData> selectPageDictDataList(SysDictData dictData, PageQuery pageQuery) {
         LambdaQueryWrapper<SysDictData> lqw = new LambdaQueryWrapper<SysDictData>()
-                .eq(StringUtils.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
-                .like(StringUtils.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
-                .eq(StringUtils.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
-                .orderByAsc(SysDictData::getDictSort);
+            .eq(StringUtils.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
+            .like(StringUtils.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
+            .eq(StringUtils.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
+            .orderByAsc(SysDictData::getDictSort);
         Page<SysDictData> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
@@ -46,10 +46,10 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     @Override
     public List<SysDictData> selectDictDataList(SysDictData dictData) {
         return baseMapper.selectList(new LambdaQueryWrapper<SysDictData>()
-                .eq(StringUtils.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
-                .like(StringUtils.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
-                .eq(StringUtils.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
-                .orderByAsc(SysDictData::getDictSort));
+            .eq(StringUtils.isNotBlank(dictData.getDictType()), SysDictData::getDictType, dictData.getDictType())
+            .like(StringUtils.isNotBlank(dictData.getDictLabel()), SysDictData::getDictLabel, dictData.getDictLabel())
+            .eq(StringUtils.isNotBlank(dictData.getStatus()), SysDictData::getStatus, dictData.getStatus())
+            .orderByAsc(SysDictData::getDictSort));
     }
 
     /**
@@ -65,7 +65,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
                 .select(SysDictData::getDictLabel)
                 .eq(SysDictData::getDictType, dictType)
                 .eq(SysDictData::getDictValue, dictValue))
-                .getDictLabel();
+            .getDictLabel();
     }
 
     /**

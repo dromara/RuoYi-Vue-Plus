@@ -15,9 +15,9 @@ public interface SysDictDataMapper extends BaseMapperPlus<SysDictDataMapper, Sys
 
     default List<SysDictData> selectDictDataByType(String dictType) {
         return selectList(
-                new LambdaQueryWrapper<SysDictData>()
-                        .eq(SysDictData::getStatus, "0")
-                        .eq(SysDictData::getDictType, dictType)
-                        .orderByAsc(SysDictData::getDictSort));
+            new LambdaQueryWrapper<SysDictData>()
+                .eq(SysDictData::getStatus, "0")
+                .eq(SysDictData::getDictType, dictType)
+                .orderByAsc(SysDictData::getDictSort));
     }
 }

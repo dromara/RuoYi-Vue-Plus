@@ -2,7 +2,6 @@ package com.ruoyi.web.controller.monitor;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.exception.NotLoginException;
-import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.annotation.Log;
@@ -12,13 +11,12 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.dto.UserOnlineDTO;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.system.domain.SysUserOnline;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -32,7 +30,7 @@ import java.util.stream.Collectors;
  * @author Lion Li
  */
 @Api(value = "在线用户监控", tags = {"在线用户监控管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/online")
 public class SysUserOnlineController extends BaseController {
@@ -59,7 +57,7 @@ public class SysUserOnlineController extends BaseController {
             ).collect(Collectors.toList());
         } else if (StringUtils.isNotEmpty(ipaddr)) {
             userOnlineDTOList = userOnlineDTOList.stream().filter(userOnline ->
-                StringUtils.equals(ipaddr, userOnline.getIpaddr()))
+                    StringUtils.equals(ipaddr, userOnline.getIpaddr()))
                 .collect(Collectors.toList());
         } else if (StringUtils.isNotEmpty(userName)) {
             userOnlineDTOList = userOnlineDTOList.stream().filter(userOnline ->

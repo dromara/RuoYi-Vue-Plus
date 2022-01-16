@@ -15,7 +15,7 @@ public class UnsignedMathGenerator implements CodeGenerator {
 
     private static final long serialVersionUID = -5514819971774091076L;
 
-    private static final String operators = "+-*";
+    private static final String OPERATORS = "+-*";
 
     /**
      * 参与计算数字最大长度
@@ -48,7 +48,7 @@ public class UnsignedMathGenerator implements CodeGenerator {
         number1 = StringUtils.rightPad(number1, this.numberLength, CharUtil.SPACE);
         number2 = StringUtils.rightPad(number2, this.numberLength, CharUtil.SPACE);
 
-        return number1 + RandomUtil.randomChar(operators) + number2 + '=';
+        return number1 + RandomUtil.randomChar(OPERATORS) + number2 + '=';
     }
 
     @Override

@@ -16,6 +16,7 @@ import java.util.Objects;
 
 /**
  * 数据脱敏json序列化工具
+ *
  * @author Yjoioooo
  */
 public class SensitiveJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {
@@ -25,7 +26,7 @@ public class SensitiveJsonSerializer extends JsonSerializer<String> implements C
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         SensitiveService sensitiveService = SpringUtils.getBean(SensitiveService.class);
-        if (sensitiveService.isSensitive()){
+        if (sensitiveService.isSensitive()) {
             gen.writeString(value);
         } else {
             gen.writeString(strategy.desensitizer().apply(value));
@@ -36,7 +37,7 @@ public class SensitiveJsonSerializer extends JsonSerializer<String> implements C
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property) throws JsonMappingException {
         Sensitive annotation = property.getAnnotation(Sensitive.class);
-        if (Objects.nonNull(annotation)&&Objects.equals(String.class, property.getType().getRawClass())) {
+        if (Objects.nonNull(annotation) && Objects.equals(String.class, property.getType().getRawClass())) {
             this.strategy = annotation.strategy();
             return this;
         }

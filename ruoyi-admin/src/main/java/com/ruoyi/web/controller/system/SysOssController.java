@@ -26,7 +26,6 @@ import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysOssService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +46,7 @@ import java.util.Map;
  */
 @Validated
 @Api(value = "OSS对象存储控制器", tags = {"OSS对象存储管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/oss")
 public class SysOssController extends BaseController {

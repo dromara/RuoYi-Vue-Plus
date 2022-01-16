@@ -17,7 +17,6 @@ import com.ruoyi.system.service.SysPermissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,7 +35,7 @@ import java.util.Set;
  */
 @Validated
 @Api(value = "登录验证控制器", tags = {"登录验证管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 public class SysLoginController {
 
@@ -56,14 +55,14 @@ public class SysLoginController {
         Map<String, Object> ajax = new HashMap<>();
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
-                loginBody.getUuid());
+            loginBody.getUuid());
         ajax.put(Constants.TOKEN, token);
         return AjaxResult.success(ajax);
     }
 
     @ApiOperation("登出方法")
     @PostMapping("/logout")
-    public AjaxResult<Void> logout(){
+    public AjaxResult<Void> logout() {
         try {
             StpUtil.logout();
         } catch (NotLoginException e) {

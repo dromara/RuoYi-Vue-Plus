@@ -137,8 +137,8 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public String checkRoleNameUnique(SysRole role) {
         Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
         boolean count = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
-                .eq(SysRole::getRoleName, role.getRoleName())
-                .ne(SysRole::getRoleId, roleId));
+            .eq(SysRole::getRoleName, role.getRoleName())
+            .ne(SysRole::getRoleId, roleId));
         if (count) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -155,8 +155,8 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public String checkRoleKeyUnique(SysRole role) {
         Long roleId = StringUtils.isNull(role.getRoleId()) ? -1L : role.getRoleId();
         boolean count = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
-                .eq(SysRole::getRoleKey, role.getRoleKey())
-                .ne(SysRole::getRoleId, roleId));
+            .eq(SysRole::getRoleKey, role.getRoleKey())
+            .ne(SysRole::getRoleId, roleId));
         if (count) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -352,8 +352,8 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public int deleteAuthUser(SysUserRole userRole) {
         return userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
-                .eq(SysUserRole::getRoleId, userRole.getRoleId())
-                .eq(SysUserRole::getUserId, userRole.getUserId()));
+            .eq(SysUserRole::getRoleId, userRole.getRoleId())
+            .eq(SysUserRole::getUserId, userRole.getUserId()));
     }
 
     /**
@@ -366,8 +366,8 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public int deleteAuthUsers(Long roleId, Long[] userIds) {
         return userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
-                .eq(SysUserRole::getRoleId, roleId)
-                .in(SysUserRole::getUserId, Arrays.asList(userIds)));
+            .eq(SysUserRole::getRoleId, roleId)
+            .in(SysUserRole::getUserId, Arrays.asList(userIds)));
     }
 
     /**

@@ -12,8 +12,8 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.ValidatorUtils;
 import com.ruoyi.common.excel.ExcelResult;
+import com.ruoyi.common.utils.ValidatorUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.domain.bo.TestDemoBo;
@@ -22,7 +22,6 @@ import com.ruoyi.demo.domain.vo.TestDemoVo;
 import com.ruoyi.demo.service.ITestDemoService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Validated
 @Api(value = "测试单表控制器", tags = {"测试单表管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/demo")
 public class TestDemoController extends BaseController {
@@ -144,7 +143,7 @@ public class TestDemoController extends BaseController {
      */
     @ApiOperation("删除测试单表")
     @SaCheckPermission("demo:demo:remove")
-    @Log(title = "测试单表" , businessType = BusinessType.DELETE)
+    @Log(title = "测试单表", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult<Void> remove(@ApiParam("测试ID串")
                                    @NotEmpty(message = "主键不能为空")
