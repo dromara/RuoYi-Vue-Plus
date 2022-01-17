@@ -277,7 +277,7 @@ public class GenTableServiceImpl implements IGenTableService {
     public void synchDb(String tableName) {
         GenTable table = baseMapper.selectGenTableByName(tableName);
         List<GenTableColumn> tableColumns = table.getColumns();
-        List<String> tableColumnNames = tableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
+        Map<String, GenTableColumn> tableColumnMap = tableColumns.stream().collect(Collectors.toMap(GenTableColumn::getColumnName, Function.identity()));
 
         List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
         if (StringUtils.isEmpty(dbTableColumns)) {
@@ -287,9 +287,17 @@ public class GenTableServiceImpl implements IGenTableService {
 
         List<GenTableColumn> saveColumns = new ArrayList<>();
         dbTableColumns.forEach(column -> {
-            if (!tableColumnNames.contains(column.getColumnName())) {
-                GenUtils.initColumnField(column, table);
-                saveColumns.add(column);
+            GenUtils.initColumnField(column, table);
+            if (tableColumnMap.containsKey(column.getColumnName())) {
+                GenTableColumn prevColumn = tableColumnMap.get(column.getColumnName());
+                column.setColumnId(prevColumn.getColumnId());
+                if (column.isList()) {
+                    // 如果是列表，继续保留字典类型
+                    column.setDictType(prevColumn.getDictType());
+                }
+                genTableColumnMapper.updateGenTableColumn(column);
+            } else {
+                genTableColumnMapper.insertGenTableColumn(column);
             }
         });
         if (CollUtil.isNotEmpty(saveColumns)) {
