@@ -9,6 +9,7 @@
         <result property="deptId" column="dept_id"/>
         <result property="userName" column="user_name"/>
         <result property="nickName" column="nick_name"/>
+        <result property="userType" column="user_type"/>
         <result property="email" column="email"/>
         <result property="phonenumber" column="phonenumber"/>
         <result property="sex" column="sex"/>
@@ -50,6 +51,7 @@
                u.dept_id,
                u.user_name,
                u.nick_name,
+               u.user_type,
                u.email,
                u.avatar,
                u.phonenumber,

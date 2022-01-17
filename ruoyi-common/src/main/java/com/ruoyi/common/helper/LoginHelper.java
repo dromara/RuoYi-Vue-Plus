@@ -19,7 +19,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginHelper {
 
-    private static final String LOGIN_USER_KEY = "loginUser";
+    public static final String JOIN_CODE = ":";
+    public static final String LOGIN_USER_KEY = "loginUser";
+
     private static final ThreadLocal<LoginUser> LOGIN_CACHE = new ThreadLocal<>();
 
     /**
@@ -80,7 +82,9 @@ public class LoginHelper {
             String userId = null;
             for (UserType value : UserType.values()) {
                 if (StringUtils.contains(loginId, value.getUserType())) {
-                    userId = StringUtils.replace(loginId, value.getUserType(), StringUtils.EMPTY);
+                    String[] strs = StringUtils.split(loginId, JOIN_CODE);
+                    // 用户id在总是在最后
+                    userId = strs[strs.length - 1];
                 }
             }
             if (StringUtils.isBlank(userId)) {

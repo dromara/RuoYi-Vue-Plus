@@ -5,6 +5,7 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.core.service.LogininforService;
+import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
 import com.ruoyi.common.utils.MessageUtils;
@@ -32,7 +33,11 @@ public class SysRegisterService {
      * 注册
      */
     public String register(RegisterBody registerBody) {
-        String msg = "", username = registerBody.getUsername(), password = registerBody.getPassword();
+        String msg = "";
+        String username = registerBody.getUsername();
+        String password = registerBody.getPassword();
+        // 校验用户类型是否存在
+        String userType = UserType.getUserType(registerBody.getUserType()).getUserType();
 
         boolean captchaOnOff = configService.selectCaptchaOnOff();
         // 验证码开关
@@ -57,6 +62,7 @@ public class SysRegisterService {
             sysUser.setUserName(username);
             sysUser.setNickName(username);
             sysUser.setPassword(SecurityUtils.encryptPassword(registerBody.getPassword()));
+            sysUser.setUserType(userType);
             boolean regFlag = userService.registerUser(sysUser);
             if (!regFlag) {
                 msg = "注册失败,请联系系统管理人员";

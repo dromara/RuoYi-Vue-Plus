@@ -65,6 +65,12 @@ public class SysUser extends BaseEntity {
     private String nickName;
 
     /**
+     * 用户类型（sys_user系统用户）
+     */
+    @ApiModelProperty(value = "用户类型")
+    private String userType;
+
+    /**
      * 用户邮箱
      */
     @Sensitive(strategy = SensitiveStrategy.EMAIL)

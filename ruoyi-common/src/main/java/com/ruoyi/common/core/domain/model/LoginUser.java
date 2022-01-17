@@ -1,5 +1,6 @@
 package com.ruoyi.common.core.domain.model;
 
+import com.ruoyi.common.helper.LoginHelper;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -85,8 +86,11 @@ public class LoginUser implements Serializable {
      */
     private String username;
 
+    /**
+     * 获取登录id
+     */
     public String getLoginId() {
-        return userType + userId;
+        return userType + LoginHelper.JOIN_CODE + userId;
     }
 
 }
