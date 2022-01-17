@@ -8,7 +8,7 @@ import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.service.UserService;
-import com.ruoyi.common.utils.LoginUtils;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
@@ -78,7 +78,7 @@ public class SysLoginController {
     @ApiOperation("获取用户信息")
     @GetMapping("getInfo")
     public AjaxResult<Map<String, Object>> getInfo() {
-        SysUser user = SpringUtils.getBean(UserService.class).selectUserById(LoginUtils.getUserId());
+        SysUser user = SpringUtils.getBean(UserService.class).selectUserById(LoginHelper.getUserId());
         // 角色集合
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合
@@ -98,7 +98,7 @@ public class SysLoginController {
     @ApiOperation("获取路由信息")
     @GetMapping("getRouters")
     public AjaxResult<List<RouterVo>> getRouters() {
-        Long userId = LoginUtils.getUserId();
+        Long userId = LoginHelper.getUserId();
         List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
         return AjaxResult.success(menuService.buildMenus(menus));
     }

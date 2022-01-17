@@ -1,7 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.core.service.SensitiveService;
-import com.ruoyi.common.utils.LoginUtils;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.SecurityUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ public class SysSensitiveServiceImpl implements SensitiveService {
      */
     @Override
     public boolean isSensitive() {
-        return SecurityUtils.isAdmin(LoginUtils.getUserId());
+        return SecurityUtils.isAdmin(LoginHelper.getUserId());
     }
 
 }

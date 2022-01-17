@@ -10,8 +10,8 @@ import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.LoginUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.generator.domain.GenTable;
@@ -161,7 +161,7 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void importGenTable(List<GenTable> tableList) {
-        String operName = LoginUtils.getUsername();
+        String operName = LoginHelper.getUsername();
         try {
             for (GenTable table : tableList) {
                 String tableName = table.getTableName();

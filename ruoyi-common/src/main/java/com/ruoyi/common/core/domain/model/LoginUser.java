@@ -36,6 +36,11 @@ public class LoginUser implements Serializable {
     private String token;
 
     /**
+     * 用户类型
+     */
+    private String userType;
+
+    /**
      * 登录时间
      */
     private Long loginTime;
@@ -79,5 +84,9 @@ public class LoginUser implements Serializable {
      * 用户名
      */
     private String username;
+
+    public String getLoginId() {
+        return userType + userId;
+    }
 
 }

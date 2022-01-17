@@ -5,8 +5,8 @@ import com.ruoyi.common.core.domain.dto.OperLogDTO;
 import com.ruoyi.common.core.service.OperLogService;
 import com.ruoyi.common.enums.BusinessStatus;
 import com.ruoyi.common.enums.HttpMethod;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.LoginUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -66,7 +66,7 @@ public class LogAspect {
             String ip = ServletUtils.getClientIP();
             operLog.setOperIp(ip);
             operLog.setOperUrl(ServletUtils.getRequest().getRequestURI());
-            operLog.setOperName(LoginUtils.getUsername());
+            operLog.setOperName(LoginHelper.getUsername());
 
             if (e != null) {
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());

@@ -1,4 +1,4 @@
-package com.ruoyi.common.utils;
+package com.ruoyi.common.helper;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -6,19 +6,21 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.exception.UtilException;
+import com.ruoyi.common.utils.StringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * 登录鉴权工具
+ * 登录鉴权助手
  * 为适配多端登录而封装
  *
  * @author Lion Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class LoginUtils {
+public class LoginHelper {
 
     private static final String LOGIN_USER_KEY = "loginUser";
+    private static final ThreadLocal<LoginUser> LOGIN_CACHE = new ThreadLocal<>();
 
     /**
      * 登录系统
@@ -26,8 +28,8 @@ public class LoginUtils {
      *
      * @param loginUser 登录用户信息
      */
-    public static void login(LoginUser loginUser, UserType userType) {
-        StpUtil.login(userType.getUserType() + loginUser.getUserId());
+    public static void login(LoginUser loginUser) {
+        StpUtil.login(loginUser.getLoginId());
         setLoginUser(loginUser);
     }
 
@@ -37,23 +39,35 @@ public class LoginUtils {
      *
      * @param loginUser 登录用户信息
      */
-    public static void loginByDevice(LoginUser loginUser, UserType userType, DeviceType deviceType) {
-        StpUtil.login(userType.getUserType() + loginUser.getUserId(), deviceType.getDevice());
+    public static void loginByDevice(LoginUser loginUser, DeviceType deviceType) {
+        StpUtil.login(loginUser.getLoginId(), deviceType.getDevice());
         setLoginUser(loginUser);
     }
 
     /**
-     * 设置用户数据
+     * 设置用户数据(多级缓存)
      */
     public static void setLoginUser(LoginUser loginUser) {
         StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
+        LOGIN_CACHE.set(loginUser);
     }
 
     /**
-     * 获取用户
-     **/
+     * 获取用户(多级缓存)
+     */
     public static LoginUser getLoginUser() {
+        LoginUser loginUser = LOGIN_CACHE.get();
+        if (loginUser != null) {
+            return loginUser;
+        }
         return (LoginUser) StpUtil.getTokenSession().get(LOGIN_USER_KEY);
+    }
+
+    /**
+     * 清除一级缓存 防止内存问题
+     */
+    public static void clearCache() {
+        LOGIN_CACHE.remove();
     }
 
     /**
@@ -63,13 +77,13 @@ public class LoginUtils {
         LoginUser loginUser = getLoginUser();
         if (ObjectUtil.isNull(loginUser)) {
             String loginId = StpUtil.getLoginIdAsString();
-            String userId;
-            String replace = "";
-            if (StringUtils.contains(loginId, UserType.SYS_USER.getUserType())) {
-                userId = StringUtils.replace(loginId, UserType.SYS_USER.getUserType(), replace);
-            } else if (StringUtils.contains(loginId, UserType.APP_USER.getUserType())) {
-                userId = StringUtils.replace(loginId, UserType.APP_USER.getUserType(), replace);
-            } else {
+            String userId = null;
+            for (UserType value : UserType.values()) {
+                if (StringUtils.contains(loginId, value.getUserType())) {
+                    userId = StringUtils.replace(loginId, value.getUserType(), StringUtils.EMPTY);
+                }
+            }
+            if (StringUtils.isBlank(userId)) {
                 throw new UtilException("登录用户: LoginId异常 => " + loginId);
             }
             return Long.parseLong(userId);
@@ -79,14 +93,14 @@ public class LoginUtils {
 
     /**
      * 获取部门ID
-     **/
+     */
     public static Long getDeptId() {
         return getLoginUser().getDeptId();
     }
 
     /**
      * 获取用户账户
-     **/
+     */
     public static String getUsername() {
         return getLoginUser().getUsername();
     }
@@ -96,17 +110,7 @@ public class LoginUtils {
      */
     public static UserType getUserType() {
         String loginId = StpUtil.getLoginIdAsString();
-        return getUserType(loginId);
-    }
-
-    public static UserType getUserType(Object loginId) {
-        if (StringUtils.contains(loginId.toString(), UserType.SYS_USER.getUserType())) {
-            return UserType.SYS_USER;
-        } else if (StringUtils.contains(loginId.toString(), UserType.APP_USER.getUserType())) {
-            return UserType.APP_USER;
-        } else {
-            throw new UtilException("登录用户: LoginId异常 => " + loginId);
-        }
+        return UserType.getUserType(loginId);
     }
 
 }

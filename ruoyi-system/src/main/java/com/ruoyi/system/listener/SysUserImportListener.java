@@ -7,7 +7,7 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.excel.ExcelListener;
 import com.ruoyi.common.excel.ExcelResult;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.LoginUtils;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ValidatorUtils;
@@ -45,7 +45,7 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
         this.userService = SpringUtils.getBean(ISysUserService.class);
         this.password = SecurityUtils.encryptPassword(initPassword);
         this.isUpdateSupport = isUpdateSupport;
-        this.operName = LoginUtils.getUsername();
+        this.operName = LoginHelper.getUsername();
     }
 
     @Override

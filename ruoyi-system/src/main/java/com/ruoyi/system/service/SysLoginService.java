@@ -12,6 +12,7 @@ import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
 import com.ruoyi.common.exception.user.UserException;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.*;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -96,11 +97,12 @@ public class SysLoginService {
         loginUser.setUserId(user.getUserId());
         loginUser.setDeptId(user.getDeptId());
         loginUser.setUsername(user.getUserName());
+        loginUser.setUserType(UserType.SYS_USER.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user));
         loginUser.setRolePermission(permissionService.getRolePermission(user));
 
         // 生成token
-        LoginUtils.loginByDevice(loginUser, UserType.SYS_USER, DeviceType.PC);
+        LoginHelper.loginByDevice(loginUser, DeviceType.PC);
         return StpUtil.getTokenValue();
     }
 

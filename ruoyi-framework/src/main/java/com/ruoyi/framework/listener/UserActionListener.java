@@ -11,38 +11,40 @@ import com.ruoyi.common.core.domain.dto.UserOnlineDTO;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.enums.UserType;
-import com.ruoyi.common.utils.LoginUtils;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * 用户行为 侦听器的实现
+ *
+ * @author Lion Li
  */
+@RequiredArgsConstructor
 @Component
 @Slf4j
 public class UserActionListener implements SaTokenListener {
 
-    @Autowired
-    private SaTokenConfig saTokenConfig;
+    private final SaTokenConfig tokenConfig;
 
     /**
      * 每次登录时触发
      */
     @Override
     public void doLogin(String loginType, Object loginId, SaLoginModel loginModel) {
-        UserType userType = LoginUtils.getUserType(loginId);
+        UserType userType = UserType.getUserType(loginId.toString());
         if (userType == UserType.SYS_USER) {
             UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
             String ip = ServletUtils.getClientIP();
-            SysUser user = SpringUtils.getBean(UserService.class).selectUserById(LoginUtils.getUserId());
+            SysUser user = SpringUtils.getBean(UserService.class).selectUserById(LoginHelper.getUserId());
             String tokenValue = StpUtil.getTokenValue();
             UserOnlineDTO userOnlineDTO = new UserOnlineDTO()
                 .setIpaddr(ip)
@@ -55,7 +57,7 @@ public class UserActionListener implements SaTokenListener {
             if (StringUtils.isNotNull(user.getDept())) {
                 userOnlineDTO.setDeptName(user.getDept().getDeptName());
             }
-            RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, userOnlineDTO, saTokenConfig.getTimeout(), TimeUnit.SECONDS);
+            RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, userOnlineDTO, tokenConfig.getTimeout(), TimeUnit.SECONDS);
             log.info("user doLogin, useId:{}, token:{}", loginId, tokenValue);
         } else if (userType == UserType.APP_USER) {
             // app端 自行根据业务编写

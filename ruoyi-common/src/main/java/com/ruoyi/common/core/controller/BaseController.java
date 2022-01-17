@@ -2,7 +2,7 @@ package com.ruoyi.common.core.controller;
 
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.utils.LoginUtils;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StringUtils;
 
 /**
@@ -71,27 +71,27 @@ public class BaseController {
      * 获取用户缓存信息
      */
     public LoginUser getLoginUser() {
-        return LoginUtils.getLoginUser();
+        return LoginHelper.getLoginUser();
     }
 
     /**
      * 获取登录用户id
      */
     public Long getUserId() {
-        return LoginUtils.getUserId();
+        return LoginHelper.getUserId();
     }
 
     /**
      * 获取登录部门id
      */
     public Long getDeptId() {
-        return LoginUtils.getDeptId();
+        return LoginHelper.getDeptId();
     }
 
     /**
      * 获取登录用户名
      */
     public String getUsername() {
-        return LoginUtils.getUsername();
+        return LoginHelper.getUsername();
     }
 }

@@ -4,8 +4,9 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.convert.Convert;
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.enums.CellDataTypeEnum;
-import com.alibaba.excel.metadata.CellData;
 import com.alibaba.excel.metadata.GlobalConfiguration;
+import com.alibaba.excel.metadata.data.ReadCellData;
+import com.alibaba.excel.metadata.data.WriteCellData;
 import com.alibaba.excel.metadata.property.ExcelContentProperty;
 import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.core.service.DictService;
@@ -35,7 +36,7 @@ public class ExcelDictConvert implements Converter<Object> {
     }
 
     @Override
-    public Object convertToJavaData(CellData cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
+    public Object convertToJavaData(ReadCellData<?> cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
         ExcelDictFormat anno = getAnnotation(contentProperty.getField());
         String type = anno.dictType();
         String label = cellData.getStringValue();
@@ -49,9 +50,9 @@ public class ExcelDictConvert implements Converter<Object> {
     }
 
     @Override
-    public CellData<String> convertToExcelData(Object object, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
+    public WriteCellData<String> convertToExcelData(Object object, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
         if (StringUtils.isNull(object)) {
-            return new CellData<>("");
+            return new WriteCellData<>("");
         }
         ExcelDictFormat anno = getAnnotation(contentProperty.getField());
         String type = anno.dictType();
@@ -62,7 +63,7 @@ public class ExcelDictConvert implements Converter<Object> {
         } else {
             label = SpringUtils.getBean(DictService.class).getDictLabel(type, value, anno.separator());
         }
-        return new CellData<>(label);
+        return new WriteCellData<>(label);
     }
 
     private ExcelDictFormat getAnnotation(Field field) {

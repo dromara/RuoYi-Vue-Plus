@@ -11,7 +11,7 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.LoginUtils;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysUserRole;
@@ -107,7 +107,7 @@ public class SysRoleController extends BaseController {
             SysUser sysUser = userService.selectUserById(loginUser.getUserId());
             if (StringUtils.isNotNull(sysUser) && !sysUser.isAdmin()) {
                 loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser));
-                LoginUtils.setLoginUser(loginUser);
+                LoginHelper.setLoginUser(loginUser);
             }
             return AjaxResult.success();
         }

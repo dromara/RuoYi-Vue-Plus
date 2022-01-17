@@ -5,25 +5,30 @@ import cn.dev33.satoken.interceptor.SaRouteInterceptor;
 import cn.dev33.satoken.jwt.StpLogicJwtForStyle;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
+import com.ruoyi.common.helper.LoginHelper;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.SecurityProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * sa-token 配置
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Slf4j
 @Configuration
 public class SaTokenConfig implements WebMvcConfigurer {
 
-    @Autowired
-    private SecurityProperties securityProperties;
+    private final SecurityProperties securityProperties;
 
     /**
      * 注册sa-token的拦截器
@@ -39,16 +44,22 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 // 排除下不需要拦截的
                 .notMatch(securityProperties.getExcludes())
                 .check(() -> {
-                    // 做一些访问检查
-//                    if (log.isDebugEnabled()) {
-//                        Long userId = LoginUtils.getUserId();
-//                        if (StringUtils.isNotNull(userId)) {
-//                             log.debug("剩余有效时间: {}", StpUtil.getTokenTimeout());
-//                             log.debug("临时有效时间: {}", StpUtil.getTokenActivityTimeout());
-//                        }
-//                    }
+                    Long userId = LoginHelper.getUserId();
+                    if (StringUtils.isNotNull(userId)) {
+                        // 有效率影响 用于临时测试
+                        // if (log.isDebugEnabled()) {
+                        //     log.debug("剩余有效时间: {}", StpUtil.getTokenTimeout());
+                        //     log.debug("临时有效时间: {}", StpUtil.getTokenActivityTimeout());
+                        // }
+                    }
                 });
-        })).addPathPatterns("/**");
+        }) {
+            @SuppressWarnings("all")
+            @Override
+            public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+                LoginHelper.clearCache();
+            }
+        }).addPathPatterns("/**");
         registry.addInterceptor(new SaAnnotationInterceptor()).addPathPatterns("/**");
     }
 
