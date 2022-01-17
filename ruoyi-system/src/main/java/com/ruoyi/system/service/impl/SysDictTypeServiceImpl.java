@@ -21,10 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 字典 业务层处理
@@ -144,11 +142,16 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      */
     @Override
     public void loadingDictCache() {
-        List<SysDictType> dictTypeList = baseMapper.selectList();
-        for (SysDictType dictType : dictTypeList) {
-            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dictType.getDictType());
-            RedisUtils.setCacheObject(getCacheKey(dictType.getDictType()), dictDatas);
-        }
+        List<SysDictData> dictDataList = dictDataMapper.selectList(
+            new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getStatus, "0"));
+        Map<String, List<SysDictData>> dictDataMap = dictDataList.stream().collect(Collectors.groupingBy(SysDictData::getDictType));
+        dictDataMap.forEach((k,v) -> {
+            String dictKey = getCacheKey(k);
+            List<SysDictData> dictList = v.stream()
+                .sorted(Comparator.comparing(SysDictData::getDictSort))
+                .collect(Collectors.toList());
+            RedisUtils.setCacheObject(dictKey, dictList);
+        });
     }
 
     /**
