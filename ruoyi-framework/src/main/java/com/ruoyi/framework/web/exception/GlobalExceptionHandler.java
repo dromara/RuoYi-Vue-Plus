@@ -3,6 +3,7 @@ package com.ruoyi.framework.web.exception;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.exception.DemoModeException;
@@ -78,7 +79,7 @@ public class GlobalExceptionHandler {
     public AjaxResult<Void> handleServiceException(ServiceException e, HttpServletRequest request) {
         log.error(e.getMessage(), e);
         Integer code = e.getCode();
-        return StringUtils.isNotNull(code) ? AjaxResult.error(code, e.getMessage()) : AjaxResult.error(e.getMessage());
+        return ObjectUtil.isNotNull(code) ? AjaxResult.error(code, e.getMessage()) : AjaxResult.error(e.getMessage());
     }
 
     /**

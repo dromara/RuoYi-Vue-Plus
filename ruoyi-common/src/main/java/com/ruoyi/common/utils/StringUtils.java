@@ -2,15 +2,15 @@ package com.ruoyi.common.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Validator;
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.util.AntPathMatcher;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 字符串工具类
@@ -23,101 +23,11 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     /**
      * 获取参数不为空值
      *
-     * @param value defaultValue 要判断的value
-     * @return value 返回值
-     */
-    public static <T> T nvl(T value, T defaultValue) {
-        return ObjectUtil.defaultIfNull(value, defaultValue);
-    }
-
-    /**
-     * 获取参数不为空值
-     *
      * @param str defaultValue 要判断的value
      * @return value 返回值
      */
     public static String blankToDefault(String str, String defaultValue) {
         return StrUtil.blankToDefault(str, defaultValue);
-    }
-
-    /**
-     * * 判断一个Collection是否为空， 包含List，Set，Queue
-     *
-     * @param coll 要判断的Collection
-     * @return true：为空 false：非空
-     */
-    public static boolean isEmpty(Collection<?> coll) {
-        return CollUtil.isEmpty(coll);
-    }
-
-    /**
-     * * 判断一个Collection是否非空，包含List，Set，Queue
-     *
-     * @param coll 要判断的Collection
-     * @return true：非空 false：空
-     */
-    public static boolean isNotEmpty(Collection<?> coll) {
-        return !isEmpty(coll);
-    }
-
-    /**
-     * * 判断一个对象数组是否为空
-     *
-     * @param objects 要判断的对象数组
-     *                * @return true：为空 false：非空
-     */
-    public static boolean isEmpty(Object[] objects) {
-        return ArrayUtil.isEmpty(objects);
-    }
-
-    /**
-     * * 判断一个对象数组是否非空
-     *
-     * @param objects 要判断的对象数组
-     * @return true：非空 false：空
-     */
-    public static boolean isNotEmpty(Object[] objects) {
-        return !isEmpty(objects);
-    }
-
-    /**
-     * * 判断一个对象是否为空
-     *
-     * @param object 要判断的对象数组
-     *               * @return true：为空 false：非空
-     */
-    public static boolean isEmpty(Object object) {
-        return ObjectUtil.isEmpty(object);
-    }
-
-    /**
-     * * 判断一个对象是否非空
-     *
-     * @param object 要判断的对象数组
-     * @return true：非空 false：空
-     */
-    public static boolean isNotEmpty(Object object) {
-        return !isEmpty(object);
-    }
-
-    /**
-     * * 判断一个Map是否为空
-     *
-     * @param map 要判断的Map
-     * @return true：为空 false：非空
-     */
-    public static boolean isEmpty(Map<?, ?> map) {
-        return MapUtil.isEmpty(map);
-    }
-
-    /**
-     * * 判断一个Map是否为空
-     *
-     * @param map 要判断的Map
-     * @return true：非空 false：空
-     */
-    public static boolean isNotEmpty(Map<?, ?> map) {
-        return !isEmpty(map);
     }
 
     /**
@@ -138,36 +48,6 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      */
     public static boolean isNotEmpty(String str) {
         return !isEmpty(str);
-    }
-
-    /**
-     * * 判断一个对象是否为空
-     *
-     * @param object Object
-     * @return true：为空 false：非空
-     */
-    public static boolean isNull(Object object) {
-        return ObjectUtil.isNull(object);
-    }
-
-    /**
-     * * 判断一个对象是否非空
-     *
-     * @param object Object
-     * @return true：非空 false：空
-     */
-    public static boolean isNotNull(Object object) {
-        return !isNull(object);
-    }
-
-    /**
-     * * 判断一个对象是否是数组类型（Java基本型别的数组）
-     *
-     * @param object 对象
-     * @return true：是数组 false：不是数组
-     */
-    public static boolean isArray(Object object) {
-        return ArrayUtil.isArray(object);
     }
 
     /**
@@ -325,7 +205,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return 是否匹配
      */
     public static boolean matches(String str, List<String> strs) {
-        if (isEmpty(str) || isEmpty(strs)) {
+        if (isEmpty(str) || CollUtil.isEmpty(strs)) {
             return false;
         }
         for (String pattern : strs) {
@@ -351,8 +231,4 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return matcher.match(pattern, url);
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> T cast(Object obj) {
-        return (T) obj;
-    }
 }

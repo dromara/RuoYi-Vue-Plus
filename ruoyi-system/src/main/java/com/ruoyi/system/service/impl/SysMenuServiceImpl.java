@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
@@ -262,7 +263,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public String checkMenuNameUnique(SysMenu menu) {
-        Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
+        Long menuId = ObjectUtil.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
         boolean count = baseMapper.exists(new LambdaQueryWrapper<SysMenu>()
             .eq(SysMenu::getMenuName, menu.getMenuName())
             .eq(SysMenu::getParentId, menu.getParentId())

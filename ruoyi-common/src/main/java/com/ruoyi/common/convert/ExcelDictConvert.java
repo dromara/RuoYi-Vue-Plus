@@ -2,6 +2,7 @@ package com.ruoyi.common.convert;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.enums.CellDataTypeEnum;
 import com.alibaba.excel.metadata.GlobalConfiguration;
@@ -51,7 +52,7 @@ public class ExcelDictConvert implements Converter<Object> {
 
     @Override
     public WriteCellData<String> convertToExcelData(Object object, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-        if (StringUtils.isNull(object)) {
+        if (ObjectUtil.isNull(object)) {
             return new WriteCellData<>("");
         }
         ExcelDictFormat anno = getAnnotation(contentProperty.getField());

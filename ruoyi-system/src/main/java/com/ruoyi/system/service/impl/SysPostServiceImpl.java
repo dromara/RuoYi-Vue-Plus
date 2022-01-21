@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.UserConstants;
@@ -94,7 +95,7 @@ public class SysPostServiceImpl implements ISysPostService {
      */
     @Override
     public String checkPostNameUnique(SysPost post) {
-        Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
+        Long postId = ObjectUtil.isNull(post.getPostId()) ? -1L : post.getPostId();
         boolean count = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
             .eq(SysPost::getPostName, post.getPostName())
             .ne(SysPost::getPostId, postId));
@@ -112,7 +113,7 @@ public class SysPostServiceImpl implements ISysPostService {
      */
     @Override
     public String checkPostCodeUnique(SysPost post) {
-        Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
+        Long postId = ObjectUtil.isNull(post.getPostId()) ? -1L : post.getPostId();
         boolean count = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
             .eq(SysPost::getPostCode, post.getPostCode())
             .ne(SysPost::getPostId, postId));

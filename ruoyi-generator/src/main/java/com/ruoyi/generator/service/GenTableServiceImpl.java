@@ -3,6 +3,7 @@ package com.ruoyi.generator.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
@@ -281,7 +282,7 @@ public class GenTableServiceImpl implements IGenTableService {
         Map<String, GenTableColumn> tableColumnMap = tableColumns.stream().collect(Collectors.toMap(GenTableColumn::getColumnName, Function.identity()));
 
         List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
-        if (StringUtils.isEmpty(dbTableColumns)) {
+        if (CollUtil.isEmpty(dbTableColumns)) {
             throw new ServiceException("同步数据失败，原表结构不存在");
         }
         List<String> dbTableColumnNames = dbTableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
@@ -373,11 +374,11 @@ public class GenTableServiceImpl implements IGenTableService {
     public void validateEdit(GenTable genTable) {
         if (GenConstants.TPL_TREE.equals(genTable.getTplCategory())) {
             Map<String, Object> paramsObj = genTable.getParams();
-            if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_CODE))) {
+            if (ObjectUtil.isEmpty(paramsObj.get(GenConstants.TREE_CODE))) {
                 throw new ServiceException("树编码字段不能为空");
-            } else if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_PARENT_CODE))) {
+            } else if (ObjectUtil.isEmpty(paramsObj.get(GenConstants.TREE_PARENT_CODE))) {
                 throw new ServiceException("树父编码字段不能为空");
-            } else if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_NAME))) {
+            } else if (ObjectUtil.isEmpty(paramsObj.get(GenConstants.TREE_NAME))) {
                 throw new ServiceException("树名称字段不能为空");
             } else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory())) {
                 if (StringUtils.isEmpty(genTable.getSubTableName())) {
@@ -401,7 +402,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 break;
             }
         }
-        if (StringUtils.isNull(table.getPkColumn())) {
+        if (ObjectUtil.isNull(table.getPkColumn())) {
             table.setPkColumn(table.getColumns().get(0));
         }
         if (GenConstants.TPL_SUB.equals(table.getTplCategory())) {
@@ -411,7 +412,7 @@ public class GenTableServiceImpl implements IGenTableService {
                     break;
                 }
             }
-            if (StringUtils.isNull(table.getSubTable().getPkColumn())) {
+            if (ObjectUtil.isNull(table.getSubTable().getPkColumn())) {
                 table.getSubTable().setPkColumn(table.getSubTable().getColumns().get(0));
             }
         }
@@ -436,7 +437,7 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     public void setTableFromOptions(GenTable genTable) {
         Map<String, Object> paramsObj = JsonUtils.parseMap(genTable.getOptions());
-        if (StringUtils.isNotNull(paramsObj)) {
+        if (ObjectUtil.isNotNull(paramsObj)) {
             String treeCode = Convert.toStr(paramsObj.get(GenConstants.TREE_CODE));
             String treeParentCode = Convert.toStr(paramsObj.get(GenConstants.TREE_PARENT_CODE));
             String treeName = Convert.toStr(paramsObj.get(GenConstants.TREE_NAME));

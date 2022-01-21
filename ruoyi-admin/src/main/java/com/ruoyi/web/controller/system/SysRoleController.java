@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -12,7 +13,6 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.service.ISysRoleService;
@@ -105,7 +105,7 @@ public class SysRoleController extends BaseController {
             // 更新缓存用户权限
             LoginUser loginUser = getLoginUser();
             SysUser sysUser = userService.selectUserById(loginUser.getUserId());
-            if (StringUtils.isNotNull(sysUser) && !sysUser.isAdmin()) {
+            if (ObjectUtil.isNotNull(sysUser) && !sysUser.isAdmin()) {
                 loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser));
                 LoginHelper.setLoginUser(loginUser);
             }

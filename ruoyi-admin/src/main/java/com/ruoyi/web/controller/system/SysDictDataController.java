@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -8,7 +9,6 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.service.ISysDictDataService;
 import com.ruoyi.system.service.ISysDictTypeService;
@@ -71,7 +71,7 @@ public class SysDictDataController extends BaseController {
     @GetMapping(value = "/type/{dictType}")
     public AjaxResult<List<SysDictData>> dictType(@ApiParam("字典类型") @PathVariable String dictType) {
         List<SysDictData> data = dictTypeService.selectDictDataByType(dictType);
-        if (StringUtils.isNull(data)) {
+        if (ObjectUtil.isNull(data)) {
             data = new ArrayList<>();
         }
         return AjaxResult.success(data);

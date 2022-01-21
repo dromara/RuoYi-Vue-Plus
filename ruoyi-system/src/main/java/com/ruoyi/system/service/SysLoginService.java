@@ -113,7 +113,7 @@ public class SysLoginService {
 
     private SysUser loadUserByUsername(String username) {
         SysUser user = userService.selectUserByUserName(username);
-        if (StringUtils.isNull(user)) {
+        if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", username);
             throw new UserException("user.not.exists", username);
         } else if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {

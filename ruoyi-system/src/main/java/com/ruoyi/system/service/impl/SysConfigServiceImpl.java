@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -73,7 +74,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
         }
         SysConfig retConfig = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>()
             .eq(SysConfig::getConfigKey, configKey));
-        if (StringUtils.isNotNull(retConfig)) {
+        if (ObjectUtil.isNotNull(retConfig)) {
             RedisUtils.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
             return retConfig.getConfigValue();
         }
@@ -197,9 +198,9 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      */
     @Override
     public String checkConfigKeyUnique(SysConfig config) {
-        Long configId = StringUtils.isNull(config.getConfigId()) ? -1L : config.getConfigId();
+        Long configId = ObjectUtil.isNull(config.getConfigId()) ? -1L : config.getConfigId();
         SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, config.getConfigKey()));
-        if (StringUtils.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
+        if (ObjectUtil.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;

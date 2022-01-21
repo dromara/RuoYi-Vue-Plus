@@ -1,6 +1,7 @@
 package com.ruoyi.framework.aspectj;
 
 import cn.dev33.satoken.SaManager;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.constant.Constants;
@@ -75,7 +76,7 @@ public class RepeatSubmitAspect {
         StringBuilder params = new StringBuilder();
         if (paramsArray != null && paramsArray.length > 0) {
             for (Object o : paramsArray) {
-                if (StringUtils.isNotNull(o) && !isFilterObject(o)) {
+                if (ObjectUtil.isNotNull(o) && !isFilterObject(o)) {
                     try {
                         params.append(JsonUtils.toJsonString(o)).append(" ");
                     } catch (Exception e) {

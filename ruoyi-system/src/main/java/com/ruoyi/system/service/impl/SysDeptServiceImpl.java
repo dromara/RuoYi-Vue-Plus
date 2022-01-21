@@ -3,6 +3,7 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.constant.UserConstants;
@@ -135,7 +136,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public String checkDeptNameUnique(SysDept dept) {
-        Long deptId = StringUtils.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
+        Long deptId = ObjectUtil.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
         boolean count = baseMapper.exists(new LambdaQueryWrapper<SysDept>()
             .eq(SysDept::getDeptName, dept.getDeptName())
             .eq(SysDept::getParentId, dept.getParentId())
@@ -157,7 +158,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
             SysDept dept = new SysDept();
             dept.setDeptId(deptId);
             List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
-            if (StringUtils.isEmpty(depts)) {
+            if (CollUtil.isEmpty(depts)) {
                 throw new ServiceException("没有权限访问部门数据！");
             }
         }
@@ -190,7 +191,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
     public int updateDept(SysDept dept) {
         SysDept newParentDept = baseMapper.selectById(dept.getParentId());
         SysDept oldDept = baseMapper.selectById(dept.getDeptId());
-        if (StringUtils.isNotNull(newParentDept) && StringUtils.isNotNull(oldDept)) {
+        if (ObjectUtil.isNotNull(newParentDept) && ObjectUtil.isNotNull(oldDept)) {
             String newAncestors = newParentDept.getAncestors() + "," + newParentDept.getDeptId();
             String oldAncestors = oldDept.getAncestors();
             dept.setAncestors(newAncestors);

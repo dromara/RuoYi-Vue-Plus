@@ -195,7 +195,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public void checkUserAllowed(SysUser user) {
-        if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin()) {
+        if (ObjectUtil.isNotNull(user.getUserId()) && user.isAdmin()) {
             throw new ServiceException("不允许操作超级管理员用户");
         }
     }
@@ -211,7 +211,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
             SysUser user = new SysUser();
             user.setUserId(userId);
             List<SysUser> users = SpringUtils.getAopProxy(this).selectUserList(user);
-            if (StringUtils.isEmpty(users)) {
+            if (CollUtil.isEmpty(users)) {
                 throw new ServiceException("没有权限访问用户数据！");
             }
         }
@@ -351,7 +351,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     public void insertUserRole(SysUser user) {
         Long[] roles = user.getRoleIds();
-        if (StringUtils.isNotNull(roles)) {
+        if (ObjectUtil.isNotNull(roles)) {
             // 新增用户与角色管理
             List<SysUserRole> list = new ArrayList<SysUserRole>();
             for (Long roleId : roles) {
@@ -373,7 +373,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     public void insertUserPost(SysUser user) {
         Long[] posts = user.getPostIds();
-        if (StringUtils.isNotNull(posts)) {
+        if (ObjectUtil.isNotNull(posts)) {
             // 新增用户与岗位管理
             List<SysUserPost> list = new ArrayList<SysUserPost>();
             for (Long postId : posts) {
@@ -395,7 +395,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @param roleIds 角色组
      */
     public void insertUserRole(Long userId, Long[] roleIds) {
-        if (StringUtils.isNotNull(roleIds)) {
+        if (ObjectUtil.isNotNull(roleIds)) {
             // 新增用户与角色管理
             List<SysUserRole> list = new ArrayList<SysUserRole>();
             for (Long roleId : roleIds) {

@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -85,7 +86,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public List<SysDictData> selectDictDataByType(String dictType) {
         List<SysDictData> dictDatas = RedisUtils.getCacheObject(getCacheKey(dictType));
-        if (StringUtils.isNotEmpty(dictDatas)) {
+        if (CollUtil.isNotEmpty(dictDatas)) {
             return dictDatas;
         }
         dictDatas = dictDataMapper.selectDictDataByType(dictType);
@@ -216,7 +217,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      */
     @Override
     public String checkDictTypeUnique(SysDictType dict) {
-        Long dictId = StringUtils.isNull(dict.getDictId()) ? -1L : dict.getDictId();
+        Long dictId = ObjectUtil.isNull(dict.getDictId()) ? -1L : dict.getDictId();
         long count = baseMapper.selectCount(new LambdaQueryWrapper<SysDictType>()
             .eq(SysDictType::getDictType, dict.getDictType())
             .ne(SysDictType::getDictId, dictId));

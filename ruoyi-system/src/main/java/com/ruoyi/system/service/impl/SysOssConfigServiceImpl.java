@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -136,11 +137,11 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
      * 判断configKey是否唯一
      */
     private String checkConfigKeyUnique(SysOssConfig sysOssConfig) {
-        long ossConfigId = StringUtils.isNull(sysOssConfig.getOssConfigId()) ? -1L : sysOssConfig.getOssConfigId();
+        long ossConfigId = ObjectUtil.isNull(sysOssConfig.getOssConfigId()) ? -1L : sysOssConfig.getOssConfigId();
         SysOssConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysOssConfig>()
             .select(SysOssConfig::getOssConfigId, SysOssConfig::getConfigKey)
             .eq(SysOssConfig::getConfigKey, sysOssConfig.getConfigKey()));
-        if (StringUtils.isNotNull(info) && info.getOssConfigId() != ossConfigId) {
+        if (ObjectUtil.isNotNull(info) && info.getOssConfigId() != ossConfigId) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
