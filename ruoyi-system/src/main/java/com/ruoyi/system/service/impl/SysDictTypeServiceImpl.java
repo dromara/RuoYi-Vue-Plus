@@ -129,8 +129,8 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     public void deleteDictTypeByIds(Long[] dictIds) {
         for (Long dictId : dictIds) {
             SysDictType dictType = selectDictTypeById(dictId);
-            if (dictDataMapper.selectCount(new LambdaQueryWrapper<SysDictData>()
-                .eq(SysDictData::getDictType, dictType.getDictType())) > 0) {
+            if (dictDataMapper.exists(new LambdaQueryWrapper<SysDictData>()
+                .eq(SysDictData::getDictType, dictType.getDictType()))) {
                 throw new ServiceException(String.format("%1$s已分配,不能删除", dictType.getDictName()));
             }
             RedisUtils.deleteObject(getCacheKey(dictType.getDictType()));
@@ -144,7 +144,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public void loadingDictCache() {
         List<SysDictData> dictDataList = dictDataMapper.selectList(
-            new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getStatus, "0"));
+            new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getStatus, UserConstants.DICT_NORMAL));
         Map<String, List<SysDictData>> dictDataMap = dictDataList.stream().collect(Collectors.groupingBy(SysDictData::getDictType));
         dictDataMap.forEach((k,v) -> {
             String dictKey = getCacheKey(k);
@@ -217,11 +217,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      */
     @Override
     public String checkDictTypeUnique(SysDictType dict) {
-        Long dictId = ObjectUtil.isNull(dict.getDictId()) ? -1L : dict.getDictId();
-        long count = baseMapper.selectCount(new LambdaQueryWrapper<SysDictType>()
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDictType>()
             .eq(SysDictType::getDictType, dict.getDictType())
-            .ne(SysDictType::getDictId, dictId));
-        if (count > 0) {
+            .ne(ObjectUtil.isNotNull(dict.getDictId()), SysDictType::getDictId, dict.getDictId()));
+        if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;

@@ -136,11 +136,10 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public String checkRoleNameUnique(SysRole role) {
-        Long roleId = ObjectUtil.isNull(role.getRoleId()) ? -1L : role.getRoleId();
-        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
             .eq(SysRole::getRoleName, role.getRoleName())
-            .ne(SysRole::getRoleId, roleId));
-        if (count) {
+            .ne(ObjectUtil.isNotNull(role.getRoleId()), SysRole::getRoleId, role.getRoleId()));
+        if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -154,11 +153,10 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public String checkRoleKeyUnique(SysRole role) {
-        Long roleId = ObjectUtil.isNull(role.getRoleId()) ? -1L : role.getRoleId();
-        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
             .eq(SysRole::getRoleKey, role.getRoleKey())
-            .ne(SysRole::getRoleId, roleId));
-        if (count) {
+            .ne(ObjectUtil.isNotNull(role.getRoleId()), SysRole::getRoleId, role.getRoleId()));
+        if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;

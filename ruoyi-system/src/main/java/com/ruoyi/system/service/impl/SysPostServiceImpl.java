@@ -95,11 +95,10 @@ public class SysPostServiceImpl implements ISysPostService {
      */
     @Override
     public String checkPostNameUnique(SysPost post) {
-        Long postId = ObjectUtil.isNull(post.getPostId()) ? -1L : post.getPostId();
-        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
             .eq(SysPost::getPostName, post.getPostName())
-            .ne(SysPost::getPostId, postId));
-        if (count) {
+            .ne(ObjectUtil.isNotNull(post.getPostId()), SysPost::getPostId, post.getPostId()));
+        if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -113,11 +112,10 @@ public class SysPostServiceImpl implements ISysPostService {
      */
     @Override
     public String checkPostCodeUnique(SysPost post) {
-        Long postId = ObjectUtil.isNull(post.getPostId()) ? -1L : post.getPostId();
-        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
             .eq(SysPost::getPostCode, post.getPostCode())
-            .ne(SysPost::getPostId, postId));
-        if (count) {
+            .ne(ObjectUtil.isNotNull(post.getPostId()), SysPost::getPostId, post.getPostId()));
+        if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;

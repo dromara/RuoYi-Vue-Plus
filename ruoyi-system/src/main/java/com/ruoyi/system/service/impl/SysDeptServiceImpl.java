@@ -92,7 +92,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
     }
 
     /**
-     * 根据ID查询所有子部门（正常状态）
+     * 根据ID查询所有子部门数（正常状态）
      *
      * @param deptId 部门ID
      * @return 子部门数
@@ -100,7 +100,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
     @Override
     public long selectNormalChildrenDeptById(Long deptId) {
         return baseMapper.selectCount(new LambdaQueryWrapper<SysDept>()
-            .eq(SysDept::getStatus, 0)
+            .eq(SysDept::getStatus, UserConstants.DEPT_NORMAL)
             .apply("find_in_set({0}, ancestors)", deptId));
     }
 
@@ -136,12 +136,11 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public String checkDeptNameUnique(SysDept dept) {
-        Long deptId = ObjectUtil.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
-        boolean count = baseMapper.exists(new LambdaQueryWrapper<SysDept>()
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDept>()
             .eq(SysDept::getDeptName, dept.getDeptName())
             .eq(SysDept::getParentId, dept.getParentId())
-            .ne(SysDept::getDeptId, deptId));
-        if (count) {
+            .ne(ObjectUtil.isNotNull(dept.getDeptId()), SysDept::getDeptId, dept.getDeptId()));
+        if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -199,7 +198,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
         }
         int result = baseMapper.updateById(dept);
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
-            && !StringUtils.equals("0", dept.getAncestors())) {
+            && !StringUtils.equals(UserConstants.DEPT_NORMAL, dept.getAncestors())) {
             // 如果该部门是启用状态，则启用该部门的所有上级部门
             updateParentDeptStatusNormal(dept);
         }
@@ -215,7 +214,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
         String ancestors = dept.getAncestors();
         Long[] deptIds = Convert.toLongArray(ancestors);
         baseMapper.update(null, new LambdaUpdateWrapper<SysDept>()
-            .set(SysDept::getStatus, "0")
+            .set(SysDept::getStatus, UserConstants.DEPT_NORMAL)
             .in(SysDept::getDeptId, Arrays.asList(deptIds)));
     }
 

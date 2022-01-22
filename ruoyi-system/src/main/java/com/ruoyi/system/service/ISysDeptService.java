@@ -44,7 +44,7 @@ public interface ISysDeptService {
     SysDept selectDeptById(Long deptId);
 
     /**
-     * 根据ID查询所有子部门（正常状态）
+     * 根据ID查询所有子部门数（正常状态）
      *
      * @param deptId 部门ID
      * @return 子部门数
