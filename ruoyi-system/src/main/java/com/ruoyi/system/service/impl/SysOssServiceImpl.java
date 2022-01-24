@@ -78,7 +78,7 @@ public class SysOssServiceImpl implements ISysOssService {
             .setFileSuffix(suffix)
             .setFileName(uploadResult.getFilename())
             .setOriginalName(originalfileName)
-            .setService(storage.getServiceType());
+            .setService(storage.getServiceType().getValue());
         baseMapper.insert(oss);
         return oss;
     }

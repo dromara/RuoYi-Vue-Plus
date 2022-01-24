@@ -1,6 +1,5 @@
 package com.ruoyi.oss.enumd;
 
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.service.impl.AliyunOssStrategy;
 import com.ruoyi.oss.service.impl.MinioOssStrategy;
 import com.ruoyi.oss.service.impl.QcloudOssStrategy;
@@ -39,25 +38,15 @@ public enum OssEnumd {
 
     private final String value;
 
-    private final Class<?> serviceClass;
+    private final Class<?> beanClass;
 
-    public static Class<?> getServiceClass(String value) {
-        for (OssEnumd clazz : values()) {
-            if (clazz.getValue().equals(value)) {
-                return clazz.getServiceClass();
+    public static OssEnumd find(String value) {
+        for (OssEnumd enumd : values()) {
+            if (enumd.getValue().equals(value)) {
+                return enumd;
             }
         }
         return null;
     }
-
-    public static String getServiceName(String value) {
-        for (OssEnumd clazz : values()) {
-            if (clazz.getValue().equals(value)) {
-                return StringUtils.uncapitalize(clazz.getServiceClass().getSimpleName());
-            }
-        }
-        return null;
-    }
-
 
 }

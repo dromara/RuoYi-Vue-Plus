@@ -10,8 +10,11 @@ import com.qiniu.util.Auth;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.exception.OssException;
+import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.properties.OssProperties;
 import com.ruoyi.oss.service.abstractd.AbstractOssStrategy;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 
@@ -20,15 +23,17 @@ import java.io.InputStream;
  *
  * @author Lion Li
  */
+@Component
 public class QiniuOssStrategy extends AbstractOssStrategy {
 
     private UploadManager uploadManager;
     private BucketManager bucketManager;
     private Auth auth;
 
+
     @Override
-    public void init(OssProperties cloudStorageProperties) {
-        properties = cloudStorageProperties;
+    public void init(OssProperties ossProperties) {
+        super.init(ossProperties);
         try {
             Configuration config = new Configuration(getRegion(properties.getRegion()));
             // https设置
@@ -36,15 +41,12 @@ public class QiniuOssStrategy extends AbstractOssStrategy {
             config.useHttpsDomains = "Y".equals(properties.getIsHttps());
             uploadManager = new UploadManager(config);
             auth = Auth.create(properties.getAccessKey(), properties.getSecretKey());
-            String bucketName = properties.getBucketName();
             bucketManager = new BucketManager(auth, config);
-
-            if (!ArrayUtil.contains(bucketManager.buckets(), bucketName)) {
-                bucketManager.createBucket(bucketName, properties.getRegion());
-            }
+            createBucket();
         } catch (Exception e) {
             throw new OssException("七牛云存储配置错误! 请检查系统配置:[" + e.getMessage() + "]");
         }
+        isInit = true;
     }
 
     @Override
@@ -61,8 +63,8 @@ public class QiniuOssStrategy extends AbstractOssStrategy {
     }
 
     @Override
-    public String getServiceType() {
-        return OssEnumd.QINIU.getValue();
+    public OssEnumd getServiceType() {
+        return OssEnumd.QINIU;
     }
 
     @Override

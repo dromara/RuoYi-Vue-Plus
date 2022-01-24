@@ -5,6 +5,7 @@ import cn.hutool.core.util.IdUtil;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.entity.UploadResult;
+import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.properties.OssProperties;
 import com.ruoyi.oss.service.IOssStrategy;
 
@@ -18,14 +19,17 @@ import java.io.InputStream;
 public abstract class AbstractOssStrategy implements IOssStrategy {
 
     protected OssProperties properties;
+    public boolean isInit = false;
 
-    public abstract void init(OssProperties properties);
+    public void init(OssProperties properties) {
+        this.properties = properties;
+    }
 
     @Override
     public abstract void createBucket();
 
     @Override
-    public abstract String getServiceType();
+    public abstract OssEnumd getServiceType();
 
     public String getPath(String prefix, String suffix) {
         // 生成uuid

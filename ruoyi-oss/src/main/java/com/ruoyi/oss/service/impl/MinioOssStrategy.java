@@ -9,6 +9,7 @@ import com.ruoyi.oss.properties.OssProperties;
 import com.ruoyi.oss.service.abstractd.AbstractOssStrategy;
 import io.minio.*;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -18,13 +19,14 @@ import java.io.InputStream;
  *
  * @author Lion Li
  */
+@Component
 public class MinioOssStrategy extends AbstractOssStrategy {
 
     private MinioClient minioClient;
 
     @Override
-    public void init(OssProperties cloudStorageProperties) {
-        properties = cloudStorageProperties;
+    public void init(OssProperties ossProperties) {
+        super.init(ossProperties);
         try {
             minioClient = MinioClient.builder()
                 .endpoint(properties.getEndpoint())
@@ -34,6 +36,7 @@ public class MinioOssStrategy extends AbstractOssStrategy {
         } catch (Exception e) {
             throw new OssException("Minio存储配置错误! 请检查系统配置:[" + e.getMessage() + "]");
         }
+        isInit = true;
     }
 
     @Override
@@ -56,8 +59,8 @@ public class MinioOssStrategy extends AbstractOssStrategy {
     }
 
     @Override
-    public String getServiceType() {
-        return OssEnumd.MINIO.getValue();
+    public OssEnumd getServiceType() {
+        return OssEnumd.MINIO;
     }
 
     @Override

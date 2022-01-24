@@ -1,6 +1,7 @@
 package com.ruoyi.oss.service;
 
 import com.ruoyi.oss.entity.UploadResult;
+import com.ruoyi.oss.enumd.OssEnumd;
 
 import java.io.InputStream;
 
@@ -15,8 +16,9 @@ public interface IOssStrategy {
 
     /**
      * 获取服务商类型
+     * @return
      */
-    String getServiceType();
+    OssEnumd getServiceType();
 
     /**
      * 文件上传
