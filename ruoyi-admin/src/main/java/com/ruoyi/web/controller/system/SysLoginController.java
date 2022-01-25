@@ -51,7 +51,7 @@ public class SysLoginController {
      */
     @ApiOperation("登录方法")
     @PostMapping("/login")
-    public AjaxResult<Map<String, Object>> login(@RequestBody LoginBody loginBody) {
+    public AjaxResult<Map<String, Object>> login(@Validated @RequestBody LoginBody loginBody) {
         Map<String, Object> ajax = new HashMap<>();
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
