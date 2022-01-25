@@ -46,18 +46,19 @@ public class UserActionListener implements SaTokenListener {
             String ip = ServletUtils.getClientIP();
             SysUser user = SpringUtils.getBean(UserService.class).selectUserById(LoginHelper.getUserId());
             String tokenValue = StpUtil.getTokenValue();
-            UserOnlineDTO userOnlineDTO = new UserOnlineDTO()
-                .setIpaddr(ip)
-                .setLoginLocation(AddressUtils.getRealAddressByIP(ip))
-                .setBrowser(userAgent.getBrowser().getName())
-                .setOs(userAgent.getOs().getName())
-                .setLoginTime(System.currentTimeMillis())
-                .setTokenId(tokenValue)
-                .setUserName(user.getUserName());
+            UserOnlineDTO dto = UserOnlineDTO.builder()
+                .ipaddr(ip)
+                .loginLocation(AddressUtils.getRealAddressByIP(ip))
+                .browser(userAgent.getBrowser().getName())
+                .os(userAgent.getOs().getName())
+                .loginTime(System.currentTimeMillis())
+                .tokenId(tokenValue)
+                .userName(user.getUserName())
+                .build();
             if (ObjectUtil.isNotNull(user.getDept())) {
-                userOnlineDTO.setDeptName(user.getDept().getDeptName());
+                dto.setDeptName(user.getDept().getDeptName());
             }
-            RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, userOnlineDTO, tokenConfig.getTimeout(), TimeUnit.SECONDS);
+            RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, dto, tokenConfig.getTimeout(), TimeUnit.SECONDS);
             log.info("user doLogin, useId:{}, token:{}", loginId, tokenValue);
         } else if (userType == UserType.APP_USER) {
             // app端 自行根据业务编写

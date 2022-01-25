@@ -77,8 +77,7 @@ public class AliyunOssStrategy extends AbstractOssStrategy {
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查阿里云配置信息:[" + e.getMessage() + "]");
         }
-        return new UploadResult().setUrl(getEndpointLink() + "/" + path).setFilename(path);
-    }
+        return UploadResult.builder().url(getEndpointLink() + "/" + path).filename(path).build();    }
 
     @Override
     public void delete(String path) {

@@ -4,7 +4,6 @@ import com.ruoyi.common.constant.UserConstants;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
@@ -16,7 +15,6 @@ import javax.validation.constraints.NotBlank;
  */
 
 @Data
-@Accessors(chain = true)
 @ApiModel("用户登录对象")
 public class LoginBody {
 

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.util.List;
 
@@ -14,7 +13,6 @@ import java.util.List;
  * @author Lion Li
  */
 @Data
-@Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @ApiModel("路由配置信息")
 public class RouterVo {

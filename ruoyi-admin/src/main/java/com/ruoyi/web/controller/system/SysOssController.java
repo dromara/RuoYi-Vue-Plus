@@ -132,7 +132,9 @@ public class SysOssController extends BaseController {
     @PutMapping("/changePreviewListResource")
     public AjaxResult<Void> changePreviewListResource(@RequestBody String body) {
         Map<String, Boolean> map = JsonUtils.parseMap(body);
-        SysConfig config = iSysConfigService.getOne(new SysConfig().setConfigKey(OssConstant.PEREVIEW_LIST_RESOURCE_KEY));
+        SysConfig sysConfig = new SysConfig();
+        sysConfig.setConfigKey(OssConstant.PEREVIEW_LIST_RESOURCE_KEY);
+        SysConfig config = iSysConfigService.getOne(sysConfig);
         config.setConfigValue(map.get("previewListResource").toString());
         return toAjax(iSysConfigService.updateConfig(config));
     }

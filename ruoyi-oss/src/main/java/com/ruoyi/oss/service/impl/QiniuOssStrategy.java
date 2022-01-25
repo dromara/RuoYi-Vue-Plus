@@ -10,10 +10,8 @@ import com.qiniu.util.Auth;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.exception.OssException;
-import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.properties.OssProperties;
 import com.ruoyi.oss.service.abstractd.AbstractOssStrategy;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -78,7 +76,7 @@ public class QiniuOssStrategy extends AbstractOssStrategy {
         } catch (Exception e) {
             throw new OssException("上传文件失败，请核对七牛配置信息:[" + e.getMessage() + "]");
         }
-        return new UploadResult().setUrl(getEndpointLink() + "/" + path).setFilename(path);
+        return UploadResult.builder().url(getEndpointLink() + "/" + path).filename(path).build();
     }
 
     @Override

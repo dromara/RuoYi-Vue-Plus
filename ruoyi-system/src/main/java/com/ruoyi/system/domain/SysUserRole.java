@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 /**
  * 用户和角色关联 sys_user_role
@@ -15,7 +14,6 @@ import lombok.experimental.Accessors;
  */
 
 @Data
-@Accessors(chain = true)
 @TableName("sys_user_role")
 @ApiModel("用户和角色关联")
 public class SysUserRole {

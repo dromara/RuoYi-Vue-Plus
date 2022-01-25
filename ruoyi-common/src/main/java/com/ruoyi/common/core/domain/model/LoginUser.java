@@ -3,7 +3,6 @@ package com.ruoyi.common.core.domain.model;
 import com.ruoyi.common.helper.LoginHelper;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -16,7 +15,6 @@ import java.util.Set;
 
 @Data
 @NoArgsConstructor
-@Accessors(chain = true)
 public class LoginUser implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -4,7 +4,6 @@ import com.ruoyi.common.utils.StringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 /**
  * 路由显示信息
@@ -13,7 +12,6 @@ import lombok.experimental.Accessors;
  */
 
 @Data
-@Accessors(chain = true)
 @ApiModel("路由显示信息")
 public class MetaVo {
 

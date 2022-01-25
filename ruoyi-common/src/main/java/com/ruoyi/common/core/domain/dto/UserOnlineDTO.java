@@ -1,8 +1,7 @@
 package com.ruoyi.common.core.domain.dto;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -13,8 +12,7 @@ import java.io.Serializable;
  */
 
 @Data
-@NoArgsConstructor
-@Accessors(chain = true)
+@Builder
 public class UserOnlineDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;

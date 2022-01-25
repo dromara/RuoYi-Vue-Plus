@@ -24,7 +24,6 @@ import javax.validation.constraints.Size;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("sys_dict_type")
 @ExcelIgnoreUnannotated
 @ApiModel("字典类型业务对象")

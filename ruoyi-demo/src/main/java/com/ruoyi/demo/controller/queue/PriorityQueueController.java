@@ -46,7 +46,9 @@ public class PriorityQueueController {
         }
         for (int i = 0; i < 10; i++) {
             int randomNum = RandomUtil.randomInt(10);
-            PriorityDemo data = new PriorityDemo().setName("data-" + i).setOrderNum(randomNum);
+            PriorityDemo data = new PriorityDemo();
+            data.setName("data-" + i);
+            data.setOrderNum(randomNum);
             if (QueueUtils.addPriorityQueueObject(queueName, data)) {
                 log.info("通道: {} , 发送数据: {}", queueName, data);
             } else {
@@ -61,7 +63,9 @@ public class PriorityQueueController {
     public AjaxResult<Void> remove(@ApiParam("队列名") String queueName,
                                    @ApiParam("对象名") String name,
                                    @ApiParam("排序号") Integer orderNum) {
-        PriorityDemo data = new PriorityDemo().setName(name).setOrderNum(orderNum);
+        PriorityDemo data = new PriorityDemo();
+        data.setName(name);
+        data.setOrderNum(orderNum);
         if (QueueUtils.removePriorityQueueObject(queueName, data)) {
             log.info("通道: {} , 删除数据: {}", queueName, data);
         } else {

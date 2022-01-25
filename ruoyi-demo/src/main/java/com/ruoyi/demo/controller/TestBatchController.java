@@ -44,7 +44,11 @@ public class TestBatchController extends BaseController {
     public AjaxResult<Void> add() {
         List<TestDemo> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
-            list.add(new TestDemo().setOrderNum(-1L).setTestKey("批量新增").setValue("测试新增"));
+            TestDemo testDemo = new TestDemo();
+            testDemo.setOrderNum(-1L);
+            testDemo.setTestKey("批量新增");
+            testDemo.setValue("测试新增");
+            list.add(testDemo);
         }
         return toAjax(testDemoMapper.insertBatch(list) ? 1 : 0);
     }
@@ -60,12 +64,16 @@ public class TestBatchController extends BaseController {
     public AjaxResult<Void> addOrUpdate() {
         List<TestDemo> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
-            list.add(new TestDemo().setOrderNum(-1L).setTestKey("批量新增").setValue("测试新增"));
-        }
+            TestDemo testDemo = new TestDemo();
+            testDemo.setOrderNum(-1L);
+            testDemo.setTestKey("批量新增");
+            testDemo.setValue("测试新增");
+            list.add(testDemo);        }
         testDemoMapper.insertBatch(list);
         for (int i = 0; i < list.size(); i++) {
             TestDemo testDemo = list.get(i);
-            testDemo.setTestKey("批量新增或修改").setValue("批量新增或修改");
+            testDemo.setTestKey("批量新增或修改");
+            testDemo.setValue("批量新增或修改");
             if (i % 2 == 0) {
                 testDemo.setId(null);
             }

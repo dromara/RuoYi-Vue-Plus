@@ -65,7 +65,8 @@ public class SysOperLogServiceImpl implements ISysOperLogService, OperLogService
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysOperLog::getOperTime, params.get("beginTime"), params.get("endTime"));
         if (StringUtils.isBlank(pageQuery.getOrderByColumn())) {
-            pageQuery.setOrderByColumn("oper_id").setIsAsc("desc");
+            pageQuery.setOrderByColumn("oper_id");
+            pageQuery.setIsAsc("desc");
         }
         Page<SysOperLog> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);

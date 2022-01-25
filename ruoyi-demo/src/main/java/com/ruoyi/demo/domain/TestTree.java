@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.annotation.Version;
 import com.ruoyi.common.core.domain.TreeEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 /**
  * 测试树表对象 test_tree
@@ -17,7 +16,6 @@ import lombok.experimental.Accessors;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("test_tree")
 public class TestTree extends TreeEntity {
 

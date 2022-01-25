@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -18,7 +17,6 @@ import java.util.Map;
  */
 
 @Data
-@Accessors(chain = true)
 public class BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

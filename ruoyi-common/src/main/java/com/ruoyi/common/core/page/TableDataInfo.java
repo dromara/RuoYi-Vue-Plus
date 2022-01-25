@@ -19,7 +19,6 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@Accessors(chain = true)
 @ApiModel("分页响应对象")
 public class TableDataInfo<T> implements Serializable {
     private static final long serialVersionUID = 1L;

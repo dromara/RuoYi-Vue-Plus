@@ -7,7 +7,6 @@ import com.ruoyi.common.enums.SensitiveStrategy;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
-import lombok.experimental.Accessors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,17 +32,16 @@ public class TestSensitiveController extends BaseController {
     @ApiOperation("查询测试单表列表")
     @GetMapping("/test")
     public AjaxResult<TestSensitive> test() {
-        TestSensitive testSensitive = new TestSensitive()
-            .setIdCard("210397198608215431")
-            .setPhone("17640125371")
-            .setAddress("北京市朝阳区某某四合院1203室")
-            .setEmail("17640125371@163.com")
-            .setBankCard("6226456952351452853");
+        TestSensitive testSensitive = new TestSensitive();
+        testSensitive.setIdCard("210397198608215431");
+        testSensitive.setPhone("17640125371");
+        testSensitive.setAddress("北京市朝阳区某某四合院1203室");
+        testSensitive.setEmail("17640125371@163.com");
+        testSensitive.setBankCard("6226456952351452853");
         return AjaxResult.success(testSensitive);
     }
 
     @Data
-    @Accessors(chain = true)
     static class TestSensitive {
 
         /**

@@ -7,7 +7,6 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.sql.SqlUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -18,7 +17,6 @@ import java.io.Serializable;
  */
 
 @Data
-@Accessors(chain = true)
 public class PageQuery implements Serializable {
 
     private static final long serialVersionUID = 1L;

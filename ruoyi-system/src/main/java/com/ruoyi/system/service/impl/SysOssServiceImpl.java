@@ -73,12 +73,12 @@ public class SysOssServiceImpl implements ISysOssService {
             throw new ServiceException(e.getMessage());
         }
         // 保存文件信息
-        SysOss oss = new SysOss()
-            .setUrl(uploadResult.getUrl())
-            .setFileSuffix(suffix)
-            .setFileName(uploadResult.getFilename())
-            .setOriginalName(originalfileName)
-            .setService(storage.getServiceType().getValue());
+        SysOss oss = new SysOss();
+        oss.setUrl(uploadResult.getUrl());
+        oss.setFileSuffix(suffix);
+        oss.setFileName(uploadResult.getFilename());
+        oss.setOriginalName(originalfileName);
+        oss.setService(storage.getServiceType().getValue());
         baseMapper.insert(oss);
         return oss;
     }

@@ -20,7 +20,6 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("gen_table_column")
 public class GenTableColumn extends BaseEntity {
 

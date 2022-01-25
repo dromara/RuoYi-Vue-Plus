@@ -1,8 +1,7 @@
 package com.ruoyi.oss.entity;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 /**
  * 上传返回体
@@ -10,8 +9,7 @@ import lombok.experimental.Accessors;
  * @author Lion Li
  */
 @Data
-@NoArgsConstructor
-@Accessors(chain = true)
+@Builder
 public class UploadResult {
 
     /**

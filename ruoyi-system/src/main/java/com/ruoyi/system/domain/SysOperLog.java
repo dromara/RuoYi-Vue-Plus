@@ -10,7 +10,6 @@ import com.ruoyi.common.convert.ExcelDictConvert;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -24,7 +23,6 @@ import java.util.Map;
  */
 
 @Data
-@Accessors(chain = true)
 @TableName("sys_oper_log")
 @ExcelIgnoreUnannotated
 @ApiModel("操作日志记录业务对象")

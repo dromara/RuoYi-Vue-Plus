@@ -3,7 +3,6 @@ package ${packageName}.domain;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.util.Date;
 import java.math.BigDecimal;
@@ -29,7 +28,6 @@ import com.ruoyi.common.core.domain.TreeEntity;
     #set($Entity="TreeEntity")
 #end
 @Data
-@Accessors(chain = true)
 @TableName("${tableName}")
 public class ${ClassName} extends ${Entity} {
 

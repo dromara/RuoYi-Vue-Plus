@@ -3,7 +3,6 @@ package com.ruoyi.system.domain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 /**
  * 当前在线会话
@@ -12,7 +11,6 @@ import lombok.experimental.Accessors;
  */
 
 @Data
-@Accessors(chain = true)
 @ApiModel("当前在线会话业务对象")
 public class SysUserOnline {
 
