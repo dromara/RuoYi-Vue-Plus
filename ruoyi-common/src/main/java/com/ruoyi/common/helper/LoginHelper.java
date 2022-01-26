@@ -31,6 +31,7 @@ public class LoginHelper {
      * @param loginUser 登录用户信息
      */
     public static void login(LoginUser loginUser) {
+        LOGIN_CACHE.set(loginUser);
         StpUtil.login(loginUser.getLoginId());
         setLoginUser(loginUser);
     }
@@ -42,6 +43,7 @@ public class LoginHelper {
      * @param loginUser 登录用户信息
      */
     public static void loginByDevice(LoginUser loginUser, DeviceType deviceType) {
+        LOGIN_CACHE.set(loginUser);
         StpUtil.login(loginUser.getLoginId(), deviceType.getDevice());
         setLoginUser(loginUser);
     }
@@ -51,7 +53,6 @@ public class LoginHelper {
      */
     public static void setLoginUser(LoginUser loginUser) {
         StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
-        LOGIN_CACHE.set(loginUser);
     }
 
     /**
