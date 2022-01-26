@@ -137,6 +137,8 @@ public class SysLoginService {
         loginUser.setUserType(user.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user));
         loginUser.setRolePermission(permissionService.getRolePermission(user));
+        loginUser.setRoles(user.getRoles());
+        loginUser.setDept(user.getDept());
         return loginUser;
     }
 

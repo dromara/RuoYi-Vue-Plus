@@ -1,10 +1,13 @@
 package com.ruoyi.common.core.domain.model;
 
+import com.ruoyi.common.core.domain.entity.SysDept;
+import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.helper.LoginHelper;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -83,6 +86,21 @@ public class LoginUser implements Serializable {
      * 用户名
      */
     private String username;
+
+    /**
+     * 部门对象
+     */
+    private SysDept dept;
+
+    /**
+     * 角色对象
+     */
+    private List<SysRole> roles;
+
+    /**
+     * 数据权限 当前角色ID
+     */
+    private Long roleId;
 
     /**
      * 获取登录id

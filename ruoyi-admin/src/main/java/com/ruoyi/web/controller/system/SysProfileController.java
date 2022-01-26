@@ -5,12 +5,10 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.service.ISysOssService;
 import com.ruoyi.system.service.ISysUserService;
@@ -91,7 +89,7 @@ public class SysProfileController extends BaseController {
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
     public AjaxResult<Void> updatePwd(String oldPassword, String newPassword) {
-        SysUser user = SpringUtils.getBean(UserService.class).selectUserById(LoginHelper.getUserId());
+        SysUser user = userService.selectUserById(LoginHelper.getUserId());
         String userName = user.getUserName();
         String password = user.getPassword();
         if (!SecurityUtils.matchesPassword(oldPassword, password)) {
