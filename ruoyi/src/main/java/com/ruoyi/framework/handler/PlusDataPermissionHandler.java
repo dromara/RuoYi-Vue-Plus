@@ -160,13 +160,13 @@ public class PlusDataPermissionHandler {
         DataPermission dataPermission;
         // 获取方法注解
         for (Method method : methods) {
-            dataPermission = dataPermissionCacheMap.get(method.getName());
+            dataPermission = dataPermissionCacheMap.get(mappedStatementId);
             if (ObjectUtil.isNotNull(dataPermission)) {
                 return dataPermission.value();
             }
             if (AnnotationUtil.hasAnnotation(method, DataPermission.class)) {
                 dataPermission = AnnotationUtil.getAnnotation(method, DataPermission.class);
-                dataPermissionCacheMap.put(method.getName(), dataPermission);
+                dataPermissionCacheMap.put(mappedStatementId, dataPermission);
                 return dataPermission.value();
             }
         }
