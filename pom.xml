@@ -27,7 +27,7 @@
         <cglib.version>3.3.0</cglib.version>
         <velocity.version>2.3</velocity.version>
         <satoken.version>1.28.0</satoken.version>
-        <mybatis-plus.version>3.5.0</mybatis-plus.version>
+        <mybatis-plus.version>3.5.1</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.7.20</hutool.version>
         <okhttp.version>4.9.2</okhttp.version>
