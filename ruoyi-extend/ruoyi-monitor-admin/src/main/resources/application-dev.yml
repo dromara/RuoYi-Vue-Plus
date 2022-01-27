@@ -9,6 +9,6 @@ spring:
         # 设置 Spring Boot Admin Server 地址
         url: http://localhost:9090/admin
         instance:
-          prefer-ip: true # 注册实例时，优先使用 IP
+          service-host-type: IP
         username: ruoyi
         password: 123456
