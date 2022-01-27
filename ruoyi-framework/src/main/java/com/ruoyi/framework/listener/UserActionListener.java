@@ -4,7 +4,6 @@ import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.ruoyi.common.constant.Constants;
@@ -52,10 +51,8 @@ public class UserActionListener implements SaTokenListener {
                 .loginTime(System.currentTimeMillis())
                 .tokenId(tokenValue)
                 .userName(user.getUsername())
+                .deptName(user.getDeptName())
                 .build();
-            if (ObjectUtil.isNotNull(user.getDept())) {
-                dto.setDeptName(user.getDept().getDeptName());
-            }
             RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, dto, tokenConfig.getTimeout(), TimeUnit.SECONDS);
             log.info("user doLogin, useId:{}, token:{}", loginId, tokenValue);
         } else if (userType == UserType.APP_USER) {
