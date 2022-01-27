@@ -90,24 +90,9 @@ public class RedissonProperties {
         private int retryInterval;
 
         /**
-         * 发布和订阅连接的最小空闲连接数
-         */
-        private int subscriptionConnectionMinimumIdleSize;
-
-        /**
          * 发布和订阅连接池大小
          */
         private int subscriptionConnectionPoolSize;
-
-        /**
-         * 单个连接最大订阅数量
-         */
-        private int subscriptionsPerConnection;
-
-        /**
-         * DNS监测时间间隔，单位：毫秒
-         */
-        private int dnsMonitoringInterval;
 
     }
 
@@ -166,34 +151,9 @@ public class RedissonProperties {
         private int retryInterval;
 
         /**
-         * 错误重试次数
-         */
-        private int failedSlaveReconnectionInterval;
-
-        /**
-         * 发布和订阅连接池最小空闲连接数
-         */
-        private int subscriptionConnectionMinimumIdleSize;
-
-        /**
          * 发布和订阅连接池大小
          */
         private int subscriptionConnectionPoolSize;
-
-        /**
-         * 单个连接最大订阅数量
-         */
-        private int subscriptionsPerConnection;
-
-        /**
-         * 扫描间隔
-         */
-        private int scanInterval;
-
-        /**
-         * DNS监测时间间隔，单位：毫秒
-         */
-        private int dnsMonitoringInterval;
 
         /**
          * 读取模式

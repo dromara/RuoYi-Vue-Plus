@@ -11,15 +11,14 @@ import org.redisson.config.Config;
 import org.redisson.spring.cache.CacheConfig;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +43,9 @@ public class RedisConfig extends CachingConfigurerSupport {
     @Autowired
     private RedissonProperties redissonProperties;
 
+    @Primary
     @Bean(destroyMethod = "shutdown")
-    @ConditionalOnMissingBean(RedissonClient.class)
-    public RedissonClient redisson() throws IOException {
+    public RedissonClient redisson() {
         String prefix = REDIS_PROTOCOL_PREFIX;
         if (redisProperties.isSsl()) {
             prefix = REDISS_PROTOCOL_PREFIX;
@@ -68,14 +67,11 @@ public class RedisConfig extends CachingConfigurerSupport {
                 .setTimeout(singleServerConfig.getTimeout())
                 .setRetryAttempts(singleServerConfig.getRetryAttempts())
                 .setRetryInterval(singleServerConfig.getRetryInterval())
-                .setSubscriptionsPerConnection(singleServerConfig.getSubscriptionsPerConnection())
                 .setClientName(singleServerConfig.getClientName())
                 .setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
-                .setSubscriptionConnectionMinimumIdleSize(singleServerConfig.getSubscriptionConnectionMinimumIdleSize())
                 .setSubscriptionConnectionPoolSize(singleServerConfig.getSubscriptionConnectionPoolSize())
                 .setConnectionMinimumIdleSize(singleServerConfig.getConnectionMinimumIdleSize())
-                .setConnectionPoolSize(singleServerConfig.getConnectionPoolSize())
-                .setDnsMonitoringInterval(singleServerConfig.getDnsMonitoringInterval());
+                .setConnectionPoolSize(singleServerConfig.getConnectionPoolSize());
         }
         // 集群配置方式 参考下方注释
         RedissonProperties.ClusterServersConfig clusterServersConfig = redissonProperties.getClusterServersConfig();
@@ -93,19 +89,14 @@ public class RedisConfig extends CachingConfigurerSupport {
                 .setTimeout(clusterServersConfig.getTimeout())
                 .setRetryAttempts(clusterServersConfig.getRetryAttempts())
                 .setRetryInterval(clusterServersConfig.getRetryInterval())
-                .setSubscriptionsPerConnection(clusterServersConfig.getSubscriptionsPerConnection())
                 .setClientName(clusterServersConfig.getClientName())
                 .setIdleConnectionTimeout(clusterServersConfig.getIdleConnectionTimeout())
                 .setPingConnectionInterval(clusterServersConfig.getPingConnectionInterval())
-                .setSubscriptionConnectionMinimumIdleSize(clusterServersConfig.getSubscriptionConnectionMinimumIdleSize())
                 .setSubscriptionConnectionPoolSize(clusterServersConfig.getSubscriptionConnectionPoolSize())
                 .setMasterConnectionMinimumIdleSize(clusterServersConfig.getMasterConnectionMinimumIdleSize())
                 .setMasterConnectionPoolSize(clusterServersConfig.getMasterConnectionPoolSize())
                 .setSlaveConnectionMinimumIdleSize(clusterServersConfig.getSlaveConnectionMinimumIdleSize())
                 .setSlaveConnectionPoolSize(clusterServersConfig.getSlaveConnectionPoolSize())
-                .setDnsMonitoringInterval(clusterServersConfig.getDnsMonitoringInterval())
-                .setFailedSlaveReconnectionInterval(clusterServersConfig.getFailedSlaveReconnectionInterval())
-                .setScanInterval(clusterServersConfig.getScanInterval())
                 .setReadMode(clusterServersConfig.getReadMode())
                 .setSubscriptionMode(clusterServersConfig.getSubscriptionMode())
                 .setNodeAddresses(nodes);
@@ -177,18 +168,8 @@ public class RedisConfig extends CachingConfigurerSupport {
      *     retryAttempts: 3
      *     # 命令重试发送时间间隔，单位：毫秒
      *     retryInterval: 1500
-     *     # 从可用服务器的内部列表中排除 Redis Slave 重新连接尝试的间隔。
-     *     failedSlaveReconnectionInterval: 3000
-     *     # 发布和订阅连接池最小空闲连接数
-     *     subscriptionConnectionMinimumIdleSize: 1
      *     # 发布和订阅连接池大小
      *     subscriptionConnectionPoolSize: 50
-     *     # 单个连接最大订阅数量
-     *     subscriptionsPerConnection: 5
-     *     # 扫描间隔
-     *     scanInterval: 1000
-     *     # DNS监测时间间隔，单位：毫秒
-     *     dnsMonitoringInterval: 5000
      *     # 读取模式
      *     readMode: "SLAVE"
      *     # 订阅模式
