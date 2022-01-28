@@ -242,6 +242,8 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public boolean registerUser(SysUser user) {
+        user.setCreateBy(user.getUserName());
+        user.setUpdateBy(user.getUserName());
         return baseMapper.insert(user) > 0;
     }
 
