@@ -43,16 +43,15 @@ public class UserActionListener implements SaTokenListener {
             String ip = ServletUtils.getClientIP();
             LoginUser user = LoginHelper.getLoginUser();
             String tokenValue = StpUtil.getTokenValue();
-            UserOnlineDTO dto = UserOnlineDTO.builder()
-                .ipaddr(ip)
-                .loginLocation(AddressUtils.getRealAddressByIP(ip))
-                .browser(userAgent.getBrowser().getName())
-                .os(userAgent.getOs().getName())
-                .loginTime(System.currentTimeMillis())
-                .tokenId(tokenValue)
-                .userName(user.getUsername())
-                .deptName(user.getDeptName())
-                .build();
+            UserOnlineDTO dto = new UserOnlineDTO();
+            dto.setIpaddr(ip);
+            dto.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
+            dto.setBrowser(userAgent.getBrowser().getName());
+            dto.setOs(userAgent.getOs().getName());
+            dto.setLoginTime(System.currentTimeMillis());
+            dto.setTokenId(tokenValue);
+            dto.setUserName(user.getUsername());
+            dto.setDeptName(user.getDeptName());
             RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, dto, tokenConfig.getTimeout(), TimeUnit.SECONDS);
             log.info("user doLogin, useId:{}, token:{}", loginId, tokenValue);
         } else if (userType == UserType.APP_USER) {
