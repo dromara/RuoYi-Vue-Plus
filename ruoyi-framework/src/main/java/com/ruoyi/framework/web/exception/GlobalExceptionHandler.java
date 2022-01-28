@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
      * 权限码异常
      */
     @ExceptionHandler(NotPermissionException.class)
-    public AjaxResult handleNotPermissionException(NotPermissionException e, HttpServletRequest request) {
+    public AjaxResult<Void> handleNotPermissionException(NotPermissionException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',权限码校验失败'{}'", requestURI, e.getMessage());
         return AjaxResult.error(HttpStatus.HTTP_FORBIDDEN, "没有访问权限，请联系管理员授权");
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
      * 角色权限异常
      */
     @ExceptionHandler(NotRoleException.class)
-    public AjaxResult handleNotRoleException(NotRoleException e, HttpServletRequest request) {
+    public AjaxResult<Void> handleNotRoleException(NotRoleException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',角色权限校验失败'{}'", requestURI, e.getMessage());
         return AjaxResult.error(HttpStatus.HTTP_FORBIDDEN, "没有访问权限，请联系管理员授权");
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
      * 认证失败
      */
     @ExceptionHandler(NotLoginException.class)
-    public AjaxResult handleNotLoginException(NotLoginException e, HttpServletRequest request) {
+    public AjaxResult<Void> handleNotLoginException(NotLoginException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI, e.getMessage());
         return AjaxResult.error(HttpStatus.HTTP_UNAUTHORIZED, "认证失败，无法访问系统资源");
