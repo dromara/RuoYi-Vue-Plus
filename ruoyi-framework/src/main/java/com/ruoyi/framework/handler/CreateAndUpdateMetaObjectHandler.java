@@ -27,26 +27,16 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
         try {
             if (ObjectUtil.isNotNull(metaObject) && metaObject.getOriginalObject() instanceof BaseEntity) {
                 BaseEntity baseEntity = (BaseEntity) metaObject.getOriginalObject();
-                Date current = new Date();
-                // 创建时间为空 则填充
-                if (ObjectUtil.isNull(baseEntity.getCreateTime())) {
-                    baseEntity.setCreateTime(current);
-                }
-                // 更新时间为空 则填充
-                if (ObjectUtil.isNull(baseEntity.getUpdateTime())) {
-                    baseEntity.setUpdateTime(current);
-                }
-                String username = getLoginUsername();
+                Date current = ObjectUtil.isNotNull(baseEntity.getCreateTime())
+                    ? baseEntity.getCreateTime() : new Date();
+                baseEntity.setCreateTime(current);
+                baseEntity.setUpdateTime(current);
+                String username = StringUtils.isNotBlank(baseEntity.getCreateBy())
+                    ? baseEntity.getCreateBy() : getLoginUsername();
                 // 当前已登录 且 创建人为空 则填充
-                if (StringUtils.isNotBlank(username)
-                    && StringUtils.isBlank(baseEntity.getCreateBy())) {
-                    baseEntity.setCreateBy(username);
-                }
+                baseEntity.setCreateBy(username);
                 // 当前已登录 且 更新人为空 则填充
-                if (StringUtils.isNotBlank(username)
-                    && StringUtils.isBlank(baseEntity.getUpdateBy())) {
-                    baseEntity.setUpdateBy(username);
-                }
+                baseEntity.setUpdateBy(username);
             }
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
