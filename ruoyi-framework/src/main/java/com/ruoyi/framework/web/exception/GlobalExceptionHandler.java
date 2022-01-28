@@ -8,7 +8,6 @@ import cn.hutool.http.HttpStatus;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.exception.DemoModeException;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.BindException;
@@ -32,33 +31,33 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     /**
-     * 权限校验异常
+     * 权限码异常
      */
     @ExceptionHandler(NotPermissionException.class)
-    public AjaxResult<Void> handleAccessDeniedException(NotPermissionException e, HttpServletRequest request) {
+    public AjaxResult handleNotPermissionException(NotPermissionException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',权限校验失败'{}'", requestURI, e.getMessage());
-        return AjaxResult.error(HttpStatus.HTTP_FORBIDDEN, "没有权限，请联系管理员授权");
+        log.error("请求地址'{}',权限码校验失败'{}'", requestURI, e.getMessage());
+        return AjaxResult.error(HttpStatus.HTTP_FORBIDDEN, "没有访问权限，请联系管理员授权");
     }
 
     /**
-     * 角色校验异常
+     * 角色权限异常
      */
     @ExceptionHandler(NotRoleException.class)
-    public AjaxResult<Void> handleAccessDeniedException(NotRoleException e, HttpServletRequest request) {
+    public AjaxResult handleNotRoleException(NotRoleException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',角色校验失败'{}'", requestURI, e.getMessage());
-        return AjaxResult.error(HttpStatus.HTTP_FORBIDDEN, "没有角色，请联系管理员授权");
+        log.error("请求地址'{}',角色权限校验失败'{}'", requestURI, e.getMessage());
+        return AjaxResult.error(HttpStatus.HTTP_FORBIDDEN, "没有访问权限，请联系管理员授权");
     }
 
     /**
      * 认证失败
      */
     @ExceptionHandler(NotLoginException.class)
-    public AjaxResult<Void> handleAccessDeniedException(NotLoginException e, HttpServletRequest request) {
+    public AjaxResult handleNotLoginException(NotLoginException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI, e.getMessage());
-        return AjaxResult.error(HttpStatus.HTTP_UNAUTHORIZED, StringUtils.format("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI));
+        return AjaxResult.error(HttpStatus.HTTP_UNAUTHORIZED, "认证失败，无法访问系统资源");
     }
 
     /**
