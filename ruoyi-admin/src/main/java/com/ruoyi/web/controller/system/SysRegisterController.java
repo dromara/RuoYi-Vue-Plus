@@ -1,7 +1,7 @@
 package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.SysRegisterService;
@@ -29,7 +29,7 @@ public class SysRegisterController extends BaseController {
 
     @ApiOperation("用户注册")
     @PostMapping("/register")
-    public AjaxResult<Void> register(@Validated @RequestBody RegisterBody user) {
+    public R<Void> register(@Validated @RequestBody RegisterBody user) {
         if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser")))) {
             return error("当前系统没有开启注册功能！");
         }

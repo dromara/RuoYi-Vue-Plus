@@ -5,7 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.AddGroup;
@@ -75,12 +75,12 @@ public class TestDemoController extends BaseController {
     @Log(title = "测试单表", businessType = BusinessType.IMPORT)
     @SaCheckPermission("demo:demo:import")
     @PostMapping("/importData")
-    public AjaxResult<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
+    public R<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
         ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
         List<TestDemoImportVo> volist = excelResult.getList();
         List<TestDemo> list = BeanUtil.copyToList(volist, TestDemo.class);
         iTestDemoService.saveBatch(list);
-        return AjaxResult.success(excelResult.getAnalysis());
+        return R.ok(excelResult.getAnalysis());
     }
 
     /**
@@ -105,10 +105,10 @@ public class TestDemoController extends BaseController {
     @ApiOperation("获取测试单表详细信息")
     @SaCheckPermission("demo:demo:query")
     @GetMapping("/{id}")
-    public AjaxResult<TestDemoVo> getInfo(@ApiParam("测试ID")
+    public R<TestDemoVo> getInfo(@ApiParam("测试ID")
                                           @NotNull(message = "主键不能为空")
                                           @PathVariable("id") Long id) {
-        return AjaxResult.success(iTestDemoService.queryById(id));
+        return R.ok(iTestDemoService.queryById(id));
     }
 
     /**
@@ -119,7 +119,7 @@ public class TestDemoController extends BaseController {
     @Log(title = "测试单表", businessType = BusinessType.INSERT)
     @RepeatSubmit(interval = 2, timeUnit = TimeUnit.SECONDS, message = "不允许重复提交")
     @PostMapping()
-    public AjaxResult<Void> add(@RequestBody TestDemoBo bo) {
+    public R<Void> add(@RequestBody TestDemoBo bo) {
         // 使用校验工具对标 @Validated(AddGroup.class) 注解
         // 用于在非 Controller 的地方校验对象
         ValidatorUtils.validate(bo, AddGroup.class);
@@ -134,7 +134,7 @@ public class TestDemoController extends BaseController {
     @Log(title = "测试单表", businessType = BusinessType.UPDATE)
     @RepeatSubmit
     @PutMapping()
-    public AjaxResult<Void> edit(@Validated(EditGroup.class) @RequestBody TestDemoBo bo) {
+    public R<Void> edit(@Validated(EditGroup.class) @RequestBody TestDemoBo bo) {
         return toAjax(iTestDemoService.updateByBo(bo) ? 1 : 0);
     }
 
@@ -145,7 +145,7 @@ public class TestDemoController extends BaseController {
     @SaCheckPermission("demo:demo:remove")
     @Log(title = "测试单表", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
-    public AjaxResult<Void> remove(@ApiParam("测试ID串")
+    public R<Void> remove(@ApiParam("测试ID串")
                                    @NotEmpty(message = "主键不能为空")
                                    @PathVariable Long[] ids) {
         return toAjax(iTestDemoService.deleteWithValidByIds(Arrays.asList(ids), true) ? 1 : 0);

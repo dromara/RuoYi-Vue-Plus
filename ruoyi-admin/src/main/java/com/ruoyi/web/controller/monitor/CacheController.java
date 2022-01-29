@@ -1,7 +1,7 @@
 package com.ruoyi.web.controller.monitor;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,7 +31,7 @@ public class CacheController {
     @ApiOperation("获取缓存监控详细信息")
     @SaCheckPermission("monitor:cache:list")
     @GetMapping()
-    public AjaxResult<Map<String, Object>> getInfo() throws Exception {
+    public R<Map<String, Object>> getInfo() throws Exception {
         Properties info = (Properties) redisTemplate.execute((RedisCallback<Object>) RedisServerCommands::info);
         Properties commandStats = (Properties) redisTemplate.execute((RedisCallback<Object>) connection -> connection.info("commandstats"));
         Object dbSize = redisTemplate.execute((RedisCallback<Object>) RedisServerCommands::dbSize);
@@ -51,6 +51,6 @@ public class CacheController {
             });
         }
         result.put("commandStats", pieList);
-        return AjaxResult.success(result);
+        return R.ok(result);
     }
 }

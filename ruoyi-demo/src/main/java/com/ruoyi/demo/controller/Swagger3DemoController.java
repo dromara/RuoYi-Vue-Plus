@@ -1,6 +1,6 @@
 package com.ruoyi.demo.controller;
 
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -31,8 +31,8 @@ public class Swagger3DemoController {
         @ApiImplicitParam(name = "file", value = "文件", dataType = "java.io.File", required = true),
     })
     @PostMapping(value = "/upload")
-    public AjaxResult<String> upload(@RequestPart("file") MultipartFile file) {
-        return AjaxResult.success("操作成功", file.getOriginalFilename());
+    public R<String> upload(@RequestPart("file") MultipartFile file) {
+        return R.ok("操作成功", file.getOriginalFilename());
     }
 
 }

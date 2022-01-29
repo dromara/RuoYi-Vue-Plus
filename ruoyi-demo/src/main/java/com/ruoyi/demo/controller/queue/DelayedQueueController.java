@@ -1,6 +1,6 @@
 package com.ruoyi.demo.controller.queue;
 
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.QueueUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,45 +34,45 @@ public class DelayedQueueController {
 
     @ApiOperation("订阅队列")
     @GetMapping("/subscribe")
-    public AjaxResult<Void> subscribe(@ApiParam("队列名") String queueName) {
+    public R<Void> subscribe(@ApiParam("队列名") String queueName) {
         log.info("通道: {} 监听中......", queueName);
         // 项目初始化设置一次即可
         QueueUtils.subscribeBlockingQueue(queueName, (String orderNum) -> {
             // 观察接收时间
             log.info("通道: {}, 收到数据: {}", queueName, orderNum);
         });
-        return AjaxResult.success("操作成功");
+        return R.ok("操作成功");
     }
 
     @ApiOperation("添加队列数据")
     @GetMapping("/add")
-    public AjaxResult<Void> add(@ApiParam("队列名") String queueName,
+    public R<Void> add(@ApiParam("队列名") String queueName,
                                 @ApiParam("订单号") String orderNum,
                                 @ApiParam("延迟时间(秒)") Long time) {
         QueueUtils.addDelayedQueueObject(queueName, orderNum, time, TimeUnit.SECONDS);
         // 观察发送时间
         log.info("通道: {} , 发送数据: {}", queueName, orderNum);
-        return AjaxResult.success("操作成功");
+        return R.ok("操作成功");
     }
 
     @ApiOperation("删除队列数据")
     @GetMapping("/remove")
-    public AjaxResult<Void> remove(@ApiParam("队列名") String queueName,
+    public R<Void> remove(@ApiParam("队列名") String queueName,
                                    @ApiParam("订单号") String orderNum) {
         if (QueueUtils.removeDelayedQueueObject(queueName, orderNum)) {
             log.info("通道: {} , 删除数据: {}", queueName, orderNum);
         } else {
-            return AjaxResult.error("操作失败");
+            return R.fail("操作失败");
         }
-        return AjaxResult.success("操作成功");
+        return R.ok("操作成功");
     }
 
     @ApiOperation("销毁队列")
     @GetMapping("/destroy")
-    public AjaxResult<Void> destroy(@ApiParam("队列名") String queueName) {
+    public R<Void> destroy(@ApiParam("队列名") String queueName) {
         // 用完了一定要销毁 否则会一直存在
         QueueUtils.destroyDelayedQueue(queueName);
-        return AjaxResult.success("操作成功");
+        return R.ok("操作成功");
     }
 
 }

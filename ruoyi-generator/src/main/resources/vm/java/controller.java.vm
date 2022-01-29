@@ -14,7 +14,7 @@ import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.core.validate.QueryGroup;
@@ -57,9 +57,9 @@ public class ${ClassName}Controller extends BaseController {
         return i${ClassName}Service.queryPageList(bo, pageQuery);
     }
 #elseif($table.tree)
-    public AjaxResult<List<${ClassName}Vo>> list(@Validated(QueryGroup.class) ${ClassName}Bo bo) {
+    public R<List<${ClassName}Vo>> list(@Validated(QueryGroup.class) ${ClassName}Bo bo) {
         List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
-        return AjaxResult.success(list);
+        return R.ok(list);
     }
 #end
 
@@ -81,10 +81,10 @@ public class ${ClassName}Controller extends BaseController {
     @ApiOperation("获取${functionName}详细信息")
     @SaCheckPermission("${permissionPrefix}:query")
     @GetMapping("/{${pkColumn.javaField}}")
-    public AjaxResult<${ClassName}Vo> getInfo(@ApiParam("主键")
+    public R<${ClassName}Vo> getInfo(@ApiParam("主键")
                                                   @NotNull(message = "主键不能为空")
                                                   @PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField}) {
-        return AjaxResult.success(i${ClassName}Service.queryById(${pkColumn.javaField}));
+        return R.ok(i${ClassName}Service.queryById(${pkColumn.javaField}));
     }
 
     /**
@@ -95,7 +95,7 @@ public class ${ClassName}Controller extends BaseController {
     @Log(title = "${functionName}", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
-    public AjaxResult<Void> add(@Validated(AddGroup.class) @RequestBody ${ClassName}Bo bo) {
+    public R<Void> add(@Validated(AddGroup.class) @RequestBody ${ClassName}Bo bo) {
         return toAjax(i${ClassName}Service.insertByBo(bo) ? 1 : 0);
     }
 
@@ -107,7 +107,7 @@ public class ${ClassName}Controller extends BaseController {
     @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
-    public AjaxResult<Void> edit(@Validated(EditGroup.class) @RequestBody ${ClassName}Bo bo) {
+    public R<Void> edit(@Validated(EditGroup.class) @RequestBody ${ClassName}Bo bo) {
         return toAjax(i${ClassName}Service.updateByBo(bo) ? 1 : 0);
     }
 
@@ -118,7 +118,7 @@ public class ${ClassName}Controller extends BaseController {
     @SaCheckPermission("${permissionPrefix}:remove")
     @Log(title = "${functionName}", businessType = BusinessType.DELETE)
     @DeleteMapping("/{${pkColumn.javaField}s}")
-    public AjaxResult<Void> remove(@ApiParam("主键串")
+    public R<Void> remove(@ApiParam("主键串")
                                        @NotEmpty(message = "主键不能为空")
                                        @PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
         return toAjax(i${ClassName}Service.deleteWithValidByIds(Arrays.asList(${pkColumn.javaField}s), true) ? 1 : 0);

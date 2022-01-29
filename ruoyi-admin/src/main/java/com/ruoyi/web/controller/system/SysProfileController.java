@@ -3,7 +3,7 @@ package com.ruoyi.web.controller.system;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.helper.LoginHelper;
@@ -45,13 +45,13 @@ public class SysProfileController extends BaseController {
      */
     @ApiOperation("个人信息")
     @GetMapping
-    public AjaxResult<Map<String, Object>> profile() {
+    public R<Map<String, Object>> profile() {
         SysUser user = userService.selectUserById(getUserId());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("user", user);
         ajax.put("roleGroup", userService.selectUserRoleGroup(user.getUserName()));
         ajax.put("postGroup", userService.selectUserPostGroup(user.getUserName()));
-        return AjaxResult.success(ajax);
+        return R.ok(ajax);
     }
 
     /**
@@ -60,22 +60,22 @@ public class SysProfileController extends BaseController {
     @ApiOperation("修改用户")
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult<Void> updateProfile(@RequestBody SysUser user) {
+    public R<Void> updateProfile(@RequestBody SysUser user) {
         if (StringUtils.isNotEmpty(user.getPhonenumber())
             && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
-            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
+            return R.fail("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
         if (StringUtils.isNotEmpty(user.getEmail())
             && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
-            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+            return R.fail("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         user.setUserId(getUserId());
         user.setUserName(null);
         user.setPassword(null);
         if (userService.updateUserProfile(user) > 0) {
-            return AjaxResult.success();
+            return R.ok();
         }
-        return AjaxResult.error("修改个人信息异常，请联系管理员");
+        return R.fail("修改个人信息异常，请联系管理员");
     }
 
     /**
@@ -88,20 +88,20 @@ public class SysProfileController extends BaseController {
     })
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
-    public AjaxResult<Void> updatePwd(String oldPassword, String newPassword) {
+    public R<Void> updatePwd(String oldPassword, String newPassword) {
         SysUser user = userService.selectUserById(LoginHelper.getUserId());
         String userName = user.getUserName();
         String password = user.getPassword();
         if (!SecurityUtils.matchesPassword(oldPassword, password)) {
-            return AjaxResult.error("修改密码失败，旧密码错误");
+            return R.fail("修改密码失败，旧密码错误");
         }
         if (SecurityUtils.matchesPassword(newPassword, password)) {
-            return AjaxResult.error("新密码不能与旧密码相同");
+            return R.fail("新密码不能与旧密码相同");
         }
         if (userService.resetUserPwd(userName, SecurityUtils.encryptPassword(newPassword)) > 0) {
-            return AjaxResult.success();
+            return R.ok();
         }
-        return AjaxResult.error("修改密码异常，请联系管理员");
+        return R.fail("修改密码异常，请联系管理员");
     }
 
     /**
@@ -113,16 +113,16 @@ public class SysProfileController extends BaseController {
     })
     @Log(title = "用户头像", businessType = BusinessType.UPDATE)
     @PostMapping("/avatar")
-    public AjaxResult<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile file) {
+    public R<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile file) {
         Map<String, Object> ajax = new HashMap<>();
         if (!file.isEmpty()) {
             SysOss oss = iSysOssService.upload(file);
             String avatar = oss.getUrl();
             if (userService.updateUserAvatar(getUsername(), avatar)) {
                 ajax.put("imgUrl", avatar);
-                return AjaxResult.success(ajax);
+                return R.ok(ajax);
             }
         }
-        return AjaxResult.error("上传图片异常，请联系管理员", ajax);
+        return R.fail("上传图片异常，请联系管理员");
     }
 }

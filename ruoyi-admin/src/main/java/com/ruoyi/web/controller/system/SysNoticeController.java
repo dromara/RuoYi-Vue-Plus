@@ -3,7 +3,7 @@ package com.ruoyi.web.controller.system;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
@@ -46,8 +46,8 @@ public class SysNoticeController extends BaseController {
     @ApiOperation("根据通知公告编号获取详细信息")
     @SaCheckPermission("system:notice:query")
     @GetMapping(value = "/{noticeId}")
-    public AjaxResult<SysNotice> getInfo(@ApiParam("公告ID") @PathVariable Long noticeId) {
-        return AjaxResult.success(noticeService.selectNoticeById(noticeId));
+    public R<SysNotice> getInfo(@ApiParam("公告ID") @PathVariable Long noticeId) {
+        return R.ok(noticeService.selectNoticeById(noticeId));
     }
 
     /**
@@ -57,7 +57,7 @@ public class SysNoticeController extends BaseController {
     @SaCheckPermission("system:notice:add")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult<Void> add(@Validated @RequestBody SysNotice notice) {
+    public R<Void> add(@Validated @RequestBody SysNotice notice) {
         return toAjax(noticeService.insertNotice(notice));
     }
 
@@ -68,7 +68,7 @@ public class SysNoticeController extends BaseController {
     @SaCheckPermission("system:notice:edit")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult<Void> edit(@Validated @RequestBody SysNotice notice) {
+    public R<Void> edit(@Validated @RequestBody SysNotice notice) {
         return toAjax(noticeService.updateNotice(notice));
     }
 
@@ -79,7 +79,7 @@ public class SysNoticeController extends BaseController {
     @SaCheckPermission("system:notice:remove")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
-    public AjaxResult<Void> remove(@ApiParam("公告ID串") @PathVariable Long[] noticeIds) {
+    public R<Void> remove(@ApiParam("公告ID串") @PathVariable Long[] noticeIds) {
         return toAjax(noticeService.deleteNoticeByIds(noticeIds));
     }
 }

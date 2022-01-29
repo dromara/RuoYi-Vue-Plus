@@ -1,6 +1,6 @@
 package com.ruoyi.demo.controller;
 
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.MessageUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,8 +35,8 @@ public class TestI18nController {
      */
     @ApiOperation("通过code获取国际化内容")
     @GetMapping()
-    public AjaxResult<Void> get(@ApiParam("国际化code") String code) {
-        return AjaxResult.success(MessageUtils.message(code));
+    public R<Void> get(@ApiParam("国际化code") String code) {
+        return R.ok(MessageUtils.message(code));
     }
 
     /**
@@ -47,8 +47,8 @@ public class TestI18nController {
      */
     @ApiOperation("Validator 校验国际化")
     @GetMapping("/test1")
-    public AjaxResult<Void> test1(@NotBlank(message = "{not.null}") String str) {
-        return AjaxResult.success(str);
+    public R<Void> test1(@NotBlank(message = "{not.null}") String str) {
+        return R.ok(str);
     }
 
     /**
@@ -59,8 +59,8 @@ public class TestI18nController {
      */
     @ApiOperation("Bean 校验国际化")
     @GetMapping("/test2")
-    public AjaxResult<TestI18nBo> test2(@Validated TestI18nBo bo) {
-        return AjaxResult.success(bo);
+    public R<TestI18nBo> test2(@Validated TestI18nBo bo) {
+        return R.ok(bo);
     }
 
     @Data
