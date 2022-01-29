@@ -329,6 +329,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public int deleteRoleByIds(Long[] roleIds) {
         for (Long roleId : roleIds) {
             checkRoleAllowed(new SysRole(roleId));
+            checkRoleDataScope(roleId);
             SysRole role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
                 throw new ServiceException(String.format("%1$s已分配,不能删除", role.getRoleName()));
