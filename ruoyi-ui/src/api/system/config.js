@@ -43,6 +43,18 @@ export function updateConfig(data) {
   })
 }
 
+// 修改参数配置
+export function updateConfigByKey(key, value) {
+  return request({
+    url: '/system/config/updateByKey',
+    method: 'put',
+    data: {
+      configKey: key,
+      configValue: value
+    }
+  })
+}
+
 // 删除参数配置
 export function delConfig(configId) {
   return request({

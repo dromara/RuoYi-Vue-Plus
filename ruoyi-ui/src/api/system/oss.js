@@ -17,13 +17,3 @@ export function delOss(ossId) {
   })
 }
 
-export function changePreviewListResource(previewListResource) {
-  const data = {
-    previewListResource
-  }
-  return request({
-    url: '/system/oss/changePreviewListResource',
-    method: 'put',
-    data: data
-  })
-}

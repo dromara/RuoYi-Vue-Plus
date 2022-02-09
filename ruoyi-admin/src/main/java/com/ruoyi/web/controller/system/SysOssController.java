@@ -9,8 +9,8 @@ import cn.hutool.http.HttpUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
@@ -121,22 +121,6 @@ public class SysOssController extends BaseController {
                                    @NotEmpty(message = "主键不能为空")
                                    @PathVariable Long[] ossIds) {
         return toAjax(iSysOssService.deleteWithValidByIds(Arrays.asList(ossIds), true) ? 1 : 0);
-    }
-
-    /**
-     * 变更图片列表预览状态
-     */
-    @ApiOperation("变更图片列表预览状态")
-    @SaCheckPermission("system:oss:edit")
-    @Log(title = "OSS对象存储", businessType = BusinessType.UPDATE)
-    @PutMapping("/changePreviewListResource")
-    public R<Void> changePreviewListResource(@RequestBody String body) {
-        Map<String, Boolean> map = JsonUtils.parseMap(body);
-        SysConfig sysConfig = new SysConfig();
-        sysConfig.setConfigKey(OssConstant.PEREVIEW_LIST_RESOURCE_KEY);
-        SysConfig config = iSysConfigService.getOne(sysConfig);
-        config.setConfigValue(map.get("previewListResource").toString());
-        return toAjax(iSysConfigService.updateConfig(config));
     }
 
 }

@@ -102,6 +102,17 @@ public class SysConfigController extends BaseController {
     }
 
     /**
+     * 根据参数键名修改参数配置
+     */
+    @ApiOperation("根据参数键名修改参数配置")
+    @SaCheckPermission("system:config:edit")
+    @Log(title = "参数管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/updateByKey")
+    public R<Void> updateByKey(@RequestBody SysConfig config) {
+        return toAjax(configService.updateConfig(config));
+    }
+
+    /**
      * 删除参数配置
      */
     @ApiOperation("删除参数配置")
