@@ -15,10 +15,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.oss.constant.OssConstant;
-import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.vo.SysOssVo;
@@ -45,7 +42,7 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Api(value = "OSS对象存储控制器", tags = {"OSS对象存储管理"})
+@Api(value = "对象存储控制器", tags = {"对象存储管理"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/oss")
@@ -69,7 +66,7 @@ public class SysOssController extends BaseController {
      */
     @ApiOperation("上传OSS对象存储")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "file", value = "文件", dataTypeClass = File.class, required = true),
+        @ApiImplicitParam(name = "file", value = "文件", paramType = "query", dataTypeClass = File.class, required = true)
     })
     @SaCheckPermission("system:oss:upload")
     @Log(title = "OSS对象存储", businessType = BusinessType.INSERT)
