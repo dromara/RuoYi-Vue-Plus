@@ -1,21 +1,21 @@
 package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.excel.ExcelResult;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.vo.SysUserExportVo;
@@ -137,7 +137,7 @@ public class SysUserController extends BaseController {
             && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
             return R.fail("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        user.setPassword(BCrypt.hashpw(user.getPassword()));
         return toAjax(userService.insertUser(user));
     }
 
@@ -185,7 +185,7 @@ public class SysUserController extends BaseController {
     public R<Void> resetPwd(@RequestBody SysUser user) {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        user.setPassword(BCrypt.hashpw(user.getPassword()));
         return toAjax(userService.resetPwd(user));
     }
 

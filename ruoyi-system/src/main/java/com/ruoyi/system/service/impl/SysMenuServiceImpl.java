@@ -9,7 +9,7 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.TreeBuildUtils;
 import com.ruoyi.system.domain.SysRoleMenu;
@@ -99,7 +99,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public List<SysMenu> selectMenuTreeByUserId(Long userId) {
         List<SysMenu> menus = null;
-        if (SecurityUtils.isAdmin(userId)) {
+        if (LoginHelper.isAdmin(userId)) {
             menus = baseMapper.selectMenuTreeAll();
         } else {
             menus = baseMapper.selectMenuTreeByUserId(userId);

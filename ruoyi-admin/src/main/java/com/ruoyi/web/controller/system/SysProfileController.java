@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import cn.dev33.satoken.secure.BCrypt;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -7,7 +8,6 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.service.ISysOssService;
@@ -92,13 +92,14 @@ public class SysProfileController extends BaseController {
         SysUser user = userService.selectUserById(LoginHelper.getUserId());
         String userName = user.getUserName();
         String password = user.getPassword();
-        if (!SecurityUtils.matchesPassword(oldPassword, password)) {
+        if (!BCrypt.checkpw(oldPassword, password)) {
             return R.fail("修改密码失败，旧密码错误");
         }
-        if (SecurityUtils.matchesPassword(newPassword, password)) {
+        if (BCrypt.checkpw(newPassword, password)) {
             return R.fail("新密码不能与旧密码相同");
         }
-        if (userService.resetUserPwd(userName, SecurityUtils.encryptPassword(newPassword)) > 0) {
+
+        if (userService.resetUserPwd(userName, BCrypt.hashpw(newPassword)) > 0) {
             return R.ok();
         }
         return R.fail("修改密码异常，请联系管理员");

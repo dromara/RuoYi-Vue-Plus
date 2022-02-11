@@ -1,5 +1,6 @@
 package com.ruoyi.system.service;
 
+import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -16,7 +17,6 @@ import com.ruoyi.common.exception.user.UserException;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +68,7 @@ public class SysLoginService {
 
         SysUser user = loadUserByUsername(username);
 
-        if (!SecurityUtils.matchesPassword(password, user.getPassword())) {
+        if (!BCrypt.checkpw(password, user.getPassword())) {
             // 是否第一次
             errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
             // 达到规定错误次数 则锁定登录
