@@ -8,37 +8,9 @@ import com.ruoyi.common.utils.StringUtils;
 /**
  * web层通用数据处理
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public class BaseController {
-
-    /**
-     * 返回成功
-     */
-    public R<Void> success() {
-        return R.ok();
-    }
-
-    /**
-     * 返回失败消息
-     */
-    public R<Void> error() {
-        return R.fail();
-    }
-
-    /**
-     * 返回成功消息
-     */
-    public R<Void> success(String message) {
-        return R.ok(message);
-    }
-
-    /**
-     * 返回失败消息
-     */
-    public R<Void> error(String message) {
-        return R.fail(message);
-    }
 
     /**
      * 响应返回结果
@@ -57,7 +29,7 @@ public class BaseController {
      * @return 操作结果
      */
     protected R<Void> toAjax(boolean result) {
-        return result ? success() : error();
+        return result ? R.ok() : R.fail();
     }
 
     /**

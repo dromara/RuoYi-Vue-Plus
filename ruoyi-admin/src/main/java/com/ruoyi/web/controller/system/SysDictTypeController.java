@@ -98,7 +98,7 @@ public class SysDictTypeController extends BaseController {
     @DeleteMapping("/{dictIds}")
     public R<Void> remove(@ApiParam("字典ID串") @PathVariable Long[] dictIds) {
         dictTypeService.deleteDictTypeByIds(dictIds);
-        return success();
+        return R.ok();
     }
 
     /**

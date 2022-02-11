@@ -108,6 +108,6 @@ public class SysDictDataController extends BaseController {
     @DeleteMapping("/{dictCodes}")
     public R<Void> remove(@ApiParam("字典code串") @PathVariable Long[] dictCodes) {
         dictDataService.deleteDictDataByIds(dictCodes);
-        return success();
+        return R.ok();
     }
 }

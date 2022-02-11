@@ -121,7 +121,7 @@ public class SysConfigController extends BaseController {
     @DeleteMapping("/{configIds}")
     public R<Void> remove(@ApiParam("参数ID串") @PathVariable Long[] configIds) {
         configService.deleteConfigByIds(configIds);
-        return success();
+        return R.ok();
     }
 
     /**

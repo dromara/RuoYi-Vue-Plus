@@ -170,7 +170,7 @@ public class SysUserController extends BaseController {
     @DeleteMapping("/{userIds}")
     public R<Void> remove(@ApiParam("角色ID串") @PathVariable Long[] userIds) {
         if (ArrayUtil.contains(userIds, getUserId())) {
-            return error("当前用户不能删除");
+            return R.fail("当前用户不能删除");
         }
         return toAjax(userService.deleteUserByIds(userIds));
     }
@@ -231,6 +231,6 @@ public class SysUserController extends BaseController {
     public R<Void> insertAuthRole(Long userId, Long[] roleIds) {
         userService.checkUserDataScope(userId);
         userService.insertUserAuth(userId, roleIds);
-        return success();
+        return R.ok();
     }
 }
