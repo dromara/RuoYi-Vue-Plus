@@ -49,7 +49,7 @@ public class R<T> implements Serializable {
         return restResult(null, SUCCESS, msg);
     }
 
-    public static <T> R<T> ok(T data, String msg) {
+    public static <T> R<T> ok(String msg, T data) {
         return restResult(data, SUCCESS, msg);
     }
 
@@ -65,7 +65,7 @@ public class R<T> implements Serializable {
         return restResult(data, FAIL, null);
     }
 
-    public static <T> R<T> fail(T data, String msg) {
+    public static <T> R<T> fail(String msg, T data) {
         return restResult(data, FAIL, msg);
     }
 
