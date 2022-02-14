@@ -5,12 +5,12 @@ import com.ruoyi.common.utils.StringUtils;
 #if($table.crud || $table.sub)
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.domain.PageQuery;
-#end
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+#end
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ${packageName}.domain.bo.${ClassName}Bo;
 import ${packageName}.domain.vo.${ClassName}Vo;
 import ${packageName}.domain.${ClassName};
@@ -33,12 +33,24 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 
     private final ${ClassName}Mapper baseMapper;
 
+    /**
+     * 查询${functionName}
+     *
+     * @param ${pkColumn.javaField} ${functionName}主键
+     * @return ${functionName}
+     */
     @Override
     public ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField}){
         return baseMapper.selectVoById(${pkColumn.javaField});
     }
 
 #if($table.crud || $table.sub)
+    /**
+     * 查询${functionName}列表
+     *
+     * @param ${className} ${functionName}
+     * @return ${functionName}
+     */
     @Override
     public TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<${ClassName}> lqw = buildQueryWrapper(bo);
@@ -47,6 +59,12 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     }
 #end
 
+    /**
+     * 查询${functionName}列表
+     *
+     * @param ${className} ${functionName}
+     * @return ${functionName}
+     */
     @Override
     public List<${ClassName}Vo> queryList(${ClassName}Bo bo) {
         LambdaQueryWrapper<${ClassName}> lqw = buildQueryWrapper(bo);
@@ -80,6 +98,12 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         return lqw;
     }
 
+    /**
+     * 新增${functionName}
+     *
+     * @param ${className} ${functionName}
+     * @return 结果
+     */
     @Override
     public Boolean insertByBo(${ClassName}Bo bo) {
         ${ClassName} add = BeanUtil.toBean(bo, ${ClassName}.class);
@@ -92,6 +116,12 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         return flag;
     }
 
+    /**
+     * 修改${functionName}
+     *
+     * @param ${className} ${functionName}
+     * @return 结果
+     */
     @Override
     public Boolean updateByBo(${ClassName}Bo bo) {
         ${ClassName} update = BeanUtil.toBean(bo, ${ClassName}.class);
@@ -108,6 +138,12 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         //TODO 做一些数据校验,如唯一约束
     }
 
+    /**
+     * 批量删除${functionName}
+     *
+     * @param ${pkColumn.javaField}s 需要删除的${functionName}主键
+     * @return 结果
+     */
     @Override
     public Boolean deleteWithValidByIds(Collection<${pkColumn.javaType}> ids, Boolean isValid) {
         if(isValid){

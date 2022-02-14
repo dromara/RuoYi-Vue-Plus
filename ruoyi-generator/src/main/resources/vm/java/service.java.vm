@@ -18,43 +18,55 @@ import java.util.List;
  * @date ${datetime}
  */
 public interface I${ClassName}Service {
+
     /**
-     * 查询单个
-     * @return
+     * 查询${functionName}
+     *
+     * @param ${pkColumn.javaField} ${functionName}主键
+     * @return ${functionName}
      */
     ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField});
 
 #if($table.crud || $table.sub)
     /**
-     * 查询列表
+     * 查询${functionName}列表
+     *
+     * @param ${className} ${functionName}
+     * @return ${functionName}集合
      */
     TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery);
 #end
 
     /**
-     * 查询列表
+     * 查询${functionName}列表
+     *
+     * @param ${className} ${functionName}
+     * @return ${functionName}集合
      */
     List<${ClassName}Vo> queryList(${ClassName}Bo bo);
 
     /**
-     * 根据新增业务对象插入${functionName}
-     * @param bo ${functionName}新增业务对象
-     * @return
+     * 修改${functionName}
+     *
+     * @param ${className} ${functionName}
+     * @return 结果
      */
     Boolean insertByBo(${ClassName}Bo bo);
 
     /**
-     * 根据编辑业务对象修改${functionName}
-     * @param bo ${functionName}编辑业务对象
-     * @return
+     * 修改${functionName}
+     *
+     * @param ${className} ${functionName}
+     * @return 结果
      */
     Boolean updateByBo(${ClassName}Bo bo);
 
     /**
-     * 校验并删除数据
-     * @param ids 主键集合
+     * 校验并批量删除${functionName}信息
+     *
+     * @param ${pkColumn.javaField}s 需要删除的${functionName}主键集合
      * @param isValid 是否校验,true-删除前校验,false-不校验
-     * @return
+     * @return 结果
      */
     Boolean deleteWithValidByIds(Collection<${pkColumn.javaType}> ids, Boolean isValid);
 }
