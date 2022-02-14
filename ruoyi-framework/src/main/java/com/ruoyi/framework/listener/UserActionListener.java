@@ -42,7 +42,7 @@ public class UserActionListener implements SaTokenListener {
             UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
             String ip = ServletUtils.getClientIP();
             LoginUser user = LoginHelper.getLoginUser();
-            String tokenValue = StpUtil.getTokenValue();
+            String tokenValue = StpUtil.getTokenValueByLoginId(loginId);
             UserOnlineDTO dto = new UserOnlineDTO();
             dto.setIpaddr(ip);
             dto.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
