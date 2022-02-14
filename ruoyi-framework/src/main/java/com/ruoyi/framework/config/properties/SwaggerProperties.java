@@ -18,23 +18,27 @@ import java.util.List;
 public class SwaggerProperties {
 
     /**
-     * 验证码类型
+     * 文档开关
      */
     private Boolean enabled;
+
     /**
      * 设置请求的统一前缀
      */
     private String pathMapping;
+
     /**
-     * 验证码类别
+     * 标头
      */
     private String title;
+
     /**
-     * 数字验证码位数
+     * 描述
      */
     private String description;
+
     /**
-     * 字符验证码长度
+     * 项目版本
      */
     private String version;
 
