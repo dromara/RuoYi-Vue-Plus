@@ -182,6 +182,11 @@ public interface GenConstants {
     String QUERY_LIKE = "LIKE";
 
     /**
+     * 相等查询
+     */
+    String QUERY_EQ = "EQ";
+
+    /**
      * 需要
      */
     String REQUIRE = "1";

@@ -140,7 +140,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService, Logininf
      * 批量删除系统登录日志
      *
      * @param infoIds 需要删除的登录日志ID
-     * @return
+     * @return 结果
      */
     @Override
     public int deleteLogininforByIds(Long[] infoIds) {

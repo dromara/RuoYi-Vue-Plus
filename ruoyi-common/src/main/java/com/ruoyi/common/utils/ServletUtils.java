@@ -97,9 +97,8 @@ public class ServletUtils extends ServletUtil {
      *
      * @param response 渲染对象
      * @param string   待渲染的字符串
-     * @return null
      */
-    public static String renderString(HttpServletResponse response, String string) {
+    public static void renderString(HttpServletResponse response, String string) {
         try {
             response.setStatus(HttpStatus.HTTP_OK);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -108,7 +107,6 @@ public class ServletUtils extends ServletUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     /**
@@ -119,12 +117,12 @@ public class ServletUtils extends ServletUtil {
     public static boolean isAjaxRequest(HttpServletRequest request) {
 
         String accept = request.getHeader("accept");
-        if (accept != null && accept.indexOf("application/json") != -1) {
+        if (accept != null && accept.contains("application/json")) {
             return true;
         }
 
         String xRequestedWith = request.getHeader("X-Requested-With");
-        if (xRequestedWith != null && xRequestedWith.indexOf("XMLHttpRequest") != -1) {
+        if (xRequestedWith != null && xRequestedWith.contains("XMLHttpRequest")) {
             return true;
         }
 
@@ -134,10 +132,7 @@ public class ServletUtils extends ServletUtil {
         }
 
         String ajax = request.getParameter("__ajax");
-        if (StringUtils.equalsAnyIgnoreCase(ajax, "json", "xml")) {
-            return true;
-        }
-        return false;
+        return StringUtils.equalsAnyIgnoreCase(ajax, "json", "xml");
     }
 
     public static String getClientIP() {

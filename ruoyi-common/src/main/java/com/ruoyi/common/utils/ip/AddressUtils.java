@@ -56,6 +56,6 @@ public class AddressUtils {
                 log.error("获取地理位置异常 {}", ip);
             }
         }
-        return address;
+        return UNKNOWN;
     }
 }
