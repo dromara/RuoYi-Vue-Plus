@@ -60,8 +60,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
         if (CollUtil.isEmpty(depts)) {
             return CollUtil.newArrayList();
         }
-        Long parentId = depts.get(0).getParentId();
-        return TreeBuildUtils.build(depts, parentId, (dept, tree) ->
+        return TreeBuildUtils.build(depts, (dept, tree) ->
             tree.setId(dept.getDeptId())
                 .setParentId(dept.getParentId())
                 .setName(dept.getDeptName())

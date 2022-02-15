@@ -181,8 +181,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         if (CollUtil.isEmpty(menus)) {
             return CollUtil.newArrayList();
         }
-        Long parentId = menus.get(0).getParentId();
-        return TreeBuildUtils.build(menus, parentId, (menu, tree) ->
+        return TreeBuildUtils.build(menus, (menu, tree) ->
             tree.setId(menu.getMenuId())
                 .setParentId(menu.getParentId())
                 .setName(menu.getMenuName())
