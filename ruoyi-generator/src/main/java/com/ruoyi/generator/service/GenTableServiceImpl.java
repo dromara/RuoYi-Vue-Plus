@@ -382,12 +382,13 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public void validateEdit(GenTable genTable) {
         if (GenConstants.TPL_TREE.equals(genTable.getTplCategory())) {
-            Map<String, Object> paramsObj = genTable.getParams();
-            if (ObjectUtil.isEmpty(paramsObj.get(GenConstants.TREE_CODE))) {
+            String options = JsonUtils.toJsonString(genTable.getParams());
+            Dict paramsObj = JsonUtils.parseMap(options);
+            if (StringUtils.isEmpty(paramsObj.getStr(GenConstants.TREE_CODE))) {
                 throw new ServiceException("树编码字段不能为空");
-            } else if (ObjectUtil.isEmpty(paramsObj.get(GenConstants.TREE_PARENT_CODE))) {
+            } else if (StringUtils.isEmpty(paramsObj.getStr(GenConstants.TREE_PARENT_CODE))) {
                 throw new ServiceException("树父编码字段不能为空");
-            } else if (ObjectUtil.isEmpty(paramsObj.get(GenConstants.TREE_NAME))) {
+            } else if (StringUtils.isEmpty(paramsObj.getStr(GenConstants.TREE_NAME))) {
                 throw new ServiceException("树名称字段不能为空");
             } else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory())) {
                 if (StringUtils.isEmpty(genTable.getSubTableName())) {
