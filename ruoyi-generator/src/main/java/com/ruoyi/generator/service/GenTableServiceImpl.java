@@ -1,8 +1,8 @@
 package com.ruoyi.generator.service;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -445,13 +445,13 @@ public class GenTableServiceImpl implements IGenTableService {
      * @param genTable 设置后的生成对象
      */
     public void setTableFromOptions(GenTable genTable) {
-        Map<String, Object> paramsObj = JsonUtils.parseMap(genTable.getOptions());
+        Dict paramsObj = JsonUtils.parseMap(genTable.getOptions());
         if (ObjectUtil.isNotNull(paramsObj)) {
-            String treeCode = Convert.toStr(paramsObj.get(GenConstants.TREE_CODE));
-            String treeParentCode = Convert.toStr(paramsObj.get(GenConstants.TREE_PARENT_CODE));
-            String treeName = Convert.toStr(paramsObj.get(GenConstants.TREE_NAME));
-            String parentMenuId = Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID));
-            String parentMenuName = Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_NAME));
+            String treeCode = paramsObj.getStr(GenConstants.TREE_CODE);
+            String treeParentCode = paramsObj.getStr(GenConstants.TREE_PARENT_CODE);
+            String treeName = paramsObj.getStr(GenConstants.TREE_NAME);
+            String parentMenuId = paramsObj.getStr(GenConstants.PARENT_MENU_ID);
+            String parentMenuName = paramsObj.getStr(GenConstants.PARENT_MENU_NAME);
 
             genTable.setTreeCode(treeCode);
             genTable.setTreeParentCode(treeParentCode);
