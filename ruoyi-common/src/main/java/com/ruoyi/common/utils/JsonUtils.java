@@ -1,5 +1,6 @@
 package com.ruoyi.common.utils;
 
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,7 +13,6 @@ import lombok.NoArgsConstructor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * JSON 工具类
@@ -72,13 +72,23 @@ public class JsonUtils {
         }
     }
 
-    public static <T> Map<String, T> parseMap(String text) {
+    public static Dict parseMap(String text) {
         if (StringUtils.isBlank(text)) {
             return null;
         }
         try {
-            return OBJECT_MAPPER.readValue(text, new TypeReference<Map<String, T>>() {
-            });
+            return OBJECT_MAPPER.readValue(text, OBJECT_MAPPER.getTypeFactory().constructType(Dict.class));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<Dict> parseArrayMap(String text) {
+        if (StringUtils.isBlank(text)) {
+            return null;
+        }
+        try {
+            return OBJECT_MAPPER.readValue(text, OBJECT_MAPPER.getTypeFactory().constructCollectionType(List.class, Dict.class));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
