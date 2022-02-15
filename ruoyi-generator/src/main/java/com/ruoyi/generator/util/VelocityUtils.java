@@ -78,14 +78,14 @@ public class VelocityUtils {
 
     public static void setMenuVelocityContext(VelocityContext context, GenTable genTable) {
         String options = genTable.getOptions();
-        Map<String, String> paramsObj = JsonUtils.parseMap(options);
+        Map<String, Object> paramsObj = JsonUtils.parseMap(options);
         String parentMenuId = getParentMenuId(paramsObj);
         context.put("parentMenuId", parentMenuId);
     }
 
     public static void setTreeVelocityContext(VelocityContext context, GenTable genTable) {
         String options = genTable.getOptions();
-        Map<String, String> paramsObj = JsonUtils.parseMap(options);
+        Map<String, Object> paramsObj = JsonUtils.parseMap(options);
         String treeCode = getTreecode(paramsObj);
         String treeParentCode = getTreeParentCode(paramsObj);
         String treeName = getTreeName(paramsObj);
@@ -270,9 +270,9 @@ public class VelocityUtils {
      * @param paramsObj 生成其他选项
      * @return 上级菜单ID字段
      */
-    public static String getParentMenuId(Map<String, String> paramsObj) {
+    public static String getParentMenuId(Map<String, Object> paramsObj) {
         if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.PARENT_MENU_ID)
-            && StringUtils.isNotEmpty(paramsObj.get(GenConstants.PARENT_MENU_ID))) {
+            && StringUtils.isNotEmpty(Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID)))) {
             return Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID));
         }
         return DEFAULT_PARENT_MENU_ID;
@@ -284,9 +284,9 @@ public class VelocityUtils {
      * @param paramsObj 生成其他选项
      * @return 树编码
      */
-    public static String getTreecode(Map<String, String> paramsObj) {
+    public static String getTreecode(Map<String, Object> paramsObj) {
         if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_CODE)) {
-            return StringUtils.toCamelCase(paramsObj.get(GenConstants.TREE_CODE));
+            return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_CODE)));
         }
         return StringUtils.EMPTY;
     }
@@ -297,9 +297,9 @@ public class VelocityUtils {
      * @param paramsObj 生成其他选项
      * @return 树父编码
      */
-    public static String getTreeParentCode(Map<String, String> paramsObj) {
+    public static String getTreeParentCode(Map<String, Object> paramsObj) {
         if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_PARENT_CODE)) {
-            return StringUtils.toCamelCase(paramsObj.get(GenConstants.TREE_PARENT_CODE));
+            return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_PARENT_CODE)));
         }
         return StringUtils.EMPTY;
     }
@@ -310,9 +310,9 @@ public class VelocityUtils {
      * @param paramsObj 生成其他选项
      * @return 树名称
      */
-    public static String getTreeName(Map<String, String> paramsObj) {
+    public static String getTreeName(Map<String, Object> paramsObj) {
         if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_NAME)) {
-            return StringUtils.toCamelCase(paramsObj.get(GenConstants.TREE_NAME));
+            return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_NAME)));
         }
         return StringUtils.EMPTY;
     }
@@ -325,8 +325,8 @@ public class VelocityUtils {
      */
     public static int getExpandColumn(GenTable genTable) {
         String options = genTable.getOptions();
-        Map<String, String> paramsObj = JsonUtils.parseMap(options);
-        String treeName = paramsObj.get(GenConstants.TREE_NAME);
+        Map<String, Object> paramsObj = JsonUtils.parseMap(options);
+        String treeName = Convert.toStr(paramsObj.get(GenConstants.TREE_NAME));
         int num = 0;
         for (GenTableColumn column : genTable.getColumns()) {
             if (column.isList()) {
