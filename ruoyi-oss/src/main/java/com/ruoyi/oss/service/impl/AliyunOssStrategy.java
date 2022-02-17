@@ -3,11 +3,13 @@ package com.ruoyi.oss.service.impl;
 import com.aliyun.oss.ClientConfiguration;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.common.auth.DefaultCredentialProvider;
+import com.aliyun.oss.common.comm.Protocol;
 import com.aliyun.oss.model.CannedAccessControlList;
 import com.aliyun.oss.model.CreateBucketRequest;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.exception.OssException;
@@ -33,6 +35,9 @@ public class AliyunOssStrategy extends AbstractOssStrategy {
         super.init(ossProperties);
         try {
             ClientConfiguration configuration = new ClientConfiguration();
+            if (OssConstant.IS_HTTPS.equals(ossProperties.getIsHttps())) {
+                configuration.setProtocol(Protocol.HTTPS);
+            }
             DefaultCredentialProvider credentialProvider = new DefaultCredentialProvider(
                 properties.getAccessKey(), properties.getSecretKey());
             client = new OSSClient(properties.getEndpoint(), credentialProvider, configuration);

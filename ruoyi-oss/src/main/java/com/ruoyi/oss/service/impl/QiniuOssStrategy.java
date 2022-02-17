@@ -7,6 +7,7 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
+import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.exception.OssException;
@@ -35,8 +36,7 @@ public class QiniuOssStrategy extends AbstractOssStrategy {
         try {
             Configuration config = new Configuration(getRegion(properties.getRegion()));
             // https设置
-            config.useHttpsDomains = false;
-            config.useHttpsDomains = "Y".equals(properties.getIsHttps());
+            config.useHttpsDomains = OssConstant.IS_HTTPS.equals(properties.getIsHttps());
             uploadManager = new UploadManager(config);
             auth = Auth.create(properties.getAccessKey(), properties.getSecretKey());
             bucketManager = new BucketManager(auth, config);

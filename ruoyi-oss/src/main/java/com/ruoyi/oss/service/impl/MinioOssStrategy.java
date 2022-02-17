@@ -1,6 +1,7 @@
 package com.ruoyi.oss.service.impl;
 
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.enumd.PolicyType;
@@ -29,7 +30,7 @@ public class MinioOssStrategy extends AbstractOssStrategy {
         super.init(ossProperties);
         try {
             minioClient = MinioClient.builder()
-                .endpoint(properties.getEndpoint())
+                .endpoint(properties.getEndpoint(), 443, OssConstant.IS_HTTPS.equals(ossProperties.getIsHttps()))
                 .credentials(properties.getAccessKey(), properties.getSecretKey())
                 .build();
             createBucket();

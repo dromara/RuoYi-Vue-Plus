@@ -8,6 +8,7 @@ import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.exception.OssException;
@@ -38,7 +39,7 @@ public class QcloudOssStrategy extends AbstractOssStrategy {
             ClientConfig clientConfig = new ClientConfig();
             // 设置bucket所在的区域，华南：gz 华北：tj 华东：sh
             clientConfig.setRegion(new Region(properties.getRegion()));
-            if ("Y".equals(properties.getIsHttps())) {
+            if (OssConstant.IS_HTTPS.equals(properties.getIsHttps())) {
                 clientConfig.setHttpProtocol(HttpProtocol.https);
             } else {
                 clientConfig.setHttpProtocol(HttpProtocol.http);
