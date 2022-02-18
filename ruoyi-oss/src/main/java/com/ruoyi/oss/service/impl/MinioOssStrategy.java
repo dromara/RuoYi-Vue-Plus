@@ -9,6 +9,8 @@ import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.properties.OssProperties;
 import com.ruoyi.oss.service.abstractd.AbstractOssStrategy;
 import io.minio.*;
+import io.minio.http.HttpUtils;
+import okhttp3.HttpUrl;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
@@ -29,10 +31,15 @@ public class MinioOssStrategy extends AbstractOssStrategy {
     public void init(OssProperties ossProperties) {
         super.init(ossProperties);
         try {
-            minioClient = MinioClient.builder()
-                .endpoint(properties.getEndpoint(), 443, OssConstant.IS_HTTPS.equals(ossProperties.getIsHttps()))
-                .credentials(properties.getAccessKey(), properties.getSecretKey())
-                .build();
+            MinioClient.Builder builder = MinioClient.builder();
+            if (OssConstant.IS_HTTPS.equals(ossProperties.getIsHttps())) {
+                HttpUrl url = HttpUtils.getBaseUrl(properties.getEndpoint())
+                    .newBuilder().scheme("https").build();
+                builder.endpoint(url);
+            } else {
+                builder.endpoint(properties.getEndpoint());
+            }
+            minioClient = builder.credentials(properties.getAccessKey(), properties.getSecretKey()).build();
             createBucket();
         } catch (Exception e) {
             throw new OssException("Minio存储配置错误! 请检查系统配置:[" + e.getMessage() + "]");
