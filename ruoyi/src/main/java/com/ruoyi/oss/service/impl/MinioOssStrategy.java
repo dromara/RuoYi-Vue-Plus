@@ -39,7 +39,7 @@ public class MinioOssStrategy extends AbstractOssStrategy {
             } else {
                 builder.endpoint(properties.getEndpoint());
             }
-            minioClient = builder.build();
+            minioClient = builder.credentials(properties.getAccessKey(), properties.getSecretKey()).build();
             createBucket();
         } catch (Exception e) {
             throw new OssException("Minio存储配置错误! 请检查系统配置:[" + e.getMessage() + "]");
