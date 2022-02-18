@@ -1,8 +1,3 @@
-# 此分支进入维护阶段
-> 不进行更新 只修复bug 持续维护到2022年10月<br>
-> 推荐使用 4.X 版本<br>
-> 主分支与Sa-Token分支合并
-
 ## 平台简介
 [![码云Gitee](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
 [![GitHub](https://img.shields.io/github/stars/JavaLionLi/RuoYi-Vue-Plus.svg?style=social&label=Stars)](https://github.com/JavaLionLi/RuoYi-Vue-Plus)
