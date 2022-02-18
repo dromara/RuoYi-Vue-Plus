@@ -2,7 +2,6 @@ package com.ruoyi.common.config;
 
 import lombok.Data;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
  */
 
 @Data
-@Accessors(chain = true)
 @Component
 @ConfigurationProperties(prefix = "ruoyi")
 public class RuoYiConfig {

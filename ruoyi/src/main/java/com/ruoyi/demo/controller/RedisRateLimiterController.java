@@ -1,7 +1,7 @@
 package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.annotation.RateLimiter;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.LimitType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,8 +29,8 @@ public class RedisRateLimiterController {
     @ApiOperation("测试全局限流")
     @RateLimiter(count = 2, time = 10)
     @GetMapping("/test")
-    public AjaxResult<String> test(String value) {
-        return AjaxResult.success("操作成功", value);
+    public R<String> test(String value) {
+        return R.ok("操作成功", value);
     }
 
     /**
@@ -40,8 +40,8 @@ public class RedisRateLimiterController {
     @ApiOperation("测试请求IP限流")
     @RateLimiter(count = 2, time = 10, limitType = LimitType.IP)
     @GetMapping("/testip")
-    public AjaxResult<String> testip(String value) {
-        return AjaxResult.success("操作成功", value);
+    public R<String> testip(String value) {
+        return R.ok("操作成功", value);
     }
 
     /**
@@ -51,8 +51,8 @@ public class RedisRateLimiterController {
     @ApiOperation("测试集群实例限流")
     @RateLimiter(count = 2, time = 10, limitType = LimitType.CLUSTER)
     @GetMapping("/testcluster")
-    public AjaxResult<String> testcluster(String value) {
-        return AjaxResult.success("操作成功", value);
+    public R<String> testcluster(String value) {
+        return R.ok("操作成功", value);
     }
 
 }

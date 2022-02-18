@@ -1,21 +1,22 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.ConfigService;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.mapper.SysConfigMapper;
 import com.ruoyi.system.service.ISysConfigService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -28,8 +29,11 @@ import java.util.Map;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
-public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysConfig, SysConfig> implements ISysConfigService, ConfigService {
+public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
+
+    private final SysConfigMapper baseMapper;
 
     @Override
     public TableDataInfo<SysConfig> selectPageConfigList(SysConfig config, PageQuery pageQuery) {
@@ -40,7 +44,7 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
             .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"));
-        Page<SysConfig> page = page(pageQuery.build(), lqw);
+        Page<SysConfig> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
 
@@ -70,7 +74,7 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
         }
         SysConfig retConfig = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>()
             .eq(SysConfig::getConfigKey, configKey));
-        if (StringUtils.isNotNull(retConfig)) {
+        if (ObjectUtil.isNotNull(retConfig)) {
             RedisUtils.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
             return retConfig.getConfigValue();
         }
@@ -132,7 +136,13 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
      */
     @Override
     public int updateConfig(SysConfig config) {
-        int row = baseMapper.updateById(config);
+        int row = 0;
+        if (config.getConfigId() != null) {
+            row = baseMapper.updateById(config);
+        } else {
+            row = baseMapper.update(config, new LambdaQueryWrapper<SysConfig>()
+                .eq(SysConfig::getConfigKey, config.getConfigKey()));
+        }
         if (row > 0) {
             RedisUtils.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
         }
@@ -143,7 +153,6 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
      * 批量删除参数信息
      *
      * @param configIds 需要删除的参数ID
-     * @return 结果
      */
     @Override
     public void deleteConfigByIds(Long[] configIds) {
@@ -194,12 +203,17 @@ public class SysConfigServiceImpl extends ServicePlusImpl<SysConfigMapper, SysCo
      */
     @Override
     public String checkConfigKeyUnique(SysConfig config) {
-        Long configId = StringUtils.isNull(config.getConfigId()) ? -1L : config.getConfigId();
+        Long configId = ObjectUtil.isNull(config.getConfigId()) ? -1L : config.getConfigId();
         SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, config.getConfigKey()));
-        if (StringUtils.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
+        if (ObjectUtil.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
+    }
+
+    @Override
+    public SysConfig getOne(SysConfig config) {
+        return baseMapper.selectOne(new LambdaQueryWrapper<>(config));
     }
 
     /**

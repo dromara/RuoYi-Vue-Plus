@@ -1,71 +1,66 @@
 package com.ruoyi.system.service;
 
+import cn.dev33.satoken.secure.BCrypt;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.core.service.LogininforService;
+import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
-import com.ruoyi.common.utils.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ruoyi.common.exception.user.UserException;
+import com.ruoyi.common.utils.MessageUtils;
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 注册校验方法
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
 public class SysRegisterService {
 
-    @Autowired
-    private ISysUserService userService;
-
-    @Autowired
-    private ISysConfigService configService;
-
-    @Autowired
-    private LogininforService asyncService;
+    private final ISysUserService userService;
+    private final ISysConfigService configService;
+    private final LogininforService asyncService;
 
     /**
      * 注册
      */
-    public String register(RegisterBody registerBody) {
-        String msg = "", username = registerBody.getUsername(), password = registerBody.getPassword();
+    public void register(RegisterBody registerBody) {
+        HttpServletRequest request = ServletUtils.getRequest();
+        String username = registerBody.getUsername();
+        String password = registerBody.getPassword();
+        // 校验用户类型是否存在
+        String userType = UserType.getUserType(registerBody.getUserType()).getUserType();
 
         boolean captchaOnOff = configService.selectCaptchaOnOff();
         // 验证码开关
         if (captchaOnOff) {
-            validateCaptcha(username, registerBody.getCode(), registerBody.getUuid());
+            validateCaptcha(username, registerBody.getCode(), registerBody.getUuid(), request);
         }
 
-        if (StringUtils.isEmpty(username)) {
-            msg = "用户名不能为空";
-        } else if (StringUtils.isEmpty(password)) {
-            msg = "用户密码不能为空";
-        } else if (username.length() < UserConstants.USERNAME_MIN_LENGTH
-                || username.length() > UserConstants.USERNAME_MAX_LENGTH) {
-            msg = "账户长度必须在2到20个字符之间";
-        } else if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
-                || password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
-            msg = "密码长度必须在5到20个字符之间";
-        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(username))) {
-            msg = "保存用户'" + username + "'失败，注册账号已存在";
-        } else {
-            SysUser sysUser = new SysUser();
-            sysUser.setUserName(username);
-            sysUser.setNickName(username);
-            sysUser.setPassword(SecurityUtils.encryptPassword(registerBody.getPassword()));
-            boolean regFlag = userService.registerUser(sysUser);
-            if (!regFlag) {
-                msg = "注册失败,请联系系统管理人员";
-            } else {
-                asyncService.recordLogininfor(username, Constants.REGISTER,
-                        MessageUtils.message("user.register.success"), ServletUtils.getRequest());
-            }
+        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(username))) {
+            throw new UserException("user.register.save.error", username);
         }
-        return msg;
+        SysUser sysUser = new SysUser();
+        sysUser.setUserName(username);
+        sysUser.setNickName(username);
+        sysUser.setPassword(BCrypt.hashpw(password));
+        sysUser.setUserType(userType);
+        boolean regFlag = userService.registerUser(sysUser);
+        if (!regFlag) {
+            throw new UserException("user.register.error");
+        }
+        asyncService.recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.register.success"), request);
     }
 
     /**
@@ -76,14 +71,16 @@ public class SysRegisterService {
      * @param uuid     唯一标识
      * @return 结果
      */
-    public void validateCaptcha(String username, String code, String uuid) {
-        String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
+    public void validateCaptcha(String username, String code, String uuid, HttpServletRequest request) {
+        String verifyKey = Constants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
+            asyncService.recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.jcaptcha.expire"), request);
             throw new CaptchaExpireException();
         }
         if (!code.equalsIgnoreCase(captcha)) {
+            asyncService.recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.jcaptcha.error"), request);
             throw new CaptchaException();
         }
     }

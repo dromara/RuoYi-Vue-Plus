@@ -1,44 +1,16 @@
 package com.ruoyi.common.core.controller;
 
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StringUtils;
 
 /**
  * web层通用数据处理
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public class BaseController {
-
-    /**
-     * 返回成功
-     */
-    public AjaxResult<Void> success() {
-        return AjaxResult.success();
-    }
-
-    /**
-     * 返回失败消息
-     */
-    public AjaxResult<Void> error() {
-        return AjaxResult.error();
-    }
-
-    /**
-     * 返回成功消息
-     */
-    public AjaxResult<Void> success(String message) {
-        return AjaxResult.success(message);
-    }
-
-    /**
-     * 返回失败消息
-     */
-    public AjaxResult<Void> error(String message) {
-        return AjaxResult.error(message);
-    }
 
     /**
      * 响应返回结果
@@ -46,8 +18,8 @@ public class BaseController {
      * @param rows 影响行数
      * @return 操作结果
      */
-    protected AjaxResult<Void> toAjax(int rows) {
-        return rows > 0 ? AjaxResult.success() : AjaxResult.error();
+    protected R<Void> toAjax(int rows) {
+        return rows > 0 ? R.ok() : R.fail();
     }
 
     /**
@@ -56,8 +28,8 @@ public class BaseController {
      * @param result 结果
      * @return 操作结果
      */
-    protected AjaxResult<Void> toAjax(boolean result) {
-        return result ? success() : error();
+    protected R<Void> toAjax(boolean result) {
+        return result ? R.ok() : R.fail();
     }
 
     /**
@@ -71,27 +43,27 @@ public class BaseController {
      * 获取用户缓存信息
      */
     public LoginUser getLoginUser() {
-        return SecurityUtils.getLoginUser();
+        return LoginHelper.getLoginUser();
     }
 
     /**
      * 获取登录用户id
      */
     public Long getUserId() {
-        return getLoginUser().getUserId();
+        return LoginHelper.getUserId();
     }
 
     /**
      * 获取登录部门id
      */
     public Long getDeptId() {
-        return getLoginUser().getDeptId();
+        return LoginHelper.getDeptId();
     }
 
     /**
      * 获取登录用户名
      */
     public String getUsername() {
-        return getLoginUser().getUsername();
+        return LoginHelper.getUsername();
     }
 }

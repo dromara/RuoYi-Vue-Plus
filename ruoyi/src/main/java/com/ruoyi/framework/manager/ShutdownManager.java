@@ -18,24 +18,24 @@ import java.util.concurrent.ScheduledExecutorService;
 @Component
 public class ShutdownManager {
 
-	@Autowired
-	@Qualifier("scheduledExecutorService")
-	private ScheduledExecutorService scheduledExecutorService;
+    @Autowired
+    @Qualifier("scheduledExecutorService")
+    private ScheduledExecutorService scheduledExecutorService;
 
-	@PreDestroy
-	public void destroy() {
-		shutdownAsyncManager();
-	}
+    @PreDestroy
+    public void destroy() {
+        shutdownAsyncManager();
+    }
 
-	/**
-	 * 停止异步执行任务
-	 */
-	private void shutdownAsyncManager() {
-		try {
-			log.info("====关闭后台任务任务线程池====");
-			Threads.shutdownAndAwaitTermination(scheduledExecutorService);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+    /**
+     * 停止异步执行任务
+     */
+    private void shutdownAsyncManager() {
+        try {
+            log.info("====关闭后台任务任务线程池====");
+            Threads.shutdownAndAwaitTermination(scheduledExecutorService);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }

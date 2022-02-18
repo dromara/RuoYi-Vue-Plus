@@ -14,7 +14,6 @@ import lombok.experimental.Accessors;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("sys_oss_config")
 public class SysOssConfig extends BaseEntity {
 

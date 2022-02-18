@@ -1,14 +1,15 @@
 package com.ruoyi.system.listener;
 
+import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.excel.ExcelListener;
 import com.ruoyi.common.excel.ExcelResult;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.ValidatorUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.vo.SysUserImportVo;
@@ -42,9 +43,9 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
     public SysUserImportListener(Boolean isUpdateSupport) {
         String initPassword = SpringUtils.getBean(ISysConfigService.class).selectConfigByKey("sys.user.initPassword");
         this.userService = SpringUtils.getBean(ISysUserService.class);
-        this.password = SecurityUtils.encryptPassword(initPassword);
+        this.password = BCrypt.hashpw(initPassword);
         this.isUpdateSupport = isUpdateSupport;
-        this.operName = SecurityUtils.getUsername();
+        this.operName = LoginHelper.getUsername();
     }
 
     @Override
@@ -52,7 +53,7 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
         SysUser user = this.userService.selectUserByUserName(userVo.getUserName());
         try {
             // 验证是否存在这个用户
-            if (StringUtils.isNull(user)) {
+            if (ObjectUtil.isNull(user)) {
                 user = BeanUtil.toBean(userVo, SysUser.class);
                 ValidatorUtils.validate(user);
                 user.setPassword(password);

@@ -1,7 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import com.ruoyi.common.core.domain.entity.SysMenu;
-import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
+import com.ruoyi.common.core.mapper.BaseMapperPlus;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface SysMenuMapper extends BaseMapperPlus<SysMenu> {
+public interface SysMenuMapper extends BaseMapperPlus<SysMenuMapper, SysMenu, SysMenu> {
 
     /**
      * 根据用户所有权限

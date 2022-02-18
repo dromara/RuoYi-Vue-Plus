@@ -9,7 +9,7 @@ spring:
         # 设置 Spring Boot Admin Server 地址
         url: http://localhost:9090/admin
         instance:
-          prefer-ip: true # 注册实例时，优先使用 IP
+          service-host-type: IP
         username: ruoyi
         password: 123456
 
@@ -129,9 +129,9 @@ spring:
 
 redisson:
   # 线程池数量
-  threads: 16
+  threads: 4
   # Netty线程池数量
-  nettyThreads: 32
+  nettyThreads: 8
   # 传输模式
   transportMode: "NIO"
   # 单节点配置
@@ -139,9 +139,9 @@ redisson:
     # 客户端名称
     clientName: ${ruoyi.name}
     # 最小空闲连接数
-    connectionMinimumIdleSize: 32
+    connectionMinimumIdleSize: 8
     # 连接池大小
-    connectionPoolSize: 64
+    connectionPoolSize: 32
     # 连接空闲超时，单位：毫秒
     idleConnectionTimeout: 10000
     # 命令等待超时，单位：毫秒
@@ -150,11 +150,5 @@ redisson:
     retryAttempts: 3
     # 命令重试发送时间间隔，单位：毫秒
     retryInterval: 1500
-    # 发布和订阅连接的最小空闲连接数
-    subscriptionConnectionMinimumIdleSize: 1
     # 发布和订阅连接池大小
     subscriptionConnectionPoolSize: 50
-    # 单个连接最大订阅数量
-    subscriptionsPerConnection: 5
-    # DNS监测时间间隔，单位：毫秒
-    dnsMonitoringInterval: 5000

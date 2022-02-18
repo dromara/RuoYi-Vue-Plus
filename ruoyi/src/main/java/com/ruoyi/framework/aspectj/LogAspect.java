@@ -1,13 +1,13 @@
 package com.ruoyi.framework.aspectj;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.domain.dto.OperLogDTO;
-import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.service.OperLogService;
 import com.ruoyi.common.enums.BusinessStatus;
 import com.ruoyi.common.enums.HttpMethod;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -60,9 +60,6 @@ public class LogAspect {
     protected void handleLog(final JoinPoint joinPoint, Log controllerLog, final Exception e, Object jsonResult) {
         try {
 
-            // 获取当前的用户
-            LoginUser loginUser = SecurityUtils.getLoginUser();
-
             // *========数据库日志=========*//
             OperLogDTO operLog = new OperLogDTO();
             operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
@@ -70,9 +67,7 @@ public class LogAspect {
             String ip = ServletUtils.getClientIP();
             operLog.setOperIp(ip);
             operLog.setOperUrl(ServletUtils.getRequest().getRequestURI());
-            if (loginUser != null) {
-                operLog.setOperName(loginUser.getUsername());
-            }
+            operLog.setOperName(LoginHelper.getUsername());
 
             if (e != null) {
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());
@@ -116,7 +111,7 @@ public class LogAspect {
             setRequestValue(joinPoint, operLog);
         }
         // 是否需要保存response，参数和值
-        if (log.isSaveResponseData() && StringUtils.isNotNull(jsonResult)) {
+        if (log.isSaveResponseData() && ObjectUtil.isNotNull(jsonResult)) {
             operLog.setJsonResult(StringUtils.substring(JsonUtils.toJsonString(jsonResult), 0, 2000));
         }
     }
@@ -145,7 +140,7 @@ public class LogAspect {
         StringBuilder params = new StringBuilder();
         if (paramsArray != null && paramsArray.length > 0) {
             for (Object o : paramsArray) {
-                if (StringUtils.isNotNull(o) && !isFilterObject(o)) {
+                if (ObjectUtil.isNotNull(o) && !isFilterObject(o)) {
                     try {
                         params.append(JsonUtils.toJsonString(o)).append(" ");
                     } catch (Exception e) {
@@ -181,6 +176,6 @@ public class LogAspect {
             }
         }
         return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse
-                || o instanceof BindingResult;
+            || o instanceof BindingResult;
     }
 }

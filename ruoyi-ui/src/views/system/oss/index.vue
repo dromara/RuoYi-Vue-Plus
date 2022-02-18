@@ -187,7 +187,7 @@
 </template>
 
 <script>
-import { listOss, delOss, changePreviewListResource } from "@/api/system/oss";
+import { listOss, delOss } from "@/api/system/oss";
 
 export default {
   name: "Oss",
@@ -344,7 +344,7 @@ export default {
     handlePreviewListResource(previewListResource) {
       let text = previewListResource ? "启用" : "停用";
       this.$modal.confirm('确认要"' + text + '""预览列表图片"配置吗?').then(() => {
-        return changePreviewListResource(previewListResource);
+        return this.updateConfigByKey("sys.oss.previewListResource", previewListResource);
       }).then(() => {
         this.getList()
         this.$modal.msgSuccess(text + "成功");

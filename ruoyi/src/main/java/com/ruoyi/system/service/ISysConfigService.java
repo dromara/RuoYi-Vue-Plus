@@ -1,6 +1,5 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysConfig;
@@ -12,7 +11,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface ISysConfigService extends IService<SysConfig> {
+public interface ISysConfigService {
 
 
     TableDataInfo<SysConfig> selectPageConfigList(SysConfig config, PageQuery pageQuery);
@@ -68,7 +67,6 @@ public interface ISysConfigService extends IService<SysConfig> {
      * 批量删除参数信息
      *
      * @param configIds 需要删除的参数ID
-     * @return 结果
      */
     void deleteConfigByIds(Long[] configIds);
 
@@ -94,4 +92,7 @@ public interface ISysConfigService extends IService<SysConfig> {
      * @return 结果
      */
     String checkConfigKeyUnique(SysConfig config);
+
+    SysConfig getOne(SysConfig config);
+
 }

@@ -7,15 +7,14 @@ import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.beans.factory.annotation.Autowired;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.core.validate.QueryGroup;
@@ -40,7 +39,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @Validated
 @Api(value = "${functionName}控制器", tags = {"${functionName}管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/${moduleName}/${businessName}")
 public class ${ClassName}Controller extends BaseController {
@@ -51,16 +50,16 @@ public class ${ClassName}Controller extends BaseController {
      * 查询${functionName}列表
      */
     @ApiOperation("查询${functionName}列表")
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:list')")
+    @SaCheckPermission("${permissionPrefix}:list")
     @GetMapping("/list")
 #if($table.crud || $table.sub)
     public TableDataInfo<${ClassName}Vo> list(@Validated(QueryGroup.class) ${ClassName}Bo bo, PageQuery pageQuery) {
         return i${ClassName}Service.queryPageList(bo, pageQuery);
     }
 #elseif($table.tree)
-    public AjaxResult<List<${ClassName}Vo>> list(@Validated(QueryGroup.class) ${ClassName}Bo bo) {
+    public R<List<${ClassName}Vo>> list(@Validated(QueryGroup.class) ${ClassName}Bo bo) {
         List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
-        return AjaxResult.success(list);
+        return R.ok(list);
     }
 #end
 
@@ -68,7 +67,7 @@ public class ${ClassName}Controller extends BaseController {
      * 导出${functionName}列表
      */
     @ApiOperation("导出${functionName}列表")
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:export')")
+    @SaCheckPermission("${permissionPrefix}:export")
     @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(@Validated ${ClassName}Bo bo, HttpServletResponse response) {
@@ -80,23 +79,23 @@ public class ${ClassName}Controller extends BaseController {
      * 获取${functionName}详细信息
      */
     @ApiOperation("获取${functionName}详细信息")
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:query')")
+    @SaCheckPermission("${permissionPrefix}:query")
     @GetMapping("/{${pkColumn.javaField}}")
-    public AjaxResult<${ClassName}Vo> getInfo(@ApiParam("主键")
+    public R<${ClassName}Vo> getInfo(@ApiParam("主键")
                                                   @NotNull(message = "主键不能为空")
                                                   @PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField}) {
-        return AjaxResult.success(i${ClassName}Service.queryById(${pkColumn.javaField}));
+        return R.ok(i${ClassName}Service.queryById(${pkColumn.javaField}));
     }
 
     /**
      * 新增${functionName}
      */
     @ApiOperation("新增${functionName}")
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:add')")
+    @SaCheckPermission("${permissionPrefix}:add")
     @Log(title = "${functionName}", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
-    public AjaxResult<Void> add(@Validated(AddGroup.class) @RequestBody ${ClassName}Bo bo) {
+    public R<Void> add(@Validated(AddGroup.class) @RequestBody ${ClassName}Bo bo) {
         return toAjax(i${ClassName}Service.insertByBo(bo) ? 1 : 0);
     }
 
@@ -104,11 +103,11 @@ public class ${ClassName}Controller extends BaseController {
      * 修改${functionName}
      */
     @ApiOperation("修改${functionName}")
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:edit')")
+    @SaCheckPermission("${permissionPrefix}:edit")
     @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
-    public AjaxResult<Void> edit(@Validated(EditGroup.class) @RequestBody ${ClassName}Bo bo) {
+    public R<Void> edit(@Validated(EditGroup.class) @RequestBody ${ClassName}Bo bo) {
         return toAjax(i${ClassName}Service.updateByBo(bo) ? 1 : 0);
     }
 
@@ -116,10 +115,10 @@ public class ${ClassName}Controller extends BaseController {
      * 删除${functionName}
      */
     @ApiOperation("删除${functionName}")
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:remove')")
-    @Log(title = "${functionName}" , businessType = BusinessType.DELETE)
+    @SaCheckPermission("${permissionPrefix}:remove")
+    @Log(title = "${functionName}", businessType = BusinessType.DELETE)
     @DeleteMapping("/{${pkColumn.javaField}s}")
-    public AjaxResult<Void> remove(@ApiParam("主键串")
+    public R<Void> remove(@ApiParam("主键串")
                                        @NotEmpty(message = "主键不能为空")
                                        @PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
         return toAjax(i${ClassName}Service.deleteWithValidByIds(Arrays.asList(${pkColumn.javaField}s), true) ? 1 : 0);

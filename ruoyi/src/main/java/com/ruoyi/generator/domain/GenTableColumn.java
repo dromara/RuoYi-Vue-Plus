@@ -20,7 +20,6 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("gen_table_column")
 public class GenTableColumn extends BaseEntity {
 
@@ -190,10 +189,10 @@ public class GenTableColumn extends BaseEntity {
 
     public static boolean isSuperColumn(String javaField) {
         return StringUtils.equalsAnyIgnoreCase(javaField,
-                // BaseEntity
-                "createBy", "createTime", "updateBy", "updateTime",
-                // TreeEntity
-                "parentName", "parentId");
+            // BaseEntity
+            "createBy", "createTime", "updateBy", "updateTime",
+            // TreeEntity
+            "parentName", "parentId");
     }
 
     public boolean isUsableColumn() {

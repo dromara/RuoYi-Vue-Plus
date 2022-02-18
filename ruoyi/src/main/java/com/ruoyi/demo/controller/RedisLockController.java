@@ -4,7 +4,7 @@ import com.baomidou.lock.LockInfo;
 import com.baomidou.lock.LockTemplate;
 import com.baomidou.lock.annotation.Lock4j;
 import com.baomidou.lock.executor.RedissonLockExecutor;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class RedisLockController {
     @ApiOperation("测试lock4j 注解")
     @Lock4j(keys = {"#key"})
     @GetMapping("/testLock4j")
-    public AjaxResult<String> testLock4j(String key, String value) {
+    public R<String> testLock4j(String key, String value) {
         System.out.println("start:" + key + ",time:" + LocalTime.now().toString());
         try {
             Thread.sleep(10000);
@@ -44,15 +44,15 @@ public class RedisLockController {
             e.printStackTrace();
         }
         System.out.println("end :" + key + ",time:" + LocalTime.now().toString());
-        return AjaxResult.success("操作成功", value);
+        return R.ok("操作成功", value);
     }
 
     /**
      * 测试lock4j 工具
      */
     @ApiOperation("测试lock4j 工具")
-    @GetMapping("/testLock4jLockTemaplate")
-    public AjaxResult<String> testLock4jLockTemaplate(String key, String value) {
+    @GetMapping("/testLock4jLockTemplate")
+    public R<String> testLock4jLockTemplate(String key, String value) {
         final LockInfo lockInfo = lockTemplate.lock(key, 30000L, 5000L, RedissonLockExecutor.class);
         if (null == lockInfo) {
             throw new RuntimeException("业务处理中,请稍后再试");
@@ -70,7 +70,7 @@ public class RedisLockController {
             lockTemplate.releaseLock(lockInfo);
         }
         //结束
-        return AjaxResult.success("操作成功", value);
+        return R.ok("操作成功", value);
     }
 
 }

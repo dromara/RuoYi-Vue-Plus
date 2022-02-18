@@ -18,71 +18,75 @@ import java.util.List;
 public class SwaggerProperties {
 
     /**
-     * 验证码类型
+     * 文档开关
      */
     private Boolean enabled;
-	/**
-	 * 设置请求的统一前缀
-	 */
-	private String pathMapping;
+
     /**
-     * 验证码类别
+     * 设置请求的统一前缀
+     */
+    private String pathMapping;
+
+    /**
+     * 标头
      */
     private String title;
+
     /**
-     * 数字验证码位数
+     * 描述
      */
     private String description;
+
     /**
-     * 字符验证码长度
+     * 项目版本
      */
     private String version;
 
-	/**
-	 * 联系方式
-	 */
+    /**
+     * 联系方式
+     */
     private Contact contact;
 
-	/**
-	 * 组配置
-	 */
-	private List<Groups> groups;
+    /**
+     * 组配置
+     */
+    private List<Groups> groups;
 
     @Data
-	@NoArgsConstructor
-	public static class Contact {
+    @NoArgsConstructor
+    public static class Contact {
 
-		/**
-		 * 联系人
-		 */
-		private String name;
+        /**
+         * 联系人
+         */
+        private String name;
 
-		/**
-		 * 联系人url
-		 */
-		private String url;
+        /**
+         * 联系人url
+         */
+        private String url;
 
-		/**
-		 * 联系人email
-		 */
-		private String email;
+        /**
+         * 联系人email
+         */
+        private String email;
 
-	}
+    }
 
-	@Data
-	@NoArgsConstructor
-	public static class Groups {
+    @Data
+    @NoArgsConstructor
+    public static class Groups {
 
-		/**
-		 * 组名
-		 */
-		private String name;
+        /**
+         * 组名
+         */
+        private String name;
 
-		/**
-		 * 基础包路径
-		 */
-		private String basePackage;
+        /**
+         * 基础包路径
+         */
+        private String basePackage;
 
-	}
+    }
 
 }

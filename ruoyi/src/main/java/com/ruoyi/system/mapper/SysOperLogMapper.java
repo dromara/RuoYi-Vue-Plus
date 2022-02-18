@@ -1,6 +1,6 @@
 package com.ruoyi.system.mapper;
 
-import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
+import com.ruoyi.common.core.mapper.BaseMapperPlus;
 import com.ruoyi.system.domain.SysOperLog;
 
 /**
@@ -8,6 +8,6 @@ import com.ruoyi.system.domain.SysOperLog;
  *
  * @author Lion Li
  */
-public interface SysOperLogMapper extends BaseMapperPlus<SysOperLog> {
+public interface SysOperLogMapper extends BaseMapperPlus<SysOperLogMapper, SysOperLog, SysOperLog> {
 
 }

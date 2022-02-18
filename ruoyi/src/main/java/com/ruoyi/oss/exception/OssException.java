@@ -7,10 +7,10 @@ package com.ruoyi.oss.exception;
  */
 public class OssException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public OssException(String msg) {
-		super(msg);
-	}
+    public OssException(String msg) {
+        super(msg);
+    }
 
 }

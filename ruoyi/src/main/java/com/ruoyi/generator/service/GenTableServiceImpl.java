@@ -1,18 +1,18 @@
 package com.ruoyi.generator.service;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.generator.domain.GenTable;
@@ -22,12 +22,11 @@ import com.ruoyi.generator.mapper.GenTableMapper;
 import com.ruoyi.generator.util.GenUtils;
 import com.ruoyi.generator.util.VelocityInitializer;
 import com.ruoyi.generator.util.VelocityUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.util.IOUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +36,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -47,11 +47,12 @@ import java.util.zip.ZipOutputStream;
  * @author Lion Li
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
-public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTable, GenTable> implements IGenTableService {
+public class GenTableServiceImpl implements IGenTableService {
 
-    @Autowired
-    private GenTableColumnMapper genTableColumnMapper;
+    private final GenTableMapper baseMapper;
+    private final GenTableColumnMapper genTableColumnMapper;
 
     /**
      * 查询业务信息
@@ -150,7 +151,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
     @Transactional(rollbackFor = Exception.class)
     public void deleteGenTableByIds(Long[] tableIds) {
         List<Long> ids = Arrays.asList(tableIds);
-        removeByIds(ids);
+        baseMapper.deleteBatchIds(ids);
         genTableColumnMapper.delete(new LambdaQueryWrapper<GenTableColumn>().in(GenTableColumn::getTableId, ids));
     }
 
@@ -162,7 +163,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void importGenTable(List<GenTable> tableList) {
-        String operName = SecurityUtils.getUsername();
+        String operName = LoginHelper.getUsername();
         try {
             for (GenTable table : tableList) {
                 String tableName = table.getTableName();
@@ -177,7 +178,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
                         saveColumns.add(column);
                     }
                     if (CollUtil.isNotEmpty(saveColumns)) {
-                        genTableColumnMapper.insertAll(saveColumns);
+                        genTableColumnMapper.insertBatch(saveColumns);
                     }
                 }
             }
@@ -228,7 +229,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ZipOutputStream zip = new ZipOutputStream(outputStream);
         generatorCode(tableName, zip);
-        IOUtils.closeQuietly(zip);
+        IoUtil.close(zip);
         return outputStream.toByteArray();
     }
 
@@ -278,23 +279,40 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
     public void synchDb(String tableName) {
         GenTable table = baseMapper.selectGenTableByName(tableName);
         List<GenTableColumn> tableColumns = table.getColumns();
-        List<String> tableColumnNames = tableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
+        Map<String, GenTableColumn> tableColumnMap = tableColumns.stream().collect(Collectors.toMap(GenTableColumn::getColumnName, Function.identity()));
 
         List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
-        if (StringUtils.isEmpty(dbTableColumns)) {
+        if (CollUtil.isEmpty(dbTableColumns)) {
             throw new ServiceException("同步数据失败，原表结构不存在");
         }
         List<String> dbTableColumnNames = dbTableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
 
         List<GenTableColumn> saveColumns = new ArrayList<>();
         dbTableColumns.forEach(column -> {
-            if (!tableColumnNames.contains(column.getColumnName())) {
-                GenUtils.initColumnField(column, table);
-                saveColumns.add(column);
+            GenUtils.initColumnField(column, table);
+            if (tableColumnMap.containsKey(column.getColumnName())) {
+                GenTableColumn prevColumn = tableColumnMap.get(column.getColumnName());
+                column.setColumnId(prevColumn.getColumnId());
+                if (column.isList()) {
+                    // 如果是列表，继续保留查询方式/字典类型选项
+                    column.setDictType(prevColumn.getDictType());
+                    column.setQueryType(prevColumn.getQueryType());
+                }
+                if (StringUtils.isNotEmpty(prevColumn.getIsRequired()) && !column.isPk()
+                        && (column.isInsert() || column.isEdit())
+                        && ((column.isUsableColumn()) || (!column.isSuperColumn())))
+                {
+                    // 如果是(新增/修改&非主键/非忽略及父属性)，继续保留必填/显示类型选项
+                    column.setIsRequired(prevColumn.getIsRequired());
+                    column.setHtmlType(prevColumn.getHtmlType());
+                }
+                genTableColumnMapper.updateById(column);
+            } else {
+                genTableColumnMapper.insert(column);
             }
         });
         if (CollUtil.isNotEmpty(saveColumns)) {
-            genTableColumnMapper.insertAll(saveColumns);
+            genTableColumnMapper.insertBatch(saveColumns);
         }
 
         List<GenTableColumn> delColumns = tableColumns.stream().filter(column -> !dbTableColumnNames.contains(column.getColumnName())).collect(Collectors.toList());
@@ -317,7 +335,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
         for (String tableName : tableNames) {
             generatorCode(tableName, zip);
         }
-        IOUtils.closeQuietly(zip);
+        IoUtil.close(zip);
         return outputStream.toByteArray();
     }
 
@@ -364,12 +382,13 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
     @Override
     public void validateEdit(GenTable genTable) {
         if (GenConstants.TPL_TREE.equals(genTable.getTplCategory())) {
-            Map<String, Object> paramsObj = genTable.getParams();
-            if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_CODE))) {
+            String options = JsonUtils.toJsonString(genTable.getParams());
+            Dict paramsObj = JsonUtils.parseMap(options);
+            if (StringUtils.isEmpty(paramsObj.getStr(GenConstants.TREE_CODE))) {
                 throw new ServiceException("树编码字段不能为空");
-            } else if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_PARENT_CODE))) {
+            } else if (StringUtils.isEmpty(paramsObj.getStr(GenConstants.TREE_PARENT_CODE))) {
                 throw new ServiceException("树父编码字段不能为空");
-            } else if (StringUtils.isEmpty(paramsObj.get(GenConstants.TREE_NAME))) {
+            } else if (StringUtils.isEmpty(paramsObj.getStr(GenConstants.TREE_NAME))) {
                 throw new ServiceException("树名称字段不能为空");
             } else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory())) {
                 if (StringUtils.isEmpty(genTable.getSubTableName())) {
@@ -393,7 +412,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
                 break;
             }
         }
-        if (StringUtils.isNull(table.getPkColumn())) {
+        if (ObjectUtil.isNull(table.getPkColumn())) {
             table.setPkColumn(table.getColumns().get(0));
         }
         if (GenConstants.TPL_SUB.equals(table.getTplCategory())) {
@@ -403,7 +422,7 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
                     break;
                 }
             }
-            if (StringUtils.isNull(table.getSubTable().getPkColumn())) {
+            if (ObjectUtil.isNull(table.getSubTable().getPkColumn())) {
                 table.getSubTable().setPkColumn(table.getSubTable().getColumns().get(0));
             }
         }
@@ -427,13 +446,13 @@ public class GenTableServiceImpl extends ServicePlusImpl<GenTableMapper, GenTabl
      * @param genTable 设置后的生成对象
      */
     public void setTableFromOptions(GenTable genTable) {
-        Map<String, Object> paramsObj = JsonUtils.parseMap(genTable.getOptions());
-        if (StringUtils.isNotNull(paramsObj)) {
-            String treeCode = Convert.toStr(paramsObj.get(GenConstants.TREE_CODE));
-            String treeParentCode = Convert.toStr(paramsObj.get(GenConstants.TREE_PARENT_CODE));
-            String treeName = Convert.toStr(paramsObj.get(GenConstants.TREE_NAME));
-            String parentMenuId = Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID));
-            String parentMenuName = Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_NAME));
+        Dict paramsObj = JsonUtils.parseMap(genTable.getOptions());
+        if (ObjectUtil.isNotNull(paramsObj)) {
+            String treeCode = paramsObj.getStr(GenConstants.TREE_CODE);
+            String treeParentCode = paramsObj.getStr(GenConstants.TREE_PARENT_CODE);
+            String treeName = paramsObj.getStr(GenConstants.TREE_NAME);
+            String parentMenuId = paramsObj.getStr(GenConstants.PARENT_MENU_ID);
+            String parentMenuName = paramsObj.getStr(GenConstants.PARENT_MENU_NAME);
 
             genTable.setTreeCode(treeCode);
             genTable.setTreeParentCode(treeParentCode);

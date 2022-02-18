@@ -1,7 +1,6 @@
 package com.ruoyi.system.service;
 
 import cn.hutool.core.lang.tree.Tree;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.entity.SysDept;
 
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface ISysDeptService extends IService<SysDept> {
+public interface ISysDeptService {
     /**
      * 查询部门管理数据
      *
@@ -45,7 +44,7 @@ public interface ISysDeptService extends IService<SysDept> {
     SysDept selectDeptById(Long deptId);
 
     /**
-     * 根据ID查询所有子部门（正常状态）
+     * 根据ID查询所有子部门数（正常状态）
      *
      * @param deptId 部门ID
      * @return 子部门数

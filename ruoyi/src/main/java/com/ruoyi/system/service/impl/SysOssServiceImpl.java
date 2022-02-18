@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
@@ -16,6 +15,7 @@ import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.vo.SysOssVo;
 import com.ruoyi.system.mapper.SysOssMapper;
 import com.ruoyi.system.service.ISysOssService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,13 +29,16 @@ import java.util.Map;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
-public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, SysOssVo> implements ISysOssService {
+public class SysOssServiceImpl implements ISysOssService {
+
+    private final SysOssMapper baseMapper;
 
     @Override
     public TableDataInfo<SysOssVo> queryPageList(SysOssBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<SysOss> lqw = buildQueryWrapper(bo);
-        Page<SysOssVo> result = pageVo(pageQuery.build(), lqw);
+        Page<SysOssVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
 
@@ -47,10 +50,15 @@ public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, Sys
         lqw.eq(StringUtils.isNotBlank(bo.getFileSuffix()), SysOss::getFileSuffix, bo.getFileSuffix());
         lqw.eq(StringUtils.isNotBlank(bo.getUrl()), SysOss::getUrl, bo.getUrl());
         lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
-                SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
+            SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
         lqw.eq(StringUtils.isNotBlank(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
         lqw.eq(StringUtils.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
         return lqw;
+    }
+
+    @Override
+    public SysOss getById(Long ossId) {
+        return baseMapper.selectById(ossId);
     }
 
     @Override
@@ -65,13 +73,13 @@ public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, Sys
             throw new ServiceException(e.getMessage());
         }
         // 保存文件信息
-        SysOss oss = new SysOss()
-                .setUrl(uploadResult.getUrl())
-                .setFileSuffix(suffix)
-                .setFileName(uploadResult.getFilename())
-                .setOriginalName(originalfileName)
-                .setService(storage.getServiceType());
-        save(oss);
+        SysOss oss = new SysOss();
+        oss.setUrl(uploadResult.getUrl());
+        oss.setFileSuffix(suffix);
+        oss.setFileName(uploadResult.getFilename());
+        oss.setOriginalName(originalfileName);
+        oss.setService(storage.getServiceType().getValue());
+        baseMapper.insert(oss);
         return oss;
     }
 
@@ -80,12 +88,12 @@ public class SysOssServiceImpl extends ServicePlusImpl<SysOssMapper, SysOss, Sys
         if (isValid) {
             // 做一些业务上的校验,判断是否需要校验
         }
-        List<SysOss> list = listByIds(ids);
+        List<SysOss> list = baseMapper.selectBatchIds(ids);
         for (SysOss sysOss : list) {
             IOssStrategy storage = OssFactory.instance(sysOss.getService());
             storage.delete(sysOss.getUrl());
         }
-        return removeByIds(ids);
+        return baseMapper.deleteBatchIds(ids) > 0;
     }
 
 }

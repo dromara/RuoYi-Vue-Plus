@@ -1,6 +1,5 @@
 package com.ruoyi.common.constant;
 
-
 /**
  * 通用常量信息
  *
@@ -66,7 +65,12 @@ public interface Constants {
     /**
      * 登录用户 redis key
      */
-    String LOGIN_TOKEN_KEY = "login_tokens:";
+    public static final String LOGIN_TOKEN_KEY = "Authorization:login:token:";
+
+    /**
+     * 在线用户 redis key
+     */
+    public static final String ONLINE_TOKEN_KEY = "online_tokens:";
 
     /**
      * 防重提交 redis key
@@ -106,37 +110,7 @@ public interface Constants {
     /**
      * 令牌前缀
      */
-    String TOKEN_PREFIX = "Bearer ";
-
-    /**
-     * 令牌前缀
-     */
     String LOGIN_USER_KEY = "login_user_key";
-
-    /**
-     * 用户ID
-     */
-    String JWT_USERID = "userid";
-
-    /**
-     * 用户名称
-     */
-    String JWT_USERNAME = "sub";
-
-    /**
-     * 用户头像
-     */
-    String JWT_AVATAR = "avatar";
-
-    /**
-     * 创建时间
-     */
-    String JWT_CREATED = "created";
-
-    /**
-     * 用户权限
-     */
-    String JWT_AUTHORITIES = "authorities";
 
     /**
      * 参数管理 cache key
@@ -149,3 +123,4 @@ public interface Constants {
     String SYS_DICT_KEY = "sys_dict:";
 
 }
+

@@ -25,7 +25,7 @@ import java.util.Date;
 @ExcelIgnoreUnannotated
 public class ${ClassName}Vo {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 #foreach ($column in $columns)
 #if($column.isList)
@@ -42,13 +42,13 @@ public class ${ClassName}Vo {
     @ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "${column.dictType}")
 #elseif($parentheseIndex != -1)
-	@ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
     @ExcelDictFormat(readConverterExp = "$column.readConverterExp()")
 #else
-	@ExcelProperty(value = "${comment}")
+    @ExcelProperty(value = "${comment}")
 #end
-	@ApiModelProperty("$column.columnComment")
-	private $column.javaType $column.javaField;
+    @ApiModelProperty("$column.columnComment")
+    private $column.javaType $column.javaField;
 
 #end
 #end

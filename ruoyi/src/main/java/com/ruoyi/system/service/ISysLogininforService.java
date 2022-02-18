@@ -1,6 +1,5 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysLogininfor;
@@ -12,7 +11,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface ISysLogininforService extends IService<SysLogininfor> {
+public interface ISysLogininforService {
 
 
     TableDataInfo<SysLogininfor> selectPageLogininforList(SysLogininfor logininfor, PageQuery pageQuery);
@@ -36,7 +35,7 @@ public interface ISysLogininforService extends IService<SysLogininfor> {
      * 批量删除系统登录日志
      *
      * @param infoIds 需要删除的登录日志ID
-     * @return
+     * @return 结果
      */
     int deleteLogininforByIds(Long[] infoIds);
 

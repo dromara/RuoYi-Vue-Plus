@@ -10,7 +10,6 @@ import com.ruoyi.common.convert.ExcelDictConvert;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -24,7 +23,6 @@ import java.util.Map;
  */
 
 @Data
-@Accessors(chain = true)
 @TableName("sys_oper_log")
 @ExcelIgnoreUnannotated
 @ApiModel("操作日志记录业务对象")
@@ -52,7 +50,7 @@ public class SysOperLog implements Serializable {
      */
     @ApiModelProperty(value = "业务类型（0其它 1新增 2修改 3删除）")
     @ExcelProperty(value = "业务类型", converter = ExcelDictConvert.class)
-	@ExcelDictFormat(dictType = "sys_oper_type")
+    @ExcelDictFormat(dictType = "sys_oper_type")
     private Integer businessType;
 
     /**
@@ -81,7 +79,7 @@ public class SysOperLog implements Serializable {
      */
     @ApiModelProperty(value = "操作类别（0其它 1后台用户 2手机端用户）")
     @ExcelProperty(value = "操作类别", converter = ExcelDictConvert.class)
-	@ExcelDictFormat(readConverterExp = "0=其它,1=后台用户,2=手机端用户")
+    @ExcelDictFormat(readConverterExp = "0=其它,1=后台用户,2=手机端用户")
     private Integer operatorType;
 
     /**
@@ -138,7 +136,7 @@ public class SysOperLog implements Serializable {
      */
     @ApiModelProperty(value = "操作状态（0正常 1异常）")
     @ExcelProperty(value = "状态", converter = ExcelDictConvert.class)
-	@ExcelDictFormat(dictType = "sys_common_status")
+    @ExcelDictFormat(dictType = "sys_common_status")
     private Integer status;
 
     /**

@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,11 +9,9 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysPost;
@@ -20,8 +19,8 @@ import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.ISysUserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,20 +35,15 @@ import java.util.stream.Collectors;
  * @author Lion Li
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
-public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, SysUser> implements ISysUserService, UserService {
+public class SysUserServiceImpl implements ISysUserService {
 
-    @Autowired
-    private SysRoleMapper roleMapper;
-
-    @Autowired
-    private SysPostMapper postMapper;
-
-    @Autowired
-    private SysUserRoleMapper userRoleMapper;
-
-    @Autowired
-    private SysUserPostMapper userPostMapper;
+    private final SysUserMapper baseMapper;
+    private final SysRoleMapper roleMapper;
+    private final SysPostMapper postMapper;
+    private final SysUserRoleMapper userRoleMapper;
+    private final SysUserPostMapper userPostMapper;
 
     @Override
     public TableDataInfo<SysUser> selectPageUserList(SysUser user, PageQuery pageQuery) {
@@ -152,8 +146,8 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     @Override
     public String checkUserNameUnique(String userName) {
-        long count = count(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName));
-        if (count > 0) {
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName));
+        if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -167,11 +161,10 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     @Override
     public String checkPhoneUnique(SysUser user) {
-        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-        long count = count(new LambdaQueryWrapper<SysUser>()
-                .eq(SysUser::getPhonenumber, user.getPhonenumber())
-                .ne(SysUser::getUserId, userId));
-        if (count > 0) {
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysUser>()
+            .eq(SysUser::getPhonenumber, user.getPhonenumber())
+            .ne(ObjectUtil.isNotNull(user.getUserId()), SysUser::getUserId, user.getUserId()));
+        if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -185,11 +178,10 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     @Override
     public String checkEmailUnique(SysUser user) {
-        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-        long count = count(new LambdaQueryWrapper<SysUser>()
-                .eq(SysUser::getEmail, user.getEmail())
-                .ne(SysUser::getUserId, userId));
-        if (count > 0) {
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysUser>()
+            .eq(SysUser::getEmail, user.getEmail())
+            .ne(ObjectUtil.isNotNull(user.getUserId()), SysUser::getUserId, user.getUserId()));
+        if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -202,7 +194,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     @Override
     public void checkUserAllowed(SysUser user) {
-        if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin()) {
+        if (ObjectUtil.isNotNull(user.getUserId()) && user.isAdmin()) {
             throw new ServiceException("不允许操作超级管理员用户");
         }
     }
@@ -214,11 +206,11 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     @Override
     public void checkUserDataScope(Long userId) {
-        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
+        if (!SysUser.isAdmin(LoginHelper.getUserId())) {
             SysUser user = new SysUser();
             user.setUserId(userId);
             List<SysUser> users = SpringUtils.getAopProxy(this).selectUserList(user);
-            if (StringUtils.isEmpty(users)) {
+            if (CollUtil.isEmpty(users)) {
                 throw new ServiceException("没有权限访问用户数据！");
             }
         }
@@ -250,6 +242,8 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     @Override
     public boolean registerUser(SysUser user) {
+        user.setCreateBy(user.getUserName());
+        user.setUpdateBy(user.getUserName());
         return baseMapper.insert(user) > 0;
     }
 
@@ -284,7 +278,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     @Transactional(rollbackFor = Exception.class)
     public void insertUserAuth(Long userId, Long[] roleIds) {
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
-                .eq(SysUserRole::getUserId, userId));
+            .eq(SysUserRole::getUserId, userId));
         insertUserRole(userId, roleIds);
     }
 
@@ -320,9 +314,9 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     @Override
     public boolean updateUserAvatar(String userName, String avatar) {
         return baseMapper.update(null,
-                new LambdaUpdateWrapper<SysUser>()
-                        .set(SysUser::getAvatar, avatar)
-                        .eq(SysUser::getUserName, userName)) > 0;
+            new LambdaUpdateWrapper<SysUser>()
+                .set(SysUser::getAvatar, avatar)
+                .eq(SysUser::getUserName, userName)) > 0;
     }
 
     /**
@@ -346,9 +340,9 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     @Override
     public int resetUserPwd(String userName, String password) {
         return baseMapper.update(null,
-                new LambdaUpdateWrapper<SysUser>()
-                        .set(SysUser::getPassword, password)
-                        .eq(SysUser::getUserName, userName));
+            new LambdaUpdateWrapper<SysUser>()
+                .set(SysUser::getPassword, password)
+                .eq(SysUser::getUserName, userName));
     }
 
     /**
@@ -358,7 +352,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     public void insertUserRole(SysUser user) {
         Long[] roles = user.getRoleIds();
-        if (StringUtils.isNotNull(roles)) {
+        if (ObjectUtil.isNotNull(roles)) {
             // 新增用户与角色管理
             List<SysUserRole> list = new ArrayList<SysUserRole>();
             for (Long roleId : roles) {
@@ -368,7 +362,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
                 list.add(ur);
             }
             if (list.size() > 0) {
-                userRoleMapper.insertAll(list);
+                userRoleMapper.insertBatch(list);
             }
         }
     }
@@ -380,7 +374,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      */
     public void insertUserPost(SysUser user) {
         Long[] posts = user.getPostIds();
-        if (StringUtils.isNotNull(posts)) {
+        if (ObjectUtil.isNotNull(posts)) {
             // 新增用户与岗位管理
             List<SysUserPost> list = new ArrayList<SysUserPost>();
             for (Long postId : posts) {
@@ -390,7 +384,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
                 list.add(up);
             }
             if (list.size() > 0) {
-                userPostMapper.insertAll(list);
+                userPostMapper.insertBatch(list);
             }
         }
     }
@@ -402,7 +396,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      * @param roleIds 角色组
      */
     public void insertUserRole(Long userId, Long[] roleIds) {
-        if (StringUtils.isNotNull(roleIds)) {
+        if (ObjectUtil.isNotNull(roleIds)) {
             // 新增用户与角色管理
             List<SysUserRole> list = new ArrayList<SysUserRole>();
             for (Long roleId : roleIds) {
@@ -412,7 +406,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
                 list.add(ur);
             }
             if (list.size() > 0) {
-                userRoleMapper.insertAll(list);
+                userRoleMapper.insertBatch(list);
             }
         }
     }
@@ -444,6 +438,7 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     public int deleteUserByIds(Long[] userIds) {
         for (Long userId : userIds) {
             checkUserAllowed(new SysUser(userId));
+            checkUserDataScope(userId);
         }
         List<Long> ids = Arrays.asList(userIds);
         // 删除用户与角色关联

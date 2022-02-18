@@ -8,7 +8,6 @@ import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.utils.StringUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.validation.Valid;
@@ -23,7 +22,6 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("gen_table")
 public class GenTable extends BaseEntity {
 
@@ -196,7 +194,7 @@ public class GenTable extends BaseEntity {
     public static boolean isSuperColumn(String tplCategory, String javaField) {
         if (isTree(tplCategory)) {
             return StringUtils.equalsAnyIgnoreCase(javaField,
-                    ArrayUtils.addAll(GenConstants.TREE_ENTITY, GenConstants.BASE_ENTITY));
+                ArrayUtils.addAll(GenConstants.TREE_ENTITY, GenConstants.BASE_ENTITY));
         }
         return StringUtils.equalsAnyIgnoreCase(javaField, GenConstants.BASE_ENTITY);
     }

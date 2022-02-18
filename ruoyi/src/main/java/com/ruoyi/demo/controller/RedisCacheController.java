@@ -1,11 +1,10 @@
 package com.ruoyi.demo.controller;
 
-import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.utils.RedisUtils;
+import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 // 类级别 缓存统一配置
 //@CacheConfig(cacheNames = "redissonCacheMap")
 @Api(value = "spring-cache 演示案例", tags = {"spring-cache 演示案例"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/cache")
 public class RedisCacheController {
@@ -45,8 +44,8 @@ public class RedisCacheController {
     @ApiOperation("测试 @Cacheable")
     @Cacheable(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
     @GetMapping("/test1")
-    public AjaxResult<String> test1(String key, String value) {
-        return AjaxResult.success("操作成功", value);
+    public R<String> test1(String key, String value) {
+        return R.ok("操作成功", value);
     }
 
     /**
@@ -60,8 +59,8 @@ public class RedisCacheController {
     @ApiOperation("测试 @CachePut")
     @CachePut(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
     @GetMapping("/test2")
-    public AjaxResult<String> test2(String key, String value) {
-        return AjaxResult.success("操作成功", value);
+    public R<String> test2(String key, String value) {
+        return R.ok("操作成功", value);
     }
 
     /**
@@ -75,8 +74,8 @@ public class RedisCacheController {
     @ApiOperation("测试 @CacheEvict")
     @CacheEvict(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
     @GetMapping("/test3")
-    public AjaxResult<String> test3(String key, String value) {
-        return AjaxResult.success("操作成功", value);
+    public R<String> test3(String key, String value) {
+        return R.ok("操作成功", value);
     }
 
     /**
@@ -86,7 +85,7 @@ public class RedisCacheController {
      */
     @ApiOperation("测试设置过期时间")
     @GetMapping("/test6")
-    public AjaxResult<Boolean> test6(String key, String value) {
+    public R<Boolean> test6(String key, String value) {
         RedisUtils.setCacheObject(key, value);
         boolean flag = RedisUtils.expire(key, 10, TimeUnit.SECONDS);
         System.out.println("***********" + flag);
@@ -96,7 +95,7 @@ public class RedisCacheController {
             e.printStackTrace();
         }
         Object obj = RedisUtils.getCacheObject(key);
-        return AjaxResult.success("操作成功", value.equals(obj));
+        return R.ok(value.equals(obj));
     }
 
 }

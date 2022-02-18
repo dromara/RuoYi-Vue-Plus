@@ -1,6 +1,6 @@
 package com.ruoyi.system.mapper;
 
-import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
+import com.ruoyi.common.core.mapper.BaseMapperPlus;
 import com.ruoyi.system.domain.SysRoleDept;
 
 /**
@@ -8,6 +8,6 @@ import com.ruoyi.system.domain.SysRoleDept;
  *
  * @author Lion Li
  */
-public interface SysRoleDeptMapper extends BaseMapperPlus<SysRoleDept> {
+public interface SysRoleDeptMapper extends BaseMapperPlus<SysRoleDeptMapper, SysRoleDept, SysRoleDept> {
 
 }

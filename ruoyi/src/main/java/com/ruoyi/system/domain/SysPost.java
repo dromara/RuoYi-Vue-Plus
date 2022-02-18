@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -25,7 +24,6 @@ import javax.validation.constraints.Size;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("sys_post")
 @ExcelIgnoreUnannotated
 @ApiModel("岗位信息业务对象")
@@ -69,8 +67,8 @@ public class SysPost extends BaseEntity {
      * 状态（0正常 1停用）
      */
     @ApiModelProperty(value = "状态（0正常 1停用）")
-	@ExcelProperty(value = "状态", converter = ExcelDictConvert.class)
-	@ExcelDictFormat(dictType = "sys_common_status")
+    @ExcelProperty(value = "状态", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "sys_common_status")
     private String status;
 
     /**

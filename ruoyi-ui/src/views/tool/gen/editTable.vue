@@ -33,6 +33,7 @@
                 <el-option label="Double" value="Double" />
                 <el-option label="BigDecimal" value="BigDecimal" />
                 <el-option label="Date" value="Date" />
+                <el-option label="Boolean" value="Boolean" />
               </el-select>
             </template>
           </el-table-column>
@@ -158,7 +159,7 @@ export default {
     };
   },
   created() {
-    const tableId = this.$route.query && this.$route.query.tableId;
+    const tableId = this.$route.params && this.$route.params.tableId;
     if (tableId) {
       // 获取表详细信息
       getGenTable(tableId).then(res => {

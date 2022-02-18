@@ -7,20 +7,19 @@ import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleDeptMapper;
-import com.ruoyi.system.service.SysDataScopeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ruoyi.system.service.ISysDataScopeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service("sdss")
-public class SysDataScopeServiceImpl implements SysDataScopeService {
+public class SysDataScopeServiceImpl implements ISysDataScopeService {
 
-    @Autowired
-    private SysRoleDeptMapper roleDeptMapper;
-    @Autowired
-    private SysDeptMapper deptMapper;
+    private final SysRoleDeptMapper roleDeptMapper;
+    private final SysDeptMapper deptMapper;
 
     @Override
     public String getRoleCustom(Long roleId) {

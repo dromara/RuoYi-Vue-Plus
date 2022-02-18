@@ -11,9 +11,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class MonitorAdminApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MonitorAdminApplication.class, args);
-		System.out.println("Admin 监控启动成功" );
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(MonitorAdminApplication.class, args);
+        System.out.println("Admin 监控启动成功");
+    }
 
 }

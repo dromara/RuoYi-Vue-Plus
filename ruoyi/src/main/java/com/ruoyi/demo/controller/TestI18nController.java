@@ -1,6 +1,6 @@
 package com.ruoyi.demo.controller;
 
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.MessageUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,40 +27,40 @@ import javax.validation.constraints.NotNull;
 @RequestMapping("/demo/i18n")
 public class TestI18nController {
 
-	/**
-	 * 通过code获取国际化内容
-	 * code为 messages.properties 中的 key
-	 *
-	 * 测试使用 user.register.success
-	 */
-	@ApiOperation("通过code获取国际化内容")
-	@GetMapping()
-	public AjaxResult<Void> get(@ApiParam("国际化code") String code) {
-		return AjaxResult.success(MessageUtils.message(code));
-	}
+    /**
+     * 通过code获取国际化内容
+     * code为 messages.properties 中的 key
+     * <p>
+     * 测试使用 user.register.success
+     */
+    @ApiOperation("通过code获取国际化内容")
+    @GetMapping()
+    public R<Void> get(@ApiParam("国际化code") String code) {
+        return R.ok(MessageUtils.message(code));
+    }
 
     /**
      * Validator 校验国际化
      * 不传值 分别查看异常返回
-     *
+     * <p>
      * 测试使用 not.null
      */
     @ApiOperation("Validator 校验国际化")
     @GetMapping("/test1")
-    public AjaxResult<Void> test1(@NotBlank(message = "{not.null}") String str) {
-        return AjaxResult.success(str);
+    public R<Void> test1(@NotBlank(message = "{not.null}") String str) {
+        return R.ok(str);
     }
 
     /**
      * Bean 校验国际化
      * 不传值 分别查看异常返回
-     *
+     * <p>
      * 测试使用 not.null
      */
     @ApiOperation("Bean 校验国际化")
     @GetMapping("/test2")
-    public AjaxResult<TestI18nBo> test2(@Validated TestI18nBo bo) {
-        return AjaxResult.success(bo);
+    public R<TestI18nBo> test2(@Validated TestI18nBo bo) {
+        return R.ok(bo);
     }
 
     @Data

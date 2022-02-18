@@ -61,7 +61,7 @@
     </el-form>
     <!--  底部  -->
     <div class="el-register-footer">
-      <span>Copyright © 2018-2021 ruoyi.vip All Rights Reserved.</span>
+      <span>Copyright © 2018-2022 ruoyi.vip All Rights Reserved.</span>
     </div>
   </div>
 </template>
@@ -124,7 +124,9 @@ export default {
       this.$refs.registerForm.validate(valid => {
         if (valid) {
           this.loading = true;
-          register(this.registerForm).then(res => {
+          let registerForm = this.registerForm;
+          registerForm.userType = "sys_user"
+          register(registerForm).then(res => {
             const username = this.registerForm.username;
             this.$alert("<font color='red'>恭喜你，您的账号 " + username + " 注册成功！</font>", '系统提示', {
               dangerouslyUseHTMLString: true,

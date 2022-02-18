@@ -1,9 +1,10 @@
 package com.ruoyi.web.controller.system;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictType;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -14,8 +15,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +28,7 @@ import java.util.List;
  */
 @Validated
 @Api(value = "数据字典信息控制器", tags = {"数据字典信息管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/dict/type")
 public class SysDictTypeController extends BaseController {
@@ -37,7 +36,7 @@ public class SysDictTypeController extends BaseController {
     private final ISysDictTypeService dictTypeService;
 
     @ApiOperation("查询字典类型列表")
-    @PreAuthorize("@ss.hasPermi('system:dict:list')")
+    @SaCheckPermission("system:dict:list")
     @GetMapping("/list")
     public TableDataInfo<SysDictType> list(SysDictType dictType, PageQuery pageQuery) {
         return dictTypeService.selectPageDictTypeList(dictType, pageQuery);
@@ -45,7 +44,7 @@ public class SysDictTypeController extends BaseController {
 
     @ApiOperation("导出字典类型列表")
     @Log(title = "字典类型", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:dict:export')")
+    @SaCheckPermission("system:dict:export")
     @PostMapping("/export")
     public void export(SysDictType dictType, HttpServletResponse response) {
         List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
@@ -56,22 +55,22 @@ public class SysDictTypeController extends BaseController {
      * 查询字典类型详细
      */
     @ApiOperation("查询字典类型详细")
-    @PreAuthorize("@ss.hasPermi('system:dict:query')")
+    @SaCheckPermission("system:dict:query")
     @GetMapping(value = "/{dictId}")
-    public AjaxResult<SysDictType> getInfo(@ApiParam("字典ID") @PathVariable Long dictId) {
-        return AjaxResult.success(dictTypeService.selectDictTypeById(dictId));
+    public R<SysDictType> getInfo(@ApiParam("字典ID") @PathVariable Long dictId) {
+        return R.ok(dictTypeService.selectDictTypeById(dictId));
     }
 
     /**
      * 新增字典类型
      */
     @ApiOperation("新增字典类型")
-    @PreAuthorize("@ss.hasPermi('system:dict:add')")
+    @SaCheckPermission("system:dict:add")
     @Log(title = "字典类型", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult<Void> add(@Validated @RequestBody SysDictType dict) {
+    public R<Void> add(@Validated @RequestBody SysDictType dict) {
         if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
-            return AjaxResult.error("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
+            return R.fail("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
         return toAjax(dictTypeService.insertDictType(dict));
     }
@@ -80,12 +79,12 @@ public class SysDictTypeController extends BaseController {
      * 修改字典类型
      */
     @ApiOperation("修改字典类型")
-    @PreAuthorize("@ss.hasPermi('system:dict:edit')")
+    @SaCheckPermission("system:dict:edit")
     @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult<Void> edit(@Validated @RequestBody SysDictType dict) {
+    public R<Void> edit(@Validated @RequestBody SysDictType dict) {
         if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
-            return AjaxResult.error("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
+            return R.fail("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
         return toAjax(dictTypeService.updateDictType(dict));
     }
@@ -94,24 +93,24 @@ public class SysDictTypeController extends BaseController {
      * 删除字典类型
      */
     @ApiOperation("删除字典类型")
-    @PreAuthorize("@ss.hasPermi('system:dict:remove')")
+    @SaCheckPermission("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping("/{dictIds}")
-    public AjaxResult<Void> remove(@ApiParam("字典ID串") @PathVariable Long[] dictIds) {
+    public R<Void> remove(@ApiParam("字典ID串") @PathVariable Long[] dictIds) {
         dictTypeService.deleteDictTypeByIds(dictIds);
-        return success();
+        return R.ok();
     }
 
     /**
      * 刷新字典缓存
      */
     @ApiOperation("刷新字典缓存")
-    @PreAuthorize("@ss.hasPermi('system:dict:remove')")
+    @SaCheckPermission("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
-    public AjaxResult<Void> refreshCache() {
+    public R<Void> refreshCache() {
         dictTypeService.resetDictCache();
-        return AjaxResult.success();
+        return R.ok();
     }
 
     /**
@@ -119,8 +118,8 @@ public class SysDictTypeController extends BaseController {
      */
     @ApiOperation("获取字典选择框列表")
     @GetMapping("/optionselect")
-    public AjaxResult<List<SysDictType>> optionselect() {
+    public R<List<SysDictType>> optionselect() {
         List<SysDictType> dictTypes = dictTypeService.selectDictTypeAll();
-        return AjaxResult.success(dictTypes);
+        return R.ok(dictTypes);
     }
 }

@@ -5,10 +5,10 @@ import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.CaptchaType;
-import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.config.properties.CaptchaProperties;
@@ -16,7 +16,6 @@ import com.ruoyi.system.service.ISysConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * @author Lion Li
  */
 @Api(value = "验证码操作处理", tags = {"验证码管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 public class CaptchaController {
 
@@ -42,12 +41,12 @@ public class CaptchaController {
      */
     @ApiOperation("生成验证码")
     @GetMapping("/captchaImage")
-    public AjaxResult<Map<String, Object>> getCode() {
+    public R<Map<String, Object>> getCode() {
         Map<String, Object> ajax = new HashMap<>();
         boolean captchaOnOff = configService.selectCaptchaOnOff();
         ajax.put("captchaOnOff", captchaOnOff);
         if (!captchaOnOff) {
-            return AjaxResult.success(ajax);
+            return R.ok(ajax);
         }
         // 保存验证码信息
         String uuid = IdUtil.simpleUUID();
@@ -64,7 +63,7 @@ public class CaptchaController {
         RedisUtils.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
         ajax.put("uuid", uuid);
         ajax.put("img", captcha.getImageBase64());
-        return AjaxResult.success(ajax);
+        return R.ok(ajax);
     }
 
     private String getCodeResult(String capStr) {

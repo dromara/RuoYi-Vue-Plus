@@ -16,7 +16,7 @@ spring:
         # 设置 Spring Boot Admin Server 地址
         url: http://172.30.0.90:9090/admin
         instance:
-          prefer-ip: true # 注册实例时，优先使用 IP
+          service-host-type: IP
         username: ruoyi
         password: 123456
 
@@ -157,11 +157,5 @@ redisson:
     retryAttempts: 3
     # 命令重试发送时间间隔，单位：毫秒
     retryInterval: 1500
-    # 发布和订阅连接的最小空闲连接数
-    subscriptionConnectionMinimumIdleSize: 1
     # 发布和订阅连接池大小
     subscriptionConnectionPoolSize: 50
-    # 单个连接最大订阅数量
-    subscriptionsPerConnection: 5
-    # DNS监测时间间隔，单位：毫秒
-    dnsMonitoringInterval: 5000

@@ -2,36 +2,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ruoyi</groupId>
     <artifactId>ruoyi-vue-plus</artifactId>
-    <version>3.5.0</version>
+    <version>4.0.0</version>
 
     <name>RuoYi-Vue-Plus</name>
     <url>https://gitee.com/JavaLionLi/RuoYi-Vue-Plus</url>
     <description>RuoYi-Vue-Plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>3.5.0</ruoyi-vue-plus.version>
-        <spring-boot.version>2.5.8</spring-boot.version>
+        <ruoyi-vue-plus.version>4.0.0</ruoyi-vue-plus.version>
+        <spring-boot.version>2.6.3</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+        <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
         <druid.version>1.2.8</druid.version>
         <knife4j.version>3.0.3</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <poi.version>4.1.2</poi.version>
-        <easyexcel.version>2.2.11</easyexcel.version>
+        <easyexcel.version>3.0.5</easyexcel.version>
         <cglib.version>3.3.0</cglib.version>
         <velocity.version>2.3</velocity.version>
-        <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
+        <satoken.version>1.29.0</satoken.version>
+        <mybatis-plus.version>3.5.1</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.7.18</hutool.version>
+        <hutool.version>5.7.20</hutool.version>
         <okhttp.version>4.9.2</okhttp.version>
-        <spring-boot-admin.version>2.5.5</spring-boot-admin.version>
-        <redisson.version>3.16.7</redisson.version>
+        <spring-boot-admin.version>2.6.2</spring-boot-admin.version>
+        <redisson.version>3.16.8</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.5.0</dynamic-ds.version>
         <tlog.version>1.3.6</tlog.version>
@@ -41,10 +42,10 @@
         <jaxb.version>3.0.1</jaxb.version>
 
         <!-- OSS 配置 -->
-        <qiniu.version>7.9.0</qiniu.version>
-        <aliyun.oss.version>3.13.1</aliyun.oss.version>
-        <qcloud.cos.version>5.6.58</qcloud.cos.version>
-        <minio.version>8.3.4</minio.version>
+        <qiniu.version>7.9.2</qiniu.version>
+        <aliyun.oss.version>3.14.0</aliyun.oss.version>
+        <qcloud.cos.version>5.6.68</qcloud.cos.version>
+        <minio.version>8.3.5</minio.version>
 
         <!-- docker 配置 -->
         <docker.registry.url>localhost</docker.registry.url>
@@ -63,6 +64,15 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- hutool 的依赖配置-->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-bom</artifactId>
+                <version>${hutool.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -128,6 +138,19 @@
                 <version>${velocity.version}</version>
             </dependency>
 
+            <!-- Sa-Token 权限认证, 在线文档：http://sa-token.dev33.cn/ -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot-starter</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
+            <!-- Sa-Token 整合 jwt -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-jwt</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
+
             <!-- jdk11 缺失依赖 jaxb-->
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
@@ -157,36 +180,6 @@
                 <groupId>p6spy</groupId>
                 <artifactId>p6spy</artifactId>
                 <version>${p6spy.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-core</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-http</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-captcha</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-extra</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-jwt</artifactId>
-                <version>${hutool.version}</version>
             </dependency>
 
             <dependency>
@@ -251,7 +244,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.9.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -261,8 +254,18 @@
         </plugins>
         <resources>
             <resource>
-                <!--打包该目录下的 application.yml -->
                 <directory>src/main/resources</directory>
+                <!-- 关闭过滤 -->
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <!-- 引入所有 匹配文件进行过滤 -->
+                <includes>
+                    <include>application*</include>
+                    <include>bootstrap*</include>
+                    <include>banner*</include>
+                </includes>
                 <!-- 启用过滤 即该资源中的变量将会被过滤器中的值替换 -->
                 <filtering>true</filtering>
             </resource>

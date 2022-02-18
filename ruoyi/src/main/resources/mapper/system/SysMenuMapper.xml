@@ -12,8 +12,8 @@
         <result property="orderNum" column="order_num"/>
         <result property="path" column="path"/>
         <result property="component" column="component"/>
-		<result property="query" column="query"/>
-		<result property="isFrame" column="is_frame"/>
+        <result property="query" column="query"/>
+        <result property="isFrame" column="is_frame"/>
         <result property="isCache" column="is_cache"/>
         <result property="menuType" column="menu_type"/>
         <result property="visible" column="visible"/>
@@ -33,8 +33,8 @@
                         m.menu_name,
                         m.path,
                         m.component,
-						m.`query`,
-						m.visible,
+                        m.`query`,
+                        m.visible,
                         m.status,
                         ifnull(m.perms, '') as perms,
                         m.is_frame,
@@ -75,7 +75,7 @@
                         m.menu_name,
                         m.path,
                         m.component,
-					    m.`query`,
+                        m.`query`,
                         m.visible,
                         m.status,
                         ifnull(m.perms, '') as perms,

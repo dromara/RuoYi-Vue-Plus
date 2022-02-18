@@ -9,6 +9,7 @@
         <result property="deptId" column="dept_id"/>
         <result property="userName" column="user_name"/>
         <result property="nickName" column="nick_name"/>
+        <result property="userType" column="user_type"/>
         <result property="email" column="email"/>
         <result property="phonenumber" column="phonenumber"/>
         <result property="sex" column="sex"/>
@@ -50,6 +51,7 @@
                u.dept_id,
                u.user_name,
                u.nick_name,
+               u.user_type,
                u.email,
                u.avatar,
                u.phonenumber,
@@ -75,9 +77,9 @@
                r.data_scope,
                r.status as role_status
         from sys_user u
-		    left join sys_dept d on u.dept_id = d.dept_id
-		    left join sys_user_role ur on u.user_id = ur.user_id
-		    left join sys_role r on r.role_id = ur.role_id
+            left join sys_dept d on u.dept_id = d.dept_id
+            left join sys_user_role ur on u.user_id = ur.user_id
+            left join sys_role r on r.role_id = ur.role_id
     </sql>
 
     <select id="selectPageUserList" parameterType="SysUser" resultMap="SysUserResult">
@@ -108,10 +110,6 @@
             AND (u.dept_id = #{user.deptId} OR u.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{user.deptId},
             ancestors) ))
         </if>
-<!--        &lt;!&ndash; 数据范围过滤 &ndash;&gt;-->
-<!--        <if test="user.params.dataScope != null and user.params.dataScope != ''">-->
-<!--            AND ( ${user.params.dataScope} )-->
-<!--        </if>-->
     </select>
 
     <select id="selectUserList" parameterType="SysUser" resultMap="SysUserResult">
@@ -142,10 +140,6 @@
             AND (u.dept_id = #{deptId} OR u.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId},
             ancestors) ))
         </if>
-<!--        &lt;!&ndash; 数据范围过滤 &ndash;&gt;-->
-<!--        <if test="params.dataScope != null and params.dataScope != ''">-->
-<!--            AND ( ${params.dataScope} )-->
-<!--        </if>-->
     </select>
 
     <select id="selectAllocatedList" parameterType="SysUser" resultMap="SysUserResult">
@@ -161,10 +155,6 @@
         <if test="user.phonenumber != null and user.phonenumber != ''">
             AND u.phonenumber like concat('%', #{user.phonenumber}, '%')
         </if>
-<!--        &lt;!&ndash; 数据范围过滤 &ndash;&gt;-->
-<!--        <if test="user.params.dataScope != null and user.params.dataScope != ''">-->
-<!--            AND ( ${user.params.dataScope} )-->
-<!--        </if>-->
     </select>
 
     <select id="selectUnallocatedList" parameterType="SysUser" resultMap="SysUserResult">
@@ -181,10 +171,6 @@
         <if test="user.phonenumber != null and user.phonenumber != ''">
             AND u.phonenumber like concat('%', #{user.phonenumber}, '%')
         </if>
-<!--        &lt;!&ndash; 数据范围过滤 &ndash;&gt;-->
-<!--        <if test="user.params.dataScope != null and user.params.dataScope != ''">-->
-<!--            AND ( ${user.params.dataScope} )-->
-<!--        </if>-->
     </select>
 
     <select id="selectUserByUserName" parameterType="String" resultMap="SysUserResult">

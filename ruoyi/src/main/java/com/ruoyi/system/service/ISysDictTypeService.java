@@ -1,6 +1,5 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.domain.entity.SysDictType;
@@ -13,7 +12,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface ISysDictTypeService extends IService<SysDictType> {
+public interface ISysDictTypeService {
 
 
     TableDataInfo<SysDictType> selectPageDictTypeList(SysDictType dictType, PageQuery pageQuery);
@@ -61,7 +60,6 @@ public interface ISysDictTypeService extends IService<SysDictType> {
      * 批量删除字典信息
      *
      * @param dictIds 需要删除的字典ID
-     * @return 结果
      */
     void deleteDictTypeByIds(Long[] dictIds);
 

@@ -2,6 +2,8 @@ package com.ruoyi.common.helper;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.utils.ServletUtils;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -13,6 +15,7 @@ import java.util.Map;
  * @author Lion Li
  * @version 3.5.0
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @SuppressWarnings("unchecked cast")
 public class DataPermissionHelper {
 
@@ -22,7 +25,6 @@ public class DataPermissionHelper {
         Map<String, Object> context = getContext();
         return (T) context.get(key);
     }
-
 
 
     public static void setVariable(String key, Object value) {

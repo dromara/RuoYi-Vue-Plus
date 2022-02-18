@@ -1,10 +1,8 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.core.service.UserService;
 
 import java.util.List;
 
@@ -13,7 +11,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface ISysUserService extends IService<SysUser>, UserService {
+public interface ISysUserService {
 
 
     TableDataInfo<SysUser> selectPageUserList(SysUser user, PageQuery pageQuery);
@@ -48,7 +46,6 @@ public interface ISysUserService extends IService<SysUser>, UserService {
      * @param userName 用户名
      * @return 用户对象信息
      */
-    @Override
     SysUser selectUserByUserName(String userName);
 
     /**
@@ -57,7 +54,6 @@ public interface ISysUserService extends IService<SysUser>, UserService {
      * @param userId 用户ID
      * @return 用户对象信息
      */
-    @Override
     SysUser selectUserById(Long userId);
 
     /**

@@ -1,5 +1,6 @@
 package com.ruoyi.common.utils.ip;
 
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.http.HtmlUtil;
 import cn.hutool.http.HttpUtil;
@@ -10,8 +11,6 @@ import com.ruoyi.common.utils.StringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Map;
 
 /**
  * 获取地址类
@@ -41,21 +40,21 @@ public class AddressUtils {
         if (RuoYiConfig.isAddressEnabled()) {
             try {
                 String rspStr = HttpUtil.createGet(IP_URL)
-                        .body("ip=" + ip + "&json=true", Constants.GBK)
-                        .execute()
-                        .body();
+                    .body("ip=" + ip + "&json=true", Constants.GBK)
+                    .execute()
+                    .body();
                 if (StringUtils.isEmpty(rspStr)) {
                     log.error("获取地理位置异常 {}", ip);
                     return UNKNOWN;
                 }
-                Map<String, String> obj = JsonUtils.parseMap(rspStr);
-                String region = obj.get("pro");
-                String city = obj.get("city");
+                Dict obj = JsonUtils.parseMap(rspStr);
+                String region = obj.getStr("pro");
+                String city = obj.getStr("city");
                 return String.format("%s %s", region, city);
             } catch (Exception e) {
                 log.error("获取地理位置异常 {}", ip);
             }
         }
-        return address;
+        return UNKNOWN;
     }
 }

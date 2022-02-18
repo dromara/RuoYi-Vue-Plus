@@ -1,28 +1,31 @@
 package com.ruoyi.system.service;
 
+import cn.dev33.satoken.secure.BCrypt;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.core.domain.dto.RoleDTO;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.service.LogininforService;
-import com.ruoyi.common.core.service.TokenService;
-import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.enums.DeviceType;
+import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
 import com.ruoyi.common.exception.user.UserException;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
-import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.ServletUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,23 +33,15 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
+@Slf4j
 @Service
 public class SysLoginService {
 
-    @Autowired
-    private TokenService tokenService;
-
-    @Resource
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private ISysUserService userService;
-
-    @Autowired
-    private ISysConfigService configService;
-
-    @Autowired
-    private LogininforService asyncService;
+    private final ISysUserService userService;
+    private final ISysConfigService configService;
+    private final LogininforService asyncService;
+    private final SysPermissionService permissionService;
 
     /**
      * 登录验证
@@ -71,39 +66,35 @@ public class SysLoginService {
             asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME), request);
             throw new UserException("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME);
         }
-        // 用户验证
-        Authentication authentication = null;
-        try {
-            // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
-            authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        } catch (Exception e) {
-            if (e instanceof BadCredentialsException) {
-                // 是否第一次
-                errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
-                // 达到规定错误次数 则锁定登录
-                if (errorNumber.equals(Constants.LOGIN_ERROR_NUMBER)) {
-                    RedisUtils.setCacheObject(Constants.LOGIN_ERROR + username, errorNumber, Constants.LOGIN_ERROR_LIMIT_TIME, TimeUnit.MINUTES);
-                    asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME), request);
-                    throw new UserException("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME);
-                } else {
-                    // 未达到规定错误次数 则递增
-                    RedisUtils.setCacheObject(Constants.LOGIN_ERROR + username, errorNumber);
-                    asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.count", errorNumber), request);
-                    throw new UserException("user.password.retry.limit.count", errorNumber);
-                }
+
+        SysUser user = loadUserByUsername(username);
+
+        if (!BCrypt.checkpw(password, user.getPassword())) {
+            // 是否第一次
+            errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
+            // 达到规定错误次数 则锁定登录
+            if (errorNumber.equals(Constants.LOGIN_ERROR_NUMBER)) {
+                RedisUtils.setCacheObject(Constants.LOGIN_ERROR + username, errorNumber, Constants.LOGIN_ERROR_LIMIT_TIME, TimeUnit.MINUTES);
+                asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME), request);
+                throw new UserException("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME);
             } else {
-                asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage(), request);
-                throw new ServiceException(e.getMessage());
+                // 未达到规定错误次数 则递增
+                RedisUtils.setCacheObject(Constants.LOGIN_ERROR + username, errorNumber);
+                asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.count", errorNumber), request);
+                throw new UserException("user.password.retry.limit.count", errorNumber);
             }
         }
+
         // 登录成功 清空错误次数
         RedisUtils.deleteObject(Constants.LOGIN_ERROR + username);
         asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
-        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        recordLoginInfo(loginUser.getUserId(), username);
+        recordLoginInfo(user.getUserId(), username);
+
+        LoginUser loginUser = buildLoginUser(user);
+
         // 生成token
-        return tokenService.createToken(loginUser);
+        LoginHelper.loginByDevice(loginUser, DeviceType.PC);
+        return StpUtil.getTokenValue();
     }
 
     /**
@@ -112,10 +103,9 @@ public class SysLoginService {
      * @param username 用户名
      * @param code     验证码
      * @param uuid     唯一标识
-     * @return 结果
      */
     public void validateCaptcha(String username, String code, String uuid, HttpServletRequest request) {
-        String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
+        String verifyKey = Constants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
@@ -126,6 +116,38 @@ public class SysLoginService {
             asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"), request);
             throw new CaptchaException();
         }
+    }
+
+    private SysUser loadUserByUsername(String username) {
+        SysUser user = userService.selectUserByUserName(username);
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", username);
+            throw new UserException("user.not.exists", username);
+        } else if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {
+            log.info("登录用户：{} 已被删除.", username);
+            throw new UserException("user.password.delete", username);
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", username);
+            throw new UserException("user.blocked", username);
+        }
+        return user;
+    }
+
+    /**
+     * 构建登录用户
+     */
+    private LoginUser buildLoginUser(SysUser user) {
+        LoginUser loginUser = new LoginUser();
+        loginUser.setUserId(user.getUserId());
+        loginUser.setDeptId(user.getDeptId());
+        loginUser.setUsername(user.getUserName());
+        loginUser.setUserType(user.getUserType());
+        loginUser.setMenuPermission(permissionService.getMenuPermission(user));
+        loginUser.setRolePermission(permissionService.getRolePermission(user));
+        loginUser.setDeptName(user.getDept().getDeptName());
+        List<RoleDTO> roles = BeanUtil.copyToList(user.getRoles(), RoleDTO.class);
+        loginUser.setRoles(roles);
+        return loginUser;
     }
 
     /**

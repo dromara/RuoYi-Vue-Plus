@@ -33,6 +33,9 @@ CREATE TABLE test_tree
     PRIMARY KEY (id) USING BTREE
 ) ENGINE = InnoDB COMMENT = '测试树表';
 
+INSERT INTO sys_user(user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time, remark) VALUES (3, 108, 'test', '本部门及以下 密码666666', 'sys_user', '', '', '0', '', '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate(), 'admin', sysdate(), 'test', sysdate(), NULL);
+INSERT INTO sys_user(user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time, remark) VALUES (4, 102, 'test1', '仅本人 密码666666', 'sys_user', '', '', '0', '', '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate(), 'admin', sysdate(), 'test1', sysdate(), NULL);
+
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES (5, '测试菜单', 0, 5, 'demo', NULL, 1, 0, 'M', '0', '0', NULL, 'star', 'admin', '2021-05-30 00:34:26', NULL, NULL, '');
 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES (1500, '测试单表', 5, 1, 'demo', 'demo/demo/index', 1, 0, 'C', '0', '0', 'demo:demo:list', '#', 'admin', '2021-05-30 00:39:23', '', NULL, '测试单表菜单');
@@ -135,9 +138,6 @@ INSERT INTO sys_role_menu(role_id, menu_id) VALUES (4, 1508);
 INSERT INTO sys_role_menu(role_id, menu_id) VALUES (4, 1509);
 INSERT INTO sys_role_menu(role_id, menu_id) VALUES (4, 1510);
 INSERT INTO sys_role_menu(role_id, menu_id) VALUES (4, 1511);
-
-INSERT INTO sys_user(user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time, remark) VALUES (3, 108, 'test', '本部门及以下 密码666', '00', '', '', '0', '', '$2a$10$M6tZRpUZbWKq11O/z6YISePQc./Jhru8E18mmVJTr9aV8whzfjacC', '0', '0', '127.0.0.1', '2021-05-30 02:00:37', 'admin', '2021-04-22 09:50:41', 'test', '2021-05-30 02:00:37', NULL);
-INSERT INTO sys_user(user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time, remark) VALUES (4, 102, 'test1', '仅本人 密码666', '00', '', '', '0', '', '$2a$10$yBSXp5Ba1m402cxXTPSy4eXUO8CXCGvXfquNVP/XMWwZ8nf9GaoMy', '0', '0', '127.0.0.1', '2021-05-30 01:48:03', 'admin', '2021-05-30 01:16:02', 'test1', '2021-05-30 01:48:03', NULL);
 
 INSERT INTO sys_user_role(user_id, role_id) VALUES (3, 3);
 INSERT INTO sys_user_role(user_id, role_id) VALUES (4, 4);

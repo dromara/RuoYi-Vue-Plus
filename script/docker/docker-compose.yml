@@ -12,7 +12,7 @@ services:
       # 初始化数据库(后续的初始化sql会在这个库执行)
       MYSQL_DATABASE: ry-vue
     ports:
-      - 3306:3306
+      - "3306:3306"
     volumes:
       # 数据挂载
       - /docker/mysql/data/:/var/lib/mysql/
@@ -38,8 +38,8 @@ services:
       # 时区上海
       TZ: Asia/Shanghai
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "443:443"
     volumes:
       # 证书映射
       - /docker/nginx/cert:/etc/nginx/cert
@@ -58,7 +58,7 @@ services:
     image: redis:6.2.6
     container_name: redis
     ports:
-      - 6379:6379
+      - "6379:6379"
     environment:
       # 时区上海
       TZ: Asia/Shanghai
@@ -79,9 +79,9 @@ services:
     container_name: minio
     ports:
       # api 端口
-      - 9000:9000
+      - "9000:9000"
       # 控制台端口
-      - 9001:9001
+      - "9001:9001"
     environment:
       # 时区上海
       TZ: Asia/Shanghai
@@ -102,7 +102,7 @@ services:
         ipv4_address: 172.30.0.54
 
   ruoyi-server1:
-    image: "ruoyi/ruoyi-server:3.5.0"
+    image: ruoyi/ruoyi-server:4.0.0
     container_name: ruoyi-server1
     environment:
       # 时区上海
@@ -117,7 +117,7 @@ services:
         ipv4_address: 172.30.0.60
 
   ruoyi-server2:
-    image: "ruoyi/ruoyi-server:3.5.0"
+    image: "ruoyi/ruoyi-server:4.0.0"
     container_name: ruoyi-server2
     environment:
       # 时区上海
@@ -132,7 +132,7 @@ services:
         ipv4_address: 172.30.0.61
 
   ruoyi-monitor-admin:
-    image: "ruoyi/ruoyi-monitor-admin:3.5.0"
+    image: ruoyi/ruoyi-monitor-admin:4.0.0
     container_name: ruoyi-monitor-admin
     environment:
       # 时区上海
@@ -147,7 +147,7 @@ services:
         ipv4_address: 172.30.0.90
 
   ruoyi-xxl-job-admin:
-    image: "ruoyi/ruoyi-xxl-job-admin:3.5.0"
+    image: ruoyi/ruoyi-xxl-job-admin:4.0.0
     container_name: ruoyi-xxl-job-admin
     environment:
       # 时区上海

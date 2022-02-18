@@ -13,6 +13,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 线程池配置
@@ -44,7 +45,8 @@ public class ThreadPoolConfig {
     @Bean(name = "scheduledExecutorService")
     protected ScheduledExecutorService scheduledExecutorService() {
         return new ScheduledThreadPoolExecutor(threadPoolProperties.getCorePoolSize(),
-                new BasicThreadFactory.Builder().namingPattern("schedule-pool-%d").daemon(true).build()) {
+            new BasicThreadFactory.Builder().namingPattern("schedule-pool-%d").daemon(true).build(),
+            new ThreadPoolExecutor.CallerRunsPolicy()) {
             @Override
             protected void afterExecute(Runnable r, Throwable t) {
                 super.afterExecute(r, t);

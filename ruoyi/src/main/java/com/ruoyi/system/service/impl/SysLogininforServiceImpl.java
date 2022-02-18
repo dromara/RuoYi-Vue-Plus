@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.LogininforService;
 import com.ruoyi.common.utils.ServletUtils;
@@ -15,6 +14,7 @@ import com.ruoyi.common.utils.ip.AddressUtils;
 import com.ruoyi.system.domain.SysLogininfor;
 import com.ruoyi.system.mapper.SysLogininforMapper;
 import com.ruoyi.system.service.ISysLogininforService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -30,9 +30,12 @@ import java.util.Map;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
-public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMapper, SysLogininfor, SysLogininfor> implements ISysLogininforService, LogininforService {
+public class SysLogininforServiceImpl implements ISysLogininforService, LogininforService {
+
+    private final SysLogininforMapper baseMapper;
 
     /**
      * 记录登录信息
@@ -96,10 +99,11 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
             .like(StringUtils.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysLogininfor::getLoginTime, params.get("beginTime"), params.get("endTime"));
-        if(StringUtils.isBlank(pageQuery.getOrderByColumn())) {
-            pageQuery.setOrderByColumn("info_id").setIsAsc("desc");
+        if (StringUtils.isBlank(pageQuery.getOrderByColumn())) {
+            pageQuery.setOrderByColumn("info_id");
+            pageQuery.setIsAsc("desc");
         }
-        Page<SysLogininfor> page = page(pageQuery.build(), lqw);
+        Page<SysLogininfor> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
 
@@ -111,7 +115,7 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
     @Override
     public void insertLogininfor(SysLogininfor logininfor) {
         logininfor.setLoginTime(new Date());
-        save(logininfor);
+        baseMapper.insert(logininfor);
     }
 
     /**
@@ -123,7 +127,7 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
     @Override
     public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor) {
         Map<String, Object> params = logininfor.getParams();
-        return list(new LambdaQueryWrapper<SysLogininfor>()
+        return baseMapper.selectList(new LambdaQueryWrapper<SysLogininfor>()
             .like(StringUtils.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
             .eq(StringUtils.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
             .like(StringUtils.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
@@ -136,7 +140,7 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
      * 批量删除系统登录日志
      *
      * @param infoIds 需要删除的登录日志ID
-     * @return
+     * @return 结果
      */
     @Override
     public int deleteLogininforByIds(Long[] infoIds) {
@@ -148,6 +152,6 @@ public class SysLogininforServiceImpl extends ServicePlusImpl<SysLogininforMappe
      */
     @Override
     public void cleanLogininfor() {
-        remove(new LambdaQueryWrapper<>());
+        baseMapper.delete(new LambdaQueryWrapper<>());
     }
 }

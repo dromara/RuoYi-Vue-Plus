@@ -19,25 +19,25 @@ import java.util.HashMap;
 @Component
 public class CookieInterceptor implements AsyncHandlerInterceptor {
 
-	@Override
-	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-			ModelAndView modelAndView) throws Exception {
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+                           ModelAndView modelAndView) throws Exception {
 
-		// cookie
-		if (modelAndView!=null && request.getCookies()!=null && request.getCookies().length>0) {
-			HashMap<String, Cookie> cookieMap = new HashMap<String, Cookie>();
-			for (Cookie ck : request.getCookies()) {
-				cookieMap.put(ck.getName(), ck);
-			}
-			modelAndView.addObject("cookieMap", cookieMap);
-		}
+        // cookie
+        if (modelAndView != null && request.getCookies() != null && request.getCookies().length > 0) {
+            HashMap<String, Cookie> cookieMap = new HashMap<String, Cookie>();
+            for (Cookie ck : request.getCookies()) {
+                cookieMap.put(ck.getName(), ck);
+            }
+            modelAndView.addObject("cookieMap" , cookieMap);
+        }
 
-		// static method
-		if (modelAndView != null) {
-			modelAndView.addObject("I18nUtil", FtlUtil.generateStaticModel(I18nUtil.class.getName()));
-		}
+        // static method
+        if (modelAndView != null) {
+            modelAndView.addObject("I18nUtil" , FtlUtil.generateStaticModel(I18nUtil.class.getName()));
+        }
 
-		AsyncHandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
-	}
+        AsyncHandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
+    }
 
 }

@@ -5,7 +5,7 @@ ruoyi:
   # 版本
   version: ${ruoyi-vue-plus.version}
   # 版权年份
-  copyrightYear: 2021
+  copyrightYear: 2022
   # 实例演示开关
   demoEnabled: true
   # 获取ip地址开关
@@ -79,6 +79,10 @@ spring:
   thymeleaf:
     # 将系统模板放置到最前面 否则会与 springboot-admin 页面冲突
     template-resolver-order: 1
+  mvc:
+    pathmatch:
+      # 适配 boot 2.6 路由与 springfox 兼容
+      matching-strategy: ANT_PATH_MATCHER
   jackson:
     # 日期格式化
     date-format: yyyy-MM-dd HH:mm:ss
@@ -91,24 +95,46 @@ spring:
       # 允许对象忽略json中不存在的属性
       fail_on_unknown_properties: false
 
-# token配置
-token:
-  # 令牌自定义标识
-  header: Authorization
-  # 令牌密钥
-  secret: abcdefghijklmnopqrstuvwxyz
-  # 令牌有效期（默认30分钟）
-  expireTime: 30
+# Sa-Token配置
+sa-token:
+  # token名称 (同时也是cookie名称)
+  token-name: Authorization
+  # token有效期 设为一天 (必定过期) 单位: 秒
+  timeout: 86400
+  # token临时有效期 (指定时间无操作就过期) 单位: 秒
+  activity-timeout: 1800
+  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+  is-share: false
+  # 是否尝试从请求体里读取token
+  is-read-body: false
+  # 是否尝试从header里读取token
+  is-read-head: true
+  # 是否尝试从cookie里读取token
+  is-read-cookie: false
+  # token前缀
+  token-prefix: "Bearer"
+  # token风格
+  token-style: uuid
+  # jwt秘钥
+  jwt-secret-key: abcdefghijklmnopqrstuvwxyz
+  # 是否输出操作日志
+  is-log: true
 
 # security配置
 security:
-  # 登出路径
-  logout-url: /logout
-  # 匿名路径
-  anonymous:
+  # 排除路径
+  excludes:
     - /login
+    - /logout
     - /register
     - /captchaImage
+    # 静态资源
+    - /*.html
+    - /**/*.html
+    - /**/*.css
+    - /**/*.js
     # swagger 文档配置
     - /doc.html
     - /swagger-resources/**
@@ -217,6 +243,10 @@ knife4j:
   enable: true
   # 是否开启生产环境保护策略
   production: @knife4j.production@
+  basic:
+    enable: true
+    username: ruoyi
+    password: 123456
   # 前端Ui的个性化配置属性
   setting:
     # 默认语言
