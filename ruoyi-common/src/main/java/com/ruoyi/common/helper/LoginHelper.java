@@ -2,6 +2,7 @@ package com.ruoyi.common.helper;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.UserType;
@@ -125,12 +126,11 @@ public class LoginHelper {
      * @return 结果
      */
     public static boolean isAdmin(Long userId) {
-        return userId != null && 1L == userId;
+        return UserConstants.ADMIN_ID.equals(userId);
     }
 
     public static boolean isAdmin() {
-        Long userId = getUserId();
-        return userId != null && 1L == userId;
+        return isAdmin(getUserId());
     }
 
 }
