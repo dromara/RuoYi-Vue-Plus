@@ -97,6 +97,10 @@ public class SysLoginService {
         return StpUtil.getTokenValue();
     }
 
+    public void logout(String loginName) {
+        asyncService.recordLogininfor(loginName, Constants.LOGOUT, MessageUtils.message("user.logout.success"), ServletUtils.getRequest());
+    }
+
     /**
      * 校验验证码
      *
