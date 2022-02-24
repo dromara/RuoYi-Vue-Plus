@@ -41,14 +41,14 @@ public class UnsignedMathGenerator implements CodeGenerator {
     @Override
     public String generate() {
         final int limit = getLimit();
-        int min = RandomUtil.randomInt(limit);
-        int max = RandomUtil.randomInt(min, limit);
-        String number1 = Integer.toString(max);
-        String number2 = Integer.toString(min);
-        number1 = StringUtils.rightPad(number1, this.numberLength, CharUtil.SPACE);
-        number2 = StringUtils.rightPad(number2, this.numberLength, CharUtil.SPACE);
+        int a = RandomUtil.randomInt(limit);
+        int b = RandomUtil.randomInt(limit);
+        String max = Integer.toString(Math.max(a,b));
+        String min = Integer.toString(Math.min(a,b));
+        max = StringUtils.rightPad(max, this.numberLength, CharUtil.SPACE);
+        min = StringUtils.rightPad(min, this.numberLength, CharUtil.SPACE);
 
-        return number1 + RandomUtil.randomChar(OPERATORS) + number2 + '=';
+        return max + RandomUtil.randomChar(OPERATORS) + min + '=';
     }
 
     @Override
