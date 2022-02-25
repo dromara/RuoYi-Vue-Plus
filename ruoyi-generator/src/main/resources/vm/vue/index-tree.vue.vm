@@ -306,7 +306,7 @@ export default {
       queryParams: {
 #foreach ($column in $columns)
 #if($column.query)
-        $column.javaField: null#if($foreach.count != $columns.size()),#end
+        $column.javaField: undefined#if($foreach.count != $columns.size()),#end
 #end
 #end
       },
