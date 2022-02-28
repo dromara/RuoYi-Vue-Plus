@@ -162,8 +162,8 @@ export default {
           this.$modal.closeLoading();
         }
       } else {
-        this.$message.error(res.msg);
-        this.loading.close();
+        this.$modal.msgError(res.msg);
+        this.$modal.closeLoading();
       }
     },
     // 删除文件
