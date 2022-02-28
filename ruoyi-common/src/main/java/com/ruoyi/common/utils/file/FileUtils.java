@@ -22,7 +22,6 @@ public class FileUtils extends FileUtil {
      *
      * @param response     响应对象
      * @param realFileName 真实文件名
-     * @return
      */
     public static void setAttachmentResponseHeader(HttpServletResponse response, String realFileName) throws UnsupportedEncodingException {
         String percentEncodedFileName = percentEncode(realFileName);
@@ -35,7 +34,6 @@ public class FileUtils extends FileUtil {
             .append("utf-8''")
             .append(percentEncodedFileName);
 
-        response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Expose-Headers", "Content-Disposition,download-filename");
         response.setHeader("Content-disposition", contentDispositionValue.toString());
         response.setHeader("download-filename", percentEncodedFileName);
