@@ -1,8 +1,6 @@
 package com.ruoyi.generator.domain;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.utils.StringUtils;
@@ -102,6 +100,7 @@ public class GenTable extends BaseEntity {
     /**
      * 生成路径（不填默认项目路径）
      */
+    @TableField(updateStrategy = FieldStrategy.NOT_EMPTY)
     private String genPath;
 
     /**
