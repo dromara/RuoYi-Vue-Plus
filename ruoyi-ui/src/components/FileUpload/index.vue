@@ -1,6 +1,7 @@
 <template>
   <div class="upload-file">
     <el-upload
+      multiple
       :action="uploadFileUrl"
       :before-upload="handleBeforeUpload"
       :file-list="fileList"
@@ -69,6 +70,8 @@ export default {
   },
   data() {
     return {
+      number: 0,
+      uploadList: [],
       baseUrl: process.env.VUE_APP_BASE_API,
       uploadFileUrl: process.env.VUE_APP_BASE_API + "/system/oss/upload", // 上传的图片服务器地址
       headers: {
@@ -122,7 +125,7 @@ export default {
           return false;
         });
         if (!isTypeOk) {
-          this.$message.error(`文件格式不正确, 请上传${this.fileType.join("/")}格式文件!`);
+          this.$modal.msgError(`文件格式不正确, 请上传${this.fileType.join("/")}格式文件!`);
           return false;
         }
       }
@@ -130,29 +133,37 @@ export default {
       if (this.fileSize) {
         const isLt = file.size / 1024 / 1024 < this.fileSize;
         if (!isLt) {
-          this.$message.error(`上传文件大小不能超过 ${this.fileSize} MB!`);
+          this.$modal.msgError(`上传文件大小不能超过 ${this.fileSize} MB!`);
           return false;
         }
       }
+      this.$modal.loading("正在上传文件，请稍候...");
+      this.number++;
       return true;
     },
     // 文件个数超出
     handleExceed() {
-      this.$message.error(`上传文件数量不能超过 ${this.limit} 个!`);
+      this.$modal.msgError(`上传文件数量不能超过 ${this.limit} 个!`);
     },
     // 上传失败
     handleUploadError(err) {
-      this.$message.error("上传失败, 请重试");
+      this.$modal.msgError("上传图片失败，请重试");
+      this.$modal.closeLoading()
     },
     // 上传成功回调
     handleUploadSuccess(res, file) {
       if (res.code === 200) {
-        this.$message.success("上传成功");
-        this.fileList.push({ name: res.data.fileName, url: res.data.url });
-        this.$emit("input", this.listToString(this.fileList));
+        this.uploadList.push({ name: res.data.fileName, url: res.data.url });
+        if (this.uploadList.length === this.number) {
+          this.fileList = this.fileList.concat(this.uploadList);
+          this.uploadList = [];
+          this.number = 0;
+          this.$emit("input", this.listToString(this.fileList));
+          this.$modal.closeLoading();
+        }
       } else {
-        this.$message.error(res.msg);
-        this.loading.close();
+        this.$modal.msgError(res.msg);
+        this.$modal.closeLoading();
       }
     },
     // 删除文件
@@ -163,7 +174,7 @@ export default {
     // 获取文件名称
     getFileName(name) {
       if (name.lastIndexOf("/") > -1) {
-        return name.slice(name.lastIndexOf("/") + 1).toLowerCase();
+        return name.slice(name.lastIndexOf("/") + 1);
       } else {
         return "";
       }

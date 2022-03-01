@@ -7,6 +7,11 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 /**
@@ -117,6 +122,14 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
+     * 计算相差天数
+     */
+    public static int differentDaysByMillisecond(Date date1, Date date2)
+    {
+        return Math.abs((int) ((date2.getTime() - date1.getTime()) / (1000 * 3600 * 24)));
+    }
+
+    /**
      * 计算两个时间差
      */
     public static String getDatePoor(Date endDate, Date nowDate) {
@@ -135,5 +148,22 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         // 计算差多少秒//输出结果
         // long sec = diff % nd % nh % nm / ns;
         return day + "天" + hour + "小时" + min + "分钟";
+    }
+
+    /**
+     * 增加 LocalDateTime ==> Date
+     */
+    public static Date toDate(LocalDateTime temporalAccessor) {
+        ZonedDateTime zdt = temporalAccessor.atZone(ZoneId.systemDefault());
+        return Date.from(zdt.toInstant());
+    }
+
+    /**
+     * 增加 LocalDate ==> Date
+     */
+    public static Date toDate(LocalDate temporalAccessor) {
+        LocalDateTime localDateTime = LocalDateTime.of(temporalAccessor, LocalTime.of(0, 0, 0));
+        ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
+        return Date.from(zdt.toInstant());
     }
 }
