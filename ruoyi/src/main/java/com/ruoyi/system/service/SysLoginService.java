@@ -87,14 +87,17 @@ public class SysLoginService {
 
         // 登录成功 清空错误次数
         RedisUtils.deleteObject(Constants.LOGIN_ERROR + username);
-        asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
-        recordLoginInfo(user.getUserId(), username);
-
         LoginUser loginUser = buildLoginUser(user);
-
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.PC);
+
+        asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
+        recordLoginInfo(user.getUserId(), username);
         return StpUtil.getTokenValue();
+    }
+
+    public void logout(String loginName) {
+        asyncService.recordLogininfor(loginName, Constants.LOGOUT, MessageUtils.message("user.logout.success"), ServletUtils.getRequest());
     }
 
     /**

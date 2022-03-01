@@ -86,7 +86,8 @@ export default {
         password: "",
         confirmPassword: "",
         code: "",
-        uuid: ""
+        uuid: "",
+        user_type: "sys_user"
       },
       registerRules: {
         username: [
