@@ -101,6 +101,29 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v4.0.1 - 2022-03-01">
+              <ol>
+                <li>update 图片上传 文件上传 支持并发上传</li>
+                <li>update 组件ImageUpload支持多图同时选择上传</li>
+                <li>udpate 组件fileUpload支持多文件同时选择上传</li>
+                <li>update springboot 2.6.3 => 2.6.4</li>
+                <li>update hutool 5.7.20 => 5.7.21</li>
+                <li>update qiniu 7.9.2 => 7.9.3</li>
+                <li>update minio 8.3.5 => 8.3.7</li>
+                <li>update 优化 R 默认返回 msg</li>
+                <li>update 增加 用户注册 用户类型默认值</li>
+                <li>update 增加用户登出日志</li>
+                <li>update 更新 多用户多设备的注释说明</li>
+                <li>update 优化 是否为管理员的判断</li>
+                <li>update 优化 页面若未匹配到字典标签则返回原字典值</li>
+                <li>update 调整用户登录 将日志调整到最后 防止获取不到用户警告</li>
+                <li>update 优化随机数生成方式 避免容易生成两个相同随机数的问题</li>
+                <li>fix 修复代码生成 基于路径生成 路径为空问题</li>
+                <li>fix 恢复误删 @Async 注解线程池配置类</li>
+                <li>fix 修复 minio 适配 https 导致的问题</li>
+                <li>fix 修复分页组件请求两次问题</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v4.0.0 - 2022-02-18">
               <ol>
                 <li>[重大更新] 重写项目整体结构 数据处理下沉至Mapper符合MVC规范 减少循环依赖</li>
@@ -708,7 +731,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "4.0.0",
+      version: "4.0.1",
     };
   },
   methods: {
