@@ -46,7 +46,15 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public List<SysDept> selectDeptList(SysDept dept) {
-        return baseMapper.selectDeptList(dept);
+        LambdaQueryWrapper<SysDept> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(SysDept::getDelFlag, "0")
+            .eq(ObjectUtil.isNotNull(dept.getDeptId()), SysDept::getDeptId, dept.getDeptId())
+            .eq(ObjectUtil.isNotNull(dept.getParentId()), SysDept::getParentId, dept.getParentId())
+            .like(StringUtils.isNotBlank(dept.getDeptName()), SysDept::getDeptName, dept.getDeptName())
+            .eq(StringUtils.isNotBlank(dept.getStatus()), SysDept::getStatus, dept.getStatus())
+            .orderByAsc(SysDept::getParentId)
+            .orderByAsc(SysDept::getOrderNum);
+        return baseMapper.selectDeptList(lqw);
     }
 
     /**
