@@ -3,6 +3,7 @@ package com.ruoyi.framework.aspectj;
 import com.ruoyi.common.annotation.RateLimiter;
 import com.ruoyi.common.enums.LimitType;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ public class RateLimiterAspect {
             }
             long number = RedisUtils.rateLimiter(combineKey, rateType, count, time);
             if (number == -1) {
-                throw new ServiceException("访问过于频繁，请稍候再试");
+                throw new ServiceException(MessageUtils.message("rate.limiter.message"));
             }
             log.info("限制令牌 => {}, 剩余令牌 => {}, 缓存key => '{}'", count, number, combineKey);
         } catch (ServiceException e) {
