@@ -3,6 +3,7 @@ package com.ruoyi.common.core.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ruoyi.common.core.domain.TreeEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -103,6 +104,7 @@ public class SysMenu extends TreeEntity {
      * 权限字符串
      */
     @ApiModelProperty(value = "权限字符串")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Size(min = 0, max = 100, message = "权限标识长度不能超过100个字符")
     private String perms;
 

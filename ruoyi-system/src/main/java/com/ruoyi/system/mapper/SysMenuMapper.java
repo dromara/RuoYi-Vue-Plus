@@ -1,5 +1,7 @@
 package com.ruoyi.system.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.mapper.BaseMapperPlus;
 import org.apache.ibatis.annotations.Param;
@@ -41,7 +43,14 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenuMapper, SysMenu, Sy
      *
      * @return 菜单列表
      */
-    List<SysMenu> selectMenuTreeAll();
+    default List<SysMenu> selectMenuTreeAll() {
+        LambdaQueryWrapper<SysMenu> lqw = new LambdaQueryWrapper<SysMenu>()
+            .in(SysMenu::getMenuType, UserConstants.TYPE_DIR, UserConstants.TYPE_MENU)
+            .eq(SysMenu::getStatus, UserConstants.MENU_NORMAL)
+            .orderByAsc(SysMenu::getParentId)
+            .orderByAsc(SysMenu::getOrderNum);
+        return this.selectList(lqw);
+    }
 
     /**
      * 根据用户ID查询菜单

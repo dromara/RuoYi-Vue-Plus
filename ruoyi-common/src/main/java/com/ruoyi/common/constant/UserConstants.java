@@ -63,6 +63,16 @@ public interface UserConstants {
     String NO_FRAME = "1";
 
     /**
+     * 菜单正常状态
+     */
+    String MENU_NORMAL = "0";
+
+    /**
+     * 菜单停用状态
+     */
+    String MENU_DISABLE = "1";
+
+    /**
      * 菜单类型（目录）
      */
     String TYPE_DIR = "M";

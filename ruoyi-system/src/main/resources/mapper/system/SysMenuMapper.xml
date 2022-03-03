@@ -27,31 +27,9 @@
         <result property="remark" column="remark"/>
     </resultMap>
 
-    <select id="selectMenuTreeAll" resultMap="SysMenuResult">
-        select distinct m.menu_id,
-                        m.parent_id,
-                        m.menu_name,
-                        m.path,
-                        m.component,
-                        m.`query`,
-                        m.visible,
-                        m.status,
-                        ifnull(m.perms, '') as perms,
-                        m.is_frame,
-                        m.is_cache,
-                        m.menu_type,
-                        m.icon,
-                        m.order_num,
-                        m.create_time
-        from sys_menu m
-        where m.menu_type in ('M', 'C')
-          and m.status = 0
-        order by m.parent_id, m.order_num
-    </select>
-
     <select id="selectMenuListByUserId" parameterType="SysMenu" resultMap="SysMenuResult">
         select distinct m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.`query`, m.visible, m.status,
-        ifnull(m.perms,'') as perms, m.is_frame, m.is_cache, m.menu_type, m.icon, m.order_num, m.create_time
+        m.perms, m.is_frame, m.is_cache, m.menu_type, m.icon, m.order_num, m.create_time
         from sys_menu m
         left join sys_role_menu rm on m.menu_id = rm.menu_id
         left join sys_user_role ur on rm.role_id = ur.role_id
@@ -78,7 +56,7 @@
                         m.`query`,
                         m.visible,
                         m.status,
-                        ifnull(m.perms, '') as perms,
+                        m.perms,
                         m.is_frame,
                         m.is_cache,
                         m.menu_type,
