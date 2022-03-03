@@ -66,11 +66,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="genTable.tableComment != null and genTable.tableComment != ''">
                 AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
             </if>
-            <if test="genTable.params.beginTime != null and genTable.params.beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{genTable.params.beginTime},'%y%m%d')
-            </if>
-            <if test="genTable.params.endTime != null and genTable.params.endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{genTable.params.endTime},'%y%m%d')
+            <if test="genTable.params.beginTime != null and genTable.params.endTime != null">
+                AND create_time between #{genTable.params.beginTime} and #{genTable.params.endTime}
             </if>
         </where>
     </select>
@@ -86,11 +83,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="genTable.tableComment != null and genTable.tableComment != ''">
             AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
         </if>
-        <if test="genTable.params.beginTime != null and genTable.params.beginTime != ''"><!-- 开始时间检索 -->
-            AND date_format(create_time,'%y%m%d') &gt;= date_format(#{genTable.params.beginTime},'%y%m%d')
-        </if>
-        <if test="genTable.params.endTime != null and genTable.params.endTime != ''"><!-- 结束时间检索 -->
-            AND date_format(create_time,'%y%m%d') &lt;= date_format(#{genTable.params.endTime},'%y%m%d')
+        <if test="genTable.params.beginTime != null and genTable.params.endTime != null">
+            AND create_time between #{genTable.params.beginTime} and #{genTable.params.endTime}
         </if>
         order by create_time desc
     </select>
@@ -105,11 +99,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="tableComment != null and tableComment != ''">
                 AND lower(table_comment) like lower(concat('%', #{tableComment}, '%'))
             </if>
-            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
-            </if>
-            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            <if test="params.beginTime != null and params.endTime != null">
+                AND create_time between #{params.beginTime} and #{params.endTime}
             </if>
         </where>
     </select>
@@ -125,11 +116,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="tableComment != null and tableComment != ''">
             AND lower(table_comment) like lower(concat('%', #{tableComment}, '%'))
         </if>
-        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-            AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
-        </if>
-        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-            AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+        <if test="params.beginTime != null and params.endTime != null">
+            AND create_time between #{params.beginTime} and #{params.endTime}
         </if>
         order by create_time desc
     </select>

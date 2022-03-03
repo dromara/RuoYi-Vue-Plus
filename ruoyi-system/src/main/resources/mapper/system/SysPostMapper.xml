@@ -17,18 +17,6 @@
         <result property="remark" column="remark"/>
     </resultMap>
 
-    <sql id="selectPostVo">
-        select post_id,
-               post_code,
-               post_name,
-               post_sort,
-               status,
-               create_by,
-               create_time,
-               remark
-        from sys_post
-    </sql>
-
     <select id="selectPostListByUserId" parameterType="Long" resultType="Long">
         select p.post_id
         from sys_post p

@@ -54,11 +54,8 @@
         <if test="role.roleKey != null and role.roleKey != ''">
             AND r.role_key like concat('%', #{role.roleKey}, '%')
         </if>
-        <if test="role.params.beginTime != null and role.params.beginTime != ''"><!-- 开始时间检索 -->
-            and date_format(r.create_time,'%y%m%d') &gt;= date_format(#{role.params.beginTime},'%y%m%d')
-        </if>
-        <if test="role.params.endTime != null and role.params.endTime != ''"><!-- 结束时间检索 -->
-            and date_format(r.create_time,'%y%m%d') &lt;= date_format(#{role.params.endTime},'%y%m%d')
+        <if test="role.params.beginTime != null and role.params.endTime != null">
+            AND r.create_time between #{role.params.beginTime} and #{role.params.endTime}
         </if>
         order by r.role_sort
     </select>
@@ -78,11 +75,8 @@
         <if test="roleKey != null and roleKey != ''">
             AND r.role_key like concat('%', #{roleKey}, '%')
         </if>
-        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-            and date_format(r.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
-        </if>
-        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-            and date_format(r.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+        <if test="params.beginTime != null and params.endTime != null">
+            AND r.create_time between #{params.beginTime} and #{params.endTime}
         </if>
         order by r.role_sort
     </select>
