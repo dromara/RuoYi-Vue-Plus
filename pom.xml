@@ -23,6 +23,7 @@
         <knife4j.version>3.0.3</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <poi.version>4.1.2</poi.version>
+        <commons-compress.version>1.21</commons-compress.version>
         <easyexcel.version>3.0.5</easyexcel.version>
         <cglib.version>3.3.0</cglib.version>
         <velocity.version>2.3</velocity.version>
@@ -107,6 +108,13 @@
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
+            </dependency>
+
+            <!-- 修复poi漏洞 -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons-compress.version}</version>
             </dependency>
 
             <dependency>
