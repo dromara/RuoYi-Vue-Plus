@@ -28,6 +28,11 @@ public interface UserConstants {
     String USER_DISABLE = "1";
 
     /**
+     * 角色正常状态
+     */
+    String ROLE_NORMAL = "0";
+
+    /**
      * 角色封禁状态
      */
     String ROLE_DISABLE = "1";
