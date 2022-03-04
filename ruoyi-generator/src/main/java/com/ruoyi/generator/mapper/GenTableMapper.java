@@ -1,6 +1,8 @@
 package com.ruoyi.generator.mapper;
 
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.mapper.BaseMapperPlus;
 import com.ruoyi.generator.domain.GenTable;
@@ -16,26 +18,15 @@ import java.util.List;
 @InterceptorIgnore(dataPermission = "true")
 public interface GenTableMapper extends BaseMapperPlus<GenTableMapper, GenTable, GenTable> {
 
-
-    Page<GenTable> selectPageGenTableList(@Param("page") Page<GenTable> page, @Param("genTable") GenTable genTable);
-
-    Page<GenTable> selectPageDbTableList(@Param("page") Page<GenTable> page, @Param("genTable") GenTable genTable);
-
-    /**
-     * 查询业务列表
-     *
-     * @param genTable 业务信息
-     * @return 业务集合
-     */
-    List<GenTable> selectGenTableList(GenTable genTable);
+    Page<GenTable> selectPageDbTableList(@Param("page") Page<GenTable> page, @Param(Constants.WRAPPER) Wrapper<Object> queryWrapper);
 
     /**
      * 查询据库列表
      *
-     * @param genTable 业务信息
+     * @param queryWrapper 查询条件
      * @return 数据库表集合
      */
-    List<GenTable> selectDbTableList(GenTable genTable);
+    List<GenTable> selectDbTableList(@Param(Constants.WRAPPER) Wrapper<Object> queryWrapper);
 
     /**
      * 查询据库列表

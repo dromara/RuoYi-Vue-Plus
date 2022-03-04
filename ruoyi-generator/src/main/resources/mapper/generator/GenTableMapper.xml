@@ -53,73 +53,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime"     column="update_time"    />
     </resultMap>
 
-    <sql id="selectGenTableVo">
-        select table_id, table_name, table_comment, sub_table_name, sub_table_fk_name, class_name, tpl_category, package_name, module_name, business_name, function_name, function_author, gen_type, gen_path, options, create_by, create_time, update_by, update_time, remark from gen_table
-    </sql>
-
-    <select id="selectPageGenTableList" parameterType="GenTable" resultMap="GenTableResult">
-        <include refid="selectGenTableVo"/>
-        <where>
-            <if test="genTable.tableName != null and genTable.tableName != ''">
-                AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
-            </if>
-            <if test="genTable.tableComment != null and genTable.tableComment != ''">
-                AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
-            </if>
-            <if test="genTable.params.beginTime != null and genTable.params.endTime != null">
-                AND create_time between #{genTable.params.beginTime} and #{genTable.params.endTime}
-            </if>
-        </where>
-    </select>
-
     <select id="selectPageDbTableList" parameterType="GenTable" resultMap="GenTableResult">
-        select table_name, table_comment, create_time, update_time from information_schema.tables
-        where table_schema = (select database())
-        AND table_name NOT LIKE 'xxl_job_%' AND table_name NOT LIKE 'gen_%'
-        AND table_name NOT IN (select table_name from gen_table)
-        <if test="genTable.tableName != null and genTable.tableName != ''">
-            AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
-        </if>
-        <if test="genTable.tableComment != null and genTable.tableComment != ''">
-            AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
-        </if>
-        <if test="genTable.params.beginTime != null and genTable.params.endTime != null">
-            AND create_time between #{genTable.params.beginTime} and #{genTable.params.endTime}
-        </if>
-        order by create_time desc
-    </select>
-
-
-    <select id="selectGenTableList" parameterType="GenTable" resultMap="GenTableResult">
-        <include refid="selectGenTableVo"/>
-        <where>
-            <if test="tableName != null and tableName != ''">
-                AND lower(table_name) like lower(concat('%', #{tableName}, '%'))
-            </if>
-            <if test="tableComment != null and tableComment != ''">
-                AND lower(table_comment) like lower(concat('%', #{tableComment}, '%'))
-            </if>
-            <if test="params.beginTime != null and params.endTime != null">
-                AND create_time between #{params.beginTime} and #{params.endTime}
-            </if>
-        </where>
+        select table_name, table_comment, create_time, update_time
+        from information_schema.tables
+        ${ew.getCustomSqlSegment}
     </select>
 
     <select id="selectDbTableList" parameterType="GenTable" resultMap="GenTableResult">
-        select table_name, table_comment, create_time, update_time from information_schema.tables
-        where table_schema = (select database())
-        AND table_name NOT LIKE 'xxl_job_%' AND table_name NOT LIKE 'gen_%'
-        AND table_name NOT IN (select table_name from gen_table)
-        <if test="tableName != null and tableName != ''">
-            AND lower(table_name) like lower(concat('%', #{tableName}, '%'))
-        </if>
-        <if test="tableComment != null and tableComment != ''">
-            AND lower(table_comment) like lower(concat('%', #{tableComment}, '%'))
-        </if>
-        <if test="params.beginTime != null and params.endTime != null">
-            AND create_time between #{params.beginTime} and #{params.endTime}
-        </if>
-        order by create_time desc
+        select table_name, table_comment, create_time, update_time
+        from information_schema.tables
+        ${ew.getCustomSqlSegment}
     </select>
 
     <select id="selectDbTableListByNames" resultMap="GenTableResult">

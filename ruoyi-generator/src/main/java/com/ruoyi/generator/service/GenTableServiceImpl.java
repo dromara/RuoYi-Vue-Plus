@@ -4,7 +4,10 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.GenConstants;
@@ -69,13 +72,7 @@ public class GenTableServiceImpl implements IGenTableService {
 
     @Override
     public TableDataInfo<GenTable> selectPageGenTableList(GenTable genTable, PageQuery pageQuery) {
-        Page<GenTable> page = baseMapper.selectPageGenTableList(pageQuery.build(), genTable);
-        return TableDataInfo.build(page);
-    }
-
-    @Override
-    public TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable, PageQuery pageQuery) {
-        Page<GenTable> page = baseMapper.selectPageDbTableList(pageQuery.build(), genTable);
+        Page<GenTable> page = baseMapper.selectPage(pageQuery.build(), this.buildGenTableQueryWrapper(genTable));
         return TableDataInfo.build(page);
     }
 
@@ -87,7 +84,24 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     @Override
     public List<GenTable> selectGenTableList(GenTable genTable) {
-        return baseMapper.selectGenTableList(genTable);
+        return baseMapper.selectList(this.buildGenTableQueryWrapper(genTable));
+    }
+
+    private QueryWrapper<GenTable> buildGenTableQueryWrapper(GenTable genTable) {
+        Map<String, Object> params = genTable.getParams();
+        QueryWrapper<GenTable> wrapper = Wrappers.query();
+        wrapper.like(StringUtils.isNotBlank(genTable.getTableName()), "lower(table_name)", StringUtils.lowerCase(genTable.getTableName()))
+            .like(StringUtils.isNotBlank(genTable.getTableComment()), "lower(table_comment)", StringUtils.lowerCase(genTable.getTableComment()))
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                "create_time", params.get("beginTime"), params.get("endTime"));
+        return wrapper;
+    }
+
+
+    @Override
+    public TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable, PageQuery pageQuery) {
+        Page<GenTable> page = baseMapper.selectPageDbTableList(pageQuery.build(), this.buildDbTableQueryWrapper(genTable));
+        return TableDataInfo.build(page);
     }
 
     /**
@@ -98,7 +112,22 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     @Override
     public List<GenTable> selectDbTableList(GenTable genTable) {
-        return baseMapper.selectDbTableList(genTable);
+        return baseMapper.selectDbTableList(this.buildDbTableQueryWrapper(genTable));
+    }
+
+    private Wrapper<Object> buildDbTableQueryWrapper(GenTable genTable) {
+        Map<String, Object> params = genTable.getParams();
+        QueryWrapper<Object> wrapper = Wrappers.query();
+        wrapper.apply("table_schema = (select database())")
+            .notLike("table_name", "xxl_job_%")
+            .notLike("table_name", "gen_%")
+            .notInSql("table_name", "select table_name from gen_table")
+            .like(StringUtils.isNotBlank(genTable.getTableName()), "lower(table_name)", StringUtils.lowerCase(genTable.getTableName()))
+            .like(StringUtils.isNotBlank(genTable.getTableComment()), "lower(table_comment)", StringUtils.lowerCase(genTable.getTableComment()))
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                "create_time", params.get("beginTime"), params.get("endTime"))
+            .orderByDesc("create_time");
+        return wrapper;
     }
 
     /**
