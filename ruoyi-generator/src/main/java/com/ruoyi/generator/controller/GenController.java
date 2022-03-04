@@ -53,11 +53,11 @@ public class GenController extends BaseController {
      */
     @ApiOperation("修改代码生成业务")
     @SaCheckPermission("tool:gen:query")
-    @GetMapping(value = "/{talbleId}")
-    public R<Map<String, Object>> getInfo(@PathVariable Long talbleId) {
-        GenTable table = genTableService.selectGenTableById(talbleId);
+    @GetMapping(value = "/{tableId}")
+    public R<Map<String, Object>> getInfo(@PathVariable Long tableId) {
+        GenTable table = genTableService.selectGenTableById(tableId);
         List<GenTable> tables = genTableService.selectGenTableAll();
-        List<GenTableColumn> list = genTableService.selectGenTableColumnListByTableId(talbleId);
+        List<GenTableColumn> list = genTableService.selectGenTableColumnListByTableId(tableId);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("info", table);
         map.put("rows", list);
@@ -80,7 +80,7 @@ public class GenController extends BaseController {
      */
     @ApiOperation("查询数据表字段列表")
     @SaCheckPermission("tool:gen:list")
-    @GetMapping(value = "/column/{talbleId}")
+    @GetMapping(value = "/column/{tableId}")
     public TableDataInfo<GenTableColumn> columnList(Long tableId) {
         TableDataInfo<GenTableColumn> dataInfo = new TableDataInfo<>();
         List<GenTableColumn> list = genTableService.selectGenTableColumnListByTableId(tableId);
