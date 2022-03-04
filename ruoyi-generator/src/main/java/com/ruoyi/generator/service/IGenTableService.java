@@ -3,6 +3,7 @@ package com.ruoyi.generator.service;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.generator.domain.GenTable;
+import com.ruoyi.generator.domain.GenTableColumn;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,14 @@ import java.util.Map;
  * @author Lion Li
  */
 public interface IGenTableService {
+
+    /**
+     * 查询业务字段列表
+     *
+     * @param tableId 业务字段编号
+     * @return 业务字段集合
+     */
+    List<GenTableColumn> selectGenTableColumnListByTableId(Long tableId);
 
 
     TableDataInfo<GenTable> selectPageGenTableList(GenTable genTable, PageQuery pageQuery);

@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  oracle:
+    image: tekintian/oracle12c:latest
+    container_name: oracle
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      DBCA_TOTAL_MEMORY: 16192
+    ports:
+      - "18080:8080"
+      - "1521:1521"
+    volumes:
+      # 数据挂载
+      - "/docker/oracle/data:/u01/app/oracle"
+    restart: always

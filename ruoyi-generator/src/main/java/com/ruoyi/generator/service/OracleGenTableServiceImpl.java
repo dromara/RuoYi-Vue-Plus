@@ -17,8 +17,8 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
-import com.ruoyi.generator.mapper.GenTableColumnMapper;
-import com.ruoyi.generator.mapper.GenTableMapper;
+import com.ruoyi.generator.mapper.OracleGenTableColumnMapper;
+import com.ruoyi.generator.mapper.OracleGenTableMapper;
 import com.ruoyi.generator.util.GenUtils;
 import com.ruoyi.generator.util.VelocityInitializer;
 import com.ruoyi.generator.util.VelocityUtils;
@@ -46,10 +46,10 @@ import java.util.zip.ZipOutputStream;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class GenTableServiceImpl extends BaseGenTableServiceImpl {
+public class OracleGenTableServiceImpl extends BaseGenTableServiceImpl {
 
-    private final GenTableMapper baseMapper;
-    private final GenTableColumnMapper genTableColumnMapper;
+    private final OracleGenTableMapper baseMapper;
+    private final OracleGenTableColumnMapper genTableColumnMapper;
 
     /**
      * 查询业务字段列表
@@ -63,7 +63,6 @@ public class GenTableServiceImpl extends BaseGenTableServiceImpl {
             .eq(GenTableColumn::getTableId, tableId)
             .orderByAsc(GenTableColumn::getSort));
     }
-
     /**
      * 查询业务信息
      *
@@ -125,12 +124,14 @@ public class GenTableServiceImpl extends BaseGenTableServiceImpl {
     private Wrapper<Object> buildDbTableQueryWrapper(GenTable genTable) {
         Map<String, Object> params = genTable.getParams();
         QueryWrapper<Object> wrapper = Wrappers.query();
-        wrapper.apply("table_schema = (select database())")
-            .notLike("table_name", "xxl_job_")
-            .notLike("table_name", "gen_")
-            .notInSql("table_name", "select table_name from gen_table")
-            .like(StringUtils.isNotBlank(genTable.getTableName()), "lower(table_name)", StringUtils.lowerCase(genTable.getTableName()))
-            .like(StringUtils.isNotBlank(genTable.getTableComment()), "lower(table_comment)", StringUtils.lowerCase(genTable.getTableComment()))
+        wrapper.apply("dt.table_name = dtc.table_name")
+            .apply("dt.table_name = uo.object_name")
+            .eq("uo.object_type ", "TABLE")
+            .notLike("dt.table_name", "XXL_JOB_")
+            .notLike("dt.table_name", "GEN_")
+            .notInSql("lower(dt.table_name)", "select table_name from gen_table")
+            .like(StringUtils.isNotBlank(genTable.getTableName()), "lower(dt.table_name)", StringUtils.lowerCase(genTable.getTableName()))
+            .like(StringUtils.isNotBlank(genTable.getTableComment()), "lower(dt.table_comment)", StringUtils.lowerCase(genTable.getTableComment()))
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 "create_time", params.get("beginTime"), params.get("endTime"))
             .orderByDesc("create_time");
@@ -317,7 +318,8 @@ public class GenTableServiceImpl extends BaseGenTableServiceImpl {
                 }
                 if (StringUtils.isNotEmpty(prevColumn.getIsRequired()) && !column.isPk()
                     && (column.isInsert() || column.isEdit())
-                    && ((column.isUsableColumn()) || (!column.isSuperColumn()))) {
+                    && ((column.isUsableColumn()) || (!column.isSuperColumn())))
+                {
                     // 如果是(新增/修改&非主键/非忽略及父属性)，继续保留必填/显示类型选项
                     column.setIsRequired(prevColumn.getIsRequired());
                     column.setHtmlType(prevColumn.getHtmlType());
