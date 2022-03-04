@@ -37,12 +37,4 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDeptMapper, SysDept, Sy
      */
     List<Long> selectDeptListByRoleId(@Param("roleId") Long roleId, @Param("deptCheckStrictly") boolean deptCheckStrictly);
 
-    /**
-     * 修改子元素关系
-     *
-     * @param depts 子元素
-     * @return 结果
-     */
-    int updateDeptChildren(@Param("depts") List<SysDept> depts);
-
 }

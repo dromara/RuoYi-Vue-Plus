@@ -21,6 +21,7 @@ import com.ruoyi.system.service.ISysDeptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -234,11 +235,15 @@ public class SysDeptServiceImpl implements ISysDeptService {
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors) {
         List<SysDept> children = baseMapper.selectList(new LambdaQueryWrapper<SysDept>()
             .apply("find_in_set({0},ancestors)", deptId));
+        List<SysDept> list = new ArrayList<>();
         for (SysDept child : children) {
-            child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
+            SysDept dept = new SysDept();
+            dept.setDeptId(child.getDeptId());
+            dept.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
+            list.add(dept);
         }
-        if (children.size() > 0) {
-            baseMapper.updateDeptChildren(children);
+        if (list.size() > 0) {
+            baseMapper.updateBatchById(list);
         }
     }
 
