@@ -28,7 +28,7 @@
     </resultMap>
 
     <select id="selectMenuListByUserId" parameterType="SysMenu" resultMap="SysMenuResult">
-        select distinct m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.`query`, m.visible, m.status,
+        select distinct m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.query, m.visible, m.status,
         m.perms, m.is_frame, m.is_cache, m.menu_type, m.icon, m.order_num, m.create_time
         from sys_menu m
         left join sys_role_menu rm on m.menu_id = rm.menu_id
@@ -43,7 +43,7 @@
                         m.menu_name,
                         m.path,
                         m.component,
-                        m.`query`,
+                        m.query,
                         m.visible,
                         m.status,
                         m.perms,
