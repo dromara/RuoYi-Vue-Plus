@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysMenu;
@@ -65,8 +67,14 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 .orderByAsc(SysMenu::getParentId)
                 .orderByAsc(SysMenu::getOrderNum));
         } else {
-            menu.getParams().put("userId", userId);
-            menuList = baseMapper.selectMenuListByUserId(menu);
+            QueryWrapper<SysMenu> wrapper = Wrappers.query();
+            wrapper.eq("ur.user_id", userId)
+                .like(StringUtils.isNotBlank(menu.getMenuName()), "m.menu_name", menu.getMenuName())
+                .eq(StringUtils.isNotBlank(menu.getVisible()), "m.visible", menu.getVisible())
+                .eq(StringUtils.isNotBlank(menu.getStatus()), "m.status", menu.getStatus())
+                .orderByAsc("m.parent_id")
+                .orderByAsc("m.order_num");
+            menuList = baseMapper.selectMenuListByUserId(wrapper);
         }
         return menuList;
     }
