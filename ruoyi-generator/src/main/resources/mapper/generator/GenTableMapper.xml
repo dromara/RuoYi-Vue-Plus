@@ -53,13 +53,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime"     column="update_time"    />
     </resultMap>
 
-    <select id="selectPageDbTableList" parameterType="GenTable" resultMap="GenTableResult">
+    <select id="selectPageDbTableList" resultMap="GenTableResult">
         select table_name, table_comment, create_time, update_time
         from information_schema.tables
         ${ew.getCustomSqlSegment}
     </select>
 
-    <select id="selectDbTableList" parameterType="GenTable" resultMap="GenTableResult">
+    <select id="selectDbTableList" resultMap="GenTableResult">
         select table_name, table_comment, create_time, update_time
         from information_schema.tables
         ${ew.getCustomSqlSegment}
