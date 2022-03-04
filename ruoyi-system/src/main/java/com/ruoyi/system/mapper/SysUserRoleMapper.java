@@ -10,4 +10,6 @@ import com.ruoyi.system.domain.SysUserRole;
  */
 public interface SysUserRoleMapper extends BaseMapperPlus<SysUserRoleMapper, SysUserRole, SysUserRole> {
 
+    Long selectUserIdByRoleId(Long roleId);
+
 }
