@@ -232,6 +232,7 @@ export default {
     };
   },
   created() {
+    localStorage.setItem("dataName", "master");
     this.getList();
   },
   activated() {
