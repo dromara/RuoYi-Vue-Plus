@@ -1,6 +1,8 @@
 version: '3'
 
 services:
+  # 此镜像仅用于测试 正式环境需自行安装数据库
+  # SID: XE user: system password: oracle
   oracle:
     image: tekintian/oracle12c:latest
     container_name: oracle
