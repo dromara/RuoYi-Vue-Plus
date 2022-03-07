@@ -953,7 +953,8 @@ select instr(','||arg2||',' , ','||arg1||',') into Result from dual;
 return(Result);
 end find_in_set;
 
-/ -- 函数分隔符
+-- 函数分隔符
+/
 
 -- ----------------------------
 -- 钩子 ，用于session连接之后 自动设置默认的date类型格式化 简化时间查询
@@ -964,4 +965,4 @@ create or replace trigger login_trg
 after logon on database
 begin
 execute immediate 'alter session set nls_date_format=''YYYY-MM-DD HH24:MI:SS''';
-end login_trg;
+end;
