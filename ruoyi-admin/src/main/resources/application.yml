@@ -163,25 +163,15 @@ mybatis-plus:
   typeAliasesPackage: com.ruoyi.**.domain
   # 启动时是否检查 MyBatis XML 文件的存在，默认不检查
   checkConfigLocation: false
-  # 通过该属性可指定 MyBatis 的执行器，MyBatis 的执行器总共有三种：
-  # SIMPLE：每个语句创建新的预处理器 REUSE：会复用预处理器 BATCH：批量执行所有的更新
-  executorType: SIMPLE
   configuration:
     # 自动驼峰命名规则（camel case）映射
     mapUnderscoreToCamelCase: true
-    # 当设置为 true 的时候，懒加载的对象可能被任何懒属性全部加载，否则，每个属性都按需加载。需要和 lazyLoadingEnabled 一起使用。
-    aggressiveLazyLoading: true
     # MyBatis 自动映射策略
     # NONE：不启用 PARTIAL：只对非嵌套 resultMap 自动映射 FULL：对所有 resultMap 自动映射
     autoMappingBehavior: PARTIAL
     # MyBatis 自动映射时未知列或未知属性处理策
     # NONE：不做处理 WARNING：打印相关警告 FAILING：抛出异常和详细信息
     autoMappingUnknownColumnBehavior: NONE
-    # Mybatis一级缓存，默认为 SESSION
-    # SESSION session级别缓存 STATEMENT 关闭一级缓存
-    localCacheScope: SESSION
-    # 开启Mybatis二级缓存，默认为 true
-    cacheEnabled: false
     # 更详细的日志输出 会有性能损耗 org.apache.ibatis.logging.stdout.StdOutImpl
     # 关闭日志记录 (可单纯使用 p6spy 分析) org.apache.ibatis.logging.nologging.NoLoggingImpl
     # 默认日志输出 org.apache.ibatis.logging.slf4j.Slf4jImpl
