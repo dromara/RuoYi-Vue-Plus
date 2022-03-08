@@ -91,6 +91,12 @@ services:
       MINIO_SECRET_KEY: ruoyi123
       # https需要指定域名
       MINIO_SERVER_URL: ""
+      # 开启压缩 on 开启 off 关闭
+      MINIO_COMPRESS: "off"
+      # 扩展名 .pdf,.doc 为空 所有类型均压缩
+      MINIO_COMPRESS_EXTENSIONS: ""
+      # mime 类型 application/pdf 为空 所有类型均压缩
+      MINIO_COMPRESS_MIME_TYPES: ""
     volumes:
       # 映射当前目录下的data目录至容器内/data目录
       - /docker/minio/data:/data
