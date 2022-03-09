@@ -108,7 +108,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
     public long selectNormalChildrenDeptById(Long deptId) {
         return baseMapper.selectCount(new LambdaQueryWrapper<SysDept>()
             .eq(SysDept::getStatus, UserConstants.DEPT_NORMAL)
-            .apply("find_in_set({0}, ancestors)", deptId));
+            .apply("find_in_set({0}, ancestors) <> 0", deptId));
     }
 
     /**
@@ -234,7 +234,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors) {
         List<SysDept> children = baseMapper.selectList(new LambdaQueryWrapper<SysDept>()
-            .apply("find_in_set({0},ancestors)", deptId));
+            .apply("find_in_set({0},ancestors) <> 0", deptId));
         List<SysDept> list = new ArrayList<>();
         for (SysDept child : children) {
             SysDept dept = new SysDept();

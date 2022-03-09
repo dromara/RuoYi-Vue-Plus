@@ -47,7 +47,7 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
             .select(SysDept::getDeptId)
             .eq(SysDept::getDeptId, deptId)
             .or()
-            .apply("find_in_set({0},ancestors)", deptId));
+            .apply("find_in_set({0},ancestors) <> 0", deptId));
         if (CollUtil.isNotEmpty(list)) {
             return list.stream().map(d -> Convert.toStr(d.getDeptId())).collect(Collectors.joining(","));
         }
