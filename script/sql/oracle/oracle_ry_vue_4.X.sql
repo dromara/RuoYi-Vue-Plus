@@ -57,8 +57,8 @@ insert into sys_dept values(109,  102, '0,100,102',  '财务部门',   2, '若�
 create table sys_user (
   user_id           number(20)      not null,
   dept_id           number(20)      default null,
-  user_name         varchar2(30)    not null,
-  nick_name         varchar2(30)    not null,
+  user_name         varchar2(40)    not null,
+  nick_name         varchar2(40)    not null,
   user_type         varchar2(10)    default 'sys_user',
   email             varchar2(50)    default '',
   phonenumber       varchar2(11)    default '',
