@@ -3,27 +3,23 @@ package com.ruoyi.generator.service;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
 import com.ruoyi.generator.util.VelocityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
@@ -38,30 +34,18 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class BaseGenTableServiceImpl implements IGenTableService {
 
-    @Autowired
-    private DataSource dataSource;
-
     public BaseGenTableServiceImpl getService() {
-        DynamicRoutingDataSource ds = (DynamicRoutingDataSource) this.dataSource;
-        DataSource dataSource = ds.determineDataSource();
-        try {
-            DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-            String databaseProductName = metaData.getDatabaseProductName();
-            if ("MySQL".equals(databaseProductName)) {
-                return SpringUtils.getBean(GenTableServiceImpl.class);
-            } else if ("Oracle".equals(databaseProductName)) {
-                return SpringUtils.getBean(OracleGenTableServiceImpl.class);
-            } else if ("PostgreSQL".equals(databaseProductName)) {
-
-            } else if ("Microsoft SQL Server".equals(databaseProductName)) {
-
-            } else {
-                throw new ServiceException("当前数据库类型不支持 => " + databaseProductName);
-            }
-        } catch (SQLException e) {
-            throw new ServiceException(e.getMessage());
+        if (DataBaseHelper.isMySql()) {
+            return SpringUtils.getBean(GenTableServiceImpl.class);
+        } else if (DataBaseHelper.isOracle()) {
+            return SpringUtils.getBean(OracleGenTableServiceImpl.class);
+        } else if (DataBaseHelper.isPostgerSql()) {
+            throw new ServiceException("当前数据库类型不支持!!!");
+        } else if (DataBaseHelper.isSqlServer()) {
+            throw new ServiceException("当前数据库类型不支持!!!");
+        } else {
+            throw new ServiceException("当前数据库类型不支持!!!");
         }
-        return null;
     }
 
     /**

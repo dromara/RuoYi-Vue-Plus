@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.domain.entity.SysDept;
+import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleDeptMapper;
@@ -47,7 +48,7 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
             .select(SysDept::getDeptId)
             .eq(SysDept::getDeptId, deptId)
             .or()
-            .apply("find_in_set({0},ancestors) <> 0", deptId));
+            .apply(DataBaseHelper.findInSet(deptId, "ancestors")));
         if (CollUtil.isNotEmpty(list)) {
             return list.stream().map(d -> Convert.toStr(d.getDeptId())).collect(Collectors.joining(","));
         }
