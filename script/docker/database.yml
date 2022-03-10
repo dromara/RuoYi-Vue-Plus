@@ -17,3 +17,19 @@ services:
       # 数据挂载
       - "/docker/oracle/data:/u01/app/oracle"
     restart: always
+
+  # 此镜像仅用于测试 正式环境需自行安装数据库
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    container_name: sqlserver
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Ruoyi@123"
+    ports:
+      - "1433:1433"
+    volumes:
+      # 数据挂载
+      - "/docker/sqlserver/data:/var/opt/mssql"
+    restart: always
