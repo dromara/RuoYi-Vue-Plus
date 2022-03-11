@@ -33,3 +33,29 @@ services:
       # 数据挂载
       - "/docker/sqlserver/data:/var/opt/mssql"
     restart: always
+
+  postgres:
+    image: postgres:14.2
+    container_name: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - /docker/postgres/data:/var/lib/postgresql/data
+    restart: always
+
+  postgres13:
+    image: postgres:13.6
+    container_name: postgres13
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - /docker/postgres13/data:/var/lib/postgresql/data
+    restart: always
