@@ -1,7 +1,7 @@
 
 CREATE TABLE [gen_table]
 (
-    [table_id]          bigint IDENTITY (1,1)          NOT NULL,
+    [table_id]          bigint                         NOT NULL,
     [table_name]        nvarchar(200) DEFAULT ''       NULL,
     [table_comment]     nvarchar(500) DEFAULT ''       NULL,
     [sub_table_name]    nvarchar(64)                   NULL,
@@ -156,7 +156,7 @@ GO
 
 CREATE TABLE [gen_table_column]
 (
-    [column_id]      bigint IDENTITY (1,1)        NOT NULL,
+    [column_id]      bigint                       NOT NULL,
     [table_id]       nvarchar(64)                 NULL,
     [column_name]    nvarchar(200)                NULL,
     [column_comment] nvarchar(500)                NULL,
@@ -427,7 +427,7 @@ GO
 
 CREATE TABLE [sys_dept]
 (
-    [dept_id]     bigint IDENTITY (100,1)    NOT NULL,
+    [dept_id]     bigint                     NOT NULL,
     [parent_id]   bigint       DEFAULT ((0)) NULL,
     [ancestors]   nvarchar(50) DEFAULT ''    NULL,
     [dept_name]   nvarchar(30) DEFAULT ''    NULL,
@@ -565,7 +565,7 @@ GO
 
 CREATE TABLE [sys_dict_data]
 (
-    [dict_code]   bigint IDENTITY (1,1)       NOT NULL,
+    [dict_code]   bigint                      NOT NULL,
     [dict_sort]   int           DEFAULT ((0)) NULL,
     [dict_label]  nvarchar(100) DEFAULT ''    NULL,
     [dict_value]  nvarchar(100) DEFAULT ''    NULL,
@@ -739,7 +739,7 @@ GO
 
 CREATE TABLE [sys_dict_type]
 (
-    [dict_id]     bigint IDENTITY (1,1)       NOT NULL,
+    [dict_id]     bigint                      NOT NULL,
     [dict_name]   nvarchar(100) DEFAULT ''    NULL,
     [dict_type]   nvarchar(100) DEFAULT ''    NULL,
     [status]      nchar(1)      DEFAULT ('0') NULL,
@@ -842,7 +842,7 @@ GO
 
 CREATE TABLE [sys_logininfor]
 (
-    [info_id]        bigint IDENTITY (1,1)       NOT NULL,
+    [info_id]        bigint                      NOT NULL,
     [user_name]      nvarchar(50)  DEFAULT ''    NULL,
     [ipaddr]         nvarchar(128) DEFAULT ''    NULL,
     [login_location] nvarchar(255) DEFAULT ''    NULL,
@@ -920,7 +920,7 @@ GO
 
 CREATE TABLE [sys_menu]
 (
-    [menu_id]     bigint IDENTITY (1,1)       NOT NULL,
+    [menu_id]     bigint                      NOT NULL,
     [menu_name]   nvarchar(50)                NOT NULL,
     [parent_id]   bigint        DEFAULT ((0)) NULL,
     [order_num]   int           DEFAULT ((0)) NULL,
@@ -1240,7 +1240,7 @@ GO
 
 CREATE TABLE [sys_notice]
 (
-    [notice_id]      bigint IDENTITY (1,1)      NOT NULL,
+    [notice_id]      bigint                     NOT NULL,
     [notice_title]   nvarchar(50)               NOT NULL,
     [notice_type]    nchar(1)                   NOT NULL,
     [notice_content] nvarchar(max)              NULL,
@@ -1335,7 +1335,7 @@ GO
 
 CREATE TABLE [sys_oper_log]
 (
-    [oper_id]        bigint IDENTITY (1,1)        NOT NULL,
+    [oper_id]        bigint                       NOT NULL,
     [title]          nvarchar(50)   DEFAULT ''    NULL,
     [business_type]  int            DEFAULT ((0)) NULL,
     [method]         nvarchar(100)  DEFAULT ''    NULL,
@@ -1462,7 +1462,7 @@ GO
 
 CREATE TABLE [sys_post]
 (
-    [post_id]     bigint IDENTITY (1,1)   NOT NULL,
+    [post_id]     bigint                  NOT NULL,
     [post_code]   nvarchar(64)            NOT NULL,
     [post_name]   nvarchar(50)            NOT NULL,
     [post_sort]   int                     NOT NULL,
@@ -1560,7 +1560,7 @@ GO
 
 CREATE TABLE [sys_role]
 (
-    [role_id]             bigint IDENTITY (1,1)      NOT NULL,
+    [role_id]             bigint                     NOT NULL,
     [role_name]           nvarchar(30)               NOT NULL,
     [role_key]            nvarchar(100)              NOT NULL,
     [role_sort]           int                        NOT NULL,
@@ -1912,7 +1912,7 @@ GO
 
 CREATE TABLE [sys_user]
 (
-    [user_id]     bigint IDENTITY (1,1)              NOT NULL,
+    [user_id]     bigint                             NOT NULL,
     [dept_id]     bigint                             NULL,
     [user_name]   nvarchar(30)                       NOT NULL,
     [nick_name]   nvarchar(30)                       NOT NULL,
@@ -2137,7 +2137,7 @@ GO
 
 CREATE TABLE [sys_oss]
 (
-    [oss_id]        bigint IDENTITY (1,1)           NOT NULL,
+    [oss_id]        bigint                          NOT NULL,
     [file_name]     nvarchar(255) DEFAULT ''        NOT NULL,
     [original_name] nvarchar(255) DEFAULT ''        NOT NULL,
     [file_suffix]   nvarchar(10)  DEFAULT ''        NOT NULL,
@@ -2222,7 +2222,7 @@ GO
 
 CREATE TABLE [sys_oss_config]
 (
-    [oss_config_id] bigint IDENTITY (1,1)       NOT NULL,
+    [oss_config_id] bigint                      NOT NULL,
     [config_key]    nvarchar(255) DEFAULT ''    NOT NULL,
     [access_key]    nvarchar(255) DEFAULT ''    NULL,
     [secret_key]    nvarchar(255) DEFAULT ''    NULL,

@@ -179,16 +179,10 @@ mybatis-plus:
   global-config:
     # 是否打印 Logo banner
     banner: true
-    # 是否初始化 SqlRunner
-    enableSqlRunner: false
     dbConfig:
       # 主键类型
       # AUTO 自增 NONE 空 INPUT 用户输入 ASSIGN_ID 雪花 ASSIGN_UUID 唯一 UUID
-      idType: AUTO
-      # 表名是否使用驼峰转下划线命名,只对表名生效
-      tableUnderline: true
-      # 大写命名,对表名和字段名均生效
-      capitalMode: false
+      idType: ASSIGN_ID
       # 逻辑已删除值
       logicDeleteValue: 2
       # 逻辑未删除值

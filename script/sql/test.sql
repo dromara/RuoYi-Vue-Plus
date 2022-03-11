@@ -1,35 +1,35 @@
 DROP TABLE if EXISTS test_demo;
 CREATE TABLE test_demo
 (
-    id          int(0) NOT NULL AUTO_INCREMENT COMMENT '主键',
-    dept_id     int(0) NULL DEFAULT NULL COMMENT '部门id',
-    user_id     int(0) NULL DEFAULT NULL COMMENT '用户id',
-    order_num   int(0) NULL DEFAULT 0 COMMENT '排序号',
+    id          int(0)       NOT NULL COMMENT '主键',
+    dept_id     int(0)       NULL DEFAULT NULL COMMENT '部门id',
+    user_id     int(0)       NULL DEFAULT NULL COMMENT '用户id',
+    order_num   int(0)       NULL DEFAULT 0 COMMENT '排序号',
     test_key    varchar(255) NULL DEFAULT NULL COMMENT 'key键',
     value       varchar(255) NULL DEFAULT NULL COMMENT '值',
-    version     int(0) NULL DEFAULT 0 COMMENT '版本',
-    create_time datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-    create_by   varchar(64) NULL DEFAULT NULL COMMENT '创建人',
-    update_time datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
-    update_by   varchar(64) NULL DEFAULT NULL COMMENT '更新人',
-    del_flag    int(0) NULL DEFAULT 0 COMMENT '删除标志',
+    version     int(0)       NULL DEFAULT 0 COMMENT '版本',
+    create_time datetime(0)  NULL DEFAULT NULL COMMENT '创建时间',
+    create_by   varchar(64)  NULL DEFAULT NULL COMMENT '创建人',
+    update_time datetime(0)  NULL DEFAULT NULL COMMENT '更新时间',
+    update_by   varchar(64)  NULL DEFAULT NULL COMMENT '更新人',
+    del_flag    int(0)       NULL DEFAULT 0 COMMENT '删除标志',
     PRIMARY KEY (id) USING BTREE
 ) ENGINE = InnoDB COMMENT = '测试单表';
 
 DROP TABLE if EXISTS test_tree;
 CREATE TABLE test_tree
 (
-    id          int(0) NOT NULL AUTO_INCREMENT COMMENT '主键',
-    parent_id   int(0) NULL DEFAULT 0 COMMENT '父id',
-    dept_id     int(0) NULL DEFAULT NULL COMMENT '部门id',
-    user_id     int(0) NULL DEFAULT NULL COMMENT '用户id',
+    id          int(0)       NOT NULL COMMENT '主键',
+    parent_id   int(0)       NULL DEFAULT 0 COMMENT '父id',
+    dept_id     int(0)       NULL DEFAULT NULL COMMENT '部门id',
+    user_id     int(0)       NULL DEFAULT NULL COMMENT '用户id',
     tree_name   varchar(255) NULL DEFAULT NULL COMMENT '值',
-    version     int(0) NULL DEFAULT 0 COMMENT '版本',
-    create_time datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-    create_by   varchar(64) NULL DEFAULT NULL COMMENT '创建人',
-    update_time datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
-    update_by   varchar(64) NULL DEFAULT NULL COMMENT '更新人',
-    del_flag    int(0) NULL DEFAULT 0 COMMENT '删除标志',
+    version     int(0)       NULL DEFAULT 0 COMMENT '版本',
+    create_time datetime(0)  NULL DEFAULT NULL COMMENT '创建时间',
+    create_by   varchar(64)  NULL DEFAULT NULL COMMENT '创建人',
+    update_time datetime(0)  NULL DEFAULT NULL COMMENT '更新时间',
+    update_by   varchar(64)  NULL DEFAULT NULL COMMENT '更新人',
+    del_flag    int(0)       NULL DEFAULT 0 COMMENT '删除标志',
     PRIMARY KEY (id) USING BTREE
 ) ENGINE = InnoDB COMMENT = '测试树表';
 
