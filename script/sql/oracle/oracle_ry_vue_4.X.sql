@@ -200,7 +200,7 @@ create table sys_menu (
   order_num         number(4)       default 0,
   path              varchar(200)    default '',
   component         varchar(255)    default null,
-  query             varchar(255)    default null,
+  query_param       varchar(255)    default null,
   is_frame          number(1)       default 1,
   is_cache          number(1)       default 0,
   menu_type         char(1)         default '',
@@ -224,7 +224,7 @@ comment on column sys_menu.parent_id    is '父菜单ID';
 comment on column sys_menu.order_num    is '显示顺序';
 comment on column sys_menu.path         is '请求地址';
 comment on column sys_menu.component    is '路由地址';
-comment on column sys_menu.query        is '路由参数';
+comment on column sys_menu.query_param  is '路由参数';
 comment on column sys_menu.is_frame     is '是否为外链（0是 1否）';
 comment on column sys_menu.is_cache     is '是否缓存（0缓存 1不缓存）';
 comment on column sys_menu.menu_type    is '菜单类型（M目录 C菜单 F按钮）';
