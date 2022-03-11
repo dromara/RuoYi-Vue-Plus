@@ -940,22 +940,6 @@ insert into sys_oss_config values (2, 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXX
 insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'http://oss-cn-beijing.aliyuncs.com',   'N', '',            '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
 insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'http://cos.ap-beijing.myqcloud.com',   'N', 'ap-beijing',  '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
 
-
--- ----------------------------
--- 函数 ，代替mysql的find_in_set
--- 例如： select * from sys_dept where FIND_IN_SET (101,ancestors) <> 0
--- mysql可接受0或其它number做为where 条件，oracle只接受表达式做为where 条件
--- ----------------------------
-create or replace function find_in_set(arg1 in varchar2,arg2 in varchar)
-return number is Result number;
-begin
-select instr(','||arg2||',' , ','||arg1||',') into Result from dual;
-return(Result);
-end find_in_set;
-
--- 函数分隔符
-/
-
 -- ----------------------------
 -- 钩子 ，用于session连接之后 自动设置默认的date类型格式化 简化时间查询
 -- 如需设置其它配置 可在此钩子内任意增加处理语句

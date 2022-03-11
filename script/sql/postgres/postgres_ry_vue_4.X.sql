@@ -951,17 +951,3 @@ insert into sys_oss_config values (1, 'minio',  'ruoyi',            'ruoyi123', 
 insert into sys_oss_config values (2, 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'http://XXX.XXXX.com',                  'N', 'z0',          '1', '', 'admin', now(), 'admin', now(), null);
 insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'http://oss-cn-beijing.aliyuncs.com',   'N', '',            '1', '', 'admin', now(), 'admin', now(), null);
 insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'http://cos.ap-beijing.myqcloud.com',   'N', 'ap-beijing',  '1', '', 'admin', now(), 'admin', now(), null);
-
--- ----------------------------
--- 函数 ，代替mysql的find_in_set
--- 例如： select * from sys_dept where FIND_IN_SET (101,ancestors) <> 0
--- ----------------------------
-create or replace function find_in_set(arg1 int8, arg2 varchar)
-returns int8 as $body$
-declare pos int8;
-begin
-select position(','||arg1||',' IN ','||arg2||',') into pos;
-return pos;
-end;
-$body$
-language plpgsql

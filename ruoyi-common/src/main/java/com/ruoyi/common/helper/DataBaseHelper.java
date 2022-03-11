@@ -53,9 +53,18 @@ public class DataBaseHelper {
 
     public static String findInSet(Object var1, String var2) {
         DataBaseType dataBasyType = getDataBasyType();
+        String var = Convert.toStr(var1);
         if (dataBasyType == DataBaseType.SQL_SERVER) {
-            return "charindex(" + Convert.toStr(var1) + ", " + var2 + ") <> 0";
+            // charindex(',100,' , ',0,100,101,') <> 0
+            return "charindex('," + var + ",' , ','+" + var2 + "+',') <> 0";
+        } else if (dataBasyType == DataBaseType.POSTGRE_SQL) {
+            // (select position(',100,' in ',0,100,101,')) <> 0
+            return "(select position('," + var + ",' in ','||" + var2 + "||',')) <> 0";
+        } else if (dataBasyType == DataBaseType.ORACLE) {
+            // instr(',0,100,101,' , ',100,') <> 0
+            return "instr(','||" + var2 + "||',' , '," + var + ",') <> 0";
         }
-        return "find_in_set(" + Convert.toStr(var1) + ", " + var2 + ") <> 0";
+        // find_in_set(100 , '0,100,101')
+        return "find_in_set(" + var + " , " + var2 + ") <> 0";
     }
 }
