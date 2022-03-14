@@ -9,7 +9,7 @@
           * 前端开发框架 Vue、Element UI<br/>
           * 后端开发框架 Spring Boot<br/>
           * 容器框架 Undertow 基于 Netty 的高性能容器<br/>
-          * 权限认证框架 Spring Security、Jwt 支持多终端认证系统<br/>
+          * 权限认证框架 Sa-Token 支持多终端认证系统<br/>
           * 关系数据库 MySQL 适配 8.X 最低 5.7<br/>
           * 缓存数据库 Redis 适配 6.X 最低 4.X<br/>
           * 数据库框架 Mybatis-Plus 快速 CRUD 增加开发效率<br/>
