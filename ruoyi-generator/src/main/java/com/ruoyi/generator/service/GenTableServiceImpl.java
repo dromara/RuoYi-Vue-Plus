@@ -2,12 +2,15 @@ package com.ruoyi.generator.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
@@ -29,6 +32,8 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -43,10 +48,11 @@ import java.util.zip.ZipOutputStream;
  *
  * @author Lion Li
  */
+@DS("#header.datasource")
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class GenTableServiceImpl extends BaseGenTableServiceImpl {
+public class GenTableServiceImpl implements IGenTableService {
 
     private final GenTableMapper baseMapper;
     private final GenTableColumnMapper genTableColumnMapper;
@@ -107,7 +113,7 @@ public class GenTableServiceImpl extends BaseGenTableServiceImpl {
 
     @Override
     public TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable, PageQuery pageQuery) {
-        Page<GenTable> page = baseMapper.selectPageDbTableList(pageQuery.build(), this.buildDbTableQueryWrapper(genTable));
+        Page<GenTable> page = baseMapper.selectPageDbTableList(pageQuery.build(), genTable);
         return TableDataInfo.build(page);
     }
 
@@ -119,22 +125,7 @@ public class GenTableServiceImpl extends BaseGenTableServiceImpl {
      */
     @Override
     public List<GenTable> selectDbTableList(GenTable genTable) {
-        return baseMapper.selectDbTableList(this.buildDbTableQueryWrapper(genTable));
-    }
-
-    private Wrapper<Object> buildDbTableQueryWrapper(GenTable genTable) {
-        Map<String, Object> params = genTable.getParams();
-        QueryWrapper<Object> wrapper = Wrappers.query();
-        wrapper.apply("table_schema = (select database())")
-            .notLike("table_name", "xxl_job_")
-            .notLike("table_name", "gen_")
-            .notInSql("table_name", "select table_name from gen_table")
-            .like(StringUtils.isNotBlank(genTable.getTableName()), "lower(table_name)", StringUtils.lowerCase(genTable.getTableName()))
-            .like(StringUtils.isNotBlank(genTable.getTableComment()), "lower(table_comment)", StringUtils.lowerCase(genTable.getTableComment()))
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                "create_time", params.get("beginTime"), params.get("endTime"))
-            .orderByDesc("create_time");
-        return wrapper;
+        return baseMapper.selectDbTableList(genTable);
     }
 
     /**
@@ -252,6 +243,21 @@ public class GenTableServiceImpl extends BaseGenTableServiceImpl {
     }
 
     /**
+     * 生成代码（下载方式）
+     *
+     * @param tableName 表名称
+     * @return 数据
+     */
+    @Override
+    public byte[] downloadCode(String tableName) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ZipOutputStream zip = new ZipOutputStream(outputStream);
+        generatorCode(tableName, zip);
+        IoUtil.close(zip);
+        return outputStream.toByteArray();
+    }
+
+    /**
      * 生成代码（自定义路径）
      *
      * @param tableName 表名称
@@ -339,10 +345,26 @@ public class GenTableServiceImpl extends BaseGenTableServiceImpl {
     }
 
     /**
-     * 查询表信息并生成代码
+     * 批量生成代码（下载方式）
+     *
+     * @param tableNames 表数组
+     * @return 数据
      */
     @Override
-    public void generatorCode(String tableName, ZipOutputStream zip) {
+    public byte[] downloadCode(String[] tableNames) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ZipOutputStream zip = new ZipOutputStream(outputStream);
+        for (String tableName : tableNames) {
+            generatorCode(tableName, zip);
+        }
+        IoUtil.close(zip);
+        return outputStream.toByteArray();
+    }
+
+    /**
+     * 查询表信息并生成代码
+     */
+    private void generatorCode(String tableName, ZipOutputStream zip) {
         // 查询表信息
         GenTable table = baseMapper.selectGenTableByName(tableName);
         // 设置主子表信息
@@ -375,6 +397,60 @@ public class GenTableServiceImpl extends BaseGenTableServiceImpl {
     }
 
     /**
+     * 修改保存参数校验
+     *
+     * @param genTable 业务信息
+     */
+    @Override
+    public void validateEdit(GenTable genTable) {
+        if (GenConstants.TPL_TREE.equals(genTable.getTplCategory())) {
+            String options = JsonUtils.toJsonString(genTable.getParams());
+            Dict paramsObj = JsonUtils.parseMap(options);
+            if (StringUtils.isEmpty(paramsObj.getStr(GenConstants.TREE_CODE))) {
+                throw new ServiceException("树编码字段不能为空");
+            } else if (StringUtils.isEmpty(paramsObj.getStr(GenConstants.TREE_PARENT_CODE))) {
+                throw new ServiceException("树父编码字段不能为空");
+            } else if (StringUtils.isEmpty(paramsObj.getStr(GenConstants.TREE_NAME))) {
+                throw new ServiceException("树名称字段不能为空");
+            } else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory())) {
+                if (StringUtils.isEmpty(genTable.getSubTableName())) {
+                    throw new ServiceException("关联子表的表名不能为空");
+                } else if (StringUtils.isEmpty(genTable.getSubTableFkName())) {
+                    throw new ServiceException("子表关联的外键名不能为空");
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置主键列信息
+     *
+     * @param table 业务表信息
+     */
+    public void setPkColumn(GenTable table) {
+        for (GenTableColumn column : table.getColumns()) {
+            if (column.isPk()) {
+                table.setPkColumn(column);
+                break;
+            }
+        }
+        if (ObjectUtil.isNull(table.getPkColumn())) {
+            table.setPkColumn(table.getColumns().get(0));
+        }
+        if (GenConstants.TPL_SUB.equals(table.getTplCategory())) {
+            for (GenTableColumn column : table.getSubTable().getColumns()) {
+                if (column.isPk()) {
+                    table.getSubTable().setPkColumn(column);
+                    break;
+                }
+            }
+            if (ObjectUtil.isNull(table.getSubTable().getPkColumn())) {
+                table.getSubTable().setPkColumn(table.getSubTable().getColumns().get(0));
+            }
+        }
+    }
+
+    /**
      * 设置主子表信息
      *
      * @param table 业务表信息
@@ -386,4 +462,41 @@ public class GenTableServiceImpl extends BaseGenTableServiceImpl {
         }
     }
 
+    /**
+     * 设置代码生成其他选项值
+     *
+     * @param genTable 设置后的生成对象
+     */
+    public void setTableFromOptions(GenTable genTable) {
+        Dict paramsObj = JsonUtils.parseMap(genTable.getOptions());
+        if (ObjectUtil.isNotNull(paramsObj)) {
+            String treeCode = paramsObj.getStr(GenConstants.TREE_CODE);
+            String treeParentCode = paramsObj.getStr(GenConstants.TREE_PARENT_CODE);
+            String treeName = paramsObj.getStr(GenConstants.TREE_NAME);
+            String parentMenuId = paramsObj.getStr(GenConstants.PARENT_MENU_ID);
+            String parentMenuName = paramsObj.getStr(GenConstants.PARENT_MENU_NAME);
+
+            genTable.setTreeCode(treeCode);
+            genTable.setTreeParentCode(treeParentCode);
+            genTable.setTreeName(treeName);
+            genTable.setParentMenuId(parentMenuId);
+            genTable.setParentMenuName(parentMenuName);
+        }
+    }
+
+    /**
+     * 获取代码生成地址
+     *
+     * @param table    业务表信息
+     * @param template 模板文件路径
+     * @return 生成地址
+     */
+    public static String getGenPath(GenTable table, String template) {
+        String genPath = table.getGenPath();
+        if (StringUtils.equals(genPath, "/")) {
+            return System.getProperty("user.dir") + File.separator + "src" + File.separator + VelocityUtils.getFileName(template, table);
+        }
+        return genPath + File.separator + VelocityUtils.getFileName(template, table);
+    }
 }
+

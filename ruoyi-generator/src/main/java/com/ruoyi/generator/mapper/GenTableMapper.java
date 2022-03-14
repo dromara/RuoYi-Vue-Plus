@@ -1,8 +1,6 @@
 package com.ruoyi.generator.mapper;
 
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.mapper.BaseMapperPlus;
 import com.ruoyi.generator.domain.GenTable;
@@ -18,15 +16,15 @@ import java.util.List;
 @InterceptorIgnore(dataPermission = "true")
 public interface GenTableMapper extends BaseMapperPlus<GenTableMapper, GenTable, GenTable> {
 
-    Page<GenTable> selectPageDbTableList(@Param("page") Page<GenTable> page, @Param(Constants.WRAPPER) Wrapper<Object> queryWrapper);
+    Page<GenTable> selectPageDbTableList(@Param("page") Page<GenTable> page, @Param("genTable") GenTable genTable);
 
     /**
      * 查询据库列表
      *
-     * @param queryWrapper 查询条件
+     * @param genTable 查询条件
      * @return 数据库表集合
      */
-    List<GenTable> selectDbTableList(@Param(Constants.WRAPPER) Wrapper<Object> queryWrapper);
+    List<GenTable> selectDbTableList(GenTable genTable);
 
     /**
      * 查询据库列表

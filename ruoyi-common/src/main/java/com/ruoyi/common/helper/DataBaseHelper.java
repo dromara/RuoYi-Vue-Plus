@@ -23,7 +23,7 @@ public class DataBaseHelper {
     /**
      * 获取当前数据库类型
      */
-    public static DataBaseType getDataBasyType() {
+    public static DataBaseType getDataBaseType() {
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) SpringUtils.getBean(DataSource.class);
         DataSource dataSource = ds.determineDataSource();
         try {
@@ -36,23 +36,23 @@ public class DataBaseHelper {
     }
 
     public static boolean isMySql() {
-        return DataBaseType.MY_SQL == getDataBasyType();
+        return DataBaseType.MY_SQL == getDataBaseType();
     }
 
     public static boolean isOracle() {
-        return DataBaseType.ORACLE == getDataBasyType();
+        return DataBaseType.ORACLE == getDataBaseType();
     }
 
     public static boolean isPostgerSql() {
-        return DataBaseType.POSTGRE_SQL == getDataBasyType();
+        return DataBaseType.POSTGRE_SQL == getDataBaseType();
     }
 
     public static boolean isSqlServer() {
-        return DataBaseType.SQL_SERVER == getDataBasyType();
+        return DataBaseType.SQL_SERVER == getDataBaseType();
     }
 
     public static String findInSet(Object var1, String var2) {
-        DataBaseType dataBasyType = getDataBasyType();
+        DataBaseType dataBasyType = getDataBaseType();
         String var = Convert.toStr(var1);
         if (dataBasyType == DataBaseType.SQL_SERVER) {
             // charindex(',100,' , ',0,100,101,') <> 0
