@@ -44,11 +44,14 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
 
     @Override
     public String getDeptAndChild(Long deptId) {
+        List<SysDept> deptList = deptMapper.selectList(new LambdaQueryWrapper<SysDept>()
+            .select(SysDept::getDeptId)
+            .apply(DataBaseHelper.findInSet(deptId, "ancestors")));
+        List<Long> ids = deptList.stream().map(SysDept::getDeptId).collect(Collectors.toList());
+        ids.add(deptId);
         List<SysDept> list = deptMapper.selectList(new LambdaQueryWrapper<SysDept>()
             .select(SysDept::getDeptId)
-            .eq(SysDept::getDeptId, deptId)
-            .or()
-            .apply(DataBaseHelper.findInSet(deptId, "ancestors")));
+            .in(SysDept::getDeptId, ids));
         if (CollUtil.isNotEmpty(list)) {
             return list.stream().map(d -> Convert.toStr(d.getDeptId())).collect(Collectors.joining(","));
         }
