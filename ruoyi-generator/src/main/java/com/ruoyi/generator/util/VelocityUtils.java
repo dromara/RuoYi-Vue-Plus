@@ -5,6 +5,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.constant.GenConstants;
+import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -135,7 +136,15 @@ public class VelocityUtils {
         templates.add("vm/java/serviceImpl.java.vm");
         templates.add("vm/java/controller.java.vm");
         templates.add("vm/xml/mapper.xml.vm");
-        templates.add("vm/sql/sql.vm");
+        if (DataBaseHelper.isOracle()) {
+            templates.add("vm/sql/oracle/sql.vm");
+        } else if (DataBaseHelper.isPostgerSql()) {
+            templates.add("vm/sql/postgers/sql.vm");
+        } else if (DataBaseHelper.isSqlServer()) {
+            templates.add("vm/sql/sqlserver/sql.vm");
+        } else {
+            templates.add("vm/sql/sql.vm");
+        }
         templates.add("vm/js/api.js.vm");
         if (GenConstants.TPL_CRUD.equals(tplCategory)) {
             templates.add("vm/vue/index.vue.vm");

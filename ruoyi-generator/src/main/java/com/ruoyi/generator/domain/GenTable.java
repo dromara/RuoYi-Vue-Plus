@@ -150,6 +150,12 @@ public class GenTable extends BaseEntity {
     @TableField(exist = false)
     private String treeName;
 
+    /*
+     * 菜单id列表
+     */
+    @TableField(exist = false)
+    private List<Long> menuIds;
+
     /**
      * 上级菜单ID字段
      */
