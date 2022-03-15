@@ -57,7 +57,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isMySql()">
             select table_name, table_comment, create_time, update_time
             from information_schema.tables
-            AND table_name NOT LIKE 'qrtz_%' AND table_name NOT LIKE 'gen_%'
+            where table_schema = (select database())
+            AND table_name NOT LIKE 'xxl_job_%' AND table_name NOT LIKE 'gen_%'
             AND table_name NOT IN (select table_name from gen_table)
             <if test="genTable.tableName != null and genTable.tableName != ''">
                 AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
@@ -73,7 +74,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             where dt.table_name = dtc.table_name
             and dt.table_name = uo.object_name
             and uo.object_type = 'TABLE'
-            AND dt.table_name NOT LIKE 'QRTZ_%' AND dt.table_name NOT LIKE 'GEN_%'
+            AND dt.table_name NOT LIKE 'XXL_JOB_%' AND dt.table_name NOT LIKE 'GEN_%'
             AND lower(dt.table_name) NOT IN (select table_name from gen_table)
             <if test="genTable.tableName != null and genTable.tableName != ''">
                 AND lower(dt.table_name) like lower(concat(concat('%', #{genTable.tableName}), '%'))
@@ -93,7 +94,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isMySql()">
             select table_name, table_comment, create_time, update_time
             from information_schema.tables
-            AND table_name NOT LIKE 'qrtz_%' AND table_name NOT LIKE 'gen_%'
+            AND table_name NOT LIKE 'xxl_job_%' AND table_name NOT LIKE 'gen_%'
             AND table_name NOT IN (select table_name from gen_table)
             <if test="tableName != null and tableName != ''">
                 AND lower(table_name) like lower(concat('%', #{tableName}, '%'))
@@ -109,7 +110,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             where dt.table_name = dtc.table_name
             and dt.table_name = uo.object_name
             and uo.object_type = 'TABLE'
-            AND dt.table_name NOT LIKE 'QRTZ_%' AND dt.table_name NOT LIKE 'GEN_%'
+            AND dt.table_name NOT LIKE 'XXL_JOB_%' AND dt.table_name NOT LIKE 'GEN_%'
             AND lower(dt.table_name) NOT IN (select table_name from gen_table)
             <if test="tableName != null and tableName != ''">
                 AND lower(dt.table_name) like lower(concat(concat('%', #{tableName}), '%'))
