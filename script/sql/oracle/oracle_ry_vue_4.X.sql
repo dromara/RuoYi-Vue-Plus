@@ -522,10 +522,10 @@ create table sys_oper_log (
   oper_url          varchar2(255)   default '',
   oper_ip           varchar2(128)   default '',
   oper_location     varchar2(255)   default '',
-  oper_param        varchar2(2000)  default '',
-  json_result       varchar2(2000)  default '',
+  oper_param        varchar2(2100)  default '',
+  json_result       varchar2(2100)  default '',
   status            number(1)       default 0,
-  error_msg         varchar2(2000)  default '' ,
+  error_msg         varchar2(2100)  default '' ,
   oper_time         date
 );
 
