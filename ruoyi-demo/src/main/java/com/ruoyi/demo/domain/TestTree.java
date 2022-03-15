@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("test_tree")
-public class TestTree extends TreeEntity {
+public class TestTree extends TreeEntity<TestTree> {
 
     private static final long serialVersionUID = 1L;
 
