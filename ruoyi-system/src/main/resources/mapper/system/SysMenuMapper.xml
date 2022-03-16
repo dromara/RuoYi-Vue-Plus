@@ -60,8 +60,8 @@
                  left join sys_user u on ur.user_id = u.user_id
         where u.user_id = #{userId}
           and m.menu_type in ('M', 'C')
-          and m.status = 0
-          AND ro.status = 0
+          and m.status = '0'
+          and ro.status = '0'
         order by m.parent_id, m.order_num
     </select>
 
