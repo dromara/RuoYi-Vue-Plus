@@ -85,7 +85,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
     @Override
     public List<Long> selectDeptListByRoleId(Long roleId) {
         SysRole role = roleMapper.selectById(roleId);
-        return baseMapper.selectDeptListByRoleId(roleId, role.isDeptCheckStrictly());
+        return baseMapper.selectDeptListByRoleId(roleId, role.getDeptCheckStrictly() == 1);
     }
 
     /**
