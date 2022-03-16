@@ -325,7 +325,7 @@ GO
 
 CREATE TABLE [sys_config]
 (
-    [config_id]    bigint IDENTITY (1,1)       NOT NULL,
+    [config_id]    bigint                      NOT NULL,
     [config_name]  nvarchar(100) DEFAULT ''    NULL,
     [config_key]   nvarchar(100) DEFAULT ''    NULL,
     [config_value] nvarchar(500) DEFAULT ''    NULL,
@@ -408,8 +408,6 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_config'
 GO
 
-SET IDENTITY_INSERT [sys_config] ON
-GO
 INSERT [sys_config] ([config_id], [config_name], [config_key], [config_value], [config_type], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'主框架页-默认皮肤样式名称', N'sys.index.skinName', N'skin-blue', N'Y', N'admin', getdate(), N'', NULL, N'蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow')
 GO
 INSERT [sys_config] ([config_id], [config_name], [config_key], [config_value], [config_type], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'用户管理-账号初始密码', N'sys.user.initPassword', N'123456', N'Y', N'admin', getdate(), N'', NULL, N'初始化密码 123456')
@@ -421,8 +419,6 @@ GO
 INSERT [sys_config] ([config_id], [config_name], [config_key], [config_value], [config_type], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (5, N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', N'admin', getdate(), N'', NULL, N'是否开启注册用户功能（true开启，false关闭）')
 GO
 INSERT [sys_config] ([config_id], [config_name], [config_key], [config_value], [config_type], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (11, N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', N'admin', getdate(), N'', null, N'true:开启, false:关闭');
-GO
-SET IDENTITY_INSERT [sys_config] OFF
 GO
 
 CREATE TABLE [sys_dept]
@@ -538,8 +534,6 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dept'
 GO
 
-SET IDENTITY_INSERT [sys_dept] ON
-GO
 INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_by], [create_time], [update_by], [update_time]) VALUES (100, 0, N'0', N'若依科技', 0, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', N'admin', getdate(), N'', NULL)
 GO
 INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_by], [create_time], [update_by], [update_time]) VALUES (101, 100, N'0,100', N'深圳总公司', 1, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', N'admin', getdate(), N'', NULL)
@@ -559,8 +553,6 @@ GO
 INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_by], [create_time], [update_by], [update_time]) VALUES (108, 102, N'0,100,102', N'市场部门', 1, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', N'admin', getdate(), N'', NULL)
 GO
 INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_by], [create_time], [update_by], [update_time]) VALUES (109, 102, N'0,100,102', N'财务部门', 2, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', N'admin', getdate(), N'', NULL)
-GO
-SET IDENTITY_INSERT [sys_dept] OFF
 GO
 
 CREATE TABLE [sys_dict_data]
@@ -676,8 +668,6 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dict_data'
 GO
 
-SET IDENTITY_INSERT [sys_dict_data] ON
-GO
 INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, 1, N'男', N'0', N'sys_user_sex', N'', N'', N'Y', N'0', N'admin', getdate(), N'', NULL, N'性别男')
 GO
 INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, 2, N'女', N'1', N'sys_user_sex', N'', N'', N'N', N'0', N'admin', getdate(), N'', NULL, N'性别女')
@@ -733,8 +723,6 @@ GO
 INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (27, 1, N'成功', N'0', N'sys_common_status', N'', N'primary', N'N', N'0', N'admin', getdate(), N'', NULL, N'正常状态')
 GO
 INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (28, 2, N'失败', N'1', N'sys_common_status', N'', N'danger', N'N', N'0', N'admin', getdate(), N'', NULL, N'停用状态')
-GO
-SET IDENTITY_INSERT [sys_dict_data] OFF
 GO
 
 CREATE TABLE [sys_dict_type]
@@ -815,8 +803,6 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dict_type'
 GO
 
-SET IDENTITY_INSERT [sys_dict_type] ON
-GO
 INSERT [sys_dict_type] ([dict_id], [dict_name], [dict_type], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'用户性别', N'sys_user_sex', N'0', N'admin', getdate(), N'', NULL, N'用户性别列表')
 GO
 INSERT [sys_dict_type] ([dict_id], [dict_name], [dict_type], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'菜单状态', N'sys_show_hide', N'0', N'admin', getdate(), N'', NULL, N'菜单状态列表')
@@ -836,8 +822,6 @@ GO
 INSERT [sys_dict_type] ([dict_id], [dict_name], [dict_type], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (9, N'操作类型', N'sys_oper_type', N'0', N'admin', getdate(), N'', NULL, N'操作类型列表')
 GO
 INSERT [sys_dict_type] ([dict_id], [dict_name], [dict_type], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (10, N'系统状态', N'sys_common_status', N'0', N'admin', getdate(), N'', NULL, N'登录状态列表')
-GO
-SET IDENTITY_INSERT [sys_dict_type] OFF
 GO
 
 CREATE TABLE [sys_logininfor]
@@ -1066,8 +1050,6 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_menu'
 GO
 
-SET IDENTITY_INSERT [sys_menu] ON
-GO
 INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'系统管理', 0, 1, N'system', NULL, N'', 1, 0, N'M', N'0', N'0', N'', N'system', N'admin', getdate(), N'', NULL, N'系统管理目录')
 GO
 INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'系统监控', 0, 2, N'monitor', NULL, N'', 1, 0, N'M', N'0', N'0', N'', N'monitor', N'admin', getdate(), N'', NULL, N'系统监控目录')
@@ -1235,8 +1217,6 @@ INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [co
 GO
 INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1605, N'配置编辑', 118, 6, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:oss:edit', N'#', N'admin', getdate(), N'', NULL, N'');
 GO
-SET IDENTITY_INSERT [sys_menu] OFF
-GO
 
 CREATE TABLE [sys_notice]
 (
@@ -1324,13 +1304,9 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_notice'
 GO
 
-SET IDENTITY_INSERT [sys_notice] ON
-GO
 INSERT [sys_notice] ([notice_id], [notice_title], [notice_type], [notice_content], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'温馨提醒：2018-07-01 若依新版本发布啦', N'2', N'<p>1111111111</p>', N'0', N'admin', getdate(), N'admin', getdate(), N'管理员')
 GO
 INSERT [sys_notice] ([notice_id], [notice_title], [notice_type], [notice_content], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'维护通知：2018-07-01 若依系统凌晨维护', N'1', N'<p><img src="/dev-api/profile/upload/2021/12/04/f1e00aba-0182-46b0-9c65-7804dfd0ea4e.png"></p>', N'0', N'admin', getdate(), N'admin', getdate(), N'管理员')
-GO
-SET IDENTITY_INSERT [sys_notice] OFF
 GO
 
 CREATE TABLE [sys_oper_log]
@@ -1545,8 +1521,6 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_post'
 GO
 
-SET IDENTITY_INSERT [sys_post] ON
-GO
 INSERT [sys_post] ([post_id], [post_code], [post_name], [post_sort], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'ceo', N'董事长', 1, N'0', N'admin', getdate(), N'', NULL, N'')
 GO
 INSERT [sys_post] ([post_id], [post_code], [post_name], [post_sort], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'se', N'项目经理', 2, N'0', N'admin', getdate(), N'', NULL, N'')
@@ -1554,8 +1528,6 @@ GO
 INSERT [sys_post] ([post_id], [post_code], [post_name], [post_sort], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (3, N'hr', N'人力资源', 3, N'0', N'admin', getdate(), N'', NULL, N'')
 GO
 INSERT [sys_post] ([post_id], [post_code], [post_name], [post_sort], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (4, N'user', N'普通员工', 4, N'0', N'admin', getdate(), N'', NULL, N'')
-GO
-SET IDENTITY_INSERT [sys_post] OFF
 GO
 
 CREATE TABLE [sys_role]
@@ -1671,13 +1643,9 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_role'
 GO
 
-SET IDENTITY_INSERT [sys_role] ON
-GO
 INSERT [sys_role] ([role_id], [role_name], [role_key], [role_sort], [data_scope], [menu_check_strictly], [dept_check_strictly], [status], [del_flag], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'超级管理员', N'admin', 1, N'1', 1, 1, N'0', N'0', N'admin', getdate(), N'', NULL, N'超级管理员')
 GO
 INSERT [sys_role] ([role_id], [role_name], [role_key], [role_sort], [data_scope], [menu_check_strictly], [dept_check_strictly], [status], [del_flag], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'普通角色', N'common', 2, N'2', 1, 1, N'0', N'0', N'admin', getdate(), N'admin', CAST(N'2021-12-04T15:44:20.0000000' AS DateTime2), N'普通角色')
-GO
-SET IDENTITY_INSERT [sys_role] OFF
 GO
 
 CREATE TABLE [sys_role_dept]
@@ -2058,13 +2026,9 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_user'
 GO
 
-SET IDENTITY_INSERT [sys_user] ON
-GO
 INSERT [sys_user] ([user_id], [dept_id], [user_name], [nick_name], [user_type], [email], [phonenumber], [sex], [avatar], [password], [status], [del_flag], [login_ip], [login_date], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, 103, N'admin', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@163.com', N'15888888888', N'1', N'', N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), N'admin', getdate(), N'', getdate(), N'管理员')
 GO
 INSERT [sys_user] ([user_id], [dept_id], [user_name], [nick_name], [user_type], [email], [phonenumber], [sex], [avatar], [password], [status], [del_flag], [login_ip], [login_date], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, 105, N'ry', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@qq.com', N'15666666666', N'1', N'', N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), N'admin', getdate(), N'admin', getdate(), N'测试员')
-GO
-SET IDENTITY_INSERT [sys_user] OFF
 GO
 
 CREATE TABLE [sys_user_post]
@@ -2347,8 +2311,6 @@ EXEC sp_addextendedproperty
     'TABLE', N'sys_oss_config'
 GO
 
-SET IDENTITY_INSERT [sys_oss_config] ON
-GO
 INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [is_https], [region], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'1', N'minio', N'lihongbo', N'lihongbo.123', N'ruoyi', N'', N'http://81.70.150.73:9000', N'N', N'', N'0', N'', N'admin', getdate(), N'admin', getdate(), NULL)
 GO
 INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [is_https], [region], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'2', N'qiniu', N'XXXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi', N'', N'http://XXX.XXXX.com', N'N', N'z0', N'1', N'', N'admin', getdate(), N'admin', getdate(), NULL)
@@ -2356,6 +2318,4 @@ GO
 INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [is_https], [region], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'3', N'aliyun', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi', N'', N'http://oss-cn-beijing.aliyuncs.com', N'N', N'', N'1', N'', N'admin', getdate(), N'admin', getdate(), NULL)
 GO
 INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [is_https], [region], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'4', N'qcloud', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi-1250000000', N'', N'http://cos.ap-beijing.myqcloud.com', N'N', N'ap-beijing', N'1', N'', N'admin', getdate(), N'admin', getdate(), NULL)
-GO
-SET IDENTITY_INSERT [sys_oss_config] OFF
 GO
