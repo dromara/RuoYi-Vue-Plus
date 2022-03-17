@@ -42,7 +42,7 @@ public class SysDictData extends BaseEntity {
      */
     @ApiModelProperty(value = "字典排序")
     @ExcelProperty(value = "字典排序")
-    private Long dictSort;
+    private Integer dictSort;
 
     /**
      * 字典标签
