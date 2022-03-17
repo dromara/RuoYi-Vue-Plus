@@ -85,6 +85,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             order by create_time desc
         </if>
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isPostgerSql()">
+            select table_name, table_comment, create_time, update_time
+            from (
+                SELECT c.relname AS table_name,
+                        obj_description(c.oid) AS table_comment,
+                        CURRENT_TIMESTAMP AS create_time,
+                        CURRENT_TIMESTAMP AS update_time
+                FROM pg_class c
+                    LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE (c.relkind = ANY (ARRAY ['r'::"char", 'p'::"char"]))
+                    AND c.relname != 'spatial_%'::text
+                    AND n.nspname = 'public'::name
+                    AND n.nspname <![CDATA[ <> ]]> ''::name
+            ) list_table
+            where table_name NOT LIKE 'xxl_job_%' AND table_name NOT LIKE 'gen_%'
+            AND table_name NOT IN (select table_name from gen_table)
+            <if test="genTable.tableName != null and genTable.tableName != ''">
+                AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
+            </if>
+            <if test="genTable.tableComment != null and genTable.tableComment != ''">
+                AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
+            </if>
+            order by create_time desc
         </if>
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isSqlServer()">
         </if>
@@ -121,6 +143,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             order by create_time desc
         </if>
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isPostgerSql()">
+            select table_name, table_comment, create_time, update_time
+            from (
+                SELECT c.relname AS table_name,
+                        obj_description(c.oid) AS table_comment,
+                        CURRENT_TIMESTAMP AS create_time,
+                        CURRENT_TIMESTAMP AS update_time
+                FROM pg_class c
+                    LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE (c.relkind = ANY (ARRAY ['r'::"char", 'p'::"char"]))
+                    AND c.relname != 'spatial_%'::text
+                    AND n.nspname = 'public'::name
+                    AND n.nspname <![CDATA[ <> ]]> ''::name
+            ) list_table
+            where table_name NOT LIKE 'xxl_job_%' AND table_name NOT LIKE 'gen_%'
+            AND table_name NOT IN (select table_name from gen_table)
+            <if test="genTable.tableName != null and genTable.tableName != ''">
+                AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
+            </if>
+            <if test="genTable.tableComment != null and genTable.tableComment != ''">
+                AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
+            </if>
+            order by create_time desc
         </if>
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isSqlServer()">
         </if>
@@ -149,6 +193,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </foreach>
         </if>
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isPostgerSql()">
+            select table_name, table_comment, create_time, update_time
+            from (
+                SELECT c.relname AS table_name,
+                        obj_description(c.oid) AS table_comment,
+                        CURRENT_TIMESTAMP AS create_time,
+                        CURRENT_TIMESTAMP AS update_time
+                FROM pg_class c
+                    LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE (c.relkind = ANY (ARRAY ['r'::"char", 'p'::"char"]))
+                    AND c.relname != 'spatial_%'::text
+                    AND n.nspname = 'public'::name
+                    AND n.nspname <![CDATA[ <> ]]> ''::name
+            ) list_table
+            where table_name NOT LIKE 'xxl_job_%' and table_name NOT LIKE 'gen_%'
+            and table_name in
+            <foreach collection="array" item="name" open="(" separator="," close=")">
+                #{name}
+            </foreach>
         </if>
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isSqlServer()">
         </if>
@@ -171,6 +233,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             and lower(dt.table_name) = #{tableName}
         </if>
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isPostgerSql()">
+            select table_name, table_comment, create_time, update_time
+            from (
+                SELECT c.relname AS table_name,
+                        obj_description(c.oid) AS table_comment,
+                        CURRENT_TIMESTAMP AS create_time,
+                        CURRENT_TIMESTAMP AS update_time
+                FROM pg_class c
+                    LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE (c.relkind = ANY (ARRAY ['r'::"char", 'p'::"char"]))
+                    AND c.relname != 'spatial_%'::text
+                    AND n.nspname = 'public'::name
+                    AND n.nspname <![CDATA[ <> ]]> ''::name
+            ) list_table
+            where table_name NOT LIKE 'xxl_job_%' and table_name NOT LIKE 'gen_%'
+            and table_name = #{tableName}
         </if>
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isSqlServer()">
         </if>

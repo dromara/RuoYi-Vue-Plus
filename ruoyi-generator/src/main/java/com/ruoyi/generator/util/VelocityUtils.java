@@ -139,7 +139,7 @@ public class VelocityUtils {
         if (DataBaseHelper.isOracle()) {
             templates.add("vm/sql/oracle/sql.vm");
         } else if (DataBaseHelper.isPostgerSql()) {
-            templates.add("vm/sql/postgers/sql.vm");
+            templates.add("vm/sql/postgres/sql.vm");
         } else if (DataBaseHelper.isSqlServer()) {
             templates.add("vm/sql/sqlserver/sql.vm");
         } else {

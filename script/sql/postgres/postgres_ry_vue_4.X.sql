@@ -825,7 +825,7 @@ drop table if exists gen_table_column;
 create table if not exists gen_table_column
 (
     column_id      int8,
-    table_id       varchar(64)  default null::varchar,
+    table_id       int8,
     column_name    varchar(200) default null::varchar,
     column_comment varchar(500) default null::varchar,
     column_type    varchar(100) default null::varchar,

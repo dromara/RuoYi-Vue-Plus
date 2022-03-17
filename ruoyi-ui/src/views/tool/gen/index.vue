@@ -229,7 +229,7 @@ export default {
     };
   },
   created() {
-    localStorage.setItem("dataName", "master");
+    localStorage.setItem("dataName", "postgres");
     this.getList();
   },
   activated() {
