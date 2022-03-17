@@ -16,6 +16,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -62,8 +63,8 @@ public class SysRole extends BaseEntity {
      */
     @ApiModelProperty(value = "角色排序")
     @ExcelProperty(value = "角色排序")
-    @NotBlank(message = "显示顺序不能为空")
-    private String roleSort;
+    @NotNull(message = "显示顺序不能为空")
+    private Integer roleSort;
 
     /**
      * 数据范围（1：所有数据权限；2：自定义数据权限；3：本部门数据权限；4：本部门及以下数据权限；5：仅本人数据权限）
