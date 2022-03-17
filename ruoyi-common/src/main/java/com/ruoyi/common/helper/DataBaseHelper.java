@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
@@ -26,8 +27,8 @@ public class DataBaseHelper {
     public static DataBaseType getDataBaseType() {
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) SpringUtils.getBean(DataSource.class);
         DataSource dataSource = ds.determineDataSource();
-        try {
-            DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
+        try (Connection conn = dataSource.getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
             String databaseProductName = metaData.getDatabaseProductName();
             return DataBaseType.find(databaseProductName);
         } catch (SQLException e) {
