@@ -45,7 +45,7 @@ public class TestBatchController extends BaseController {
         List<TestDemo> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
             TestDemo testDemo = new TestDemo();
-            testDemo.setOrderNum(-1L);
+            testDemo.setOrderNum(-1);
             testDemo.setTestKey("批量新增");
             testDemo.setValue("测试新增");
             list.add(testDemo);
@@ -65,7 +65,7 @@ public class TestBatchController extends BaseController {
         List<TestDemo> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
             TestDemo testDemo = new TestDemo();
-            testDemo.setOrderNum(-1L);
+            testDemo.setOrderNum(-1);
             testDemo.setTestKey("批量新增");
             testDemo.setValue("测试新增");
             list.add(testDemo);        }
