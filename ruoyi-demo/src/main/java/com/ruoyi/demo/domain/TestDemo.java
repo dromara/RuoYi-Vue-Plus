@@ -39,7 +39,7 @@ public class TestDemo extends BaseEntity {
      * 排序号
      */
     @OrderBy(asc = false, sort = 1)
-    private Long orderNum;
+    private Integer orderNum;
 
     /**
      * key键

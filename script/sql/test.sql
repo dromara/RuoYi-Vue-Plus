@@ -1,9 +1,9 @@
 DROP TABLE if EXISTS test_demo;
 CREATE TABLE test_demo
 (
-    id          int(0)       NOT NULL COMMENT '主键',
-    dept_id     int(0)       NULL DEFAULT NULL COMMENT '部门id',
-    user_id     int(0)       NULL DEFAULT NULL COMMENT '用户id',
+    id          bigint(20)   NOT NULL COMMENT '主键',
+    dept_id     bigint(20)   NULL DEFAULT NULL COMMENT '部门id',
+    user_id     bigint(20)   NULL DEFAULT NULL COMMENT '用户id',
     order_num   int(0)       NULL DEFAULT 0 COMMENT '排序号',
     test_key    varchar(255) NULL DEFAULT NULL COMMENT 'key键',
     value       varchar(255) NULL DEFAULT NULL COMMENT '值',
@@ -19,10 +19,10 @@ CREATE TABLE test_demo
 DROP TABLE if EXISTS test_tree;
 CREATE TABLE test_tree
 (
-    id          int(0)       NOT NULL COMMENT '主键',
-    parent_id   int(0)       NULL DEFAULT 0 COMMENT '父id',
-    dept_id     int(0)       NULL DEFAULT NULL COMMENT '部门id',
-    user_id     int(0)       NULL DEFAULT NULL COMMENT '用户id',
+    id          bigint(20)   NOT NULL COMMENT '主键',
+    parent_id   bigint(20)   NULL DEFAULT 0 COMMENT '父id',
+    dept_id     bigint(20)   NULL DEFAULT NULL COMMENT '部门id',
+    user_id     bigint(20)   NULL DEFAULT NULL COMMENT '用户id',
     tree_name   varchar(255) NULL DEFAULT NULL COMMENT '值',
     version     int(0)       NULL DEFAULT 0 COMMENT '版本',
     create_time datetime(0)  NULL DEFAULT NULL COMMENT '创建时间',
