@@ -21,12 +21,13 @@ import java.sql.SQLException;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DataBaseHelper {
 
+    private static final DynamicRoutingDataSource DS = SpringUtils.getBean(DynamicRoutingDataSource.class);
+
     /**
      * 获取当前数据库类型
      */
     public static DataBaseType getDataBaseType() {
-        DynamicRoutingDataSource ds = (DynamicRoutingDataSource) SpringUtils.getBean(DataSource.class);
-        DataSource dataSource = ds.determineDataSource();
+        DataSource dataSource = DS.determineDataSource();
         try (Connection conn = dataSource.getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
             String databaseProductName = metaData.getDatabaseProductName();
