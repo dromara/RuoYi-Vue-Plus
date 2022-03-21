@@ -77,6 +77,26 @@
         </filter>
     </appender>
 
+    <!-- info异步输出 -->
+    <appender name="async_info" class="com.yomahub.tlog.core.enhance.logback.async.AspectLogbackAsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>512</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="file_info"/>
+    </appender>
+
+    <!-- error异步输出 -->
+    <appender name="async_error" class="com.yomahub.tlog.core.enhance.logback.async.AspectLogbackAsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>512</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="file_error"/>
+    </appender>
+
     <!-- 系统模块日志级别控制  -->
     <logger name="com.ruoyi" level="info" />
     <!-- Spring日志级别控制  -->
@@ -88,8 +108,8 @@
 
     <!--系统操作日志-->
     <root level="info">
-        <appender-ref ref="file_info" />
-        <appender-ref ref="file_error" />
+        <appender-ref ref="async_info" />
+        <appender-ref ref="async_error" />
         <appender-ref ref="file_console" />
     </root>
 
