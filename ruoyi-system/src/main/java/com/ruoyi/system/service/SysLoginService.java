@@ -87,6 +87,8 @@ public class SysLoginService {
 
         // 登录成功 清空错误次数
         RedisUtils.deleteObject(Constants.LOGIN_ERROR + username);
+
+        // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = buildLoginUser(user);
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.PC);
@@ -96,8 +98,78 @@ public class SysLoginService {
         return StpUtil.getTokenValue();
     }
 
+    public String smsLogin(String phonenumber, String smsCode) {
+        // 通过手机号查找用户
+        SysUser user = loadUserByPhonenumber(phonenumber);
+
+        HttpServletRequest request = ServletUtils.getRequest();
+        // 获取用户登录错误次数(可自定义限制策略 例如: key + username + ip)
+        Integer errorNumber = RedisUtils.getCacheObject(Constants.LOGIN_ERROR + user.getUserName());
+        // 锁定时间内登录 则踢出
+        if (ObjectUtil.isNotNull(errorNumber) && errorNumber.equals(Constants.LOGIN_ERROR_NUMBER)) {
+            asyncService.recordLogininfor(user.getUserName(), Constants.LOGIN_FAIL, MessageUtils.message("sms.code.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME), request);
+            throw new UserException("sms.code.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME);
+        }
+
+        if (!validateSmsCode(phonenumber, smsCode)) {
+            // 是否第一次
+            errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
+            // 达到规定错误次数 则锁定登录
+            if (errorNumber.equals(Constants.LOGIN_ERROR_NUMBER)) {
+                RedisUtils.setCacheObject(Constants.LOGIN_ERROR + user.getUserName(), errorNumber, Constants.LOGIN_ERROR_LIMIT_TIME, TimeUnit.MINUTES);
+                asyncService.recordLogininfor(user.getUserName(), Constants.LOGIN_FAIL, MessageUtils.message("sms.code.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME), request);
+                throw new UserException("sms.code.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME);
+            } else {
+                // 未达到规定错误次数 则递增
+                RedisUtils.setCacheObject(Constants.LOGIN_ERROR + user.getUserName(), errorNumber);
+                asyncService.recordLogininfor(user.getUserName(), Constants.LOGIN_FAIL, MessageUtils.message("sms.code.retry.limit.count", errorNumber), request);
+                throw new UserException("sms.code.retry.limit.count", errorNumber);
+            }
+        }
+
+        // 登录成功 清空错误次数
+        RedisUtils.deleteObject(Constants.LOGIN_ERROR + user.getUserName());
+
+        // 此处可根据登录用户的数据不同 自行创建 loginUser
+        LoginUser loginUser = buildLoginUser(user);
+        // 生成token
+        LoginHelper.loginByDevice(loginUser, DeviceType.APP);
+
+        asyncService.recordLogininfor(user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
+        recordLoginInfo(user.getUserId(), user.getUserName());
+        return StpUtil.getTokenValue();
+    }
+
+
+    public String xcxLogin(String xcxCode) {
+        HttpServletRequest request = ServletUtils.getRequest();
+        // xcxCode 为 小程序调用 wx.login 授权后获取
+        // todo 以下自行实现
+        // 校验 appid + appsrcret + xcxCode 调用登录凭证校验接口 获取 session_key 与 openid
+        String openid = "";
+        SysUser user = loadUserByOpenid(openid);
+
+        // 此处可根据登录用户的数据不同 自行创建 loginUser
+        LoginUser loginUser = buildLoginUser(user);
+        // 生成token
+        LoginHelper.loginByDevice(loginUser, DeviceType.XCX);
+
+        asyncService.recordLogininfor(user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
+        recordLoginInfo(user.getUserId(), user.getUserName());
+        return StpUtil.getTokenValue();
+    }
+
+
     public void logout(String loginName) {
         asyncService.recordLogininfor(loginName, Constants.LOGOUT, MessageUtils.message("user.logout.success"), ServletUtils.getRequest());
+    }
+
+    /**
+     * 校验短信验证码
+     */
+    private boolean validateSmsCode(String phonenumber, String smsCode) {
+        // todo 此处使用手机号查询redis验证码与参数验证码是否一致 用户自行实现
+        return true;
     }
 
     /**
@@ -132,6 +204,38 @@ public class SysLoginService {
         } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", username);
             throw new UserException("user.blocked", username);
+        }
+        return user;
+    }
+
+    private SysUser loadUserByPhonenumber(String phonenumber) {
+        SysUser user = userService.selectUserByPhonenumber(phonenumber);
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", phonenumber);
+            throw new UserException("user.not.exists", phonenumber);
+        } else if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {
+            log.info("登录用户：{} 已被删除.", phonenumber);
+            throw new UserException("user.password.delete", phonenumber);
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", phonenumber);
+            throw new UserException("user.blocked", phonenumber);
+        }
+        return user;
+    }
+
+    private SysUser loadUserByOpenid(String openid) {
+        // 使用 openid 查询绑定用户 如未绑定用户 则根据业务自行处理 例如 创建默认用户
+        // todo 自行实现 userService.selectUserByOpenid(openid);
+        SysUser user = new SysUser();
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", openid);
+            // todo 用户不存在 业务逻辑自行实现
+        } else if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {
+            log.info("登录用户：{} 已被删除.", openid);
+            // todo 用户已被删除 业务逻辑自行实现
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", openid);
+            // todo 用户已被停用 业务逻辑自行实现
         }
         return user;
     }
