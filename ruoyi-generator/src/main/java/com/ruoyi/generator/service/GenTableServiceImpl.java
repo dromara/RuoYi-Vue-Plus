@@ -91,17 +91,6 @@ public class GenTableServiceImpl implements IGenTableService {
         return TableDataInfo.build(page);
     }
 
-    /**
-     * 查询业务列表
-     *
-     * @param genTable 业务信息
-     * @return 业务集合
-     */
-    @Override
-    public List<GenTable> selectGenTableList(GenTable genTable) {
-        return baseMapper.selectList(this.buildGenTableQueryWrapper(genTable));
-    }
-
     private QueryWrapper<GenTable> buildGenTableQueryWrapper(GenTable genTable) {
         Map<String, Object> params = genTable.getParams();
         QueryWrapper<GenTable> wrapper = Wrappers.query();
@@ -117,17 +106,6 @@ public class GenTableServiceImpl implements IGenTableService {
     public TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable, PageQuery pageQuery) {
         Page<GenTable> page = baseMapper.selectPageDbTableList(pageQuery.build(), genTable);
         return TableDataInfo.build(page);
-    }
-
-    /**
-     * 查询据库列表
-     *
-     * @param genTable 业务信息
-     * @return 数据库表集合
-     */
-    @Override
-    public List<GenTable> selectDbTableList(GenTable genTable) {
-        return baseMapper.selectDbTableList(genTable);
     }
 
     /**

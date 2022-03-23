@@ -95,6 +95,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             WHERE table_name = (#{tableName})
         </if>
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isSqlServer()">
+            SELECT
+                cast(A.NAME as nvarchar) as column_name,
+                cast(B.NAME as nvarchar) + (case when B.NAME = 'numeric' then '(' + cast(A.prec as nvarchar) + ',' + cast(A.scale as nvarchar) + ')' else '' end) as column_type,
+                cast(G.[VALUE] as nvarchar) as column_comment,
+                (SELECT 1 FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE Z WHERE TABLE_NAME = D.NAME and A.NAME = Z.column_name  ) as is_pk,
+                colorder as sort
+            FROM SYSCOLUMNS A
+                LEFT JOIN SYSTYPES B ON A.XTYPE = B.XUSERTYPE
+                INNER JOIN SYSOBJECTS D ON A.ID = D.ID AND D.XTYPE='U' AND D.NAME != 'DTPROPERTIES'
+                LEFT JOIN SYS.EXTENDED_PROPERTIES G ON A.ID = G.MAJOR_ID AND A.COLID = G.MINOR_ID
+                LEFT JOIN SYS.EXTENDED_PROPERTIES F ON D.ID = F.MAJOR_ID AND F.MINOR_ID = 0
+            WHERE D.NAME = #{tableName}
+            ORDER BY A.COLORDER
         </if>
     </select>
 

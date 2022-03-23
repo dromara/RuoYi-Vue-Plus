@@ -16,15 +16,13 @@ import java.util.List;
 @InterceptorIgnore(dataPermission = "true")
 public interface GenTableMapper extends BaseMapperPlus<GenTableMapper, GenTable, GenTable> {
 
-    Page<GenTable> selectPageDbTableList(@Param("page") Page<GenTable> page, @Param("genTable") GenTable genTable);
-
     /**
      * 查询据库列表
      *
      * @param genTable 查询条件
      * @return 数据库表集合
      */
-    List<GenTable> selectDbTableList(GenTable genTable);
+    Page<GenTable> selectPageDbTableList(@Param("page") Page<GenTable> page, @Param("genTable") GenTable genTable);
 
     /**
      * 查询据库列表
