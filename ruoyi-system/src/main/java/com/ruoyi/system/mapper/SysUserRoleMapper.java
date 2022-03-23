@@ -3,6 +3,8 @@ package com.ruoyi.system.mapper;
 import com.ruoyi.common.core.mapper.BaseMapperPlus;
 import com.ruoyi.system.domain.SysUserRole;
 
+import java.util.List;
+
 /**
  * 用户与角色关联表 数据层
  *
@@ -10,6 +12,6 @@ import com.ruoyi.system.domain.SysUserRole;
  */
 public interface SysUserRoleMapper extends BaseMapperPlus<SysUserRoleMapper, SysUserRole, SysUserRole> {
 
-    Long selectUserIdByRoleId(Long roleId);
+    List<Long> selectUserIdsByRoleId(Long roleId);
 
 }
