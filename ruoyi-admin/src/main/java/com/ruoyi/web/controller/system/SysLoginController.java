@@ -84,7 +84,7 @@ public class SysLoginController {
      * @param xcxCode 小程序code
      * @return 结果
      */
-    @ApiOperation("短信登录(示例)")
+    @ApiOperation("小程序登录(示例)")
     @PostMapping("/xcxLogin")
     public R<Map<String, Object>> xcxLogin(@NotBlank(message = "{xcx.code.not.blank}") String xcxCode) {
         Map<String, Object> ajax = new HashMap<>();
