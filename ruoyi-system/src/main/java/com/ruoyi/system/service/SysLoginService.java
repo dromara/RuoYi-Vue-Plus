@@ -8,6 +8,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.dto.RoleDTO;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.domain.model.XcxLoginUser;
 import com.ruoyi.common.core.service.LogininforService;
 import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.UserStatus;
@@ -150,7 +151,11 @@ public class SysLoginService {
         SysUser user = loadUserByOpenid(openid);
 
         // 此处可根据登录用户的数据不同 自行创建 loginUser
-        LoginUser loginUser = buildLoginUser(user);
+        XcxLoginUser loginUser = new XcxLoginUser();
+        loginUser.setUserId(user.getUserId());
+        loginUser.setUsername(user.getUserName());
+        loginUser.setUserType(user.getUserType());
+        loginUser.setOpenid(openid);
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.XCX);
 
