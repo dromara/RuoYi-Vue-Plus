@@ -136,6 +136,7 @@ security:
     - /**/*.css
     - /**/*.js
     # swagger 文档配置
+    - /favicon.ico
     - /doc.html
     - /swagger-resources/**
     - /webjars/**
