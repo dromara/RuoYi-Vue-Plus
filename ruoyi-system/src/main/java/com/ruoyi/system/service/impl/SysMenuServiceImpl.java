@@ -123,7 +123,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public List<Long> selectMenuListByRoleId(Long roleId) {
         SysRole role = roleMapper.selectById(roleId);
-        return baseMapper.selectMenuListByRoleId(roleId, role.getMenuCheckStrictly() == 1);
+        return baseMapper.selectMenuListByRoleId(roleId, role.getMenuCheckStrictly());
     }
 
     /**
