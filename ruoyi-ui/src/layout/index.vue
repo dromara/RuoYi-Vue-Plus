@@ -101,6 +101,10 @@ export default {
     width: calc(100% - 54px);
   }
 
+  .sidebarHide .fixed-header {
+    width: 100%;
+  }
+
   .mobile .fixed-header {
     width: 100%;
   }
