@@ -171,6 +171,7 @@ Router.prototype.push = function push(location) {
 }
 
 export default new Router({
+  base: process.env.VUE_APP_CONTEXT_PATH,
   mode: 'history', // 去掉url中的#
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
