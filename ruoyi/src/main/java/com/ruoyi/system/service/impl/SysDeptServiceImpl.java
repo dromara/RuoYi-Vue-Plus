@@ -155,7 +155,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
         if (!LoginHelper.isAdmin()) {
             SysDept dept = new SysDept();
             dept.setDeptId(deptId);
-            List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
+            List<SysDept> depts = this.selectDeptList(dept);
             if (CollUtil.isEmpty(depts)) {
                 throw new ServiceException("没有权限访问部门数据！");
             }

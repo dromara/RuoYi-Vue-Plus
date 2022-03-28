@@ -102,7 +102,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public List<SysRole> selectRoleAll() {
-        return SpringUtils.getAopProxy(this).selectRoleList(new SysRole());
+        return this.selectRoleList(new SysRole());
     }
 
     /**
@@ -183,7 +183,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         if (!LoginHelper.isAdmin()) {
             SysRole role = new SysRole();
             role.setRoleId(roleId);
-            List<SysRole> roles = SpringUtils.getAopProxy(this).selectRoleList(role);
+            List<SysRole> roles = this.selectRoleList(role);
             if (CollUtil.isEmpty(roles)) {
                 throw new ServiceException("没有权限访问角色数据！");
             }
