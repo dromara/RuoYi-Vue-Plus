@@ -145,6 +145,10 @@ public class SysRole extends BaseEntity {
     }
 
     public void setMenuCheckStrictly(Boolean menuCheckStrictly) {
+        if (menuCheckStrictly == null) {
+            this.menuCheckStrictly = null;
+            return;
+        }
         this.menuCheckStrictly = menuCheckStrictly ? 1 : 0;
     }
 
@@ -156,6 +160,10 @@ public class SysRole extends BaseEntity {
     }
 
     public void setDeptCheckStrictly(Boolean deptCheckStrictly) {
+        if (deptCheckStrictly == null) {
+            this.deptCheckStrictly = null;
+            return;
+        }
         this.deptCheckStrictly = deptCheckStrictly ? 1 : 0;
     }
 }
