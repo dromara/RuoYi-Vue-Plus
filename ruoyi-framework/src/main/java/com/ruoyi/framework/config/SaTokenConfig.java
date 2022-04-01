@@ -5,7 +5,7 @@ import cn.dev33.satoken.interceptor.SaRouteInterceptor;
 import cn.dev33.satoken.jwt.StpLogicJwtForStyle;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
-import cn.hutool.core.util.ObjectUtil;
+import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.framework.config.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
@@ -43,15 +43,17 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 .match("/**")
                 // 排除下不需要拦截的
                 .notMatch(securityProperties.getExcludes())
+                // 对未排除的路径进行检查
                 .check(() -> {
-                    Long userId = LoginHelper.getUserId();
-                    if (ObjectUtil.isNotNull(userId)) {
-                        // 有效率影响 用于临时测试
-                        // if (log.isDebugEnabled()) {
-                        //     log.debug("剩余有效时间: {}", StpUtil.getTokenTimeout());
-                        //     log.debug("临时有效时间: {}", StpUtil.getTokenActivityTimeout());
-                        // }
-                    }
+                    // 检查是否登录 是否有token
+                    StpUtil.checkLogin();
+
+                    // 有效率影响 用于临时测试
+                    // if (log.isDebugEnabled()) {
+                    //     log.debug("剩余有效时间: {}", StpUtil.getTokenTimeout());
+                    //     log.debug("临时有效时间: {}", StpUtil.getTokenActivityTimeout());
+                    // }
+
                 });
         }) {
             @SuppressWarnings("all")
