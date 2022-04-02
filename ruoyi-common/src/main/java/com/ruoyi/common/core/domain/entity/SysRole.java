@@ -78,13 +78,13 @@ public class SysRole extends BaseEntity {
      * 菜单树选择项是否关联显示（ 0：父子不互相关联显示 1：父子互相关联显示）
      */
     @ApiModelProperty(value = "菜单树选择项是否关联显示（ 0：父子不互相关联显示 1：父子互相关联显示）")
-    private Integer menuCheckStrictly;
+    private Boolean menuCheckStrictly;
 
     /**
      * 部门树选择项是否关联显示（0：父子不互相关联显示 1：父子互相关联显示 ）
      */
     @ApiModelProperty(value = "部门树选择项是否关联显示（0：父子不互相关联显示 1：父子互相关联显示 ）")
-    private Integer deptCheckStrictly;
+    private Boolean deptCheckStrictly;
 
     /**
      * 角色状态（0正常 1停用）
@@ -135,35 +135,5 @@ public class SysRole extends BaseEntity {
     @ApiModelProperty(value = "是否管理员")
     public boolean isAdmin() {
         return UserConstants.ADMIN_ID.equals(this.roleId);
-    }
-
-    public Boolean getMenuCheckStrictly() {
-        if (menuCheckStrictly == null) {
-            return null;
-        }
-        return menuCheckStrictly == 1;
-    }
-
-    public void setMenuCheckStrictly(Boolean menuCheckStrictly) {
-        if (menuCheckStrictly == null) {
-            this.menuCheckStrictly = null;
-            return;
-        }
-        this.menuCheckStrictly = menuCheckStrictly ? 1 : 0;
-    }
-
-    public Boolean getDeptCheckStrictly() {
-        if (deptCheckStrictly == null) {
-            return null;
-        }
-        return deptCheckStrictly == 1;
-    }
-
-    public void setDeptCheckStrictly(Boolean deptCheckStrictly) {
-        if (deptCheckStrictly == null) {
-            this.deptCheckStrictly = null;
-            return;
-        }
-        this.deptCheckStrictly = deptCheckStrictly ? 1 : 0;
     }
 }

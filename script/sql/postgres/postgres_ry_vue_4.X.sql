@@ -157,8 +157,8 @@ create table if not exists sys_role
     role_key            varchar(100) not null,
     role_sort           int4         not null,
     data_scope          char         default '1'::bpchar,
-    menu_check_strictly int2         default 1,
-    dept_check_strictly int2         default 1,
+    menu_check_strictly bool         default true,
+    dept_check_strictly bool         default true,
     status              char         not null,
     del_flag            char         default '0'::bpchar,
     create_by           varchar(64)  default ''::varchar,
@@ -188,8 +188,8 @@ comment on column sys_role.remark is '备注';
 -- ----------------------------
 -- 初始化-角色信息表数据
 -- ----------------------------
-insert into sys_role values('1', '超级管理员',  'admin',  1, 1, 1, 1, '0', '0', 'admin', now(), '', null, '超级管理员');
-insert into sys_role values('2', '普通角色',    'common', 2, 2, 1, 1, '0', '0', 'admin', now(), '', null, '普通角色');
+insert into sys_role values('1', '超级管理员',  'admin',  1, '1', 't', 't', '0', '0', 'admin', now(), '', null, '超级管理员');
+insert into sys_role values('2', '普通角色',    'common', 2, '2', 't', 't', '0', '0', 'admin', now(), '', null, '普通角色');
 
 
 -- ----------------------------

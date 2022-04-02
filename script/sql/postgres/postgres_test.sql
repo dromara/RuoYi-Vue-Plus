@@ -77,8 +77,8 @@ INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES (1510, '测试树表删除', 1506, 4, '#', '', 1, 0, 'F', '0', '0', 'demo:tree:remove', '#', 'admin', now(), '', NULL, '');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES (1511, '测试树表导出', 1506, 5, '#', '', 1, 0, 'F', '0', '0', 'demo:tree:export', '#', 'admin', now(), '', NULL, '');
 
-INSERT INTO sys_role(role_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, del_flag, create_by, create_time, update_by, update_time, remark) VALUES (3, '本部门及以下', 'test1', 3, '4', 1, 1, '0', '0', 'admin', now(), 'admin', NULL, NULL);
-INSERT INTO sys_role(role_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, del_flag, create_by, create_time, update_by, update_time, remark) VALUES (4, '仅本人', 'test2', 4, '5', 1, 1, '0', '0', 'admin', now(), 'admin', NULL, NULL);
+INSERT INTO sys_role(role_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, del_flag, create_by, create_time, update_by, update_time, remark) VALUES (3, '本部门及以下', 'test1', 3, '4', 't', 't', '0', '0', 'admin', now(), 'admin', NULL, NULL);
+INSERT INTO sys_role(role_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, del_flag, create_by, create_time, update_by, update_time, remark) VALUES (4, '仅本人', 'test2', 4, '5', 't', 't', '0', '0', 'admin', now(), 'admin', NULL, NULL);
 
 INSERT INTO sys_role_menu(role_id, menu_id) VALUES (3, 1);
 INSERT INTO sys_role_menu(role_id, menu_id) VALUES (3, 5);
