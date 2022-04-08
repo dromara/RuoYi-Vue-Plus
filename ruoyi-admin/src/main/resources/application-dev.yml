@@ -47,6 +47,8 @@ spring:
       p6spy: true
       # 设置默认的数据源或者数据源组,默认值即为 master
       primary: master
+      # 严格模式 匹配不到数据源则报错
+      strict: true
       datasource:
         # 主库数据源
         master:
