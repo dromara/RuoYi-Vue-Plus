@@ -32,6 +32,7 @@
         <id property="deptId" column="dept_id"/>
         <result property="parentId" column="parent_id"/>
         <result property="deptName" column="dept_name"/>
+        <result property="ancestors" column="ancestors"/>
         <result property="orderNum" column="order_num"/>
         <result property="leader" column="leader"/>
         <result property="status" column="dept_status"/>
@@ -66,6 +67,7 @@
                u.remark,
                d.dept_id,
                d.parent_id,
+               d.ancestors,
                d.dept_name,
                d.order_num,
                d.leader,
