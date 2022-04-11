@@ -32,8 +32,8 @@
         <mybatis-plus.version>3.5.1</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.7.22</hutool.version>
-        <okhttp.version>4.9.2</okhttp.version>
-        <spring-boot-admin.version>2.6.5</spring-boot-admin.version>
+        <okhttp.version>4.9.3</okhttp.version>
+        <spring-boot-admin.version>2.6.6</spring-boot-admin.version>
         <redisson.version>3.17.0</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.5.1</dynamic-ds.version>
@@ -44,10 +44,10 @@
         <jaxb.version>3.0.1</jaxb.version>
 
         <!-- OSS 配置 -->
-        <qiniu.version>7.9.3</qiniu.version>
+        <qiniu.version>7.9.5</qiniu.version>
         <aliyun.oss.version>3.14.0</aliyun.oss.version>
-        <qcloud.cos.version>5.6.68</qcloud.cos.version>
-        <minio.version>8.3.7</minio.version>
+        <qcloud.cos.version>5.6.72</qcloud.cos.version>
+        <minio.version>8.3.8</minio.version>
 
         <!-- docker 配置 -->
         <docker.registry.url>localhost</docker.registry.url>
