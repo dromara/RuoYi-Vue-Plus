@@ -5,7 +5,7 @@ drop table if exists sys_dept;
 create table sys_dept (
   dept_id           bigint(20)      not null     comment '部门id',
   parent_id         bigint(20)      default 0                  comment '父部门id',
-  ancestors         varchar(50)     default ''                 comment '祖级列表',
+  ancestors         varchar(500)    default ''                 comment '祖级列表',
   dept_name         varchar(30)     default ''                 comment '部门名称',
   order_num         int(4)          default 0                  comment '显示顺序',
   leader            varchar(20)     default null               comment '负责人',

@@ -4,7 +4,7 @@
 create table sys_dept (
   dept_id           number(20)      not null,
   parent_id         number(20)      default 0,
-  ancestors         varchar2(50)    default '',
+  ancestors         varchar2(500)   default '',
   dept_name         varchar2(30)    default '',
   order_num         number(4)       default 0,
   leader            varchar2(20)    default null,

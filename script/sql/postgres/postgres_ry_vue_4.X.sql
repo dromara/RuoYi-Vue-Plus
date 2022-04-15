@@ -6,7 +6,7 @@ create table if not exists sys_dept
 (
     dept_id     int8,
     parent_id   int8        default 0,
-    ancestors   varchar(50) default ''::varchar,
+    ancestors   varchar(500)default ''::varchar,
     dept_name   varchar(30) default ''::varchar,
     order_num   int4        default 0,
     leader      varchar(20) default null::varchar,

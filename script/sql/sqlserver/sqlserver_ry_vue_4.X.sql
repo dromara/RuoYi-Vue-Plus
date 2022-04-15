@@ -425,7 +425,7 @@ CREATE TABLE [sys_dept]
 (
     [dept_id]     bigint                     NOT NULL,
     [parent_id]   bigint       DEFAULT ((0)) NULL,
-    [ancestors]   nvarchar(50) DEFAULT ''    NULL,
+    [ancestors]   nvarchar(500)DEFAULT ''    NULL,
     [dept_name]   nvarchar(30) DEFAULT ''    NULL,
     [order_num]   int          DEFAULT ((0)) NULL,
     [leader]      nvarchar(20)               NULL,
