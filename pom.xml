@@ -226,6 +226,20 @@
                 <groupId>com.yomahub</groupId>
                 <artifactId>tlog-web-spring-boot-starter</artifactId>
                 <version>${tlog.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>log4j</artifactId>
+                        <groupId>log4j</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>dom4j</artifactId>
+                        <groupId>dom4j</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>commons-beanutils</artifactId>
+                        <groupId>commons-beanutils</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
