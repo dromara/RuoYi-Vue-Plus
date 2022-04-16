@@ -41,6 +41,8 @@
 
         <!-- jdk11 缺失依赖 jaxb-->
         <jaxb.version>3.0.1</jaxb.version>
+        <!-- 统一 guava 版本 解决隐式漏洞问题 -->
+        <guava.version>30.0-jre</guava.version>
 
         <!-- OSS 配置 -->
         <qiniu.version>7.9.5</qiniu.version>
@@ -230,6 +232,13 @@
                 <groupId>com.yomahub</groupId>
                 <artifactId>tlog-xxljob-spring-boot-starter</artifactId>
                 <version>${tlog.version}</version>
+            </dependency>
+
+            <!-- 统一 guava 版本 解决隐式漏洞问题 -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
 
             <!-- 定时任务 -->
