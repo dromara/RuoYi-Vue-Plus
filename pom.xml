@@ -26,7 +26,6 @@
         <poi.version>4.1.2</poi.version>
         <commons-compress.version>1.21</commons-compress.version>
         <easyexcel.version>3.0.5</easyexcel.version>
-        <cglib.version>3.3.0</cglib.version>
         <velocity.version>2.3</velocity.version>
         <satoken.version>1.29.0</satoken.version>
         <mybatis-plus.version>3.5.1</mybatis-plus.version>
@@ -132,12 +131,6 @@
                         <artifactId>poi-ooxml-schemas</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>cglib</groupId>
-                <artifactId>cglib</artifactId>
-                <version>${cglib.version}</version>
             </dependency>
 
             <!-- velocity代码生成使用模板 -->

@@ -69,11 +69,6 @@
             <artifactId>easyexcel</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-        </dependency>
-
         <!-- yml解析器 -->
         <dependency>
             <groupId>org.yaml</groupId>
