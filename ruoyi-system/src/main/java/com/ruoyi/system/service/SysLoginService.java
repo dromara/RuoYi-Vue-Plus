@@ -11,6 +11,7 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.XcxLoginUser;
 import com.ruoyi.common.core.service.LogininforService;
 import com.ruoyi.common.enums.DeviceType;
+import com.ruoyi.common.enums.LoginType;
 import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * 登录校验方法
@@ -60,35 +62,8 @@ public class SysLoginService {
         if (captchaOnOff) {
             validateCaptcha(username, code, uuid, request);
         }
-        // 获取用户登录错误次数(可自定义限制策略 例如: key + username + ip)
-        Integer errorNumber = RedisUtils.getCacheObject(Constants.LOGIN_ERROR + username);
-        // 锁定时间内登录 则踢出
-        if (ObjectUtil.isNotNull(errorNumber) && errorNumber.equals(Constants.LOGIN_ERROR_NUMBER)) {
-            asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME), request);
-            throw new UserException("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME);
-        }
-
         SysUser user = loadUserByUsername(username);
-
-        if (!BCrypt.checkpw(password, user.getPassword())) {
-            // 是否第一次
-            errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
-            // 达到规定错误次数 则锁定登录
-            if (errorNumber.equals(Constants.LOGIN_ERROR_NUMBER)) {
-                RedisUtils.setCacheObject(Constants.LOGIN_ERROR + username, errorNumber, Constants.LOGIN_ERROR_LIMIT_TIME, TimeUnit.MINUTES);
-                asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME), request);
-                throw new UserException("user.password.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME);
-            } else {
-                // 未达到规定错误次数 则递增
-                RedisUtils.setCacheObject(Constants.LOGIN_ERROR + username, errorNumber);
-                asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.count", errorNumber), request);
-                throw new UserException("user.password.retry.limit.count", errorNumber);
-            }
-        }
-
-        // 登录成功 清空错误次数
-        RedisUtils.deleteObject(Constants.LOGIN_ERROR + username);
-
+        checkLogin(LoginType.PASSWORD, username, () -> !BCrypt.checkpw(password, user.getPassword()));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = buildLoginUser(user);
         // 生成token
@@ -104,33 +79,7 @@ public class SysLoginService {
         SysUser user = loadUserByPhonenumber(phonenumber);
 
         HttpServletRequest request = ServletUtils.getRequest();
-        // 获取用户登录错误次数(可自定义限制策略 例如: key + username + ip)
-        Integer errorNumber = RedisUtils.getCacheObject(Constants.LOGIN_ERROR + user.getUserName());
-        // 锁定时间内登录 则踢出
-        if (ObjectUtil.isNotNull(errorNumber) && errorNumber.equals(Constants.LOGIN_ERROR_NUMBER)) {
-            asyncService.recordLogininfor(user.getUserName(), Constants.LOGIN_FAIL, MessageUtils.message("sms.code.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME), request);
-            throw new UserException("sms.code.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME);
-        }
-
-        if (!validateSmsCode(phonenumber, smsCode)) {
-            // 是否第一次
-            errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
-            // 达到规定错误次数 则锁定登录
-            if (errorNumber.equals(Constants.LOGIN_ERROR_NUMBER)) {
-                RedisUtils.setCacheObject(Constants.LOGIN_ERROR + user.getUserName(), errorNumber, Constants.LOGIN_ERROR_LIMIT_TIME, TimeUnit.MINUTES);
-                asyncService.recordLogininfor(user.getUserName(), Constants.LOGIN_FAIL, MessageUtils.message("sms.code.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME), request);
-                throw new UserException("sms.code.retry.limit.exceed", Constants.LOGIN_ERROR_LIMIT_TIME);
-            } else {
-                // 未达到规定错误次数 则递增
-                RedisUtils.setCacheObject(Constants.LOGIN_ERROR + user.getUserName(), errorNumber);
-                asyncService.recordLogininfor(user.getUserName(), Constants.LOGIN_FAIL, MessageUtils.message("sms.code.retry.limit.count", errorNumber), request);
-                throw new UserException("sms.code.retry.limit.count", errorNumber);
-            }
-        }
-
-        // 登录成功 清空错误次数
-        RedisUtils.deleteObject(Constants.LOGIN_ERROR + user.getUserName());
-
+        checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = buildLoginUser(user);
         // 生成token
@@ -274,5 +223,43 @@ public class SysLoginService {
         sysUser.setLoginDate(DateUtils.getNowDate());
         sysUser.setUpdateBy(username);
         userService.updateUserProfile(sysUser);
+    }
+
+    /**
+     * 登录校验
+     */
+    private void checkLogin(LoginType loginType, String username, Supplier<Boolean> supplier) {
+        HttpServletRequest request = ServletUtils.getRequest();
+        String errorKey = Constants.LOGIN_ERROR + username;
+        Integer errorLimitTime = Constants.LOGIN_ERROR_LIMIT_TIME;
+        Integer setErrorNumber = Constants.LOGIN_ERROR_NUMBER;
+        String loginFail = Constants.LOGIN_FAIL;
+
+        // 获取用户登录错误次数(可自定义限制策略 例如: key + username + ip)
+        Integer errorNumber = RedisUtils.getCacheObject(errorKey);
+        // 锁定时间内登录 则踢出
+        if (ObjectUtil.isNotNull(errorNumber) && errorNumber.equals(setErrorNumber)) {
+            asyncService.recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), errorLimitTime), request);
+            throw new UserException(loginType.getRetryLimitExceed(), errorLimitTime);
+        }
+
+        if (supplier.get()) {
+            // 是否第一次
+            errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
+            // 达到规定错误次数 则锁定登录
+            if (errorNumber.equals(setErrorNumber)) {
+                RedisUtils.setCacheObject(errorKey, errorNumber, errorLimitTime, TimeUnit.MINUTES);
+                asyncService.recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), errorLimitTime), request);
+                throw new UserException(loginType.getRetryLimitExceed(), errorLimitTime);
+            } else {
+                // 未达到规定错误次数 则递增
+                RedisUtils.setCacheObject(errorKey, errorNumber);
+                asyncService.recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitCount(), errorNumber), request);
+                throw new UserException(loginType.getRetryLimitCount(), errorNumber);
+            }
+        }
+
+        // 登录成功 清空错误次数
+        RedisUtils.deleteObject(errorKey);
     }
 }
