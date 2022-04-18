@@ -44,6 +44,7 @@
 
 <script>
 import { getToken } from "@/utils/auth";
+import { delOss } from "@/api/system/oss";
 
 export default {
   props: {
@@ -92,9 +93,8 @@ export default {
           const list = Array.isArray(val) ? val : this.value.split(',');
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
-            if (typeof item === "string") {
-              item = { name: item, url: item };
-            }
+            // 此处name使用ossId 防止删除出现重名
+            item = { name: item.ossId, url: item.url, ossId: item.ossId };
             return item;
           });
         } else {
@@ -117,19 +117,21 @@ export default {
     handleRemove(file, fileList) {
       const findex = this.fileList.map(f => f.name).indexOf(file.name);
       if(findex > -1) {
+        let ossId = this.fileList[findex].ossId;
+        delOss(ossId);
         this.fileList.splice(findex, 1);
-        this.$emit("input", this.listToString(this.fileList));
+        this.$emit("input", this.fileList);
       }
     },
     // 上传成功回调
     handleUploadSuccess(res) {
       if (res.code == 200) {
-        this.uploadList.push({ name: res.data.fileName, url: res.data.url });
+        this.uploadList.push({ name: res.data.fileName, url: res.data.url, ossId: res.data.ossId });
         if (this.uploadList.length === this.number) {
           this.fileList = this.fileList.concat(this.uploadList);
           this.uploadList = [];
           this.number = 0;
-          this.$emit("input", this.listToString(this.fileList));
+          this.$emit("input", this.fileList);
           this.$modal.closeLoading();
         }
       } else {
@@ -182,15 +184,6 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-    // 对象转成指定字符串分隔
-    listToString(list, separator) {
-      let strs = "";
-      separator = separator || ",";
-      for (let i in list) {
-        strs += list[i].url + separator;
-      }
-      return strs != '' ? strs.substr(0, strs.length - 1) : '';
-    }
   }
 };
 </script>
