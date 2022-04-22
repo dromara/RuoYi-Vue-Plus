@@ -1,7 +1,6 @@
 package com.ruoyi.framework.config;
 
 import com.ruoyi.common.utils.Threads;
-import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.framework.config.properties.ThreadPoolProperties;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -23,6 +21,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class ThreadPoolConfig {
 
+    /**
+     * 核心线程数 = cpu 核心数 + 1
+     */
+    private final int core = Runtime.getRuntime().availableProcessors() + 1;
+
     @Autowired
     private ThreadPoolProperties threadPoolProperties;
 
@@ -30,12 +33,11 @@ public class ThreadPoolConfig {
     @ConditionalOnProperty(prefix = "thread-pool", name = "enabled", havingValue = "true")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setMaxPoolSize(threadPoolProperties.getMaxPoolSize());
-        executor.setCorePoolSize(threadPoolProperties.getCorePoolSize());
+        executor.setMaxPoolSize(core);
+        executor.setCorePoolSize(core * 2);
         executor.setQueueCapacity(threadPoolProperties.getQueueCapacity());
         executor.setKeepAliveSeconds(threadPoolProperties.getKeepAliveSeconds());
-        RejectedExecutionHandler handler = ReflectUtils.newInstance(threadPoolProperties.getRejectedExecutionHandler().getClazz());
-        executor.setRejectedExecutionHandler(handler);
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         return executor;
     }
 
@@ -44,7 +46,7 @@ public class ThreadPoolConfig {
      */
     @Bean(name = "scheduledExecutorService")
     protected ScheduledExecutorService scheduledExecutorService() {
-        return new ScheduledThreadPoolExecutor(threadPoolProperties.getCorePoolSize(),
+        return new ScheduledThreadPoolExecutor(core,
             new BasicThreadFactory.Builder().namingPattern("schedule-pool-%d").daemon(true).build(),
             new ThreadPoolExecutor.CallerRunsPolicy()) {
             @Override

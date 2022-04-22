@@ -256,20 +256,10 @@ xss:
 thread-pool:
   # 是否开启线程池
   enabled: false
-  # 核心线程池大小
-  corePoolSize: 8
-  # 最大可创建的线程数
-  maxPoolSize: 16
   # 队列最大长度
   queueCapacity: 128
   # 线程池维护线程所允许的空闲时间
   keepAliveSeconds: 300
-  # 线程池对拒绝任务(无线程可用)的处理策略
-  # CALLER_RUNS_POLICY 调用方执行
-  # DISCARD_OLDEST_POLICY 放弃最旧的
-  # DISCARD_POLICY 丢弃
-  # ABORT_POLICY 中止
-  rejectedExecutionHandler: CALLER_RUNS_POLICY
 
 --- # redisson 缓存配置
 redisson:
