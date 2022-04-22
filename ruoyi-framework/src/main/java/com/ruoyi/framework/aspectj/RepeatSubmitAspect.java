@@ -12,7 +12,6 @@ import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
-import com.ruoyi.framework.config.properties.RepeatSubmitProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -43,12 +42,10 @@ public class RepeatSubmitAspect {
 
     private static final ThreadLocal<String> KEY_CACHE = new ThreadLocal<>();
 
-    private final RepeatSubmitProperties repeatSubmitProperties;
-
     @Before("@annotation(repeatSubmit)")
     public void doBefore(JoinPoint point, RepeatSubmit repeatSubmit) throws Throwable {
         // 如果注解不为0 则使用注解数值
-        long interval = repeatSubmitProperties.getInterval();
+        long interval = 0;
         if (repeatSubmit.interval() > 0) {
             interval = repeatSubmit.timeUnit().toMillis(repeatSubmit.interval());
         }
