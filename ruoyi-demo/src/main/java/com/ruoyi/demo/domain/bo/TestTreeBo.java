@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ApiModel("测试树表业务对象")
-public class TestTreeBo extends TreeEntity {
+public class TestTreeBo extends TreeEntity<TestTreeBo> {
 
     /**
      * 主键

@@ -18,7 +18,6 @@ import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.vo.SysOssVo;
-import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysOssService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +47,6 @@ import java.util.Map;
 public class SysOssController extends BaseController {
 
     private final ISysOssService iSysOssService;
-    private final ISysConfigService iSysConfigService;
 
     /**
      * 查询OSS对象存储列表
@@ -77,7 +75,8 @@ public class SysOssController extends BaseController {
         SysOss oss = iSysOssService.upload(file);
         Map<String, String> map = new HashMap<>(2);
         map.put("url", oss.getUrl());
-        map.put("fileName", oss.getFileName());
+        map.put("fileName", oss.getOriginalName());
+        map.put("ossId", oss.getOssId().toString());
         return R.ok(map);
     }
 

@@ -1,8 +1,8 @@
 package com.ruoyi.common.core.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ruoyi.common.core.domain.TreeEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -23,7 +23,7 @@ import javax.validation.constraints.Size;
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_menu")
 @ApiModel("菜单权限业务对象")
-public class SysMenu extends TreeEntity {
+public class SysMenu extends TreeEntity<SysMenu> {
 
     /**
      * 菜单ID
@@ -45,7 +45,7 @@ public class SysMenu extends TreeEntity {
      */
     @ApiModelProperty(value = "显示顺序")
     @NotNull(message = "显示顺序不能为空")
-    private Long orderNum;
+    private Integer orderNum;
 
     /**
      * 路由地址
@@ -65,8 +65,7 @@ public class SysMenu extends TreeEntity {
      * 路由参数
      */
     @ApiModelProperty(value = "路由参数")
-    @TableField("`query`")
-    private String query;
+    private String queryParam;
 
     /**
      * 是否为外链（0是 1否）
@@ -103,6 +102,7 @@ public class SysMenu extends TreeEntity {
      * 权限字符串
      */
     @ApiModelProperty(value = "权限字符串")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Size(min = 0, max = 100, message = "权限标识长度不能超过100个字符")
     private String perms;
 

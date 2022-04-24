@@ -117,7 +117,7 @@ public class TestDemoController extends BaseController {
     @ApiOperation("新增测试单表")
     @SaCheckPermission("demo:demo:add")
     @Log(title = "测试单表", businessType = BusinessType.INSERT)
-    @RepeatSubmit(interval = 2, timeUnit = TimeUnit.SECONDS, message = "不允许重复提交")
+    @RepeatSubmit(interval = 2, timeUnit = TimeUnit.SECONDS, message = "{repeat.submit.message}")
     @PostMapping()
     public R<Void> add(@RequestBody TestDemoBo bo) {
         // 使用校验工具对标 @Validated(AddGroup.class) 注解

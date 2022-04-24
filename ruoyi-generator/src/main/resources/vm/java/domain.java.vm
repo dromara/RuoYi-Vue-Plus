@@ -25,7 +25,7 @@ import com.ruoyi.common.core.domain.TreeEntity;
 #if($table.crud || $table.sub)
     #set($Entity="BaseEntity")
 #elseif($table.tree)
-    #set($Entity="TreeEntity")
+    #set($Entity="TreeEntity<${ClassName}>")
 #end
 @Data
 @TableName("${tableName}")

@@ -1,15 +1,20 @@
 package com.ruoyi.common.utils;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.SimpleCache;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.extra.cglib.CglibUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.beans.BeanCopier;
+import org.springframework.cglib.beans.BeanMap;
+import org.springframework.cglib.core.Converter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * bean深拷贝工具(基于 cglib 性能优异)
@@ -37,7 +42,8 @@ public class BeanCopyUtils {
         if (ObjectUtil.isNull(desc)) {
             return null;
         }
-        return CglibUtil.copy(source, desc);
+        final V target = ReflectUtil.newInstanceIfPossible(desc);
+        return copy(source, target);
     }
 
     /**
@@ -54,7 +60,8 @@ public class BeanCopyUtils {
         if (ObjectUtil.isNull(desc)) {
             return null;
         }
-        CglibUtil.copy(source, desc);
+        BeanCopier beanCopier = BeanCopierCache.INSTANCE.get(source.getClass(), desc.getClass(), null);
+        beanCopier.copy(source, desc, null);
         return desc;
     }
 
@@ -72,7 +79,11 @@ public class BeanCopyUtils {
         if (CollUtil.isEmpty(sourceList)) {
             return CollUtil.newArrayList();
         }
-        return CglibUtil.copyList(sourceList, () -> ReflectUtil.newInstanceIfPossible(desc));
+        return sourceList.stream().map(source -> {
+            V target = ReflectUtil.newInstanceIfPossible(desc);
+            copy(source, target);
+            return target;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -81,11 +92,12 @@ public class BeanCopyUtils {
      * @param bean 数据来源实体
      * @return map对象
      */
+    @SuppressWarnings("unchecked")
     public static <T> Map<String, Object> copyToMap(T bean) {
         if (ObjectUtil.isNull(bean)) {
             return null;
         }
-        return CglibUtil.toMap(bean);
+        return BeanMap.create(bean);
     }
 
     /**
@@ -102,7 +114,8 @@ public class BeanCopyUtils {
         if (ObjectUtil.isNull(beanClass)) {
             return null;
         }
-        return CglibUtil.toBean(map, beanClass);
+        T bean = ReflectUtil.newInstanceIfPossible(beanClass);
+        return mapToBean(map, bean);
     }
 
     /**
@@ -119,6 +132,54 @@ public class BeanCopyUtils {
         if (ObjectUtil.isNull(bean)) {
             return null;
         }
-        return CglibUtil.fillBean(map, bean);
+        BeanMap.create(bean).putAll(map);
+        return bean;
     }
+
+    /**
+     * BeanCopier属性缓存<br>
+     * 缓存用于防止多次反射造成的性能问题
+     *
+     * @author Looly
+     * @since 5.4.1
+     */
+    public enum BeanCopierCache {
+        /**
+         * BeanCopier属性缓存单例
+         */
+        INSTANCE;
+
+        private final SimpleCache<String, BeanCopier> cache = new SimpleCache<>();
+
+        /**
+         * 获得类与转换器生成的key在{@link BeanCopier}的Map中对应的元素
+         *
+         * @param srcClass    源Bean的类
+         * @param targetClass 目标Bean的类
+         * @param converter   转换器
+         * @return Map中对应的BeanCopier
+         */
+        public BeanCopier get(Class<?> srcClass, Class<?> targetClass, Converter converter) {
+            final String key = genKey(srcClass, targetClass, converter);
+            return cache.get(key, () -> BeanCopier.create(srcClass, targetClass, converter != null));
+        }
+
+        /**
+         * 获得类与转换器生成的key
+         *
+         * @param srcClass    源Bean的类
+         * @param targetClass 目标Bean的类
+         * @param converter   转换器
+         * @return 属性名和Map映射的key
+         */
+        private String genKey(Class<?> srcClass, Class<?> targetClass, Converter converter) {
+            final StringBuilder key = StrUtil.builder()
+                .append(srcClass.getName()).append('#').append(targetClass.getName());
+            if(null != converter){
+                key.append('#').append(converter.getClass().getName());
+            }
+            return key.toString();
+        }
+    }
+
 }

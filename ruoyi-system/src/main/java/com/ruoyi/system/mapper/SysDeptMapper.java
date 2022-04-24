@@ -1,5 +1,7 @@
 package com.ruoyi.system.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.ruoyi.common.annotation.DataColumn;
 import com.ruoyi.common.annotation.DataPermission;
 import com.ruoyi.common.core.domain.entity.SysDept;
@@ -18,13 +20,13 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDeptMapper, SysDept, Sy
     /**
      * 查询部门管理数据
      *
-     * @param dept 部门信息
+     * @param queryWrapper 查询条件
      * @return 部门信息集合
      */
     @DataPermission({
-        @DataColumn(key = "deptName", value = "d.dept_id")
+        @DataColumn(key = "deptName", value = "dept_id")
     })
-    List<SysDept> selectDeptList(SysDept dept);
+    List<SysDept> selectDeptList(@Param(Constants.WRAPPER) Wrapper<SysDept> queryWrapper);
 
     /**
      * 根据角色ID查询部门树信息
@@ -34,13 +36,5 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDeptMapper, SysDept, Sy
      * @return 选中部门列表
      */
     List<Long> selectDeptListByRoleId(@Param("roleId") Long roleId, @Param("deptCheckStrictly") boolean deptCheckStrictly);
-
-    /**
-     * 修改子元素关系
-     *
-     * @param depts 子元素
-     * @return 结果
-     */
-    int updateDeptChildren(@Param("depts") List<SysDept> depts);
 
 }

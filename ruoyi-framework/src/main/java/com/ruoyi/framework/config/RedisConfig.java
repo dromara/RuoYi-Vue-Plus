@@ -53,8 +53,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         Config config = new Config();
         config.setThreads(redissonProperties.getThreads())
             .setNettyThreads(redissonProperties.getNettyThreads())
-            .setCodec(JsonJacksonCodec.INSTANCE)
-            .setTransportMode(redissonProperties.getTransportMode());
+            .setCodec(JsonJacksonCodec.INSTANCE);
 
         RedissonProperties.SingleServerConfig singleServerConfig = redissonProperties.getSingleServerConfig();
         if (ObjectUtil.isNotNull(singleServerConfig)) {
@@ -65,8 +64,6 @@ public class RedisConfig extends CachingConfigurerSupport {
                 .setDatabase(redisProperties.getDatabase())
                 .setPassword(StringUtils.isNotBlank(redisProperties.getPassword()) ? redisProperties.getPassword() : null)
                 .setTimeout(singleServerConfig.getTimeout())
-                .setRetryAttempts(singleServerConfig.getRetryAttempts())
-                .setRetryInterval(singleServerConfig.getRetryInterval())
                 .setClientName(singleServerConfig.getClientName())
                 .setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
                 .setSubscriptionConnectionPoolSize(singleServerConfig.getSubscriptionConnectionPoolSize())
@@ -87,11 +84,8 @@ public class RedisConfig extends CachingConfigurerSupport {
                 .setConnectTimeout(((Long) redisProperties.getTimeout().toMillis()).intValue())
                 .setPassword(StringUtils.isNotBlank(redisProperties.getPassword()) ? redisProperties.getPassword() : null)
                 .setTimeout(clusterServersConfig.getTimeout())
-                .setRetryAttempts(clusterServersConfig.getRetryAttempts())
-                .setRetryInterval(clusterServersConfig.getRetryInterval())
                 .setClientName(clusterServersConfig.getClientName())
                 .setIdleConnectionTimeout(clusterServersConfig.getIdleConnectionTimeout())
-                .setPingConnectionInterval(clusterServersConfig.getPingConnectionInterval())
                 .setSubscriptionConnectionPoolSize(clusterServersConfig.getSubscriptionConnectionPoolSize())
                 .setMasterConnectionMinimumIdleSize(clusterServersConfig.getMasterConnectionMinimumIdleSize())
                 .setMasterConnectionPoolSize(clusterServersConfig.getMasterConnectionPoolSize())
@@ -144,8 +138,6 @@ public class RedisConfig extends CachingConfigurerSupport {
      *   threads: 16
      *   # Netty线程池数量
      *   nettyThreads: 32
-     *   # 传输模式
-     *   transportMode: "NIO"
      *   # 集群配置
      *   clusterServersConfig:
      *     # 客户端名称
@@ -160,14 +152,8 @@ public class RedisConfig extends CachingConfigurerSupport {
      *     slaveConnectionPoolSize: 64
      *     # 连接空闲超时，单位：毫秒
      *     idleConnectionTimeout: 10000
-     *     # ping连接间隔
-     *     pingConnectionInterval: 1000
      *     # 命令等待超时，单位：毫秒
      *     timeout: 3000
-     *     # 如果尝试在此限制之内发送成功，则开始启用 timeout 计时。
-     *     retryAttempts: 3
-     *     # 命令重试发送时间间隔，单位：毫秒
-     *     retryInterval: 1500
      *     # 发布和订阅连接池大小
      *     subscriptionConnectionPoolSize: 50
      *     # 读取模式

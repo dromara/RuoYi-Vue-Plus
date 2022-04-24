@@ -24,7 +24,7 @@ public interface ISysOssConfigService {
     /**
      * 查询单个
      */
-    SysOssConfigVo queryById(Integer ossConfigId);
+    SysOssConfigVo queryById(Long ossConfigId);
 
     /**
      * 查询列表

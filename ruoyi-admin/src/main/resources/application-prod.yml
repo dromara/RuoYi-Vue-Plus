@@ -1,48 +1,37 @@
---- # 配置临时路径存储
-spring:
-  servlet:
-    multipart:
-      # 临时文件存储位置 避免临时文件被系统清理报错
-      location: /ruoyi/server/temp
+--- # 临时文件存储位置 避免临时文件被系统清理报错
+spring.servlet.multipart.location: /ruoyi/server/temp
 
---- # 监控配置
-spring:
-  boot:
-    admin:
-      # Spring Boot Admin Client 客户端的相关配置
-      client:
-        # 增加客户端开关
-        enabled: true
-        # 设置 Spring Boot Admin Server 地址
-        url: http://172.30.0.90:9090/admin
-        instance:
-          service-host-type: IP
-        username: ruoyi
-        password: 123456
+--- # 监控中心配置
+spring.boot.admin.client:
+  # 增加客户端开关
+  enabled: true
+  url: http://172.30.0.90:9090/admin
+  instance:
+    service-host-type: IP
+  username: ruoyi
+  password: 123456
 
 --- # xxl-job 配置
-xxl:
-  job:
-    # 执行器开关
-    enabled: true
-    # 调度中心地址：如调度中心集群部署存在多个地址则用逗号分隔。
-    admin-addresses: http://172.30.0.92:9100/xxl-job-admin
-    # 执行器通讯TOKEN：非空时启用
-    access-token: xxl-job
-    # 执行器配置
-    executor:
-      # 执行器AppName：执行器心跳注册分组依据；为空则关闭自动注册
-      appname: xxl-job-executor
-      # 执行器端口号 执行器从9101开始往后写
-      port: 9101
-      # 执行器注册：默认IP:PORT
-      address:
-      # 执行器IP：默认自动获取IP
-      ip:
-      # 执行器运行日志文件存储磁盘路径
-      logpath: ./logs/xxl-job
-      # 执行器日志文件保存天数：大于3生效
-      logretentiondays: 30
+xxl.job:
+  # 执行器开关
+  enabled: true
+  # 调度中心地址：如调度中心集群部署存在多个地址则用逗号分隔。
+  admin-addresses: http://172.30.0.92:9100/xxl-job-admin
+  # 执行器通讯TOKEN：非空时启用
+  access-token: xxl-job
+  executor:
+    # 执行器AppName：执行器心跳注册分组依据；为空则关闭自动注册
+    appname: xxl-job-executor
+    # 执行器端口号 执行器从9101开始往后写
+    port: 9101
+    # 执行器注册：默认IP:PORT
+    address:
+    # 执行器IP：默认自动获取IP
+    ip:
+    # 执行器运行日志文件存储磁盘路径
+    logpath: ./logs/xxl-job
+    # 执行器日志文件保存天数：大于3生效
+    logretentiondays: 30
 
 --- # 数据源配置
 spring:
@@ -54,6 +43,8 @@ spring:
       p6spy: false
       # 设置默认的数据源或者数据源组,默认值即为 master
       primary: master
+      # 严格模式 匹配不到数据源则报错
+      strict: true
       datasource:
         # 主库数据源
         master:
@@ -70,6 +61,23 @@ spring:
           url:
           username:
           password:
+#        oracle:
+#          driverClassName: oracle.jdbc.OracleDriver
+#          url: jdbc:oracle:thin:@//172.30.0.36:1521/XE
+#          username: ROOT
+#          password: root
+#          druid:
+#            validationQuery: SELECT 1 FROM DUAL
+#        postgres:
+#          driverClassName: org.postgresql.Driver
+#          url: jdbc:postgresql://172.30.0.36:5432/postgres?useUnicode=true&characterEncoding=utf8&useSSL=true&autoReconnect=true&reWriteBatchedInserts=true
+#          username: root
+#          password: root
+#        sqlserver:
+#          driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#          url: jdbc:sqlserver://172.30.0.36:1433;DatabaseName=tempdb;SelectMethod=cursor;rewriteBatchedStatements=true
+#          username: SA
+#          password: root
       druid:
         # 初始连接数
         initialSize: 5
@@ -86,7 +94,7 @@ spring:
         # 配置一个连接在池中最大生存的时间，单位是毫秒
         maxEvictableIdleTimeMillis: 900000
         # 配置检测连接是否有效
-        validationQuery: SELECT 1 FROM DUAL
+        validationQuery: SELECT 1
         testWhileIdle: true
         testOnBorrow: false
         testOnReturn: false
@@ -94,29 +102,27 @@ spring:
         filters: stat
 
 --- # druid 配置
-spring:
-  datasource:
-    druid:
-      webStatFilter:
-        enabled: true
-      statViewServlet:
-        enabled: true
-        # 设置白名单，不填则允许所有访问
-        allow:
-        url-pattern: /druid/*
-        # 控制台管理用户名和密码
-        login-username: ruoyi
-        login-password: 123456
-      filter:
-        stat:
-          enabled: true
-          # 慢SQL记录
-          log-slow-sql: true
-          slow-sql-millis: 1000
-          merge-sql: true
-        wall:
-          config:
-            multi-statement-allow: true
+spring.datasource.druid:
+  webStatFilter:
+    enabled: true
+  statViewServlet:
+    enabled: true
+    # 设置白名单，不填则允许所有访问
+    allow:
+    url-pattern: /druid/*
+    # 控制台管理用户名和密码
+    login-username: ruoyi
+    login-password: 123456
+  filter:
+    stat:
+      enabled: true
+      # 慢SQL记录
+      log-slow-sql: true
+      slow-sql-millis: 1000
+      merge-sql: true
+    wall:
+      config:
+        multi-statement-allow: true
 
 --- # redis 单机配置(单机与集群只能开启一个另一个需要注释掉)
 spring:
@@ -139,8 +145,6 @@ redisson:
   threads: 16
   # Netty线程池数量
   nettyThreads: 32
-  # 传输模式
-  transportMode: "NIO"
   # 单节点配置
   singleServerConfig:
     # 客户端名称
@@ -153,9 +157,5 @@ redisson:
     idleConnectionTimeout: 10000
     # 命令等待超时，单位：毫秒
     timeout: 3000
-    # 如果尝试在此限制之内发送成功，则开始启用 timeout 计时。
-    retryAttempts: 3
-    # 命令重试发送时间间隔，单位：毫秒
-    retryInterval: 1500
     # 发布和订阅连接池大小
     subscriptionConnectionPoolSize: 50

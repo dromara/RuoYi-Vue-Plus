@@ -53,100 +53,183 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime"     column="update_time"    />
     </resultMap>
 
-    <sql id="selectGenTableVo">
-        select table_id, table_name, table_comment, sub_table_name, sub_table_fk_name, class_name, tpl_category, package_name, module_name, business_name, function_name, function_author, gen_type, gen_path, options, create_by, create_time, update_by, update_time, remark from gen_table
-    </sql>
-
-    <select id="selectPageGenTableList" parameterType="GenTable" resultMap="GenTableResult">
-        <include refid="selectGenTableVo"/>
-        <where>
+    <select id="selectPageDbTableList" resultMap="GenTableResult">
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isMySql()">
+            select table_name, table_comment, create_time, update_time
+            from information_schema.tables
+            where table_schema = (select database())
+            AND table_name NOT LIKE 'xxl_job_%' AND table_name NOT LIKE 'gen_%'
+            AND table_name NOT IN (select table_name from gen_table)
             <if test="genTable.tableName != null and genTable.tableName != ''">
                 AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
             </if>
             <if test="genTable.tableComment != null and genTable.tableComment != ''">
                 AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
             </if>
-            <if test="genTable.params.beginTime != null and genTable.params.beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{genTable.params.beginTime},'%y%m%d')
+            order by create_time desc
+        </if>
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isOracle()">
+            select lower(dt.table_name) as table_name, dtc.comments as table_comment, uo.created as create_time, uo.last_ddl_time as update_time
+            from user_tables dt, user_tab_comments dtc, user_objects uo
+            where dt.table_name = dtc.table_name
+            and dt.table_name = uo.object_name
+            and uo.object_type = 'TABLE'
+            AND dt.table_name NOT LIKE 'XXL_JOB_%' AND dt.table_name NOT LIKE 'GEN_%'
+            AND lower(dt.table_name) NOT IN (select table_name from gen_table)
+            <if test="genTable.tableName != null and genTable.tableName != ''">
+                AND lower(dt.table_name) like lower(concat(concat('%', #{genTable.tableName}), '%'))
             </if>
-            <if test="genTable.params.endTime != null and genTable.params.endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{genTable.params.endTime},'%y%m%d')
+            <if test="genTable.tableComment != null and genTable.tableComment != ''">
+                AND lower(dtc.comments) like lower(concat(concat('%', #{genTable.tableComment}), '%'))
             </if>
-        </where>
-    </select>
-
-    <select id="selectPageDbTableList" parameterType="GenTable" resultMap="GenTableResult">
-        select table_name, table_comment, create_time, update_time from information_schema.tables
-        where table_schema = (select database())
-        AND table_name NOT LIKE 'xxl_job_%' AND table_name NOT LIKE 'gen_%'
-        AND table_name NOT IN (select table_name from gen_table)
-        <if test="genTable.tableName != null and genTable.tableName != ''">
-            AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
+            order by create_time desc
         </if>
-        <if test="genTable.tableComment != null and genTable.tableComment != ''">
-            AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
-        </if>
-        <if test="genTable.params.beginTime != null and genTable.params.beginTime != ''"><!-- 开始时间检索 -->
-            AND date_format(create_time,'%y%m%d') &gt;= date_format(#{genTable.params.beginTime},'%y%m%d')
-        </if>
-        <if test="genTable.params.endTime != null and genTable.params.endTime != ''"><!-- 结束时间检索 -->
-            AND date_format(create_time,'%y%m%d') &lt;= date_format(#{genTable.params.endTime},'%y%m%d')
-        </if>
-        order by create_time desc
-    </select>
-
-
-    <select id="selectGenTableList" parameterType="GenTable" resultMap="GenTableResult">
-        <include refid="selectGenTableVo"/>
-        <where>
-            <if test="tableName != null and tableName != ''">
-                AND lower(table_name) like lower(concat('%', #{tableName}, '%'))
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isPostgerSql()">
+            select table_name, table_comment, create_time, update_time
+            from (
+                SELECT c.relname AS table_name,
+                        obj_description(c.oid) AS table_comment,
+                        CURRENT_TIMESTAMP AS create_time,
+                        CURRENT_TIMESTAMP AS update_time
+                FROM pg_class c
+                    LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE (c.relkind = ANY (ARRAY ['r'::"char", 'p'::"char"]))
+                    AND c.relname != 'spatial_%'::text
+                    AND n.nspname = 'public'::name
+                    AND n.nspname <![CDATA[ <> ]]> ''::name
+            ) list_table
+            where table_name NOT LIKE 'xxl_job_%' AND table_name NOT LIKE 'gen_%'
+            AND table_name NOT IN (select table_name from gen_table)
+            <if test="genTable.tableName != null and genTable.tableName != ''">
+                AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
             </if>
-            <if test="tableComment != null and tableComment != ''">
-                AND lower(table_comment) like lower(concat('%', #{tableComment}, '%'))
+            <if test="genTable.tableComment != null and genTable.tableComment != ''">
+                AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
             </if>
-            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            order by create_time desc
+        </if>
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isSqlServer()">
+            SELECT cast(D.NAME as nvarchar) as table_name,
+                   cast(F.VALUE as nvarchar) as table_comment,
+                   crdate as create_time,
+                   refdate as update_time
+            FROM SYSOBJECTS D
+                INNER JOIN SYS.EXTENDED_PROPERTIES F ON D.ID = F.MAJOR_ID
+                    AND F.MINOR_ID = 0 AND D.XTYPE = 'U' AND D.NAME != 'DTPROPERTIES'
+                    AND D.NAME NOT LIKE 'xxl_job_%' AND D.NAME NOT LIKE 'gen_%'
+                    AND D.NAME NOT IN (select table_name from gen_table)
+            <if test="genTable.tableName != null and genTable.tableName != ''">
+                AND lower(D.NAME) like lower(concat(N'%', N'${genTable.tableName}', N'%'))
             </if>
-            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            <if test="genTable.tableComment != null and genTable.tableComment != ''">
+                AND lower(CAST(F.VALUE AS nvarchar)) like lower(concat(N'%', N'${genTable.tableComment}', N'%'))
             </if>
-        </where>
-    </select>
-
-    <select id="selectDbTableList" parameterType="GenTable" resultMap="GenTableResult">
-        select table_name, table_comment, create_time, update_time from information_schema.tables
-        where table_schema = (select database())
-        AND table_name NOT LIKE 'xxl_job_%' AND table_name NOT LIKE 'gen_%'
-        AND table_name NOT IN (select table_name from gen_table)
-        <if test="tableName != null and tableName != ''">
-            AND lower(table_name) like lower(concat('%', #{tableName}, '%'))
+            order by crdate desc
         </if>
-        <if test="tableComment != null and tableComment != ''">
-            AND lower(table_comment) like lower(concat('%', #{tableComment}, '%'))
-        </if>
-        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-            AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
-        </if>
-        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-            AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
-        </if>
-        order by create_time desc
     </select>
 
     <select id="selectDbTableListByNames" resultMap="GenTableResult">
-        select table_name, table_comment, create_time, update_time from information_schema.tables
-        where table_name NOT LIKE 'xxl_job_%' and table_name NOT LIKE 'gen_%' and table_schema = (select database())
-        and table_name in
-        <foreach collection="array" item="name" open="(" separator="," close=")">
-             #{name}
-        </foreach>
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isMySql()">
+            select table_name, table_comment, create_time, update_time from information_schema.tables
+            where table_name NOT LIKE 'xxl_job_%' and table_name NOT LIKE 'gen_%' and table_schema = (select database())
+            and table_name in
+            <foreach collection="array" item="name" open="(" separator="," close=")">
+                 #{name}
+            </foreach>
+        </if>
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isOracle()">
+            select lower(dt.table_name) as table_name, dtc.comments as table_comment, uo.created as create_time, uo.last_ddl_time as update_time
+            from user_tables dt, user_tab_comments dtc, user_objects uo
+            where dt.table_name = dtc.table_name
+            and dt.table_name = uo.object_name
+            and uo.object_type = 'TABLE'
+            AND dt.table_name NOT LIKE 'XXL_JOB_%' AND dt.table_name NOT LIKE 'GEN_%'
+            AND dt.table_name NOT IN (select table_name from gen_table)
+            and lower(dt.table_name) in
+            <foreach collection="array" item="name" open="(" separator="," close=")">
+                #{name}
+            </foreach>
+        </if>
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isPostgerSql()">
+            select table_name, table_comment, create_time, update_time
+            from (
+                SELECT c.relname AS table_name,
+                        obj_description(c.oid) AS table_comment,
+                        CURRENT_TIMESTAMP AS create_time,
+                        CURRENT_TIMESTAMP AS update_time
+                FROM pg_class c
+                    LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE (c.relkind = ANY (ARRAY ['r'::"char", 'p'::"char"]))
+                    AND c.relname != 'spatial_%'::text
+                    AND n.nspname = 'public'::name
+                    AND n.nspname <![CDATA[ <> ]]> ''::name
+            ) list_table
+            where table_name NOT LIKE 'xxl_job_%' and table_name NOT LIKE 'gen_%'
+            and table_name in
+            <foreach collection="array" item="name" open="(" separator="," close=")">
+                #{name}
+            </foreach>
+        </if>
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isSqlServer()">
+            SELECT cast(D.NAME as nvarchar) as table_name,
+                   cast(F.VALUE as nvarchar) as table_comment,
+                   crdate as create_time,
+                   refdate as update_time
+            FROM SYSOBJECTS D
+                INNER JOIN SYS.EXTENDED_PROPERTIES F ON D.ID = F.MAJOR_ID
+                    AND F.MINOR_ID = 0 AND D.XTYPE = 'U' AND D.NAME != 'DTPROPERTIES'
+                    AND D.NAME NOT LIKE 'xxl_job_%' AND D.NAME NOT LIKE 'gen_%'
+                    AND D.NAME in
+            <foreach collection="array" item="name" open="(" separator="," close=")">
+                #{name}
+            </foreach>
+        </if>
     </select>
 
     <select id="selectTableByName" parameterType="String" resultMap="GenTableResult">
-        select table_name, table_comment, create_time, update_time from information_schema.tables
-        where table_comment <![CDATA[ <> ]]> '' and table_schema = (select database())
-        and table_name = #{tableName}
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isMySql()">
+            select table_name, table_comment, create_time, update_time from information_schema.tables
+            where table_name NOT LIKE 'xxl_job_%' and table_name NOT LIKE 'gen_%' and table_schema = (select database())
+            and table_name = #{tableName}
+        </if>
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isOracle()">
+            select lower(dt.table_name) as table_name, dtc.comments as table_comment, uo.created as create_time, uo.last_ddl_time as update_time
+            from user_tables dt, user_tab_comments dtc, user_objects uo
+            where dt.table_name = dtc.table_name
+            and dt.table_name = uo.object_name
+            and uo.object_type = 'TABLE'
+            AND dt.table_name NOT LIKE 'XXL_JOB_%' AND dt.table_name NOT LIKE 'GEN_%'
+            AND dt.table_name NOT IN (select table_name from gen_table)
+            and lower(dt.table_name) = #{tableName}
+        </if>
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isPostgerSql()">
+            select table_name, table_comment, create_time, update_time
+            from (
+                SELECT c.relname AS table_name,
+                        obj_description(c.oid) AS table_comment,
+                        CURRENT_TIMESTAMP AS create_time,
+                        CURRENT_TIMESTAMP AS update_time
+                FROM pg_class c
+                    LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE (c.relkind = ANY (ARRAY ['r'::"char", 'p'::"char"]))
+                    AND c.relname != 'spatial_%'::text
+                    AND n.nspname = 'public'::name
+                    AND n.nspname <![CDATA[ <> ]]> ''::name
+            ) list_table
+            where table_name NOT LIKE 'xxl_job_%' and table_name NOT LIKE 'gen_%'
+            and table_name = #{tableName}
+        </if>
+        <if test="@com.ruoyi.common.helper.DataBaseHelper@isSqlServer()">
+            SELECT cast(D.NAME as nvarchar) as table_name,
+                   cast(F.VALUE as nvarchar) as table_comment,
+                   crdate as create_time,
+                   refdate as update_time
+            FROM SYSOBJECTS D
+                INNER JOIN SYS.EXTENDED_PROPERTIES F ON D.ID = F.MAJOR_ID
+                    AND F.MINOR_ID = 0 AND D.XTYPE = 'U' AND D.NAME != 'DTPROPERTIES'
+                    AND D.NAME NOT LIKE 'xxl_job_%' AND D.NAME NOT LIKE 'gen_%'
+                    AND D.NAME = #{tableName}
+        </if>
     </select>
 
     <select id="selectGenTableById" parameterType="Long" resultMap="GenTableResult">

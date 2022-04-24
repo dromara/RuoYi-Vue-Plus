@@ -22,8 +22,8 @@ public @interface RepeatSubmit {
     TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
 
     /**
-     * 提示消息
+     * 提示消息 支持国际化 格式为 {code}
      */
-    String message() default "不允许重复提交，请稍候再试";
+    String message() default "{repeat.submit.message}";
 
 }

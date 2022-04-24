@@ -38,7 +38,10 @@ export default {
       method: 'get',
       url: url,
       responseType: 'blob',
-      headers: { 'Authorization': 'Bearer ' + getToken() }
+      headers: {
+        'Authorization': 'Bearer ' + getToken(),
+        'datasource': localStorage.getItem("dataName")
+      }
     }).then(async (res) => {
       const isLogin = await blobValidate(res.data);
       if (isLogin) {

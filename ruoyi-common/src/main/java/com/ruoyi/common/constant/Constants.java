@@ -65,12 +65,12 @@ public interface Constants {
     /**
      * 登录用户 redis key
      */
-    public static final String LOGIN_TOKEN_KEY = "Authorization:login:token:";
+    String LOGIN_TOKEN_KEY = "Authorization:login:token:";
 
     /**
      * 在线用户 redis key
      */
-    public static final String ONLINE_TOKEN_KEY = "online_tokens:";
+    String ONLINE_TOKEN_KEY = "online_tokens:";
 
     /**
      * 防重提交 redis key

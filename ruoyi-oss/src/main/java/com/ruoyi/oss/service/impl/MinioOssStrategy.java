@@ -79,6 +79,8 @@ public class MinioOssStrategy extends AbstractOssStrategy {
     @Override
     public UploadResult upload(InputStream inputStream, String path, String contentType) {
         try {
+            // 解决 inputStream.available() 再 socket 下传输延迟问题 导致获取数值不精确
+            Thread.sleep(1000);
             minioClient.putObject(PutObjectArgs.builder()
                 .bucket(properties.getBucketName())
                 .object(path)
