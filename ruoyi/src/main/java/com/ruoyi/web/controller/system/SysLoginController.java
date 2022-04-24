@@ -7,6 +7,7 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
+import com.ruoyi.common.core.domain.model.SmsLoginBody;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +58,38 @@ public class SysLoginController {
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
             loginBody.getUuid());
+        ajax.put(Constants.TOKEN, token);
+        return R.ok(ajax);
+    }
+
+    /**
+     * 短信登录(示例)
+     *
+     * @param smsLoginBody 登录信息
+     * @return 结果
+     */
+    @ApiOperation("短信登录(示例)")
+    @PostMapping("/smsLogin")
+    public R<Map<String, Object>> smsLogin(@Validated @RequestBody SmsLoginBody smsLoginBody) {
+        Map<String, Object> ajax = new HashMap<>();
+        // 生成令牌
+        String token = loginService.smsLogin(smsLoginBody.getPhonenumber(), smsLoginBody.getSmsCode());
+        ajax.put(Constants.TOKEN, token);
+        return R.ok(ajax);
+    }
+
+    /**
+     * 小程序登录(示例)
+     *
+     * @param xcxCode 小程序code
+     * @return 结果
+     */
+    @ApiOperation("小程序登录(示例)")
+    @PostMapping("/xcxLogin")
+    public R<Map<String, Object>> xcxLogin(@NotBlank(message = "{xcx.code.not.blank}") String xcxCode) {
+        Map<String, Object> ajax = new HashMap<>();
+        // 生成令牌
+        String token = loginService.xcxLogin(xcxCode);
         ajax.put(Constants.TOKEN, token);
         return R.ok(ajax);
     }

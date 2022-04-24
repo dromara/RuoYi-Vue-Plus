@@ -41,6 +41,7 @@
 
 <script>
 import { getToken } from "@/utils/auth";
+import { delOss } from "@/api/system/oss";
 
 export default {
   name: "FileUpload",
@@ -89,9 +90,7 @@ export default {
           const list = Array.isArray(val) ? val : this.value.split(',');
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
-            if (typeof item === "string") {
-              item = { name: item, url: item };
-            }
+            item = { name: item.name, url: item.url, ossId: item.ossId };
             item.uid = item.uid || new Date().getTime() + temp++;
             return item;
           });
@@ -153,12 +152,12 @@ export default {
     // 上传成功回调
     handleUploadSuccess(res, file) {
       if (res.code === 200) {
-        this.uploadList.push({ name: res.data.fileName, url: res.data.url });
+        this.uploadList.push({ name: res.data.fileName, url: res.data.url, ossId: res.data.ossId });
         if (this.uploadList.length === this.number) {
           this.fileList = this.fileList.concat(this.uploadList);
           this.uploadList = [];
           this.number = 0;
-          this.$emit("input", this.listToString(this.fileList));
+          this.$emit("input", this.fileList);
           this.$modal.closeLoading();
         }
       } else {
@@ -168,25 +167,19 @@ export default {
     },
     // 删除文件
     handleDelete(index) {
+      let ossId = this.fileList[index].ossId;
+      delOss(ossId);
       this.fileList.splice(index, 1);
-      this.$emit("input", this.listToString(this.fileList));
+      this.$emit("input", this.fileList);
     },
     // 获取文件名称
     getFileName(name) {
+      // 如果是url那么取最后的名字 如果不是直接返回
       if (name.lastIndexOf("/") > -1) {
         return name.slice(name.lastIndexOf("/") + 1);
       } else {
-        return "";
+        return name;
       }
-    },
-    // 对象转成指定字符串分隔
-    listToString(list, separator) {
-      let strs = "";
-      separator = separator || ",";
-      for (let i in list) {
-        strs += list[i].url + separator;
-      }
-      return strs != "" ? strs.substr(0, strs.length - 1) : "";
     },
   },
 };

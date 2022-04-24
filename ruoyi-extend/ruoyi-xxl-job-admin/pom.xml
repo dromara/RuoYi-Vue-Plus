@@ -4,14 +4,12 @@
     <parent>
         <artifactId>ruoyi-extend</artifactId>
         <groupId>com.ruoyi</groupId>
-        <version>4.0.1</version>
+        <version>4.1.0</version>
     </parent>
     <artifactId>ruoyi-xxl-job-admin</artifactId>
     <packaging>jar</packaging>
 
     <properties>
-        <mybatis-spring-boot-starter.version>2.1.4</mybatis-spring-boot-starter.version>
-        <mysql-connector-java.version>8.0.23</mysql-connector-java.version>
     </properties>
 
     <dependencyManagement>
@@ -62,13 +60,12 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>${mybatis-spring-boot-starter.version}</version>
+            <version>${spring-boot.mybatis}</version>
         </dependency>
         <!-- mysql -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql-connector-java.version}</version>
         </dependency>
 
         <dependency>

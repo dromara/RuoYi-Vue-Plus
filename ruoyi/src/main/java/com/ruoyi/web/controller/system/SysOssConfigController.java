@@ -59,7 +59,7 @@ public class SysOssConfigController extends BaseController {
     @GetMapping("/{ossConfigId}")
     public R<SysOssConfigVo> getInfo(@ApiParam("OSS配置ID")
                                               @NotNull(message = "主键不能为空")
-                                              @PathVariable("ossConfigId") Integer ossConfigId) {
+                                              @PathVariable("ossConfigId") Long ossConfigId) {
         return R.ok(iSysOssConfigService.queryById(ossConfigId));
     }
 

@@ -60,5 +60,10 @@ public abstract class AbstractOssStrategy implements IOssStrategy {
     @Override
     public abstract UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType);
 
+    /**
+     * 获取域名访问链接
+     *
+     * @return 域名访问链接
+     */
     public abstract String getEndpointLink();
 }

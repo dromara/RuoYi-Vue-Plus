@@ -164,7 +164,14 @@ export const dynamicRoutes = [
   }
 ]
 
+// 防止连续点击多次路由报错
+let routerPush = Router.prototype.push;
+Router.prototype.push = function push(location) {
+  return routerPush.call(this, location).catch(err => err)
+}
+
 export default new Router({
+  base: process.env.VUE_APP_CONTEXT_PATH,
   mode: 'history', // 去掉url中的#
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes

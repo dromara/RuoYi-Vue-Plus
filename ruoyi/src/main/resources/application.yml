@@ -75,10 +75,6 @@ spring:
     restart:
       # 热部署开关
       enabled: true
-  # 与vue整合部署使用
-  thymeleaf:
-    # 将系统模板放置到最前面 否则会与 springboot-admin 页面冲突
-    template-resolver-order: 1
   mvc:
     pathmatch:
       # 适配 boot 2.6 路由与 springfox 兼容
@@ -107,16 +103,12 @@ sa-token:
   is-concurrent: true
   # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
   is-share: false
-  # 是否尝试从请求体里读取token
-  is-read-body: false
   # 是否尝试从header里读取token
   is-read-head: true
   # 是否尝试从cookie里读取token
   is-read-cookie: false
   # token前缀
   token-prefix: "Bearer"
-  # token风格
-  token-style: uuid
   # jwt秘钥
   jwt-secret-key: abcdefghijklmnopqrstuvwxyz
   # 是否输出操作日志
@@ -127,6 +119,8 @@ security:
   # 排除路径
   excludes:
     - /login
+    - /smsLogin
+    - /xcxLogin
     - /logout
     - /register
     - /captchaImage
@@ -136,22 +130,16 @@ security:
     - /**/*.css
     - /**/*.js
     # swagger 文档配置
+    - /favicon.ico
     - /doc.html
     - /swagger-resources/**
     - /webjars/**
     - /*/api-docs
     # druid 监控配置
     - /druid/**
-  # 用户放行
-  permit-all:
     # actuator 监控配置
     - /actuator
     - /actuator/**
-
-# 重复提交
-repeat-submit:
-  # 全局间隔时间(毫秒)
-  interval: 5000
 
 # MyBatisPlus配置
 # https://baomidou.com/config/
@@ -165,25 +153,15 @@ mybatis-plus:
   typeAliasesPackage: com.ruoyi.**.domain
   # 启动时是否检查 MyBatis XML 文件的存在，默认不检查
   checkConfigLocation: false
-  # 通过该属性可指定 MyBatis 的执行器，MyBatis 的执行器总共有三种：
-  # SIMPLE：每个语句创建新的预处理器 REUSE：会复用预处理器 BATCH：批量执行所有的更新
-  executorType: SIMPLE
   configuration:
     # 自动驼峰命名规则（camel case）映射
     mapUnderscoreToCamelCase: true
-    # 当设置为 true 的时候，懒加载的对象可能被任何懒属性全部加载，否则，每个属性都按需加载。需要和 lazyLoadingEnabled 一起使用。
-    aggressiveLazyLoading: true
     # MyBatis 自动映射策略
     # NONE：不启用 PARTIAL：只对非嵌套 resultMap 自动映射 FULL：对所有 resultMap 自动映射
     autoMappingBehavior: PARTIAL
     # MyBatis 自动映射时未知列或未知属性处理策
     # NONE：不做处理 WARNING：打印相关警告 FAILING：抛出异常和详细信息
     autoMappingUnknownColumnBehavior: NONE
-    # Mybatis一级缓存，默认为 SESSION
-    # SESSION session级别缓存 STATEMENT 关闭一级缓存
-    localCacheScope: SESSION
-    # 开启Mybatis二级缓存，默认为 true
-    cacheEnabled: false
     # 更详细的日志输出 会有性能损耗 org.apache.ibatis.logging.stdout.StdOutImpl
     # 关闭日志记录 (可单纯使用 p6spy 分析) org.apache.ibatis.logging.nologging.NoLoggingImpl
     # 默认日志输出 org.apache.ibatis.logging.slf4j.Slf4jImpl
@@ -191,16 +169,10 @@ mybatis-plus:
   global-config:
     # 是否打印 Logo banner
     banner: true
-    # 是否初始化 SqlRunner
-    enableSqlRunner: false
     dbConfig:
       # 主键类型
       # AUTO 自增 NONE 空 INPUT 用户输入 ASSIGN_ID 雪花 ASSIGN_UUID 唯一 UUID
-      idType: AUTO
-      # 表名是否使用驼峰转下划线命名,只对表名生效
-      tableUnderline: true
-      # 大写命名,对表名和字段名均生效
-      capitalMode: false
+      idType: ASSIGN_ID
       # 逻辑已删除值
       logicDeleteValue: 2
       # 逻辑未删除值
@@ -271,20 +243,10 @@ xss:
 thread-pool:
   # 是否开启线程池
   enabled: false
-  # 核心线程池大小
-  corePoolSize: 8
-  # 最大可创建的线程数
-  maxPoolSize: 16
   # 队列最大长度
   queueCapacity: 128
   # 线程池维护线程所允许的空闲时间
   keepAliveSeconds: 300
-  # 线程池对拒绝任务(无线程可用)的处理策略
-  # CALLER_RUNS_POLICY 调用方执行
-  # DISCARD_OLDEST_POLICY 放弃最旧的
-  # DISCARD_POLICY 丢弃
-  # ABORT_POLICY 中止
-  rejectedExecutionHandler: CALLER_RUNS_POLICY
 
 --- # redisson 缓存配置
 redisson:
@@ -312,8 +274,6 @@ lock4j:
 management:
   endpoints:
     web:
-      # Actuator 提供的 API 接口的根目录。默认为 /actuator
-      base-path: /actuator
       exposure:
         # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
         # 生产环境不建议放开所有 根据项目需求放开即可

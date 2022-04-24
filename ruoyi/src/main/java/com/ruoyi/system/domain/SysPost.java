@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -60,8 +61,8 @@ public class SysPost extends BaseEntity {
      */
     @ApiModelProperty(value = "岗位排序")
     @ExcelProperty(value = "岗位排序")
-    @NotBlank(message = "显示顺序不能为空")
-    private String postSort;
+    @NotNull(message = "显示顺序不能为空")
+    private Integer postSort;
 
     /**
      * 状态（0正常 1停用）

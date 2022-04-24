@@ -21,7 +21,12 @@ public enum DeviceType {
     /**
      * app端
      */
-    APP("app");
+    APP("app"),
+
+    /**
+     * 小程序端
+     */
+    XCX("xcx");
 
     private final String device;
 }

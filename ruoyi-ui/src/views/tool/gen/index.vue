@@ -1,12 +1,19 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="数据源" prop="dataName">
+        <el-input
+          v-model="queryParams.dataName"
+          placeholder="请输入数据源名称"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="表名称" prop="tableName">
         <el-input
           v-model="queryParams.tableName"
           placeholder="请输入表名称"
           clearable
-          size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -15,14 +22,12 @@
           v-model="queryParams.tableComment"
           placeholder="请输入表描述"
           clearable
-          size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
           v-model="dateRange"
-          size="small"
           style="width: 240px"
           value-format="yyyy-MM-dd"
           type="daterange"
@@ -220,7 +225,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         tableName: undefined,
-        tableComment: undefined
+        tableComment: undefined,
+        dataName: "master"
       },
       // 预览参数
       preview: {
@@ -232,6 +238,7 @@ export default {
     };
   },
   created() {
+    localStorage.setItem("dataName", this.queryParams.dataName);
     this.getList();
   },
   activated() {
@@ -255,6 +262,7 @@ export default {
     },
     /** 搜索按钮操作 */
     handleQuery() {
+      localStorage.setItem("dataName", this.queryParams.dataName);
       this.queryParams.pageNum = 1;
       this.getList();
     },
@@ -321,7 +329,9 @@ export default {
     /** 修改按钮操作 */
     handleEditTable(row) {
       const tableId = row.tableId || this.ids[0];
-      this.$router.push({ path: '/tool/gen-edit/index/' + tableId, query: { pageNum: this.queryParams.pageNum } });
+      const tableName = row.tableName || this.tableNames[0];
+      const params = { pageNum: this.queryParams.pageNum };
+      this.$tab.openPage("修改[" + tableName + "]生成配置", '/tool/gen-edit/index/' + tableId, params);
     },
     /** 删除按钮操作 */
     handleDelete(row) {

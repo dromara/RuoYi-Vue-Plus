@@ -18,10 +18,10 @@ import java.awt.*;
 @Configuration
 public class CaptchaConfig {
 
-    private final int width = 160;
-    private final int height = 60;
-    private final Color background = Color.PINK;
-    private final Font font = new Font("Arial", Font.BOLD, 48);
+    private static final int WIDTH = 160;
+    private static final int HEIGHT = 60;
+    private static final Color BACKGROUND = Color.PINK;
+    private static final Font FONT = new Font("Arial", Font.BOLD, 48);
 
     /**
      * 圆圈干扰验证码
@@ -29,9 +29,9 @@ public class CaptchaConfig {
     @Lazy
     @Bean
     public CircleCaptcha circleCaptcha() {
-        CircleCaptcha captcha = CaptchaUtil.createCircleCaptcha(width, height);
-        captcha.setBackground(background);
-        captcha.setFont(font);
+        CircleCaptcha captcha = CaptchaUtil.createCircleCaptcha(WIDTH, HEIGHT);
+        captcha.setBackground(BACKGROUND);
+        captcha.setFont(FONT);
         return captcha;
     }
 
@@ -41,9 +41,9 @@ public class CaptchaConfig {
     @Lazy
     @Bean
     public LineCaptcha lineCaptcha() {
-        LineCaptcha captcha = CaptchaUtil.createLineCaptcha(width, height);
-        captcha.setBackground(background);
-        captcha.setFont(font);
+        LineCaptcha captcha = CaptchaUtil.createLineCaptcha(WIDTH, HEIGHT);
+        captcha.setBackground(BACKGROUND);
+        captcha.setFont(FONT);
         return captcha;
     }
 
@@ -53,9 +53,9 @@ public class CaptchaConfig {
     @Lazy
     @Bean
     public ShearCaptcha shearCaptcha() {
-        ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(width, height);
-        captcha.setBackground(background);
-        captcha.setFont(font);
+        ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(WIDTH, HEIGHT);
+        captcha.setBackground(BACKGROUND);
+        captcha.setFont(FONT);
         return captcha;
     }
 

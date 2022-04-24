@@ -1,6 +1,8 @@
 package com.ruoyi.generator.util;
 
 import com.ruoyi.common.constant.Constants;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.velocity.app.Velocity;
 
 import java.util.Properties;
@@ -10,6 +12,7 @@ import java.util.Properties;
  *
  * @author ruoyi
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class VelocityInitializer {
 
     /**

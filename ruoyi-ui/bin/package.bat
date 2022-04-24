@@ -1,12 +1,12 @@
 @echo off
 echo.
-echo [信息] 安装Web工程，生成node_modules文件。
+echo [锟斤拷息] 锟斤拷装Web锟斤拷锟教ｏ拷锟斤拷锟斤拷node_modules锟侥硷拷锟斤拷
 echo.
 
 %~d0
 cd %~dp0
 
 cd ..
-npm install --registry=https://registry.npm.taobao.org
+npm install --registry=https://registry.npmmirror.com
 
 pause

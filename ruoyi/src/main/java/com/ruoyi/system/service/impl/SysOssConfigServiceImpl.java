@@ -63,7 +63,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
     }
 
     @Override
-    public SysOssConfigVo queryById(Integer ossConfigId) {
+    public SysOssConfigVo queryById(Long ossConfigId) {
         return baseMapper.selectVoById(ossConfigId);
     }
 

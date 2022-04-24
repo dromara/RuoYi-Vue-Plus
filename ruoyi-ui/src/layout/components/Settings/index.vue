@@ -41,7 +41,7 @@
       <el-divider/>
 
       <h3 class="drawer-title">系统布局配置</h3>
-      
+
       <div class="drawer-item">
         <span>开启 TopNav</span>
         <el-switch v-model="topNav" class="drawer-switch" />
@@ -108,6 +108,7 @@ export default {
           value: val
         })
         if (!val) {
+          this.$store.dispatch('app/toggleSideBarHide', false);
           this.$store.commit("SET_SIDEBAR_ROUTERS", this.$store.state.permission.defaultRoutes);
         }
       }

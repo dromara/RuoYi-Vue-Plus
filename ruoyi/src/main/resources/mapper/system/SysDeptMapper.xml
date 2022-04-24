@@ -22,27 +22,8 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
-    <sql id="selectDeptVo">
-        select d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.phone, d.email, d.status, d.del_flag, d.create_by, d.create_time
-        from sys_dept d
-    </sql>
-
-    <select id="selectDeptList" parameterType="SysDept" resultMap="SysDeptResult">
-        <include refid="selectDeptVo"/>
-        where d.del_flag = '0'
-        <if test="deptId != null and deptId != 0">
-            AND dept_id = #{deptId}
-        </if>
-        <if test="parentId != null and parentId != 0">
-            AND parent_id = #{parentId}
-        </if>
-        <if test="deptName != null and deptName != ''">
-            AND dept_name like concat('%', #{deptName}, '%')
-        </if>
-        <if test="status != null and status != ''">
-            AND status = #{status}
-        </if>
-        order by d.parent_id, d.order_num
+    <select id="selectDeptList" resultMap="SysDeptResult">
+        select * from sys_dept ${ew.getCustomSqlSegment}
     </select>
 
     <select id="selectDeptListByRoleId" resultType="Long">
@@ -55,18 +36,5 @@
             </if>
         order by d.parent_id, d.order_num
     </select>
-
-    <update id="updateDeptChildren" parameterType="java.util.List">
-        update sys_dept set ancestors =
-        <foreach collection="depts" item="item" index="index"
-                 separator=" " open="case dept_id" close="end">
-            when #{item.deptId} then #{item.ancestors}
-        </foreach>
-        where dept_id in
-        <foreach collection="depts" item="item" index="index"
-                 separator="," open="(" close=")">
-            #{item.deptId}
-        </foreach>
-    </update>
 
 </mapper>

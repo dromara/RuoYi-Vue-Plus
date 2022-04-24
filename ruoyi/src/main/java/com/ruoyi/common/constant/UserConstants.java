@@ -23,9 +23,19 @@ public interface UserConstants {
     String EXCEPTION = "1";
 
     /**
+     * 用户正常状态
+     */
+    String USER_NORMAL = "0";
+
+    /**
      * 用户封禁状态
      */
     String USER_DISABLE = "1";
+
+    /**
+     * 角色正常状态
+     */
+    String ROLE_NORMAL = "0";
 
     /**
      * 角色封禁状态
@@ -61,6 +71,16 @@ public interface UserConstants {
      * 是否菜单外链（否）
      */
     String NO_FRAME = "1";
+
+    /**
+     * 菜单正常状态
+     */
+    String MENU_NORMAL = "0";
+
+    /**
+     * 菜单停用状态
+     */
+    String MENU_DISABLE = "1";
 
     /**
      * 菜单类型（目录）

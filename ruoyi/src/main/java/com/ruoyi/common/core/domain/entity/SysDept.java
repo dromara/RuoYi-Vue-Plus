@@ -24,7 +24,7 @@ import javax.validation.constraints.Size;
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_dept")
 @ApiModel("部门业务对象")
-public class SysDept extends TreeEntity {
+public class SysDept extends TreeEntity<SysDept> {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -47,7 +47,7 @@ public class SysDept extends TreeEntity {
      */
     @ApiModelProperty(value = "显示顺序")
     @NotNull(message = "显示顺序不能为空")
-    private Long orderNum;
+    private Integer orderNum;
 
     /**
      * 负责人
