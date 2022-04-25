@@ -103,7 +103,7 @@ public class ExcelUtil {
         String[] convertSource = converterExp.split(",");
         for (String item : convertSource) {
             String[] itemArray = item.split("=");
-            if (StringUtils.containsAny(separator, propertyValue)) {
+            if (StringUtils.containsAny(propertyValue, separator)) {
                 for (String value : propertyValue.split(separator)) {
                     if (itemArray[0].equals(value)) {
                         propertyString.append(itemArray[1] + separator);
@@ -132,7 +132,7 @@ public class ExcelUtil {
         String[] convertSource = converterExp.split(",");
         for (String item : convertSource) {
             String[] itemArray = item.split("=");
-            if (StringUtils.containsAny(separator, propertyValue)) {
+            if (StringUtils.containsAny(propertyValue, separator)) {
                 for (String value : propertyValue.split(separator)) {
                     if (itemArray[1].equals(value)) {
                         propertyString.append(itemArray[0] + separator);
