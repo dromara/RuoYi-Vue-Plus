@@ -1,6 +1,7 @@
 package com.ruoyi.framework.config;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.RedissonProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         Config config = new Config();
         config.setThreads(redissonProperties.getThreads())
             .setNettyThreads(redissonProperties.getNettyThreads())
-            .setCodec(JsonJacksonCodec.INSTANCE);
+            .setCodec(new JsonJacksonCodec(JsonUtils.getObjectMapper()));
 
         RedissonProperties.SingleServerConfig singleServerConfig = redissonProperties.getSingleServerConfig();
         if (ObjectUtil.isNotNull(singleServerConfig)) {
