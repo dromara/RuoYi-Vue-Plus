@@ -38,13 +38,13 @@ public class MailUtils {
     /**
      * 获取邮件发送实例 (自定义发送人以及授权码)
      *
-     * @param username 发送人
-     * @param password 授权码
+     * @param user 发送人
+     * @param pass 授权码
      */
-    public static MailAccount getMailAccount(String username, String password) {
-        ACCOUNT.setFrom(StringUtils.blankToDefault(username, ACCOUNT.getUser()));
-        ACCOUNT.setUser(StringUtils.blankToDefault(username, ACCOUNT.getUser()));
-        ACCOUNT.setPass(StringUtils.blankToDefault(password, ACCOUNT.getPass()));
+    public static MailAccount getMailAccount(String from, String user, String pass) {
+        ACCOUNT.setFrom(StringUtils.blankToDefault(from, ACCOUNT.getFrom()));
+        ACCOUNT.setUser(StringUtils.blankToDefault(user, ACCOUNT.getUser()));
+        ACCOUNT.setPass(StringUtils.blankToDefault(pass, ACCOUNT.getPass()));
         return ACCOUNT;
     }
 

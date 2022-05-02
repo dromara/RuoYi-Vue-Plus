@@ -1,7 +1,6 @@
 package com.ruoyi.framework.config.properties;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Component;
  */
 @Data
 @Component
-@ConfigurationProperties(prefix = "spring.mail")
+@ConfigurationProperties(prefix = "mail")
 public class MailProperties {
 
     /**
@@ -21,45 +20,52 @@ public class MailProperties {
     private String enabled;
 
     /**
-     * 邮件服务地址
+     * SMTP服务器域名
      */
     private String host;
 
     /**
-     * 用户名
-     */
-    private String username;
-
-    /**
-     * 授权码 (设置 - 账户 - POP3/SMTP服务)
-     */
-    private String password;
-
-    /**
-     * 邮箱加密端口，不同邮箱的端口不一样
+     * SMTP服务端口
      */
     private Integer port;
 
     /**
-     * 是否需要用户认证
+     * 是否需要用户名密码验证
      */
-    @Value("${spring.mail.properties.mail.smtp.auth}")
     private Boolean auth;
 
     /**
-     * 是否启用TLS加密
+     * 用户名
      */
-    @Value("${spring.mail.properties.mail.smtp.starttls.enable}")
-    private Boolean starttlsEnable;
-
-    @Value("${spring.mail.properties.mail.smtp.ssl.trust}")
-    private String sslTrust;
-
-    private Boolean debug;
+    private String user;
 
     /**
-     * 传输协议 starttls.enable = true 时为 smtps
+     * 密码
      */
-    private String protocol;
+    private String pass;
 
+    /**
+     * 发送方，遵循RFC-822标准
+     */
+    private String from;
+
+    /**
+     * 使用 STARTTLS安全连接，STARTTLS是对纯文本通信协议的扩展。它将纯文本连接升级为加密连接（TLS或SSL）， 而不是使用一个单独的加密通信端口。
+     */
+    private Boolean starttlsEnable;
+
+    /**
+     * 使用 SSL安全连接
+     */
+    private Boolean sslEnable;
+
+    /**
+     * SMTP超时时长，单位毫秒，缺省值不超时
+     */
+    private Long timeout;
+
+    /**
+     * Socket连接超时值，单位毫秒，缺省值不超时
+     */
+    private Long connectionTimeout;
 }

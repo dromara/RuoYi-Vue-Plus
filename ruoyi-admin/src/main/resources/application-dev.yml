@@ -137,34 +137,6 @@ spring:
     # 是否开启ssl
     ssl: false
 
-  # 邮件
-  mail:
-    enabled: false
-    # 邮件服务地址 (enabled = true 时打开该配置)
-#    host: smtp.qq.com
-    # 用户名
-    username: xxx@qq.com
-    # 授权码 (设置 - 账户 - POP3/SMTP服务)
-    password: xxx
-    # QQ邮箱加密端口，不同邮箱的端口不一样
-    port: 465
-    properties:
-      mail:
-        smtp:
-          socketFactory:
-            class: javax.net.ssl.SSLSocketFactory
-          ssl:
-            trust: smtp.qq.com
-          # 是否需要用户认证
-          auth: true
-          starttls:
-            # 启用TLS加密
-            enable: true
-            required: true
-    # 传输协议 starttls.enable = true 时为 smtps
-    protocol: smtps
-    debug: true
-
 redisson:
   # 线程池数量
   threads: 4
@@ -184,3 +156,25 @@ redisson:
     timeout: 3000
     # 发布和订阅连接池大小
     subscriptionConnectionPoolSize: 50
+
+--- # mail 邮件发送
+mail:
+  enabled: false
+  host: smtp.163.com
+  port: 465
+  # 是否需要用户名密码验证
+  auth: true
+  # 发送方，遵循RFC-822标准
+  from: xxx@163.com
+  # 用户名（注意：如果使用foxmail邮箱，此处user为qq号）
+  user: xxx@163.com
+  # 密码（注意，某些邮箱需要为SMTP服务单独设置密码，详情查看相关帮助）
+  pass: xxxxxxxxxx
+  # 使用 STARTTLS安全连接，STARTTLS是对纯文本通信协议的扩展。
+  starttlsEnable: true
+  # 使用SSL安全连接
+  sslEnable: true
+  # SMTP超时时长，单位毫秒，缺省值不超时
+  timeout: 0
+  # Socket连接超时值，单位毫秒，缺省值不超时
+  connectionTimeout: 0

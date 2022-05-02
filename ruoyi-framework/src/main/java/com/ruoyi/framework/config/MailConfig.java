@@ -6,8 +6,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.Resource;
-
 /**
  * JavaMail 配置
  *
@@ -16,23 +14,21 @@ import javax.annotation.Resource;
 @Configuration
 public class MailConfig {
 
-    @Resource
-    private MailProperties mailProperties;
-
-    /**
-     * 初始化 JavaMailSender
-     */
     @Bean
-    @ConditionalOnProperty(value = "spring.mail.enabled", havingValue = "true")
-    public MailAccount mailAccount() {
+    @ConditionalOnProperty(value = "mail.enabled", havingValue = "true")
+    public MailAccount mailAccount(MailProperties mailProperties) {
         MailAccount account = new MailAccount();
-        account.setFrom(mailProperties.getUsername());
-        account.setUser(mailProperties.getUsername());
-        account.setPass(mailProperties.getPassword());
+        account.setHost(mailProperties.getHost());
         account.setPort(mailProperties.getPort());
         account.setAuth(mailProperties.getAuth());
-        account.setDebug(mailProperties.getDebug());
+        account.setFrom(mailProperties.getFrom());
+        account.setUser(mailProperties.getUser());
+        account.setPass(mailProperties.getPass());
+        account.setSocketFactoryPort(mailProperties.getPort());
         account.setStarttlsEnable(mailProperties.getStarttlsEnable());
+        account.setSslEnable(mailProperties.getSslEnable());
+        account.setTimeout(mailProperties.getTimeout());
+        account.setConnectionTimeout(mailProperties.getConnectionTimeout());
         return account;
     }
 
