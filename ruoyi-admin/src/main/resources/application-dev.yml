@@ -137,6 +137,34 @@ spring:
     # 是否开启ssl
     ssl: false
 
+  # 邮件
+  mail:
+    enabled: false
+    # 邮件服务地址 (enabled = true 时打开该配置)
+#    host: smtp.qq.com
+    # 用户名
+    username: xxx@qq.com
+    # 授权码 (设置 - 账户 - POP3/SMTP服务)
+    password: xxx
+    # QQ邮箱加密端口，不同邮箱的端口不一样
+    port: 465
+    properties:
+      mail:
+        smtp:
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+          ssl:
+            trust: smtp.qq.com
+          # 是否需要用户认证
+          auth: true
+          starttls:
+            # 启用TLS加密
+            enable: true
+            required: true
+    # 传输协议 starttls.enable = true 时为 smtps
+    protocol: smtps
+    debug: true
+
 redisson:
   # 线程池数量
   threads: 4
