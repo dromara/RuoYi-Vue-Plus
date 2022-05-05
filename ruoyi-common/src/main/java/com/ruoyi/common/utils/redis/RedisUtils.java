@@ -365,6 +365,50 @@ public class RedisUtils {
     }
 
     /**
+     * 设置原子值
+     *
+     * @param key   Redis键
+     * @param value 值
+     */
+    public static void setAtomicValue(String key, long value) {
+        RAtomicLong atomic = CLIENT.getAtomicLong(key);
+        atomic.set(value);
+    }
+
+    /**
+     * 获取原子值
+     *
+     * @param key Redis键
+     * @return 当前值
+     */
+    public static long getAtomicValue(String key) {
+        RAtomicLong atomic = CLIENT.getAtomicLong(key);
+        return atomic.get();
+    }
+
+    /**
+     * 递增原子值
+     *
+     * @param key Redis键
+     * @return 当前值
+     */
+    public static long incrAtomicValue(String key) {
+        RAtomicLong atomic = CLIENT.getAtomicLong(key);
+        return atomic.incrementAndGet();
+    }
+
+    /**
+     * 递减原子值
+     *
+     * @param key Redis键
+     * @return 当前值
+     */
+    public static long decrAtomicValue(String key) {
+        RAtomicLong atomic = CLIENT.getAtomicLong(key);
+        return atomic.decrementAndGet();
+    }
+
+    /**
      * 获得缓存的基本对象列表
      *
      * @param pattern 字符串前缀
