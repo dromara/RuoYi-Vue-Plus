@@ -31,7 +31,7 @@ public class SmsController {
 
     @ApiOperation("发送短信Aliyun")
     @GetMapping("/sendAliyun")
-    public R<Object> sendSimpleMessage(@ApiParam("电话号") String phones,
+    public R<Object> sendAliyun(@ApiParam("电话号") String phones,
                                      @ApiParam("模板ID") String templateId) {
         Map<String, String> map = new HashMap<>(1);
         map.put("code", "1234");
@@ -41,7 +41,7 @@ public class SmsController {
 
     @ApiOperation("发送短信Tencent")
     @GetMapping("/sendTencent")
-    public R<Object> sendMessageWithAttachment(@ApiParam("电话号") String phones,
+    public R<Object> sendTencent(@ApiParam("电话号") String phones,
                                              @ApiParam("模板ID") String templateId) {
         Map<String, String> map = new HashMap<>(1);
 //        map.put("2", "测试测试");
