@@ -178,3 +178,15 @@ mail:
   timeout: 0
   # Socket连接超时值，单位毫秒，缺省值不超时
   connectionTimeout: 0
+
+--- # sms 短信
+sms:
+  enabled: false
+  # 阿里云 dysmsapi.aliyuncs.com
+  # 腾讯云 sms.tencentcloudapi.com
+  endpoint: "dysmsapi.aliyuncs.com"
+  accessKeyId: xxxxxxx
+  accessKeySecret: xxxxxx
+  signName: 测试
+  # 腾讯专用
+  sdkAppId:

@@ -50,6 +50,10 @@
         <qcloud.cos.version>5.6.72</qcloud.cos.version>
         <minio.version>8.3.8</minio.version>
 
+        <!-- SMS 配置 -->
+        <aliyun.sms.version>2.0.9</aliyun.sms.version>
+        <tencent.sms.version>3.1.500</tencent.sms.version>
+
         <!-- docker 配置 -->
         <docker.registry.url>localhost</docker.registry.url>
         <docker.registry.host>http://${docker.registry.url}:2375</docker.registry.host>
@@ -193,6 +197,18 @@
             </dependency>
 
             <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>dysmsapi20170525</artifactId>
+                <version>${aliyun.sms.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java</artifactId>
+                <version>${tencent.sms.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-server</artifactId>
                 <version>${spring-boot-admin.version}</version>
@@ -297,6 +313,13 @@
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
+            <!-- SMS短信模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-sms</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+
             <!-- demo模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
@@ -317,6 +340,7 @@
         <module>ruoyi-demo</module>
         <module>ruoyi-extend</module>
         <module>ruoyi-oss</module>
+        <module>ruoyi-sms</module>
     </modules>
     <packaging>pom</packaging>
 
