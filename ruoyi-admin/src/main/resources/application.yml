@@ -124,6 +124,7 @@ security:
     - /logout
     - /register
     - /captchaImage
+    - /captchaSms
     # 静态资源
     - /*.html
     - /**/*.html

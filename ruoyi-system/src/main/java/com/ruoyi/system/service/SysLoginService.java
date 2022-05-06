@@ -79,7 +79,7 @@ public class SysLoginService {
         SysUser user = loadUserByPhonenumber(phonenumber);
 
         HttpServletRequest request = ServletUtils.getRequest();
-        checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode));
+        checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode, request));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = buildLoginUser(user);
         // 生成token
@@ -121,9 +121,13 @@ public class SysLoginService {
     /**
      * 校验短信验证码
      */
-    private boolean validateSmsCode(String phonenumber, String smsCode) {
-        // todo 此处使用手机号查询redis验证码与参数验证码是否一致 用户自行实现
-        return true;
+    private boolean validateSmsCode(String phonenumber, String smsCode, HttpServletRequest request) {
+        String code = RedisUtils.getCacheObject(Constants.CAPTCHA_CODE_KEY + phonenumber);
+        if (StringUtils.isNotBlank(code)) {
+            asyncService.recordLogininfor(phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"), request);
+            throw new CaptchaExpireException();
+        }
+        return code.equals(smsCode);
     }
 
     /**

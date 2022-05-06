@@ -4,6 +4,7 @@ import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.CaptchaType;
@@ -12,13 +13,17 @@ import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.config.properties.CaptchaProperties;
+import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.system.service.ISysConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotBlank;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,13 +33,32 @@ import java.util.Map;
  *
  * @author Lion Li
  */
+@Validated
 @Api(value = "验证码操作处理", tags = {"验证码管理"})
 @RequiredArgsConstructor
 @RestController
 public class CaptchaController {
 
     private final CaptchaProperties captchaProperties;
+    private final SmsProperties smsProperties;
     private final ISysConfigService configService;
+
+    /**
+     * 短信验证码
+     */
+    @ApiOperation("短信验证码")
+    @GetMapping("/captchaSms")
+    public R<Void> smsCaptcha(@ApiParam("用户手机号")
+                              @NotBlank(message = "{user.phonenumber.not.blank}")
+                              String phonenumber) {
+        if (smsProperties.getEnabled()) {
+            R.fail("当前系统没有开启短信功能！");
+        }
+        String key = Constants.CAPTCHA_CODE_KEY + phonenumber;
+        String code = RandomUtil.randomNumbers(4);
+        RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
+        return R.ok();
+    }
 
     /**
      * 生成验证码

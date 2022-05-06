@@ -29,6 +29,12 @@
             <artifactId>ruoyi-oss</artifactId>
         </dependency>
 
+        <!-- SMS功能模块 -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-sms</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
