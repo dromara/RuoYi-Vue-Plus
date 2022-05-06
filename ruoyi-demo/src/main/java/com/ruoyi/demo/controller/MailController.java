@@ -6,7 +6,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +21,9 @@ import java.io.File;
  */
 @Validated
 @Api(value = "邮件发送案例", tags = {"邮件发送案例"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
-@RequestMapping("/demo/mail")
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/demo/mail")
 public class MailController {
 
     @ApiOperation("发送邮件")

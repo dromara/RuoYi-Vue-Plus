@@ -17,7 +17,7 @@ public class MailProperties {
     /**
      * 过滤开关
      */
-    private String enabled;
+    private Boolean enabled;
 
     /**
      * SMTP服务器域名
