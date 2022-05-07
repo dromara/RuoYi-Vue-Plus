@@ -14,6 +14,7 @@ import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.config.properties.CaptchaProperties;
 import com.ruoyi.sms.config.properties.SmsProperties;
+import com.ruoyi.sms.core.SmsTemplate;
 import com.ruoyi.system.service.ISysConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,6 +42,7 @@ public class CaptchaController {
 
     private final CaptchaProperties captchaProperties;
     private final SmsProperties smsProperties;
+    private final SmsTemplate smsTemplate;
     private final ISysConfigService configService;
 
     /**
@@ -57,6 +59,11 @@ public class CaptchaController {
         String key = Constants.CAPTCHA_CODE_KEY + phonenumber;
         String code = RandomUtil.randomNumbers(4);
         RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
+        // 验证码模板id 自行处理 (查数据库或写死均可)
+        String templateId = "";
+        Map<String, String> map = new HashMap<>(1);
+        map.put("code", code);
+        smsTemplate.send(phonenumber, templateId, map);
         return R.ok();
     }
 
