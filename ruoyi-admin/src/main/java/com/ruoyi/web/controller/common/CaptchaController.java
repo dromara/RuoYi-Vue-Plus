@@ -45,7 +45,6 @@ public class CaptchaController {
 
     private final CaptchaProperties captchaProperties;
     private final SmsProperties smsProperties;
-    private final SmsTemplate smsTemplate;
     private final ISysConfigService configService;
 
     /**
@@ -66,6 +65,7 @@ public class CaptchaController {
         String templateId = "";
         Map<String, String> map = new HashMap<>(1);
         map.put("code", code);
+        SmsTemplate smsTemplate = SpringUtils.getBean(SmsTemplate.class);
         SmsResult result = smsTemplate.send(phonenumber, templateId, map);
         if (!result.isSuccess()) {
             log.error("验证码短信发送异常 => {}", result);

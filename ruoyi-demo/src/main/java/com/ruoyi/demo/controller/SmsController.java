@@ -1,6 +1,8 @@
 package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,12 +29,17 @@ import java.util.Map;
 @RequestMapping("/demo/sms")
 public class SmsController {
 
-    private final SmsTemplate smsTemplate;
+    private final SmsProperties smsProperties;
+//    private final SmsTemplate smsTemplate; // 可以使用spring注入
 
     @ApiOperation("发送短信Aliyun")
     @GetMapping("/sendAliyun")
     public R<Object> sendAliyun(@ApiParam("电话号") String phones,
                                      @ApiParam("模板ID") String templateId) {
+        if (smsProperties.getEnabled()) {
+            R.fail("当前系统没有开启短信功能！");
+        }
+        SmsTemplate smsTemplate = SpringUtils.getBean(SmsTemplate.class);
         Map<String, String> map = new HashMap<>(1);
         map.put("code", "1234");
         Object send = smsTemplate.send(phones, templateId, map);
@@ -43,6 +50,10 @@ public class SmsController {
     @GetMapping("/sendTencent")
     public R<Object> sendTencent(@ApiParam("电话号") String phones,
                                              @ApiParam("模板ID") String templateId) {
+        if (smsProperties.getEnabled()) {
+            R.fail("当前系统没有开启短信功能！");
+        }
+        SmsTemplate smsTemplate = SpringUtils.getBean(SmsTemplate.class);
         Map<String, String> map = new HashMap<>(1);
 //        map.put("2", "测试测试");
         map.put("1", "1234");
