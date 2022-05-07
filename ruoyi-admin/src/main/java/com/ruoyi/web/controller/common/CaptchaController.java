@@ -15,11 +15,13 @@ import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.config.properties.CaptchaProperties;
 import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
+import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.service.ISysConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +36,7 @@ import java.util.Map;
  *
  * @author Lion Li
  */
+@Slf4j
 @Validated
 @Api(value = "验证码操作处理", tags = {"验证码管理"})
 @RequiredArgsConstructor
@@ -63,7 +66,11 @@ public class CaptchaController {
         String templateId = "";
         Map<String, String> map = new HashMap<>(1);
         map.put("code", code);
-        smsTemplate.send(phonenumber, templateId, map);
+        SmsResult result = smsTemplate.send(phonenumber, templateId, map);
+        if (!result.isSuccess()) {
+            log.error("验证码短信发送异常 => {}", result);
+            return R.fail(result.getMessage());
+        }
         return R.ok();
     }
 
