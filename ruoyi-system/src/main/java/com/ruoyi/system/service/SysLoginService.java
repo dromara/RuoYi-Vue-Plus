@@ -123,7 +123,7 @@ public class SysLoginService {
      */
     private boolean validateSmsCode(String phonenumber, String smsCode, HttpServletRequest request) {
         String code = RedisUtils.getCacheObject(Constants.CAPTCHA_CODE_KEY + phonenumber);
-        if (StringUtils.isNotBlank(code)) {
+        if (StringUtils.isBlank(code)) {
             asyncService.recordLogininfor(phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"), request);
             throw new CaptchaExpireException();
         }
