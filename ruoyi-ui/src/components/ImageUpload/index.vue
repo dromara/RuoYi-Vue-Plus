@@ -93,8 +93,13 @@ export default {
           const list = Array.isArray(val) ? val : this.value.split(',');
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
-            // 此处name使用ossId 防止删除出现重名
-            item = { name: item.ossId, url: item.url, ossId: item.ossId };
+            // 字符串回显处理 如果此处存的是url可直接回显 如果存的是id需要调用接口查出来
+            if (typeof item === "string") {
+              item = { name: item, url: item };
+            } else {
+              // 此处name使用ossId 防止删除出现重名
+              item = { name: item.ossId, url: item.url, ossId: item.ossId };
+            }
             return item;
           });
         } else {
