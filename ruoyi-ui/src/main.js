@@ -73,6 +73,9 @@ DictData.install()
  * please remove it before going online! ! !
  */
 
+// 修改 el-dialog 默认点击遮照为不关闭
+Element.Dialog.props.closeOnClickModal.default = false
+
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium' // set element-ui default size
 })
