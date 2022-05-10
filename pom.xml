@@ -19,24 +19,24 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
-        <spring-boot.mybatis>2.2.0</spring-boot.mybatis>
-        <druid.version>1.2.8</druid.version>
+        <spring-boot.mybatis>2.2.2</spring-boot.mybatis>
+        <druid.version>1.2.9</druid.version>
         <knife4j.version>3.0.3</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <poi.version>4.1.2</poi.version>
         <commons-compress.version>1.21</commons-compress.version>
         <easyexcel.version>3.0.5</easyexcel.version>
         <velocity.version>2.3</velocity.version>
-        <satoken.version>1.29.0</satoken.version>
+        <satoken.version>1.30.0</satoken.version>
         <mybatis-plus.version>3.5.1</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.7.22</hutool.version>
+        <hutool.version>5.8.0</hutool.version>
         <okhttp.version>4.9.3</okhttp.version>
-        <spring-boot-admin.version>2.6.6</spring-boot-admin.version>
+        <spring-boot-admin.version>2.6.7</spring-boot-admin.version>
         <redisson.version>3.17.0</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.5.1</dynamic-ds.version>
-        <tlog.version>1.3.6</tlog.version>
+        <tlog.version>1.4.0</tlog.version>
         <xxl-job.version>2.3.0</xxl-job.version>
 
         <!-- jdk11 缺失依赖 jaxb-->

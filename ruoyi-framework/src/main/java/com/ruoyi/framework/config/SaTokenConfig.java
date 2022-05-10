@@ -2,7 +2,7 @@ package com.ruoyi.framework.config;
 
 import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
 import cn.dev33.satoken.interceptor.SaRouteInterceptor;
-import cn.dev33.satoken.jwt.StpLogicJwtForStyle;
+import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
@@ -67,8 +67,8 @@ public class SaTokenConfig implements WebMvcConfigurer {
 
     @Bean
     public StpLogic getStpLogicJwt() {
-        // Sa-Token 整合 jwt (Style模式)
-        return new StpLogicJwtForStyle();
+        // Sa-Token 整合 jwt (简单模式)
+        return new StpLogicJwtForSimple();
     }
 
 }

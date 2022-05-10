@@ -3,7 +3,6 @@ package com.ruoyi.framework.listener;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.stp.SaLoginModel;
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.ruoyi.common.constant.Constants;
@@ -36,13 +35,12 @@ public class UserActionListener implements SaTokenListener {
      * 每次登录时触发
      */
     @Override
-    public void doLogin(String loginType, Object loginId, SaLoginModel loginModel) {
+    public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginModel loginModel) {
         UserType userType = UserType.getUserType(loginId.toString());
         if (userType == UserType.SYS_USER) {
             UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
             String ip = ServletUtils.getClientIP();
             LoginUser user = LoginHelper.getLoginUser();
-            String tokenValue = StpUtil.getTokenValueByLoginId(loginId);
             UserOnlineDTO dto = new UserOnlineDTO();
             dto.setIpaddr(ip);
             dto.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
