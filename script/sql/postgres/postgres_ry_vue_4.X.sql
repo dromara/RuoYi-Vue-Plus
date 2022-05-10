@@ -917,6 +917,7 @@ create table if not exists sys_oss_config
     bucket_name   varchar(255) default ''::varchar,
     prefix        varchar(255) default ''::varchar,
     endpoint      varchar(255) default ''::varchar,
+    domain        varchar(255) default ''::varchar,
     is_https      char         default 'N'::bpchar,
     region        varchar(255) default ''::varchar,
     status        char         default '1'::bpchar,
@@ -937,6 +938,7 @@ comment on column sys_oss_config.secret_key is '秘钥';
 comment on column sys_oss_config.bucket_name is '桶名称';
 comment on column sys_oss_config.prefix is '前缀';
 comment on column sys_oss_config.endpoint is '访问站点';
+comment on column sys_oss_config.domain is '自定义域名';
 comment on column sys_oss_config.is_https is '是否https（Y=是,N=否）';
 comment on column sys_oss_config.region is '域';
 comment on column sys_oss_config.status is '状态（0=正常,1=停用）';
@@ -947,7 +949,9 @@ comment on column sys_oss_config.update_by is '更新者';
 comment on column sys_oss_config.update_time is '更新时间';
 comment on column sys_oss_config.remark is '备注';
 
-insert into sys_oss_config values (1, 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', 'http://localhost:9000',                'N', '',            '0', '', 'admin', now(), 'admin', now(), null);
-insert into sys_oss_config values (2, 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'http://XXX.XXXX.com',                  'N', 'z0',          '1', '', 'admin', now(), 'admin', now(), null);
-insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'http://oss-cn-beijing.aliyuncs.com',   'N', '',            '1', '', 'admin', now(), 'admin', now(), null);
-insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'http://cos.ap-beijing.myqcloud.com',   'N', 'ap-beijing',  '1', '', 'admin', now(), 'admin', now(), null);
+insert into sys_oss_config values (1, 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', 'localhost:9000',                      '','N', '',            '0', '', 'admin', now(), 'admin', now(), null);
+insert into sys_oss_config values (2, 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',           '','N', '',            '1', '', 'admin', now(), 'admin', now(), null);
+insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',         '','N', '',            '1', '', 'admin', now(), 'admin', now(), null);
+insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',         '','N', 'ap-beijing',  '1', '', 'admin', now(), 'admin', now(), null);
+insert into sys_oss_config values (5, 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', 'localhost:9000',                 '','N', '',            '1', '', 'admin', now(), 'admin', now(), NULL);
+
