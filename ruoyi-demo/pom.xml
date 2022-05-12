@@ -34,10 +34,10 @@
 <!--            <artifactId>dysmsapi20170525</artifactId>-->
 <!--        </dependency>-->
 
-        <dependency>
-            <groupId>com.tencentcloudapi</groupId>
-            <artifactId>tencentcloud-sdk-java</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.tencentcloudapi</groupId>-->
+<!--            <artifactId>tencentcloud-sdk-java</artifactId>-->
+<!--        </dependency>-->
 
     </dependencies>
 
