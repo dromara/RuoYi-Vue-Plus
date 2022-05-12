@@ -9,6 +9,14 @@ export function listOss(query) {
   })
 }
 
+// 查询OSS对象基于id串
+export function listByIds(ossId) {
+  return request({
+    url: '/system/oss/listByIds/' + ossId,
+    method: 'get'
+  })
+}
+
 // 删除OSS对象存储
 export function delOss(ossId) {
   return request({

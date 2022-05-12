@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,6 +57,19 @@ public class SysOssController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<SysOssVo> list(@Validated(QueryGroup.class) SysOssBo bo, PageQuery pageQuery) {
         return iSysOssService.queryPageList(bo, pageQuery);
+    }
+
+    /**
+     * 查询OSS对象基于id串
+     */
+    @ApiOperation("查询OSS对象基于ID")
+    @SaCheckPermission("system:oss:list")
+    @GetMapping("/listByIds/{ossIds}")
+    public R<List<SysOssVo>> listByIds(@ApiParam("OSS对象ID串")
+                                     @NotEmpty(message = "主键不能为空")
+                                     @PathVariable Long[] ossIds) {
+        List<SysOssVo> list = iSysOssService.listByIds(Arrays.asList(ossIds));
+        return R.ok(list);
     }
 
     /**

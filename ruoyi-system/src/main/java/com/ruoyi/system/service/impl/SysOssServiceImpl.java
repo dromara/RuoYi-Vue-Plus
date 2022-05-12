@@ -42,6 +42,11 @@ public class SysOssServiceImpl implements ISysOssService {
         return TableDataInfo.build(result);
     }
 
+    @Override
+    public List<SysOssVo> listByIds(Collection<Long> ossIds) {
+        return baseMapper.selectVoById(ossIds);
+    }
+
     private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysOss> lqw = Wrappers.lambdaQuery();
