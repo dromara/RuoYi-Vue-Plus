@@ -108,4 +108,10 @@ public class SysOssConfigBo extends BaseEntity {
     @ApiModelProperty(value = "扩展字段")
     private String ext1;
 
+    /**
+     * 备注
+     */
+    @ApiModelProperty(value = "备注")
+    private String remark;
+
 }
