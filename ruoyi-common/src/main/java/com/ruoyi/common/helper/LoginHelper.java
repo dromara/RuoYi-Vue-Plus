@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 登录鉴权助手
- * 
+ *
  * user_type 为 用户类型 同一个用户表 可以有多种用户类型 例如 pc,app
  * deivce 为 设备类型 同一个用户类型 可以有 多种设备类型 例如 web,ios
  * 可以组成 用户类型与设备类型多对多的 权限灵活控制
@@ -69,7 +69,9 @@ public class LoginHelper {
         if (loginUser != null) {
             return loginUser;
         }
-        return (LoginUser) StpUtil.getTokenSession().get(LOGIN_USER_KEY);
+        loginUser = (LoginUser) StpUtil.getTokenSession().get(LOGIN_USER_KEY);
+        LOGIN_CACHE.set(loginUser);
+        return loginUser;
     }
 
     /**
