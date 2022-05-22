@@ -25,12 +25,12 @@
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <poi.version>4.1.2</poi.version>
         <commons-compress.version>1.21</commons-compress.version>
-        <easyexcel.version>3.0.5</easyexcel.version>
+        <easyexcel.version>3.1.0</easyexcel.version>
         <velocity.version>2.3</velocity.version>
         <satoken.version>1.30.0</satoken.version>
         <mybatis-plus.version>3.5.1</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.8.0</hutool.version>
+        <hutool.version>5.8.1</hutool.version>
         <okhttp.version>4.9.3</okhttp.version>
         <spring-boot-admin.version>2.6.7</spring-boot-admin.version>
         <redisson.version>3.17.0</redisson.version>
