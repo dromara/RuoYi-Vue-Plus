@@ -56,13 +56,13 @@ public class IndexController {
     @PermissionLimit(limit = false)
     public ModelAndView toLogin(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
         if (loginService.ifLogin(request, response) != null) {
-            modelAndView.setView(new RedirectView("/" , true, false));
+            modelAndView.setView(new RedirectView("/", true, false));
             return modelAndView;
         }
         return new ModelAndView("login");
     }
 
-    @RequestMapping(value = "login" , method = RequestMethod.POST)
+    @RequestMapping(value = "login", method = RequestMethod.POST)
     @ResponseBody
     @PermissionLimit(limit = false)
     public ReturnT<String> loginDo(HttpServletRequest request, HttpServletResponse response, String userName, String password, String ifRemember) {
@@ -70,7 +70,7 @@ public class IndexController {
         return loginService.login(request, response, userName, password, ifRem);
     }
 
-    @RequestMapping(value = "logout" , method = RequestMethod.POST)
+    @RequestMapping(value = "logout", method = RequestMethod.POST)
     @ResponseBody
     @PermissionLimit(limit = false)
     public ReturnT<String> logout(HttpServletRequest request, HttpServletResponse response) {

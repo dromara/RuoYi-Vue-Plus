@@ -31,7 +31,7 @@ public class XxlJobInfo {
     private int executorTimeout;            // 任务执行超时时间，单位秒
     private int executorFailRetryCount;        // 失败重试次数
 
-    private String glueType;        // GLUE类型    #com.xxl.job.core.glue.GlueTypeEnum
+    private String glueType;        // GLUE类型	#com.xxl.job.core.glue.GlueTypeEnum
     private String glueSource;        // GLUE源代码
     private String glueRemark;        // GLUE备注
     private Date glueUpdatetime;    // GLUE更新时间

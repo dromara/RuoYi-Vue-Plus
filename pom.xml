@@ -37,7 +37,7 @@
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.5.1</dynamic-ds.version>
         <tlog.version>1.4.0</tlog.version>
-        <xxl-job.version>2.3.0</xxl-job.version>
+        <xxl-job.version>2.3.1</xxl-job.version>
 
         <!-- jdk11 缺失依赖 jaxb-->
         <jaxb.version>3.0.1</jaxb.version>
