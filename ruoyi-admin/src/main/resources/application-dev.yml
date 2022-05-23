@@ -130,8 +130,8 @@ spring:
     port: 6379
     # 数据库索引
     database: 0
-    # 密码
-    password:
+    # 密码(如没有密码请注释掉)
+    # password:
     # 连接超时时间
     timeout: 10s
     # 是否开启ssl
