@@ -118,13 +118,6 @@ sa-token:
 security:
   # 排除路径
   excludes:
-    - /login
-    - /smsLogin
-    - /xcxLogin
-    - /logout
-    - /register
-    - /captchaImage
-    - /captchaSms
     # 静态资源
     - /*.html
     - /**/*.html

@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.RegisterBody;
@@ -27,6 +28,7 @@ public class SysRegisterController extends BaseController {
     private final SysRegisterService registerService;
     private final ISysConfigService configService;
 
+    @Anonymous
     @ApiOperation("用户注册")
     @PostMapping("/register")
     public R<Void> register(@Validated @RequestBody RegisterBody user) {

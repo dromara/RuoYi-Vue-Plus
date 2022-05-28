@@ -5,6 +5,7 @@ import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.CaptchaType;
@@ -36,6 +37,7 @@ import java.util.Map;
  *
  * @author Lion Li
  */
+@Anonymous
 @Slf4j
 @Validated
 @Api(value = "验证码操作处理", tags = {"验证码管理"})
