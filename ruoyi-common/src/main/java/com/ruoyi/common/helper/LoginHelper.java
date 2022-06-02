@@ -1,5 +1,6 @@
 package com.ruoyi.common.helper;
 
+import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.constant.UserConstants;
@@ -29,15 +30,13 @@ public class LoginHelper {
     public static final String JOIN_CODE = ":";
     public static final String LOGIN_USER_KEY = "loginUser";
 
-    private static final ThreadLocal<LoginUser> LOGIN_CACHE = new ThreadLocal<>();
-
     /**
      * 登录系统
      *
      * @param loginUser 登录用户信息
      */
     public static void login(LoginUser loginUser) {
-        LOGIN_CACHE.set(loginUser);
+        SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
         StpUtil.login(loginUser.getLoginId());
         setLoginUser(loginUser);
     }
@@ -49,7 +48,7 @@ public class LoginHelper {
      * @param loginUser 登录用户信息
      */
     public static void loginByDevice(LoginUser loginUser, DeviceType deviceType) {
-        LOGIN_CACHE.set(loginUser);
+        SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
         StpUtil.login(loginUser.getLoginId(), deviceType.getDevice());
         setLoginUser(loginUser);
     }
@@ -65,20 +64,13 @@ public class LoginHelper {
      * 获取用户(多级缓存)
      */
     public static LoginUser getLoginUser() {
-        LoginUser loginUser = LOGIN_CACHE.get();
+        LoginUser loginUser = (LoginUser) SaHolder.getStorage().get(LOGIN_USER_KEY);
         if (loginUser != null) {
             return loginUser;
         }
         loginUser = (LoginUser) StpUtil.getTokenSession().get(LOGIN_USER_KEY);
-        LOGIN_CACHE.set(loginUser);
+        SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
         return loginUser;
-    }
-
-    /**
-     * 清除一级缓存 防止内存问题
-     */
-    public static void clearCache() {
-        LOGIN_CACHE.remove();
     }
 
     /**

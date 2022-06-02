@@ -6,7 +6,6 @@ import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
-import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.config.properties.ExcludeUrlProperties;
 import com.ruoyi.framework.config.properties.SecurityProperties;
@@ -16,9 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * sa-token 配置
@@ -59,13 +55,7 @@ public class SaTokenConfig implements WebMvcConfigurer {
                     // }
 
                 });
-        }) {
-            @SuppressWarnings("all")
-            @Override
-            public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-                LoginHelper.clearCache();
-            }
-        }).addPathPatterns("/**");
+        })).addPathPatterns("/**");
         registry.addInterceptor(new SaAnnotationInterceptor()).addPathPatterns("/**");
     }
 
