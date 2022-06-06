@@ -23,7 +23,6 @@
         <druid.version>1.2.9</druid.version>
         <knife4j.version>3.0.3</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
-        <commons-compress.version>1.21</commons-compress.version>
         <poi.version>5.2.2</poi.version>
         <easyexcel.version>3.1.0</easyexcel.version>
         <velocity.version>2.3</velocity.version>
@@ -101,13 +100,6 @@
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
                 <version>${swagger-annotations.version}</version>
-            </dependency>
-
-            <!-- 修复poi漏洞 -->
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-compress</artifactId>
-                <version>${commons-compress.version}</version>
             </dependency>
 
             <dependency>
