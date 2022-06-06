@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +71,7 @@ public class TestDemoController extends BaseController {
 
     @ApiOperation("导入测试-校验")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "file", value = "导入文件", dataType = "java.io.File", required = true),
+        @ApiImplicitParam(name = "file", value = "导入文件", paramType = "query", dataTypeClass = File.class, required = true),
     })
     @Log(title = "测试单表", businessType = BusinessType.IMPORT)
     @SaCheckPermission("demo:demo:import")
