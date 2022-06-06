@@ -1,8 +1,14 @@
 package com.ruoyi.common.utils.poi;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.builder.ExcelWriterSheetBuilder;
+import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.fill.FillConfig;
+import com.alibaba.excel.write.metadata.fill.FillWrapper;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.ruoyi.common.convert.ExcelBigNumberConvert;
 import com.ruoyi.common.excel.CellMergeStrategy;
@@ -18,7 +24,10 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Excel相关处理
@@ -89,10 +98,7 @@ public class ExcelUtil {
      */
     public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge, HttpServletResponse response) {
         try {
-            String filename = encodingFilename(sheetName);
-            response.reset();
-            FileUtils.setAttachmentResponseHeader(response, filename);
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");
+            resetResponse(sheetName, response);
             ServletOutputStream os = response.getOutputStream();
             ExcelWriterSheetBuilder builder = EasyExcel.write(os, clazz)
                 .autoCloseStream(false)
@@ -109,6 +115,88 @@ public class ExcelUtil {
         } catch (IOException e) {
             throw new RuntimeException("导出Excel异常");
         }
+    }
+
+    /**
+     * 单表多数据模板导出 模板格式为 {.属性}
+     *
+     * @param filename     文件名
+     * @param templatePath 模板路径 resource 目录下的路径包括模板文件名
+     *                     例如: excel/temp.xlsx
+     *                     重点: 模板文件必须放置到启动类对应的 resource 目录下
+     * @param data         模板需要的数据
+     */
+    public static void exportTemplate(List<Object> data, String filename, String templatePath, HttpServletResponse response) {
+        try {
+            resetResponse(filename, response);
+            ClassPathResource templateResource = new ClassPathResource(templatePath);
+            ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream())
+                .withTemplate(templateResource.getStream())
+                .autoCloseStream(false)
+                // 大数值自动转换 防止失真
+                .registerConverter(new ExcelBigNumberConvert())
+                .build();
+            WriteSheet writeSheet = EasyExcel.writerSheet().build();
+            if (CollUtil.isEmpty(data)) {
+                throw new IllegalArgumentException("数据为空");
+            }
+            // 单表多数据导出 模板格式为 {.属性}
+            for (Object d : data) {
+                excelWriter.fill(d, writeSheet);
+            }
+            excelWriter.finish();
+        } catch (IOException e) {
+            throw new RuntimeException("导出Excel异常");
+        }
+    }
+
+    /**
+     * 多表多数据模板导出 模板格式为 {key.属性}
+     *
+     * @param filename     文件名
+     * @param templatePath 模板路径 resource 目录下的路径包括模板文件名
+     *                     例如: excel/temp.xlsx
+     *                     重点: 模板文件必须放置到启动类对应的 resource 目录下
+     * @param data         模板需要的数据
+     */
+    public static void exportTemplateMultiList(Map<String, Object> data, String filename, String templatePath, HttpServletResponse response) {
+        try {
+            resetResponse(filename, response);
+            ClassPathResource templateResource = new ClassPathResource(templatePath);
+            ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream())
+                .withTemplate(templateResource.getStream())
+                .autoCloseStream(false)
+                // 大数值自动转换 防止失真
+                .registerConverter(new ExcelBigNumberConvert())
+                .build();
+            WriteSheet writeSheet = EasyExcel.writerSheet().build();
+            if (CollUtil.isEmpty(data)) {
+                throw new IllegalArgumentException("数据为空");
+            }
+            for (Map.Entry<String, Object> map : data.entrySet()) {
+                // 设置列表后续还有数据
+                FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
+                if (map.getValue() instanceof Collection) {
+                    // 多表导出必须使用 FillWrapper
+                    excelWriter.fill(new FillWrapper(map.getKey(), (Collection<?>) map.getValue()), fillConfig, writeSheet);
+                } else {
+                    excelWriter.fill(map.getValue(), writeSheet);
+                }
+            }
+            excelWriter.finish();
+        } catch (IOException e) {
+            throw new RuntimeException("导出Excel异常");
+        }
+    }
+
+    /**
+     * 重置响应体
+     */
+    private static void resetResponse(String sheetName, HttpServletResponse response) throws UnsupportedEncodingException {
+        String filename = encodingFilename(sheetName);
+        response.reset();
+        FileUtils.setAttachmentResponseHeader(response, filename);
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");
     }
 
     /**
