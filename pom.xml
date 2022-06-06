@@ -24,6 +24,7 @@
         <knife4j.version>3.0.3</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <commons-compress.version>1.21</commons-compress.version>
+        <poi.version>5.2.2</poi.version>
         <easyexcel.version>3.1.0</easyexcel.version>
         <velocity.version>2.3</velocity.version>
         <satoken.version>1.30.0</satoken.version>
@@ -110,9 +111,25 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
                 <version>${easyexcel.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.poi</groupId>
+                        <artifactId>poi-ooxml-schemas</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- velocity代码生成使用模板 -->
