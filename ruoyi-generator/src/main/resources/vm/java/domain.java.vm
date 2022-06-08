@@ -28,6 +28,7 @@ import com.ruoyi.common.core.domain.TreeEntity;
     #set($Entity="TreeEntity<${ClassName}>")
 #end
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("${tableName}")
 public class ${ClassName} extends ${Entity} {
 
