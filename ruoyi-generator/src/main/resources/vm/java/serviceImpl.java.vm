@@ -35,9 +35,6 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 
     /**
      * 查询${functionName}
-     *
-     * @param ${pkColumn.javaField} ${functionName}主键
-     * @return ${functionName}
      */
     @Override
     public ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField}){
@@ -47,9 +44,6 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 #if($table.crud || $table.sub)
     /**
      * 查询${functionName}列表
-     *
-     * @param bo ${functionName}
-     * @return ${functionName}
      */
     @Override
     public TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery) {
@@ -61,9 +55,6 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 
     /**
      * 查询${functionName}列表
-     *
-     * @param bo ${functionName}
-     * @return ${functionName}
      */
     @Override
     public List<${ClassName}Vo> queryList(${ClassName}Bo bo) {
@@ -100,9 +91,6 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 
     /**
      * 新增${functionName}
-     *
-     * @param bo ${functionName}
-     * @return 结果
      */
     @Override
     public Boolean insertByBo(${ClassName}Bo bo) {
@@ -118,9 +106,6 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 
     /**
      * 修改${functionName}
-     *
-     * @param bo ${functionName}
-     * @return 结果
      */
     @Override
     public Boolean updateByBo(${ClassName}Bo bo) {
@@ -131,8 +116,6 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 
     /**
      * 保存前的数据校验
-     *
-     * @param entity 实体类数据
      */
     private void validEntityBeforeSave(${ClassName} entity){
         //TODO 做一些数据校验,如唯一约束
@@ -140,9 +123,6 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 
     /**
      * 批量删除${functionName}
-     *
-     * @param ${pkColumn.javaField}s 需要删除的${functionName}主键
-     * @return 结果
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<${pkColumn.javaType}> ids, Boolean isValid) {
