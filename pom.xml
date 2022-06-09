@@ -35,7 +35,7 @@
         <redisson.version>3.17.2</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.5.1</dynamic-ds.version>
-        <tlog.version>1.4.0</tlog.version>
+        <tlog.version>1.4.3</tlog.version>
         <xxl-job.version>2.3.1</xxl-job.version>
 
         <!-- 统一 guava 版本 解决隐式漏洞问题 -->
