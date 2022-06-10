@@ -54,5 +54,5 @@ public interface TestDemoMapper extends BaseMapperPlus<TestDemoMapper, TestDemo,
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "user_id")
     })
-    int deleteBatchIds(@Param(Constants.COLLECTION) Collection<?> idList);
+    int deleteBatchIds(@Param(Constants.COLL) Collection<?> idList);
 }
