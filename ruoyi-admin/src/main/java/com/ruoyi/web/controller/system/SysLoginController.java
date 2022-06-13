@@ -103,8 +103,9 @@ public class SysLoginController {
     @PostMapping("/logout")
     public R<Void> logout() {
         try {
+            String username = LoginHelper.getUsername();
             StpUtil.logout();
-            loginService.logout(LoginHelper.getUsername());
+            loginService.logout(username);
         } catch (NotLoginException e) {
         }
         return R.ok("退出成功");
