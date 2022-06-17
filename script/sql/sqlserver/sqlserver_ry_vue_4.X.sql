@@ -157,7 +157,7 @@ GO
 CREATE TABLE [gen_table_column]
 (
     [column_id]      bigint                       NOT NULL,
-    [table_id]       nvarchar(64)                 NULL,
+    [table_id]       bigint                       NULL,
     [column_name]    nvarchar(200)                NULL,
     [column_comment] nvarchar(500)                NULL,
     [column_type]    nvarchar(100)                NULL,
