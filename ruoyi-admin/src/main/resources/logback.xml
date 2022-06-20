@@ -97,17 +97,9 @@
         <appender-ref ref="file_error"/>
     </appender>
 
-    <!-- 系统模块日志级别控制  -->
-    <logger name="com.ruoyi" level="info" />
-    <!-- Spring日志级别控制  -->
-    <logger name="org.springframework" level="warn" />
-
-    <root level="info">
-        <appender-ref ref="console" />
-    </root>
-
     <!--系统操作日志-->
     <root level="info">
+        <appender-ref ref="console" />
         <appender-ref ref="async_info" />
         <appender-ref ref="async_error" />
         <appender-ref ref="file_console" />
