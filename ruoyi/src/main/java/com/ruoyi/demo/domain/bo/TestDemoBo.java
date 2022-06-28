@@ -49,7 +49,7 @@ public class TestDemoBo extends BaseEntity {
      */
     @ApiModelProperty("排序号")
     @NotNull(message = "排序号不能为空", groups = {AddGroup.class, EditGroup.class})
-    private Long orderNum;
+    private Integer orderNum;
 
     /**
      * key键

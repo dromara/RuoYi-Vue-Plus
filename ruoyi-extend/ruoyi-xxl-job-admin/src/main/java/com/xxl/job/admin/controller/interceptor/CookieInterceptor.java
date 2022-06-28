@@ -29,15 +29,14 @@ public class CookieInterceptor implements AsyncHandlerInterceptor {
             for (Cookie ck : request.getCookies()) {
                 cookieMap.put(ck.getName(), ck);
             }
-            modelAndView.addObject("cookieMap" , cookieMap);
+            modelAndView.addObject("cookieMap", cookieMap);
         }
 
         // static method
         if (modelAndView != null) {
-            modelAndView.addObject("I18nUtil" , FtlUtil.generateStaticModel(I18nUtil.class.getName()));
+            modelAndView.addObject("I18nUtil", FtlUtil.generateStaticModel(I18nUtil.class.getName()));
         }
 
-        AsyncHandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
     }
 
 }

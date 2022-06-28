@@ -48,7 +48,7 @@ public class TestDemoVo {
      */
     @ExcelProperty(value = "排序号")
     @ApiModelProperty("排序号")
-    private Long orderNum;
+    private Integer orderNum;
 
     /**
      * key键

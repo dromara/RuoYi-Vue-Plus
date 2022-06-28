@@ -80,12 +80,12 @@
                r.status as role_status
         from sys_user u
             left join sys_dept d on u.dept_id = d.dept_id
-            left join sys_user_role ur on u.user_id = ur.user_id
-            left join sys_role r on r.role_id = ur.role_id
+            left join sys_user_role sur on u.user_id = sur.user_id
+            left join sys_role r on r.role_id = sur.role_id
     </sql>
 
     <select id="selectPageUserList" resultMap="SysUserResult">
-        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.password, u.sex,
+        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
         u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from
         sys_user u
         left join sys_dept d on u.dept_id = d.dept_id
@@ -93,7 +93,7 @@
     </select>
 
     <select id="selectUserList" resultMap="SysUserResult">
-        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.password, u.sex,
+        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
         u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from
         sys_user u
         left join sys_dept d on u.dept_id = d.dept_id
@@ -104,8 +104,8 @@
         select distinct u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.phonenumber, u.status, u.create_time
         from sys_user u
              left join sys_dept d on u.dept_id = d.dept_id
-             left join sys_user_role ur on u.user_id = ur.user_id
-             left join sys_role r on r.role_id = ur.role_id
+             left join sys_user_role sur on u.user_id = sur.user_id
+             left join sys_role r on r.role_id = sur.role_id
         ${ew.getCustomSqlSegment}
     </select>
 
@@ -113,8 +113,8 @@
         select distinct u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.phonenumber, u.status, u.create_time
         from sys_user u
              left join sys_dept d on u.dept_id = d.dept_id
-             left join sys_user_role ur on u.user_id = ur.user_id
-             left join sys_role r on r.role_id = ur.role_id
+             left join sys_user_role sur on u.user_id = sur.user_id
+             left join sys_role r on r.role_id = sur.role_id
         ${ew.getCustomSqlSegment}
     </select>
 

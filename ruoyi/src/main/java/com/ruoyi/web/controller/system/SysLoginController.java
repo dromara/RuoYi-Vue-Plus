@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysMenu;
@@ -51,6 +52,7 @@ public class SysLoginController {
      * @param loginBody 登录信息
      * @return 结果
      */
+    @Anonymous
     @ApiOperation("登录方法")
     @PostMapping("/login")
     public R<Map<String, Object>> login(@Validated @RequestBody LoginBody loginBody) {
@@ -68,6 +70,7 @@ public class SysLoginController {
      * @param smsLoginBody 登录信息
      * @return 结果
      */
+    @Anonymous
     @ApiOperation("短信登录(示例)")
     @PostMapping("/smsLogin")
     public R<Map<String, Object>> smsLogin(@Validated @RequestBody SmsLoginBody smsLoginBody) {
@@ -84,6 +87,7 @@ public class SysLoginController {
      * @param xcxCode 小程序code
      * @return 结果
      */
+    @Anonymous
     @ApiOperation("小程序登录(示例)")
     @PostMapping("/xcxLogin")
     public R<Map<String, Object>> xcxLogin(@NotBlank(message = "{xcx.code.not.blank}") String xcxCode) {
@@ -94,12 +98,14 @@ public class SysLoginController {
         return R.ok(ajax);
     }
 
+    @Anonymous
     @ApiOperation("登出方法")
     @PostMapping("/logout")
     public R<Void> logout() {
         try {
+            String username = LoginHelper.getUsername();
             StpUtil.logout();
-            loginService.logout(LoginHelper.getUsername());
+            loginService.logout(username);
         } catch (NotLoginException e) {
         }
         return R.ok("退出成功");

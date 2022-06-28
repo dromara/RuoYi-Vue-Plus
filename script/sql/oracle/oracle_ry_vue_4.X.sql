@@ -812,7 +812,7 @@ comment on column gen_table.remark            is '备注';
 -- ----------------------------
 create table gen_table_column (
   column_id         number(20)      not null,
-  table_id          varchar2(64),
+  table_id          number(20),
   column_name       varchar2(200),
   column_comment    varchar2(500),
   column_type       varchar2(100),
@@ -904,6 +904,7 @@ create table sys_oss_config (
   bucket_name     varchar(255)  default '',
   prefix          varchar(255)  default '',
   endpoint        varchar(255)  default '',
+  domain          varchar(255)  default '',
   is_https        char(1)       default 'N',
   region          varchar(255)  default '',
   status          char(1)       default '1',
@@ -925,6 +926,7 @@ comment on column sys_oss_config.secret_key is '秘钥';
 comment on column sys_oss_config.bucket_name is '桶名称';
 comment on column sys_oss_config.prefix is '前缀';
 comment on column sys_oss_config.endpoint is '访问站点';
+comment on column sys_oss_config.domain is '自定义域名';
 comment on column sys_oss_config.is_https is '是否https（Y=是,N=否）';
 comment on column sys_oss_config.region is '域';
 comment on column sys_oss_config.status is '状态（0=正常,1=停用）';
@@ -935,10 +937,12 @@ comment on column sys_oss_config.create_time is '创建时间';
 comment on column sys_oss_config.update_by is '更新者';
 comment on column sys_oss_config.update_time is '更新时间';
 
-insert into sys_oss_config values (1, 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', 'http://localhost:9000',                'N', '',            '0', '', NULL, 'admin', sysdate, 'admin', sysdate);
-insert into sys_oss_config values (2, 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'http://XXX.XXXX.com',                  'N', 'z0',          '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
-insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'http://oss-cn-beijing.aliyuncs.com',   'N', '',            '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
-insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'http://cos.ap-beijing.myqcloud.com',   'N', 'ap-beijing',  '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
+insert into sys_oss_config values (1, 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                '','N', '',            '0', '', NULL, 'admin', sysdate, 'admin', sysdate);
+insert into sys_oss_config values (2, 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',     '','N', '',            '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
+insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','N', '',            '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
+insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',  '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
+insert into sys_oss_config values (5, 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','N', '',            '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
+
 
 -- ----------------------------
 -- 钩子 ，用于session连接之后 自动设置默认的date类型格式化 简化时间查询

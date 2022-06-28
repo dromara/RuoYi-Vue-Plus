@@ -36,6 +36,11 @@ public interface OssConstant {
     List<Integer> SYSTEM_DATA_IDS = Arrays.asList(1, 2, 3, 4);
 
     /**
+     * 云服务商
+     */
+    String[] CLOUD_SERVICE = new String[] {"aliyun", "qcloud", "qiniu"};
+
+    /**
      * https 状态
      */
     String IS_HTTPS = "Y";

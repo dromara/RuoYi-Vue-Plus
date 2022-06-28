@@ -52,9 +52,9 @@ public class XxlJobServiceImpl implements XxlJobService {
 
         // package result
         Map<String, Object> maps = new HashMap<String, Object>();
-        maps.put("recordsTotal" , list_count);        // 总记录数
-        maps.put("recordsFiltered" , list_count);    // 过滤后的总记录数
-        maps.put("data" , list);                    // 分页列表
+        maps.put("recordsTotal", list_count);        // 总记录数
+        maps.put("recordsFiltered", list_count);    // 过滤后的总记录数
+        maps.put("data", list);                    // 分页列表
         return maps;
     }
 
@@ -105,7 +105,7 @@ public class XxlJobServiceImpl implements XxlJobService {
         }
         // 》fix "\r" in shell
         if (GlueTypeEnum.GLUE_SHELL == GlueTypeEnum.match(jobInfo.getGlueType()) && jobInfo.getGlueSource() != null) {
-            jobInfo.setGlueSource(jobInfo.getGlueSource().replaceAll("\r" , ""));
+            jobInfo.setGlueSource(jobInfo.getGlueSource().replaceAll("\r", ""));
         }
 
         // valid advanced
@@ -373,10 +373,10 @@ public class XxlJobServiceImpl implements XxlJobService {
         int executorCount = executorAddressSet.size();
 
         Map<String, Object> dashboardMap = new HashMap<String, Object>();
-        dashboardMap.put("jobInfoCount" , jobInfoCount);
-        dashboardMap.put("jobLogCount" , jobLogCount);
-        dashboardMap.put("jobLogSuccessCount" , jobLogSuccessCount);
-        dashboardMap.put("executorCount" , executorCount);
+        dashboardMap.put("jobInfoCount", jobInfoCount);
+        dashboardMap.put("jobLogCount", jobLogCount);
+        dashboardMap.put("jobLogSuccessCount", jobLogSuccessCount);
+        dashboardMap.put("executorCount", executorCount);
         return dashboardMap;
     }
 
@@ -420,14 +420,14 @@ public class XxlJobServiceImpl implements XxlJobService {
         }
 
         Map<String, Object> result = new HashMap<String, Object>();
-        result.put("triggerDayList" , triggerDayList);
-        result.put("triggerDayCountRunningList" , triggerDayCountRunningList);
-        result.put("triggerDayCountSucList" , triggerDayCountSucList);
-        result.put("triggerDayCountFailList" , triggerDayCountFailList);
+        result.put("triggerDayList", triggerDayList);
+        result.put("triggerDayCountRunningList", triggerDayCountRunningList);
+        result.put("triggerDayCountSucList", triggerDayCountSucList);
+        result.put("triggerDayCountFailList", triggerDayCountFailList);
 
-        result.put("triggerCountRunningTotal" , triggerCountRunningTotal);
-        result.put("triggerCountSucTotal" , triggerCountSucTotal);
-        result.put("triggerCountFailTotal" , triggerCountFailTotal);
+        result.put("triggerCountRunningTotal", triggerCountRunningTotal);
+        result.put("triggerCountSucTotal", triggerCountSucTotal);
+        result.put("triggerCountFailTotal", triggerCountFailTotal);
 
         return new ReturnT<Map<String, Object>>(result);
     }

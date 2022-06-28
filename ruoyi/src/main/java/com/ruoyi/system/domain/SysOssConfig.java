@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 /**
  * 对象存储配置对象 sys_oss_config
@@ -52,6 +51,11 @@ public class SysOssConfig extends BaseEntity {
      * 访问站点
      */
     private String endpoint;
+
+    /**
+     * 自定义域名
+     */
+    private String domain;
 
     /**
      * 是否https（0否 1是）

@@ -27,7 +27,7 @@ public class PermissionInterceptor implements AsyncHandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         if (!(handler instanceof HandlerMethod)) {
-            return AsyncHandlerInterceptor.super.preHandle(request, response, handler);
+            return true;    // proceed with the next interceptor
         }
 
         // if need login
@@ -44,7 +44,7 @@ public class PermissionInterceptor implements AsyncHandlerInterceptor {
             XxlJobUser loginUser = loginService.ifLogin(request, response);
             if (loginUser == null) {
                 response.setStatus(302);
-                response.setHeader("location" , request.getContextPath() + "/toLogin");
+                response.setHeader("location", request.getContextPath() + "/toLogin");
                 return false;
             }
             if (needAdminuser && loginUser.getRole() != 1) {
@@ -53,7 +53,7 @@ public class PermissionInterceptor implements AsyncHandlerInterceptor {
             request.setAttribute(LoginService.LOGIN_IDENTITY_KEY, loginUser);
         }
 
-        return AsyncHandlerInterceptor.super.preHandle(request, response, handler);
+        return true;    // proceed with the next interceptor
     }
 
 }

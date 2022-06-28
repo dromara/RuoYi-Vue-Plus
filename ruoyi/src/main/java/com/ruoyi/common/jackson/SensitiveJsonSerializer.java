@@ -27,9 +27,9 @@ public class SensitiveJsonSerializer extends JsonSerializer<String> implements C
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         SensitiveService sensitiveService = SpringUtils.getBean(SensitiveService.class);
         if (sensitiveService.isSensitive()) {
-            gen.writeString(value);
-        } else {
             gen.writeString(strategy.desensitizer().apply(value));
+        } else {
+            gen.writeString(value);
         }
 
     }

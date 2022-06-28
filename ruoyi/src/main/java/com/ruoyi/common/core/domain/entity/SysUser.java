@@ -108,12 +108,6 @@ public class SysUser extends BaseEntity {
     )
     private String password;
 
-    @JsonIgnore
-    @JsonProperty
-    public String getPassword() {
-        return password;
-    }
-
     /**
      * 帐号状态（0正常 1停用）
      */

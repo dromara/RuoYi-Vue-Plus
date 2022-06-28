@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -7,9 +8,11 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
+import com.ruoyi.oss.constant.OssConstant;
+import com.ruoyi.oss.core.OssClient;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.factory.OssFactory;
-import com.ruoyi.oss.service.IOssStrategy;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.vo.SysOssVo;
@@ -20,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +45,21 @@ public class SysOssServiceImpl implements ISysOssService {
         LambdaQueryWrapper<SysOss> lqw = buildQueryWrapper(bo);
         Page<SysOssVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
+    }
+
+    @Override
+    public List<SysOssVo> listByIds(Collection<Long> ossIds) {
+        List<SysOssVo> list = new ArrayList<>();
+        for (Long id : ossIds) {
+            String key = OssConstant.SYS_OSS_KEY + id;
+            SysOssVo vo = RedisUtils.getCacheObject(key);
+            if (ObjectUtil.isNull(vo)) {
+                vo = baseMapper.selectVoById(id);
+                RedisUtils.setCacheObject(key, vo, Duration.ofDays(30));
+            }
+            list.add(vo);
+        }
+        return list;
     }
 
     private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {
@@ -65,7 +85,7 @@ public class SysOssServiceImpl implements ISysOssService {
     public SysOss upload(MultipartFile file) {
         String originalfileName = file.getOriginalFilename();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
-        IOssStrategy storage = OssFactory.instance();
+        OssClient storage = OssFactory.instance();
         UploadResult uploadResult;
         try {
             uploadResult = storage.uploadSuffix(file.getBytes(), suffix, file.getContentType());
@@ -78,7 +98,7 @@ public class SysOssServiceImpl implements ISysOssService {
         oss.setFileSuffix(suffix);
         oss.setFileName(uploadResult.getFilename());
         oss.setOriginalName(originalfileName);
-        oss.setService(storage.getServiceType().getValue());
+        oss.setService(storage.getConfigKey());
         baseMapper.insert(oss);
         return oss;
     }
@@ -90,7 +110,7 @@ public class SysOssServiceImpl implements ISysOssService {
         }
         List<SysOss> list = baseMapper.selectBatchIds(ids);
         for (SysOss sysOss : list) {
-            IOssStrategy storage = OssFactory.instance(sysOss.getService());
+            OssClient storage = OssFactory.instance(sysOss.getService());
             storage.delete(sysOss.getUrl());
         }
         return baseMapper.deleteBatchIds(ids) > 0;

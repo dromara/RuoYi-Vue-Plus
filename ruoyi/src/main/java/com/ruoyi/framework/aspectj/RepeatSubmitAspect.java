@@ -25,9 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 防止重复提交(参考美团GTIS防重系统)
@@ -66,7 +66,7 @@ public class RepeatSubmitAspect {
         String cacheRepeatKey = Constants.REPEAT_SUBMIT_KEY + url + submitKey;
         String key = RedisUtils.getCacheObject(cacheRepeatKey);
         if (key == null) {
-            RedisUtils.setCacheObject(cacheRepeatKey, "", interval, TimeUnit.MILLISECONDS);
+            RedisUtils.setCacheObject(cacheRepeatKey, "", Duration.ofMillis(interval));
             KEY_CACHE.set(cacheRepeatKey);
         } else {
             String message = repeatSubmit.message();

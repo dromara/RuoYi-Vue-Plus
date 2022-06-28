@@ -47,10 +47,10 @@ public class JobCodeController {
         JobInfoController.validPermission(request, jobInfo.getJobGroup());
 
         // Glue类型-字典
-        model.addAttribute("GlueTypeEnum" , GlueTypeEnum.values());
+        model.addAttribute("GlueTypeEnum", GlueTypeEnum.values());
 
-        model.addAttribute("jobInfo" , jobInfo);
-        model.addAttribute("jobLogGlues" , jobLogGlues);
+        model.addAttribute("jobInfo", jobInfo);
+        model.addAttribute("jobLogGlues", jobLogGlues);
         return "jobcode/jobcode.index";
     }
 

@@ -2,7 +2,7 @@ package ${packageName}.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 import java.util.Date;
 import java.math.BigDecimal;
@@ -28,6 +28,7 @@ import com.ruoyi.common.core.domain.TreeEntity;
     #set($Entity="TreeEntity<${ClassName}>")
 #end
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("${tableName}")
 public class ${ClassName} extends ${Entity} {
 
