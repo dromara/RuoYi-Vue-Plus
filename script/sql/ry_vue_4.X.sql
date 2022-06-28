@@ -515,7 +515,7 @@ insert into sys_dict_data values(28, 2,  '失败',     '1',       'sys_common_st
 -- ----------------------------
 drop table if exists sys_config;
 create table sys_config (
-  config_id         int(5)          not null                   comment '参数主键',
+  config_id         bigint(20)      not null                   comment '参数主键',
   config_name       varchar(100)    default ''                 comment '参数名称',
   config_key        varchar(100)    default ''                 comment '参数键名',
   config_value      varchar(500)    default ''                 comment '参数键值',
@@ -559,7 +559,7 @@ create table sys_logininfor (
 -- ----------------------------
 drop table if exists sys_notice;
 create table sys_notice (
-  notice_id         int(4)          not null                   comment '公告ID',
+  notice_id         bigint(20)      not null                   comment '公告ID',
   notice_title      varchar(50)     not null                   comment '公告标题',
   notice_type       char(1)         not null                   comment '公告类型（1通知 2公告）',
   notice_content    longblob        default null               comment '公告内容',
