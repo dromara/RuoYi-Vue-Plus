@@ -44,7 +44,7 @@
 
 <script>
 import { getToken } from "@/utils/auth";
-import { delOss } from "@/api/system/oss";
+import { listByIds, delOss } from "@/api/system/oss";
 
 export default {
   props: {
@@ -87,10 +87,17 @@ export default {
   },
   watch: {
     value: {
-      handler(val) {
+      async handler(val) {
         if (val) {
           // 首先将值转为数组
-          const list = Array.isArray(val) ? val : this.value.split(',');
+          let list;
+          if (Array.isArray(val)) {
+            list = val;
+          } else {
+            await listByIds(val).then(res => {
+              list = res.data;
+            })
+          }
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
             // 此处name使用ossId 防止删除出现重名
@@ -120,7 +127,7 @@ export default {
         let ossId = this.fileList[findex].ossId;
         delOss(ossId);
         this.fileList.splice(findex, 1);
-        this.$emit("input", this.fileList);
+        this.$emit("input", this.listToString(this.fileList));
       }
     },
     // 上传成功回调
@@ -131,7 +138,7 @@ export default {
           this.fileList = this.fileList.concat(this.uploadList);
           this.uploadList = [];
           this.number = 0;
-          this.$emit("input", this.fileList);
+          this.$emit("input", this.listToString(this.fileList));
           this.$modal.closeLoading();
         }
       } else {
@@ -183,6 +190,15 @@ export default {
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
+    },
+    // 对象转成指定字符串分隔
+    listToString(list, separator) {
+      let strs = "";
+      separator = separator || ",";
+      for (let i in list) {
+        strs += list[i].ossId + separator;
+      }
+      return strs != "" ? strs.substr(0, strs.length - 1) : "";
     },
   }
 };

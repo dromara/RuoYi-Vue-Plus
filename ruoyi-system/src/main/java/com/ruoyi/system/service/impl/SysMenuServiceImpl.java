@@ -68,7 +68,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 .orderByAsc(SysMenu::getOrderNum));
         } else {
             QueryWrapper<SysMenu> wrapper = Wrappers.query();
-            wrapper.eq("ur.user_id", userId)
+            wrapper.eq("sur.user_id", userId)
                 .like(StringUtils.isNotBlank(menu.getMenuName()), "m.menu_name", menu.getMenuName())
                 .eq(StringUtils.isNotBlank(menu.getVisible()), "m.visible", menu.getVisible())
                 .eq(StringUtils.isNotBlank(menu.getStatus()), "m.status", menu.getStatus())

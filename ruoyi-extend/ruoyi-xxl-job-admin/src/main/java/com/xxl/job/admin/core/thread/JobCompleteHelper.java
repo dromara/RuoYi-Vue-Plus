@@ -96,7 +96,7 @@ public class JobCompleteHelper {
                         }
                     } catch (Exception e) {
                         if (!toStop) {
-                            logger.error(">>>>>>>>>>> xxl-job, job fail monitor thread error:{}" , e);
+                            logger.error(">>>>>>>>>>> xxl-job, job fail monitor thread error:{}", e);
                         }
                     }
 
@@ -144,7 +144,7 @@ public class JobCompleteHelper {
             public void run() {
                 for (HandleCallbackParam handleCallbackParam : callbackParamList) {
                     ReturnT<String> callbackResult = callback(handleCallbackParam);
-                    logger.debug(">>>>>>>>> JobApiController.callback {}, handleCallbackParam={}, callbackResult={}" ,
+                    logger.debug(">>>>>>>>> JobApiController.callback {}, handleCallbackParam={}, callbackResult={}",
                         (callbackResult.getCode() == ReturnT.SUCCESS_CODE ? "success" : "fail"), handleCallbackParam, callbackResult);
                 }
             }

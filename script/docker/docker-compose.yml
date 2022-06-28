@@ -2,7 +2,7 @@ version: '3'
 
 services:
   mysql:
-    image: mysql:8.0.27
+    image: mysql:8.0.29
     container_name: mysql
     environment:
       # 时区上海
@@ -32,7 +32,7 @@ services:
         ipv4_address: 172.30.0.36
 
   nginx-web:
-    image: nginx:1.21.3
+    image: nginx:1.21.6
     container_name: nginx-web
     environment:
       # 时区上海
@@ -55,7 +55,7 @@ services:
       - ruoyi_net
 
   redis:
-    image: redis:6.2.6
+    image: redis:6.2.7
     container_name: redis
     ports:
       - "6379:6379"
@@ -75,7 +75,7 @@ services:
         ipv4_address: 172.30.0.48
 
   minio:
-    image: minio/minio:RELEASE.2021-10-27T16-29-42Z
+    image: minio/minio:RELEASE.2022-05-26T05-48-41Z
     container_name: minio
     ports:
       # api 端口
@@ -110,7 +110,7 @@ services:
         ipv4_address: 172.30.0.54
 
   ruoyi-server1:
-    image: ruoyi/ruoyi-server:4.1.0
+    image: ruoyi/ruoyi-server:4.2.0
     container_name: ruoyi-server1
     environment:
       # 时区上海
@@ -125,7 +125,7 @@ services:
         ipv4_address: 172.30.0.60
 
   ruoyi-server2:
-    image: "ruoyi/ruoyi-server:4.1.0"
+    image: "ruoyi/ruoyi-server:4.2.0"
     container_name: ruoyi-server2
     environment:
       # 时区上海
@@ -140,7 +140,7 @@ services:
         ipv4_address: 172.30.0.61
 
   ruoyi-monitor-admin:
-    image: ruoyi/ruoyi-monitor-admin:4.1.0
+    image: ruoyi/ruoyi-monitor-admin:4.2.0
     container_name: ruoyi-monitor-admin
     environment:
       # 时区上海
@@ -155,7 +155,7 @@ services:
         ipv4_address: 172.30.0.90
 
   ruoyi-xxl-job-admin:
-    image: ruoyi/ruoyi-xxl-job-admin:4.1.0
+    image: ruoyi/ruoyi-xxl-job-admin:4.2.0
     container_name: ruoyi-xxl-job-admin
     environment:
       # 时区上海

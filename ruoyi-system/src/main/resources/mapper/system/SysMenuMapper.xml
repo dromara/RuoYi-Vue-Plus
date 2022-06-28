@@ -32,8 +32,8 @@
         m.perms, m.is_frame, m.is_cache, m.menu_type, m.icon, m.order_num, m.create_time
         from sys_menu m
         left join sys_role_menu rm on m.menu_id = rm.menu_id
-        left join sys_user_role ur on rm.role_id = ur.role_id
-        left join sys_role ro on ur.role_id = ro.role_id
+        left join sys_user_role sur on rm.role_id = sur.role_id
+        left join sys_role ro on sur.role_id = ro.role_id
         ${ew.getCustomSqlSegment}
     </select>
 
@@ -55,9 +55,9 @@
                         m.create_time
         from sys_menu m
                  left join sys_role_menu rm on m.menu_id = rm.menu_id
-                 left join sys_user_role ur on rm.role_id = ur.role_id
-                 left join sys_role ro on ur.role_id = ro.role_id
-                 left join sys_user u on ur.user_id = u.user_id
+                 left join sys_user_role sur on rm.role_id = sur.role_id
+                 left join sys_role ro on sur.role_id = ro.role_id
+                 left join sys_user u on sur.user_id = u.user_id
         where u.user_id = #{userId}
           and m.menu_type in ('M', 'C')
           and m.status = '0'
@@ -81,18 +81,18 @@
         select distinct m.perms
         from sys_menu m
                  left join sys_role_menu rm on m.menu_id = rm.menu_id
-                 left join sys_user_role ur on rm.role_id = ur.role_id
+                 left join sys_user_role sur on rm.role_id = sur.role_id
     </select>
 
     <select id="selectMenuPermsByUserId" parameterType="Long" resultType="String">
         select distinct m.perms
         from sys_menu m
                  left join sys_role_menu rm on m.menu_id = rm.menu_id
-                 left join sys_user_role ur on rm.role_id = ur.role_id
-                 left join sys_role r on r.role_id = ur.role_id
+                 left join sys_user_role sur on rm.role_id = sur.role_id
+                 left join sys_role r on r.role_id = sur.role_id
         where m.status = '0'
           and r.status = '0'
-          and ur.user_id = #{userId}
+          and sur.user_id = #{userId}
     </select>
 
 </mapper>

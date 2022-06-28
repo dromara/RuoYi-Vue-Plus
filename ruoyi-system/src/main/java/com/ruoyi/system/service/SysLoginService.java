@@ -27,8 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -79,7 +79,7 @@ public class SysLoginService {
         SysUser user = loadUserByPhonenumber(phonenumber);
 
         HttpServletRequest request = ServletUtils.getRequest();
-        checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode));
+        checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode, request));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = buildLoginUser(user);
         // 生成token
@@ -121,9 +121,13 @@ public class SysLoginService {
     /**
      * 校验短信验证码
      */
-    private boolean validateSmsCode(String phonenumber, String smsCode) {
-        // todo 此处使用手机号查询redis验证码与参数验证码是否一致 用户自行实现
-        return true;
+    private boolean validateSmsCode(String phonenumber, String smsCode, HttpServletRequest request) {
+        String code = RedisUtils.getCacheObject(Constants.CAPTCHA_CODE_KEY + phonenumber);
+        if (StringUtils.isBlank(code)) {
+            asyncService.recordLogininfor(phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"), request);
+            throw new CaptchaExpireException();
+        }
+        return code.equals(smsCode);
     }
 
     /**
@@ -205,7 +209,7 @@ public class SysLoginService {
         loginUser.setUserType(user.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user));
         loginUser.setRolePermission(permissionService.getRolePermission(user));
-        loginUser.setDeptName(user.getDept().getDeptName());
+        loginUser.setDeptName(ObjectUtil.isNull(user.getDept()) ? "" : user.getDept().getDeptName());
         List<RoleDTO> roles = BeanUtil.copyToList(user.getRoles(), RoleDTO.class);
         loginUser.setRoles(roles);
         return loginUser;
@@ -248,7 +252,7 @@ public class SysLoginService {
             errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
             // 达到规定错误次数 则锁定登录
             if (errorNumber.equals(setErrorNumber)) {
-                RedisUtils.setCacheObject(errorKey, errorNumber, errorLimitTime, TimeUnit.MINUTES);
+                RedisUtils.setCacheObject(errorKey, errorNumber, Duration.ofMinutes(errorLimitTime));
                 asyncService.recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), errorLimitTime), request);
                 throw new UserException(loginType.getRetryLimitExceed(), errorLimitTime);
             } else {

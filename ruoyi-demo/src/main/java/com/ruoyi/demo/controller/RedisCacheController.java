@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 /**
  * spring-cache 演示案例
@@ -87,7 +87,7 @@ public class RedisCacheController {
     @GetMapping("/test6")
     public R<Boolean> test6(String key, String value) {
         RedisUtils.setCacheObject(key, value);
-        boolean flag = RedisUtils.expire(key, 10, TimeUnit.SECONDS);
+        boolean flag = RedisUtils.expire(key, Duration.ofSeconds(10));
         System.out.println("***********" + flag);
         try {
             Thread.sleep(11 * 1000);

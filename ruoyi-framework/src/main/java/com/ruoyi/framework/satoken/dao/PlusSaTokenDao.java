@@ -5,10 +5,10 @@ import cn.dev33.satoken.util.SaFoxUtil;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Sa-Token持久层接口(使用框架自带RedisUtils实现 协议统一)
@@ -38,7 +38,7 @@ public class PlusSaTokenDao implements SaTokenDao {
         if (timeout == SaTokenDao.NEVER_EXPIRE) {
             RedisUtils.setCacheObject(key, value);
         } else {
-            RedisUtils.setCacheObject(key, value, timeout, TimeUnit.SECONDS);
+            RedisUtils.setCacheObject(key, value, Duration.ofSeconds(timeout));
         }
     }
 
@@ -68,7 +68,8 @@ public class PlusSaTokenDao implements SaTokenDao {
      */
     @Override
     public long getTimeout(String key) {
-        return RedisUtils.getTimeToLive(key) / 1000;
+        long timeout = RedisUtils.getTimeToLive(key);
+        return timeout < 0 ? timeout : timeout / 1000;
     }
 
     /**
@@ -87,7 +88,7 @@ public class PlusSaTokenDao implements SaTokenDao {
             }
             return;
         }
-        RedisUtils.expire(key, timeout, TimeUnit.SECONDS);
+        RedisUtils.expire(key, Duration.ofSeconds(timeout));
     }
 
 
@@ -111,7 +112,7 @@ public class PlusSaTokenDao implements SaTokenDao {
         if (timeout == SaTokenDao.NEVER_EXPIRE) {
             RedisUtils.setCacheObject(key, object);
         } else {
-            RedisUtils.setCacheObject(key, object, timeout, TimeUnit.SECONDS);
+            RedisUtils.setCacheObject(key, object, Duration.ofSeconds(timeout));
         }
     }
 
@@ -141,7 +142,8 @@ public class PlusSaTokenDao implements SaTokenDao {
      */
     @Override
     public long getObjectTimeout(String key) {
-        return RedisUtils.getTimeToLive(key) / 1000;
+        long timeout = RedisUtils.getTimeToLive(key);
+        return timeout < 0 ? timeout : timeout / 1000;
     }
 
     /**
@@ -160,7 +162,7 @@ public class PlusSaTokenDao implements SaTokenDao {
             }
             return;
         }
-        RedisUtils.expire(key, timeout, TimeUnit.SECONDS);
+        RedisUtils.expire(key, Duration.ofSeconds(timeout));
     }
 
 

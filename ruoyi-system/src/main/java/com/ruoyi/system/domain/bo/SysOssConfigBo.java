@@ -35,8 +35,8 @@ public class SysOssConfigBo extends BaseEntity {
     /**
      * 配置key
      */
-    @ApiModelProperty(value = "configKey", required = true)
-    @NotBlank(message = "configKey不能为空", groups = {AddGroup.class, EditGroup.class})
+    @ApiModelProperty(value = "配置key", required = true)
+    @NotBlank(message = "配置key不能为空", groups = {AddGroup.class, EditGroup.class})
     @Size(min = 2, max = 100, message = "configKey长度必须介于2和20 之间")
     private String configKey;
 
@@ -59,8 +59,8 @@ public class SysOssConfigBo extends BaseEntity {
     /**
      * 桶名称
      */
-    @ApiModelProperty(value = "bucketName", required = true)
-    @NotBlank(message = "bucketName不能为空", groups = {AddGroup.class, EditGroup.class})
+    @ApiModelProperty(value = "桶名称", required = true)
+    @NotBlank(message = "桶名称不能为空", groups = {AddGroup.class, EditGroup.class})
     @Size(min = 2, max = 100, message = "bucketName长度必须介于2和100之间")
     private String bucketName;
 
@@ -73,10 +73,16 @@ public class SysOssConfigBo extends BaseEntity {
     /**
      * 访问站点
      */
-    @ApiModelProperty(value = "endpoint", required = true)
-    @NotBlank(message = "endpoint不能为空", groups = {AddGroup.class, EditGroup.class})
+    @ApiModelProperty(value = "访问站点", required = true)
+    @NotBlank(message = "访问站点不能为空", groups = {AddGroup.class, EditGroup.class})
     @Size(min = 2, max = 100, message = "endpoint长度必须介于2和100之间")
     private String endpoint;
+
+    /**
+     * 自定义域名
+     */
+    @ApiModelProperty("自定义域名")
+    private String domain;
 
     /**
      * 是否https（Y=是,N=否）
@@ -93,7 +99,7 @@ public class SysOssConfigBo extends BaseEntity {
     /**
      * 域
      */
-    @ApiModelProperty(value = "region")
+    @ApiModelProperty(value = "域")
     private String region;
 
     /**
@@ -101,5 +107,11 @@ public class SysOssConfigBo extends BaseEntity {
      */
     @ApiModelProperty(value = "扩展字段")
     private String ext1;
+
+    /**
+     * 备注
+     */
+    @ApiModelProperty(value = "备注")
+    private String remark;
 
 }

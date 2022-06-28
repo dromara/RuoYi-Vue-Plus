@@ -33,6 +33,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -135,6 +136,7 @@ public class GenTableServiceImpl implements IGenTableService {
      * @param genTable 业务信息
      * @return 结果
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateGenTable(GenTable genTable) {
         String options = JsonUtils.toJsonString(genTable.getParams());
@@ -153,6 +155,7 @@ public class GenTableServiceImpl implements IGenTableService {
      * @param tableIds 需要删除的数据ID
      * @return 结果
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteGenTableByIds(Long[] tableIds) {
         List<Long> ids = Arrays.asList(tableIds);
@@ -165,6 +168,7 @@ public class GenTableServiceImpl implements IGenTableService {
      *
      * @param tableList 导入表列表
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void importGenTable(List<GenTable> tableList) {
         String operName = LoginHelper.getUsername();
@@ -284,6 +288,7 @@ public class GenTableServiceImpl implements IGenTableService {
      *
      * @param tableName 表名称
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void synchDb(String tableName) {
         GenTable table = baseMapper.selectGenTableByName(tableName);

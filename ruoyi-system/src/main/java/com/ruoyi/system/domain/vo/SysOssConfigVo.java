@@ -63,6 +63,12 @@ public class SysOssConfigVo {
     private String endpoint;
 
     /**
+     * 自定义域名
+     */
+    @ApiModelProperty("自定义域名")
+    private String domain;
+
+    /**
      * 是否https（Y=是,N=否）
      */
     @ApiModelProperty("是否https（Y=是,N=否）")

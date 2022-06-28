@@ -57,3 +57,15 @@ export function getCodeImg() {
     timeout: 20000
   })
 }
+
+// 短信验证码
+export function getCodeSms() {
+  return request({
+    url: '/captchaSms',
+    headers: {
+      isToken: false
+    },
+    method: 'get',
+    timeout: 20000
+  })
+}

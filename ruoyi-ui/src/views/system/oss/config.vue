@@ -2,14 +2,13 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="配置key" prop="configKey">
-        <el-select v-model="queryParams.configKey" placeholder="请选择配置key" clearable size="small">
-          <el-option
-            v-for="configKey in configKeyOptions"
-            :key="configKey.configKey"
-            :label="configKey.label"
-            :value="configKey.configKey"
-          />
-        </el-select>
+        <el-input
+          v-model="queryParams.configKey"
+          placeholder="配置key"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
       </el-form-item>
       <el-form-item label="桶名称" prop="bucketName">
         <el-input
@@ -77,6 +76,7 @@
       <el-table-column label="主建" align="center" prop="ossConfigId" v-if="false"/>
       <el-table-column label="配置key" align="center" prop="configKey" />
       <el-table-column label="访问站点" align="center" prop="endpoint" width="200" />
+      <el-table-column label="自定义域名" align="center" prop="domain" width="200" />
       <el-table-column label="桶名称" align="center" prop="bucketName" />
       <el-table-column label="前缀" align="center" prop="prefix" />
       <el-table-column label="域" align="center" prop="region" />
@@ -122,17 +122,13 @@
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="配置key" prop="configKey">
-          <el-select v-model="form.configKey" placeholder="请选择配置key">
-            <el-option
-              v-for="configKey in configKeyOptions"
-              :key="configKey.configKey"
-              :label="configKey.label"
-              :value="configKey.configKey"
-            />
-          </el-select>
+          <el-input v-model="form.configKey" placeholder="请输入配置key" />
         </el-form-item>
         <el-form-item label="访问站点" prop="endpoint">
           <el-input v-model="form.endpoint" placeholder="请输入访问站点" />
+        </el-form-item>
+        <el-form-item label="自定义域名" prop="domain">
+          <el-input v-model="form.domain" placeholder="请输入自定义域名" />
         </el-form-item>
         <el-form-item label="accessKey" prop="accessKey">
           <el-input v-model="form.accessKey" placeholder="请输入accessKey" />
@@ -204,14 +200,6 @@ export default {
       total: 0,
       // 对象存储配置表格数据
       ossConfigList: [],
-      // configKeyOptions
-      configKeyOptions: [],
-      configKeyDatas: [
-        { configKey: "minio", label: "Minio" },
-        { configKey: "qiniu", label: "七牛云" },
-        { configKey: "aliyun", label: "阿里云" },
-        { configKey: "qcloud", label: "腾讯云" },
-      ],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -276,7 +264,6 @@ export default {
   },
   created() {
     this.getList();
-    this.configKeyOptions = this.configKeyDatas;
   },
   methods: {
     /** 查询对象存储配置列表 */
@@ -303,6 +290,7 @@ export default {
         bucketName: undefined,
         prefix: undefined,
         endpoint: undefined,
+        domain: undefined,
         isHttps: "N",
         region: undefined,
         status: "1",

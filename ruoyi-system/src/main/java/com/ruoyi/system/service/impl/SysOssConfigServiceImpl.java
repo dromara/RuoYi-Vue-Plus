@@ -95,9 +95,10 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         SysOssConfig config = BeanUtil.toBean(bo, SysOssConfig.class);
         validEntityBeforeSave(config);
         LambdaUpdateWrapper<SysOssConfig> luw = new LambdaUpdateWrapper<>();
-        luw.set(StringUtils.isBlank(config.getPrefix()), SysOssConfig::getPrefix, "");
-        luw.set(StringUtils.isBlank(config.getRegion()), SysOssConfig::getRegion, "");
-        luw.set(StringUtils.isBlank(config.getExt1()), SysOssConfig::getExt1, "");
+        luw.set(ObjectUtil.isNull(config.getPrefix()), SysOssConfig::getPrefix, "");
+        luw.set(ObjectUtil.isNull(config.getRegion()), SysOssConfig::getRegion, "");
+        luw.set(ObjectUtil.isNull(config.getExt1()), SysOssConfig::getExt1, "");
+        luw.set(ObjectUtil.isNull(config.getRemark()), SysOssConfig::getRemark, "");
         luw.eq(SysOssConfig::getOssConfigId, config.getOssConfigId());
         return setConfigCache(baseMapper.update(config, luw) > 0, config);
     }
