@@ -1,5 +1,6 @@
 package com.ruoyi.common.jackson;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -26,7 +27,7 @@ public class SensitiveJsonSerializer extends JsonSerializer<String> implements C
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         SensitiveService sensitiveService = SpringUtils.getBean(SensitiveService.class);
-        if (sensitiveService.isSensitive()) {
+        if (ObjectUtil.isNotNull(sensitiveService) && sensitiveService.isSensitive()) {
             gen.writeString(strategy.desensitizer().apply(value));
         } else {
             gen.writeString(value);
