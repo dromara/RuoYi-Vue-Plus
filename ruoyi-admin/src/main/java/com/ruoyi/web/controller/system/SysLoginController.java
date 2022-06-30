@@ -1,7 +1,5 @@
 package com.ruoyi.web.controller.system;
 
-import cn.dev33.satoken.exception.NotLoginException;
-import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.R;
@@ -102,12 +100,7 @@ public class SysLoginController {
     @ApiOperation("登出方法")
     @PostMapping("/logout")
     public R<Void> logout() {
-        try {
-            String username = LoginHelper.getUsername();
-            StpUtil.logout();
-            loginService.logout(username);
-        } catch (NotLoginException e) {
-        }
+        loginService.logout();
         return R.ok("退出成功");
     }
 
