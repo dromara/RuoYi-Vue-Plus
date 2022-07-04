@@ -1,6 +1,7 @@
 package com.ruoyi.common.filter;
 
 import cn.hutool.extra.servlet.ServletUtil;
+import com.ruoyi.common.enums.HttpMethod;
 import com.ruoyi.common.utils.StringUtils;
 
 import javax.servlet.*;
@@ -49,7 +50,7 @@ public class XssFilter implements Filter {
         String url = request.getServletPath();
         String method = request.getMethod();
         // GET DELETE 不过滤
-        if (method == null || method.matches(ServletUtil.METHOD_GET) || method.matches(ServletUtil.METHOD_DELETE)) {
+        if (method == null || method.matches(HttpMethod.GET.name()) || method.matches(HttpMethod.DELETE.name())) {
             return true;
         }
         return StringUtils.matches(url, excludes);

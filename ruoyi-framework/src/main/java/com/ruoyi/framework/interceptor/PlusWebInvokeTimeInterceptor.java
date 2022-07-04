@@ -28,7 +28,7 @@ import java.util.Map;
 @Slf4j
 public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
 
-    public static final String PROD_PROFILE = "prod";
+    private static final String PROD_PROFILE = "prod";
 
     private final TransmittableThreadLocal<StopWatch> invokeTimeTL = new TransmittableThreadLocal<>();
 
