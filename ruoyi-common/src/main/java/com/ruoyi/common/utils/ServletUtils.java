@@ -117,7 +117,7 @@ public class ServletUtils extends ServletUtil {
     public static boolean isAjaxRequest(HttpServletRequest request) {
 
         String accept = request.getHeader("accept");
-        if (accept != null && accept.contains("application/json")) {
+        if (accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE)) {
             return true;
         }
 
