@@ -1,6 +1,5 @@
 package com.ruoyi.common.filter;
 
-import cn.hutool.extra.servlet.ServletUtil;
 import com.ruoyi.common.enums.HttpMethod;
 import com.ruoyi.common.utils.StringUtils;
 
