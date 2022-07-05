@@ -125,13 +125,13 @@ public class OssClient {
         // 云服务商直接返回
         if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)){
             if (StringUtils.isNotBlank(domain)) {
-                return domain;
+                return header + domain;
             }
             return header + properties.getBucketName() + "." + endpoint;
         }
         // minio 单独处理
         if (StringUtils.isNotBlank(domain)) {
-            return domain + "/" + properties.getBucketName();
+            return header + domain + "/" + properties.getBucketName();
         }
         return header + endpoint + "/" + properties.getBucketName();
     }
