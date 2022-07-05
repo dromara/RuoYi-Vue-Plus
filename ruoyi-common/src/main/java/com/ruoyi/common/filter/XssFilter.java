@@ -49,7 +49,7 @@ public class XssFilter implements Filter {
         String url = request.getServletPath();
         String method = request.getMethod();
         // GET DELETE 不过滤
-        if (method == null || method.matches(HttpMethod.GET.name()) || method.matches(HttpMethod.DELETE.name())) {
+        if (method == null || HttpMethod.GET.matches(method) || HttpMethod.DELETE.matches(method)) {
             return true;
         }
         return StringUtils.matches(url, excludes);
