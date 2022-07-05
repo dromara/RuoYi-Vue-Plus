@@ -127,7 +127,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         }
         boolean flag = baseMapper.deleteBatchIds(ids) > 0;
         if (flag) {
-            list.stream().forEach(sysOssConfig -> {
+            list.forEach(sysOssConfig -> {
                 RedisUtils.deleteObject(getCacheKey(sysOssConfig.getConfigKey()));
             });
         }
