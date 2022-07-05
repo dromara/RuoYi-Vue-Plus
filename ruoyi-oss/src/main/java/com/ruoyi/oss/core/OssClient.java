@@ -120,16 +120,19 @@ public class OssClient {
 
     public String getUrl() {
         String domain = properties.getDomain();
-        if (StringUtils.isNotBlank(domain)) {
-            return domain;
-        }
         String endpoint = properties.getEndpoint();
         String header = OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? "https://" : "http://";
         // 云服务商直接返回
         if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)){
+            if (StringUtils.isNotBlank(domain)) {
+                return domain;
+            }
             return header + properties.getBucketName() + "." + endpoint;
         }
         // minio 单独处理
+        if (StringUtils.isNotBlank(domain)) {
+            return domain + "/" + properties.getBucketName();
+        }
         return header + endpoint + "/" + properties.getBucketName();
     }
 
