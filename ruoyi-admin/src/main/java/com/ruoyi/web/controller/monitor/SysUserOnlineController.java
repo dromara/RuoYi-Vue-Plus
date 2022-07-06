@@ -5,7 +5,7 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.dto.UserOnlineDTO;
@@ -43,12 +43,12 @@ public class SysUserOnlineController extends BaseController {
         List<String> keys = StpUtil.searchTokenValue("", -1, 0);
         List<UserOnlineDTO> userOnlineDTOList = new ArrayList<>();
         for (String key : keys) {
-            String token = key.replace(Constants.LOGIN_TOKEN_KEY, "");
+            String token = key.replace(CacheConstants.LOGIN_TOKEN_KEY, "");
             // 如果已经过期则踢下线
             if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(token) < 0) {
                 continue;
             }
-            userOnlineDTOList.add(RedisUtils.getCacheObject(Constants.ONLINE_TOKEN_KEY + token));
+            userOnlineDTOList.add(RedisUtils.getCacheObject(CacheConstants.ONLINE_TOKEN_KEY + token));
         }
         if (StringUtils.isNotEmpty(ipaddr) && StringUtils.isNotEmpty(userName)) {
             userOnlineDTOList = StreamUtils.filter(userOnlineDTOList, userOnline ->

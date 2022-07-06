@@ -5,7 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
@@ -157,7 +157,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      */
     @Override
     public void clearDictCache() {
-        Collection<String> keys = RedisUtils.keys(Constants.SYS_DICT_KEY + "*");
+        Collection<String> keys = RedisUtils.keys(CacheConstants.SYS_DICT_KEY + "*");
         RedisUtils.deleteObject(keys);
     }
 
@@ -294,6 +294,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @return 缓存键key
      */
     String getCacheKey(String configKey) {
-        return Constants.SYS_DICT_KEY + configKey;
+        return CacheConstants.SYS_DICT_KEY + configKey;
     }
 }
