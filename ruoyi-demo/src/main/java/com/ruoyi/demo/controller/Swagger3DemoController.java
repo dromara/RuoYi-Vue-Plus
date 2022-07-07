@@ -1,7 +1,6 @@
 package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -26,7 +25,6 @@ public class Swagger3DemoController {
      * 上传请求
      * 必须使用 @RequestPart 注解标注为文件
      */
-    @Operation(summary = "通用上传请求")
     @Parameters({
         @Parameter(name = "file", description = "文件", in = ParameterIn.QUERY, required = true)
     })

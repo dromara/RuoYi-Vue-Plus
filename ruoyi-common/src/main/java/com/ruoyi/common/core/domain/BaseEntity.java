@@ -2,7 +2,6 @@ package com.ruoyi.common.core.domain;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -24,42 +23,36 @@ public class BaseEntity implements Serializable {
     /**
      * 搜索值
      */
-    @Schema(name = "搜索值")
     @TableField(exist = false)
     private String searchValue;
 
     /**
      * 创建者
      */
-    @Schema(name = "创建者")
     @TableField(fill = FieldFill.INSERT)
     private String createBy;
 
     /**
      * 创建时间
      */
-    @Schema(name = "创建时间")
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
     /**
      * 更新者
      */
-    @Schema(name = "更新者")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
 
     /**
      * 更新时间
      */
-    @Schema(name = "更新时间")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     /**
      * 请求参数
      */
-    @Schema(name = "请求参数")
     @TableField(exist = false)
     private Map<String, Object> params = new HashMap<>();
 

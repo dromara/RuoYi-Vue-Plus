@@ -12,7 +12,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
 import com.ruoyi.generator.service.IGenTableService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +40,6 @@ public class GenController extends BaseController {
     /**
      * 查询代码生成列表
      */
-    @Operation(summary = "查询代码生成列表")
     @SaCheckPermission("tool:gen:list")
     @GetMapping("/list")
     public TableDataInfo<GenTable> genList(GenTable genTable, PageQuery pageQuery) {
@@ -51,7 +49,6 @@ public class GenController extends BaseController {
     /**
      * 修改代码生成业务
      */
-    @Operation(summary = "修改代码生成业务")
     @SaCheckPermission("tool:gen:query")
     @GetMapping(value = "/{tableId}")
     public R<Map<String, Object>> getInfo(@PathVariable Long tableId) {
@@ -68,7 +65,6 @@ public class GenController extends BaseController {
     /**
      * 查询数据库列表
      */
-    @Operation(summary = "查询数据库列表")
     @SaCheckPermission("tool:gen:list")
     @GetMapping("/db/list")
     public TableDataInfo<GenTable> dataList(GenTable genTable, PageQuery pageQuery) {
@@ -78,7 +74,6 @@ public class GenController extends BaseController {
     /**
      * 查询数据表字段列表
      */
-    @Operation(summary = "查询数据表字段列表")
     @SaCheckPermission("tool:gen:list")
     @GetMapping(value = "/column/{tableId}")
     public TableDataInfo<GenTableColumn> columnList(Long tableId) {
@@ -92,7 +87,6 @@ public class GenController extends BaseController {
     /**
      * 导入表结构（保存）
      */
-    @Operation(summary = "导入表结构（保存）")
     @SaCheckPermission("tool:gen:import")
     @Log(title = "代码生成", businessType = BusinessType.IMPORT)
     @PostMapping("/importTable")
@@ -107,7 +101,6 @@ public class GenController extends BaseController {
     /**
      * 修改保存代码生成业务
      */
-    @Operation(summary = "修改保存代码生成业务")
     @SaCheckPermission("tool:gen:edit")
     @Log(title = "代码生成", businessType = BusinessType.UPDATE)
     @PutMapping
@@ -120,7 +113,6 @@ public class GenController extends BaseController {
     /**
      * 删除代码生成
      */
-    @Operation(summary = "删除代码生成")
     @SaCheckPermission("tool:gen:remove")
     @Log(title = "代码生成", businessType = BusinessType.DELETE)
     @DeleteMapping("/{tableIds}")
@@ -132,7 +124,6 @@ public class GenController extends BaseController {
     /**
      * 预览代码
      */
-    @Operation(summary = "预览代码")
     @SaCheckPermission("tool:gen:preview")
     @GetMapping("/preview/{tableId}")
     public R<Map<String, String>> preview(@PathVariable("tableId") Long tableId) throws IOException {
@@ -143,7 +134,6 @@ public class GenController extends BaseController {
     /**
      * 生成代码（下载方式）
      */
-    @Operation(summary = "生成代码（下载方式）")
     @SaCheckPermission("tool:gen:code")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
     @GetMapping("/download/{tableName}")
@@ -155,7 +145,6 @@ public class GenController extends BaseController {
     /**
      * 生成代码（自定义路径）
      */
-    @Operation(summary = "生成代码（自定义路径）")
     @SaCheckPermission("tool:gen:code")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
     @GetMapping("/genCode/{tableName}")
@@ -167,7 +156,6 @@ public class GenController extends BaseController {
     /**
      * 同步数据库
      */
-    @Operation(summary = "同步数据库")
     @SaCheckPermission("tool:gen:edit")
     @Log(title = "代码生成", businessType = BusinessType.UPDATE)
     @GetMapping("/synchDb/{tableName}")
@@ -179,7 +167,6 @@ public class GenController extends BaseController {
     /**
      * 批量生成代码
      */
-    @Operation(summary = "批量生成代码")
     @SaCheckPermission("tool:gen:code")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
     @GetMapping("/batchGenCode")

@@ -14,7 +14,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.bo.SysOssConfigBo;
 import com.ruoyi.system.domain.vo.SysOssConfigVo;
 import com.ruoyi.system.service.ISysOssConfigService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,6 @@ public class SysOssConfigController extends BaseController {
     /**
      * 查询对象存储配置列表
      */
-    @Operation(summary = "查询对象存储配置列表")
     @SaCheckPermission("system:oss:list")
     @GetMapping("/list")
     public TableDataInfo<SysOssConfigVo> list(@Validated(QueryGroup.class) SysOssConfigBo bo, PageQuery pageQuery) {
@@ -54,7 +52,6 @@ public class SysOssConfigController extends BaseController {
     /**
      * 获取对象存储配置详细信息
      */
-    @Operation(summary = "获取对象存储配置详细信息")
     @SaCheckPermission("system:oss:query")
     @GetMapping("/{ossConfigId}")
     public R<SysOssConfigVo> getInfo(@Parameter(name = "OSS配置ID")
@@ -66,7 +63,6 @@ public class SysOssConfigController extends BaseController {
     /**
      * 新增对象存储配置
      */
-    @Operation(summary = "新增对象存储配置")
     @SaCheckPermission("system:oss:add")
     @Log(title = "对象存储配置", businessType = BusinessType.INSERT)
     @RepeatSubmit()
@@ -78,7 +74,6 @@ public class SysOssConfigController extends BaseController {
     /**
      * 修改对象存储配置
      */
-    @Operation(summary = "修改对象存储配置")
     @SaCheckPermission("system:oss:edit")
     @Log(title = "对象存储配置", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
@@ -90,7 +85,6 @@ public class SysOssConfigController extends BaseController {
     /**
      * 删除对象存储配置
      */
-    @Operation(summary = "删除对象存储配置")
     @SaCheckPermission("system:oss:remove")
     @Log(title = "对象存储配置", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ossConfigIds}")
@@ -103,7 +97,6 @@ public class SysOssConfigController extends BaseController {
     /**
      * 状态修改
      */
-    @Operation(summary = "状态修改")
     @SaCheckPermission("system:oss:edit")
     @Log(title = "对象存储状态修改", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")

@@ -19,7 +19,6 @@ import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.vo.SysOssVo;
 import com.ruoyi.system.service.ISysOssService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -55,7 +54,6 @@ public class SysOssController extends BaseController {
     /**
      * 查询OSS对象存储列表
      */
-    @Operation(summary = "查询OSS对象存储列表")
     @SaCheckPermission("system:oss:list")
     @GetMapping("/list")
     public TableDataInfo<SysOssVo> list(@Validated(QueryGroup.class) SysOssBo bo, PageQuery pageQuery) {
@@ -65,7 +63,6 @@ public class SysOssController extends BaseController {
     /**
      * 查询OSS对象基于id串
      */
-    @Operation(summary = "查询OSS对象基于ID")
     @SaCheckPermission("system:oss:list")
     @GetMapping("/listByIds/{ossIds}")
     public R<List<SysOssVo>> listByIds(@Parameter(name = "OSS对象ID串")
@@ -78,7 +75,6 @@ public class SysOssController extends BaseController {
     /**
      * 上传OSS对象存储
      */
-    @Operation(summary = "上传OSS对象存储")
     @Parameters({
         @Parameter(name = "file", description = "文件", in = ParameterIn.QUERY, required = true)
     })
@@ -97,7 +93,6 @@ public class SysOssController extends BaseController {
         return R.ok(map);
     }
 
-    @Operation(summary = "下载OSS对象存储")
     @SaCheckPermission("system:oss:download")
     @GetMapping("/download/{ossId}")
     public void download(@Parameter(name = "OSS对象ID") @PathVariable Long ossId, HttpServletResponse response) throws IOException {
@@ -124,7 +119,6 @@ public class SysOssController extends BaseController {
     /**
      * 删除OSS对象存储
      */
-    @Operation(summary = "删除OSS对象存储")
     @SaCheckPermission("system:oss:remove")
     @Log(title = "OSS对象存储", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ossIds}")

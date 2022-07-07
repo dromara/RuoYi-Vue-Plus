@@ -20,7 +20,6 @@ import com.ruoyi.demo.domain.bo.TestDemoBo;
 import com.ruoyi.demo.domain.bo.TestDemoImportVo;
 import com.ruoyi.demo.domain.vo.TestDemoVo;
 import com.ruoyi.demo.service.ITestDemoService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -55,7 +54,6 @@ public class TestDemoController extends BaseController {
     /**
      * 查询测试单表列表
      */
-    @Operation(summary = "查询测试单表列表")
     @SaCheckPermission("demo:demo:list")
     @GetMapping("/list")
     public TableDataInfo<TestDemoVo> list(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
@@ -65,14 +63,12 @@ public class TestDemoController extends BaseController {
     /**
      * 自定义分页查询
      */
-    @Operation(summary = "自定义分页查询")
     @SaCheckPermission("demo:demo:list")
     @GetMapping("/page")
     public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
         return iTestDemoService.customPageList(bo, pageQuery);
     }
 
-    @Operation(summary = "导入测试-校验")
     @Parameters({
         @Parameter(name = "file", description = "导入文件", in = ParameterIn.QUERY, required = true),
     })
@@ -90,7 +86,6 @@ public class TestDemoController extends BaseController {
     /**
      * 导出测试单表列表
      */
-    @Operation(summary = "导出测试单表列表")
     @SaCheckPermission("demo:demo:export")
     @Log(title = "测试单表", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
@@ -106,7 +101,6 @@ public class TestDemoController extends BaseController {
     /**
      * 获取测试单表详细信息
      */
-    @Operation(summary = "获取测试单表详细信息")
     @SaCheckPermission("demo:demo:query")
     @GetMapping("/{id}")
     public R<TestDemoVo> getInfo(@Parameter(name = "测试ID")
@@ -118,7 +112,6 @@ public class TestDemoController extends BaseController {
     /**
      * 新增测试单表
      */
-    @Operation(summary = "新增测试单表")
     @SaCheckPermission("demo:demo:add")
     @Log(title = "测试单表", businessType = BusinessType.INSERT)
     @RepeatSubmit(interval = 2, timeUnit = TimeUnit.SECONDS, message = "{repeat.submit.message}")
@@ -133,7 +126,6 @@ public class TestDemoController extends BaseController {
     /**
      * 修改测试单表
      */
-    @Operation(summary = "修改测试单表")
     @SaCheckPermission("demo:demo:edit")
     @Log(title = "测试单表", businessType = BusinessType.UPDATE)
     @RepeatSubmit
@@ -145,7 +137,6 @@ public class TestDemoController extends BaseController {
     /**
      * 删除测试单表
      */
-    @Operation(summary = "删除测试单表")
     @SaCheckPermission("demo:demo:remove")
     @Log(title = "测试单表", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")

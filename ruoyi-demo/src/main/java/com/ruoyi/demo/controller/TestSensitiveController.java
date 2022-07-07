@@ -4,7 +4,6 @@ import com.ruoyi.common.annotation.Sensitive;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.SensitiveStrategy;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +28,6 @@ public class TestSensitiveController extends BaseController {
     /**
      * 测试数据脱敏
      */
-    @Operation(summary = "查询测试单表列表")
     @GetMapping("/test")
     public R<TestSensitive> test() {
         TestSensitive testSensitive = new TestSensitive();

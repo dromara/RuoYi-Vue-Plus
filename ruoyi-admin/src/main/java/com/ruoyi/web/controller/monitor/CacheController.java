@@ -5,7 +5,6 @@ import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysCache;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.RedisServerCommands;
@@ -41,7 +40,6 @@ public class CacheController {
         CACHES.add(new SysCache(CacheConstants.RATE_LIMIT_KEY, "限流处理"));
     }
 
-    @Operation(summary = "获取缓存监控详细信息")
     @SaCheckPermission("monitor:cache:list")
     @GetMapping()
     public R<Map<String, Object>> getInfo() throws Exception {
@@ -67,14 +65,12 @@ public class CacheController {
         return R.ok(result);
     }
 
-    @Operation(summary = "获取缓存名称列表")
     @SaCheckPermission("monitor:cache:list")
     @GetMapping("/getNames")
     public R<List<SysCache>> cache() {
         return R.ok(CACHES);
     }
 
-    @Operation(summary = "获取KEYS基于缓存名")
     @SaCheckPermission("monitor:cache:list")
     @GetMapping("/getKeys/{cacheName}")
     public R<Set<String>> getCacheKeys(@PathVariable String cacheName) {
@@ -82,7 +78,6 @@ public class CacheController {
         return R.ok(cacheKyes);
     }
 
-    @Operation(summary = "获取值基于缓存名与KEY")
     @SaCheckPermission("monitor:cache:list")
     @GetMapping("/getValue/{cacheName}/{cacheKey}")
     public R<SysCache> getCacheValue(@PathVariable String cacheName, @PathVariable String cacheKey) {
@@ -91,7 +86,6 @@ public class CacheController {
         return R.ok(sysCache);
     }
 
-    @Operation(summary = "清空缓存名")
     @SaCheckPermission("monitor:cache:list")
     @DeleteMapping("/clearCacheName/{cacheName}")
     public R<Void> clearCacheName(@PathVariable String cacheName) {
@@ -100,7 +94,6 @@ public class CacheController {
         return R.ok();
     }
 
-    @Operation(summary = "清空缓存KEY")
     @SaCheckPermission("monitor:cache:list")
     @DeleteMapping("/clearCacheKey/{cacheKey}")
     public R<Void> clearCacheKey(@PathVariable String cacheKey) {
@@ -108,7 +101,6 @@ public class CacheController {
         return R.ok();
     }
 
-    @Operation(summary = "清空所有缓存")
     @SaCheckPermission("monitor:cache:list")
     @DeleteMapping("/clearCacheAll")
     public R<Void> clearCacheAll() {

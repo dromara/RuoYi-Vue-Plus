@@ -11,7 +11,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.service.ISysConfigService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -38,14 +37,12 @@ public class SysConfigController extends BaseController {
     /**
      * 获取参数配置列表
      */
-    @Operation(summary = "获取参数配置列表")
     @SaCheckPermission("system:config:list")
     @GetMapping("/list")
     public TableDataInfo<SysConfig> list(SysConfig config, PageQuery pageQuery) {
         return configService.selectPageConfigList(config, pageQuery);
     }
 
-    @Operation(summary = "导出参数配置列表")
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:config:export")
     @PostMapping("/export")
@@ -57,7 +54,6 @@ public class SysConfigController extends BaseController {
     /**
      * 根据参数编号获取详细信息
      */
-    @Operation(summary = "根据参数编号获取详细信息")
     @SaCheckPermission("system:config:query")
     @GetMapping(value = "/{configId}")
     public R<SysConfig> getInfo(@Parameter(name = "参数ID") @PathVariable Long configId) {
@@ -67,7 +63,6 @@ public class SysConfigController extends BaseController {
     /**
      * 根据参数键名查询参数值
      */
-    @Operation(summary = "根据参数键名查询参数值")
     @GetMapping(value = "/configKey/{configKey}")
     public R<Void> getConfigKey(@Parameter(name = "参数Key") @PathVariable String configKey) {
         return R.ok(configService.selectConfigByKey(configKey));
@@ -76,7 +71,6 @@ public class SysConfigController extends BaseController {
     /**
      * 新增参数配置
      */
-    @Operation(summary = "新增参数配置")
     @SaCheckPermission("system:config:add")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
@@ -90,7 +84,6 @@ public class SysConfigController extends BaseController {
     /**
      * 修改参数配置
      */
-    @Operation(summary = "修改参数配置")
     @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
@@ -104,7 +97,6 @@ public class SysConfigController extends BaseController {
     /**
      * 根据参数键名修改参数配置
      */
-    @Operation(summary = "根据参数键名修改参数配置")
     @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping("/updateByKey")
@@ -115,7 +107,6 @@ public class SysConfigController extends BaseController {
     /**
      * 删除参数配置
      */
-    @Operation(summary = "删除参数配置")
     @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
@@ -127,7 +118,6 @@ public class SysConfigController extends BaseController {
     /**
      * 刷新参数缓存
      */
-    @Operation(summary = "刷新参数缓存")
     @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")

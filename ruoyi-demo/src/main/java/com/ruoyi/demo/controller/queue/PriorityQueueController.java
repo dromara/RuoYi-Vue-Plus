@@ -3,7 +3,6 @@ package com.ruoyi.demo.controller.queue;
 import cn.hutool.core.util.RandomUtil;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.QueueUtils;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/demo/queue/priority")
 public class PriorityQueueController {
 
-    @Operation(summary = "添加队列数据")
     @GetMapping("/add")
     public R<Void> add(@Parameter(name = "队列名") String queueName) {
         // 用完了一定要销毁 否则会一直存在
@@ -58,7 +56,6 @@ public class PriorityQueueController {
         return R.ok("操作成功");
     }
 
-    @Operation(summary = "删除队列数据")
     @GetMapping("/remove")
     public R<Void> remove(@Parameter(name = "队列名") String queueName,
                                    @Parameter(name = "对象名") String name,
@@ -74,7 +71,6 @@ public class PriorityQueueController {
         return R.ok("操作成功");
     }
 
-    @Operation(summary = "获取队列数据")
     @GetMapping("/get")
     public R<Void> get(@Parameter(name = "队列名") String queueName) {
         PriorityDemo data;

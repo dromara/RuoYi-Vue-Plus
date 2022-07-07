@@ -13,7 +13,6 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.demo.domain.bo.TestTreeBo;
 import com.ruoyi.demo.domain.vo.TestTreeVo;
 import com.ruoyi.demo.service.ITestTreeService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,6 @@ public class TestTreeController extends BaseController {
     /**
      * 查询测试树表列表
      */
-    @Operation(summary = "查询测试树表列表")
     @SaCheckPermission("demo:tree:list")
     @GetMapping("/list")
     public R<List<TestTreeVo>> list(@Validated(QueryGroup.class) TestTreeBo bo) {
@@ -55,7 +53,6 @@ public class TestTreeController extends BaseController {
     /**
      * 导出测试树表列表
      */
-    @Operation(summary = "导出测试树表列表")
     @SaCheckPermission("demo:tree:export")
     @Log(title = "测试树表", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
@@ -67,7 +64,6 @@ public class TestTreeController extends BaseController {
     /**
      * 获取测试树表详细信息
      */
-    @Operation(summary = "获取测试树表详细信息")
     @SaCheckPermission("demo:tree:query")
     @GetMapping("/{id}")
     public R<TestTreeVo> getInfo(@Parameter(name = "测试树ID")
@@ -79,7 +75,6 @@ public class TestTreeController extends BaseController {
     /**
      * 新增测试树表
      */
-    @Operation(summary = "新增测试树表")
     @SaCheckPermission("demo:tree:add")
     @Log(title = "测试树表", businessType = BusinessType.INSERT)
     @RepeatSubmit
@@ -91,7 +86,6 @@ public class TestTreeController extends BaseController {
     /**
      * 修改测试树表
      */
-    @Operation(summary = "修改测试树表")
     @SaCheckPermission("demo:tree:edit")
     @Log(title = "测试树表", businessType = BusinessType.UPDATE)
     @RepeatSubmit
@@ -103,7 +97,6 @@ public class TestTreeController extends BaseController {
     /**
      * 删除测试树表
      */
-    @Operation(summary = "删除测试树表")
     @SaCheckPermission("demo:tree:remove")
     @Log(title = "测试树表", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")

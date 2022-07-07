@@ -9,7 +9,6 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.SysNotice;
 import com.ruoyi.system.service.ISysNoticeService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,6 @@ public class SysNoticeController extends BaseController {
     /**
      * 获取通知公告列表
      */
-    @Operation(summary = "获取通知公告列表")
     @SaCheckPermission("system:notice:list")
     @GetMapping("/list")
     public TableDataInfo<SysNotice> list(SysNotice notice, PageQuery pageQuery) {
@@ -43,7 +41,6 @@ public class SysNoticeController extends BaseController {
     /**
      * 根据通知公告编号获取详细信息
      */
-    @Operation(summary = "根据通知公告编号获取详细信息")
     @SaCheckPermission("system:notice:query")
     @GetMapping(value = "/{noticeId}")
     public R<SysNotice> getInfo(@Parameter(name = "公告ID") @PathVariable Long noticeId) {
@@ -53,7 +50,6 @@ public class SysNoticeController extends BaseController {
     /**
      * 新增通知公告
      */
-    @Operation(summary = "新增通知公告")
     @SaCheckPermission("system:notice:add")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
@@ -64,7 +60,6 @@ public class SysNoticeController extends BaseController {
     /**
      * 修改通知公告
      */
-    @Operation(summary = "修改通知公告")
     @SaCheckPermission("system:notice:edit")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
@@ -75,7 +70,6 @@ public class SysNoticeController extends BaseController {
     /**
      * 删除通知公告
      */
-    @Operation(summary = "删除通知公告")
     @SaCheckPermission("system:notice:remove")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")

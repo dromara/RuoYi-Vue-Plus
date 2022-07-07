@@ -15,7 +15,6 @@ import com.ruoyi.common.utils.StreamUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.system.domain.SysUserOnline;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +34,6 @@ import java.util.List;
 @RequestMapping("/monitor/online")
 public class SysUserOnlineController extends BaseController {
 
-    @Operation(summary = "在线用户列表")
     @SaCheckPermission("monitor:online:list")
     @GetMapping("/list")
     public TableDataInfo<SysUserOnline> list(String ipaddr, String userName) {
@@ -73,7 +71,6 @@ public class SysUserOnlineController extends BaseController {
     /**
      * 强退用户
      */
-    @Operation(summary = "强退用户")
     @SaCheckPermission("monitor:online:forceLogout")
     @Log(title = "在线用户", businessType = BusinessType.FORCE)
     @DeleteMapping("/{tokenId}")

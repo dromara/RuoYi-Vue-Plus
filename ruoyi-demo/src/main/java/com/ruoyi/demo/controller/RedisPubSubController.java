@@ -2,7 +2,6 @@ package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.RedisUtils;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/demo/redis/pubsub")
 public class RedisPubSubController {
 
-    @Operation(summary = "发布消息")
     @GetMapping("/pub")
     public R<Void> pub(@Parameter(name = "通道Key") String key, @Parameter(name = "发送内容") String value) {
         RedisUtils.publish(key, value, consumer -> {
@@ -30,7 +28,6 @@ public class RedisPubSubController {
         return R.ok("操作成功");
     }
 
-    @Operation(summary = "订阅消息")
     @GetMapping("/sub")
     public R<Void> sub(@Parameter(name = "通道Key") String key) {
         RedisUtils.subscribe(key, String.class, msg -> {

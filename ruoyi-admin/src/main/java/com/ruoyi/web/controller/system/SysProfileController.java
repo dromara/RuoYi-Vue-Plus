@@ -14,7 +14,6 @@ import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.service.ISysOssService;
 import com.ruoyi.system.service.ISysUserService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -46,7 +45,6 @@ public class SysProfileController extends BaseController {
     /**
      * 个人信息
      */
-    @Operation(summary = "个人信息")
     @GetMapping
     public R<Map<String, Object>> profile() {
         SysUser user = userService.selectUserById(getUserId());
@@ -60,7 +58,6 @@ public class SysProfileController extends BaseController {
     /**
      * 修改用户
      */
-    @Operation(summary = "修改用户")
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping
     public R<Void> updateProfile(@RequestBody SysUser user) {
@@ -84,7 +81,6 @@ public class SysProfileController extends BaseController {
     /**
      * 重置密码
      */
-    @Operation(summary = "重置密码")
     @Parameters({
         @Parameter(name = "oldPassword", description = "旧密码", in = ParameterIn.QUERY),
         @Parameter(name = "newPassword", description = "新密码", in = ParameterIn.QUERY)
@@ -111,7 +107,6 @@ public class SysProfileController extends BaseController {
     /**
      * 头像上传
      */
-    @Operation(summary = "头像上传")
     @Parameters({
         @Parameter(name = "avatarfile", description = "用户头像", in = ParameterIn.QUERY, required = true)
     })

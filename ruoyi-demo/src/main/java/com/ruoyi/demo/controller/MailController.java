@@ -2,7 +2,6 @@ package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.email.MailUtils;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,6 @@ import java.io.File;
 @RequestMapping("/demo/mail")
 public class MailController {
 
-    @Operation(summary = "发送邮件")
     @GetMapping("/sendSimpleMessage")
     public R<Void> sendSimpleMessage(@Parameter(name = "接收人") String to,
                                      @Parameter(name = "标题") String subject,
@@ -35,7 +33,6 @@ public class MailController {
         return R.ok();
     }
 
-    @Operation(summary = "发送邮件（带附件）")
     @GetMapping("/sendMessageWithAttachment")
     public R<Void> sendMessageWithAttachment(@Parameter(name = "接收人") String to,
                                              @Parameter(name = "标题") String subject,

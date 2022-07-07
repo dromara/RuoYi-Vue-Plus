@@ -5,7 +5,6 @@ import com.baomidou.lock.LockTemplate;
 import com.baomidou.lock.annotation.Lock4j;
 import com.baomidou.lock.executor.RedissonLockExecutor;
 import com.ruoyi.common.core.domain.R;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,6 @@ public class RedisLockController {
     /**
      * 测试lock4j 注解
      */
-    @Operation(summary = "测试lock4j 注解")
     @Lock4j(keys = {"#key"})
     @GetMapping("/testLock4j")
     public R<String> testLock4j(String key, String value) {
@@ -50,7 +48,6 @@ public class RedisLockController {
     /**
      * 测试lock4j 工具
      */
-    @Operation(summary = "测试lock4j 工具")
     @GetMapping("/testLock4jLockTemplate")
     public R<String> testLock4jLockTemplate(String key, String value) {
         final LockInfo lockInfo = lockTemplate.lock(key, 30000L, 5000L, RedissonLockExecutor.class);

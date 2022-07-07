@@ -2,7 +2,6 @@ package com.ruoyi.demo.controller;
 
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +28,6 @@ public class TestExcelController {
     /**
      * 单列表多数据
      */
-    @Operation(summary = "单列表多数据")
     @GetMapping("/exportTemplateOne")
     public void exportTemplateOne(HttpServletResponse response) {
         Map<String,String> map = new HashMap<>();
@@ -49,7 +47,6 @@ public class TestExcelController {
     /**
      * 多列表多数据
      */
-    @Operation(summary = "多列表多数据")
     @GetMapping("/exportTemplateMuliti")
     public void exportTemplateMuliti(HttpServletResponse response) {
         Map<String,String> map = new HashMap<>();

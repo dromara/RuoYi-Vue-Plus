@@ -6,7 +6,6 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.SysRegisterService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -29,7 +28,6 @@ public class SysRegisterController extends BaseController {
     private final ISysConfigService configService;
 
     @Anonymous
-    @Operation(summary = "用户注册")
     @PostMapping("/register")
     public R<Void> register(@Validated @RequestBody RegisterBody user) {
         if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser")))) {

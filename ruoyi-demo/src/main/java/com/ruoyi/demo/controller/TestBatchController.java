@@ -5,7 +5,6 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.mapper.TestDemoMapper;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,7 +37,6 @@ public class TestBatchController extends BaseController {
      * <p>
      * 3.5.0 版本 增加 rewriteBatchedStatements=true 批处理参数 使 MP 原生批处理可以达到同样的速度
      */
-    @Operation(summary = "新增批量方法")
     @PostMapping("/add")
 //    @DS("slave")
     public R<Void> add() {
@@ -58,7 +56,6 @@ public class TestBatchController extends BaseController {
      * <p>
      * 3.5.0 版本 增加 rewriteBatchedStatements=true 批处理参数 使 MP 原生批处理可以达到同样的速度
      */
-    @Operation(summary = "新增或更新批量方法")
     @PostMapping("/addOrUpdate")
 //    @DS("slave")
     public R<Void> addOrUpdate() {
@@ -84,7 +81,6 @@ public class TestBatchController extends BaseController {
     /**
      * 删除批量方法
      */
-    @Operation(summary = "删除批量方法")
     @DeleteMapping()
 //    @DS("slave")
     public R<Void> remove() {

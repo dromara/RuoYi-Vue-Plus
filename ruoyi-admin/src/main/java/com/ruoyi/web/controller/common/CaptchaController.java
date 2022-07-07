@@ -19,7 +19,6 @@ import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
 import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.service.ISysConfigService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +52,6 @@ public class CaptchaController {
     /**
      * 短信验证码
      */
-    @Operation(summary = "短信验证码")
     @GetMapping("/captchaSms")
     public R<Void> smsCaptcha(@Parameter(name = "用户手机号")
                               @NotBlank(message = "{user.phonenumber.not.blank}")
@@ -80,7 +78,6 @@ public class CaptchaController {
     /**
      * 生成验证码
      */
-    @Operation(summary = "生成验证码")
     @GetMapping("/captchaImage")
     public R<Map<String, Object>> getCode() {
         Map<String, Object> ajax = new HashMap<>();

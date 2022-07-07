@@ -2,7 +2,6 @@ package com.ruoyi.demo.controller.queue;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.QueueUtils;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/demo/queue/delayed")
 public class DelayedQueueController {
 
-    @Operation(summary = "订阅队列")
     @GetMapping("/subscribe")
     public R<Void> subscribe(@Parameter(name = "队列名") String queueName) {
         log.info("通道: {} 监听中......", queueName);
@@ -44,7 +42,6 @@ public class DelayedQueueController {
         return R.ok("操作成功");
     }
 
-    @Operation(summary = "添加队列数据")
     @GetMapping("/add")
     public R<Void> add(@Parameter(name = "队列名") String queueName,
                                 @Parameter(name = "订单号") String orderNum,
@@ -55,7 +52,6 @@ public class DelayedQueueController {
         return R.ok("操作成功");
     }
 
-    @Operation(summary = "删除队列数据")
     @GetMapping("/remove")
     public R<Void> remove(@Parameter(name = "队列名") String queueName,
                                    @Parameter(name = "订单号") String orderNum) {
@@ -67,7 +63,6 @@ public class DelayedQueueController {
         return R.ok("操作成功");
     }
 
-    @Operation(summary = "销毁队列")
     @GetMapping("/destroy")
     public R<Void> destroy(@Parameter(name = "队列名") String queueName) {
         // 用完了一定要销毁 否则会一直存在

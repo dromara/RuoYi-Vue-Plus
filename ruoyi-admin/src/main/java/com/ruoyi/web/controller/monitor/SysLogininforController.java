@@ -10,7 +10,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysLogininfor;
 import com.ruoyi.system.service.ISysLogininforService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -33,14 +32,12 @@ public class SysLogininforController extends BaseController {
 
     private final ISysLogininforService logininforService;
 
-    @Operation(summary = "查询系统访问记录列表")
     @SaCheckPermission("monitor:logininfor:list")
     @GetMapping("/list")
     public TableDataInfo<SysLogininfor> list(SysLogininfor logininfor, PageQuery pageQuery) {
         return logininforService.selectPageLogininforList(logininfor, pageQuery);
     }
 
-    @Operation(summary = "导出系统访问记录列表")
     @Log(title = "登录日志", businessType = BusinessType.EXPORT)
     @SaCheckPermission("monitor:logininfor:export")
     @PostMapping("/export")
@@ -49,7 +46,6 @@ public class SysLogininforController extends BaseController {
         ExcelUtil.exportExcel(list, "登录日志", SysLogininfor.class, response);
     }
 
-    @Operation(summary = "删除系统访问记录")
     @SaCheckPermission("monitor:logininfor:remove")
     @Log(title = "登录日志", businessType = BusinessType.DELETE)
     @DeleteMapping("/{infoIds}")
@@ -57,7 +53,6 @@ public class SysLogininforController extends BaseController {
         return toAjax(logininforService.deleteLogininforByIds(infoIds));
     }
 
-    @Operation(summary = "清空系统访问记录")
     @SaCheckPermission("monitor:logininfor:remove")
     @Log(title = "登录日志", businessType = BusinessType.CLEAN)
     @DeleteMapping("/clean")

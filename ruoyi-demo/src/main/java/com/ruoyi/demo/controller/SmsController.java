@@ -4,7 +4,6 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,6 @@ public class SmsController {
 //    private final SmsTemplate smsTemplate; // 可以使用spring注入
 //    private final AliyunSmsTemplate smsTemplate; // 也可以注入某个厂家的模板工具
 
-    @Operation(summary = "发送短信Aliyun")
     @GetMapping("/sendAliyun")
     public R<Object> sendAliyun(@Parameter(name = "电话号") String phones,
                                      @Parameter(name = "模板ID") String templateId) {
@@ -51,7 +49,6 @@ public class SmsController {
         return R.ok(send);
     }
 
-    @Operation(summary = "发送短信Tencent")
     @GetMapping("/sendTencent")
     public R<Object> sendTencent(@Parameter(name = "电话号") String phones,
                                              @Parameter(name = "模板ID") String templateId) {

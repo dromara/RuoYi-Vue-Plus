@@ -2,7 +2,6 @@ package com.ruoyi.demo.domain.vo;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.Date;
@@ -15,7 +14,6 @@ import java.util.Date;
  * @date 2021-07-26
  */
 @Data
-@Schema(name = "测试树表视图对象")
 @ExcelIgnoreUnannotated
 public class TestTreeVo {
 
@@ -24,42 +22,36 @@ public class TestTreeVo {
     /**
      * 主键
      */
-    @Schema(name = "主键")
     private Long id;
 
     /**
      * 父id
      */
     @ExcelProperty(value = "父id")
-    @Schema(name = "父id")
     private Long parentId;
 
     /**
      * 部门id
      */
     @ExcelProperty(value = "部门id")
-    @Schema(name = "部门id")
     private Long deptId;
 
     /**
      * 用户id
      */
     @ExcelProperty(value = "用户id")
-    @Schema(name = "用户id")
     private Long userId;
 
     /**
      * 树节点名
      */
     @ExcelProperty(value = "树节点名")
-    @Schema(name = "树节点名")
     private String treeName;
 
     /**
      * 创建时间
      */
     @ExcelProperty(value = "创建时间")
-    @Schema(name = "创建时间")
     private Date createTime;
 
 

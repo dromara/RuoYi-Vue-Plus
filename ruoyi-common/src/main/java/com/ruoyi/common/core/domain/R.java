@@ -1,6 +1,5 @@
 package com.ruoyi.common.core.domain;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,7 +12,6 @@ import java.io.Serializable;
  */
 @Data
 @NoArgsConstructor
-@Schema(name = "请求响应对象")
 public class R<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -27,13 +25,10 @@ public class R<T> implements Serializable {
      */
     public static final int FAIL = 500;
 
-    @Schema(name = "消息状态码")
     private int code;
 
-    @Schema(name = "消息内容")
     private String msg;
 
-    @Schema(name = "数据对象")
     private T data;
 
     public static <T> R<T> ok() {

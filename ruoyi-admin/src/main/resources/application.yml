@@ -215,11 +215,11 @@ springdoc:
     enabled: true
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
-    - group: 演示模块
+    - group: 1.演示模块
       packages-to-scan: com.ruoyi.demo
-    - group: 系统模块
+    - group: 2.系统模块
       packages-to-scan: com.ruoyi.web
-    - group: 代码生成模块
+    - group: 3.代码生成模块
       packages-to-scan: com.ruoyi.generator
 
 # 防止XSS攻击

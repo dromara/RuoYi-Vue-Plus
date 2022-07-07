@@ -41,7 +41,6 @@ public class RedisCacheController {
      * <p>
      * cacheNames 为配置文件内 groupId
      */
-    @Operation(summary = "测试 @Cacheable")
     @Cacheable(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
     @GetMapping("/test1")
     public R<String> test1(String key, String value) {
@@ -56,7 +55,6 @@ public class RedisCacheController {
      * <p>
      * cacheNames 为 配置文件内 groupId
      */
-    @Operation(summary = "测试 @CachePut")
     @CachePut(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
     @GetMapping("/test2")
     public R<String> test2(String key, String value) {
@@ -71,7 +69,6 @@ public class RedisCacheController {
      * <p>
      * cacheNames 为 配置文件内 groupId
      */
-    @Operation(summary = "测试 @CacheEvict")
     @CacheEvict(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
     @GetMapping("/test3")
     public R<String> test3(String key, String value) {
@@ -83,7 +80,6 @@ public class RedisCacheController {
      * 手动设置过期时间10秒
      * 11秒后获取 判断是否相等
      */
-    @Operation(summary = "测试设置过期时间")
     @GetMapping("/test6")
     public R<Boolean> test6(String key, String value) {
         RedisUtils.setCacheObject(key, value);
