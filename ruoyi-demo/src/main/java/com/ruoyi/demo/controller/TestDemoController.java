@@ -5,8 +5,8 @@ import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
@@ -20,7 +20,11 @@ import com.ruoyi.demo.domain.bo.TestDemoBo;
 import com.ruoyi.demo.domain.bo.TestDemoImportVo;
 import com.ruoyi.demo.domain.vo.TestDemoVo;
 import com.ruoyi.demo.service.ITestDemoService;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2021-07-26
  */
 @Validated
-@Api(value = "测试单表控制器", tags = {"测试单表管理"})
+@Tag(name ="测试单表控制器", description = "测试单表管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/demo")
@@ -52,7 +55,7 @@ public class TestDemoController extends BaseController {
     /**
      * 查询测试单表列表
      */
-    @ApiOperation("查询测试单表列表")
+    @Operation(summary = "查询测试单表列表")
     @SaCheckPermission("demo:demo:list")
     @GetMapping("/list")
     public TableDataInfo<TestDemoVo> list(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
@@ -62,16 +65,16 @@ public class TestDemoController extends BaseController {
     /**
      * 自定义分页查询
      */
-    @ApiOperation("自定义分页查询")
+    @Operation(summary = "自定义分页查询")
     @SaCheckPermission("demo:demo:list")
     @GetMapping("/page")
     public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
         return iTestDemoService.customPageList(bo, pageQuery);
     }
 
-    @ApiOperation("导入测试-校验")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "file", value = "导入文件", paramType = "query", dataTypeClass = File.class, required = true),
+    @Operation(summary = "导入测试-校验")
+    @Parameters({
+        @Parameter(name = "file", description = "导入文件", in = ParameterIn.QUERY, required = true),
     })
     @Log(title = "测试单表", businessType = BusinessType.IMPORT)
     @SaCheckPermission("demo:demo:import")
@@ -87,7 +90,7 @@ public class TestDemoController extends BaseController {
     /**
      * 导出测试单表列表
      */
-    @ApiOperation("导出测试单表列表")
+    @Operation(summary = "导出测试单表列表")
     @SaCheckPermission("demo:demo:export")
     @Log(title = "测试单表", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
@@ -103,10 +106,10 @@ public class TestDemoController extends BaseController {
     /**
      * 获取测试单表详细信息
      */
-    @ApiOperation("获取测试单表详细信息")
+    @Operation(summary = "获取测试单表详细信息")
     @SaCheckPermission("demo:demo:query")
     @GetMapping("/{id}")
-    public R<TestDemoVo> getInfo(@ApiParam("测试ID")
+    public R<TestDemoVo> getInfo(@Parameter(name = "测试ID")
                                           @NotNull(message = "主键不能为空")
                                           @PathVariable("id") Long id) {
         return R.ok(iTestDemoService.queryById(id));
@@ -115,7 +118,7 @@ public class TestDemoController extends BaseController {
     /**
      * 新增测试单表
      */
-    @ApiOperation("新增测试单表")
+    @Operation(summary = "新增测试单表")
     @SaCheckPermission("demo:demo:add")
     @Log(title = "测试单表", businessType = BusinessType.INSERT)
     @RepeatSubmit(interval = 2, timeUnit = TimeUnit.SECONDS, message = "{repeat.submit.message}")
@@ -130,7 +133,7 @@ public class TestDemoController extends BaseController {
     /**
      * 修改测试单表
      */
-    @ApiOperation("修改测试单表")
+    @Operation(summary = "修改测试单表")
     @SaCheckPermission("demo:demo:edit")
     @Log(title = "测试单表", businessType = BusinessType.UPDATE)
     @RepeatSubmit
@@ -142,11 +145,11 @@ public class TestDemoController extends BaseController {
     /**
      * 删除测试单表
      */
-    @ApiOperation("删除测试单表")
+    @Operation(summary = "删除测试单表")
     @SaCheckPermission("demo:demo:remove")
     @Log(title = "测试单表", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
-    public R<Void> remove(@ApiParam("测试ID串")
+    public R<Void> remove(@Parameter(name = "测试ID串")
                                    @NotEmpty(message = "主键不能为空")
                                    @PathVariable Long[] ids) {
         return toAjax(iTestDemoService.deleteWithValidByIds(Arrays.asList(ids), true) ? 1 : 0);

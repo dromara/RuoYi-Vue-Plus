@@ -19,9 +19,9 @@ import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
 import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.service.ISysConfigService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +41,7 @@ import java.util.Map;
 @Anonymous
 @Slf4j
 @Validated
-@Api(value = "验证码操作处理", tags = {"验证码管理"})
+@Tag(name ="验证码操作处理", description = "验证码管理")
 @RequiredArgsConstructor
 @RestController
 public class CaptchaController {
@@ -53,9 +53,9 @@ public class CaptchaController {
     /**
      * 短信验证码
      */
-    @ApiOperation("短信验证码")
+    @Operation(summary = "短信验证码")
     @GetMapping("/captchaSms")
-    public R<Void> smsCaptcha(@ApiParam("用户手机号")
+    public R<Void> smsCaptcha(@Parameter(name = "用户手机号")
                               @NotBlank(message = "{user.phonenumber.not.blank}")
                               String phonenumber) {
         if (smsProperties.getEnabled()) {
@@ -80,7 +80,7 @@ public class CaptchaController {
     /**
      * 生成验证码
      */
-    @ApiOperation("生成验证码")
+    @Operation(summary = "生成验证码")
     @GetMapping("/captchaImage")
     public R<Map<String, Object>> getCode() {
         Map<String, Object> ajax = new HashMap<>();

@@ -126,9 +126,8 @@ security:
     # swagger 文档配置
     - /favicon.ico
     - /doc.html
-    - /swagger-resources/**
-    - /webjars/**
-    - /*/api-docs
+    - /swagger-ui/**
+    - /*/api-docs/**
     # druid 监控配置
     - /druid/**
     # actuator 监控配置
@@ -183,46 +182,45 @@ mybatis-plus:
 swagger:
   # 是否开启swagger
   enabled: true
-  # 请求前缀
-  pathMapping: /dev-api
-  # 标题
-  title: '标题：${ruoyi.name}后台管理系统_接口文档'
-  # 描述
-  description: '描述：用于管理集团旗下公司的人员信息,具体包括XXX,XXX模块...'
-  # 版本
-  version: '版本号: ${ruoyi-vue-plus.version}'
-  # 作者信息
-  contact:
-    name: Lion Li
-    email: crazylionli@163.com
-    url: https://gitee.com/JavaLionLi/RuoYi-Vue-Plus
-  groups:
-    - name: 1.演示案例
-      basePackage: com.ruoyi.demo
-    - name: 2.系统模块
-      basePackage: com.ruoyi.web
-    - name: 3.代码生成模块
-      basePackage: com.ruoyi.generator
+  info:
+    # 标题
+    title: '标题：${ruoyi.name}后台管理系统_接口文档'
+    # 描述
+    description: '描述：用于管理集团旗下公司的人员信息,具体包括XXX,XXX模块...'
+    # 版本
+    version: '版本号: ${ruoyi-vue-plus.version}'
+    # 作者信息
+    contact:
+      name: Lion Li
+      email: crazylionli@163.com
+      url: https://gitee.com/JavaLionLi/RuoYi-Vue-Plus
+  components:
+    # 鉴权方式配置
+    security-schemes:
+      apiKey:
+        type: APIKEY
+        in: HEADER
+        name: ${sa-token.token-name}
 
-knife4j:
-  # 是否开启Knife4j增强模式
-  enable: true
-  # 是否开启生产环境保护策略
-  production: @knife4j.production@
-  basic:
-    enable: true
-    username: ruoyi
-    password: 123456
-  # 前端Ui的个性化配置属性
-  setting:
-    # 默认语言
-    language: zh-CN
-    # 是否显示Footer
-    enableFooter: false
-    # 是否开启动态参数调试功能
-    enableDynamicParameter: true
-    # 是否在每个Debug调试栏后显示刷新变量按钮
-    enableReloadCacheParameter: true
+springdoc:
+  swagger-ui:
+    # 修改Swagger UI路径
+    path: /doc.html
+    # 开启Swagger UI界面
+    enabled: true
+  api-docs:
+    # 修改api-docs路径
+    path: /v3/api-docs
+    # 开启api-docs
+    enabled: true
+  #这里定义了两个分组，可定义多个，也可以不定义
+  group-configs:
+    - group: 演示模块
+      packages-to-scan: com.ruoyi.demo
+    - group: 系统模块
+      packages-to-scan: com.ruoyi.web
+    - group: 代码生成模块
+      packages-to-scan: com.ruoyi.generator
 
 # 防止XSS攻击
 xss:

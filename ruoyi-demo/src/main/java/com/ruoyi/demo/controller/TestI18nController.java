@@ -2,9 +2,9 @@ package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.MessageUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.validation.annotation.Validated;
@@ -22,7 +22,7 @@ import javax.validation.constraints.NotNull;
  * @author Lion Li
  */
 @Validated
-@Api(value = "测试国际化控制器", tags = {"测试国际化管理"})
+@Tag(name ="测试国际化控制器", description = "测试国际化管理")
 @RestController
 @RequestMapping("/demo/i18n")
 public class TestI18nController {
@@ -33,9 +33,9 @@ public class TestI18nController {
      * <p>
      * 测试使用 user.register.success
      */
-    @ApiOperation("通过code获取国际化内容")
+    @Operation(summary = "通过code获取国际化内容")
     @GetMapping()
-    public R<Void> get(@ApiParam("国际化code") String code) {
+    public R<Void> get(@Parameter(name = "国际化code") String code) {
         return R.ok(MessageUtils.message(code));
     }
 
@@ -45,7 +45,7 @@ public class TestI18nController {
      * <p>
      * 测试使用 not.null
      */
-    @ApiOperation("Validator 校验国际化")
+    @Operation(summary = "Validator 校验国际化")
     @GetMapping("/test1")
     public R<Void> test1(@NotBlank(message = "{not.null}") String str) {
         return R.ok(str);
@@ -57,7 +57,7 @@ public class TestI18nController {
      * <p>
      * 测试使用 not.null
      */
-    @ApiOperation("Bean 校验国际化")
+    @Operation(summary = "Bean 校验国际化")
     @GetMapping("/test2")
     public R<TestI18nBo> test2(@Validated TestI18nBo bo) {
         return R.ok(bo);

@@ -2,8 +2,8 @@ package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.RedisUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -21,7 +21,7 @@ import java.time.Duration;
  */
 // 类级别 缓存统一配置
 //@CacheConfig(cacheNames = "redissonCacheMap")
-@Api(value = "spring-cache 演示案例", tags = {"spring-cache 演示案例"})
+@Tag(name ="spring-cache 演示案例", description = "spring-cache 演示案例")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/cache")
@@ -41,7 +41,7 @@ public class RedisCacheController {
      * <p>
      * cacheNames 为配置文件内 groupId
      */
-    @ApiOperation("测试 @Cacheable")
+    @Operation(summary = "测试 @Cacheable")
     @Cacheable(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
     @GetMapping("/test1")
     public R<String> test1(String key, String value) {
@@ -56,7 +56,7 @@ public class RedisCacheController {
      * <p>
      * cacheNames 为 配置文件内 groupId
      */
-    @ApiOperation("测试 @CachePut")
+    @Operation(summary = "测试 @CachePut")
     @CachePut(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
     @GetMapping("/test2")
     public R<String> test2(String key, String value) {
@@ -71,7 +71,7 @@ public class RedisCacheController {
      * <p>
      * cacheNames 为 配置文件内 groupId
      */
-    @ApiOperation("测试 @CacheEvict")
+    @Operation(summary = "测试 @CacheEvict")
     @CacheEvict(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
     @GetMapping("/test3")
     public R<String> test3(String key, String value) {
@@ -83,7 +83,7 @@ public class RedisCacheController {
      * 手动设置过期时间10秒
      * 11秒后获取 判断是否相等
      */
-    @ApiOperation("测试设置过期时间")
+    @Operation(summary = "测试设置过期时间")
     @GetMapping("/test6")
     public R<Boolean> test6(String key, String value) {
         RedisUtils.setCacheObject(key, value);

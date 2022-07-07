@@ -1,8 +1,7 @@
 package com.ruoyi.system.domain;
 
 import com.ruoyi.common.utils.StringUtils;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,31 +12,31 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-@ApiModel("缓存信息")
+@Schema(name = "缓存信息")
 public class SysCache {
 
     /**
      * 缓存名称
      */
-    @ApiModelProperty(value = "缓存名称")
+    @Schema(name = "缓存名称")
     private String cacheName = "";
 
     /**
      * 缓存键名
      */
-    @ApiModelProperty(value = "缓存键名")
+    @Schema(name = "缓存键名")
     private String cacheKey = "";
 
     /**
      * 缓存内容
      */
-    @ApiModelProperty(value = "缓存内容")
+    @Schema(name = "缓存内容")
     private String cacheValue = "";
 
     /**
      * 备注
      */
-    @ApiModelProperty(value = "备注")
+    @Schema(name = "备注")
     private String remark = "";
 
     public SysCache(String cacheName, String remark) {

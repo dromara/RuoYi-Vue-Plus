@@ -2,8 +2,8 @@ package com.ruoyi.demo.controller;
 
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * @author Lion Li
  */
-@Api(value = "测试Excel功能", tags = {"测试Excel功能"})
+@Tag(name ="测试Excel功能", description = "测试Excel功能")
 @RestController
 @RequestMapping("/demo/excel")
 public class TestExcelController {
@@ -29,7 +29,7 @@ public class TestExcelController {
     /**
      * 单列表多数据
      */
-    @ApiOperation(value = "单列表多数据")
+    @Operation(summary = "单列表多数据")
     @GetMapping("/exportTemplateOne")
     public void exportTemplateOne(HttpServletResponse response) {
         Map<String,String> map = new HashMap<>();
@@ -49,7 +49,7 @@ public class TestExcelController {
     /**
      * 多列表多数据
      */
-    @ApiOperation(value = "多列表多数据")
+    @Operation(summary = "多列表多数据")
     @GetMapping("/exportTemplateMuliti")
     public void exportTemplateMuliti(HttpServletResponse response) {
         Map<String,String> map = new HashMap<>();
