@@ -11,7 +11,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.service.ISysPostService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +24,6 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="岗位信息控制器", description = "岗位信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/post")

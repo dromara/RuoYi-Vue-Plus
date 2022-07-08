@@ -25,7 +25,6 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "数据字典信息控制器", description = "数据字典信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/dict/type")

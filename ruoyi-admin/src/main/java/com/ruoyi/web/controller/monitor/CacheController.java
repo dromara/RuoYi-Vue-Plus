@@ -19,7 +19,6 @@ import java.util.*;
  *
  * @author Lion Li
  */
-@Tag(name = "缓存监控", description = "缓存监控管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/cache")

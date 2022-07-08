@@ -41,7 +41,6 @@ import java.util.concurrent.TimeUnit;
  * @date 2021-07-26
  */
 @Validated
-@Tag(name = "测试单表控制器", description = "测试单表管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/demo")

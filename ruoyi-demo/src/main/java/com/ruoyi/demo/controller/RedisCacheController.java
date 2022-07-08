@@ -20,7 +20,6 @@ import java.time.Duration;
  */
 // 类级别 缓存统一配置
 //@CacheConfig(cacheNames = "redissonCacheMap")
-@Tag(name = "spring-cache 演示案例", description = "spring-cache 演示案例")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/cache")

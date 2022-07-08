@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Lion Li
  */
-@Tag(name = "测试分布式限流样例", description = "测试分布式限流样例")
 @Slf4j
 @RestController
 @RequestMapping("/demo/rateLimiter")

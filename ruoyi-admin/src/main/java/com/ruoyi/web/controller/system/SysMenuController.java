@@ -25,7 +25,6 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "菜单信息控制器", description = "菜单信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/menu")

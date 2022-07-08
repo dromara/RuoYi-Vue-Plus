@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Lion Li
  */
-@Tag(name = "演示swagger3控制器", description = "演示swagger3接口")
 @RestController
 @RequestMapping("/swagger/demo")
 public class Swagger3DemoController {

@@ -29,7 +29,6 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "代码生成", description = "代码生成管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/tool/gen")

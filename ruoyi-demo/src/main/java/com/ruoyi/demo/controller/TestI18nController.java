@@ -20,7 +20,6 @@ import javax.validation.constraints.NotNull;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "测试国际化控制器", description = "测试国际化管理")
 @RestController
 @RequestMapping("/demo/i18n")
 public class TestI18nController {

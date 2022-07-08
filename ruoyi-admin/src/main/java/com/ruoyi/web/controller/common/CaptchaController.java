@@ -19,7 +19,6 @@ import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
 import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.service.ISysConfigService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -39,7 +38,6 @@ import java.util.Map;
 @Anonymous
 @Slf4j
 @Validated
-@Tag(name = "验证码操作处理", description = "验证码管理")
 @RequiredArgsConstructor
 @RestController
 public class CaptchaController {

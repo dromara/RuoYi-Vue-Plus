@@ -21,7 +21,7 @@
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
         <spring-boot.mybatis>2.2.2</spring-boot.mybatis>
         <druid.version>1.2.11</druid.version>
-        <knife4j.version>3.0.3</knife4j.version>
+        <springdoc.version>1.6.9</springdoc.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <poi.version>5.2.2</poi.version>
         <easyexcel.version>3.1.1</easyexcel.version>
@@ -37,6 +37,7 @@
         <dynamic-ds.version>3.5.1</dynamic-ds.version>
         <tlog.version>1.4.3</tlog.version>
         <xxl-job.version>2.3.1</xxl-job.version>
+        <lombok.version>1.18.24</lombok.version>
 
         <!-- 统一 guava 版本 解决隐式漏洞问题 -->
         <guava.version>30.0-jre</guava.version>
@@ -87,13 +88,19 @@
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-ui</artifactId>
-                <version>1.6.9</version>
+                <version>${springdoc.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-javadoc</artifactId>
-                <version>1.6.9</version>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
             </dependency>
 
             <dependency>
@@ -341,7 +348,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.24</version>
+                            <version>${lombok.version}</version>
                         </path>
                         <path>
                             <groupId>org.springframework.boot</groupId>

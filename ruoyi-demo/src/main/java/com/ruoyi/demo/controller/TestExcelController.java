@@ -20,7 +20,6 @@ import java.util.Map;
  *
  * @author Lion Li
  */
-@Tag(name = "测试Excel功能", description = "测试Excel功能")
 @RestController
 @RequestMapping("/demo/excel")
 public class TestExcelController {

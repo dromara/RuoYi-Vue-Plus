@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 3.6.0
  */
 @Slf4j
-@Tag(name = "有界队列 演示案例", description = "有界队列")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/queue/bounded")

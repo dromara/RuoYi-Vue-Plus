@@ -31,7 +31,6 @@ import java.util.Arrays;
  * @date 2021-08-13
  */
 @Validated
-@Tag(name = "对象存储配置控制器", description = "对象存储配置管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/oss/config")

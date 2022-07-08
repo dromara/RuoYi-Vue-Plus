@@ -33,7 +33,6 @@ import java.util.Set;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "登录验证控制器", description = "登录验证管理")
 @RequiredArgsConstructor
 @RestController
 public class SysLoginController {

@@ -40,7 +40,6 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "对象存储控制器", description = "对象存储管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/oss")

@@ -24,7 +24,6 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "系统访问记录", description = "系统访问记录管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/logininfor")

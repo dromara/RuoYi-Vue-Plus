@@ -24,7 +24,6 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "操作日志记录", description = "操作日志记录管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/operlog")

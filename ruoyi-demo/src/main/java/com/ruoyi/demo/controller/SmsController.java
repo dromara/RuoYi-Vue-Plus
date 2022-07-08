@@ -22,7 +22,6 @@ import java.util.Map;
  * @version 4.2.0
  */
 @Validated
-@Tag(name = "短信演示案例", description = "短信演示案例")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/sms")

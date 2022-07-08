@@ -27,16 +27,14 @@ import ${packageName}.service.I${ClassName}Service;
 import com.ruoyi.common.core.page.TableDataInfo;
 #elseif($table.tree)
 #end
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * ${functionName}Controller
+ * ${functionName}
  *
  * @author ${author}
  * @date ${datetime}
  */
 @Validated
-@Tag(name ="${functionName}控制器", description = "${functionName}管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/${moduleName}/${businessName}")

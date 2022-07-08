@@ -25,7 +25,6 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "参数配置控制器", description = "参数配置管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/config")

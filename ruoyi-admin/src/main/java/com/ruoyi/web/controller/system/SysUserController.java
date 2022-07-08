@@ -45,7 +45,6 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "用户信息控制器", description = "用户信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/user")

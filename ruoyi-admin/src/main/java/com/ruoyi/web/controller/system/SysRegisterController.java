@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "注册验证控制器", description = "注册验证管理")
 @RequiredArgsConstructor
 @RestController
 public class SysRegisterController extends BaseController {

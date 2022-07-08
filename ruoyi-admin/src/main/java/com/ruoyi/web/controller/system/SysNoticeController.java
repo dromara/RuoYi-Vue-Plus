@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "公告信息控制器", description = "公告信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/notice")

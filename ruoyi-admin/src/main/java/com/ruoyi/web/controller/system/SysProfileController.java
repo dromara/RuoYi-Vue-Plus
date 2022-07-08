@@ -31,7 +31,6 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "个人信息控制器", description = "个人信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/user/profile")

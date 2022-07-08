@@ -28,7 +28,6 @@ import java.util.List;
  *
  * @author Lion Li
  */
-@Tag(name = "在线用户监控", description = "在线用户监控管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/online")

@@ -31,7 +31,6 @@ import java.util.List;
  * @date 2021-07-26
  */
 @Validated
-@Tag(name = "测试树表控制器", description = "测试树表管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/tree")

@@ -12,7 +12,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.service.ISysDictDataService;
 import com.ruoyi.system.service.ISysDictTypeService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +26,6 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "数据字典信息控制器", description = "数据字典信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/dict/data")

@@ -32,7 +32,6 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "角色信息控制器", description = "角色信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/role")

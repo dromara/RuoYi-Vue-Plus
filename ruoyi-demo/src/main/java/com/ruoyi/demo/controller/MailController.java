@@ -18,7 +18,6 @@ import java.io.File;
  * @author Michelle.Chung
  */
 @Validated
-@Tag(name = "邮件发送案例", description = "邮件发送案例")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/mail")

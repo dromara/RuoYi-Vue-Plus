@@ -26,7 +26,6 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Tag(name = "部门控制器", description = "部门管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/dept")

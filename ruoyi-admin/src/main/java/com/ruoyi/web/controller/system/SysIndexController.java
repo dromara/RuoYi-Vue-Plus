@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Lion Li
  */
-@Tag(name ="首页控制器", description = "首页管理")
 @RequiredArgsConstructor
 @RestController
 public class SysIndexController {

@@ -4,7 +4,6 @@ import com.ruoyi.common.annotation.Sensitive;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.SensitiveStrategy;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 3.6.0
  * @see com.ruoyi.common.core.service.SensitiveService
  */
-@Tag(name = "测试数据脱敏控制器", description = "测试数据脱敏管理")
 @RestController
 @RequestMapping("/demo/sensitive")
 public class TestSensitiveController extends BaseController {

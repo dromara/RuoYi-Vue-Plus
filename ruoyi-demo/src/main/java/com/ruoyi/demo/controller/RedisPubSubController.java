@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Lion Li
  */
-@Tag(name = "Redis发布订阅 演示案例", description = "Redis发布订阅")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/redis/pubsub")
