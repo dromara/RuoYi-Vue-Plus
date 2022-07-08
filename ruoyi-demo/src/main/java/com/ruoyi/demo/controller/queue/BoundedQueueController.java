@@ -2,7 +2,6 @@ package com.ruoyi.demo.controller.queue;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.QueueUtils;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;

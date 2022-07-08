@@ -2,7 +2,6 @@ package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.utils.StringUtils;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

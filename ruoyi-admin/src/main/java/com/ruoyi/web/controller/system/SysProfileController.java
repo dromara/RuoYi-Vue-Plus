@@ -14,7 +14,6 @@ import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.service.ISysOssService;
 import com.ruoyi.system.service.ISysUserService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;

@@ -14,7 +14,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.bo.SysOssConfigBo;
 import com.ruoyi.system.domain.vo.SysOssConfigVo;
 import com.ruoyi.system.service.ISysOssConfigService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

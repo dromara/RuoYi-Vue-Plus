@@ -3,7 +3,6 @@ package com.ruoyi.demo.controller;
 import com.ruoyi.common.annotation.RateLimiter;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.LimitType;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

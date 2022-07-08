@@ -12,7 +12,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
 import com.ruoyi.generator.service.IGenTableService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

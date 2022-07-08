@@ -5,7 +5,6 @@ import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysCache;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.RedisServerCommands;
 import org.springframework.data.redis.core.RedisCallback;

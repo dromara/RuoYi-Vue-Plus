@@ -19,7 +19,6 @@ import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.vo.SysOssVo;
 import com.ruoyi.system.service.ISysOssService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;

@@ -2,7 +2,6 @@ package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.RedisUtils;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
