@@ -18,9 +18,6 @@ import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysPermissionService;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -35,7 +32,7 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="角色信息控制器", description = "角色信息管理")
+@Tag(name = "角色信息控制器", description = "角色信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/role")
@@ -45,12 +42,18 @@ public class SysRoleController extends BaseController {
     private final ISysUserService userService;
     private final SysPermissionService permissionService;
 
+    /**
+     * 获取角色信息列表
+     */
     @SaCheckPermission("system:role:list")
     @GetMapping("/list")
     public TableDataInfo<SysRole> list(SysRole role, PageQuery pageQuery) {
         return roleService.selectPageRoleList(role, pageQuery);
     }
 
+    /**
+     * 导出角色信息列表
+     */
     @Log(title = "角色管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:role:export")
     @PostMapping("/export")
@@ -61,10 +64,12 @@ public class SysRoleController extends BaseController {
 
     /**
      * 根据角色编号获取详细信息
+     *
+     * @param roleId 角色ID
      */
     @SaCheckPermission("system:role:query")
     @GetMapping(value = "/{roleId}")
-    public R<SysRole> getInfo(@Parameter(name = "角色ID") @PathVariable Long roleId) {
+    public R<SysRole> getInfo(@PathVariable Long roleId) {
         roleService.checkRoleDataScope(roleId);
         return R.ok(roleService.selectRoleById(roleId));
     }
@@ -139,11 +144,13 @@ public class SysRoleController extends BaseController {
 
     /**
      * 删除角色
+     *
+     * @param roleIds 角色ID串
      */
     @SaCheckPermission("system:role:remove")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{roleIds}")
-    public R<Void> remove(@Parameter(name = "角色ID串") @PathVariable Long[] roleIds) {
+    public R<Void> remove(@PathVariable Long[] roleIds) {
         return toAjax(roleService.deleteRoleByIds(roleIds));
     }
 
@@ -186,11 +193,10 @@ public class SysRoleController extends BaseController {
 
     /**
      * 批量取消授权用户
+     *
+     * @param roleId  角色ID
+     * @param userIds 用户ID串
      */
-    @Parameters({
-        @Parameter(name = "roleId", description = "角色ID", in = ParameterIn.QUERY),
-        @Parameter(name = "userIds", description = "用户ID串", in = ParameterIn.QUERY)
-    })
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancelAll")
@@ -200,11 +206,10 @@ public class SysRoleController extends BaseController {
 
     /**
      * 批量选择用户授权
+     *
+     * @param roleId  角色ID
+     * @param userIds 用户ID串
      */
-    @Parameters({
-        @Parameter(name = "roleId", description = "角色ID", in = ParameterIn.QUERY),
-        @Parameter(name = "userIds", description = "用户ID串", in = ParameterIn.QUERY)
-    })
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/selectAll")

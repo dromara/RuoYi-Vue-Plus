@@ -11,7 +11,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.service.ISysPostService;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -43,6 +42,9 @@ public class SysPostController extends BaseController {
         return postService.selectPagePostList(post, pageQuery);
     }
 
+    /**
+     * 导出岗位列表
+     */
     @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:post:export")
     @PostMapping("/export")
@@ -53,10 +55,12 @@ public class SysPostController extends BaseController {
 
     /**
      * 根据岗位编号获取详细信息
+     *
+     * @param postId 岗位ID
      */
     @SaCheckPermission("system:post:query")
     @GetMapping(value = "/{postId}")
-    public R<SysPost> getInfo(@Parameter(name = "岗位ID") @PathVariable Long postId) {
+    public R<SysPost> getInfo(@PathVariable Long postId) {
         return R.ok(postService.selectPostById(postId));
     }
 
@@ -92,11 +96,13 @@ public class SysPostController extends BaseController {
 
     /**
      * 删除岗位
+     *
+     * @param postIds 岗位ID串
      */
     @SaCheckPermission("system:post:remove")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{postIds}")
-    public R<Void> remove(@Parameter(name = "岗位ID串") @PathVariable Long[] postIds) {
+    public R<Void> remove(@PathVariable Long[] postIds) {
         return toAjax(postService.deletePostByIds(postIds));
     }
 

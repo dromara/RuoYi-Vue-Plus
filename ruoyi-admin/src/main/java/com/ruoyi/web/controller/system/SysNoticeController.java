@@ -9,7 +9,6 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.SysNotice;
 import com.ruoyi.system.service.ISysNoticeService;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="公告信息控制器", description = "公告信息管理")
+@Tag(name = "公告信息控制器", description = "公告信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/notice")
@@ -40,10 +39,12 @@ public class SysNoticeController extends BaseController {
 
     /**
      * 根据通知公告编号获取详细信息
+     *
+     * @param noticeId 公告ID
      */
     @SaCheckPermission("system:notice:query")
     @GetMapping(value = "/{noticeId}")
-    public R<SysNotice> getInfo(@Parameter(name = "公告ID") @PathVariable Long noticeId) {
+    public R<SysNotice> getInfo(@PathVariable Long noticeId) {
         return R.ok(noticeService.selectNoticeById(noticeId));
     }
 
@@ -69,11 +70,13 @@ public class SysNoticeController extends BaseController {
 
     /**
      * 删除通知公告
+     *
+     * @param noticeIds 公告ID串
      */
     @SaCheckPermission("system:notice:remove")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
-    public R<Void> remove(@Parameter(name = "公告ID串") @PathVariable Long[] noticeIds) {
+    public R<Void> remove(@PathVariable Long[] noticeIds) {
         return toAjax(noticeService.deleteNoticeByIds(noticeIds));
     }
 }

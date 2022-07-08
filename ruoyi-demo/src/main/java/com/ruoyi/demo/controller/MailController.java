@@ -2,7 +2,6 @@ package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.email.MailUtils;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -19,25 +18,35 @@ import java.io.File;
  * @author Michelle.Chung
  */
 @Validated
-@Tag(name ="邮件发送案例", description = "邮件发送案例")
+@Tag(name = "邮件发送案例", description = "邮件发送案例")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/mail")
 public class MailController {
 
+    /**
+     * 发送邮件
+     *
+     * @param to      接收人
+     * @param subject 标题
+     * @param text    内容
+     */
     @GetMapping("/sendSimpleMessage")
-    public R<Void> sendSimpleMessage(@Parameter(name = "接收人") String to,
-                                     @Parameter(name = "标题") String subject,
-                                     @Parameter(name = "内容") String text) {
+    public R<Void> sendSimpleMessage(String to, String subject, String text) {
         MailUtils.sendText(to, subject, text);
         return R.ok();
     }
 
+    /**
+     * 发送邮件（带附件）
+     *
+     * @param to       接收人
+     * @param subject  标题
+     * @param text     内容
+     * @param filePath 附件路径
+     */
     @GetMapping("/sendMessageWithAttachment")
-    public R<Void> sendMessageWithAttachment(@Parameter(name = "接收人") String to,
-                                             @Parameter(name = "标题") String subject,
-                                             @Parameter(name = "内容") String text,
-                                             @Parameter(name = "附件路径") String filePath) {
+    public R<Void> sendMessageWithAttachment(String to, String subject, String text, String filePath) {
         MailUtils.sendText(to, subject, text, new File(filePath));
         return R.ok();
     }

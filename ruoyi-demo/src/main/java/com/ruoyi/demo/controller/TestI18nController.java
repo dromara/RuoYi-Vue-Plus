@@ -2,7 +2,6 @@ package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.MessageUtils;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
@@ -21,7 +20,7 @@ import javax.validation.constraints.NotNull;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="测试国际化控制器", description = "测试国际化管理")
+@Tag(name = "测试国际化控制器", description = "测试国际化管理")
 @RestController
 @RequestMapping("/demo/i18n")
 public class TestI18nController {
@@ -31,9 +30,11 @@ public class TestI18nController {
      * code为 messages.properties 中的 key
      * <p>
      * 测试使用 user.register.success
+     *
+     * @param code 国际化code
      */
     @GetMapping()
-    public R<Void> get(@Parameter(name = "国际化code") String code) {
+    public R<Void> get(String code) {
         return R.ok(MessageUtils.message(code));
     }
 

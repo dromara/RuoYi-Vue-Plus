@@ -13,7 +13,6 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.demo.domain.bo.TestTreeBo;
 import com.ruoyi.demo.domain.vo.TestTreeVo;
 import com.ruoyi.demo.service.ITestTreeService;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +31,7 @@ import java.util.List;
  * @date 2021-07-26
  */
 @Validated
-@Tag(name ="测试树表控制器", description = "测试树表管理")
+@Tag(name = "测试树表控制器", description = "测试树表管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/tree")
@@ -63,12 +62,13 @@ public class TestTreeController extends BaseController {
 
     /**
      * 获取测试树表详细信息
+     *
+     * @param id 测试树ID
      */
     @SaCheckPermission("demo:tree:query")
     @GetMapping("/{id}")
-    public R<TestTreeVo> getInfo(@Parameter(name = "测试树ID")
-                                          @NotNull(message = "主键不能为空")
-                                          @PathVariable("id") Long id) {
+    public R<TestTreeVo> getInfo(@NotNull(message = "主键不能为空")
+                                 @PathVariable("id") Long id) {
         return R.ok(iTestTreeService.queryById(id));
     }
 
@@ -96,13 +96,14 @@ public class TestTreeController extends BaseController {
 
     /**
      * 删除测试树表
+     *
+     * @param ids 测试树ID串
      */
     @SaCheckPermission("demo:tree:remove")
     @Log(title = "测试树表", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
-    public R<Void> remove(@Parameter(name = "测试树ID串")
-                                   @NotEmpty(message = "主键不能为空")
-                                   @PathVariable Long[] ids) {
+    public R<Void> remove(@NotEmpty(message = "主键不能为空")
+                          @PathVariable Long[] ids) {
         return toAjax(iTestTreeService.deleteWithValidByIds(Arrays.asList(ids), true) ? 1 : 0);
     }
 }

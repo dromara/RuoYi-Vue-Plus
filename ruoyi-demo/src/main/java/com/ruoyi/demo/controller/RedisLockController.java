@@ -20,7 +20,7 @@ import java.time.LocalTime;
  *
  * @author shenxinquan
  */
-@Tag(name ="测试分布式锁的样例", description = "测试分布式锁的样例")
+@Tag(name = "测试分布式锁的样例", description = "测试分布式锁的样例")
 @Slf4j
 @RestController
 @RequestMapping("/demo/redisLock")

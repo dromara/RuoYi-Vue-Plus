@@ -24,7 +24,7 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="操作日志记录", description = "操作日志记录管理")
+@Tag(name = "操作日志记录", description = "操作日志记录管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/operlog")
@@ -32,12 +32,18 @@ public class SysOperlogController extends BaseController {
 
     private final ISysOperLogService operLogService;
 
+    /**
+     * 获取操作日志记录列表
+     */
     @SaCheckPermission("monitor:operlog:list")
     @GetMapping("/list")
     public TableDataInfo<SysOperLog> list(SysOperLog operLog, PageQuery pageQuery) {
         return operLogService.selectPageOperLogList(operLog, pageQuery);
     }
 
+    /**
+     * 导出操作日志记录列表
+     */
     @Log(title = "操作日志", businessType = BusinessType.EXPORT)
     @SaCheckPermission("monitor:operlog:export")
     @PostMapping("/export")
@@ -46,6 +52,9 @@ public class SysOperlogController extends BaseController {
         ExcelUtil.exportExcel(list, "操作日志", SysOperLog.class, response);
     }
 
+    /**
+     * 获取操作日志记录详情
+     */
     @Log(title = "操作日志", businessType = BusinessType.DELETE)
     @SaCheckPermission("monitor:operlog:remove")
     @DeleteMapping("/{operIds}")
@@ -53,6 +62,9 @@ public class SysOperlogController extends BaseController {
         return toAjax(operLogService.deleteOperLogByIds(operIds));
     }
 
+    /**
+     * 清理操作日志记录
+     */
     @Log(title = "操作日志", businessType = BusinessType.CLEAN)
     @SaCheckPermission("monitor:operlog:remove")
     @DeleteMapping("/clean")

@@ -2,7 +2,6 @@ package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.RedisUtils;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,22 +13,33 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Lion Li
  */
-@Tag(name ="Redis发布订阅 演示案例", description = "Redis发布订阅")
+@Tag(name = "Redis发布订阅 演示案例", description = "Redis发布订阅")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/redis/pubsub")
 public class RedisPubSubController {
 
+    /**
+     * 发布消息
+     *
+     * @param key   通道Key
+     * @param value 发送内容
+     */
     @GetMapping("/pub")
-    public R<Void> pub(@Parameter(name = "通道Key") String key, @Parameter(name = "发送内容") String value) {
+    public R<Void> pub(String key, String value) {
         RedisUtils.publish(key, value, consumer -> {
             System.out.println("发布通道 => " + key + ", 发送值 => " + value);
         });
         return R.ok("操作成功");
     }
 
+    /**
+     * 订阅消息
+     *
+     * @param key 通道Key
+     */
     @GetMapping("/sub")
-    public R<Void> sub(@Parameter(name = "通道Key") String key) {
+    public R<Void> sub(String key) {
         RedisUtils.subscribe(key, String.class, msg -> {
             System.out.println("订阅通道 => " + key + ", 接收值 => " + msg);
         });

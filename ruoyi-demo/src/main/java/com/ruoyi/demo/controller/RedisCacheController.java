@@ -2,7 +2,6 @@ package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.RedisUtils;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -21,7 +20,7 @@ import java.time.Duration;
  */
 // 类级别 缓存统一配置
 //@CacheConfig(cacheNames = "redissonCacheMap")
-@Tag(name ="spring-cache 演示案例", description = "spring-cache 演示案例")
+@Tag(name = "spring-cache 演示案例", description = "spring-cache 演示案例")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/cache")

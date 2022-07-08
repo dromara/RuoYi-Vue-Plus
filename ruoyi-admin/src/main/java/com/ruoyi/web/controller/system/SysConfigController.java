@@ -11,7 +11,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.service.ISysConfigService;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +25,7 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="参数配置控制器", description = "参数配置管理")
+@Tag(name = "参数配置控制器", description = "参数配置管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/config")
@@ -43,6 +42,9 @@ public class SysConfigController extends BaseController {
         return configService.selectPageConfigList(config, pageQuery);
     }
 
+    /**
+     * 导出参数配置列表
+     */
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:config:export")
     @PostMapping("/export")
@@ -53,18 +55,22 @@ public class SysConfigController extends BaseController {
 
     /**
      * 根据参数编号获取详细信息
+     *
+     * @param configId 参数ID
      */
     @SaCheckPermission("system:config:query")
     @GetMapping(value = "/{configId}")
-    public R<SysConfig> getInfo(@Parameter(name = "参数ID") @PathVariable Long configId) {
+    public R<SysConfig> getInfo(@PathVariable Long configId) {
         return R.ok(configService.selectConfigById(configId));
     }
 
     /**
      * 根据参数键名查询参数值
+     *
+     * @param configKey 参数Key
      */
     @GetMapping(value = "/configKey/{configKey}")
-    public R<Void> getConfigKey(@Parameter(name = "参数Key") @PathVariable String configKey) {
+    public R<Void> getConfigKey(@PathVariable String configKey) {
         return R.ok(configService.selectConfigByKey(configKey));
     }
 
@@ -106,11 +112,13 @@ public class SysConfigController extends BaseController {
 
     /**
      * 删除参数配置
+     *
+     * @param configIds 参数ID串
      */
     @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
-    public R<Void> remove(@Parameter(name = "参数ID串") @PathVariable Long[] configIds) {
+    public R<Void> remove(@PathVariable Long[] configIds) {
         configService.deleteConfigByIds(configIds);
         return R.ok();
     }

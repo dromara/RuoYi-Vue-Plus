@@ -14,11 +14,9 @@ import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.service.ISysOssService;
 import com.ruoyi.system.service.ISysUserService;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +31,7 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="个人信息控制器", description = "个人信息管理")
+@Tag(name = "个人信息控制器", description = "个人信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/user/profile")
@@ -80,11 +78,10 @@ public class SysProfileController extends BaseController {
 
     /**
      * 重置密码
+     *
+     * @param newPassword 旧密码
+     * @param oldPassword 新密码
      */
-    @Parameters({
-        @Parameter(name = "oldPassword", description = "旧密码", in = ParameterIn.QUERY),
-        @Parameter(name = "newPassword", description = "新密码", in = ParameterIn.QUERY)
-    })
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
     public R<Void> updatePwd(String oldPassword, String newPassword) {
@@ -106,20 +103,19 @@ public class SysProfileController extends BaseController {
 
     /**
      * 头像上传
+     *
+     * @param avatarfile 用户头像
      */
-    @Parameters({
-        @Parameter(name = "avatarfile", description = "用户头像", in = ParameterIn.QUERY, required = true)
-    })
     @Log(title = "用户头像", businessType = BusinessType.UPDATE)
-    @PostMapping("/avatar")
-    public R<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile file) {
+    @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public R<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile avatarfile) {
         Map<String, Object> ajax = new HashMap<>();
-        if (!file.isEmpty()) {
-            String extension = FileUtil.extName(file.getOriginalFilename());
+        if (!avatarfile.isEmpty()) {
+            String extension = FileUtil.extName(avatarfile.getOriginalFilename());
             if (!StringUtils.equalsAnyIgnoreCase(extension, MimeTypeUtils.IMAGE_EXTENSION)) {
                 return R.fail("文件格式不正确，请上传" + Arrays.toString(MimeTypeUtils.IMAGE_EXTENSION) + "格式");
             }
-            SysOss oss = iSysOssService.upload(file);
+            SysOss oss = iSysOssService.upload(avatarfile);
             String avatar = oss.getUrl();
             if (userService.updateUserAvatar(getUsername(), avatar)) {
                 ajax.put("imgUrl", avatar);

@@ -73,12 +73,13 @@ public class ${ClassName}Controller extends BaseController {
 
     /**
      * 获取${functionName}详细信息
+     *
+     * @param ${pkColumn.javaField} 主键
      */
     @SaCheckPermission("${permissionPrefix}:query")
     @GetMapping("/{${pkColumn.javaField}}")
-    public R<${ClassName}Vo> getInfo(@Parameter(name = "主键")
-                                     @NotNull(message = "主键不能为空")
-                                     @PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField}) {
+    public R<${ClassName}Vo> getInfo(@NotNull(message = "主键不能为空")
+                                     @PathVariable ${pkColumn.javaType} ${pkColumn.javaField}) {
         return R.ok(i${ClassName}Service.queryById(${pkColumn.javaField}));
     }
 
@@ -106,13 +107,14 @@ public class ${ClassName}Controller extends BaseController {
 
     /**
      * 删除${functionName}
+     *
+     * @param ${pkColumn.javaField}s 主键串
      */
     @SaCheckPermission("${permissionPrefix}:remove")
     @Log(title = "${functionName}", businessType = BusinessType.DELETE)
     @DeleteMapping("/{${pkColumn.javaField}s}")
-    public R<Void> remove(@Parameter(name = "主键串")
-                                       @NotEmpty(message = "主键不能为空")
-                                       @PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
+    public R<Void> remove(@NotEmpty(message = "主键不能为空")
+                          @PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
         return toAjax(i${ClassName}Service.deleteWithValidByIds(Arrays.asList(${pkColumn.javaField}s), true) ? 1 : 0);
     }
 }

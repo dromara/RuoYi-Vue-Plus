@@ -33,7 +33,7 @@ import java.util.Set;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="登录验证控制器", description = "登录验证管理")
+@Tag(name = "登录验证控制器", description = "登录验证管理")
 @RequiredArgsConstructor
 @RestController
 public class SysLoginController {
@@ -92,6 +92,9 @@ public class SysLoginController {
         return R.ok(ajax);
     }
 
+    /**
+     * 退出登录
+     */
     @Anonymous
     @PostMapping("/logout")
     public R<Void> logout() {

@@ -206,13 +206,8 @@ springdoc:
   swagger-ui:
     # 修改Swagger UI路径
     path: /doc.html
-    # 开启Swagger UI界面
-    enabled: true
-  api-docs:
-    # 修改api-docs路径
-    path: /v3/api-docs
-    # 开启api-docs
-    enabled: true
+    # 持久化认证数据
+    persistAuthorization: true
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
     - group: 1.演示模块

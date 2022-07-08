@@ -20,11 +20,9 @@ import com.ruoyi.demo.domain.bo.TestDemoBo;
 import com.ruoyi.demo.domain.bo.TestDemoImportVo;
 import com.ruoyi.demo.domain.vo.TestDemoVo;
 import com.ruoyi.demo.service.ITestDemoService;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2021-07-26
  */
 @Validated
-@Tag(name ="测试单表控制器", description = "测试单表管理")
+@Tag(name = "测试单表控制器", description = "测试单表管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/demo")
@@ -69,12 +67,14 @@ public class TestDemoController extends BaseController {
         return iTestDemoService.customPageList(bo, pageQuery);
     }
 
-    @Parameters({
-        @Parameter(name = "file", description = "导入文件", in = ParameterIn.QUERY, required = true),
-    })
+    /**
+     * 导入数据
+     *
+     * @param file 导入文件
+     */
     @Log(title = "测试单表", businessType = BusinessType.IMPORT)
     @SaCheckPermission("demo:demo:import")
-    @PostMapping("/importData")
+    @PostMapping(value = "/importData", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
         ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
         List<TestDemoImportVo> volist = excelResult.getList();
@@ -100,12 +100,13 @@ public class TestDemoController extends BaseController {
 
     /**
      * 获取测试单表详细信息
+     *
+     * @param id 测试ID
      */
     @SaCheckPermission("demo:demo:query")
     @GetMapping("/{id}")
-    public R<TestDemoVo> getInfo(@Parameter(name = "测试ID")
-                                          @NotNull(message = "主键不能为空")
-                                          @PathVariable("id") Long id) {
+    public R<TestDemoVo> getInfo(@NotNull(message = "主键不能为空")
+                                 @PathVariable("id") Long id) {
         return R.ok(iTestDemoService.queryById(id));
     }
 
@@ -136,13 +137,14 @@ public class TestDemoController extends BaseController {
 
     /**
      * 删除测试单表
+     *
+     * @param ids 测试ID串
      */
     @SaCheckPermission("demo:demo:remove")
     @Log(title = "测试单表", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
-    public R<Void> remove(@Parameter(name = "测试ID串")
-                                   @NotEmpty(message = "主键不能为空")
-                                   @PathVariable Long[] ids) {
+    public R<Void> remove(@NotEmpty(message = "主键不能为空")
+                          @PathVariable Long[] ids) {
         return toAjax(iTestDemoService.deleteWithValidByIds(Arrays.asList(ids), true) ? 1 : 0);
     }
 }

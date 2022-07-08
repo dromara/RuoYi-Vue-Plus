@@ -48,6 +48,8 @@ public class GenController extends BaseController {
 
     /**
      * 修改代码生成业务
+     *
+     * @param tableId 表ID
      */
     @SaCheckPermission("tool:gen:query")
     @GetMapping(value = "/{tableId}")
@@ -73,6 +75,8 @@ public class GenController extends BaseController {
 
     /**
      * 查询数据表字段列表
+     *
+     * @param tableId 表ID
      */
     @SaCheckPermission("tool:gen:list")
     @GetMapping(value = "/column/{tableId}")
@@ -86,6 +90,8 @@ public class GenController extends BaseController {
 
     /**
      * 导入表结构（保存）
+     *
+     * @param tables 表名串
      */
     @SaCheckPermission("tool:gen:import")
     @Log(title = "代码生成", businessType = BusinessType.IMPORT)
@@ -112,6 +118,8 @@ public class GenController extends BaseController {
 
     /**
      * 删除代码生成
+     *
+     * @param tableIds 表ID串
      */
     @SaCheckPermission("tool:gen:remove")
     @Log(title = "代码生成", businessType = BusinessType.DELETE)
@@ -123,6 +131,8 @@ public class GenController extends BaseController {
 
     /**
      * 预览代码
+     *
+     * @param tableId 表ID
      */
     @SaCheckPermission("tool:gen:preview")
     @GetMapping("/preview/{tableId}")
@@ -133,6 +143,8 @@ public class GenController extends BaseController {
 
     /**
      * 生成代码（下载方式）
+     *
+     * @param tableName 表名
      */
     @SaCheckPermission("tool:gen:code")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
@@ -144,6 +156,8 @@ public class GenController extends BaseController {
 
     /**
      * 生成代码（自定义路径）
+     *
+     * @param tableName 表名
      */
     @SaCheckPermission("tool:gen:code")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
@@ -155,6 +169,8 @@ public class GenController extends BaseController {
 
     /**
      * 同步数据库
+     *
+     * @param tableName 表名
      */
     @SaCheckPermission("tool:gen:edit")
     @Log(title = "代码生成", businessType = BusinessType.UPDATE)
@@ -166,6 +182,8 @@ public class GenController extends BaseController {
 
     /**
      * 批量生成代码
+     *
+     * @param tables 表名串
      */
     @SaCheckPermission("tool:gen:code")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)

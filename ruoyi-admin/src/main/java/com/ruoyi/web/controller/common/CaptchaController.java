@@ -19,7 +19,6 @@ import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
 import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.service.ISysConfigService;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +39,7 @@ import java.util.Map;
 @Anonymous
 @Slf4j
 @Validated
-@Tag(name ="验证码操作处理", description = "验证码管理")
+@Tag(name = "验证码操作处理", description = "验证码管理")
 @RequiredArgsConstructor
 @RestController
 public class CaptchaController {
@@ -51,10 +50,11 @@ public class CaptchaController {
 
     /**
      * 短信验证码
+     *
+     * @param phonenumber 用户手机号
      */
     @GetMapping("/captchaSms")
-    public R<Void> smsCaptcha(@Parameter(name = "用户手机号")
-                              @NotBlank(message = "{user.phonenumber.not.blank}")
+    public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}")
                               String phonenumber) {
         if (smsProperties.getEnabled()) {
             R.fail("当前系统没有开启短信功能！");

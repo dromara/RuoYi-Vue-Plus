@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 3.6.0
  * @see com.ruoyi.common.core.service.SensitiveService
  */
-@Tag(name ="测试数据脱敏控制器", description = "测试数据脱敏管理")
+@Tag(name = "测试数据脱敏控制器", description = "测试数据脱敏管理")
 @RestController
 @RequestMapping("/demo/sensitive")
 public class TestSensitiveController extends BaseController {

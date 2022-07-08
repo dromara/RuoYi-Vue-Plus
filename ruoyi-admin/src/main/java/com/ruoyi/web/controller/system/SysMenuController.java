@@ -10,7 +10,6 @@ import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysMenuService;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +25,7 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="菜单信息控制器", description = "菜单信息管理")
+@Tag(name = "菜单信息控制器", description = "菜单信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/menu")
@@ -46,10 +45,12 @@ public class SysMenuController extends BaseController {
 
     /**
      * 根据菜单编号获取详细信息
+     *
+     * @param menuId 菜单ID
      */
     @SaCheckPermission("system:menu:query")
     @GetMapping(value = "/{menuId}")
-    public R<SysMenu> getInfo(@Parameter(name = "菜单ID") @PathVariable Long menuId) {
+    public R<SysMenu> getInfo(@PathVariable Long menuId) {
         return R.ok(menuService.selectMenuById(menuId));
     }
 
@@ -64,9 +65,11 @@ public class SysMenuController extends BaseController {
 
     /**
      * 加载对应角色菜单列表树
+     *
+     * @param roleId 角色ID
      */
     @GetMapping(value = "/roleMenuTreeselect/{roleId}")
-    public R<Map<String, Object>> roleMenuTreeselect(@Parameter(name = "角色ID") @PathVariable("roleId") Long roleId) {
+    public R<Map<String, Object>> roleMenuTreeselect(@PathVariable("roleId") Long roleId) {
         List<SysMenu> menus = menuService.selectMenuList(getUserId());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("checkedKeys", menuService.selectMenuListByRoleId(roleId));
@@ -108,11 +111,13 @@ public class SysMenuController extends BaseController {
 
     /**
      * 删除菜单
+     *
+     * @param menuId 菜单ID
      */
     @SaCheckPermission("system:menu:remove")
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{menuId}")
-    public R<Void> remove(@Parameter(name = "菜单ID") @PathVariable("menuId") Long menuId) {
+    public R<Void> remove(@PathVariable("menuId") Long menuId) {
         if (menuService.hasChildByMenuId(menuId)) {
             return R.fail("存在子菜单,不允许删除");
         }

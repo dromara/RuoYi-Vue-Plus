@@ -4,7 +4,6 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -23,7 +22,7 @@ import java.util.Map;
  * @version 4.2.0
  */
 @Validated
-@Tag(name ="短信演示案例", description = "短信演示案例")
+@Tag(name = "短信演示案例", description = "短信演示案例")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/sms")
@@ -33,9 +32,14 @@ public class SmsController {
 //    private final SmsTemplate smsTemplate; // 可以使用spring注入
 //    private final AliyunSmsTemplate smsTemplate; // 也可以注入某个厂家的模板工具
 
+    /**
+     * 发送短信Aliyun
+     *
+     * @param phones     电话号
+     * @param templateId 模板ID
+     */
     @GetMapping("/sendAliyun")
-    public R<Object> sendAliyun(@Parameter(name = "电话号") String phones,
-                                     @Parameter(name = "模板ID") String templateId) {
+    public R<Object> sendAliyun(String phones, String templateId) {
         if (!smsProperties.getEnabled()) {
             return R.fail("当前系统没有开启短信功能！");
         }
@@ -49,9 +53,14 @@ public class SmsController {
         return R.ok(send);
     }
 
+    /**
+     * 发送短信Tencent
+     *
+     * @param phones     电话号
+     * @param templateId 模板ID
+     */
     @GetMapping("/sendTencent")
-    public R<Object> sendTencent(@Parameter(name = "电话号") String phones,
-                                             @Parameter(name = "模板ID") String templateId) {
+    public R<Object> sendTencent(String phones, String templateId) {
         if (!smsProperties.getEnabled()) {
             return R.fail("当前系统没有开启短信功能！");
         }

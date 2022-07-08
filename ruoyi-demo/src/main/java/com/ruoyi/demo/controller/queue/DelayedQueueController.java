@@ -2,7 +2,6 @@ package com.ruoyi.demo.controller.queue;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.QueueUtils;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,14 +24,19 @@ import java.util.concurrent.TimeUnit;
  * @version 3.6.0
  */
 @Slf4j
-@Tag(name ="延迟队列 演示案例", description = "延迟队列")
+@Tag(name = "延迟队列 演示案例", description = "延迟队列")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/queue/delayed")
 public class DelayedQueueController {
 
+    /**
+     * 订阅队列
+     *
+     * @param queueName 队列名
+     */
     @GetMapping("/subscribe")
-    public R<Void> subscribe(@Parameter(name = "队列名") String queueName) {
+    public R<Void> subscribe(String queueName) {
         log.info("通道: {} 监听中......", queueName);
         // 项目初始化设置一次即可
         QueueUtils.subscribeBlockingQueue(queueName, (String orderNum) -> {
@@ -42,19 +46,29 @@ public class DelayedQueueController {
         return R.ok("操作成功");
     }
 
+    /**
+     * 添加队列数据
+     *
+     * @param queueName 队列名
+     * @param orderNum  订单号
+     * @param time      延迟时间(秒)
+     */
     @GetMapping("/add")
-    public R<Void> add(@Parameter(name = "队列名") String queueName,
-                                @Parameter(name = "订单号") String orderNum,
-                                @Parameter(name = "延迟时间(秒)") Long time) {
+    public R<Void> add(String queueName, String orderNum, Long time) {
         QueueUtils.addDelayedQueueObject(queueName, orderNum, time, TimeUnit.SECONDS);
         // 观察发送时间
         log.info("通道: {} , 发送数据: {}", queueName, orderNum);
         return R.ok("操作成功");
     }
 
+    /**
+     * 删除队列数据
+     *
+     * @param queueName 队列名
+     * @param orderNum  订单号
+     */
     @GetMapping("/remove")
-    public R<Void> remove(@Parameter(name = "队列名") String queueName,
-                                   @Parameter(name = "订单号") String orderNum) {
+    public R<Void> remove(String queueName, String orderNum) {
         if (QueueUtils.removeDelayedQueueObject(queueName, orderNum)) {
             log.info("通道: {} , 删除数据: {}", queueName, orderNum);
         } else {
@@ -63,8 +77,13 @@ public class DelayedQueueController {
         return R.ok("操作成功");
     }
 
+    /**
+     * 销毁队列
+     *
+     * @param queueName 队列名
+     */
     @GetMapping("/destroy")
-    public R<Void> destroy(@Parameter(name = "队列名") String queueName) {
+    public R<Void> destroy(String queueName) {
         // 用完了一定要销毁 否则会一直存在
         QueueUtils.destroyDelayedQueue(queueName);
         return R.ok("操作成功");

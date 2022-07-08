@@ -3,7 +3,6 @@ package com.ruoyi.demo.controller.queue;
 import cn.hutool.core.util.RandomUtil;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.QueueUtils;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +22,19 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 3.6.0
  */
 @Slf4j
-@Tag(name ="优先队列 演示案例", description = "优先队列")
+@Tag(name = "优先队列 演示案例", description = "优先队列")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/queue/priority")
 public class PriorityQueueController {
 
+    /**
+     * 添加队列数据
+     *
+     * @param queueName 队列名
+     */
     @GetMapping("/add")
-    public R<Void> add(@Parameter(name = "队列名") String queueName) {
+    public R<Void> add(String queueName) {
         // 用完了一定要销毁 否则会一直存在
         boolean b = QueueUtils.destroyPriorityQueueObject(queueName);
         log.info("通道: {} , 删除: {}", queueName, b);
@@ -56,10 +60,15 @@ public class PriorityQueueController {
         return R.ok("操作成功");
     }
 
+    /**
+     * 删除队列数据
+     *
+     * @param queueName 队列名
+     * @param name      对象名
+     * @param orderNum  排序号
+     */
     @GetMapping("/remove")
-    public R<Void> remove(@Parameter(name = "队列名") String queueName,
-                                   @Parameter(name = "对象名") String name,
-                                   @Parameter(name = "排序号") Integer orderNum) {
+    public R<Void> remove(String queueName, String name, Integer orderNum) {
         PriorityDemo data = new PriorityDemo();
         data.setName(name);
         data.setOrderNum(orderNum);
@@ -71,8 +80,13 @@ public class PriorityQueueController {
         return R.ok("操作成功");
     }
 
+    /**
+     * 获取队列数据
+     *
+     * @param queueName 队列名
+     */
     @GetMapping("/get")
-    public R<Void> get(@Parameter(name = "队列名") String queueName) {
+    public R<Void> get(String queueName) {
         PriorityDemo data;
         do {
             data = QueueUtils.getPriorityQueueObject(queueName);

@@ -3,6 +3,7 @@ package com.ruoyi.framework.config;
 import com.ruoyi.framework.config.properties.SwaggerProperties;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.SpringDocConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -10,6 +11,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Swagger 文档配置
@@ -37,6 +41,9 @@ public class SwaggerConfig {
         openApi.tags(swaggerProperties.getTags());
         openApi.paths(swaggerProperties.getPaths());
         openApi.components(swaggerProperties.getComponents());
+        List<SecurityRequirement> list = new ArrayList<>();
+        list.add(new SecurityRequirement().addList("apikey"));
+        openApi.security(list);
 
         return openApi;
     }

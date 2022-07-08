@@ -24,7 +24,7 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="系统访问记录", description = "系统访问记录管理")
+@Tag(name = "系统访问记录", description = "系统访问记录管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/logininfor")
@@ -32,12 +32,18 @@ public class SysLogininforController extends BaseController {
 
     private final ISysLogininforService logininforService;
 
+    /**
+     * 获取系统访问记录列表
+     */
     @SaCheckPermission("monitor:logininfor:list")
     @GetMapping("/list")
     public TableDataInfo<SysLogininfor> list(SysLogininfor logininfor, PageQuery pageQuery) {
         return logininforService.selectPageLogininforList(logininfor, pageQuery);
     }
 
+    /**
+     * 导出系统访问记录列表
+     */
     @Log(title = "登录日志", businessType = BusinessType.EXPORT)
     @SaCheckPermission("monitor:logininfor:export")
     @PostMapping("/export")
@@ -46,6 +52,9 @@ public class SysLogininforController extends BaseController {
         ExcelUtil.exportExcel(list, "登录日志", SysLogininfor.class, response);
     }
 
+    /**
+     * 获取系统访问记录详情
+     */
     @SaCheckPermission("monitor:logininfor:remove")
     @Log(title = "登录日志", businessType = BusinessType.DELETE)
     @DeleteMapping("/{infoIds}")
@@ -53,6 +62,9 @@ public class SysLogininforController extends BaseController {
         return toAjax(logininforService.deleteLogininforByIds(infoIds));
     }
 
+    /**
+     * 清理系统访问记录
+     */
     @SaCheckPermission("monitor:logininfor:remove")
     @Log(title = "登录日志", businessType = BusinessType.CLEAN)
     @DeleteMapping("/clean")

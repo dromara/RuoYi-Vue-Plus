@@ -26,11 +26,9 @@ import com.ruoyi.system.listener.SysUserImportListener;
 import com.ruoyi.system.service.ISysPostService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,7 +45,7 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="用户信息控制器", description = "用户信息管理")
+@Tag(name = "用户信息控制器", description = "用户信息管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/user")
@@ -66,6 +64,9 @@ public class SysUserController extends BaseController {
         return userService.selectPageUserList(user, pageQuery);
     }
 
+    /**
+     * 导出用户列表
+     */
     @Log(title = "用户管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:user:export")
     @PostMapping("/export")
@@ -83,17 +84,23 @@ public class SysUserController extends BaseController {
         ExcelUtil.exportExcel(listVo, "用户数据", SysUserExportVo.class, response);
     }
 
-    @Parameters({
-        @Parameter(name = "file", description = "导入文件", required = true),
-    })
+    /**
+     * 导入数据
+     *
+     * @param file          导入文件
+     * @param updateSupport 是否更新已存在数据
+     */
     @Log(title = "用户管理", businessType = BusinessType.IMPORT)
     @SaCheckPermission("system:user:import")
-    @PostMapping("/importData")
+    @PostMapping(value = "/importData", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<Void> importData(@RequestPart("file") MultipartFile file, boolean updateSupport) throws Exception {
         ExcelResult<SysUserImportVo> result = ExcelUtil.importExcel(file.getInputStream(), SysUserImportVo.class, new SysUserImportListener(updateSupport));
         return R.ok(result.getAnalysis());
     }
 
+    /**
+     * 获取导入模板
+     */
     @PostMapping("/importTemplate")
     public void importTemplate(HttpServletResponse response) {
         ExcelUtil.exportExcel(new ArrayList<>(), "用户数据", SysUserImportVo.class, response);
@@ -101,10 +108,12 @@ public class SysUserController extends BaseController {
 
     /**
      * 根据用户编号获取详细信息
+     *
+     * @param userId 用户ID
      */
     @SaCheckPermission("system:user:query")
     @GetMapping(value = {"/", "/{userId}"})
-    public R<Map<String, Object>> getInfo(@Parameter(name = "用户ID") @PathVariable(value = "userId", required = false) Long userId) {
+    public R<Map<String, Object>> getInfo(@PathVariable(value = "userId", required = false) Long userId) {
         userService.checkUserDataScope(userId);
         Map<String, Object> ajax = new HashMap<>();
         List<SysRole> roles = roleService.selectRoleAll();
@@ -160,11 +169,13 @@ public class SysUserController extends BaseController {
 
     /**
      * 删除用户
+     *
+     * @param userIds 角色ID串
      */
     @SaCheckPermission("system:user:remove")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
-    public R<Void> remove(@Parameter(name = "角色ID串") @PathVariable Long[] userIds) {
+    public R<Void> remove(@PathVariable Long[] userIds) {
         if (ArrayUtil.contains(userIds, getUserId())) {
             return R.fail("当前用户不能删除");
         }
@@ -198,10 +209,12 @@ public class SysUserController extends BaseController {
 
     /**
      * 根据用户编号获取授权角色
+     *
+     * @param userId 用户ID
      */
     @SaCheckPermission("system:user:query")
     @GetMapping("/authRole/{userId}")
-    public R<Map<String, Object>> authRole(@Parameter(name = "用户ID") @PathVariable("userId") Long userId) {
+    public R<Map<String, Object>> authRole(@PathVariable Long userId) {
         SysUser user = userService.selectUserById(userId);
         List<SysRole> roles = roleService.selectRolesByUserId(userId);
         Map<String, Object> ajax = new HashMap<>();
@@ -212,11 +225,10 @@ public class SysUserController extends BaseController {
 
     /**
      * 用户授权角色
+     *
+     * @param userId  用户Id
+     * @param roleIds 角色ID串
      */
-    @Parameters({
-        @Parameter(name = "userId", description = "用户Id", in = ParameterIn.QUERY),
-        @Parameter(name = "roleIds", description = "角色ID串", in = ParameterIn.QUERY)
-    })
     @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.GRANT)
     @PutMapping("/authRole")

@@ -14,7 +14,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.bo.SysOssConfigBo;
 import com.ruoyi.system.domain.vo.SysOssConfigVo;
 import com.ruoyi.system.service.ISysOssConfigService;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -25,14 +24,14 @@ import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 
 /**
- * 对象存储配置Controller
+ * 对象存储配置
  *
  * @author Lion Li
  * @author 孤舟烟雨
  * @date 2021-08-13
  */
 @Validated
-@Tag(name ="对象存储配置控制器", description = "对象存储配置管理")
+@Tag(name = "对象存储配置控制器", description = "对象存储配置管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/oss/config")
@@ -51,12 +50,13 @@ public class SysOssConfigController extends BaseController {
 
     /**
      * 获取对象存储配置详细信息
+     *
+     * @param ossConfigId OSS配置ID
      */
     @SaCheckPermission("system:oss:query")
     @GetMapping("/{ossConfigId}")
-    public R<SysOssConfigVo> getInfo(@Parameter(name = "OSS配置ID")
-                                              @NotNull(message = "主键不能为空")
-                                              @PathVariable("ossConfigId") Long ossConfigId) {
+    public R<SysOssConfigVo> getInfo(@NotNull(message = "主键不能为空")
+                                     @PathVariable Long ossConfigId) {
         return R.ok(iSysOssConfigService.queryById(ossConfigId));
     }
 
@@ -84,13 +84,14 @@ public class SysOssConfigController extends BaseController {
 
     /**
      * 删除对象存储配置
+     *
+     * @param ossConfigIds OSS配置ID串
      */
     @SaCheckPermission("system:oss:remove")
     @Log(title = "对象存储配置", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ossConfigIds}")
-    public R<Void> remove(@Parameter(name = "OSS配置ID串")
-                                   @NotEmpty(message = "主键不能为空")
-                                   @PathVariable Long[] ossConfigIds) {
+    public R<Void> remove(@NotEmpty(message = "主键不能为空")
+                          @PathVariable Long[] ossConfigIds) {
         return toAjax(iSysOssConfigService.deleteWithValidByIds(Arrays.asList(ossConfigIds), true) ? 1 : 0);
     }
 

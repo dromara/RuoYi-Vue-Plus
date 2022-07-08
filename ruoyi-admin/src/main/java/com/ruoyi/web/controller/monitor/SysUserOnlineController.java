@@ -28,12 +28,18 @@ import java.util.List;
  *
  * @author Lion Li
  */
-@Tag(name ="在线用户监控", description = "在线用户监控管理")
+@Tag(name = "在线用户监控", description = "在线用户监控管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/online")
 public class SysUserOnlineController extends BaseController {
 
+    /**
+     * 获取在线用户监控列表
+     *
+     * @param ipaddr   IP地址
+     * @param userName 用户名
+     */
     @SaCheckPermission("monitor:online:list")
     @GetMapping("/list")
     public TableDataInfo<SysUserOnline> list(String ipaddr, String userName) {
@@ -55,7 +61,7 @@ public class SysUserOnlineController extends BaseController {
             );
         } else if (StringUtils.isNotEmpty(ipaddr)) {
             userOnlineDTOList = StreamUtils.filter(userOnlineDTOList, userOnline ->
-                    StringUtils.equals(ipaddr, userOnline.getIpaddr())
+                StringUtils.equals(ipaddr, userOnline.getIpaddr())
             );
         } else if (StringUtils.isNotEmpty(userName)) {
             userOnlineDTOList = StreamUtils.filter(userOnlineDTOList, userOnline ->
@@ -70,6 +76,8 @@ public class SysUserOnlineController extends BaseController {
 
     /**
      * 强退用户
+     *
+     * @param tokenId token值
      */
     @SaCheckPermission("monitor:online:forceLogout")
     @Log(title = "在线用户", businessType = BusinessType.FORCE)

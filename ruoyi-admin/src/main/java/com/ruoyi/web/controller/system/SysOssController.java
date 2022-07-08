@@ -19,9 +19,6 @@ import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.vo.SysOssVo;
 import com.ruoyi.system.service.ISysOssService;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -43,7 +40,7 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Tag(name ="对象存储控制器", description = "对象存储管理")
+@Tag(name = "对象存储控制器", description = "对象存储管理")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/oss")
@@ -62,25 +59,25 @@ public class SysOssController extends BaseController {
 
     /**
      * 查询OSS对象基于id串
+     *
+     * @param ossIds OSS对象ID串
      */
     @SaCheckPermission("system:oss:list")
     @GetMapping("/listByIds/{ossIds}")
-    public R<List<SysOssVo>> listByIds(@Parameter(name = "OSS对象ID串")
-                                     @NotEmpty(message = "主键不能为空")
-                                     @PathVariable Long[] ossIds) {
+    public R<List<SysOssVo>> listByIds(@NotEmpty(message = "主键不能为空")
+                                       @PathVariable Long[] ossIds) {
         List<SysOssVo> list = iSysOssService.listByIds(Arrays.asList(ossIds));
         return R.ok(list);
     }
 
     /**
      * 上传OSS对象存储
+     *
+     * @param file 文件
      */
-    @Parameters({
-        @Parameter(name = "file", description = "文件", in = ParameterIn.QUERY, required = true)
-    })
     @SaCheckPermission("system:oss:upload")
     @Log(title = "OSS对象存储", businessType = BusinessType.INSERT)
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<Map<String, String>> upload(@RequestPart("file") MultipartFile file) {
         if (ObjectUtil.isNull(file)) {
             throw new ServiceException("上传文件不能为空");
@@ -93,9 +90,14 @@ public class SysOssController extends BaseController {
         return R.ok(map);
     }
 
+    /**
+     * 下载OSS对象
+     *
+     * @param ossId OSS对象ID
+     */
     @SaCheckPermission("system:oss:download")
     @GetMapping("/download/{ossId}")
-    public void download(@Parameter(name = "OSS对象ID") @PathVariable Long ossId, HttpServletResponse response) throws IOException {
+    public void download(@PathVariable Long ossId, HttpServletResponse response) throws IOException {
         SysOss sysOss = iSysOssService.getById(ossId);
         if (ObjectUtil.isNull(sysOss)) {
             throw new ServiceException("文件数据不存在!");
@@ -118,13 +120,14 @@ public class SysOssController extends BaseController {
 
     /**
      * 删除OSS对象存储
+     *
+     * @param ossIds OSS对象ID串
      */
     @SaCheckPermission("system:oss:remove")
     @Log(title = "OSS对象存储", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ossIds}")
-    public R<Void> remove(@Parameter(name = "OSS对象ID串")
-                                   @NotEmpty(message = "主键不能为空")
-                                   @PathVariable Long[] ossIds) {
+    public R<Void> remove(@NotEmpty(message = "主键不能为空")
+                          @PathVariable Long[] ossIds) {
         return toAjax(iSysOssService.deleteWithValidByIds(Arrays.asList(ossIds), true) ? 1 : 0);
     }
 
