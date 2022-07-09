@@ -75,10 +75,6 @@ spring:
     restart:
       # 热部署开关
       enabled: true
-  mvc:
-    pathmatch:
-      # 适配 boot 2.6 路由与 springfox 兼容
-      matching-strategy: ANT_PATH_MATCHER
   jackson:
     # 日期格式化
     date-format: yyyy-MM-dd HH:mm:ss
