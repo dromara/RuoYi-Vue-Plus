@@ -37,7 +37,7 @@ public interface I${ClassName}Service {
     List<${ClassName}Vo> queryList(${ClassName}Bo bo);
 
     /**
-     * 修改${functionName}
+     * 新增${functionName}
      */
     Boolean insertByBo(${ClassName}Bo bo);
 
