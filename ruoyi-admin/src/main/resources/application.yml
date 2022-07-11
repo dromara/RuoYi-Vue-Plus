@@ -121,8 +121,7 @@ security:
     - /**/*.js
     # swagger 文档配置
     - /favicon.ico
-    - /doc.html
-    - /swagger-ui/**
+    - /*/api-docs
     - /*/api-docs/**
     # druid 监控配置
     - /druid/**
@@ -199,11 +198,6 @@ swagger:
         name: ${sa-token.token-name}
 
 springdoc:
-  swagger-ui:
-    # 修改Swagger UI路径
-    path: /doc.html
-    # 持久化认证数据
-    persistAuthorization: true
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
     - group: 1.演示模块
