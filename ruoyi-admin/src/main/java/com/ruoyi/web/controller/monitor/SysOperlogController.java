@@ -51,7 +51,8 @@ public class SysOperlogController extends BaseController {
     }
 
     /**
-     * 获取操作日志记录详情
+     * 批量删除操作日志记录
+     * @param operIds 日志ids
      */
     @Log(title = "操作日志", businessType = BusinessType.DELETE)
     @SaCheckPermission("monitor:operlog:remove")
