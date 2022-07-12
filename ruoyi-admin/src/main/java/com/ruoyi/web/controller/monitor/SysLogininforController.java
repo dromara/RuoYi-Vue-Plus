@@ -51,8 +51,8 @@ public class SysLogininforController extends BaseController {
     }
 
     /**
-     * 删除登录日志
-     * @param infoIds 日志id
+     * 批量删除登录日志
+     * @param infoIds 日志ids
      */
     @SaCheckPermission("monitor:logininfor:remove")
     @Log(title = "登录日志", businessType = BusinessType.DELETE)
