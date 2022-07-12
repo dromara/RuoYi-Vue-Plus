@@ -14,7 +14,7 @@
 
     <properties>
         <ruoyi-vue-plus.version>4.2.0</ruoyi-vue-plus.version>
-        <spring-boot.version>2.6.9</spring-boot.version>
+        <spring-boot.version>2.7.1</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -22,7 +22,6 @@
         <spring-boot.mybatis>2.2.2</spring-boot.mybatis>
         <druid.version>1.2.11</druid.version>
         <springdoc.version>1.6.9</springdoc.version>
-        <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <poi.version>5.2.2</poi.version>
         <easyexcel.version>3.1.1</easyexcel.version>
         <velocity.version>2.3</velocity.version>
@@ -31,7 +30,7 @@
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.3</hutool.version>
         <okhttp.version>4.9.3</okhttp.version>
-        <spring-boot-admin.version>2.6.7</spring-boot-admin.version>
+        <spring-boot-admin.version>2.7.2</spring-boot-admin.version>
         <redisson.version>3.17.4</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.5.1</dynamic-ds.version>
