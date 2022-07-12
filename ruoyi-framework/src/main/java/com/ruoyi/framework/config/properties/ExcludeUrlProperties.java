@@ -33,7 +33,7 @@ public class ExcludeUrlProperties implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         String asterisk = "*";
-        RequestMappingHandlerMapping mapping = SpringUtils.getBean(RequestMappingHandlerMapping.class);
+        RequestMappingHandlerMapping mapping = SpringUtils.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
 
         map.keySet().forEach(info -> {
