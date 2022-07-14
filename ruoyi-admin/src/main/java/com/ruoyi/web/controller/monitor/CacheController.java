@@ -1,14 +1,16 @@
 package com.ruoyi.web.controller.monitor;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.system.domain.SysCache;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.connection.RedisServerCommands;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.redisson.spring.data.connection.RedissonConnectionFactory;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -23,7 +25,7 @@ import java.util.*;
 @RequestMapping("/monitor/cache")
 public class CacheController {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedissonConnectionFactory connectionFactory;
 
     private final static List<SysCache> CACHES = new ArrayList<>();
 
@@ -44,9 +46,10 @@ public class CacheController {
     @SaCheckPermission("monitor:cache:list")
     @GetMapping()
     public R<Map<String, Object>> getInfo() throws Exception {
-        Properties info = (Properties) redisTemplate.execute((RedisCallback<Object>) RedisServerCommands::info);
-        Properties commandStats = (Properties) redisTemplate.execute((RedisCallback<Object>) connection -> connection.info("commandstats"));
-        Object dbSize = redisTemplate.execute((RedisCallback<Object>) RedisServerCommands::dbSize);
+        RedisConnection connection = connectionFactory.getConnection();
+        Properties info = connection.info();
+        Properties commandStats = connection.info("commandstats");
+        Long dbSize = connection.dbSize();
 
         Map<String, Object> result = new HashMap<>(3);
         result.put("info", info);
@@ -82,8 +85,9 @@ public class CacheController {
      */
     @SaCheckPermission("monitor:cache:list")
     @GetMapping("/getKeys/{cacheName}")
-    public R<Set<String>> getCacheKeys(@PathVariable String cacheName) {
-        Set<String> cacheKyes = redisTemplate.keys(cacheName + "*");
+    public R<Collection<String>> getCacheKeys(@PathVariable String cacheName) {
+        Iterable<String> iterable = RedisUtils.getClient().getKeys().getKeysByPattern(cacheName + "*");
+        Collection<String> cacheKyes = CollUtil.toCollection(iterable);
         return R.ok(cacheKyes);
     }
 
@@ -96,8 +100,8 @@ public class CacheController {
     @SaCheckPermission("monitor:cache:list")
     @GetMapping("/getValue/{cacheName}/{cacheKey}")
     public R<SysCache> getCacheValue(@PathVariable String cacheName, @PathVariable String cacheKey) {
-        String cacheValue = redisTemplate.opsForValue().get(cacheKey);
-        SysCache sysCache = new SysCache(cacheName, cacheKey, cacheValue);
+        Object cacheValue = RedisUtils.getCacheObject(cacheKey);
+        SysCache sysCache = new SysCache(cacheName, cacheKey, JsonUtils.toJsonString(cacheValue));
         return R.ok(sysCache);
     }
 
@@ -109,8 +113,7 @@ public class CacheController {
     @SaCheckPermission("monitor:cache:list")
     @DeleteMapping("/clearCacheName/{cacheName}")
     public R<Void> clearCacheName(@PathVariable String cacheName) {
-        Collection<String> cacheKeys = redisTemplate.keys(cacheName + "*");
-        redisTemplate.delete(cacheKeys);
+        RedisUtils.getClient().getKeys().deleteByPattern(cacheName + "*");
         return R.ok();
     }
 
@@ -122,7 +125,7 @@ public class CacheController {
     @SaCheckPermission("monitor:cache:list")
     @DeleteMapping("/clearCacheKey/{cacheKey}")
     public R<Void> clearCacheKey(@PathVariable String cacheKey) {
-        redisTemplate.delete(cacheKey);
+        RedisUtils.deleteObject(cacheKey);
         return R.ok();
     }
 
@@ -132,8 +135,7 @@ public class CacheController {
     @SaCheckPermission("monitor:cache:list")
     @DeleteMapping("/clearCacheAll")
     public R<Void> clearCacheAll() {
-        Collection<String> cacheKeys = redisTemplate.keys("*");
-        redisTemplate.delete(cacheKeys);
+        RedisUtils.getClient().getKeys().deleteByPattern("*");
         return R.ok();
     }
 
