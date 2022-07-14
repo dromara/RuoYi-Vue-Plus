@@ -3,6 +3,7 @@ package com.ruoyi.framework.config;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ruoyi.framework.config.properties.RedissonProperties;
+import com.ruoyi.framework.handler.KeyPrefixHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
@@ -48,6 +49,7 @@ public class RedisConfig extends CachingConfigurerSupport {
             if (ObjectUtil.isNotNull(singleServerConfig)) {
                 // 使用单机模式
                 config.useSingleServer()
+                     .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()))//设置redis key前缀
                     .setTimeout(singleServerConfig.getTimeout())
                     .setClientName(singleServerConfig.getClientName())
                     .setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
@@ -59,6 +61,7 @@ public class RedisConfig extends CachingConfigurerSupport {
             RedissonProperties.ClusterServersConfig clusterServersConfig = redissonProperties.getClusterServersConfig();
             if (ObjectUtil.isNotNull(clusterServersConfig)) {
                 config.useClusterServers()
+                     .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()))//设置redis key前缀
                     .setTimeout(clusterServersConfig.getTimeout())
                     .setClientName(clusterServersConfig.getClientName())
                     .setIdleConnectionTimeout(clusterServersConfig.getIdleConnectionTimeout())
