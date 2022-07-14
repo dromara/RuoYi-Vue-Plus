@@ -124,12 +124,19 @@ public class PlusDataPermissionHandler {
             }
             boolean isSuccess = false;
             for (DataColumn dataColumn : dataColumns) {
+                if (dataColumn.key().length != dataColumn.value().length) {
+                    throw new ServiceException("角色数据范围异常 => key与value长度不匹配");
+                }
                 // 不包含 key 变量 则不处理
-                if (!StringUtils.contains(type.getSqlTemplate(), "#" + dataColumn.key())) {
+                if (!StringUtils.containsAny(type.getSqlTemplate(),
+                    Arrays.stream(dataColumn.key()).map(key -> "#" + key).toArray(String[]::new)
+                )) {
                     continue;
                 }
                 // 设置注解变量 key 为表达式变量 value 为变量值
-                context.setVariable(dataColumn.key(), dataColumn.value());
+                for (int i = 0; i < dataColumn.key().length; i++) {
+                    context.setVariable(dataColumn.key()[i], dataColumn.value()[i]);
+                }
 
                 // 解析sql模板并填充
                 String sql = parser.parseExpression(type.getSqlTemplate(), parserContext).getValue(context, String.class);
@@ -137,7 +144,7 @@ public class PlusDataPermissionHandler {
                 isSuccess = true;
             }
             // 未处理成功则填充兜底方案
-            if (!isSuccess) {
+            if (!isSuccess && StringUtils.isNotBlank(type.getElseSql())) {
                 sqlString.append(joinStr).append(type.getElseSql());
             }
         }
