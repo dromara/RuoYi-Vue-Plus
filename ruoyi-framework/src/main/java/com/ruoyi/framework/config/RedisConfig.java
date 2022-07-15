@@ -49,7 +49,8 @@ public class RedisConfig extends CachingConfigurerSupport {
             if (ObjectUtil.isNotNull(singleServerConfig)) {
                 // 使用单机模式
                 config.useSingleServer()
-                     .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()))//设置redis key前缀
+                    //设置redis key前缀
+                    .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()))
                     .setTimeout(singleServerConfig.getTimeout())
                     .setClientName(singleServerConfig.getClientName())
                     .setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
@@ -61,7 +62,8 @@ public class RedisConfig extends CachingConfigurerSupport {
             RedissonProperties.ClusterServersConfig clusterServersConfig = redissonProperties.getClusterServersConfig();
             if (ObjectUtil.isNotNull(clusterServersConfig)) {
                 config.useClusterServers()
-                     .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()))//设置redis key前缀
+                    //设置redis key前缀
+                    .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()))
                     .setTimeout(clusterServersConfig.getTimeout())
                     .setClientName(clusterServersConfig.getClientName())
                     .setIdleConnectionTimeout(clusterServersConfig.getIdleConnectionTimeout())
