@@ -125,7 +125,7 @@ public class StreamUtils {
         }
         return collection
             .stream()
-            .collect(Collectors.groupingBy(key, Collectors.toList()));
+            .collect(Collectors.groupingBy(key, LinkedHashMap::new, Collectors.toList()));
     }
 
     /**
@@ -146,7 +146,7 @@ public class StreamUtils {
         }
         return collection
             .stream()
-            .collect(Collectors.groupingBy(key1, Collectors.groupingBy(key2, Collectors.toList())));
+            .collect(Collectors.groupingBy(key1, LinkedHashMap::new, Collectors.groupingBy(key2, LinkedHashMap::new, Collectors.toList())));
     }
 
     /**
@@ -167,7 +167,7 @@ public class StreamUtils {
         }
         return collection
             .stream()
-            .collect(Collectors.groupingBy(key1, Collectors.toMap(key2, Function.identity(), (l, r) -> l)));
+            .collect(Collectors.groupingBy(key1, LinkedHashMap::new, Collectors.toMap(key2, Function.identity(), (l, r) -> l)));
     }
 
     /**
