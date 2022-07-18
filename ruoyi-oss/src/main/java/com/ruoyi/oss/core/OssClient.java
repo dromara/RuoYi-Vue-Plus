@@ -119,12 +119,12 @@ public class OssClient {
     }
 
     public String getUrl() {
-        String header = OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? "https://" : "http://";
         String domain = properties.getDomain();
         if (StringUtils.isNotBlank(domain)) {
-            return header + domain;
+            return domain;
         }
         String endpoint = properties.getEndpoint();
+        String header = OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? "https://" : "http://";
         // 云服务商直接返回
         if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)){
             return header + properties.getBucketName() + "." + endpoint;
