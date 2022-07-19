@@ -1,6 +1,7 @@
 package com.ruoyi.framework.handler;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
@@ -13,6 +14,7 @@ import com.ruoyi.common.enums.DataScopeType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.DataPermissionHelper;
 import com.ruoyi.common.helper.LoginHelper;
+import com.ruoyi.common.utils.StreamUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +32,9 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -104,13 +104,13 @@ public class PlusDataPermissionHandler {
      * 构造数据过滤sql
      */
     private String buildDataFilter(DataColumn[] dataColumns, boolean isSelect) {
-        StringBuilder sqlString = new StringBuilder();
         // 更新或删除需满足所有条件
         String joinStr = isSelect ? " OR " : " AND ";
         LoginUser user = DataPermissionHelper.getVariable("user");
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setBeanResolver(beanResolver);
         DataPermissionHelper.getContext().forEach(context::setVariable);
+        Set<String> conditions = new HashSet<>();
         for (RoleDTO role : user.getRoles()) {
             user.setRoleId(role.getRoleId());
             // 获取角色权限泛型
@@ -140,17 +140,18 @@ public class PlusDataPermissionHandler {
 
                 // 解析sql模板并填充
                 String sql = parser.parseExpression(type.getSqlTemplate(), parserContext).getValue(context, String.class);
-                sqlString.append(joinStr).append(sql);
+                conditions.add(joinStr + sql);
                 isSuccess = true;
             }
             // 未处理成功则填充兜底方案
             if (!isSuccess && StringUtils.isNotBlank(type.getElseSql())) {
-                sqlString.append(joinStr).append(type.getElseSql());
+                conditions.add(joinStr + type.getElseSql());
             }
         }
 
-        if (StringUtils.isNotBlank(sqlString.toString())) {
-            return sqlString.substring(joinStr.length());
+        if (CollUtil.isNotEmpty(conditions)) {
+            String sql = StreamUtils.join(conditions, Function.identity(), "");
+            return sql.substring(joinStr.length());
         }
         return "";
     }
