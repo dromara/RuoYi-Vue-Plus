@@ -81,7 +81,7 @@
             <h4>后端技术</h4>
             <ul>
               <li>SpringBoot</li>
-              <li>Spring Security</li>
+              <li>Sa-Token</li>
               <li>JWT</li>
               <li>MyBatis</li>
               <li>Druid</li>
