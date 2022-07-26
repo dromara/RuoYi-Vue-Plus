@@ -1,18 +1,22 @@
 package com.ruoyi.framework.config;
 
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.SwaggerProperties;
 import com.ruoyi.framework.handler.OpenApiHandler;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.*;
 import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
+import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springdoc.core.customizers.ServerBaseUrlCustomizer;
 import org.springdoc.core.providers.JavadocProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,6 +36,7 @@ import java.util.Optional;
 public class SwaggerConfig {
 
     private final SwaggerProperties swaggerProperties;
+    private final ServerProperties serverProperties;
 
     @Bean
     @ConditionalOnMissingBean(OpenAPI.class)
@@ -73,6 +78,27 @@ public class SwaggerConfig {
                                          Optional<List<OpenApiBuilderCustomizer>> openApiBuilderCustomisers,
                                          Optional<List<ServerBaseUrlCustomizer>> serverBaseUrlCustomisers, Optional<JavadocProvider> javadocProvider) {
         return new OpenApiHandler(openAPI, securityParser, springDocConfigProperties, propertyResolverUtils, openApiBuilderCustomisers, serverBaseUrlCustomisers, javadocProvider);
+    }
+
+    /**
+     * 对已经生成好的 OpenApi 进行自定义操作
+     */
+    @Bean
+    public OpenApiCustomiser openApiCustomiser() {
+        String contextPath = serverProperties.getServlet().getContextPath();
+        String finalContextPath;
+        if (StringUtils.isBlank(contextPath) || "/".equals(contextPath)) {
+            finalContextPath = "";
+        } else {
+            finalContextPath = contextPath;
+        }
+        // 对所有路径增加前置上下文路径
+        return openApi -> {
+            Paths oldPaths = openApi.getPaths();
+            Paths newPaths = new Paths();
+            oldPaths.forEach((k,v) -> newPaths.addPathItem(finalContextPath + k, v));
+            openApi.setPaths(newPaths);
+        };
     }
 
 }
