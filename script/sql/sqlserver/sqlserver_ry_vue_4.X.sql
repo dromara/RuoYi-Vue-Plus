@@ -414,7 +414,7 @@ INSERT [sys_config] ([config_id], [config_name], [config_key], [config_value], [
 GO
 INSERT [sys_config] ([config_id], [config_name], [config_key], [config_value], [config_type], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (3, N'主框架页-侧边栏主题', N'sys.index.sideTheme', N'theme-dark', N'Y', N'admin', getdate(), N'', NULL, N'深色主题theme-dark，浅色主题theme-light')
 GO
-INSERT [sys_config] ([config_id], [config_name], [config_key], [config_value], [config_type], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (4, N'账号自助-验证码开关', N'sys.account.captchaOnOff', N'true', N'Y', N'admin', getdate(), N'', NULL, N'是否开启验证码功能（true开启，false关闭）')
+INSERT [sys_config] ([config_id], [config_name], [config_key], [config_value], [config_type], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (4, N'账号自助-验证码开关', N'sys.account.captchaEnabled', N'true', N'Y', N'admin', getdate(), N'', NULL, N'是否开启验证码功能（true开启，false关闭）')
 GO
 INSERT [sys_config] ([config_id], [config_name], [config_key], [config_value], [config_type], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (5, N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', N'admin', getdate(), N'', NULL, N'是否开启注册用户功能（true开启，false关闭）')
 GO

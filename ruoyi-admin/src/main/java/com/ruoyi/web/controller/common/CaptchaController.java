@@ -79,9 +79,9 @@ public class CaptchaController {
     @GetMapping("/captchaImage")
     public R<Map<String, Object>> getCode() {
         Map<String, Object> ajax = new HashMap<>();
-        boolean captchaOnOff = configService.selectCaptchaOnOff();
-        ajax.put("captchaOnOff", captchaOnOff);
-        if (!captchaOnOff) {
+        boolean captchaEnabled = configService.selectCaptchaEnabled();
+        ajax.put("captchaEnabled", captchaEnabled);
+        if (!captchaEnabled) {
             return R.ok(ajax);
         }
         // 保存验证码信息

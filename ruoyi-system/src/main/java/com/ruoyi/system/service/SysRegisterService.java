@@ -43,9 +43,9 @@ public class SysRegisterService {
         // 校验用户类型是否存在
         String userType = UserType.getUserType(registerBody.getUserType()).getUserType();
 
-        boolean captchaOnOff = configService.selectCaptchaOnOff();
+        boolean captchaEnabled = configService.selectCaptchaEnabled();
         // 验证码开关
-        if (captchaOnOff) {
+        if (captchaEnabled) {
             validateCaptcha(username, registerBody.getCode(), registerBody.getUuid(), request);
         }
 

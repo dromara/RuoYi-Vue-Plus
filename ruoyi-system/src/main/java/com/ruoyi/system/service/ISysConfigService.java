@@ -37,7 +37,7 @@ public interface ISysConfigService {
      *
      * @return true开启，false关闭
      */
-    boolean selectCaptchaOnOff();
+    boolean selectCaptchaEnabled();
 
     /**
      * 查询参数配置列表

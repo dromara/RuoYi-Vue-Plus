@@ -87,8 +87,8 @@ public class CacheController {
     @SaCheckPermission("monitor:cache:list")
     @GetMapping("/getKeys/{cacheName}")
     public R<Collection<String>> getCacheKeys(@PathVariable String cacheName) {
-        Collection<String> cacheKyes = RedisUtils.keys(cacheName + "*");
-        return R.ok(cacheKyes);
+        Collection<String> cacheKeys = RedisUtils.keys(cacheName + "*");
+        return R.ok(cacheKeys);
     }
 
     /**
