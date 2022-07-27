@@ -3,3 +3,6 @@ GO
 
 delete from sys_menu WHERE menu_id = 116;
 GO
+
+update sys_config set config_key = 'sys.account.captchaEnabled' where config_id = 4
+GO
