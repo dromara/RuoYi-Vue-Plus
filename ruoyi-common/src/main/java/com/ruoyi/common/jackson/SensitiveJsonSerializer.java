@@ -11,6 +11,8 @@ import com.ruoyi.common.annotation.Sensitive;
 import com.ruoyi.common.core.service.SensitiveService;
 import com.ruoyi.common.enums.SensitiveStrategy;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -20,19 +22,24 @@ import java.util.Objects;
  *
  * @author Yjoioooo
  */
+@Slf4j
 public class SensitiveJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {
 
     private SensitiveStrategy strategy;
 
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        SensitiveService sensitiveService = SpringUtils.getBean(SensitiveService.class);
-        if (ObjectUtil.isNotNull(sensitiveService) && sensitiveService.isSensitive()) {
-            gen.writeString(strategy.desensitizer().apply(value));
-        } else {
+        try {
+            SensitiveService sensitiveService = SpringUtils.getBean(SensitiveService.class);
+            if (ObjectUtil.isNotNull(sensitiveService) && sensitiveService.isSensitive()) {
+                gen.writeString(strategy.desensitizer().apply(value));
+            } else {
+                gen.writeString(value);
+            }
+        } catch (BeansException e) {
+            log.error("脱敏实现不存在, 采用默认处理 => {}", e.getMessage());
             gen.writeString(value);
         }
-
     }
 
     @Override
