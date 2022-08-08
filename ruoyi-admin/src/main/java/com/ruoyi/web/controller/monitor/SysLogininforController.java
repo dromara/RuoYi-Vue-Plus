@@ -2,12 +2,14 @@ package com.ruoyi.web.controller.monitor;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.system.domain.SysLogininfor;
 import com.ruoyi.system.service.ISysLogininforService;
 import lombok.RequiredArgsConstructor;
@@ -71,4 +73,16 @@ public class SysLogininforController extends BaseController {
         logininforService.cleanLogininfor();
         return R.ok();
     }
+
+    @SaCheckPermission("monitor:logininfor:unlock")
+    @Log(title = "账户解锁", businessType = BusinessType.OTHER)
+    @GetMapping("/unlock/{userName}")
+    public R<Void> unlock(@PathVariable("userName") String userName) {
+        String loginName = CacheConstants.PWD_ERR_CNT_KEY + userName;
+        if (RedisUtils.hasKey(loginName)) {
+            RedisUtils.deleteObject(loginName);
+        }
+        return R.ok();
+    }
+
 }
