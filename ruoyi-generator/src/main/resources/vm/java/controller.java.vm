@@ -27,18 +27,14 @@ import ${packageName}.service.I${ClassName}Service;
 import com.ruoyi.common.core.page.TableDataInfo;
 #elseif($table.tree)
 #end
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiOperation;
 
 /**
- * ${functionName}Controller
+ * ${functionName}
  *
  * @author ${author}
  * @date ${datetime}
  */
 @Validated
-@Api(value = "${functionName}控制器", tags = {"${functionName}管理"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/${moduleName}/${businessName}")
@@ -49,7 +45,6 @@ public class ${ClassName}Controller extends BaseController {
     /**
      * 查询${functionName}列表
      */
-    @ApiOperation("查询${functionName}列表")
     @SaCheckPermission("${permissionPrefix}:list")
     @GetMapping("/list")
 #if($table.crud || $table.sub)
@@ -66,7 +61,6 @@ public class ${ClassName}Controller extends BaseController {
     /**
      * 导出${functionName}列表
      */
-    @ApiOperation("导出${functionName}列表")
     @SaCheckPermission("${permissionPrefix}:export")
     @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
@@ -77,20 +71,19 @@ public class ${ClassName}Controller extends BaseController {
 
     /**
      * 获取${functionName}详细信息
+     *
+     * @param ${pkColumn.javaField} 主键
      */
-    @ApiOperation("获取${functionName}详细信息")
     @SaCheckPermission("${permissionPrefix}:query")
     @GetMapping("/{${pkColumn.javaField}}")
-    public R<${ClassName}Vo> getInfo(@ApiParam("主键")
-                                     @NotNull(message = "主键不能为空")
-                                     @PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField}) {
+    public R<${ClassName}Vo> getInfo(@NotNull(message = "主键不能为空")
+                                     @PathVariable ${pkColumn.javaType} ${pkColumn.javaField}) {
         return R.ok(i${ClassName}Service.queryById(${pkColumn.javaField}));
     }
 
     /**
      * 新增${functionName}
      */
-    @ApiOperation("新增${functionName}")
     @SaCheckPermission("${permissionPrefix}:add")
     @Log(title = "${functionName}", businessType = BusinessType.INSERT)
     @RepeatSubmit()
@@ -102,7 +95,6 @@ public class ${ClassName}Controller extends BaseController {
     /**
      * 修改${functionName}
      */
-    @ApiOperation("修改${functionName}")
     @SaCheckPermission("${permissionPrefix}:edit")
     @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
@@ -113,14 +105,14 @@ public class ${ClassName}Controller extends BaseController {
 
     /**
      * 删除${functionName}
+     *
+     * @param ${pkColumn.javaField}s 主键串
      */
-    @ApiOperation("删除${functionName}")
     @SaCheckPermission("${permissionPrefix}:remove")
     @Log(title = "${functionName}", businessType = BusinessType.DELETE)
     @DeleteMapping("/{${pkColumn.javaField}s}")
-    public R<Void> remove(@ApiParam("主键串")
-                                       @NotEmpty(message = "主键不能为空")
-                                       @PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
+    public R<Void> remove(@NotEmpty(message = "主键不能为空")
+                          @PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
         return toAjax(i${ClassName}Service.deleteWithValidByIds(Arrays.asList(${pkColumn.javaField}s), true) ? 1 : 0);
     }
 }

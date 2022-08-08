@@ -2,9 +2,6 @@ package com.ruoyi.demo.controller.queue;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.QueueUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,17 +20,20 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 3.6.0
  */
 @Slf4j
-@Api(value = "有界队列 演示案例", tags = {"有界队列"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/queue/bounded")
 public class BoundedQueueController {
 
 
-    @ApiOperation("添加队列数据")
+    /**
+     * 添加队列数据
+     *
+     * @param queueName 队列名
+     * @param capacity  容量
+     */
     @GetMapping("/add")
-    public R<Void> add(@ApiParam("队列名") String queueName,
-                                @ApiParam("容量") int capacity) {
+    public R<Void> add(String queueName, int capacity) {
         // 用完了一定要销毁 否则会一直存在
         boolean b = QueueUtils.destroyBoundedQueueObject(queueName);
         log.info("通道: {} , 删除: {}", queueName, b);
@@ -56,9 +56,13 @@ public class BoundedQueueController {
         return R.ok("操作成功");
     }
 
-    @ApiOperation("删除队列数据")
+    /**
+     * 删除队列数据
+     *
+     * @param queueName 队列名
+     */
     @GetMapping("/remove")
-    public R<Void> remove(@ApiParam("队列名") String queueName) {
+    public R<Void> remove(String queueName) {
         String data = "data-" + 5;
         if (QueueUtils.removeBoundedQueueObject(queueName, data)) {
             log.info("通道: {} , 删除数据: {}", queueName, data);
@@ -68,9 +72,13 @@ public class BoundedQueueController {
         return R.ok("操作成功");
     }
 
-    @ApiOperation("获取队列数据")
+    /**
+     * 获取队列数据
+     *
+     * @param queueName 队列名
+     */
     @GetMapping("/get")
-    public R<Void> get(@ApiParam("队列名") String queueName) {
+    public R<Void> get(String queueName) {
         String data;
         do {
             data = QueueUtils.getBoundedQueueObject(queueName);

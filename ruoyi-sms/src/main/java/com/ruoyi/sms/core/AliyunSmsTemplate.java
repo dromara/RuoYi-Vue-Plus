@@ -56,7 +56,7 @@ public class AliyunSmsTemplate implements SmsTemplate {
             return SmsResult.builder()
                 .isSuccess("OK".equals(resp.getBody().getCode()))
                 .message(resp.getBody().getMessage())
-                .response(resp)
+                .response(JsonUtils.toJsonString(resp))
                 .build();
         } catch (Exception e) {
             throw new SmsException(e.getMessage());

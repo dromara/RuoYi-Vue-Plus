@@ -94,7 +94,10 @@ public class OssClient {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(contentType);
             metadata.setContentLength(inputStream.available());
-            client.putObject(new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata));
+            PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata);
+            // 设置上传对象的 Acl 为公共读
+            putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+            client.putObject(putObjectRequest);
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }
@@ -120,16 +123,19 @@ public class OssClient {
 
     public String getUrl() {
         String domain = properties.getDomain();
-        if (StringUtils.isNotBlank(domain)) {
-            return domain;
-        }
         String endpoint = properties.getEndpoint();
         String header = OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? "https://" : "http://";
         // 云服务商直接返回
         if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)){
+            if (StringUtils.isNotBlank(domain)) {
+                return header + domain;
+            }
             return header + properties.getBucketName() + "." + endpoint;
         }
         // minio 单独处理
+        if (StringUtils.isNotBlank(domain)) {
+            return header + domain + "/" + properties.getBucketName();
+        }
         return header + endpoint + "/" + properties.getBucketName();
     }
 

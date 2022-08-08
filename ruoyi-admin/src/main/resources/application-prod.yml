@@ -5,7 +5,7 @@ spring.servlet.multipart.location: /ruoyi/server/temp
 spring.boot.admin.client:
   # 增加客户端开关
   enabled: true
-  url: http://172.30.0.90:9090/admin
+  url: http://localhost:9090/admin
   instance:
     service-host-type: IP
   username: ruoyi
@@ -16,7 +16,7 @@ xxl.job:
   # 执行器开关
   enabled: true
   # 调度中心地址：如调度中心集群部署存在多个地址则用逗号分隔。
-  admin-addresses: http://172.30.0.92:9100/xxl-job-admin
+  admin-addresses: http://localhost:9100/xxl-job-admin
   # 执行器通讯TOKEN：非空时启用
   access-token: xxl-job
   executor:
@@ -51,7 +51,7 @@ spring:
           driverClassName: com.mysql.cj.jdbc.Driver
           # jdbc 所有参数配置参考 https://lionli.blog.csdn.net/article/details/122018562
           # rewriteBatchedStatements=true 批处理优化 大幅提升批量插入更新删除性能(对数据库有性能损耗 使用批量操作应考虑性能问题)
-          url: jdbc:mysql://172.30.0.36:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
           username: root
           password: root
         # 从库数据源
@@ -63,19 +63,19 @@ spring:
           password:
 #        oracle:
 #          driverClassName: oracle.jdbc.OracleDriver
-#          url: jdbc:oracle:thin:@//172.30.0.36:1521/XE
+#          url: jdbc:oracle:thin:@//localhost:1521/XE
 #          username: ROOT
 #          password: root
 #          druid:
 #            validationQuery: SELECT 1 FROM DUAL
 #        postgres:
 #          driverClassName: org.postgresql.Driver
-#          url: jdbc:postgresql://172.30.0.36:5432/postgres?useUnicode=true&characterEncoding=utf8&useSSL=true&autoReconnect=true&reWriteBatchedInserts=true
+#          url: jdbc:postgresql://localhost:5432/postgres?useUnicode=true&characterEncoding=utf8&useSSL=true&autoReconnect=true&reWriteBatchedInserts=true
 #          username: root
 #          password: root
 #        sqlserver:
 #          driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-#          url: jdbc:sqlserver://172.30.0.36:1433;DatabaseName=tempdb;SelectMethod=cursor;rewriteBatchedStatements=true
+#          url: jdbc:sqlserver://localhost:1433;DatabaseName=tempdb;SelectMethod=cursor;rewriteBatchedStatements=true
 #          username: SA
 #          password: root
       druid:
@@ -128,7 +128,7 @@ spring.datasource.druid:
 spring:
   redis:
     # 地址
-    host: 172.30.0.48
+    host: localhost
     # 端口，默认为6379
     port: 6379
     # 数据库索引
@@ -141,6 +141,8 @@ spring:
     ssl: false
 
 redisson:
+  # redis key前缀
+  keyPrefix:
   # 线程池数量
   threads: 16
   # Netty线程池数量

@@ -5,8 +5,8 @@ import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
@@ -18,7 +18,6 @@ import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysPermissionService;
-import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +31,6 @@ import java.util.List;
  * @author Lion Li
  */
 @Validated
-@Api(value = "角色信息控制器", tags = {"角色信息管理"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/role")
@@ -42,14 +40,18 @@ public class SysRoleController extends BaseController {
     private final ISysUserService userService;
     private final SysPermissionService permissionService;
 
-    @ApiOperation("查询角色信息列表")
+    /**
+     * 获取角色信息列表
+     */
     @SaCheckPermission("system:role:list")
     @GetMapping("/list")
     public TableDataInfo<SysRole> list(SysRole role, PageQuery pageQuery) {
         return roleService.selectPageRoleList(role, pageQuery);
     }
 
-    @ApiOperation("导出角色信息列表")
+    /**
+     * 导出角色信息列表
+     */
     @Log(title = "角色管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:role:export")
     @PostMapping("/export")
@@ -60,11 +62,12 @@ public class SysRoleController extends BaseController {
 
     /**
      * 根据角色编号获取详细信息
+     *
+     * @param roleId 角色ID
      */
-    @ApiOperation("根据角色编号获取详细信息")
     @SaCheckPermission("system:role:query")
     @GetMapping(value = "/{roleId}")
-    public R<SysRole> getInfo(@ApiParam("角色ID") @PathVariable Long roleId) {
+    public R<SysRole> getInfo(@PathVariable Long roleId) {
         roleService.checkRoleDataScope(roleId);
         return R.ok(roleService.selectRoleById(roleId));
     }
@@ -72,7 +75,6 @@ public class SysRoleController extends BaseController {
     /**
      * 新增角色
      */
-    @ApiOperation("新增角色")
     @SaCheckPermission("system:role:add")
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
@@ -89,7 +91,6 @@ public class SysRoleController extends BaseController {
     /**
      * 修改保存角色
      */
-    @ApiOperation("修改保存角色")
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
@@ -118,7 +119,6 @@ public class SysRoleController extends BaseController {
     /**
      * 修改保存数据权限
      */
-    @ApiOperation("修改保存数据权限")
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/dataScope")
@@ -131,7 +131,6 @@ public class SysRoleController extends BaseController {
     /**
      * 状态修改
      */
-    @ApiOperation("状态修改")
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
@@ -143,19 +142,19 @@ public class SysRoleController extends BaseController {
 
     /**
      * 删除角色
+     *
+     * @param roleIds 角色ID串
      */
-    @ApiOperation("删除角色")
     @SaCheckPermission("system:role:remove")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{roleIds}")
-    public R<Void> remove(@ApiParam("角色ID串") @PathVariable Long[] roleIds) {
+    public R<Void> remove(@PathVariable Long[] roleIds) {
         return toAjax(roleService.deleteRoleByIds(roleIds));
     }
 
     /**
      * 获取角色选择框列表
      */
-    @ApiOperation("获取角色选择框列表")
     @SaCheckPermission("system:role:query")
     @GetMapping("/optionselect")
     public R<List<SysRole>> optionselect() {
@@ -165,7 +164,6 @@ public class SysRoleController extends BaseController {
     /**
      * 查询已分配用户角色列表
      */
-    @ApiOperation("查询已分配用户角色列表")
     @SaCheckPermission("system:role:list")
     @GetMapping("/authUser/allocatedList")
     public TableDataInfo<SysUser> allocatedList(SysUser user, PageQuery pageQuery) {
@@ -175,7 +173,6 @@ public class SysRoleController extends BaseController {
     /**
      * 查询未分配用户角色列表
      */
-    @ApiOperation("查询未分配用户角色列表")
     @SaCheckPermission("system:role:list")
     @GetMapping("/authUser/unallocatedList")
     public TableDataInfo<SysUser> unallocatedList(SysUser user, PageQuery pageQuery) {
@@ -185,7 +182,6 @@ public class SysRoleController extends BaseController {
     /**
      * 取消授权用户
      */
-    @ApiOperation("取消授权用户")
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancel")
@@ -195,12 +191,10 @@ public class SysRoleController extends BaseController {
 
     /**
      * 批量取消授权用户
+     *
+     * @param roleId  角色ID
+     * @param userIds 用户ID串
      */
-    @ApiOperation("批量取消授权用户")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "roleId", value = "角色ID", paramType = "query", dataTypeClass = String.class),
-        @ApiImplicitParam(name = "userIds", value = "用户ID串", paramType = "query", dataTypeClass = String.class)
-    })
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancelAll")
@@ -210,12 +204,10 @@ public class SysRoleController extends BaseController {
 
     /**
      * 批量选择用户授权
+     *
+     * @param roleId  角色ID
+     * @param userIds 用户ID串
      */
-    @ApiOperation("批量选择用户授权")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "roleId", value = "角色ID", paramType = "query", dataTypeClass = String.class),
-        @ApiImplicitParam(name = "userIds", value = "用户ID串", paramType = "query", dataTypeClass = String.class)
-    })
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/selectAll")

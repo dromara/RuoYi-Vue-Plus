@@ -1,10 +1,10 @@
 package com.ruoyi.common.utils.redis;
 
-import cn.hutool.core.collection.IterUtil;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.redisson.api.*;
+import org.redisson.config.Config;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * redis 工具类
@@ -24,6 +26,14 @@ import java.util.function.Consumer;
 public class RedisUtils {
 
     private static final RedissonClient CLIENT = SpringUtils.getBean(RedissonClient.class);
+
+    public static NameMapper getNameMapper() {
+        Config config = CLIENT.getConfig();
+        if (config.isClusterConfig()) {
+            return config.useClusterServers().getNameMapper();
+        }
+        return config.useSingleServer().getNameMapper();
+    }
 
     /**
      * 限流
@@ -100,14 +110,13 @@ public class RedisUtils {
      * @since Redis 6.X 以上使用 setAndKeepTTL 兼容 5.X 方案
      */
     public static <T> void setCacheObject(final String key, final T value, final boolean isSaveTtl) {
-        RBucket<Object> bucket = CLIENT.getBucket(key);
+        RBucket<T> bucket = CLIENT.getBucket(key);
         if (isSaveTtl) {
             try {
                 bucket.setAndKeepTTL(value);
             } catch (Exception e) {
                 long timeToLive = bucket.remainTimeToLive();
-                bucket.set(value);
-                bucket.expire(Duration.ofMillis(timeToLive));
+                setCacheObject(key, value, Duration.ofMillis(timeToLive));
             }
         } else {
             bucket.set(value);
@@ -122,9 +131,11 @@ public class RedisUtils {
      * @param duration 时间
      */
     public static <T> void setCacheObject(final String key, final T value, final Duration duration) {
-        RBucket<T> result = CLIENT.getBucket(key);
-        result.set(value);
-        result.expire(duration);
+        RBatch batch = CLIENT.createBatch();
+        RBucketAsync<T> bucket = batch.getBucket(key);
+        bucket.setAsync(value);
+        bucket.expireAsync(duration);
+        batch.execute();
     }
 
     /**
@@ -415,8 +426,17 @@ public class RedisUtils {
      * @return 对象列表
      */
     public static Collection<String> keys(final String pattern) {
-        Iterable<String> iterable = CLIENT.getKeys().getKeysByPattern(pattern);
-        return IterUtil.toList(iterable);
+        Stream<String> stream = CLIENT.getKeys().getKeysStreamByPattern(getNameMapper().map(pattern));
+        return stream.map(key -> getNameMapper().unmap(key)).collect(Collectors.toList());
+    }
+
+    /**
+     * 删除缓存的基本对象列表
+     *
+     * @param pattern 字符串前缀
+     */
+    public static void deleteKeys(final String pattern) {
+        CLIENT.getKeys().deleteByPattern(getNameMapper().map(pattern));
     }
 
     /**
@@ -426,6 +446,6 @@ public class RedisUtils {
      */
     public static Boolean hasKey(String key) {
         RKeys rKeys = CLIENT.getKeys();
-        return rKeys.countExists(key) > 0;
+        return rKeys.countExists(getNameMapper().map(key)) > 0;
     }
 }

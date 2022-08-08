@@ -11,9 +11,6 @@ import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysDeptService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +25,6 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Api(value = "部门控制器", tags = {"部门管理"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/dept")
@@ -39,7 +35,6 @@ public class SysDeptController extends BaseController {
     /**
      * 获取部门列表
      */
-    @ApiOperation("获取部门列表")
     @SaCheckPermission("system:dept:list")
     @GetMapping("/list")
     public R<List<SysDept>> list(SysDept dept) {
@@ -49,11 +44,12 @@ public class SysDeptController extends BaseController {
 
     /**
      * 查询部门列表（排除节点）
+     *
+     * @param deptId 部门ID
      */
-    @ApiOperation("查询部门列表（排除节点）")
     @SaCheckPermission("system:dept:list")
     @GetMapping("/list/exclude/{deptId}")
-    public R<List<SysDept>> excludeChild(@ApiParam("部门ID") @PathVariable(value = "deptId", required = false) Long deptId) {
+    public R<List<SysDept>> excludeChild(@PathVariable(value = "deptId", required = false) Long deptId) {
         List<SysDept> depts = deptService.selectDeptList(new SysDept());
         depts.removeIf(d -> d.getDeptId().equals(deptId)
             || ArrayUtil.contains(StringUtils.split(d.getAncestors(), ","), deptId + ""));
@@ -62,11 +58,12 @@ public class SysDeptController extends BaseController {
 
     /**
      * 根据部门编号获取详细信息
+     *
+     * @param deptId 部门ID
      */
-    @ApiOperation("根据部门编号获取详细信息")
     @SaCheckPermission("system:dept:query")
     @GetMapping(value = "/{deptId}")
-    public R<SysDept> getInfo(@ApiParam("部门ID") @PathVariable Long deptId) {
+    public R<SysDept> getInfo(@PathVariable Long deptId) {
         deptService.checkDeptDataScope(deptId);
         return R.ok(deptService.selectDeptById(deptId));
     }
@@ -74,7 +71,6 @@ public class SysDeptController extends BaseController {
     /**
      * 获取部门下拉树列表
      */
-    @ApiOperation("获取部门下拉树列表")
     @GetMapping("/treeselect")
     public R<List<Tree<Long>>> treeselect(SysDept dept) {
         List<SysDept> depts = deptService.selectDeptList(dept);
@@ -83,10 +79,11 @@ public class SysDeptController extends BaseController {
 
     /**
      * 加载对应角色部门列表树
+     *
+     * @param roleId 角色ID
      */
-    @ApiOperation("加载对应角色部门列表树")
     @GetMapping(value = "/roleDeptTreeselect/{roleId}")
-    public R<Map<String, Object>> roleDeptTreeselect(@ApiParam("角色ID") @PathVariable("roleId") Long roleId) {
+    public R<Map<String, Object>> roleDeptTreeselect(@PathVariable("roleId") Long roleId) {
         List<SysDept> depts = deptService.selectDeptList(new SysDept());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("checkedKeys", deptService.selectDeptListByRoleId(roleId));
@@ -97,7 +94,6 @@ public class SysDeptController extends BaseController {
     /**
      * 新增部门
      */
-    @ApiOperation("新增部门")
     @SaCheckPermission("system:dept:add")
     @Log(title = "部门管理", businessType = BusinessType.INSERT)
     @PostMapping
@@ -111,7 +107,6 @@ public class SysDeptController extends BaseController {
     /**
      * 修改部门
      */
-    @ApiOperation("修改部门")
     @SaCheckPermission("system:dept:edit")
     @Log(title = "部门管理", businessType = BusinessType.UPDATE)
     @PutMapping
@@ -131,12 +126,13 @@ public class SysDeptController extends BaseController {
 
     /**
      * 删除部门
+     *
+     * @param deptId 部门ID
      */
-    @ApiOperation("删除部门")
     @SaCheckPermission("system:dept:remove")
     @Log(title = "部门管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{deptId}")
-    public R<Void> remove(@ApiParam("部门ID串") @PathVariable Long deptId) {
+    public R<Void> remove(@PathVariable Long deptId) {
         if (deptService.hasChildByDeptId(deptId)) {
             return R.fail("存在下级部门,不允许删除");
         }

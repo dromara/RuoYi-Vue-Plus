@@ -1,8 +1,14 @@
 package com.ruoyi.framework.config.properties;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.tags.Tag;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,74 +24,77 @@ import java.util.List;
 public class SwaggerProperties {
 
     /**
-     * 文档开关
+     * 是否开启 openApi 文档
      */
-    private Boolean enabled;
+    private Boolean enabled = true;
 
     /**
-     * 设置请求的统一前缀
+     * 文档基本信息
      */
-    private String pathMapping;
+    @NestedConfigurationProperty
+    private InfoProperties info = new InfoProperties();
 
     /**
-     * 标头
+     * 扩展文档地址
      */
-    private String title;
+    @NestedConfigurationProperty
+    private ExternalDocumentation externalDocs;
 
     /**
-     * 描述
+     * 标签
      */
-    private String description;
+    private List<Tag> tags = null;
 
     /**
-     * 项目版本
+     * 路径
      */
-    private String version;
+    @NestedConfigurationProperty
+    private Paths paths = null;
 
     /**
-     * 联系方式
+     * 组件
      */
-    private Contact contact;
+    @NestedConfigurationProperty
+    private Components components = null;
 
     /**
-     * 组配置
+     * <p>
+     * 文档的基础属性信息
+     * </p>
+     *
+     * @see io.swagger.v3.oas.models.info.Info
+     *
+     * 为了 springboot 自动生产配置提示信息，所以这里复制一个类出来
      */
-    private List<Groups> groups;
-
     @Data
-    @NoArgsConstructor
-    public static class Contact {
+    public static class InfoProperties {
 
         /**
-         * 联系人
+         * 标题
          */
-        private String name;
+        private String title = null;
 
         /**
-         * 联系人url
+         * 描述
          */
-        private String url;
+        private String description = null;
 
         /**
-         * 联系人email
+         * 联系人信息
          */
-        private String email;
-
-    }
-
-    @Data
-    @NoArgsConstructor
-    public static class Groups {
+        @NestedConfigurationProperty
+        private Contact contact = null;
 
         /**
-         * 组名
+         * 许可证
          */
-        private String name;
+        @NestedConfigurationProperty
+        private License license = null;
 
         /**
-         * 基础包路径
+         * 版本
          */
-        private String basePackage;
+        private String version = null;
 
     }
 

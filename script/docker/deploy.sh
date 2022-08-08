@@ -27,15 +27,16 @@ port(){
 ##放置挂载文件
 mount(){
     #挂载 nginx 配置文件
-    if test ! -f "/docker/nginx/conf/nginx.conf" ;then
-        mkdir -p /docker/nginx/conf
-        cp nginx/nginx.conf /docker/nginx/conf/nginx.conf
+    if test ! -f "/docker/nginx/" ;then
+        mkdir -p /docker/nginx/
+        cp nginx/* /docker/nginx/
     fi
     #挂载 redis 配置文件
-    if test ! -f "/docker/redis/conf/redis.conf" ;then
-        mkdir -p /docker/redis/conf
-        cp redis/redis.conf /docker/redis/conf/redis.conf
+    if test ! -f "/docker/redis/" ;then
+        mkdir -p /docker/redis/
+        cp redis/* /docker/redis/
     fi
+    chmod -R 777 /docker
 }
 
 #启动基础模块

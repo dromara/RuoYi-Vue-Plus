@@ -5,8 +5,6 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.mapper.TestDemoMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +20,6 @@ import java.util.List;
  * @author Lion Li
  * @date 2021-05-30
  */
-@Api(value = "测试批量方法", tags = {"测试批量方法"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/batch")
@@ -38,7 +35,6 @@ public class TestBatchController extends BaseController {
      * <p>
      * 3.5.0 版本 增加 rewriteBatchedStatements=true 批处理参数 使 MP 原生批处理可以达到同样的速度
      */
-    @ApiOperation(value = "新增批量方法")
     @PostMapping("/add")
 //    @DS("slave")
     public R<Void> add() {
@@ -58,7 +54,6 @@ public class TestBatchController extends BaseController {
      * <p>
      * 3.5.0 版本 增加 rewriteBatchedStatements=true 批处理参数 使 MP 原生批处理可以达到同样的速度
      */
-    @ApiOperation(value = "新增或更新批量方法")
     @PostMapping("/addOrUpdate")
 //    @DS("slave")
     public R<Void> addOrUpdate() {
@@ -68,7 +63,8 @@ public class TestBatchController extends BaseController {
             testDemo.setOrderNum(-1);
             testDemo.setTestKey("批量新增");
             testDemo.setValue("测试新增");
-            list.add(testDemo);        }
+            list.add(testDemo);
+        }
         testDemoMapper.insertBatch(list);
         for (int i = 0; i < list.size(); i++) {
             TestDemo testDemo = list.get(i);
@@ -84,7 +80,6 @@ public class TestBatchController extends BaseController {
     /**
      * 删除批量方法
      */
-    @ApiOperation(value = "删除批量方法")
     @DeleteMapping()
 //    @DS("slave")
     public R<Void> remove() {

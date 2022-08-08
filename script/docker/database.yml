@@ -16,7 +16,7 @@ services:
     volumes:
       # 数据挂载
       - "/docker/oracle/data:/u01/app/oracle"
-    restart: always
+    network_mode: "host"
 
   # 此镜像仅用于测试 正式环境需自行安装数据库
   sqlserver:
@@ -32,7 +32,7 @@ services:
     volumes:
       # 数据挂载
       - "/docker/sqlserver/data:/var/opt/mssql"
-    restart: always
+    network_mode: "host"
 
   postgres:
     image: postgres:14.2
@@ -45,7 +45,7 @@ services:
       - "5432:5432"
     volumes:
       - /docker/postgres/data:/var/lib/postgresql/data
-    restart: always
+    network_mode: "host"
 
   postgres13:
     image: postgres:13.6
@@ -58,4 +58,4 @@ services:
       - "5433:5432"
     volumes:
       - /docker/postgres13/data:/var/lib/postgresql/data
-    restart: always
+    network_mode: "host"

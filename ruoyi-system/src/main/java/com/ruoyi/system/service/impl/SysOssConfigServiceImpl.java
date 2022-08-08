@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.collect.Lists;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -120,14 +119,14 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
                 throw new ServiceException("系统内置, 不可删除!");
             }
         }
-        List<SysOssConfig> list = Lists.newArrayList();
+        List<SysOssConfig> list = CollUtil.newArrayList();
         for (Long configId : ids) {
             SysOssConfig config = baseMapper.selectById(configId);
             list.add(config);
         }
         boolean flag = baseMapper.deleteBatchIds(ids) > 0;
         if (flag) {
-            list.stream().forEach(sysOssConfig -> {
+            list.forEach(sysOssConfig -> {
                 RedisUtils.deleteObject(getCacheKey(sysOssConfig.getConfigKey()));
             });
         }
