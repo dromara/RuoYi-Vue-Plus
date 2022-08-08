@@ -63,16 +63,6 @@ public interface Constants {
     Integer CAPTCHA_EXPIRATION = 2;
 
     /**
-     * 登录错误次数
-     */
-    Integer LOGIN_ERROR_NUMBER = 5;
-
-    /**
-     * 登录错误限制时间(分钟)
-     */
-    Integer LOGIN_ERROR_LIMIT_TIME = 10;
-
-    /**
      * 令牌
      */
     String TOKEN = "token";

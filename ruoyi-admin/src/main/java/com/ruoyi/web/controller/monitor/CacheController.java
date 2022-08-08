@@ -32,7 +32,6 @@ public class CacheController {
     static {
         CACHES.add(new SysCache(CacheConstants.LOGIN_TOKEN_KEY, "用户信息"));
         CACHES.add(new SysCache(CacheConstants.ONLINE_TOKEN_KEY, "在线用户"));
-        CACHES.add(new SysCache(CacheConstants.LOGIN_ERROR, "登陆错误"));
         CACHES.add(new SysCache(CacheConstants.SYS_CONFIG_KEY, "配置信息"));
         CACHES.add(new SysCache(CacheConstants.SYS_DICT_KEY, "数据字典"));
         CACHES.add(new SysCache(CacheConstants.CAPTCHA_CODE_KEY, "验证码"));

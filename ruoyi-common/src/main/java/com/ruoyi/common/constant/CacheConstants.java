@@ -18,11 +18,6 @@ public interface CacheConstants {
     String ONLINE_TOKEN_KEY = "online_tokens:";
 
     /**
-     * 登陆错误 redis key
-     */
-    String LOGIN_ERROR = "login_error:";
-
-    /**
      * 验证码 redis key
      */
     String CAPTCHA_CODE_KEY = "captcha_codes:";
