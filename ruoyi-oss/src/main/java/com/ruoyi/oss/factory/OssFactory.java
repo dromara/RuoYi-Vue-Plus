@@ -1,7 +1,9 @@
 package com.ruoyi.oss.factory;
 
+import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.cache.CacheUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.core.OssClient;
@@ -42,7 +44,7 @@ public class OssFactory {
      */
     public static OssClient instance() {
         // 获取redis 默认类型
-        String configKey = RedisUtils.getCacheObject(OssConstant.CACHE_CONFIG_KEY);
+        String configKey = (String) CacheUtils.get(CacheNames.SYS_OSS_CONFIG, OssConstant.OSS_CONFIG_KEY);
         if (StringUtils.isEmpty(configKey)) {
             throw new OssException("文件存储服务类型无法找到!");
         }
@@ -62,7 +64,7 @@ public class OssFactory {
     }
 
     private static void refresh(String configKey) {
-        Object json = RedisUtils.getCacheObject(OssConstant.SYS_OSS_KEY + configKey);
+        Object json = CacheUtils.get(CacheNames.SYS_OSS_CONFIG, configKey);
         OssProperties properties = JsonUtils.parseObject(json.toString(), OssProperties.class);
         if (properties == null) {
             throw new OssException("系统异常, '" + configKey + "'配置信息不存在!");

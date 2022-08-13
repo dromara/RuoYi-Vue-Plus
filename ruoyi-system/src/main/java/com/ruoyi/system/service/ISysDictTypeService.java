@@ -84,7 +84,7 @@ public interface ISysDictTypeService {
      * @param dictType 字典类型信息
      * @return 结果
      */
-    int insertDictType(SysDictType dictType);
+    List<SysDictData> insertDictType(SysDictType dictType);
 
     /**
      * 修改保存字典类型信息
@@ -92,7 +92,7 @@ public interface ISysDictTypeService {
      * @param dictType 字典类型信息
      * @return 结果
      */
-    int updateDictType(SysDictType dictType);
+    List<SysDictData> updateDictType(SysDictType dictType);
 
     /**
      * 校验字典类型称是否唯一

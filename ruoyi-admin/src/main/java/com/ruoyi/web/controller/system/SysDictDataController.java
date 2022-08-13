@@ -86,7 +86,8 @@ public class SysDictDataController extends BaseController {
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
     @PostMapping
     public R<Void> add(@Validated @RequestBody SysDictData dict) {
-        return toAjax(dictDataService.insertDictData(dict));
+        dictDataService.insertDictData(dict);
+        return R.ok();
     }
 
     /**
@@ -96,7 +97,8 @@ public class SysDictDataController extends BaseController {
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
     @PutMapping
     public R<Void> edit(@Validated @RequestBody SysDictData dict) {
-        return toAjax(dictDataService.updateDictData(dict));
+        dictDataService.updateDictData(dict);
+        return R.ok();
     }
 
     /**
