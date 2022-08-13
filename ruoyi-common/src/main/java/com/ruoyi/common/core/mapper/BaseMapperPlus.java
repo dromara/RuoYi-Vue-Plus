@@ -149,7 +149,7 @@ public interface BaseMapperPlus<M, T, V> extends BaseMapper<T> {
         return BeanCopyUtils.copy(obj, voClass);
     }
 
-    default List<V> selectVoById(Collection<? extends Serializable> idList) {
+    default List<V> selectVoBatchIds(Collection<? extends Serializable> idList) {
         return selectVoBatchIds(idList, this.currentVoClass());
     }
 
