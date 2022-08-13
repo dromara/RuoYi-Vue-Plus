@@ -31,8 +31,18 @@ public interface CacheNames {
     String SYS_DICT = "sys_dict";
 
     /**
+     * OSS内容
+     */
+    String SYS_OSS = "sys_oss#30d";
+
+    /**
      * OSS配置
      */
     String SYS_OSS_CONFIG = "sys_oss_config";
+
+    /**
+     * 在线用户
+     */
+    String ONLINE_TOKEN = "online_tokens";
 
 }

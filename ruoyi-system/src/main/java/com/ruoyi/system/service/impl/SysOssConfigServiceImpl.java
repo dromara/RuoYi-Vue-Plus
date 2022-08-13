@@ -14,7 +14,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.cache.CacheUtils;
+import com.ruoyi.common.utils.redis.CacheUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.factory.OssFactory;
@@ -55,7 +55,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         for (SysOssConfig config : list) {
             String configKey = config.getConfigKey();
             if ("0".equals(config.getStatus())) {
-                CacheUtils.put(CacheNames.SYS_OSS_CONFIG, OssConstant.OSS_CONFIG_KEY, configKey);
+                RedisUtils.setCacheObject(OssConstant.DEFAULT_CONFIG_KEY, configKey);
             }
             setConfigCache(true, config);
         }
@@ -159,7 +159,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
             .set(SysOssConfig::getStatus, "1"));
         row += baseMapper.updateById(sysOssConfig);
         if (row > 0) {
-            CacheUtils.put(CacheNames.SYS_OSS_CONFIG, OssConstant.OSS_CONFIG_KEY, sysOssConfig.getConfigKey());
+            RedisUtils.setCacheObject(OssConstant.DEFAULT_CONFIG_KEY, sysOssConfig.getConfigKey());
         }
         return row;
     }
@@ -174,7 +174,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
     private boolean setConfigCache(boolean flag, SysOssConfig config) {
         if (flag) {
             CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
-            RedisUtils.publish(OssConstant.CACHE_CONFIG_KEY, config.getConfigKey(), msg -> {
+            RedisUtils.publish(OssConstant.DEFAULT_CONFIG_KEY, config.getConfigKey(), msg -> {
                 log.info("发布刷新OSS配置 => " + msg);
             });
         }

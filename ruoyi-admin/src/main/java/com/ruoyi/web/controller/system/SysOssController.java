@@ -96,7 +96,7 @@ public class SysOssController extends BaseController {
     @SaCheckPermission("system:oss:download")
     @GetMapping("/download/{ossId}")
     public void download(@PathVariable Long ossId, HttpServletResponse response) throws IOException {
-        SysOss sysOss = iSysOssService.getById(ossId);
+        SysOssVo sysOss = iSysOssService.getById(ossId);
         if (ObjectUtil.isNull(sysOss)) {
             throw new ServiceException("文件数据不存在!");
         }

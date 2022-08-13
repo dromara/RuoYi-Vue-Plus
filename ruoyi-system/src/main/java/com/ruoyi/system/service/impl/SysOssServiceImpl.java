@@ -4,12 +4,11 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.redis.RedisUtils;
-import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.core.OssClient;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.factory.OssFactory;
@@ -19,11 +18,11 @@ import com.ruoyi.system.domain.vo.SysOssVo;
 import com.ruoyi.system.mapper.SysOssMapper;
 import com.ruoyi.system.service.ISysOssService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -51,13 +50,10 @@ public class SysOssServiceImpl implements ISysOssService {
     public List<SysOssVo> listByIds(Collection<Long> ossIds) {
         List<SysOssVo> list = new ArrayList<>();
         for (Long id : ossIds) {
-            String key = OssConstant.SYS_OSS_KEY + id;
-            SysOssVo vo = RedisUtils.getCacheObject(key);
-            if (ObjectUtil.isNull(vo)) {
-                vo = baseMapper.selectVoById(id);
-                RedisUtils.setCacheObject(key, vo, Duration.ofDays(30));
+            SysOssVo vo = getById(id);
+            if (ObjectUtil.isNotNull(vo)) {
+                list.add(vo);
             }
-            list.add(vo);
         }
         return list;
     }
@@ -76,9 +72,10 @@ public class SysOssServiceImpl implements ISysOssService {
         return lqw;
     }
 
+    @Cacheable(cacheNames = CacheNames.SYS_OSS, key = "#ossId")
     @Override
-    public SysOss getById(Long ossId) {
-        return baseMapper.selectById(ossId);
+    public SysOssVo getById(Long ossId) {
+        return baseMapper.selectVoById(ossId);
     }
 
     @Override

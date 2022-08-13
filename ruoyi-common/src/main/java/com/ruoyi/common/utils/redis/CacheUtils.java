@@ -1,9 +1,13 @@
-package com.ruoyi.common.utils.cache;
+package com.ruoyi.common.utils.redis;
 
 import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.redisson.api.RMap;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+
+import java.util.Set;
 
 /**
  * 缓存操作工具类 {@link }
@@ -12,10 +16,20 @@ import org.springframework.cache.CacheManager;
  * @date 2022/8/13
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@SuppressWarnings(value = {"unchecked", "rawtypes"})
+@SuppressWarnings(value = {"unchecked"})
 public class CacheUtils {
 
     private static final CacheManager CACHE_MANAGER = SpringUtils.getBean(CacheManager.class);
+
+    /**
+     * 获取缓存组内所有的KEY
+     *
+     * @param cacheNames 缓存组名称
+     */
+    public static Set<Object> keys(String cacheNames) {
+        RMap<Object, Object> rmap = (RMap<Object, Object>) CACHE_MANAGER.getCache(cacheNames).getNativeCache();
+        return rmap.keySet();
+    }
 
     /**
      * 获取缓存值
@@ -23,8 +37,9 @@ public class CacheUtils {
      * @param cacheNames 缓存组名称
      * @param key        缓存key
      */
-    public static Object get(String cacheNames, Object key) {
-        return CACHE_MANAGER.getCache(cacheNames).get(key).get();
+    public static <T> T get(String cacheNames, Object key) {
+        Cache.ValueWrapper wrapper = CACHE_MANAGER.getCache(cacheNames).get(key);
+        return wrapper != null ? (T) wrapper.get() : null;
     }
 
     /**
