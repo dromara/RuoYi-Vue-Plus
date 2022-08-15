@@ -112,6 +112,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @param dictType 字典类型
      * @return 字典类型
      */
+    @Cacheable(cacheNames = CacheNames.SYS_DICT, key = "#dictType")
     @Override
     public SysDictType selectDictTypeByType(String dictType) {
         return baseMapper.selectById(new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, dictType));
