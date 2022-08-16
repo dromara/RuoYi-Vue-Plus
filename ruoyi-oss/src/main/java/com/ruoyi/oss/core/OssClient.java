@@ -10,10 +10,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.CreateBucketRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.constant.OssConstant;
@@ -119,6 +116,16 @@ public class OssClient {
 
     public UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType) {
         return upload(inputStream, getPath(properties.getPrefix(), suffix), contentType);
+    }
+
+    /**
+     * 获取文件元数据
+     *
+     * @param path 完整文件路径
+     */
+    public ObjectMetadata getObjectMetadata(String path) {
+        S3Object object = client.getObject(properties.getBucketName(), path);
+        return object.getObjectMetadata();
     }
 
     public String getUrl() {
