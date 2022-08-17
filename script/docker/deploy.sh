@@ -29,12 +29,12 @@ mount(){
     #挂载 nginx 配置文件
     if test ! -f "/docker/nginx/" ;then
         mkdir -p /docker/nginx/
-        cp nginx/* /docker/nginx/
+        cp -r nginx/* /docker/nginx/
     fi
     #挂载 redis 配置文件
     if test ! -f "/docker/redis/" ;then
         mkdir -p /docker/redis/
-        cp redis/* /docker/redis/
+        cp -r redis/* /docker/redis/
     fi
     chmod -R 777 /docker
 }
