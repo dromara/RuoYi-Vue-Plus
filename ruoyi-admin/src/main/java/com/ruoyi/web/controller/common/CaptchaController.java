@@ -54,8 +54,8 @@ public class CaptchaController {
     @GetMapping("/captchaSms")
     public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}")
                               String phonenumber) {
-        if (smsProperties.getEnabled()) {
-            R.fail("当前系统没有开启短信功能！");
+        if (!smsProperties.getEnabled()) {
+            return R.fail("当前系统没有开启短信功能！");
         }
         String key = CacheConstants.CAPTCHA_CODE_KEY + phonenumber;
         String code = RandomUtil.randomNumbers(4);

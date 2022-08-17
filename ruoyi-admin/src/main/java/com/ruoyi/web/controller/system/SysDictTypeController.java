@@ -72,7 +72,8 @@ public class SysDictTypeController extends BaseController {
         if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
             return R.fail("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-        return toAjax(dictTypeService.insertDictType(dict));
+        dictTypeService.insertDictType(dict);
+        return R.ok();
     }
 
     /**
@@ -85,7 +86,8 @@ public class SysDictTypeController extends BaseController {
         if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
             return R.fail("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-        return toAjax(dictTypeService.updateDictType(dict));
+        dictTypeService.updateDictType(dict);
+        return R.ok();
     }
 
     /**

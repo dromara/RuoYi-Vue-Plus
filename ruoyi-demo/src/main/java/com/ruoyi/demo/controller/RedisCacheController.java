@@ -1,5 +1,6 @@
 package com.ruoyi.demo.controller;
 
+import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ import java.time.Duration;
  * @author Lion Li
  */
 // 类级别 缓存统一配置
-//@CacheConfig(cacheNames = "redissonCacheMap")
+//@CacheConfig(cacheNames = CacheNames.DEMO_CACHE)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/cache")
@@ -36,9 +37,9 @@ public class RedisCacheController {
      * 重点说明: 缓存注解严谨与其他筛选数据功能一起使用
      * 例如: 数据权限注解 会造成 缓存击穿 与 数据不一致问题
      * <p>
-     * cacheNames 为配置文件内 groupId
+     * cacheNames 命名规则 查看 {@link CacheNames} 注释 支持多参数
      */
-    @Cacheable(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
+    @Cacheable(cacheNames = "demo:cache#60s#10m#20", key = "#key", condition = "#key != null")
     @GetMapping("/test1")
     public R<String> test1(String key, String value) {
         return R.ok("操作成功", value);
@@ -48,11 +49,11 @@ public class RedisCacheController {
      * 测试 @CachePut
      * <p>
      * 加了@CachePut注解的方法,会把方法的返回值put到缓存里面缓存起来,供其它地方使用
-     * 它「通常用在新增方法上」
+     * 它「通常用在新增或者实时更新方法上」
      * <p>
-     * cacheNames 为 配置文件内 groupId
+     * cacheNames 命名规则 查看 {@link CacheNames} 注释 支持多参数
      */
-    @CachePut(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
+    @CachePut(cacheNames = CacheNames.DEMO_CACHE, key = "#key", condition = "#key != null")
     @GetMapping("/test2")
     public R<String> test2(String key, String value) {
         return R.ok("操作成功", value);
@@ -62,11 +63,11 @@ public class RedisCacheController {
      * 测试 @CacheEvict
      * <p>
      * 使用了CacheEvict注解的方法,会清空指定缓存
-     * 「一般用在更新或者删除的方法上」
+     * 「一般用在删除的方法上」
      * <p>
-     * cacheNames 为 配置文件内 groupId
+     * cacheNames 命名规则 查看 {@link CacheNames} 注释 支持多参数
      */
-    @CacheEvict(cacheNames = "redissonCacheMap", key = "#key", condition = "#key != null")
+    @CacheEvict(cacheNames = CacheNames.DEMO_CACHE, key = "#key", condition = "#key != null")
     @GetMapping("/test3")
     public R<String> test3(String key, String value) {
         return R.ok("操作成功", value);

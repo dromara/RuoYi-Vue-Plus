@@ -211,7 +211,7 @@ export default {
     },
     /** 清理指定键名缓存 */
     handleClearCacheKey(cacheKey) {
-      clearCacheKey(cacheKey).then(response => {
+      clearCacheKey(this.nowCacheName, cacheKey).then(response => {
         this.$modal.msgSuccess("清理缓存键名[" + cacheKey + "]成功");
         this.getCacheKeys();
       });
