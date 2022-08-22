@@ -82,7 +82,8 @@ services:
       # 管理后台密码，最小8个字符
       MINIO_SECRET_KEY: ruoyi123
       # https需要指定域名
-      MINIO_SERVER_URL: ""
+      #MINIO_SERVER_URL: "https://xxx.com:9000"
+      #MINIO_BROWSER_REDIRECT_URL: "https://xxx.com:9001"
       # 开启压缩 on 开启 off 关闭
       MINIO_COMPRESS: "off"
       # 扩展名 .pdf,.doc 为空 所有类型均压缩

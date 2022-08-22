@@ -56,6 +56,8 @@ public class OssClient {
                 .withClientConfiguration(clientConfig)
                 .withCredentials(credentialsProvider)
                 .disableChunkedEncoding()
+                // https限制使用域名访问 需要此配置 站点填域名
+                .enablePathStyleAccess()
                 .build();
 
             createBucket();
