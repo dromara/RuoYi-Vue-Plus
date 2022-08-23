@@ -504,6 +504,7 @@ export default {
         this.loading = false;
         this.getList();
         this.#[[$modal]]#.msgSuccess("删除成功");
+      }).catch(() => {
       }).finally(() => {
         this.loading = false;
       });
