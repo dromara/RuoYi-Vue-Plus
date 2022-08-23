@@ -561,9 +561,10 @@ export default {
         this.loading = false;
         this.getList();
         this.#[[$modal]]#.msgSuccess("删除成功");
+      }).catch(() => {
       }).finally(() => {
-        this.loading = false;
-      });
+          this.loading = false;
+        });
     },
 #if($table.sub)
     /** ${subTable.functionName}序号 */
