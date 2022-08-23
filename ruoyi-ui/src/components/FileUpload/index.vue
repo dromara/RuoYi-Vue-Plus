@@ -157,7 +157,7 @@ export default {
     // 上传失败
     handleUploadError(err) {
       this.$modal.msgError("上传图片失败，请重试");
-      this.$modal.closeLoading()
+      this.$modal.closeLoading();
     },
     // 上传成功回调
     handleUploadSuccess(res, file) {
@@ -173,6 +173,7 @@ export default {
       } else {
         this.$modal.msgError(res.msg);
         this.$modal.closeLoading();
+        this.number--;
       }
     },
     // 删除文件
