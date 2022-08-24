@@ -957,3 +957,9 @@ insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXX
 insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',         '','N', 'ap-beijing',  '1', '', 'admin', now(), 'admin', now(), null);
 insert into sys_oss_config values (5, 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',                 '','N', '',            '1', '', 'admin', now(), 'admin', now(), NULL);
 
+-- 字符串自动转时间 避免框架时间查询报错问题
+create or replace function cast_varchar_to_timestamp(varchar) returns timestamptz as $$
+select to_timestamp($1, 'yyyy-mm-dd hh24:mi:ss');
+$$ language sql strict ;
+
+create cast (varchar as timestamptz) with function cast_varchar_to_timestamp as IMPLICIT;
