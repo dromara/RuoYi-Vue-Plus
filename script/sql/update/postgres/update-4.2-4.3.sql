@@ -14,3 +14,6 @@ select to_timestamp($1, 'yyyy-mm-dd hh24:mi:ss');
 $$ language sql strict ;
 
 create cast (varchar as timestamptz) with function cast_varchar_to_timestamp as IMPLICIT;
+
+insert into sys_dict_data values(29, 99, '其他',     '0',       'sys_oper_type',       '',   'info',    'N', '0', 'admin', now(), '', null, '其他操作');
+

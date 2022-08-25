@@ -702,6 +702,8 @@ INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [d
 GO
 INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (17, 2, N'关闭', N'1', N'sys_notice_status', N'', N'danger', N'N', N'0', N'admin', getdate(), N'', NULL, N'关闭状态')
 GO
+INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (29, 99, N'其他', N'0', N'sys_oper_type', N'', N'info', N'N', N'0', N'admin', getdate(), N'', NULL, N'其他操作');
+GO
 INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (18, 1, N'新增', N'1', N'sys_oper_type', N'', N'info', N'N', N'0', N'admin', getdate(), N'', NULL, N'新增操作')
 GO
 INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (19, 2, N'修改', N'2', N'sys_oper_type', N'', N'info', N'N', N'0', N'admin', getdate(), N'', NULL, N'修改操作')
