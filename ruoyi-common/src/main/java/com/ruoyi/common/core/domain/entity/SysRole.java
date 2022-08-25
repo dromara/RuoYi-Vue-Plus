@@ -118,6 +118,7 @@ public class SysRole extends BaseEntity {
     /**
      * 角色菜单权限
      */
+    @TableField(exist = false)
     private Set<String> permissions;
 
     public SysRole(Long roleId) {
