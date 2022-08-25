@@ -82,7 +82,7 @@ public class SysRole extends BaseEntity {
      * 角色状态（0正常 1停用）
      */
     @ExcelProperty(value = "角色状态", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(dictType = "sys_common_status")
+    @ExcelDictFormat(dictType = "sys_normal_disable")
     private String status;
 
     /**
