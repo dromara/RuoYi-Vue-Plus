@@ -208,7 +208,7 @@ export default {
         }
       }
       return strs != "" ? strs.substr(0, strs.length - 1) : "";
-    },
+    }
   }
 };
 </script>

@@ -247,4 +247,5 @@ public class SysUserController extends BaseController {
     public R<List<Tree<Long>>> deptTree(SysDept dept) {
         return R.ok(deptService.selectDeptTreeList(dept));
     }
+
 }
