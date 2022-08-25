@@ -231,7 +231,7 @@ comment on column sys_menu.query_param is '路由参数';
 comment on column sys_menu.is_frame is '是否为外链（0是 1否）';
 comment on column sys_menu.is_cache is '是否缓存（0缓存 1不缓存）';
 comment on column sys_menu.menu_type is '菜单类型（M目录 C菜单 F按钮）';
-comment on column sys_menu.visible is '菜单状态（0显示 1隐藏）';
+comment on column sys_menu.visible is '显示状态（0显示 1隐藏）';
 comment on column sys_menu.status is '菜单状态（0正常 1停用）';
 comment on column sys_menu.perms is '权限标识';
 comment on column sys_menu.icon is '菜单图标';

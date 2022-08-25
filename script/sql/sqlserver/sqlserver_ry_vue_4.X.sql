@@ -991,7 +991,7 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'menu_type'
 GO
 EXEC sys.sp_addextendedproperty
-    'MS_Description', N'菜单状态（0显示 1隐藏）' ,
+    'MS_Description', N'显示状态（0显示 1隐藏）' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_menu',
     'COLUMN', N'visible'
