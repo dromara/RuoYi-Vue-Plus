@@ -874,7 +874,7 @@ create table sys_oss (
   original_name   varchar(255)  not null,
   file_suffix     varchar(10)  not null,
   url             varchar(500) not null,
-  service         varchar(10)  default 'minio' not null,
+  service         varchar(20)  default 'minio' not null,
   create_by       varchar(64)  default '',
   create_time     date,
   update_by       varchar(64)  default '',
@@ -901,7 +901,7 @@ comment on column sys_oss.update_by is '更新者';
 -- ----------------------------
 create table sys_oss_config (
   oss_config_id   number(20)    not null,
-  config_key      varchar(255)  not null,
+  config_key      varchar(20)   not null,
   access_key      varchar(255)  default '',
   secret_key      varchar(255)  default '',
   bucket_name     varchar(255)  default '',

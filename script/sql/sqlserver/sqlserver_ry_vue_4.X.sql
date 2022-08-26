@@ -2116,7 +2116,7 @@ CREATE TABLE [sys_oss]
     [create_by]     nvarchar(64)  DEFAULT ''        NULL,
     [update_time]   datetime2(7)                    NULL,
     [update_by]     nvarchar(64)  DEFAULT ''        NULL,
-    [service]       nvarchar(10)  DEFAULT ('minio') NOT NULL,
+    [service]       nvarchar(20)  DEFAULT ('minio') NOT NULL,
     CONSTRAINT [PK__sys_oss__91241EA442389F0D] PRIMARY KEY CLUSTERED ([oss_id])
         WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
         ON [PRIMARY]
@@ -2193,7 +2193,7 @@ GO
 CREATE TABLE [sys_oss_config]
 (
     [oss_config_id] bigint                      NOT NULL,
-    [config_key]    nvarchar(255) DEFAULT ''    NOT NULL,
+    [config_key]    nvarchar(20)  DEFAULT ''    NOT NULL,
     [access_key]    nvarchar(255) DEFAULT ''    NULL,
     [secret_key]    nvarchar(255) DEFAULT ''    NULL,
     [bucket_name]   nvarchar(255) DEFAULT ''    NULL,

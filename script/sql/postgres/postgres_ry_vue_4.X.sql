@@ -891,7 +891,7 @@ create table if not exists sys_oss
     create_time   timestamp,
     update_by     varchar(64)  default ''::varchar,
     update_time   timestamp,
-    service       varchar(10)  default 'minio'::varchar,
+    service       varchar(20)  default 'minio'::varchar,
     constraint sys_oss_pk primary key (oss_id)
 );
 
@@ -914,7 +914,7 @@ drop table if exists sys_oss_config;
 create table if not exists sys_oss_config
 (
     oss_config_id int8,
-    config_key    varchar(255) default ''::varchar not null,
+    config_key    varchar(20)  default ''::varchar not null,
     access_key    varchar(255) default ''::varchar,
     secret_key    varchar(255) default ''::varchar,
     bucket_name   varchar(255) default ''::varchar,
