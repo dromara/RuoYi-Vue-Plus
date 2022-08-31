@@ -10,6 +10,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -51,14 +52,16 @@ public class OssClient {
             } else {
                 clientConfig.setProtocol(Protocol.HTTP);
             }
-            this.client = AmazonS3Client.builder()
+            AmazonS3ClientBuilder build = AmazonS3Client.builder()
                 .withEndpointConfiguration(endpointConfig)
                 .withClientConfiguration(clientConfig)
                 .withCredentials(credentialsProvider)
-                .disableChunkedEncoding()
-                // https限制使用域名访问 需要此配置 站点填域名
-                .enablePathStyleAccess()
-                .build();
+                .disableChunkedEncoding();
+            if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)){
+                // minio 使用https限制使用域名访问 需要此配置 站点填域名
+                build.enablePathStyleAccess();
+            }
+            this.client = build.build();
 
             createBucket();
         } catch (Exception e) {
