@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.redisson.api.*;
 
-import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -119,21 +118,6 @@ public class QueueUtils {
         RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
         RDelayedQueue<T> delayedQueue = CLIENT.getDelayedQueue(queue);
         delayedQueue.destroy();
-    }
-
-    /**
-     * 尝试设置 优先队列比较器 用于排序优先级
-     *
-     * @param queueName  队列名
-     * @param comparator 比较器
-     * @param destroy    已存在是否销毁
-     */
-    public static <T> boolean trySetPriorityQueueComparator(String queueName, Comparator<T> comparator, boolean destroy) {
-        RPriorityBlockingQueue<T> priorityBlockingQueue = CLIENT.getPriorityBlockingQueue(queueName);
-        if (priorityBlockingQueue.isExists() && destroy) {
-            destroyQueue(queueName);
-        }
-        return priorityBlockingQueue.trySetComparator(comparator);
     }
 
     /**
