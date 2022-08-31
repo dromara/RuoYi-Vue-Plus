@@ -43,7 +43,7 @@ export function delOssConfig(ossConfigId) {
   })
 }
 
-// 用户状态修改
+// 对象存储状态修改
 export function changeOssConfigStatus(ossConfigId, status, configKey) {
   const data = {
     ossConfigId,
