@@ -31,6 +31,35 @@ public class QueueUtils {
     }
 
     /**
+     * 添加普通队列数据
+     *
+     * @param queueName 队列名
+     * @param data      数据
+     */
+    public static <T> boolean addQueueObject(String queueName, T data) {
+        RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
+        return queue.offer(data);
+    }
+
+    /**
+     * 获取一个普通队列数据 没有数据返回 null
+     *
+     * @param queueName 队列名
+     */
+    public static <T> T getQueueObject(String queueName) {
+        RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
+        return queue.poll();
+    }
+
+    /**
+     * 删除普通队列数据
+     */
+    public static <T> boolean removeQueueObject(String queueName, T data) {
+        RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
+        return queue.remove(data);
+    }
+
+    /**
      * 添加延迟队列数据 默认毫秒
      *
      * @param queueName 队列名
