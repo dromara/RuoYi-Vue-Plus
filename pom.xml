@@ -46,13 +46,6 @@
         <!-- SMS 配置 -->
         <aliyun.sms.version>2.0.16</aliyun.sms.version>
         <tencent.sms.version>3.1.555</tencent.sms.version>
-
-        <!-- docker 配置 -->
-        <docker.registry.url>localhost</docker.registry.url>
-        <docker.registry.host>http://${docker.registry.url}:2375</docker.registry.host>
-        <docker.namespace>ruoyi</docker.namespace>
-        <docker.plugin.version>1.2.2</docker.plugin.version>
-
     </properties>
 
     <!-- 依赖声明 -->
