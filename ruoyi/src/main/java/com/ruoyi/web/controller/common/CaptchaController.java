@@ -6,6 +6,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.ruoyi.common.annotation.Anonymous;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.CaptchaType;
@@ -18,9 +19,6 @@ import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
 import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.service.ISysConfigService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -40,7 +38,6 @@ import java.util.Map;
 @Anonymous
 @Slf4j
 @Validated
-@Api(value = "验证码操作处理", tags = {"验证码管理"})
 @RequiredArgsConstructor
 @RestController
 public class CaptchaController {
@@ -51,16 +48,16 @@ public class CaptchaController {
 
     /**
      * 短信验证码
+     *
+     * @param phonenumber 用户手机号
      */
-    @ApiOperation("短信验证码")
     @GetMapping("/captchaSms")
-    public R<Void> smsCaptcha(@ApiParam("用户手机号")
-                              @NotBlank(message = "{user.phonenumber.not.blank}")
+    public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}")
                               String phonenumber) {
-        if (smsProperties.getEnabled()) {
-            R.fail("当前系统没有开启短信功能！");
+        if (!smsProperties.getEnabled()) {
+            return R.fail("当前系统没有开启短信功能！");
         }
-        String key = Constants.CAPTCHA_CODE_KEY + phonenumber;
+        String key = CacheConstants.CAPTCHA_CODE_KEY + phonenumber;
         String code = RandomUtil.randomNumbers(4);
         RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         // 验证码模板id 自行处理 (查数据库或写死均可)
@@ -79,18 +76,17 @@ public class CaptchaController {
     /**
      * 生成验证码
      */
-    @ApiOperation("生成验证码")
     @GetMapping("/captchaImage")
     public R<Map<String, Object>> getCode() {
         Map<String, Object> ajax = new HashMap<>();
-        boolean captchaOnOff = configService.selectCaptchaOnOff();
-        ajax.put("captchaOnOff", captchaOnOff);
-        if (!captchaOnOff) {
+        boolean captchaEnabled = configService.selectCaptchaEnabled();
+        ajax.put("captchaEnabled", captchaEnabled);
+        if (!captchaEnabled) {
             return R.ok(ajax);
         }
         // 保存验证码信息
         String uuid = IdUtil.simpleUUID();
-        String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
+        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + uuid;
         // 生成验证码
         CaptchaType captchaType = captchaProperties.getType();
         boolean isMath = CaptchaType.MATH == captchaType;

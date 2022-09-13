@@ -4,7 +4,7 @@ import cn.dev33.satoken.SaManager;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.ruoyi.common.annotation.RepeatSubmit;
-import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
@@ -63,7 +63,7 @@ public class RepeatSubmitAspect {
 
         submitKey = SecureUtil.md5(submitKey + ":" + nowParams);
         // 唯一标识（指定key + url + 消息头）
-        String cacheRepeatKey = Constants.REPEAT_SUBMIT_KEY + url + submitKey;
+        String cacheRepeatKey = CacheConstants.REPEAT_SUBMIT_KEY + url + submitKey;
         String key = RedisUtils.getCacheObject(cacheRepeatKey);
         if (key == null) {
             RedisUtils.setCacheObject(cacheRepeatKey, "", Duration.ofMillis(interval));
@@ -85,12 +85,16 @@ public class RepeatSubmitAspect {
     @AfterReturning(pointcut = "@annotation(repeatSubmit)", returning = "jsonResult")
     public void doAfterReturning(JoinPoint joinPoint, RepeatSubmit repeatSubmit, Object jsonResult) {
         if (jsonResult instanceof R) {
-            R<?> r = (R<?>) jsonResult;
-            if (r.getCode() == R.SUCCESS) {
-                return;
+            try {
+                R<?> r = (R<?>) jsonResult;
+                // 成功则不删除redis数据 保证在有效时间内无法重复提交
+                if (r.getCode() == R.SUCCESS) {
+                    return;
+                }
+                RedisUtils.deleteObject(KEY_CACHE.get());
+            } finally {
+                KEY_CACHE.remove();
             }
-            RedisUtils.deleteObject(KEY_CACHE.get());
-            KEY_CACHE.remove();
         }
     }
 

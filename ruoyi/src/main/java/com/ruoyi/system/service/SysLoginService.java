@@ -1,9 +1,11 @@
 package com.ruoyi.system.service;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.dto.RoleDTO;
 import com.ruoyi.common.core.domain.entity.SysUser;
@@ -13,9 +15,7 @@ import com.ruoyi.common.core.service.LogininforService;
 import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.LoginType;
 import com.ruoyi.common.enums.UserStatus;
-import com.ruoyi.common.exception.user.CaptchaException;
-import com.ruoyi.common.exception.user.CaptchaExpireException;
-import com.ruoyi.common.exception.user.UserException;
+import com.ruoyi.common.exception.user.*;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
@@ -24,6 +24,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,12 @@ public class SysLoginService {
     private final LogininforService asyncService;
     private final SysPermissionService permissionService;
 
+    @Value("${user.password.maxRetryCount}")
+    private Integer maxRetryCount;
+
+    @Value("${user.password.lockTime}")
+    private Integer lockTime;
+
     /**
      * 登录验证
      *
@@ -57,9 +64,9 @@ public class SysLoginService {
      */
     public String login(String username, String password, String code, String uuid) {
         HttpServletRequest request = ServletUtils.getRequest();
-        boolean captchaOnOff = configService.selectCaptchaOnOff();
+        boolean captchaEnabled = configService.selectCaptchaEnabled();
         // 验证码开关
-        if (captchaOnOff) {
+        if (captchaEnabled) {
             validateCaptcha(username, code, uuid, request);
         }
         SysUser user = loadUserByUsername(username);
@@ -113,16 +120,23 @@ public class SysLoginService {
         return StpUtil.getTokenValue();
     }
 
-
-    public void logout(String loginName) {
-        asyncService.recordLogininfor(loginName, Constants.LOGOUT, MessageUtils.message("user.logout.success"), ServletUtils.getRequest());
+    /**
+     * 退出登录
+     */
+    public void logout() {
+        try {
+            String username = LoginHelper.getUsername();
+            StpUtil.logout();
+            asyncService.recordLogininfor(username, Constants.LOGOUT, MessageUtils.message("user.logout.success"), ServletUtils.getRequest());
+        } catch (NotLoginException e) {
+        }
     }
 
     /**
      * 校验短信验证码
      */
     private boolean validateSmsCode(String phonenumber, String smsCode, HttpServletRequest request) {
-        String code = RedisUtils.getCacheObject(Constants.CAPTCHA_CODE_KEY + phonenumber);
+        String code = RedisUtils.getCacheObject(CacheConstants.CAPTCHA_CODE_KEY + phonenumber);
         if (StringUtils.isBlank(code)) {
             asyncService.recordLogininfor(phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"), request);
             throw new CaptchaExpireException();
@@ -138,7 +152,7 @@ public class SysLoginService {
      * @param uuid     唯一标识
      */
     public void validateCaptcha(String username, String code, String uuid, HttpServletRequest request) {
-        String verifyKey = Constants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
+        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
@@ -234,27 +248,25 @@ public class SysLoginService {
      */
     private void checkLogin(LoginType loginType, String username, Supplier<Boolean> supplier) {
         HttpServletRequest request = ServletUtils.getRequest();
-        String errorKey = Constants.LOGIN_ERROR + username;
-        Integer errorLimitTime = Constants.LOGIN_ERROR_LIMIT_TIME;
-        Integer setErrorNumber = Constants.LOGIN_ERROR_NUMBER;
+        String errorKey = CacheConstants.PWD_ERR_CNT_KEY + username;
         String loginFail = Constants.LOGIN_FAIL;
 
         // 获取用户登录错误次数(可自定义限制策略 例如: key + username + ip)
         Integer errorNumber = RedisUtils.getCacheObject(errorKey);
         // 锁定时间内登录 则踢出
-        if (ObjectUtil.isNotNull(errorNumber) && errorNumber.equals(setErrorNumber)) {
-            asyncService.recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), errorLimitTime), request);
-            throw new UserException(loginType.getRetryLimitExceed(), errorLimitTime);
+        if (ObjectUtil.isNotNull(errorNumber) && errorNumber.equals(maxRetryCount)) {
+            asyncService.recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime), request);
+            throw new UserException(loginType.getRetryLimitExceed(), maxRetryCount, lockTime);
         }
 
         if (supplier.get()) {
             // 是否第一次
             errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
             // 达到规定错误次数 则锁定登录
-            if (errorNumber.equals(setErrorNumber)) {
-                RedisUtils.setCacheObject(errorKey, errorNumber, Duration.ofMinutes(errorLimitTime));
-                asyncService.recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), errorLimitTime), request);
-                throw new UserException(loginType.getRetryLimitExceed(), errorLimitTime);
+            if (errorNumber.equals(maxRetryCount)) {
+                RedisUtils.setCacheObject(errorKey, errorNumber, Duration.ofMinutes(lockTime));
+                asyncService.recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime), request);
+                throw new UserException(loginType.getRetryLimitExceed(), maxRetryCount, lockTime);
             } else {
                 // 未达到规定错误次数 则递增
                 RedisUtils.setCacheObject(errorKey, errorNumber);

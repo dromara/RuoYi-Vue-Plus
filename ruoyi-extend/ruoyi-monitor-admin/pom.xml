@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ruoyi-extend</artifactId>
         <groupId>com.ruoyi</groupId>
-        <version>4.2.0</version>
+        <version>4.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
@@ -58,25 +58,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>${docker.plugin.version}</version>
-                <configuration>
-                    <imageName>${docker.namespace}/${project.artifactId}:${project.version}</imageName>
-                    <dockerDirectory>${project.basedir}</dockerDirectory>
-                    <dockerHost>${docker.registry.host}</dockerHost>
-                    <registryUrl>${docker.registry.url}</registryUrl>
-                    <serverId>${docker.registry.url}</serverId>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}.jar</include>
-                        </resource>
-                    </resources>
-                </configuration>
             </plugin>
         </plugins>
     </build>

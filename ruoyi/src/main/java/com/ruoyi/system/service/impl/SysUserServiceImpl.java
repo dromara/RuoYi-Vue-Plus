@@ -18,6 +18,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.helper.LoginHelper;
+import com.ruoyi.common.utils.StreamUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
@@ -33,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 用户 业务层处理
@@ -83,7 +83,7 @@ public class SysUserServiceImpl implements ISysUserService {
                 List<SysDept> deptList = deptMapper.selectList(new LambdaQueryWrapper<SysDept>()
                     .select(SysDept::getDeptId)
                     .apply(DataBaseHelper.findInSet(user.getDeptId(), "ancestors")));
-                List<Long> ids = deptList.stream().map(SysDept::getDeptId).collect(Collectors.toList());
+                List<Long> ids = StreamUtils.toList(deptList, SysDept::getDeptId);
                 ids.add(user.getDeptId());
                 w.in("u.dept_id", ids);
             });
@@ -172,7 +172,7 @@ public class SysUserServiceImpl implements ISysUserService {
         if (CollUtil.isEmpty(list)) {
             return StringUtils.EMPTY;
         }
-        return list.stream().map(SysRole::getRoleName).collect(Collectors.joining(","));
+        return StreamUtils.join(list, SysRole::getRoleName);
     }
 
     /**
@@ -187,7 +187,7 @@ public class SysUserServiceImpl implements ISysUserService {
         if (CollUtil.isEmpty(list)) {
             return StringUtils.EMPTY;
         }
-        return list.stream().map(SysPost::getPostName).collect(Collectors.joining(","));
+        return StreamUtils.join(list, SysPost::getPostName);
     }
 
     /**

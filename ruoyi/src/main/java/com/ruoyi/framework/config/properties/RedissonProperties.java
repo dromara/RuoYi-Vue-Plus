@@ -7,8 +7,6 @@ import org.redisson.config.SubscriptionMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
  * Redisson 配置属性
  *
@@ -18,6 +16,11 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "redisson")
 public class RedissonProperties {
+
+    /**
+     * redis缓存key前缀
+     */
+    private String keyPrefix;
 
     /**
      * 线程池数量,默认值 = 当前处理核数量 * 2
@@ -38,11 +41,6 @@ public class RedissonProperties {
      * 集群服务配置
      */
     private ClusterServersConfig clusterServersConfig;
-
-    /**
-     * 缓存组
-     */
-    private List<CacheGroup> cacheGroup;
 
     @Data
     @NoArgsConstructor
@@ -133,32 +131,6 @@ public class RedissonProperties {
          * 订阅模式
          */
         private SubscriptionMode subscriptionMode;
-
-    }
-
-    @Data
-    @NoArgsConstructor
-    public static class CacheGroup {
-
-        /**
-         * 组id
-         */
-        private String groupId;
-
-        /**
-         * 组过期时间
-         */
-        private long ttl;
-
-        /**
-         * 组最大空闲时间
-         */
-        private long maxIdleTime;
-
-        /**
-         * 组最大长度
-         */
-        private int maxSize;
 
     }
 

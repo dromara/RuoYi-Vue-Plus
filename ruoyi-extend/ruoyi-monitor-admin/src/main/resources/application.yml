@@ -14,18 +14,29 @@ spring:
       password: 123456
   boot:
     admin:
+      ui:
+        title: RuoYi-Vue-Plus服务监控中心
       context-path: /admin
 
 --- # Actuator 监控端点的配置项
 management:
   endpoints:
     web:
-      # Actuator 提供的 API 接口的根目录。默认为 /actuator
-      base-path: /actuator
       exposure:
-        # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
-        # 生产环境不建议放开所有 根据项目需求放开即可
-        include: @endpoints.include@
+        include: '*'
   endpoint:
+    health:
+      show-details: ALWAYS
     logfile:
       external-file: ./logs/ruoyi-monitor-admin.log
+
+--- # 监控配置
+spring.boot.admin.client:
+  # 增加客户端开关
+  enabled: true
+  # 设置 Spring Boot Admin Server 地址
+  url: http://localhost:9090/admin
+  instance:
+    service-host-type: IP
+  username: ruoyi
+  password: 123456

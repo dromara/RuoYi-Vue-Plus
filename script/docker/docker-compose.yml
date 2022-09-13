@@ -26,10 +26,7 @@ services:
       --explicit_defaults_for_timestamp=true
       --lower_case_table_names=1
     privileged: true
-    restart: always
-    networks:
-      ruoyi_net:
-        ipv4_address: 172.30.0.36
+    network_mode: "host"
 
   nginx-web:
     image: nginx:1.21.6
@@ -50,9 +47,7 @@ services:
       # 日志目录
       - /docker/nginx/log:/var/log/nginx
     privileged: true
-    restart: always
-    networks:
-      - ruoyi_net
+    network_mode: "host"
 
   redis:
     image: redis:6.2.7
@@ -69,10 +64,7 @@ services:
       - /docker/redis/data/:/redis/data/:rw
     command: "redis-server /redis/config/redis.conf"
     privileged: true
-    restart: always
-    networks:
-      ruoyi_net:
-        ipv4_address: 172.30.0.48
+    network_mode: "host"
 
   minio:
     image: minio/minio:RELEASE.2022-05-26T05-48-41Z
@@ -90,7 +82,8 @@ services:
       # 管理后台密码，最小8个字符
       MINIO_SECRET_KEY: ruoyi123
       # https需要指定域名
-      MINIO_SERVER_URL: ""
+      #MINIO_SERVER_URL: "https://xxx.com:9000"
+      #MINIO_BROWSER_REDIRECT_URL: "https://xxx.com:9001"
       # 开启压缩 on 开启 off 关闭
       MINIO_COMPRESS: "off"
       # 扩展名 .pdf,.doc 为空 所有类型均压缩
@@ -104,43 +97,36 @@ services:
       - /docker/minio/config:/root/.minio/
     command: server --address ':9000' --console-address ':9001' /data  # 指定容器中的目录 /data
     privileged: true
-    restart: always
-    networks:
-      ruoyi_net:
-        ipv4_address: 172.30.0.54
+    network_mode: "host"
 
   ruoyi-server1:
-    image: ruoyi/ruoyi-server:4.2.0
+    image: ruoyi/ruoyi-server:4.3.0
     container_name: ruoyi-server1
     environment:
       # 时区上海
       TZ: Asia/Shanghai
+      SERVER_PORT: 8080
     volumes:
       # 配置文件
       - /docker/server1/logs/:/ruoyi/server/logs/
     privileged: true
-    restart: always
-    networks:
-      ruoyi_net:
-        ipv4_address: 172.30.0.60
+    network_mode: "host"
 
   ruoyi-server2:
-    image: "ruoyi/ruoyi-server:4.2.0"
+    image: "ruoyi/ruoyi-server:4.3.0"
     container_name: ruoyi-server2
     environment:
       # 时区上海
       TZ: Asia/Shanghai
+      SERVER_PORT: 8081
     volumes:
       # 配置文件
       - /docker/server2/logs/:/ruoyi/server/logs/
     privileged: true
-    restart: always
-    networks:
-      ruoyi_net:
-        ipv4_address: 172.30.0.61
+    network_mode: "host"
 
   ruoyi-monitor-admin:
-    image: ruoyi/ruoyi-monitor-admin:4.2.0
+    image: ruoyi/ruoyi-monitor-admin:4.3.0
     container_name: ruoyi-monitor-admin
     environment:
       # 时区上海
@@ -149,13 +135,10 @@ services:
       # 配置文件
       - /docker/monitor/logs/:/ruoyi/monitor/logs
     privileged: true
-    restart: always
-    networks:
-      ruoyi_net:
-        ipv4_address: 172.30.0.90
+    network_mode: "host"
 
   ruoyi-xxl-job-admin:
-    image: ruoyi/ruoyi-xxl-job-admin:4.2.0
+    image: ruoyi/ruoyi-xxl-job-admin:4.3.0
     container_name: ruoyi-xxl-job-admin
     environment:
       # 时区上海
@@ -164,14 +147,4 @@ services:
       # 配置文件
       - /docker/xxljob/logs/:/ruoyi/xxljob/logs
     privileged: true
-    restart: always
-    networks:
-      ruoyi_net:
-        ipv4_address: 172.30.0.92
-
-networks:
-  ruoyi_net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.30.0.0/16
+    network_mode: "host"

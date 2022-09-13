@@ -10,9 +10,6 @@ import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysMenuService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +24,6 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Api(value = "菜单信息控制器", tags = {"菜单信息管理"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/menu")
@@ -38,7 +34,6 @@ public class SysMenuController extends BaseController {
     /**
      * 获取菜单列表
      */
-    @ApiOperation("获取菜单列表")
     @SaCheckPermission("system:menu:list")
     @GetMapping("/list")
     public R<List<SysMenu>> list(SysMenu menu) {
@@ -48,18 +43,18 @@ public class SysMenuController extends BaseController {
 
     /**
      * 根据菜单编号获取详细信息
+     *
+     * @param menuId 菜单ID
      */
-    @ApiOperation("根据菜单编号获取详细信息")
     @SaCheckPermission("system:menu:query")
     @GetMapping(value = "/{menuId}")
-    public R<SysMenu> getInfo(@ApiParam("菜单ID") @PathVariable Long menuId) {
+    public R<SysMenu> getInfo(@PathVariable Long menuId) {
         return R.ok(menuService.selectMenuById(menuId));
     }
 
     /**
      * 获取菜单下拉树列表
      */
-    @ApiOperation("获取菜单下拉树列表")
     @GetMapping("/treeselect")
     public R<List<Tree<Long>>> treeselect(SysMenu menu) {
         List<SysMenu> menus = menuService.selectMenuList(menu, getUserId());
@@ -68,10 +63,11 @@ public class SysMenuController extends BaseController {
 
     /**
      * 加载对应角色菜单列表树
+     *
+     * @param roleId 角色ID
      */
-    @ApiOperation("加载对应角色菜单列表树")
     @GetMapping(value = "/roleMenuTreeselect/{roleId}")
-    public R<Map<String, Object>> roleMenuTreeselect(@ApiParam("角色ID") @PathVariable("roleId") Long roleId) {
+    public R<Map<String, Object>> roleMenuTreeselect(@PathVariable("roleId") Long roleId) {
         List<SysMenu> menus = menuService.selectMenuList(getUserId());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("checkedKeys", menuService.selectMenuListByRoleId(roleId));
@@ -82,7 +78,6 @@ public class SysMenuController extends BaseController {
     /**
      * 新增菜单
      */
-    @ApiOperation("新增菜单")
     @SaCheckPermission("system:menu:add")
     @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
@@ -98,7 +93,6 @@ public class SysMenuController extends BaseController {
     /**
      * 修改菜单
      */
-    @ApiOperation("修改菜单")
     @SaCheckPermission("system:menu:edit")
     @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
@@ -115,12 +109,13 @@ public class SysMenuController extends BaseController {
 
     /**
      * 删除菜单
+     *
+     * @param menuId 菜单ID
      */
-    @ApiOperation("删除菜单")
     @SaCheckPermission("system:menu:remove")
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{menuId}")
-    public R<Void> remove(@ApiParam("菜单ID") @PathVariable("menuId") Long menuId) {
+    public R<Void> remove(@PathVariable("menuId") Long menuId) {
         if (menuService.hasChildByMenuId(menuId)) {
             return R.fail("存在子菜单,不允许删除");
         }

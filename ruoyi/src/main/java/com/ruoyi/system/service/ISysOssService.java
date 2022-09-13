@@ -21,7 +21,7 @@ public interface ISysOssService {
 
     List<SysOssVo> listByIds(Collection<Long> ossIds);
 
-    SysOss getById(Long ossId);
+    SysOssVo getById(Long ossId);
 
     SysOss upload(MultipartFile file);
 

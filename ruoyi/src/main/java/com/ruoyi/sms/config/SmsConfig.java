@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * 短信配置类
- * 需要哪个 打开哪个的注释即可
  *
  * @author Lion Li
  * @version 4.2.0

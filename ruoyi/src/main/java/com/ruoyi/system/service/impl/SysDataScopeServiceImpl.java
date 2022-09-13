@@ -5,6 +5,7 @@ import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.helper.DataBaseHelper;
+import com.ruoyi.common.utils.StreamUtils;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleDeptMapper;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 数据权限 实现
@@ -37,7 +37,7 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
                 .select(SysRoleDept::getDeptId)
                 .eq(SysRoleDept::getRoleId, roleId));
         if (CollUtil.isNotEmpty(list)) {
-            return list.stream().map(rd -> Convert.toStr(rd.getDeptId())).collect(Collectors.joining(","));
+            return StreamUtils.join(list, rd -> Convert.toStr(rd.getDeptId()));
         }
         return null;
     }
@@ -47,13 +47,13 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
         List<SysDept> deptList = deptMapper.selectList(new LambdaQueryWrapper<SysDept>()
             .select(SysDept::getDeptId)
             .apply(DataBaseHelper.findInSet(deptId, "ancestors")));
-        List<Long> ids = deptList.stream().map(SysDept::getDeptId).collect(Collectors.toList());
+        List<Long> ids = StreamUtils.toList(deptList, SysDept::getDeptId);
         ids.add(deptId);
         List<SysDept> list = deptMapper.selectList(new LambdaQueryWrapper<SysDept>()
             .select(SysDept::getDeptId)
             .in(SysDept::getDeptId, ids));
         if (CollUtil.isNotEmpty(list)) {
-            return list.stream().map(d -> Convert.toStr(d.getDeptId())).collect(Collectors.joining(","));
+            return StreamUtils.join(list, d -> Convert.toStr(d.getDeptId()));
         }
         return null;
     }

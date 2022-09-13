@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.pattern.PathPattern;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -32,7 +33,7 @@ public class ExcludeUrlProperties implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         String asterisk = "*";
-        RequestMappingHandlerMapping mapping = SpringUtils.getBean(RequestMappingHandlerMapping.class);
+        RequestMappingHandlerMapping mapping = SpringUtils.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
 
         map.keySet().forEach(info -> {
@@ -41,18 +42,18 @@ public class ExcludeUrlProperties implements InitializingBean {
             // 获取方法上边的注解 替代path variable 为 *
             Anonymous method = AnnotationUtils.findAnnotation(handlerMethod.getMethod(), Anonymous.class);
             Optional.ofNullable(method).ifPresent(anonymous -> {
-                Set<String> patterns = info.getPatternsCondition().getPatterns();
+                Set<PathPattern> patterns = info.getPathPatternsCondition().getPatterns();
                 patterns.forEach(url -> {
-                    excludes.add(ReUtil.replaceAll(url, PATTERN, asterisk));
+                    excludes.add(ReUtil.replaceAll(url.getPatternString(), PATTERN, asterisk));
                 });
             });
 
             // 获取类上边的注解, 替代path variable 为 *
             Anonymous controller = AnnotationUtils.findAnnotation(handlerMethod.getBeanType(), Anonymous.class);
             Optional.ofNullable(controller).ifPresent(anonymous -> {
-                Set<String> patterns = info.getPatternsCondition().getPatterns();
+                Set<PathPattern> patterns = info.getPathPatternsCondition().getPatterns();
                 patterns.forEach(url -> {
-                    excludes.add(ReUtil.replaceAll(url, PATTERN, asterisk));
+                    excludes.add(ReUtil.replaceAll(url.getPatternString(), PATTERN, asterisk));
                 });
             });
         });

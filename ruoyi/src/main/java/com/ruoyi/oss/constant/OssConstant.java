@@ -11,19 +11,9 @@ import java.util.List;
 public interface OssConstant {
 
     /**
-     * OSS模块KEY
+     * 默认配置KEY
      */
-    String SYS_OSS_KEY = "sys_oss:";
-
-    /**
-     * 对象存储配置KEY
-     */
-    String OSS_CONFIG_KEY = "OssConfig";
-
-    /**
-     * 缓存配置KEY
-     */
-    String CACHE_CONFIG_KEY = SYS_OSS_KEY + OSS_CONFIG_KEY;
+    String DEFAULT_CONFIG_KEY = "sys_oss:default_config";
 
     /**
      * 预览列表资源开关Key
@@ -33,7 +23,7 @@ public interface OssConstant {
     /**
      * 系统数据ids
      */
-    List<Integer> SYSTEM_DATA_IDS = Arrays.asList(1, 2, 3, 4);
+    List<Long> SYSTEM_DATA_IDS = Arrays.asList(1L, 2L, 3L, 4L);
 
     /**
      * 云服务商

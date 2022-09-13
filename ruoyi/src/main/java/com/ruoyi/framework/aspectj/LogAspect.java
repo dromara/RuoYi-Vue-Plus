@@ -1,5 +1,7 @@
 package com.ruoyi.framework.aspectj;
 
+import cn.hutool.core.lang.Dict;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.domain.dto.OperLogDTO;
@@ -37,6 +39,11 @@ import java.util.Map;
 public class LogAspect {
 
     /**
+     * 排除敏感属性字段
+     */
+    public static final String[] EXCLUDE_PROPERTIES = { "password", "oldPassword", "newPassword", "confirmPassword" };
+
+    /**
      * 处理完请求后执行
      *
      * @param joinPoint 切点
@@ -66,7 +73,7 @@ public class LogAspect {
             // 请求的地址
             String ip = ServletUtils.getClientIP();
             operLog.setOperIp(ip);
-            operLog.setOperUrl(ServletUtils.getRequest().getRequestURI());
+            operLog.setOperUrl(StringUtils.substring(ServletUtils.getRequest().getRequestURI(), 0, 255));
             operLog.setOperName(LoginHelper.getUsername());
 
             if (e != null) {
@@ -142,7 +149,13 @@ public class LogAspect {
             for (Object o : paramsArray) {
                 if (ObjectUtil.isNotNull(o) && !isFilterObject(o)) {
                     try {
-                        params.append(JsonUtils.toJsonString(o)).append(" ");
+                        String str = JsonUtils.toJsonString(o);
+                        Dict dict = JsonUtils.parseMap(str);
+                        if (MapUtil.isNotEmpty(dict)) {
+                            MapUtil.removeAny(dict, EXCLUDE_PROPERTIES);
+                            str = JsonUtils.toJsonString(dict);
+                        }
+                        params.append(str).append(" ");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

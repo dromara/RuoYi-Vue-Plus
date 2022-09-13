@@ -2,8 +2,6 @@ package ${packageName}.domain.bo;
 
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import javax.validation.constraints.*;
@@ -33,7 +31,6 @@ import com.ruoyi.common.core.domain.TreeEntity;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ApiModel("${functionName}业务对象")
 public class ${ClassName}Bo extends ${Entity} {
 
 #foreach ($column in $columns)
@@ -49,14 +46,11 @@ public class ${ClassName}Bo extends ${Entity} {
 #set($Group="EditGroup.class")
 #end
 #if($column.isRequired == 1)
-    @ApiModelProperty(value = "$column.columnComment", required = true)
 #if($column.javaType == 'String')
     @NotBlank(message = "$column.columnComment不能为空", groups = { $Group })
 #else
     @NotNull(message = "$column.columnComment不能为空", groups = { $Group })
 #end
-#else
-    @ApiModelProperty(value = "$column.columnComment")
 #end
     private $column.javaType $column.javaField;
 

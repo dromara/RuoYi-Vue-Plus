@@ -7,8 +7,6 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.convert.ExcelDictConvert;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import java.util.Date;
 
@@ -21,7 +19,6 @@ import java.util.Date;
  * @date ${datetime}
  */
 @Data
-@ApiModel("${functionName}视图对象")
 @ExcelIgnoreUnannotated
 public class ${ClassName}Vo {
 
@@ -47,7 +44,6 @@ public class ${ClassName}Vo {
 #else
     @ExcelProperty(value = "${comment}")
 #end
-    @ApiModelProperty("$column.columnComment")
     private $column.javaType $column.javaField;
 
 #end

@@ -29,7 +29,7 @@
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
-      <el-form-item prop="code" v-if="captchaOnOff">
+      <el-form-item prop="code" v-if="captchaEnabled">
         <el-input
           v-model="registerForm.code"
           auto-complete="off"
@@ -105,7 +105,7 @@ export default {
         code: [{ required: true, trigger: "change", message: "请输入验证码" }]
       },
       loading: false,
-      captchaOnOff: true
+      captchaEnabled: true
     };
   },
   created() {
@@ -114,8 +114,8 @@ export default {
   methods: {
     getCode() {
       getCodeImg().then(res => {
-        this.captchaOnOff = res.data.captchaOnOff === undefined ? true : res.data.captchaOnOff;
-        if (this.captchaOnOff) {
+        this.captchaEnabled = res.data.captchaEnabled === undefined ? true : res.data.captchaEnabled;
+        if (this.captchaEnabled) {
           this.codeUrl = "data:image/gif;base64," + res.data.img;
           this.registerForm.uuid = res.data.uuid;
         }
@@ -137,7 +137,7 @@ export default {
             }).catch(() => {});
           }).catch(() => {
             this.loading = false;
-            if (this.captchaOnOff) {
+            if (this.captchaEnabled) {
               this.getCode();
             }
           })

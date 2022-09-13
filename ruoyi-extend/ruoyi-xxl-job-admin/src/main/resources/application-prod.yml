@@ -1,24 +1,20 @@
 --- # 监控配置
-spring:
-  boot:
-    admin:
-      # Spring Boot Admin Client 客户端的相关配置
-      client:
-        # 增加客户端开关
-        enabled: true
-        # 设置 Spring Boot Admin Server 地址
-        url: http://172.30.0.90:9090/admin
-        instance:
-          service-host-type: IP
-        username: ruoyi
-        password: 123456
+spring.boot.admin.client:
+  # 增加客户端开关
+  enabled: true
+  # 设置 Spring Boot Admin Server 地址
+  url: http://localhost:9090/admin
+  instance:
+    service-host-type: IP
+  username: ruoyi
+  password: 123456
 
 --- # 数据库配置
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://172.30.0.36:3306/ry-vue?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://127.0.0.1:3306/ry-vue?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
     username: root
     password: root
     hikari:

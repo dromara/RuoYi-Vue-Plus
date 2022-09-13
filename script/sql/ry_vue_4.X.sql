@@ -3,7 +3,7 @@
 -- ----------------------------
 drop table if exists sys_dept;
 create table sys_dept (
-  dept_id           bigint(20)      not null     comment '部门id',
+  dept_id           bigint(20)      not null                   comment '部门id',
   parent_id         bigint(20)      default 0                  comment '父部门id',
   ancestors         varchar(500)    default ''                 comment '祖级列表',
   dept_name         varchar(30)     default ''                 comment '部门名称',
@@ -141,7 +141,7 @@ create table sys_menu (
   is_frame          int(1)          default 1                  comment '是否为外链（0是 1否）',
   is_cache          int(1)          default 0                  comment '是否缓存（0缓存 1不缓存）',
   menu_type         char(1)         default ''                 comment '菜单类型（M目录 C菜单 F按钮）',
-  visible           char(1)         default 0                  comment '菜单状态（0显示 1隐藏）',
+  visible           char(1)         default 0                  comment '显示状态（0显示 1隐藏）',
   status            char(1)         default 0                  comment '菜单状态（0正常 1停用）',
   perms             varchar(100)    default null               comment '权限标识',
   icon              varchar(100)    default '#'                comment '菜单图标',
@@ -173,10 +173,10 @@ insert into sys_menu values('107',  '通知公告', '1',   '8', 'notice',     's
 insert into sys_menu values('108',  '日志管理', '1',   '9', 'log',        '',                         '', 1, 0, 'M', '0', '0', '',                        'log',           'admin', sysdate(), '', null, '日志管理菜单');
 insert into sys_menu values('109',  '在线用户', '2',   '1', 'online',     'monitor/online/index',     '', 1, 0, 'C', '0', '0', 'monitor:online:list',     'online',        'admin', sysdate(), '', null, '在线用户菜单');
 insert into sys_menu values('111',  '数据监控', '2',   '3', 'druid',      'monitor/druid/index',      '', 1, 0, 'C', '0', '0', 'monitor:druid:list',      'druid',         'admin', sysdate(), '', null, '数据监控菜单');
+insert into sys_menu values('112',  '缓存列表', '2',   '6', 'cacheList',  'monitor/cache/list',       '', 1, 0, 'C', '0', '0', 'monitor:cache:list',      'redis-list',    'admin', sysdate(), '', null, '缓存列表菜单');
 insert into sys_menu values('113',  '缓存监控', '2',   '5', 'cache',      'monitor/cache/index',      '', 1, 0, 'C', '0', '0', 'monitor:cache:list',      'redis',         'admin', sysdate(), '', null, '缓存监控菜单');
 insert into sys_menu values('114',  '表单构建', '3',   '1', 'build',      'tool/build/index',         '', 1, 0, 'C', '0', '0', 'tool:build:list',         'build',         'admin', sysdate(), '', null, '表单构建菜单');
 insert into sys_menu values('115',  '代码生成', '3',   '2', 'gen',        'tool/gen/index',           '', 1, 0, 'C', '0', '0', 'tool:gen:list',           'code',          'admin', sysdate(), '', null, '代码生成菜单');
-insert into sys_menu values('116',  '系统接口', '3',   '3', 'swagger',    'tool/swagger/index',       '', 1, 0, 'C', '0', '0', 'tool:swagger:list',       'swagger',       'admin', sysdate(), '', null, '系统接口菜单');
 -- springboot-admin监控
 insert into sys_menu values('117',  'Admin监控', '2',  '5', 'Admin',      'monitor/admin/index',      '', 1, 0, 'C', '0', '0', 'monitor:admin:list',      'dashboard',     'admin', sysdate(), '', null, 'Admin监控菜单');
 -- oss菜单
@@ -242,6 +242,7 @@ insert into sys_menu values('1042', '日志导出', '500', '4', '#', '', '', 1, 
 insert into sys_menu values('1043', '登录查询', '501', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:query',   '#', 'admin', sysdate(), '', null, '');
 insert into sys_menu values('1044', '登录删除', '501', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:remove',  '#', 'admin', sysdate(), '', null, '');
 insert into sys_menu values('1045', '日志导出', '501', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:export',  '#', 'admin', sysdate(), '', null, '');
+insert into sys_menu values('1050', '账户解锁', '501', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:unlock',  '#', 'admin', sysdate(), '', null, '');
 -- 在线用户按钮
 insert into sys_menu values('1046', '在线查询', '109', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:query',       '#', 'admin', sysdate(), '', null, '');
 insert into sys_menu values('1047', '批量强退', '109', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:batchLogout', '#', 'admin', sysdate(), '', null, '');
@@ -361,6 +362,7 @@ insert into sys_role_menu values ('2', '1042');
 insert into sys_role_menu values ('2', '1043');
 insert into sys_role_menu values ('2', '1044');
 insert into sys_role_menu values ('2', '1045');
+insert into sys_role_menu values ('2', '1050');
 insert into sys_role_menu values ('2', '1046');
 insert into sys_role_menu values ('2', '1047');
 insert into sys_role_menu values ('2', '1048');
@@ -497,6 +499,7 @@ insert into sys_dict_data values(14, 1,  '通知',     '1',       'sys_notice_ty
 insert into sys_dict_data values(15, 2,  '公告',     '2',       'sys_notice_type',     '',   'success', 'N', '0', 'admin', sysdate(), '', null, '公告');
 insert into sys_dict_data values(16, 1,  '正常',     '0',       'sys_notice_status',   '',   'primary', 'Y', '0', 'admin', sysdate(), '', null, '正常状态');
 insert into sys_dict_data values(17, 2,  '关闭',     '1',       'sys_notice_status',   '',   'danger',  'N', '0', 'admin', sysdate(), '', null, '关闭状态');
+insert into sys_dict_data values(29, 99, '其他',     '0',       'sys_oper_type',       '',   'info',    'N', '0', 'admin', sysdate(), '', null, '其他操作');
 insert into sys_dict_data values(18, 1,  '新增',     '1',       'sys_oper_type',       '',   'info',    'N', '0', 'admin', sysdate(), '', null, '新增操作');
 insert into sys_dict_data values(19, 2,  '修改',     '2',       'sys_oper_type',       '',   'info',    'N', '0', 'admin', sysdate(), '', null, '修改操作');
 insert into sys_dict_data values(20, 3,  '删除',     '3',       'sys_oper_type',       '',   'danger',  'N', '0', 'admin', sysdate(), '', null, '删除操作');
@@ -529,11 +532,11 @@ create table sys_config (
 ) engine=innodb comment = '参数配置表';
 
 insert into sys_config values(1, '主框架页-默认皮肤样式名称',     'sys.index.skinName',            'skin-blue',     'Y', 'admin', sysdate(), '', null, '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow' );
-insert into sys_config values(2, '用户管理-账号初始密码',         'sys.user.initPassword',         '123456',        'Y', 'admin', sysdate(), '', null, '初始化密码 123456' );
-insert into sys_config values(3, '主框架页-侧边栏主题',           'sys.index.sideTheme',           'theme-dark',    'Y', 'admin', sysdate(), '', null, '深色主题theme-dark，浅色主题theme-light' );
-insert into sys_config values(4, '账号自助-验证码开关',           'sys.account.captchaOnOff',      'true',          'Y', 'admin', sysdate(), '', null, '是否开启验证码功能（true开启，false关闭）');
-insert into sys_config values(5, '账号自助-是否开启用户注册功能', 'sys.account.registerUser',      'false',         'Y', 'admin', sysdate(), '', null, '是否开启注册用户功能（true开启，false关闭）');
-insert into sys_config values(11, 'OSS预览列表资源开关', 'sys.oss.previewListResource', 'true', 'Y', 'admin', sysdate(), '', null, 'true:开启, false:关闭');
+insert into sys_config values(2, '用户管理-账号初始密码',        'sys.user.initPassword',         '123456',        'Y', 'admin', sysdate(), '', null, '初始化密码 123456' );
+insert into sys_config values(3, '主框架页-侧边栏主题',          'sys.index.sideTheme',           'theme-dark',    'Y', 'admin', sysdate(), '', null, '深色主题theme-dark，浅色主题theme-light' );
+insert into sys_config values(4, '账号自助-验证码开关',          'sys.account.captchaEnabled',    'true',          'Y', 'admin', sysdate(), '', null, '是否开启验证码功能（true开启，false关闭）');
+insert into sys_config values(5, '账号自助-是否开启用户注册功能',  'sys.account.registerUser',      'false',         'Y', 'admin', sysdate(), '', null, '是否开启注册用户功能（true开启，false关闭）');
+insert into sys_config values(11, 'OSS预览列表资源开关',         'sys.oss.previewListResource',   'true',          'Y', 'admin', sysdate(), '', null, 'true:开启, false:关闭');
 
 
 -- ----------------------------
@@ -652,7 +655,7 @@ create table sys_oss (
   create_by       varchar(64)           default ''        comment '上传人',
   update_time     datetime              default null      comment '更新时间',
   update_by       varchar(64)           default ''        comment '更新人',
-  service         varchar(10)  not null default 'minio'   comment '服务商',
+  service         varchar(20)  not null default 'minio'   comment '服务商',
   primary key (oss_id)
 ) engine=innodb comment ='OSS对象存储表';
 
@@ -662,7 +665,7 @@ create table sys_oss (
 drop table if exists sys_oss_config;
 create table sys_oss_config (
   oss_config_id   bigint(20)   not null                   comment '主建',
-  config_key      varchar(255)  not null default ''       comment '配置key',
+  config_key      varchar(20)  not null   default ''      comment '配置key',
   access_key      varchar(255)            default ''      comment 'accessKey',
   secret_key      varchar(255)            default ''      comment '秘钥',
   bucket_name     varchar(255)            default ''      comment '桶名称',

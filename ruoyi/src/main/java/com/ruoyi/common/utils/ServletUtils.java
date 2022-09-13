@@ -3,6 +3,7 @@ package com.ruoyi.common.utils;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HttpStatus;
+import com.ruoyi.common.constant.Constants;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.MediaType;
@@ -14,6 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -117,7 +121,7 @@ public class ServletUtils extends ServletUtil {
     public static boolean isAjaxRequest(HttpServletRequest request) {
 
         String accept = request.getHeader("accept");
-        if (accept != null && accept.contains("application/json")) {
+        if (accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE)) {
             return true;
         }
 
@@ -137,6 +141,34 @@ public class ServletUtils extends ServletUtil {
 
     public static String getClientIP() {
         return getClientIP(getRequest());
+    }
+
+    /**
+     * 内容编码
+     *
+     * @param str 内容
+     * @return 编码后的内容
+     */
+    public static String urlEncode(String str) {
+        try {
+            return URLEncoder.encode(str, Constants.UTF8);
+        } catch (UnsupportedEncodingException e) {
+            return StringUtils.EMPTY;
+        }
+    }
+
+    /**
+     * 内容解码
+     *
+     * @param str 内容
+     * @return 解码后的内容
+     */
+    public static String urlDecode(String str) {
+        try {
+            return URLDecoder.decode(str, Constants.UTF8);
+        } catch (UnsupportedEncodingException e) {
+            return StringUtils.EMPTY;
+        }
     }
 
 }

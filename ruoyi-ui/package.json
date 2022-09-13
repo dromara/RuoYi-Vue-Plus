@@ -1,13 +1,12 @@
 {
   "name": "ruoyi-vue-plus",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "RuoYi-Vue-Plus后台管理系统",
   "author": "LionLi",
   "license": "MIT",
   "scripts": {
     "dev": "vue-cli-service serve",
     "build:prod": "vue-cli-service build",
-    "build:stage": "vue-cli-service build --mode staging",
     "preview": "node build/index.js --preview",
     "lint": "eslint --ext .js,.vue src"
   },

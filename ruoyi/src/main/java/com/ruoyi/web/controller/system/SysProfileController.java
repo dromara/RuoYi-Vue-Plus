@@ -14,16 +14,12 @@ import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.service.ISysOssService;
 import com.ruoyi.system.service.ISysUserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +30,6 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Api(value = "个人信息控制器", tags = {"个人信息管理"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/user/profile")
@@ -46,7 +41,6 @@ public class SysProfileController extends BaseController {
     /**
      * 个人信息
      */
-    @ApiOperation("个人信息")
     @GetMapping
     public R<Map<String, Object>> profile() {
         SysUser user = userService.selectUserById(getUserId());
@@ -60,7 +54,6 @@ public class SysProfileController extends BaseController {
     /**
      * 修改用户
      */
-    @ApiOperation("修改用户")
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping
     public R<Void> updateProfile(@RequestBody SysUser user) {
@@ -75,6 +68,8 @@ public class SysProfileController extends BaseController {
         user.setUserId(getUserId());
         user.setUserName(null);
         user.setPassword(null);
+        user.setAvatar(null);
+        user.setDeptId(null);
         if (userService.updateUserProfile(user) > 0) {
             return R.ok();
         }
@@ -83,12 +78,10 @@ public class SysProfileController extends BaseController {
 
     /**
      * 重置密码
+     *
+     * @param newPassword 旧密码
+     * @param oldPassword 新密码
      */
-    @ApiOperation("重置密码")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "oldPassword", value = "旧密码", paramType = "query", dataTypeClass = String.class),
-        @ApiImplicitParam(name = "newPassword", value = "新密码", paramType = "query", dataTypeClass = String.class)
-    })
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
     public R<Void> updatePwd(String oldPassword, String newPassword) {
@@ -110,21 +103,19 @@ public class SysProfileController extends BaseController {
 
     /**
      * 头像上传
+     *
+     * @param avatarfile 用户头像
      */
-    @ApiOperation("头像上传")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "avatarfile", value = "用户头像", paramType = "query", dataTypeClass = File.class, required = true)
-    })
     @Log(title = "用户头像", businessType = BusinessType.UPDATE)
-    @PostMapping("/avatar")
-    public R<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile file) {
+    @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public R<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile avatarfile) {
         Map<String, Object> ajax = new HashMap<>();
-        if (!file.isEmpty()) {
-            String extension = FileUtil.extName(file.getOriginalFilename());
+        if (!avatarfile.isEmpty()) {
+            String extension = FileUtil.extName(avatarfile.getOriginalFilename());
             if (!StringUtils.equalsAnyIgnoreCase(extension, MimeTypeUtils.IMAGE_EXTENSION)) {
                 return R.fail("文件格式不正确，请上传" + Arrays.toString(MimeTypeUtils.IMAGE_EXTENSION) + "格式");
             }
-            SysOss oss = iSysOssService.upload(file);
+            SysOss oss = iSysOssService.upload(avatarfile);
             String avatar = oss.getUrl();
             if (userService.updateUserAvatar(getUsername(), avatar)) {
                 ajax.put("imgUrl", avatar);
