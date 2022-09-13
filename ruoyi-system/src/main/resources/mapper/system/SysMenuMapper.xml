@@ -95,4 +95,11 @@
           and sur.user_id = #{userId}
     </select>
 
+    <select id="selectMenuPermsByRoleId" parameterType="Long" resultType="String">
+        select distinct m.perms
+        from sys_menu m
+                 left join sys_role_menu rm on m.menu_id = rm.menu_id
+        where m.status = '0' and rm.role_id = #{roleId}
+    </select>
+
 </mapper>

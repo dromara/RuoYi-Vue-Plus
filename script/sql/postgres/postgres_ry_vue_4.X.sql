@@ -231,7 +231,7 @@ comment on column sys_menu.query_param is '路由参数';
 comment on column sys_menu.is_frame is '是否为外链（0是 1否）';
 comment on column sys_menu.is_cache is '是否缓存（0缓存 1不缓存）';
 comment on column sys_menu.menu_type is '菜单类型（M目录 C菜单 F按钮）';
-comment on column sys_menu.visible is '菜单状态（0显示 1隐藏）';
+comment on column sys_menu.visible is '显示状态（0显示 1隐藏）';
 comment on column sys_menu.status is '菜单状态（0正常 1停用）';
 comment on column sys_menu.perms is '权限标识';
 comment on column sys_menu.icon is '菜单图标';
@@ -650,6 +650,7 @@ insert into sys_dict_data values(14, 1,  '通知',     '1',       'sys_notice_ty
 insert into sys_dict_data values(15, 2,  '公告',     '2',       'sys_notice_type',     '',   'success', 'N', '0', 'admin', now(), '', null, '公告');
 insert into sys_dict_data values(16, 1,  '正常',     '0',       'sys_notice_status',   '',   'primary', 'Y', '0', 'admin', now(), '', null, '正常状态');
 insert into sys_dict_data values(17, 2,  '关闭',     '1',       'sys_notice_status',   '',   'danger',  'N', '0', 'admin', now(), '', null, '关闭状态');
+insert into sys_dict_data values(29, 99, '其他',     '0',       'sys_oper_type',       '',   'info',    'N', '0', 'admin', now(), '', null, '其他操作');
 insert into sys_dict_data values(18, 1,  '新增',     '1',       'sys_oper_type',       '',   'info',    'N', '0', 'admin', now(), '', null, '新增操作');
 insert into sys_dict_data values(19, 2,  '修改',     '2',       'sys_oper_type',       '',   'info',    'N', '0', 'admin', now(), '', null, '修改操作');
 insert into sys_dict_data values(20, 3,  '删除',     '3',       'sys_oper_type',       '',   'danger',  'N', '0', 'admin', now(), '', null, '删除操作');
@@ -890,7 +891,7 @@ create table if not exists sys_oss
     create_time   timestamp,
     update_by     varchar(64)  default ''::varchar,
     update_time   timestamp,
-    service       varchar(10)  default 'minio'::varchar,
+    service       varchar(20)  default 'minio'::varchar,
     constraint sys_oss_pk primary key (oss_id)
 );
 
@@ -913,7 +914,7 @@ drop table if exists sys_oss_config;
 create table if not exists sys_oss_config
 (
     oss_config_id int8,
-    config_key    varchar(255) default ''::varchar not null,
+    config_key    varchar(20)  default ''::varchar not null,
     access_key    varchar(255) default ''::varchar,
     secret_key    varchar(255) default ''::varchar,
     bucket_name   varchar(255) default ''::varchar,
@@ -957,3 +958,9 @@ insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXX
 insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',         '','N', 'ap-beijing',  '1', '', 'admin', now(), 'admin', now(), null);
 insert into sys_oss_config values (5, 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',                 '','N', '',            '1', '', 'admin', now(), 'admin', now(), NULL);
 
+-- 字符串自动转时间 避免框架时间查询报错问题
+create or replace function cast_varchar_to_timestamp(varchar) returns timestamptz as $$
+select to_timestamp($1, 'yyyy-mm-dd hh24:mi:ss');
+$$ language sql strict ;
+
+create cast (varchar as timestamptz) with function cast_varchar_to_timestamp as IMPLICIT;

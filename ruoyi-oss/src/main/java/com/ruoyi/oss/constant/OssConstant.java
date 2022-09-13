@@ -23,7 +23,7 @@ public interface OssConstant {
     /**
      * 系统数据ids
      */
-    List<Integer> SYSTEM_DATA_IDS = Arrays.asList(1, 2, 3, 4);
+    List<Long> SYSTEM_DATA_IDS = Arrays.asList(1L, 2L, 3L, 4L);
 
     /**
      * 云服务商

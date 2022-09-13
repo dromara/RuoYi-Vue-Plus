@@ -3,6 +3,7 @@ package com.ruoyi.web.controller.system;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.Log;
@@ -23,6 +24,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.vo.SysUserExportVo;
 import com.ruoyi.system.domain.vo.SysUserImportVo;
 import com.ruoyi.system.listener.SysUserImportListener;
+import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysPostService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
@@ -52,6 +54,7 @@ public class SysUserController extends BaseController {
     private final ISysUserService userService;
     private final ISysRoleService roleService;
     private final ISysPostService postService;
+    private final ISysDeptService deptService;
 
     /**
      * 获取用户列表
@@ -235,4 +238,14 @@ public class SysUserController extends BaseController {
         userService.insertUserAuth(userId, roleIds);
         return R.ok();
     }
+
+    /**
+     * 获取部门树列表
+     */
+    @SaCheckPermission("system:user:list")
+    @GetMapping("/deptTree")
+    public R<List<Tree<Long>>> deptTree(SysDept dept) {
+        return R.ok(deptService.selectDeptTreeList(dept));
+    }
+
 }

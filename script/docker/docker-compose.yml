@@ -82,7 +82,8 @@ services:
       # 管理后台密码，最小8个字符
       MINIO_SECRET_KEY: ruoyi123
       # https需要指定域名
-      MINIO_SERVER_URL: ""
+      #MINIO_SERVER_URL: "https://xxx.com:9000"
+      #MINIO_BROWSER_REDIRECT_URL: "https://xxx.com:9001"
       # 开启压缩 on 开启 off 关闭
       MINIO_COMPRESS: "off"
       # 扩展名 .pdf,.doc 为空 所有类型均压缩
@@ -99,7 +100,7 @@ services:
     network_mode: "host"
 
   ruoyi-server1:
-    image: ruoyi/ruoyi-server:4.3.0-beta2
+    image: ruoyi/ruoyi-server:4.3.0
     container_name: ruoyi-server1
     environment:
       # 时区上海
@@ -112,7 +113,7 @@ services:
     network_mode: "host"
 
   ruoyi-server2:
-    image: "ruoyi/ruoyi-server:4.3.0-beta2"
+    image: "ruoyi/ruoyi-server:4.3.0"
     container_name: ruoyi-server2
     environment:
       # 时区上海
@@ -125,7 +126,7 @@ services:
     network_mode: "host"
 
   ruoyi-monitor-admin:
-    image: ruoyi/ruoyi-monitor-admin:4.3.0-beta2
+    image: ruoyi/ruoyi-monitor-admin:4.3.0
     container_name: ruoyi-monitor-admin
     environment:
       # 时区上海
@@ -137,7 +138,7 @@ services:
     network_mode: "host"
 
   ruoyi-xxl-job-admin:
-    image: ruoyi/ruoyi-xxl-job-admin:4.3.0-beta2
+    image: ruoyi/ruoyi-xxl-job-admin:4.3.0
     container_name: ruoyi-xxl-job-admin
     environment:
       # 时区上海

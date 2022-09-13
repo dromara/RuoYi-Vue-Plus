@@ -702,6 +702,8 @@ INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [d
 GO
 INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (17, 2, N'关闭', N'1', N'sys_notice_status', N'', N'danger', N'N', N'0', N'admin', getdate(), N'', NULL, N'关闭状态')
 GO
+INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (29, 99, N'其他', N'0', N'sys_oper_type', N'', N'info', N'N', N'0', N'admin', getdate(), N'', NULL, N'其他操作');
+GO
 INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (18, 1, N'新增', N'1', N'sys_oper_type', N'', N'info', N'N', N'0', N'admin', getdate(), N'', NULL, N'新增操作')
 GO
 INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (19, 2, N'修改', N'2', N'sys_oper_type', N'', N'info', N'N', N'0', N'admin', getdate(), N'', NULL, N'修改操作')
@@ -991,7 +993,7 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'menu_type'
 GO
 EXEC sys.sp_addextendedproperty
-    'MS_Description', N'菜单状态（0显示 1隐藏）' ,
+    'MS_Description', N'显示状态（0显示 1隐藏）' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_menu',
     'COLUMN', N'visible'
@@ -2114,7 +2116,7 @@ CREATE TABLE [sys_oss]
     [create_by]     nvarchar(64)  DEFAULT ''        NULL,
     [update_time]   datetime2(7)                    NULL,
     [update_by]     nvarchar(64)  DEFAULT ''        NULL,
-    [service]       nvarchar(10)  DEFAULT ('minio') NOT NULL,
+    [service]       nvarchar(20)  DEFAULT ('minio') NOT NULL,
     CONSTRAINT [PK__sys_oss__91241EA442389F0D] PRIMARY KEY CLUSTERED ([oss_id])
         WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
         ON [PRIMARY]
@@ -2191,7 +2193,7 @@ GO
 CREATE TABLE [sys_oss_config]
 (
     [oss_config_id] bigint                      NOT NULL,
-    [config_key]    nvarchar(255) DEFAULT ''    NOT NULL,
+    [config_key]    nvarchar(20)  DEFAULT ''    NOT NULL,
     [access_key]    nvarchar(255) DEFAULT ''    NULL,
     [secret_key]    nvarchar(255) DEFAULT ''    NULL,
     [bucket_name]   nvarchar(255) DEFAULT ''    NULL,

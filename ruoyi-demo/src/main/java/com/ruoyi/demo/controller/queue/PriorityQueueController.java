@@ -34,16 +34,9 @@ public class PriorityQueueController {
     @GetMapping("/add")
     public R<Void> add(String queueName) {
         // 用完了一定要销毁 否则会一直存在
-        boolean b = QueueUtils.destroyPriorityQueueObject(queueName);
+        boolean b = QueueUtils.destroyQueue(queueName);
         log.info("通道: {} , 删除: {}", queueName, b);
-        // 初始化设置一次即可 此处注意 不允许用内部类或匿名类
-        boolean flag = QueueUtils.trySetPriorityQueueComparator(queueName, new PriorityDemoComparator());
-        if (flag) {
-            log.info("通道: {} , 设置比较器成功", queueName);
-        } else {
-            log.info("通道: {} , 设置比较器失败", queueName);
-            return R.fail("操作失败");
-        }
+
         for (int i = 0; i < 10; i++) {
             int randomNum = RandomUtil.randomInt(10);
             PriorityDemo data = new PriorityDemo();
@@ -70,7 +63,7 @@ public class PriorityQueueController {
         PriorityDemo data = new PriorityDemo();
         data.setName(name);
         data.setOrderNum(orderNum);
-        if (QueueUtils.removePriorityQueueObject(queueName, data)) {
+        if (QueueUtils.removeQueueObject(queueName, data)) {
             log.info("通道: {} , 删除数据: {}", queueName, data);
         } else {
             return R.fail("操作失败");
@@ -87,7 +80,7 @@ public class PriorityQueueController {
     public R<Void> get(String queueName) {
         PriorityDemo data;
         do {
-            data = QueueUtils.getPriorityQueueObject(queueName);
+            data = QueueUtils.getQueueObject(queueName);
             log.info("通道: {} , 获取数据: {}", queueName, data);
         } while (data != null);
         return R.ok("操作成功");

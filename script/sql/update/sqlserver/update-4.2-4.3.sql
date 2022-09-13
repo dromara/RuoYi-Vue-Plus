@@ -12,3 +12,6 @@ GO
 
 INSERT [sys_role_menu] ([role_id], [menu_id]) VALUES (2, 1050)
 GO
+
+INSERT [sys_dict_data] ([dict_code], [dict_sort], [dict_label], [dict_value], [dict_type], [css_class], [list_class], [is_default], [status], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (29, 99, N'其他', N'0', N'sys_oper_type', N'', N'info', N'N', N'0', N'admin', getdate(), N'', NULL, N'其他操作');
+GO

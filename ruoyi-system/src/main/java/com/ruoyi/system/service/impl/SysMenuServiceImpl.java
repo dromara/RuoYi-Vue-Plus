@@ -98,6 +98,24 @@ public class SysMenuServiceImpl implements ISysMenuService {
     }
 
     /**
+     * 根据角色ID查询权限
+     *
+     * @param roleId 角色ID
+     * @return 权限列表
+     */
+    @Override
+    public Set<String> selectMenuPermsByRoleId(Long roleId) {
+        List<String> perms = baseMapper.selectMenuPermsByRoleId(roleId);
+        Set<String> permsSet = new HashSet<>();
+        for (String perm : perms) {
+            if (StringUtils.isNotEmpty(perm)) {
+                permsSet.addAll(Arrays.asList(perm.trim().split(",")));
+            }
+        }
+        return permsSet;
+    }
+
+    /**
      * 根据用户ID查询菜单
      *
      * @param userId 用户名称
@@ -429,7 +447,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return
      */
     public String innerLinkReplaceEach(String path) {
-        return StringUtils.replaceEach(path, new String[]{Constants.HTTP, Constants.HTTPS},
+        return StringUtils.replaceEach(path, new String[]{Constants.HTTP, Constants.HTTPS, Constants.WWW, "." },
             new String[]{"", ""});
     }
 }

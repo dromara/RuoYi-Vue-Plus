@@ -68,6 +68,8 @@ public class SysProfileController extends BaseController {
         user.setUserId(getUserId());
         user.setUserName(null);
         user.setPassword(null);
+        user.setAvatar(null);
+        user.setDeptId(null);
         if (userService.updateUserProfile(user) > 0) {
             return R.ok();
         }

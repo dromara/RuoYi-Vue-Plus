@@ -141,7 +141,7 @@ create table sys_menu (
   is_frame          int(1)          default 1                  comment '是否为外链（0是 1否）',
   is_cache          int(1)          default 0                  comment '是否缓存（0缓存 1不缓存）',
   menu_type         char(1)         default ''                 comment '菜单类型（M目录 C菜单 F按钮）',
-  visible           char(1)         default 0                  comment '菜单状态（0显示 1隐藏）',
+  visible           char(1)         default 0                  comment '显示状态（0显示 1隐藏）',
   status            char(1)         default 0                  comment '菜单状态（0正常 1停用）',
   perms             varchar(100)    default null               comment '权限标识',
   icon              varchar(100)    default '#'                comment '菜单图标',
@@ -499,6 +499,7 @@ insert into sys_dict_data values(14, 1,  '通知',     '1',       'sys_notice_ty
 insert into sys_dict_data values(15, 2,  '公告',     '2',       'sys_notice_type',     '',   'success', 'N', '0', 'admin', sysdate(), '', null, '公告');
 insert into sys_dict_data values(16, 1,  '正常',     '0',       'sys_notice_status',   '',   'primary', 'Y', '0', 'admin', sysdate(), '', null, '正常状态');
 insert into sys_dict_data values(17, 2,  '关闭',     '1',       'sys_notice_status',   '',   'danger',  'N', '0', 'admin', sysdate(), '', null, '关闭状态');
+insert into sys_dict_data values(29, 99, '其他',     '0',       'sys_oper_type',       '',   'info',    'N', '0', 'admin', sysdate(), '', null, '其他操作');
 insert into sys_dict_data values(18, 1,  '新增',     '1',       'sys_oper_type',       '',   'info',    'N', '0', 'admin', sysdate(), '', null, '新增操作');
 insert into sys_dict_data values(19, 2,  '修改',     '2',       'sys_oper_type',       '',   'info',    'N', '0', 'admin', sysdate(), '', null, '修改操作');
 insert into sys_dict_data values(20, 3,  '删除',     '3',       'sys_oper_type',       '',   'danger',  'N', '0', 'admin', sysdate(), '', null, '删除操作');
@@ -654,7 +655,7 @@ create table sys_oss (
   create_by       varchar(64)           default ''        comment '上传人',
   update_time     datetime              default null      comment '更新时间',
   update_by       varchar(64)           default ''        comment '更新人',
-  service         varchar(10)  not null default 'minio'   comment '服务商',
+  service         varchar(20)  not null default 'minio'   comment '服务商',
   primary key (oss_id)
 ) engine=innodb comment ='OSS对象存储表';
 
@@ -664,7 +665,7 @@ create table sys_oss (
 drop table if exists sys_oss_config;
 create table sys_oss_config (
   oss_config_id   bigint(20)   not null                   comment '主建',
-  config_key      varchar(255)  not null default ''       comment '配置key',
+  config_key      varchar(20)  not null   default ''      comment '配置key',
   access_key      varchar(255)            default ''      comment 'accessKey',
   secret_key      varchar(255)            default ''      comment '秘钥',
   bucket_name     varchar(255)            default ''      comment '桶名称',

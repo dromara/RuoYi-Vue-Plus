@@ -1,7 +1,6 @@
 package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ArrayUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
@@ -15,9 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 部门信息
@@ -66,29 +63,6 @@ public class SysDeptController extends BaseController {
     public R<SysDept> getInfo(@PathVariable Long deptId) {
         deptService.checkDeptDataScope(deptId);
         return R.ok(deptService.selectDeptById(deptId));
-    }
-
-    /**
-     * 获取部门下拉树列表
-     */
-    @GetMapping("/treeselect")
-    public R<List<Tree<Long>>> treeselect(SysDept dept) {
-        List<SysDept> depts = deptService.selectDeptList(dept);
-        return R.ok(deptService.buildDeptTreeSelect(depts));
-    }
-
-    /**
-     * 加载对应角色部门列表树
-     *
-     * @param roleId 角色ID
-     */
-    @GetMapping(value = "/roleDeptTreeselect/{roleId}")
-    public R<Map<String, Object>> roleDeptTreeselect(@PathVariable("roleId") Long roleId) {
-        List<SysDept> depts = deptService.selectDeptList(new SysDept());
-        Map<String, Object> ajax = new HashMap<>();
-        ajax.put("checkedKeys", deptService.selectDeptListByRoleId(roleId));
-        ajax.put("depts", deptService.buildDeptTreeSelect(depts));
-        return R.ok(ajax);
     }
 
     /**

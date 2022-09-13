@@ -80,7 +80,7 @@ public class SysMenu extends TreeEntity<SysMenu> {
     private String visible;
 
     /**
-     * 菜单状态（0显示 1隐藏）
+     * 菜单状态（0正常 1停用）
      */
     private String status;
 
