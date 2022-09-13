@@ -108,7 +108,11 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public SysDept selectDeptById(Long deptId) {
-        return baseMapper.selectById(deptId);
+        SysDept dept = baseMapper.selectById(deptId);
+        SysDept parentDept = baseMapper.selectOne(new LambdaQueryWrapper<SysDept>()
+            .select(SysDept::getDeptName).eq(SysDept::getDeptId, dept.getParentId()));
+        dept.setParentName(ObjectUtil.isNotNull(parentDept) ? parentDept.getDeptName() : null);
+        return dept;
     }
 
     /**
