@@ -25,7 +25,7 @@
         <poi.version>5.2.2</poi.version>
         <easyexcel.version>3.1.1</easyexcel.version>
         <velocity.version>2.3</velocity.version>
-        <satoken.version>1.30.0</satoken.version>
+        <satoken.version>1.31.0</satoken.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.6</hutool.version>
