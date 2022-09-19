@@ -1,6 +1,6 @@
 package com.ruoyi.web.controller.system;
 
-import com.ruoyi.common.annotation.Anonymous;
+import cn.dev33.satoken.annotation.SaIgnore;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysMenu;
@@ -47,7 +47,7 @@ public class SysLoginController {
      * @param loginBody 登录信息
      * @return 结果
      */
-    @Anonymous
+    @SaIgnore
     @PostMapping("/login")
     public R<Map<String, Object>> login(@Validated @RequestBody LoginBody loginBody) {
         Map<String, Object> ajax = new HashMap<>();
@@ -64,7 +64,7 @@ public class SysLoginController {
      * @param smsLoginBody 登录信息
      * @return 结果
      */
-    @Anonymous
+    @SaIgnore
     @PostMapping("/smsLogin")
     public R<Map<String, Object>> smsLogin(@Validated @RequestBody SmsLoginBody smsLoginBody) {
         Map<String, Object> ajax = new HashMap<>();
@@ -80,7 +80,7 @@ public class SysLoginController {
      * @param xcxCode 小程序code
      * @return 结果
      */
-    @Anonymous
+    @SaIgnore
     @PostMapping("/xcxLogin")
     public R<Map<String, Object>> xcxLogin(@NotBlank(message = "{xcx.code.not.blank}") String xcxCode) {
         Map<String, Object> ajax = new HashMap<>();
@@ -93,7 +93,7 @@ public class SysLoginController {
     /**
      * 退出登录
      */
-    @Anonymous
+    @SaIgnore
     @PostMapping("/logout")
     public R<Void> logout() {
         loginService.logout();
