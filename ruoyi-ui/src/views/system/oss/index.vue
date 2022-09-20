@@ -118,7 +118,7 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="ossList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="ossList" @selection-change="handleSelectionChange" :default-sort="defaultSort" @sort-change="handleSortChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="对象存储主键" align="center" prop="ossId" v-if="false"/>
       <el-table-column label="文件名" align="center" prop="fileName" />
@@ -135,13 +135,13 @@
                 v-if="!checkFileSuffix(scope.row.fileSuffix) || !previewListResource"/>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="创建时间" align="center" prop="createTime" sortable="custom" :sort-orders="['descending', 'ascending']" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="上传人" align="center" prop="createBy" />
-      <el-table-column label="服务商" align="center" prop="service" />
+      <el-table-column label="服务商" align="center" prop="service" sortable="custom" :sort-orders="['descending', 'ascending']" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -221,6 +221,8 @@ export default {
       previewListResource: true,
       // 创建时间时间范围
       daterangeCreateTime: [],
+      // 默认排序
+      defaultSort: {prop: 'createTime', order: 'ascending'},
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -298,6 +300,12 @@ export default {
       this.ids = selection.map(item => item.ossId)
       this.single = selection.length!==1
       this.multiple = !selection.length
+    },
+    /** 排序触发事件 */
+    handleSortChange(column, prop, order) {
+      this.queryParams.orderByColumn = column.prop;
+      this.queryParams.isAsc = column.order;
+      this.getList();
     },
     /** 任务日志列表查询 */
     handleOssConfig() {
