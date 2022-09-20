@@ -3,11 +3,14 @@ package com.ruoyi.common.core.domain;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.sql.SqlUtil;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 分页查询实体类
@@ -57,28 +60,51 @@ public class PageQuery implements Serializable {
             pageNum = DEFAULT_PAGE_NUM;
         }
         Page<T> page = new Page<>(pageNum, pageSize);
-        OrderItem orderItem = buildOrderItem();
-        if (ObjectUtil.isNotNull(orderItem)) {
-            page.addOrder(orderItem);
+        List<OrderItem> orderItems = buildOrderItem();
+        if (ObjectUtil.isNotNull(orderItems)) {
+            page.addOrder(orderItems);
         }
         return page;
     }
 
-    private OrderItem buildOrderItem() {
-        // 兼容前端排序类型
-        if ("ascending".equals(isAsc)) {
-            isAsc = "asc";
-        } else if ("descending".equals(isAsc)) {
-            isAsc = "desc";
-        }
-        if (StringUtils.isNotBlank(orderByColumn)) {
+    private List<OrderItem> buildOrderItem() {
+        if (StringUtils.isNotBlank(isAsc) && StringUtils.isNotBlank(orderByColumn)) {
+            // 兼容前端排序类型
+            isAsc = isAsc.replace("ascending", "asc")
+                .replace("descending", "desc");
+
             String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
             orderBy = StringUtils.toUnderScoreCase(orderBy);
-            if ("asc".equals(isAsc)) {
-                return OrderItem.asc(orderBy);
-            } else if ("desc".equals(isAsc)) {
-                return OrderItem.desc(orderBy);
+            //分割orderByColumn和isAsc参数
+            String[] orderByArr = orderBy.split(",");
+            String[] isAscArr = isAsc.split(",");
+            if (isAscArr.length != 1 && isAscArr.length != orderByArr.length) {
+                throw new ServiceException("排序参数有误");
             }
+            if (isAscArr.length == 1) {
+                //isAsc只提供了一个 则全部字段都是如此排序
+                if ("asc".equals(isAsc)) {
+                    return OrderItem.ascs(orderBy);
+                } else if ("desc".equals(isAsc)) {
+                    return OrderItem.descs(orderBy);
+                } else {
+                    throw new ServiceException("isAsc参数有误");
+                }
+            }
+            ArrayList<OrderItem> list = new ArrayList<>();
+            //每个字段各自排序
+            for (int i = 0; i < isAscArr.length; i++) {
+                String isAscStr = isAscArr[i];
+                String orderByStr = orderByArr[i];
+                if ("asc".equals(isAscStr)) {
+                    list.add(OrderItem.asc(orderByStr));
+                } else if ("desc".equals(isAscStr)) {
+                    list.add(OrderItem.desc(orderByStr));
+                } else {
+                    throw new ServiceException("isAsc参数有误");
+                }
+            }
+            return list;
         }
         return null;
     }
