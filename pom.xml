@@ -28,13 +28,13 @@
         <satoken.version>1.31.0</satoken.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.8.6</hutool.version>
+        <hutool.version>5.8.7</hutool.version>
         <okhttp.version>4.10.0</okhttp.version>
         <spring-boot-admin.version>2.7.4</spring-boot-admin.version>
         <redisson.version>3.17.6</redisson.version>
         <lock4j.version>2.2.2</lock4j.version>
         <dynamic-ds.version>3.5.2</dynamic-ds.version>
-        <tlog.version>1.4.3</tlog.version>
+        <tlog.version>1.5.0</tlog.version>
         <xxl-job.version>2.3.1</xxl-job.version>
         <lombok.version>1.18.24</lombok.version>
 
