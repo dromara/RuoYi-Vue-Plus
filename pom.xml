@@ -41,7 +41,7 @@
         <!-- 统一 guava 版本 解决隐式漏洞问题 -->
         <guava.version>31.1-jre</guava.version>
         <!-- 临时修复 snakeyaml 漏洞 -->
-        <snakeyaml.version>1.31</snakeyaml.version>
+        <snakeyaml.version>1.32</snakeyaml.version>
 
         <!-- OSS 配置 -->
         <aws-java-sdk-s3.version>1.12.300</aws-java-sdk-s3.version>
