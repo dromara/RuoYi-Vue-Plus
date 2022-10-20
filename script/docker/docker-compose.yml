@@ -29,7 +29,7 @@ services:
     network_mode: "host"
 
   nginx-web:
-    image: nginx:1.21.6
+    image: nginx:1.22.1
     container_name: nginx-web
     environment:
       # 时区上海
