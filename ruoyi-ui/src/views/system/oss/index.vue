@@ -118,7 +118,10 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="ossList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="ossList" @selection-change="handleSelectionChange"
+              :header-cell-class-name="handleHeaderClass"
+              @header-click="handleHeaderCLick"
+              v-if="showTable">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="对象存储主键" align="center" prop="ossId" v-if="false"/>
       <el-table-column label="文件名" align="center" prop="fileName" />
@@ -135,13 +138,15 @@
                 v-if="!checkFileSuffix(scope.row.fileSuffix) || !previewListResource"/>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180"
+                       sortable="custom">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="上传人" align="center" prop="createBy" />
-      <el-table-column label="服务商" align="center" prop="service" />
+      <el-table-column label="服务商" align="center" prop="service"
+                       sortable="custom"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -193,6 +198,7 @@ export default {
   name: "Oss",
   data() {
     return {
+      showTable: true,
       // 按钮loading
       buttonLoading: false,
       // 遮罩层
@@ -221,6 +227,8 @@ export default {
       previewListResource: true,
       // 创建时间时间范围
       daterangeCreateTime: [],
+      // 默认排序
+      defaultSort: {prop: 'createTime', order: 'ascending'},
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -262,6 +270,7 @@ export default {
         this.ossList = response.rows;
         this.total = response.total;
         this.loading = false;
+        this.showTable = true;
       });
     },
     checkFileSuffix(fileSuffix) {
@@ -289,8 +298,11 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
+      this.showTable = false;
       this.daterangeCreateTime = [];
       this.resetForm("queryForm");
+      this.queryParams.orderByColumn = this.defaultSort.prop;
+      this.queryParams.isAsc = this.defaultSort.order;
       this.handleQuery();
     },
     // 多选框选中数据
@@ -298,6 +310,51 @@ export default {
       this.ids = selection.map(item => item.ossId)
       this.single = selection.length!==1
       this.multiple = !selection.length
+    },
+    // 设置列的排序为我们自定义的排序
+    handleHeaderClass({column}) {
+      column.order = column.multiOrder
+    },
+    // 点击表头进行排序
+    handleHeaderCLick(column) {
+      if (column.sortable !== 'custom') {
+        return
+      }
+      switch (column.multiOrder) {
+        case 'descending':
+          column.multiOrder = 'ascending';
+          break;
+        case 'ascending':
+          column.multiOrder = '';
+          break;
+        default:
+          column.multiOrder = 'descending';
+          break;
+      }
+      this.handleOrderChange(column.property, column.multiOrder)
+    },
+    handleOrderChange(prop, order) {
+      let orderByArr = this.queryParams.orderByColumn ? this.queryParams.orderByColumn.split(",") : [];
+      let isAscArr = this.queryParams.isAsc ? this.queryParams.isAsc.split(",") : [];
+      let propIndex = orderByArr.indexOf(prop)
+      if (propIndex !== -1) {
+        if (order) {
+          //排序里已存在 只修改排序
+          isAscArr[propIndex] = order;
+        } else {
+          //如果order为null 则删除排序字段和属性
+          isAscArr.splice(propIndex, 1);//删除排序
+          orderByArr.splice(propIndex, 1);//删除属性
+        }
+      } else {
+        //排序里不存在则新增排序
+        orderByArr.push(prop);
+        isAscArr.push(order);
+      }
+      //合并排序
+      this.queryParams.orderByColumn = orderByArr.join(",");
+      this.queryParams.isAsc = isAscArr.join(",");
+      this.getList();
     },
     /** 任务日志列表查询 */
     handleOssConfig() {

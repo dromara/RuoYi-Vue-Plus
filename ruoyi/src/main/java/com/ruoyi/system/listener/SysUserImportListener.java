@@ -66,6 +66,8 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
                 user = BeanUtil.toBean(userVo, SysUser.class);
                 user.setUserId(userId);
                 ValidatorUtils.validate(user);
+                userService.checkUserAllowed(user);
+                userService.checkUserDataScope(user.getUserId());
                 user.setUpdateBy(operName);
                 userService.updateUser(user);
                 successNum++;

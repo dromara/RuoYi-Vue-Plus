@@ -1,6 +1,6 @@
 package com.ruoyi.web.controller.system;
 
-import com.ruoyi.common.annotation.Anonymous;
+import cn.dev33.satoken.annotation.SaIgnore;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.RegisterBody;
@@ -28,7 +28,7 @@ public class SysRegisterController extends BaseController {
     /**
      * 用户注册
      */
-    @Anonymous
+    @SaIgnore
     @PostMapping("/register")
     public R<Void> register(@Validated @RequestBody RegisterBody user) {
         if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser")))) {

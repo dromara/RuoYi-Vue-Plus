@@ -1,11 +1,11 @@
 package com.ruoyi.web.controller.common;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
-import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.R;
@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @author Lion Li
  */
-@Anonymous
+@SaIgnore
 @Slf4j
 @Validated
 @RequiredArgsConstructor
