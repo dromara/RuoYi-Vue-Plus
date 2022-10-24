@@ -13,6 +13,7 @@ import com.ruoyi.common.core.service.ConfigService;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.redis.CacheUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.mapper.SysConfigMapper;
 import com.ruoyi.system.service.ISysConfigService;
@@ -85,7 +86,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      */
     @Override
     public boolean selectCaptchaEnabled() {
-        String captchaEnabled = selectConfigByKey("sys.account.captchaEnabled");
+        String captchaEnabled = SpringUtils.getAopProxy(this).selectConfigByKey("sys.account.captchaEnabled");
         if (StringUtils.isEmpty(captchaEnabled)) {
             return true;
         }
@@ -216,7 +217,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      */
     @Override
     public String getConfigValue(String configKey) {
-        return selectConfigByKey(configKey);
+        return SpringUtils.getAopProxy(this).selectConfigByKey(configKey);
     }
 
 }

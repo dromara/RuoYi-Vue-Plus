@@ -1,11 +1,12 @@
 package com.ruoyi.web.controller.system;
 
-import com.ruoyi.common.annotation.Anonymous;
+import cn.dev33.satoken.annotation.SaIgnore;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.SmsLoginBody;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.system.domain.vo.RouterVo;
@@ -24,7 +25,6 @@ import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 登录验证
@@ -47,7 +47,7 @@ public class SysLoginController {
      * @param loginBody 登录信息
      * @return 结果
      */
-    @Anonymous
+    @SaIgnore
     @PostMapping("/login")
     public R<Map<String, Object>> login(@Validated @RequestBody LoginBody loginBody) {
         Map<String, Object> ajax = new HashMap<>();
@@ -64,7 +64,7 @@ public class SysLoginController {
      * @param smsLoginBody 登录信息
      * @return 结果
      */
-    @Anonymous
+    @SaIgnore
     @PostMapping("/smsLogin")
     public R<Map<String, Object>> smsLogin(@Validated @RequestBody SmsLoginBody smsLoginBody) {
         Map<String, Object> ajax = new HashMap<>();
@@ -80,7 +80,7 @@ public class SysLoginController {
      * @param xcxCode 小程序code
      * @return 结果
      */
-    @Anonymous
+    @SaIgnore
     @PostMapping("/xcxLogin")
     public R<Map<String, Object>> xcxLogin(@NotBlank(message = "{xcx.code.not.blank}") String xcxCode) {
         Map<String, Object> ajax = new HashMap<>();
@@ -93,7 +93,7 @@ public class SysLoginController {
     /**
      * 退出登录
      */
-    @Anonymous
+    @SaIgnore
     @PostMapping("/logout")
     public R<Void> logout() {
         loginService.logout();
@@ -107,15 +107,12 @@ public class SysLoginController {
      */
     @GetMapping("getInfo")
     public R<Map<String, Object>> getInfo() {
-        SysUser user = userService.selectUserById(LoginHelper.getUserId());
-        // 角色集合
-        Set<String> roles = permissionService.getRolePermission(user);
-        // 权限集合
-        Set<String> permissions = permissionService.getMenuPermission(user);
+        LoginUser loginUser = LoginHelper.getLoginUser();
+        SysUser user = userService.selectUserById(loginUser.getUserId());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("user", user);
-        ajax.put("roles", roles);
-        ajax.put("permissions", permissions);
+        ajax.put("roles", loginUser.getRolePermission());
+        ajax.put("permissions", loginUser.getMenuPermission());
         return R.ok(ajax);
     }
 

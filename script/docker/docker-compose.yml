@@ -29,7 +29,7 @@ services:
     network_mode: "host"
 
   nginx-web:
-    image: nginx:1.21.6
+    image: nginx:1.22.1
     container_name: nginx-web
     environment:
       # 时区上海
@@ -100,7 +100,7 @@ services:
     network_mode: "host"
 
   ruoyi-server1:
-    image: ruoyi/ruoyi-server:4.3.0
+    image: ruoyi/ruoyi-server:4.3.1
     container_name: ruoyi-server1
     environment:
       # 时区上海
@@ -113,7 +113,7 @@ services:
     network_mode: "host"
 
   ruoyi-server2:
-    image: "ruoyi/ruoyi-server:4.3.0"
+    image: "ruoyi/ruoyi-server:4.3.1"
     container_name: ruoyi-server2
     environment:
       # 时区上海
@@ -126,7 +126,7 @@ services:
     network_mode: "host"
 
   ruoyi-monitor-admin:
-    image: ruoyi/ruoyi-monitor-admin:4.3.0
+    image: ruoyi/ruoyi-monitor-admin:4.3.1
     container_name: ruoyi-monitor-admin
     environment:
       # 时区上海
@@ -138,7 +138,7 @@ services:
     network_mode: "host"
 
   ruoyi-xxl-job-admin:
-    image: ruoyi/ruoyi-xxl-job-admin:4.3.0
+    image: ruoyi/ruoyi-xxl-job-admin:4.3.1
     container_name: ruoyi-xxl-job-admin
     environment:
       # 时区上海

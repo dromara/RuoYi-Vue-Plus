@@ -50,7 +50,11 @@ public class UserActionListener implements SaTokenListener {
             dto.setTokenId(tokenValue);
             dto.setUserName(user.getUsername());
             dto.setDeptName(user.getDeptName());
-            RedisUtils.setCacheObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto, Duration.ofSeconds(tokenConfig.getTimeout()));
+            if(tokenConfig.getTimeout() == -1) {
+                RedisUtils.setCacheObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto);
+            } else {
+                RedisUtils.setCacheObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto, Duration.ofSeconds(tokenConfig.getTimeout()));
+            }
             log.info("user doLogin, userId:{}, token:{}", loginId, tokenValue);
         } else if (userType == UserType.APP_USER) {
             // app端 自行根据业务编写
@@ -88,14 +92,14 @@ public class UserActionListener implements SaTokenListener {
      * 每次被封禁时触发
      */
     @Override
-    public void doDisable(String loginType, Object loginId, long disableTime) {
+    public void doDisable(String loginType, Object loginId, String service, int level, long disableTime) {
     }
 
     /**
      * 每次被解封时触发
      */
     @Override
-    public void doUntieDisable(String loginType, Object loginId) {
+    public void doUntieDisable(String loginType, Object loginId, String service) {
     }
 
     /**
@@ -112,5 +116,10 @@ public class UserActionListener implements SaTokenListener {
     public void doLogoutSession(String id) {
     }
 
-
+    /**
+     * 每次Token续期时触发
+     */
+    @Override
+    public void doRenewTimeout(String tokenValue, Object loginId, long timeout) {
+    }
 }
