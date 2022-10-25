@@ -72,7 +72,7 @@ spring:
 #          password: root
 #        sqlserver:
 #          driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-#          url: jdbc:sqlserver://localhost:1433;DatabaseName=tempdb;SelectMethod=cursor;rewriteBatchedStatements=true
+#          url: jdbc:sqlserver://localhost:1433;DatabaseName=tempdb;SelectMethod=cursor;encrypt=false;rewriteBatchedStatements=true
 #          username: SA
 #          password: root
       druid:
