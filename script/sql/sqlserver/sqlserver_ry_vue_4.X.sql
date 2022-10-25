@@ -1851,8 +1851,6 @@ INSERT [sys_role_menu] ([role_id], [menu_id]) VALUES (2, 1044)
 GO
 INSERT [sys_role_menu] ([role_id], [menu_id]) VALUES (2, 1045)
 GO
-INSERT [sys_role_menu] ([role_id], [menu_id]) VALUES (2, 1050)
-GO
 INSERT [sys_role_menu] ([role_id], [menu_id]) VALUES (2, 1046)
 GO
 INSERT [sys_role_menu] ([role_id], [menu_id]) VALUES (2, 1047)
