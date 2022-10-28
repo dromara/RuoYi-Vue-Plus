@@ -371,6 +371,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
                     <!-- 根据打包环境执行对应的@Tag测试方法 -->
                     <groups>${profiles.active}</groups>
                     <!-- 排除标签 -->
