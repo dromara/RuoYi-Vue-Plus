@@ -46,7 +46,7 @@ public class TestBatchController extends BaseController {
             testDemo.setValue("测试新增");
             list.add(testDemo);
         }
-        return toAjax(testDemoMapper.insertBatch(list) ? 1 : 0);
+        return toAjax(testDemoMapper.insertBatch(list));
     }
 
     /**
@@ -74,7 +74,7 @@ public class TestBatchController extends BaseController {
                 testDemo.setId(null);
             }
         }
-        return toAjax(testDemoMapper.insertOrUpdateBatch(list) ? 1 : 0);
+        return toAjax(testDemoMapper.insertOrUpdateBatch(list));
     }
 
     /**
