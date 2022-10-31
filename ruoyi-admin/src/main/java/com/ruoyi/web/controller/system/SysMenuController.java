@@ -117,10 +117,10 @@ public class SysMenuController extends BaseController {
     @DeleteMapping("/{menuId}")
     public R<Void> remove(@PathVariable("menuId") Long menuId) {
         if (menuService.hasChildByMenuId(menuId)) {
-            return R.fail("存在子菜单,不允许删除");
+            return R.warn("存在子菜单,不允许删除");
         }
         if (menuService.checkMenuExistRole(menuId)) {
-            return R.fail("菜单已分配,不允许删除");
+            return R.warn("菜单已分配,不允许删除");
         }
         return toAjax(menuService.deleteMenuById(menuId));
     }
