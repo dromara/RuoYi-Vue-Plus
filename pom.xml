@@ -30,7 +30,7 @@
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.8</hutool.version>
         <okhttp.version>4.10.0</okhttp.version>
-        <spring-boot-admin.version>2.7.6</spring-boot-admin.version>
+        <spring-boot-admin.version>2.7.7</spring-boot-admin.version>
         <redisson.version>3.17.7</redisson.version>
         <lock4j.version>2.2.2</lock4j.version>
         <dynamic-ds.version>3.5.2</dynamic-ds.version>
