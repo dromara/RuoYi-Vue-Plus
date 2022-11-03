@@ -82,9 +82,9 @@
       <el-table-column label="域" align="center" prop="region" />
       <el-table-column label="桶权限类型" align="center" prop="accessPolicy">
         <template slot-scope="scope">
-          <span class="el-tag el-tag--warning el-tag--medium el-tag--light" v-if="scope.row.accessPolicy === '0'">private</span>
-          <span class="el-tag el-tag--success el-tag--medium el-tag--light" v-if="scope.row.accessPolicy === '1'">public</span>
-          <span class="el-tag el-tag--medium el-tag--light" v-if="scope.row.accessPolicy === '2'">custom</span>
+          <el-tag type="warning" v-if="scope.row.accessPolicy === '0'">private</el-tag>
+          <el-tag type="success" v-if="scope.row.accessPolicy === '1'">public</el-tag>
+          <el-tag type="info" v-if="scope.row.accessPolicy === '2'">custom</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
