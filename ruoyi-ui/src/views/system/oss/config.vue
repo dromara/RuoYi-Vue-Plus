@@ -80,7 +80,13 @@
       <el-table-column label="桶名称" align="center" prop="bucketName" />
       <el-table-column label="前缀" align="center" prop="prefix" />
       <el-table-column label="域" align="center" prop="region" />
-      <el-table-column label="桶权限类型" align="center" prop="accessPolicy" :formatter="accessPolicyStateFormat" />
+      <el-table-column label="桶权限类型" align="center" prop="accessPolicy">
+        <template slot-scope="scope">
+          <span class="el-tag el-tag--warning el-tag--medium el-tag--light" v-if="scope.row.accessPolicy === '0'">private</span>
+          <span class="el-tag el-tag--success el-tag--medium el-tag--light" v-if="scope.row.accessPolicy === '1'">public</span>
+          <span class="el-tag el-tag--medium el-tag--light" v-if="scope.row.accessPolicy === '2'">custom</span>
+        </template>
+      </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <el-switch
@@ -394,17 +400,7 @@ export default {
       }).catch(() => {
         row.status = row.status === "0" ? "1" : "0";
       })
-    },
-    accessPolicyStateFormat(row) {
-        if (row.accessPolicy === "0") {
-          return <span class="el-tag el-tag--warning el-tag--medium el-tag--light">private</span>
-        } else if (row.accessPolicy === "1") {
-          return <span class="el-tag el-tag--success el-tag--medium el-tag--light">public</span>
-        } else if (row.accessPolicy === "2") {
-          return <span class="el-tag el-tag--medium el-tag--light">custom</span>
-        }
-
-      }
+    }
   }
 };
 </script>
