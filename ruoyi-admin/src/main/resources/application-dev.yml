@@ -45,56 +45,56 @@ spring:
       datasource:
         # 主库数据源
         master:
+          type: ${spring.datasource.type}
           driverClassName: com.mysql.cj.jdbc.Driver
           # jdbc 所有参数配置参考 https://lionli.blog.csdn.net/article/details/122018562
           # rewriteBatchedStatements=true 批处理优化 大幅提升批量插入更新删除性能(对数据库有性能损耗 使用批量操作应考虑性能问题)
           url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
           username: root
           password: root
-          type: ${spring.datasource.type}
         # 从库数据源
         slave:
           lazy: true
+          type: ${spring.datasource.type}
           driverClassName: com.mysql.cj.jdbc.Driver
           url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
           username:
           password:
-          type: ${spring.datasource.type}
 #        oracle:
+#          type: ${spring.datasource.type}
 #          driverClassName: oracle.jdbc.OracleDriver
 #          url: jdbc:oracle:thin:@//localhost:1521/XE
 #          username: ROOT
 #          password: root
-#          type: ${spring.datasource.type}
 #          hikari:
 #            connectionTestQuery: SELECT 1 FROM DUAL
 #        postgres:
+#          type: ${spring.datasource.type}
 #          driverClassName: org.postgresql.Driver
 #          url: jdbc:postgresql://localhost:5432/postgres?useUnicode=true&characterEncoding=utf8&useSSL=true&autoReconnect=true&reWriteBatchedInserts=true
 #          username: root
 #          password: root
-#          type: ${spring.datasource.type}
 #        sqlserver:
+#          type: ${spring.datasource.type}
 #          driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
 #          url: jdbc:sqlserver://localhost:1433;DatabaseName=tempdb;SelectMethod=cursor;encrypt=false;rewriteBatchedStatements=true
 #          username: SA
 #          password: root
-#          type: ${spring.datasource.type}
       hikari:
+        # 最大连接池数量
+        maxPoolSize: 20
+        # 最小空闲线程数量
+        minIdle: 10
         # 配置获取连接等待超时的时间
-        connection-timeout: 60000
+        connectionTimeout: 10000
+        # 校验超时时间
+        validationTimeout: 5000
         # 空闲连接存活最大时间，默认10分钟
-        idle-timeout: 60000
+        idleTimeout: 60000
         # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认30分钟
-        max-lifetime: 900000
-        # 最大连接池数量，默认是10
-        max-pool-size: 20
-        # 最小连接池数量
-        min-idle: 10
+        maxLifetime: 900000
         # 连接测试query（配置检测连接是否有效）
         connectionTestQuery: SELECT 1
-        # 此属性控制从池返回的连接的默认自动提交行为，默认值：true
-        isAutoCommit: true
 
 --- # redis 单机配置(单机与集群只能开启一个另一个需要注释掉)
 spring:
