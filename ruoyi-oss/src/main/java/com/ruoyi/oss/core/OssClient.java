@@ -116,7 +116,7 @@ public class OssClient {
         try {
             client.deleteObject(properties.getBucketName(), path);
         } catch (Exception e) {
-            throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
+            throw new OssException("删除文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }
     }
 
