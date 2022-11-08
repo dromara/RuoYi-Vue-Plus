@@ -134,8 +134,15 @@ public class OssClient {
      * @param path 完整文件路径
      */
     public ObjectMetadata getObjectMetadata(String path) {
+        path = path.replace(getUrl() + "/", "");
         S3Object object = client.getObject(properties.getBucketName(), path);
         return object.getObjectMetadata();
+    }
+
+    public InputStream getObjectContent(String path) {
+        path = path.replace(getUrl() + "/", "");
+        S3Object object = client.getObject(properties.getBucketName(), path);
+        return object.getObjectContent();
     }
 
     public String getUrl() {

@@ -1,9 +1,7 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.http.HttpException;
-import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -92,23 +91,20 @@ public class SysOssServiceImpl implements ISysOssService {
 
     @Override
     public void download(Long ossId, HttpServletResponse response) throws IOException {
-        SysOssVo sysOss = this.matchingUrl(SpringUtils.getAopProxy(this).getById(ossId));
+        SysOssVo sysOss = this.getById(ossId);
         if (ObjectUtil.isNull(sysOss)) {
             throw new ServiceException("文件数据不存在!");
         }
         FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
-        long data;
-        try {
-            data = HttpUtil.download(sysOss.getUrl(), response.getOutputStream(), false);
-        } catch (HttpException e) {
-            if (e.getMessage().contains("403")) {
-                throw new ServiceException("无读取权限, 请在对应的OSS开启'公有读'权限!");
-            } else {
-                throw new ServiceException(e.getMessage());
-            }
+        OssClient storage = OssFactory.instance();
+        try(InputStream inputStream = storage.getObjectContent(sysOss.getUrl())) {
+            int available = inputStream.available();
+            IoUtil.copy(inputStream, response.getOutputStream(), available);
+            response.setContentLength(available);
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage());
         }
-        response.setContentLength(Convert.toInt(data));
     }
 
     @Override
@@ -118,7 +114,7 @@ public class SysOssServiceImpl implements ISysOssService {
         OssClient storage = OssFactory.instance();
         UploadResult uploadResult;
         try {
-            uploadResult = storage.uploadSuffix(file.getBytes(), suffix, file.getContentType());
+            uploadResult = storage.uploadSuffix(file.getInputStream(), suffix, file.getContentType());
         } catch (IOException e) {
             throw new ServiceException(e.getMessage());
         }
