@@ -1,5 +1,6 @@
 package com.ruoyi.oss.core;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.HttpMethod;
@@ -97,6 +98,9 @@ public class OssClient {
     }
 
     public UploadResult upload(InputStream inputStream, String path, String contentType) {
+        if (!(inputStream instanceof ByteArrayInputStream)) {
+            inputStream = new ByteArrayInputStream(IoUtil.readBytes(inputStream));
+        }
         try {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(contentType);
