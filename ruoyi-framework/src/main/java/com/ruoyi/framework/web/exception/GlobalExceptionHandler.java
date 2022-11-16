@@ -105,7 +105,7 @@ public class GlobalExceptionHandler {
     public R<Void> handleServiceException(ServiceException e, HttpServletRequest request) {
         log.error(e.getMessage(), e);
         Integer code = e.getCode();
-        return ObjectUtil.isNotNull(code) ? R.fail(code.intValue(), e.getMessage()) : R.fail(e.getMessage());
+        return ObjectUtil.isNotNull(code) ? R.fail(code, e.getMessage()) : R.fail(e.getMessage());
     }
 
     /**
