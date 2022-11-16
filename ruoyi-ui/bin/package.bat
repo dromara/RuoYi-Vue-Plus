@@ -1,6 +1,6 @@
 @echo off
 echo.
-echo [��Ϣ] ��װWeb���̣�����node_modules�ļ���
+echo [信息] 安装Web工程，生成node_modules文件。
 echo.
 
 %~d0
