@@ -1,5 +1,6 @@
 package com.ruoyi.common.jackson;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
@@ -29,9 +30,10 @@ public class DictDataJsonSerializer extends JsonSerializer<String> implements Co
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         try {
-            String label = SpringUtils.getBean(DictService.class).getDictLabel(dictType, value);
-            if (StrUtil.isNotBlank(label)) {
-                gen.writeString(label);
+            DictService dictService = SpringUtils.getBean(DictService.class);
+            if (ObjectUtil.isNotNull(dictService)) {
+                String label = dictService.getDictLabel(dictType, value);
+                gen.writeString(StrUtil.isNotBlank(label) ? label : value);
             } else {
                 gen.writeString(value);
             }
