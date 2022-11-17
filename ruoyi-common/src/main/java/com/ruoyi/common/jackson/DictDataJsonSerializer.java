@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.ruoyi.common.annotation.DictDataMapper;
 import com.ruoyi.common.core.service.DictService;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -33,7 +34,7 @@ public class DictDataJsonSerializer extends JsonSerializer<String> implements Co
             DictService dictService = SpringUtils.getBean(DictService.class);
             if (ObjectUtil.isNotNull(dictService)) {
                 String label = dictService.getDictLabel(dictType, value);
-                gen.writeString(StrUtil.isNotBlank(label) ? label : value);
+                gen.writeString(StringUtils.isNotBlank(label) ? label : value);
             } else {
                 gen.writeString(value);
             }

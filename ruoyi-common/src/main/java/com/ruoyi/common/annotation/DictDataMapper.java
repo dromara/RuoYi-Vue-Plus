@@ -20,5 +20,8 @@ import java.lang.annotation.Target;
 @JsonSerialize(using = DictDataJsonSerializer.class)
 public @interface DictDataMapper {
 
+    /**
+     * 设置字典的type值 (如: sys_user_sex)
+     */
     String dictType() default "";
 }
