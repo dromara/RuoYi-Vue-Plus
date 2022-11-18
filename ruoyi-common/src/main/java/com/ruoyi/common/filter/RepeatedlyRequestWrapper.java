@@ -1,6 +1,7 @@
 package com.ruoyi.common.filter;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.constant.Constants;
 
 import javax.servlet.ReadListener;
@@ -27,7 +28,7 @@ public class RepeatedlyRequestWrapper extends HttpServletRequestWrapper {
         request.setCharacterEncoding(Constants.UTF8);
         response.setCharacterEncoding(Constants.UTF8);
 
-        body = IoUtil.readUtf8(request.getInputStream()).getBytes(StandardCharsets.UTF_8);
+        body = StrUtil.str(IoUtil.readBytes(request.getInputStream(), false), StandardCharsets.UTF_8).getBytes();
     }
 
     @Override
