@@ -1,10 +1,8 @@
 package com.ruoyi.framework.config;
 
 import com.ruoyi.framework.interceptor.PlusWebInvokeTimeInterceptor;
-import com.yomahub.tlog.web.interceptor.TLogWebInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.CacheControl;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -22,8 +20,6 @@ public class ResourcesConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // 全局链路跟踪拦截器
-        registry.addInterceptor(new TLogWebInterceptor());
         // 全局访问性能拦截
         registry.addInterceptor(new PlusWebInvokeTimeInterceptor());
     }

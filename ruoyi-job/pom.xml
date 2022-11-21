@@ -29,11 +29,6 @@
             <artifactId>xxl-job-core</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.yomahub</groupId>
-            <artifactId>tlog-xxljob-spring-boot-starter</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

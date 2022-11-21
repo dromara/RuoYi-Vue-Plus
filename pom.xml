@@ -33,7 +33,7 @@
         <redisson.version>3.18.0</redisson.version>
         <lock4j.version>2.2.2</lock4j.version>
         <dynamic-ds.version>3.5.2</dynamic-ds.version>
-        <tlog.version>1.5.0</tlog.version>
+        <alibaba-ttl.version>2.14.2</alibaba-ttl.version>
         <xxl-job.version>2.3.1</xxl-job.version>
         <lombok.version>1.18.24</lombok.version>
 
@@ -216,29 +216,9 @@
             </dependency>
 
             <dependency>
-                <groupId>com.yomahub</groupId>
-                <artifactId>tlog-web-spring-boot-starter</artifactId>
-                <version>${tlog.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>log4j</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>dom4j</artifactId>
-                        <groupId>dom4j</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-beanutils</artifactId>
-                        <groupId>commons-beanutils</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.yomahub</groupId>
-                <artifactId>tlog-xxljob-spring-boot-starter</artifactId>
-                <version>${tlog.version}</version>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId>
+                <version>${alibaba-ttl.version}</version>
             </dependency>
 
             <!-- 统一 guava 版本 解决隐式漏洞问题 -->
