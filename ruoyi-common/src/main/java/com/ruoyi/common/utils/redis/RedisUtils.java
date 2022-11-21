@@ -3,7 +3,6 @@ package com.ruoyi.common.utils.redis;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.poi.ss.formula.functions.T;
 import org.redisson.api.*;
 import org.redisson.config.Config;
 
@@ -334,7 +333,7 @@ public class RedisUtils {
      * @param key 缓存的键值
      * @return key列表
      */
-    public static Set<String> getCacheMapKeySet(final String key) {
+    public static <T> Set<String> getCacheMapKeySet(final String key) {
         RMap<String, T> rMap = CLIENT.getMap(key);
         return rMap.keySet();
     }
