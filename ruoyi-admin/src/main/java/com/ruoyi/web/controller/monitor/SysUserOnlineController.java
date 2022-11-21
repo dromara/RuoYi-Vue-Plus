@@ -83,7 +83,7 @@ public class SysUserOnlineController extends BaseController {
     public R<Void> forceLogout(@PathVariable String tokenId) {
         try {
             StpUtil.kickoutByTokenValue(tokenId);
-        } catch (NotLoginException e) {
+        } catch (NotLoginException ignored) {
         }
         return R.ok();
     }
