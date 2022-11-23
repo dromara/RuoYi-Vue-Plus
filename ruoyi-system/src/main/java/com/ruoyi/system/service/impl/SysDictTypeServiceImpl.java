@@ -1,10 +1,12 @@
 package com.ruoyi.system.service.impl;
 
+import cn.dev33.satoken.context.SaHolder;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
@@ -231,16 +233,22 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @param separator 分隔符
      * @return 字典标签
      */
+    @SuppressWarnings("unchecked cast")
     @Override
     public String getDictLabel(String dictType, String dictValue, String separator) {
         StringBuilder propertyString = new StringBuilder();
-        List<SysDictData> datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+        // 优先从本地缓存获取
+        List<SysDictData> datas = (List<SysDictData>) SaHolder.getStorage().get(CacheConstants.SYS_DICT_KEY + dictType);
+        if (ObjectUtil.isNull(datas)) {
+            datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+            SaHolder.getStorage().set(CacheConstants.SYS_DICT_KEY + dictType, datas);
+        }
 
         if (StringUtils.containsAny(dictValue, separator) && CollUtil.isNotEmpty(datas)) {
             for (SysDictData dict : datas) {
                 for (String value : dictValue.split(separator)) {
                     if (value.equals(dict.getDictValue())) {
-                        propertyString.append(dict.getDictLabel() + separator);
+                        propertyString.append(dict.getDictLabel()).append(separator);
                         break;
                     }
                 }
@@ -263,16 +271,22 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @param separator 分隔符
      * @return 字典值
      */
+    @SuppressWarnings("unchecked cast")
     @Override
     public String getDictValue(String dictType, String dictLabel, String separator) {
         StringBuilder propertyString = new StringBuilder();
-        List<SysDictData> datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+        // 优先从本地缓存获取
+        List<SysDictData> datas = (List<SysDictData>) SaHolder.getStorage().get(CacheConstants.SYS_DICT_KEY + dictType);
+        if (ObjectUtil.isNull(datas)) {
+            datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+            SaHolder.getStorage().set(CacheConstants.SYS_DICT_KEY + dictType, datas);
+        }
 
         if (StringUtils.containsAny(dictLabel, separator) && CollUtil.isNotEmpty(datas)) {
             for (SysDictData dict : datas) {
                 for (String label : dictLabel.split(separator)) {
                     if (label.equals(dict.getDictLabel())) {
-                        propertyString.append(dict.getDictValue() + separator);
+                        propertyString.append(dict.getDictValue()).append(separator);
                         break;
                     }
                 }
