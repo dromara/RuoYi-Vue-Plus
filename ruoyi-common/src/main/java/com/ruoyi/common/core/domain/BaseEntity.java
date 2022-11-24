@@ -2,6 +2,8 @@ package com.ruoyi.common.core.domain;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -23,6 +25,7 @@ public class BaseEntity implements Serializable {
     /**
      * 搜索值
      */
+    @JsonIgnore
     @TableField(exist = false)
     private String searchValue;
 
@@ -53,6 +56,7 @@ public class BaseEntity implements Serializable {
     /**
      * 请求参数
      */
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @TableField(exist = false)
     private Map<String, Object> params = new HashMap<>();
 
