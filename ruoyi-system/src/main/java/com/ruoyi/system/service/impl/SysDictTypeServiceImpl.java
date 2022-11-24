@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import cn.dev33.satoken.context.SaHolder;
+import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 字典 业务层处理
@@ -236,7 +238,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @SuppressWarnings("unchecked cast")
     @Override
     public String getDictLabel(String dictType, String dictValue, String separator) {
-        StringBuilder propertyString = new StringBuilder();
         // 优先从本地缓存获取
         List<SysDictData> datas = (List<SysDictData>) SaHolder.getStorage().get(CacheConstants.SYS_DICT_KEY + dictType);
         if (ObjectUtil.isNull(datas)) {
@@ -244,23 +245,14 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
             SaHolder.getStorage().set(CacheConstants.SYS_DICT_KEY + dictType, datas);
         }
 
-        if (StringUtils.containsAny(dictValue, separator) && CollUtil.isNotEmpty(datas)) {
-            for (SysDictData dict : datas) {
-                for (String value : dictValue.split(separator)) {
-                    if (value.equals(dict.getDictValue())) {
-                        propertyString.append(dict.getDictLabel()).append(separator);
-                        break;
-                    }
-                }
-            }
+        Map<String, String> map = CollStreamUtil.toMap(datas, SysDictData::getDictValue, SysDictData::getDictLabel);
+        if (StringUtils.containsAny(dictValue, separator)) {
+            return Arrays.stream(dictValue.split(separator))
+                .map(v -> map.getOrDefault(v, StringUtils.EMPTY))
+                .collect(Collectors.joining(separator));
         } else {
-            for (SysDictData dict : datas) {
-                if (dictValue.equals(dict.getDictValue())) {
-                    return dict.getDictLabel();
-                }
-            }
+            return map.getOrDefault(dictValue, StringUtils.EMPTY);
         }
-        return StringUtils.stripEnd(propertyString.toString(), separator);
     }
 
     /**
@@ -274,7 +266,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @SuppressWarnings("unchecked cast")
     @Override
     public String getDictValue(String dictType, String dictLabel, String separator) {
-        StringBuilder propertyString = new StringBuilder();
         // 优先从本地缓存获取
         List<SysDictData> datas = (List<SysDictData>) SaHolder.getStorage().get(CacheConstants.SYS_DICT_KEY + dictType);
         if (ObjectUtil.isNull(datas)) {
@@ -282,23 +273,14 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
             SaHolder.getStorage().set(CacheConstants.SYS_DICT_KEY + dictType, datas);
         }
 
-        if (StringUtils.containsAny(dictLabel, separator) && CollUtil.isNotEmpty(datas)) {
-            for (SysDictData dict : datas) {
-                for (String label : dictLabel.split(separator)) {
-                    if (label.equals(dict.getDictLabel())) {
-                        propertyString.append(dict.getDictValue()).append(separator);
-                        break;
-                    }
-                }
-            }
+        Map<String, String> map = CollStreamUtil.toMap(datas, SysDictData::getDictLabel, SysDictData::getDictValue);
+        if (StringUtils.containsAny(dictLabel, separator)) {
+            return Arrays.stream(dictLabel.split(separator))
+                .map(l -> map.getOrDefault(l, StringUtils.EMPTY))
+                .collect(Collectors.joining(separator));
         } else {
-            for (SysDictData dict : datas) {
-                if (dictLabel.equals(dict.getDictLabel())) {
-                    return dict.getDictValue();
-                }
-            }
+            return map.getOrDefault(dictLabel, StringUtils.EMPTY);
         }
-        return StringUtils.stripEnd(propertyString.toString(), separator);
     }
 
 }
