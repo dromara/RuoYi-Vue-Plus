@@ -1,7 +1,6 @@
 package com.ruoyi.system.service.impl;
 
 import cn.dev33.satoken.context.SaHolder;
-import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -245,7 +244,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
             SaHolder.getStorage().set(CacheConstants.SYS_DICT_KEY + dictType, datas);
         }
 
-        Map<String, String> map = CollStreamUtil.toMap(datas, SysDictData::getDictValue, SysDictData::getDictLabel);
+        Map<String, String> map = StreamUtils.toMap(datas, SysDictData::getDictValue, SysDictData::getDictLabel);
         if (StringUtils.containsAny(dictValue, separator)) {
             return Arrays.stream(dictValue.split(separator))
                 .map(v -> map.getOrDefault(v, StringUtils.EMPTY))
@@ -273,7 +272,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
             SaHolder.getStorage().set(CacheConstants.SYS_DICT_KEY + dictType, datas);
         }
 
-        Map<String, String> map = CollStreamUtil.toMap(datas, SysDictData::getDictLabel, SysDictData::getDictValue);
+        Map<String, String> map = StreamUtils.toMap(datas, SysDictData::getDictLabel, SysDictData::getDictValue);
         if (StringUtils.containsAny(dictLabel, separator)) {
             return Arrays.stream(dictLabel.split(separator))
                 .map(l -> map.getOrDefault(l, StringUtils.EMPTY))
