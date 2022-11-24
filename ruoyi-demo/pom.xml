@@ -36,7 +36,7 @@
 
 <!--        <dependency>-->
 <!--            <groupId>com.tencentcloudapi</groupId>-->
-<!--            <artifactId>tencentcloud-sdk-java</artifactId>-->
+<!--            <artifactId>tencentcloud-sdk-java-sms</artifactId>-->
 <!--        </dependency>-->
 
     </dependencies>
