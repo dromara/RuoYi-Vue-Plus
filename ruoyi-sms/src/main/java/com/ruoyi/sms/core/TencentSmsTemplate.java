@@ -2,6 +2,7 @@ package com.ruoyi.sms.core;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.entity.SmsResult;
@@ -65,7 +66,7 @@ public class TencentSmsTemplate implements SmsTemplate {
             SmsResult.SmsResultBuilder builder = SmsResult.builder()
                 .isSuccess(true)
                 .message("send success")
-                .response(resp);
+                .response(JsonUtils.toJsonString(resp));
             for (SendStatus sendStatus : resp.getSendStatusSet()) {
                 if (!"Ok".equals(sendStatus.getCode())) {
                     builder.isSuccess(false).message(sendStatus.getMessage());

@@ -1,33 +1,28 @@
 package com.ruoyi.framework.config;
 
-import cn.dev33.satoken.config.SaTokenConfig;
-import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
-import com.github.xiaoymin.knife4j.spring.extension.OpenApiExtensionResolver;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.config.properties.SwaggerProperties;
-import io.swagger.models.auth.In;
+import com.ruoyi.framework.handler.OpenApiHandler;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springdoc.core.*;
+import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
+import org.springdoc.core.customizers.OpenApiCustomiser;
+import org.springdoc.core.customizers.ServerBaseUrlCustomizer;
+import org.springdoc.core.providers.JavadocProvider;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.*;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.contexts.SecurityContext;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.spring.web.plugins.WebFluxRequestHandlerProvider;
-import springfox.documentation.spring.web.plugins.WebMvcRequestHandlerProvider;
 
-import javax.annotation.PostConstruct;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Swagger 文档配置
@@ -36,125 +31,89 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Configuration
-@EnableKnife4j
+@AutoConfigureBefore(SpringDocConfiguration.class)
+@ConditionalOnProperty(name = "swagger.enabled", havingValue = "true", matchIfMissing = true)
 public class SwaggerConfig {
 
     private final SwaggerProperties swaggerProperties;
-    private final SaTokenConfig saTokenConfig;
-    private final OpenApiExtensionResolver openApiExtensionResolver;
+    private final ServerProperties serverProperties;
+
+    @Bean
+    @ConditionalOnMissingBean(OpenAPI.class)
+    public OpenAPI openApi() {
+        OpenAPI openApi = new OpenAPI();
+        // 文档基本信息
+        SwaggerProperties.InfoProperties infoProperties = swaggerProperties.getInfo();
+        Info info = convertInfo(infoProperties);
+        openApi.info(info);
+        // 扩展文档信息
+        openApi.externalDocs(swaggerProperties.getExternalDocs());
+        openApi.tags(swaggerProperties.getTags());
+        openApi.paths(swaggerProperties.getPaths());
+        openApi.components(swaggerProperties.getComponents());
+        List<SecurityRequirement> list = new ArrayList<>();
+        list.add(new SecurityRequirement().addList("apikey"));
+        openApi.security(list);
+
+        return openApi;
+    }
+
+    private Info convertInfo(SwaggerProperties.InfoProperties infoProperties) {
+        Info info = new Info();
+        info.setTitle(infoProperties.getTitle());
+        info.setDescription(infoProperties.getDescription());
+        info.setContact(infoProperties.getContact());
+        info.setLicense(infoProperties.getLicense());
+        info.setVersion(infoProperties.getVersion());
+        return info;
+    }
 
     /**
-     * 用于适配springboot 2.6
+     * 自定义 openapi 处理器
      */
     @Bean
-    @SuppressWarnings("all")
-    public BeanPostProcessor springfoxHandlerProviderBeanPostProcessor() {
-        return new BeanPostProcessor() {
-            @Override
-            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-                if (bean instanceof WebMvcRequestHandlerProvider || bean instanceof WebFluxRequestHandlerProvider) {
-                    customizeSpringfoxHandlerMappings(getHandlerMappings(bean));
-                }
-                return bean;
-            }
+    public OpenAPIService openApiBuilder(Optional<OpenAPI> openAPI,
+                                         SecurityService securityParser,
+                                         SpringDocConfigProperties springDocConfigProperties, PropertyResolverUtils propertyResolverUtils,
+                                         Optional<List<OpenApiBuilderCustomizer>> openApiBuilderCustomisers,
+                                         Optional<List<ServerBaseUrlCustomizer>> serverBaseUrlCustomisers, Optional<JavadocProvider> javadocProvider) {
+        return new OpenApiHandler(openAPI, securityParser, springDocConfigProperties, propertyResolverUtils, openApiBuilderCustomisers, serverBaseUrlCustomisers, javadocProvider);
+    }
 
-            private <T extends RequestMappingInfoHandlerMapping> void customizeSpringfoxHandlerMappings(List<T> mappings) {
-                mappings.removeIf(mapping -> mapping.getPatternParser() != null);
+    /**
+     * 对已经生成好的 OpenApi 进行自定义操作
+     */
+    @Bean
+    public OpenApiCustomiser openApiCustomiser() {
+        String contextPath = serverProperties.getServlet().getContextPath();
+        String finalContextPath;
+        if (StringUtils.isBlank(contextPath) || "/".equals(contextPath)) {
+            finalContextPath = "";
+        } else {
+            finalContextPath = contextPath;
+        }
+        // 对所有路径增加前置上下文路径
+        return openApi -> {
+            Paths oldPaths = openApi.getPaths();
+            if (oldPaths instanceof PlusPaths) {
+                return;
             }
-
-            private List<RequestMappingInfoHandlerMapping> getHandlerMappings(Object bean) {
-                try {
-                    Field field = ReflectionUtils.findField(bean.getClass(), "handlerMappings");
-                    field.setAccessible(true);
-                    return (List<RequestMappingInfoHandlerMapping>) field.get(bean);
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
+            PlusPaths newPaths = new PlusPaths();
+            oldPaths.forEach((k,v) -> newPaths.addPathItem(finalContextPath + k, v));
+            openApi.setPaths(newPaths);
         };
     }
 
     /**
-     * 创建API
+     * 单独使用一个类便于判断 解决springdoc路径拼接重复问题
+     *
+     * @author Lion Li
      */
-    @PostConstruct
-    public void createRestApi() {
-        for (SwaggerProperties.Groups group : swaggerProperties.getGroups()) {
-            String basePackage = group.getBasePackage();
-            Docket docket = new Docket(DocumentationType.OAS_30)
-                .enable(swaggerProperties.getEnabled())
-                // 用来创建该API的基本信息，展示在文档的页面中（自定义展示的信息）
-                .apiInfo(apiInfo())
-                // 设置哪些接口暴露给Swagger展示
-                .select()
-                // 扫描所有有注解的api，用这种方式更灵活
-                //.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
-                // 扫描指定包中的swagger注解
-                .apis(RequestHandlerSelectors.basePackage(basePackage))
-                // 扫描所有 .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
-                .build()
-                .groupName(group.getName())
-                // 设置安全模式，swagger可以设置访问token
-                .securitySchemes(securitySchemes())
-                .securityContexts(securityContexts())
-                .extensions(openApiExtensionResolver.buildExtensions(group.getName()))
-                .pathMapping(swaggerProperties.getPathMapping());
-            String beanName = StringUtils.substringAfterLast(basePackage, ".") + "Docket";
-            SpringUtils.registerBean(beanName, docket);
+    static class PlusPaths extends Paths {
+
+        public PlusPaths() {
+            super();
         }
     }
 
-    /**
-     * 安全模式，这里指定token通过Authorization头请求头传递
-     */
-    private List<SecurityScheme> securitySchemes() {
-        List<SecurityScheme> apiKeyList = new ArrayList<>();
-        String header = saTokenConfig.getTokenName();
-        apiKeyList.add(new ApiKey(header, header, In.HEADER.toValue()));
-        return apiKeyList;
-    }
-
-    /**
-     * 安全上下文
-     */
-    private List<SecurityContext> securityContexts() {
-        List<SecurityContext> securityContexts = new ArrayList<>();
-        securityContexts.add(
-            SecurityContext.builder()
-                .securityReferences(defaultAuth())
-                .operationSelector(o -> o.requestMappingPattern().matches("/.*"))
-                .build());
-        return securityContexts;
-    }
-
-    /**
-     * 默认的安全上引用
-     */
-    private List<SecurityReference> defaultAuth() {
-        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
-        authorizationScopes[0] = authorizationScope;
-        List<SecurityReference> securityReferences = new ArrayList<>();
-        securityReferences.add(new SecurityReference(saTokenConfig.getTokenName(), authorizationScopes));
-        return securityReferences;
-    }
-
-    /**
-     * 添加摘要信息
-     */
-    private ApiInfo apiInfo() {
-        // 用ApiInfoBuilder进行定制
-        SwaggerProperties.Contact contact = swaggerProperties.getContact();
-        return new ApiInfoBuilder()
-            // 设置标题
-            .title(swaggerProperties.getTitle())
-            // 描述
-            .description(swaggerProperties.getDescription())
-            // 作者信息
-            .contact(new Contact(contact.getName(), contact.getUrl(), contact.getEmail()))
-            // 版本
-            .version(swaggerProperties.getVersion())
-            .build();
-    }
 }

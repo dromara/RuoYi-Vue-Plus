@@ -1,7 +1,6 @@
 package com.ruoyi.common.core.domain;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import com.ruoyi.common.constant.HttpStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +13,6 @@ import java.io.Serializable;
  */
 @Data
 @NoArgsConstructor
-@ApiModel("请求响应对象")
 public class R<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -28,13 +26,10 @@ public class R<T> implements Serializable {
      */
     public static final int FAIL = 500;
 
-    @ApiModelProperty("消息状态码")
     private int code;
 
-    @ApiModelProperty("消息内容")
     private String msg;
 
-    @ApiModelProperty("数据对象")
     private T data;
 
     public static <T> R<T> ok() {
@@ -73,6 +68,27 @@ public class R<T> implements Serializable {
         return restResult(null, code, msg);
     }
 
+    /**
+     * 返回警告消息
+     *
+     * @param msg 返回内容
+     * @return 警告消息
+     */
+    public static <T> R<T> warn(String msg) {
+        return restResult(null, HttpStatus.WARN, msg);
+    }
+
+    /**
+     * 返回警告消息
+     *
+     * @param msg 返回内容
+     * @param data 数据对象
+     * @return 警告消息
+     */
+    public static <T> R<T> warn(String msg, T data) {
+        return restResult(data, HttpStatus.WARN, msg);
+    }
+
     private static <T> R<T> restResult(T data, int code, String msg) {
         R<T> r = new R<>();
         r.setCode(code);
@@ -81,4 +97,11 @@ public class R<T> implements Serializable {
         return r;
     }
 
+    public static <T> Boolean isError(R<T> ret) {
+        return !isSuccess(ret);
+    }
+
+    public static <T> Boolean isSuccess(R<T> ret) {
+        return R.SUCCESS == ret.getCode();
+    }
 }

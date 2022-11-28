@@ -124,7 +124,7 @@ public class GenTableColumn extends BaseEntity {
     private Integer sort;
 
     public String getCapJavaField() {
-        return StringUtils.uncapitalize(javaField);
+        return StringUtils.capitalize(javaField);
     }
 
     public boolean isPk() {

@@ -8,6 +8,7 @@ import cn.hutool.http.HttpStatus;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.exception.DemoModeException;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.StreamUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.MyBatisSystemException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.stream.Collectors;
 
 /**
  * 全局异常处理器
@@ -105,7 +105,7 @@ public class GlobalExceptionHandler {
     public R<Void> handleServiceException(ServiceException e, HttpServletRequest request) {
         log.error(e.getMessage(), e);
         Integer code = e.getCode();
-        return ObjectUtil.isNotNull(code) ? R.fail(code.intValue(), e.getMessage()) : R.fail(e.getMessage());
+        return ObjectUtil.isNotNull(code) ? R.fail(code, e.getMessage()) : R.fail(e.getMessage());
     }
 
     /**
@@ -134,9 +134,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BindException.class)
     public R<Void> handleBindException(BindException e) {
         log.error(e.getMessage(), e);
-        String message = e.getAllErrors().stream()
-            .map(DefaultMessageSourceResolvable::getDefaultMessage)
-            .collect(Collectors.joining(", "));
+        String message = StreamUtils.join(e.getAllErrors(), DefaultMessageSourceResolvable::getDefaultMessage, ", ");
         return R.fail(message);
     }
 
@@ -146,9 +144,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public R<Void> constraintViolationException(ConstraintViolationException e) {
         log.error(e.getMessage(), e);
-        String message = e.getConstraintViolations().stream()
-            .map(ConstraintViolation::getMessage)
-            .collect(Collectors.joining(", "));
+        String message = StreamUtils.join(e.getConstraintViolations(), ConstraintViolation::getMessage, ", ");
         return R.fail(message);
     }
 

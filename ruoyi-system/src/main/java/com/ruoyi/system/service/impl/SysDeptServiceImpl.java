@@ -59,6 +59,18 @@ public class SysDeptServiceImpl implements ISysDeptService {
     }
 
     /**
+     * 查询部门树结构信息
+     *
+     * @param dept 部门信息
+     * @return 部门树信息集合
+     */
+    @Override
+    public List<Tree<Long>> selectDeptTreeList(SysDept dept) {
+        List<SysDept> depts = this.selectDeptList(dept);
+        return buildDeptTreeSelect(depts);
+    }
+
+    /**
      * 构建前端所需要下拉树结构
      *
      * @param depts 部门列表
@@ -96,7 +108,11 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public SysDept selectDeptById(Long deptId) {
-        return baseMapper.selectById(deptId);
+        SysDept dept = baseMapper.selectById(deptId);
+        SysDept parentDept = baseMapper.selectOne(new LambdaQueryWrapper<SysDept>()
+            .select(SysDept::getDeptName).eq(SysDept::getDeptId, dept.getParentId()));
+        dept.setParentName(ObjectUtil.isNotNull(parentDept) ? parentDept.getDeptName() : null);
+        return dept;
     }
 
     /**

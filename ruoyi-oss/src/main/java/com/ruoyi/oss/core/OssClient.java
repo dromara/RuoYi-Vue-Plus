@@ -1,7 +1,9 @@
 package com.ruoyi.oss.core;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -10,20 +12,21 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.CreateBucketRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.*;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.entity.UploadResult;
+import com.ruoyi.oss.enumd.AccessPolicyType;
 import com.ruoyi.oss.enumd.PolicyType;
 import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.properties.OssProperties;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Date;
 
 /**
  * S3 存储协议 所有兼容S3协议的云厂商均支持
@@ -54,12 +57,16 @@ public class OssClient {
             } else {
                 clientConfig.setProtocol(Protocol.HTTP);
             }
-            this.client = AmazonS3Client.builder()
+            AmazonS3ClientBuilder build = AmazonS3Client.builder()
                 .withEndpointConfiguration(endpointConfig)
                 .withClientConfiguration(clientConfig)
                 .withCredentials(credentialsProvider)
-                .disableChunkedEncoding()
-                .build();
+                .disableChunkedEncoding();
+            if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)) {
+                // minio 使用https限制使用域名访问 需要此配置 站点填域名
+                build.enablePathStyleAccess();
+            }
+            this.client = build.build();
 
             createBucket();
         } catch (Exception e) {
@@ -77,9 +84,10 @@ public class OssClient {
                 return;
             }
             CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
-            createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+            AccessPolicyType accessPolicy = getAccessPolicy();
+            createBucketRequest.setCannedAcl(accessPolicy.getAcl());
             client.createBucket(createBucketRequest);
-            client.setBucketPolicy(bucketName, getPolicy(bucketName, PolicyType.READ));
+            client.setBucketPolicy(bucketName, getPolicy(bucketName, accessPolicy.getPolicyType()));
         } catch (Exception e) {
             throw new OssException("创建Bucket失败, 请核对配置信息:[" + e.getMessage() + "]");
         }
@@ -90,11 +98,17 @@ public class OssClient {
     }
 
     public UploadResult upload(InputStream inputStream, String path, String contentType) {
+        if (!(inputStream instanceof ByteArrayInputStream)) {
+            inputStream = new ByteArrayInputStream(IoUtil.readBytes(inputStream));
+        }
         try {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(contentType);
             metadata.setContentLength(inputStream.available());
-            client.putObject(new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata));
+            PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata);
+            // 设置上传对象的 Acl 为公共读
+            putObjectRequest.setCannedAcl(getAccessPolicy().getAcl());
+            client.putObject(putObjectRequest);
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }
@@ -106,7 +120,7 @@ public class OssClient {
         try {
             client.deleteObject(properties.getBucketName(), path);
         } catch (Exception e) {
-            throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
+            throw new OssException("删除文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }
     }
 
@@ -118,18 +132,38 @@ public class OssClient {
         return upload(inputStream, getPath(properties.getPrefix(), suffix), contentType);
     }
 
+    /**
+     * 获取文件元数据
+     *
+     * @param path 完整文件路径
+     */
+    public ObjectMetadata getObjectMetadata(String path) {
+        path = path.replace(getUrl() + "/", "");
+        S3Object object = client.getObject(properties.getBucketName(), path);
+        return object.getObjectMetadata();
+    }
+
+    public InputStream getObjectContent(String path) {
+        path = path.replace(getUrl() + "/", "");
+        S3Object object = client.getObject(properties.getBucketName(), path);
+        return object.getObjectContent();
+    }
+
     public String getUrl() {
         String domain = properties.getDomain();
-        if (StringUtils.isNotBlank(domain)) {
-            return domain;
-        }
         String endpoint = properties.getEndpoint();
         String header = OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? "https://" : "http://";
         // 云服务商直接返回
-        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)){
+        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)) {
+            if (StringUtils.isNotBlank(domain)) {
+                return header + domain;
+            }
             return header + properties.getBucketName() + "." + endpoint;
         }
         // minio 单独处理
+        if (StringUtils.isNotBlank(domain)) {
+            return header + domain + "/" + properties.getBucketName();
+        }
         return header + endpoint + "/" + properties.getBucketName();
     }
 
@@ -147,6 +181,24 @@ public class OssClient {
 
     public String getConfigKey() {
         return configKey;
+    }
+
+    public String getPrivateUrl(String objectKey, Integer second) {
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+            new GeneratePresignedUrlRequest(properties.getBucketName(), objectKey)
+                .withMethod(HttpMethod.GET)
+                .withExpiration(new Date(System.currentTimeMillis() + 1000L * second));
+        URL url = client.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
+    }
+
+    /**
+     * 获取当前桶权限类型
+     *
+     * @return 当前桶权限类型code
+     */
+    public AccessPolicyType getAccessPolicy() {
+        return AccessPolicyType.getByType(properties.getAccessPolicy());
     }
 
     private static String getPolicy(String bucketName, PolicyType policyType) {

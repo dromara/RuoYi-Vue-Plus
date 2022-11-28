@@ -4,7 +4,7 @@
     <parent>
         <artifactId>ruoyi-extend</artifactId>
         <groupId>com.ruoyi</groupId>
-        <version>4.2.0</version>
+        <version>4.4.0</version>
     </parent>
     <artifactId>ruoyi-xxl-job-admin</artifactId>
     <packaging>jar</packaging>
@@ -64,8 +64,8 @@
         </dependency>
         <!-- mysql -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
         </dependency>
 
         <dependency>
@@ -95,27 +95,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <!-- docker -->
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>${docker.plugin.version}</version>
-                <configuration>
-                    <!-- made of '[a-z0-9-_.]' -->
-                    <imageName>${docker.namespace}/${project.artifactId}:${project.version}</imageName>
-                    <dockerDirectory>${project.basedir}</dockerDirectory>
-                    <dockerHost>${docker.registry.host}</dockerHost>
-                    <registryUrl>${docker.registry.url}</registryUrl>
-                    <serverId>${docker.registry.url}</serverId>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}.jar</include>
-                        </resource>
-                    </resources>
-                </configuration>
             </plugin>
         </plugins>
     </build>

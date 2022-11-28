@@ -9,8 +9,8 @@
       :limit="limit"
       :on-error="handleUploadError"
       :on-exceed="handleExceed"
-      name="file"
-      :on-remove="handleRemove"
+      ref="imageUpload"
+      :on-remove="handleDelete"
       :show-file-list="true"
       :headers="headers"
       :file-list="fileList"
@@ -120,32 +120,6 @@ export default {
     },
   },
   methods: {
-    // 删除图片
-    handleRemove(file, fileList) {
-      const findex = this.fileList.map(f => f.name).indexOf(file.name);
-      if(findex > -1) {
-        let ossId = this.fileList[findex].ossId;
-        delOss(ossId);
-        this.fileList.splice(findex, 1);
-        this.$emit("input", this.listToString(this.fileList));
-      }
-    },
-    // 上传成功回调
-    handleUploadSuccess(res) {
-      if (res.code == 200) {
-        this.uploadList.push({ name: res.data.fileName, url: res.data.url, ossId: res.data.ossId });
-        if (this.uploadList.length === this.number) {
-          this.fileList = this.fileList.concat(this.uploadList);
-          this.uploadList = [];
-          this.number = 0;
-          this.$emit("input", this.listToString(this.fileList));
-          this.$modal.closeLoading();
-        }
-      } else {
-        this.$modal.msgError(res.msg);
-        this.$modal.closeLoading();
-      }
-    },
     // 上传前loading加载
     handleBeforeUpload(file) {
       let isImg = false;
@@ -181,10 +155,43 @@ export default {
     handleExceed() {
       this.$modal.msgError(`上传文件数量不能超过 ${this.limit} 个!`);
     },
+    // 上传成功回调
+    handleUploadSuccess(res, file) {
+      if (res.code === 200) {
+        this.uploadList.push({ name: res.data.fileName, url: res.data.url, ossId: res.data.ossId });
+        this.uploadedSuccessfully();
+      } else {
+        this.number--;
+        this.$modal.closeLoading();
+        this.$modal.msgError(res.msg);
+        this.$refs.imageUpload.handleRemove(file);
+        this.uploadedSuccessfully();
+      }
+    },
+    // 删除图片
+    handleDelete(file) {
+      const findex = this.fileList.map(f => f.name).indexOf(file.name);
+      if(findex > -1) {
+        let ossId = this.fileList[findex].ossId;
+        delOss(ossId);
+        this.fileList.splice(findex, 1);
+        this.$emit("input", this.listToString(this.fileList));
+      }
+    },
     // 上传失败
     handleUploadError(res) {
       this.$modal.msgError("上传图片失败，请重试");
       this.$modal.closeLoading();
+    },
+    // 上传结束处理
+    uploadedSuccessfully() {
+      if (this.number > 0 && this.uploadList.length === this.number) {
+        this.fileList = this.fileList.concat(this.uploadList);
+        this.uploadList = [];
+        this.number = 0;
+        this.$emit("input", this.listToString(this.fileList));
+        this.$modal.closeLoading();
+      }
     },
     // 预览
     handlePictureCardPreview(file) {
@@ -196,10 +203,12 @@ export default {
       let strs = "";
       separator = separator || ",";
       for (let i in list) {
-        strs += list[i].ossId + separator;
+        if (list[i].ossId) {
+          strs += list[i].ossId + separator;
+        }
       }
       return strs != "" ? strs.substr(0, strs.length - 1) : "";
-    },
+    }
   }
 };
 </script>

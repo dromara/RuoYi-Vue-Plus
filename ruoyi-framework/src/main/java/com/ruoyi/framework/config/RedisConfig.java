@@ -3,11 +3,10 @@ package com.ruoyi.framework.config;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ruoyi.framework.config.properties.RedissonProperties;
+import com.ruoyi.framework.handler.KeyPrefixHandler;
+import com.ruoyi.framework.manager.PlusSpringCacheManager;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
-import org.redisson.spring.cache.CacheConfig;
-import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,10 +15,6 @@ import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * redis配置
@@ -48,6 +43,8 @@ public class RedisConfig extends CachingConfigurerSupport {
             if (ObjectUtil.isNotNull(singleServerConfig)) {
                 // 使用单机模式
                 config.useSingleServer()
+                    //设置redis key前缀
+                    .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()))
                     .setTimeout(singleServerConfig.getTimeout())
                     .setClientName(singleServerConfig.getClientName())
                     .setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
@@ -59,6 +56,8 @@ public class RedisConfig extends CachingConfigurerSupport {
             RedissonProperties.ClusterServersConfig clusterServersConfig = redissonProperties.getClusterServersConfig();
             if (ObjectUtil.isNotNull(clusterServersConfig)) {
                 config.useClusterServers()
+                    //设置redis key前缀
+                    .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()))
                     .setTimeout(clusterServersConfig.getTimeout())
                     .setClientName(clusterServersConfig.getClientName())
                     .setIdleConnectionTimeout(clusterServersConfig.getIdleConnectionTimeout())
@@ -75,18 +74,11 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     /**
-     * 整合spring-cache
+     * 自定义缓存管理器 整合spring-cache
      */
     @Bean
-    public CacheManager cacheManager(RedissonClient redissonClient) {
-        List<RedissonProperties.CacheGroup> cacheGroup = redissonProperties.getCacheGroup();
-        Map<String, CacheConfig> config = new HashMap<>();
-        for (RedissonProperties.CacheGroup group : cacheGroup) {
-            CacheConfig cacheConfig = new CacheConfig(group.getTtl(), group.getMaxIdleTime());
-            cacheConfig.setMaxSize(group.getMaxSize());
-            config.put(group.getGroupId(), cacheConfig);
-        }
-        return new RedissonSpringCacheManager(redissonClient, config, new JsonJacksonCodec(objectMapper));
+    public CacheManager cacheManager() {
+        return new PlusSpringCacheManager();
     }
 
     /**

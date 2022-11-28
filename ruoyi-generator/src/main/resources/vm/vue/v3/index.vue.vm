@@ -148,18 +148,8 @@
 #end
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button
-            type="text"
-            icon="Edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['${moduleName}:${businessName}:edit']"
-          >修改</el-button>
-          <el-button
-            type="text"
-            icon="Delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['${moduleName}:${businessName}:remove']"
-          >删除</el-button>
+            <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['${moduleName}:${businessName}:edit']">修改</el-button>
+            <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['${moduleName}:${businessName}:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -492,8 +482,8 @@ function handleAdd() {
 function handleUpdate(row) {
   loading.value = true
   reset();
-  const ${pkColumn.javaField} = row.${pkColumn.javaField} || ids.value
-  get${BusinessName}(${pkColumn.javaField}).then(response => {
+  const _${pkColumn.javaField} = row.${pkColumn.javaField} || ids.value
+  get${BusinessName}(_${pkColumn.javaField}).then(response => {
     loading.value = false;
     form.value = response.data;
 #foreach ($column in $columns)
@@ -545,14 +535,15 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const ${pkColumn.javaField}s = row.${pkColumn.javaField} || ids.value;
+  const _${pkColumn.javaField}s = row.${pkColumn.javaField} || ids.value;
   proxy.#[[$modal]]#.confirm('是否确认删除${functionName}编号为"' + ${pkColumn.javaField}s + '"的数据项？').then(function() {
     loading.value = true;
-    return del${BusinessName}(${pkColumn.javaField}s);
+    return del${BusinessName}(_${pkColumn.javaField}s);
   }).then(() => {
     loading.value = true;
     getList();
     proxy.#[[$modal]]#.msgSuccess("删除成功");
+  }).catch(() => {
   }).finally(() => {
     loading.value = false;
   });

@@ -2,15 +2,17 @@ package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.redis.RedisUtils;
+import com.ruoyi.common.utils.redis.CacheUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
 import com.ruoyi.system.service.ISysDictDataService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -89,8 +91,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
         for (Long dictCode : dictCodes) {
             SysDictData data = selectDictDataById(dictCode);
             baseMapper.deleteById(dictCode);
-            List<SysDictData> dictDatas = baseMapper.selectDictDataByType(data.getDictType());
-            RedisUtils.setCacheObject(getCacheKey(data.getDictType()), dictDatas);
+            CacheUtils.evict(CacheNames.SYS_DICT, data.getDictType());
         }
     }
 
@@ -100,14 +101,14 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      * @param data 字典数据信息
      * @return 结果
      */
+    @CachePut(cacheNames = CacheNames.SYS_DICT, key = "#data.dictType")
     @Override
-    public int insertDictData(SysDictData data) {
+    public List<SysDictData> insertDictData(SysDictData data) {
         int row = baseMapper.insert(data);
         if (row > 0) {
-            List<SysDictData> dictDatas = baseMapper.selectDictDataByType(data.getDictType());
-            RedisUtils.setCacheObject(getCacheKey(data.getDictType()), dictDatas);
+            return baseMapper.selectDictDataByType(data.getDictType());
         }
-        return row;
+        throw new ServiceException("操作失败");
     }
 
     /**
@@ -116,23 +117,14 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      * @param data 字典数据信息
      * @return 结果
      */
+    @CachePut(cacheNames = CacheNames.SYS_DICT, key = "#data.dictType")
     @Override
-    public int updateDictData(SysDictData data) {
+    public List<SysDictData> updateDictData(SysDictData data) {
         int row = baseMapper.updateById(data);
         if (row > 0) {
-            List<SysDictData> dictDatas = baseMapper.selectDictDataByType(data.getDictType());
-            RedisUtils.setCacheObject(getCacheKey(data.getDictType()), dictDatas);
+            return baseMapper.selectDictDataByType(data.getDictType());
         }
-        return row;
+        throw new ServiceException("操作失败");
     }
 
-    /**
-     * 设置cache key
-     *
-     * @param configKey 参数键
-     * @return 缓存键key
-     */
-    String getCacheKey(String configKey) {
-        return Constants.SYS_DICT_KEY + configKey;
-    }
 }

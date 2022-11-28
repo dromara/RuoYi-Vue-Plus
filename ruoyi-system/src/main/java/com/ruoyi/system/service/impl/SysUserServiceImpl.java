@@ -18,6 +18,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.helper.LoginHelper;
+import com.ruoyi.common.utils.StreamUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
@@ -33,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 用户 业务层处理
@@ -83,7 +83,7 @@ public class SysUserServiceImpl implements ISysUserService {
                 List<SysDept> deptList = deptMapper.selectList(new LambdaQueryWrapper<SysDept>()
                     .select(SysDept::getDeptId)
                     .apply(DataBaseHelper.findInSet(user.getDeptId(), "ancestors")));
-                List<Long> ids = deptList.stream().map(SysDept::getDeptId).collect(Collectors.toList());
+                List<Long> ids = StreamUtils.toList(deptList, SysDept::getDeptId);
                 ids.add(user.getDeptId());
                 w.in("u.dept_id", ids);
             });
@@ -172,7 +172,7 @@ public class SysUserServiceImpl implements ISysUserService {
         if (CollUtil.isEmpty(list)) {
             return StringUtils.EMPTY;
         }
-        return list.stream().map(SysRole::getRoleName).collect(Collectors.joining(","));
+        return StreamUtils.join(list, SysRole::getRoleName);
     }
 
     /**
@@ -187,18 +187,20 @@ public class SysUserServiceImpl implements ISysUserService {
         if (CollUtil.isEmpty(list)) {
             return StringUtils.EMPTY;
         }
-        return list.stream().map(SysPost::getPostName).collect(Collectors.joining(","));
+        return StreamUtils.join(list, SysPost::getPostName);
     }
 
     /**
      * 校验用户名称是否唯一
      *
-     * @param userName 用户名称
+     * @param user 用户信息
      * @return 结果
      */
     @Override
-    public String checkUserNameUnique(String userName) {
-        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName));
+    public String checkUserNameUnique(SysUser user) {
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysUser>()
+            .eq(SysUser::getUserName, user.getUserName())
+            .ne(ObjectUtil.isNotNull(user.getUserId()), SysUser::getUserId, user.getUserId()));
         if (exist) {
             return UserConstants.NOT_UNIQUE;
         }

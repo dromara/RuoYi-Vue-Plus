@@ -12,7 +12,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 /**
  * XxlJob开发示例（Bean模式）
@@ -39,7 +38,6 @@ public class SampleService {
 
         for (int i = 0; i < 5; i++) {
             XxlJobHelper.log("beat at:" + i);
-            TimeUnit.SECONDS.sleep(2);
         }
         // default success
     }
