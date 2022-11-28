@@ -2,9 +2,9 @@ FROM anapsix/alpine-java:8_server-jre_unlimited
 
 MAINTAINER Lion Li
 
-RUN mkdir -p /ruoyi/server
-RUN mkdir -p /ruoyi/server/logs
-RUN mkdir -p /ruoyi/server/temp
+RUN mkdir -p /ruoyi/server/logs \
+    /ruoyi/server/temp \
+    /ruoyi/skywalking/agent
 
 WORKDIR /ruoyi/server
 
@@ -14,4 +14,10 @@ EXPOSE ${SERVER_PORT}
 
 ADD ./target/ruoyi-admin.jar ./app.jar
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-Dserver.port=${SERVER_PORT}","-jar", "app.jar"]
+ENTRYPOINT ["java", \
+            "-Djava.security.egd=file:/dev/./urandom", \
+            "-Dserver.port=${SERVER_PORT}", \
+            # 应用名称 如果想区分集群节点监控 改成不同的名称即可
+#            "-Dskywalking.agent.service_name=ruoyi-server", \
+#            "-javaagent:/ruoyi/skywalking/agent/skywalking-agent.jar", \
+            "-jar", "app.jar"]

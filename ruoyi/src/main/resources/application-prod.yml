@@ -36,7 +36,7 @@ xxl.job:
 --- # 数据源配置
 spring:
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
+    type: com.zaxxer.hikari.HikariDataSource
     # 动态数据源文档 https://www.kancloud.cn/tracy5546/dynamic-datasource/content
     dynamic:
       # 性能分析插件(有性能损耗 不建议生产环境使用)
@@ -48,6 +48,7 @@ spring:
       datasource:
         # 主库数据源
         master:
+          type: ${spring.datasource.type}
           driverClassName: com.mysql.cj.jdbc.Driver
           # jdbc 所有参数配置参考 https://lionli.blog.csdn.net/article/details/122018562
           # rewriteBatchedStatements=true 批处理优化 大幅提升批量插入更新删除性能(对数据库有性能损耗 使用批量操作应考虑性能问题)
@@ -57,72 +58,46 @@ spring:
         # 从库数据源
         slave:
           lazy: true
+          type: ${spring.datasource.type}
           driverClassName: com.mysql.cj.jdbc.Driver
-          url:
+          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
           username:
           password:
 #        oracle:
+#          type: ${spring.datasource.type}
 #          driverClassName: oracle.jdbc.OracleDriver
 #          url: jdbc:oracle:thin:@//localhost:1521/XE
 #          username: ROOT
 #          password: root
-#          druid:
-#            validationQuery: SELECT 1 FROM DUAL
+#          hikari:
+#            connectionTestQuery: SELECT 1 FROM DUAL
 #        postgres:
+#          type: ${spring.datasource.type}
 #          driverClassName: org.postgresql.Driver
 #          url: jdbc:postgresql://localhost:5432/postgres?useUnicode=true&characterEncoding=utf8&useSSL=true&autoReconnect=true&reWriteBatchedInserts=true
 #          username: root
 #          password: root
 #        sqlserver:
+#          type: ${spring.datasource.type}
 #          driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-#          url: jdbc:sqlserver://localhost:1433;DatabaseName=tempdb;SelectMethod=cursor;rewriteBatchedStatements=true
+#          url: jdbc:sqlserver://localhost:1433;DatabaseName=tempdb;SelectMethod=cursor;encrypt=false;rewriteBatchedStatements=true
 #          username: SA
 #          password: root
-      druid:
-        # 初始连接数
-        initialSize: 5
-        # 最小连接池数量
-        minIdle: 10
+      hikari:
         # 最大连接池数量
-        maxActive: 20
+        maxPoolSize: 20
+        # 最小空闲线程数量
+        minIdle: 10
         # 配置获取连接等待超时的时间
-        maxWait: 60000
-        # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
-        timeBetweenEvictionRunsMillis: 60000
-        # 配置一个连接在池中最小生存的时间，单位是毫秒
-        minEvictableIdleTimeMillis: 300000
-        # 配置一个连接在池中最大生存的时间，单位是毫秒
-        maxEvictableIdleTimeMillis: 900000
-        # 配置检测连接是否有效
-        validationQuery: SELECT 1
-        testWhileIdle: true
-        testOnBorrow: false
-        testOnReturn: false
-        # 注意这个值和druid原生不一致，默认启动了stat
-        filters: stat
-
---- # druid 配置
-spring.datasource.druid:
-  webStatFilter:
-    enabled: true
-  statViewServlet:
-    enabled: true
-    # 设置白名单，不填则允许所有访问
-    allow:
-    url-pattern: /druid/*
-    # 控制台管理用户名和密码
-    login-username: ruoyi
-    login-password: 123456
-  filter:
-    stat:
-      enabled: true
-      # 慢SQL记录
-      log-slow-sql: true
-      slow-sql-millis: 1000
-      merge-sql: true
-    wall:
-      config:
-        multi-statement-allow: true
+        connectionTimeout: 10000
+        # 校验超时时间
+        validationTimeout: 5000
+        # 空闲连接存活最大时间，默认10分钟
+        idleTimeout: 60000
+        # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认30分钟
+        maxLifetime: 900000
+        # 连接测试query（配置检测连接是否有效）
+        connectionTestQuery: SELECT 1
 
 --- # redis 单机配置(单机与集群只能开启一个另一个需要注释掉)
 spring:

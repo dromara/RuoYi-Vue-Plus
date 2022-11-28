@@ -103,6 +103,20 @@ public class UserActionListener implements SaTokenListener {
     }
 
     /**
+     * 每次打开二级认证时触发
+     */
+    @Override
+    public void doOpenSafe(String loginType, String tokenValue, String service, long safeTime) {
+    }
+
+    /**
+     * 每次创建Session时触发
+     */
+    @Override
+    public void doCloseSafe(String loginType, String tokenValue, String service) {
+    }
+
+    /**
      * 每次创建Session时触发
      */
     @Override

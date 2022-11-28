@@ -21,7 +21,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -92,7 +91,6 @@ public class LogAspect {
             SpringUtils.getBean(OperLogService.class).recordOper(operLog);
         } catch (Exception exp) {
             // 记录本地异常日志
-            log.error("==前置通知异常==");
             log.error("异常信息:{}", exp.getMessage());
             exp.printStackTrace();
         }
@@ -135,8 +133,9 @@ public class LogAspect {
             String params = argsArrayToString(joinPoint.getArgs());
             operLog.setOperParam(StringUtils.substring(params, 0, 2000));
         } else {
-            Map<?, ?> paramsMap = (Map<?, ?>) ServletUtils.getRequest().getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            operLog.setOperParam(StringUtils.substring(paramsMap.toString(), 0, 2000));
+            Map<String, String> paramsMap = ServletUtils.getParamMap(ServletUtils.getRequest());
+            MapUtil.removeAny(paramsMap, EXCLUDE_PROPERTIES);
+            operLog.setOperParam(StringUtils.substring(JsonUtils.toJsonString(paramsMap), 0, 2000));
         }
     }
 

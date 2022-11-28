@@ -328,6 +328,17 @@ public class RedisUtils {
     }
 
     /**
+     * 获得缓存Map的key列表
+     *
+     * @param key 缓存的键值
+     * @return key列表
+     */
+    public static <T> Set<String> getCacheMapKeySet(final String key) {
+        RMap<String, T> rMap = CLIENT.getMap(key);
+        return rMap.keySet();
+    }
+
+    /**
      * 往Hash中存入数据
      *
      * @param key   Redis键

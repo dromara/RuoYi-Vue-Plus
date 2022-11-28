@@ -50,4 +50,9 @@ public class OssProperties {
      */
     private String isHttps;
 
+    /**
+     * 桶权限类型(0private 1public 2custom)
+     */
+    private String accessPolicy;
+
 }

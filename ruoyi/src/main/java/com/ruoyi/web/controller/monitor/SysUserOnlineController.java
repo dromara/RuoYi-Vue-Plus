@@ -42,7 +42,7 @@ public class SysUserOnlineController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<SysUserOnline> list(String ipaddr, String userName) {
         // 获取所有未过期的 token
-        List<String> keys = StpUtil.searchTokenValue("", -1, 0, false);
+        List<String> keys = StpUtil.searchTokenValue("", 0, -1, false);
         List<UserOnlineDTO> userOnlineDTOList = new ArrayList<>();
         for (String key : keys) {
             String token = key.replace(CacheConstants.LOGIN_TOKEN_KEY, "");
@@ -83,7 +83,7 @@ public class SysUserOnlineController extends BaseController {
     public R<Void> forceLogout(@PathVariable String tokenId) {
         try {
             StpUtil.kickoutByTokenValue(tokenId);
-        } catch (NotLoginException e) {
+        } catch (NotLoginException ignored) {
         }
         return R.ok();
     }

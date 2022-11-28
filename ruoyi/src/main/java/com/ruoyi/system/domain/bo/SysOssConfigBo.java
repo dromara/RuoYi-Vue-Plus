@@ -98,4 +98,10 @@ public class SysOssConfigBo extends BaseEntity {
      */
     private String remark;
 
+    /**
+     * 桶权限类型(0private 1public 2custom)
+     */
+    @NotBlank(message = "桶权限类型不能为空", groups = {AddGroup.class, EditGroup.class})
+    private String accessPolicy;
+
 }

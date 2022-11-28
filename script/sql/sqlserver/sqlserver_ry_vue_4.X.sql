@@ -1078,8 +1078,6 @@ INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [co
 GO
 INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (109, N'在线用户', 2, 1, N'online', N'monitor/online/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:online:list', N'online', N'admin', getdate(), N'', NULL, N'在线用户菜单')
 GO
-INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (111, N'数据监控', 2, 3, N'druid', N'monitor/druid/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:druid:list', N'druid', N'admin', getdate(), N'', NULL, N'数据监控菜单')
-GO
 INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (112, N'缓存列表', 2, 6, N'cacheList', N'monitor/cache/list', N'', 1, 0, N'C', N'0', N'0', N'monitor:cache:list', N'redis-list', N'admin', getdate(), N'', NULL, N'缓存列表菜单')
 GO
 INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (113, N'缓存监控', 2, 5, N'cache', N'monitor/cache/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:cache:list', N'redis', N'admin', getdate(), N'', NULL, N'缓存监控菜单')
@@ -1851,8 +1849,6 @@ INSERT [sys_role_menu] ([role_id], [menu_id]) VALUES (2, 1044)
 GO
 INSERT [sys_role_menu] ([role_id], [menu_id]) VALUES (2, 1045)
 GO
-INSERT [sys_role_menu] ([role_id], [menu_id]) VALUES (2, 1050)
-GO
 INSERT [sys_role_menu] ([role_id], [menu_id]) VALUES (2, 1046)
 GO
 INSERT [sys_role_menu] ([role_id], [menu_id]) VALUES (2, 1047)
@@ -2202,6 +2198,7 @@ CREATE TABLE [sys_oss_config]
     [domain]        nvarchar(255) DEFAULT ''    NULL,
     [is_https]      nchar(1)      DEFAULT ('N') NULL,
     [region]        nvarchar(255) DEFAULT ''    NULL,
+    [access_policy] nchar(1)      DEFAULT ('1') NOT NULL,
     [status]        nchar(1)      DEFAULT ('1') NULL,
     [ext1]          nvarchar(255) DEFAULT ''    NULL,
     [create_by]     nvarchar(64)  DEFAULT ''    NULL,
@@ -2277,6 +2274,12 @@ EXEC sp_addextendedproperty
     'COLUMN', N'region'
 GO
 EXEC sp_addextendedproperty
+     'MS_Description', N'桶权限类型(0=private 1=public 2=custom)',
+     'SCHEMA', N'dbo',
+     'TABLE', N'sys_oss_config',
+     'COLUMN', N'access_policy'
+GO
+EXEC sp_addextendedproperty
     'MS_Description', N'状态（0=正常,1=停用）',
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oss_config',
@@ -2324,13 +2327,13 @@ EXEC sp_addextendedproperty
     'TABLE', N'sys_oss_config'
 GO
 
-INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'1', N'minio', N'ruoyi',            N'ruoyi123',        N'ruoyi',            N'', N'127.0.0.1:9000',                    N'',N'N', N'',           N'0', N'', N'admin', getdate(), N'admin', getdate(), NULL)
+INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'1', N'minio', N'ruoyi',            N'ruoyi123',        N'ruoyi',            N'', N'127.0.0.1:9000',                    N'',N'N', N'',           N'1', N'0', N'', N'admin', getdate(), N'admin', getdate(), NULL)
 GO
-INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'2', N'qiniu', N'XXXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N's3-cn-north-1.qiniucs.com',         N'',N'N', N'',           N'1', N'', N'admin', getdate(), N'admin', getdate(), NULL)
+INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'2', N'qiniu', N'XXXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N's3-cn-north-1.qiniucs.com',         N'',N'N', N'',           N'1', N'1', N'', N'admin', getdate(), N'admin', getdate(), NULL)
 GO
-INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'3', N'aliyun', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N'oss-cn-beijing.aliyuncs.com',       N'',N'N', N'',           N'1', N'', N'admin', getdate(), N'admin', getdate(), NULL)
+INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'3', N'aliyun', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N'oss-cn-beijing.aliyuncs.com',       N'',N'N', N'',           N'1', N'1', N'', N'admin', getdate(), N'admin', getdate(), NULL)
 GO
-INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'4', N'qcloud', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi-1250000000', N'', N'cos.ap-beijing.myqcloud.com',       N'',N'N', N'ap-beijing', N'1', N'', N'admin', getdate(), N'admin', getdate(), NULL)
+INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'4', N'qcloud', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi-1250000000', N'', N'cos.ap-beijing.myqcloud.com',       N'',N'N', N'ap-beijing', N'1', N'1', N'', N'admin', getdate(), N'admin', getdate(), NULL)
 GO
-INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'5', N'image',  N'ruoyi',           N'ruoyi123',        N'ruoyi',            N'image', N'127.0.0.1:9000',               N'',N'N', N'',           N'1', N'', N'admin', getdate(), N'admin', getdate(), NULL)
+INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'5', N'image',  N'ruoyi',           N'ruoyi123',        N'ruoyi',            N'image', N'127.0.0.1:9000',               N'',N'N', N'',           N'1', N'1', N'', N'admin', getdate(), N'admin', getdate(), NULL)
 GO

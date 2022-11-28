@@ -260,7 +260,6 @@ insert into sys_menu values('106',  '参数设置', '1',   '7', 'config',     's
 insert into sys_menu values('107',  '通知公告', '1',   '8', 'notice',     'system/notice/index',      '', '1', '0', 'C', '0', '0', 'system:notice:list',      'message',       'admin', now(), '', null, '通知公告菜单');
 insert into sys_menu values('108',  '日志管理', '1',   '9', 'log',        '',                         '', '1', '0', 'M', '0', '0', '',                        'log',           'admin', now(), '', null, '日志管理菜单');
 insert into sys_menu values('109',  '在线用户', '2',   '1', 'online',     'monitor/online/index',     '', '1', '0', 'C', '0', '0', 'monitor:online:list',     'online',        'admin', now(), '', null, '在线用户菜单');
-insert into sys_menu values('111',  '数据监控', '2',   '3', 'druid',      'monitor/druid/index',      '', '1', '0', 'C', '0', '0', 'monitor:druid:list',      'druid',         'admin', now(), '', null, '数据监控菜单');
 insert into sys_menu values('112',  '缓存列表', '2',   '6', 'cacheList',  'monitor/cache/list',       '', '1', '0', 'C', '0', '0', 'monitor:cache:list',      'redis-list',    'admin', now(), '', null, '缓存列表菜单');
 insert into sys_menu values('113',  '缓存监控', '2',   '5', 'cache',      'monitor/cache/index',      '', '1', '0', 'C', '0', '0', 'monitor:cache:list',      'redis',         'admin', now(), '', null, '缓存监控菜单');
 insert into sys_menu values('114',  '表单构建', '3',   '1', 'build',      'tool/build/index',         '', '1', '0', 'C', '0', '0', 'tool:build:list',         'build',         'admin', now(), '', null, '表单构建菜单');
@@ -923,6 +922,7 @@ create table if not exists sys_oss_config
     domain        varchar(255) default ''::varchar,
     is_https      char         default 'N'::bpchar,
     region        varchar(255) default ''::varchar,
+    access_policy char(1)      default '1'::bpchar not null,
     status        char         default '1'::bpchar,
     ext1          varchar(255) default ''::varchar,
     create_by     varchar(64)  default ''::varchar,
@@ -944,6 +944,7 @@ comment on column sys_oss_config.endpoint is '访问站点';
 comment on column sys_oss_config.domain is '自定义域名';
 comment on column sys_oss_config.is_https is '是否https（Y=是,N=否）';
 comment on column sys_oss_config.region is '域';
+comment on column sys_oss_config.access_policy is '桶权限类型(0=private 1=public 2=custom)';
 comment on column sys_oss_config.status is '状态（0=正常,1=停用）';
 comment on column sys_oss_config.ext1 is '扩展字段';
 comment on column sys_oss_config.create_by is '创建者';
@@ -952,11 +953,11 @@ comment on column sys_oss_config.update_by is '更新者';
 comment on column sys_oss_config.update_time is '更新时间';
 comment on column sys_oss_config.remark is '备注';
 
-insert into sys_oss_config values (1, 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                      '','N', '',            '0', '', 'admin', now(), 'admin', now(), null);
-insert into sys_oss_config values (2, 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',           '','N', '',            '1', '', 'admin', now(), 'admin', now(), null);
-insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',         '','N', '',            '1', '', 'admin', now(), 'admin', now(), null);
-insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',         '','N', 'ap-beijing',  '1', '', 'admin', now(), 'admin', now(), null);
-insert into sys_oss_config values (5, 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',                 '','N', '',            '1', '', 'admin', now(), 'admin', now(), NULL);
+insert into sys_oss_config values (1, 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                      '','N', '',            '1', '0', '', 'admin', now(), 'admin', now(), null);
+insert into sys_oss_config values (2, 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',           '','N', '',            '1', '1', '', 'admin', now(), 'admin', now(), null);
+insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',         '','N', '',            '1', '1', '', 'admin', now(), 'admin', now(), null);
+insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',         '','N', 'ap-beijing',  '1', '1', '', 'admin', now(), 'admin', now(), null);
+insert into sys_oss_config values (5, 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',                 '','N', '',            '1', '1', '', 'admin', now(), 'admin', now(), NULL);
 
 -- 字符串自动转时间 避免框架时间查询报错问题
 create or replace function cast_varchar_to_timestamp(varchar) returns timestamptz as $$

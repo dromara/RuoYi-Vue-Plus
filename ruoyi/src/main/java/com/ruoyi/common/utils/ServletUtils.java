@@ -11,6 +11,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -19,6 +20,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 客户端工具类
@@ -68,6 +72,31 @@ public class ServletUtils extends ServletUtil {
      */
     public static Boolean getParameterToBool(String name, Boolean defaultValue) {
         return Convert.toBool(getRequest().getParameter(name), defaultValue);
+    }
+
+    /**
+     * 获得所有请求参数
+     *
+     * @param request 请求对象{@link ServletRequest}
+     * @return Map
+     */
+    public static Map<String, String[]> getParams(ServletRequest request) {
+        final Map<String, String[]> map = request.getParameterMap();
+        return Collections.unmodifiableMap(map);
+    }
+
+    /**
+     * 获得所有请求参数
+     *
+     * @param request 请求对象{@link ServletRequest}
+     * @return Map
+     */
+    public static Map<String, String> getParamMap(ServletRequest request) {
+        Map<String, String> params = new HashMap<>();
+        for (Map.Entry<String, String[]> entry : getParams(request).entrySet()) {
+            params.put(entry.getKey(), StringUtils.join(entry.getValue(), ","));
+        }
+        return params;
     }
 
     /**

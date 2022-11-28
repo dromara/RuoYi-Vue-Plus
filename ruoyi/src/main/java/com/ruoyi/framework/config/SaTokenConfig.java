@@ -5,8 +5,6 @@ import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
-import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.framework.config.properties.ExcludeUrlProperties;
 import com.ruoyi.framework.config.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,14 +32,10 @@ public class SaTokenConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册路由拦截器，自定义验证规则
         registry.addInterceptor(new SaInterceptor(handler -> {
-            // 自定义注解 @Anonymous 匿名访问配置，后续版本将删除
-            ExcludeUrlProperties excludeUrlProperties = SpringUtils.getBean(ExcludeUrlProperties.class);
             // 登录验证 -- 排除多个路径
             SaRouter
                 // 获取所有的
                 .match("/**")
-                // 排除下不需要拦截的（每次匹配）
-                .notMatch(excludeUrlProperties.getExcludes())
                 // 对未排除的路径进行检查
                 .check(() -> {
                     // 检查是否登录 是否有token

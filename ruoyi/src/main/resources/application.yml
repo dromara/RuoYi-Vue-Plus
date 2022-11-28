@@ -115,8 +115,6 @@ sa-token:
   token-prefix: "Bearer"
   # jwt秘钥
   jwt-secret-key: abcdefghijklmnopqrstuvwxyz
-  # 是否输出操作日志
-  is-log: true
 
 # security配置
 security:
@@ -131,8 +129,6 @@ security:
     - /favicon.ico
     - /*/api-docs
     - /*/api-docs/**
-    # druid 监控配置
-    - /druid/**
     # actuator 监控配置
     - /actuator
     - /actuator/**
