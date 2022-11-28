@@ -2,7 +2,7 @@ version: '3'
 
 services:
   mysql:
-    image: mysql:8.0.29
+    image: mysql:8.0.31
     container_name: mysql
     environment:
       # 时区上海
