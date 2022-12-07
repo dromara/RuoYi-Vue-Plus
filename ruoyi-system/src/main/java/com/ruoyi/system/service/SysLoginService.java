@@ -7,11 +7,11 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.core.domain.event.LogininforEvent;
 import com.ruoyi.common.core.domain.dto.RoleDTO;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.XcxLoginUser;
-import com.ruoyi.common.core.service.LogininforService;
 import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.LoginType;
 import com.ruoyi.common.enums.UserStatus;
@@ -24,6 +24,7 @@ import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +47,6 @@ public class SysLoginService {
 
     private final ISysUserService userService;
     private final ISysConfigService configService;
-    private final LogininforService asyncService;
     private final SysPermissionService permissionService;
 
     @Value("${user.password.maxRetryCount}")
@@ -141,7 +141,12 @@ public class SysLoginService {
      * @return
      */
     private void recordLogininfor(String username, String status, String message) {
-        asyncService.recordLogininfor(username, status, message, ServletUtils.getRequest());
+        LogininforEvent logininforDTO = new LogininforEvent();
+        logininforDTO.setUsername(username);
+        logininforDTO.setStatus(status);
+        logininforDTO.setMessage(message);
+        logininforDTO.setRequest(ServletUtils.getRequest());
+        SpringUtils.context().publishEvent(logininforDTO);
     }
 
     /**

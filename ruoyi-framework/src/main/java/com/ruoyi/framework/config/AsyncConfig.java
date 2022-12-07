@@ -18,7 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
  *
  * @author Lion Li
  */
-@EnableAsync
+@EnableAsync(proxyTargetClass = true)
 @Configuration
 public class AsyncConfig extends AsyncConfigurerSupport {
 
