@@ -13,7 +13,6 @@ import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysLoginService;
-import com.ruoyi.system.service.SysPermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +38,6 @@ public class SysLoginController {
     private final SysLoginService loginService;
     private final ISysMenuService menuService;
     private final ISysUserService userService;
-    private final SysPermissionService permissionService;
 
     /**
      * 登录方法
