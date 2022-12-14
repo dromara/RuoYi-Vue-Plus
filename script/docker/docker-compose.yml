@@ -78,9 +78,9 @@ services:
       # 时区上海
       TZ: Asia/Shanghai
       # 管理后台用户名
-      MINIO_ACCESS_KEY: ruoyi
+      MINIO_ROOT_USER: ruoyi
       # 管理后台密码，最小8个字符
-      MINIO_SECRET_KEY: ruoyi123
+      MINIO_ROOT_PASSWORD: ruoyi123
       # https需要指定域名
       #MINIO_SERVER_URL: "https://xxx.com:9000"
       #MINIO_BROWSER_REDIRECT_URL: "https://xxx.com:9001"
