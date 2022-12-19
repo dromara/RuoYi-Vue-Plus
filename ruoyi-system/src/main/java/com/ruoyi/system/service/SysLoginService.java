@@ -141,12 +141,12 @@ public class SysLoginService {
      * @return
      */
     private void recordLogininfor(String username, String status, String message) {
-        LogininforEvent logininforDTO = new LogininforEvent();
-        logininforDTO.setUsername(username);
-        logininforDTO.setStatus(status);
-        logininforDTO.setMessage(message);
-        logininforDTO.setRequest(ServletUtils.getRequest());
-        SpringUtils.context().publishEvent(logininforDTO);
+        LogininforEvent logininforEvent = new LogininforEvent();
+        logininforEvent.setUsername(username);
+        logininforEvent.setStatus(status);
+        logininforEvent.setMessage(message);
+        logininforEvent.setRequest(ServletUtils.getRequest());
+        SpringUtils.context().publishEvent(logininforEvent);
     }
 
     /**
