@@ -210,6 +210,15 @@ public class RedisUtils {
     }
 
     /**
+     * 检查缓存对象是否存在
+     *
+     * @param key 缓存的键值
+     */
+    public static boolean isExistsObject(final String key) {
+        return CLIENT.getBucket(key).isExists();
+    }
+
+    /**
      * 缓存List数据
      *
      * @param key      缓存的键值
