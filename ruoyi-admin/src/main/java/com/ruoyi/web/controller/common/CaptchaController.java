@@ -3,7 +3,6 @@ package com.ruoyi.web.controller.common;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.ruoyi.common.constant.CacheConstants;
@@ -21,6 +20,9 @@ import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -95,28 +97,16 @@ public class CaptchaController {
         AbstractCaptcha captcha = SpringUtils.getBean(captchaProperties.getCategory().getClazz());
         captcha.setGenerator(codeGenerator);
         captcha.createCode();
-        String code = isMath ? getCodeResult(captcha.getCode()) : captcha.getCode();
+        String code = captcha.getCode();
+        if (isMath) {
+            ExpressionParser parser = new SpelExpressionParser();
+            Expression exp = parser.parseExpression(StringUtils.remove(code, "="));
+            code = exp.getValue(String.class);
+        }
         RedisUtils.setCacheObject(verifyKey, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         ajax.put("uuid", uuid);
         ajax.put("img", captcha.getImageBase64());
         return R.ok(ajax);
-    }
-
-    private String getCodeResult(String capStr) {
-        int numberLength = captchaProperties.getNumberLength();
-        int a = Convert.toInt(StringUtils.substring(capStr, 0, numberLength).trim());
-        char operator = capStr.charAt(numberLength);
-        int b = Convert.toInt(StringUtils.substring(capStr, numberLength + 1, numberLength + 1 + numberLength).trim());
-        switch (operator) {
-            case '*':
-                return Convert.toStr(a * b);
-            case '+':
-                return Convert.toStr(a + b);
-            case '-':
-                return Convert.toStr(a - b);
-            default:
-                return StringUtils.EMPTY;
-        }
     }
 
 }
