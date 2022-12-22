@@ -129,6 +129,10 @@ security:
     - /favicon.ico
     - /*/api-docs
     - /*/api-docs/**
+    - /swagger-ui/**
+    - /webjars/**
+    - /swagger-ui.html
+    - /doc.html
     # actuator 监控配置
     - /actuator
     - /actuator/**
@@ -202,6 +206,9 @@ swagger:
         name: ${sa-token.token-name}
 
 springdoc:
+  swagger-ui:
+    # 持久化认证数据
+    persistAuthorization: true
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
     - group: 1.演示模块
