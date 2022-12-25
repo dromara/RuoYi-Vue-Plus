@@ -1,6 +1,5 @@
 package com.ruoyi.common.core.domain.dto;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
