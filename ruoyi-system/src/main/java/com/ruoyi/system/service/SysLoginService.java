@@ -5,6 +5,7 @@ import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.event.LogininforEvent;
@@ -25,6 +26,7 @@ import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.system.mapper.SysUserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,7 +47,7 @@ import java.util.function.Supplier;
 @Service
 public class SysLoginService {
 
-    private final ISysUserService userService;
+    private final SysUserMapper userMapper;
     private final ISysConfigService configService;
     private final SysPermissionService permissionService;
 
@@ -183,33 +185,31 @@ public class SysLoginService {
     }
 
     private SysUser loadUserByUsername(String username) {
-        SysUser user = userService.selectUserByUserName(username);
+        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+            .select(SysUser::getUserName, SysUser::getStatus)
+            .eq(SysUser::getUserName, username));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", username);
             throw new UserException("user.not.exists", username);
-        } else if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {
-            log.info("登录用户：{} 已被删除.", username);
-            throw new UserException("user.password.delete", username);
         } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", username);
             throw new UserException("user.blocked", username);
         }
-        return user;
+        return userMapper.selectUserByUserName(username);
     }
 
     private SysUser loadUserByPhonenumber(String phonenumber) {
-        SysUser user = userService.selectUserByPhonenumber(phonenumber);
+        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+            .select(SysUser::getPhonenumber, SysUser::getStatus)
+            .eq(SysUser::getPhonenumber, phonenumber));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", phonenumber);
             throw new UserException("user.not.exists", phonenumber);
-        } else if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {
-            log.info("登录用户：{} 已被删除.", phonenumber);
-            throw new UserException("user.password.delete", phonenumber);
         } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", phonenumber);
             throw new UserException("user.blocked", phonenumber);
         }
-        return user;
+        return userMapper.selectUserByPhonenumber(phonenumber);
     }
 
     private SysUser loadUserByOpenid(String openid) {
@@ -219,9 +219,6 @@ public class SysLoginService {
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", openid);
             // todo 用户不存在 业务逻辑自行实现
-        } else if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {
-            log.info("登录用户：{} 已被删除.", openid);
-            // todo 用户已被删除 业务逻辑自行实现
         } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", openid);
             // todo 用户已被停用 业务逻辑自行实现
@@ -257,7 +254,7 @@ public class SysLoginService {
         sysUser.setLoginIp(ServletUtils.getClientIP());
         sysUser.setLoginDate(DateUtils.getNowDate());
         sysUser.setUpdateBy(username);
-        userService.updateUserProfile(sysUser);
+        userMapper.updateById(sysUser);
     }
 
     /**
