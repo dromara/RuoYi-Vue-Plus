@@ -83,6 +83,9 @@ spring:
     restart:
       # 热部署开关
       enabled: true
+  mvc:
+    format:
+      date-time: yyyy-MM-dd HH:mm:ss
   jackson:
     # 日期格式化
     date-format: yyyy-MM-dd HH:mm:ss
