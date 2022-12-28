@@ -27,7 +27,7 @@
         <satoken.version>1.33.0</satoken.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.8.10</hutool.version>
+        <hutool.version>5.8.11</hutool.version>
         <okhttp.version>4.10.0</okhttp.version>
         <spring-boot-admin.version>2.7.9</spring-boot-admin.version>
         <redisson.version>3.19.0</redisson.version>
@@ -41,10 +41,10 @@
         <snakeyaml.version>1.33</snakeyaml.version>
 
         <!-- OSS 配置 -->
-        <aws-java-sdk-s3.version>1.12.349</aws-java-sdk-s3.version>
+        <aws-java-sdk-s3.version>1.12.373</aws-java-sdk-s3.version>
         <!-- SMS 配置 -->
-        <aliyun.sms.version>2.0.22</aliyun.sms.version>
-        <tencent.sms.version>3.1.635</tencent.sms.version>
+        <aliyun.sms.version>2.0.23</aliyun.sms.version>
+        <tencent.sms.version>3.1.660</tencent.sms.version>
     </properties>
 
     <!-- 依赖声明 -->
