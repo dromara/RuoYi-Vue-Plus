@@ -25,7 +25,7 @@
         <easyexcel.version>3.1.4</easyexcel.version>
         <velocity.version>2.3</velocity.version>
         <satoken.version>1.33.0</satoken.version>
-        <mybatis-plus.version>3.5.2</mybatis-plus.version>
+        <mybatis-plus.version>3.5.3</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.11</hutool.version>
         <okhttp.version>4.10.0</okhttp.version>
@@ -147,11 +147,7 @@
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-extension</artifactId>
-                <version>${mybatis-plus.version}</version>
-            </dependency>
+
             <!-- sql性能分析插件 -->
             <dependency>
                 <groupId>p6spy</groupId>

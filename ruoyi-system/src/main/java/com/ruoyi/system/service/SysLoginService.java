@@ -261,7 +261,6 @@ public class SysLoginService {
      * 登录校验
      */
     private void checkLogin(LoginType loginType, String username, Supplier<Boolean> supplier) {
-        HttpServletRequest request = ServletUtils.getRequest();
         String errorKey = CacheConstants.PWD_ERR_CNT_KEY + username;
         String loginFail = Constants.LOGIN_FAIL;
 
