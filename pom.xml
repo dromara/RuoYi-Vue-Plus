@@ -47,6 +47,36 @@
         <tencent.sms.version>3.1.660</tencent.sms.version>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>local</id>
+            <properties>
+                <!-- 环境标识，需要与配置文件的名称相对应 -->
+                <profiles.active>local</profiles.active>
+                <logging.level>debug</logging.level>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <!-- 环境标识，需要与配置文件的名称相对应 -->
+                <profiles.active>dev</profiles.active>
+                <logging.level>debug</logging.level>
+            </properties>
+            <activation>
+                <!-- 默认环境 -->
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profiles.active>prod</profiles.active>
+                <logging.level>warn</logging.level>
+            </properties>
+        </profile>
+    </profiles>
+
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
@@ -382,36 +412,6 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
-    <profiles>
-        <profile>
-            <id>local</id>
-            <properties>
-                <!-- 环境标识，需要与配置文件的名称相对应 -->
-                <profiles.active>local</profiles.active>
-                <logging.level>debug</logging.level>
-            </properties>
-        </profile>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <!-- 环境标识，需要与配置文件的名称相对应 -->
-                <profiles.active>dev</profiles.active>
-                <logging.level>debug</logging.level>
-            </properties>
-            <activation>
-                <!-- 默认环境 -->
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <profiles.active>prod</profiles.active>
-                <logging.level>warn</logging.level>
-            </properties>
-        </profile>
-    </profiles>
 
 </project>
 
