@@ -81,12 +81,18 @@ public class LoginHelper {
         LoginUser loginUser = getLoginUser();
         if (ObjectUtil.isNull(loginUser)) {
             String loginId = StpUtil.getLoginIdAsString();
-            String[] strs = StringUtils.split(loginId, JOIN_CODE);
-            if (!ArrayUtil.containsAny(strs, UserType.values())) {
+            String userId = null;
+            for (UserType value : UserType.values()) {
+                if (StringUtils.contains(loginId, value.getUserType())) {
+                    String[] strs = StringUtils.split(loginId, JOIN_CODE);
+                    // 用户id在总是在最后
+                    userId = strs[strs.length - 1];
+                }
+            }
+            if (StringUtils.isBlank(userId)) {
                 throw new UtilException("登录用户: LoginId异常 => " + loginId);
             }
-            // 用户id在总是在最后
-            return Long.parseLong(strs[strs.length - 1]);
+            return Long.parseLong(userId);
         }
         return loginUser.getUserId();
     }
