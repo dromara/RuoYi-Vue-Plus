@@ -132,10 +132,6 @@ security:
     - /favicon.ico
     - /*/api-docs
     - /*/api-docs/**
-    - /swagger-ui/**
-    - /webjars/**
-    - /swagger-ui.html
-    - /doc.html
     # actuator 监控配置
     - /actuator
     - /actuator/**
