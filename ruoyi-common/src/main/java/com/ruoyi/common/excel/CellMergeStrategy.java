@@ -86,7 +86,7 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
 						// 空值跳过不合并
 						continue;
 					}
-					if (cellValue != val) {
+					if (!cellValue.equals(val)) {
 						if (i - repeatCell.getCurrent() > 1) {
 							cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex - 1, colNum, colNum));
 						}

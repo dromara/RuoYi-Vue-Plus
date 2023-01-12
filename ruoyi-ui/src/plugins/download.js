@@ -21,7 +21,7 @@ export default {
       const isLogin = await blobValidate(res.data);
       if (isLogin) {
         const blob = new Blob([res.data], { type: 'application/octet-stream' })
-        this.saveAs(blob, decodeURI(res.headers['download-filename']))
+        this.saveAs(blob, decodeURIComponent(res.headers['download-filename']))
       } else {
         this.printErrMsg(res.data);
       }

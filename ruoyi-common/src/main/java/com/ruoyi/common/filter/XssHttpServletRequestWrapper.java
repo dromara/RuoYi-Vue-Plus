@@ -33,12 +33,12 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         String[] values = super.getParameterValues(name);
         if (values != null) {
             int length = values.length;
-            String[] escapseValues = new String[length];
+            String[] escapesValues = new String[length];
             for (int i = 0; i < length; i++) {
                 // 防xss攻击和过滤前后空格
-                escapseValues[i] = HtmlUtil.cleanHtmlTag(values[i]).trim();
+                escapesValues[i] = HtmlUtil.cleanHtmlTag(values[i]).trim();
             }
-            return escapseValues;
+            return escapesValues;
         }
         return super.getParameterValues(name);
     }

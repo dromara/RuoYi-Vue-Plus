@@ -3,12 +3,11 @@ package com.ruoyi.generator.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.lang.Snowflake;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
@@ -58,6 +57,7 @@ public class GenTableServiceImpl implements IGenTableService {
 
     private final GenTableMapper baseMapper;
     private final GenTableColumnMapper genTableColumnMapper;
+    private final IdentifierGenerator identifierGenerator;
 
     /**
      * 查询业务字段列表
@@ -205,10 +205,9 @@ public class GenTableServiceImpl implements IGenTableService {
         Map<String, String> dataMap = new LinkedHashMap<>();
         // 查询表信息
         GenTable table = baseMapper.selectGenTableById(tableId);
-        Snowflake snowflake = IdUtil.getSnowflake();
         List<Long> menuIds = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
-            menuIds.add(snowflake.nextId());
+            menuIds.add(identifierGenerator.nextId(null).longValue());
         }
         table.setMenuIds(menuIds);
         // 设置主子表信息
@@ -356,10 +355,9 @@ public class GenTableServiceImpl implements IGenTableService {
     private void generatorCode(String tableName, ZipOutputStream zip) {
         // 查询表信息
         GenTable table = baseMapper.selectGenTableByName(tableName);
-        Snowflake snowflake = IdUtil.getSnowflake();
         List<Long> menuIds = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
-            menuIds.add(snowflake.nextId());
+            menuIds.add(identifierGenerator.nextId(null).longValue());
         }
         table.setMenuIds(menuIds);
         // 设置主子表信息
