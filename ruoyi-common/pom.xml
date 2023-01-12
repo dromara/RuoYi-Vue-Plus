@@ -146,7 +146,6 @@
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-data-27</artifactId>
-            <version>${redisson.version}</version>
         </dependency>
 
         <dependency>
