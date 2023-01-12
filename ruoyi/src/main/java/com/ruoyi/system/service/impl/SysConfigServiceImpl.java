@@ -138,6 +138,10 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     public String updateConfig(SysConfig config) {
         int row = 0;
         if (config.getConfigId() != null) {
+            SysConfig temp = baseMapper.selectById(config.getConfigId());
+            if (!StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
+                CacheUtils.evict(CacheNames.SYS_CONFIG, temp.getConfigKey());
+            }
             row = baseMapper.updateById(config);
         } else {
             row = baseMapper.update(config, new LambdaQueryWrapper<SysConfig>()

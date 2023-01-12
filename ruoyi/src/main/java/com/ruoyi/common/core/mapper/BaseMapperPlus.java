@@ -4,16 +4,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
+import com.baomidou.mybatisplus.extension.toolkit.Db;
 import com.ruoyi.common.utils.BeanCopyUtils;
-import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 
@@ -21,7 +17,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 自定义 Mapper 接口, 实现 自定义扩展
@@ -36,8 +31,6 @@ import java.util.Objects;
 public interface BaseMapperPlus<M, T, V> extends BaseMapper<T> {
 
     Log log = LogFactory.getLog(BaseMapperPlus.class);
-
-    int DEFAULT_BATCH_SIZE = 1000;
 
     default Class<V> currentVoClass() {
         return (Class<V>) ReflectionKit.getSuperClassGenericType(this.getClass(), BaseMapperPlus.class, 2);
@@ -59,79 +52,49 @@ public interface BaseMapperPlus<M, T, V> extends BaseMapper<T> {
      * 批量插入
      */
     default boolean insertBatch(Collection<T> entityList) {
-        return insertBatch(entityList, DEFAULT_BATCH_SIZE);
+        return Db.saveBatch(entityList);
     }
 
     /**
      * 批量更新
      */
     default boolean updateBatchById(Collection<T> entityList) {
-        return updateBatchById(entityList, DEFAULT_BATCH_SIZE);
+        return Db.updateBatchById(entityList);
     }
 
     /**
      * 批量插入或更新
      */
     default boolean insertOrUpdateBatch(Collection<T> entityList) {
-        return insertOrUpdateBatch(entityList, DEFAULT_BATCH_SIZE);
+        return Db.saveOrUpdateBatch(entityList);
     }
 
     /**
      * 批量插入(包含限制条数)
      */
     default boolean insertBatch(Collection<T> entityList, int batchSize) {
-        String sqlStatement = SqlHelper.getSqlStatement(this.currentMapperClass(), SqlMethod.INSERT_ONE);
-        return SqlHelper.executeBatch(this.currentModelClass(), log, entityList, batchSize,
-            (sqlSession, entity) -> sqlSession.insert(sqlStatement, entity));
+        return Db.saveBatch(entityList, batchSize);
     }
 
     /**
      * 批量更新(包含限制条数)
      */
     default boolean updateBatchById(Collection<T> entityList, int batchSize) {
-        String sqlStatement = SqlHelper.getSqlStatement(this.currentMapperClass(), SqlMethod.UPDATE_BY_ID);
-        return SqlHelper.executeBatch(this.currentModelClass(), log, entityList, batchSize,
-            (sqlSession, entity) -> {
-                MapperMethod.ParamMap<T> param = new MapperMethod.ParamMap<>();
-                param.put(Constants.ENTITY, entity);
-                sqlSession.update(sqlStatement, param);
-            });
+        return Db.updateBatchById(entityList, batchSize);
     }
 
     /**
      * 批量插入或更新(包含限制条数)
      */
     default boolean insertOrUpdateBatch(Collection<T> entityList, int batchSize) {
-        TableInfo tableInfo = TableInfoHelper.getTableInfo(this.currentModelClass());
-        Assert.notNull(tableInfo, "error: can not execute. because can not find cache of TableInfo for entity!");
-        String keyProperty = tableInfo.getKeyProperty();
-        Assert.notEmpty(keyProperty, "error: can not execute. because can not find column for id from entity!");
-        return SqlHelper.saveOrUpdateBatch(this.currentModelClass(), this.currentMapperClass(), log, entityList, batchSize, (sqlSession, entity) -> {
-            Object idVal = tableInfo.getPropertyValue(entity, keyProperty);
-            String sqlStatement = SqlHelper.getSqlStatement(this.currentMapperClass(), SqlMethod.SELECT_BY_ID);
-            return StringUtils.checkValNull(idVal)
-                || CollectionUtils.isEmpty(sqlSession.selectList(sqlStatement, entity));
-        }, (sqlSession, entity) -> {
-            MapperMethod.ParamMap<T> param = new MapperMethod.ParamMap<>();
-            param.put(Constants.ENTITY, entity);
-            String sqlStatement = SqlHelper.getSqlStatement(this.currentMapperClass(), SqlMethod.UPDATE_BY_ID);
-            sqlSession.update(sqlStatement, param);
-        });
+        return Db.saveOrUpdateBatch(entityList, batchSize);
     }
 
     /**
      * 插入或更新(包含限制条数)
      */
     default boolean insertOrUpdate(T entity) {
-        if (null != entity) {
-            TableInfo tableInfo = TableInfoHelper.getTableInfo(this.currentModelClass());
-            Assert.notNull(tableInfo, "error: can not execute. because can not find cache of TableInfo for entity!");
-            String keyProperty = tableInfo.getKeyProperty();
-            Assert.notEmpty(keyProperty, "error: can not execute. because can not find column for id from entity!");
-            Object idVal = tableInfo.getPropertyValue(entity, tableInfo.getKeyProperty());
-            return StringUtils.checkValNull(idVal) || Objects.isNull(selectById((Serializable) idVal)) ? insert(entity) > 0 : updateById(entity) > 0;
-        }
-        return false;
+        return Db.saveOrUpdate(entity);
     }
 
     default V selectVoById(Serializable id) {
