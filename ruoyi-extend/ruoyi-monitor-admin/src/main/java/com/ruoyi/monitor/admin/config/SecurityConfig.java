@@ -2,6 +2,7 @@ package com.ruoyi.monitor.admin.config;
 
 import de.codecentric.boot.admin.server.config.AdminServerProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -13,6 +14,7 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
  * @author Lion Li
  */
 @EnableWebSecurity
+@Configuration
 public class SecurityConfig {
 
     private final String adminContextPath;
@@ -29,8 +31,8 @@ public class SecurityConfig {
 
         return httpSecurity
                 .headers().frameOptions().disable()
-                .and().authorizeRequests()
-                .antMatchers(adminContextPath + "/assets/**"
+                .and().authorizeHttpRequests()
+                .requestMatchers(adminContextPath + "/assets/**"
                     , adminContextPath + "/login"
                     , "/actuator"
                     , "/actuator/**"
