@@ -6,6 +6,7 @@ import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -18,6 +19,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 // @Accessors(chain = true) // 导入不允许使用 会找不到set方法
 public class SysUserImportVo implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

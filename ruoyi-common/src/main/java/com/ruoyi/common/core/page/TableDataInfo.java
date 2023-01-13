@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -17,6 +18,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class TableDataInfo<T> implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

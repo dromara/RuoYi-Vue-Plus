@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class TreeEntity<T> extends BaseEntity {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

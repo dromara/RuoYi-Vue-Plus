@@ -9,6 +9,7 @@ import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +25,8 @@ import java.util.Map;
 @TableName("sys_logininfor")
 @ExcelIgnoreUnannotated
 public class SysLogininfor implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

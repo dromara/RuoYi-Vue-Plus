@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
+
 /**
  * 基础异常
  *
@@ -15,6 +17,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class BaseException extends RuntimeException {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

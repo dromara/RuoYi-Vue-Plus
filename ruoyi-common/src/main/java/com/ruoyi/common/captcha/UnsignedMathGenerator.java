@@ -6,6 +6,8 @@ import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.ruoyi.common.utils.StringUtils;
 
+import java.io.Serial;
+
 /**
  * 无符号计算生成器
  *
@@ -13,6 +15,7 @@ import com.ruoyi.common.utils.StringUtils;
  */
 public class UnsignedMathGenerator implements CodeGenerator {
 
+    @Serial
     private static final long serialVersionUID = -5514819971774091076L;
 
     private static final String OPERATORS = "+-*";

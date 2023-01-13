@@ -5,6 +5,8 @@ import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
+
 /**
  * 测试单表对象 test_demo
  *
@@ -16,8 +18,8 @@ import lombok.EqualsAndHashCode;
 @TableName("test_demo")
 public class TestDemo extends BaseEntity {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-
 
     /**
      * 主键

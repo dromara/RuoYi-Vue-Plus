@@ -1,5 +1,7 @@
 package com.ruoyi.sms.exception;
 
+import java.io.Serial;
+
 /**
  * Sms异常类
  *
@@ -7,6 +9,7 @@ package com.ruoyi.sms.exception;
  */
 public class SmsException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public SmsException(String msg) {

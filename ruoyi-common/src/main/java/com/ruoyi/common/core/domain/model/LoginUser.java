@@ -5,6 +5,7 @@ import com.ruoyi.common.helper.LoginHelper;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class LoginUser implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

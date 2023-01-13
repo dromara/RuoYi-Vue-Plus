@@ -3,6 +3,9 @@ package com.ruoyi.system.domain.vo;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 
 /**
  * 对象存储配置视图对象 sys_oss_config
@@ -13,8 +16,9 @@ import lombok.Data;
  */
 @Data
 @ExcelIgnoreUnannotated
-public class SysOssConfigVo {
+public class SysOssConfigVo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

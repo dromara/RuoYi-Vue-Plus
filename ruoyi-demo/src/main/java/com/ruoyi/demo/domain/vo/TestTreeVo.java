@@ -4,6 +4,8 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 
 
@@ -15,8 +17,9 @@ import java.util.Date;
  */
 @Data
 @ExcelIgnoreUnannotated
-public class TestTreeVo {
+public class TestTreeVo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
