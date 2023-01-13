@@ -11,8 +11,8 @@ import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import javax.mail.Authenticator;
-import javax.mail.Session;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Session;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
