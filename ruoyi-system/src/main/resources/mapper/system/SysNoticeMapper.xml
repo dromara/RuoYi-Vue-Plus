@@ -4,17 +4,4 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysNoticeMapper">
 
-    <resultMap type="SysNotice" id="SysNoticeResult">
-        <result property="noticeId" column="notice_id"/>
-        <result property="noticeTitle" column="notice_title"/>
-        <result property="noticeType" column="notice_type"/>
-        <result property="noticeContent" column="notice_content"/>
-        <result property="status" column="status"/>
-        <result property="createBy" column="create_by"/>
-        <result property="createTime" column="create_time"/>
-        <result property="updateBy" column="update_by"/>
-        <result property="updateTime" column="update_time"/>
-        <result property="remark" column="remark"/>
-    </resultMap>
-
 </mapper>

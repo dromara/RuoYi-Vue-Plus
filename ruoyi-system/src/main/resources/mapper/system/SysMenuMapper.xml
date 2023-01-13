@@ -4,30 +4,10 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysMenuMapper">
 
-    <resultMap type="SysMenu" id="SysMenuResult">
-        <id property="menuId" column="menu_id"/>
-        <result property="menuName" column="menu_name"/>
-        <result property="parentName" column="parent_name"/>
-        <result property="parentId" column="parent_id"/>
-        <result property="orderNum" column="order_num"/>
-        <result property="path" column="path"/>
-        <result property="component" column="component"/>
-        <result property="queryParam" column="query_param"/>
-        <result property="isFrame" column="is_frame"/>
-        <result property="isCache" column="is_cache"/>
-        <result property="menuType" column="menu_type"/>
-        <result property="visible" column="visible"/>
-        <result property="status" column="status"/>
-        <result property="perms" column="perms"/>
-        <result property="icon" column="icon"/>
-        <result property="createBy" column="create_by"/>
-        <result property="createTime" column="create_time"/>
-        <result property="updateTime" column="update_time"/>
-        <result property="updateBy" column="update_by"/>
-        <result property="remark" column="remark"/>
+    <resultMap type="com.ruoyi.common.core.domain.entity.SysMenu" id="SysMenuResult">
     </resultMap>
 
-    <select id="selectMenuListByUserId" parameterType="SysMenu" resultMap="SysMenuResult">
+    <select id="selectMenuListByUserId" resultMap="SysMenuResult">
         select distinct m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.query_param, m.visible, m.status,
         m.perms, m.is_frame, m.is_cache, m.menu_type, m.icon, m.order_num, m.create_time
         from sys_menu m

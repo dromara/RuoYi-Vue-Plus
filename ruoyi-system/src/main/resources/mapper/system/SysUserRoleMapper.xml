@@ -4,10 +4,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysUserRoleMapper">
 
-    <resultMap type="SysUserRole" id="SysUserRoleResult">
-        <result property="userId" column="user_id"/>
-        <result property="roleId" column="role_id"/>
-    </resultMap>
     <select id="selectUserIdsByRoleId" resultType="Long">
         select u.user_id from sys_user u
         inner join sys_user_role sur
