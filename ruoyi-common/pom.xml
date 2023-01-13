@@ -124,18 +124,12 @@
 
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-webmvc-core</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-javadoc</artifactId>
-        </dependency>
-
-        <!--  自动生成YML配置关联JSON文件  -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
+            <groupId>com.github.therapi</groupId>
+            <artifactId>therapi-runtime-javadoc</artifactId>
         </dependency>
 
         <!--redisson-->
@@ -145,13 +139,20 @@
         </dependency>
 
         <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson-spring-data-27</artifactId>
+            <groupId>com.baomidou</groupId>
+            <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!--  自动生成YML配置关联JSON文件  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-properties-migrator</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
     </dependencies>
