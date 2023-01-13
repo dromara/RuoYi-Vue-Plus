@@ -2,7 +2,7 @@ package com.ruoyi.common.core.domain.event;
 
 import lombok.Data;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 
 /**

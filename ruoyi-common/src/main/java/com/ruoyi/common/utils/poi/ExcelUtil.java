@@ -20,8 +20,8 @@ import com.ruoyi.common.utils.file.FileUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

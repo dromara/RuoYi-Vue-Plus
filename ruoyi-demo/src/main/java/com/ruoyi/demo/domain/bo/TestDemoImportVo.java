@@ -3,8 +3,8 @@ package com.ruoyi.demo.domain.bo;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 测试单表业务对象 test_demo

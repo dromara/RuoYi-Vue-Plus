@@ -2,7 +2,7 @@ package com.ruoyi.common.core.domain.model;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 短信登录对象

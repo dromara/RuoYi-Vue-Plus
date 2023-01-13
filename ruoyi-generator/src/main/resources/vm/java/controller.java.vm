@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import lombok.RequiredArgsConstructor;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.*;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
