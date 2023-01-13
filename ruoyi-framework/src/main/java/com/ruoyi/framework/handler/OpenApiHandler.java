@@ -9,16 +9,15 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springdoc.core.OpenAPIService;
-import org.springdoc.core.PropertyResolverUtils;
-import org.springdoc.core.SecurityService;
-import org.springdoc.core.SpringDocConfigProperties;
 import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
 import org.springdoc.core.customizers.ServerBaseUrlCustomizer;
+import org.springdoc.core.properties.SpringDocConfigProperties;
 import org.springdoc.core.providers.JavadocProvider;
+import org.springdoc.core.service.OpenAPIService;
+import org.springdoc.core.service.SecurityService;
+import org.springdoc.core.utils.PropertyResolverUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.CollectionUtils;
@@ -34,18 +33,14 @@ import java.util.stream.Stream;
  * 自定义 openapi 处理器
  * 对源码功能进行修改 增强使用
  */
+@Slf4j
 @SuppressWarnings("all")
 public class OpenApiHandler extends OpenAPIService {
 
     /**
-     * The constant LOGGER.
+     * The Basic error controller.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenAPIService.class);
-
-    /**
-     * The Context.
-     */
-    private ApplicationContext context;
+    private static Class<?> basicErrorController;
 
     /**
      * The Security parser.
@@ -60,7 +55,7 @@ public class OpenApiHandler extends OpenAPIService {
     /**
      * The Springdoc tags.
      */
-    private final Map<HandlerMethod, io.swagger.v3.oas.models.tags.Tag> springdocTags = new HashMap<>();
+    private final Map<HandlerMethod, Tag> springdocTags = new HashMap<>();
 
     /**
      * The Open api builder customisers.
@@ -78,24 +73,9 @@ public class OpenApiHandler extends OpenAPIService {
     private final SpringDocConfigProperties springDocConfigProperties;
 
     /**
-     * The Open api.
-     */
-    private OpenAPI openAPI;
-
-    /**
      * The Cached open api map.
      */
     private final Map<String, OpenAPI> cachedOpenAPI = new HashMap<>();
-
-    /**
-     * The Is servers present.
-     */
-    private boolean isServersPresent;
-
-    /**
-     * The Server base url.
-     */
-    private String serverBaseUrl;
 
     /**
      * The Property resolver utils.
@@ -108,24 +88,24 @@ public class OpenApiHandler extends OpenAPIService {
     private final Optional<JavadocProvider> javadocProvider;
 
     /**
-     * The Basic error controller.
+     * The Context.
      */
-    private static Class<?> basicErrorController;
+    private ApplicationContext context;
 
-    static {
-        try {
-            //spring-boot 2
-            basicErrorController = Class.forName("org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController");
-        } catch (ClassNotFoundException e) {
-            //spring-boot 1
-            try {
-                basicErrorController = Class.forName("org.springframework.boot.autoconfigure.web.BasicErrorController");
-            } catch (ClassNotFoundException classNotFoundException) {
-                //Basic error controller class not found
-                LOGGER.trace(classNotFoundException.getMessage());
-            }
-        }
-    }
+    /**
+     * The Open api.
+     */
+    private OpenAPI openAPI;
+
+    /**
+     * The Is servers present.
+     */
+    private boolean isServersPresent;
+
+    /**
+     * The Server base url.
+     */
+    private String serverBaseUrl;
 
     /**
      * Instantiates a new Open api builder.
