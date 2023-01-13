@@ -265,70 +265,6 @@
 #end
 #end
 #end
-#if($table.sub)
-        <el-divider content-position="center">${subTable.functionName}信息</el-divider>
-        <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button type="primary" icon="Plus" @click="handleAdd${subClassName}">添加</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button type="danger" icon="Delete" @click="handleDelete${subClassName}">删除</el-button>
-          </el-col>
-        </el-row>
-        <el-table :data="${subclassName}List" :row-class-name="row${subClassName}Index" @selection-change="handle${subClassName}SelectionChange" ref="${subclassName}">
-          <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="序号" align="center" prop="index" width="50"/>
-#foreach($column in $subTable.columns)
-#set($javaField=$column.javaField)
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
-#else
-#set($comment=$column.columnComment)
-#end
-#if($column.pk || $javaField == ${subTableFkclassName})
-#elseif($column.list && $column.htmlType == "input")
-          <el-table-column label="$comment" prop="${javaField}" width="150">
-            <template #default="scope">
-              <el-input v-model="scope.row.$javaField" placeholder="请输入$comment" />
-            </template>
-          </el-table-column>
-#elseif($column.list && $column.htmlType == "datetime")
-          <el-table-column label="$comment" prop="${javaField}" width="240">
-            <template #default="scope">
-              <el-date-picker clearable
-                v-model="scope.row.$javaField"
-                type="date"
-                value-format="YYYY-MM-DD"
-                placeholder="请选择$comment">
-              </el-date-picker>
-            </template>
-          </el-table-column>
-#elseif($column.list && ($column.htmlType == "select" || $column.htmlType == "radio") && "" != $column.dictType)
-          <el-table-column label="$comment" prop="${javaField}" width="150">
-            <template #default="scope">
-              <el-select v-model="scope.row.$javaField" placeholder="请选择$comment">
-                <el-option
-                  v-for="dict in $column.dictType"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-#elseif($column.list && ($column.htmlType == "select" || $column.htmlType == "radio") && "" == $column.dictType)
-          <el-table-column label="$comment" prop="${javaField}" width="150">
-            <template #default="scope">
-              <el-select v-model="scope.row.$javaField" placeholder="请选择$comment">
-                <el-option label="请选择字典生成" value="" />
-              </el-select>
-            </template>
-          </el-table-column>
-#end
-#end
-        </el-table>
-#end
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -350,17 +286,11 @@ const { ${dictsNoSymbol} } = proxy.useDict(${dicts});
 #end
 
 const ${businessName}List = ref([]);
-#if($table.sub)
-const ${subclassName}List = ref([]);
-#end
 const open = ref(false);
 const buttonLoading = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
-#if($table.sub)
-const checked${subClassName} = ref([]);
-#end
 const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
@@ -444,9 +374,6 @@ function reset() {
 #end
 #end
   };
-#if($table.sub)
-  ${subclassName}List.value = [];
-#end
   proxy.resetForm("${businessName}Ref");
 }
 
@@ -495,9 +422,6 @@ function handleUpdate(row) {
     form.value.$column.javaField = form.value.${column.javaField}.split(",");
 #end
 #end
-#if($table.sub)
-    ${subclassName}List.value = response.data.${subclassName}List;
-#end
     open.value = true;
     title.value = "修改${functionName}";
   });
@@ -512,9 +436,6 @@ function submitForm() {
 #if($column.htmlType == "checkbox")
       form.value.$column.javaField = form.value.${column.javaField}.join(",");
 #end
-#end
-#if($table.sub)
-      form.value.${subclassName}List = ${subclassName}List.value;
 #end
       if (form.value.${pkColumn.javaField} != null) {
         update${BusinessName}(form.value).then(response => {
@@ -553,43 +474,6 @@ function handleDelete(row) {
   });
 }
 
-#if($table.sub)
-/** ${subTable.functionName}序号 */
-function row${subClassName}Index({ row, rowIndex }) {
-  row.index = rowIndex + 1;
-}
-
-/** ${subTable.functionName}添加按钮操作 */
-function handleAdd${subClassName}() {
-  let obj = {};
-#foreach($column in $subTable.columns)
-#if($column.pk || $column.javaField == ${subTableFkclassName})
-#elseif($column.list && "" != $javaField)
-  obj.$column.javaField = "";
-#end
-#end
-  ${subclassName}List.value.push(obj);
-}
-
-/** ${subTable.functionName}删除按钮操作 */
-function handleDelete${subClassName}() {
-  if (checked${subClassName}.value.length == 0) {
-    proxy.#[[$modal]]#.msgError("请先选择要删除的${subTable.functionName}数据");
-  } else {
-    const ${subclassName}s = ${subclassName}List.value;
-    const checked${subClassName}s = checked${subClassName}.value;
-    ${subclassName}List.value = ${subclassName}s.filter(function(item) {
-      return checked${subClassName}s.indexOf(item.index) == -1
-    });
-  }
-}
-
-/** 复选框选中数据 */
-function handle${subClassName}SelectionChange(selection) {
-  checked${subClassName}.value = selection.map(item => item.index)
-}
-
-#end
 /** 导出按钮操作 */
 function handleExport() {
   proxy.download('${moduleName}/${businessName}/export', {

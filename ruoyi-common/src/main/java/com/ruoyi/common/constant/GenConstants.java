@@ -17,11 +17,6 @@ public interface GenConstants {
     String TPL_TREE = "tree";
 
     /**
-     * 主子表（增删改查）
-     */
-    String TPL_SUB = "sub";
-
-    /**
      * 树编码字段
      */
     String TREE_CODE = "treeCode";

@@ -3,7 +3,6 @@ package com.ruoyi.generator.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.utils.DateUtils;
@@ -75,9 +74,6 @@ public class VelocityUtils {
         if (GenConstants.TPL_TREE.equals(tplCategory)) {
             setTreeVelocityContext(velocityContext, genTable);
         }
-        if (GenConstants.TPL_SUB.equals(tplCategory)) {
-            setSubVelocityContext(velocityContext, genTable);
-        }
         return velocityContext;
     }
 
@@ -105,23 +101,6 @@ public class VelocityUtils {
         if (paramsObj.containsKey(GenConstants.TREE_NAME)) {
             context.put("tree_name", paramsObj.get(GenConstants.TREE_NAME));
         }
-    }
-
-    public static void setSubVelocityContext(VelocityContext context, GenTable genTable) {
-        GenTable subTable = genTable.getSubTable();
-        String subTableName = genTable.getSubTableName();
-        String subTableFkName = genTable.getSubTableFkName();
-        String subClassName = genTable.getSubTable().getClassName();
-        String subTableFkClassName = StringUtils.convertToCamelCase(subTableFkName);
-
-        context.put("subTable", subTable);
-        context.put("subTableName", subTableName);
-        context.put("subTableFkName", subTableFkName);
-        context.put("subTableFkClassName", subTableFkClassName);
-        context.put("subTableFkclassName", StringUtils.uncapitalize(subTableFkClassName));
-        context.put("subClassName", subClassName);
-        context.put("subclassName", StringUtils.uncapitalize(subClassName));
-        context.put("subImportList", getImportList(genTable.getSubTable()));
     }
 
     /**
@@ -153,9 +132,6 @@ public class VelocityUtils {
             templates.add("vm/vue/index.vue.vm");
         } else if (GenConstants.TPL_TREE.equals(tplCategory)) {
             templates.add("vm/vue/index-tree.vue.vm");
-        } else if (GenConstants.TPL_SUB.equals(tplCategory)) {
-            templates.add("vm/vue/index.vue.vm");
-            templates.add("vm/java/sub-domain.java.vm");
         }
         return templates;
     }
@@ -188,9 +164,7 @@ public class VelocityUtils {
         if (template.contains("bo.java.vm")) {
             fileName = StringUtils.format("{}/domain/bo/{}Bo.java", javaPath, className);
         }
-        if (template.contains("sub-domain.java.vm") && StringUtils.equals(GenConstants.TPL_SUB, genTable.getTplCategory())) {
-            fileName = StringUtils.format("{}/domain/{}.java", javaPath, genTable.getSubTable().getClassName());
-        } else if (template.contains("mapper.java.vm")) {
+        if (template.contains("mapper.java.vm")) {
             fileName = StringUtils.format("{}/mapper/{}Mapper.java", javaPath, className);
         } else if (template.contains("service.java.vm")) {
             fileName = StringUtils.format("{}/service/I{}Service.java", javaPath, className);
@@ -231,11 +205,7 @@ public class VelocityUtils {
      */
     public static HashSet<String> getImportList(GenTable genTable) {
         List<GenTableColumn> columns = genTable.getColumns();
-        GenTable subGenTable = genTable.getSubTable();
         HashSet<String> importList = new HashSet<String>();
-        if (ObjectUtil.isNotNull(subGenTable)) {
-            importList.add("java.util.List");
-        }
         for (GenTableColumn column : columns) {
             if (!column.isSuperColumn() && GenConstants.TYPE_DATE.equals(column.getJavaType())) {
                 importList.add("java.util.Date");
@@ -257,10 +227,6 @@ public class VelocityUtils {
         List<GenTableColumn> columns = genTable.getColumns();
         Set<String> dicts = new HashSet<String>();
         addDicts(dicts, columns);
-        if (ObjectUtil.isNotNull(genTable.getSubTable())) {
-            List<GenTableColumn> subColumns = genTable.getSubTable().getColumns();
-            addDicts(dicts, subColumns);
-        }
         return StringUtils.join(dicts, ", ");
     }
 

@@ -210,8 +210,6 @@ public class GenTableServiceImpl implements IGenTableService {
             menuIds.add(identifierGenerator.nextId(null).longValue());
         }
         table.setMenuIds(menuIds);
-        // 设置主子表信息
-        setSubTable(table);
         // 设置主键列信息
         setPkColumn(table);
         VelocityInitializer.initVelocity();
@@ -254,8 +252,6 @@ public class GenTableServiceImpl implements IGenTableService {
     public void generatorCode(String tableName) {
         // 查询表信息
         GenTable table = baseMapper.selectGenTableByName(tableName);
-        // 设置主子表信息
-        setSubTable(table);
         // 设置主键列信息
         setPkColumn(table);
 
@@ -360,8 +356,6 @@ public class GenTableServiceImpl implements IGenTableService {
             menuIds.add(identifierGenerator.nextId(null).longValue());
         }
         table.setMenuIds(menuIds);
-        // 设置主子表信息
-        setSubTable(table);
         // 设置主键列信息
         setPkColumn(table);
 
@@ -405,12 +399,6 @@ public class GenTableServiceImpl implements IGenTableService {
                 throw new ServiceException("树父编码字段不能为空");
             } else if (StringUtils.isEmpty(paramsObj.getStr(GenConstants.TREE_NAME))) {
                 throw new ServiceException("树名称字段不能为空");
-            } else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory())) {
-                if (StringUtils.isEmpty(genTable.getSubTableName())) {
-                    throw new ServiceException("关联子表的表名不能为空");
-                } else if (StringUtils.isEmpty(genTable.getSubTableFkName())) {
-                    throw new ServiceException("子表关联的外键名不能为空");
-                }
             }
         }
     }
@@ -430,29 +418,7 @@ public class GenTableServiceImpl implements IGenTableService {
         if (ObjectUtil.isNull(table.getPkColumn())) {
             table.setPkColumn(table.getColumns().get(0));
         }
-        if (GenConstants.TPL_SUB.equals(table.getTplCategory())) {
-            for (GenTableColumn column : table.getSubTable().getColumns()) {
-                if (column.isPk()) {
-                    table.getSubTable().setPkColumn(column);
-                    break;
-                }
-            }
-            if (ObjectUtil.isNull(table.getSubTable().getPkColumn())) {
-                table.getSubTable().setPkColumn(table.getSubTable().getColumns().get(0));
-            }
-        }
-    }
 
-    /**
-     * 设置主子表信息
-     *
-     * @param table 业务表信息
-     */
-    public void setSubTable(GenTable table) {
-        String subTableName = table.getSubTableName();
-        if (StringUtils.isNotEmpty(subTableName)) {
-            table.setSubTable(baseMapper.selectGenTableByName(subTableName));
-        }
     }
 
     /**

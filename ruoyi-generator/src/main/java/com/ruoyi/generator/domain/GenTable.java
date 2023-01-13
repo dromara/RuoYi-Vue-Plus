@@ -1,15 +1,18 @@
 package com.ruoyi.generator.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.utils.StringUtils;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.ArrayUtils;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -110,12 +113,6 @@ public class GenTable extends BaseEntity {
     private GenTableColumn pkColumn;
 
     /**
-     * 子表信息
-     */
-    @TableField(exist = false)
-    private GenTable subTable;
-
-    /**
      * 表列信息
      */
     @Valid
@@ -167,14 +164,6 @@ public class GenTable extends BaseEntity {
      */
     @TableField(exist = false)
     private String parentMenuName;
-
-    public boolean isSub() {
-        return isSub(this.tplCategory);
-    }
-
-    public static boolean isSub(String tplCategory) {
-        return tplCategory != null && StringUtils.equals(GenConstants.TPL_SUB, tplCategory);
-    }
 
     public boolean isTree() {
         return isTree(this.tplCategory);
