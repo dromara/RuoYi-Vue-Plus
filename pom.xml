@@ -374,7 +374,11 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                    <argLine>
+                        -Dfile.encoding=UTF-8
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.lang.invoke=ALL-UNNAMED
+                    </argLine>
                     <!-- 根据打包环境执行对应的@Tag测试方法 -->
                     <groups>${profiles.active}</groups>
                     <!-- 排除标签 -->

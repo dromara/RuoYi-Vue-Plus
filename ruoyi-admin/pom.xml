@@ -119,11 +119,28 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Add-Opens>java.base/java.lang java.base/java.lang.invoke</Add-Opens>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>${maven-war-plugin.version}</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <warName>${project.artifactId}</warName>
+                    <archive>
+                        <manifestEntries>
+                            <Add-Opens>java.base/java.lang java.base/java.lang.invoke</Add-Opens>
+                        </manifestEntries>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>
