@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.system;
+package com.ruoyi.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import com.ruoyi.common.core.controller.BaseController;

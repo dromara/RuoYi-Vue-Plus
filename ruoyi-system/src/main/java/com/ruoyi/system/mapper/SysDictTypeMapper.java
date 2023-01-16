@@ -1,6 +1,6 @@
 package com.ruoyi.system.mapper;
 
-import com.ruoyi.common.core.domain.entity.SysDictType;
+import com.ruoyi.system.domain.SysDictType;
 import com.ruoyi.common.core.mapper.BaseMapperPlus;
 
 /**

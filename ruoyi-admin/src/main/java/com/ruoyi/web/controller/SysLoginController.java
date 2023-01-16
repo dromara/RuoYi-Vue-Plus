@@ -1,10 +1,10 @@
-package com.ruoyi.web.controller.system;
+package com.ruoyi.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.core.domain.entity.SysMenu;
-import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.system.domain.SysMenu;
+import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.SmsLoginBody;

@@ -3,7 +3,7 @@ package com.ruoyi.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ruoyi.common.core.domain.entity.SysDept;
+import com.ruoyi.system.domain.SysDept;
 import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.utils.StreamUtils;
 import com.ruoyi.system.domain.SysRoleDept;

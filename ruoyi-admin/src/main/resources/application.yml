@@ -212,9 +212,11 @@ springdoc:
   group-configs:
     - group: 1.演示模块
       packages-to-scan: com.ruoyi.demo
-    - group: 2.系统模块
+    - group: 2.通用模块
       packages-to-scan: com.ruoyi.web
-    - group: 3.代码生成模块
+    - group: 3.系统模块
+      packages-to-scan: com.ruoyi.system
+    - group: 4.代码生成模块
       packages-to-scan: com.ruoyi.generator
 
 # 防止XSS攻击
