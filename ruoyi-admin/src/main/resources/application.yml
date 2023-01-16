@@ -153,7 +153,7 @@ mybatis-plus:
     mapUnderscoreToCamelCase: true
     # MyBatis 自动映射策略
     # NONE：不启用 PARTIAL：只对非嵌套 resultMap 自动映射 FULL：对所有 resultMap 自动映射
-    autoMappingBehavior: PARTIAL
+    autoMappingBehavior: FULL
     # MyBatis 自动映射时未知列或未知属性处理策
     # NONE：不做处理 WARNING：打印相关警告 FAILING：抛出异常和详细信息
     autoMappingUnknownColumnBehavior: NONE
