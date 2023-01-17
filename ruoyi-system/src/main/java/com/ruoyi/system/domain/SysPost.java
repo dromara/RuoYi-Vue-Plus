@@ -39,7 +39,7 @@ public class SysPost extends BaseEntity {
      */
     @ExcelProperty(value = "岗位编码")
     @NotBlank(message = "岗位编码不能为空")
-    @Size(min = 0, max = 64, message = "岗位编码长度不能超过64个字符")
+    @Size(min = 0, max = 64, message = "岗位编码长度不能超过{max}个字符")
     private String postCode;
 
     /**
@@ -47,7 +47,7 @@ public class SysPost extends BaseEntity {
      */
     @ExcelProperty(value = "岗位名称")
     @NotBlank(message = "岗位名称不能为空")
-    @Size(min = 0, max = 50, message = "岗位名称长度不能超过50个字符")
+    @Size(min = 0, max = 50, message = "岗位名称长度不能超过{max}个字符")
     private String postName;
 
     /**
