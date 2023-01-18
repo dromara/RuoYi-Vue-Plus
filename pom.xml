@@ -285,74 +285,14 @@
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
             </dependency>
-
-            <!-- 定时任务 -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-job</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <!-- 代码生成-->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-generator</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <!-- 核心模块-->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-framework</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <!-- 系统模块-->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-system</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <!-- 通用工具-->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-common</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <!-- OSS对象存储模块 -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-oss</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <!-- SMS短信模块 -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-sms</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <!-- demo模块 -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-demo</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
     <modules>
         <module>ruoyi-admin</module>
-        <module>ruoyi-system</module>
-        <module>ruoyi-job</module>
-        <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
-        <module>ruoyi-demo</module>
         <module>ruoyi-extend</module>
+        <module>ruoyi-modules</module>
     </modules>
     <packaging>pom</packaging>
 

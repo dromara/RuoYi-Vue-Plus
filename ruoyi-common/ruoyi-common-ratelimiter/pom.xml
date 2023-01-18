@@ -10,10 +10,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ruoyi-common-doc</artifactId>
+    <artifactId>ruoyi-common-ratelimiter</artifactId>
 
     <description>
-        ruoyi-common-doc 系统接口
+        ruoyi-common-ratelimiter 限流功能
     </description>
 
     <dependencies>
@@ -23,13 +23,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.therapi</groupId>
-            <artifactId>therapi-runtime-javadoc</artifactId>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-redis</artifactId>
         </dependency>
     </dependencies>
 

@@ -4,33 +4,33 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>com.ruoyi</groupId>
-        <artifactId>ruoyi-common</artifactId>
+        <artifactId>ruoyi-modules</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>ruoyi-common-doc</artifactId>
+    <packaging>jar</packaging>
+    <artifactId>ruoyi-job</artifactId>
 
     <description>
-        ruoyi-common-doc 系统接口
+        任务调度
     </description>
 
     <dependencies>
+
+        <!-- 通用工具-->
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
+        <!-- xxl-job-core -->
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.therapi</groupId>
-            <artifactId>therapi-runtime-javadoc</artifactId>
-        </dependency>
     </dependencies>
 
 </project>
+

@@ -85,7 +85,7 @@
             <!-- 限流 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-common-rateLimiter</artifactId>
+                <artifactId>ruoyi-common-ratelimiter</artifactId>
                 <version>${revision}</version>
             </dependency>
 

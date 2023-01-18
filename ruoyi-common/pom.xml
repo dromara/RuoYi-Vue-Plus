@@ -21,7 +21,7 @@
         <module>ruoyi-common-mail</module>
         <module>ruoyi-common-mybatis</module>
         <module>ruoyi-common-oss</module>
-        <module>ruoyi-common-rateLimiter</module>
+        <module>ruoyi-common-ratelimiter</module>
         <module>ruoyi-common-redis</module>
         <module>ruoyi-common-satoken</module>
         <module>ruoyi-common-security</module>
