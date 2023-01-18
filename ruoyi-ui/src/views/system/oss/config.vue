@@ -189,7 +189,7 @@ import {
 
 export default {
   name: "OssConfig",
-  dicts: ['sys_yes_no', 'sys_normal_disable'],
+  dicts: ['sys_yes_no'],
   data() {
     return {
       // 按钮loading
