@@ -87,7 +87,7 @@
           <el-tag type="info" v-if="scope.row.accessPolicy === '2'">custom</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status">
+      <el-table-column label="是否默认" align="center" prop="status">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status"
