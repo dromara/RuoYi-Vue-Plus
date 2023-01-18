@@ -1,8 +1,8 @@
 package com.ruoyi.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
-import com.ruoyi.common.config.RuoYiConfig;
-import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.core.config.RuoYiConfig;
+import com.ruoyi.common.core.utils.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

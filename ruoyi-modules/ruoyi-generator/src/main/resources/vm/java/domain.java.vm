@@ -1,0 +1,57 @@
+package ${packageName}.domain;
+
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Date;
+import java.math.BigDecimal;
+
+#foreach ($import in $importList)
+import ${import};
+#end
+#if($table.crud || $table.sub)
+import com.ruoyi.common.core.web.domain.BaseEntity;
+#elseif($table.tree)
+import com.ruoyi.common.core.web.domain.TreeEntity;
+#end
+
+/**
+ * ${functionName}对象 ${tableName}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+#if($table.crud || $table.sub)
+    #set($Entity="BaseEntity")
+#elseif($table.tree)
+    #set($Entity="TreeEntity<${ClassName}>")
+#end
+@Data
+@EqualsAndHashCode(callSuper = true)
+@TableName("${tableName}")
+public class ${ClassName} extends ${Entity} {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+#foreach ($column in $columns)
+#if(!$table.isSuperColumn($column.javaField))
+    /**
+     * $column.columnComment
+     */
+#if($column.javaField=='delFlag')
+    @TableLogic
+#end
+#if($column.javaField=='version')
+    @Version
+#end
+#if($column.isPk==1)
+    @TableId(value = "$column.columnName")
+#end
+    private $column.javaType $column.javaField;
+#end
+#end
+
+}
