@@ -36,6 +36,7 @@
         <alibaba-ttl.version>2.14.2</alibaba-ttl.version>
         <xxl-job.version>2.3.1</xxl-job.version>
         <lombok.version>1.18.24</lombok.version>
+        <bouncycastle.version>1.72</bouncycastle.version>
 
         <!-- 临时修复 snakeyaml 漏洞 -->
         <snakeyaml.version>1.33</snakeyaml.version>
@@ -262,6 +263,13 @@
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
+            </dependency>
+
+            <!-- 加密包引入 -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15to18</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
 
             <!-- 定时任务 -->
