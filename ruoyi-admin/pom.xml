@@ -48,37 +48,17 @@
 
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-system</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-doc</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common-satoken</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common-web</artifactId>
+            <artifactId>ruoyi-system</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-job</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common-log</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common-oss</artifactId>
         </dependency>
 
         <!-- 代码生成-->

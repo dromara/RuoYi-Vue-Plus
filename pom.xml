@@ -285,6 +285,31 @@
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-system</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-job</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-generator</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-demo</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
