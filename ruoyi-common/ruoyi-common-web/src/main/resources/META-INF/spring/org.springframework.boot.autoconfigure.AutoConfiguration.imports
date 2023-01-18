@@ -1,0 +1,5 @@
+com.ruoyi.common.web.config.CaptchaConfig
+com.ruoyi.common.web.config.FilterConfig
+com.ruoyi.common.web.config.I18nConfig
+com.ruoyi.common.web.config.ResourcesConfig
+com.ruoyi.common.web.config.UndertowConfig

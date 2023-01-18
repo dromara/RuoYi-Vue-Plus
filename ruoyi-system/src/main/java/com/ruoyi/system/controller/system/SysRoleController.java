@@ -2,19 +2,19 @@ package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.util.ObjectUtil;
-import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysDept;
 import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.excel.utils.ExcelUtil;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysRoleService;
@@ -110,7 +110,7 @@ public class SysRoleController extends BaseController {
 
         if (roleService.updateRole(role) > 0) {
             // 更新缓存用户权限
-            LoginUser loginUser = getLoginUser();
+            LoginUser loginUser = LoginHelper.getLoginUser();
             SysUser sysUser = userService.selectUserById(loginUser.getUserId());
             if (ObjectUtil.isNotNull(sysUser) && !sysUser.isAdmin()) {
                 loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser));

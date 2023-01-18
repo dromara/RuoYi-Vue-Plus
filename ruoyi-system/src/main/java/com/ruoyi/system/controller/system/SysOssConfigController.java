@@ -1,16 +1,16 @@
 package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.annotation.RepeatSubmit;
-import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.idempotent.annotation.RepeatSubmit;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.core.validate.QueryGroup;
-import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.system.domain.bo.SysOssConfigBo;
 import com.ruoyi.system.domain.vo.SysOssConfigVo;
 import com.ruoyi.system.service.ISysOssConfigService;

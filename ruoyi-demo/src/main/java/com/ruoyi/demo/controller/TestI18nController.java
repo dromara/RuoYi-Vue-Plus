@@ -1,7 +1,7 @@
 package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.utils.MessageUtils;
+import com.ruoyi.common.core.utils.MessageUtils;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.validation.annotation.Validated;

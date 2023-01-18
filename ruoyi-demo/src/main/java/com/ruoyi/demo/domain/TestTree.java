@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
-import com.ruoyi.common.core.domain.TreeEntity;
+import com.ruoyi.common.core.web.domain.TreeEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

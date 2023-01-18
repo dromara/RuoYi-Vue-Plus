@@ -2,13 +2,13 @@ package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.util.ArrayUtil;
-import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.domain.SysDept;
-import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.system.service.ISysDeptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;

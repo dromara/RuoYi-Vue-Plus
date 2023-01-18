@@ -1,7 +1,7 @@
 package com.ruoyi.demo.controller;
 
 import cn.hutool.core.collection.CollUtil;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.common.excel.utils.ExcelUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.web.bind.annotation.GetMapping;

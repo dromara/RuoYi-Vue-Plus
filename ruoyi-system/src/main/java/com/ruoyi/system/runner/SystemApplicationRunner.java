@@ -1,6 +1,6 @@
 package com.ruoyi.system.runner;
 
-import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.core.config.RuoYiConfig;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysDictTypeService;
 import com.ruoyi.system.service.ISysOssConfigService;

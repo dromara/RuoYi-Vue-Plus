@@ -1,6 +1,6 @@
 package com.ruoyi.test;
 
-import com.ruoyi.common.enums.UserType;
+import com.ruoyi.common.core.enums.UserType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

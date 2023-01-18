@@ -1,11 +1,11 @@
 package com.ruoyi.system.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.ruoyi.common.annotation.Sensitive;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.core.domain.BaseEntity;
-import com.ruoyi.common.enums.SensitiveStrategy;
-import com.ruoyi.common.xss.Xss;
+import com.ruoyi.common.core.annotation.Sensitive;
+import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.enums.SensitiveStrategy;
+import com.ruoyi.common.core.web.domain.BaseEntity;
+import com.ruoyi.common.core.xss.Xss;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

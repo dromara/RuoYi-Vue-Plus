@@ -3,10 +3,10 @@ package com.ruoyi.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.common.annotation.DataColumn;
-import com.ruoyi.common.annotation.DataPermission;
+import com.ruoyi.common.mybatis.annotation.DataColumn;
+import com.ruoyi.common.mybatis.annotation.DataPermission;
 import com.ruoyi.system.domain.SysRole;
-import com.ruoyi.common.core.mapper.BaseMapperPlus;
+import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

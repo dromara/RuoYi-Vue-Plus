@@ -1,7 +1,7 @@
 package com.ruoyi.generator.util;
 
-import com.ruoyi.common.constant.GenConstants;
-import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.core.constant.GenConstants;
+import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.generator.config.GenConfig;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;

@@ -1,12 +1,9 @@
 package com.ruoyi.generator.domain;
 
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.ruoyi.common.constant.GenConstants;
-import com.ruoyi.common.core.domain.BaseEntity;
-import com.ruoyi.common.utils.StringUtils;
+import com.baomidou.mybatisplus.annotation.*;
+import com.ruoyi.common.core.constant.GenConstants;
+import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.core.web.domain.BaseEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

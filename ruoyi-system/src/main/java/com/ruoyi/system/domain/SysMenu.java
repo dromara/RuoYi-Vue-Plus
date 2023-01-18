@@ -3,7 +3,7 @@ package com.ruoyi.system.domain;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ruoyi.common.core.domain.TreeEntity;
+import com.ruoyi.common.core.web.domain.TreeEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

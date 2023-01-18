@@ -1,7 +1,7 @@
 package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.utils.email.MailUtils;
+import com.ruoyi.common.mail.utils.MailUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;

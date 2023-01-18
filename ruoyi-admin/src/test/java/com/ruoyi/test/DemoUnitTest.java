@@ -1,6 +1,6 @@
 package com.ruoyi.test;
 
-import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.core.config.RuoYiConfig;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

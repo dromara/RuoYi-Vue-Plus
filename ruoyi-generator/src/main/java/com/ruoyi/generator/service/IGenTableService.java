@@ -1,7 +1,7 @@
 package com.ruoyi.generator.service;
 
-import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.mybatis.core.page.PageQuery;
+import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
 

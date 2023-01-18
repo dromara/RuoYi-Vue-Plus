@@ -1,7 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.SysDictType;
-import com.ruoyi.common.core.mapper.BaseMapperPlus;
+import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
 
 /**
  * 字典表 数据层

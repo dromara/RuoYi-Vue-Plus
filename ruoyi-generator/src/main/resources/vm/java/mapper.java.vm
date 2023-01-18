@@ -2,7 +2,7 @@ package ${packageName}.mapper;
 
 import ${packageName}.domain.${ClassName};
 import ${packageName}.domain.vo.${ClassName}Vo;
-import com.ruoyi.common.core.mapper.BaseMapperPlus;
+import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
 
 /**
  * ${functionName}Mapper接口

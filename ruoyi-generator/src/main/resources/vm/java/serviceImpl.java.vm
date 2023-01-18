@@ -1,10 +1,10 @@
 package ${packageName}.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.core.utils.StringUtils;
 #if($table.crud || $table.sub)
-import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 #end
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

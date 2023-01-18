@@ -1,8 +1,8 @@
 package com.ruoyi.demo.controller;
 
-import com.ruoyi.common.constant.CacheNames;
+import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.utils.redis.RedisUtils;
+import com.ruoyi.common.redis.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;

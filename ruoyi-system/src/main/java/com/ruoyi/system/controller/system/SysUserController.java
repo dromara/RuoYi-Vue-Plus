@@ -6,21 +6,21 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.excel.core.ExcelResult;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysDept;
 import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.system.domain.SysUser;
-import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.excel.ExcelResult;
-import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.StreamUtils;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.core.utils.StreamUtils;
+import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.excel.utils.ExcelUtil;
 import com.ruoyi.system.domain.vo.SysUserExportVo;
 import com.ruoyi.system.domain.vo.SysUserImportVo;
 import com.ruoyi.system.listener.SysUserImportListener;
@@ -179,7 +179,7 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
     public R<Void> remove(@PathVariable Long[] userIds) {
-        if (ArrayUtil.contains(userIds, getUserId())) {
+        if (ArrayUtil.contains(userIds, LoginHelper.getUserId())) {
             return R.fail("当前用户不能删除");
         }
         return toAjax(userService.deleteUserByIds(userIds));

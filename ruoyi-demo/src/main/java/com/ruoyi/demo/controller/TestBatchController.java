@@ -1,8 +1,8 @@
 package com.ruoyi.demo.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.mapper.TestDemoMapper;
 import lombok.RequiredArgsConstructor;

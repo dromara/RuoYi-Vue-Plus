@@ -1,9 +1,9 @@
 package com.ruoyi.demo.controller;
 
-import com.ruoyi.common.annotation.Sensitive;
-import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.core.annotation.Sensitive;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.enums.SensitiveStrategy;
+import com.ruoyi.common.core.enums.SensitiveStrategy;
+import com.ruoyi.common.core.web.controller.BaseController;
 import lombok.Data;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

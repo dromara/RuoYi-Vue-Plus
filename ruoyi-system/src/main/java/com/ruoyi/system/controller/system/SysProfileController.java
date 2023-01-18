@@ -2,15 +2,15 @@ package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.io.FileUtil;
-import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysUser;
-import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.MimeTypeUtils;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.core.utils.file.MimeTypeUtils;
 import com.ruoyi.system.domain.vo.SysOssVo;
 import com.ruoyi.system.service.ISysOssService;
 import com.ruoyi.system.service.ISysUserService;
@@ -43,7 +43,7 @@ public class SysProfileController extends BaseController {
      */
     @GetMapping
     public R<Map<String, Object>> profile() {
-        SysUser user = userService.selectUserById(getUserId());
+        SysUser user = userService.selectUserById(LoginHelper.getUserId());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("user", user);
         ajax.put("roleGroup", userService.selectUserRoleGroup(user.getUserName()));
@@ -65,7 +65,7 @@ public class SysProfileController extends BaseController {
             && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
-        user.setUserId(getUserId());
+        user.setUserId(LoginHelper.getUserId());
         user.setUserName(null);
         user.setPassword(null);
         user.setAvatar(null);
@@ -117,7 +117,7 @@ public class SysProfileController extends BaseController {
             }
             SysOssVo oss = iSysOssService.upload(avatarfile);
             String avatar = oss.getUrl();
-            if (userService.updateUserAvatar(getUsername(), avatar)) {
+            if (userService.updateUserAvatar(LoginHelper.getUsername(), avatar)) {
                 ajax.put("imgUrl", avatar);
                 return R.ok(ajax);
             }

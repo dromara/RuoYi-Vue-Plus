@@ -1,8 +1,8 @@
 package com.ruoyi.system.domain.vo;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.ruoyi.common.annotation.ExcelDictFormat;
-import com.ruoyi.common.convert.ExcelDictConvert;
+import com.ruoyi.common.excel.annotation.ExcelDictFormat;
+import com.ruoyi.common.excel.convert.ExcelDictConvert;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

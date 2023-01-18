@@ -106,6 +106,15 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- common 的依赖配置-->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-bom</artifactId>
+                <version>${revision}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
@@ -171,6 +180,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-core</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
 
             <!-- dynamic-datasource 多数据源-->
             <dependency>
@@ -188,6 +202,12 @@
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-annotation</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
@@ -327,15 +347,12 @@
 
     <modules>
         <module>ruoyi-admin</module>
-        <module>ruoyi-framework</module>
         <module>ruoyi-system</module>
         <module>ruoyi-job</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>ruoyi-demo</module>
         <module>ruoyi-extend</module>
-        <module>ruoyi-oss</module>
-        <module>ruoyi-sms</module>
     </modules>
     <packaging>pom</packaging>
 

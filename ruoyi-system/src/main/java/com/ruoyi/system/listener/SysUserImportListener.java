@@ -1,17 +1,17 @@
 package com.ruoyi.system.listener;
 
-import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.crypto.digest.BCrypt;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
+import com.ruoyi.common.core.exception.ServiceException;
+import com.ruoyi.common.core.utils.SpringUtils;
+import com.ruoyi.common.core.utils.ValidatorUtils;
+import com.ruoyi.common.excel.core.ExcelListener;
+import com.ruoyi.common.excel.core.ExcelResult;
+import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysUser;
-import com.ruoyi.common.excel.ExcelListener;
-import com.ruoyi.common.excel.ExcelResult;
-import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.ValidatorUtils;
-import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.vo.SysUserImportVo;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
