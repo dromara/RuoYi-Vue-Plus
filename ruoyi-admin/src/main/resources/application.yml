@@ -179,19 +179,20 @@ mybatis-plus:
       updateStrategy: NOT_NULL
       # 字段验证策略之 select,在 select 的时候的字段验证策略既 wrapper 根据内部 entity 生成的 where 条件
       where-strategy: NOT_NULL
+
 # 数据加密
 mybatis-encryptor:
   # 是否开启加密
-  enabled: false
+  enable: false
   # 默认加密算法
-  algorithm: base64
-  # 安全秘钥。对称算法的秘钥。如：AES，SM4
-#  password: QBcc3SHK2G4ijyfl5XQ7@2g!N2j2jRDR
-#  # 公私钥。非对称算法的公私钥，如：SM2，RSA
-#  publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCDt41GIcWvY6/tpjOLoWY78Oy00uWcNbMRG/8DRoS79/h2D+pV8uxV+0ezaN+fBFCZnK8TdJcPeU4EnNRUh/8HEY33KFvZ700n+Gj5BHUUDKzx3UVFNuF49UI/yoJ8rz6VQQHO79KK89VwmSMO77Tfee1ofe0STY6IwMt/MwaoKwIDAQAB
-#  privateKey: MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAIO3jUYhxa9jr+2mM4uhZjvw7LTS5Zw1sxEb/wNGhLv3+HYP6lXy7FX7R7No358EUJmcrxN0lw95TgSc1FSH/wcRjfcoW9nvTSf4aPkEdRQMrPHdRUU24Xj1Qj/KgnyvPpVBAc7v0orz1XCZIw7vtN957Wh97RJNjojAy38zBqgrAgMBAAECgYAkXx4qvI6rFNryw88+Am6JpMioUghHb2ioE9QCYomqohnA+DocS71JLN8qwo3lijp7gJGzzKEeC8Aoc+oKAZfBQQwPP0K/ql+NcLdlqNAr+XyzkZrLJD/BfluQ6mXI23tjonWnPPZ1Et9HC3zXRQPiuh7Ff6UoqatTMI3OIbSyuQJBAPbaJpVYmIsWJdpvaAC6hcGgR/vbG9yX8VphPn8/2wsm2MmQrRkUoKkudE/veX3KQjGikDwo9+bT6aBl+nn2DUUCQQCImSGZFNcGqhMLyRGVogP6fh0YZSEQAhFbZ69nQmplqbie+dREhODH5Vs5F0C2aL5iSR/UaIDkNEA1auX7x56vAkAFWjON927PTTqi4tmBconl6eDFsDmJbe34xLUDM1I/iqcWr8FhEtZs9Knm9c1PkewfgWPZOhYt9hhRtwRYUqJ1AkAPvQ0I9US9KNVe80DKa8tnjiZODEDd9k8HqA+mpxlZM0/pSUGyz1iSz5NOJaa4HaNp8aDwOUY4hOis/u8Wrm5TAkEA00YeUsaXlMyMF/5pjols44tXb54AjAC2mH66pz9JsKg7pKpWVOpEV5rMY58CGZHWau69vGLZnCd1coeMw77YAQ==
-#  # 编码方式，base64/hex。默认base64
-#  encode: base64
+  algorithm: BASE64
+  # 编码方式 BASE64/HEX。默认BASE64
+  encode: BASE64
+  # 安全秘钥 对称算法的秘钥 如：AES，SM4
+  password:
+  # 公私钥 非对称算法的公私钥 如：SM2，RSA
+  publicKey:
+  privateKey:
 
 # Swagger配置
 swagger:

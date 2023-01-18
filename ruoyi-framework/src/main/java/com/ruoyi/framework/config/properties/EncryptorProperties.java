@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * 加解密属性配置类
  *
  * @author 老马
- * @date 2023-01-10 16:52
+ * @version 4.6.0
  */
 @Data
 @Component
@@ -20,7 +20,7 @@ public class EncryptorProperties {
     /**
      * 过滤开关
      */
-    private Boolean enabled;
+    private Boolean enable;
 
     /**
      * 默认算法
@@ -46,4 +46,5 @@ public class EncryptorProperties {
      * 编码方式，base64/hex
      */
     private EncodeType encode;
+
 }

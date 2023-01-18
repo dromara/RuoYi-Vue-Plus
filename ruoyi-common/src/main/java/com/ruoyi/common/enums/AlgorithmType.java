@@ -1,6 +1,5 @@
 package com.ruoyi.common.enums;
 
-import com.ruoyi.common.encrypt.IEncryptor;
 import com.ruoyi.common.encrypt.encryptor.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,10 +8,17 @@ import lombok.Getter;
  * 算法名称
  *
  * @author 老马
+ * @version 4.6.0
  */
 @Getter
 @AllArgsConstructor
 public enum AlgorithmType {
+
+    /**
+     * 默认走yml配置
+     */
+    DEFAULT(null),
+
     /**
      * base64
      */
@@ -38,5 +44,5 @@ public enum AlgorithmType {
      */
     SM4(Sm4Encryptor.class);
 
-    private final Class<? extends IEncryptor> clazz;
+    private final Class<? extends AbstractEncryptor> clazz;
 }

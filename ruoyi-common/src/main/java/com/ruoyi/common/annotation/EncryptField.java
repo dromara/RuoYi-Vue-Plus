@@ -19,7 +19,7 @@ public @interface EncryptField {
     /**
      * 加密算法
      */
-    AlgorithmType algorithm() default AlgorithmType.BASE64;
+    AlgorithmType algorithm() default AlgorithmType.DEFAULT;
 
     /**
      * 秘钥。AES、SM4需要
@@ -39,6 +39,6 @@ public @interface EncryptField {
     /**
      * 编码方式。对加密算法为BASE64的不起作用
      */
-    EncodeType encode() default EncodeType.BASE64;
+    EncodeType encode() default EncodeType.DEFAULT;
 
 }
