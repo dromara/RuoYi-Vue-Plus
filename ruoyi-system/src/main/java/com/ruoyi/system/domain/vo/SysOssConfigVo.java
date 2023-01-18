@@ -72,7 +72,7 @@ public class SysOssConfigVo implements Serializable {
     private String region;
 
     /**
-     * 状态（0=正常,1=停用）
+     * 是否默认（0=是,1=否）
      */
     private String status;
 
