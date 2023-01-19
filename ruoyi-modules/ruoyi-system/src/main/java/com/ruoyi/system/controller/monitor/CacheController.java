@@ -94,7 +94,7 @@ public class CacheController {
         if (isCacheNames(cacheName)) {
             Set<Object> keys = CacheUtils.keys(cacheName);
             if (CollUtil.isNotEmpty(keys)) {
-                cacheKeys = keys.stream().map(Object::toString).collect(Collectors.toList());
+                cacheKeys = keys.stream().map(Object::toString).toList();
             }
         } else {
             cacheKeys = RedisUtils.keys(cacheName + "*");

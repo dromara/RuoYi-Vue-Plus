@@ -221,15 +221,12 @@ public class OssClient {
         }
         builder.append("{\n\"Action\": ");
         switch (policyType) {
-            case WRITE:
+            case WRITE ->
                 builder.append("[\n\"s3:AbortMultipartUpload\",\n\"s3:DeleteObject\",\n\"s3:ListMultipartUploadParts\",\n\"s3:PutObject\"\n],\n");
-                break;
-            case READ_WRITE:
+            case READ_WRITE ->
                 builder.append("[\n\"s3:AbortMultipartUpload\",\n\"s3:DeleteObject\",\n\"s3:GetObject\",\n\"s3:ListMultipartUploadParts\",\n\"s3:PutObject\"\n],\n");
-                break;
-            default:
+            default ->
                 builder.append("\"s3:GetObject\",\n");
-                break;
         }
         builder.append("\"Effect\": \"Allow\",\n\"Principal\": \"*\",\n\"Resource\": \"arn:aws:s3:::");
         builder.append(bucketName);
