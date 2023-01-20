@@ -80,11 +80,9 @@ public class CaptchaController {
      */
     @GetMapping("/captchaImage")
     public R<Map<String, Object>> getCode() {
-        Map<String, Object> ajax = new HashMap<>();
         boolean captchaEnabled = configService.selectCaptchaEnabled();
-        ajax.put("captchaEnabled", captchaEnabled);
         if (!captchaEnabled) {
-            return R.ok(ajax);
+            return R.ok(Map.of("captchaEnabled", false));
         }
         // 保存验证码信息
         String uuid = IdUtil.simpleUUID();
@@ -104,9 +102,7 @@ public class CaptchaController {
             code = exp.getValue(String.class);
         }
         RedisUtils.setCacheObject(verifyKey, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
-        ajax.put("uuid", uuid);
-        ajax.put("img", captcha.getImageBase64());
-        return R.ok(ajax);
+        return R.ok(Map.of("uuid", uuid, "img", captcha.getImageBase64()));
     }
 
 }

@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -139,10 +140,10 @@ public class SysUserController extends BaseController {
         if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user))) {
             return R.fail("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
         } else if (StringUtils.isNotEmpty(user.getPhonenumber())
-            && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
+                   && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
             return R.fail("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
         } else if (StringUtils.isNotEmpty(user.getEmail())
-            && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
+                   && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
             return R.fail("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         user.setPassword(BCrypt.hashpw(user.getPassword()));
@@ -161,10 +162,10 @@ public class SysUserController extends BaseController {
         if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user))) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
         } else if (StringUtils.isNotEmpty(user.getPhonenumber())
-            && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
+                   && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
         } else if (StringUtils.isNotEmpty(user.getEmail())
-            && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
+                   && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         return toAjax(userService.updateUser(user));
@@ -220,10 +221,10 @@ public class SysUserController extends BaseController {
     public R<Map<String, Object>> authRole(@PathVariable Long userId) {
         SysUser user = userService.selectUserById(userId);
         List<SysRole> roles = roleService.selectRolesByUserId(userId);
-        Map<String, Object> ajax = new HashMap<>();
-        ajax.put("user", user);
-        ajax.put("roles", LoginHelper.isAdmin(userId) ? roles : StreamUtils.filter(roles, r -> !r.isAdmin()));
-        return R.ok(ajax);
+        return R.ok(Map.of(
+                "user", user,
+                "roles", LoginHelper.isAdmin(userId) ? roles : StreamUtils.filter(roles, r -> !r.isAdmin())
+        ));
     }
 
     /**

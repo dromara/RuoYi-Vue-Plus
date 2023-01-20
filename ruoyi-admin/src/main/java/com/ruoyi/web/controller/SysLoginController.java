@@ -3,16 +3,17 @@ package com.ruoyi.web.controller;
 import cn.dev33.satoken.annotation.SaIgnore;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.satoken.utils.LoginHelper;
-import com.ruoyi.system.domain.SysMenu;
-import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.SmsLoginBody;
+import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.system.domain.SysMenu;
+import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysLoginService;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.constraints.NotBlank;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,12 +47,10 @@ public class SysLoginController {
     @SaIgnore
     @PostMapping("/login")
     public R<Map<String, Object>> login(@Validated @RequestBody LoginBody loginBody) {
-        Map<String, Object> ajax = new HashMap<>();
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
             loginBody.getUuid());
-        ajax.put(Constants.TOKEN, token);
-        return R.ok(ajax);
+        return R.ok(Map.of(Constants.TOKEN, token));
     }
 
     /**
@@ -65,11 +62,9 @@ public class SysLoginController {
     @SaIgnore
     @PostMapping("/smsLogin")
     public R<Map<String, Object>> smsLogin(@Validated @RequestBody SmsLoginBody smsLoginBody) {
-        Map<String, Object> ajax = new HashMap<>();
         // 生成令牌
         String token = loginService.smsLogin(smsLoginBody.getPhonenumber(), smsLoginBody.getSmsCode());
-        ajax.put(Constants.TOKEN, token);
-        return R.ok(ajax);
+        return R.ok(Map.of(Constants.TOKEN, token));
     }
 
     /**
@@ -81,11 +76,9 @@ public class SysLoginController {
     @SaIgnore
     @PostMapping("/xcxLogin")
     public R<Map<String, Object>> xcxLogin(@NotBlank(message = "{xcx.code.not.blank}") String xcxCode) {
-        Map<String, Object> ajax = new HashMap<>();
         // 生成令牌
         String token = loginService.xcxLogin(xcxCode);
-        ajax.put(Constants.TOKEN, token);
-        return R.ok(ajax);
+        return R.ok(Map.of(Constants.TOKEN, token));
     }
 
     /**
@@ -107,11 +100,11 @@ public class SysLoginController {
     public R<Map<String, Object>> getInfo() {
         LoginUser loginUser = LoginHelper.getLoginUser();
         SysUser user = userService.selectUserById(loginUser.getUserId());
-        Map<String, Object> ajax = new HashMap<>();
-        ajax.put("user", user);
-        ajax.put("roles", loginUser.getRolePermission());
-        ajax.put("permissions", loginUser.getMenuPermission());
-        return R.ok(ajax);
+        return R.ok(Map.of(
+            "user", user,
+            "roles", loginUser.getRolePermission(),
+            "permissions", loginUser.getMenuPermission()
+        ));
     }
 
     /**
@@ -121,8 +114,7 @@ public class SysLoginController {
      */
     @GetMapping("getRouters")
     public R<List<RouterVo>> getRouters() {
-        Long userId = LoginHelper.getUserId();
-        List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
+        List<SysMenu> menus = menuService.selectMenuTreeByUserId(LoginHelper.getUserId());
         return R.ok(menuService.buildMenus(menus));
     }
 }

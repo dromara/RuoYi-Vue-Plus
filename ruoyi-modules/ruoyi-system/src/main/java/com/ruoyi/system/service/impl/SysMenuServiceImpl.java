@@ -407,9 +407,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
 
     /**
      * 递归列表
-     *
-     * @param list
-     * @param t
      */
     private void recursionFn(List<SysMenu> list, SysMenu t) {
         // 得到子节点列表

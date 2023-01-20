@@ -2,15 +2,15 @@ package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.io.FileUtil;
-import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.satoken.utils.LoginHelper;
-import com.ruoyi.system.domain.SysUser;
-import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.file.MimeTypeUtils;
+import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.vo.SysOssVo;
 import com.ruoyi.system.service.ISysOssService;
 import com.ruoyi.system.service.ISysUserService;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,11 +43,11 @@ public class SysProfileController extends BaseController {
     @GetMapping
     public R<Map<String, Object>> profile() {
         SysUser user = userService.selectUserById(LoginHelper.getUserId());
-        Map<String, Object> ajax = new HashMap<>();
-        ajax.put("user", user);
-        ajax.put("roleGroup", userService.selectUserRoleGroup(user.getUserName()));
-        ajax.put("postGroup", userService.selectUserPostGroup(user.getUserName()));
-        return R.ok(ajax);
+        return R.ok(Map.of(
+                "user", user,
+                "roleGroup", userService.selectUserRoleGroup(user.getUserName()),
+                "postGroup", userService.selectUserPostGroup(user.getUserName())
+        ));
     }
 
     /**
@@ -109,7 +108,6 @@ public class SysProfileController extends BaseController {
     @Log(title = "用户头像", businessType = BusinessType.UPDATE)
     @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile avatarfile) {
-        Map<String, Object> ajax = new HashMap<>();
         if (!avatarfile.isEmpty()) {
             String extension = FileUtil.extName(avatarfile.getOriginalFilename());
             if (!StringUtils.equalsAnyIgnoreCase(extension, MimeTypeUtils.IMAGE_EXTENSION)) {
@@ -118,8 +116,7 @@ public class SysProfileController extends BaseController {
             SysOssVo oss = iSysOssService.upload(avatarfile);
             String avatar = oss.getUrl();
             if (userService.updateUserAvatar(LoginHelper.getUsername(), avatar)) {
-                ajax.put("imgUrl", avatar);
-                return R.ok(ajax);
+                return R.ok(Map.of("imgUrl", avatar));
             }
         }
         return R.fail("上传图片异常，请联系管理员");

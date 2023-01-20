@@ -91,7 +91,7 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
 
     @Override
     public ExcelResult<SysUserImportVo> getExcelResult() {
-        return new ExcelResult<SysUserImportVo>() {
+        return new ExcelResult<>() {
 
             @Override
             public String getAnalysis() {
