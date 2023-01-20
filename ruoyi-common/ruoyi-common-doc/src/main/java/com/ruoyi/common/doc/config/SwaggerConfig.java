@@ -21,6 +21,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 import java.util.ArrayList;
@@ -35,15 +36,15 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 @AutoConfiguration(before = SpringDocConfiguration.class)
+@EnableConfigurationProperties(SwaggerProperties.class)
 @ConditionalOnProperty(name = "swagger.enabled", havingValue = "true", matchIfMissing = true)
 public class SwaggerConfig {
 
-    private final SwaggerProperties swaggerProperties;
     private final ServerProperties serverProperties;
 
     @Bean
     @ConditionalOnMissingBean(OpenAPI.class)
-    public OpenAPI openApi() {
+    public OpenAPI openApi(SwaggerProperties swaggerProperties) {
         OpenAPI openApi = new OpenAPI();
         // 文档基本信息
         SwaggerProperties.InfoProperties infoProperties = swaggerProperties.getInfo();

@@ -7,6 +7,7 @@ import com.ruoyi.common.security.config.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -15,9 +16,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  *
  * @author Lion Li
  */
-@RequiredArgsConstructor
+
 @Slf4j
 @AutoConfiguration
+@EnableConfigurationProperties(SecurityProperties.class)
+@RequiredArgsConstructor
 public class SecurityConfig implements WebMvcConfigurer {
 
     private final SecurityProperties securityProperties;

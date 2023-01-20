@@ -2,7 +2,6 @@ package com.ruoyi.common.mail.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * JavaMail 配置属性
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Component;
  * @author Michelle.Chung
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "mail")
 public class MailProperties {
 

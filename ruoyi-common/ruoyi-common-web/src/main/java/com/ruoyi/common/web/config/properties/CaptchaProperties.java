@@ -4,7 +4,6 @@ import com.ruoyi.common.web.enums.CaptchaCategory;
 import com.ruoyi.common.web.enums.CaptchaType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * 验证码 配置属性
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
  * @author Lion Li
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "captcha")
 public class CaptchaProperties {
 

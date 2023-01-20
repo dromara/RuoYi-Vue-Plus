@@ -3,9 +3,9 @@ package com.ruoyi.common.core.config;
 import com.ruoyi.common.core.config.properties.ThreadPoolProperties;
 import com.ruoyi.common.core.utils.Threads;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -19,6 +19,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @author Lion Li
  **/
 @AutoConfiguration
+@EnableConfigurationProperties(ThreadPoolProperties.class)
 public class ThreadPoolConfig {
 
     /**
@@ -26,12 +27,9 @@ public class ThreadPoolConfig {
      */
     private final int core = Runtime.getRuntime().availableProcessors() + 1;
 
-    @Autowired
-    private ThreadPoolProperties threadPoolProperties;
-
     @Bean(name = "threadPoolTaskExecutor")
     @ConditionalOnProperty(prefix = "thread-pool", name = "enabled", havingValue = "true")
-    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+    public ThreadPoolTaskExecutor threadPoolTaskExecutor(ThreadPoolProperties threadPoolProperties) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(core);
         executor.setMaxPoolSize(core * 2);

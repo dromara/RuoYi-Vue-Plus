@@ -21,10 +21,8 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "xxl.job", name = "enabled", havingValue = "true")
 public class XxlJobConfig {
 
-    private final XxlJobProperties xxlJobProperties;
-
     @Bean
-    public XxlJobSpringExecutor xxlJobExecutor() {
+    public XxlJobSpringExecutor xxlJobExecutor(XxlJobProperties xxlJobProperties) {
         log.info(">>>>>>>>>>> xxl-job config init.");
         XxlJobSpringExecutor xxlJobSpringExecutor = new XxlJobSpringExecutor();
         xxlJobSpringExecutor.setAdminAddresses(xxlJobProperties.getAdminAddresses());
