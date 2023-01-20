@@ -55,9 +55,8 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
     @Override
     public void onException(Exception exception, AnalysisContext context) throws Exception {
         String errMsg = null;
-        if (exception instanceof ExcelDataConvertException) {
+        if (exception instanceof ExcelDataConvertException excelDataConvertException) {
             // 如果是某一个单元格的转换异常 能获取到具体行号
-            ExcelDataConvertException excelDataConvertException = (ExcelDataConvertException) exception;
             Integer rowIndex = excelDataConvertException.getRowIndex();
             Integer columnIndex = excelDataConvertException.getColumnIndex();
             errMsg = StrUtil.format("第{}行-第{}列-表头{}: 解析异常<br/>",
@@ -66,8 +65,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
                 log.error(errMsg);
             }
         }
-        if (exception instanceof ConstraintViolationException) {
-            ConstraintViolationException constraintViolationException = (ConstraintViolationException) exception;
+        if (exception instanceof ConstraintViolationException constraintViolationException) {
             Set<ConstraintViolation<?>> constraintViolations = constraintViolationException.getConstraintViolations();
             String constraintViolationsMsg = StreamUtils.join(constraintViolations, ConstraintViolation::getMessage, ", ");
             errMsg = StrUtil.format("第{}行数据校验异常: {}", context.readRowHolder().getRowIndex() + 1, constraintViolationsMsg);

@@ -39,8 +39,8 @@ public class DataPermissionHelper {
             saStorage.set(DATA_PERMISSION_KEY, new HashMap<>());
             attribute = saStorage.get(DATA_PERMISSION_KEY);
         }
-        if (attribute instanceof Map) {
-            return (Map<String, Object>) attribute;
+        if (attribute instanceof Map map) {
+            return map;
         }
         throw new NullPointerException("data permission context type exception");
     }

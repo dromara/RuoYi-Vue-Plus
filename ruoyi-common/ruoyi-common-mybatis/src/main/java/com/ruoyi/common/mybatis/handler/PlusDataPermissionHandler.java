@@ -163,7 +163,7 @@ public class PlusDataPermissionHandler {
         String methodName = sb.substring(index + 1, sb.length());
         Class<?> clazz = ClassUtil.loadClass(clazzName);
         List<Method> methods = Arrays.stream(ClassUtil.getDeclaredMethods(clazz))
-            .filter(method -> method.getName().equals(methodName)).collect(Collectors.toList());
+            .filter(method -> method.getName().equals(methodName)).toList();
         DataPermission dataPermission;
         // 获取方法注解
         for (Method method : methods) {

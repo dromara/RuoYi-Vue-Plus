@@ -52,7 +52,7 @@ public class SysOssServiceImpl implements ISysOssService {
     public TableDataInfo<SysOssVo> queryPageList(SysOssBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<SysOss> lqw = buildQueryWrapper(bo);
         Page<SysOssVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
-        List<SysOssVo> filterResult = result.getRecords().stream().map(this::matchingUrl).collect(Collectors.toList());
+        List<SysOssVo> filterResult = result.getRecords().stream().map(this::matchingUrl).toList();
         result.setRecords(filterResult);
         return TableDataInfo.build(result);
     }

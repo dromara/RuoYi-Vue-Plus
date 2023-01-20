@@ -68,8 +68,7 @@ public class PlusDataPermissionInterceptor extends JsqlParserSupport implements 
         SelectBody selectBody = select.getSelectBody();
         if (selectBody instanceof PlainSelect) {
             this.setWhere((PlainSelect) selectBody, (String) obj);
-        } else if (selectBody instanceof SetOperationList) {
-            SetOperationList setOperationList = (SetOperationList) selectBody;
+        } else if (selectBody instanceof SetOperationList setOperationList) {
             List<SelectBody> selectBodyList = setOperationList.getSelects();
             selectBodyList.forEach(s -> this.setWhere((PlainSelect) s, (String) obj));
         }
