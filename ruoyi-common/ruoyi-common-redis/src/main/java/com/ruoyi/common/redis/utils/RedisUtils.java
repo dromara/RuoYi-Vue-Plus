@@ -438,7 +438,7 @@ public class RedisUtils {
      */
     public static Collection<String> keys(final String pattern) {
         Stream<String> stream = CLIENT.getKeys().getKeysStreamByPattern(pattern);
-        return stream.toList();
+        return stream.collect(Collectors.toList());
     }
 
     /**
