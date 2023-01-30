@@ -50,7 +50,7 @@ public class SysOssVo implements Serializable {
     /**
      * 上传人
      */
-    private String createBy;
+    private Long createBy;
 
     /**
      * 服务商

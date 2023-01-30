@@ -68,7 +68,7 @@ public class TestDemoVo implements Serializable {
      * 创建人
      */
     @ExcelProperty(value = "创建人")
-    private String createBy;
+    private Long createBy;
 
     /**
      * 更新时间
@@ -80,7 +80,7 @@ public class TestDemoVo implements Serializable {
      * 更新人
      */
     @ExcelProperty(value = "更新人")
-    private String updateBy;
+    private Long updateBy;
 
 
 }

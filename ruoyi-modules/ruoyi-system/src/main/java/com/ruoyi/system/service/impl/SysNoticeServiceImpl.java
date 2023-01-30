@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
@@ -30,7 +31,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
         LambdaQueryWrapper<SysNotice> lqw = new LambdaQueryWrapper<SysNotice>()
             .like(StringUtils.isNotBlank(notice.getNoticeTitle()), SysNotice::getNoticeTitle, notice.getNoticeTitle())
             .eq(StringUtils.isNotBlank(notice.getNoticeType()), SysNotice::getNoticeType, notice.getNoticeType())
-            .like(StringUtils.isNotBlank(notice.getCreateBy()), SysNotice::getCreateBy, notice.getCreateBy());
+            .like(ObjectUtil.isNotNull(notice.getCreateBy()), SysNotice::getCreateBy, notice.getCreateBy());
         Page<SysNotice> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
@@ -57,7 +58,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
         return baseMapper.selectList(new LambdaQueryWrapper<SysNotice>()
             .like(StringUtils.isNotBlank(notice.getNoticeTitle()), SysNotice::getNoticeTitle, notice.getNoticeTitle())
             .eq(StringUtils.isNotBlank(notice.getNoticeType()), SysNotice::getNoticeType, notice.getNoticeType())
-            .like(StringUtils.isNotBlank(notice.getCreateBy()), SysNotice::getCreateBy, notice.getCreateBy()));
+            .like(ObjectUtil.isNotNull(notice.getCreateBy()), SysNotice::getCreateBy, notice.getCreateBy()));
     }
 
     /**
