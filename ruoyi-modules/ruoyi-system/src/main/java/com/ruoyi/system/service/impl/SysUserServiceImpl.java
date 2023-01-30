@@ -10,19 +10,14 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.mybatis.core.page.PageQuery;
-import com.ruoyi.system.domain.SysDept;
-import com.ruoyi.system.domain.SysRole;
-import com.ruoyi.system.domain.SysUser;
-import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.core.exception.ServiceException;
-import com.ruoyi.common.mybatis.helper.DataBaseHelper;
-import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
-import com.ruoyi.system.domain.SysPost;
-import com.ruoyi.system.domain.SysUserPost;
-import com.ruoyi.system.domain.SysUserRole;
+import com.ruoyi.common.mybatis.core.page.PageQuery;
+import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.mybatis.helper.DataBaseHelper;
+import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.system.domain.*;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -211,7 +204,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * 校验手机号码是否唯一
      *
      * @param user 用户信息
-     * @return
      */
     @Override
     public String checkPhoneUnique(SysUser user) {
@@ -228,7 +220,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * 校验email是否唯一
      *
      * @param user 用户信息
-     * @return
      */
     @Override
     public String checkEmailUnique(SysUser user) {
@@ -417,13 +408,12 @@ public class SysUserServiceImpl implements ISysUserService {
         Long[] posts = user.getPostIds();
         if (ArrayUtil.isNotEmpty(posts)) {
             // 新增用户与岗位管理
-            List<SysUserPost> list = new ArrayList<>(posts.length);
-            for (Long postId : posts) {
+            List<SysUserPost> list = StreamUtils.toList(List.of(posts), postId -> {
                 SysUserPost up = new SysUserPost();
                 up.setUserId(user.getUserId());
                 up.setPostId(postId);
-                list.add(up);
-            }
+                return up;
+            });
             userPostMapper.insertBatch(list);
         }
     }
@@ -437,13 +427,12 @@ public class SysUserServiceImpl implements ISysUserService {
     public void insertUserRole(Long userId, Long[] roleIds) {
         if (ArrayUtil.isNotEmpty(roleIds)) {
             // 新增用户与角色管理
-            List<SysUserRole> list = new ArrayList<>(roleIds.length);
-            for (Long roleId : roleIds) {
+            List<SysUserRole> list = StreamUtils.toList(List.of(roleIds), roleId -> {
                 SysUserRole ur = new SysUserRole();
                 ur.setUserId(userId);
                 ur.setRoleId(roleId);
-                list.add(ur);
-            }
+                return ur;
+            });
             userRoleMapper.insertBatch(list);
         }
     }
@@ -477,7 +466,7 @@ public class SysUserServiceImpl implements ISysUserService {
             checkUserAllowed(new SysUser(userId));
             checkUserDataScope(userId);
         }
-        List<Long> ids = Arrays.asList(userIds);
+        List<Long> ids = List.of(userIds);
         // 删除用户与角色关联
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getUserId, ids));
         // 删除用户与岗位表

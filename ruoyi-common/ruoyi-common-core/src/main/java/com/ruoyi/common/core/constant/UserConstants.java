@@ -131,8 +131,8 @@ public interface UserConstants {
     int PASSWORD_MAX_LENGTH = 20;
 
     /**
-     * 管理员ID
+     * 超级管理员ID
      */
-    Long ADMIN_ID = 1L;
+    Long SUPER_ADMIN_ID = 1L;
 
 }

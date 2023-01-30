@@ -1,5 +1,6 @@
 package com.ruoyi.system.service;
 
+import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.system.domain.SysUser;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class SysPermissionService {
      * @return 角色权限信息
      */
     public Set<String> getRolePermission(SysUser user) {
-        Set<String> roles = new HashSet<String>();
+        Set<String> roles = new HashSet<>();
         // 管理员拥有所有权限
         if (user.isAdmin()) {
             roles.add("admin");
@@ -45,13 +46,13 @@ public class SysPermissionService {
      * @return 菜单权限信息
      */
     public Set<String> getMenuPermission(SysUser user) {
-        Set<String> perms = new HashSet<String>();
+        Set<String> perms = new HashSet<>();
         // 管理员拥有所有权限
         if (user.isAdmin()) {
             perms.add("*:*:*");
         } else {
             List<SysRole> roles = user.getRoles();
-            if (!roles.isEmpty() && roles.size() > 1) {
+            if (CollUtil.isNotEmpty(roles)) {
                 // 多角色设置permissions属性，以便数据权限匹配权限
                 for (SysRole role : roles) {
                     Set<String> rolePerms = menuService.selectMenuPermsByRoleId(role.getRoleId());

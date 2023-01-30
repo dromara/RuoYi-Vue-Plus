@@ -10,13 +10,13 @@ import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.web.domain.BaseEntity;
 import com.ruoyi.common.excel.annotation.ExcelDictFormat;
 import com.ruoyi.common.excel.convert.ExcelDictConvert;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.util.Set;
 
 /**
@@ -126,6 +126,6 @@ public class SysRole extends BaseEntity {
     }
 
     public boolean isAdmin() {
-        return UserConstants.ADMIN_ID.equals(this.roleId);
+        return UserConstants.SUPER_ADMIN_ID.equals(this.roleId);
     }
 }

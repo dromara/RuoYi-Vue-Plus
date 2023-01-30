@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
@@ -397,14 +398,13 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public int insertAuthUsers(Long roleId, Long[] userIds) {
         // 新增用户与角色管理
         int rows = 1;
-        List<SysUserRole> list = new ArrayList<SysUserRole>();
-        for (Long userId : userIds) {
+        List<SysUserRole> list = StreamUtils.toList(List.of(userIds), userId -> {
             SysUserRole ur = new SysUserRole();
             ur.setUserId(userId);
             ur.setRoleId(roleId);
-            list.add(ur);
-        }
-        if (list.size() > 0) {
+            return ur;
+        });
+        if (CollUtil.isNotEmpty(list)) {
             rows = userRoleMapper.insertBatch(list) ? list.size() : 0;
         }
         return rows;
