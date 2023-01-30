@@ -232,7 +232,7 @@ public class SysLoginService {
     private LoginUser buildLoginUser(SysUser user) {
         LoginUser loginUser = new LoginUser();
         loginUser.setUserId(user.getUserId());
-        loginUser.setDeptId(ObjectUtil.isNull(user.getDept()) ? null : user.getDept().getDeptId());
+        loginUser.setDeptId(user.getDeptId());
         loginUser.setUsername(user.getUserName());
         loginUser.setUserType(user.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user));
