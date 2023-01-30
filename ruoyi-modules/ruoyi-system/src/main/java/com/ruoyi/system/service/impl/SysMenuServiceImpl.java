@@ -8,12 +8,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.system.domain.SysMenu;
-import com.ruoyi.system.domain.SysRole;
-import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.TreeBuildUtils;
+import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.system.domain.SysMenu;
+import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.system.domain.SysRoleMenu;
 import com.ruoyi.system.domain.vo.MetaVo;
 import com.ruoyi.system.domain.vo.RouterVo;
@@ -153,7 +153,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public List<RouterVo> buildMenus(List<SysMenu> menus) {
-        List<RouterVo> routers = new LinkedList<RouterVo>();
+        List<RouterVo> routers = new LinkedList<>();
         for (SysMenu menu : menus) {
             RouterVo router = new RouterVo();
             router.setHidden("1".equals(menu.getVisible()));
@@ -169,7 +169,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 router.setChildren(buildMenus(cMenus));
             } else if (isMenuFrame(menu)) {
                 router.setMeta(null);
-                List<RouterVo> childrenList = new ArrayList<RouterVo>();
+                List<RouterVo> childrenList = new ArrayList<>();
                 RouterVo children = new RouterVo();
                 children.setPath(menu.getPath());
                 children.setComponent(menu.getComponent());
@@ -181,7 +181,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
             } else if (menu.getParentId().intValue() == 0 && isInnerLink(menu)) {
                 router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
                 router.setPath("/");
-                List<RouterVo> childrenList = new ArrayList<RouterVo>();
+                List<RouterVo> childrenList = new ArrayList<>();
                 RouterVo children = new RouterVo();
                 String routerPath = innerLinkReplaceEach(menu.getPath());
                 children.setPath(routerPath);
@@ -394,7 +394,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return String
      */
     public List<SysMenu> getChildPerms(List<SysMenu> list, int parentId) {
-        List<SysMenu> returnList = new ArrayList<SysMenu>();
+        List<SysMenu> returnList = new ArrayList<>();
         for (SysMenu t : list) {
             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
             if (t.getParentId() == parentId) {
@@ -430,7 +430,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * 判断是否有子节点
      */
     private boolean hasChild(List<SysMenu> list, SysMenu t) {
-        return getChildList(list, t).size() > 0;
+        return CollUtil.isNotEmpty(getChildList(list, t));
     }
 
     /**

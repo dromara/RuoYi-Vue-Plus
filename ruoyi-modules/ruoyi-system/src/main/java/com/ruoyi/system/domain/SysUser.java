@@ -6,13 +6,13 @@ import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.enums.SensitiveStrategy;
 import com.ruoyi.common.core.web.domain.BaseEntity;
 import com.ruoyi.common.core.xss.Xss;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
 
@@ -154,7 +154,7 @@ public class SysUser extends BaseEntity {
     }
 
     public boolean isAdmin() {
-        return UserConstants.ADMIN_ID.equals(this.userId);
+        return UserConstants.SUPER_ADMIN_ID.equals(this.userId);
     }
 
 }
