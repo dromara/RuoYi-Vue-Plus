@@ -14,6 +14,7 @@ import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
+import com.ruoyi.common.utils.StreamUtils;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.domain.SysRoleMenu;
 import com.ruoyi.system.domain.SysUserRole;
@@ -397,14 +398,13 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public int insertAuthUsers(Long roleId, Long[] userIds) {
         // 新增用户与角色管理
         int rows = 1;
-        List<SysUserRole> list = new ArrayList<SysUserRole>();
-        for (Long userId : userIds) {
+        List<SysUserRole> list = StreamUtils.toList(Arrays.asList(userIds), userId -> {
             SysUserRole ur = new SysUserRole();
             ur.setUserId(userId);
             ur.setRoleId(roleId);
-            list.add(ur);
-        }
-        if (list.size() > 0) {
+            return ur;
+        });
+        if (CollUtil.isNotEmpty(list)) {
             rows = userRoleMapper.insertBatch(list) ? list.size() : 0;
         }
         return rows;
