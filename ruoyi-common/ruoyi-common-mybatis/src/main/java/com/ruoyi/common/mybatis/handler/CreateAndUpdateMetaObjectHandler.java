@@ -30,12 +30,17 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
                     ? baseEntity.getCreateTime() : new Date();
                 baseEntity.setCreateTime(current);
                 baseEntity.setUpdateTime(current);
-                String username = StringUtils.isNotBlank(baseEntity.getCreateBy())
-                    ? baseEntity.getCreateBy() : getLoginUsername();
+                LoginUser loginUser = LoginHelper.getLoginUser();
+                Long userId = ObjectUtil.isNotNull(baseEntity.getCreateBy())
+                    ? baseEntity.getCreateBy() : loginUser.getUserId();
                 // 当前已登录 且 创建人为空 则填充
-                baseEntity.setCreateBy(username);
+                baseEntity.setCreateBy(userId);
                 // 当前已登录 且 更新人为空 则填充
-                baseEntity.setUpdateBy(username);
+                baseEntity.setUpdateBy(userId);
+                // 创建部门
+                Long deptId = ObjectUtil.isNotNull(baseEntity.getCreateDept())
+                    ? baseEntity.getCreateDept() : loginUser.getDeptId();
+                baseEntity.setCreateDept(deptId);
             }
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
@@ -49,11 +54,8 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
                 Date current = new Date();
                 // 更新时间填充(不管为不为空)
                 baseEntity.setUpdateTime(current);
-                String username = getLoginUsername();
                 // 当前已登录 更新人填充(不管为不为空)
-                if (StringUtils.isNotBlank(username)) {
-                    baseEntity.setUpdateBy(username);
-                }
+                baseEntity.setUpdateBy(LoginHelper.getUserId());
             }
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);

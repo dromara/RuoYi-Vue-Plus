@@ -2,6 +2,7 @@ package com.ruoyi.generator.util;
 
 import com.ruoyi.common.core.constant.GenConstants;
 import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.generator.config.GenConfig;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
@@ -29,7 +30,7 @@ public class GenUtils {
         genTable.setBusinessName(getBusinessName(genTable.getTableName()));
         genTable.setFunctionName(replaceText(genTable.getTableComment()));
         genTable.setFunctionAuthor(GenConfig.getAuthor());
-        genTable.setCreateBy(operName);
+        genTable.setCreateBy(LoginHelper.getUserId());
     }
 
     /**

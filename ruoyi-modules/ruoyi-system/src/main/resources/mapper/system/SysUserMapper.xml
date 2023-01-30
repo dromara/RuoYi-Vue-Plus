@@ -7,6 +7,7 @@
     <!-- 多结构嵌套自动映射需带上每个实体的主键id 否则映射会失败 -->
     <resultMap type="com.ruoyi.system.domain.SysUser" id="SysUserResult">
         <id property="userId" column="user_id"/>
+        <result property="deptId" column="dept_id"/>
         <association property="dept" column="dept_id" resultMap="deptResult"/>
         <collection property="roles" javaType="java.util.List" resultMap="RoleResult"/>
     </resultMap>

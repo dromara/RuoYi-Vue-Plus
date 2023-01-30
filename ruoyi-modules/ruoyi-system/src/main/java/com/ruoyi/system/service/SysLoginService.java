@@ -81,7 +81,7 @@ public class SysLoginService {
         LoginHelper.loginByDevice(loginUser, DeviceType.PC);
 
         recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
-        recordLoginInfo(user.getUserId(), username);
+        recordLoginInfo(user.getUserId());
         return StpUtil.getTokenValue();
     }
 
@@ -96,7 +96,7 @@ public class SysLoginService {
         LoginHelper.loginByDevice(loginUser, DeviceType.APP);
 
         recordLogininfor(user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
-        recordLoginInfo(user.getUserId(), user.getUserName());
+        recordLoginInfo(user.getUserId());
         return StpUtil.getTokenValue();
     }
 
@@ -118,7 +118,7 @@ public class SysLoginService {
         LoginHelper.loginByDevice(loginUser, DeviceType.XCX);
 
         recordLogininfor(user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
-        recordLoginInfo(user.getUserId(), user.getUserName());
+        recordLoginInfo(user.getUserId());
         return StpUtil.getTokenValue();
     }
 
@@ -248,12 +248,12 @@ public class SysLoginService {
      *
      * @param userId 用户ID
      */
-    public void recordLoginInfo(Long userId, String username) {
+    public void recordLoginInfo(Long userId) {
         SysUser sysUser = new SysUser();
         sysUser.setUserId(userId);
         sysUser.setLoginIp(ServletUtils.getClientIP());
         sysUser.setLoginDate(DateUtils.getNowDate());
-        sysUser.setUpdateBy(username);
+        sysUser.setUpdateBy(userId);
         userMapper.updateById(sysUser);
     }
 

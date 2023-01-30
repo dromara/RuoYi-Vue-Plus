@@ -57,7 +57,7 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
                 user = BeanUtil.toBean(userVo, SysUser.class);
                 ValidatorUtils.validate(user);
                 user.setPassword(password);
-                user.setCreateBy(operName);
+                user.setCreateBy(LoginHelper.getUserId());
                 userService.insertUser(user);
                 successNum++;
                 successMsg.append("<br/>").append(successNum).append("、账号 ").append(user.getUserName()).append(" 导入成功");
@@ -68,7 +68,7 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
                 ValidatorUtils.validate(user);
                 userService.checkUserAllowed(user);
                 userService.checkUserDataScope(user.getUserId());
-                user.setUpdateBy(operName);
+                user.setUpdateBy(LoginHelper.getUserId());
                 userService.updateUser(user);
                 successNum++;
                 successMsg.append("<br/>").append(successNum).append("、账号 ").append(user.getUserName()).append(" 更新成功");
