@@ -461,7 +461,7 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   const _${pkColumn.javaField}s = row.${pkColumn.javaField} || ids.value;
-  proxy.#[[$modal]]#.confirm('是否确认删除${functionName}编号为"' + ${pkColumn.javaField}s + '"的数据项？').then(function() {
+  proxy.#[[$modal]]#.confirm('是否确认删除${functionName}编号为"' + _${pkColumn.javaField}s + '"的数据项？').then(function() {
     loading.value = true;
     return del${BusinessName}(_${pkColumn.javaField}s);
   }).then(() => {
