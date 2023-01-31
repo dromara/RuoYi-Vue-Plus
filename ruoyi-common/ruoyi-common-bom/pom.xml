@@ -130,6 +130,14 @@
                 <artifactId>ruoyi-common-web</artifactId>
                 <version>${revision}</version>
             </dependency>
+
+            <!-- 翻译模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-translation</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

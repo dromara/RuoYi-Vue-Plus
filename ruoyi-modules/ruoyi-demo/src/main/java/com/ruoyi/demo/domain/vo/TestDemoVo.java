@@ -2,6 +2,8 @@ package com.ruoyi.demo.domain.vo;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.ruoyi.common.translation.annotation.Translation;
+import com.ruoyi.common.translation.constant.TransConstant;
 import lombok.Data;
 
 import java.io.Serial;
@@ -67,6 +69,7 @@ public class TestDemoVo implements Serializable {
     /**
      * 创建人
      */
+    @Translation(type = TransConstant.USER_ID_TO_NAME)
     @ExcelProperty(value = "创建人")
     private Long createBy;
 
@@ -79,6 +82,7 @@ public class TestDemoVo implements Serializable {
     /**
      * 更新人
      */
+    @Translation(type = TransConstant.USER_ID_TO_NAME)
     @ExcelProperty(value = "更新人")
     private Long updateBy;
 
