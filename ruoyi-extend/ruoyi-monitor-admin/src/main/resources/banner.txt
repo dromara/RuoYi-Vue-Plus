@@ -1,4 +1,4 @@
-Application Version: ${ruoyi-vue-plus.version}
+Application Version: ${revision}
 Spring Boot Version: ${spring-boot.version}
  __  __             _ _                              _           _
 |  \/  |           (_) |                    /\      | |         (_)
