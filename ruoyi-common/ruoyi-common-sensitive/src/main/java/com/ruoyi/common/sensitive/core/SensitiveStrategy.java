@@ -1,4 +1,4 @@
-package com.ruoyi.common.core.enums;
+package com.ruoyi.common.sensitive.core;
 
 import cn.hutool.core.util.DesensitizedUtil;
 import lombok.AllArgsConstructor;

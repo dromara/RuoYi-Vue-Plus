@@ -1,11 +1,11 @@
 package com.ruoyi.system.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.ruoyi.common.core.annotation.Sensitive;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.core.enums.SensitiveStrategy;
 import com.ruoyi.common.core.web.domain.BaseEntity;
 import com.ruoyi.common.core.xss.Xss;
+import com.ruoyi.common.sensitive.annotation.Sensitive;
+import com.ruoyi.common.sensitive.core.SensitiveStrategy;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

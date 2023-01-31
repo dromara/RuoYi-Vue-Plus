@@ -1,4 +1,4 @@
-package com.ruoyi.common.core.service;
+package com.ruoyi.common.sensitive.core;
 
 /**
  * 脱敏服务

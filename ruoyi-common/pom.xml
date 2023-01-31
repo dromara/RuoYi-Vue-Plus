@@ -28,6 +28,7 @@
         <module>ruoyi-common-sms</module>
         <module>ruoyi-common-web</module>
         <module>ruoyi-common-translation</module>
+        <module>ruoyi-common-sensitive</module>
     </modules>
 
     <artifactId>ruoyi-common</artifactId>

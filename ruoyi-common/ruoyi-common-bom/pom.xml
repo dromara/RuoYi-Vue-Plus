@@ -131,6 +131,12 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- 脱敏模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-sensitive</artifactId>
+                <version>${revision}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -80,6 +80,11 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-idempotent</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-sensitive</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

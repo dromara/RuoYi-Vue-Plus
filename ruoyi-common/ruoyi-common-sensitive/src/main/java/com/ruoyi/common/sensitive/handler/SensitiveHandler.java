@@ -1,4 +1,4 @@
-package com.ruoyi.common.core.jackson;
+package com.ruoyi.common.sensitive.handler;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -7,10 +7,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
-import com.ruoyi.common.core.annotation.Sensitive;
-import com.ruoyi.common.core.enums.SensitiveStrategy;
-import com.ruoyi.common.core.service.SensitiveService;
 import com.ruoyi.common.core.utils.SpringUtils;
+import com.ruoyi.common.sensitive.annotation.Sensitive;
+import com.ruoyi.common.sensitive.core.SensitiveService;
+import com.ruoyi.common.sensitive.core.SensitiveStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 
@@ -23,7 +23,7 @@ import java.util.Objects;
  * @author Yjoioooo
  */
 @Slf4j
-public class SensitiveJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {
+public class SensitiveHandler extends JsonSerializer<String> implements ContextualSerializer {
 
     private SensitiveStrategy strategy;
 
