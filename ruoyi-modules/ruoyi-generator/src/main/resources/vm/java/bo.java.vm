@@ -12,9 +12,9 @@ import java.util.Date;
 import ${import};
 #end
 #if($table.crud || $table.sub)
-import com.ruoyi.common.core.web.domain.BaseEntity;
+import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 #elseif($table.tree)
-import com.ruoyi.common.core.web.domain.TreeEntity;
+import com.ruoyi.common.mybatis.core.domain.TreeEntity;
 #end
 
 /**

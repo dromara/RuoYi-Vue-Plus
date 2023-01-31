@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.ruoyi.common.mybatis.handler.CreateAndUpdateMetaObjectHandler;
+import com.ruoyi.common.mybatis.handler.InjectionMetaObjectHandler;
 import com.ruoyi.common.mybatis.interceptor.PlusDataPermissionInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -67,7 +67,7 @@ public class MybatisPlusConfig {
      */
     @Bean
     public MetaObjectHandler metaObjectHandler() {
-        return new CreateAndUpdateMetaObjectHandler();
+        return new InjectionMetaObjectHandler();
     }
 
     /**

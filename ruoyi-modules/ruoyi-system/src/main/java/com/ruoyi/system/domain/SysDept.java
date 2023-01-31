@@ -3,7 +3,7 @@ package com.ruoyi.system.domain;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ruoyi.common.core.web.domain.TreeEntity;
+import com.ruoyi.common.mybatis.core.domain.TreeEntity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

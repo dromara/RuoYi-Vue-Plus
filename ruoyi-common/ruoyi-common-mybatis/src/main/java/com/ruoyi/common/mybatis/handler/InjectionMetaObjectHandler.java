@@ -5,7 +5,7 @@ import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.exception.ServiceException;
-import com.ruoyi.common.core.web.domain.BaseEntity;
+import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
@@ -19,7 +19,7 @@ import java.util.Date;
  * @date 2021/4/25
  */
 @Slf4j
-public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
+public class InjectionMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {

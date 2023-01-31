@@ -1,4 +1,4 @@
-package com.ruoyi.common.core.web.domain;
+package com.ruoyi.common.mybatis.core.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
