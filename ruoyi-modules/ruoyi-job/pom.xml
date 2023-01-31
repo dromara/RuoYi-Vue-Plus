@@ -24,10 +24,10 @@
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
-        <!-- xxl-job-core -->
+        <!-- 调度模块 -->
         <dependency>
-            <groupId>com.xuxueli</groupId>
-            <artifactId>xxl-job-core</artifactId>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-job</artifactId>
         </dependency>
 
     </dependencies>

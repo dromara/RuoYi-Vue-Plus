@@ -17,6 +17,7 @@
         <module>ruoyi-common-doc</module>
         <module>ruoyi-common-excel</module>
         <module>ruoyi-common-idempotent</module>
+        <module>ruoyi-common-job</module>
         <module>ruoyi-common-log</module>
         <module>ruoyi-common-mail</module>
         <module>ruoyi-common-mybatis</module>

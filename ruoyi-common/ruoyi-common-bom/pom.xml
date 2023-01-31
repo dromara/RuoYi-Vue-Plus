@@ -54,6 +54,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- 调度模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-job</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- 日志记录 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
