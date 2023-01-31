@@ -26,13 +26,6 @@
                 <version>${revision}</version>
             </dependency>
 
-            <!-- 字典 -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-common-dict</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
             <!-- 接口模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>

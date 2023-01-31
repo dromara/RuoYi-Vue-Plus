@@ -25,8 +25,8 @@ public @interface Translation {
     String type();
 
     /**
-     * 通用Key 如果为空则取被标注的字段值 例如: 字典type(sys_user_sex)
+     * 其他条件 例如: 字典type(sys_user_sex)
      */
-    String key() default "";
+    String other() default "";
 
 }

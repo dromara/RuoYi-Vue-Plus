@@ -35,7 +35,7 @@
 
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common-dict</artifactId>
+            <artifactId>ruoyi-common-translation</artifactId>
         </dependency>
 
         <!-- OSS功能模块 -->

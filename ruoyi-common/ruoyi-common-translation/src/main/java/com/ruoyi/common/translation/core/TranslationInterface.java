@@ -13,5 +13,5 @@ public interface TranslationInterface {
      * @param key 需要被翻译的键
      * @return 返回键对应的值
      */
-    String translation(Object key);
+    String translation(Object key, String other);
 }

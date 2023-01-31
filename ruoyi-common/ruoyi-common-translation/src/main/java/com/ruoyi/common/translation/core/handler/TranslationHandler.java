@@ -38,13 +38,13 @@ public class TranslationHandler extends JsonSerializer<Object> implements Contex
         try {
             TranslationInterface trans = TRANSLATION_MAPPER.get(translation.type());
             if (ObjectUtil.isNotNull(trans)) {
-                String result = trans.translation(StringUtils.isBlank(translation.key()) ? value : translation.key());
+                String result = trans.translation(value, translation.other());
                 gen.writeString(StringUtils.isNotBlank(result) ? result : value.toString());
             } else {
                 gen.writeString(value.toString());
             }
         } catch (BeansException e) {
-            log.error("字典数据未查到, 采用默认处理 => {}", e.getMessage());
+            log.error("数据未查到, 采用默认处理 => {}", e.getMessage());
             gen.writeString(value.toString());
         }
     }
