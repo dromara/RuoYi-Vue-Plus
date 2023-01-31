@@ -10,7 +10,7 @@ import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
-import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.common.excel.core.ExcelResult;
 import com.ruoyi.common.excel.utils.ExcelUtil;
 import com.ruoyi.common.log.annotation.Log;

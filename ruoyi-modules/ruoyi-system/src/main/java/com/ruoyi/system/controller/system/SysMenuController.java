@@ -5,7 +5,7 @@ import cn.hutool.core.lang.tree.Tree;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.StringUtils;
-import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.satoken.utils.LoginHelper;

@@ -1,7 +1,7 @@
 package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.common.sensitive.annotation.Sensitive;
 import com.ruoyi.common.sensitive.core.SensitiveStrategy;
 import lombok.Data;

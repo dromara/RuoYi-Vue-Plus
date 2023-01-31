@@ -4,7 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.util.ArrayUtil;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.domain.SysDept;
 import com.ruoyi.common.log.enums.BusinessType;

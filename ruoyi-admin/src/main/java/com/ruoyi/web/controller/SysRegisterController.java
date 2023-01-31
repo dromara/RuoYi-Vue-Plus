@@ -1,7 +1,7 @@
 package com.ruoyi.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
-import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.system.service.ISysConfigService;

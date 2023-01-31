@@ -2,7 +2,7 @@ package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.log.annotation.Log;
-import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;

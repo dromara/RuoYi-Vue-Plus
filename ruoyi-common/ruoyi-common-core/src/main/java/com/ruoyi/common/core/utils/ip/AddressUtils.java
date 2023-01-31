@@ -1,12 +1,12 @@
 package com.ruoyi.common.core.utils.ip;
 
-import cn.hutool.core.lang.Dict;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.http.HtmlUtil;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.ruoyi.common.core.config.RuoYiConfig;
 import com.ruoyi.common.core.constant.Constants;
-import com.ruoyi.common.core.utils.JsonUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -47,7 +47,7 @@ public class AddressUtils {
                     log.error("获取地理位置异常 {}", ip);
                     return UNKNOWN;
                 }
-                Dict obj = JsonUtils.parseMap(rspStr);
+                JSONObject obj = JSONUtil.parseObj(rspStr);
                 String region = obj.getStr("pro");
                 String city = obj.getStr("city");
                 return String.format("%s %s", region, city);

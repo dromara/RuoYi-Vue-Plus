@@ -137,6 +137,14 @@
                 <artifactId>ruoyi-common-sensitive</artifactId>
                 <version>${revision}</version>
             </dependency>
+
+            <!-- 序列化模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-json</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
