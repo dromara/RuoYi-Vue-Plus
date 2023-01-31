@@ -1,4 +1,4 @@
-FROM anapsix/alpine-java:8_server-jre_unlimited
+FROM ghcr.io/graalvm/jdk:ol8-java17-22.3.0
 
 MAINTAINER Lion Li
 
