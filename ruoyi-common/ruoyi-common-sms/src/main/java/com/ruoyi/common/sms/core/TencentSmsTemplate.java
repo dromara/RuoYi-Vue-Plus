@@ -2,8 +2,8 @@ package com.ruoyi.common.sms.core;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
-import com.ruoyi.common.core.utils.JsonUtils;
 import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.json.utils.JsonUtils;
 import com.ruoyi.common.sms.config.properties.SmsProperties;
 import com.ruoyi.common.sms.entity.SmsResult;
 import com.ruoyi.common.sms.exception.SmsException;

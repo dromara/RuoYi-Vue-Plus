@@ -1,8 +1,8 @@
 package com.ruoyi.common.oss.factory;
 
 import com.ruoyi.common.core.constant.CacheNames;
-import com.ruoyi.common.core.utils.JsonUtils;
 import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.json.utils.JsonUtils;
 import com.ruoyi.common.oss.constant.OssConstant;
 import com.ruoyi.common.oss.core.OssClient;
 import com.ruoyi.common.oss.exception.OssException;
