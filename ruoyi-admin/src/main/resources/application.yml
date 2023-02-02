@@ -182,8 +182,6 @@ mybatis-plus:
 
 # Swagger配置
 swagger:
-  # 是否开启swagger
-  enabled: true
   info:
     # 标题
     title: '标题：${ruoyi.name}后台管理系统_接口文档'
@@ -205,6 +203,9 @@ swagger:
         name: ${sa-token.token-name}
 
 springdoc:
+  api-docs:
+    # 是否开启接口文档
+    enabled: true
   swagger-ui:
     # 持久化认证数据
     persistAuthorization: true

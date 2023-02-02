@@ -37,7 +37,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @AutoConfiguration(before = SpringDocConfiguration.class)
 @EnableConfigurationProperties(SwaggerProperties.class)
-@ConditionalOnProperty(name = "swagger.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "springdoc.api-docs.enabled", havingValue = "true", matchIfMissing = true)
 public class SwaggerConfig {
 
     private final ServerProperties serverProperties;
