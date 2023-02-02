@@ -69,9 +69,15 @@ public class TestDemoVo implements Serializable {
     /**
      * 创建人
      */
-    @Translation(type = TransConstant.USER_ID_TO_NAME)
     @ExcelProperty(value = "创建人")
     private Long createBy;
+
+    /**
+     * 创建人账号
+     */
+    @Translation(type = TransConstant.USER_ID_TO_NAME, mapper = "createBy")
+    @ExcelProperty(value = "创建人账号")
+    private String createByName;
 
     /**
      * 更新时间
@@ -86,5 +92,11 @@ public class TestDemoVo implements Serializable {
     @ExcelProperty(value = "更新人")
     private Long updateBy;
 
+    /**
+     * 更新人账号
+     */
+    @Translation(type = TransConstant.USER_ID_TO_NAME, mapper = "updateBy")
+    @ExcelProperty(value = "更新人账号")
+    private String updateByName;
 
 }

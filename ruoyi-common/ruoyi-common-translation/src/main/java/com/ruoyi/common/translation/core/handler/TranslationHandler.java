@@ -41,10 +41,15 @@ public class TranslationHandler extends JsonSerializer<Object> implements Contex
             if (StringUtils.isNotBlank(translation.mapper())) {
                 value = ReflectUtils.invokeGetter(gen.getCurrentValue(), translation.mapper());
             }
+            // 如果为 null 直接写出
+            if (ObjectUtil.isNull(value)) {
+                gen.writeNull();
+                return;
+            }
             String result = trans.translation(value, translation.other());
-            gen.writeString(StringUtils.isNotBlank(result) ? result : value.toString());
+            gen.writeString(result);
         } else {
-            gen.writeString(value.toString());
+            gen.writeObject(value);
         }
     }
 

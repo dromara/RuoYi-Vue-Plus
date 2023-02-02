@@ -61,7 +61,7 @@ public class SysNoticeVo implements Serializable {
      * 创建人名称
      */
     @Translation(type = TransConstant.USER_ID_TO_NAME, mapper = "createBy")
-    private String createByName = "";
+    private String createByName;
 
     /**
      * 创建时间

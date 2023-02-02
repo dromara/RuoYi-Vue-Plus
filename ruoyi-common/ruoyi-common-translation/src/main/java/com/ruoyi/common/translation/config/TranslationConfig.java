@@ -3,6 +3,7 @@ package com.ruoyi.common.translation.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ruoyi.common.translation.annotation.TranslationType;
 import com.ruoyi.common.translation.core.TranslationInterface;
+import com.ruoyi.common.translation.core.handler.TranslationBeanSerializerModifier;
 import com.ruoyi.common.translation.core.handler.TranslationHandler;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +41,10 @@ public class TranslationConfig {
             }
         }
         TranslationHandler.TRANSLATION_MAPPER.putAll(map);
-        // todo null值处理
-//        objectMapper.getSerializerProvider().setNullValueSerializer();
+        // 设置 Bean 序列化修改器
+        objectMapper.setSerializerFactory(
+            objectMapper.getSerializerFactory()
+                .withSerializerModifier(new TranslationBeanSerializerModifier()));
     }
 
 }
