@@ -7,7 +7,8 @@ import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.log.enums.BusinessType;
-import com.ruoyi.system.domain.SysNotice;
+import com.ruoyi.system.domain.bo.SysNoticeBo;
+import com.ruoyi.system.domain.vo.SysNoticeVo;
 import com.ruoyi.system.service.ISysNoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -31,7 +32,7 @@ public class SysNoticeController extends BaseController {
      */
     @SaCheckPermission("system:notice:list")
     @GetMapping("/list")
-    public TableDataInfo<SysNotice> list(SysNotice notice, PageQuery pageQuery) {
+    public TableDataInfo<SysNoticeVo> list(SysNoticeBo notice, PageQuery pageQuery) {
         return noticeService.selectPageNoticeList(notice, pageQuery);
     }
 
@@ -42,7 +43,7 @@ public class SysNoticeController extends BaseController {
      */
     @SaCheckPermission("system:notice:query")
     @GetMapping(value = "/{noticeId}")
-    public R<SysNotice> getInfo(@PathVariable Long noticeId) {
+    public R<SysNoticeVo> getInfo(@PathVariable Long noticeId) {
         return R.ok(noticeService.selectNoticeById(noticeId));
     }
 
@@ -52,7 +53,7 @@ public class SysNoticeController extends BaseController {
     @SaCheckPermission("system:notice:add")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysNotice notice) {
+    public R<Void> add(@Validated @RequestBody SysNoticeBo notice) {
         return toAjax(noticeService.insertNotice(notice));
     }
 
@@ -62,7 +63,7 @@ public class SysNoticeController extends BaseController {
     @SaCheckPermission("system:notice:edit")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysNotice notice) {
+    public R<Void> edit(@Validated @RequestBody SysNoticeBo notice) {
         return toAjax(noticeService.updateNotice(notice));
     }
 

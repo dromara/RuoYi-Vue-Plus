@@ -2,7 +2,9 @@ package com.ruoyi.system.service;
 
 import cn.hutool.core.lang.tree.Tree;
 import com.ruoyi.system.domain.SysMenu;
+import com.ruoyi.system.domain.bo.SysMenuBo;
 import com.ruoyi.system.domain.vo.RouterVo;
+import com.ruoyi.system.domain.vo.SysMenuVo;
 
 import java.util.List;
 import java.util.Set;
@@ -85,7 +87,7 @@ public interface ISysMenuService {
      * @param menuId 菜单ID
      * @return 菜单信息
      */
-    SysMenu selectMenuById(Long menuId);
+    SysMenuVo selectMenuById(Long menuId);
 
     /**
      * 是否存在菜单子节点
@@ -106,18 +108,18 @@ public interface ISysMenuService {
     /**
      * 新增保存菜单信息
      *
-     * @param menu 菜单信息
+     * @param bo 菜单信息
      * @return 结果
      */
-    int insertMenu(SysMenu menu);
+    int insertMenu(SysMenuBo bo);
 
     /**
      * 修改保存菜单信息
      *
-     * @param menu 菜单信息
+     * @param bo 菜单信息
      * @return 结果
      */
-    int updateMenu(SysMenu menu);
+    int updateMenu(SysMenuBo bo);
 
     /**
      * 删除菜单管理信息
@@ -133,5 +135,5 @@ public interface ISysMenuService {
      * @param menu 菜单信息
      * @return 结果
      */
-    String checkMenuNameUnique(SysMenu menu);
+    String checkMenuNameUnique(SysMenuBo menu);
 }

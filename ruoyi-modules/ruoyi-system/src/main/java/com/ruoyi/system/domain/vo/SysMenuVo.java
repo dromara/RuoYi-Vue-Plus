@@ -1,37 +1,39 @@
-package com.ruoyi.system.domain;
+package com.ruoyi.system.domain.vo;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ruoyi.common.mybatis.core.domain.TreeEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Date;
+
+
 
 /**
- * 菜单权限表 sys_menu
+ * 菜单权限视图对象 sys_menu
  *
- * @author Lion Li
+ * @author ruoyi
+ * @date 2023-02-01
  */
-
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("sys_menu")
-public class SysMenu extends TreeEntity<SysMenu> {
+public class SysMenuVo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 菜单ID
      */
-    @TableId(value = "menu_id")
     private Long menuId;
 
     /**
      * 菜单名称
      */
     private String menuName;
+
+    /**
+     * 父菜单ID
+     */
+    private Long parentId;
 
     /**
      * 显示顺序
@@ -64,7 +66,7 @@ public class SysMenu extends TreeEntity<SysMenu> {
     private String isCache;
 
     /**
-     * 类型（M目录 C菜单 F按钮）
+     * 菜单类型（M目录 C菜单 F按钮）
      */
     private String menuType;
 
@@ -79,7 +81,7 @@ public class SysMenu extends TreeEntity<SysMenu> {
     private String status;
 
     /**
-     * 权限字符串
+     * 权限标识
      */
     private String perms;
 
@@ -89,8 +91,18 @@ public class SysMenu extends TreeEntity<SysMenu> {
     private String icon;
 
     /**
+     * 创建部门
+     */
+    private Long createDept;
+
+    /**
      * 备注
      */
     private String remark;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
 }

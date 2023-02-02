@@ -20,6 +20,8 @@ import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.mybatis.helper.DataBaseHelper;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.*;
+import com.ruoyi.system.domain.vo.SysPostVo;
+import com.ruoyi.system.domain.vo.SysRoleVo;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
@@ -164,11 +166,11 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public String selectUserRoleGroup(String userName) {
-        List<SysRole> list = roleMapper.selectRolesByUserName(userName);
+        List<SysRoleVo> list = roleMapper.selectRolesByUserName(userName);
         if (CollUtil.isEmpty(list)) {
             return StringUtils.EMPTY;
         }
-        return StreamUtils.join(list, SysRole::getRoleName);
+        return StreamUtils.join(list, SysRoleVo::getRoleName);
     }
 
     /**
@@ -179,11 +181,11 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public String selectUserPostGroup(String userName) {
-        List<SysPost> list = postMapper.selectPostsByUserName(userName);
+        List<SysPostVo> list = postMapper.selectPostsByUserName(userName);
         if (CollUtil.isEmpty(list)) {
             return StringUtils.EMPTY;
         }
-        return StreamUtils.join(list, SysPost::getPostName);
+        return StreamUtils.join(list, SysPostVo::getPostName);
     }
 
     /**

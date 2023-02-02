@@ -2,7 +2,8 @@ package com.ruoyi.system.service;
 
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.system.domain.SysConfig;
+import com.ruoyi.system.domain.bo.SysConfigBo;
+import com.ruoyi.system.domain.vo.SysConfigVo;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
 public interface ISysConfigService {
 
 
-    TableDataInfo<SysConfig> selectPageConfigList(SysConfig config, PageQuery pageQuery);
+    TableDataInfo<SysConfigVo> selectPageConfigList(SysConfigBo config, PageQuery pageQuery);
 
     /**
      * 查询参数配置信息
@@ -22,7 +23,7 @@ public interface ISysConfigService {
      * @param configId 参数配置ID
      * @return 参数配置信息
      */
-    SysConfig selectConfigById(Long configId);
+    SysConfigVo selectConfigById(Long configId);
 
     /**
      * 根据键名查询参数配置信息
@@ -45,23 +46,23 @@ public interface ISysConfigService {
      * @param config 参数配置信息
      * @return 参数配置集合
      */
-    List<SysConfig> selectConfigList(SysConfig config);
+    List<SysConfigVo> selectConfigList(SysConfigBo config);
 
     /**
      * 新增参数配置
      *
-     * @param config 参数配置信息
+     * @param bo 参数配置信息
      * @return 结果
      */
-    String insertConfig(SysConfig config);
+    String insertConfig(SysConfigBo bo);
 
     /**
      * 修改参数配置
      *
-     * @param config 参数配置信息
+     * @param bo 参数配置信息
      * @return 结果
      */
-    String updateConfig(SysConfig config);
+    String updateConfig(SysConfigBo bo);
 
     /**
      * 批量删除参数信息
@@ -91,6 +92,6 @@ public interface ISysConfigService {
      * @param config 参数信息
      * @return 结果
      */
-    String checkConfigKeyUnique(SysConfig config);
+    String checkConfigKeyUnique(SysConfigBo config);
 
 }

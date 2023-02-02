@@ -2,7 +2,8 @@ package com.ruoyi.system.service;
 
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.system.domain.SysNotice;
+import com.ruoyi.system.domain.bo.SysNoticeBo;
+import com.ruoyi.system.domain.vo.SysNoticeVo;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
 public interface ISysNoticeService {
 
 
-    TableDataInfo<SysNotice> selectPageNoticeList(SysNotice notice, PageQuery pageQuery);
+    TableDataInfo<SysNoticeVo> selectPageNoticeList(SysNoticeBo notice, PageQuery pageQuery);
 
     /**
      * 查询公告信息
@@ -22,7 +23,7 @@ public interface ISysNoticeService {
      * @param noticeId 公告ID
      * @return 公告信息
      */
-    SysNotice selectNoticeById(Long noticeId);
+    SysNoticeVo selectNoticeById(Long noticeId);
 
     /**
      * 查询公告列表
@@ -30,23 +31,23 @@ public interface ISysNoticeService {
      * @param notice 公告信息
      * @return 公告集合
      */
-    List<SysNotice> selectNoticeList(SysNotice notice);
+    List<SysNoticeVo> selectNoticeList(SysNoticeBo notice);
 
     /**
      * 新增公告
      *
-     * @param notice 公告信息
+     * @param bo 公告信息
      * @return 结果
      */
-    int insertNotice(SysNotice notice);
+    int insertNotice(SysNoticeBo bo);
 
     /**
      * 修改公告
      *
-     * @param notice 公告信息
+     * @param bo 公告信息
      * @return 结果
      */
-    int updateNotice(SysNotice notice);
+    int updateNotice(SysNoticeBo bo);
 
     /**
      * 删除公告信息

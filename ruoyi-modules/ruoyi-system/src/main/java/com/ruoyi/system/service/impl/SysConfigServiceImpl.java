@@ -1,9 +1,11 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.UserConstants;
@@ -15,6 +17,8 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.redis.utils.CacheUtils;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.system.domain.SysConfig;
+import com.ruoyi.system.domain.bo.SysConfigBo;
+import com.ruoyi.system.domain.vo.SysConfigVo;
 import com.ruoyi.system.mapper.SysConfigMapper;
 import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
@@ -38,15 +42,9 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     private final SysConfigMapper baseMapper;
 
     @Override
-    public TableDataInfo<SysConfig> selectPageConfigList(SysConfig config, PageQuery pageQuery) {
-        Map<String, Object> params = config.getParams();
-        LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
-            .like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
-            .eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
-            .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"));
-        Page<SysConfig> page = baseMapper.selectPage(pageQuery.build(), lqw);
+    public TableDataInfo<SysConfigVo> selectPageConfigList(SysConfigBo config, PageQuery pageQuery) {
+        LambdaQueryWrapper<SysConfig> lqw = buildQueryWrapper(config);
+        Page<SysConfigVo> page = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
 
@@ -58,8 +56,8 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      */
     @Override
     @DS("master")
-    public SysConfig selectConfigById(Long configId) {
-        return baseMapper.selectById(configId);
+    public SysConfigVo selectConfigById(Long configId) {
+        return baseMapper.selectVoById(configId);
     }
 
     /**
@@ -100,26 +98,32 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * @return 参数配置集合
      */
     @Override
-    public List<SysConfig> selectConfigList(SysConfig config) {
-        Map<String, Object> params = config.getParams();
-        LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
-            .like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
-            .eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
-            .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"));
-        return baseMapper.selectList(lqw);
+    public List<SysConfigVo> selectConfigList(SysConfigBo config) {
+        LambdaQueryWrapper<SysConfig> lqw = buildQueryWrapper(config);
+        return baseMapper.selectVoList(lqw);
+    }
+
+    private LambdaQueryWrapper<SysConfig> buildQueryWrapper(SysConfigBo bo) {
+        Map<String, Object> params = bo.getParams();
+        LambdaQueryWrapper<SysConfig> lqw = Wrappers.lambdaQuery();
+        lqw.like(StringUtils.isNotBlank(bo.getConfigName()), SysConfig::getConfigName, bo.getConfigName());
+        lqw.eq(StringUtils.isNotBlank(bo.getConfigType()), SysConfig::getConfigType, bo.getConfigType());
+        lqw.like(StringUtils.isNotBlank(bo.getConfigKey()), SysConfig::getConfigKey, bo.getConfigKey());
+        lqw.between(params.get("beginTime") != null && params.get("endTime") != null,
+            SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"));
+        return lqw;
     }
 
     /**
      * 新增参数配置
      *
-     * @param config 参数配置信息
+     * @param bo 参数配置信息
      * @return 结果
      */
-    @CachePut(cacheNames = CacheNames.SYS_CONFIG, key = "#config.configKey")
+    @CachePut(cacheNames = CacheNames.SYS_CONFIG, key = "#bo.configKey")
     @Override
-    public String insertConfig(SysConfig config) {
+    public String insertConfig(SysConfigBo bo) {
+        SysConfig config = BeanUtil.toBean(bo, SysConfig.class);
         int row = baseMapper.insert(config);
         if (row > 0) {
             return config.getConfigValue();
@@ -130,13 +134,14 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     /**
      * 修改参数配置
      *
-     * @param config 参数配置信息
+     * @param bo 参数配置信息
      * @return 结果
      */
-    @CachePut(cacheNames = CacheNames.SYS_CONFIG, key = "#config.configKey")
+    @CachePut(cacheNames = CacheNames.SYS_CONFIG, key = "#bo.configKey")
     @Override
-    public String updateConfig(SysConfig config) {
+    public String updateConfig(SysConfigBo bo) {
         int row = 0;
+        SysConfig config = BeanUtil.toBean(bo, SysConfig.class);
         if (config.getConfigId() != null) {
             SysConfig temp = baseMapper.selectById(config.getConfigId());
             if (!StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
@@ -161,7 +166,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     @Override
     public void deleteConfigByIds(Long[] configIds) {
         for (Long configId : configIds) {
-            SysConfig config = selectConfigById(configId);
+            SysConfig config = baseMapper.selectById(configId);
             if (StringUtils.equals(UserConstants.YES, config.getConfigType())) {
                 throw new ServiceException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
             }
@@ -175,7 +180,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      */
     @Override
     public void loadingConfigCache() {
-        List<SysConfig> configsList = selectConfigList(new SysConfig());
+        List<SysConfigVo> configsList = selectConfigList(new SysConfigBo());
         configsList.forEach(config ->
             CacheUtils.put(CacheNames.SYS_CONFIG, config.getConfigKey(), config.getConfigValue()));
     }
@@ -204,7 +209,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * @return 结果
      */
     @Override
-    public String checkConfigKeyUnique(SysConfig config) {
+    public String checkConfigKeyUnique(SysConfigBo config) {
         long configId = ObjectUtil.isNull(config.getConfigId()) ? -1L : config.getConfigId();
         SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, config.getConfigKey()));
         if (ObjectUtil.isNotNull(info) && info.getConfigId() != configId) {

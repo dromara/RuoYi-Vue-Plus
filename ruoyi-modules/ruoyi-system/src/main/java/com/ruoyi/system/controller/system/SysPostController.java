@@ -9,7 +9,8 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
-import com.ruoyi.system.domain.SysPost;
+import com.ruoyi.system.domain.bo.SysPostBo;
+import com.ruoyi.system.domain.vo.SysPostVo;
 import com.ruoyi.system.service.ISysPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -36,7 +37,7 @@ public class SysPostController extends BaseController {
      */
     @SaCheckPermission("system:post:list")
     @GetMapping("/list")
-    public TableDataInfo<SysPost> list(SysPost post, PageQuery pageQuery) {
+    public TableDataInfo<SysPostVo> list(SysPostBo post, PageQuery pageQuery) {
         return postService.selectPagePostList(post, pageQuery);
     }
 
@@ -46,9 +47,9 @@ public class SysPostController extends BaseController {
     @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:post:export")
     @PostMapping("/export")
-    public void export(SysPost post, HttpServletResponse response) {
-        List<SysPost> list = postService.selectPostList(post);
-        ExcelUtil.exportExcel(list, "岗位数据", SysPost.class, response);
+    public void export(SysPostBo post, HttpServletResponse response) {
+        List<SysPostVo> list = postService.selectPostList(post);
+        ExcelUtil.exportExcel(list, "岗位数据", SysPostVo.class, response);
     }
 
     /**
@@ -58,7 +59,7 @@ public class SysPostController extends BaseController {
      */
     @SaCheckPermission("system:post:query")
     @GetMapping(value = "/{postId}")
-    public R<SysPost> getInfo(@PathVariable Long postId) {
+    public R<SysPostVo> getInfo(@PathVariable Long postId) {
         return R.ok(postService.selectPostById(postId));
     }
 
@@ -68,7 +69,7 @@ public class SysPostController extends BaseController {
     @SaCheckPermission("system:post:add")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysPost post) {
+    public R<Void> add(@Validated @RequestBody SysPostBo post) {
         if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post))) {
             return R.fail("新增岗位'" + post.getPostName() + "'失败，岗位名称已存在");
         } else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post))) {
@@ -83,7 +84,7 @@ public class SysPostController extends BaseController {
     @SaCheckPermission("system:post:edit")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysPost post) {
+    public R<Void> edit(@Validated @RequestBody SysPostBo post) {
         if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post))) {
             return R.fail("修改岗位'" + post.getPostName() + "'失败，岗位名称已存在");
         } else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post))) {
@@ -108,8 +109,8 @@ public class SysPostController extends BaseController {
      * 获取岗位选择框列表
      */
     @GetMapping("/optionselect")
-    public R<List<SysPost>> optionselect() {
-        List<SysPost> posts = postService.selectPostAll();
+    public R<List<SysPostVo>> optionselect() {
+        List<SysPostVo> posts = postService.selectPostAll();
         return R.ok(posts);
     }
 }

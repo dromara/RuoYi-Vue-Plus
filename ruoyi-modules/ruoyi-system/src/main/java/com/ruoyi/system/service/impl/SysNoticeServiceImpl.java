@@ -1,12 +1,16 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.system.domain.SysNotice;
+import com.ruoyi.system.domain.bo.SysNoticeBo;
+import com.ruoyi.system.domain.vo.SysNoticeVo;
 import com.ruoyi.system.mapper.SysNoticeMapper;
 import com.ruoyi.system.service.ISysNoticeService;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +31,9 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
     private final SysNoticeMapper baseMapper;
 
     @Override
-    public TableDataInfo<SysNotice> selectPageNoticeList(SysNotice notice, PageQuery pageQuery) {
-        LambdaQueryWrapper<SysNotice> lqw = new LambdaQueryWrapper<SysNotice>()
-            .like(StringUtils.isNotBlank(notice.getNoticeTitle()), SysNotice::getNoticeTitle, notice.getNoticeTitle())
-            .eq(StringUtils.isNotBlank(notice.getNoticeType()), SysNotice::getNoticeType, notice.getNoticeType())
-            .like(ObjectUtil.isNotNull(notice.getCreateBy()), SysNotice::getCreateBy, notice.getCreateBy());
-        Page<SysNotice> page = baseMapper.selectPage(pageQuery.build(), lqw);
+    public TableDataInfo<SysNoticeVo> selectPageNoticeList(SysNoticeBo notice, PageQuery pageQuery) {
+        LambdaQueryWrapper<SysNotice> lqw = buildQueryWrapper(notice);
+        Page<SysNoticeVo> page = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
 
@@ -43,8 +44,8 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @return 公告信息
      */
     @Override
-    public SysNotice selectNoticeById(Long noticeId) {
-        return baseMapper.selectById(noticeId);
+    public SysNoticeVo selectNoticeById(Long noticeId) {
+        return baseMapper.selectVoById(noticeId);
     }
 
     /**
@@ -54,32 +55,40 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @return 公告集合
      */
     @Override
-    public List<SysNotice> selectNoticeList(SysNotice notice) {
-        return baseMapper.selectList(new LambdaQueryWrapper<SysNotice>()
-            .like(StringUtils.isNotBlank(notice.getNoticeTitle()), SysNotice::getNoticeTitle, notice.getNoticeTitle())
-            .eq(StringUtils.isNotBlank(notice.getNoticeType()), SysNotice::getNoticeType, notice.getNoticeType())
-            .like(ObjectUtil.isNotNull(notice.getCreateBy()), SysNotice::getCreateBy, notice.getCreateBy()));
+    public List<SysNoticeVo> selectNoticeList(SysNoticeBo notice) {
+        LambdaQueryWrapper<SysNotice> lqw = buildQueryWrapper(notice);
+        return baseMapper.selectVoList(lqw);
+    }
+
+    private LambdaQueryWrapper<SysNotice> buildQueryWrapper(SysNoticeBo bo) {
+        LambdaQueryWrapper<SysNotice> lqw = Wrappers.lambdaQuery();
+        lqw.like(StringUtils.isNotBlank(bo.getNoticeTitle()), SysNotice::getNoticeTitle, bo.getNoticeTitle());
+        lqw.eq(StringUtils.isNotBlank(bo.getNoticeType()), SysNotice::getNoticeType, bo.getNoticeType());
+        lqw.eq(ObjectUtil.isNotNull(bo.getCreateBy()), SysNotice::getCreateBy, bo.getCreateBy());
+        return lqw;
     }
 
     /**
      * 新增公告
      *
-     * @param notice 公告信息
+     * @param bo 公告信息
      * @return 结果
      */
     @Override
-    public int insertNotice(SysNotice notice) {
+    public int insertNotice(SysNoticeBo bo) {
+        SysNotice notice = BeanUtil.toBean(bo, SysNotice.class);
         return baseMapper.insert(notice);
     }
 
     /**
      * 修改公告
      *
-     * @param notice 公告信息
+     * @param bo 公告信息
      * @return 结果
      */
     @Override
-    public int updateNotice(SysNotice notice) {
+    public int updateNotice(SysNoticeBo bo) {
+        SysNotice notice = BeanUtil.toBean(bo, SysNotice.class);
         return baseMapper.updateById(notice);
     }
 
