@@ -2,11 +2,12 @@ package com.ruoyi.system.domain.bo;
 
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
+import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import jakarta.validation.constraints.*;
-
-import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
 /**
  * 字典数据业务对象 sys_dict_data
@@ -81,6 +82,5 @@ public class SysDictDataBo extends BaseEntity {
      * 备注
      */
     private String remark;
-
 
 }

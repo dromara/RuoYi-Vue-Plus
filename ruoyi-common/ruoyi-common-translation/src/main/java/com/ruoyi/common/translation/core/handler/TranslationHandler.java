@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.core.utils.reflect.ReflectUtils;
 import com.ruoyi.common.translation.annotation.Translation;
 import com.ruoyi.common.translation.core.TranslationInterface;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
 
 import java.io.IOException;
 import java.util.Map;
@@ -35,16 +35,15 @@ public class TranslationHandler extends JsonSerializer<Object> implements Contex
 
     @Override
     public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        try {
-            TranslationInterface trans = TRANSLATION_MAPPER.get(translation.type());
-            if (ObjectUtil.isNotNull(trans)) {
-                String result = trans.translation(value, translation.other());
-                gen.writeString(StringUtils.isNotBlank(result) ? result : value.toString());
-            } else {
-                gen.writeString(value.toString());
+        TranslationInterface trans = TRANSLATION_MAPPER.get(translation.type());
+        if (ObjectUtil.isNotNull(trans)) {
+            // 如果映射字段不为空 则取映射字段的值
+            if (StringUtils.isNotBlank(translation.mapper())) {
+                value = ReflectUtils.invokeGetter(gen.getCurrentValue(), translation.mapper());
             }
-        } catch (BeansException e) {
-            log.error("数据未查到, 采用默认处理 => {}", e.getMessage());
+            String result = trans.translation(value, translation.other());
+            gen.writeString(StringUtils.isNotBlank(result) ? result : value.toString());
+        } else {
             gen.writeString(value.toString());
         }
     }

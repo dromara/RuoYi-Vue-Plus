@@ -5,13 +5,15 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.system.domain.SysNotice;
+import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.bo.SysNoticeBo;
 import com.ruoyi.system.domain.vo.SysNoticeVo;
 import com.ruoyi.system.mapper.SysNoticeMapper;
+import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysNoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ import java.util.List;
 public class SysNoticeServiceImpl implements ISysNoticeService {
 
     private final SysNoticeMapper baseMapper;
+    private final SysUserMapper userMapper;
 
     @Override
     public TableDataInfo<SysNoticeVo> selectPageNoticeList(SysNoticeBo notice, PageQuery pageQuery) {
@@ -64,7 +67,10 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
         LambdaQueryWrapper<SysNotice> lqw = Wrappers.lambdaQuery();
         lqw.like(StringUtils.isNotBlank(bo.getNoticeTitle()), SysNotice::getNoticeTitle, bo.getNoticeTitle());
         lqw.eq(StringUtils.isNotBlank(bo.getNoticeType()), SysNotice::getNoticeType, bo.getNoticeType());
-        lqw.eq(ObjectUtil.isNotNull(bo.getCreateBy()), SysNotice::getCreateBy, bo.getCreateBy());
+        if (StringUtils.isNotBlank(bo.getCreateByName())) {
+            SysUser sysUser = userMapper.selectUserByUserName(bo.getCreateByName());
+            lqw.eq(SysNotice::getCreateBy, ObjectUtil.isNotNull(sysUser) ? sysUser.getUserId() : null);
+        }
         return lqw;
     }
 

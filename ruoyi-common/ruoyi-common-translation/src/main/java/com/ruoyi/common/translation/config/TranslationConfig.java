@@ -1,5 +1,6 @@
 package com.ruoyi.common.translation.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ruoyi.common.translation.annotation.TranslationType;
 import com.ruoyi.common.translation.core.TranslationInterface;
 import com.ruoyi.common.translation.core.handler.TranslationHandler;
@@ -24,6 +25,9 @@ public class TranslationConfig {
     @Autowired
     private List<TranslationInterface> list;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @PostConstruct
     public void init() {
         Map<String, TranslationInterface> map = new HashMap<>(list.size());
@@ -36,6 +40,8 @@ public class TranslationConfig {
             }
         }
         TranslationHandler.TRANSLATION_MAPPER.putAll(map);
+        // todo null值处理
+//        objectMapper.getSerializerProvider().setNullValueSerializer();
     }
 
 }

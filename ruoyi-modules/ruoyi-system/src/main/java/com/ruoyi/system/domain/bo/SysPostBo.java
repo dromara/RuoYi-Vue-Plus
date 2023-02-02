@@ -2,13 +2,12 @@ package com.ruoyi.system.domain.bo;
 
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
+import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import jakarta.validation.constraints.*;
-
-import java.util.Date;
-
-import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
 /**
  * 岗位信息业务对象 sys_post

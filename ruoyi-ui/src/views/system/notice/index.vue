@@ -9,9 +9,9 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="操作人员" prop="createBy">
+      <el-form-item label="操作人员" prop="createByName">
         <el-input
-          v-model="queryParams.createBy"
+          v-model="queryParams.createByName"
           placeholder="请输入操作人员"
           clearable
           @keyup.enter.native="handleQuery"
@@ -88,7 +88,7 @@
           <dict-tag :options="dict.type.sys_notice_status" :value="scope.row.status"/>
         </template>
       </el-table-column>
-      <el-table-column label="创建者" align="center" prop="createBy" width="100" />
+      <el-table-column label="创建者" align="center" prop="createByName" width="100" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="100">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
@@ -200,7 +200,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         noticeTitle: undefined,
-        createBy: undefined,
+        createByName: undefined,
         status: undefined
       },
       // 表单参数
@@ -282,6 +282,7 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.noticeId != undefined) {
+              console.log(this.$refs['form'])
             updateNotice(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;

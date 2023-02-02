@@ -1,9 +1,5 @@
 package com.ruoyi.system.domain.vo;
 
-import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import com.alibaba.excel.annotation.ExcelProperty;
-import com.ruoyi.common.excel.annotation.ExcelDictFormat;
-import com.ruoyi.common.excel.convert.ExcelDictConvert;
 import com.ruoyi.common.translation.annotation.Translation;
 import com.ruoyi.common.translation.constant.TransConstant;
 import lombok.Data;
@@ -59,8 +55,13 @@ public class SysNoticeVo implements Serializable {
     /**
      * 创建者
      */
-    @Translation(type = TransConstant.USER_ID_TO_NAME)
     private Long createBy;
+
+    /**
+     * 创建人名称
+     */
+    @Translation(type = TransConstant.USER_ID_TO_NAME, mapper = "createBy")
+    private String createByName = "";
 
     /**
      * 创建时间
