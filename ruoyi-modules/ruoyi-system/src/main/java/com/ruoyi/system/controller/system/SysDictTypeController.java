@@ -1,23 +1,22 @@
 package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.web.core.BaseController;
-import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.system.domain.SysDictType;
-import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.mybatis.core.page.PageQuery;
+import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.system.domain.bo.SysDictTypeBo;
 import com.ruoyi.system.domain.vo.SysDictTypeVo;
 import com.ruoyi.system.service.ISysDictTypeService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -120,8 +119,8 @@ public class SysDictTypeController extends BaseController {
      * 获取字典选择框列表
      */
     @GetMapping("/optionselect")
-    public R<List<SysDictType>> optionselect() {
-        List<SysDictType> dictTypes = dictTypeService.selectDictTypeAll();
+    public R<List<SysDictTypeVo>> optionselect() {
+        List<SysDictTypeVo> dictTypes = dictTypeService.selectDictTypeAll();
         return R.ok(dictTypes);
     }
 }

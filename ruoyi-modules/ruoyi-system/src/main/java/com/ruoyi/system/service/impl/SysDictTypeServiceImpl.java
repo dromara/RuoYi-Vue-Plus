@@ -84,8 +84,8 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @return 字典类型集合信息
      */
     @Override
-    public List<SysDictType> selectDictTypeAll() {
-        return baseMapper.selectList();
+    public List<SysDictTypeVo> selectDictTypeAll() {
+        return baseMapper.selectVoList();
     }
 
     /**

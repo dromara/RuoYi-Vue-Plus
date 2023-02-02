@@ -4,8 +4,9 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
-
+import java.util.List;
 
 
 /**
@@ -104,5 +105,10 @@ public class SysMenuVo implements Serializable {
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 子菜单
+     */
+    private List<SysMenuVo> children = new ArrayList<>();
 
 }

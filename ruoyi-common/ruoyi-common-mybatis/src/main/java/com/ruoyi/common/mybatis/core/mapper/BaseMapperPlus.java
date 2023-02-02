@@ -157,6 +157,10 @@ public interface BaseMapperPlus<M, T, V> extends BaseMapper<T> {
         return BeanCopyUtils.copy(obj, voClass);
     }
 
+    default List<V> selectVoList() {
+        return selectVoList(new QueryWrapper<>(), this.currentVoClass());
+    }
+
     default List<V> selectVoList(Wrapper<T> wrapper) {
         return selectVoList(wrapper, this.currentVoClass());
     }

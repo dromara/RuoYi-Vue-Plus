@@ -22,7 +22,7 @@ public interface ISysMenuService {
      * @param userId 用户ID
      * @return 菜单列表
      */
-    List<SysMenu> selectMenuList(Long userId);
+    List<SysMenuVo> selectMenuList(Long userId);
 
     /**
      * 根据用户查询系统菜单列表
@@ -31,7 +31,7 @@ public interface ISysMenuService {
      * @param userId 用户ID
      * @return 菜单列表
      */
-    List<SysMenu> selectMenuList(SysMenu menu, Long userId);
+    List<SysMenuVo> selectMenuList(SysMenuBo menu, Long userId);
 
     /**
      * 根据用户ID查询权限
@@ -79,7 +79,7 @@ public interface ISysMenuService {
      * @param menus 菜单列表
      * @return 下拉树结构列表
      */
-    List<Tree<Long>> buildMenuTreeSelect(List<SysMenu> menus);
+    List<Tree<Long>> buildMenuTreeSelect(List<SysMenuVo> menus);
 
     /**
      * 根据菜单ID查询信息
