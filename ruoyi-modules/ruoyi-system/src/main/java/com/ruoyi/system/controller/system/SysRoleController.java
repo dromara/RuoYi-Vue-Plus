@@ -16,6 +16,7 @@ import com.ruoyi.system.domain.SysDept;
 import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.domain.bo.SysRoleBo;
+import com.ruoyi.system.domain.vo.DeptTreeSelectVo;
 import com.ruoyi.system.domain.vo.SysRoleVo;
 import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysRoleService;
@@ -27,7 +28,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 角色信息
@@ -228,10 +228,10 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:list")
     @GetMapping(value = "/deptTree/{roleId}")
-    public R<Map<String, Object>> roleDeptTreeselect(@PathVariable("roleId") Long roleId) {
-        return R.ok(Map.of(
-                "checkedKeys", deptService.selectDeptListByRoleId(roleId),
-                "depts", deptService.selectDeptTreeList(new SysDept())
-        ));
+    public R<DeptTreeSelectVo> roleDeptTreeselect(@PathVariable("roleId") Long roleId) {
+        DeptTreeSelectVo selectVo = new DeptTreeSelectVo();
+        selectVo.setCheckedKeys(deptService.selectDeptListByRoleId(roleId));
+        selectVo.setDepts(deptService.selectDeptTreeList(new SysDept()));
+        return R.ok(selectVo);
     }
 }

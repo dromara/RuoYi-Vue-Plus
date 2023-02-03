@@ -1,7 +1,7 @@
 package com.ruoyi.generator.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.ruoyi.common.core.constant.GenConstants;
+import com.ruoyi.generator.constant.GenConstants;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 import jakarta.validation.Valid;

@@ -11,6 +11,8 @@ import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysUser;
+import com.ruoyi.system.domain.vo.AvatarVo;
+import com.ruoyi.system.domain.vo.ProfileVo;
 import com.ruoyi.system.domain.vo.SysOssVo;
 import com.ruoyi.system.service.ISysOssService;
 import com.ruoyi.system.service.ISysUserService;
@@ -21,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
-import java.util.Map;
 
 /**
  * 个人信息 业务处理
@@ -41,13 +42,13 @@ public class SysProfileController extends BaseController {
      * 个人信息
      */
     @GetMapping
-    public R<Map<String, Object>> profile() {
+    public R<ProfileVo> profile() {
         SysUser user = userService.selectUserById(LoginHelper.getUserId());
-        return R.ok(Map.of(
-                "user", user,
-                "roleGroup", userService.selectUserRoleGroup(user.getUserName()),
-                "postGroup", userService.selectUserPostGroup(user.getUserName())
-        ));
+        ProfileVo profileVo = new ProfileVo();
+        profileVo.setUser(user);
+        profileVo.setRoleGroup(userService.selectUserRoleGroup(user.getUserName()));
+        profileVo.setPostGroup(userService.selectUserPostGroup(user.getUserName()));
+        return R.ok(profileVo);
     }
 
     /**
@@ -107,7 +108,7 @@ public class SysProfileController extends BaseController {
      */
     @Log(title = "用户头像", businessType = BusinessType.UPDATE)
     @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public R<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile avatarfile) {
+    public R<AvatarVo> avatar(@RequestPart("avatarfile") MultipartFile avatarfile) {
         if (!avatarfile.isEmpty()) {
             String extension = FileUtil.extName(avatarfile.getOriginalFilename());
             if (!StringUtils.equalsAnyIgnoreCase(extension, MimeTypeUtils.IMAGE_EXTENSION)) {
@@ -116,7 +117,9 @@ public class SysProfileController extends BaseController {
             SysOssVo oss = iSysOssService.upload(avatarfile);
             String avatar = oss.getUrl();
             if (userService.updateUserAvatar(LoginHelper.getUsername(), avatar)) {
-                return R.ok(Map.of("imgUrl", avatar));
+                AvatarVo avatarVo = new AvatarVo();
+                avatarVo.setImgUrl(avatar);
+                return R.ok(avatarVo);
             }
         }
         return R.fail("上传图片异常，请联系管理员");

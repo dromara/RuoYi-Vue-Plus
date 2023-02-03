@@ -24,6 +24,7 @@ import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.vo.SysRoleVo;
 import com.ruoyi.system.domain.vo.SysUserExportVo;
 import com.ruoyi.system.domain.vo.SysUserImportVo;
+import com.ruoyi.system.domain.vo.SysUserInfoVo;
 import com.ruoyi.system.listener.SysUserImportListener;
 import com.ruoyi.system.service.*;
 import jakarta.servlet.http.HttpServletResponse;
@@ -109,19 +110,19 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:query")
     @GetMapping(value = {"/", "/{userId}"})
-    public R<Map<String, Object>> getInfo(@PathVariable(value = "userId", required = false) Long userId) {
+    public R<SysUserInfoVo> getInfo(@PathVariable(value = "userId", required = false) Long userId) {
         userService.checkUserDataScope(userId);
-        Map<String, Object> ajax = new HashMap<>();
+        SysUserInfoVo userInfoVo = new SysUserInfoVo();
         List<SysRoleVo> roles = roleService.selectRoleAll();
-        ajax.put("roles", LoginHelper.isAdmin(userId) ? roles : StreamUtils.filter(roles, r -> !r.isAdmin()));
-        ajax.put("posts", postService.selectPostAll());
+        userInfoVo.setRoles(LoginHelper.isAdmin(userId) ? roles : StreamUtils.filter(roles, r -> !r.isAdmin()));
+        userInfoVo.setPosts(postService.selectPostAll());
         if (ObjectUtil.isNotNull(userId)) {
             SysUser sysUser = userService.selectUserById(userId);
-            ajax.put("user", sysUser);
-            ajax.put("postIds", postService.selectPostListByUserId(userId));
-            ajax.put("roleIds", StreamUtils.toList(sysUser.getRoles(), SysRole::getRoleId));
+            userInfoVo.setUser(sysUser);
+            userInfoVo.setRoleIds(StreamUtils.toList(sysUser.getRoles(), SysRole::getRoleId));
+            userInfoVo.setPostIds(postService.selectPostListByUserId(userId));
         }
-        return R.ok(ajax);
+        return R.ok(userInfoVo);
     }
 
     /**
@@ -212,13 +213,13 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:query")
     @GetMapping("/authRole/{userId}")
-    public R<Map<String, Object>> authRole(@PathVariable Long userId) {
+    public R<SysUserInfoVo> authRole(@PathVariable Long userId) {
         SysUser user = userService.selectUserById(userId);
         List<SysRoleVo> roles = roleService.selectRolesByUserId(userId);
-        return R.ok(Map.of(
-                "user", user,
-                "roles", LoginHelper.isAdmin(userId) ? roles : StreamUtils.filter(roles, r -> !r.isAdmin())
-        ));
+        SysUserInfoVo userInfoVo = new SysUserInfoVo();
+        userInfoVo.setUser(user);
+        userInfoVo.setRoles(LoginHelper.isAdmin(userId) ? roles : StreamUtils.filter(roles, r -> !r.isAdmin()));
+        return R.ok(userInfoVo);
     }
 
     /**

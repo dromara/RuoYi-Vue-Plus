@@ -11,6 +11,7 @@ import com.ruoyi.common.json.utils.JsonUtils;
 import com.ruoyi.common.redis.utils.CacheUtils;
 import com.ruoyi.common.redis.utils.RedisUtils;
 import com.ruoyi.system.domain.SysCache;
+import com.ruoyi.system.domain.vo.CacheListInfoVo;
 import lombok.RequiredArgsConstructor;
 import org.redisson.spring.data.connection.RedissonConnectionFactory;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -49,7 +50,7 @@ public class CacheController {
      */
     @SaCheckPermission("monitor:cache:list")
     @GetMapping()
-    public R<Map<String, Object>> getInfo() throws Exception {
+    public R<CacheListInfoVo> getInfo() throws Exception {
         RedisConnection connection = connectionFactory.getConnection();
         Properties commandStats = connection.commands().info("commandstats");
 
@@ -63,11 +64,12 @@ public class CacheController {
                 pieList.add(data);
             });
         }
-        return R.ok(Map.of(
-                "info", connection.commands().info(),
-                "dbSize", connection.commands().dbSize(),
-                "commandStats", pieList
-        ));
+
+        CacheListInfoVo infoVo = new CacheListInfoVo();
+        infoVo.setInfo(connection.commands().info());
+        infoVo.setDbSize(connection.commands().dbSize());
+        infoVo.setCommandStats(pieList);
+        return R.ok(infoVo);
     }
 
     /**

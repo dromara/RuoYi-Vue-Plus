@@ -1,7 +1,6 @@
 package com.ruoyi.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
-import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
@@ -13,6 +12,8 @@ import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysLoginService;
+import com.ruoyi.web.domain.vo.UserInfoVo;
+import com.ruoyi.web.domain.vo.LoginVo;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 登录验证
@@ -46,11 +46,13 @@ public class SysLoginController {
      */
     @SaIgnore
     @PostMapping("/login")
-    public R<Map<String, Object>> login(@Validated @RequestBody LoginBody loginBody) {
+    public R<LoginVo> login(@Validated @RequestBody LoginBody loginBody) {
+        LoginVo loginVo = new LoginVo();
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
             loginBody.getUuid());
-        return R.ok(Map.of(Constants.TOKEN, token));
+        loginVo.setToken(token);
+        return R.ok(loginVo);
     }
 
     /**
@@ -61,10 +63,12 @@ public class SysLoginController {
      */
     @SaIgnore
     @PostMapping("/smsLogin")
-    public R<Map<String, Object>> smsLogin(@Validated @RequestBody SmsLoginBody smsLoginBody) {
+    public R<LoginVo> smsLogin(@Validated @RequestBody SmsLoginBody smsLoginBody) {
+        LoginVo loginVo = new LoginVo();
         // 生成令牌
         String token = loginService.smsLogin(smsLoginBody.getPhonenumber(), smsLoginBody.getSmsCode());
-        return R.ok(Map.of(Constants.TOKEN, token));
+        loginVo.setToken(token);
+        return R.ok(loginVo);
     }
 
     /**
@@ -75,10 +79,12 @@ public class SysLoginController {
      */
     @SaIgnore
     @PostMapping("/xcxLogin")
-    public R<Map<String, Object>> xcxLogin(@NotBlank(message = "{xcx.code.not.blank}") String xcxCode) {
+    public R<LoginVo> xcxLogin(@NotBlank(message = "{xcx.code.not.blank}") String xcxCode) {
+        LoginVo loginVo = new LoginVo();
         // 生成令牌
         String token = loginService.xcxLogin(xcxCode);
-        return R.ok(Map.of(Constants.TOKEN, token));
+        loginVo.setToken(token);
+        return R.ok(loginVo);
     }
 
     /**
@@ -97,14 +103,14 @@ public class SysLoginController {
      * @return 用户信息
      */
     @GetMapping("getInfo")
-    public R<Map<String, Object>> getInfo() {
+    public R<UserInfoVo> getInfo() {
+        UserInfoVo userInfoVo = new UserInfoVo();
         LoginUser loginUser = LoginHelper.getLoginUser();
         SysUser user = userService.selectUserById(loginUser.getUserId());
-        return R.ok(Map.of(
-            "user", user,
-            "roles", loginUser.getRolePermission(),
-            "permissions", loginUser.getMenuPermission()
-        ));
+        userInfoVo.setUser(user);
+        userInfoVo.setPermissions(loginUser.getMenuPermission());
+        userInfoVo.setRoles(loginUser.getRolePermission());
+        return R.ok(userInfoVo);
     }
 
     /**

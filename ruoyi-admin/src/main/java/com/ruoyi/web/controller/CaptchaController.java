@@ -18,6 +18,7 @@ import com.ruoyi.common.sms.entity.SmsResult;
 import com.ruoyi.common.web.config.properties.CaptchaProperties;
 import com.ruoyi.common.web.enums.CaptchaType;
 import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.web.domain.vo.CaptchaVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.Expression;
@@ -79,10 +80,12 @@ public class CaptchaController {
      * 生成验证码
      */
     @GetMapping("/captchaImage")
-    public R<Map<String, Object>> getCode() {
+    public R<CaptchaVo> getCode() {
+        CaptchaVo captchaVo = new CaptchaVo();
         boolean captchaEnabled = configService.selectCaptchaEnabled();
         if (!captchaEnabled) {
-            return R.ok(Map.of("captchaEnabled", false));
+            captchaVo.setCaptchaEnabled(false);
+            return R.ok(captchaVo);
         }
         // 保存验证码信息
         String uuid = IdUtil.simpleUUID();
@@ -102,7 +105,9 @@ public class CaptchaController {
             code = exp.getValue(String.class);
         }
         RedisUtils.setCacheObject(verifyKey, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
-        return R.ok(Map.of("uuid", uuid, "img", captcha.getImageBase64()));
+        captchaVo.setUuid(uuid);
+        captchaVo.setImg(captcha.getImageBase64());
+        return R.ok(captchaVo);
     }
 
 }
