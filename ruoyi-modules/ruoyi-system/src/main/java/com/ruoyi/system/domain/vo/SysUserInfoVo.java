@@ -1,6 +1,5 @@
 package com.ruoyi.system.domain.vo;
 
-import com.ruoyi.system.domain.SysUser;
 import lombok.Data;
 
 import java.util.List;
@@ -16,7 +15,7 @@ public class SysUserInfoVo {
     /**
      * 用户信息
      */
-    private SysUser user;
+    private SysUserVo user;
 
     /**
      * 角色ID列表

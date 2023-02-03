@@ -1,8 +1,7 @@
 package com.ruoyi.system.service;
 
 import cn.hutool.core.collection.CollUtil;
-import com.ruoyi.system.domain.SysRole;
-import com.ruoyi.system.domain.SysUser;
+import com.ruoyi.system.domain.vo.SysRoleVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,16 +24,17 @@ public class SysPermissionService {
     /**
      * 获取角色数据权限
      *
-     * @param user 用户信息
+     * @param userId  用户id
+     * @param isAdmin 是否管理员
      * @return 角色权限信息
      */
-    public Set<String> getRolePermission(SysUser user) {
+    public Set<String> getRolePermission(Long userId, boolean isAdmin) {
         Set<String> roles = new HashSet<>();
         // 管理员拥有所有权限
-        if (user.isAdmin()) {
+        if (isAdmin) {
             roles.add("admin");
         } else {
-            roles.addAll(roleService.selectRolePermissionByUserId(user.getUserId()));
+            roles.addAll(roleService.selectRolePermissionByUserId(userId));
         }
         return roles;
     }
@@ -42,25 +42,26 @@ public class SysPermissionService {
     /**
      * 获取菜单数据权限
      *
-     * @param user 用户信息
+     * @param userId  用户id
+     * @param isAdmin 是否管理员
      * @return 菜单权限信息
      */
-    public Set<String> getMenuPermission(SysUser user) {
+    public Set<String> getMenuPermission(Long userId, boolean isAdmin) {
         Set<String> perms = new HashSet<>();
         // 管理员拥有所有权限
-        if (user.isAdmin()) {
+        if (isAdmin) {
             perms.add("*:*:*");
         } else {
-            List<SysRole> roles = user.getRoles();
+            List<SysRoleVo> roles = roleService.selectRolesByUserId(userId);
             if (CollUtil.isNotEmpty(roles)) {
                 // 多角色设置permissions属性，以便数据权限匹配权限
-                for (SysRole role : roles) {
+                for (SysRoleVo role : roles) {
                     Set<String> rolePerms = menuService.selectMenuPermsByRoleId(role.getRoleId());
                     role.setPermissions(rolePerms);
                     perms.addAll(rolePerms);
                 }
             } else {
-                perms.addAll(menuService.selectMenuPermsByUserId(user.getUserId()));
+                perms.addAll(menuService.selectMenuPermsByUserId(userId));
             }
         }
         return perms;

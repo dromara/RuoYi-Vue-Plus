@@ -1,6 +1,5 @@
 package com.ruoyi.system.domain.vo;
 
-import com.ruoyi.system.domain.SysUser;
 import lombok.Data;
 
 /**
@@ -14,7 +13,7 @@ public class ProfileVo {
     /**
      * 用户信息
      */
-    private SysUser user;
+    private SysUserVo user;
 
     /**
      * 用户所属角色组

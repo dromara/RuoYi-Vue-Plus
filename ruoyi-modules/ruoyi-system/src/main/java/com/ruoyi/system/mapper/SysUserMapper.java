@@ -7,6 +7,7 @@ import com.ruoyi.common.mybatis.annotation.DataColumn;
 import com.ruoyi.common.mybatis.annotation.DataPermission;
 import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
+import com.ruoyi.system.domain.vo.SysUserVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
         @DataColumn(key = "deptName", value = "d.dept_id"),
         @DataColumn(key = "userName", value = "u.user_id")
     })
-    Page<SysUser> selectPageUserList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+    Page<SysUserVo> selectPageUserList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
 
     /**
      * 根据条件分页查询用户列表
@@ -34,7 +35,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
         @DataColumn(key = "deptName", value = "d.dept_id"),
         @DataColumn(key = "userName", value = "u.user_id")
     })
-    List<SysUser> selectUserList(@Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+    List<SysUserVo> selectUserList(@Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
 
     /**
      * 根据条件分页查询已配用户角色列表
@@ -46,7 +47,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
         @DataColumn(key = "deptName", value = "d.dept_id"),
         @DataColumn(key = "userName", value = "u.user_id")
     })
-    Page<SysUser> selectAllocatedList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+    Page<SysUserVo> selectAllocatedList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
 
     /**
      * 根据条件分页查询未分配用户角色列表
@@ -58,7 +59,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
         @DataColumn(key = "deptName", value = "d.dept_id"),
         @DataColumn(key = "userName", value = "u.user_id")
     })
-    Page<SysUser> selectUnallocatedList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+    Page<SysUserVo> selectUnallocatedList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
 
     /**
      * 通过用户名查询用户
@@ -66,7 +67,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
      * @param userName 用户名
      * @return 用户对象信息
      */
-    SysUser selectUserByUserName(String userName);
+    SysUserVo selectUserByUserName(String userName);
 
     /**
      * 通过手机号查询用户
@@ -74,7 +75,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
      * @param phonenumber 手机号
      * @return 用户对象信息
      */
-    SysUser selectUserByPhonenumber(String phonenumber);
+    SysUserVo selectUserByPhonenumber(String phonenumber);
 
     /**
      * 通过用户ID查询用户
@@ -82,6 +83,6 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
      * @param userId 用户ID
      * @return 用户对象信息
      */
-    SysUser selectUserById(Long userId);
+    SysUserVo selectUserById(Long userId);
 
 }

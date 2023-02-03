@@ -7,13 +7,13 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.SmsLoginBody;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysMenu;
-import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.vo.RouterVo;
+import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.service.ISysMenuService;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.service.SysLoginService;
-import com.ruoyi.web.domain.vo.UserInfoVo;
 import com.ruoyi.web.domain.vo.LoginVo;
+import com.ruoyi.web.domain.vo.UserInfoVo;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -106,7 +106,7 @@ public class SysLoginController {
     public R<UserInfoVo> getInfo() {
         UserInfoVo userInfoVo = new UserInfoVo();
         LoginUser loginUser = LoginHelper.getLoginUser();
-        SysUser user = userService.selectUserById(loginUser.getUserId());
+        SysUserVo user = userService.selectUserById(loginUser.getUserId());
         userInfoVo.setUser(user);
         userInfoVo.setPermissions(loginUser.getMenuPermission());
         userInfoVo.setRoles(loginUser.getRolePermission());

@@ -8,31 +8,28 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.constant.CacheConstants;
 import com.ruoyi.common.core.constant.Constants;
-import com.ruoyi.common.log.event.LogininforEvent;
 import com.ruoyi.common.core.domain.dto.RoleDTO;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.domain.model.XcxLoginUser;
 import com.ruoyi.common.core.enums.DeviceType;
 import com.ruoyi.common.core.enums.LoginType;
 import com.ruoyi.common.core.enums.UserStatus;
-import com.ruoyi.system.domain.SysUser;
-import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.core.domain.model.XcxLoginUser;
 import com.ruoyi.common.core.exception.user.CaptchaException;
 import com.ruoyi.common.core.exception.user.CaptchaExpireException;
 import com.ruoyi.common.core.exception.user.UserException;
-import com.ruoyi.common.satoken.utils.LoginHelper;
-import com.ruoyi.common.core.utils.DateUtils;
-import com.ruoyi.common.core.utils.MessageUtils;
-import com.ruoyi.common.core.utils.ServletUtils;
-import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.core.utils.*;
+import com.ruoyi.common.log.event.LogininforEvent;
 import com.ruoyi.common.redis.utils.RedisUtils;
-import com.ruoyi.common.core.utils.SpringUtils;
+import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.system.domain.SysUser;
+import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.mapper.SysUserMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Supplier;
@@ -73,7 +70,7 @@ public class SysLoginService {
         if (captchaEnabled) {
             validateCaptcha(username, code, uuid, request);
         }
-        SysUser user = loadUserByUsername(username);
+        SysUserVo user = loadUserByUsername(username);
         checkLogin(LoginType.PASSWORD, username, () -> !BCrypt.checkpw(password, user.getPassword()));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = buildLoginUser(user);
@@ -87,7 +84,7 @@ public class SysLoginService {
 
     public String smsLogin(String phonenumber, String smsCode) {
         // 通过手机号查找用户
-        SysUser user = loadUserByPhonenumber(phonenumber);
+        SysUserVo user = loadUserByPhonenumber(phonenumber);
 
         checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
@@ -106,7 +103,7 @@ public class SysLoginService {
         // todo 以下自行实现
         // 校验 appid + appsrcret + xcxCode 调用登录凭证校验接口 获取 session_key 与 openid
         String openid = "";
-        SysUser user = loadUserByOpenid(openid);
+        SysUserVo user = loadUserByOpenid(openid);
 
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         XcxLoginUser loginUser = new XcxLoginUser();
@@ -184,7 +181,7 @@ public class SysLoginService {
         }
     }
 
-    private SysUser loadUserByUsername(String username) {
+    private SysUserVo loadUserByUsername(String username) {
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getUserName, SysUser::getStatus)
             .eq(SysUser::getUserName, username));
@@ -198,7 +195,7 @@ public class SysLoginService {
         return userMapper.selectUserByUserName(username);
     }
 
-    private SysUser loadUserByPhonenumber(String phonenumber) {
+    private SysUserVo loadUserByPhonenumber(String phonenumber) {
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getPhonenumber, SysUser::getStatus)
             .eq(SysUser::getPhonenumber, phonenumber));
@@ -212,10 +209,10 @@ public class SysLoginService {
         return userMapper.selectUserByPhonenumber(phonenumber);
     }
 
-    private SysUser loadUserByOpenid(String openid) {
+    private SysUserVo loadUserByOpenid(String openid) {
         // 使用 openid 查询绑定用户 如未绑定用户 则根据业务自行处理 例如 创建默认用户
         // todo 自行实现 userService.selectUserByOpenid(openid);
-        SysUser user = new SysUser();
+        SysUserVo user = new SysUserVo();
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", openid);
             // todo 用户不存在 业务逻辑自行实现
@@ -229,14 +226,14 @@ public class SysLoginService {
     /**
      * 构建登录用户
      */
-    private LoginUser buildLoginUser(SysUser user) {
+    private LoginUser buildLoginUser(SysUserVo user) {
         LoginUser loginUser = new LoginUser();
         loginUser.setUserId(user.getUserId());
         loginUser.setDeptId(user.getDeptId());
         loginUser.setUsername(user.getUserName());
         loginUser.setUserType(user.getUserType());
-        loginUser.setMenuPermission(permissionService.getMenuPermission(user));
-        loginUser.setRolePermission(permissionService.getRolePermission(user));
+        loginUser.setMenuPermission(permissionService.getMenuPermission(user.getUserId(), user.isAdmin()));
+        loginUser.setRolePermission(permissionService.getRolePermission(user.getUserId(), user.isAdmin()));
         loginUser.setDeptName(ObjectUtil.isNull(user.getDept()) ? "" : user.getDept().getDeptName());
         List<RoleDTO> roles = BeanUtil.copyToList(user.getRoles(), RoleDTO.class);
         loginUser.setRoles(roles);

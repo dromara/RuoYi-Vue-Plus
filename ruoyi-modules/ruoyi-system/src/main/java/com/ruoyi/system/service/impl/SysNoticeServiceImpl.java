@@ -9,9 +9,9 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.system.domain.SysNotice;
-import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.bo.SysNoticeBo;
 import com.ruoyi.system.domain.vo.SysNoticeVo;
+import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.mapper.SysNoticeMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysNoticeService;
@@ -68,7 +68,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
         lqw.like(StringUtils.isNotBlank(bo.getNoticeTitle()), SysNotice::getNoticeTitle, bo.getNoticeTitle());
         lqw.eq(StringUtils.isNotBlank(bo.getNoticeType()), SysNotice::getNoticeType, bo.getNoticeType());
         if (StringUtils.isNotBlank(bo.getCreateByName())) {
-            SysUser sysUser = userMapper.selectUserByUserName(bo.getCreateByName());
+            SysUserVo sysUser = userMapper.selectUserByUserName(bo.getCreateByName());
             lqw.eq(SysNotice::getCreateBy, ObjectUtil.isNotNull(sysUser) ? sysUser.getUserId() : null);
         }
         return lqw;

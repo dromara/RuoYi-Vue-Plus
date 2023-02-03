@@ -3,18 +3,11 @@ package com.ruoyi.system.domain;
 import com.baomidou.mybatisplus.annotation.*;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
-import com.ruoyi.common.core.xss.Xss;
-import com.ruoyi.common.sensitive.annotation.Sensitive;
-import com.ruoyi.common.sensitive.core.SensitiveStrategy;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * 用户对象 sys_user
@@ -42,16 +35,11 @@ public class SysUser extends BaseEntity {
     /**
      * 用户账号
      */
-    @Xss(message = "用户账号不能包含脚本字符")
-    @NotBlank(message = "用户账号不能为空")
-    @Size(min = 0, max = 30, message = "用户账号长度不能超过{max}个字符")
     private String userName;
 
     /**
      * 用户昵称
      */
-    @Xss(message = "用户昵称不能包含脚本字符")
-    @Size(min = 0, max = 30, message = "用户昵称长度不能超过{max}个字符")
     private String nickName;
 
     /**
@@ -62,15 +50,11 @@ public class SysUser extends BaseEntity {
     /**
      * 用户邮箱
      */
-    @Sensitive(strategy = SensitiveStrategy.EMAIL)
-    @Email(message = "邮箱格式不正确")
-    @Size(min = 0, max = 50, message = "邮箱长度不能超过{max}个字符")
     private String email;
 
     /**
      * 手机号码
      */
-    @Sensitive(strategy = SensitiveStrategy.PHONE)
     private String phonenumber;
 
     /**
@@ -119,35 +103,6 @@ public class SysUser extends BaseEntity {
      */
     private String remark;
 
-    /**
-     * 部门对象
-     */
-    @TableField(exist = false)
-    private SysDept dept;
-
-    /**
-     * 角色对象
-     */
-    @TableField(exist = false)
-    private List<SysRole> roles;
-
-    /**
-     * 角色组
-     */
-    @TableField(exist = false)
-    private Long[] roleIds;
-
-    /**
-     * 岗位组
-     */
-    @TableField(exist = false)
-    private Long[] postIds;
-
-    /**
-     * 数据权限 当前角色ID
-     */
-    @TableField(exist = false)
-    private Long roleId;
 
     public SysUser(Long userId) {
         this.userId = userId;

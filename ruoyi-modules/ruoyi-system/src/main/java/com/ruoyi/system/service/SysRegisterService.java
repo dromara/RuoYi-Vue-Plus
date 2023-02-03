@@ -4,22 +4,21 @@ import cn.dev33.satoken.secure.BCrypt;
 import com.ruoyi.common.core.constant.CacheConstants;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.log.event.LogininforEvent;
-import com.ruoyi.common.core.enums.UserType;
-import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;
+import com.ruoyi.common.core.enums.UserType;
 import com.ruoyi.common.core.exception.user.CaptchaException;
 import com.ruoyi.common.core.exception.user.CaptchaExpireException;
 import com.ruoyi.common.core.exception.user.UserException;
 import com.ruoyi.common.core.utils.MessageUtils;
 import com.ruoyi.common.core.utils.ServletUtils;
-import com.ruoyi.common.core.utils.StringUtils;
-import com.ruoyi.common.redis.utils.RedisUtils;
 import com.ruoyi.common.core.utils.SpringUtils;
+import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.log.event.LogininforEvent;
+import com.ruoyi.common.redis.utils.RedisUtils;
+import com.ruoyi.system.domain.bo.SysUserBo;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 注册校验方法
@@ -48,7 +47,7 @@ public class SysRegisterService {
         if (captchaEnabled) {
             validateCaptcha(username, registerBody.getCode(), registerBody.getUuid(), request);
         }
-        SysUser sysUser = new SysUser();
+        SysUserBo sysUser = new SysUserBo();
         sysUser.setUserName(username);
         sysUser.setNickName(username);
         sysUser.setPassword(BCrypt.hashpw(password));

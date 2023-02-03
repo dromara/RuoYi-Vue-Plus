@@ -6,14 +6,15 @@ import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.file.MimeTypeUtils;
-import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.satoken.utils.LoginHelper;
-import com.ruoyi.system.domain.SysUser;
+import com.ruoyi.common.web.core.BaseController;
+import com.ruoyi.system.domain.bo.SysUserBo;
 import com.ruoyi.system.domain.vo.AvatarVo;
 import com.ruoyi.system.domain.vo.ProfileVo;
 import com.ruoyi.system.domain.vo.SysOssVo;
+import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.service.ISysOssService;
 import com.ruoyi.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class SysProfileController extends BaseController {
      */
     @GetMapping
     public R<ProfileVo> profile() {
-        SysUser user = userService.selectUserById(LoginHelper.getUserId());
+        SysUserVo user = userService.selectUserById(LoginHelper.getUserId());
         ProfileVo profileVo = new ProfileVo();
         profileVo.setUser(user);
         profileVo.setRoleGroup(userService.selectUserRoleGroup(user.getUserName()));
@@ -56,7 +57,7 @@ public class SysProfileController extends BaseController {
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> updateProfile(@RequestBody SysUser user) {
+    public R<Void> updateProfile(@RequestBody SysUserBo user) {
         if (StringUtils.isNotEmpty(user.getPhonenumber())
             && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
@@ -85,7 +86,7 @@ public class SysProfileController extends BaseController {
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
     public R<Void> updatePwd(String oldPassword, String newPassword) {
-        SysUser user = userService.selectUserById(LoginHelper.getUserId());
+        SysUserVo user = userService.selectUserById(LoginHelper.getUserId());
         String userName = user.getUserName();
         String password = user.getPassword();
         if (!BCrypt.checkpw(oldPassword, password)) {

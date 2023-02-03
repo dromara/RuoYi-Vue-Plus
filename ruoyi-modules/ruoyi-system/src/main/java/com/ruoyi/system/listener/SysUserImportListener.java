@@ -11,8 +11,9 @@ import com.ruoyi.common.core.utils.ValidatorUtils;
 import com.ruoyi.common.excel.core.ExcelListener;
 import com.ruoyi.common.excel.core.ExcelResult;
 import com.ruoyi.common.satoken.utils.LoginHelper;
-import com.ruoyi.system.domain.SysUser;
+import com.ruoyi.system.domain.bo.SysUserBo;
 import com.ruoyi.system.domain.vo.SysUserImportVo;
+import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -50,11 +51,11 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
 
     @Override
     public void invoke(SysUserImportVo userVo, AnalysisContext context) {
-        SysUser user = this.userService.selectUserByUserName(userVo.getUserName());
+        SysUserVo sysUser = this.userService.selectUserByUserName(userVo.getUserName());
         try {
             // 验证是否存在这个用户
-            if (ObjectUtil.isNull(user)) {
-                user = BeanUtil.toBean(userVo, SysUser.class);
+            if (ObjectUtil.isNull(sysUser)) {
+                SysUserBo user = BeanUtil.toBean(userVo, SysUserBo.class);
                 ValidatorUtils.validate(user);
                 user.setPassword(password);
                 user.setCreateBy(operUserId);
@@ -62,8 +63,8 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
                 successNum++;
                 successMsg.append("<br/>").append(successNum).append("、账号 ").append(user.getUserName()).append(" 导入成功");
             } else if (isUpdateSupport) {
-                Long userId = user.getUserId();
-                user = BeanUtil.toBean(userVo, SysUser.class);
+                Long userId = sysUser.getUserId();
+                SysUserBo user = BeanUtil.toBean(userVo, SysUserBo.class);
                 user.setUserId(userId);
                 ValidatorUtils.validate(user);
                 userService.checkUserAllowed(user);
@@ -74,11 +75,11 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
                 successMsg.append("<br/>").append(successNum).append("、账号 ").append(user.getUserName()).append(" 更新成功");
             } else {
                 failureNum++;
-                failureMsg.append("<br/>").append(failureNum).append("、账号 ").append(user.getUserName()).append(" 已存在");
+                failureMsg.append("<br/>").append(failureNum).append("、账号 ").append(sysUser.getUserName()).append(" 已存在");
             }
         } catch (Exception e) {
             failureNum++;
-            String msg = "<br/>" + failureNum + "、账号 " + user.getUserName() + " 导入失败：";
+            String msg = "<br/>" + failureNum + "、账号 " + sysUser.getUserName() + " 导入失败：";
             failureMsg.append(msg).append(e.getMessage());
             log.error(msg, e);
         }

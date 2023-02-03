@@ -5,18 +5,18 @@
 <mapper namespace="com.ruoyi.system.mapper.SysUserMapper">
 
     <!-- 多结构嵌套自动映射需带上每个实体的主键id 否则映射会失败 -->
-    <resultMap type="com.ruoyi.system.domain.SysUser" id="SysUserResult">
+    <resultMap type="com.ruoyi.system.domain.vo.SysUserVo" id="SysUserResult">
         <id property="userId" column="user_id"/>
         <result property="deptId" column="dept_id"/>
         <association property="dept" column="dept_id" resultMap="deptResult"/>
         <collection property="roles" javaType="java.util.List" resultMap="RoleResult"/>
     </resultMap>
 
-    <resultMap id="deptResult" type="com.ruoyi.system.domain.SysDept">
+    <resultMap id="deptResult" type="com.ruoyi.system.domain.vo.SysDeptVo">
         <id property="deptId" column="dept_id"/>
     </resultMap>
 
-    <resultMap id="RoleResult" type="com.ruoyi.system.domain.SysRole">
+    <resultMap id="RoleResult" type="com.ruoyi.system.domain.vo.SysRoleVo">
         <id property="roleId" column="role_id"/>
     </resultMap>
 
