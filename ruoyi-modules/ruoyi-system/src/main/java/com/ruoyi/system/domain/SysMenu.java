@@ -127,7 +127,7 @@ public class SysMenu extends TreeEntity<SysMenu> {
     /**
      * 获取组件信息
      */
-    public String getComponent() {
+    public String getComponentInfo() {
         String component = UserConstants.LAYOUT;
         if (StringUtils.isNotEmpty(this.component) && !isMenuFrame()) {
             component = this.component;
