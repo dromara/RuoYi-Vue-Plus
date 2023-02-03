@@ -40,15 +40,6 @@
           end-placeholder="结束日期"
         ></el-date-picker>
       </el-form-item>
-      <el-form-item label="上传人" prop="createBy">
-        <el-input
-          v-model="queryParams.createBy"
-          placeholder="请输入上传人"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="服务商" prop="service">
         <el-input
           v-model="queryParams.service"
@@ -144,7 +135,7 @@
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="上传人" align="center" prop="createBy" />
+      <el-table-column label="上传人" align="center" prop="createByName" />
       <el-table-column label="服务商" align="center" prop="service"
                        sortable="custom"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -236,9 +227,7 @@ export default {
         fileName: undefined,
         originalName: undefined,
         fileSuffix: undefined,
-        url: undefined,
         createTime: undefined,
-        createBy: undefined,
         service: undefined
       },
       // 表单参数

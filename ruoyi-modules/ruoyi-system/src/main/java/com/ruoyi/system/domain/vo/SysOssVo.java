@@ -1,5 +1,7 @@
 package com.ruoyi.system.domain.vo;
 
+import com.ruoyi.common.translation.annotation.Translation;
+import com.ruoyi.common.translation.constant.TransConstant;
 import lombok.Data;
 
 import java.io.Serial;
@@ -51,6 +53,12 @@ public class SysOssVo implements Serializable {
      * 上传人
      */
     private Long createBy;
+
+    /**
+     * 上传人名称
+     */
+    @Translation(type = TransConstant.USER_ID_TO_NAME, mapper = "createBy")
+    private String createByName;
 
     /**
      * 服务商
