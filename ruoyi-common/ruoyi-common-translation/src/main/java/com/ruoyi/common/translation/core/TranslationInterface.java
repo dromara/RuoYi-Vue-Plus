@@ -10,7 +10,7 @@ public interface TranslationInterface {
     /**
      * 翻译
      *
-     * @param key 需要被翻译的键
+     * @param key 需要被翻译的键(不为空)
      * @return 返回键对应的值
      */
     String translation(Object key, String other);

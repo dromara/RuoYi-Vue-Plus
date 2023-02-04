@@ -8,15 +8,19 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.exception.ServiceException;
+import com.ruoyi.common.core.service.DeptService;
+import com.ruoyi.common.core.utils.SpringUtils;
+import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.core.utils.TreeBuildUtils;
+import com.ruoyi.common.mybatis.helper.DataBaseHelper;
+import com.ruoyi.common.redis.utils.CacheUtils;
+import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysDept;
 import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.system.domain.SysUser;
-import com.ruoyi.common.core.exception.ServiceException;
-import com.ruoyi.common.mybatis.helper.DataBaseHelper;
-import com.ruoyi.common.satoken.utils.LoginHelper;
-import com.ruoyi.common.core.utils.StringUtils;
-import com.ruoyi.common.core.utils.TreeBuildUtils;
 import com.ruoyi.system.domain.bo.SysDeptBo;
 import com.ruoyi.system.domain.vo.SysDeptVo;
 import com.ruoyi.system.mapper.SysDeptMapper;
@@ -24,6 +28,8 @@ import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysDeptService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,7 +43,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Service
-public class SysDeptServiceImpl implements ISysDeptService {
+public class SysDeptServiceImpl implements ISysDeptService, DeptService {
 
     private final SysDeptMapper baseMapper;
     private final SysRoleMapper roleMapper;
@@ -117,6 +123,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param deptId 部门ID
      * @return 部门信息
      */
+    @Cacheable(cacheNames = CacheNames.SYS_DEPT, key = "#deptId")
     @Override
     public SysDeptVo selectDeptById(Long deptId) {
         SysDeptVo dept = baseMapper.selectVoById(deptId);
@@ -124,6 +131,24 @@ public class SysDeptServiceImpl implements ISysDeptService {
             .select(SysDept::getDeptName).eq(SysDept::getDeptId, dept.getParentId()));
         dept.setParentName(ObjectUtil.isNotNull(parentDept) ? parentDept.getDeptName() : null);
         return dept;
+    }
+
+    /**
+     * 通过部门ID查询部门名称
+     *
+     * @param deptIds 部门ID串逗号分隔
+     * @return 部门名称串逗号分隔
+     */
+    @Override
+    public String selectDeptNameByIds(String deptIds) {
+        List<String> list = new ArrayList<>();
+        for (Long id : Arrays.stream(deptIds.split(",")).map(Long::parseLong).toList()) {
+            SysDeptVo vo = SpringUtils.getAopProxy(this).selectDeptById(id);
+            if (ObjectUtil.isNotNull(vo)) {
+                list.add(vo.getDeptName());
+            }
+        }
+        return String.join(",", list);
     }
 
     /**
@@ -222,6 +247,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param bo 部门信息
      * @return 结果
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_DEPT, key = "#bo.deptId")
     @Override
     public int updateDept(SysDeptBo bo) {
         SysDept dept = BeanUtil.toBean(bo, SysDept.class);
@@ -273,7 +299,9 @@ public class SysDeptServiceImpl implements ISysDeptService {
             list.add(dept);
         }
         if (CollUtil.isNotEmpty(list)) {
-            baseMapper.updateBatchById(list);
+            if (baseMapper.updateBatchById(list)) {
+                list.forEach(dept -> CacheUtils.evict(CacheNames.SYS_DEPT, dept.getDeptId()));
+            }
         }
     }
 
@@ -283,6 +311,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @param deptId 部门ID
      * @return 结果
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_DEPT, key = "#deptId")
     @Override
     public int deleteDeptById(Long deptId) {
         return baseMapper.deleteById(deptId);
