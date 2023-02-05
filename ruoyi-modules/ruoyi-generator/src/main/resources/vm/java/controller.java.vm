@@ -10,7 +10,7 @@ import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
-import com.ruoyi.common.web.annotation.RepeatSubmit;
+import com.ruoyi.common.idempotent.annotation.RepeatSubmit;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
