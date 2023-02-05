@@ -236,6 +236,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
      * @param dept 部门信息
      * @return 结果
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_DEPT, key = "#dept.deptId")
     @Override
     public int updateDept(SysDept dept) {
         SysDept newParentDept = baseMapper.selectById(dept.getParentId());
