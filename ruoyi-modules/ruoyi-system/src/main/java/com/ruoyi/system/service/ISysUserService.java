@@ -174,7 +174,7 @@ public interface ISysUserService {
      * @param avatar   头像地址
      * @return 结果
      */
-    boolean updateUserAvatar(String userName, String avatar);
+    boolean updateUserAvatar(String userName, Long avatar);
 
     /**
      * 重置用户密码

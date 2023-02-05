@@ -78,7 +78,7 @@ public class SysUserBo extends BaseEntity {
     /**
      * 头像地址
      */
-    private String avatar;
+    private Long avatar;
 
     /**
      * 密码

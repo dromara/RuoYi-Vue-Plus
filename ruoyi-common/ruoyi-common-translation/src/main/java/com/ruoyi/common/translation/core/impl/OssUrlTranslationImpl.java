@@ -22,6 +22,8 @@ public class OssUrlTranslationImpl implements TranslationInterface {
     public String translation(Object key, String other) {
         if (key instanceof String ids) {
             return ossService.selectUrlByIds(ids);
+        } else if (key instanceof Long id) {
+            return ossService.selectUrlByIds(id.toString());
         }
         return null;
     }

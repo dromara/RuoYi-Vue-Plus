@@ -1,6 +1,8 @@
 package com.ruoyi.system.domain.vo;
 
 import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.translation.annotation.Translation;
+import com.ruoyi.common.translation.constant.TransConstant;
 import lombok.Data;
 
 import java.io.Serial;
@@ -64,7 +66,8 @@ public class SysUserVo implements Serializable {
     /**
      * 头像地址
      */
-    private String avatar;
+    @Translation(type = TransConstant.OSS_ID_TO_URL)
+    private Long avatar;
 
     /**
      * 密码
