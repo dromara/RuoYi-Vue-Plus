@@ -22,7 +22,9 @@ import java.util.Objects;
  * 字典数据json序列化工具
  *
  * @author itino
+ * @deprecated 建议使用通用翻译注解
  */
+@Deprecated
 @Slf4j
 public class DictDataJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {
 
