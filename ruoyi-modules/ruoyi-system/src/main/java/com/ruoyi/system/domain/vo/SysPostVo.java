@@ -15,8 +15,7 @@ import java.util.Date;
 /**
  * 岗位信息视图对象 sys_post
  *
- * @author ruoyi
- * @date 2023-02-01
+ * @author Michelle.Chung
  */
 @Data
 @ExcelIgnoreUnannotated

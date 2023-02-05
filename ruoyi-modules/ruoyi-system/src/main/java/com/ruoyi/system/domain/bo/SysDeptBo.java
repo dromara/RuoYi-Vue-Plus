@@ -13,8 +13,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 部门业务对象 sys_dept
  *
- * @author ruoyi
- * @date 2023-01-31
+ * @author Michelle.Chung
  */
 
 @Data

@@ -11,8 +11,7 @@ import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 /**
  * 参数配置业务对象 sys_config
  *
- * @author ruoyi
- * @date 2023-01-31
+ * @author Michelle.Chung
  */
 
 @Data

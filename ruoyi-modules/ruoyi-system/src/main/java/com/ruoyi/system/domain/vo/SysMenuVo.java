@@ -12,8 +12,7 @@ import java.util.List;
 /**
  * 菜单权限视图对象 sys_menu
  *
- * @author ruoyi
- * @date 2023-02-01
+ * @author Michelle.Chung
  */
 @Data
 public class SysMenuVo implements Serializable {

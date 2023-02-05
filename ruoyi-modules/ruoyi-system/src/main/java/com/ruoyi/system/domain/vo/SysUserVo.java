@@ -14,8 +14,7 @@ import java.util.List;
 /**
  * 用户信息视图对象 sys_user
  *
- * @author ruoyi
- * @date 2023-02-01
+ * @author Michelle.Chung
  */
 @Data
 public class SysUserVo implements Serializable {

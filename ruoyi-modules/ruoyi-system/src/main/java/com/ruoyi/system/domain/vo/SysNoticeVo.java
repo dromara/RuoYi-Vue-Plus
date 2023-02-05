@@ -13,8 +13,7 @@ import java.util.Date;
 /**
  * 通知公告视图对象 sys_notice
  *
- * @author ruoyi
- * @date 2023-02-01
+ * @author Michelle.Chung
  */
 @Data
 public class SysNoticeVo implements Serializable {

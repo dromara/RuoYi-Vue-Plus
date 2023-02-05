@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 /**
  * 角色信息业务对象 sys_role
  *
- * @author ruoyi
- * @date 2023-02-01
+ * @author Michelle.Chung
  */
 
 @Data

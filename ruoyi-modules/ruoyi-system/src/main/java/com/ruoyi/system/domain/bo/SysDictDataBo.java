@@ -12,8 +12,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 字典数据业务对象 sys_dict_data
  *
- * @author ruoyi
- * @date 2023-02-01
+ * @author Michelle.Chung
  */
 
 @Data

@@ -17,8 +17,7 @@ import java.util.Date;
 /**
  * 用户信息业务对象 sys_user
  *
- * @author ruoyi
- * @date 2023-02-01
+ * @author Michelle.Chung
  */
 
 @Data

@@ -1,6 +1,7 @@
 package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.secure.BCrypt;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
@@ -11,6 +12,7 @@ import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.system.domain.bo.SysUserBo;
+import com.ruoyi.system.domain.bo.SysUserProfileBo;
 import com.ruoyi.system.domain.vo.AvatarVo;
 import com.ruoyi.system.domain.vo.ProfileVo;
 import com.ruoyi.system.domain.vo.SysOssVo;
@@ -57,7 +59,8 @@ public class SysProfileController extends BaseController {
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> updateProfile(@RequestBody SysUserBo user) {
+    public R<Void> updateProfile(@RequestBody SysUserProfileBo profile) {
+        SysUserBo user = BeanUtil.copyProperties(profile, SysUserBo.class);
         if (StringUtils.isNotEmpty(user.getPhonenumber())
             && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
@@ -67,10 +70,6 @@ public class SysProfileController extends BaseController {
             return R.fail("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         user.setUserId(LoginHelper.getUserId());
-        user.setUserName(null);
-        user.setPassword(null);
-        user.setAvatar(null);
-        user.setDeptId(null);
         if (userService.updateUserProfile(user) > 0) {
             return R.ok();
         }
@@ -117,7 +116,7 @@ public class SysProfileController extends BaseController {
             }
             SysOssVo oss = iSysOssService.upload(avatarfile);
             String avatar = oss.getUrl();
-            if (userService.updateUserAvatar(LoginHelper.getUsername(), avatar)) {
+            if (userService.updateUserAvatar(LoginHelper.getUsername(), oss.getOssId())) {
                 AvatarVo avatarVo = new AvatarVo();
                 avatarVo.setImgUrl(avatar);
                 return R.ok(avatarVo);

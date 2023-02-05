@@ -14,8 +14,7 @@ import java.util.Date;
 /**
  * 参数配置视图对象 sys_config
  *
- * @author ruoyi
- * @date 2023-01-31
+ * @author Michelle.Chung
  */
 @Data
 @ExcelIgnoreUnannotated

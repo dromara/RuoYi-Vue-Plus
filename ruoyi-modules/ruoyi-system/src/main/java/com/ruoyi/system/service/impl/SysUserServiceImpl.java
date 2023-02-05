@@ -373,7 +373,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @return 结果
      */
     @Override
-    public boolean updateUserAvatar(String userName, String avatar) {
+    public boolean updateUserAvatar(String userName, Long avatar) {
         return baseMapper.update(null,
             new LambdaUpdateWrapper<SysUser>()
                 .set(SysUser::getAvatar, avatar)

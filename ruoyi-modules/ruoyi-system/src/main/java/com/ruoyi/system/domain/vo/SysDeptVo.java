@@ -13,8 +13,7 @@ import java.util.Date;
 /**
  * 部门视图对象 sys_dept
  *
- * @author ruoyi
- * @date 2023-01-31
+ * @author Michelle.Chung
  */
 @Data
 @ExcelIgnoreUnannotated
