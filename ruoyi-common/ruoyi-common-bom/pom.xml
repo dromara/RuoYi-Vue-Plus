@@ -145,6 +145,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- 数据库加解密模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-encrypt</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
