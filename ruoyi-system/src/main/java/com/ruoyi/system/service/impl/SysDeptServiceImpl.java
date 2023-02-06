@@ -226,7 +226,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         if (!UserConstants.DEPT_NORMAL.equals(info.getStatus())) {
             throw new ServiceException("部门停用，不允许新增");
         }
-        dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
+        dept.setAncestors(info.getAncestors() + StringUtils.SEPARATOR + dept.getParentId());
         return baseMapper.insert(dept);
     }
 
@@ -242,7 +242,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         SysDept newParentDept = baseMapper.selectById(dept.getParentId());
         SysDept oldDept = baseMapper.selectById(dept.getDeptId());
         if (ObjectUtil.isNotNull(newParentDept) && ObjectUtil.isNotNull(oldDept)) {
-            String newAncestors = newParentDept.getAncestors() + "," + newParentDept.getDeptId();
+            String newAncestors = newParentDept.getAncestors() + StringUtils.SEPARATOR + newParentDept.getDeptId();
             String oldAncestors = oldDept.getAncestors();
             dept.setAncestors(newAncestors);
             updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);

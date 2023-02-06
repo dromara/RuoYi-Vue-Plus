@@ -5,7 +5,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.UserConstants;
@@ -15,6 +14,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StreamUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.domain.SysRoleMenu;
 import com.ruoyi.system.domain.SysUserRole;
@@ -107,7 +107,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         Set<String> permsSet = new HashSet<>();
         for (SysRole perm : perms) {
             if (ObjectUtil.isNotNull(perm)) {
-                permsSet.addAll(Arrays.asList(perm.getRoleKey().trim().split(",")));
+                permsSet.addAll(StringUtils.splitList(perm.getRoleKey().trim()));
             }
         }
         return permsSet;
