@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 部门管理 服务实现
@@ -132,13 +131,13 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
     @Override
     public String selectDeptNameByIds(String deptIds) {
         List<String> list = new ArrayList<>();
-        for (Long id : Arrays.stream(deptIds.split(",")).map(Long::parseLong).collect(Collectors.toList())) {
+        for (Long id : StringUtils.splitTo(deptIds, Convert::toLong)) {
             SysDept dept = SpringUtils.getAopProxy(this).selectDeptById(id);
             if (ObjectUtil.isNotNull(dept)) {
                 list.add(dept.getDeptName());
             }
         }
-        return String.join(",", list);
+        return String.join(StringUtils.SEPARATOR, list);
     }
 
     /**
