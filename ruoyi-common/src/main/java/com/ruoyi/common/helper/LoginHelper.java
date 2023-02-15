@@ -1,8 +1,10 @@
 package com.ruoyi.common.helper;
 
 import cn.dev33.satoken.context.SaHolder;
+import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONObject;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.DeviceType;
@@ -37,8 +39,7 @@ public class LoginHelper {
      */
     public static void login(LoginUser loginUser) {
         SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
-        StpUtil.login(loginUser.getLoginId());
-        setLoginUser(loginUser);
+        StpUtil.login(loginUser.getLoginId(), new SaLoginModel().setExtra(LOGIN_USER_KEY, loginUser));
     }
 
     /**
@@ -49,15 +50,10 @@ public class LoginHelper {
      */
     public static void loginByDevice(LoginUser loginUser, DeviceType deviceType) {
         SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
-        StpUtil.login(loginUser.getLoginId(), deviceType.getDevice());
-        setLoginUser(loginUser);
-    }
-
-    /**
-     * 设置用户数据(多级缓存)
-     */
-    public static void setLoginUser(LoginUser loginUser) {
-        StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
+        StpUtil.login(loginUser.getLoginId(),
+            new SaLoginModel()
+                .setDevice(deviceType.getDevice())
+                .setExtra(LOGIN_USER_KEY, loginUser));
     }
 
     /**
@@ -68,7 +64,7 @@ public class LoginHelper {
         if (loginUser != null) {
             return loginUser;
         }
-        loginUser = (LoginUser) StpUtil.getTokenSession().get(LOGIN_USER_KEY);
+        loginUser = ((JSONObject) StpUtil.getExtra(LOGIN_USER_KEY)).toBean(LoginUser.class);
         SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
         return loginUser;
     }
