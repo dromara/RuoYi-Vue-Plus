@@ -183,6 +183,12 @@ public class OssClient {
         return configKey;
     }
 
+    /**
+     * 获取私有URL链接
+     *
+     * @param objectKey 对象KEY
+     * @param second    授权时间
+     */
     public String getPrivateUrl(String objectKey, Integer second) {
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
             new GeneratePresignedUrlRequest(properties.getBucketName(), objectKey)
@@ -190,6 +196,13 @@ public class OssClient {
                 .withExpiration(new Date(System.currentTimeMillis() + 1000L * second));
         URL url = client.generatePresignedUrl(generatePresignedUrlRequest);
         return url.toString();
+    }
+
+    /**
+     * 检查配置是否相同
+     */
+    public boolean checkPropertiesSame(OssProperties properties) {
+        return this.properties.equals(properties);
     }
 
     /**
