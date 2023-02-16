@@ -11,6 +11,9 @@
     <packaging>jar</packaging>
 
     <properties>
+        <spring-boot.version>2.7.8</spring-boot.version>
+        <spring-boot-admin.version>2.7.10</spring-boot-admin.version>
+        <mybatis-spring-boot.version>2.2.2</mybatis-spring-boot.version>
     </properties>
 
     <dependencyManagement>
@@ -66,6 +69,7 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>${mybatis-spring-boot.version}</version>
         </dependency>
         <!-- mysql -->
         <dependency>
@@ -76,12 +80,13 @@
         <dependency>
             <groupId>de.codecentric</groupId>
             <artifactId>spring-boot-admin-starter-client</artifactId>
+            <version>${spring-boot-admin.version}</version>
         </dependency>
 
-        <!-- 调度模块 -->
+        <!-- xxl-job-core -->
         <dependency>
-            <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common-job</artifactId>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
         </dependency>
 
     </dependencies>
