@@ -3,7 +3,7 @@ package com.ruoyi.system.domain.bo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
-import com.ruoyi.common.mybatis.core.domain.TreeEntity;
+import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,13 +18,18 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysMenuBo extends TreeEntity<SysMenuBo> {
+public class SysMenuBo extends BaseEntity {
 
     /**
      * 菜单ID
      */
     @NotNull(message = "菜单ID不能为空", groups = { EditGroup.class })
     private Long menuId;
+
+    /**
+     * 父菜单ID
+     */
+    private Long parentId;
 
     /**
      * 菜单名称

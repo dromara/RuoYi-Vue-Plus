@@ -66,6 +66,14 @@ public interface ISysMenuService {
     List<Long> selectMenuListByRoleId(Long roleId);
 
     /**
+     * 根据租户套餐ID查询菜单树信息
+     *
+     * @param packageId 租户套餐ID
+     * @return 选中菜单列表
+     */
+    List<Long> selectMenuListByPackageId(Long packageId);
+
+    /**
      * 构建前端路由所需要的菜单
      *
      * @param menus 菜单列表

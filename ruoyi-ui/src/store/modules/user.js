@@ -3,6 +3,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
   state: {
+    userId: undefined,
     token: getToken(),
     name: '',
     avatar: '',
@@ -11,6 +12,9 @@ const user = {
   },
 
   mutations: {
+    SET_USER_ID: (state, userId) => {
+      state.userId = userId
+    },
     SET_TOKEN: (state, token) => {
       state.token = token
     },
@@ -31,12 +35,13 @@ const user = {
   actions: {
     // 登录
     Login({ commit }, userInfo) {
+      const tenantId = userInfo.tenantId.trim()
       const username = userInfo.username.trim()
       const password = userInfo.password
       const code = userInfo.code
       const uuid = userInfo.uuid
       return new Promise((resolve, reject) => {
-        login(username, password, code, uuid).then(res => {
+        login(tenantId, username, password, code, uuid).then(res => {
           setToken(res.data.token)
           commit('SET_TOKEN', res.data.token)
           resolve()
@@ -60,6 +65,7 @@ const user = {
           }
           commit('SET_NAME', user.userName)
           commit('SET_AVATAR', avatar)
+          commit('SET_USER_ID', user.userId)
           resolve(res)
         }).catch(error => {
           reject(error)

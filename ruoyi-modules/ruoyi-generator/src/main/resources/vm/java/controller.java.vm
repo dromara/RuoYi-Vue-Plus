@@ -39,7 +39,7 @@ import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 @RequestMapping("/${moduleName}/${businessName}")
 public class ${ClassName}Controller extends BaseController {
 
-    private final I${ClassName}Service i${ClassName}Service;
+    private final I${ClassName}Service ${className}Service;
 
     /**
      * 查询${functionName}列表
@@ -52,7 +52,7 @@ public class ${ClassName}Controller extends BaseController {
     }
 #elseif($table.tree)
     public R<List<${ClassName}Vo>> list(${ClassName}Bo bo) {
-        List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
+        List<${ClassName}Vo> list = ${className}Service.queryList(bo);
         return R.ok(list);
     }
 #end
@@ -64,7 +64,7 @@ public class ${ClassName}Controller extends BaseController {
     @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(${ClassName}Bo bo, HttpServletResponse response) {
-        List<${ClassName}Vo> list = i${ClassName}Service.queryList(bo);
+        List<${ClassName}Vo> list = ${className}Service.queryList(bo);
         ExcelUtil.exportExcel(list, "${functionName}", ${ClassName}Vo.class, response);
     }
 
@@ -77,7 +77,7 @@ public class ${ClassName}Controller extends BaseController {
     @GetMapping("/{${pkColumn.javaField}}")
     public R<${ClassName}Vo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable ${pkColumn.javaType} ${pkColumn.javaField}) {
-        return R.ok(i${ClassName}Service.queryById(${pkColumn.javaField}));
+        return R.ok(${className}Service.queryById(${pkColumn.javaField}));
     }
 
     /**
@@ -88,7 +88,7 @@ public class ${ClassName}Controller extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody ${ClassName}Bo bo) {
-        return toAjax(i${ClassName}Service.insertByBo(bo));
+        return toAjax(${className}Service.insertByBo(bo));
     }
 
     /**
@@ -99,7 +99,7 @@ public class ${ClassName}Controller extends BaseController {
     @RepeatSubmit()
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody ${ClassName}Bo bo) {
-        return toAjax(i${ClassName}Service.updateByBo(bo));
+        return toAjax(${className}Service.updateByBo(bo));
     }
 
     /**
@@ -112,6 +112,6 @@ public class ${ClassName}Controller extends BaseController {
     @DeleteMapping("/{${pkColumn.javaField}s}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
-        return toAjax(i${ClassName}Service.deleteWithValidByIds(List.of(${pkColumn.javaField}s), true));
+        return toAjax(${className}Service.deleteWithValidByIds(List.of(${pkColumn.javaField}s), true));
     }
 }

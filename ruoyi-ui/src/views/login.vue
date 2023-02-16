@@ -2,6 +2,17 @@
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">RuoYi-Vue-Plus后台管理系统</h3>
+      <el-form-item prop="tenantId">
+        <el-select v-model="loginForm.tenantId" filterable placeholder="请选择/输入公司名称" style="width: 100%">
+          <el-option
+            v-for="item in tenantList"
+            :key="item.tenantId"
+            :label="item.companyName"
+            :value="item.tenantId">
+          </el-option>
+          <svg-icon slot="prefix" icon-class="company" class="el-input__icon input-icon" />
+        </el-select>
+      </el-form-item>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
@@ -62,7 +73,7 @@
 </template>
 
 <script>
-import { getCodeImg } from "@/api/login";
+import { getCodeImg, tenantList } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 
@@ -72,6 +83,7 @@ export default {
     return {
       codeUrl: "",
       loginForm: {
+        tenantId: "000000",
         username: "admin",
         password: "admin123",
         rememberMe: false,
@@ -79,6 +91,9 @@ export default {
         uuid: ""
       },
       loginRules: {
+        tenantId: [
+          { required: true, trigger: "blur", message: "请输入您的租户编号" }
+        ],
         username: [
           { required: true, trigger: "blur", message: "请输入您的账号" }
         ],
@@ -92,7 +107,9 @@ export default {
       captchaEnabled: true,
       // 注册开关
       register: false,
-      redirect: undefined
+      redirect: undefined,
+      // 租户列表
+      tenantList:[]
     };
   },
   watch: {
@@ -105,6 +122,7 @@ export default {
   },
   created() {
     this.getCode();
+    this.getTenantList();
     this.getCookie();
   },
   methods: {
@@ -117,11 +135,18 @@ export default {
         }
       });
     },
+    getTenantList() {
+      tenantList().then(res => {
+        this.tenantList = res.data;
+      });
+    },
     getCookie() {
+      const tenantId = Cookies.get("tenantId");
       const username = Cookies.get("username");
       const password = Cookies.get("password");
       const rememberMe = Cookies.get('rememberMe')
       this.loginForm = {
+        tenantId: tenantId === undefined ? this.loginForm.tenantId : tenantId,
         username: username === undefined ? this.loginForm.username : username,
         password: password === undefined ? this.loginForm.password : decrypt(password),
         rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
@@ -132,10 +157,12 @@ export default {
         if (valid) {
           this.loading = true;
           if (this.loginForm.rememberMe) {
+            Cookies.set("tenantId", this.loginForm.tenantId, { expires: 30 });
             Cookies.set("username", this.loginForm.username, { expires: 30 });
             Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
             Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 });
           } else {
+            Cookies.remove("tenantId");
             Cookies.remove("username");
             Cookies.remove("password");
             Cookies.remove('rememberMe');

@@ -10,7 +10,6 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * 角色信息视图对象 sys_role
@@ -91,12 +90,7 @@ public class SysRoleVo implements Serializable {
      */
     private boolean flag = false;
 
-    /**
-     * 角色菜单权限
-     */
-    private Set<String> permissions;
-
-    public boolean isAdmin() {
+    public boolean isSuperAdmin() {
         return UserConstants.SUPER_ADMIN_ID.equals(this.roleId);
     }
 

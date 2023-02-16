@@ -63,7 +63,7 @@
 
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common-satoken</artifactId>
+            <artifactId>ruoyi-common-tenant</artifactId>
         </dependency>
 
         <dependency>

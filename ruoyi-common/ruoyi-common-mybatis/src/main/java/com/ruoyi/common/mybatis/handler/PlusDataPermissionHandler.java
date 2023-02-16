@@ -35,7 +35,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * 数据权限过滤
@@ -79,7 +78,7 @@ public class PlusDataPermissionHandler {
             DataPermissionHelper.setVariable("user", currentUser);
         }
         // 如果是超级管理员，则不过滤数据
-        if (LoginHelper.isAdmin()) {
+        if (LoginHelper.isSuperAdmin()) {
             return where;
         }
         String dataFilterSql = buildDataFilter(dataColumns, isSelect);

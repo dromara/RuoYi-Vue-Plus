@@ -1,5 +1,7 @@
 package com.ruoyi.common.excel.annotation;
 
+import com.ruoyi.common.core.utils.StringUtils;
+
 import java.lang.annotation.*;
 
 /**
@@ -25,6 +27,6 @@ public @interface ExcelDictFormat {
     /**
      * 分隔符，读取字符串组内容
      */
-    String separator() default ",";
+    String separator() default StringUtils.SEPARATOR;
 
 }

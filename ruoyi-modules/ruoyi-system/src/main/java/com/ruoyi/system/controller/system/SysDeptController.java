@@ -1,13 +1,13 @@
 package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.util.ArrayUtil;
-import com.ruoyi.common.log.annotation.Log;
+import cn.hutool.core.convert.Convert;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.system.domain.bo.SysDeptBo;
 import com.ruoyi.system.domain.vo.SysDeptVo;
 import com.ruoyi.system.service.ISysDeptService;
@@ -50,7 +50,7 @@ public class SysDeptController extends BaseController {
     public R<List<SysDeptVo>> excludeChild(@PathVariable(value = "deptId", required = false) Long deptId) {
         List<SysDeptVo> depts = deptService.selectDeptList(new SysDeptBo());
         depts.removeIf(d -> d.getDeptId().equals(deptId)
-            || ArrayUtil.contains(StringUtils.split(d.getAncestors(), ","), deptId + ""));
+            || StringUtils.splitList(d.getAncestors()).contains(Convert.toStr(deptId)));
         return R.ok(depts);
     }
 

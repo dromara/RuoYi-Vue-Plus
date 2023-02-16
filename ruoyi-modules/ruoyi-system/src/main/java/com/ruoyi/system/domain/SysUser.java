@@ -2,7 +2,7 @@ package com.ruoyi.system.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import com.ruoyi.common.tenant.core.TenantEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.Date;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_user")
-public class SysUser extends BaseEntity {
+public class SysUser extends TenantEntity {
 
     /**
      * 用户ID
@@ -108,7 +108,7 @@ public class SysUser extends BaseEntity {
         this.userId = userId;
     }
 
-    public boolean isAdmin() {
+    public boolean isSuperAdmin() {
         return UserConstants.SUPER_ADMIN_ID.equals(this.userId);
     }
 

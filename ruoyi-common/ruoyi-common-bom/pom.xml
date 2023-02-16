@@ -152,6 +152,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- 租户模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-tenant</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

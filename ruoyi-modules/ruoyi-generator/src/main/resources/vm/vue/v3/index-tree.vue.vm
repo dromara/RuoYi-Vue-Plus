@@ -304,6 +304,7 @@ const data = reactive({
   },
   rules: {
 #foreach ($column in $columns)
+#if($column.isInsert || $column.isEdit)
 #if($column.required)
 #set($parentheseIndex=$column.columnComment.indexOf("（"))
 #if($parentheseIndex != -1)
@@ -314,6 +315,7 @@ const data = reactive({
     $column.javaField: [
       { required: true, message: "$comment不能为空", trigger: #if($column.htmlType == "select" || $column.htmlType == "radio")"change"#else"blur"#end }
     ]#if($foreach.count != $columns.size()),#end
+#end
 #end
 #end
   }
@@ -365,10 +367,12 @@ function cancel() {
 function reset() {
   form.value = {
 #foreach ($column in $columns)
+#if($column.isInsert || $column.isEdit)
 #if($column.htmlType == "checkbox")
     $column.javaField: []#if($foreach.count != $columns.size()),#end
 #else
     $column.javaField: null#if($foreach.count != $columns.size()),#end
+#end
 #end
 #end
   };

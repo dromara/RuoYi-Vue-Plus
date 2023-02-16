@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -70,13 +71,13 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     @Override
     public String selectUrlByIds(String ossIds) {
         List<String> list = new ArrayList<>();
-        for (Long id : Arrays.stream(ossIds.split(",")).map(Long::parseLong).toList()) {
+        for (Long id : StringUtils.splitTo(ossIds, Convert::toLong)) {
             SysOssVo vo = SpringUtils.getAopProxy(this).getById(id);
             if (ObjectUtil.isNotNull(vo)) {
                 list.add(this.matchingUrl(vo).getUrl());
             }
         }
-        return String.join(",", list);
+        return String.join(StringUtils.SEPARATOR, list);
     }
 
     private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {

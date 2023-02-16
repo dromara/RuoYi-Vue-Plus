@@ -72,5 +72,10 @@ public interface Constants {
      */
     String TOKEN = "token";
 
+    /**
+     * 顶级部门id
+     */
+    Long TOP_PARENT_ID = 0L;
+
 }
 

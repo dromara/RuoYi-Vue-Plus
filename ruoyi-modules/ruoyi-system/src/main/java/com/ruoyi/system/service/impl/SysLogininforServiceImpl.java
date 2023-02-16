@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,6 +13,8 @@ import com.ruoyi.common.core.utils.ServletUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.ip.AddressUtils;
 import com.ruoyi.system.domain.SysLogininfor;
+import com.ruoyi.system.domain.bo.SysLogininforBo;
+import com.ruoyi.system.domain.vo.SysLogininforVo;
 import com.ruoyi.system.mapper.SysLogininforMapper;
 import com.ruoyi.system.service.ISysLogininforService;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +67,8 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
         // 获取客户端浏览器
         String browser = userAgent.getBrowser().getName();
         // 封装对象
-        SysLogininfor logininfor = new SysLogininfor();
+        SysLogininforBo logininfor = new SysLogininforBo();
+        logininfor.setTenantId(logininforEvent.getTenantId());
         logininfor.setUserName(logininforEvent.getUsername());
         logininfor.setIpaddr(ip);
         logininfor.setLoginLocation(address);
@@ -89,7 +93,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
     }
 
     @Override
-    public TableDataInfo<SysLogininfor> selectPageLogininforList(SysLogininfor logininfor, PageQuery pageQuery) {
+    public TableDataInfo<SysLogininforVo> selectPageLogininforList(SysLogininforBo logininfor, PageQuery pageQuery) {
         Map<String, Object> params = logininfor.getParams();
         LambdaQueryWrapper<SysLogininfor> lqw = new LambdaQueryWrapper<SysLogininfor>()
             .like(StringUtils.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
@@ -101,17 +105,18 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
             pageQuery.setOrderByColumn("info_id");
             pageQuery.setIsAsc("desc");
         }
-        Page<SysLogininfor> page = baseMapper.selectPage(pageQuery.build(), lqw);
+        Page<SysLogininforVo> page = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
 
     /**
      * 新增系统登录日志
      *
-     * @param logininfor 访问日志对象
+     * @param bo 访问日志对象
      */
     @Override
-    public void insertLogininfor(SysLogininfor logininfor) {
+    public void insertLogininfor(SysLogininforBo bo) {
+        SysLogininfor logininfor = BeanUtil.toBean(bo, SysLogininfor.class);
         logininfor.setLoginTime(new Date());
         baseMapper.insert(logininfor);
     }
@@ -123,9 +128,9 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
      * @return 登录记录集合
      */
     @Override
-    public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor) {
+    public List<SysLogininforVo> selectLogininforList(SysLogininforBo logininfor) {
         Map<String, Object> params = logininfor.getParams();
-        return baseMapper.selectList(new LambdaQueryWrapper<SysLogininfor>()
+        return baseMapper.selectVoList(new LambdaQueryWrapper<SysLogininfor>()
             .like(StringUtils.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
             .eq(StringUtils.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
             .like(StringUtils.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())

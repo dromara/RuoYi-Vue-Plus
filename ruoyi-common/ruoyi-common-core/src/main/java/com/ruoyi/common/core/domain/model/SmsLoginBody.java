@@ -14,6 +14,12 @@ import jakarta.validation.constraints.NotBlank;
 public class SmsLoginBody {
 
     /**
+     * 租户ID
+     */
+    @NotBlank(message = "{tenant.number.not.blank}")
+    private String tenantId;
+
+    /**
      * 用户名
      */
     @NotBlank(message = "{user.phonenumber.not.blank}")

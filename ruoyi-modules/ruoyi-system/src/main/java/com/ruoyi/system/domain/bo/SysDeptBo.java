@@ -2,7 +2,7 @@ package com.ruoyi.system.domain.bo;
 
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
-import com.ruoyi.common.mybatis.core.domain.TreeEntity;
+import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,13 +18,18 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysDeptBo extends TreeEntity<SysDeptBo> {
+public class SysDeptBo extends BaseEntity {
 
     /**
      * 部门id
      */
     @NotNull(message = "部门id不能为空", groups = { EditGroup.class })
     private Long deptId;
+
+    /**
+     * 父部门ID
+     */
+    private Long parentId;
 
     /**
      * 部门名称
@@ -37,7 +42,7 @@ public class SysDeptBo extends TreeEntity<SysDeptBo> {
      * 显示顺序
      */
     @NotNull(message = "显示顺序不能为空")
-    private Long orderNum;
+    private Integer orderNum;
 
     /**
      * 负责人

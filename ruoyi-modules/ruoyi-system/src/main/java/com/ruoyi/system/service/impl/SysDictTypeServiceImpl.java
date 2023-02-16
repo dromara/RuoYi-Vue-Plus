@@ -11,16 +11,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.CacheConstants;
 import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.mybatis.core.page.PageQuery;
-import com.ruoyi.common.core.service.DictService;
-import com.ruoyi.system.domain.SysDictData;
-import com.ruoyi.system.domain.SysDictType;
-import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.core.exception.ServiceException;
+import com.ruoyi.common.core.service.DictService;
+import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.mybatis.core.page.PageQuery;
+import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.redis.utils.CacheUtils;
-import com.ruoyi.common.core.utils.SpringUtils;
+import com.ruoyi.system.domain.SysDictData;
+import com.ruoyi.system.domain.SysDictType;
 import com.ruoyi.system.domain.bo.SysDictTypeBo;
 import com.ruoyi.system.domain.vo.SysDictDataVo;
 import com.ruoyi.system.domain.vo.SysDictTypeVo;
@@ -33,7 +33,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -146,34 +149,11 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     }
 
     /**
-     * 加载字典缓存数据
-     */
-    @Override
-    public void loadingDictCache() {
-        List<SysDictDataVo> dictDataList = dictDataMapper.selectVoList(
-            new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getStatus, UserConstants.DICT_NORMAL));
-        Map<String, List<SysDictDataVo>> dictDataMap = StreamUtils.groupByKey(dictDataList, SysDictDataVo::getDictType);
-        dictDataMap.forEach((k,v) -> {
-            List<SysDictDataVo> dictList = StreamUtils.sorted(v, Comparator.comparing(SysDictDataVo::getDictSort));
-            CacheUtils.put(CacheNames.SYS_DICT, k, dictList);
-        });
-    }
-
-    /**
-     * 清空字典缓存数据
-     */
-    @Override
-    public void clearDictCache() {
-        CacheUtils.clear(CacheNames.SYS_DICT);
-    }
-
-    /**
      * 重置字典缓存数据
      */
     @Override
     public void resetDictCache() {
-        clearDictCache();
-        loadingDictCache();
+        CacheUtils.clear(CacheNames.SYS_DICT);
     }
 
     /**

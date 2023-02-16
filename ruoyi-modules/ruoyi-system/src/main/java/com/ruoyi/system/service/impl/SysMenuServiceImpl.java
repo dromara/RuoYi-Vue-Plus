@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -16,6 +17,7 @@ import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysMenu;
 import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.system.domain.SysRoleMenu;
+import com.ruoyi.system.domain.SysTenantPackage;
 import com.ruoyi.system.domain.bo.SysMenuBo;
 import com.ruoyi.system.domain.vo.MetaVo;
 import com.ruoyi.system.domain.vo.RouterVo;
@@ -23,6 +25,7 @@ import com.ruoyi.system.domain.vo.SysMenuVo;
 import com.ruoyi.system.mapper.SysMenuMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysRoleMenuMapper;
+import com.ruoyi.system.mapper.SysTenantPackageMapper;
 import com.ruoyi.system.service.ISysMenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     private final SysMenuMapper baseMapper;
     private final SysRoleMapper roleMapper;
     private final SysRoleMenuMapper roleMenuMapper;
+    private final SysTenantPackageMapper sysTenantPackageMapper;
 
     /**
      * 根据用户查询系统菜单列表
@@ -63,7 +67,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     public List<SysMenuVo> selectMenuList(SysMenuBo menu, Long userId) {
         List<SysMenuVo> menuList;
         // 管理员显示所有菜单信息
-        if (LoginHelper.isAdmin(userId)) {
+        if (LoginHelper.isSuperAdmin(userId)) {
             menuList = baseMapper.selectVoList(new LambdaQueryWrapper<SysMenu>()
                 .like(StringUtils.isNotBlank(menu.getMenuName()), SysMenu::getMenuName, menu.getMenuName())
                 .eq(StringUtils.isNotBlank(menu.getVisible()), SysMenu::getVisible, menu.getVisible())
@@ -96,7 +100,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
             if (StringUtils.isNotEmpty(perm)) {
-                permsSet.addAll(Arrays.asList(perm.trim().split(",")));
+                permsSet.addAll(StringUtils.splitList(perm.trim()));
             }
         }
         return permsSet;
@@ -114,7 +118,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
             if (StringUtils.isNotEmpty(perm)) {
-                permsSet.addAll(Arrays.asList(perm.trim().split(",")));
+                permsSet.addAll(StringUtils.splitList(perm.trim()));
             }
         }
         return permsSet;
@@ -129,7 +133,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public List<SysMenu> selectMenuTreeByUserId(Long userId) {
         List<SysMenu> menus;
-        if (LoginHelper.isAdmin(userId)) {
+        if (LoginHelper.isSuperAdmin(userId)) {
             menus = baseMapper.selectMenuTreeAll();
         } else {
             menus = baseMapper.selectMenuTreeByUserId(userId);
@@ -147,6 +151,30 @@ public class SysMenuServiceImpl implements ISysMenuService {
     public List<Long> selectMenuListByRoleId(Long roleId) {
         SysRole role = roleMapper.selectById(roleId);
         return baseMapper.selectMenuListByRoleId(roleId, role.getMenuCheckStrictly());
+    }
+
+    /**
+     * 根据租户套餐ID查询菜单树信息
+     *
+     * @param packageId 租户套餐ID
+     * @return 选中菜单列表
+     */
+    @Override
+    public List<Long> selectMenuListByPackageId(Long packageId) {
+        SysTenantPackage tenantPackage = sysTenantPackageMapper.selectById(packageId);
+        List<Long> menuIds = StringUtils.splitTo(tenantPackage.getMenuIds(), Convert::toLong);
+        if (CollUtil.isEmpty(menuIds)) {
+            return List.of();
+        }
+        List<Long> parentIds = null;
+        if (tenantPackage.getMenuCheckStrictly()) {
+            parentIds = baseMapper.selectObjs(new LambdaQueryWrapper<SysMenu>()
+                .select(SysMenu::getParentId)
+                .in(SysMenu::getMenuId, menuIds), Convert::toLong);
+        }
+        return baseMapper.selectObjs(new LambdaQueryWrapper<SysMenu>()
+            .in(SysMenu::getMenuId, menuIds)
+            .notIn(CollUtil.isNotEmpty(parentIds), SysMenu::getMenuId, parentIds), Convert::toLong);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.ruoyi.system.domain.bo;
 
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import com.ruoyi.common.tenant.core.TenantEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.*;
+import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
 import com.ruoyi.common.core.utils.BeanCopyUtils;
@@ -17,6 +17,9 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 自定义 Mapper 接口, 实现 自定义扩展
@@ -191,6 +194,10 @@ public interface BaseMapperPlus<M, T, V> extends BaseMapper<T> {
         }
         voPage.setRecords(BeanCopyUtils.copyList(pageData.getRecords(), voClass));
         return (P) voPage;
+    }
+
+    default <C> List<C> selectObjs(Wrapper<T> wrapper, Function<? super Object, C> mapper) {
+        return this.selectObjs(wrapper).stream().filter(Objects::nonNull).map(mapper).collect(Collectors.toList());
     }
 
 }

@@ -3,7 +3,7 @@ package com.ruoyi.common.idempotent.aspectj;
 import cn.dev33.satoken.SaManager;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
-import com.ruoyi.common.core.constant.CacheConstants;
+import com.ruoyi.common.core.constant.GlobalConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.utils.MessageUtils;
@@ -57,7 +57,7 @@ public class RepeatSubmitAspect {
 
         submitKey = SecureUtil.md5(submitKey + ":" + nowParams);
         // 唯一标识（指定key + url + 消息头）
-        String cacheRepeatKey = CacheConstants.REPEAT_SUBMIT_KEY + url + submitKey;
+        String cacheRepeatKey = GlobalConstants.REPEAT_SUBMIT_KEY + url + submitKey;
         String key = RedisUtils.getCacheObject(cacheRepeatKey);
         if (key == null) {
             RedisUtils.setCacheObject(cacheRepeatKey, "", Duration.ofMillis(interval));

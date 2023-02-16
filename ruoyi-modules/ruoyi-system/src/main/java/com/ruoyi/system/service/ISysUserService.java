@@ -133,7 +133,7 @@ public interface ISysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    boolean registerUser(SysUserBo user);
+    boolean registerUser(SysUserBo user, String tenantId);
 
     /**
      * 修改用户信息

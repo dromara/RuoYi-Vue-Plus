@@ -22,6 +22,7 @@
 
     <sql id="selectUserVo">
         select u.user_id,
+               u.tenant_id,
                u.dept_id,
                u.user_name,
                u.nick_name,

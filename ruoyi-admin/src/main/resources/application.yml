@@ -10,10 +10,9 @@ ruoyi:
   demoEnabled: true
   # 获取ip地址开关
   addressEnabled: true
-  # 缓存懒加载
-  cacheLazy: false
 
 captcha:
+  enable: true
   # 页面 <参数设置> 可开启关闭 验证码校验
   # 验证码类型 math 数组计算 char 字符验证
   type: MATH
@@ -135,6 +134,20 @@ security:
     # actuator 监控配置
     - /actuator
     - /actuator/**
+
+# 多租户配置
+tenant:
+  # 是否开启
+  enable: true
+  # 排除表
+  excludes:
+    - sys_menu
+    - sys_tenant
+    - sys_tenant_package
+    - sys_role_dept
+    - sys_role_menu
+    - sys_user_post
+    - sys_user_role
 
 # MyBatisPlus配置
 # https://baomidou.com/config/

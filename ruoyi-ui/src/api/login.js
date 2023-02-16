@@ -1,8 +1,9 @@
 import request from '@/utils/request'
 
 // 登录方法
-export function login(username, password, code, uuid) {
+export function login(tenantId, username, password, code, uuid) {
   const data = {
+    tenantId,
     username,
     password,
     code,
@@ -67,5 +68,16 @@ export function getCodeSms() {
     },
     method: 'get',
     timeout: 20000
+  })
+}
+
+// 获取租户列表
+export function tenantList() {
+  return request({
+    url: '/tenant/list',
+    headers: {
+      isToken: false
+    },
+    method: 'get'
   })
 }

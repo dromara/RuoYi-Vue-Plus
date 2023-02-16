@@ -225,7 +225,7 @@ public class VelocityUtils {
      */
     public static String getDicts(GenTable genTable) {
         List<GenTableColumn> columns = genTable.getColumns();
-        Set<String> dicts = new HashSet<String>();
+        Set<String> dicts = new HashSet<>();
         addDicts(dicts, columns);
         return StringUtils.join(dicts, ", ");
     }

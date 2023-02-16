@@ -52,7 +52,7 @@ public class SysDeptVo implements Serializable {
     /**
      * 显示顺序
      */
-    private Long orderNum;
+    private Integer orderNum;
 
     /**
      * 负责人

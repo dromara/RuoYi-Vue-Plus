@@ -92,7 +92,7 @@ public class ServletUtils extends JakartaServletUtil {
     public static Map<String, String> getParamMap(ServletRequest request) {
         Map<String, String> params = new HashMap<>();
         for (Map.Entry<String, String[]> entry : getParams(request).entrySet()) {
-            params.put(entry.getKey(), StringUtils.join(entry.getValue(), ","));
+            params.put(entry.getKey(), StringUtils.join(entry.getValue(), StringUtils.SEPARATOR));
         }
         return params;
     }

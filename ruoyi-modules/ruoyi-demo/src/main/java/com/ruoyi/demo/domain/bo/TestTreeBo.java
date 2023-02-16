@@ -2,12 +2,11 @@ package com.ruoyi.demo.domain.bo;
 
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
-import com.ruoyi.common.mybatis.core.domain.TreeEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
+import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 测试树表业务对象 test_tree
@@ -18,13 +17,18 @@ import jakarta.validation.constraints.NotNull;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class TestTreeBo extends TreeEntity<TestTreeBo> {
+public class TestTreeBo extends BaseEntity {
 
     /**
      * 主键
      */
     @NotNull(message = "主键不能为空", groups = {EditGroup.class})
     private Long id;
+
+    /**
+     * 父ID
+     */
+    private Long parentId;
 
     /**
      * 部门id

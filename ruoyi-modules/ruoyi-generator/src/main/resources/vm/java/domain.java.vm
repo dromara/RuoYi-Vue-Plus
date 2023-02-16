@@ -1,21 +1,25 @@
 package ${packageName}.domain;
 
+#foreach ($column in $columns)
+#if($column.javaField=='tenantId')
+#set($IsTenant=1)
+#end
+#end
+#if($IsTenant==1)
+import com.ruoyi.common.tenant.core.TenantEntity;
+#else
+import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+#end
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.Date;
-import java.math.BigDecimal;
-
 #foreach ($import in $importList)
 import ${import};
 #end
-#if($table.crud || $table.sub)
-import com.ruoyi.common.mybatis.core.domain.BaseEntity;
-#elseif($table.tree)
-import com.ruoyi.common.mybatis.core.domain.TreeEntity;
-#end
+
+import java.io.Serial;
+import java.util.Date;
+import java.math.BigDecimal;
 
 /**
  * ${functionName}对象 ${tableName}
@@ -23,10 +27,10 @@ import com.ruoyi.common.mybatis.core.domain.TreeEntity;
  * @author ${author}
  * @date ${datetime}
  */
-#if($table.crud || $table.sub)
-    #set($Entity="BaseEntity")
-#elseif($table.tree)
-    #set($Entity="TreeEntity<${ClassName}>")
+#if($IsTenant==1)
+#set($Entity="TenantEntity")
+#else
+#set($Entity="BaseEntity")
 #end
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -51,6 +55,7 @@ public class ${ClassName} extends ${Entity} {
     @TableId(value = "$column.columnName")
 #end
     private $column.javaType $column.javaField;
+
 #end
 #end
 

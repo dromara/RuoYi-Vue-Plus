@@ -1,15 +1,12 @@
 package com.ruoyi.system.domain;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import com.ruoyi.common.tenant.core.TenantEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 /**
  * 角色表 sys_role
@@ -21,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_role")
-public class SysRole extends BaseEntity {
+public class SysRole extends TenantEntity {
 
     /**
      * 角色ID
@@ -74,30 +71,6 @@ public class SysRole extends BaseEntity {
      * 备注
      */
     private String remark;
-
-    /**
-     * 用户是否存在此角色标识 默认不存在
-     */
-    @TableField(exist = false)
-    private boolean flag = false;
-
-    /**
-     * 菜单组
-     */
-    @TableField(exist = false)
-    private Long[] menuIds;
-
-    /**
-     * 部门组（数据权限）
-     */
-    @TableField(exist = false)
-    private Long[] deptIds;
-
-    /**
-     * 角色菜单权限
-     */
-    @TableField(exist = false)
-    private Set<String> permissions;
 
     public SysRole(Long roleId) {
         this.roleId = roleId;

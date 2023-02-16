@@ -2,6 +2,16 @@
   <div class="register">
     <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form">
       <h3 class="title">RuoYi-Vue-Plus后台管理系统</h3>
+      <el-form-item prop="tenantId">
+        <el-input
+            v-model="loginForm.tenantId"
+            type="text"
+            auto-complete="off"
+            placeholder="租户编号"
+        >
+          <svg-icon slot="prefix" icon-class="input" class="el-input__icon input-icon" />
+        </el-input>
+      </el-form-item>
       <el-form-item prop="username">
         <el-input v-model="registerForm.username" type="text" auto-complete="off" placeholder="账号">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -82,6 +92,7 @@ export default {
     return {
       codeUrl: "",
       registerForm: {
+        tenantId: "",
         username: "",
         password: "",
         confirmPassword: "",
@@ -90,6 +101,9 @@ export default {
         userType: "sys_user"
       },
       registerRules: {
+        tenantId: [
+          { required: true, trigger: "blur", message: "请输入您的租户编号" }
+        ],
         username: [
           { required: true, trigger: "blur", message: "请输入您的账号" },
           { min: 2, max: 20, message: '用户账号长度必须介于 2 和 20 之间', trigger: 'blur' }

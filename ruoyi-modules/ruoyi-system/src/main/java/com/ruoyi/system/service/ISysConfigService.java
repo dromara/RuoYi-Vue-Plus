@@ -72,16 +72,6 @@ public interface ISysConfigService {
     void deleteConfigByIds(Long[] configIds);
 
     /**
-     * 加载参数缓存数据
-     */
-    void loadingConfigCache();
-
-    /**
-     * 清空参数缓存数据
-     */
-    void clearConfigCache();
-
-    /**
      * 重置参数缓存数据
      */
     void resetConfigCache();

@@ -1,6 +1,5 @@
 package com.ruoyi.system.domain.vo;
 
-import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.translation.annotation.Translation;
 import com.ruoyi.common.translation.constant.TransConstant;
 import lombok.Data;
@@ -26,6 +25,11 @@ public class SysUserVo implements Serializable {
      * 用户ID
      */
     private Long userId;
+
+    /**
+     * 租户ID
+     */
+    private String tenantId;
 
     /**
      * 部门ID
@@ -122,9 +126,5 @@ public class SysUserVo implements Serializable {
      * 数据权限 当前角色ID
      */
     private Long roleId;
-
-    public boolean isAdmin() {
-        return UserConstants.SUPER_ADMIN_ID.equals(this.userId);
-    }
 
 }

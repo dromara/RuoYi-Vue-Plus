@@ -25,7 +25,7 @@ public class XssFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         String tempExcludes = filterConfig.getInitParameter("excludes");
         if (StringUtils.isNotEmpty(tempExcludes)) {
-            String[] url = tempExcludes.split(",");
+            String[] url = tempExcludes.split(StringUtils.SEPARATOR);
             for (int i = 0; url != null && i < url.length; i++) {
                 excludes.add(url[i]);
             }

@@ -5,7 +5,7 @@ import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.system.service.ISysConfigService;
-import com.ruoyi.system.service.SysRegisterService;
+import com.ruoyi.web.service.SysRegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;

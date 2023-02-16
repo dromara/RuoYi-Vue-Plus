@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/demo/demo")
 public class TestDemoController extends BaseController {
 
-    private final ITestDemoService iTestDemoService;
+    private final ITestDemoService testDemoService;
 
     /**
      * 查询测试单表列表
@@ -53,7 +53,7 @@ public class TestDemoController extends BaseController {
     @SaCheckPermission("demo:demo:list")
     @GetMapping("/list")
     public TableDataInfo<TestDemoVo> list(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
-        return iTestDemoService.queryPageList(bo, pageQuery);
+        return testDemoService.queryPageList(bo, pageQuery);
     }
 
     /**
@@ -62,7 +62,7 @@ public class TestDemoController extends BaseController {
     @SaCheckPermission("demo:demo:list")
     @GetMapping("/page")
     public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
-        return iTestDemoService.customPageList(bo, pageQuery);
+        return testDemoService.customPageList(bo, pageQuery);
     }
 
     /**
@@ -77,7 +77,7 @@ public class TestDemoController extends BaseController {
         ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
         List<TestDemoImportVo> volist = excelResult.getList();
         List<TestDemo> list = BeanUtil.copyToList(volist, TestDemo.class);
-        iTestDemoService.saveBatch(list);
+        testDemoService.saveBatch(list);
         return R.ok(excelResult.getAnalysis());
     }
 
@@ -88,7 +88,7 @@ public class TestDemoController extends BaseController {
     @Log(title = "测试单表", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(@Validated TestDemoBo bo, HttpServletResponse response) {
-        List<TestDemoVo> list = iTestDemoService.queryList(bo);
+        List<TestDemoVo> list = testDemoService.queryList(bo);
         // 测试雪花id导出
 //        for (TestDemoVo vo : list) {
 //            vo.setId(1234567891234567893L);
@@ -105,7 +105,7 @@ public class TestDemoController extends BaseController {
     @GetMapping("/{id}")
     public R<TestDemoVo> getInfo(@NotNull(message = "主键不能为空")
                                  @PathVariable("id") Long id) {
-        return R.ok(iTestDemoService.queryById(id));
+        return R.ok(testDemoService.queryById(id));
     }
 
     /**
@@ -119,7 +119,7 @@ public class TestDemoController extends BaseController {
         // 使用校验工具对标 @Validated(AddGroup.class) 注解
         // 用于在非 Controller 的地方校验对象
         ValidatorUtils.validate(bo, AddGroup.class);
-        return toAjax(iTestDemoService.insertByBo(bo));
+        return toAjax(testDemoService.insertByBo(bo));
     }
 
     /**
@@ -130,7 +130,7 @@ public class TestDemoController extends BaseController {
     @RepeatSubmit
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody TestDemoBo bo) {
-        return toAjax(iTestDemoService.updateByBo(bo));
+        return toAjax(testDemoService.updateByBo(bo));
     }
 
     /**
@@ -143,6 +143,6 @@ public class TestDemoController extends BaseController {
     @DeleteMapping("/{ids}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ids) {
-        return toAjax(iTestDemoService.deleteWithValidByIds(Arrays.asList(ids), true));
+        return toAjax(testDemoService.deleteWithValidByIds(Arrays.asList(ids), true));
     }
 }

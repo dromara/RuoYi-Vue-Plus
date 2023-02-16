@@ -1,16 +1,13 @@
 package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.excel.utils.ExcelUtil;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.system.domain.SysDept;
 import com.ruoyi.system.domain.SysUserRole;
@@ -20,9 +17,9 @@ import com.ruoyi.system.domain.vo.DeptTreeSelectVo;
 import com.ruoyi.system.domain.vo.SysRoleVo;
 import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.service.ISysDeptService;
+import com.ruoyi.system.service.ISysPermissionService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
-import com.ruoyi.system.service.SysPermissionService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -44,7 +41,7 @@ public class SysRoleController extends BaseController {
     private final ISysRoleService roleService;
     private final ISysUserService userService;
     private final ISysDeptService deptService;
-    private final SysPermissionService permissionService;
+    private final ISysPermissionService permissionService;
 
     /**
      * 获取角色信息列表
@@ -110,13 +107,14 @@ public class SysRoleController extends BaseController {
         }
 
         if (roleService.updateRole(role) > 0) {
-            // 更新缓存用户权限
-            LoginUser loginUser = LoginHelper.getLoginUser();
-            SysUserVo sysUser = userService.selectUserById(loginUser.getUserId());
-            if (ObjectUtil.isNotNull(sysUser) && !LoginHelper.isAdmin()) {
-                loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser.getUserId(), sysUser.isAdmin()));
-                LoginHelper.setLoginUser(loginUser);
-            }
+//            // 更新缓存用户权限
+//            LoginUser loginUser = LoginHelper.getLoginUser();
+//            SysUserVo sysUser = userService.selectUserById(loginUser.getUserId());
+//            if (ObjectUtil.isNotNull(sysUser)) {
+//                loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser.getUserId()));
+//                LoginHelper.setLoginUser(loginUser);
+//            }
+            // todo LoginUser 改为存储到token内部 无法热更新 等待后续想办法
             return R.ok();
         }
         return R.fail("修改角色'" + role.getRoleName() + "'失败，请联系管理员");

@@ -142,13 +142,13 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
     @Override
     public String selectDeptNameByIds(String deptIds) {
         List<String> list = new ArrayList<>();
-        for (Long id : Arrays.stream(deptIds.split(",")).map(Long::parseLong).toList()) {
+        for (Long id : StringUtils.splitTo(deptIds, Convert::toLong)) {
             SysDeptVo vo = SpringUtils.getAopProxy(this).selectDeptById(id);
             if (ObjectUtil.isNotNull(vo)) {
                 list.add(vo.getDeptName());
             }
         }
-        return String.join(",", list);
+        return String.join(StringUtils.SEPARATOR, list);
     }
 
     /**
@@ -213,7 +213,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
      */
     @Override
     public void checkDeptDataScope(Long deptId) {
-        if (!LoginHelper.isAdmin()) {
+        if (!LoginHelper.isSuperAdmin()) {
             SysDeptBo dept = new SysDeptBo();
             dept.setDeptId(deptId);
             List<SysDeptVo> depts = this.selectDeptList(dept);
@@ -237,7 +237,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
             throw new ServiceException("部门停用，不允许新增");
         }
         SysDept dept = BeanUtil.toBean(bo, SysDept.class);
-        dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
+        dept.setAncestors(info.getAncestors() + StringUtils.SEPARATOR + dept.getParentId());
         return baseMapper.insert(dept);
     }
 
@@ -254,7 +254,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         SysDept newParentDept = baseMapper.selectById(dept.getParentId());
         SysDept oldDept = baseMapper.selectById(dept.getDeptId());
         if (ObjectUtil.isNotNull(newParentDept) && ObjectUtil.isNotNull(oldDept)) {
-            String newAncestors = newParentDept.getAncestors() + "," + newParentDept.getDeptId();
+            String newAncestors = newParentDept.getAncestors() + StringUtils.SEPARATOR + newParentDept.getDeptId();
             String oldAncestors = oldDept.getAncestors();
             dept.setAncestors(newAncestors);
             updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);

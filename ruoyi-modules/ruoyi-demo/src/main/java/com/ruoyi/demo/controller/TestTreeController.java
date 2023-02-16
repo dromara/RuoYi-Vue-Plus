@@ -35,7 +35,7 @@ import java.util.List;
 @RequestMapping("/demo/tree")
 public class TestTreeController extends BaseController {
 
-    private final ITestTreeService iTestTreeService;
+    private final ITestTreeService testTreeService;
 
     /**
      * 查询测试树表列表
@@ -43,7 +43,7 @@ public class TestTreeController extends BaseController {
     @SaCheckPermission("demo:tree:list")
     @GetMapping("/list")
     public R<List<TestTreeVo>> list(@Validated(QueryGroup.class) TestTreeBo bo) {
-        List<TestTreeVo> list = iTestTreeService.queryList(bo);
+        List<TestTreeVo> list = testTreeService.queryList(bo);
         return R.ok(list);
     }
 
@@ -54,7 +54,7 @@ public class TestTreeController extends BaseController {
     @Log(title = "测试树表", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public void export(@Validated TestTreeBo bo, HttpServletResponse response) {
-        List<TestTreeVo> list = iTestTreeService.queryList(bo);
+        List<TestTreeVo> list = testTreeService.queryList(bo);
         ExcelUtil.exportExcel(list, "测试树表", TestTreeVo.class, response);
     }
 
@@ -67,7 +67,7 @@ public class TestTreeController extends BaseController {
     @GetMapping("/{id}")
     public R<TestTreeVo> getInfo(@NotNull(message = "主键不能为空")
                                  @PathVariable("id") Long id) {
-        return R.ok(iTestTreeService.queryById(id));
+        return R.ok(testTreeService.queryById(id));
     }
 
     /**
@@ -78,7 +78,7 @@ public class TestTreeController extends BaseController {
     @RepeatSubmit
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody TestTreeBo bo) {
-        return toAjax(iTestTreeService.insertByBo(bo));
+        return toAjax(testTreeService.insertByBo(bo));
     }
 
     /**
@@ -89,7 +89,7 @@ public class TestTreeController extends BaseController {
     @RepeatSubmit
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody TestTreeBo bo) {
-        return toAjax(iTestTreeService.updateByBo(bo));
+        return toAjax(testTreeService.updateByBo(bo));
     }
 
     /**
@@ -102,6 +102,6 @@ public class TestTreeController extends BaseController {
     @DeleteMapping("/{ids}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ids) {
-        return toAjax(iTestTreeService.deleteWithValidByIds(Arrays.asList(ids), true));
+        return toAjax(testTreeService.deleteWithValidByIds(Arrays.asList(ids), true));
     }
 }

@@ -1,14 +1,16 @@
 package com.ruoyi.generator.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
-import com.ruoyi.generator.constant.GenConstants;
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import com.ruoyi.generator.constant.GenConstants;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
 
@@ -183,10 +185,6 @@ public class GenTable extends BaseEntity {
     }
 
     public static boolean isSuperColumn(String tplCategory, String javaField) {
-        if (isTree(tplCategory)) {
-            return StringUtils.equalsAnyIgnoreCase(javaField,
-                ArrayUtils.addAll(GenConstants.TREE_ENTITY, GenConstants.BASE_ENTITY));
-        }
         return StringUtils.equalsAnyIgnoreCase(javaField, GenConstants.BASE_ENTITY);
     }
 }

@@ -3,11 +3,7 @@ package com.ruoyi.system.domain;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ruoyi.common.mybatis.core.domain.TreeEntity;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import com.ruoyi.common.tenant.core.TenantEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,7 +18,7 @@ import java.io.Serial;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_dept")
-public class SysDept extends TreeEntity<SysDept> {
+public class SysDept extends TenantEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -32,6 +28,11 @@ public class SysDept extends TreeEntity<SysDept> {
      */
     @TableId(value = "dept_id")
     private Long deptId;
+
+    /**
+     * 父部门ID
+     */
+    private Long parentId;
 
     /**
      * 部门名称

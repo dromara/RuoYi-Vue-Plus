@@ -31,6 +31,7 @@
         <module>ruoyi-common-sensitive</module>
         <module>ruoyi-common-json</module>
         <module>ruoyi-common-encrypt</module>
+        <module>ruoyi-common-tenant</module>
     </modules>
 
     <artifactId>ruoyi-common</artifactId>

@@ -9,13 +9,13 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.exception.ServiceException;
+import com.ruoyi.common.core.service.ConfigService;
+import com.ruoyi.common.core.utils.SpringUtils;
+import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.common.core.service.ConfigService;
-import com.ruoyi.common.core.exception.ServiceException;
-import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.redis.utils.CacheUtils;
-import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.domain.bo.SysConfigBo;
 import com.ruoyi.system.domain.vo.SysConfigVo;
@@ -176,30 +176,11 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     }
 
     /**
-     * 加载参数缓存数据
-     */
-    @Override
-    public void loadingConfigCache() {
-        List<SysConfigVo> configsList = selectConfigList(new SysConfigBo());
-        configsList.forEach(config ->
-            CacheUtils.put(CacheNames.SYS_CONFIG, config.getConfigKey(), config.getConfigValue()));
-    }
-
-    /**
-     * 清空参数缓存数据
-     */
-    @Override
-    public void clearConfigCache() {
-        CacheUtils.clear(CacheNames.SYS_CONFIG);
-    }
-
-    /**
      * 重置参数缓存数据
      */
     @Override
     public void resetConfigCache() {
-        clearConfigCache();
-        loadingConfigCache();
+        CacheUtils.clear(CacheNames.SYS_CONFIG);
     }
 
     /**

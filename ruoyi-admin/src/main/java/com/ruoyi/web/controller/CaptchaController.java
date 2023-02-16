@@ -5,8 +5,8 @@ import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
-import com.ruoyi.common.core.constant.CacheConstants;
 import com.ruoyi.common.core.constant.Constants;
+import com.ruoyi.common.core.constant.GlobalConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -17,8 +17,8 @@ import com.ruoyi.common.sms.core.SmsTemplate;
 import com.ruoyi.common.sms.entity.SmsResult;
 import com.ruoyi.common.web.config.properties.CaptchaProperties;
 import com.ruoyi.common.web.enums.CaptchaType;
-import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.web.domain.vo.CaptchaVo;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.Expression;
@@ -28,7 +28,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.constraints.NotBlank;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +46,6 @@ public class CaptchaController {
 
     private final CaptchaProperties captchaProperties;
     private final SmsProperties smsProperties;
-    private final ISysConfigService configService;
 
     /**
      * 短信验证码
@@ -60,7 +58,7 @@ public class CaptchaController {
         if (!smsProperties.getEnabled()) {
             return R.fail("当前系统没有开启短信功能！");
         }
-        String key = CacheConstants.CAPTCHA_CODE_KEY + phonenumber;
+        String key = GlobalConstants.CAPTCHA_CODE_KEY + phonenumber;
         String code = RandomUtil.randomNumbers(4);
         RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         // 验证码模板id 自行处理 (查数据库或写死均可)
@@ -82,14 +80,14 @@ public class CaptchaController {
     @GetMapping("/captchaImage")
     public R<CaptchaVo> getCode() {
         CaptchaVo captchaVo = new CaptchaVo();
-        boolean captchaEnabled = configService.selectCaptchaEnabled();
+        boolean captchaEnabled = captchaProperties.getEnable();
         if (!captchaEnabled) {
             captchaVo.setCaptchaEnabled(false);
             return R.ok(captchaVo);
         }
         // 保存验证码信息
         String uuid = IdUtil.simpleUUID();
-        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + uuid;
+        String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + uuid;
         // 生成验证码
         CaptchaType captchaType = captchaProperties.getType();
         boolean isMath = CaptchaType.MATH == captchaType;

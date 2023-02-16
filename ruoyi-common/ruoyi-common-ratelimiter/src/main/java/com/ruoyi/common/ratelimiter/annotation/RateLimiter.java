@@ -1,6 +1,6 @@
 package com.ruoyi.common.ratelimiter.annotation;
 
-import com.ruoyi.common.core.constant.CacheConstants;
+import com.ruoyi.common.core.constant.GlobalConstants;
 import com.ruoyi.common.ratelimiter.enums.LimitType;
 
 import java.lang.annotation.*;
@@ -17,7 +17,7 @@ public @interface RateLimiter {
     /**
      * 限流key
      */
-    String key() default CacheConstants.RATE_LIMIT_KEY;
+    String key() default GlobalConstants.RATE_LIMIT_KEY;
 
     /**
      * 限流时间,单位秒

@@ -6,11 +6,11 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.utils.StreamUtils;
+import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
@@ -110,7 +110,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         Set<String> permsSet = new HashSet<>();
         for (SysRoleVo perm : perms) {
             if (ObjectUtil.isNotNull(perm)) {
-                permsSet.addAll(Arrays.asList(perm.getRoleKey().trim().split(",")));
+                permsSet.addAll(StringUtils.splitList(perm.getRoleKey().trim()));
             }
         }
         return permsSet;
@@ -189,7 +189,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public void checkRoleAllowed(SysRoleBo role) {
-        if (ObjectUtil.isNotNull(role.getRoleId()) && role.isAdmin()) {
+        if (ObjectUtil.isNotNull(role.getRoleId()) && role.isSuperAdmin()) {
             throw new ServiceException("不允许操作超级管理员角色");
         }
     }
@@ -201,7 +201,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public void checkRoleDataScope(Long roleId) {
-        if (!LoginHelper.isAdmin()) {
+        if (!LoginHelper.isSuperAdmin()) {
             SysRoleBo role = new SysRoleBo();
             role.setRoleId(roleId);
             List<SysRoleVo> roles = this.selectRoleList(role);
@@ -234,7 +234,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         SysRole role = BeanUtil.toBean(bo, SysRole.class);
         // 新增角色信息
         baseMapper.insert(role);
-        return insertRoleMenu(role);
+        return insertRoleMenu(bo);
     }
 
     /**
@@ -251,7 +251,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         baseMapper.updateById(role);
         // 删除角色与菜单关联
         roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, role.getRoleId()));
-        return insertRoleMenu(role);
+        return insertRoleMenu(bo);
     }
 
     /**
@@ -281,7 +281,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         // 删除角色与部门关联
         roleDeptMapper.delete(new LambdaQueryWrapper<SysRoleDept>().eq(SysRoleDept::getRoleId, role.getRoleId()));
         // 新增角色和部门信息（数据权限）
-        return insertRoleDept(role);
+        return insertRoleDept(bo);
     }
 
     /**
@@ -289,7 +289,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      *
      * @param role 角色对象
      */
-    public int insertRoleMenu(SysRole role) {
+    public int insertRoleMenu(SysRoleBo role) {
         int rows = 1;
         // 新增用户与角色管理
         List<SysRoleMenu> list = new ArrayList<SysRoleMenu>();
@@ -310,7 +310,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      *
      * @param role 角色对象
      */
-    public int insertRoleDept(SysRole role) {
+    public int insertRoleDept(SysRoleBo role) {
         int rows = 1;
         // 新增角色与部门（数据权限）管理
         List<SysRoleDept> list = new ArrayList<SysRoleDept>();

@@ -30,7 +30,7 @@
         <hutool.version>5.8.11</hutool.version>
         <okhttp.version>4.10.0</okhttp.version>
         <spring-boot-admin.version>3.0.0</spring-boot-admin.version>
-        <redisson.version>3.19.1</redisson.version>
+        <redisson.version>3.19.2</redisson.version>
         <lock4j.version>2.2.4</lock4j.version>
         <dynamic-ds.version>3.6.1</dynamic-ds.version>
         <alibaba-ttl.version>2.14.2</alibaba-ttl.version>
@@ -42,10 +42,10 @@
         <snakeyaml.version>1.33</snakeyaml.version>
 
         <!-- OSS 配置 -->
-        <aws-java-sdk-s3.version>1.12.373</aws-java-sdk-s3.version>
+        <aws-java-sdk-s3.version>1.12.400</aws-java-sdk-s3.version>
         <!-- SMS 配置 -->
         <aliyun.sms.version>2.0.23</aliyun.sms.version>
-        <tencent.sms.version>3.1.660</tencent.sms.version>
+        <tencent.sms.version>3.1.687</tencent.sms.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
