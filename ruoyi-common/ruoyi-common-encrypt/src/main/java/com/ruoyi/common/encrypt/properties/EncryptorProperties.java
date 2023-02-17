@@ -4,7 +4,6 @@ import com.ruoyi.common.encrypt.enumd.AlgorithmType;
 import com.ruoyi.common.encrypt.enumd.EncodeType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * 加解密属性配置类
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
  * @version 4.6.0
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "mybatis-encryptor")
 public class EncryptorProperties {
 

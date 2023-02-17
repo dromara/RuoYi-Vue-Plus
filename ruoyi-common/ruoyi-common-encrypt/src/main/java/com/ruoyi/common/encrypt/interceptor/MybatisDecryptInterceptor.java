@@ -55,17 +55,17 @@ public class MybatisDecryptInterceptor implements Interceptor {
      * @param sourceObject 待加密对象
      */
     private void decryptHandler(Object sourceObject) {
-        if (sourceObject instanceof Map) {
-            ((Map<?, Object>) sourceObject).values().forEach(this::decryptHandler);
+        if (sourceObject instanceof Map<?, ?> map) {
+            map.values().forEach(this::decryptHandler);
             return;
         }
-        if (sourceObject instanceof List) {
+        if (sourceObject instanceof List<?> list) {
             // 判断第一个元素是否含有注解。如果没有直接返回，提高效率
-            Object firstItem = ((List<?>) sourceObject).get(0);
+            Object firstItem = list.get(0);
             if (CollectionUtil.isEmpty(encryptorManager.getFieldCache(firstItem.getClass()))) {
                 return;
             }
-            ((List<?>) sourceObject).forEach(this::decryptHandler);
+            list.forEach(this::decryptHandler);
             return;
         }
         Set<Field> fields = encryptorManager.getFieldCache(sourceObject.getClass());
