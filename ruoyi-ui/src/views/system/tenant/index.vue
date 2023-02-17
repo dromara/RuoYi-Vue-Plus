@@ -360,6 +360,7 @@ export default {
     handleUpdate(row) {
       this.loading = true;
       this.reset();
+      this.getTenantPackage();
       const id = row.id || this.ids
       getTenant(id).then(response => {
         this.loading = false;

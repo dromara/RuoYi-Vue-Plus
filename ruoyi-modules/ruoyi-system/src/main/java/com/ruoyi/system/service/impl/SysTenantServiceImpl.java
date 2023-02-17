@@ -278,6 +278,9 @@ public class SysTenantServiceImpl implements ISysTenantService {
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         if (isValid) {
             // 做一些业务上的校验,判断是否需要校验
+            if (ids.contains(TenantConstants.SUPER_ADMIN_ID)) {
+                throw new ServiceException("超管租户不能删除");
+            }
         }
         return baseMapper.deleteBatchIds(ids) > 0;
     }
