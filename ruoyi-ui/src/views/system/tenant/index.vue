@@ -291,7 +291,7 @@ export default {
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
       this.$modal.confirm('确认要"' + text + '""' + row.companyName + '"租户吗？').then(function() {
-        return changeTenantStatus(row.id, row.status);
+        return changeTenantStatus(row.id, row.tenantId, row.status);
       }).then(() => {
         this.$modal.msgSuccess(text + "成功");
       }).catch(function() {
