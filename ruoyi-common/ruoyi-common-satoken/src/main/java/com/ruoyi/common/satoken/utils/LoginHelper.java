@@ -10,8 +10,6 @@ import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.enums.DeviceType;
 import com.ruoyi.common.core.enums.UserType;
-import com.ruoyi.common.core.exception.UtilException;
-import com.ruoyi.common.core.utils.StringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -32,8 +30,8 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginHelper {
 
-    public static final String JOIN_CODE = ":";
     public static final String LOGIN_USER_KEY = "loginUser";
+    public static final String MENU_PERMISSION = "menuPermission";
 
     /**
      * 登录系统
@@ -41,8 +39,7 @@ public class LoginHelper {
      * @param loginUser 登录用户信息
      */
     public static void login(LoginUser loginUser) {
-        SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
-        StpUtil.login(loginUser.getLoginId(), new SaLoginModel().setExtra(LOGIN_USER_KEY, loginUser));
+        loginByDevice(loginUser, null);
     }
 
     /**
@@ -53,20 +50,30 @@ public class LoginHelper {
      */
     public static void loginByDevice(LoginUser loginUser, DeviceType deviceType) {
         SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
-        StpUtil.login(loginUser.getLoginId(), new SaLoginModel()
-            .setDevice(deviceType.getDevice())
-            .setExtra(LOGIN_USER_KEY, loginUser));
+        Set<String> menuPermission = loginUser.getMenuPermission();
+        loginUser.setMenuPermission(null);
+        SaLoginModel model = new SaLoginModel();
+        if (ObjectUtil.isNotNull(deviceType)) {
+            model.setDevice(deviceType.getDevice());
+        }
+        StpUtil.login(loginUser.getLoginId(), model.setExtra(LOGIN_USER_KEY, loginUser));
+        // 解决菜单权限过度 token 臃肿过长问题
+        StpUtil.getTokenSession().set(MENU_PERMISSION, menuPermission);
     }
 
     /**
      * 获取用户(多级缓存)
      */
+    @SuppressWarnings("unchecked cast")
     public static LoginUser getLoginUser() {
         LoginUser loginUser = (LoginUser) SaHolder.getStorage().get(LOGIN_USER_KEY);
         if (loginUser != null) {
             return loginUser;
         }
         loginUser = ((JSONObject) StpUtil.getExtra(LOGIN_USER_KEY)).toBean(LoginUser.class);
+        // 解决菜单权限过度 token 臃肿过长问题
+        Set<String> menuPermission = (Set<String>) StpUtil.getTokenSession().get(MENU_PERMISSION);
+        loginUser.setMenuPermission(menuPermission);
         SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
         return loginUser;
     }
@@ -74,29 +81,24 @@ public class LoginHelper {
     /**
      * 获取用户基于token
      */
+    @SuppressWarnings("unchecked cast")
     public static LoginUser getLoginUser(String token) {
-        return ((JSONObject) StpUtil.getExtra(token, LOGIN_USER_KEY)).toBean(LoginUser.class);
+        LoginUser loginUser = ((JSONObject) StpUtil.getExtra(token, LOGIN_USER_KEY)).toBean(LoginUser.class);
+        // 解决菜单权限过度 token 臃肿过长问题
+        Set<String> menuPermission = (Set<String>) StpUtil.getTokenSessionByToken(token).get(MENU_PERMISSION);
+        loginUser.setMenuPermission(menuPermission);
+        return loginUser;
     }
 
     /**
      * 获取用户id
      */
     public static Long getUserId() {
-        LoginUser loginUser = getLoginUser();
-        if (ObjectUtil.isNull(loginUser)) {
-            String loginId = StpUtil.getLoginIdAsString();
-            String userId = null;
-            for (UserType value : UserType.values()) {
-                if (StringUtils.contains(loginId, value.getUserType())) {
-                    String[] strs = StringUtils.split(loginId, JOIN_CODE);
-                    // 用户id在总是在最后
-                    userId = strs[strs.length - 1];
-                }
-            }
-            if (StringUtils.isBlank(userId)) {
-                throw new UtilException("登录用户: LoginId异常 => " + loginId);
-            }
-            return Long.parseLong(userId);
+        LoginUser loginUser;
+        try {
+            loginUser = getLoginUser();
+        } catch (Exception e) {
+            return null;
         }
         return loginUser.getUserId();
     }
