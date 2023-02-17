@@ -264,9 +264,6 @@ export default {
         password: [
           { required: true, message: "密码不能为空", trigger: "blur" },
           { min: 5, max: 20, message: '用户密码长度必须介于 5 和 20 之间', trigger: 'blur' }
-        ],
-        packageId: [
-          { required: true, message: "租户套餐不能为空", trigger: "blur" }
         ]
       }
     };
