@@ -88,7 +88,6 @@ public class TestDemoVo implements Serializable {
     /**
      * 更新人
      */
-    @Translation(type = TransConstant.USER_ID_TO_NAME)
     @ExcelProperty(value = "更新人")
     private Long updateBy;
 

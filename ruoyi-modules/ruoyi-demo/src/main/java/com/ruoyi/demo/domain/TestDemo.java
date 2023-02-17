@@ -1,7 +1,7 @@
 package com.ruoyi.demo.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import com.ruoyi.common.tenant.core.TenantEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,7 +16,7 @@ import java.io.Serial;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("test_demo")
-public class TestDemo extends BaseEntity {
+public class TestDemo extends TenantEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
