@@ -72,6 +72,13 @@ public class LoginHelper {
     }
 
     /**
+     * 获取用户基于token
+     */
+    public static LoginUser getLoginUser(String token) {
+        return ((JSONObject) StpUtil.getExtra(token, LOGIN_USER_KEY)).toBean(LoginUser.class);
+    }
+
+    /**
      * 获取用户id
      */
     public static Long getUserId() {

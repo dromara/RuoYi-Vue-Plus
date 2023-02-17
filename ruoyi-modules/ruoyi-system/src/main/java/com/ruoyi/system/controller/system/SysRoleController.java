@@ -1,13 +1,19 @@
 package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.collection.CollUtil;
+import com.ruoyi.common.core.constant.GlobalConstants;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.excel.utils.ExcelUtil;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.system.domain.SysDept;
 import com.ruoyi.system.domain.SysUserRole;
@@ -107,14 +113,25 @@ public class SysRoleController extends BaseController {
         }
 
         if (roleService.updateRole(role) > 0) {
-//            // 更新缓存用户权限
-//            LoginUser loginUser = LoginHelper.getLoginUser();
-//            SysUserVo sysUser = userService.selectUserById(loginUser.getUserId());
-//            if (ObjectUtil.isNotNull(sysUser)) {
-//                loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser.getUserId()));
-//                LoginHelper.setLoginUser(loginUser);
-//            }
-            // todo LoginUser 改为存储到token内部 无法热更新 等待后续想办法
+            List<String> keys = StpUtil.searchTokenValue("", 0, -1, false);
+            if (CollUtil.isEmpty(keys)) {
+                return R.ok();
+            }
+            // 角色关联的在线用户量过大会导致redis阻塞卡顿 谨慎操作
+            keys.parallelStream().forEach(key -> {
+                String token = key.replace(GlobalConstants.LOGIN_TOKEN_KEY, "");
+                // 如果已经过期则跳过
+                if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(token) < -1) {
+                    return;
+                }
+                LoginUser loginUser = LoginHelper.getLoginUser(token);
+                if (loginUser.getRoles().stream().anyMatch(r -> r.getRoleId().equals(role.getRoleId()))) {
+                    try {
+                        StpUtil.logoutByTokenValue(token);
+                    } catch (NotLoginException ignored) {
+                    }
+                }
+            });
             return R.ok();
         }
         return R.fail("修改角色'" + role.getRoleName() + "'失败，请联系管理员");
