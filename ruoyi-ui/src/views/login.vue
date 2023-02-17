@@ -138,6 +138,9 @@ export default {
     getTenantList() {
       tenantList().then(res => {
         this.tenantList = res.data;
+        if (this.tenantList != null && this.tenantList.length !== 0) {
+          this.loginForm.tenantId = this.tenantList[0].tenantId;
+        }
       });
     },
     getCookie() {
