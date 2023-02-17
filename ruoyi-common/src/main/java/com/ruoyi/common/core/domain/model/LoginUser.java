@@ -1,7 +1,6 @@
 package com.ruoyi.common.core.domain.model;
 
 import com.ruoyi.common.core.domain.dto.RoleDTO;
-import com.ruoyi.common.helper.LoginHelper;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -111,7 +110,7 @@ public class LoginUser implements Serializable {
         if (userId == null) {
             throw new IllegalArgumentException("用户ID不能为空");
         }
-        return userType + LoginHelper.JOIN_CODE + userId;
+        return userType + ":" + userId;
     }
 
 }
