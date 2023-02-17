@@ -1,5 +1,6 @@
 create table test_demo (
     id          number(20)      not null,
+    tenant_id   varchar2(20)    not null,
     dept_id     number(20)      default null,
     user_id     number(20)      default null,
     order_num   number(10)      default 0,
@@ -18,6 +19,7 @@ alter table test_demo add constraint pk_test_demo primary key (id);
 
 comment on table  test_demo              is '测试单表';
 comment on column test_demo.id           is '主键';
+comment on column test_demo.tenant_id    is '租户编号';
 comment on column test_demo.dept_id      is '部门id';
 comment on column test_demo.user_id      is '用户id';
 comment on column test_demo.order_num    is '排序号';
@@ -33,6 +35,7 @@ comment on column test_demo.del_flag     is '删除标志';
 
 create table test_tree (
     id          number(20)      not null,
+    tenant_id   varchar2(20)    not null,
     parent_id   number(20)      default 0,
     dept_id     number(20)      default null,
     user_id     number(20)      default null,
@@ -50,6 +53,7 @@ alter table test_tree add constraint pk_test_tree primary key (id);
 
 comment on table  test_tree              is '测试树表';
 comment on column test_tree.id           is '主键';
+comment on column test_tree.tenant_id    is '租户编号';
 comment on column test_tree.parent_id    is '父id';
 comment on column test_tree.dept_id      is '部门id';
 comment on column test_tree.user_id      is '用户id';
@@ -62,8 +66,8 @@ comment on column test_tree.update_time  is '更新时间';
 comment on column test_tree.update_by    is '更新人';
 comment on column test_tree.del_flag     is '删除标志';
 
-insert into sys_user(user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_dept, create_by, create_time, update_by, update_time, remark) values (3, 108, 'test', '本部门及以下 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate, 103, sysdate, 1, sysdate, 3, sysdate, null);
-insert into sys_user(user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_dept, create_by, create_time, update_by, update_time, remark) values (4, 102, 'test1', '仅本人 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate, 103, sysdate, 1, sysdate, 4, sysdate, null);
+insert into sys_user(user_id, tenant_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_dept, create_by, create_time, update_by, update_time, remark) values (3, '000000', 108, 'test', '本部门及以下 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate, 103, sysdate, 1, sysdate, 3, sysdate, null);
+insert into sys_user(user_id, tenant_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_dept, create_by, create_time, update_by, update_time, remark) values (4, '000000', 102, 'test1', '仅本人 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate, 103, sysdate, 1, sysdate, 4, sysdate, null);
 
 insert into sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) values (5, '测试菜单', 0, 5, 'demo', null, 1, 0, 'M', '0', '0', null, 'star', 103, 1, sysdate, 1, sysdate, '');
 
@@ -81,8 +85,8 @@ insert into sys_menu(menu_id, menu_name, parent_id, order_num, path, component, 
 insert into sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) values (1510, '测试树表删除', 1506, 4, '#', '', 1, 0, 'F', '0', '0', 'demo:tree:remove', '#', 103, 1, sysdate, null, null, '');
 insert into sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) values (1511, '测试树表导出', 1506, 5, '#', '', 1, 0, 'F', '0', '0', 'demo:tree:export', '#', 103, 1, sysdate, null, null, '');
 
-insert into sys_role(role_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, del_flag, create_dept, create_by, create_time, update_by, update_time, remark) values (3, '本部门及以下', 'test1', 3, '4', 1, 1, '0', '0', 103, 1, sysdate, null, null, null);
-insert into sys_role(role_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, del_flag, create_dept, create_by, create_time, update_by, update_time, remark) values (4, '仅本人',      'test2', 4, '5', 1, 1, '0', '0', 103, 1, sysdate, null, null, null);
+insert into sys_role(role_id, tenant_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, del_flag, create_dept, create_by, create_time, update_by, update_time, remark) values (3, '000000', '本部门及以下', 'test1', 3, '4', 1, 1, '0', '0', 103, 1, sysdate, null, null, null);
+insert into sys_role(role_id, tenant_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, del_flag, create_dept, create_by, create_time, update_by, update_time, remark) values (4, '000000', '仅本人',      'test2', 4, '5', 1, 1, '0', '0', 103, 1, sysdate, null, null, null);
 
 insert into sys_role_menu(role_id, menu_id) values (3, 1);
 insert into sys_role_menu(role_id, menu_id) values (3, 5);
@@ -171,30 +175,30 @@ insert into sys_role_menu(role_id, menu_id) values (4, 1511);
 insert into sys_user_role(user_id, role_id) values (3, 3);
 insert into sys_user_role(user_id, role_id) values (4, 4);
 
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (1, 102, 4, 1, '测试数据权限', '测试', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (2, 102, 3, 2, '子节点1', '111', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (3, 102, 3, 3, '子节点2', '222', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (4, 108, 4, 4, '测试数据', 'demo', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (5, 108, 3, 13, '子节点11', '1111', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (6, 108, 3, 12, '子节点22', '2222', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (7, 108, 3, 11, '子节点33', '3333', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (8, 108, 3, 10, '子节点44', '4444', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (9, 108, 3, 9, '子节点55', '5555', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (10, 108, 3, 8, '子节点66', '6666', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (11, 108, 3, 7, '子节点77', '7777', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (12, 108, 3, 6, '子节点88', '8888', 0, 103, sysdate, 1, null, null, 0);
-insert into test_demo(id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (13, 108, 3, 5, '子节点99', '9999', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (1, '000000', 102, 4, 1, '测试数据权限', '测试', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (2, '000000', 102, 3, 2, '子节点1', '111', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (3, '000000', 102, 3, 3, '子节点2', '222', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (4, '000000', 108, 4, 4, '测试数据', 'demo', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (5, '000000', 108, 3, 13, '子节点11', '1111', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (6, '000000', 108, 3, 12, '子节点22', '2222', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (7, '000000', 108, 3, 11, '子节点33', '3333', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (8, '000000', 108, 3, 10, '子节点44', '4444', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (9, '000000', 108, 3, 9, '子节点55', '5555', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (10, '000000', 108, 3, 8, '子节点66', '6666', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (11, '000000', 108, 3, 7, '子节点77', '7777', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (12, '000000', 108, 3, 6, '子节点88', '8888', 0, 103, sysdate, 1, null, null, 0);
+insert into test_demo(id, tenant_id, dept_id, user_id, order_num, test_key, value, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (13, '000000', 108, 3, 5, '子节点99', '9999', 0, 103, sysdate, 1, null, null, 0);
 
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (1, 0, 102, 4, '测试数据权限', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (2, 1, 102, 3, '子节点1', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (3, 2, 102, 3, '子节点2', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (4, 0, 108, 4, '测试树1', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (5, 4, 108, 3, '子节点11', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (6, 4, 108, 3, '子节点22', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (7, 4, 108, 3, '子节点33', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (8, 5, 108, 3, '子节点44', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (9, 6, 108, 3, '子节点55', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (10, 7, 108, 3, '子节点66', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (11, 7, 108, 3, '子节点77', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (12, 10, 108, 3, '子节点88', 0, 103, sysdate, 1, null, null, 0);
-insert into test_tree(id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (13, 10, 108, 3, '子节点99', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (1, '000000', 0, 102, 4, '测试数据权限', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (2, '000000', 1, 102, 3, '子节点1', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (3, '000000', 2, 102, 3, '子节点2', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (4, '000000', 0, 108, 4, '测试树1', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (5, '000000', 4, 108, 3, '子节点11', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (6, '000000', 4, 108, 3, '子节点22', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (7, '000000', 4, 108, 3, '子节点33', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (8, '000000', 5, 108, 3, '子节点44', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (9, '000000', 6, 108, 3, '子节点55', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (10, '000000', 7, 108, 3, '子节点66', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (11, '000000', 7, 108, 3, '子节点77', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (12, '000000', 10, 108, 3, '子节点88', 0, 103, sysdate, 1, null, null, 0);
+insert into test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) values (13, '000000', 10, 108, 3, '子节点99', 0, 103, sysdate, 1, null, null, 0);

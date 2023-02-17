@@ -1,6 +1,7 @@
 CREATE TABLE test_demo
 (
     id          bigint            NOT NULL,
+    tenant_id   nvarchar(20)      NOT NULL,
     dept_id     bigint            NULL,
     user_id     bigint            NULL,
     order_num   int DEFAULT ((0)) NULL,
@@ -25,6 +26,13 @@ EXEC sp_addextendedproperty
      'SCHEMA', N'dbo',
      'TABLE', N'test_demo',
      'COLUMN', N'id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'租户id',
+    'SCHEMA', N'dbo',
+    'TABLE', N'test_demo',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
@@ -120,6 +128,7 @@ GO
 CREATE TABLE test_tree
 (
     id          bigint               NOT NULL,
+    tenant_id   nvarchar(20)         NOT NULL,
     parent_id   bigint DEFAULT ((0)) NULL,
     dept_id     bigint               NULL,
     user_id     bigint               NULL,
@@ -143,6 +152,13 @@ EXEC sp_addextendedproperty
      'SCHEMA', N'dbo',
      'TABLE', N'test_tree',
      'COLUMN', N'id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'租户id',
+    'SCHEMA', N'dbo',
+    'TABLE', N'test_tree',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
@@ -228,9 +244,9 @@ EXEC sp_addextendedproperty
      'TABLE', N'test_tree'
 GO
 
-INSERT sys_user VALUES (3, 108, N'test', N'本部门及以下 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), 3, getdate(), NULL);
+INSERT sys_user VALUES (3, N'000000', 108, N'test', N'本部门及以下 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), 3, getdate(), NULL);
 GO
-INSERT sys_user VALUES (4, 102, N'test1', N'仅本人 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), 4, getdate(), NULL);
+INSERT sys_user VALUES (4, N'000000', 102, N'test1', N'仅本人 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), 4, getdate(), NULL);
 GO
 
 INSERT sys_menu VALUES (5, N'测试菜单', 0, 5, N'demo', NULL, 1, 0, N'M', N'0', N'0', NULL, N'star', 103, 1, getdate(), NULL, NULL, N'');
@@ -262,9 +278,9 @@ GO
 INSERT sys_menu VALUES (1511, N'测试树表导出', 1506, 5, N'#', N'', 1, 0, N'F', N'0', N'0', N'demo:tree:export', N'#', 103, 1, getdate(), NULL, NULL, N'');
 GO
 
-INSERT sys_role VALUES (3, N'本部门及以下', N'test1', 3, N'4', 1, 1, N'0', N'0', 103, 1, getdate(), 1, NULL, NULL);
+INSERT sys_role VALUES (3, N'000000', N'本部门及以下', N'test1', 3, N'4', 1, 1, N'0', N'0', 103, 1, getdate(), 1, NULL, NULL);
 GO
-INSERT sys_role VALUES (4, N'仅本人', N'test2', 4, N'5', 1, 1, N'0', N'0', 103, 1, getdate(), 1, NULL, NULL);
+INSERT sys_role VALUES (4, N'000000', N'仅本人', N'test2', 4, N'5', 1, 1, N'0', N'0', 103, 1, getdate(), 1, NULL, NULL);
 GO
 
 INSERT sys_role_menu VALUES (3, 1);
@@ -439,56 +455,56 @@ GO
 INSERT sys_user_role VALUES (4, 4);
 GO
 
-INSERT test_demo VALUES (1, 102, 4, 1, N'测试数据权限', N'测试', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1, N'000000', 102, 4, 1, N'测试数据权限', N'测试', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (2, 102, 3, 2, N'子节点1', N'111', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (2, N'000000', 102, 3, 2, N'子节点1', N'111', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (3, 102, 3, 3, N'子节点2', N'222', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (3, N'000000', 102, 3, 3, N'子节点2', N'222', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (4, 108, 4, 4, N'测试数据', N'demo', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (4, N'000000', 108, 4, 4, N'测试数据', N'demo', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (5, 108, 3, 13, N'子节点11', N'1111', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (5, N'000000', 108, 3, 13, N'子节点11', N'1111', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (6, 108, 3, 12, N'子节点22', N'2222', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (6, N'000000', 108, 3, 12, N'子节点22', N'2222', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (7, 108, 3, 11, N'子节点33', N'3333', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (7, N'000000', 108, 3, 11, N'子节点33', N'3333', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (8, 108, 3, 10, N'子节点44', N'4444', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (8, N'000000', 108, 3, 10, N'子节点44', N'4444', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (9, 108, 3, 9, N'子节点55', N'5555', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (9, N'000000', 108, 3, 9, N'子节点55', N'5555', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (10, 108, 3, 8, N'子节点66', N'6666', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (10, N'000000', 108, 3, 8, N'子节点66', N'6666', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (11, 108, 3, 7, N'子节点77', N'7777', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (11, N'000000', 108, 3, 7, N'子节点77', N'7777', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (12, 108, 3, 6, N'子节点88', N'8888', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (12, N'000000', 108, 3, 6, N'子节点88', N'8888', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (13, 108, 3, 5, N'子节点99', N'9999', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (13, N'000000', 108, 3, 5, N'子节点99', N'9999', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
 
-INSERT test_tree VALUES (1, 0, 102, 4, N'测试数据权限', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1, N'000000', 0, 102, 4, N'测试数据权限', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (2, 1, 102, 3, N'子节点1', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (2, N'000000', 1, 102, 3, N'子节点1', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (3, 2, 102, 3, N'子节点2', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (3, N'000000', 2, 102, 3, N'子节点2', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (4, 0, 108, 4, N'测试树1', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (4, N'000000', 0, 108, 4, N'测试树1', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (5, 4, 108, 3, N'子节点11', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (5, N'000000', 4, 108, 3, N'子节点11', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (6, 4, 108, 3, N'子节点22', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (6, N'000000', 4, 108, 3, N'子节点22', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (7, 4, 108, 3, N'子节点33', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (7, N'000000', 4, 108, 3, N'子节点33', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (8, 5, 108, 3, N'子节点44', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (8, N'000000', 5, 108, 3, N'子节点44', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (9, 6, 108, 3, N'子节点55', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (9, N'000000', 6, 108, 3, N'子节点55', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (10, 7, 108, 3, N'子节点66', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (10, N'000000', 7, 108, 3, N'子节点66', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (11, 7, 108, 3, N'子节点77', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (11, N'000000', 7, 108, 3, N'子节点77', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (12, 10, 108, 3, N'子节点88', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (12, N'000000', 10, 108, 3, N'子节点88', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (13, 10, 108, 3, N'子节点99', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (13, N'000000', 10, 108, 3, N'子节点99', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
