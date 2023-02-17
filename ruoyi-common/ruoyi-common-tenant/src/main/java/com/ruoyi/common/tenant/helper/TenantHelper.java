@@ -2,6 +2,7 @@ package com.ruoyi.common.tenant.helper;
 
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.spring.SpringMVCUtil;
+import cn.hutool.core.convert.Convert;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
@@ -10,7 +11,6 @@ import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.redis.utils.RedisUtils;
 import com.ruoyi.common.satoken.utils.LoginHelper;
-import com.ruoyi.common.tenant.properties.TenantProperties;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TenantHelper {
 
-    private static final TenantProperties PROPERTIES = SpringUtils.getBean(TenantProperties.class);
-
     private static final String DYNAMIC_TENANT_KEY = GlobalConstants.GLOBAL_REDIS_KEY + "dynamicTenant";
 
     private static final ThreadLocal<String> TEMP_DYNAMIC_TENANT = new TransmittableThreadLocal<>();
@@ -34,7 +32,7 @@ public class TenantHelper {
      * 租户功能是否启用
      */
     public static boolean isEnable() {
-        return PROPERTIES.getEnable();
+        return Convert.toBool(SpringUtils.getProperty("tenant.enable"), false);
     }
 
     /**
