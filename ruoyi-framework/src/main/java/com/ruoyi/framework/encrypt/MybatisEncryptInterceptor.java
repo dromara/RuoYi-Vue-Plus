@@ -67,11 +67,11 @@ public class MybatisEncryptInterceptor implements Interceptor {
      */
     @SuppressWarnings("unchecked cast")
     private void encryptHandler(Object sourceObject) {
-        if (sourceObject instanceof Map) {
+        if (sourceObject instanceof Map<?, ?>) {
             ((Map<?, Object>) sourceObject).values().forEach(this::encryptHandler);
             return;
         }
-        if (sourceObject instanceof List) {
+        if (sourceObject instanceof List<?>) {
             // 判断第一个元素是否含有注解。如果没有直接返回，提高效率
             Object firstItem = ((List<?>) sourceObject).get(0);
             if (CollectionUtil.isEmpty(encryptorManager.getFieldCache(firstItem.getClass()))) {
