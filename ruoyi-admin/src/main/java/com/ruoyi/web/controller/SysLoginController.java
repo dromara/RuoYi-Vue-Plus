@@ -9,6 +9,7 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.SmsLoginBody;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.common.tenant.helper.TenantHelper;
 import com.ruoyi.system.domain.SysMenu;
 import com.ruoyi.system.domain.bo.SysTenantBo;
 import com.ruoyi.system.domain.vo.RouterVo;
@@ -135,6 +136,10 @@ public class SysLoginController {
     public R<UserInfoVo> getInfo() {
         UserInfoVo userInfoVo = new UserInfoVo();
         LoginUser loginUser = LoginHelper.getLoginUser();
+        if (TenantHelper.isEnable() && LoginHelper.isSuperAdmin()) {
+            // 超级管理员 如果重新加载用户信息需清除动态租户
+            TenantHelper.clearDynamic();
+        }
         SysUserVo user = userService.selectUserById(loginUser.getUserId());
         userInfoVo.setUser(user);
         userInfoVo.setPermissions(loginUser.getMenuPermission());
