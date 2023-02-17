@@ -284,6 +284,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         SysUser sysUser = BeanUtil.copyProperties(user, SysUser.class);
         // 新增用户信息
         int rows = baseMapper.insert(sysUser);
+        user.setUserId(sysUser.getUserId());
         // 新增用户岗位关联
         insertUserPost(user);
         // 新增用户与角色管理

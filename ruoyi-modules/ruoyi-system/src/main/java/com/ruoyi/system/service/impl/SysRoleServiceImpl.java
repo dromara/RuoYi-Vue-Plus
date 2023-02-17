@@ -234,6 +234,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         SysRole role = BeanUtil.toBean(bo, SysRole.class);
         // 新增角色信息
         baseMapper.insert(role);
+        bo.setRoleId(role.getRoleId());
         return insertRoleMenu(bo);
     }
 
