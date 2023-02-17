@@ -76,7 +76,7 @@ public class UserActionListener implements SaTokenListener {
     @Override
     public void doKickout(String loginType, Object loginId, String tokenValue) {
         RedisUtils.deleteObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue);
-        log.info("user doLogoutByLoginId, userId:{}, token:{}", loginId, tokenValue);
+        log.info("user doKickout, userId:{}, token:{}", loginId, tokenValue);
     }
 
     /**
