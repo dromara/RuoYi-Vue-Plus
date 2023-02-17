@@ -65,10 +65,9 @@ public class MybatisEncryptInterceptor implements Interceptor {
      *
      * @param sourceObject 待加密对象
      */
-    @SuppressWarnings("unchecked cast")
     private void encryptHandler(Object sourceObject) {
         if (sourceObject instanceof Map<?, ?>) {
-            ((Map<?, Object>) sourceObject).values().forEach(this::encryptHandler);
+            ((Map<?, ?>) sourceObject).values().forEach(this::encryptHandler);
             return;
         }
         if (sourceObject instanceof List<?>) {
