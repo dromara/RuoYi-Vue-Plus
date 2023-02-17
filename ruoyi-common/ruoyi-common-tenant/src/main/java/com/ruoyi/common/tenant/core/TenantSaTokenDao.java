@@ -1,8 +1,10 @@
 package com.ruoyi.common.tenant.core;
 
 import com.ruoyi.common.core.constant.GlobalConstants;
+import com.ruoyi.common.redis.utils.RedisUtils;
 import com.ruoyi.common.satoken.core.dao.PlusSaTokenDao;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -27,7 +29,12 @@ public class TenantSaTokenDao extends PlusSaTokenDao {
      */
     @Override
     public void update(String key, String value) {
-        super.update(GlobalConstants.GLOBAL_REDIS_KEY + key, value);
+        long expire = getTimeout(key);
+        // -2 = 无此键
+        if (expire == NOT_VALUE_EXPIRE) {
+            return;
+        }
+        this.set(key, value, expire);
     }
 
     /**
@@ -51,7 +58,18 @@ public class TenantSaTokenDao extends PlusSaTokenDao {
      */
     @Override
     public void updateTimeout(String key, long timeout) {
-        super.updateTimeout(GlobalConstants.GLOBAL_REDIS_KEY + key, timeout);
+        // 判断是否想要设置为永久
+        if (timeout == NEVER_EXPIRE) {
+            long expire = getTimeout(key);
+            if (expire == NEVER_EXPIRE) {
+                // 如果其已经被设置为永久，则不作任何处理
+            } else {
+                // 如果尚未被设置为永久，那么再次set一次
+                this.set(key, this.get(key), timeout);
+            }
+            return;
+        }
+        RedisUtils.expire(GlobalConstants.GLOBAL_REDIS_KEY + key, Duration.ofSeconds(timeout));
     }
 
 
@@ -76,7 +94,12 @@ public class TenantSaTokenDao extends PlusSaTokenDao {
      */
     @Override
     public void updateObject(String key, Object object) {
-        super.updateObject(GlobalConstants.GLOBAL_REDIS_KEY + key, object);
+        long expire = getObjectTimeout(key);
+        // -2 = 无此键
+        if (expire == NOT_VALUE_EXPIRE) {
+            return;
+        }
+        this.setObject(key, object, expire);
     }
 
     /**
@@ -100,7 +123,18 @@ public class TenantSaTokenDao extends PlusSaTokenDao {
      */
     @Override
     public void updateObjectTimeout(String key, long timeout) {
-        super.updateObjectTimeout(GlobalConstants.GLOBAL_REDIS_KEY + key, timeout);
+        // 判断是否想要设置为永久
+        if (timeout == NEVER_EXPIRE) {
+            long expire = getObjectTimeout(key);
+            if (expire == NEVER_EXPIRE) {
+                // 如果其已经被设置为永久，则不作任何处理
+            } else {
+                // 如果尚未被设置为永久，那么再次set一次
+                this.setObject(key, this.getObject(key), timeout);
+            }
+            return;
+        }
+        RedisUtils.expire(GlobalConstants.GLOBAL_REDIS_KEY + key, Duration.ofSeconds(timeout));
     }
 
 
