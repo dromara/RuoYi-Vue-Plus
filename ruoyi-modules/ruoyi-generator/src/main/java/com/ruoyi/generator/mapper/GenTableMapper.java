@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-@InterceptorIgnore(dataPermission = "true")
+@InterceptorIgnore(dataPermission = "true", tenantLine = "true")
 public interface GenTableMapper extends BaseMapperPlus<GenTableMapper, GenTable, GenTable> {
 
     /**
