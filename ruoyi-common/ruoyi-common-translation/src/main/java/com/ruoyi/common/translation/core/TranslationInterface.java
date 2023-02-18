@@ -5,13 +5,14 @@ package com.ruoyi.common.translation.core;
  *
  * @author Lion Li
  */
-public interface TranslationInterface {
+public interface TranslationInterface<T> {
 
     /**
      * 翻译
      *
-     * @param key 需要被翻译的键(不为空)
+     * @param key   需要被翻译的键(不为空)
+     * @param other 其他参数
      * @return 返回键对应的值
      */
-    String translation(Object key, String other);
+    T translation(Object key, String other);
 }

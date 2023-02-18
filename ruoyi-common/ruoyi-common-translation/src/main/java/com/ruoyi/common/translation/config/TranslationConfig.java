@@ -24,15 +24,15 @@ import java.util.Map;
 public class TranslationConfig {
 
     @Autowired
-    private List<TranslationInterface> list;
+    private List<TranslationInterface<?>> list;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @PostConstruct
     public void init() {
-        Map<String, TranslationInterface> map = new HashMap<>(list.size());
-        for (TranslationInterface trans : list) {
+        Map<String, TranslationInterface<?>> map = new HashMap<>(list.size());
+        for (TranslationInterface<?> trans : list) {
             if (trans.getClass().isAnnotationPresent(TranslationType.class)) {
                 TranslationType annotation = trans.getClass().getAnnotation(TranslationType.class);
                 map.put(annotation.type(), trans);
