@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 @TranslationType(type = TransConstant.DICT_TYPE_TO_LABEL)
-public class DictTypeTranslationImpl implements TranslationInterface {
+public class DictTypeTranslationImpl implements TranslationInterface<String> {
 
     private final DictService dictService;
 

@@ -5,7 +5,7 @@ package com.ruoyi.common.translation;
  *
  * @author Lion Li
  */
-public interface TranslationInterface {
+public interface TranslationInterface<T> {
 
     /**
      * 翻译
@@ -13,5 +13,5 @@ public interface TranslationInterface {
      * @param key 需要被翻译的键(不为空)
      * @return 返回键对应的值
      */
-    String translation(Object key, String other);
+    T translation(Object key, String other);
 }
