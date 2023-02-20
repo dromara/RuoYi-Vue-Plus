@@ -3,16 +3,14 @@ package com.ruoyi.common.helper;
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONObject;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.UserType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 /**
  * 登录鉴权助手
@@ -30,7 +28,7 @@ import java.util.Set;
 public class LoginHelper {
 
     public static final String LOGIN_USER_KEY = "loginUser";
-    public static final String MENU_PERMISSION = "menuPermission";
+    public static final String USER_KEY = "userId";
 
     /**
      * 登录系统
@@ -49,30 +47,23 @@ public class LoginHelper {
      */
     public static void loginByDevice(LoginUser loginUser, DeviceType deviceType) {
         SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
-        Set<String> menuPermission = loginUser.getMenuPermission();
-        loginUser.setMenuPermission(null);
         SaLoginModel model = new SaLoginModel();
         if (ObjectUtil.isNotNull(deviceType)) {
             model.setDevice(deviceType.getDevice());
         }
-        StpUtil.login(loginUser.getLoginId(), model.setExtra(LOGIN_USER_KEY, loginUser));
-        // 解决菜单权限过度 token 臃肿过长问题
-        StpUtil.getTokenSession().set(MENU_PERMISSION, menuPermission);
+        StpUtil.login(loginUser.getLoginId(), model.setExtra(USER_KEY, loginUser.getUserId()));
+        StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
     }
 
     /**
      * 获取用户(多级缓存)
      */
-    @SuppressWarnings("unchecked cast")
     public static LoginUser getLoginUser() {
         LoginUser loginUser = (LoginUser) SaHolder.getStorage().get(LOGIN_USER_KEY);
         if (loginUser != null) {
             return loginUser;
         }
-        loginUser = ((JSONObject) StpUtil.getExtra(LOGIN_USER_KEY)).toBean(LoginUser.class);
-        // 解决菜单权限过度 token 臃肿过长问题
-        Set<String> menuPermission = (Set<String>) StpUtil.getTokenSession().get(MENU_PERMISSION);
-        loginUser.setMenuPermission(menuPermission);
+        loginUser = (LoginUser) StpUtil.getTokenSession().get(LOGIN_USER_KEY);
         SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
         return loginUser;
     }
@@ -80,26 +71,21 @@ public class LoginHelper {
     /**
      * 获取用户基于token
      */
-    @SuppressWarnings("unchecked cast")
     public static LoginUser getLoginUser(String token) {
-        LoginUser loginUser = ((JSONObject) StpUtil.getExtra(token, LOGIN_USER_KEY)).toBean(LoginUser.class);
-        // 解决菜单权限过多 token 臃肿过长问题
-        Set<String> menuPermission = (Set<String>) StpUtil.getTokenSessionByToken(token).get(MENU_PERMISSION);
-        loginUser.setMenuPermission(menuPermission);
-        return loginUser;
+        return (LoginUser) StpUtil.getTokenSessionByToken(token).get(LOGIN_USER_KEY);
     }
 
     /**
      * 获取用户id
      */
     public static Long getUserId() {
-        LoginUser loginUser;
+        Long userId;
         try {
-            loginUser = getLoginUser();
+            userId = Convert.toLong(StpUtil.getExtra(USER_KEY));
         } catch (Exception e) {
             return null;
         }
-        return loginUser.getUserId();
+        return userId;
     }
 
     /**
