@@ -124,6 +124,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
         add.setTenantId(tenantId);
         boolean flag = baseMapper.insert(add) > 0;
         if (!flag) {
+            TenantHelper.disableIgnore();
             throw new ServiceException("创建租户失败");
         }
         bo.setId(add.getId());
