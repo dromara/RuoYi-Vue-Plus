@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
  *
  * @author Lion Li
  */
-@Component
 @AllArgsConstructor
 @TranslationType(type = TransConstant.OSS_ID_TO_URL)
 public class OssUrlTranslationImpl implements TranslationInterface<String> {

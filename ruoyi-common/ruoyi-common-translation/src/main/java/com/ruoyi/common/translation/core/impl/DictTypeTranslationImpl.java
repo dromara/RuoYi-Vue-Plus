@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
  *
  * @author Lion Li
  */
-@Component
 @AllArgsConstructor
 @TranslationType(type = TransConstant.DICT_TYPE_TO_LABEL)
 public class DictTypeTranslationImpl implements TranslationInterface<String> {
