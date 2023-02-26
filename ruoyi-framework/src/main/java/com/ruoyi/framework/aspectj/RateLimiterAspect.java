@@ -1,6 +1,8 @@
 package com.ruoyi.framework.aspectj;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.ruoyi.common.annotation.RateLimiter;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.enums.LimitType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.MessageUtils;
@@ -35,15 +37,22 @@ import java.lang.reflect.Method;
 @Component
 public class RateLimiterAspect {
 
-    //定义spel表达式解析器
+    /**
+     * 定义spel表达式解析器
+     */
     private final ExpressionParser parser = new SpelExpressionParser();
-    //定义spel解析模版
+    /**
+     * 定义spel解析模版
+     */
     private final ParserContext parserContext = new TemplateParserContext();
-    //定义spel上下文对象进行解析
+    /**
+     * 定义spel上下文对象进行解析
+     */
     private final EvaluationContext context = new StandardEvaluationContext();
-    //方法参数解析器
+    /**
+     * 方法参数解析器
+     */
     private final ParameterNameDiscoverer pnd = new DefaultParameterNameDiscoverer();
-
 
     @Before("@annotation(rateLimiter)")
     public void doBefore(JoinPoint point, RateLimiter rateLimiter) throws Throwable {
@@ -75,35 +84,38 @@ public class RateLimiterAspect {
 
     public String getCombineKey(RateLimiter rateLimiter, JoinPoint point) {
         String key = rateLimiter.key();
-        //获取方法(通过方法签名来获取)
+        // 获取方法(通过方法签名来获取)
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
         Class<?> targetClass = method.getDeclaringClass();
-        //判断是否是spel格式
+        // 判断是否是spel格式
         if (StringUtils.containsAny(key, "#")) {
-            //获取参数值
+            // 获取参数值
             Object[] args = point.getArgs();
-            //获取方法上参数的名称
+            // 获取方法上参数的名称
             String[] parameterNames = pnd.getParameterNames(method);
+            if (ArrayUtil.isEmpty(parameterNames)) {
+                throw new ServiceException("限流key解析异常!请联系管理员!");
+            }
             for (int i = 0; i < parameterNames.length; i++) {
                 context.setVariable(parameterNames[i], args[i]);
             }
-            //解析返回给key
+            // 解析返回给key
             try {
                 key = parser.parseExpression(key, parserContext).getValue(context, String.class) + ":";
             } catch (Exception e) {
                 throw new ServiceException("限流key解析异常!请联系管理员!");
             }
         }
-        StringBuilder stringBuffer = new StringBuilder(key);
+        StringBuilder stringBuffer = new StringBuilder(CacheConstants.RATE_LIMIT_KEY);
+        stringBuffer.append(ServletUtils.getRequest().getRequestURI()).append(":");
         if (rateLimiter.limitType() == LimitType.IP) {
             // 获取请求ip
-            stringBuffer.append(ServletUtils.getClientIP()).append("-");
+            stringBuffer.append(ServletUtils.getClientIP()).append(":");
         } else if (rateLimiter.limitType() == LimitType.CLUSTER) {
             // 获取客户端实例id
-            stringBuffer.append(RedisUtils.getClient().getId()).append("-");
+            stringBuffer.append(RedisUtils.getClient().getId()).append(":");
         }
-        stringBuffer.append(targetClass.getName()).append("-").append(method.getName());
-        return stringBuffer.toString();
+        return stringBuffer.append(key).toString();
     }
 }
