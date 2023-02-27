@@ -77,8 +77,8 @@ public class PlusDataPermissionHandler {
             currentUser = LoginHelper.getLoginUser();
             DataPermissionHelper.setVariable("user", currentUser);
         }
-        // 如果是超级管理员，则不过滤数据
-        if (LoginHelper.isSuperAdmin()) {
+        // 如果是超级管理员或租户管理员，则不过滤数据
+        if (LoginHelper.isSuperAdmin() || LoginHelper.isTenantAdmin()) {
             return where;
         }
         String dataFilterSql = buildDataFilter(dataColumns, isSelect);
