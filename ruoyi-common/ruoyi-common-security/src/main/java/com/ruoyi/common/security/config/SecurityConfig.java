@@ -3,7 +3,9 @@ package com.ruoyi.common.security.config;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
+import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.security.config.properties.SecurityProperties;
+import com.ruoyi.common.security.handler.AllUrlHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -32,10 +34,11 @@ public class SecurityConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册路由拦截器，自定义验证规则
         registry.addInterceptor(new SaInterceptor(handler -> {
+            AllUrlHandler allUrlHandler = SpringUtils.getBean(AllUrlHandler.class);
             // 登录验证 -- 排除多个路径
             SaRouter
                 // 获取所有的
-                .match("/**")
+                .match(allUrlHandler.getUrls())
                 // 对未排除的路径进行检查
                 .check(() -> {
                     // 检查是否登录 是否有token

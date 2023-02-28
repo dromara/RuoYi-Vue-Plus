@@ -1,2 +1,3 @@
 com.ruoyi.common.security.handler.GlobalExceptionHandler
+com.ruoyi.common.security.handler.AllUrlHandler
 com.ruoyi.common.security.config.SecurityConfig
