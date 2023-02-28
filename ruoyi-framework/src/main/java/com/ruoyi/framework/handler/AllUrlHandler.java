@@ -8,10 +8,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -28,16 +25,15 @@ public class AllUrlHandler implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
+        Set<String> set = new HashSet<>();
         RequestMappingHandlerMapping mapping = SpringUtils.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
         map.keySet().forEach(info -> {
-            // 获取方法上边的注解 替代path variable 为 *
+            // 获取注解上边的 path 替代 path variable 为 *
             Objects.requireNonNull(info.getPathPatternsCondition().getPatterns())
-                    .forEach(url -> urls.add(ReUtil.replaceAll(url.getPatternString(), PATTERN, "*")));
-            // 获取类上边的注解, 替代path variable 为 *
-            Objects.requireNonNull(info.getPathPatternsCondition().getPatterns())
-                    .forEach(url -> urls.add(ReUtil.replaceAll(url.getPatternString(), PATTERN, "*")));
+                .forEach(url -> set.add(ReUtil.replaceAll(url.getPatternString(), PATTERN, "*")));
         });
+        urls.addAll(set);
     }
 
 }
