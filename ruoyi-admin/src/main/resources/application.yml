@@ -128,8 +128,10 @@ security:
     - /**/*.html
     - /**/*.css
     - /**/*.js
-    # swagger 文档配置
+    # 公共路径
     - /favicon.ico
+    - /error
+    # swagger 文档配置
     - /*/api-docs
     - /*/api-docs/**
     # actuator 监控配置
