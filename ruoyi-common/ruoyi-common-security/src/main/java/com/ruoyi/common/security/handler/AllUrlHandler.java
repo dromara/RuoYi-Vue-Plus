@@ -29,10 +29,7 @@ public class AllUrlHandler implements InitializingBean {
         RequestMappingHandlerMapping mapping = SpringUtils.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
         map.keySet().forEach(info -> {
-            // 获取方法上边的注解 替代path variable 为 *
-            Objects.requireNonNull(info.getPathPatternsCondition().getPatterns())
-                    .forEach(url -> set.add(ReUtil.replaceAll(url.getPatternString(), PATTERN, "*")));
-            // 获取类上边的注解, 替代path variable 为 *
+            // 获取注解上边的 path 替代 path variable 为 *
             Objects.requireNonNull(info.getPathPatternsCondition().getPatterns())
                     .forEach(url -> set.add(ReUtil.replaceAll(url.getPatternString(), PATTERN, "*")));
         });
