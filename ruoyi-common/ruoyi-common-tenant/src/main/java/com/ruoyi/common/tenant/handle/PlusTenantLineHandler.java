@@ -7,8 +7,8 @@ import com.ruoyi.common.tenant.helper.TenantHelper;
 import com.ruoyi.common.tenant.properties.TenantProperties;
 import lombok.AllArgsConstructor;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.NullValue;
+import net.sf.jsqlparser.expression.StringValue;
 
 import java.util.List;
 
@@ -31,10 +31,10 @@ public class PlusTenantLineHandler implements TenantLineHandler {
         String dynamicTenantId = TenantHelper.getDynamic();
         if (StringUtils.isNotBlank(dynamicTenantId)) {
             // 返回动态租户
-            return new LongValue(dynamicTenantId);
+            return new StringValue(dynamicTenantId);
         }
         // 返回固定租户
-        return new LongValue(tenantId);
+        return new StringValue(tenantId);
     }
 
     @Override
