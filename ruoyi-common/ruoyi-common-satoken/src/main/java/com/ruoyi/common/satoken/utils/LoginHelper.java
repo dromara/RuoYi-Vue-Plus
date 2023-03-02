@@ -1,6 +1,7 @@
 package com.ruoyi.common.satoken.utils;
 
 import cn.dev33.satoken.context.SaHolder;
+import cn.dev33.satoken.context.model.SaStorage;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.convert.Convert;
@@ -50,7 +51,10 @@ public class LoginHelper {
      * @param loginUser 登录用户信息
      */
     public static void loginByDevice(LoginUser loginUser, DeviceType deviceType) {
-        SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
+        SaStorage storage = SaHolder.getStorage();
+        storage.set(LOGIN_USER_KEY, loginUser);
+        storage.set(TENANT_KEY, loginUser.getTenantId());
+        storage.set(USER_KEY, loginUser.getUserId());
         SaLoginModel model = new SaLoginModel();
         if (ObjectUtil.isNotNull(deviceType)) {
             model.setDevice(deviceType.getDevice());
@@ -87,7 +91,11 @@ public class LoginHelper {
     public static Long getUserId() {
         Long userId;
         try {
-            userId = Convert.toLong(StpUtil.getExtra(USER_KEY));
+            userId = Convert.toLong(SaHolder.getStorage().get(USER_KEY));
+            if (ObjectUtil.isNull(userId)) {
+                userId = Convert.toLong(StpUtil.getExtra(USER_KEY));
+                SaHolder.getStorage().set(USER_KEY, userId);
+            }
         } catch (Exception e) {
             return null;
         }
@@ -100,7 +108,11 @@ public class LoginHelper {
     public static String getTenantId() {
         String tenantId;
         try {
-            tenantId = (String) StpUtil.getExtra(TENANT_KEY);
+            tenantId =(String) SaHolder.getStorage().get(TENANT_KEY);
+            if (ObjectUtil.isNull(tenantId)) {
+                tenantId = (String) StpUtil.getExtra(TENANT_KEY);
+                SaHolder.getStorage().set(TENANT_KEY, tenantId);
+            }
         } catch (Exception e) {
             return null;
         }
