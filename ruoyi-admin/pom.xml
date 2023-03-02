@@ -18,13 +18,6 @@
 
     <dependencies>
 
-        <!-- spring-boot-devtools -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <optional>true</optional> <!-- 表示依赖不会传递 -->
-        </dependency>
-
         <!-- Mysql驱动包 -->
         <dependency>
             <groupId>com.mysql</groupId>
@@ -105,9 +98,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
-                <configuration>
-<!--                    <fork>true</fork> &lt;!&ndash; 如果没有该配置，devtools不会生效 &ndash;&gt;-->
-                </configuration>
                 <executions>
                     <execution>
                         <goals>

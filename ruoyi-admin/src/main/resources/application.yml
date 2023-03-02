@@ -77,11 +77,6 @@ spring:
       max-file-size: 10MB
       # 设置总上传的文件大小
       max-request-size: 20MB
-  # 服务模块
-  devtools:
-    restart:
-      # 热部署开关
-      enabled: true
   mvc:
     format:
       date-time: yyyy-MM-dd HH:mm:ss
