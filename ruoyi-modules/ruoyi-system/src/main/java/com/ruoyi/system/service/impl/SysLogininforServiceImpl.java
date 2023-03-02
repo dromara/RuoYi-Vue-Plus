@@ -1,11 +1,11 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.Constants;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.log.event.LogininforEvent;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
@@ -116,7 +116,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
      */
     @Override
     public void insertLogininfor(SysLogininforBo bo) {
-        SysLogininfor logininfor = BeanUtil.toBean(bo, SysLogininfor.class);
+        SysLogininfor logininfor = MapstructUtils.convert(bo, SysLogininfor.class);
         logininfor.setLoginTime(new Date());
         baseMapper.insert(logininfor);
     }

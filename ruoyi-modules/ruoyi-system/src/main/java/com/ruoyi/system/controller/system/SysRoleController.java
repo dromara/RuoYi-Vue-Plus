@@ -15,8 +15,8 @@ import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.common.web.core.BaseController;
-import com.ruoyi.system.domain.SysDept;
 import com.ruoyi.system.domain.SysUserRole;
+import com.ruoyi.system.domain.bo.SysDeptBo;
 import com.ruoyi.system.domain.bo.SysRoleBo;
 import com.ruoyi.system.domain.bo.SysUserBo;
 import com.ruoyi.system.domain.vo.DeptTreeSelectVo;
@@ -247,7 +247,7 @@ public class SysRoleController extends BaseController {
     public R<DeptTreeSelectVo> roleDeptTreeselect(@PathVariable("roleId") Long roleId) {
         DeptTreeSelectVo selectVo = new DeptTreeSelectVo();
         selectVo.setCheckedKeys(deptService.selectDeptListByRoleId(roleId));
-        selectVo.setDepts(deptService.selectDeptTreeList(new SysDept()));
+        selectVo.setDepts(deptService.selectDeptTreeList(new SysDeptBo()));
         return R.ok(selectVo);
     }
 }

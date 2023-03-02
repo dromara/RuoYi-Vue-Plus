@@ -4,6 +4,8 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.excel.annotation.ExcelDictFormat;
 import com.ruoyi.common.excel.convert.ExcelDictConvert;
+import com.ruoyi.system.domain.SysDictData;
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 import java.io.Serial;
@@ -18,6 +20,7 @@ import java.util.Date;
  */
 @Data
 @ExcelIgnoreUnannotated
+@AutoMapper(target = SysDictData.class)
 public class SysDictDataVo implements Serializable {
 
     @Serial

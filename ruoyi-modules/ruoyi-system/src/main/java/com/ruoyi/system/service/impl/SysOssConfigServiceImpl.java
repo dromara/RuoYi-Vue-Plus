@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -10,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.exception.ServiceException;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.json.utils.JsonUtils;
@@ -95,7 +95,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
 
     @Override
     public Boolean insertByBo(SysOssConfigBo bo) {
-        SysOssConfig config = BeanUtil.toBean(bo, SysOssConfig.class);
+        SysOssConfig config = MapstructUtils.convert(bo, SysOssConfig.class);
         validEntityBeforeSave(config);
         boolean flag = baseMapper.insert(config) > 0;
         if (flag) {
@@ -106,7 +106,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
 
     @Override
     public Boolean updateByBo(SysOssConfigBo bo) {
-        SysOssConfig config = BeanUtil.toBean(bo, SysOssConfig.class);
+        SysOssConfig config = MapstructUtils.convert(bo, SysOssConfig.class);
         validEntityBeforeSave(config);
         LambdaUpdateWrapper<SysOssConfig> luw = new LambdaUpdateWrapper<>();
         luw.set(ObjectUtil.isNull(config.getPrefix()), SysOssConfig::getPrefix, "");
@@ -171,7 +171,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateOssConfigStatus(SysOssConfigBo bo) {
-        SysOssConfig sysOssConfig = BeanUtil.toBean(bo, SysOssConfig.class);
+        SysOssConfig sysOssConfig = MapstructUtils.convert(bo, SysOssConfig.class);
         int row = baseMapper.update(null, new LambdaUpdateWrapper<SysOssConfig>()
             .set(SysOssConfig::getStatus, "1"));
         row += baseMapper.updateById(sysOssConfig);

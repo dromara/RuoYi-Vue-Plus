@@ -1,8 +1,8 @@
 package com.ruoyi.demo.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.ValidatorUtils;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
@@ -29,8 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.Arrays;
-import java.util.List;
+
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -76,7 +76,7 @@ public class TestDemoController extends BaseController {
     public R<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
         ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
         List<TestDemoImportVo> volist = excelResult.getList();
-        List<TestDemo> list = BeanUtil.copyToList(volist, TestDemo.class);
+        List<TestDemo> list = MapstructUtils.convert(volist, TestDemo.class);
         testDemoService.saveBatch(list);
         return R.ok(excelResult.getAnalysis());
     }

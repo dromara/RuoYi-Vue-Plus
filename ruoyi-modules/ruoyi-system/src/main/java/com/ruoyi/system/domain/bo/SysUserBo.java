@@ -5,6 +5,8 @@ import com.ruoyi.common.core.xss.Xss;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 import com.ruoyi.common.sensitive.annotation.Sensitive;
 import com.ruoyi.common.sensitive.core.SensitiveStrategy;
+import com.ruoyi.system.domain.SysUser;
+import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -23,6 +25,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@AutoMapper(target = SysUser.class, reverseConvertGenerate = false)
 public class SysUserBo extends BaseEntity {
 
     /**

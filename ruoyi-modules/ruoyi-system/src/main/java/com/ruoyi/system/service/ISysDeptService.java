@@ -27,7 +27,7 @@ public interface ISysDeptService {
      * @param dept 部门信息
      * @return 部门树信息集合
      */
-    List<Tree<Long>> selectDeptTreeList(SysDept dept);
+    List<Tree<Long>> selectDeptTreeList(SysDeptBo dept);
 
     /**
      * 构建前端所需要下拉树结构

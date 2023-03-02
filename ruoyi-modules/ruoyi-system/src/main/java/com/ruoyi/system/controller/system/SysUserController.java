@@ -2,13 +2,13 @@ package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.secure.BCrypt;
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.core.constant.TenantConstants;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.excel.core.ExcelResult;
@@ -20,7 +20,7 @@ import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.tenant.helper.TenantHelper;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.common.web.core.BaseController;
-import com.ruoyi.system.domain.SysDept;
+import com.ruoyi.system.domain.bo.SysDeptBo;
 import com.ruoyi.system.domain.bo.SysUserBo;
 import com.ruoyi.system.domain.vo.*;
 import com.ruoyi.system.listener.SysUserImportListener;
@@ -69,15 +69,7 @@ public class SysUserController extends BaseController {
     @PostMapping("/export")
     public void export(SysUserBo user, HttpServletResponse response) {
         List<SysUserVo> list = userService.selectUserList(user);
-        List<SysUserExportVo> listVo = BeanUtil.copyToList(list, SysUserExportVo.class);
-        for (int i = 0; i < list.size(); i++) {
-            SysDeptVo dept = list.get(i).getDept();
-            SysUserExportVo vo = listVo.get(i);
-            if (ObjectUtil.isNotEmpty(dept)) {
-                vo.setDeptName(dept.getDeptName());
-                vo.setLeader(dept.getLeader());
-            }
-        }
+        List<SysUserExportVo> listVo = MapstructUtils.convert(list, SysUserExportVo.class);
         ExcelUtil.exportExcel(listVo, "用户数据", SysUserExportVo.class, response);
     }
 
@@ -248,7 +240,7 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:list")
     @GetMapping("/deptTree")
-    public R<List<Tree<Long>>> deptTree(SysDept dept) {
+    public R<List<Tree<Long>>> deptTree(SysDeptBo dept) {
         return R.ok(deptService.selectDeptTreeList(dept));
     }
 

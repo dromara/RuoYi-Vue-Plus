@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
@@ -11,6 +10,7 @@ import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.service.ConfigService;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
@@ -123,7 +123,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     @CachePut(cacheNames = CacheNames.SYS_CONFIG, key = "#bo.configKey")
     @Override
     public String insertConfig(SysConfigBo bo) {
-        SysConfig config = BeanUtil.toBean(bo, SysConfig.class);
+        SysConfig config = MapstructUtils.convert(bo, SysConfig.class);
         int row = baseMapper.insert(config);
         if (row > 0) {
             return config.getConfigValue();
@@ -141,7 +141,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     @Override
     public String updateConfig(SysConfigBo bo) {
         int row = 0;
-        SysConfig config = BeanUtil.toBean(bo, SysConfig.class);
+        SysConfig config = MapstructUtils.convert(bo, SysConfig.class);
         if (config.getConfigId() != null) {
             SysConfig temp = baseMapper.selectById(config.getConfigId());
             if (!StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {

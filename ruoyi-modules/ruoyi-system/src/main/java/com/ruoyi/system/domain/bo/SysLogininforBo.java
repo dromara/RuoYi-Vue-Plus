@@ -1,5 +1,7 @@
 package com.ruoyi.system.domain.bo;
 
+import com.ruoyi.system.domain.SysLogininfor;
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 import java.util.Date;
@@ -13,6 +15,7 @@ import java.util.Map;
  */
 
 @Data
+@AutoMapper(target = SysLogininfor.class, reverseConvertGenerate = false)
 public class SysLogininforBo {
 
     /**

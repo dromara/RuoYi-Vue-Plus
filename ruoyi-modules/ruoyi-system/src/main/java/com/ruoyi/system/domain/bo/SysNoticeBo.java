@@ -4,6 +4,8 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.core.xss.Xss;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import com.ruoyi.system.domain.SysNotice;
+import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,6 +20,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@AutoMapper(target = SysNotice.class, reverseConvertGenerate = false)
 public class SysNoticeBo extends BaseEntity {
 
     /**

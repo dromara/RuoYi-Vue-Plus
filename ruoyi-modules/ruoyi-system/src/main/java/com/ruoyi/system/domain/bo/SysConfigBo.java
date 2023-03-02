@@ -2,6 +2,8 @@ package com.ruoyi.system.domain.bo;
 
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
+import com.ruoyi.system.domain.SysConfig;
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
@@ -16,6 +18,7 @@ import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@AutoMapper(target = SysConfig.class, reverseConvertGenerate = false)
 public class SysConfigBo extends BaseEntity {
 
     /**

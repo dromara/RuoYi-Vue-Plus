@@ -3,6 +3,8 @@ package com.ruoyi.system.domain.bo;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import com.ruoyi.system.domain.SysDept;
+import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +20,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@AutoMapper(target = SysDept.class, reverseConvertGenerate = false)
 public class SysDeptBo extends BaseEntity {
 
     /**

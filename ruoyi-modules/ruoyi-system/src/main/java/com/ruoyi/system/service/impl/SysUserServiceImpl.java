@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -14,6 +13,7 @@ import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.service.UserService;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
@@ -281,7 +281,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int insertUser(SysUserBo user) {
-        SysUser sysUser = BeanUtil.copyProperties(user, SysUser.class);
+        SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
         // 新增用户信息
         int rows = baseMapper.insert(sysUser);
         user.setUserId(sysUser.getUserId());
@@ -302,7 +302,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     public boolean registerUser(SysUserBo user, String tenantId) {
         user.setCreateBy(user.getUserId());
         user.setUpdateBy(user.getUserId());
-        SysUser sysUser = BeanUtil.copyProperties(user, SysUser.class);
+        SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
         sysUser.setTenantId(tenantId);
         return baseMapper.insert(sysUser) > 0;
     }
@@ -325,7 +325,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getUserId, userId));
         // 新增用户与岗位管理
         insertUserPost(user);
-        SysUser sysUser = BeanUtil.copyProperties(user, SysUser.class);
+        SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
         return baseMapper.updateById(sysUser);
     }
 
@@ -351,7 +351,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public int updateUserStatus(SysUserBo user) {
-        SysUser sysUser = BeanUtil.copyProperties(user, SysUser.class);
+        SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
         return baseMapper.updateById(sysUser);
     }
 
@@ -363,7 +363,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public int updateUserProfile(SysUserBo user) {
-        SysUser sysUser = BeanUtil.copyProperties(user, SysUser.class);
+        SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
         return baseMapper.updateById(sysUser);
     }
 
@@ -390,7 +390,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public int resetPwd(SysUserBo user) {
-        SysUser sysUser = BeanUtil.copyProperties(user, SysUser.class);
+        SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
         return baseMapper.updateById(sysUser);
     }
 

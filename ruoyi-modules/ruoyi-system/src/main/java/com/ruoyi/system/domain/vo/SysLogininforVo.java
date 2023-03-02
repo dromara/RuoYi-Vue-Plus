@@ -5,6 +5,8 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.excel.annotation.ExcelDictFormat;
 import com.ruoyi.common.excel.convert.ExcelDictConvert;
+import com.ruoyi.system.domain.SysLogininfor;
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 import java.io.Serial;
@@ -20,6 +22,7 @@ import java.io.Serializable;
  */
 @Data
 @ExcelIgnoreUnannotated
+@AutoMapper(target = SysLogininfor.class)
 public class SysLogininforVo implements Serializable {
 
     @Serial

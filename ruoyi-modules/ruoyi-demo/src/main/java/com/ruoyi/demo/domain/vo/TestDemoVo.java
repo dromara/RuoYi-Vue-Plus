@@ -4,6 +4,8 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.translation.annotation.Translation;
 import com.ruoyi.common.translation.constant.TransConstant;
+import com.ruoyi.demo.domain.TestDemo;
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 import java.io.Serial;
@@ -19,6 +21,7 @@ import java.util.Date;
  */
 @Data
 @ExcelIgnoreUnannotated
+@AutoMapper(target = TestDemo.class)
 public class TestDemoVo implements Serializable {
 
     @Serial

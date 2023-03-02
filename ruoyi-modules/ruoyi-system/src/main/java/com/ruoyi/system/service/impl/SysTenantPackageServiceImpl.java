@@ -1,8 +1,8 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.core.exception.ServiceException;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
@@ -78,7 +78,7 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(SysTenantPackageBo bo) {
-        SysTenantPackage add = BeanUtil.toBean(bo, SysTenantPackage.class);
+        SysTenantPackage add = MapstructUtils.convert(bo, SysTenantPackage.class);
         // 保存菜单id
         List<Long> menuIds = Arrays.asList(bo.getMenuIds());
         if (CollUtil.isNotEmpty(menuIds)) {
@@ -99,7 +99,7 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(SysTenantPackageBo bo) {
-        SysTenantPackage update = BeanUtil.toBean(bo, SysTenantPackage.class);
+        SysTenantPackage update = MapstructUtils.convert(bo, SysTenantPackage.class);
         // 保存菜单id
         List<Long> menuIds = Arrays.asList(bo.getMenuIds());
         if (CollUtil.isNotEmpty(menuIds)) {
@@ -118,7 +118,7 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
      */
     @Override
     public int updatePackageStatus(SysTenantPackageBo bo) {
-        SysTenantPackage tenantPackage = BeanUtil.toBean(bo, SysTenantPackage.class);
+        SysTenantPackage tenantPackage = MapstructUtils.convert(bo, SysTenantPackage.class);
         return baseMapper.updateById(tenantPackage);
     }
 

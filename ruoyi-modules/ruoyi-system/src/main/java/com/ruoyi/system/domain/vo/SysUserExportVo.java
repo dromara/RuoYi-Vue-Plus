@@ -3,6 +3,8 @@ package com.ruoyi.system.domain.vo;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.excel.annotation.ExcelDictFormat;
 import com.ruoyi.common.excel.convert.ExcelDictConvert;
+import io.github.linpeilie.annotations.AutoMapper;
+import io.github.linpeilie.annotations.ReverseAutoMapping;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +20,7 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
+@AutoMapper(target = SysUserVo.class, convertGenerate = false)
 public class SysUserExportVo implements Serializable {
 
     @Serial
@@ -82,12 +85,14 @@ public class SysUserExportVo implements Serializable {
     /**
      * 部门名称
      */
+    @ReverseAutoMapping(target = "deptName", source = "dept.deptName")
     @ExcelProperty(value = "部门名称")
     private String deptName;
 
     /**
      * 负责人
      */
+    @ReverseAutoMapping(target = "leader", source = "dept.leader")
     @ExcelProperty(value = "部门负责人")
     private String leader;
 

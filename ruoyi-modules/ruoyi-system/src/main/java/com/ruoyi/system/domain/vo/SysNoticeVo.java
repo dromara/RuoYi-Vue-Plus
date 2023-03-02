@@ -2,6 +2,8 @@ package com.ruoyi.system.domain.vo;
 
 import com.ruoyi.common.translation.annotation.Translation;
 import com.ruoyi.common.translation.constant.TransConstant;
+import com.ruoyi.system.domain.SysNotice;
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 import java.io.Serial;
@@ -16,6 +18,7 @@ import java.util.Date;
  * @author Michelle.Chung
  */
 @Data
+@AutoMapper(target = SysNotice.class)
 public class SysNoticeVo implements Serializable {
 
     @Serial

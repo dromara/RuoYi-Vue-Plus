@@ -1,7 +1,6 @@
 package com.ruoyi.system.service.impl;
 
 import cn.dev33.satoken.context.SaHolder;
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -13,6 +12,7 @@ import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.service.DictService;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -165,7 +165,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @CachePut(cacheNames = CacheNames.SYS_DICT, key = "#bo.dictType")
     @Override
     public List<SysDictTypeVo> insertDictType(SysDictTypeBo bo) {
-        SysDictType dict = BeanUtil.toBean(bo, SysDictType.class);
+        SysDictType dict = MapstructUtils.convert(bo, SysDictType.class);
         int row = baseMapper.insert(dict);
         if (row > 0) {
             return new ArrayList<>();
@@ -183,7 +183,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<SysDictDataVo> updateDictType(SysDictTypeBo bo) {
-        SysDictType dict = BeanUtil.toBean(bo, SysDictType.class);
+        SysDictType dict = MapstructUtils.convert(bo, SysDictType.class);
         SysDictType oldDict = baseMapper.selectById(dict.getDictId());
         dictDataMapper.update(null, new LambdaUpdateWrapper<SysDictData>()
             .set(SysDictData::getDictType, dict.getDictType())

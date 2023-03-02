@@ -1,11 +1,11 @@
 package com.ruoyi.system.listener;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.ruoyi.common.core.exception.ServiceException;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.ValidatorUtils;
 import com.ruoyi.common.excel.core.ExcelListener;
@@ -55,7 +55,7 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
         try {
             // 验证是否存在这个用户
             if (ObjectUtil.isNull(sysUser)) {
-                SysUserBo user = BeanUtil.toBean(userVo, SysUserBo.class);
+                SysUserBo user = MapstructUtils.convert(userVo, SysUserBo.class);
                 ValidatorUtils.validate(user);
                 user.setPassword(password);
                 user.setCreateBy(operUserId);
@@ -64,7 +64,7 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
                 successMsg.append("<br/>").append(successNum).append("、账号 ").append(user.getUserName()).append(" 导入成功");
             } else if (isUpdateSupport) {
                 Long userId = sysUser.getUserId();
-                SysUserBo user = BeanUtil.toBean(userVo, SysUserBo.class);
+                SysUserBo user = MapstructUtils.convert(userVo, SysUserBo.class);
                 user.setUserId(userId);
                 ValidatorUtils.validate(user);
                 userService.checkUserAllowed(user);

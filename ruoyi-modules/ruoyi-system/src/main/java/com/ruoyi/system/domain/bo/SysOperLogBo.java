@@ -1,6 +1,10 @@
 package com.ruoyi.system.domain.bo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.ruoyi.common.log.event.OperLogEvent;
+import com.ruoyi.system.domain.SysOperLog;
+import io.github.linpeilie.annotations.AutoMapper;
+import io.github.linpeilie.annotations.AutoMappers;
 import lombok.Data;
 
 import java.util.Date;
@@ -15,6 +19,10 @@ import java.util.Map;
  */
 
 @Data
+@AutoMappers({
+    @AutoMapper(target = SysOperLog.class, reverseConvertGenerate = false),
+    @AutoMapper(target = OperLogEvent.class)
+})
 public class SysOperLogBo {
 
     /**

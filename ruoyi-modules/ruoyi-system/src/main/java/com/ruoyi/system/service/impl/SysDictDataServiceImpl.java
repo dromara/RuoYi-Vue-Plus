@@ -1,10 +1,10 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.CacheNames;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.system.domain.SysDictData;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
@@ -111,7 +111,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     @CachePut(cacheNames = CacheNames.SYS_DICT, key = "#bo.dictType")
     @Override
     public List<SysDictDataVo> insertDictData(SysDictDataBo bo) {
-        SysDictData data = BeanUtil.toBean(bo, SysDictData.class);
+        SysDictData data = MapstructUtils.convert(bo, SysDictData.class);
         int row = baseMapper.insert(data);
         if (row > 0) {
             return baseMapper.selectDictDataByType(data.getDictType());
@@ -128,7 +128,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     @CachePut(cacheNames = CacheNames.SYS_DICT, key = "#bo.dictType")
     @Override
     public List<SysDictDataVo> updateDictData(SysDictDataBo bo) {
-        SysDictData data = BeanUtil.toBean(bo, SysDictData.class);
+        SysDictData data = MapstructUtils.convert(bo, SysDictData.class);
         int row = baseMapper.updateById(data);
         if (row > 0) {
             return baseMapper.selectDictDataByType(data.getDictType());

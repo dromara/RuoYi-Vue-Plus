@@ -2,6 +2,8 @@ package com.ruoyi.system.domain.vo;
 
 import com.ruoyi.common.translation.annotation.Translation;
 import com.ruoyi.common.translation.constant.TransConstant;
+import com.ruoyi.system.domain.SysOss;
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 import java.io.Serial;
@@ -14,6 +16,7 @@ import java.util.Date;
  * @author Lion Li
  */
 @Data
+@AutoMapper(target = SysOss.class)
 public class SysOssVo implements Serializable {
 
     @Serial

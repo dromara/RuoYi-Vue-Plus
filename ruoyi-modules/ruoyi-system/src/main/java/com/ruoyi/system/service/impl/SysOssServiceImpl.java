@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.service.OssService;
-import com.ruoyi.common.core.utils.BeanCopyUtils;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -138,7 +138,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         oss.setService(storage.getConfigKey());
         baseMapper.insert(oss);
         SysOssVo sysOssVo = new SysOssVo();
-        BeanCopyUtils.copy(oss, sysOssVo);
+        MapstructUtils.convert(oss, sysOssVo);
         return this.matchingUrl(sysOssVo);
     }
 

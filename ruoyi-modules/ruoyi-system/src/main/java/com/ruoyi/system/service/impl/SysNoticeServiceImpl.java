@@ -1,10 +1,10 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
@@ -82,7 +82,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      */
     @Override
     public int insertNotice(SysNoticeBo bo) {
-        SysNotice notice = BeanUtil.toBean(bo, SysNotice.class);
+        SysNotice notice = MapstructUtils.convert(bo, SysNotice.class);
         return baseMapper.insert(notice);
     }
 
@@ -94,7 +94,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      */
     @Override
     public int updateNotice(SysNoticeBo bo) {
-        SysNotice notice = BeanUtil.toBean(bo, SysNotice.class);
+        SysNotice notice = MapstructUtils.convert(bo, SysNotice.class);
         return baseMapper.updateById(notice);
     }
 

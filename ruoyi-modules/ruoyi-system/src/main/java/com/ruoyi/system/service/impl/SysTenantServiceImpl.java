@@ -1,7 +1,6 @@
 package com.ruoyi.system.service.impl;
 
 import cn.dev33.satoken.secure.BCrypt;
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -12,6 +11,7 @@ import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.TenantConstants;
 import com.ruoyi.common.core.exception.ServiceException;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
@@ -115,7 +115,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
     public Boolean insertByBo(SysTenantBo bo) {
         TenantHelper.enableIgnore();
 
-        SysTenant add = BeanUtil.toBean(bo, SysTenant.class);
+        SysTenant add = MapstructUtils.convert(bo, SysTenant.class);
 
         // 获取所有租户编号
         List<String> tenantIds = baseMapper.selectObjs(
@@ -252,7 +252,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
     @CacheEvict(cacheNames = CacheNames.SYS_TENANT, key = "#bo.tenantId")
     @Override
     public Boolean updateByBo(SysTenantBo bo) {
-        SysTenant tenant = BeanUtil.toBean(bo, SysTenant.class);
+        SysTenant tenant = MapstructUtils.convert(bo, SysTenant.class);
         tenant.setTenantId(null);
         tenant.setPackageId(null);
         return baseMapper.updateById(tenant) > 0;
@@ -267,7 +267,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
     @CacheEvict(cacheNames = CacheNames.SYS_TENANT, key = "#bo.tenantId")
     @Override
     public int updateTenantStatus(SysTenantBo bo) {
-        SysTenant tenant = BeanUtil.toBean(bo, SysTenant.class);
+        SysTenant tenant = MapstructUtils.convert(bo, SysTenant.class);
         return baseMapper.updateById(tenant);
     }
 

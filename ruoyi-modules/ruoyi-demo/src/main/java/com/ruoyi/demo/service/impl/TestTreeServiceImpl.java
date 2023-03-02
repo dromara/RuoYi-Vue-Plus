@@ -1,8 +1,8 @@
 package com.ruoyi.demo.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.demo.domain.TestTree;
 import com.ruoyi.demo.domain.bo.TestTreeBo;
@@ -52,7 +52,7 @@ public class TestTreeServiceImpl implements ITestTreeService {
 
     @Override
     public Boolean insertByBo(TestTreeBo bo) {
-        TestTree add = BeanUtil.toBean(bo, TestTree.class);
+        TestTree add = MapstructUtils.convert(bo, TestTree.class);
         validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
@@ -63,7 +63,7 @@ public class TestTreeServiceImpl implements ITestTreeService {
 
     @Override
     public Boolean updateByBo(TestTreeBo bo) {
-        TestTree update = BeanUtil.toBean(bo, TestTree.class);
+        TestTree update = MapstructUtils.convert(bo, TestTree.class);
         validEntityBeforeSave(update);
         return baseMapper.updateById(update) > 0;
     }

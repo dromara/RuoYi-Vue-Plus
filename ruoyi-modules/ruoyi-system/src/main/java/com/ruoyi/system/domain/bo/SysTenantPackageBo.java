@@ -2,6 +2,9 @@ package com.ruoyi.system.domain.bo;
 
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
+import com.ruoyi.system.domain.SysTenantPackage;
+import io.github.linpeilie.annotations.AutoMapper;
+import io.github.linpeilie.annotations.AutoMapping;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
@@ -16,6 +19,7 @@ import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@AutoMapper(target = SysTenantPackage.class, reverseConvertGenerate = false)
 public class SysTenantPackageBo extends BaseEntity {
 
     /**
@@ -33,6 +37,7 @@ public class SysTenantPackageBo extends BaseEntity {
     /**
      * 关联菜单id
      */
+    @AutoMapping(target = "menuIds", expression = "java(com.ruoyi.common.core.utils.StringUtils.join(source.getMenuIds(), \",\"))")
     private Long[] menuIds;
 
     /**

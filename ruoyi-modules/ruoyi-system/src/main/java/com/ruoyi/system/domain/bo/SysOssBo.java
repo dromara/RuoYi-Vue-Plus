@@ -1,7 +1,8 @@
 package com.ruoyi.system.domain.bo;
 
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
-import com.ruoyi.common.tenant.core.TenantEntity;
+import com.ruoyi.system.domain.SysOss;
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,6 +13,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@AutoMapper(target = SysOss.class, reverseConvertGenerate = false)
 public class SysOssBo extends BaseEntity {
 
     /**

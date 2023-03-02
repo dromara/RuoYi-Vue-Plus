@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
@@ -9,7 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.core.utils.BeanCopyUtils;
+import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.TreeBuildUtils;
@@ -83,7 +82,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 .orderByAsc("m.parent_id")
                 .orderByAsc("m.order_num");
             List<SysMenu> list = baseMapper.selectMenuListByUserId(wrapper);
-            menuList = BeanCopyUtils.copyList(list, SysMenuVo.class);
+            menuList = MapstructUtils.convert(list, SysMenuVo.class);
         }
         return menuList;
     }
@@ -287,7 +286,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public int insertMenu(SysMenuBo bo) {
-        SysMenu menu = BeanUtil.toBean(bo, SysMenu.class);
+        SysMenu menu = MapstructUtils.convert(bo, SysMenu.class);
         return baseMapper.insert(menu);
     }
 
@@ -299,7 +298,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public int updateMenu(SysMenuBo bo) {
-        SysMenu menu = BeanUtil.toBean(bo, SysMenu.class);
+        SysMenu menu = MapstructUtils.convert(bo, SysMenu.class);
         return baseMapper.updateById(menu);
     }
 
