@@ -216,6 +216,9 @@ public class SysLoginService {
             log.info("登录用户：{} 已被停用.", username);
             throw new UserException("user.blocked", username);
         }
+        if (TenantHelper.isEnable()) {
+            return userMapper.selectTenantUserByUserName(username, tenantId);
+        }
         return userMapper.selectUserByUserName(username);
     }
 
@@ -230,6 +233,9 @@ public class SysLoginService {
         } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", phonenumber);
             throw new UserException("user.blocked", phonenumber);
+        }
+        if (TenantHelper.isEnable()) {
+            return userMapper.selectTenantUserByPhonenumber(phonenumber, tenantId);
         }
         return userMapper.selectUserByPhonenumber(phonenumber);
     }

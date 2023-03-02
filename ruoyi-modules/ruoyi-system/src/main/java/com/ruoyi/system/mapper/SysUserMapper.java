@@ -1,12 +1,13 @@
 package com.ruoyi.system.mapper;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.mybatis.annotation.DataColumn;
 import com.ruoyi.common.mybatis.annotation.DataPermission;
-import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
+import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.vo.SysUserVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -76,6 +77,26 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
      * @return 用户对象信息
      */
     SysUserVo selectUserByPhonenumber(String phonenumber);
+
+    /**
+     * 通过用户名查询用户(不走租户插件)
+     *
+     * @param userName 用户名
+     * @param tenantId 租户id
+     * @return 用户对象信息
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    SysUserVo selectTenantUserByUserName(String userName, String tenantId);
+
+    /**
+     * 通过手机号查询用户(不走租户插件)
+     *
+     * @param phonenumber 手机号
+     * @param tenantId    租户id
+     * @return 用户对象信息
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    SysUserVo selectTenantUserByPhonenumber(String phonenumber, String tenantId);
 
     /**
      * 通过用户ID查询用户
