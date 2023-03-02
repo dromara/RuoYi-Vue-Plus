@@ -20,7 +20,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@AutoMapper(target = TestDemo.class)
+@AutoMapper(target = TestDemo.class, reverseConvertGenerate = false)
 public class TestDemoBo extends BaseEntity {
 
     /**

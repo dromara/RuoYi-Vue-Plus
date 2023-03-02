@@ -19,7 +19,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@AutoMapper(target = TestTree.class)
+@AutoMapper(target = TestTree.class, reverseConvertGenerate = false)
 public class TestTreeBo extends BaseEntity {
 
     /**

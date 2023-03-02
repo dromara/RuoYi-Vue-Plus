@@ -69,7 +69,7 @@ public class MapstructUtils {
         if (CollUtil.isEmpty(sourceList)) {
             return CollUtil.newArrayList();
         }
-        return StreamUtils.toList(sourceList, source -> CONVERTER.convert(source, desc));
+        return CONVERTER.convert(sourceList, desc);
     }
 
     /**

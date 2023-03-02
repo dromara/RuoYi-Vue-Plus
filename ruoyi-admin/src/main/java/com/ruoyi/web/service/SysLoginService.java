@@ -3,6 +3,7 @@ package com.ruoyi.web.service;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.constant.Constants;
@@ -266,7 +267,7 @@ public class SysLoginService {
         loginUser.setMenuPermission(permissionService.getMenuPermission(user.getUserId()));
         loginUser.setRolePermission(permissionService.getRolePermission(user.getUserId()));
         loginUser.setDeptName(ObjectUtil.isNull(user.getDept()) ? "" : user.getDept().getDeptName());
-        List<RoleDTO> roles = MapstructUtils.convert(user.getRoles(), RoleDTO.class);
+        List<RoleDTO> roles = BeanUtil.copyToList(user.getRoles(), RoleDTO.class);
         loginUser.setRoles(roles);
         return loginUser;
     }

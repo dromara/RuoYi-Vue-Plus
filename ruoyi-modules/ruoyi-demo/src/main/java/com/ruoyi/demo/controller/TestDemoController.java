@@ -75,8 +75,7 @@ public class TestDemoController extends BaseController {
     @PostMapping(value = "/importData", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
         ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
-        List<TestDemoImportVo> volist = excelResult.getList();
-        List<TestDemo> list = MapstructUtils.convert(volist, TestDemo.class);
+        List<TestDemo> list = MapstructUtils.convert(excelResult.getList(), TestDemo.class);
         testDemoService.saveBatch(list);
         return R.ok(excelResult.getAnalysis());
     }
