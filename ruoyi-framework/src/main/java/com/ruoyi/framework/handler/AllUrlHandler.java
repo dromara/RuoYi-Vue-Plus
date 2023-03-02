@@ -4,6 +4,7 @@ import cn.hutool.core.util.ReUtil;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.Data;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -17,6 +18,7 @@ import java.util.regex.Pattern;
  * @author Lion Li
  */
 @Data
+@Component
 public class AllUrlHandler implements InitializingBean {
 
     private static final Pattern PATTERN = Pattern.compile("\\{(.*?)\\}");
