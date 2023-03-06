@@ -120,6 +120,13 @@
           <el-button
             size="mini"
             type="text"
+            icon="el-icon-edit"
+            @click="handleSyncTenantPackage(scope.row)"
+            v-hasPermi="['system:tenant:edit']"
+          >同步套餐</el-button>
+          <el-button
+            size="mini"
+            type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:tenant:remove']"
@@ -192,7 +199,7 @@
 </template>
 
 <script>
-import { listTenant, getTenant, delTenant, addTenant, updateTenant, changeTenantStatus } from "@/api/system/tenant";
+import { listTenant, getTenant, delTenant, addTenant, updateTenant, changeTenantStatus, syncTenantPackage} from "@/api/system/tenant";
 import { listTenantPackage } from "@/api/system/tenantPackage";
 
 export default {
@@ -401,6 +408,20 @@ export default {
         this.loading = false;
         this.getList();
         this.$modal.msgSuccess("删除成功");
+      }).catch(() => {
+      }).finally(() => {
+        this.loading = false;
+      });
+    },
+    /** 同步租户套餐按钮操作 */
+    handleSyncTenantPackage(row) {
+      this.$modal.confirm('是否确认同步租户套餐租户编号为"' + row.tenantId + '"的数据项？').then(() => {
+        this.loading = true;
+        return syncTenantPackage(row.tenantId, row.packageId);
+      }).then(() => {
+        this.loading = false;
+        this.getList();
+        this.$modal.msgSuccess("同步成功");
       }).catch(() => {
       }).finally(() => {
         this.loading = false;

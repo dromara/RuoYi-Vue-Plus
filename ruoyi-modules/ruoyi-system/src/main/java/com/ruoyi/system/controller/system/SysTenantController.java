@@ -122,8 +122,8 @@ public class SysTenantController extends BaseController {
      * 状态修改
      */
     @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
-    @SaCheckPermission("system:tenantPackage:edit")
-    @Log(title = "租户套餐", businessType = BusinessType.UPDATE)
+    @SaCheckPermission("system:tenant:edit")
+    @Log(title = "租户", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysTenantBo bo) {
         return toAjax(sysTenantService.updateTenantStatus(bo));
@@ -163,6 +163,21 @@ public class SysTenantController extends BaseController {
     public R<Void> dynamicClear() {
         TenantHelper.clearDynamic();
         return R.ok();
+    }
+
+
+    /**
+     * 同步租户套餐
+     *
+     * @param tenantId  租户id
+     * @param packageId 套餐id
+     */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    @SaCheckPermission("system:tenant:edit")
+    @Log(title = "租户", businessType = BusinessType.UPDATE)
+    @GetMapping("/syncTenantPackage")
+    public R<Void> syncTenantPackage(@NotBlank(message = "租户ID不能为空") String tenantId, @NotBlank(message = "套餐ID不能为空") String packageId) {
+        return toAjax(sysTenantService.syncTenantPackage(tenantId, packageId));
     }
 
 }

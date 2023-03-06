@@ -335,4 +335,38 @@ public class SysTenantServiceImpl implements ISysTenantService {
         return TenantConstants.NOT_PASS;
     }
 
+    /**
+     * 同步租户套餐
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean syncTenantPackage(String tenantId, String packageId) {
+        TenantHelper.enableIgnore();
+        SysTenantPackage tenantPackage = sysTenantPackageMapper.selectById(packageId);
+        List<SysRole> roles = sysRoleMapper.selectList(
+            new LambdaQueryWrapper<SysRole>().eq(SysRole::getTenantId, tenantId));
+        List<Long> roleIds = new ArrayList<>(roles.size() - 1);
+        List<Long> menuIds = StringUtils.splitTo(tenantPackage.getMenuIds(), Convert::toLong);
+        roles.forEach(item -> {
+            if (TenantConstants.TENANT_ADMIN_ROLE_KEY.equals(item.getRoleKey())) {
+                List<SysRoleMenu> roleMenus = new ArrayList<>(menuIds.size());
+                menuIds.forEach(menuId -> {
+                    SysRoleMenu roleMenu = new SysRoleMenu();
+                    roleMenu.setRoleId(item.getRoleId());
+                    roleMenu.setMenuId(menuId);
+                    roleMenus.add(roleMenu);
+                });
+                sysRoleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, item.getRoleId()));
+                sysRoleMenuMapper.insertBatch(roleMenus);
+            } else {
+                roleIds.add(item.getRoleId());
+            }
+        });
+        if (!roleIds.isEmpty()) {
+            sysRoleMenuMapper.delete(
+                new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, roleIds).notIn(!menuIds.isEmpty(), SysRoleMenu::getMenuId, menuIds));
+        }
+        TenantHelper.disableIgnore();
+        return true;
+    }
 }

@@ -73,3 +73,16 @@ export function dynamicClear() {
   })
 }
 
+// 同步租户套餐
+export function syncTenantPackage(tenantId, packageId) {
+  const data = {
+    tenantId,
+    packageId
+  }
+  return request({
+    url: '/system/tenant/syncTenantPackage',
+    method: 'get',
+    params: data
+  })
+}
+

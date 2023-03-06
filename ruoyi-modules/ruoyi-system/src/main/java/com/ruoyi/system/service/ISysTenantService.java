@@ -69,4 +69,9 @@ public interface ISysTenantService {
      * 校验有效期
      */
     String checkExpireTime(String tenantId);
+
+    /**
+     * 同步租户套餐
+     */
+    Boolean syncTenantPackage(String tenantId, String packageId);
 }
