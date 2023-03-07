@@ -1,6 +1,8 @@
 package com.ruoyi.common.core.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ruoyi.common.annotation.Sensitive;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.BaseEntity;
@@ -91,6 +93,8 @@ public class SysUser extends BaseEntity {
         updateStrategy = FieldStrategy.NOT_EMPTY,
         whereStrategy = FieldStrategy.NOT_EMPTY
     )
+    @JsonIgnore
+    @JsonProperty
     private String password;
 
     /**
