@@ -38,4 +38,10 @@ public @interface Log {
      * 是否保存响应的参数
      */
     boolean isSaveResponseData() default true;
+
+    /**
+     * 排除指定的请求参数
+     */
+    String[] excludeParamNames() default {};
+
 }

@@ -204,13 +204,13 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * @return 结果
      */
     @Override
-    public String checkConfigKeyUnique(SysConfig config) {
+    public boolean checkConfigKeyUnique(SysConfig config) {
         long configId = ObjectUtil.isNull(config.getConfigId()) ? -1L : config.getConfigId();
         SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, config.getConfigKey()));
         if (ObjectUtil.isNotNull(info) && info.getConfigId() != configId) {
-            return UserConstants.NOT_UNIQUE;
+            return false;
         }
-        return UserConstants.UNIQUE;
+        return true;
     }
 
     /**
