@@ -1,22 +1,21 @@
 package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import com.ruoyi.common.log.annotation.Log;
-import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.web.core.BaseController;
-import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.mybatis.core.page.PageQuery;
+import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.system.domain.bo.SysConfigBo;
 import com.ruoyi.system.domain.vo.SysConfigVo;
 import com.ruoyi.system.service.ISysConfigService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -80,7 +79,7 @@ public class SysConfigController extends BaseController {
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
     public R<Void> add(@Validated @RequestBody SysConfigBo config) {
-        if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(config))) {
+        if (!configService.checkConfigKeyUnique(config)) {
             return R.fail("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
         configService.insertConfig(config);
@@ -94,7 +93,7 @@ public class SysConfigController extends BaseController {
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public R<Void> edit(@Validated @RequestBody SysConfigBo config) {
-        if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(config))) {
+        if (!configService.checkConfigKeyUnique(config)) {
             return R.fail("修改参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
         configService.updateConfig(config);

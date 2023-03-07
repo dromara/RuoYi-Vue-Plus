@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.CacheConstants;
 import com.ruoyi.common.core.constant.CacheNames;
-import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.service.DictService;
 import com.ruoyi.common.core.utils.MapstructUtils;
@@ -203,14 +202,11 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @return 结果
      */
     @Override
-    public String checkDictTypeUnique(SysDictTypeBo dictType) {
+    public boolean checkDictTypeUnique(SysDictTypeBo dictType) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDictType>()
             .eq(SysDictType::getDictType, dictType.getDictType())
             .ne(ObjectUtil.isNotNull(dictType.getDictId()), SysDictType::getDictId, dictType.getDictId()));
-        if (exist) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !exist;
     }
 
     /**

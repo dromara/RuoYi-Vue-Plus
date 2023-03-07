@@ -155,14 +155,11 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * @return 结果
      */
     @Override
-    public String checkRoleNameUnique(SysRoleBo role) {
+    public boolean checkRoleNameUnique(SysRoleBo role) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
             .eq(SysRole::getRoleName, role.getRoleName())
             .ne(ObjectUtil.isNotNull(role.getRoleId()), SysRole::getRoleId, role.getRoleId()));
-        if (exist) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !exist;
     }
 
     /**
@@ -172,14 +169,11 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * @return 结果
      */
     @Override
-    public String checkRoleKeyUnique(SysRoleBo role) {
+    public boolean checkRoleKeyUnique(SysRoleBo role) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
             .eq(SysRole::getRoleKey, role.getRoleKey())
             .ne(ObjectUtil.isNotNull(role.getRoleId()), SysRole::getRoleId, role.getRoleId()));
-        if (exist) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !exist;
     }
 
     /**

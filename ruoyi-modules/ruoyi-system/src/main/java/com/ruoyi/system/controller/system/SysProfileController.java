@@ -3,7 +3,6 @@ package com.ruoyi.system.controller.system;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
-import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.file.MimeTypeUtils;
@@ -61,12 +60,10 @@ public class SysProfileController extends BaseController {
     @PutMapping
     public R<Void> updateProfile(@RequestBody SysUserProfileBo profile) {
         SysUserBo user = BeanUtil.toBean(profile, SysUserBo.class);
-        if (StringUtils.isNotEmpty(user.getPhonenumber())
-            && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
+        if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
-        if (StringUtils.isNotEmpty(user.getEmail())
-            && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
+        if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         user.setUserId(LoginHelper.getUserId());

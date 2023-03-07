@@ -1165,6 +1165,11 @@ CREATE TABLE sys_logininfor
 ON [PRIMARY]
 GO
 
+CREATE NONCLUSTERED INDEX idx_sys_logininfor_s ON sys_logininfor (status)
+GO
+CREATE NONCLUSTERED INDEX idx_sys_logininfor_lt ON sys_logininfor (login_time)
+GO
+
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'访问ID' ,
     'SCHEMA', N'dbo',
@@ -1704,11 +1709,19 @@ CREATE TABLE sys_oper_log
     status         int            DEFAULT ((0)) NULL,
     error_msg      nvarchar(2000) DEFAULT ''    NULL,
     oper_time      datetime2(7)                 NULL,
+    cost_time      bigint         DEFAULT ((0)) NULL,
     CONSTRAINT PK__sys_oper__34723BF9BD954573 PRIMARY KEY CLUSTERED (oper_id)
         WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
         ON [PRIMARY]
 )
 ON [PRIMARY]
+GO
+
+CREATE NONCLUSTERED INDEX idx_sys_oper_log_bt ON sys_oper_log (business_type)
+GO
+CREATE NONCLUSTERED INDEX idx_sys_oper_log_s ON sys_oper_log (status)
+GO
+CREATE NONCLUSTERED INDEX idx_sys_oper_log_ot ON sys_oper_log (oper_time)
 GO
 
 EXEC sys.sp_addextendedproperty
@@ -1814,6 +1827,12 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'oper_time'
 GO
 EXEC sys.sp_addextendedproperty
+    'MS_Description', N'消耗时间' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_oper_log',
+    'COLUMN', N'cost_time'
+GO
+EXEC sys.sp_addextendedproperty
     'MS_Description', N'操作日志记录' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oper_log'
@@ -1827,10 +1846,10 @@ CREATE TABLE sys_post
     post_name   nvarchar(50)            NOT NULL,
     post_sort   int                     NOT NULL,
     status      nchar(1)                NOT NULL,
-    create_dept bigint                  NOT NULL,
-    create_by   bigint                  NOT NULL,
+    create_dept bigint                  NULL,
+    create_by   bigint                  NULL,
     create_time datetime2(7)            NULL,
-    update_by   bigint                  NOT NULL,
+    update_by   bigint                  NULL,
     update_time datetime2(7)            NULL,
     remark      nvarchar(500)           NULL,
     CONSTRAINT PK__sys_post__3ED7876668E2D081 PRIMARY KEY CLUSTERED (post_id)
@@ -1838,6 +1857,9 @@ CREATE TABLE sys_post
         ON [PRIMARY]
 )
 ON [PRIMARY]
+GO
+
+CREATE NONCLUSTERED INDEX sys_dict_type_index1 ON sys_dict_type (tenant_id, dict_type)
 GO
 
 EXEC sys.sp_addextendedproperty

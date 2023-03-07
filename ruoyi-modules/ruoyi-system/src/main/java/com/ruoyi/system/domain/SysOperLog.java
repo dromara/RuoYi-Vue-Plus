@@ -107,4 +107,9 @@ public class SysOperLog implements Serializable {
      */
     private Date operTime;
 
+    /**
+     * 消耗时间
+     */
+    private Long costTime;
+
 }

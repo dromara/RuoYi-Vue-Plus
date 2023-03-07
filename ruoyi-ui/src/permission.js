@@ -8,7 +8,7 @@ import { isRelogin } from '@/utils/request'
 
 NProgress.configure({ showSpinner: false })
 
-const whiteList = ['/login', '/auth-redirect', '/bind', '/register']
+const whiteList = ['/login', '/register']
 
 router.beforeEach((to, from, next) => {
   NProgress.start()
@@ -30,11 +30,11 @@ router.beforeEach((to, from, next) => {
             next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
           })
         }).catch(err => {
-            store.dispatch('LogOut').then(() => {
-              Message.error(err)
-              next({ path: '/' })
-            })
+          store.dispatch('LogOut').then(() => {
+            Message.error(err)
+            next({ path: '/' })
           })
+        })
       } else {
         next()
       }

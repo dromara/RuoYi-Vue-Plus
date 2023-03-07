@@ -667,8 +667,13 @@ create table if not exists sys_oper_log
     status         int4          default 0,
     error_msg      varchar(2000) default ''::varchar,
     oper_time      timestamp,
+    cost_time      int8          default 0,
     constraint sys_oper_log_pk primary key (oper_id)
 );
+
+create unique index idx_sys_oper_log_bt ON sys_oper_log (business_type);
+create unique index idx_sys_oper_log_s ON sys_oper_log (status);
+create unique index idx_sys_oper_log_ot ON sys_oper_log (oper_time);
 
 comment on table sys_oper_log                   is '操作日志记录';
 comment on column sys_oper_log.oper_id          is '日志主键';
@@ -688,6 +693,7 @@ comment on column sys_oper_log.json_result      is '返回参数';
 comment on column sys_oper_log.status           is '操作状态（0正常 1异常）';
 comment on column sys_oper_log.error_msg        is '错误消息';
 comment on column sys_oper_log.oper_time        is '操作时间';
+comment on column sys_oper_log.cost_time        is '消耗时间';
 
 -- ----------------------------
 -- 11、字典类型表
@@ -709,7 +715,7 @@ create table if not exists sys_dict_type
     constraint sys_dict_type_pk primary key (dict_id)
 );
 
-CREATE UNIQUE INDEX sys_dict_type_index1 ON sys_dict_type (tenant_id, dict_type);
+create unique index sys_dict_type_index1 ON sys_dict_type (tenant_id, dict_type);
 
 comment on table sys_dict_type                  is '字典类型表';
 comment on column sys_dict_type.dict_id         is '字典主键';
@@ -865,6 +871,9 @@ create table if not exists sys_logininfor
     constraint sys_logininfor_pk primary key (info_id)
 );
 
+create unique index idx_sys_logininfor_s ON sys_logininfor (status);
+create unique index idx_sys_logininfor_lt ON sys_logininfor (login_time);
+
 comment on table sys_logininfor                 is '系统访问记录';
 comment on column sys_logininfor.info_id        is '访问ID';
 comment on column sys_logininfor.tenant_id      is '租户编号';
@@ -940,6 +949,7 @@ create table if not exists gen_table
     gen_type          char          default '0'::bpchar not null,
     gen_path          varchar(200)  default '/'::varchar,
     options           varchar(1000) default null::varchar,
+    create_dept       int8,
     create_by         int8,
     create_time       timestamp,
     update_by         int8,

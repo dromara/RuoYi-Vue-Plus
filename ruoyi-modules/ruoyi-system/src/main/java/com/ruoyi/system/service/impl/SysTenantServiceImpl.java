@@ -290,49 +290,40 @@ public class SysTenantServiceImpl implements ISysTenantService {
      * 校验企业名称是否唯一
      */
     @Override
-    public String checkCompanyNameUnique(SysTenantBo bo) {
+    public boolean checkCompanyNameUnique(SysTenantBo bo) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysTenant>()
             .eq(SysTenant::getCompanyName, bo.getCompanyName())
             .ne(ObjectUtil.isNotNull(bo.getTenantId()), SysTenant::getTenantId, bo.getTenantId()));
-        if (exist) {
-            return TenantConstants.NOT_PASS;
-        }
-        return TenantConstants.PASS;
+        return !exist;
     }
 
     /**
      * 校验账号余额
      */
     @Override
-    public String checkAccountBalance(String tenantId) {
+    public boolean checkAccountBalance(String tenantId) {
         SysTenantVo tenant = SpringUtils.getAopProxy(this).queryByTenantId(tenantId);
         // 如果余额为-1代表不限制
         if (tenant.getAccountCount() == -1) {
-            return TenantConstants.PASS;
+            return true;
         }
         Long userNumber = sysUserMapper.selectCount(new LambdaQueryWrapper<>());
         // 如果余额大于0代表还有可用名额
-        if (tenant.getAccountCount() - userNumber > 0) {
-            return TenantConstants.PASS;
-        }
-        return TenantConstants.NOT_PASS;
+        return tenant.getAccountCount() - userNumber > 0;
     }
 
     /**
      * 校验有效期
      */
     @Override
-    public String checkExpireTime(String tenantId) {
+    public boolean checkExpireTime(String tenantId) {
         SysTenantVo tenant = SpringUtils.getAopProxy(this).queryByTenantId(tenantId);
         // 如果未设置过期时间代表不限制
         if (ObjectUtil.isNull(tenant.getExpireTime())) {
-            return TenantConstants.PASS;
+            return true;
         }
         // 如果当前时间在过期时间之前则通过
-        if (new Date().before(tenant.getExpireTime())) {
-            return TenantConstants.PASS;
-        }
-        return TenantConstants.NOT_PASS;
+        return new Date().before(tenant.getExpireTime());
     }
 
     /**

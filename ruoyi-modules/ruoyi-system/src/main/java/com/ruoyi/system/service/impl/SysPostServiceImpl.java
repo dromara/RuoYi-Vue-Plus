@@ -5,12 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.utils.MapstructUtils;
+import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.common.core.exception.ServiceException;
-import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.domain.bo.SysPostBo;
@@ -103,14 +102,11 @@ public class SysPostServiceImpl implements ISysPostService {
      * @return 结果
      */
     @Override
-    public String checkPostNameUnique(SysPostBo post) {
+    public boolean checkPostNameUnique(SysPostBo post) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
             .eq(SysPost::getPostName, post.getPostName())
             .ne(ObjectUtil.isNotNull(post.getPostId()), SysPost::getPostId, post.getPostId()));
-        if (exist) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !exist;
     }
 
     /**
@@ -120,14 +116,11 @@ public class SysPostServiceImpl implements ISysPostService {
      * @return 结果
      */
     @Override
-    public String checkPostCodeUnique(SysPostBo post) {
+    public boolean checkPostCodeUnique(SysPostBo post) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
             .eq(SysPost::getPostCode, post.getPostCode())
             .ne(ObjectUtil.isNotNull(post.getPostId()), SysPost::getPostId, post.getPostId()));
-        if (exist) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !exist;
     }
 
     /**

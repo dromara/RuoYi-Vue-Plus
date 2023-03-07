@@ -1,6 +1,5 @@
 package com.ruoyi.system.domain.bo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.ruoyi.common.log.event.OperLogEvent;
 import com.ruoyi.system.domain.SysOperLog;
 import io.github.linpeilie.annotations.AutoMapper;
@@ -116,9 +115,13 @@ public class SysOperLogBo {
     private Date operTime;
 
     /**
+     * 消耗时间
+     */
+    private Long costTime;
+
+    /**
      * 请求参数
      */
-    @TableField(exist = false)
     private Map<String, Object> params = new HashMap<>();
 
 }

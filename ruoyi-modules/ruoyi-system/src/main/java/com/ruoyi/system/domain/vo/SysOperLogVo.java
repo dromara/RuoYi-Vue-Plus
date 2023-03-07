@@ -1,7 +1,5 @@
 package com.ruoyi.system.domain.vo;
 
-import java.util.Date;
-
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.excel.annotation.ExcelDictFormat;
@@ -12,6 +10,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 
 /**
@@ -137,5 +136,9 @@ public class SysOperLogVo implements Serializable {
     @ExcelProperty(value = "操作时间")
     private Date operTime;
 
-
+    /**
+     * 消耗时间
+     */
+    @ExcelProperty(value = "消耗时间")
+    private Long costTime;
 }

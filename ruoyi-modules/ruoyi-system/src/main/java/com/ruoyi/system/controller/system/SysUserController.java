@@ -5,8 +5,6 @@ import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.ruoyi.common.core.constant.TenantConstants;
-import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.StreamUtils;
@@ -17,8 +15,8 @@ import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.common.tenant.helper.TenantHelper;
 import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.common.tenant.helper.TenantHelper;
 import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.system.domain.bo.SysDeptBo;
 import com.ruoyi.system.domain.bo.SysUserBo;
@@ -124,18 +122,15 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
     public R<Void> add(@Validated @RequestBody SysUserBo user) {
-        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user))) {
+        if (!userService.checkUserNameUnique(user)) {
             return R.fail("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
-        } else if (StringUtils.isNotEmpty(user.getPhonenumber())
-                   && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
+        } else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
             return R.fail("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
-        } else if (StringUtils.isNotEmpty(user.getEmail())
-                   && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
+        } else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
             return R.fail("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         if (TenantHelper.isEnable()) {
-            String status = tenantService.checkAccountBalance(LoginHelper.getTenantId());
-            if (TenantConstants.NOT_PASS.equals(status)) {
+            if (!tenantService.checkAccountBalance(LoginHelper.getTenantId())) {
                 return R.fail("当前租户下用户名额不足，请联系管理员");
             }
         }
@@ -152,13 +147,11 @@ public class SysUserController extends BaseController {
     public R<Void> edit(@Validated @RequestBody SysUserBo user) {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
-        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user))) {
+        if (!userService.checkUserNameUnique(user)) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
-        } else if (StringUtils.isNotEmpty(user.getPhonenumber())
-                   && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
+        } else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
-        } else if (StringUtils.isNotEmpty(user.getEmail())
-                   && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
+        } else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         return toAjax(userService.updateUser(user));

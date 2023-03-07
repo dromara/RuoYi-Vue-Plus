@@ -18,12 +18,6 @@ public interface TenantConstants {
     String DISABLE = "1";
 
     /**
-     * 校验返回结果码
-     */
-    String PASS = "0";
-    String NOT_PASS = "1";
-
-    /**
      * 超级管理员ID
      */
     Long SUPER_ADMIN_ID = 1L;

@@ -83,7 +83,7 @@ public interface ISysDeptService {
      * @param dept 部门信息
      * @return 结果
      */
-    String checkDeptNameUnique(SysDeptBo dept);
+    boolean checkDeptNameUnique(SysDeptBo dept);
 
     /**
      * 校验部门是否有数据权限

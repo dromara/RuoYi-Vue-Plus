@@ -3,7 +3,6 @@ package com.ruoyi.web.service;
 import cn.dev33.satoken.secure.BCrypt;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.GlobalConstants;
-import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.core.enums.UserType;
 import com.ruoyi.common.core.exception.user.CaptchaException;
@@ -56,7 +55,7 @@ public class SysRegisterService {
         sysUser.setPassword(BCrypt.hashpw(password));
         sysUser.setUserType(userType);
 
-        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(sysUser))) {
+        if (!userService.checkUserNameUnique(sysUser)) {
             throw new UserException("user.register.save.error", username);
         }
         boolean regFlag = userService.registerUser(sysUser, tenantId);

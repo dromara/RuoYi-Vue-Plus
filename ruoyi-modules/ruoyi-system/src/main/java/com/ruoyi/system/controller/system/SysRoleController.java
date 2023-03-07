@@ -5,7 +5,6 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.core.constant.GlobalConstants;
-import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.excel.utils.ExcelUtil;
@@ -88,9 +87,9 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
     public R<Void> add(@Validated @RequestBody SysRoleBo role) {
-        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role))) {
+        if (!roleService.checkRoleNameUnique(role)) {
             return R.fail("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
-        } else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role))) {
+        } else if (!roleService.checkRoleKeyUnique(role)) {
             return R.fail("新增角色'" + role.getRoleName() + "'失败，角色权限已存在");
         }
         return toAjax(roleService.insertRole(role));
@@ -106,9 +105,9 @@ public class SysRoleController extends BaseController {
     public R<Void> edit(@Validated @RequestBody SysRoleBo role) {
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
-        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role))) {
+        if (!roleService.checkRoleNameUnique(role)) {
             return R.fail("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
-        } else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role))) {
+        } else if (!roleService.checkRoleKeyUnique(role)) {
             return R.fail("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
         }
 

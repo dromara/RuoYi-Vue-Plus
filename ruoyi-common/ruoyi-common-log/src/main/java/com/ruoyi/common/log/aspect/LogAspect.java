@@ -3,6 +3,7 @@ package com.ruoyi.common.log.aspect;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.ttl.TransmittableThreadLocal;
 import com.ruoyi.common.core.utils.ServletUtils;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -14,10 +15,12 @@ import com.ruoyi.common.satoken.utils.LoginHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.StopWatch;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.http.HttpMethod;
 import org.springframework.validation.BindingResult;
@@ -40,6 +43,22 @@ public class LogAspect {
      * 排除敏感属性字段
      */
     public static final String[] EXCLUDE_PROPERTIES = { "password", "oldPassword", "newPassword", "confirmPassword" };
+
+
+    /**
+     * 计算操作消耗时间
+     */
+    private static final ThreadLocal<StopWatch> TIME_THREADLOCAL = new TransmittableThreadLocal<>();
+
+    /**
+     * 处理请求前执行
+     */
+    @Before(value = "@annotation(controllerLog)")
+    public void boBefore(JoinPoint joinPoint, Log controllerLog) {
+        StopWatch stopWatch = new StopWatch();
+        TIME_THREADLOCAL.set(stopWatch);
+        stopWatch.start();
+    }
 
     /**
      * 处理完请求后执行
@@ -87,12 +106,18 @@ public class LogAspect {
             operLog.setRequestMethod(ServletUtils.getRequest().getMethod());
             // 处理设置注解上的参数
             getControllerMethodDescription(joinPoint, controllerLog, operLog, jsonResult);
+            // 设置消耗时间
+            StopWatch stopWatch = TIME_THREADLOCAL.get();
+            stopWatch.stop();
+            operLog.setCostTime(stopWatch.getTime());
             // 发布事件保存数据库
             SpringUtils.context().publishEvent(operLog);
         } catch (Exception exp) {
             // 记录本地异常日志
             log.error("异常信息:{}", exp.getMessage());
             exp.printStackTrace();
+        } finally {
+            TIME_THREADLOCAL.remove();
         }
     }
 
@@ -113,7 +138,7 @@ public class LogAspect {
         // 是否需要保存request，参数和值
         if (log.isSaveRequestData()) {
             // 获取参数的信息，传入到数据库中。
-            setRequestValue(joinPoint, operLog);
+            setRequestValue(joinPoint, operLog, log.excludeParamNames());
         }
         // 是否需要保存response，参数和值
         if (log.isSaveResponseData() && ObjectUtil.isNotNull(jsonResult)) {
@@ -127,14 +152,16 @@ public class LogAspect {
      * @param operLog 操作日志
      * @throws Exception 异常
      */
-    private void setRequestValue(JoinPoint joinPoint, OperLogEvent operLog) throws Exception {
+    private void setRequestValue(JoinPoint joinPoint, OperLogEvent operLog, String[] excludeParamNames) throws Exception {
+        Map<String, String> paramsMap = ServletUtils.getParamMap(ServletUtils.getRequest());
         String requestMethod = operLog.getRequestMethod();
-        if (HttpMethod.PUT.name().equals(requestMethod) || HttpMethod.POST.name().equals(requestMethod)) {
-            String params = argsArrayToString(joinPoint.getArgs());
+        if (MapUtil.isEmpty(paramsMap)
+                && HttpMethod.PUT.name().equals(requestMethod) || HttpMethod.POST.name().equals(requestMethod)) {
+            String params = argsArrayToString(joinPoint.getArgs(), excludeParamNames);
             operLog.setOperParam(StringUtils.substring(params, 0, 2000));
         } else {
-            Map<String, String> paramsMap = ServletUtils.getParamMap(ServletUtils.getRequest());
             MapUtil.removeAny(paramsMap, EXCLUDE_PROPERTIES);
+            MapUtil.removeAny(paramsMap, excludeParamNames);
             operLog.setOperParam(StringUtils.substring(JsonUtils.toJsonString(paramsMap), 0, 2000));
         }
     }
@@ -142,7 +169,7 @@ public class LogAspect {
     /**
      * 参数拼装
      */
-    private String argsArrayToString(Object[] paramsArray) {
+    private String argsArrayToString(Object[] paramsArray, String[] excludeParamNames) {
         StringBuilder params = new StringBuilder();
         if (paramsArray != null && paramsArray.length > 0) {
             for (Object o : paramsArray) {
@@ -152,6 +179,7 @@ public class LogAspect {
                         Dict dict = JsonUtils.parseMap(str);
                         if (MapUtil.isNotEmpty(dict)) {
                             MapUtil.removeAny(dict, EXCLUDE_PROPERTIES);
+                            MapUtil.removeAny(dict, excludeParamNames);
                             str = JsonUtils.toJsonString(dict);
                         }
                         params.append(str).append(" ");

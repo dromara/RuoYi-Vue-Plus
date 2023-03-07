@@ -137,8 +137,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         oss.setOriginalName(originalfileName);
         oss.setService(storage.getConfigKey());
         baseMapper.insert(oss);
-        SysOssVo sysOssVo = new SysOssVo();
-        MapstructUtils.convert(oss, sysOssVo);
+        SysOssVo sysOssVo = MapstructUtils.convert(oss, SysOssVo.class);
         return this.matchingUrl(sysOssVo);
     }
 

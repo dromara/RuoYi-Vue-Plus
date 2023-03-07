@@ -58,17 +58,17 @@ public interface ISysTenantService {
     /**
      * 校验企业名称是否唯一
      */
-    String checkCompanyNameUnique(SysTenantBo bo);
+    boolean checkCompanyNameUnique(SysTenantBo bo);
 
     /**
      * 校验账号余额
      */
-    String checkAccountBalance(String tenantId);
+    boolean checkAccountBalance(String tenantId);
 
     /**
      * 校验有效期
      */
-    String checkExpireTime(String tenantId);
+    boolean checkExpireTime(String tenantId);
 
     /**
      * 同步租户套餐

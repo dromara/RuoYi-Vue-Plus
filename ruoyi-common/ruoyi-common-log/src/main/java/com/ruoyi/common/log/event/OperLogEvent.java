@@ -108,4 +108,8 @@ public class OperLogEvent implements Serializable {
      */
     private Date operTime;
 
+    /**
+     * 消耗时间
+     */
+    private Long costTime;
 }
