@@ -1,6 +1,7 @@
 package com.ruoyi.framework.encrypt;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.EncryptField;
 import com.ruoyi.common.encrypt.EncryptContext;
 import com.ruoyi.common.enums.AlgorithmType;
@@ -55,6 +56,9 @@ public class MybatisDecryptInterceptor implements Interceptor {
      * @param sourceObject 待加密对象
      */
     private void decryptHandler(Object sourceObject) {
+        if (ObjectUtil.isNull(sourceObject)) {
+            return;
+        }
         if (sourceObject instanceof Map<?, ?>) {
             ((Map<?, ?>) sourceObject).values().forEach(this::decryptHandler);
             return;
