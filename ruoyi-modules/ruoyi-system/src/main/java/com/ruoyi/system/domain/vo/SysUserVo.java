@@ -1,5 +1,7 @@
 package com.ruoyi.system.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ruoyi.common.translation.annotation.Translation;
 import com.ruoyi.common.translation.constant.TransConstant;
 import com.ruoyi.system.domain.SysUser;
@@ -78,6 +80,8 @@ public class SysUserVo implements Serializable {
     /**
      * 密码
      */
+    @JsonIgnore
+    @JsonProperty
     private String password;
 
     /**
