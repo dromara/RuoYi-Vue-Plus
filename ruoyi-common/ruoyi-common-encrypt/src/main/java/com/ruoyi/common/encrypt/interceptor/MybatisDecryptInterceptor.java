@@ -60,6 +60,9 @@ public class MybatisDecryptInterceptor implements Interceptor {
             return;
         }
         if (sourceObject instanceof List<?> list) {
+            if(CollectionUtil.isEmpty(list)) {
+                return;
+            }
             // 判断第一个元素是否含有注解。如果没有直接返回，提高效率
             Object firstItem = list.get(0);
             if (CollectionUtil.isEmpty(encryptorManager.getFieldCache(firstItem.getClass()))) {
