@@ -179,9 +179,9 @@ create table sys_role (
   status               char(1)         not null                   comment '角色状态（0正常 1停用）',
   del_flag             char(1)         default '0'                comment '删除标志（0代表存在 2代表删除）',
   create_dept          bigint(20)      default null               comment '创建部门',
-  create_by            varchar(64)     default null               comment '创建者',
+  create_by            bigint(20)      default null               comment '创建者',
   create_time          datetime                                   comment '创建时间',
-  update_by            varchar(64)     default null               comment '更新者',
+  update_by            bigint(20)      default null               comment '更新者',
   update_time          datetime                                   comment '更新时间',
   remark               varchar(500)    default null               comment '备注',
   primary key (role_id)
@@ -534,9 +534,9 @@ create table sys_dict_type
   dict_type        varchar(100)    default ''                 comment '字典类型',
   status           char(1)         default '0'                comment '状态（0正常 1停用）',
   create_dept      bigint(20)      default null               comment '创建部门',
-  create_by        varchar(64)     default null               comment '创建者',
+  create_by        bigint(20)      default null               comment '创建者',
   create_time      datetime                                   comment '创建时间',
-  update_by        varchar(64)     default null               comment '更新者',
+  update_by        bigint(20)      default null               comment '更新者',
   update_time      datetime                                   comment '更新时间',
   remark           varchar(500)    default null               comment '备注',
   primary key (dict_id),
@@ -570,9 +570,9 @@ create table sys_dict_data
   is_default       char(1)         default 'N'                comment '是否默认（Y是 N否）',
   status           char(1)         default '0'                comment '状态（0正常 1停用）',
   create_dept      bigint(20)      default null               comment '创建部门',
-  create_by        varchar(64)     default null               comment '创建者',
+  create_by        bigint(20)      default null               comment '创建者',
   create_time      datetime                                   comment '创建时间',
-  update_by        varchar(64)     default null               comment '更新者',
+  update_by        bigint(20)      default null               comment '更新者',
   update_time      datetime                                   comment '更新时间',
   remark           varchar(500)    default null               comment '备注',
   primary key (dict_code)
@@ -785,7 +785,7 @@ create table sys_oss_config (
   create_time     datetime                default null    comment '创建时间',
   update_by       bigint(20)              default null    comment '更新者',
   update_time     datetime                default null    comment '更新时间',
-  remark           varchar(500)           default null    comment '备注',
+  remark          varchar(500)            default null    comment '备注',
   primary key (oss_config_id)
 ) engine=innodb comment='对象存储配置表';
 
