@@ -65,6 +65,9 @@ public class MybatisEncryptInterceptor implements Interceptor {
      * @param sourceObject 待加密对象
      */
     private void encryptHandler(Object sourceObject) {
+        if (ObjectUtil.isNull(sourceObject)) {
+            return;
+        }
         if (sourceObject instanceof Map<?, ?> map) {
             map.values().forEach(this::encryptHandler);
             return;
