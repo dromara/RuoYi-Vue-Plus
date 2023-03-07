@@ -1053,6 +1053,9 @@ CREATE TABLE sys_dict_type
 ON [PRIMARY]
 GO
 
+CREATE NONCLUSTERED INDEX sys_dict_type_index1 ON sys_dict_type (tenant_id, dict_type)
+GO
+
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'字典主键' ,
     'SCHEMA', N'dbo',
@@ -1857,9 +1860,6 @@ CREATE TABLE sys_post
         ON [PRIMARY]
 )
 ON [PRIMARY]
-GO
-
-CREATE NONCLUSTERED INDEX sys_dict_type_index1 ON sys_dict_type (tenant_id, dict_type)
 GO
 
 EXEC sys.sp_addextendedproperty
