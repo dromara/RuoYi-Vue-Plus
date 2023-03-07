@@ -113,12 +113,6 @@ public interface UserConstants {
     String INNER_LINK = "InnerLink";
 
     /**
-     * 校验返回结果码
-     */
-    String UNIQUE = "0";
-    String NOT_UNIQUE = "1";
-
-    /**
      * 用户名长度限制
      */
     int USERNAME_MIN_LENGTH = 2;

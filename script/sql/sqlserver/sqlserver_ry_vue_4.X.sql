@@ -737,6 +737,9 @@ CREATE TABLE sys_dict_type
 ON [PRIMARY]
 GO
 
+CREATE NONCLUSTERED INDEX sys_dict_type_index1 ON sys_dict_type (dict_type)
+GO
+
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'字典主键' ,
     'SCHEMA', N'dbo',
@@ -830,6 +833,11 @@ CREATE TABLE sys_logininfor
         ON [PRIMARY]
 )
 ON [PRIMARY]
+GO
+
+CREATE NONCLUSTERED INDEX idx_sys_logininfor_s ON sys_logininfor (status)
+GO
+CREATE NONCLUSTERED INDEX idx_sys_logininfor_lt ON sys_logininfor (login_time)
 GO
 
 EXEC sys.sp_addextendedproperty
@@ -1322,6 +1330,13 @@ CREATE TABLE sys_oper_log
         ON [PRIMARY]
 )
 ON [PRIMARY]
+GO
+
+CREATE NONCLUSTERED INDEX idx_sys_oper_log_bt ON sys_oper_log (business_type)
+GO
+CREATE NONCLUSTERED INDEX idx_sys_oper_log_s ON sys_oper_log (status)
+GO
+CREATE NONCLUSTERED INDEX idx_sys_oper_log_ot ON sys_oper_log (oper_time)
 GO
 
 EXEC sys.sp_addextendedproperty
