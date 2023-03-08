@@ -130,9 +130,9 @@
       <el-table-column label="文件后缀" align="center" prop="fileSuffix" />
       <el-table-column label="文件展示" align="center" prop="url">
         <template slot-scope="scope">
-          <el-image
+          <ImagePreview
             v-if="previewListResource && checkFileSuffix(scope.row.fileSuffix)"
-            style="width: 100px; height: 100px;"
+            :width=100 :height=100
             :src="scope.row.url"
             :preview-src-list="[scope.row.url]"/>
           <span v-text="scope.row.url"
