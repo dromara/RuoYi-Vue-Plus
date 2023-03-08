@@ -16,10 +16,7 @@ import org.apache.ibatis.plugin.*;
 
 import java.lang.reflect.Field;
 import java.sql.Statement;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 出参解密拦截器
@@ -60,7 +57,7 @@ public class MybatisDecryptInterceptor implements Interceptor {
             return;
         }
         if (sourceObject instanceof Map<?, ?>) {
-            ((Map<?, ?>) sourceObject).values().forEach(this::decryptHandler);
+            new HashSet<>(((Map<?, ?>) sourceObject).values()).forEach(this::decryptHandler);
             return;
         }
         if (sourceObject instanceof List<?>) {
