@@ -108,7 +108,7 @@ public class LoginHelper {
     public static String getTenantId() {
         String tenantId;
         try {
-            tenantId =(String) SaHolder.getStorage().get(TENANT_KEY);
+            tenantId = (String) SaHolder.getStorage().get(TENANT_KEY);
             if (ObjectUtil.isNull(tenantId)) {
                 tenantId = (String) StpUtil.getExtra(TENANT_KEY);
                 SaHolder.getStorage().set(TENANT_KEY, tenantId);
