@@ -93,6 +93,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 ORDER BY c.relname, a.attnum
             ) temp
             WHERE table_name = (#{tableName})
+                AND column_type <![CDATA[ <> ]]> '-'
         </if>
         <if test="@com.ruoyi.common.helper.DataBaseHelper@isSqlServer()">
             SELECT
