@@ -86,7 +86,7 @@ public class LoginHelper {
         try {
             userId = Convert.toLong(SaHolder.getStorage().get(USER_KEY));
             if (ObjectUtil.isNull(userId)) {
-                userId = Convert.toLong(StpUtil.getExtra(USER_KEY).toString());
+                userId = Convert.toLong(StpUtil.getExtra(USER_KEY));
                 SaHolder.getStorage().set(USER_KEY, userId);
             }
         } catch (Exception e) {
