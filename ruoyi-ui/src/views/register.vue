@@ -3,14 +3,15 @@
     <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form">
       <h3 class="title">RuoYi-Vue-Plus后台管理系统</h3>
       <el-form-item prop="tenantId">
-        <el-input
-            v-model="loginForm.tenantId"
-            type="text"
-            auto-complete="off"
-            placeholder="租户编号"
-        >
-          <svg-icon slot="prefix" icon-class="input" class="el-input__icon input-icon" />
-        </el-input>
+        <el-select v-model="registerForm.tenantId" filterable placeholder="请选择/输入公司名称" style="width: 100%">
+          <el-option
+            v-for="item in tenantList"
+            :key="item.tenantId"
+            :label="item.companyName"
+            :value="item.tenantId">
+          </el-option>
+          <svg-icon slot="prefix" icon-class="company" class="el-input__icon input-icon" />
+        </el-select>
       </el-form-item>
       <el-form-item prop="username">
         <el-input v-model="registerForm.username" type="text" auto-complete="off" placeholder="账号">
@@ -77,7 +78,7 @@
 </template>
 
 <script>
-import { getCodeImg, register } from "@/api/login";
+import {getCodeImg, register, tenantList} from "@/api/login";
 
 export default {
   name: "Register",
@@ -119,11 +120,14 @@ export default {
         code: [{ required: true, trigger: "change", message: "请输入验证码" }]
       },
       loading: false,
-      captchaEnabled: true
+      captchaEnabled: true,
+      // 租户列表
+      tenantList:[]
     };
   },
   created() {
     this.getCode();
+    this.getTenantList();
   },
   methods: {
     getCode() {
@@ -132,6 +136,14 @@ export default {
         if (this.captchaEnabled) {
           this.codeUrl = "data:image/gif;base64," + res.data.img;
           this.registerForm.uuid = res.data.uuid;
+        }
+      });
+    },
+    getTenantList() {
+      tenantList().then(res => {
+        this.tenantList = res.data;
+        if (this.tenantList != null && this.tenantList.length !== 0) {
+          this.loginForm.tenantId = this.tenantList[0].tenantId;
         }
       });
     },

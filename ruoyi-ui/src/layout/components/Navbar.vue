@@ -82,8 +82,7 @@ export default {
       userId: this.$store.getters.userId,
       tenantId: undefined,
       companyName: undefined,
-      tenantList: [],
-      userList: []
+      tenantList: []
     }
   },
   components: {
