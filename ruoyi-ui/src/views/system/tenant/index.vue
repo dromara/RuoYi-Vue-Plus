@@ -401,7 +401,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除租户编号为"' + ids + '"的数据项？').then(() => {
+      this.$modal.confirm('是否确认删除租户编号为"' + row.tenantId + '"的数据项？').then(() => {
         this.loading = true;
         return delTenant(ids);
       }).then(() => {

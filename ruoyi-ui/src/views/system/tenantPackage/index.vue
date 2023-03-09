@@ -379,7 +379,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.download('system/tenantPackage/export', {
+      this.download('system/tenant/package/export', {
         ...this.queryParams
       }, `tenantPackage_${new Date().getTime()}.xlsx`)
     }
