@@ -16,6 +16,7 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.redis.utils.CacheUtils;
+import com.ruoyi.common.tenant.helper.TenantHelper;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.domain.bo.SysConfigBo;
 import com.ruoyi.system.domain.vo.SysConfigVo;
@@ -75,6 +76,22 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
             return retConfig.getConfigValue();
         }
         return StringUtils.EMPTY;
+    }
+
+    /**
+     * 获取注册开关
+     * @param tenantId 租户id
+     * @return true开启，false关闭
+     */
+    @Override
+    public boolean selectRegisterEnabled(String tenantId) {
+        SysConfig retConfig = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>()
+            .eq(SysConfig::getConfigKey, "sys.account.registerUser")
+            .eq(TenantHelper.isEnable(),SysConfig::getTenantId, tenantId));
+        if (ObjectUtil.isNull(retConfig)) {
+            return false;
+        }
+        return Convert.toBool(retConfig.getConfigValue());
     }
 
     /**
