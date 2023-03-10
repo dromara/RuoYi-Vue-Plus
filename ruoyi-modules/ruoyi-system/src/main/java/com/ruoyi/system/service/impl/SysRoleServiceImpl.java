@@ -5,17 +5,18 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
-import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.domain.SysRoleMenu;
 import com.ruoyi.system.domain.SysUserRole;
@@ -145,7 +146,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public SysRoleVo selectRoleById(Long roleId) {
-        return baseMapper.selectVoById(roleId);
+        return baseMapper.selectRoleById(roleId);
     }
 
     /**
@@ -179,11 +180,11 @@ public class SysRoleServiceImpl implements ISysRoleService {
     /**
      * 校验角色是否允许操作
      *
-     * @param role 角色信息
+     * @param roleId 角色ID
      */
     @Override
-    public void checkRoleAllowed(SysRoleBo role) {
-        if (ObjectUtil.isNotNull(role.getRoleId()) && role.isSuperAdmin()) {
+    public void checkRoleAllowed(Long roleId) {
+        if (ObjectUtil.isNotNull(roleId) && LoginHelper.isSuperAdmin(roleId)) {
             throw new ServiceException("不允许操作超级管理员角色");
         }
     }
@@ -195,14 +196,17 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public void checkRoleDataScope(Long roleId) {
-        if (!LoginHelper.isSuperAdmin()) {
-            SysRoleBo role = new SysRoleBo();
-            role.setRoleId(roleId);
-            List<SysRoleVo> roles = this.selectRoleList(role);
-            if (CollUtil.isEmpty(roles)) {
-                throw new ServiceException("没有权限访问角色数据！");
-            }
+        if (ObjectUtil.isNull(roleId)) {
+            return;
         }
+        if (LoginHelper.isSuperAdmin()) {
+            return;
+        }
+        List<SysRoleVo> roles = this.selectRoleList(new SysRoleBo(roleId));
+        if (CollUtil.isEmpty(roles)) {
+            throw new ServiceException("没有权限访问角色数据！");
+        }
+
     }
 
     /**
@@ -252,13 +256,16 @@ public class SysRoleServiceImpl implements ISysRoleService {
     /**
      * 修改角色状态
      *
-     * @param bo 角色信息
+     * @param roleId 角色ID
+     * @param status 角色状态
      * @return 结果
      */
     @Override
-    public int updateRoleStatus(SysRoleBo bo) {
-        SysRole role = MapstructUtils.convert(bo, SysRole.class);
-        return baseMapper.updateById(role);
+    public int updateRoleStatus(Long roleId, String status) {
+        return baseMapper.update(null,
+            new LambdaUpdateWrapper<SysRole>()
+                .set(SysRole::getStatus, status)
+                .eq(SysRole::getRoleId, roleId));
     }
 
     /**
@@ -347,7 +354,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteRoleByIds(Long[] roleIds) {
         for (Long roleId : roleIds) {
-            checkRoleAllowed(new SysRoleBo(roleId));
+            checkRoleAllowed(roleId);
             checkRoleDataScope(roleId);
             SysRole role = baseMapper.selectById(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {

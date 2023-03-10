@@ -104,6 +104,10 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
      * @param userId 用户ID
      * @return 用户对象信息
      */
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "d.dept_id"),
+        @DataColumn(key = "userName", value = "u.user_id")
+    })
     SysUserVo selectUserById(Long userId);
 
     @Override
@@ -111,7 +115,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "user_id")
     })
-    int update(@Param(Constants.ENTITY) SysUser user,@Param(Constants.WRAPPER) Wrapper<SysUser> updateWrapper);
+    int update(@Param(Constants.ENTITY) SysUser user, @Param(Constants.WRAPPER) Wrapper<SysUser> updateWrapper);
 
     @Override
     @DataPermission({

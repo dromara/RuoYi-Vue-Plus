@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.mybatis.annotation.DataColumn;
 import com.ruoyi.common.mybatis.annotation.DataPermission;
-import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
+import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.system.domain.vo.SysRoleVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -34,6 +34,11 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRoleMapper, SysRole, Sy
         @DataColumn(key = "deptName", value = "d.dept_id")
     })
     List<SysRoleVo> selectRoleList(@Param(Constants.WRAPPER) Wrapper<SysRole> queryWrapper);
+
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "d.dept_id")
+    })
+    SysRoleVo selectRoleById(Long roleId);
 
     /**
      * 根据用户ID查询角色

@@ -145,7 +145,7 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public R<Void> edit(@Validated @RequestBody SysUserBo user) {
-        userService.checkUserAllowed(user);
+        userService.checkUserAllowed(user.getUserId());
         userService.checkUserDataScope(user.getUserId());
         if (!userService.checkUserNameUnique(user)) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
@@ -179,10 +179,10 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/resetPwd")
     public R<Void> resetPwd(@RequestBody SysUserBo user) {
-        userService.checkUserAllowed(user);
+        userService.checkUserAllowed(user.getUserId());
         userService.checkUserDataScope(user.getUserId());
         user.setPassword(BCrypt.hashpw(user.getPassword()));
-        return toAjax(userService.resetUserPwd(user.getUserId(),user.getPassword()));
+        return toAjax(userService.resetUserPwd(user.getUserId(), user.getPassword()));
     }
 
     /**
@@ -192,9 +192,9 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysUserBo user) {
-        userService.checkUserAllowed(user);
+        userService.checkUserAllowed(user.getUserId());
         userService.checkUserDataScope(user.getUserId());
-        return toAjax(userService.updateUserStatus(user));
+        return toAjax(userService.updateUserStatus(user.getUserId(), user.getStatus()));
     }
 
     /**

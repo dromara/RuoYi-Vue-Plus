@@ -85,9 +85,9 @@ public interface ISysRoleService {
     /**
      * 校验角色是否允许操作
      *
-     * @param role 角色信息
+     * @param roleId 角色ID
      */
-    void checkRoleAllowed(SysRoleBo role);
+    void checkRoleAllowed(Long roleId);
 
     /**
      * 校验角色是否有数据权限
@@ -123,10 +123,11 @@ public interface ISysRoleService {
     /**
      * 修改角色状态
      *
-     * @param bo 角色信息
+     * @param roleId 角色ID
+     * @param status 角色状态
      * @return 结果
      */
-    int updateRoleStatus(SysRoleBo bo);
+    int updateRoleStatus(Long roleId, String status);
 
     /**
      * 修改数据权限信息

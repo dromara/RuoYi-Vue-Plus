@@ -22,7 +22,6 @@ import com.ruoyi.system.domain.vo.DeptTreeSelectVo;
 import com.ruoyi.system.domain.vo.SysRoleVo;
 import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.service.ISysDeptService;
-import com.ruoyi.system.service.ISysPermissionService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,7 +45,6 @@ public class SysRoleController extends BaseController {
     private final ISysRoleService roleService;
     private final ISysUserService userService;
     private final ISysDeptService deptService;
-    private final ISysPermissionService permissionService;
 
     /**
      * 获取角色信息列表
@@ -103,7 +101,7 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public R<Void> edit(@Validated @RequestBody SysRoleBo role) {
-        roleService.checkRoleAllowed(role);
+        roleService.checkRoleAllowed(role.getRoleId());
         roleService.checkRoleDataScope(role.getRoleId());
         if (!roleService.checkRoleNameUnique(role)) {
             return R.fail("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
@@ -143,7 +141,7 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/dataScope")
     public R<Void> dataScope(@RequestBody SysRoleBo role) {
-        roleService.checkRoleAllowed(role);
+        roleService.checkRoleAllowed(role.getRoleId());
         roleService.checkRoleDataScope(role.getRoleId());
         return toAjax(roleService.authDataScope(role));
     }
@@ -155,9 +153,9 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysRoleBo role) {
-        roleService.checkRoleAllowed(role);
+        roleService.checkRoleAllowed(role.getRoleId());
         roleService.checkRoleDataScope(role.getRoleId());
-        return toAjax(roleService.updateRoleStatus(role));
+        return toAjax(roleService.updateRoleStatus(role.getRoleId(), role.getStatus()));
     }
 
     /**

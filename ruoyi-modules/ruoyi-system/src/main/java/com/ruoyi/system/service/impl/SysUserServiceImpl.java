@@ -36,10 +36,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 用户 业务层处理
@@ -239,11 +237,11 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     /**
      * 校验用户是否允许操作
      *
-     * @param user 用户信息
+     * @param userId 用户ID
      */
     @Override
-    public void checkUserAllowed(SysUserBo user) {
-        if (ObjectUtil.isNotNull(user.getUserId()) && user.isSuperAdmin()) {
+    public void checkUserAllowed(Long userId) {
+        if (ObjectUtil.isNotNull(userId) && LoginHelper.isSuperAdmin(userId)) {
             throw new ServiceException("不允许操作超级管理员用户");
         }
     }
@@ -255,13 +253,14 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public void checkUserDataScope(Long userId) {
-        if (!LoginHelper.isSuperAdmin()) {
-            SysUserBo user = new SysUserBo();
-            user.setUserId(userId);
-            List<SysUserVo> users = this.selectUserList(user);
-            if (CollUtil.isEmpty(users)) {
-                throw new ServiceException("没有权限访问用户数据！");
-            }
+        if (ObjectUtil.isNull(userId)) {
+            return;
+        }
+        if (LoginHelper.isSuperAdmin()) {
+            return;
+        }
+        if (ObjectUtil.isNull(baseMapper.selectUserById(userId))) {
+            throw new ServiceException("没有权限访问用户数据！");
         }
     }
 
@@ -279,9 +278,9 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         int rows = baseMapper.insert(sysUser);
         user.setUserId(sysUser.getUserId());
         // 新增用户岗位关联
-        insertUserPost(user);
+        insertUserPost(user, false);
         // 新增用户与角色管理
-        insertUserRole(user);
+        insertUserRole(user, false);
         return rows;
     }
 
@@ -309,20 +308,15 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateUser(SysUserBo user) {
-        Long userId = user.getUserId();
-        // 删除用户与角色关联
-        userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userId));
         // 新增用户与角色管理
-        insertUserRole(user);
-        // 删除用户与岗位关联
-        userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getUserId, userId));
+        insertUserRole(user, true);
         // 新增用户与岗位管理
-        insertUserPost(user);
+        insertUserPost(user, true);
         SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
-        //防止错误更新后导致的数据误删除
+        // 防止错误更新后导致的数据误删除
         int flag = baseMapper.updateById(sysUser);
-        if (flag <= 0){
-            throw new ServiceException("修改用户"+user.getUserName()+"信息失败");
+        if (flag < 1) {
+            throw new ServiceException("修改用户" + user.getUserName() + "信息失败");
         }
         return flag;
     }
@@ -338,21 +332,22 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     public void insertUserAuth(Long userId, Long[] roleIds) {
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
             .eq(SysUserRole::getUserId, userId));
-        insertUserRole(userId, roleIds);
+        insertUserRole(userId, roleIds, false);
     }
 
     /**
      * 修改用户状态
      *
-     * @param user 用户信息
+     * @param userId 用户ID
+     * @param status 帐号状态
      * @return 结果
      */
     @Override
-    public int updateUserStatus(SysUserBo user) {
+    public int updateUserStatus(Long userId, String status) {
         return baseMapper.update(null,
             new LambdaUpdateWrapper<SysUser>()
-                .set(SysUser::getStatus, user.getStatus())
-                .eq(SysUser::getUserId, user.getUserId()));
+                .set(SysUser::getStatus, status)
+                .eq(SysUser::getUserId, userId));
     }
 
     /**
@@ -376,7 +371,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * 修改用户头像
      *
      * @param userId 用户ID
-     * @param avatar   头像地址
+     * @param avatar 头像地址
      * @return 结果
      */
     @Override
@@ -390,7 +385,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     /**
      * 重置用户密码
      *
-     * @param userId 用户ID
+     * @param userId   用户ID
      * @param password 密码
      * @return 结果
      */
@@ -405,34 +400,29 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     /**
      * 新增用户角色信息
      *
-     * @param user 用户对象
+     * @param user  用户对象
+     * @param clear 清除已存在的关联数据
      */
-    public void insertUserRole(SysUserBo user) {
-        this.insertUserRole(user.getUserId(), user.getRoleIds());
+    public void insertUserRole(SysUserBo user, boolean clear) {
+        this.insertUserRole(user.getUserId(), user.getRoleIds(), clear);
     }
 
     /**
      * 新增用户岗位信息
      *
-     * @param user 用户对象
+     * @param user  用户对象
+     * @param clear 清除已存在的关联数据
      */
-    public void insertUserPost(SysUserBo user) {
+    public void insertUserPost(SysUserBo user, boolean clear) {
         Long[] posts = user.getPostIds();
         if (ArrayUtil.isNotEmpty(posts)) {
-            //判断是否具有此角色的岗位权限
-            List<Long> postList = postMapper.selectPostListByUserId(LoginHelper.getUserId());
-            if (postList.isEmpty()){
-                throw new ServiceException("您不具有操作岗位的权限");
-            }
-            List<Long> postIdList = Arrays.asList(posts);
-            List<Long> canDoPostList = postIdList.stream()
-                .filter(postList::contains)
-                .collect(Collectors.toList());
-            if (canDoPostList.isEmpty()){
-                throw new ServiceException("您不具有操作当前岗位的权限");
+            Long userId = LoginHelper.getUserId();
+            if (clear) {
+                // 删除用户与岗位关联
+                userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getUserId, userId));
             }
             // 新增用户与岗位管理
-            List<SysUserPost> list = StreamUtils.toList(canDoPostList, postId -> {
+            List<SysUserPost> list = StreamUtils.toList(List.of(posts), postId -> {
                 SysUserPost up = new SysUserPost();
                 up.setUserId(user.getUserId());
                 up.setPostId(postId);
@@ -447,20 +437,26 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      *
      * @param userId  用户ID
      * @param roleIds 角色组
+     * @param clear   清除已存在的关联数据
      */
-    public void insertUserRole(Long userId, Long[] roleIds) {
+    public void insertUserRole(Long userId, Long[] roleIds, boolean clear) {
         if (ArrayUtil.isNotEmpty(roleIds)) {
-            //判断是否具有此角色的操作权限
-            List<Long> roleList = roleMapper.selectRoleListByUserId(LoginHelper.getUserId());
-            if (roleList.isEmpty()){
-                throw new ServiceException("您不具有操作角色的权限");
+            // 判断是否具有此角色的操作权限
+            List<SysRoleVo> roles = roleMapper.selectRoleList(new LambdaQueryWrapper<>());
+            if (CollUtil.isEmpty(roles)) {
+                throw new ServiceException("没有权限访问角色的数据");
             }
-            List<Long> roleIdList = Arrays.asList(roleIds);
-            List<Long> canDoRoleList = roleIdList.stream()
-                .filter(roleList::contains)
-                .collect(Collectors.toList());
-            if (canDoRoleList.isEmpty()){
-                throw new ServiceException("您不具有操作当前角色的权限");
+            List<Long> roleList = StreamUtils.toList(roles, SysRoleVo::getRoleId);
+            if (!LoginHelper.isSuperAdmin(userId)) {
+                roleList.remove(UserConstants.SUPER_ADMIN_ID);
+            }
+            List<Long> canDoRoleList = StreamUtils.filter(List.of(roleIds), roleList::contains);
+            if (CollUtil.isEmpty(canDoRoleList)) {
+                throw new ServiceException("没有权限访问角色的数据");
+            }
+            if (clear) {
+                // 删除用户与角色关联
+                userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userId));
             }
             // 新增用户与角色管理
             List<SysUserRole> list = StreamUtils.toList(canDoRoleList, roleId -> {
@@ -488,8 +484,8 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getUserId, userId));
         // 防止更新失败导致的数据删除
         int flag = baseMapper.deleteById(userId);
-        if (flag <= 0){
-            throw new ServiceException("删除用户发生异常");
+        if (flag < 1) {
+            throw new ServiceException("删除用户失败!");
         }
         return flag;
     }
@@ -504,7 +500,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteUserByIds(Long[] userIds) {
         for (Long userId : userIds) {
-            checkUserAllowed(new SysUserBo(userId));
+            checkUserAllowed(userId);
             checkUserDataScope(userId);
         }
         List<Long> ids = List.of(userIds);
@@ -514,8 +510,8 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().in(SysUserPost::getUserId, ids));
         // 防止更新失败导致的数据删除
         int flag = baseMapper.deleteBatchIds(ids);
-        if (flag <= 0){
-            throw new ServiceException("删除用户发生异常");
+        if (flag < 1) {
+            throw new ServiceException("删除用户失败!");
         }
         return flag;
     }

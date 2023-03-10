@@ -212,13 +212,15 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
      */
     @Override
     public void checkDeptDataScope(Long deptId) {
-        if (!LoginHelper.isSuperAdmin()) {
-            SysDeptBo dept = new SysDeptBo();
-            dept.setDeptId(deptId);
-            List<SysDeptVo> depts = this.selectDeptList(dept);
-            if (CollUtil.isEmpty(depts)) {
-                throw new ServiceException("没有权限访问部门数据！");
-            }
+        if (ObjectUtil.isNull(deptId)) {
+            return;
+        }
+        if (LoginHelper.isSuperAdmin()) {
+            return;
+        }
+        SysDeptVo dept = baseMapper.selectDeptById(deptId);
+        if (ObjectUtil.isNull(dept)) {
+            throw new ServiceException("没有权限访问部门数据！");
         }
     }
 
@@ -250,13 +252,17 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
     @Override
     public int updateDept(SysDeptBo bo) {
         SysDept dept = MapstructUtils.convert(bo, SysDept.class);
-        SysDept newParentDept = baseMapper.selectById(dept.getParentId());
         SysDept oldDept = baseMapper.selectById(dept.getDeptId());
-        if (ObjectUtil.isNotNull(newParentDept) && ObjectUtil.isNotNull(oldDept)) {
-            String newAncestors = newParentDept.getAncestors() + StringUtils.SEPARATOR + newParentDept.getDeptId();
-            String oldAncestors = oldDept.getAncestors();
-            dept.setAncestors(newAncestors);
-            updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
+        if (!oldDept.getParentId().equals(dept.getParentId())) {
+            // 如果是新父部门 则校验是否具有新父部门权限 避免越权
+            this.checkDeptDataScope(dept.getParentId());
+            SysDept newParentDept = baseMapper.selectById(dept.getParentId());
+            if (ObjectUtil.isNotNull(newParentDept) && ObjectUtil.isNotNull(oldDept)) {
+                String newAncestors = newParentDept.getAncestors() + StringUtils.SEPARATOR + newParentDept.getDeptId();
+                String oldAncestors = oldDept.getAncestors();
+                dept.setAncestors(newAncestors);
+                updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
+            }
         }
         int result = baseMapper.updateById(dept);
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())

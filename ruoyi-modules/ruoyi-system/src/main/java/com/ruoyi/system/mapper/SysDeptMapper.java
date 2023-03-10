@@ -29,6 +29,11 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDeptMapper, SysDept, Sy
     })
     List<SysDeptVo> selectDeptList(@Param(Constants.WRAPPER) Wrapper<SysDept> queryWrapper);
 
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id")
+    })
+    SysDeptVo selectDeptById(Long deptId);
+
     /**
      * 根据角色ID查询部门树信息
      *
