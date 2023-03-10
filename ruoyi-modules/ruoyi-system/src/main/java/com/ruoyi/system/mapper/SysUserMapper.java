@@ -106,4 +106,18 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
      */
     SysUserVo selectUserById(Long userId);
 
+    @Override
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "user_id")
+    })
+    int update(@Param(Constants.ENTITY) SysUser user,@Param(Constants.WRAPPER) Wrapper<SysUser> updateWrapper);
+
+    @Override
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "user_id")
+    })
+    int updateById(@Param(Constants.ENTITY) SysUser user);
+
 }

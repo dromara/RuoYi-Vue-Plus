@@ -83,7 +83,6 @@ public class SysProfileController extends BaseController {
     @PutMapping("/updatePwd")
     public R<Void> updatePwd(String oldPassword, String newPassword) {
         SysUserVo user = userService.selectUserById(LoginHelper.getUserId());
-        String userName = user.getUserName();
         String password = user.getPassword();
         if (!BCrypt.checkpw(oldPassword, password)) {
             return R.fail("修改密码失败，旧密码错误");
@@ -92,7 +91,7 @@ public class SysProfileController extends BaseController {
             return R.fail("新密码不能与旧密码相同");
         }
 
-        if (userService.resetUserPwd(userName, BCrypt.hashpw(newPassword)) > 0) {
+        if (userService.resetUserPwd(user.getUserId(), BCrypt.hashpw(newPassword)) > 0) {
             return R.ok();
         }
         return R.fail("修改密码异常，请联系管理员");
@@ -113,7 +112,7 @@ public class SysProfileController extends BaseController {
             }
             SysOssVo oss = sysOssService.upload(avatarfile);
             String avatar = oss.getUrl();
-            if (userService.updateUserAvatar(LoginHelper.getUsername(), oss.getOssId())) {
+            if (userService.updateUserAvatar(LoginHelper.getUserId(), oss.getOssId())) {
                 AvatarVo avatarVo = new AvatarVo();
                 avatarVo.setImgUrl(avatar);
                 return R.ok(avatarVo);
