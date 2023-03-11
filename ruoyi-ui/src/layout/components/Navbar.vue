@@ -80,9 +80,10 @@ export default {
   data() {
     return {
       userId: this.$store.getters.userId,
-      tenantId: undefined,
       companyName: undefined,
-      tenantList: []
+      tenantList: [],
+      // 是否切换了租户
+      dynamic: false
     }
   },
   components: {
@@ -123,6 +124,7 @@ export default {
     dynamicTenantEvent(tenantId) {
       if (this.companyName != null && this.companyName !== '') {
         dynamicTenant(tenantId).then(res => {
+          this.dynamic = true;
           this.$tab.closeAllPage()
           this.$router.push('/')
         });
@@ -130,6 +132,7 @@ export default {
     },
     dynamicClearEvent() {
       dynamicClear().then(res => {
+        this.dynamic = false;
         this.$tab.closeAllPage()
         this.$router.push('/')
       });
