@@ -17,7 +17,6 @@ import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.tenant.helper.TenantHelper;
 import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.system.domain.bo.SysTenantBo;
-import com.ruoyi.system.domain.bo.SysUserBo;
 import com.ruoyi.system.domain.vo.SysTenantVo;
 import com.ruoyi.system.service.ISysTenantService;
 import com.ruoyi.system.service.ISysUserService;
@@ -92,12 +91,6 @@ public class SysTenantController extends BaseController {
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysTenantBo bo) {
         if (!sysTenantService.checkCompanyNameUnique(bo)) {
             throw new ServiceException("新增租户'" + bo.getCompanyName() + "'失败，企业名称已存在");
-        }
-        SysUserBo userBo = new SysUserBo();
-        userBo.setUserName(bo.getUsername());
-        // 判断用户名是否重复
-        if (!sysUserService.checkUserNameUnique(userBo)) {
-            throw new ServiceException("新增用户'" + bo.getUsername() + "'失败，登录账号已存在");
         }
         return toAjax(sysTenantService.insertByBo(bo));
     }
