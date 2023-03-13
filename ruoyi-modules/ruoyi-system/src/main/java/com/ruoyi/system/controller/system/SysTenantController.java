@@ -104,6 +104,7 @@ public class SysTenantController extends BaseController {
     @RepeatSubmit()
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysTenantBo bo) {
+        sysTenantService.checkTenantAllowed(bo.getTenantId());
         if (!sysTenantService.checkCompanyNameUnique(bo)) {
             throw new ServiceException("修改租户'" + bo.getCompanyName() + "'失败，公司名称已存在");
         }
@@ -118,6 +119,7 @@ public class SysTenantController extends BaseController {
     @Log(title = "租户", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysTenantBo bo) {
+        sysTenantService.checkTenantAllowed(bo.getTenantId());
         return toAjax(sysTenantService.updateTenantStatus(bo));
     }
 

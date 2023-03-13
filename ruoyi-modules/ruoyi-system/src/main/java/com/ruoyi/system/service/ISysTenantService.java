@@ -51,6 +51,11 @@ public interface ISysTenantService {
     int updateTenantStatus(SysTenantBo bo);
 
     /**
+     * 校验租户是否允许操作
+     */
+    void checkTenantAllowed(String tenantId);
+
+    /**
      * 校验并批量删除租户信息
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);

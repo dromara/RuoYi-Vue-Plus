@@ -8,6 +8,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.GlobalConstants;
+import com.ruoyi.common.core.constant.TenantConstants;
 import com.ruoyi.common.core.domain.dto.RoleDTO;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.XcxLoginUser;
@@ -323,6 +324,9 @@ public class SysLoginService {
 
     private void checkTenant(String tenantId) {
         if (!TenantHelper.isEnable()) {
+            return;
+        }
+        if (TenantConstants.DEFAULT_TENANT_ID.equals(tenantId)) {
             return;
         }
         SysTenantVo tenant = tenantService.queryByTenantId(tenantId);

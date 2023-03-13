@@ -272,6 +272,18 @@ public class SysTenantServiceImpl implements ISysTenantService {
     }
 
     /**
+     * 校验租户是否允许操作
+     *
+     * @param tenantId 租户ID
+     */
+    @Override
+    public void checkTenantAllowed(String tenantId) {
+        if (ObjectUtil.isNotNull(tenantId) && TenantConstants.DEFAULT_TENANT_ID.equals(tenantId)) {
+            throw new ServiceException("不允许操作管理租户");
+        }
+    }
+
+    /**
      * 批量删除租户
      */
     @CacheEvict(cacheNames = CacheNames.SYS_TENANT, allEntries = true)
