@@ -62,7 +62,7 @@ create table sys_tenant_package (
 drop table if exists sys_dept;
 create table sys_dept (
   dept_id           bigint(20)      not null                   comment '部门id',
-  tenant_id         varchar(20)     not null                   comment '租户编号',
+  tenant_id         varchar(20)     default '000000'           comment '租户编号',
   parent_id         bigint(20)      default 0                  comment '父部门id',
   ancestors         varchar(500)    default ''                 comment '祖级列表',
   dept_name         varchar(30)     default ''                 comment '部门名称',
@@ -103,7 +103,7 @@ insert into sys_dept values(109, '000000', 102, '0,100,102',  '财务部门',   
 drop table if exists sys_user;
 create table sys_user (
   user_id           bigint(20)      not null                   comment '用户ID',
-  tenant_id         varchar(20)     not null                   comment '租户编号',
+  tenant_id         varchar(20)     default '000000'           comment '租户编号',
   dept_id           bigint(20)      default null               comment '部门ID',
   user_name         varchar(30)     not null                   comment '用户账号',
   nick_name         varchar(30)     not null                   comment '用户昵称',
@@ -140,7 +140,7 @@ drop table if exists sys_post;
 create table sys_post
 (
   post_id       bigint(20)      not null                   comment '岗位ID',
-  tenant_id     varchar(20)     not null                   comment '租户编号',
+  tenant_id     varchar(20)     default '000000'           comment '租户编号',
   post_code     varchar(64)     not null                   comment '岗位编码',
   post_name     varchar(50)     not null                   comment '岗位名称',
   post_sort     int(4)          not null                   comment '显示顺序',
@@ -169,7 +169,7 @@ insert into sys_post values(4, '000000', 'user', '普通员工',  4, '0', 103, 1
 drop table if exists sys_role;
 create table sys_role (
   role_id              bigint(20)      not null                   comment '角色ID',
-  tenant_id            varchar(20)     not null                   comment '租户编号',
+  tenant_id            varchar(20)     default '000000'           comment '租户编号',
   role_name            varchar(30)     not null                   comment '角色名称',
   role_key             varchar(100)    not null                   comment '角色权限字符串',
   role_sort            int(4)          not null                   comment '显示顺序',
@@ -498,7 +498,7 @@ insert into sys_user_post values ('2', '2');
 drop table if exists sys_oper_log;
 create table sys_oper_log (
   oper_id           bigint(20)      not null                   comment '日志主键',
-  tenant_id         varchar(20)     not null                   comment '租户编号',
+  tenant_id         varchar(20)     default '000000'           comment '租户编号',
   title             varchar(50)     default ''                 comment '模块标题',
   business_type     int(2)          default 0                  comment '业务类型（0其它 1新增 2修改 3删除）',
   method            varchar(100)    default ''                 comment '方法名称',
@@ -529,7 +529,7 @@ drop table if exists sys_dict_type;
 create table sys_dict_type
 (
   dict_id          bigint(20)      not null                   comment '字典主键',
-  tenant_id        varchar(20)     not null                   comment '租户编号',
+  tenant_id        varchar(20)     default '000000'           comment '租户编号',
   dict_name        varchar(100)    default ''                 comment '字典名称',
   dict_type        varchar(100)    default ''                 comment '字典类型',
   status           char(1)         default '0'                comment '状态（0正常 1停用）',
@@ -560,7 +560,7 @@ drop table if exists sys_dict_data;
 create table sys_dict_data
 (
   dict_code        bigint(20)      not null                   comment '字典编码',
-  tenant_id        varchar(20)     not null                   comment '租户编号',
+  tenant_id        varchar(20)     default '000000'           comment '租户编号',
   dict_sort        int(4)          default 0                  comment '字典排序',
   dict_label       varchar(100)    default ''                 comment '字典标签',
   dict_value       varchar(100)    default ''                 comment '字典键值',
@@ -611,7 +611,7 @@ insert into sys_dict_data values(28, '000000', 2,  '失败',     '1',       'sys
 drop table if exists sys_config;
 create table sys_config (
   config_id         bigint(20)      not null                   comment '参数主键',
-  tenant_id         varchar(20)    not null                    comment '租户编号',
+  tenant_id         varchar(20)     default '000000'           comment '租户编号',
   config_name       varchar(100)    default ''                 comment '参数名称',
   config_key        varchar(100)    default ''                 comment '参数键名',
   config_value      varchar(500)    default ''                 comment '参数键值',
@@ -638,7 +638,7 @@ insert into sys_config values(11, '000000', 'OSS预览列表资源开关',      
 drop table if exists sys_logininfor;
 create table sys_logininfor (
   info_id        bigint(20)     not null                  comment '访问ID',
-  tenant_id      varchar(20)    not null                  comment '租户编号',
+  tenant_id      varchar(20)    default '000000'          comment '租户编号',
   user_name      varchar(50)    default ''                comment '用户账号',
   ipaddr         varchar(128)   default ''                comment '登录IP地址',
   login_location varchar(255)   default ''                comment '登录地点',
@@ -659,7 +659,7 @@ create table sys_logininfor (
 drop table if exists sys_notice;
 create table sys_notice (
   notice_id         bigint(20)      not null                   comment '公告ID',
-  tenant_id         varchar(20)     not null                   comment '租户编号',
+  tenant_id         varchar(20)     default '000000'           comment '租户编号',
   notice_title      varchar(50)     not null                   comment '公告标题',
   notice_type       char(1)         not null                   comment '公告类型（1通知 2公告）',
   notice_content    longblob        default null               comment '公告内容',
@@ -747,7 +747,7 @@ create table gen_table_column (
 drop table if exists sys_oss;
 create table sys_oss (
   oss_id          bigint(20)   not null                   comment '对象存储主键',
-  tenant_id       varchar(20)  not null                   comment '租户编号',
+  tenant_id       varchar(20)           default '000000'  comment '租户编号',
   file_name       varchar(255) not null default ''        comment '文件名',
   original_name   varchar(255) not null default ''        comment '原名',
   file_suffix     varchar(10)  not null default ''        comment '文件后缀名',
@@ -767,7 +767,7 @@ create table sys_oss (
 drop table if exists sys_oss_config;
 create table sys_oss_config (
   oss_config_id   bigint(20)    not null                  comment '主建',
-  tenant_id       varchar(20)   not null                  comment '租户编号',
+  tenant_id       varchar(20)             default '000000'comment '租户编号',
   config_key      varchar(20)   not null  default ''      comment '配置key',
   access_key      varchar(255)            default ''      comment 'accessKey',
   secret_key      varchar(255)            default ''      comment '秘钥',

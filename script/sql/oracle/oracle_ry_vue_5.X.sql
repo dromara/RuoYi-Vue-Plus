@@ -92,7 +92,7 @@ comment on column  sys_tenant_package.update_time        is '更新时间';
 -- ----------------------------
 create table sys_dept (
   dept_id           number(20)      not null,
-  tenant_id         varchar2(20)    not null,
+  tenant_id         varchar2(20)    default '000000',
   parent_id         number(20)      default 0,
   ancestors         varchar2(500)   default '',
   dept_name         varchar2(30)    default '',
@@ -149,7 +149,7 @@ insert into sys_dept values(109, '000000', 102, '0,100,102',  '财务部门',   
 -- ----------------------------
 create table sys_user (
   user_id           number(20)      not null,
-  tenant_id         varchar2(20)    not null,
+  tenant_id         varchar2(20)    default '000000',
   dept_id           number(20)      default null,
   user_name         varchar2(40)    not null,
   nick_name         varchar2(40)    not null,
@@ -208,7 +208,7 @@ insert into sys_user values(2, '000000', 105, 'lionli', '疯狂的狮子Li', 'sy
 -- ----------------------------
 create table sys_post (
   post_id           number(20)      not null,
-  tenant_id         varchar2(20)    not null,
+  tenant_id         varchar2(20)    default '000000',
   post_code         varchar2(64)    not null,
   post_name         varchar2(50)    not null,
   post_sort         number(4)       not null,
@@ -251,7 +251,7 @@ insert into sys_post values(4, '000000', 'user', '普通员工',  4, '0', 103, 1
 -- ----------------------------
 create table sys_role (
   role_id              number(20)      not null,
-  tenant_id            varchar2(20)    not null,
+  tenant_id            varchar2(20)    default '000000',
   role_name            varchar2(30)    not null,
   role_key             varchar2(100)   not null,
   role_sort            number(4)       not null,
@@ -634,7 +634,7 @@ insert into sys_user_post values ('2', '2');
 -- ----------------------------
 create table sys_oper_log (
   oper_id           number(20)      not null,
-  tenant_id         varchar2(20)    not null,
+  tenant_id         varchar2(20)    default '000000',
   title             varchar2(50)    default '',
   business_type     number(2)       default 0,
   method            varchar2(100)   default '',
@@ -684,7 +684,7 @@ comment on column sys_oper_log.cost_time      is '消耗时间';
 -- ----------------------------
 create table sys_dict_type (
   dict_id           number(20)      not null,
-  tenant_id         varchar2(20)    not null,
+  tenant_id         varchar2(20)    default '000000',
   dict_name         varchar2(100)   default '',
   dict_type         varchar2(100)   default '',
   status            char(1)         default '0',
@@ -727,7 +727,7 @@ insert into sys_dict_type values(10, '000000', '系统状态', 'sys_common_statu
 -- ----------------------------
 create table sys_dict_data (
   dict_code        number(20)      not null,
-  tenant_id        varchar2(20)    not null,
+  tenant_id        varchar2(20)    default '000000',
   dict_sort        number(4)       default 0,
   dict_label       varchar2(100)   default '',
   dict_value       varchar2(100)   default '',
@@ -796,7 +796,7 @@ insert into sys_dict_data values(28, '000000', 2,  '失败',     '1',       'sys
 -- ----------------------------
 create table sys_config (
   config_id         number(20)     not null,
-  tenant_id         varchar2(20)   not null,
+  tenant_id         varchar2(20)   default '000000',
   config_name       varchar2(100)  default '',
   config_key        varchar2(100)  default '',
   config_value      varchar2(100)  default '',
@@ -836,7 +836,7 @@ insert into sys_config values(11, '000000', 'OSS预览列表资源开关',      
 -- ----------------------------
 create table sys_logininfor (
   info_id         number(20)     not null,
-  tenant_id       varchar2(20)   not null,
+  tenant_id       varchar2(20)   default '000000',
   user_name       varchar2(50)   default '',
   ipaddr          varchar2(128)  default '',
   login_location  varchar2(255)  default '',
@@ -869,7 +869,7 @@ comment on column sys_logininfor.login_time     is '访问时间';
 -- ----------------------------
 create table sys_notice (
   notice_id         number(20)      not null,
-  tenant_id         varchar2(20)    not null,
+  tenant_id         varchar2(20)    default '000000',
   notice_title      varchar2(50)    not null,
   notice_type       char(1)         not null,
   notice_content    clob            default null,
@@ -1020,7 +1020,7 @@ comment on column gen_table_column.update_time    is '更新时间';
 -- ----------------------------
 create table sys_oss (
   oss_id          number(20)    not null,
-  tenant_id       varchar2(20)  not null,
+  tenant_id       varchar2(20)  default '000000',
   file_name       varchar(255)  not null,
   original_name   varchar(255)  not null,
   file_suffix     varchar(10)   not null,
@@ -1055,7 +1055,7 @@ comment on column sys_oss.update_by         is '更新者';
 -- ----------------------------
 create table sys_oss_config (
   oss_config_id   number(20)    not null,
-  tenant_id       varchar2(20)  not null,
+  tenant_id       varchar2(20)  default '000000',
   config_key      varchar(20)   not null,
   access_key      varchar(255)  default '',
   secret_key      varchar(255)  default '',

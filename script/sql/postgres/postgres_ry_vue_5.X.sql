@@ -100,7 +100,7 @@ drop table if exists sys_dept;
 create table if not exists sys_dept
 (
     dept_id     int8,
-    tenant_id   varchar(20) not null,
+    tenant_id   varchar(20) default '000000'::varchar,
     parent_id   int8        default 0,
     ancestors   varchar(500)default ''::varchar,
     dept_name   varchar(30) default ''::varchar,
@@ -157,7 +157,7 @@ drop table if exists sys_user;
 create table if not exists sys_user
 (
     user_id     int8,
-    tenant_id   varchar(20)  not null,
+    tenant_id   varchar(20)  default '000000'::varchar,
     dept_id     int8,
     user_name   varchar(30)  not null,
     nick_name   varchar(30)  not null,
@@ -218,7 +218,7 @@ drop table if exists sys_post;
 create table if not exists sys_post
 (
     post_id     int8,
-    tenant_id   varchar(20) not null,
+    tenant_id   varchar(20) default '000000'::varchar,
     post_code   varchar(64) not null,
     post_name   varchar(50) not null,
     post_sort   int4        not null,
@@ -261,7 +261,7 @@ drop table if exists sys_role;
 create table if not exists sys_role
 (
     role_id             int8,
-    tenant_id           varchar(20)  not null,
+    tenant_id           varchar(20)  default '000000'::varchar,
     role_name           varchar(30)  not null,
     role_key            varchar(100) not null,
     role_sort           int4         not null,
@@ -651,7 +651,7 @@ drop table if exists sys_oper_log;
 create table if not exists sys_oper_log
 (
     oper_id        int8,
-    tenant_id      varchar(20)   not null,
+    tenant_id      varchar(20)   default '000000'::varchar,
     title          varchar(50)   default ''::varchar,
     business_type  int4          default 0,
     method         varchar(100)  default ''::varchar,
@@ -702,7 +702,7 @@ drop table if exists sys_dict_type;
 create table if not exists sys_dict_type
 (
     dict_id     int8,
-    tenant_id   varchar(20)  not null,
+    tenant_id   varchar(20)  default '000000'::varchar,
     dict_name   varchar(100) default ''::varchar,
     dict_type   varchar(100) default ''::varchar,
     status      char         default '0'::bpchar,
@@ -747,7 +747,7 @@ drop table if exists sys_dict_data;
 create table if not exists sys_dict_data
 (
     dict_code   int8,
-    tenant_id   varchar(20)  not null,
+    tenant_id   varchar(20)  default '000000'::varchar,
     dict_sort   int4         default 0,
     dict_label  varchar(100) default ''::varchar,
     dict_value  varchar(100) default ''::varchar,
@@ -817,7 +817,7 @@ drop table if exists sys_config;
 create table if not exists sys_config
 (
     config_id    int8,
-    tenant_id    varchar(20)  not null,
+    tenant_id    varchar(20)  default '000000'::varchar,
     config_name  varchar(100) default ''::varchar,
     config_key   varchar(100) default ''::varchar,
     config_value varchar(500) default ''::varchar,
@@ -859,7 +859,7 @@ drop table if exists sys_logininfor;
 create table if not exists sys_logininfor
 (
     info_id        int8,
-    tenant_id      varchar(20)  not null,
+    tenant_id      varchar(20)  default '000000'::varchar,
     user_name      varchar(50)  default ''::varchar,
     ipaddr         varchar(128) default ''::varchar,
     login_location varchar(255) default ''::varchar,
@@ -893,7 +893,7 @@ drop table if exists sys_notice;
 create table if not exists sys_notice
 (
     notice_id      int8,
-    tenant_id      varchar(20)  not null,
+    tenant_id      varchar(20)  default '000000'::varchar,
     notice_title   varchar(50)  not null,
     notice_type    char         not null,
     notice_content text,
@@ -1045,7 +1045,7 @@ drop table if exists sys_oss;
 create table if not exists sys_oss
 (
     oss_id        int8,
-    tenant_id     varchar(20)  not null,
+    tenant_id     varchar(20)  default '000000'::varchar,
     file_name     varchar(255) default ''::varchar not null,
     original_name varchar(255) default ''::varchar not null,
     file_suffix   varchar(10)  default ''::varchar not null,
@@ -1080,7 +1080,7 @@ drop table if exists sys_oss_config;
 create table if not exists sys_oss_config
 (
     oss_config_id int8,
-    tenant_id     varchar(20)  not null,
+    tenant_id     varchar(20)  default '000000'::varchar,
     config_key    varchar(20)  default ''::varchar not null,
     access_key    varchar(255) default ''::varchar,
     secret_key    varchar(255) default ''::varchar,

@@ -592,7 +592,7 @@ GO
 CREATE TABLE sys_config
 (
     config_id    bigint                      NOT NULL,
-    tenant_id    nvarchar(20)                NOT NULL,
+    tenant_id    nvarchar(20)  DEFAULT '000000'  NULL,
     config_name  nvarchar(100) DEFAULT ''    NULL,
     config_key   nvarchar(100) DEFAULT ''    NULL,
     config_value nvarchar(500) DEFAULT ''    NULL,
@@ -702,7 +702,7 @@ GO
 CREATE TABLE sys_dept
 (
     dept_id     bigint                     NOT NULL,
-    tenant_id   nvarchar(20)               NOT NULL,
+    tenant_id   nvarchar(20) DEFAULT ('000000') NULL,
     parent_id   bigint       DEFAULT ((0)) NULL,
     ancestors   nvarchar(500)DEFAULT ''    NULL,
     dept_name   nvarchar(30) DEFAULT ''    NULL,
@@ -850,7 +850,7 @@ GO
 CREATE TABLE sys_dict_data
 (
     dict_code   bigint                      NOT NULL,
-    tenant_id   nvarchar(20)                NOT NULL,
+    tenant_id   nvarchar(20)  DEFAULT ('000000') NULL,
     dict_sort   int           DEFAULT ((0)) NULL,
     dict_label  nvarchar(100) DEFAULT ''    NULL,
     dict_value  nvarchar(100) DEFAULT ''    NULL,
@@ -1036,7 +1036,7 @@ GO
 CREATE TABLE sys_dict_type
 (
     dict_id     bigint                      NOT NULL,
-    tenant_id   nvarchar(20)                NOT NULL,
+    tenant_id   nvarchar(20)  DEFAULT ('000000') NULL,
     dict_name   nvarchar(100) DEFAULT ''    NULL,
     dict_type   nvarchar(100) DEFAULT ''    NULL,
     status      nchar(1)      DEFAULT ('0') NULL,
@@ -1152,7 +1152,7 @@ GO
 CREATE TABLE sys_logininfor
 (
     info_id        bigint                      NOT NULL,
-    tenant_id      nvarchar(20)                NOT NULL,
+    tenant_id      nvarchar(20)  DEFAULT ('000000') NULL,
     user_name      nvarchar(50)  DEFAULT ''    NULL,
     ipaddr         nvarchar(128) DEFAULT ''    NULL,
     login_location nvarchar(255) DEFAULT ''    NULL,
@@ -1591,7 +1591,7 @@ GO
 CREATE TABLE sys_notice
 (
     notice_id      bigint                     NOT NULL,
-    tenant_id      nvarchar(20)               NOT NULL,
+    tenant_id      nvarchar(20) DEFAULT ('000000') NULL,
     notice_title   nvarchar(50)               NOT NULL,
     notice_type    nchar(1)                   NOT NULL,
     notice_content nvarchar(max)              NULL,
@@ -1696,7 +1696,7 @@ GO
 CREATE TABLE sys_oper_log
 (
     oper_id        bigint                       NOT NULL,
-    tenant_id      nvarchar(20)                 NOT NULL,
+    tenant_id      nvarchar(20)   DEFAULT ('000000') NULL,
     title          nvarchar(50)   DEFAULT ''    NULL,
     business_type  int            DEFAULT ((0)) NULL,
     method         nvarchar(100)  DEFAULT ''    NULL,
@@ -1843,18 +1843,18 @@ GO
 
 CREATE TABLE sys_post
 (
-    post_id     bigint                  NOT NULL,
-    tenant_id   nvarchar(20)            NOT NULL,
-    post_code   nvarchar(64)            NOT NULL,
-    post_name   nvarchar(50)            NOT NULL,
-    post_sort   int                     NOT NULL,
-    status      nchar(1)                NOT NULL,
-    create_dept bigint                  NULL,
-    create_by   bigint                  NULL,
-    create_time datetime2(7)            NULL,
-    update_by   bigint                  NULL,
-    update_time datetime2(7)            NULL,
-    remark      nvarchar(500)           NULL,
+    post_id     bigint                          NOT NULL,
+    tenant_id   nvarchar(20) DEFAULT ('000000') NULL,
+    post_code   nvarchar(64)                    NOT NULL,
+    post_name   nvarchar(50)                    NOT NULL,
+    post_sort   int                             NOT NULL,
+    status      nchar(1)                        NOT NULL,
+    create_dept bigint                          NULL,
+    create_by   bigint                          NULL,
+    create_time datetime2(7)                    NULL,
+    update_by   bigint                          NULL,
+    update_time datetime2(7)                    NULL,
+    remark      nvarchar(500)                   NULL,
     CONSTRAINT PK__sys_post__3ED7876668E2D081 PRIMARY KEY CLUSTERED (post_id)
         WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
         ON [PRIMARY]
@@ -1952,7 +1952,7 @@ GO
 CREATE TABLE sys_role
 (
     role_id             bigint                     NOT NULL,
-    tenant_id           nvarchar(20)               NOT NULL,
+    tenant_id           nvarchar(20) DEFAULT ('000000') NULL,
     role_name           nvarchar(30)               NOT NULL,
     role_key            nvarchar(100)              NOT NULL,
     role_sort           int                        NOT NULL,
@@ -2314,7 +2314,7 @@ GO
 CREATE TABLE sys_user
 (
     user_id     bigint                             NOT NULL,
-    tenant_id   nvarchar(20)                       NOT NULL,
+    tenant_id   nvarchar(20)  DEFAULT ('000000')   NULL,
     dept_id     bigint                             NULL,
     user_name   nvarchar(30)                       NOT NULL,
     nick_name   nvarchar(30)                       NOT NULL,
@@ -2549,7 +2549,7 @@ GO
 CREATE TABLE sys_oss
 (
     oss_id        bigint                          NOT NULL,
-    tenant_id     nvarchar(20)                    NOT NULL,
+    tenant_id     nvarchar(20)  DEFAULT ('000000') NULL,
     file_name     nvarchar(255) DEFAULT ''        NOT NULL,
     original_name nvarchar(255) DEFAULT ''        NOT NULL,
     file_suffix   nvarchar(10)  DEFAULT ''        NOT NULL,
@@ -2648,7 +2648,7 @@ GO
 CREATE TABLE sys_oss_config
 (
     oss_config_id bigint                      NOT NULL,
-    tenant_id     nvarchar(20)                NOT NULL,
+    tenant_id     nvarchar(20)  DEFAULT ('000000') NULL,
     config_key    nvarchar(20)  DEFAULT ''    NOT NULL,
     access_key    nvarchar(255) DEFAULT ''    NULL,
     secret_key    nvarchar(255) DEFAULT ''    NULL,
