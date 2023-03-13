@@ -32,28 +32,28 @@ public class SysOssConfigBo extends BaseEntity {
      * 配置key
      */
     @NotBlank(message = "配置key不能为空", groups = {AddGroup.class, EditGroup.class})
-    @Size(min = 2, max = 100, message = "configKey长度必须介于2和20 之间")
+    @Size(min = 2, max = 100, message = "configKey长度必须介于{min}和{max} 之间")
     private String configKey;
 
     /**
      * accessKey
      */
     @NotBlank(message = "accessKey不能为空", groups = {AddGroup.class, EditGroup.class})
-    @Size(min = 2, max = 100, message = "accessKey长度必须介于2和100 之间")
+    @Size(min = 2, max = 100, message = "accessKey长度必须介于{min}和{max} 之间")
     private String accessKey;
 
     /**
      * 秘钥
      */
     @NotBlank(message = "secretKey不能为空", groups = {AddGroup.class, EditGroup.class})
-    @Size(min = 2, max = 100, message = "secretKey长度必须介于2和100 之间")
+    @Size(min = 2, max = 100, message = "secretKey长度必须介于{min}和{max} 之间")
     private String secretKey;
 
     /**
      * 桶名称
      */
     @NotBlank(message = "桶名称不能为空", groups = {AddGroup.class, EditGroup.class})
-    @Size(min = 2, max = 100, message = "bucketName长度必须介于2和100之间")
+    @Size(min = 2, max = 100, message = "bucketName长度必须介于{min}和{max}之间")
     private String bucketName;
 
     /**
@@ -65,7 +65,7 @@ public class SysOssConfigBo extends BaseEntity {
      * 访问站点
      */
     @NotBlank(message = "访问站点不能为空", groups = {AddGroup.class, EditGroup.class})
-    @Size(min = 2, max = 100, message = "endpoint长度必须介于2和100之间")
+    @Size(min = 2, max = 100, message = "endpoint长度必须介于{min}和{max}之间")
     private String endpoint;
 
     /**
@@ -79,7 +79,7 @@ public class SysOssConfigBo extends BaseEntity {
     private String isHttps;
 
     /**
-     * 状态（0=正常,1=停用）
+     * 是否默认（0=是,1=否）
      */
     private String status;
 

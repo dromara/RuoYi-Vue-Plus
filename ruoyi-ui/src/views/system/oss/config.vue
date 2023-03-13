@@ -19,14 +19,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态" prop="status">
+      <el-form-item label="是否默认" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
-          <el-option
-            v-for="dict in dict.type.sys_normal_disable"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
+          <el-option key="0" label="是" value="0"/>
+          <el-option key="1" label="否" value="1"/>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -87,7 +83,7 @@
           <el-tag type="info" v-if="scope.row.accessPolicy === '2'">custom</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status">
+      <el-table-column label="是否默认" align="center" prop="status">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status"
@@ -193,7 +189,7 @@ import {
 
 export default {
   name: "OssConfig",
-  dicts: ['sys_yes_no', 'sys_normal_disable'],
+  dicts: ['sys_yes_no'],
   data() {
     return {
       // 按钮loading

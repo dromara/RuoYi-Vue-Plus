@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Set;
 
 /**
  * 角色表 sys_role
@@ -44,7 +43,7 @@ public class SysRole extends BaseEntity {
      */
     @ExcelProperty(value = "角色名称")
     @NotBlank(message = "角色名称不能为空")
-    @Size(min = 0, max = 30, message = "角色名称长度不能超过30个字符")
+    @Size(min = 0, max = 30, message = "角色名称长度不能超过{max}个字符")
     private String roleName;
 
     /**
@@ -52,7 +51,7 @@ public class SysRole extends BaseEntity {
      */
     @ExcelProperty(value = "角色权限")
     @NotBlank(message = "权限字符不能为空")
-    @Size(min = 0, max = 100, message = "权限字符长度不能超过100个字符")
+    @Size(min = 0, max = 100, message = "权限字符长度不能超过{max}个字符")
     private String roleKey;
 
     /**
@@ -114,12 +113,6 @@ public class SysRole extends BaseEntity {
      */
     @TableField(exist = false)
     private Long[] deptIds;
-
-    /**
-     * 角色菜单权限
-     */
-    @TableField(exist = false)
-    private Set<String> permissions;
 
     public SysRole(Long roleId) {
         this.roleId = roleId;

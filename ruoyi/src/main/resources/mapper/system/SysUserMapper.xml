@@ -86,17 +86,17 @@
 
     <select id="selectPageUserList" resultMap="SysUserResult">
         select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
-        u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from
-        sys_user u
-        left join sys_dept d on u.dept_id = d.dept_id
+            u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader
+        from sys_user u
+            left join sys_dept d on u.dept_id = d.dept_id
         ${ew.getCustomSqlSegment}
     </select>
 
     <select id="selectUserList" resultMap="SysUserResult">
         select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
-        u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from
-        sys_user u
-        left join sys_dept d on u.dept_id = d.dept_id
+            u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader
+        from sys_user u
+            left join sys_dept d on u.dept_id = d.dept_id
         ${ew.getCustomSqlSegment}
     </select>
 

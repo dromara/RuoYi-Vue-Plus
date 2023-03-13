@@ -270,7 +270,7 @@ public class ExcelUtil {
      */
     public static String convertByExp(String propertyValue, String converterExp, String separator) {
         StringBuilder propertyString = new StringBuilder();
-        String[] convertSource = converterExp.split(",");
+        String[] convertSource = converterExp.split(StringUtils.SEPARATOR);
         for (String item : convertSource) {
             String[] itemArray = item.split("=");
             if (StringUtils.containsAny(propertyValue, separator)) {
@@ -299,7 +299,7 @@ public class ExcelUtil {
      */
     public static String reverseByExp(String propertyValue, String converterExp, String separator) {
         StringBuilder propertyString = new StringBuilder();
-        String[] convertSource = converterExp.split(",");
+        String[] convertSource = converterExp.split(StringUtils.SEPARATOR);
         for (String item : convertSource) {
             String[] itemArray = item.split("=");
             if (StringUtils.containsAny(propertyValue, separator)) {

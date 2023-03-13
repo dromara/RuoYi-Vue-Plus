@@ -5,7 +5,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.UserConstants;
@@ -14,6 +13,8 @@ import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
+import com.ruoyi.common.utils.StreamUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.domain.SysRoleMenu;
 import com.ruoyi.system.domain.SysUserRole;
@@ -106,7 +107,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         Set<String> permsSet = new HashSet<>();
         for (SysRole perm : perms) {
             if (ObjectUtil.isNotNull(perm)) {
-                permsSet.addAll(Arrays.asList(perm.getRoleKey().trim().split(",")));
+                permsSet.addAll(StringUtils.splitList(perm.getRoleKey().trim()));
             }
         }
         return permsSet;
@@ -151,14 +152,11 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * @return 结果
      */
     @Override
-    public String checkRoleNameUnique(SysRole role) {
+    public boolean checkRoleNameUnique(SysRole role) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
             .eq(SysRole::getRoleName, role.getRoleName())
             .ne(ObjectUtil.isNotNull(role.getRoleId()), SysRole::getRoleId, role.getRoleId()));
-        if (exist) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !exist;
     }
 
     /**
@@ -168,14 +166,11 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * @return 结果
      */
     @Override
-    public String checkRoleKeyUnique(SysRole role) {
+    public boolean checkRoleKeyUnique(SysRole role) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
             .eq(SysRole::getRoleKey, role.getRoleKey())
             .ne(ObjectUtil.isNotNull(role.getRoleId()), SysRole::getRoleId, role.getRoleId()));
-        if (exist) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !exist;
     }
 
     /**
@@ -397,14 +392,13 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public int insertAuthUsers(Long roleId, Long[] userIds) {
         // 新增用户与角色管理
         int rows = 1;
-        List<SysUserRole> list = new ArrayList<SysUserRole>();
-        for (Long userId : userIds) {
+        List<SysUserRole> list = StreamUtils.toList(Arrays.asList(userIds), userId -> {
             SysUserRole ur = new SysUserRole();
             ur.setUserId(userId);
             ur.setRoleId(roleId);
-            list.add(ur);
-        }
-        if (list.size() > 0) {
+            return ur;
+        });
+        if (CollUtil.isNotEmpty(list)) {
             rows = userRoleMapper.insertBatch(list) ? list.size() : 0;
         }
         return rows;

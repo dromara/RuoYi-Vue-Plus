@@ -87,8 +87,8 @@ public class PageQuery implements Serializable {
         // 兼容前端排序类型
         isAsc = StringUtils.replaceEach(isAsc, new String[]{"ascending", "descending"}, new String[]{"asc", "desc"});
 
-        String[] orderByArr = orderBy.split(",");
-        String[] isAscArr = isAsc.split(",");
+        String[] orderByArr = orderBy.split(StringUtils.SEPARATOR);
+        String[] isAscArr = isAsc.split(StringUtils.SEPARATOR);
         if (isAscArr.length != 1 && isAscArr.length != orderByArr.length) {
             throw new ServiceException("排序参数有误");
         }

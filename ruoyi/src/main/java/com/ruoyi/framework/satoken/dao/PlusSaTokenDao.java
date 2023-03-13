@@ -3,7 +3,6 @@ package com.ruoyi.framework.satoken.dao;
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.util.SaFoxUtil;
 import com.ruoyi.common.utils.redis.RedisUtils;
-import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import java.util.List;
  *
  * @author Lion Li
  */
-@Component
 public class PlusSaTokenDao implements SaTokenDao {
 
     /**

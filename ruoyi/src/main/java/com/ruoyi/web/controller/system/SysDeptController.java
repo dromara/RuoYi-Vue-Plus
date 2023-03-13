@@ -1,7 +1,7 @@
 package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.convert.Convert;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -49,7 +49,7 @@ public class SysDeptController extends BaseController {
     public R<List<SysDept>> excludeChild(@PathVariable(value = "deptId", required = false) Long deptId) {
         List<SysDept> depts = deptService.selectDeptList(new SysDept());
         depts.removeIf(d -> d.getDeptId().equals(deptId)
-            || ArrayUtil.contains(StringUtils.split(d.getAncestors(), ","), deptId + ""));
+            || StringUtils.splitList(d.getAncestors()).contains(Convert.toStr(deptId)));
         return R.ok(depts);
     }
 
@@ -72,7 +72,7 @@ public class SysDeptController extends BaseController {
     @Log(title = "部门管理", businessType = BusinessType.INSERT)
     @PostMapping
     public R<Void> add(@Validated @RequestBody SysDept dept) {
-        if (UserConstants.NOT_UNIQUE.equals(deptService.checkDeptNameUnique(dept))) {
+        if (!deptService.checkDeptNameUnique(dept)) {
             return R.fail("新增部门'" + dept.getDeptName() + "'失败，部门名称已存在");
         }
         return toAjax(deptService.insertDept(dept));
@@ -87,7 +87,7 @@ public class SysDeptController extends BaseController {
     public R<Void> edit(@Validated @RequestBody SysDept dept) {
         Long deptId = dept.getDeptId();
         deptService.checkDeptDataScope(deptId);
-        if (UserConstants.NOT_UNIQUE.equals(deptService.checkDeptNameUnique(dept))) {
+        if (!deptService.checkDeptNameUnique(dept)) {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
         } else if (dept.getParentId().equals(deptId)) {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");

@@ -41,7 +41,7 @@ public class StreamUtils {
      * @return 拼接后的list
      */
     public static <E> String join(Collection<E> collection, Function<E, String> function) {
-        return join(collection, function, ",");
+        return join(collection, function, StringUtils.SEPARATOR);
     }
 
     /**

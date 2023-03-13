@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -8,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.service.OssService;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.BeanCopyUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -31,10 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +43,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 @Service
-public class SysOssServiceImpl implements ISysOssService {
+public class SysOssServiceImpl implements ISysOssService, OssService {
 
     private final SysOssMapper baseMapper;
 
@@ -67,6 +66,18 @@ public class SysOssServiceImpl implements ISysOssService {
             }
         }
         return list;
+    }
+
+    @Override
+    public String selectUrlByIds(String ossIds) {
+        List<String> list = new ArrayList<>();
+        for (Long id : StringUtils.splitTo(ossIds, Convert::toLong)) {
+            SysOssVo vo = SpringUtils.getAopProxy(this).getById(id);
+            if (ObjectUtil.isNotNull(vo)) {
+                list.add(this.matchingUrl(vo).getUrl());
+            }
+        }
+        return String.join(StringUtils.SEPARATOR, list);
     }
 
     private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {

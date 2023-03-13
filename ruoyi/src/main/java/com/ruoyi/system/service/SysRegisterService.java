@@ -54,7 +54,7 @@ public class SysRegisterService {
         sysUser.setPassword(BCrypt.hashpw(password));
         sysUser.setUserType(userType);
 
-        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(sysUser))) {
+        if (!userService.checkUserNameUnique(sysUser)) {
             throw new UserException("user.register.save.error", username);
         }
         boolean regFlag = userService.registerUser(sysUser);

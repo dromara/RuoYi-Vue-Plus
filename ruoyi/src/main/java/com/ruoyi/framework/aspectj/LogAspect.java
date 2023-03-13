@@ -112,7 +112,7 @@ public class LogAspect {
         // 是否需要保存request，参数和值
         if (log.isSaveRequestData()) {
             // 获取参数的信息，传入到数据库中。
-            setRequestValue(joinPoint, operLog);
+            setRequestValue(joinPoint, operLog, log.excludeParamNames());
         }
         // 是否需要保存response，参数和值
         if (log.isSaveResponseData() && ObjectUtil.isNotNull(jsonResult)) {
@@ -126,14 +126,16 @@ public class LogAspect {
      * @param operLog 操作日志
      * @throws Exception 异常
      */
-    private void setRequestValue(JoinPoint joinPoint, OperLogEvent operLog) throws Exception {
+    private void setRequestValue(JoinPoint joinPoint, OperLogEvent operLog, String[] excludeParamNames) throws Exception {
+        Map<String, String> paramsMap = ServletUtils.getParamMap(ServletUtils.getRequest());
         String requestMethod = operLog.getRequestMethod();
-        if (HttpMethod.PUT.name().equals(requestMethod) || HttpMethod.POST.name().equals(requestMethod)) {
-            String params = argsArrayToString(joinPoint.getArgs());
+        if (MapUtil.isEmpty(paramsMap)
+            && HttpMethod.PUT.name().equals(requestMethod) || HttpMethod.POST.name().equals(requestMethod)) {
+            String params = argsArrayToString(joinPoint.getArgs(), excludeParamNames);
             operLog.setOperParam(StringUtils.substring(params, 0, 2000));
         } else {
-            Map<String, String> paramsMap = ServletUtils.getParamMap(ServletUtils.getRequest());
             MapUtil.removeAny(paramsMap, EXCLUDE_PROPERTIES);
+            MapUtil.removeAny(paramsMap, excludeParamNames);
             operLog.setOperParam(StringUtils.substring(JsonUtils.toJsonString(paramsMap), 0, 2000));
         }
     }
@@ -141,7 +143,7 @@ public class LogAspect {
     /**
      * 参数拼装
      */
-    private String argsArrayToString(Object[] paramsArray) {
+    private String argsArrayToString(Object[] paramsArray, String[] excludeParamNames) {
         StringBuilder params = new StringBuilder();
         if (paramsArray != null && paramsArray.length > 0) {
             for (Object o : paramsArray) {
@@ -151,6 +153,7 @@ public class LogAspect {
                         Dict dict = JsonUtils.parseMap(str);
                         if (MapUtil.isNotEmpty(dict)) {
                             MapUtil.removeAny(dict, EXCLUDE_PROPERTIES);
+                            MapUtil.removeAny(dict, excludeParamNames);
                             str = JsonUtils.toJsonString(dict);
                         }
                         params.append(str).append(" ");

@@ -216,14 +216,11 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @return 结果
      */
     @Override
-    public String checkDictTypeUnique(SysDictType dict) {
+    public boolean checkDictTypeUnique(SysDictType dict) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDictType>()
             .eq(SysDictType::getDictType, dict.getDictType())
             .ne(ObjectUtil.isNotNull(dict.getDictId()), SysDictType::getDictId, dict.getDictId()));
-        if (exist) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !exist;
     }
 
     /**

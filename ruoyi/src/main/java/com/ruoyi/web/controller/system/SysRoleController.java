@@ -1,8 +1,11 @@
 package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.util.ObjectUtil;
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
@@ -84,9 +87,9 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
     public R<Void> add(@Validated @RequestBody SysRole role) {
-        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role))) {
+        if (!roleService.checkRoleNameUnique(role)) {
             return R.fail("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
-        } else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role))) {
+        } else if (!roleService.checkRoleKeyUnique(role)) {
             return R.fail("新增角色'" + role.getRoleName() + "'失败，角色权限已存在");
         }
         return toAjax(roleService.insertRole(role));
@@ -102,20 +105,32 @@ public class SysRoleController extends BaseController {
     public R<Void> edit(@Validated @RequestBody SysRole role) {
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
-        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role))) {
+        if (!roleService.checkRoleNameUnique(role)) {
             return R.fail("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
-        } else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role))) {
+        } else if (!roleService.checkRoleKeyUnique(role)) {
             return R.fail("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
         }
 
         if (roleService.updateRole(role) > 0) {
-            // 更新缓存用户权限
-            LoginUser loginUser = getLoginUser();
-            SysUser sysUser = userService.selectUserById(loginUser.getUserId());
-            if (ObjectUtil.isNotNull(sysUser) && !sysUser.isAdmin()) {
-                loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser));
-                LoginHelper.setLoginUser(loginUser);
+            List<String> keys = StpUtil.searchTokenValue("", 0, -1, false);
+            if (CollUtil.isEmpty(keys)) {
+                return R.ok();
             }
+            // 角色关联的在线用户量过大会导致redis阻塞卡顿 谨慎操作
+            keys.parallelStream().forEach(key -> {
+                String token = key.replace(CacheConstants.LOGIN_TOKEN_KEY, "");
+                // 如果已经过期则跳过
+                if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(token) < -1) {
+                    return;
+                }
+                LoginUser loginUser = LoginHelper.getLoginUser(token);
+                if (loginUser.getRoles().stream().anyMatch(r -> r.getRoleId().equals(role.getRoleId()))) {
+                    try {
+                        StpUtil.logoutByTokenValue(token);
+                    } catch (NotLoginException ignored) {
+                    }
+                }
+            });
             return R.ok();
         }
         return R.fail("修改角色'" + role.getRoleName() + "'失败，请联系管理员");

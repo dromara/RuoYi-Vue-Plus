@@ -31,6 +31,16 @@ public interface CacheNames {
     String SYS_DICT = "sys_dict";
 
     /**
+     * 用户账户
+     */
+    String SYS_USER_NAME = "sys_user_name#30d";
+
+    /**
+     * 部门
+     */
+    String SYS_DEPT = "sys_dept#30d";
+
+    /**
      * OSS内容
      */
     String SYS_OSS = "sys_oss#30d";

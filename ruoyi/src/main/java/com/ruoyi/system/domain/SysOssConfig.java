@@ -68,7 +68,7 @@ public class SysOssConfig extends BaseEntity {
     private String region;
 
     /**
-     * 状态(0正常 1停用)
+     * 是否默认（0=是,1=否）
      */
     private String status;
 
