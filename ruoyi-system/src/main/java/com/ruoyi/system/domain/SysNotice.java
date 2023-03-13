@@ -32,7 +32,7 @@ public class SysNotice extends BaseEntity {
      */
     @Xss(message = "公告标题不能包含脚本字符")
     @NotBlank(message = "公告标题不能为空")
-    @Size(min = 0, max = 50, message = "公告标题不能超过50个字符")
+    @Size(min = 0, max = 50, message = "公告标题不能超过{max}个字符")
     private String noticeTitle;
 
     /**

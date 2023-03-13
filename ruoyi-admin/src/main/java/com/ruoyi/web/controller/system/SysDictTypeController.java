@@ -69,7 +69,7 @@ public class SysDictTypeController extends BaseController {
     @Log(title = "字典类型", businessType = BusinessType.INSERT)
     @PostMapping
     public R<Void> add(@Validated @RequestBody SysDictType dict) {
-        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
+        if (!dictTypeService.checkDictTypeUnique(dict)) {
             return R.fail("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
         dictTypeService.insertDictType(dict);
@@ -83,7 +83,7 @@ public class SysDictTypeController extends BaseController {
     @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     @PutMapping
     public R<Void> edit(@Validated @RequestBody SysDictType dict) {
-        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
+        if (!dictTypeService.checkDictTypeUnique(dict)) {
             return R.fail("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
         dictTypeService.updateDictType(dict);

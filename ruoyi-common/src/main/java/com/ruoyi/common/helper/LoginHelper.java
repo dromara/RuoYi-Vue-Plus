@@ -1,25 +1,25 @@
 package com.ruoyi.common.helper;
 
 import cn.dev33.satoken.context.SaHolder;
+import cn.dev33.satoken.context.model.SaStorage;
+import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.UserType;
-import com.ruoyi.common.exception.UtilException;
-import com.ruoyi.common.utils.StringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
  * 登录鉴权助手
- *
+ * <p>
  * user_type 为 用户类型 同一个用户表 可以有多种用户类型 例如 pc,app
  * deivce 为 设备类型 同一个用户类型 可以有 多种设备类型 例如 web,ios
  * 可以组成 用户类型与设备类型多对多的 权限灵活控制
- *
+ * <p>
  * 多用户体系 针对 多种用户类型 但权限控制不一致
  * 可以组成 多用户类型表与多设备类型 分别控制权限
  *
@@ -28,8 +28,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginHelper {
 
-    public static final String JOIN_CODE = ":";
     public static final String LOGIN_USER_KEY = "loginUser";
+    public static final String USER_KEY = "userId";
 
     /**
      * 登录系统
@@ -37,9 +37,7 @@ public class LoginHelper {
      * @param loginUser 登录用户信息
      */
     public static void login(LoginUser loginUser) {
-        SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
-        StpUtil.login(loginUser.getLoginId());
-        setLoginUser(loginUser);
+        loginByDevice(loginUser, null);
     }
 
     /**
@@ -49,15 +47,14 @@ public class LoginHelper {
      * @param loginUser 登录用户信息
      */
     public static void loginByDevice(LoginUser loginUser, DeviceType deviceType) {
-        SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
-        StpUtil.login(loginUser.getLoginId(), deviceType.getDevice());
-        setLoginUser(loginUser);
-    }
-
-    /**
-     * 设置用户数据(多级缓存)
-     */
-    public static void setLoginUser(LoginUser loginUser) {
+        SaStorage storage = SaHolder.getStorage();
+        storage.set(LOGIN_USER_KEY, loginUser);
+        storage.set(USER_KEY, loginUser.getUserId());
+        SaLoginModel model = new SaLoginModel();
+        if (ObjectUtil.isNotNull(deviceType)) {
+            model.setDevice(deviceType.getDevice());
+        }
+        StpUtil.login(loginUser.getLoginId(), model.setExtra(USER_KEY, loginUser.getUserId()));
         StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
     }
 
@@ -75,26 +72,27 @@ public class LoginHelper {
     }
 
     /**
+     * 获取用户基于token
+     */
+    public static LoginUser getLoginUser(String token) {
+        return (LoginUser) StpUtil.getTokenSessionByToken(token).get(LOGIN_USER_KEY);
+    }
+
+    /**
      * 获取用户id
      */
     public static Long getUserId() {
-        LoginUser loginUser = getLoginUser();
-        if (ObjectUtil.isNull(loginUser)) {
-            String loginId = StpUtil.getLoginIdAsString();
-            String userId = null;
-            for (UserType value : UserType.values()) {
-                if (StringUtils.contains(loginId, value.getUserType())) {
-                    String[] strs = StringUtils.split(loginId, JOIN_CODE);
-                    // 用户id在总是在最后
-                    userId = strs[strs.length - 1];
-                }
+        Long userId;
+        try {
+            userId = Convert.toLong(SaHolder.getStorage().get(USER_KEY));
+            if (ObjectUtil.isNull(userId)) {
+                userId = Convert.toLong(StpUtil.getExtra(USER_KEY));
+                SaHolder.getStorage().set(USER_KEY, userId);
             }
-            if (StringUtils.isBlank(userId)) {
-                throw new UtilException("登录用户: LoginId异常 => " + loginId);
-            }
-            return Long.parseLong(userId);
+        } catch (Exception e) {
+            return null;
         }
-        return loginUser.getUserId();
+        return userId;
     }
 
     /**

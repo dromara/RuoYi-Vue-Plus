@@ -58,7 +58,7 @@ public class GenUtils {
             column.setHtmlType(GenConstants.HTML_INPUT);
 
             // 如果是浮点型 统一用BigDecimal
-            String[] str = StringUtils.split(StringUtils.substringBetween(column.getColumnType(), "(", ")"), ",");
+            String[] str = StringUtils.split(StringUtils.substringBetween(column.getColumnType(), "(", ")"), StringUtils.SEPARATOR);
             if (str != null && str.length == 2 && Integer.parseInt(str[1]) > 0) {
                 column.setJavaType(GenConstants.TYPE_BIGDECIMAL);
             }
@@ -167,7 +167,7 @@ public class GenUtils {
         boolean autoRemovePre = GenConfig.getAutoRemovePre();
         String tablePrefix = GenConfig.getTablePrefix();
         if (autoRemovePre && StringUtils.isNotEmpty(tablePrefix)) {
-            String[] searchList = StringUtils.split(tablePrefix, ",");
+            String[] searchList = StringUtils.split(tablePrefix, StringUtils.SEPARATOR);
             tableName = replaceFirst(tableName, searchList);
         }
         return StringUtils.convertToCamelCase(tableName);
@@ -184,7 +184,7 @@ public class GenUtils {
         String text = replacementm;
         for (String searchString : searchList) {
             if (replacementm.startsWith(searchString)) {
-                text = replacementm.replaceFirst(searchString, "");
+                text = replacementm.replaceFirst(searchString, StringUtils.EMPTY);
                 break;
             }
         }

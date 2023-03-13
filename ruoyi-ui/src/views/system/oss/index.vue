@@ -33,11 +33,12 @@
           v-model="daterangeCreateTime"
           size="small"
           style="width: 240px"
-          value-format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd HH:mm:ss"
           type="daterange"
           range-separator="-"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          :default-time="['00:00:00', '23:59:59']"
         ></el-date-picker>
       </el-form-item>
       <el-form-item label="上传人" prop="createBy">
@@ -129,9 +130,9 @@
       <el-table-column label="文件后缀" align="center" prop="fileSuffix" />
       <el-table-column label="文件展示" align="center" prop="url">
         <template slot-scope="scope">
-          <el-image
+          <ImagePreview
             v-if="previewListResource && checkFileSuffix(scope.row.fileSuffix)"
-            style="width: 100px; height: 100px;"
+            :width=100 :height=100
             :src="scope.row.url"
             :preview-src-list="[scope.row.url]"/>
           <span v-text="scope.row.url"

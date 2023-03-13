@@ -3,6 +3,8 @@ package com.ruoyi.common.helper;
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.context.model.SaStorage;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
+import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -44,4 +46,19 @@ public class DataPermissionHelper {
         }
         throw new NullPointerException("data permission context type exception");
     }
+
+    /**
+     * 开启忽略数据权限(开启后需手动调用 {@link #disableIgnore()} 关闭)
+     */
+    public static void enableIgnore() {
+        InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().dataPermission(true).build());
+    }
+
+    /**
+     * 关闭忽略数据权限
+     */
+    public static void disableIgnore() {
+        InterceptorIgnoreHelper.clearIgnoreStrategy();
+    }
+
 }

@@ -53,7 +53,7 @@ public interface ISysPostService {
      * @param post 岗位信息
      * @return 结果
      */
-    String checkPostNameUnique(SysPost post);
+    boolean checkPostNameUnique(SysPost post);
 
     /**
      * 校验岗位编码
@@ -61,7 +61,7 @@ public interface ISysPostService {
      * @param post 岗位信息
      * @return 结果
      */
-    String checkPostCodeUnique(SysPost post);
+    boolean checkPostCodeUnique(SysPost post);
 
     /**
      * 通过岗位ID查询岗位使用数量

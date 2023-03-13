@@ -128,8 +128,10 @@ security:
     - /**/*.html
     - /**/*.css
     - /**/*.js
-    # swagger 文档配置
+    # 公共路径
     - /favicon.ico
+    - /error
+    # swagger 文档配置
     - /*/api-docs
     - /*/api-docs/**
     # actuator 监控配置
@@ -180,10 +182,22 @@ mybatis-plus:
       # 字段验证策略之 select,在 select 的时候的字段验证策略既 wrapper 根据内部 entity 生成的 where 条件
       where-strategy: NOT_NULL
 
+# 数据加密
+mybatis-encryptor:
+  # 是否开启加密
+  enable: false
+  # 默认加密算法
+  algorithm: BASE64
+  # 编码方式 BASE64/HEX。默认BASE64
+  encode: BASE64
+  # 安全秘钥 对称算法的秘钥 如：AES，SM4
+  password:
+  # 公私钥 非对称算法的公私钥 如：SM2，RSA
+  publicKey:
+  privateKey:
+
 # Swagger配置
 swagger:
-  # 是否开启swagger
-  enabled: true
   info:
     # 标题
     title: '标题：${ruoyi.name}后台管理系统_接口文档'
@@ -205,6 +219,9 @@ swagger:
         name: ${sa-token.token-name}
 
 springdoc:
+  api-docs:
+    # 是否开启接口文档
+    enabled: true
   swagger-ui:
     # 持久化认证数据
     persistAuthorization: true
