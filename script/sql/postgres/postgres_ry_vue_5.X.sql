@@ -1115,7 +1115,7 @@ comment on column sys_oss_config.domain         is '自定义域名';
 comment on column sys_oss_config.is_https       is '是否https（Y=是,N=否）';
 comment on column sys_oss_config.region         is '域';
 comment on column sys_oss_config.access_policy  is '桶权限类型(0=private 1=public 2=custom)';
-comment on column sys_oss_config.status         is '状态（0=正常,1=停用）';
+comment on column sys_oss_config.status         is '是否默认（0=是,1=否）';
 comment on column sys_oss_config.ext1           is '扩展字段';
 comment on column sys_oss_config.create_dept    is '创建部门';
 comment on column sys_oss_config.create_by      is '创建者';
