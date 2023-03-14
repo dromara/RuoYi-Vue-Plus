@@ -2283,7 +2283,7 @@ EXEC sp_addextendedproperty
      'COLUMN', N'access_policy'
 GO
 EXEC sp_addextendedproperty
-    'MS_Description', N'状态（0=正常,1=停用）',
+    'MS_Description', N'是否默认（0=是,1=否）',
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oss_config',
     'COLUMN', N'status'
