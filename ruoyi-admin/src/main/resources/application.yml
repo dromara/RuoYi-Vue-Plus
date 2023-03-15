@@ -3,7 +3,7 @@ ruoyi:
   # 名称
   name: RuoYi-Vue-Plus
   # 版本
-  version: ${ruoyi-vue-plus.version}
+  version: ${revision}
   # 版权年份
   copyrightYear: 2022
   # 实例演示开关

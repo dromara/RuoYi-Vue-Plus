@@ -10,7 +10,7 @@ export function login(tenantId, username, password, code, uuid) {
     uuid
   }
   return request({
-    url: '/login',
+    url: '/auth/login',
     headers: {
       isToken: false
     },
@@ -22,7 +22,7 @@ export function login(tenantId, username, password, code, uuid) {
 // 注册方法
 export function register(data) {
   return request({
-    url: '/register',
+    url: '/auth/register',
     headers: {
       isToken: false
     },
@@ -34,7 +34,7 @@ export function register(data) {
 // 获取用户详细信息
 export function getInfo() {
   return request({
-    url: '/getInfo',
+    url: '/system/user/getInfo',
     method: 'get'
   })
 }
@@ -42,7 +42,7 @@ export function getInfo() {
 // 退出方法
 export function logout() {
   return request({
-    url: '/logout',
+    url: '/auth/logout',
     method: 'post'
   })
 }
@@ -50,7 +50,7 @@ export function logout() {
 // 获取验证码
 export function getCodeImg() {
   return request({
-    url: '/captchaImage',
+    url: '/code',
     headers: {
       isToken: false
     },
@@ -62,7 +62,7 @@ export function getCodeImg() {
 // 短信验证码
 export function getCodeSms() {
   return request({
-    url: '/captchaSms',
+    url: '/sms/code',
     headers: {
       isToken: false
     },
@@ -74,7 +74,7 @@ export function getCodeSms() {
 // 获取租户列表
 export function tenantList() {
   return request({
-    url: '/tenant/list',
+    url: '/auth/tenant/list',
     headers: {
       isToken: false
     },

@@ -1,4 +1,4 @@
-package com.ruoyi.web.domain.vo;
+package com.ruoyi.system.domain.vo;
 
 import com.ruoyi.system.domain.vo.SysUserVo;
 import lombok.Data;

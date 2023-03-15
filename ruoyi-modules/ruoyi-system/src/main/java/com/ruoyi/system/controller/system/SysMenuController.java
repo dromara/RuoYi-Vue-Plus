@@ -12,8 +12,10 @@ import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.common.web.core.BaseController;
+import com.ruoyi.system.domain.SysMenu;
 import com.ruoyi.system.domain.bo.SysMenuBo;
 import com.ruoyi.system.domain.vo.MenuTreeSelectVo;
+import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.domain.vo.SysMenuVo;
 import com.ruoyi.system.service.ISysMenuService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,17 @@ import java.util.List;
 public class SysMenuController extends BaseController {
 
     private final ISysMenuService menuService;
+
+    /**
+     * 获取路由信息
+     *
+     * @return 路由信息
+     */
+    @GetMapping("/getRouters")
+    public R<List<RouterVo>> getRouters() {
+        List<SysMenu> menus = menuService.selectMenuTreeByUserId(LoginHelper.getUserId());
+        return R.ok(menuService.buildMenus(menus));
+    }
 
     /**
      * 获取菜单列表
