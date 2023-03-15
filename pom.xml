@@ -37,6 +37,8 @@
         <xxl-job.version>2.3.1</xxl-job.version>
         <lombok.version>1.18.26</lombok.version>
         <bouncycastle.version>1.72</bouncycastle.version>
+        <!-- 离线IP地址定位库 -->
+        <ip2region.version>2.7.0</ip2region.version>
 
         <!-- 临时修复 snakeyaml 漏洞 -->
         <snakeyaml.version>1.33</snakeyaml.version>
@@ -256,6 +258,13 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>transmittable-thread-local</artifactId>
                 <version>${alibaba-ttl.version}</version>
+            </dependency>
+
+            <!-- 离线IP地址定位库 ip2region -->
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>${ip2region.version}</version>
             </dependency>
 
             <!-- 临时修复 snakeyaml 漏洞 -->
