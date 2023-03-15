@@ -416,10 +416,9 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     public void insertUserPost(SysUserBo user, boolean clear) {
         Long[] posts = user.getPostIds();
         if (ArrayUtil.isNotEmpty(posts)) {
-            Long userId = LoginHelper.getUserId();
             if (clear) {
                 // 删除用户与岗位关联
-                userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getUserId, userId));
+                userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getUserId, user.getUserId()));
             }
             // 新增用户与岗位管理
             List<SysUserPost> list = StreamUtils.toList(List.of(posts), postId -> {
