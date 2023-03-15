@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">RuoYi-Vue-Plus后台管理系统</h3>
+      <h3 class="title">RuoYi-Vue-Plus多租户管理系统</h3>
       <el-form-item prop="tenantId">
         <el-select v-model="loginForm.tenantId" filterable placeholder="请选择/输入公司名称" style="width: 100%">
           <el-option

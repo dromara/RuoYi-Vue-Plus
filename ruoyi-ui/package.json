@@ -1,7 +1,7 @@
 {
   "name": "ruoyi-vue-plus",
   "version": "5.0.0",
-  "description": "RuoYi-Vue-Plus后台管理系统",
+  "description": "RuoYi-Vue-Plus多租户管理系统",
   "author": "LionLi",
   "license": "MIT",
   "scripts": {

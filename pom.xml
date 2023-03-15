@@ -10,7 +10,7 @@
 
     <name>RuoYi-Vue-Plus</name>
     <url>https://gitee.com/JavaLionLi/RuoYi-Vue-Plus</url>
-    <description>RuoYi-Vue-Plus后台管理系统</description>
+    <description>RuoYi-Vue-Plus多租户管理系统</description>
 
     <properties>
         <revision>5.0.0-SNAPSHOT</revision>
