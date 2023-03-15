@@ -64,7 +64,4 @@ public class RegionUtils {
         }
     }
 
-    public static void main(String[] args){
-        System.out.println(RegionUtils.getCityInfo("175.169.65.25"));
-    }
 }
