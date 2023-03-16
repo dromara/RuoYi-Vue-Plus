@@ -34,18 +34,18 @@ import com.ruoyi.common.core.domain.TreeEntity;
 public class ${ClassName}Bo extends ${Entity} {
 
 #foreach ($column in $columns)
-#if(!$table.isSuperColumn($column.javaField) && ($column.query || $column.isInsert || $column.isEdit))
+#if(!$table.isSuperColumn($column.javaField) && ($column.query || $column.insert || $column.edit))
     /**
      * $column.columnComment
      */
-#if($column.isInsert && $column.isEdit)
+#if($column.insert && $column.edit)
 #set($Group="AddGroup.class, EditGroup.class")
-#elseif($column.isInsert)
+#elseif($column.insert)
 #set($Group="AddGroup.class")
-#elseif($column.isEdit)
+#elseif($column.edit)
 #set($Group="EditGroup.class")
 #end
-#if($column.isRequired == 1)
+#if($column.required)
 #if($column.javaType == 'String')
     @NotBlank(message = "$column.columnComment不能为空", groups = { $Group })
 #else

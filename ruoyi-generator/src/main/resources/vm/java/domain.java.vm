@@ -45,7 +45,7 @@ public class ${ClassName} extends ${Entity} {
 #if($column.javaField=='version')
     @Version
 #end
-#if($column.isPk==1)
+#if($column.pk)
     @TableId(value = "$column.columnName")
 #end
     private $column.javaType $column.javaField;
