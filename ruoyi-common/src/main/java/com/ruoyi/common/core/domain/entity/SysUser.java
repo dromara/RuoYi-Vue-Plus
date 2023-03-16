@@ -93,9 +93,13 @@ public class SysUser extends BaseEntity {
         updateStrategy = FieldStrategy.NOT_EMPTY,
         whereStrategy = FieldStrategy.NOT_EMPTY
     )
+    private String password;
+
     @JsonIgnore
     @JsonProperty
-    private String password;
+    public String getPassword() {
+        return password;
+    }
 
     /**
      * 帐号状态（0正常 1停用）
