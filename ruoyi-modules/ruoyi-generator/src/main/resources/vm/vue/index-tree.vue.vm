@@ -334,7 +334,7 @@ export default {
       // 表单校验
       rules: {
 #foreach ($column in $columns)
-#if($column.isInsert || $column.isEdit)
+#if($column.insert || $column.edit)
 #if($column.required)
 #set($parentheseIndex=$column.columnComment.indexOf("（"))
 #if($parentheseIndex != -1)
@@ -407,7 +407,7 @@ export default {
     reset() {
       this.form = {
 #foreach ($column in $columns)
-#if($column.isInsert || $column.isEdit)
+#if($column.insert || $column.edit)
 #if($column.htmlType == "checkbox")
         $column.javaField: []#if($foreach.count != $columns.size()),#end
 #else

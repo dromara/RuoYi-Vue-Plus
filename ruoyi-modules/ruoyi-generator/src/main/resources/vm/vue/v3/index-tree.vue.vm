@@ -305,7 +305,7 @@ const data = reactive({
   },
   rules: {
 #foreach ($column in $columns)
-#if($column.isInsert || $column.isEdit)
+#if($column.insert || $column.edit)
 #if($column.required)
 #set($parentheseIndex=$column.columnComment.indexOf("（"))
 #if($parentheseIndex != -1)
@@ -368,7 +368,7 @@ function cancel() {
 function reset() {
   form.value = {
 #foreach ($column in $columns)
-#if($column.isInsert || $column.isEdit)
+#if($column.insert || $column.edit)
 #if($column.htmlType == "checkbox")
     $column.javaField: []#if($foreach.count != $columns.size()),#end
 #else
