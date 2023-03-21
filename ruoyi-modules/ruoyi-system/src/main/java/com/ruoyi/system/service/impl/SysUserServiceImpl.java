@@ -403,7 +403,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @param user  用户对象
      * @param clear 清除已存在的关联数据
      */
-    public void insertUserRole(SysUserBo user, boolean clear) {
+    private void insertUserRole(SysUserBo user, boolean clear) {
         this.insertUserRole(user.getUserId(), user.getRoleIds(), clear);
     }
 
@@ -413,7 +413,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @param user  用户对象
      * @param clear 清除已存在的关联数据
      */
-    public void insertUserPost(SysUserBo user, boolean clear) {
+    private void insertUserPost(SysUserBo user, boolean clear) {
         Long[] posts = user.getPostIds();
         if (ArrayUtil.isNotEmpty(posts)) {
             if (clear) {
@@ -438,7 +438,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @param roleIds 角色组
      * @param clear   清除已存在的关联数据
      */
-    public void insertUserRole(Long userId, Long[] roleIds, boolean clear) {
+    private void insertUserRole(Long userId, Long[] roleIds, boolean clear) {
         if (ArrayUtil.isNotEmpty(roleIds)) {
             // 判断是否具有此角色的操作权限
             List<SysRoleVo> roles = roleMapper.selectRoleList(new LambdaQueryWrapper<>());
