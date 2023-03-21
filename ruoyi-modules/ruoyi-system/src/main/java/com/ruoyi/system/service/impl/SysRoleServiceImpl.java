@@ -291,7 +291,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      *
      * @param role 角色对象
      */
-    public int insertRoleMenu(SysRoleBo role) {
+    private int insertRoleMenu(SysRoleBo role) {
         int rows = 1;
         // 新增用户与角色管理
         List<SysRoleMenu> list = new ArrayList<SysRoleMenu>();
@@ -312,7 +312,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      *
      * @param role 角色对象
      */
-    public int insertRoleDept(SysRoleBo role) {
+    private int insertRoleDept(SysRoleBo role) {
         int rows = 1;
         // 新增角色与部门（数据权限）管理
         List<SysRoleDept> list = new ArrayList<SysRoleDept>();
