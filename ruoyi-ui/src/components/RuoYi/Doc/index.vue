@@ -9,7 +9,7 @@ export default {
   name: 'RuoYiDoc',
   data() {
     return {
-      url: 'https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages'
+      url: 'https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages'
     }
   },
   methods: {

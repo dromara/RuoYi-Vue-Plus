@@ -48,7 +48,7 @@
             size="mini"
             icon="el-icon-cloudy"
             plain
-            @click="goTarget('https://gitee.com/JavaLionLi/RuoYi-Vue-Plus')"
+            @click="goTarget('https://gitee.com/dromara/RuoYi-Vue-Plus')"
             >访问码云</el-button
           >
           <el-button
@@ -56,7 +56,7 @@
             size="mini"
             icon="el-icon-cloudy"
             plain
-            @click="goTarget('https://github.com/JavaLionLi/RuoYi-Vue-Plus')"
+            @click="goTarget('https://github.com/dromara/RuoYi-Vue-Plus')"
           >访问GitHub</el-button
           >
           <el-button
@@ -64,7 +64,7 @@
             size="mini"
             icon="el-icon-cloudy"
             plain
-            @click="goTarget('https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4106467&doc_id=1469725')"
+            @click="goTarget('https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=4106467&doc_id=1469725')"
           >更新日志</el-button
           >
         </p>

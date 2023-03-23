@@ -1,10 +1,10 @@
 ## 平台简介
-[![码云Gitee](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
-[![GitHub](https://img.shields.io/github/stars/JavaLionLi/RuoYi-Vue-Plus.svg?style=social&label=Stars)](https://github.com/JavaLionLi/RuoYi-Vue-Plus)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/blob/master/LICENSE)
+[![码云Gitee](https://gitee.com/dromara/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/dromara/RuoYi-Vue-Plus)
+[![GitHub](https://img.shields.io/github/stars/JavaLionLi/RuoYi-Vue-Plus.svg?style=social&label=Stars)](https://github.com/dromara/RuoYi-Vue-Plus)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus/blob/master/LICENSE)
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
 <br>
-[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-4.6.0-success.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
+[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-4.6.0-success.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7-blue.svg)]()
 [![JDK-8+](https://img.shields.io/badge/JDK-8-green.svg)]()
 [![JDK-11](https://img.shields.io/badge/JDK-11-green.svg)]()
@@ -14,14 +14,14 @@
 > 项目代码、文档 均开源免费可商用 遵循开源协议在项目中保留开源协议文件即可<br>
 活到老写到老 为兴趣而开源 为学习而开源 为让大家真正可以学到技术而开源
 
-> 系统演示: [传送门](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4836388&doc_id=1469725)
+> 系统演示: [传送门](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=4836388&doc_id=1469725)
 
 | 功能介绍     | 使用技术                | 文档地址                                                                                              | 特性注意事项                     |
 |----------|---------------------|---------------------------------------------------------------------------------------------------|----------------------------|
-| 当前框架     | RuoYi-Vue-Plus      | [RuoYi-Vue-Plus文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)                       | 重写RuoYi-Vue全方位升级(不兼容原框架)   |
+| 当前框架     | RuoYi-Vue-Plus      | [RuoYi-Vue-Plus文档](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages)                       | 重写RuoYi-Vue全方位升级(不兼容原框架)   |
 | 微服务分支    | RuoYi-Cloud-Plus    | [微服务分支地址](https://gitee.com/JavaLionLi/RuoYi-Cloud-Plus)                                          | 重写RuoYi-Cloud全方位升级(不兼容原框架) |
-| 单体分支     | RuoYi-Vue-Plus-fast | [fast分支地址](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)                                | 单体应用结构                     |
-| Vue3分支   | RuoYi-Vue-Plus-UI   | [UI地址](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus-UI)                                            | 由于组件还未完善 仅供学习              |
+| 单体分支     | RuoYi-Vue-Plus-fast | [fast分支地址](https://gitee.com/dromara/RuoYi-Vue-Plus/tree/fast/)                                | 单体应用结构                     |
+| Vue3分支   | RuoYi-Vue-Plus-UI   | [UI地址](https://gitee.com/dromara/RuoYi-Vue-Plus-UI)                                            | 由于组件还未完善 仅供学习              |
 | 原框架      | RuoYi-Vue           | [RuoYi-Vue官网](http://ruoyi.vip/)                                                                  | 定期同步需要的功能                  |
 | 前端开发框架   | Vue、Element UI      | [Element UI官网](https://element.eleme.cn/#/zh-CN)                                                  |                            |
 | 后端开发框架   | SpringBoot          | [SpringBoot官网](https://spring.io/projects/spring-boot/#learn)                                     |                            |
@@ -44,14 +44,14 @@
 | 分布式链路追踪  | Apache SkyWalking   | [Apache SkyWalking文档](https://skywalking.apache.org/docs/)                                        | 链路追踪、网格分析、度量聚合、可视化         |
 | 分布式任务调度  | Xxl-Job             | [Xxl-Job官网](https://www.xuxueli.com/xxl-job/)                                                     | 高性能 高可靠 易扩展                |
 | 文件存储     | Minio               | [Minio文档](https://docs.min.io/)                                                                   | 本地存储                       |
-| 文件存储     | 七牛、阿里、腾讯            | [OSS使用文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4359146&doc_id=1469725) | 云存储                        |
-| 短信模块     | 阿里、腾讯               | [短信使用文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=5578491&doc_id=1469725)  | 短信发送                       |
+| 文件存储     | 七牛、阿里、腾讯            | [OSS使用文档](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=4359146&doc_id=1469725) | 云存储                        |
+| 短信模块     | 阿里、腾讯               | [短信使用文档](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=5578491&doc_id=1469725)  | 短信发送                       |
 | 监控框架     | SpringBoot-Admin    | [SpringBoot-Admin文档](https://codecentric.github.io/spring-boot-admin/current/)                    | 全方位服务监控                    |
 | 校验框架     | Validation          | [Validation文档](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/)    | 增强接口安全性、严谨性 支持国际化          |
 | Excel框架  | Alibaba EasyExcel   | [EasyExcel文档](https://www.yuque.com/easyexcel/doc/easyexcel)                                      | 性能优异 扩展性强                  |
-| 文档框架     | SpringDoc、javadoc   | [接口文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=5805266&doc_id=1469725)    | 无注解零入侵基于java注释             |
+| 文档框架     | SpringDoc、javadoc   | [接口文档](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=5805266&doc_id=1469725)    | 无注解零入侵基于java注释             |
 | 工具类框架    | Hutool、Lombok       | [Hutool文档](https://www.hutool.cn/docs/)                                                           | 减少代码冗余 增加安全性               |
-| 代码生成器    | 适配MP、SpringDoc规范化代码 | [代码生成文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=5522329&doc_id=1469725)  | 一键生成前后端代码                  |
+| 代码生成器    | 适配MP、SpringDoc规范化代码 | [代码生成文档](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=5522329&doc_id=1469725)  | 一键生成前后端代码                  |
 | 部署方式     | Docker              | [Docker文档](https://docs.docker.com/)                                                              | 容器编排 一键部署业务集群              |
 | 国际化      | SpringMessage       | [SpringMVC文档](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc)   | Spring标准国际化方案              |
 
@@ -59,17 +59,17 @@
 
 使用框架前请仔细阅读文档重点注意事项
 <br>
->[初始化项目 必看](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4164117&doc_id=1469725)
->>[https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4164117&doc_id=1469725](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4164117&doc_id=1469725)
+>[初始化项目 必看](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=4164117&doc_id=1469725)
+>>[https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=4164117&doc_id=1469725](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=4164117&doc_id=1469725)
 >
->[专栏与视频 入门必看](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=5473272&doc_id=1469725)
->>[https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=5473272&doc_id=1469725](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=5473272&doc_id=1469725)
+>[专栏与视频 入门必看](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=5473272&doc_id=1469725)
+>>[https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=5473272&doc_id=1469725](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=5473272&doc_id=1469725)
 >
->[部署项目 必看](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4219382&doc_id=1469725)
->>[https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4219382&doc_id=1469725](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4219382&doc_id=1469725)
+>[部署项目 必看](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=4219382&doc_id=1469725)
+>>[https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=4219382&doc_id=1469725](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=4219382&doc_id=1469725)
 > 
->[参考文档 Wiki](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)
->>[https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages)
+>[参考文档 Wiki](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages)
+>>[https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages)
 
 ## 软件架构图
 
@@ -83,14 +83,14 @@
 ### 其他
 
 * 同步升级 RuoYi-Vue
-* GitHub 地址 [RuoYi-Vue-Plus-github](https://github.com/JavaLionLi/RuoYi-Vue-Plus)
-* 单模块 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
+* GitHub 地址 [RuoYi-Vue-Plus-github](https://github.com/dromara/RuoYi-Vue-Plus)
+* 单模块 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/dromara/RuoYi-Vue-Plus/tree/fast/)
 * 微服务 分支 [RuoYi-Cloud-Plus](https://gitee.com/JavaLionLi/RuoYi-Cloud-Plus)
-* 用户扩展项目 [扩展项目列表](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages?sort_id=4478302&doc_id=1469725)
+* 用户扩展项目 [扩展项目列表](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=4478302&doc_id=1469725)
 
 ## 加群与捐献
->[加群与捐献](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/加群与捐献?sort_id=4104598)
->>[https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/加群与捐献?sort_id=4104598](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/加群与捐献?sort_id=4104598)
+>[加群与捐献](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/加群与捐献?sort_id=4104598)
+>>[https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/加群与捐献?sort_id=4104598](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/加群与捐献?sort_id=4104598)
 
 ## 捐献作者
 作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  
