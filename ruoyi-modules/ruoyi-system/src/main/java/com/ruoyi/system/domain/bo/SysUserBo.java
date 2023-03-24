@@ -9,6 +9,7 @@ import com.ruoyi.system.domain.SysUser;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -110,6 +111,7 @@ public class SysUserBo extends BaseEntity {
     /**
      * 角色组
      */
+    @Size(min = 1, message = "用户角色不能为空")
     private Long[] roleIds;
 
     /**
