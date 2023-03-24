@@ -73,7 +73,7 @@ public class TenantHelper {
         if (!SpringMVCUtil.isWeb()) {
             return TEMP_DYNAMIC_TENANT.get();
         }
-        String cacheKey = DYNAMIC_TENANT_KEY + ":" + LoginHelper.getTenantId();
+        String cacheKey = DYNAMIC_TENANT_KEY + ":" + LoginHelper.getUserId();
         String tenantId = (String) SaHolder.getStorage().get(cacheKey);
         if (StringUtils.isNotBlank(tenantId)) {
             return tenantId;
