@@ -14,7 +14,7 @@
 
     <properties>
         <revision>5.0.0-SNAPSHOT</revision>
-        <spring-boot.version>3.0.4</spring-boot.version>
+        <spring-boot.version>3.0.5</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
@@ -35,7 +35,7 @@
         <dynamic-ds.version>3.6.1</dynamic-ds.version>
         <alibaba-ttl.version>2.14.2</alibaba-ttl.version>
         <xxl-job.version>2.3.1</xxl-job.version>
-        <mapstruct-plus.version>1.1.8</mapstruct-plus.version>
+        <mapstruct-plus.version>1.1.9</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.26</lombok.version>
         <bouncycastle.version>1.72</bouncycastle.version>
