@@ -67,6 +67,6 @@ public class DataBaseHelper {
             return "instr(','||%s||',' , ',%s,') <> 0".formatted(var2, var);
         }
         // find_in_set(100 , '0,100,101')
-        return "find_in_set(%s , %s) <> 0".formatted(var, var2);
+        return "find_in_set('%s' , %s) <> 0".formatted(var, var2);
     }
 }
