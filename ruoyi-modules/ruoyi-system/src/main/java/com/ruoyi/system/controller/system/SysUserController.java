@@ -151,7 +151,7 @@ public class SysUserController extends BaseController {
             return R.fail("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         if (TenantHelper.isEnable()) {
-            if (!tenantService.checkAccountBalance(LoginHelper.getTenantId())) {
+            if (!tenantService.checkAccountBalance(TenantHelper.getTenantId())) {
                 return R.fail("当前租户下用户名额不足，请联系管理员");
             }
         }
