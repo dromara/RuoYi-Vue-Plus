@@ -38,7 +38,7 @@ import java.util.List;
 @RequestMapping("/system/oss")
 public class SysOssController extends BaseController {
 
-    private final ISysOssService sysOssService;
+    private final ISysOssService ossService;
 
     /**
      * 查询OSS对象存储列表
@@ -46,7 +46,7 @@ public class SysOssController extends BaseController {
     @SaCheckPermission("system:oss:list")
     @GetMapping("/list")
     public TableDataInfo<SysOssVo> list(@Validated(QueryGroup.class) SysOssBo bo, PageQuery pageQuery) {
-        return sysOssService.queryPageList(bo, pageQuery);
+        return ossService.queryPageList(bo, pageQuery);
     }
 
     /**
@@ -58,7 +58,7 @@ public class SysOssController extends BaseController {
     @GetMapping("/listByIds/{ossIds}")
     public R<List<SysOssVo>> listByIds(@NotEmpty(message = "主键不能为空")
                                        @PathVariable Long[] ossIds) {
-        List<SysOssVo> list = sysOssService.listByIds(Arrays.asList(ossIds));
+        List<SysOssVo> list = ossService.listByIds(Arrays.asList(ossIds));
         return R.ok(list);
     }
 
@@ -74,7 +74,7 @@ public class SysOssController extends BaseController {
         if (ObjectUtil.isNull(file)) {
             throw new ServiceException("上传文件不能为空");
         }
-        SysOssVo oss = sysOssService.upload(file);
+        SysOssVo oss = ossService.upload(file);
         SysOssUploadVo uploadVo = new SysOssUploadVo();
         uploadVo.setUrl(oss.getUrl());
         uploadVo.setFileName(oss.getOriginalName());
@@ -90,7 +90,7 @@ public class SysOssController extends BaseController {
     @SaCheckPermission("system:oss:download")
     @GetMapping("/download/{ossId}")
     public void download(@PathVariable Long ossId, HttpServletResponse response) throws IOException {
-        sysOssService.download(ossId, response);
+        ossService.download(ossId, response);
     }
 
     /**
@@ -103,7 +103,7 @@ public class SysOssController extends BaseController {
     @DeleteMapping("/{ossIds}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ossIds) {
-        return toAjax(sysOssService.deleteWithValidByIds(List.of(ossIds), true));
+        return toAjax(ossService.deleteWithValidByIds(List.of(ossIds), true));
     }
 
 }
