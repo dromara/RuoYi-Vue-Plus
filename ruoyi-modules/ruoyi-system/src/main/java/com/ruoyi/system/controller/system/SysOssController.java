@@ -72,7 +72,7 @@ public class SysOssController extends BaseController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<SysOssUploadVo> upload(@RequestPart("file") MultipartFile file) {
         if (ObjectUtil.isNull(file)) {
-            R.fail("上传文件不能为空");
+            return R.fail("上传文件不能为空");
         }
         SysOssVo oss = ossService.upload(file);
         SysOssUploadVo uploadVo = new SysOssUploadVo();
