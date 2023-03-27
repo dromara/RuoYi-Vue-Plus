@@ -9,6 +9,6 @@ import com.ruoyi.system.domain.vo.SysDictTypeVo;
  *
  * @author Lion Li
  */
-public interface SysDictTypeMapper extends BaseMapperPlus<SysDictTypeMapper, SysDictType, SysDictTypeVo> {
+public interface SysDictTypeMapper extends BaseMapperPlus<SysDictType, SysDictTypeVo> {
 
 }

@@ -24,27 +24,22 @@ import java.util.stream.Collectors;
 /**
  * 自定义 Mapper 接口, 实现 自定义扩展
  *
- * @param <M> mapper 泛型
  * @param <T> table 泛型
  * @param <V> vo 泛型
  * @author Lion Li
  * @since 2021-05-13
  */
 @SuppressWarnings("unchecked")
-public interface BaseMapperPlus<M, T, V> extends BaseMapper<T> {
+public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
 
     Log log = LogFactory.getLog(BaseMapperPlus.class);
 
     default Class<V> currentVoClass() {
-        return (Class<V>) ReflectionKit.getSuperClassGenericType(this.getClass(), BaseMapperPlus.class, 2);
+        return (Class<V>) ReflectionKit.getSuperClassGenericType(this.getClass(), BaseMapperPlus.class, 1);
     }
 
     default Class<T> currentModelClass() {
-        return (Class<T>) ReflectionKit.getSuperClassGenericType(this.getClass(), BaseMapperPlus.class, 1);
-    }
-
-    default Class<M> currentMapperClass() {
-        return (Class<M>) ReflectionKit.getSuperClassGenericType(this.getClass(), BaseMapperPlus.class, 0);
+        return (Class<T>) ReflectionKit.getSuperClassGenericType(this.getClass(), BaseMapperPlus.class, 0);
     }
 
     default List<T> selectList() {

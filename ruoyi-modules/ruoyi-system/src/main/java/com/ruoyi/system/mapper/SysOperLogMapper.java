@@ -9,6 +9,6 @@ import com.ruoyi.system.domain.vo.SysOperLogVo;
  *
  * @author Lion Li
  */
-public interface SysOperLogMapper extends BaseMapperPlus<SysOperLogMapper, SysOperLog, SysOperLogVo> {
+public interface SysOperLogMapper extends BaseMapperPlus<SysOperLog, SysOperLogVo> {
 
 }

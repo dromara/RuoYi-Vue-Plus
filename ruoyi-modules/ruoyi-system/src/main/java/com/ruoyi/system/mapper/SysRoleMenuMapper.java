@@ -8,6 +8,6 @@ import com.ruoyi.system.domain.SysRoleMenu;
  *
  * @author Lion Li
  */
-public interface SysRoleMenuMapper extends BaseMapperPlus<SysRoleMenuMapper, SysRoleMenu, SysRoleMenu> {
+public interface SysRoleMenuMapper extends BaseMapperPlus<SysRoleMenu, SysRoleMenu> {
 
 }

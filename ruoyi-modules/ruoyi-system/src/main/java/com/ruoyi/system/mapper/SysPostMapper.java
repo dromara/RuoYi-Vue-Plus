@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface SysPostMapper extends BaseMapperPlus<SysPostMapper, SysPost, SysPostVo> {
+public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
 
     /**
      * 根据用户ID获取岗位选择框列表

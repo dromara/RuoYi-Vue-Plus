@@ -9,6 +9,6 @@ import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
  *
  * @author Michelle.Chung
  */
-public interface SysTenantMapper extends BaseMapperPlus<SysTenantMapper, SysTenant, SysTenantVo> {
+public interface SysTenantMapper extends BaseMapperPlus<SysTenant, SysTenantVo> {
 
 }
