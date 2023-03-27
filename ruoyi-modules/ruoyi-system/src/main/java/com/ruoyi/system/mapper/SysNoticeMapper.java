@@ -9,6 +9,6 @@ import com.ruoyi.system.domain.vo.SysNoticeVo;
  *
  * @author Lion Li
  */
-public interface SysNoticeMapper extends BaseMapperPlus<SysNoticeMapper, SysNotice, SysNoticeVo> {
+public interface SysNoticeMapper extends BaseMapperPlus<SysNotice, SysNoticeVo> {
 
 }

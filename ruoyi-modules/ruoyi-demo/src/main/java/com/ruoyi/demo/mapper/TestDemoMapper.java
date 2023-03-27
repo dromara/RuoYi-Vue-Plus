@@ -20,7 +20,7 @@ import java.util.List;
  * @author Lion Li
  * @date 2021-07-26
  */
-public interface TestDemoMapper extends BaseMapperPlus<TestDemoMapper, TestDemo, TestDemoVo> {
+public interface TestDemoMapper extends BaseMapperPlus<TestDemo, TestDemoVo> {
 
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id"),

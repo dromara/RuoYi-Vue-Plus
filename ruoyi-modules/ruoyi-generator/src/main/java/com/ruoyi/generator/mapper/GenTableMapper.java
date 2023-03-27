@@ -14,7 +14,7 @@ import java.util.List;
  * @author Lion Li
  */
 @InterceptorIgnore(dataPermission = "true", tenantLine = "true")
-public interface GenTableMapper extends BaseMapperPlus<GenTableMapper, GenTable, GenTable> {
+public interface GenTableMapper extends BaseMapperPlus<GenTable, GenTable> {
 
     /**
      * 查询据库列表

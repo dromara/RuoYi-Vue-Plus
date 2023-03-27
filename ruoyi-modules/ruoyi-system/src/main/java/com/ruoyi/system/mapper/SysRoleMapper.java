@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface SysRoleMapper extends BaseMapperPlus<SysRoleMapper, SysRole, SysRoleVo> {
+public interface SysRoleMapper extends BaseMapperPlus<SysRole, SysRoleVo> {
 
     @DataPermission({
         @DataColumn(key = "deptName", value = "d.dept_id")

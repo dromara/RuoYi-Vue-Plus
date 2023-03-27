@@ -9,6 +9,6 @@ import com.ruoyi.system.domain.vo.SysConfigVo;
  *
  * @author Lion Li
  */
-public interface SysConfigMapper extends BaseMapperPlus<SysConfigMapper, SysConfig, SysConfigVo> {
+public interface SysConfigMapper extends BaseMapperPlus<SysConfig, SysConfigVo> {
 
 }

@@ -9,6 +9,6 @@ import com.ruoyi.system.domain.vo.SysTenantPackageVo;
  *
  * @author Michelle.Chung
  */
-public interface SysTenantPackageMapper extends BaseMapperPlus<SysTenantPackageMapper, SysTenantPackage, SysTenantPackageVo> {
+public interface SysTenantPackageMapper extends BaseMapperPlus<SysTenantPackage, SysTenantPackageVo> {
 
 }
