@@ -89,7 +89,7 @@ public class SysTenantController extends BaseController {
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysTenantBo bo) {
         if (!tenantService.checkCompanyNameUnique(bo)) {
-            throw new ServiceException("新增租户'" + bo.getCompanyName() + "'失败，企业名称已存在");
+            R.fail("新增租户'" + bo.getCompanyName() + "'失败，企业名称已存在");
         }
         return toAjax(tenantService.insertByBo(bo));
     }
@@ -105,7 +105,7 @@ public class SysTenantController extends BaseController {
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysTenantBo bo) {
         tenantService.checkTenantAllowed(bo.getTenantId());
         if (!tenantService.checkCompanyNameUnique(bo)) {
-            throw new ServiceException("修改租户'" + bo.getCompanyName() + "'失败，公司名称已存在");
+            R.fail("修改租户'" + bo.getCompanyName() + "'失败，公司名称已存在");
         }
         return toAjax(tenantService.updateByBo(bo));
     }
