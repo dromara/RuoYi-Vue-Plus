@@ -1,4 +1,4 @@
-FROM ghcr.io/graalvm/jdk:ol8-java17-22.3.0
+FROM ghcr.io/graalvm/graalvm-ce:22.3.0
 
 MAINTAINER Lion Li
 
