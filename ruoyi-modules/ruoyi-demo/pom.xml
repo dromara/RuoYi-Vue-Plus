@@ -94,6 +94,10 @@
             <artifactId>ruoyi-common-tenant</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-websocket</artifactId>
+        </dependency>
         <!-- 短信 用哪个导入哪个依赖 -->
 <!--        <dependency>-->
 <!--            <groupId>com.aliyun</groupId>-->

@@ -159,6 +159,12 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- WebSocket模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-websocket</artifactId>
+                <version>${revision}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
