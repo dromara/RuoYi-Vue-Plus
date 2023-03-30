@@ -57,7 +57,6 @@ public class SysLoginService {
     private final CaptchaProperties captchaProperties;
     private final ISysPermissionService permissionService;
     private final ISysTenantService tenantService;
-
     private final ISysConfigService configService;
 
     /**

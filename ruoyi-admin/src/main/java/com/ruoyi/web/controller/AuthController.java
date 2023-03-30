@@ -156,7 +156,6 @@ public class AuthController {
      *
      * @return ture：打开 false：关闭
      */
-    @SaIgnore
     @GetMapping("/registerEnabled")
     public R<Boolean> registerEnabled() {
         return R.ok(Convert.toBool(configService.selectConfigByKey("sys.account.registerUser")));
