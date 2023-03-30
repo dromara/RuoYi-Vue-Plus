@@ -3,9 +3,9 @@ package com.ruoyi.web.controller;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.GlobalConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.SpringUtils;
@@ -14,11 +14,11 @@ import com.ruoyi.common.core.utils.reflect.ReflectUtils;
 import com.ruoyi.common.mail.config.properties.MailProperties;
 import com.ruoyi.common.mail.utils.MailUtils;
 import com.ruoyi.common.redis.utils.RedisUtils;
+import com.ruoyi.common.sms.config.properties.SmsProperties;
 import com.ruoyi.common.sms.core.SmsTemplate;
 import com.ruoyi.common.sms.entity.SmsResult;
 import com.ruoyi.common.web.config.properties.CaptchaProperties;
 import com.ruoyi.common.web.enums.CaptchaType;
-import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.web.domain.vo.CaptchaVo;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -47,9 +47,8 @@ import java.util.Map;
 public class CaptchaController {
 
     private final CaptchaProperties captchaProperties;
+    private final SmsProperties smsProperties;
     private final MailProperties mailProperties;
-    private final ISysConfigService configService;
-
 
     /**
      * 短信验证码
@@ -58,15 +57,14 @@ public class CaptchaController {
      */
     @GetMapping("/sms/code")
     public R<Void> smsCode(@NotBlank(message = "{user.phonenumber.not.blank}") String phonenumber) {
-        if (!Convert.toBool(configService.selectConfigByKey("sys.account.smsEnabled"))) {
+        if (!smsProperties.getEnabled()) {
             return R.fail("当前系统没有开启短信功能！");
         }
         String key = GlobalConstants.CAPTCHA_CODE_KEY + phonenumber;
         String code = RandomUtil.randomNumbers(4);
-        Integer captchaExpired = Convert.toInt(configService.selectConfigByKey("sys.account.captchaExpired"));
-        RedisUtils.setCacheObject(key, code, Duration.ofMinutes(captchaExpired));
+        RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         // 验证码模板id 自行处理 (查数据库或写死均可)
-        String templateId = configService.selectConfigByKey("sys.account.templateId");
+        String templateId = "";
         Map<String, String> map = new HashMap<>(1);
         map.put("code", code);
         SmsTemplate smsTemplate = SpringUtils.getBean(SmsTemplate.class);
@@ -90,10 +88,9 @@ public class CaptchaController {
         }
         String key = GlobalConstants.CAPTCHA_CODE_KEY + email;
         String code = RandomUtil.randomNumbers(4);
-        Integer captchaExpired = Convert.toInt(configService.selectConfigByKey("sys.account.captchaExpired"));
-        RedisUtils.setCacheObject(key, code, Duration.ofMinutes(captchaExpired));
+        RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         try {
-            MailUtils.sendText(email, "登录验证码", "您本次验证码为：%s，有效性为%d分钟，请尽快填写。".formatted(code, captchaExpired));
+            MailUtils.sendText(email, "登录验证码", "您本次验证码为：" + code + "，有效性为" + Constants.CAPTCHA_EXPIRATION + "分钟，请尽快填写。");
         } catch (Exception e) {
             log.error("验证码短信发送异常 => {}", e.getMessage());
             return R.fail(e.getMessage());
@@ -129,8 +126,7 @@ public class CaptchaController {
             Expression exp = parser.parseExpression(StringUtils.remove(code, "="));
             code = exp.getValue(String.class);
         }
-        Integer captchaExpired = Convert.toInt(configService.selectConfigByKey("sys.account.captchaExpired"));
-        RedisUtils.setCacheObject(verifyKey, code, Duration.ofMinutes(captchaExpired));
+        RedisUtils.setCacheObject(verifyKey, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         captchaVo.setUuid(uuid);
         captchaVo.setImg(captcha.getImageBase64());
         return R.ok(captchaVo);

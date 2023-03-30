@@ -63,6 +63,11 @@ public interface Constants {
     String LOGIN_FAIL = "Error";
 
     /**
+     * 验证码有效期（分钟）
+     */
+    Integer CAPTCHA_EXPIRATION = 2;
+
+    /**
      * 令牌
      */
     String TOKEN = "token";

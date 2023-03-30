@@ -13,6 +13,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "sms")
 public class SmsProperties {
 
+    private Boolean enabled;
+
     /**
      * 配置节点
      * 阿里云 dysmsapi.aliyuncs.com

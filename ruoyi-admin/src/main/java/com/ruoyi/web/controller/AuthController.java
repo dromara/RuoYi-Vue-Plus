@@ -2,7 +2,6 @@ package com.ruoyi.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.EmailLoginBody;
 import com.ruoyi.common.core.domain.model.LoginBody;
@@ -58,9 +57,9 @@ public class AuthController {
         LoginVo loginVo = new LoginVo();
         // 生成令牌
         String token = loginService.login(
-            body.getTenantId(),
-            body.getUsername(), body.getPassword(),
-            body.getCode(), body.getUuid());
+                body.getTenantId(),
+                body.getUsername(), body.getPassword(),
+                body.getCode(), body.getUuid());
         loginVo.setToken(token);
         return R.ok(loginVo);
     }
@@ -149,16 +148,6 @@ public class AuthController {
         vo.setVoList(CollUtil.isNotEmpty(list) ? list : voList);
         vo.setTenantEnabled(TenantHelper.isEnable());
         return R.ok(vo);
-    }
-
-    /**
-     * 注册开关
-     *
-     * @return ture：打开 false：关闭
-     */
-    @GetMapping("/registerEnabled")
-    public R<Boolean> registerEnabled() {
-        return R.ok(Convert.toBool(configService.selectConfigByKey("sys.account.registerUser")));
     }
 
 }
