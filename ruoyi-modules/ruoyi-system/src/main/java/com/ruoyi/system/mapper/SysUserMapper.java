@@ -79,6 +79,14 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     SysUserVo selectUserByPhonenumber(String phonenumber);
 
     /**
+     * 通过邮箱查询用户
+     *
+     * @param email 邮箱
+     * @return 用户对象信息
+     */
+    SysUserVo selectUserByEmail(String email);
+
+    /**
      * 通过用户名查询用户(不走租户插件)
      *
      * @param userName 用户名
@@ -97,6 +105,16 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
      */
     @InterceptorIgnore(tenantLine = "true")
     SysUserVo selectTenantUserByPhonenumber(String phonenumber, String tenantId);
+
+    /**
+     * 通过邮箱查询用户(不走租户插件)
+     *
+     * @param email    邮箱
+     * @param tenantId 租户id
+     * @return 用户对象信息
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    SysUserVo selectTenantUserByEmail(String email, String tenantId);
 
     /**
      * 通过用户ID查询用户

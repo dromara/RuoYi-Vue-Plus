@@ -11,6 +11,8 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.reflect.ReflectUtils;
+import com.ruoyi.common.mail.config.properties.MailProperties;
+import com.ruoyi.common.mail.utils.MailUtils;
 import com.ruoyi.common.redis.utils.RedisUtils;
 import com.ruoyi.common.sms.config.properties.SmsProperties;
 import com.ruoyi.common.sms.core.SmsTemplate;
@@ -46,6 +48,7 @@ public class CaptchaController {
 
     private final CaptchaProperties captchaProperties;
     private final SmsProperties smsProperties;
+    private final MailProperties mailProperties;
 
     /**
      * 短信验证码
@@ -53,8 +56,7 @@ public class CaptchaController {
      * @param phonenumber 用户手机号
      */
     @GetMapping("/sms/code")
-    public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}")
-                              String phonenumber) {
+    public R<Void> smsCode(@NotBlank(message = "{user.phonenumber.not.blank}") String phonenumber) {
         if (!smsProperties.getEnabled()) {
             return R.fail("当前系统没有开启短信功能！");
         }
@@ -70,6 +72,28 @@ public class CaptchaController {
         if (!result.isSuccess()) {
             log.error("验证码短信发送异常 => {}", result);
             return R.fail(result.getMessage());
+        }
+        return R.ok();
+    }
+
+    /**
+     * 邮箱验证码
+     *
+     * @param email 邮箱
+     */
+    @GetMapping("/email/code")
+    public R<Void> emailCode(@NotBlank(message = "{user.email.not.blank}") String email) {
+        if (!mailProperties.getEnabled()) {
+            return R.fail("当前系统没有开启邮箱功能！");
+        }
+        String key = GlobalConstants.CAPTCHA_CODE_KEY + email;
+        String code = RandomUtil.randomNumbers(4);
+        RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
+        try {
+            MailUtils.sendText(email, "登录验证码", "您本次验证码为：" + code + "，有效性为" + Constants.CAPTCHA_EXPIRATION + "分钟，请尽快填写。");
+        } catch (Exception e) {
+            log.error("验证码短信发送异常 => {}", e.getMessage());
+            return R.fail(e.getMessage());
         }
         return R.ok();
     }

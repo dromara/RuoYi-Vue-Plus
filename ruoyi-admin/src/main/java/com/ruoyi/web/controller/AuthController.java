@@ -3,6 +3,7 @@ package com.ruoyi.web.controller;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.domain.model.EmailLoginBody;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.core.domain.model.SmsLoginBody;
@@ -62,7 +63,7 @@ public class AuthController {
     }
 
     /**
-     * 短信登录(示例)
+     * 短信登录
      *
      * @param body 登录信息
      * @return 结果
@@ -72,6 +73,21 @@ public class AuthController {
         LoginVo loginVo = new LoginVo();
         // 生成令牌
         String token = loginService.smsLogin(body.getTenantId(), body.getPhonenumber(), body.getSmsCode());
+        loginVo.setToken(token);
+        return R.ok(loginVo);
+    }
+
+    /**
+     * 邮件登录
+     *
+     * @param body 登录信息
+     * @return 结果
+     */
+    @PostMapping("/emailLogin")
+    public R<LoginVo> emailLogin(@Validated @RequestBody EmailLoginBody body) {
+        LoginVo loginVo = new LoginVo();
+        // 生成令牌
+        String token = loginService.emailLogin(body.getTenantId(), body.getEmail(), body.getEmailCode());
         loginVo.setToken(token);
         return R.ok(loginVo);
     }
