@@ -2,7 +2,6 @@ package com.ruoyi.common.websocket.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.validation.annotation.Validated;
 
 /**
  * WebSocket 配置项
@@ -13,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @Data
 public class WebSocketProperties {
 
-    private Boolean enable;
+    private Boolean enabled;
 
     /**
      * 路径

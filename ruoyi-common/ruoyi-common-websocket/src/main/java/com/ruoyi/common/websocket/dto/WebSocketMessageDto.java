@@ -3,6 +3,7 @@ package com.ruoyi.common.websocket.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Data
 public class WebSocketMessageDto implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

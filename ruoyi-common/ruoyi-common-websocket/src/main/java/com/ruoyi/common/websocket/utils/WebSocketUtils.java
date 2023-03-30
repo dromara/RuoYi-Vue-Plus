@@ -2,9 +2,7 @@ package com.ruoyi.common.websocket.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.json.utils.JsonUtils;
 import com.ruoyi.common.redis.utils.RedisUtils;
-import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.common.websocket.dto.WebSocketMessageDto;
 import com.ruoyi.common.websocket.holder.WebSocketSessionHolder;
 import lombok.AccessLevel;
@@ -34,8 +32,9 @@ public class WebSocketUtils {
 
     /**
      * 发送消息
-     * @param sessionKey
-     * @param message
+     *
+     * @param sessionKey session主键 一般为用户id
+     * @param message    消息文本
      */
     public static void sendMessage(Long sessionKey, String message) {
         WebSocketSession session = WebSocketSessionHolder.getSessions(sessionKey);
@@ -45,7 +44,7 @@ public class WebSocketUtils {
     /**
      * 订阅消息
      *
-     * @param consumer
+     * @param consumer 自定义处理
      */
     public static void subscribeMessage(Consumer<WebSocketMessageDto> consumer) {
         RedisUtils.subscribe(WEB_SOCKET_TOPIC, WebSocketMessageDto.class, consumer);
@@ -54,12 +53,12 @@ public class WebSocketUtils {
     /**
      * 发布订阅的消息
      *
-     * @param webSocketMessage
+     * @param webSocketMessage 消息对象
      */
     public static void publishMessage(WebSocketMessageDto webSocketMessage) {
         List<Long> unsentSessionKeys = new ArrayList<>();
         // 当前服务内session,直接发送消息
-        for (Long sessionKey: webSocketMessage.getSessionKeys()) {
+        for (Long sessionKey : webSocketMessage.getSessionKeys()) {
             if (WebSocketSessionHolder.existSession(sessionKey)) {
                 WebSocketUtils.sendMessage(sessionKey, webSocketMessage.getMessage());
                 continue;
@@ -70,7 +69,7 @@ public class WebSocketUtils {
         if (CollUtil.isNotEmpty(unsentSessionKeys)) {
             WebSocketMessageDto broadcastMessage = WebSocketMessageDto.builder()
                 .message(webSocketMessage.getMessage()).sessionKeys(unsentSessionKeys).build();
-            RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage,  consumer -> {
+            RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage, consumer -> {
                 log.info(" WebSocket发送主题订阅消息topic:{} session keys:{} message:{}",
                     WEB_SOCKET_TOPIC, unsentSessionKeys, webSocketMessage.getMessage());
             });

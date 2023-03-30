@@ -2,12 +2,10 @@ package com.ruoyi.common.websocket.config;
 
 import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.websocket.config.properties.WebSocketProperties;
-import com.ruoyi.common.websocket.constant.WebSocketConstants;
 import com.ruoyi.common.websocket.handler.PlusWebSocketHandler;
 import com.ruoyi.common.websocket.interceptor.PlusWebSocketInterceptor;
 import com.ruoyi.common.websocket.listener.WebSocketTopicListener;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

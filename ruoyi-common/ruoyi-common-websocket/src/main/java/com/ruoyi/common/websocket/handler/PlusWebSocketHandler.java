@@ -22,8 +22,6 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
 
     /**
      * 连接成功后
-     *
-     * @param session
      */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
