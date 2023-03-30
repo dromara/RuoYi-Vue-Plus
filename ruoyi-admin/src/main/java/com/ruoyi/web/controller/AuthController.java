@@ -9,10 +9,12 @@ import com.ruoyi.common.core.domain.model.SmsLoginBody;
 import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.tenant.helper.TenantHelper;
 import com.ruoyi.system.domain.bo.SysTenantBo;
 import com.ruoyi.system.domain.vo.SysTenantVo;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysTenantService;
+import com.ruoyi.web.domain.vo.LoginTenantVo;
 import com.ruoyi.web.domain.vo.LoginVo;
 import com.ruoyi.web.domain.vo.TenantListVo;
 import com.ruoyi.web.service.SysLoginService;
@@ -118,14 +120,18 @@ public class AuthController {
      * @return 租户列表
      */
     @GetMapping("/tenant/list")
-    public R<List<TenantListVo>> tenantList(HttpServletRequest request) throws Exception {
+    public R<LoginTenantVo> tenantList(HttpServletRequest request) throws Exception {
         List<SysTenantVo> tenantList = tenantService.queryList(new SysTenantBo());
         List<TenantListVo> voList = MapstructUtils.convert(tenantList, TenantListVo.class);
         // 获取域名
         String host = new URL(request.getRequestURL().toString()).getHost();
         // 根据域名进行筛选
         List<TenantListVo> list = StreamUtils.filter(voList, vo -> StringUtils.equals(vo.getDomain(), host));
-        return R.ok(CollUtil.isNotEmpty(list) ? list : voList);
+        // 返回对象
+        LoginTenantVo vo = new LoginTenantVo();
+        vo.setVoList(CollUtil.isNotEmpty(list) ? list : voList);
+        vo.setTenantEnabled(TenantHelper.isEnable());
+        return R.ok(vo);
     }
 
 }
