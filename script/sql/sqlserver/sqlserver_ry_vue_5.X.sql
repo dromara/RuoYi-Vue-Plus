@@ -694,6 +694,8 @@ INSERT sys_config VALUES (2, N'000000', N'用户管理-账号初始密码', N'sy
 GO
 INSERT sys_config VALUES (3, N'000000', N'主框架页-侧边栏主题', N'sys.index.sideTheme', N'theme-dark', N'Y', 103, 1, getdate(), NULL, NULL, N'深色主题theme-dark，浅色主题theme-light')
 GO
+INSERT sys_config VALUES (4, N'000000', N'用户配置-验证码有效期', N'sys.account.captchaExpired', N'2', N'Y', 103, 1, sysdate(), null, NULL, N'验证码有效期（分钟）');
+GO
 INSERT sys_config VALUES (5, N'000000', N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
 GO
 INSERT sys_config VALUES (6, N'000000', N'用户配置-密码最大错误次数', N'sys.user.maxRetryCount', N'5', N'Y', 103, 1, getdate(), NULL, NULL, N'密码最大错误次数')
@@ -703,6 +705,8 @@ GO
 INSERT sys_config VALUES (8, N'000000', N'账号自助-短信开关', N'sys.account.smsEnabled', N'false', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启短信功能（true开启，false关闭）')
 GO
 INSERT sys_config VALUES (9, N'000000', N'账号自助-验证码模板id', N'sys.account.templateId', N'', N'Y', 103, 1, getdate(), NULL, NULL, N'验证码模板id')
+GO
+INSERT sys_config VALUES (10, N'000000', N'账号自助-邮件开关', N'sys.account.emailEnabled', N'false', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启邮件功能（true开启，false关闭）')
 GO
 INSERT sys_config VALUES (11, N'000000', N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 103, 1, getdate(), NULL, NULL, N'true:开启, false:关闭');
 GO
