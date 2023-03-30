@@ -32,6 +32,7 @@
         <module>ruoyi-common-json</module>
         <module>ruoyi-common-encrypt</module>
         <module>ruoyi-common-tenant</module>
+        <module>ruoyi-common-websocket</module>
     </modules>
 
     <artifactId>ruoyi-common</artifactId>
