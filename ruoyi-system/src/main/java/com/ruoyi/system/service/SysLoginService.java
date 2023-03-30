@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Supplier;
@@ -67,11 +66,10 @@ public class SysLoginService {
      * @return 结果
      */
     public String login(String username, String password, String code, String uuid) {
-        HttpServletRequest request = ServletUtils.getRequest();
         boolean captchaEnabled = configService.selectCaptchaEnabled();
         // 验证码开关
         if (captchaEnabled) {
-            validateCaptcha(username, code, uuid, request);
+            validateCaptcha(username, code, uuid);
         }
         SysUser user = loadUserByUsername(username);
         checkLogin(LoginType.PASSWORD, username, () -> !BCrypt.checkpw(password, user.getPassword()));
@@ -140,7 +138,6 @@ public class SysLoginService {
      * @param username 用户名
      * @param status   状态
      * @param message  消息内容
-     * @return
      */
     private void recordLogininfor(String username, String status, String message) {
         LogininforEvent logininforEvent = new LogininforEvent();
@@ -170,7 +167,7 @@ public class SysLoginService {
      * @param code     验证码
      * @param uuid     唯一标识
      */
-    public void validateCaptcha(String username, String code, String uuid, HttpServletRequest request) {
+    public void validateCaptcha(String username, String code, String uuid) {
         String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
