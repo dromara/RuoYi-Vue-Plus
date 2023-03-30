@@ -540,9 +540,9 @@ create table if not exists sys_oper_log
     constraint sys_oper_log_pk primary key (oper_id)
 );
 
-create unique index idx_sys_oper_log_bt ON sys_oper_log (business_type);
-create unique index idx_sys_oper_log_s ON sys_oper_log (status);
-create unique index idx_sys_oper_log_ot ON sys_oper_log (oper_time);
+create index idx_sys_oper_log_bt ON sys_oper_log (business_type);
+create index idx_sys_oper_log_s ON sys_oper_log (status);
+create index idx_sys_oper_log_ot ON sys_oper_log (oper_time);
 
 comment on table sys_oper_log is '操作日志记录';
 comment on column sys_oper_log.oper_id is '日志主键';
@@ -726,8 +726,8 @@ create table if not exists sys_logininfor
     constraint sys_logininfor_pk primary key (info_id)
 );
 
-create unique index idx_sys_logininfor_s ON sys_logininfor (status);
-create unique index idx_sys_logininfor_lt ON sys_logininfor (login_time);
+create index idx_sys_logininfor_s ON sys_logininfor (status);
+create index idx_sys_logininfor_lt ON sys_logininfor (login_time);
 
 comment on table sys_logininfor is '系统访问记录';
 comment on column sys_logininfor.info_id is '访问ID';
