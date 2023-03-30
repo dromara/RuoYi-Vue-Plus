@@ -13,11 +13,11 @@ import org.springframework.context.annotation.Bean;
  * @author Michelle.Chung
  */
 @AutoConfiguration
-@ConditionalOnProperty(value = "mail.enabled", havingValue = "true")
 @EnableConfigurationProperties(MailProperties.class)
 public class MailConfig {
 
     @Bean
+    @ConditionalOnProperty(value = "mail.enabled", havingValue = "true")
     public MailAccount mailAccount(MailProperties mailProperties) {
         MailAccount account = new MailAccount();
         account.setHost(mailProperties.getHost());
