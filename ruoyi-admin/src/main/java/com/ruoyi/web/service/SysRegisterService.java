@@ -17,7 +17,6 @@ import com.ruoyi.common.redis.utils.RedisUtils;
 import com.ruoyi.common.web.config.properties.CaptchaProperties;
 import com.ruoyi.system.domain.bo.SysUserBo;
 import com.ruoyi.system.service.ISysUserService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +36,6 @@ public class SysRegisterService {
      * 注册
      */
     public void register(RegisterBody registerBody) {
-        HttpServletRequest request = ServletUtils.getRequest();
         String tenantId = registerBody.getTenantId();
         String username = registerBody.getUsername();
         String password = registerBody.getPassword();
@@ -47,7 +45,7 @@ public class SysRegisterService {
         boolean captchaEnabled = captchaProperties.getEnable();
         // 验证码开关
         if (captchaEnabled) {
-            validateCaptcha(tenantId, username, registerBody.getCode(), registerBody.getUuid(), request);
+            validateCaptcha(tenantId, username, registerBody.getCode(), registerBody.getUuid());
         }
         SysUserBo sysUser = new SysUserBo();
         sysUser.setUserName(username);
@@ -71,9 +69,8 @@ public class SysRegisterService {
      * @param username 用户名
      * @param code     验证码
      * @param uuid     唯一标识
-     * @return 结果
      */
-    public void validateCaptcha(String tenantId, String username, String code, String uuid, HttpServletRequest request) {
+    public void validateCaptcha(String tenantId, String username, String code, String uuid) {
         String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
