@@ -124,7 +124,7 @@
 * GitHub 地址 [RuoYi-Vue-Plus-github](https://github.com/dromara/RuoYi-Vue-Plus)
 * 单模块 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/dromara/RuoYi-Vue-Plus/tree/fast/)
 * 微服务 分支 [RuoYi-Cloud-Plus](https://gitee.com/JavaLionLi/RuoYi-Cloud-Plus)
-* Vue3 分支 [RuoYi-Cloud-Plus-UI](https://gitee.com/JavaLionLi/RuoYi-Cloud-Plus-UI)
+* Vue3 分支 [RuoYi-Vue-Plus-UI](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus-UI)
 * 用户扩展项目 [扩展项目列表](https://gitee.com/dromara/RuoYi-Vue-Plus/wikis/pages?sort_id=4478302&doc_id=1469725)
 
 ## 加群与捐献
