@@ -95,20 +95,6 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     }
 
     /**
-     * 获取验证码开关
-     *
-     * @return true开启，false关闭
-     */
-    @Override
-    public boolean selectCaptchaEnabled() {
-        String captchaEnabled = SpringUtils.getAopProxy(this).selectConfigByKey("sys.account.captchaEnabled");
-        if (StringUtils.isEmpty(captchaEnabled)) {
-            return true;
-        }
-        return Convert.toBool(captchaEnabled);
-    }
-
-    /**
      * 查询参数配置列表
      *
      * @param config 参数配置信息
