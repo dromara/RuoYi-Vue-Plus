@@ -696,6 +696,14 @@ INSERT sys_config VALUES (3, N'000000', N'主框架页-侧边栏主题', N'sys.i
 GO
 INSERT sys_config VALUES (5, N'000000', N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
 GO
+INSERT sys_config VALUES (6, N'000000', N'用户配置-密码最大错误次数', N'sys.user.maxRetryCount', N'5', N'Y', 103, 1, getdate(), NULL, NULL, N'密码最大错误次数')
+GO
+INSERT sys_config VALUES (7, N'000000', N'用户配置-密码锁定时间', N'sys.user.lockTime', N'10', N'Y', 103, 1, getdate(), NULL, NULL, N'密码锁定时间（分钟）')
+GO
+INSERT sys_config VALUES (8, N'000000', N'账号自助-短信开关', N'sys.account.smsEnabled', N'false', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启短信功能（true开启，false关闭）')
+GO
+INSERT sys_config VALUES (9, N'000000', N'账号自助-验证码模板id', N'sys.account.templateId', N'', N'Y', 103, 1, getdate(), NULL, NULL, N'验证码模板id')
+GO
 INSERT sys_config VALUES (11, N'000000', N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 103, 1, getdate(), NULL, NULL, N'true:开启, false:关闭');
 GO
 

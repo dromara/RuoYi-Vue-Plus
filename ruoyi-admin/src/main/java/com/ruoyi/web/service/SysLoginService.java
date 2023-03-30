@@ -4,6 +4,7 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.constant.Constants;
@@ -30,11 +31,11 @@ import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.vo.SysTenantVo;
 import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.mapper.SysUserMapper;
+import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysPermissionService;
 import com.ruoyi.system.service.ISysTenantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -57,11 +58,7 @@ public class SysLoginService {
     private final ISysPermissionService permissionService;
     private final ISysTenantService tenantService;
 
-    @Value("${user.password.maxRetryCount}")
-    private Integer maxRetryCount;
-
-    @Value("${user.password.lockTime}")
-    private Integer lockTime;
+    private final ISysConfigService configService;
 
     /**
      * 登录验证
@@ -340,6 +337,10 @@ public class SysLoginService {
 
         // 获取用户登录错误次数(可自定义限制策略 例如: key + username + ip)
         Integer errorNumber = RedisUtils.getCacheObject(errorKey);
+        //密码最大错误次数
+        Integer maxRetryCount = Convert.toInt(configService.selectConfigByKey("sys.user.maxRetryCount"));
+        //密码锁定时间
+        Integer lockTime = Convert.toInt(configService.selectConfigByKey("sys.user.lockTime"));
         // 锁定时间内登录 则踢出
         if (ObjectUtil.isNotNull(errorNumber) && errorNumber.equals(maxRetryCount)) {
             recordLogininfor(tenantId, username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime));

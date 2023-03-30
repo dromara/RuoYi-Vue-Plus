@@ -1,8 +1,9 @@
 package com.ruoyi.demo.controller;
 
+import cn.hutool.core.convert.Convert;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.service.ConfigService;
 import com.ruoyi.common.core.utils.SpringUtils;
-import com.ruoyi.common.sms.config.properties.SmsProperties;
 import com.ruoyi.common.sms.core.SmsTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +27,7 @@ import java.util.Map;
 @RequestMapping("/demo/sms")
 public class SmsController {
 
-    private final SmsProperties smsProperties;
+    private final ConfigService configService;
 //    private final SmsTemplate smsTemplate; // 可以使用spring注入
 //    private final AliyunSmsTemplate smsTemplate; // 也可以注入某个厂家的模板工具
 
@@ -38,7 +39,7 @@ public class SmsController {
      */
     @GetMapping("/sendAliyun")
     public R<Object> sendAliyun(String phones, String templateId) {
-        if (!smsProperties.getEnabled()) {
+        if (!Convert.toBool(configService.getConfigValue("sys.account.smsEnabled"))) {
             return R.fail("当前系统没有开启短信功能！");
         }
         if (!SpringUtils.containsBean("aliyunSmsTemplate")) {
@@ -59,7 +60,7 @@ public class SmsController {
      */
     @GetMapping("/sendTencent")
     public R<Object> sendTencent(String phones, String templateId) {
-        if (!smsProperties.getEnabled()) {
+        if (!Convert.toBool(configService.getConfigValue("sys.account.smsEnabled"))) {
             return R.fail("当前系统没有开启短信功能！");
         }
         if (!SpringUtils.containsBean("tencentSmsTemplate")) {
