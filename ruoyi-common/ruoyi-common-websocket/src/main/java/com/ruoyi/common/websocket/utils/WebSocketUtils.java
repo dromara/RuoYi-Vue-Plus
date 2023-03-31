@@ -67,8 +67,9 @@ public class WebSocketUtils {
         }
         // 不在当前服务内session,发布订阅消息
         if (CollUtil.isNotEmpty(unsentSessionKeys)) {
-            WebSocketMessageDto broadcastMessage = WebSocketMessageDto.builder()
-                .message(webSocketMessage.getMessage()).sessionKeys(unsentSessionKeys).build();
+            WebSocketMessageDto broadcastMessage = new WebSocketMessageDto();
+            broadcastMessage.setMessage(webSocketMessage.getMessage());
+            broadcastMessage.setSessionKeys(unsentSessionKeys);
             RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage, consumer -> {
                 log.info(" WebSocket发送主题订阅消息topic:{} session keys:{} message:{}",
                     WEB_SOCKET_TOPIC, unsentSessionKeys, webSocketMessage.getMessage());

@@ -1,6 +1,5 @@
 package com.ruoyi.common.websocket.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serial;
@@ -12,7 +11,6 @@ import java.util.List;
  *
  * @author zendwang
  */
-@Builder
 @Data
 public class WebSocketMessageDto implements Serializable {
 
