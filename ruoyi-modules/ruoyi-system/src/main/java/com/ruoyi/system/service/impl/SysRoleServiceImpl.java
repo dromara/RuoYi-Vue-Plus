@@ -74,7 +74,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
             .like(StringUtils.isNotBlank(bo.getRoleKey()), "r.role_key", bo.getRoleKey())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 "r.create_time", params.get("beginTime"), params.get("endTime"))
-            .orderByAsc("r.role_sort");
+            .orderByAsc("r.role_sort").orderByAsc("r.crete_time");;
         return wrapper;
     }
 
