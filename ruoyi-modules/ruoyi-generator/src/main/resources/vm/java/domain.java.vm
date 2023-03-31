@@ -6,9 +6,8 @@ package ${packageName}.domain;
 #end
 #end
 #if($IsTenant==1)
-import com.ruoyi.common.tenant.core.TenantEntity;
+import core.tenant.common.org.dromara.TenantEntity;
 #else
-import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 #end
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -18,8 +17,6 @@ import ${import};
 #end
 
 import java.io.Serial;
-import java.util.Date;
-import java.math.BigDecimal;
 
 /**
  * ${functionName}对象 ${tableName}

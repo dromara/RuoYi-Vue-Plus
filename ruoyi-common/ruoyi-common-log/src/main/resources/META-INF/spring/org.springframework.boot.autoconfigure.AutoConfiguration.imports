@@ -1,1 +1,1 @@
-com.ruoyi.common.log.aspect.LogAspect
+org.dromara.common.log.aspect.LogAspect

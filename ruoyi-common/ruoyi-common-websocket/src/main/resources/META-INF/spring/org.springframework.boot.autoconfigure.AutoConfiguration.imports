@@ -1,1 +1,1 @@
-com.ruoyi.common.websocket.config.WebSocketConfig
+org.dromara.common.websocket.config.WebSocketConfig

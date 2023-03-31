@@ -1,10 +1,9 @@
 package ${packageName}.service.impl;
 
-import com.ruoyi.common.core.utils.MapstructUtils;
-import com.ruoyi.common.core.utils.StringUtils;
-#if($table.crud || $table.sub)
-import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.common.mybatis.core.page.PageQuery;
+import org.dromara.common.core.utils.MapstructUtils;
+    #if($table.crud || $table.sub)
+import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 #end
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

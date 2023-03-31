@@ -1,1 +1,1 @@
-com.ruoyi.common.ratelimiter.config.RateLimiterConfig
+org.dromara.common.ratelimiter.config.RateLimiterConfig

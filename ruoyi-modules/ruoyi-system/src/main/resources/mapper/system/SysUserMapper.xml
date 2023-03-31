@@ -2,21 +2,21 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.system.mapper.SysUserMapper">
+<mapper namespace="org.dromara.system.mapper.SysUserMapper">
 
     <!-- 多结构嵌套自动映射需带上每个实体的主键id 否则映射会失败 -->
-    <resultMap type="com.ruoyi.system.domain.vo.SysUserVo" id="SysUserResult">
+    <resultMap type="org.dromara.system.domain.vo.SysUserVo" id="SysUserResult">
         <id property="userId" column="user_id"/>
         <result property="deptId" column="dept_id"/>
         <association property="dept" column="dept_id" resultMap="deptResult"/>
         <collection property="roles" javaType="java.util.List" resultMap="RoleResult"/>
     </resultMap>
 
-    <resultMap id="deptResult" type="com.ruoyi.system.domain.vo.SysDeptVo">
+    <resultMap id="deptResult" type="org.dromara.system.domain.vo.SysDeptVo">
         <id property="deptId" column="dept_id"/>
     </resultMap>
 
-    <resultMap id="RoleResult" type="com.ruoyi.system.domain.vo.SysRoleVo">
+    <resultMap id="RoleResult" type="org.dromara.system.domain.vo.SysRoleVo">
         <id property="roleId" column="role_id"/>
     </resultMap>
 

@@ -3,7 +3,7 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>com.ruoyi</groupId>
+        <groupId>org.dromara</groupId>
         <artifactId>ruoyi-common</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
@@ -35,7 +35,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.ruoyi</groupId>
+            <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 

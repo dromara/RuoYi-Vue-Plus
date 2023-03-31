@@ -5,7 +5,7 @@
 ## 平台简介
 
 [![码云Gitee](https://gitee.com/dromara/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/dromara/RuoYi-Vue-Plus)
-[![GitHub](https://img.shields.io/github/stars/JavaLionLi/RuoYi-Vue-Plus.svg?style=social&label=Stars)](https://github.com/dromara/RuoYi-Vue-Plus)
+[![GitHub](https://img.shields.io/github/stars/dromara/RuoYi-Vue-Plus.svg?style=social&label=Stars)](https://github.com/dromara/RuoYi-Vue-Plus)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus/blob/master/LICENSE)
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
 <br>
@@ -19,7 +19,7 @@
 > 项目代码、文档 均开源免费可商用 遵循开源协议在项目中保留开源协议文件即可<br>
 活到老写到老 为兴趣而开源 为学习而开源 为让大家真正可以学到技术而开源
 
-> 系统演示: [传送门](https://javalionli.gitee.io/plus-doc/#/common/demo_system)
+> 系统演示: [传送门](https://plus-doc.dromara.org/#/common/demo_system)
 
 > 前端项目地址: [plus-ui](https://gitee.com/JavaLionLi/plus-ui)
 
@@ -27,7 +27,7 @@
 
 | 功能          | 本框架                                                                                                               | RuoYi                                                                              |
 |-------------|-------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| 前端项目        | 基于vue3-element-admin开源项目重写<br/>Vue3 + TS + ElementPlus                                                            | 基于Vue2/Vue3 + JS                                                                   | 
+| 前端项目        | 采用 Vue3 + TS + ElementPlus 重写                                                                                     | 基于Vue2/Vue3 + JS                                                                   | 
 | 后端项目结构      | 采用插件化 + 扩展包形式 结构解耦 易于扩展                                                                                           | 模块相互注入耦合严重难以扩展                                                                     | 
 | 后端代码风格      | 严格遵守Alibaba规范与项目统一配置的代码格式化                                                                                        | 代码书写与常规结构不同阅读障碍大                                                                   |
 | Web容器       | 采用 Undertow 基于 XNIO 的高性能容器                                                                                        | 采用 Tomcat                                                                          |
@@ -51,6 +51,7 @@
 | WebSocket协议 | 基于 Spring 封装的 WebSocket 协议 扩展了Token鉴权与分布式会话同步 不再只是基于单机的废物                                                         | 无                                                                                  |
 | 序列化         | 采用 Jackson Spring官方内置序列化 靠谱!!!                                                                                    | 采用 fastjson bugjson 远近闻名                                                           | 
 | 分布式幂等       | 参考美团GTIS防重系统简化实现(细节可看文档)                                                                                          | 手动编写注解基于aop实现                                                                      |
+| 分布式锁        | 采用 Lock4j 底层基于 Redisson                                                                                           | 无                                                                                  |
 | 分布式任务调度     | 采用 Xxl-Job 天生支持分布式 统一的管理中心                                                                                        | 采用 Quartz 基于数据库锁性能差 集群需要做很多配置与改造                                                   | 
 | 文件存储        | 采用 Minio 分布式文件存储 天生支持多机、多硬盘、多分片、多副本存储<br/>支持权限管理 安全可靠 文件可加密存储                                                     | 采用 本机文件存储 文件裸漏 易丢失泄漏 不支持集群有单点效应                                                    |
 | 云存储         | 采用 AWS S3 协议客户端 支持 七牛、阿里、腾讯 等一切支持S3协议的厂家                                                                          | 不支持                                                                                |
@@ -101,17 +102,17 @@
 
 使用框架前请仔细阅读文档重点注意事项
 <br>
->[初始化项目 必看](https://javalionli.gitee.io/plus-doc/#/ruoyi-vue-plus/quickstart/init)
->>[https://javalionli.gitee.io/plus-doc/#/ruoyi-vue-plus/quickstart/init](https://javalionli.gitee.io/plus-doc/#/ruoyi-vue-plus/quickstart/init)
+>[初始化项目 必看](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init)
+>>[https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init)
 >
->[专栏与视频 入门必看](https://javalionli.gitee.io/plus-doc/#/common/column)
->>[https://javalionli.gitee.io/plus-doc/#/common/column](https://javalionli.gitee.io/plus-doc/#/common/column)
+>[专栏与视频 入门必看](https://plus-doc.dromara.org/#/common/column)
+>>[https://plus-doc.dromara.org/#/common/column](https://plus-doc.dromara.org/#/common/column)
 >
->[部署项目 必看](https://javalionli.gitee.io/plus-doc/#/ruoyi-vue-plus/quickstart/deploy)
->>[https://javalionli.gitee.io/plus-doc/#/ruoyi-vue-plus/quickstart/deploy](https://javalionli.gitee.io/plus-doc/#/ruoyi-vue-plus/quickstart/deploy)
+>[部署项目 必看](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy)
+>>[https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy)
 > 
->[参考文档 Wiki](https://javalionli.gitee.io/plus-doc)
->>[https://javalionli.gitee.io/plus-doc](https://javalionli.gitee.io/plus-doc)
+>[参考文档 Wiki](https://plus-doc.dromara.org)
+>>[https://plus-doc.dromara.org](https://plus-doc.dromara.org)
 
 ## 软件架构图
 
@@ -119,7 +120,7 @@
 
 ## 如何参与贡献
 
-[参与贡献的方式 https://javalionli.gitee.io/plus-doc/#/common/contribution](https://javalionli.gitee.io/plus-doc/#/common/contribution)
+[参与贡献的方式 https://plus-doc.dromara.org/#/common/contribution](https://plus-doc.dromara.org/#/common/contribution)
 
 ### 其他
 
@@ -127,16 +128,16 @@
 * GitHub 地址 [RuoYi-Vue-Plus](https://github.com/dromara/RuoYi-Vue-Plus)
 * 微服务 分支 [RuoYi-Cloud-Plus](https://gitee.com/JavaLionLi/RuoYi-Cloud-Plus)
 * 前端项目 地址 [plus-ui](https://gitee.com/JavaLionLi/plus-ui)
-* 用户扩展项目 [扩展项目列表](https://javalionli.gitee.io/plus-doc/#/ruoyi-vue-plus/extend-project/list)
+* 用户扩展项目 [扩展项目列表](https://plus-doc.dromara.org/#/ruoyi-vue-plus/extend-project/list)
 
 ## 加群与捐献
->[加群与捐献](https://javalionli.gitee.io/plus-doc/#/ruoyi-vue-plus/other/group_chat)
->>[https://javalionli.gitee.io/plus-doc/#/ruoyi-vue-plus/other/group_chat](https://javalionli.gitee.io/plus-doc/#/ruoyi-vue-plus/other/group_chat)
+>[加群与捐献](https://plus-doc.dromara.org/#/ruoyi-vue-plus/other/group_chat)
+>>[https://plus-doc.dromara.org/#/ruoyi-vue-plus/other/group_chat](https://plus-doc.dromara.org/#/ruoyi-vue-plus/other/group_chat)
 
 ## 捐献作者
 作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  
-<img src="https://images.gitee.com/uploads/images/2022/0218/213734_b1b8197f_1766278.jpeg" width="300px" height="450px" />
-<img src="https://images.gitee.com/uploads/images/2021/0525/101713_3d18b119_1766278.jpeg" width="300px" height="450px" />
+<img src="https://foruda.gitee.com/images/1678975784848381069/d8661ed9_1766278.png" width="300px" height="450px" />
+<img src="https://foruda.gitee.com/images/1678975801230205215/6f96229d_1766278.png" width="300px" height="450px" />
 
 ## 演示图例
 

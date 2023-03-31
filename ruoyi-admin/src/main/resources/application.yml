@@ -5,7 +5,7 @@ ruoyi:
   # 版本
   version: ${revision}
   # 版权年份
-  copyrightYear: 2022
+  copyrightYear: 2023
   # 实例演示开关
   demoEnabled: true
   # 获取ip地址开关
@@ -48,7 +48,7 @@ server:
 # 日志配置
 logging:
   level:
-    com.ruoyi: @logging.level@
+    org.dromara: @logging.level@
     org.springframework: warn
   config: classpath:logback.xml
 
@@ -151,11 +151,11 @@ tenant:
 mybatis-plus:
   # 不支持多包, 如有需要可在注解配置 或 提升扫包等级
   # 例如 com.**.**.mapper
-  mapperPackage: com.ruoyi.**.mapper
+  mapperPackage: org.dromara.**.mapper
   # 对应的 XML 文件位置
   mapperLocations: classpath*:mapper/**/*Mapper.xml
   # 实体扫描，多个package用逗号或者分号分隔
-  typeAliasesPackage: com.ruoyi.**.domain
+  typeAliasesPackage: org.dromara.**.domain
   # 启动时是否检查 MyBatis XML 文件的存在，默认不检查
   checkConfigLocation: false
   configuration:
@@ -212,7 +212,7 @@ swagger:
     # 描述
     description: '描述：用于管理集团旗下公司的人员信息,具体包括XXX,XXX模块...'
     # 版本
-    version: '版本号: ${ruoyi-vue-plus.version}'
+    version: '版本号: ${ruoyi.version}'
     # 作者信息
     contact:
       name: Lion Li
@@ -236,13 +236,13 @@ springdoc:
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
     - group: 1.演示模块
-      packages-to-scan: com.ruoyi.demo
+      packages-to-scan: org.dromara.demo
     - group: 2.通用模块
-      packages-to-scan: com.ruoyi.web
+      packages-to-scan: org.dromara.web
     - group: 3.系统模块
-      packages-to-scan: com.ruoyi.system
+      packages-to-scan: org.dromara.system
     - group: 4.代码生成模块
-      packages-to-scan: com.ruoyi.generator
+      packages-to-scan: org.dromara.generator
 
 # 防止XSS攻击
 xss:

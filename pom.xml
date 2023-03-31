@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ruoyi</groupId>
+    <groupId>org.dromara</groupId>
     <artifactId>ruoyi-vue-plus</artifactId>
     <version>${revision}</version>
 
@@ -113,7 +113,7 @@
 
             <!-- common 的依赖配置-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-common-bom</artifactId>
                 <version>${revision}</version>
                 <type>pom</type>
@@ -312,25 +312,25 @@
             </dependency>
 
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-system</artifactId>
                 <version>${revision}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-job</artifactId>
                 <version>${revision}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-generator</artifactId>
                 <version>${revision}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-demo</artifactId>
                 <version>${revision}</version>
             </dependency>

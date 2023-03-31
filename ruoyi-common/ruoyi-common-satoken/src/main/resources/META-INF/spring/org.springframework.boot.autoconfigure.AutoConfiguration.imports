@@ -1,1 +1,1 @@
-com.ruoyi.common.satoken.config.SaTokenConfig
+org.dromara.common.satoken.config.SaTokenConfig
