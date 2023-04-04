@@ -12,7 +12,7 @@ import java.util.List;
  * @author Yjoioooo
  * @author Lion Li
  */
-public class DefautExcelResult<T> implements ExcelResult<T> {
+public class DefaultExcelResult<T> implements ExcelResult<T> {
 
     /**
      * 数据对象list
@@ -26,17 +26,17 @@ public class DefautExcelResult<T> implements ExcelResult<T> {
     @Setter
     private List<String> errorList;
 
-    public DefautExcelResult() {
+    public DefaultExcelResult() {
         this.list = new ArrayList<>();
         this.errorList = new ArrayList<>();
     }
 
-    public DefautExcelResult(List<T> list, List<String> errorList) {
+    public DefaultExcelResult(List<T> list, List<String> errorList) {
         this.list = list;
         this.errorList = errorList;
     }
 
-    public DefautExcelResult(ExcelResult<T> excelResult) {
+    public DefaultExcelResult(ExcelResult<T> excelResult) {
         this.list = excelResult.getList();
         this.errorList = excelResult.getErrorList();
     }

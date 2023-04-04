@@ -42,7 +42,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
     private ExcelResult<T> excelResult;
 
     public DefaultExcelListener(boolean isValidate) {
-        this.excelResult = new DefautExcelResult<>();
+        this.excelResult = new DefaultExcelResult<>();
         this.isValidate = isValidate;
     }
 
