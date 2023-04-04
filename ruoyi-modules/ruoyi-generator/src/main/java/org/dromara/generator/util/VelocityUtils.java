@@ -127,7 +127,8 @@ public class VelocityUtils {
         } else {
             templates.add("vm/sql/sql.vm");
         }
-        templates.add("vm/js/api.js.vm");
+        templates.add("vm/ts/api.ts.vm");
+        templates.add("vm/ts/types.ts.vm");
         if (GenConstants.TPL_CRUD.equals(tplCategory)) {
             templates.add("vm/vue/index.vue.vm");
         } else if (GenConstants.TPL_TREE.equals(tplCategory)) {
@@ -176,8 +177,10 @@ public class VelocityUtils {
             fileName = StringUtils.format("{}/{}Mapper.xml", mybatisPath, className);
         } else if (template.contains("sql.vm")) {
             fileName = businessName + "Menu.sql";
-        } else if (template.contains("api.js.vm")) {
-            fileName = StringUtils.format("{}/api/{}/{}.js", vuePath, moduleName, businessName);
+        } else if (template.contains("api.ts.vm")) {
+            fileName = StringUtils.format("{}/api/{}/{}/index.ts", vuePath, moduleName, businessName);
+        } else if (template.contains("types.ts.vm")) {
+            fileName = StringUtils.format("{}/api/{}/{}/types.ts", vuePath, moduleName, businessName);
         } else if (template.contains("index.vue.vm")) {
             fileName = StringUtils.format("{}/views/{}/{}/index.vue", vuePath, moduleName, businessName);
         } else if (template.contains("index-tree.vue.vm")) {
