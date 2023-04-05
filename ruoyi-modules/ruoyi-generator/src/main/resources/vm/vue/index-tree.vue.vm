@@ -15,12 +15,7 @@
 #end
 #if($column.htmlType == "input" || $column.htmlType == "textarea")
           <el-form-item label="${comment}" prop="${column.javaField}">
-            <el-input
-                v-model="queryParams.${column.javaField}"
-                placeholder="请输入${comment}"
-                clearable
-                @keyup.enter="handleQuery"
-            />
+            <el-input v-model="queryParams.${column.javaField}" placeholder="请输入${comment}" clearable @keyup.enter="handleQuery" />
           </el-form-item>
 #elseif(($column.htmlType == "select" || $column.htmlType == "radio") && "" != $dictType)
           <el-form-item label="${comment}" prop="${column.javaField}">
@@ -71,26 +66,14 @@
       </div>
     </transition>
 
-
     <el-card shadow="never">
       <template #header>
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button
-                type="primary"
-                plain
-                icon="Plus"
-                @click="handleAdd()"
-                v-hasPermi="['${moduleName}:${businessName}:add']
-            >新增</el-button>
+            <el-button type="primary" plain icon="Plus" @click="handleAdd()" v-hasPermi="['${moduleName}:${businessName}:add']">新增</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button
-                type="info"
-                plain
-                icon="Sort"
-                @click="handleToggleExpandAll"
-            >展开/折叠</el-button>
+            <el-button type="info" plain icon="Sort" @click="handleToggleExpandAll">展开/折叠</el-button>
           </el-col>
           <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -274,7 +257,7 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button :loading="buttonLoading" type="primary" @click="submitForm">确 定</el-button>
           <el-button @click="cancel">取 消</el-button>
         </div>
       </template>
@@ -307,7 +290,6 @@ const ${businessName}Options = ref<${BusinessName}Option[]>([]);
 const buttonLoading = ref(false);
 const showSearch = ref(true);
 const isExpandAll = ref(true);
-const refreshTable = ref(true);
 const loading = ref(false);
 
 const queryFormRef = ref(ElForm);
@@ -472,15 +454,14 @@ const handleUpdate = (row: ${BusinessName}VO) => {
     if (row != null) {
       form.value.${treeParentCode} = row.${treeCode};
     }
-    get${BusinessName}(row.${pkColumn.javaField}).then(response => {
-      loading.value = false;
-      form.value = response.data;
+    const res = await get${BusinessName}(row.${treeCode});
+    loading.value = false;
+    Object.assign(form.value, res.data);
 #foreach ($column in $columns)
 #if($column.htmlType == "checkbox")
-      form.value.$column.javaField = form.value.${column.javaField}.split(",");
+    form.value.$column.javaField = form.value.${column.javaField}.split(",");
 #end
 #end
-    });
   });
 }
 

@@ -15,12 +15,7 @@
 #end
 #if($column.htmlType == "input" || $column.htmlType == "textarea")
           <el-form-item label="${comment}" prop="${column.javaField}">
-            <el-input
-              v-model="queryParams.${column.javaField}"
-              placeholder="请输入${comment}"
-              clearable
-              @keyup.enter="handleQuery"
-            />
+            <el-input v-model="queryParams.${column.javaField}" placeholder="请输入${comment}" clearable @keyup.enter="handleQuery" />
           </el-form-item>
 #elseif(($column.htmlType == "select" || $column.htmlType == "radio") && "" != $dictType)
           <el-form-item label="${comment}" prop="${column.javaField}">
@@ -75,42 +70,16 @@
       <template #header>
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button
-                type="primary"
-                plain
-                icon="Plus"
-                @click="handleAdd"
-                v-hasPermi="['${moduleName}:${businessName}:add']"
-            >新增</el-button>
+            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['${moduleName}:${businessName}:add']">新增</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button
-                type="success"
-                plain
-                icon="Edit"
-                :disabled="single"
-                @click="handleUpdate()"
-                v-hasPermi="['${moduleName}:${businessName}:edit']"
-            >修改</el-button>
+            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate()" v-hasPermi="['${moduleName}:${businessName}:edit']">修改</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button
-                type="danger"
-                plain
-                icon="Delete"
-                :disabled="multiple"
-                @click="handleDelete()"
-                v-hasPermi="['${moduleName}:${businessName}:remove']"
-            >删除</el-button>
+            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete()" v-hasPermi="['${moduleName}:${businessName}:remove']">删除</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button
-                type="warning"
-                plain
-                icon="Download"
-                @click="handleExport"
-                v-hasPermi="['${moduleName}:${businessName}:export']"
-            >导出</el-button>
+            <el-button type="warning" plain icon="Download" @click="handleExport" v-hasPermi="['${moduleName}:${businessName}:export']">导出</el-button>
           </el-col>
           <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -127,7 +96,7 @@
 #set($comment=$column.columnComment)
 #end
 #if($column.pk)
-        <el-table-column label="${comment}" align="center" prop="${javaField}" v-if="${column.list}"/>
+        <el-table-column label="${comment}" align="center" prop="${javaField}" v-if="${column.list}" />
 #elseif($column.list && $column.htmlType == "datetime")
         <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
           <template #default="scope">

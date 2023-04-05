@@ -1,13 +1,14 @@
 import request from '@/utils/request';
 import { AxiosPromise } from 'axios';
-import { ${BusinessName}VO, ${BusinessName}Form, ${BusinessName}Query } from './types';
+import { ${BusinessName}VO, ${BusinessName}Form, ${BusinessName}Query } from '@/api/${moduleName}/${businessName}/types';
 
 /**
  * 查询${functionName}列表
  * @param query
  * @returns {*}
  */
-export const list${BusinessName} = (#if(${treeCode})query?: ${BusinessName}Query#else query: ${BusinessName}Query#end): AxiosPromise<${BusinessName}VO[]> => {
+
+export const list${BusinessName} = (query?: ${BusinessName}Query): AxiosPromise<${BusinessName}VO[]> => {
   return request({
     url: '/${moduleName}/${businessName}/list',
     method: 'get',

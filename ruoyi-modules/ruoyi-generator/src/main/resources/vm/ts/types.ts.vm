@@ -13,7 +13,7 @@ export interface ${BusinessName}VO {
 #end
 }
 
-export interface ${BusinessName}Form extends BaseEntity{
+export interface ${BusinessName}Form extends BaseEntity {
 #foreach ($column in $columns)
 #if($column.insert || $column.edit)
   /**
