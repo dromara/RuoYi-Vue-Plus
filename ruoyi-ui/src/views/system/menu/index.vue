@@ -140,8 +140,7 @@
                     v-if="form.icon"
                     slot="prefix"
                     :icon-class="form.icon"
-                    class="el-input__icon"
-                    style="height: 32px;width: 16px;"
+                    style="width: 25px;"
                   />
                   <i v-else slot="prefix" class="el-icon-search el-input__icon" />
                 </el-input>
