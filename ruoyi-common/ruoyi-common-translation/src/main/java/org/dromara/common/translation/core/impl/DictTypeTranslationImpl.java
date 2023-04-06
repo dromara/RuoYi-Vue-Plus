@@ -18,6 +18,7 @@ public class DictTypeTranslationImpl implements TranslationInterface<String> {
 
     private final DictService dictService;
 
+    @Override
     public String translation(Object key, String other) {
         if (key instanceof String dictValue && StringUtils.isNotBlank(other)) {
             return dictService.getDictLabel(other, dictValue);

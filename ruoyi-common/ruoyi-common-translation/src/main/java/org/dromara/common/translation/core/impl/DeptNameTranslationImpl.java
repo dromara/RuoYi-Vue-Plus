@@ -17,6 +17,7 @@ public class DeptNameTranslationImpl implements TranslationInterface<String> {
 
     private final DeptService deptService;
 
+    @Override
     public String translation(Object key, String other) {
         if (key instanceof String ids) {
             return deptService.selectDeptNameByIds(ids);

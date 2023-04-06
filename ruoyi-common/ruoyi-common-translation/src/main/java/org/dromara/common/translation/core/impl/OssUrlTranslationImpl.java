@@ -17,6 +17,7 @@ public class OssUrlTranslationImpl implements TranslationInterface<String> {
 
     private final OssService ossService;
 
+    @Override
     public String translation(Object key, String other) {
         if (key instanceof String ids) {
             return ossService.selectUrlByIds(ids);
