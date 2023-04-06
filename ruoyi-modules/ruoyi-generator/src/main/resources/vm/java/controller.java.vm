@@ -46,7 +46,7 @@ public class ${ClassName}Controller extends BaseController {
     @GetMapping("/list")
 #if($table.crud || $table.sub)
     public TableDataInfo<${ClassName}Vo> list(${ClassName}Bo bo, PageQuery pageQuery) {
-        return i${ClassName}Service.queryPageList(bo, pageQuery);
+        return ${className}Service.queryPageList(bo, pageQuery);
     }
 #elseif($table.tree)
     public R<List<${ClassName}Vo>> list(${ClassName}Bo bo) {
