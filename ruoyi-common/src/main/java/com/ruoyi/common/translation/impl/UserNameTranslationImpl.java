@@ -19,6 +19,7 @@ public class UserNameTranslationImpl implements TranslationInterface<String> {
 
     private final UserService userService;
 
+    @Override
     public String translation(Object key, String other) {
         if (key instanceof Long) {
             return userService.selectUserNameById((Long) key);
