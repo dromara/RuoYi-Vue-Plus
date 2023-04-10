@@ -16,6 +16,9 @@ spring:
     resources:
       static-locations: classpath:/static/
 
+logging:
+  config: classpath:logback-plus.xml
+
 --- # mybatis 配置
 mybatis:
   mapper-locations: classpath:/mybatis-mapper/*Mapper.xml
