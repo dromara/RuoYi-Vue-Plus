@@ -6,6 +6,9 @@ spring:
   profiles:
     active: @profiles.active@
 
+logging:
+  config: classpath:logback-plus.xml
+
 --- # 监控中心服务端配置
 spring:
   security:

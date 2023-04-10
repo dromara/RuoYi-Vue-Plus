@@ -50,7 +50,7 @@ logging:
   level:
     org.dromara: @logging.level@
     org.springframework: warn
-  config: classpath:logback.xml
+  config: classpath:logback-plus.xml
 
 # 用户配置
 user:
