@@ -73,7 +73,7 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
             log.warn("自动注入警告 => 用户未登录");
             return null;
         }
-        return loginUser.getUsername();
+        return ObjectUtil.isNotNull(loginUser) ? loginUser.getUsername() : null;
     }
 
 }
