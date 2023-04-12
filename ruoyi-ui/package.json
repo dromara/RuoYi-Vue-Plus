@@ -32,7 +32,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/y_project/RuoYi-Vue.git"
+    "url": "https://gitee.com/dromara/RuoYi-Vue-Plus.git"
   },
   "dependencies": {
     "@riophae/vue-treeselect": "0.4.0",
