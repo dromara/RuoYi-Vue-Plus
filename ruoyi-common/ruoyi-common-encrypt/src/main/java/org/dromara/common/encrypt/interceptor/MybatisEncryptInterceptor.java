@@ -1,14 +1,7 @@
 package org.dromara.common.encrypt.interceptor;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.encrypt.annotation.EncryptField;
-import org.dromara.common.encrypt.core.EncryptContext;
-import org.dromara.common.encrypt.core.EncryptorManager;
-import org.dromara.common.encrypt.enumd.AlgorithmType;
-import org.dromara.common.encrypt.enumd.EncodeType;
-import org.dromara.common.encrypt.properties.EncryptorProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
@@ -16,6 +9,13 @@ import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.encrypt.annotation.EncryptField;
+import org.dromara.common.encrypt.core.EncryptContext;
+import org.dromara.common.encrypt.core.EncryptorManager;
+import org.dromara.common.encrypt.enumd.AlgorithmType;
+import org.dromara.common.encrypt.enumd.EncodeType;
+import org.dromara.common.encrypt.properties.EncryptorProperties;
 
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
@@ -70,12 +70,12 @@ public class MybatisEncryptInterceptor implements Interceptor {
             return;
         }
         if (sourceObject instanceof List<?> list) {
-            if(CollectionUtil.isEmpty(list)) {
+            if(CollUtil.isEmpty(list)) {
                 return;
             }
             // 判断第一个元素是否含有注解。如果没有直接返回，提高效率
             Object firstItem = list.get(0);
-            if (CollectionUtil.isEmpty(encryptorManager.getFieldCache(firstItem.getClass()))) {
+            if (ObjectUtil.isNull(firstItem) && CollUtil.isEmpty(encryptorManager.getFieldCache(firstItem.getClass()))) {
                 return;
             }
             list.forEach(this::encryptHandler);
@@ -84,12 +84,7 @@ public class MybatisEncryptInterceptor implements Interceptor {
         Set<Field> fields = encryptorManager.getFieldCache(sourceObject.getClass());
         try {
             for (Field field : fields) {
-                // 防止对象不是null 属性内容是null
-                Object obj = field.get(sourceObject);
-                if (ObjectUtil.isNull(obj)) {
-                    continue;
-                }
-                field.set(sourceObject, this.encryptField(String.valueOf(field.get(obj)), field));
+                field.set(sourceObject, this.encryptField(String.valueOf(field.get(sourceObject)), field));
             }
         } catch (Exception e) {
             log.error("处理加密字段时出错", e);
@@ -104,6 +99,9 @@ public class MybatisEncryptInterceptor implements Interceptor {
      * @return 加密后结果
      */
     private String encryptField(String value, Field field) {
+        if (ObjectUtil.isNull(value)) {
+            return null;
+        }
         EncryptField encryptField = field.getAnnotation(EncryptField.class);
         EncryptContext encryptContext = new EncryptContext();
         encryptContext.setAlgorithm(encryptField.algorithm() == AlgorithmType.DEFAULT ? defaultProperties.getAlgorithm() : encryptField.algorithm());
