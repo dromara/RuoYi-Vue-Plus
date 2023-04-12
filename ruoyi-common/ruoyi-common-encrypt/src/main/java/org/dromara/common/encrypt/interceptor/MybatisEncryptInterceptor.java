@@ -84,7 +84,12 @@ public class MybatisEncryptInterceptor implements Interceptor {
         Set<Field> fields = encryptorManager.getFieldCache(sourceObject.getClass());
         try {
             for (Field field : fields) {
-                field.set(sourceObject, this.encryptField(String.valueOf(field.get(sourceObject)), field));
+                // 防止对象不是null 属性内容是null
+                Object obj = field.get(sourceObject);
+                if (ObjectUtil.isNull(obj)) {
+                    continue;
+                }
+                field.set(sourceObject, this.encryptField(String.valueOf(field.get(obj)), field));
             }
         } catch (Exception e) {
             log.error("处理加密字段时出错", e);
