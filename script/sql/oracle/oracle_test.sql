@@ -1,6 +1,6 @@
 create table test_demo (
     id          number(20)      not null,
-    tenant_id   varchar2(20)    not null,
+    tenant_id   varchar2(20)    default '000000',
     dept_id     number(20)      default null,
     user_id     number(20)      default null,
     order_num   number(10)      default 0,
@@ -35,7 +35,7 @@ comment on column test_demo.del_flag     is '删除标志';
 
 create table test_tree (
     id          number(20)      not null,
-    tenant_id   varchar2(20)    not null,
+    tenant_id   varchar2(20)    default '000000',
     parent_id   number(20)      default 0,
     dept_id     number(20)      default null,
     user_id     number(20)      default null,

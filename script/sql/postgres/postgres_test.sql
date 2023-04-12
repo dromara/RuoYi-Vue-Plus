@@ -2,7 +2,7 @@ DROP TABLE if EXISTS test_demo;
 create table if not exists test_demo
 (
     id          int8,
-    tenant_id   varchar(20)     not null,
+    tenant_id   varchar(20)     default '000000',
     dept_id     int8,
     user_id     int8,
     order_num   int4            default 0,
@@ -37,7 +37,7 @@ DROP TABLE if EXISTS test_tree;
 create table if not exists test_tree
 (
     id          int8,
-    tenant_id   varchar(20)     not null,
+    tenant_id   varchar(20)     default '000000',
     parent_id   int8            default 0,
     dept_id     int8,
     user_id     int8,

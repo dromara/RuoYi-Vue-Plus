@@ -2,7 +2,7 @@ DROP TABLE if EXISTS test_demo;
 CREATE TABLE test_demo
 (
     id          bigint(0)    NOT NULL COMMENT '主键',
-    tenant_id   varchar(20)  NOT NULL COMMENT '租户编号',
+    tenant_id   varchar(20)  NULL DEFAULT '000000' COMMENT '租户编号',
     dept_id     bigint(0)    NULL DEFAULT NULL COMMENT '部门id',
     user_id     bigint(0)    NULL DEFAULT NULL COMMENT '用户id',
     order_num   int(0)       NULL DEFAULT 0 COMMENT '排序号',
@@ -22,7 +22,7 @@ DROP TABLE if EXISTS test_tree;
 CREATE TABLE test_tree
 (
     id          bigint(0)    NOT NULL COMMENT '主键',
-    tenant_id   varchar(20)  NOT NULL COMMENT '租户编号',
+    tenant_id   varchar(20)  NULL DEFAULT '000000' COMMENT '租户编号',
     parent_id   bigint(0)    NULL DEFAULT 0 COMMENT '父id',
     dept_id     bigint(0)    NULL DEFAULT NULL COMMENT '部门id',
     user_id     bigint(0)    NULL DEFAULT NULL COMMENT '用户id',

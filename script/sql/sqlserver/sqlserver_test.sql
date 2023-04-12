@@ -1,7 +1,7 @@
 CREATE TABLE test_demo
 (
     id          bigint            NOT NULL,
-    tenant_id   nvarchar(20)      NOT NULL,
+    tenant_id   nvarchar(20)      DEFAULT ('000000') NULL,
     dept_id     bigint            NULL,
     user_id     bigint            NULL,
     order_num   int DEFAULT ((0)) NULL,
@@ -128,7 +128,7 @@ GO
 CREATE TABLE test_tree
 (
     id          bigint               NOT NULL,
-    tenant_id   nvarchar(20)         NOT NULL,
+    tenant_id   nvarchar(20)         DEFAULT ('000000') NULL,
     parent_id   bigint DEFAULT ((0)) NULL,
     dept_id     bigint               NULL,
     user_id     bigint               NULL,
