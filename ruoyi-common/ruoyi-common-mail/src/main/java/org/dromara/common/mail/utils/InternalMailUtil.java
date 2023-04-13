@@ -1,7 +1,6 @@
 package org.dromara.common.mail.utils;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.extra.mail.MailException;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeUtility;
