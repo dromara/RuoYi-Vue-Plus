@@ -413,7 +413,7 @@ public class MailUtils {
      */
     private static String send(MailAccount mailAccount, boolean useGlobalSession, Collection<String> tos, Collection<String> ccs, Collection<String> bccs, String subject, String content,
                                Map<String, InputStream> imageMap, boolean isHtml, File... files) {
-        final org.dromara.common.mail.utils.Mail mail = Mail.create(mailAccount).setUseGlobalSession(useGlobalSession);
+        final Mail mail = Mail.create(mailAccount).setUseGlobalSession(useGlobalSession);
 
         // 可选抄送人
         if (CollUtil.isNotEmpty(ccs)) {

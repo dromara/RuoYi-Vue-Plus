@@ -18,10 +18,7 @@ import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.internet.MimeUtility;
 import jakarta.mail.util.ByteArrayDataSource;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Date;
 
@@ -32,7 +29,8 @@ import java.util.Date;
  * @since 3.2.0
  */
 public class Mail implements Builder<MimeMessage> {
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
 	/**
 	 * 邮箱帐户信息以及一些客户端配置信息
@@ -261,7 +259,7 @@ public class Mail implements Builder<MimeMessage> {
 					bodyPart.setDataHandler(new DataHandler(attachment));
 					nameEncoded = attachment.getName();
 					if (this.mailAccount.isEncodefilename()) {
-						nameEncoded = org.dromara.common.mail.utils.InternalMailUtil.encodeText(nameEncoded, charset);
+						nameEncoded = InternalMailUtil.encodeText(nameEncoded, charset);
 					}
 					// 普通附件文件名
 					bodyPart.setFileName(nameEncoded);
@@ -423,7 +421,7 @@ public class Mail implements Builder<MimeMessage> {
 			// 用户未提供发送方，则从Session中自动获取
 			msg.setFrom();
 		} else {
-			msg.setFrom(org.dromara.common.mail.utils.InternalMailUtil.parseFirstAddress(from, charset));
+			msg.setFrom(InternalMailUtil.parseFirstAddress(from, charset));
 		}
 		// 标题
 		msg.setSubject(this.title, (null == charset) ? null : charset.name());
@@ -432,14 +430,14 @@ public class Mail implements Builder<MimeMessage> {
 		// 内容和附件
 		msg.setContent(buildContent(charset));
 		// 收件人
-		msg.setRecipients(MimeMessage.RecipientType.TO, org.dromara.common.mail.utils.InternalMailUtil.parseAddressFromStrs(this.tos, charset));
+		msg.setRecipients(MimeMessage.RecipientType.TO, InternalMailUtil.parseAddressFromStrs(this.tos, charset));
 		// 抄送人
 		if (ArrayUtil.isNotEmpty(this.ccs)) {
-			msg.setRecipients(MimeMessage.RecipientType.CC, org.dromara.common.mail.utils.InternalMailUtil.parseAddressFromStrs(this.ccs, charset));
+			msg.setRecipients(MimeMessage.RecipientType.CC, InternalMailUtil.parseAddressFromStrs(this.ccs, charset));
 		}
 		// 密送人
 		if (ArrayUtil.isNotEmpty(this.bccs)) {
-			msg.setRecipients(MimeMessage.RecipientType.BCC, org.dromara.common.mail.utils.InternalMailUtil.parseAddressFromStrs(this.bccs, charset));
+			msg.setRecipients(MimeMessage.RecipientType.BCC, InternalMailUtil.parseAddressFromStrs(this.bccs, charset));
 		}
 		// 回复地址(reply-to)
 		if (ArrayUtil.isNotEmpty(this.reply)) {

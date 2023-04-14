@@ -3,12 +3,15 @@ package org.dromara.common.mail.utils;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
 
+import java.io.Serial;
+
 /**
  * 邮件异常
  * @author xiaoleilu
  */
 public class MailException extends RuntimeException{
-	private static final long serialVersionUID = 8247610319171014183L;
+	@Serial
+    private static final long serialVersionUID = 8247610319171014183L;
 
 	public MailException(Throwable e) {
 		super(ExceptionUtil.getMessage(e), e);
