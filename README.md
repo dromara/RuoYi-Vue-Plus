@@ -23,6 +23,8 @@
 
 > 前端项目地址: [plus-ui](https://gitee.com/JavaLionLi/plus-ui)
 
+> 文档地址: [plus-doc](https://plus-doc.dromara.org) - [plus-doc(国内备用)](https://dromara.gitee.io/plus-doc)
+
 # 本框架与RuoYi的功能差异
 
 | 功能          | 本框架                                                                                                               | RuoYi                                                                              |
@@ -113,6 +115,10 @@
 > 
 >[参考文档 Wiki](https://plus-doc.dromara.org)
 >>[https://plus-doc.dromara.org](https://plus-doc.dromara.org)
+> 
+>[参考文档(国内备份)](https://dromara.gitee.io/plus-doc)
+>>[https://dromara.gitee.io/plus-doc](https://dromara.gitee.io/plus-doc)
+
 
 ## 软件架构图
 
