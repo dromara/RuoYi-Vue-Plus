@@ -18,7 +18,7 @@ import java.util.Map;
  *
  * @author 老马
  */
-public class SecurityUtils {
+public class EncryptUtils {
     /**
      * 公钥
      */
@@ -130,7 +130,7 @@ public class SecurityUtils {
      * @return 公私钥Map
      */
     public static Map<String, String> generateSm2Key() {
-        Map<String, String> keyMap = new HashMap<>();
+        Map<String, String> keyMap = new HashMap<>(2);
         SM2 sm2 = SmUtil.sm2();
         keyMap.put(PRIVATE_KEY, sm2.getPrivateKeyBase64());
         keyMap.put(PUBLIC_KEY, sm2.getPublicKeyBase64());
@@ -173,7 +173,7 @@ public class SecurityUtils {
      * @return 公私钥Map
      */
     public static Map<String, String> generateRsaKey() {
-        Map<String, String> keyMap = new HashMap<>();
+        Map<String, String> keyMap = new HashMap<>(2);
         RSA rsa = SecureUtil.rsa();
         keyMap.put(PRIVATE_KEY, rsa.getPrivateKeyBase64());
         keyMap.put(PUBLIC_KEY, rsa.getPublicKeyBase64());
@@ -210,46 +210,24 @@ public class SecurityUtils {
         return rsa.decryptStr(data, KeyType.PrivateKey, StandardCharsets.UTF_8);
     }
 
-    // 测试方法
-    public static void main(String[] args) {
-        String str = "";
-        String password = "";
-        Map<String, String> keyMap = new HashMap<>();
-
-        //base64加解密测试
-        str = "老马base64加解密测试";
-        String encryptByBase64 = encryptByBase64(str);
-        System.out.println("base64加解密测试: encryptByBase64=" + encryptByBase64);
-        String decryptByBase64 = decryptByBase64(encryptByBase64);
-        System.out.println("base64加解密测试: decryptByBase64=" + decryptByBase64);
-        //aes加解密测试
-        str = "老马aes测试";
-        password = "adsfasddg234sfwt2545sgr@";
-        String encryptByAes = encryptByAes(str, password);
-        System.out.println("aes加解密测试: encryptByAes=" + encryptByAes);
-        String decryptByAes = decryptByAes(encryptByAes, password);
-        System.out.println("aes加解密测试: decryptByAes=" + decryptByAes);
-        //sm4加解密测试
-        str = "老马sm4测试";
-        password = "adsfasddg234sfwt";
-        String encryptBySm4 = encryptBySm4(str, password);
-        System.out.println("sm4加解密测试: encryptBySm4=" + encryptBySm4);
-        String decryptBySm4 = decryptBySm4(encryptBySm4, password);
-        System.out.println("sm4加解密测试: decryptBySm4=" + decryptBySm4);
-        //sm2加解密测试
-        str = "老马sm2测试";
-        keyMap = generateSm2Key();
-        String encryptBySm2 = encryptBySm2(str, keyMap.get(SecurityUtils.PUBLIC_KEY));
-        System.out.println("sm2加解密测试: encryptBySm2=" + encryptBySm2);
-        String decryptBySm2 = decryptBySm2(encryptBySm2, keyMap.get(SecurityUtils.PRIVATE_KEY));
-        System.out.println("sm2加解密测试: decryptBySm2=" + decryptBySm2);
-        //rsa加解密测试
-        str = "老马rsa测试";
-        keyMap = generateRsaKey();
-        String encryptByRsa = encryptByRsa(str, keyMap.get(SecurityUtils.PUBLIC_KEY));
-        System.out.println("rsa加解密测试: encryptByRsa=" + encryptByRsa);
-        String decryptByRsa = decryptByRsa(encryptByRsa, keyMap.get(SecurityUtils.PRIVATE_KEY));
-        System.out.println("rsa加解密测试: decryptByRsa=" + decryptByRsa);
-
+    /**
+     * md5加密
+     *
+     * @param data 待加密数据
+     * @return 加密后字符串, 采用Hex编码
+     */
+    public static String encryptByMd5(String data) {
+        return SecureUtil.md5(data);
     }
+
+    /**
+     * sha256加密
+     *
+     * @param data 待加密数据
+     * @return 加密后字符串, 采用Hex编码
+     */
+    public static String encryptBySha256(String data) {
+        return SecureUtil.sha256(data);
+    }
+
 }
