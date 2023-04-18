@@ -49,6 +49,16 @@ public class SysTenantPackageController extends BaseController {
     }
 
     /**
+     * 查询租户套餐下拉选列表
+     */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    @SaCheckPermission("system:tenantPackage:list")
+    @GetMapping("/selectList")
+    public R<List<SysTenantPackageVo>> selectList() {
+        return R.ok(tenantPackageService.selectList());
+    }
+
+    /**
      * 导出租户套餐列表
      */
     @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)

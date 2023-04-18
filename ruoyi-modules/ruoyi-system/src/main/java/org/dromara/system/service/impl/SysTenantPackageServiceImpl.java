@@ -1,6 +1,7 @@
 package org.dromara.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -53,6 +54,12 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
         LambdaQueryWrapper<SysTenantPackage> lqw = buildQueryWrapper(bo);
         Page<SysTenantPackageVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
+    }
+
+    @Override
+    public List<SysTenantPackageVo> selectList() {
+        return baseMapper.selectVoList(new LambdaQueryWrapper<SysTenantPackage>()
+                .eq(SysTenantPackage::getStatus, TenantConstants.NORMAL));
     }
 
     /**

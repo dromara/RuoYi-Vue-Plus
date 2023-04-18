@@ -26,6 +26,11 @@ public interface ISysTenantPackageService {
     TableDataInfo<SysTenantPackageVo> queryPageList(SysTenantPackageBo bo, PageQuery pageQuery);
 
     /**
+     * 查询租户套餐已启用列表
+     */
+    List<SysTenantPackageVo> selectList();
+
+    /**
      * 查询租户套餐列表
      */
     List<SysTenantPackageVo> queryList(SysTenantPackageBo bo);
