@@ -13,11 +13,6 @@ public interface GlobalConstants {
     String GLOBAL_REDIS_KEY = "global:";
 
     /**
-     * 登录用户 redis key
-     */
-    String LOGIN_TOKEN_KEY = GLOBAL_REDIS_KEY + "Authorization:login:token:";
-
-    /**
      * 验证码 redis key
      */
     String CAPTCHA_CODE_KEY = GLOBAL_REDIS_KEY + "captcha_codes:";
