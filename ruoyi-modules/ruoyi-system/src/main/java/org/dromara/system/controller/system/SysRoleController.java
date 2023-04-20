@@ -7,6 +7,7 @@ import cn.hutool.core.collection.CollUtil;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginUser;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
@@ -110,25 +111,7 @@ public class SysRoleController extends BaseController {
         }
 
         if (roleService.updateRole(role) > 0) {
-            List<String> keys = StpUtil.searchTokenValue("", 0, -1, false);
-            if (CollUtil.isEmpty(keys)) {
-                return R.ok();
-            }
-            // 角色关联的在线用户量过大会导致redis阻塞卡顿 谨慎操作
-            keys.parallelStream().forEach(key -> {
-                String token = key.replace(GlobalConstants.LOGIN_TOKEN_KEY, "");
-                // 如果已经过期则跳过
-                if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(token) < -1) {
-                    return;
-                }
-                LoginUser loginUser = LoginHelper.getLoginUser(token);
-                if (loginUser.getRoles().stream().anyMatch(r -> r.getRoleId().equals(role.getRoleId()))) {
-                    try {
-                        StpUtil.logoutByTokenValue(token);
-                    } catch (NotLoginException ignored) {
-                    }
-                }
-            });
+            roleService.cleanOnlineUserByRole(role.getRoleId());
             return R.ok();
         }
         return R.fail("修改角色'" + role.getRoleName() + "'失败，请联系管理员");
