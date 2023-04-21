@@ -2,6 +2,8 @@ package ${packageName}.domain.bo;
 
 import ${packageName}.domain.${ClassName};
 import org.dromara.common.mybatis.core.domain.BaseEntity;
+import org.dromara.common.core.validate.AddGroup;
+import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
