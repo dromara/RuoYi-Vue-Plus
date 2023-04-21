@@ -3,6 +3,11 @@ package org.dromara.system.controller.system;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.lock.annotation.Lock4j;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
@@ -18,13 +23,15 @@ import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.service.ISysTenantService;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -72,7 +79,7 @@ public class SysTenantController extends BaseController {
     @SaCheckPermission("system:tenant:query")
     @GetMapping("/{id}")
     public R<SysTenantVo> getInfo(@NotNull(message = "主键不能为空")
-                                     @PathVariable Long id) {
+                                  @PathVariable Long id) {
         return R.ok(tenantService.queryById(id));
     }
 
@@ -89,7 +96,7 @@ public class SysTenantController extends BaseController {
         if (!tenantService.checkCompanyNameUnique(bo)) {
             return R.fail("新增租户'" + bo.getCompanyName() + "'失败，企业名称已存在");
         }
-        return toAjax(tenantService.insertByBo(bo));
+        return toAjax(TenantHelper.ignore(() -> tenantService.insertByBo(bo)));
     }
 
     /**
@@ -168,7 +175,7 @@ public class SysTenantController extends BaseController {
     @Log(title = "租户", businessType = BusinessType.UPDATE)
     @GetMapping("/syncTenantPackage")
     public R<Void> syncTenantPackage(@NotBlank(message = "租户ID不能为空") String tenantId, @NotBlank(message = "套餐ID不能为空") String packageId) {
-        return toAjax(tenantService.syncTenantPackage(tenantId, packageId));
+        return toAjax(TenantHelper.ignore(() -> tenantService.syncTenantPackage(tenantId, packageId)));
     }
 
 }

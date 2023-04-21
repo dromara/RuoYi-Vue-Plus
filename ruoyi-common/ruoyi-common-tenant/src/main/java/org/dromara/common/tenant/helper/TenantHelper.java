@@ -6,14 +6,16 @@ import cn.hutool.core.convert.Convert;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+import java.util.function.Supplier;
 
 /**
  * 租户助手
@@ -47,6 +49,34 @@ public class TenantHelper {
      */
     public static void disableIgnore() {
         InterceptorIgnoreHelper.clearIgnoreStrategy();
+    }
+
+    /**
+     * 在忽略租户中执行
+     *
+     * @param handle 处理执行方法
+     */
+    public static void ignore(Runnable handle) {
+        enableIgnore();
+        try {
+            handle.run();
+        } finally {
+            disableIgnore();
+        }
+    }
+
+    /**
+     * 在忽略租户中执行
+     *
+     * @param handle 处理执行方法
+     */
+    public static <T> T ignore(Supplier<T> handle) {
+        enableIgnore();
+        try {
+            return handle.get();
+        } finally {
+            disableIgnore();
+        }
     }
 
     /**
