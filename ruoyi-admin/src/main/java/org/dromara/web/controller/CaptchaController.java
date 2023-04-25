@@ -55,7 +55,7 @@ public class CaptchaController {
      *
      * @param phonenumber 用户手机号
      */
-    @GetMapping("/sms/code")
+    @GetMapping("/resource/sms/code")
     public R<Void> smsCode(@NotBlank(message = "{user.phonenumber.not.blank}") String phonenumber) {
         if (!smsProperties.getEnabled()) {
             return R.fail("当前系统没有开启短信功能！");
@@ -81,7 +81,7 @@ public class CaptchaController {
      *
      * @param email 邮箱
      */
-    @GetMapping("/email/code")
+    @GetMapping("/resource/email/code")
     public R<Void> emailCode(@NotBlank(message = "{user.email.not.blank}") String email) {
         if (!mailProperties.getEnabled()) {
             return R.fail("当前系统没有开启邮箱功能！");

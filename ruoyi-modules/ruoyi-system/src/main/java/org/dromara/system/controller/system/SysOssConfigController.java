@@ -32,7 +32,7 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/system/oss/config")
+@RequestMapping("/resource/oss/config")
 public class SysOssConfigController extends BaseController {
 
     private final ISysOssConfigService ossConfigService;
