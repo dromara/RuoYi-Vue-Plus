@@ -34,7 +34,7 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/system/oss")
+@RequestMapping("/resource/oss")
 public class SysOssController extends BaseController {
 
     private final ISysOssService ossService;
