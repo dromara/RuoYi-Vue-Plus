@@ -230,4 +230,14 @@ public class EncryptUtils {
         return SecureUtil.sha256(data);
     }
 
+    /**
+     * sm3加密
+     *
+     * @param data 待加密数据
+     * @return 加密后字符串, 采用Hex编码
+     */
+    public static String encryptBySm3(String data) {
+        return SmUtil.sm3(data);
+    }
+
 }
