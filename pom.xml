@@ -14,12 +14,12 @@
 
     <properties>
         <revision>5.0.0-BETA</revision>
-        <spring-boot.version>3.0.5</spring-boot.version>
+        <spring-boot.version>3.0.6</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
         <spring-boot.mybatis>3.0.1</spring-boot.mybatis>
-        <springdoc.version>2.0.4</springdoc.version>
+        <springdoc.version>2.1.0</springdoc.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
         <poi.version>5.2.3</poi.version>
         <easyexcel.version>3.2.1</easyexcel.version>
@@ -27,10 +27,10 @@
         <satoken.version>1.34.0</satoken.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.8.15</hutool.version>
+        <hutool.version>5.8.18</hutool.version>
         <okhttp.version>4.10.0</okhttp.version>
-        <spring-boot-admin.version>3.0.2</spring-boot-admin.version>
-        <redisson.version>3.20.0</redisson.version>
+        <spring-boot-admin.version>3.0.3</spring-boot-admin.version>
+        <redisson.version>3.20.1</redisson.version>
         <lock4j.version>2.2.4</lock4j.version>
         <dynamic-ds.version>3.6.1</dynamic-ds.version>
         <alibaba-ttl.version>2.14.2</alibaba-ttl.version>
