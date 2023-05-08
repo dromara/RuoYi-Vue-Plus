@@ -160,7 +160,7 @@ create table sys_menu (
 insert into sys_menu values('1', '系统管理', '0', '1', 'system',           null, '', 1, 0, 'M', '0', '0', '', 'system',   'admin', sysdate(), '', null, '系统管理目录');
 insert into sys_menu values('2', '系统监控', '0', '2', 'monitor',          null, '', 1, 0, 'M', '0', '0', '', 'monitor',  'admin', sysdate(), '', null, '系统监控目录');
 insert into sys_menu values('3', '系统工具', '0', '3', 'tool',             null, '', 1, 0, 'M', '0', '0', '', 'tool',     'admin', sysdate(), '', null, '系统工具目录');
-insert into sys_menu values('4', 'PLUS官网', '0', '4', 'https://gitee.com/JavaLionLi/RuoYi-Vue-Plus', null, '', 0, 0, 'M', '0', '0', '', 'guide',    'admin', sysdate(), '', null, 'RuoYi-Vue-Plus官网地址');
+insert into sys_menu values('4', 'PLUS官网', '0', '4', 'https://gitee.com/dromara/RuoYi-Vue-Plus', null, '', 0, 0, 'M', '0', '0', '', 'guide',    'admin', sysdate(), '', null, 'RuoYi-Vue-Plus官网地址');
 -- 二级菜单
 insert into sys_menu values('100',  '用户管理', '1',   '1', 'user',       'system/user/index',        '', 1, 0, 'C', '0', '0', 'system:user:list',        'user',          'admin', sysdate(), '', null, '用户管理菜单');
 insert into sys_menu values('101',  '角色管理', '1',   '2', 'role',       'system/role/index',        '', 1, 0, 'C', '0', '0', 'system:role:list',        'peoples',       'admin', sysdate(), '', null, '角色管理菜单');
@@ -679,7 +679,7 @@ create table sys_oss_config (
   is_https         char(1)                default 'N'     comment '是否https（Y=是,N=否）',
   region           varchar(255)           default ''      comment '域',
   access_policy    char(1)     not null   default '1'     comment '桶权限类型(0=private 1=public 2=custom)',
-  status           char(1)                default '1'     comment '状态（0=正常,1=停用）',
+  status           char(1)                default '1'     comment '是否默认（0=是,1=否）',
   ext1             varchar(255)           default ''      comment '扩展字段',
   create_by       varchar(64)             default ''      comment '创建者',
   create_time     datetime                default null    comment '创建时间',

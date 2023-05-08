@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * 数据权限助手
@@ -59,6 +60,34 @@ public class DataPermissionHelper {
      */
     public static void disableIgnore() {
         InterceptorIgnoreHelper.clearIgnoreStrategy();
+    }
+
+    /**
+     * 在忽略数据权限中执行
+     *
+     * @param handle 处理执行方法
+     */
+    public static void ignore(Runnable handle) {
+        enableIgnore();
+        try {
+            handle.run();
+        } finally {
+            disableIgnore();
+        }
+    }
+
+    /**
+     * 在忽略数据权限中执行
+     *
+     * @param handle 处理执行方法
+     */
+    public static <T> T ignore(Supplier<T> handle) {
+        enableIgnore();
+        try {
+            return handle.get();
+        } finally {
+            disableIgnore();
+        }
     }
 
 }

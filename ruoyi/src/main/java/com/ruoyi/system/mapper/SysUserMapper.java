@@ -77,6 +77,14 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
     SysUser selectUserByPhonenumber(String phonenumber);
 
     /**
+     * 通过邮箱查询用户
+     *
+     * @param email 邮箱
+     * @return 用户对象信息
+     */
+    SysUser selectUserByEmail(String email);
+
+    /**
      * 通过用户ID查询用户
      *
      * @param userId 用户ID

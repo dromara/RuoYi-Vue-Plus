@@ -1054,6 +1054,8 @@ INSERT sys_menu VALUES (2, N'系统监控', 0, 2, N'monitor', NULL, N'', 1, 0, N
 GO
 INSERT sys_menu VALUES (3, N'系统工具', 0, 3, N'tool', NULL, N'', 1, 0, N'M', N'0', N'0', N'', N'tool', N'admin', getdate(), N'', NULL, N'系统工具目录')
 GO
+INSERT sys_menu VALUES (4, N'PLUS官网', 0, 5, N'https://gitee.com/dromara/RuoYi-Vue-Plus', null, N'', 0, 0, N'M', N'0', N'0', N'', N'guide', N'admin', getdate(), N'', null, N'RuoYi-Vue-Plus官网地址');
+GO
 INSERT sys_menu VALUES (100, N'用户管理', 1, 1, N'user', N'system/user/index', N'', 1, 0, N'C', N'0', N'0', N'system:user:list', N'user', N'admin', getdate(), N'', NULL, N'用户管理菜单')
 GO
 INSERT sys_menu VALUES (101, N'角色管理', 1, 2, N'role', N'system/role/index', N'', 1, 0, N'C', N'0', N'0', N'system:role:list', N'peoples', N'admin', getdate(), N'', NULL, N'角色管理菜单')
@@ -2283,7 +2285,7 @@ EXEC sp_addextendedproperty
      'COLUMN', N'access_policy'
 GO
 EXEC sp_addextendedproperty
-    'MS_Description', N'状态（0=正常,1=停用）',
+    'MS_Description', N'是否默认（0=是,1=否）',
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oss_config',
     'COLUMN', N'status'

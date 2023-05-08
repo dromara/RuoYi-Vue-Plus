@@ -1,15 +1,15 @@
 <template>
   <div :class="classObj" class="app-wrapper" :style="{'--current-color': theme}">
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
-    <sidebar v-if="!sidebar.hide" class="sidebar-container" />
+    <sidebar v-if="!sidebar.hide" class="sidebar-container"/>
     <div :class="{hasTagsView:needTagsView,sidebarHide:sidebar.hide}" class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
-        <navbar />
-        <tags-view v-if="needTagsView" />
+        <navbar/>
+        <tags-view v-if="needTagsView"/>
       </div>
-      <app-main />
+      <app-main/>
       <right-panel>
-        <settings />
+        <settings/>
       </right-panel>
     </div>
   </div>

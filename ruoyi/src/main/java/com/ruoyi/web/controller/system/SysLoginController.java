@@ -5,6 +5,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.EmailLoginBody;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.SmsLoginBody;
@@ -57,7 +58,7 @@ public class SysLoginController {
     }
 
     /**
-     * 短信登录(示例)
+     * 短信登录
      *
      * @param smsLoginBody 登录信息
      * @return 结果
@@ -68,6 +69,21 @@ public class SysLoginController {
         Map<String, Object> ajax = new HashMap<>();
         // 生成令牌
         String token = loginService.smsLogin(smsLoginBody.getPhonenumber(), smsLoginBody.getSmsCode());
+        ajax.put(Constants.TOKEN, token);
+        return R.ok(ajax);
+    }
+
+    /**
+     * 邮件登录
+     *
+     * @param body 登录信息
+     * @return 结果
+     */
+    @PostMapping("/emailLogin")
+    public R<Map<String, Object>> emailLogin(@Validated @RequestBody EmailLoginBody body) {
+        Map<String, Object> ajax = new HashMap<>();
+        // 生成令牌
+        String token = loginService.emailLogin(body.getEmail(), body.getEmailCode());
         ajax.put(Constants.TOKEN, token);
         return R.ok(ajax);
     }

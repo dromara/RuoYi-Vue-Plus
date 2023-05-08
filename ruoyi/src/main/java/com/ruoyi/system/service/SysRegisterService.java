@@ -3,7 +3,6 @@ package com.ruoyi.system.service;
 import cn.dev33.satoken.secure.BCrypt;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.event.LogininforEvent;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;
@@ -18,8 +17,6 @@ import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 注册校验方法
@@ -37,7 +34,6 @@ public class SysRegisterService {
      * 注册
      */
     public void register(RegisterBody registerBody) {
-        HttpServletRequest request = ServletUtils.getRequest();
         String username = registerBody.getUsername();
         String password = registerBody.getPassword();
         // 校验用户类型是否存在
@@ -46,7 +42,7 @@ public class SysRegisterService {
         boolean captchaEnabled = configService.selectCaptchaEnabled();
         // 验证码开关
         if (captchaEnabled) {
-            validateCaptcha(username, registerBody.getCode(), registerBody.getUuid(), request);
+            validateCaptcha(username, registerBody.getCode(), registerBody.getUuid());
         }
         SysUser sysUser = new SysUser();
         sysUser.setUserName(username);
@@ -70,9 +66,8 @@ public class SysRegisterService {
      * @param username 用户名
      * @param code     验证码
      * @param uuid     唯一标识
-     * @return 结果
      */
-    public void validateCaptcha(String username, String code, String uuid, HttpServletRequest request) {
+    public void validateCaptcha(String username, String code, String uuid) {
         String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);

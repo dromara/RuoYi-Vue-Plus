@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Supplier;
@@ -67,11 +66,10 @@ public class SysLoginService {
      * @return 结果
      */
     public String login(String username, String password, String code, String uuid) {
-        HttpServletRequest request = ServletUtils.getRequest();
         boolean captchaEnabled = configService.selectCaptchaEnabled();
         // 验证码开关
         if (captchaEnabled) {
-            validateCaptcha(username, code, uuid, request);
+            validateCaptcha(username, code, uuid);
         }
         SysUser user = loadUserByUsername(username);
         checkLogin(LoginType.PASSWORD, username, () -> !BCrypt.checkpw(password, user.getPassword()));
@@ -100,6 +98,20 @@ public class SysLoginService {
         return StpUtil.getTokenValue();
     }
 
+    public String emailLogin(String email, String emailCode) {
+        // 通过手机号查找用户
+        SysUser user = loadUserByEmail(email);
+
+        checkLogin(LoginType.EMAIL, user.getUserName(), () -> !validateEmailCode(email, emailCode));
+        // 此处可根据登录用户的数据不同 自行创建 loginUser
+        LoginUser loginUser = buildLoginUser(user);
+        // 生成token
+        LoginHelper.loginByDevice(loginUser, DeviceType.APP);
+
+        recordLogininfor(user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+        recordLoginInfo(user.getUserId(), user.getUserName());
+        return StpUtil.getTokenValue();
+    }
 
     public String xcxLogin(String xcxCode) {
         // xcxCode 为 小程序调用 wx.login 授权后获取
@@ -140,7 +152,6 @@ public class SysLoginService {
      * @param username 用户名
      * @param status   状态
      * @param message  消息内容
-     * @return
      */
     private void recordLogininfor(String username, String status, String message) {
         LogininforEvent logininforEvent = new LogininforEvent();
@@ -164,13 +175,25 @@ public class SysLoginService {
     }
 
     /**
+     * 校验邮箱验证码
+     */
+    private boolean validateEmailCode(String email, String emailCode) {
+        String code = RedisUtils.getCacheObject(CacheConstants.CAPTCHA_CODE_KEY + email);
+        if (StringUtils.isBlank(code)) {
+            recordLogininfor(email, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            throw new CaptchaExpireException();
+        }
+        return code.equals(emailCode);
+    }
+
+    /**
      * 校验验证码
      *
      * @param username 用户名
      * @param code     验证码
      * @param uuid     唯一标识
      */
-    public void validateCaptcha(String username, String code, String uuid, HttpServletRequest request) {
+    public void validateCaptcha(String username, String code, String uuid) {
         String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
@@ -210,6 +233,20 @@ public class SysLoginService {
             throw new UserException("user.blocked", phonenumber);
         }
         return userMapper.selectUserByPhonenumber(phonenumber);
+    }
+
+    private SysUser loadUserByEmail(String email) {
+        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+            .select(SysUser::getPhonenumber, SysUser::getStatus)
+            .eq(SysUser::getEmail, email));
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", email);
+            throw new UserException("user.not.exists", email);
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", email);
+            throw new UserException("user.blocked", email);
+        }
+        return userMapper.selectUserByEmail(email);
     }
 
     private SysUser loadUserByOpenid(String openid) {

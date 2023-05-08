@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ruoyi-vue-plus</artifactId>
         <groupId>com.ruoyi</groupId>
-        <version>4.6.0</version>
+        <version>4.7.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
@@ -242,6 +242,12 @@
                     <artifactId>okio</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- 离线IP地址定位库 ip2region -->
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
         </dependency>
 
         <dependency>

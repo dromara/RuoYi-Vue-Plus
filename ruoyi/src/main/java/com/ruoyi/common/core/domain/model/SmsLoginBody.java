@@ -14,13 +14,13 @@ import javax.validation.constraints.NotBlank;
 public class SmsLoginBody {
 
     /**
-     * 用户名
+     * 手机号
      */
     @NotBlank(message = "{user.phonenumber.not.blank}")
     private String phonenumber;
 
     /**
-     * 用户密码
+     * 短信code
      */
     @NotBlank(message = "{sms.code.not.blank}")
     private String smsCode;

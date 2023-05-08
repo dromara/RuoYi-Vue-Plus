@@ -18,6 +18,7 @@ import org.redisson.api.RateType;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
@@ -102,7 +103,14 @@ public class RateLimiterAspect {
             }
             // 解析返回给key
             try {
-                key = parser.parseExpression(key, parserContext).getValue(context, String.class) + ":";
+                Expression expression;
+                if (StringUtils.startsWith(key, parserContext.getExpressionPrefix())
+                    && StringUtils.endsWith(key, parserContext.getExpressionSuffix())) {
+                    expression = parser.parseExpression(key, parserContext);
+                } else {
+                    expression = parser.parseExpression(key);
+                }
+                key = expression.getValue(context, String.class) + ":";
             } catch (Exception e) {
                 throw new ServiceException("限流key解析异常!请联系管理员!");
             }
