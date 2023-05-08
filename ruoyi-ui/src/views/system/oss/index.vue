@@ -406,9 +406,7 @@ export default {
       }).then(() => {
         this.getList()
         this.$modal.msgSuccess(text + "成功");
-      }).catch(() => {
-        this.previewListResource = previewListResource !== true;
-      })
+      }).catch(() => {})
     }
   }
 };

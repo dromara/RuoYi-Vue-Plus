@@ -317,13 +317,11 @@ public class GenTableServiceImpl implements IGenTableService {
                     column.setIsRequired(prevColumn.getIsRequired());
                     column.setHtmlType(prevColumn.getHtmlType());
                 }
-                genTableColumnMapper.updateById(column);
-            } else {
-                genTableColumnMapper.insert(column);
             }
+            saveColumns.add(column);
         });
         if (CollUtil.isNotEmpty(saveColumns)) {
-            genTableColumnMapper.insertBatch(saveColumns);
+            genTableColumnMapper.insertOrUpdateBatch(saveColumns);
         }
         List<GenTableColumn> delColumns = StreamUtils.filter(tableColumns, column -> !dbTableColumnNames.contains(column.getColumnName()));
         if (CollUtil.isNotEmpty(delColumns)) {

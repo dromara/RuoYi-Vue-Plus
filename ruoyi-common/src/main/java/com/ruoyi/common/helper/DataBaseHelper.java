@@ -66,7 +66,7 @@ public class DataBaseHelper {
             // instr(',0,100,101,' , ',100,') <> 0
             return "instr(','||" + var2 + "||',' , '," + var + ",') <> 0";
         }
-        // find_in_set(100 , '0,100,101')
-        return "find_in_set(" + var + " , " + var2 + ") <> 0";
+        // find_in_set('100' , '0,100,101')
+        return "find_in_set('" + var + "' , " + var2 + ") <> 0";
     }
 }

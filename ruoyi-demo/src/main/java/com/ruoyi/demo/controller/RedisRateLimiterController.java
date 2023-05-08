@@ -49,4 +49,16 @@ public class RedisRateLimiterController {
         return R.ok("操作成功", value);
     }
 
+    /**
+     * 测试请求IP限流(key基于参数获取)
+     * 同一IP请求受影响
+     *
+     * 简单变量获取 #变量 复杂表达式 #{#变量 != 1 ? 1 : 0}
+     */
+    @RateLimiter(count = 2, time = 10, limitType = LimitType.IP, key = "#value")
+    @GetMapping("/testObj")
+    public R<String> testObj(String value) {
+        return R.ok("操作成功", value);
+    }
+
 }

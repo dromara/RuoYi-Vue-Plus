@@ -1,22 +1,15 @@
 package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.dev33.satoken.exception.NotLoginException;
-import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.CacheConstants;
-import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.service.ISysDeptService;
@@ -112,25 +105,7 @@ public class SysRoleController extends BaseController {
         }
 
         if (roleService.updateRole(role) > 0) {
-            List<String> keys = StpUtil.searchTokenValue("", 0, -1, false);
-            if (CollUtil.isEmpty(keys)) {
-                return R.ok();
-            }
-            // 角色关联的在线用户量过大会导致redis阻塞卡顿 谨慎操作
-            keys.parallelStream().forEach(key -> {
-                String token = key.replace(CacheConstants.LOGIN_TOKEN_KEY, "");
-                // 如果已经过期则跳过
-                if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(token) < -1) {
-                    return;
-                }
-                LoginUser loginUser = LoginHelper.getLoginUser(token);
-                if (loginUser.getRoles().stream().anyMatch(r -> r.getRoleId().equals(role.getRoleId()))) {
-                    try {
-                        StpUtil.logoutByTokenValue(token);
-                    } catch (NotLoginException ignored) {
-                    }
-                }
-            });
+            roleService.cleanOnlineUserByRole(role.getRoleId());
             return R.ok();
         }
         return R.fail("修改角色'" + role.getRoleName() + "'失败，请联系管理员");

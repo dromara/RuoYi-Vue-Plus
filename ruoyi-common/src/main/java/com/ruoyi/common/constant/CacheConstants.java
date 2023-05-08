@@ -8,11 +8,6 @@ package com.ruoyi.common.constant;
 public interface CacheConstants {
 
     /**
-     * 登录用户 redis key
-     */
-    String LOGIN_TOKEN_KEY = "Authorization:login:token:";
-
-    /**
      * 在线用户 redis key
      */
     String ONLINE_TOKEN_KEY = "online_tokens:";

@@ -23,6 +23,11 @@ public enum LoginType {
     SMS("sms.code.retry.limit.exceed", "sms.code.retry.limit.count"),
 
     /**
+     * 邮箱登录
+     */
+    EMAIL("email.code.retry.limit.exceed", "email.code.retry.limit.count"),
+
+    /**
      * 小程序登录
      */
     XCX("", "");

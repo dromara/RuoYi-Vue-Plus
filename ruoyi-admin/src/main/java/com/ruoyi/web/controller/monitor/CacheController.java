@@ -33,7 +33,6 @@ public class CacheController {
     private final static List<SysCache> CACHES = new ArrayList<>();
 
     static {
-        CACHES.add(new SysCache(CacheConstants.LOGIN_TOKEN_KEY, "用户信息"));
         CACHES.add(new SysCache(CacheConstants.ONLINE_TOKEN_KEY, "在线用户"));
         CACHES.add(new SysCache(CacheNames.SYS_CONFIG, "配置信息"));
         CACHES.add(new SysCache(CacheNames.SYS_DICT, "数据字典"));
