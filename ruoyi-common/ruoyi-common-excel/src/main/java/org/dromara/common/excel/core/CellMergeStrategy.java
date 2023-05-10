@@ -1,19 +1,20 @@
 package org.dromara.common.excel.core;
 
+import cn.hutool.core.collection.CollUtil;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.metadata.Head;
 import com.alibaba.excel.write.merge.AbstractMergeStrategy;
-import org.dromara.common.excel.annotation.CellMerge;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.dromara.common.core.utils.reflect.ReflectUtils;
+import org.dromara.common.excel.annotation.CellMerge;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,20 +25,27 @@ import java.util.Map;
  *
  * @author Lion Li
  */
-@AllArgsConstructor
 @Slf4j
 public class CellMergeStrategy extends AbstractMergeStrategy {
 
-	private List<?> list;
-	private boolean hasTitle;
+	private final List<?> list;
+	private final boolean hasTitle;
+    private int rowIndex;
 
-	@Override
+    public CellMergeStrategy(List<?> list, boolean hasTitle) {
+        this.list = list;
+        this.hasTitle = hasTitle;
+        // 行合并开始下标
+        this.rowIndex = hasTitle ? 1 : 0;
+    }
+
+    @Override
 	protected void merge(Sheet sheet, Cell cell, Head head, Integer relativeRowIndex) {
 		List<CellRangeAddress> cellList = handle(list, hasTitle);
 		// judge the list is not null
-		if (CollectionUtils.isNotEmpty(cellList)) {
+		if (CollUtil.isNotEmpty(cellList)) {
 			// the judge is necessary
-			if (cell.getRowIndex() == 1 && cell.getColumnIndex() == 0) {
+			if (cell.getRowIndex() == rowIndex && cell.getColumnIndex() == 0) {
 				for (CellRangeAddress item : cellList) {
 					sheet.addMergedRegion(item);
 				}
@@ -46,13 +54,13 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
 	}
 
 	@SneakyThrows
-	private static List<CellRangeAddress> handle(List<?> list, boolean hasTitle) {
+	private List<CellRangeAddress> handle(List<?> list, boolean hasTitle) {
 		List<CellRangeAddress> cellList = new ArrayList<>();
-		if (CollectionUtils.isEmpty(list)) {
+		if (CollUtil.isEmpty(list)) {
 			return cellList;
 		}
-		Class<?> clazz = list.get(0).getClass();
-		Field[] fields = clazz.getDeclaredFields();
+        Field[] fields = ReflectUtils.getFields(list.get(0).getClass(), field -> !"serialVersionUID".equals(field.getName()));
+
 		// 有注解的字段
 		List<Field> mergeFields = new ArrayList<>();
 		List<Integer> mergeFieldsIndex = new ArrayList<>();
@@ -60,21 +68,21 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
 			Field field = fields[i];
 			if (field.isAnnotationPresent(CellMerge.class)) {
 				CellMerge cm = field.getAnnotation(CellMerge.class);
-				mergeFields.add(field);
-				mergeFieldsIndex.add(cm.index() == -1 ? i : cm.index());
+                mergeFields.add(field);
+                mergeFieldsIndex.add(cm.index() == -1 ? i : cm.index());
+                if (hasTitle) {
+                    ExcelProperty property = field.getAnnotation(ExcelProperty.class);
+                    rowIndex = Math.max(rowIndex, property.value().length);
+                }
 			}
 		}
-		// 行合并开始下标
-		int rowIndex = hasTitle ? 1 : 0;
+
 		Map<Field, RepeatCell> map = new HashMap<>();
 		// 生成两两合并单元格
 		for (int i = 0; i < list.size(); i++) {
 			for (int j = 0; j < mergeFields.size(); j++) {
 				Field field = mergeFields.get(j);
-				String name = field.getName();
-				String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
-				Method readMethod = clazz.getMethod(methodName);
-				Object val = readMethod.invoke(list.get(i));
+                Object val = ReflectUtils.invokeGetter(list.get(i), field.getName());
 
 				int colNum = mergeFieldsIndex.get(j);
 				if (!map.containsKey(field)) {
