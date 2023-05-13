@@ -148,7 +148,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
         List<SysDictData> dictDataList = dictDataMapper.selectList(
             new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getStatus, UserConstants.DICT_NORMAL));
         Map<String, List<SysDictData>> dictDataMap = StreamUtils.groupByKey(dictDataList, SysDictData::getDictType);
-        dictDataMap.forEach((k,v) -> {
+        dictDataMap.forEach((k, v) -> {
             List<SysDictData> dictList = StreamUtils.sorted(v, Comparator.comparing(SysDictData::getDictSort));
             CacheUtils.put(CacheNames.SYS_DICT, k, dictList);
         });
@@ -279,4 +279,16 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
         }
     }
 
+    @Override
+    public Map<String, String> getAllDictByDictType(String dictType) {
+        List<SysDictData> thisDictTypeDataList = selectDictDataByType(dictType);
+        Map<String, String> dictMap = null;
+        for (SysDictData everyDictData : thisDictTypeDataList) {
+            if (ObjectUtil.isNull(dictMap)) {
+                dictMap = new HashMap<>();
+            }
+            dictMap.put(everyDictData.getDictValue(), everyDictData.getDictLabel());
+        }
+        return dictMap;
+    }
 }
