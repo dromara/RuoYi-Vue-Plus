@@ -1,5 +1,7 @@
 package com.ruoyi.common.excel;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -11,6 +13,7 @@ import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.annotation.ExcelEnumFormat;
 import com.ruoyi.common.core.service.DictService;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.StreamUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -20,7 +23,6 @@ import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * <h1>Excel表格下拉选操作</h1>
@@ -90,37 +92,24 @@ public class ExcelDownHandler implements SheetWriteHandler {
             List<String> options = new ArrayList<>();
             if (fields[i].isAnnotationPresent(ExcelDictFormat.class)) {
                 // 如果指定了@ExcelDictFormat，则使用字典的逻辑
-                ExcelDictFormat thisFiledExcelDictFormat = fields[i].getDeclaredAnnotation(ExcelDictFormat.class);
-                String dictType = thisFiledExcelDictFormat.dictType();
-                String converterExp = thisFiledExcelDictFormat.readConverterExp();
+                ExcelDictFormat format = fields[i].getDeclaredAnnotation(ExcelDictFormat.class);
+                String dictType = format.dictType();
+                String converterExp = format.readConverterExp();
                 if (StrUtil.isNotBlank(dictType)) {
                     // 如果传递了字典名，则依据字典建立下拉
-                    options =
-                        new ArrayList<>(
-                            Optional.ofNullable(dictService.getAllDictByDictType(dictType))
-                                .orElseThrow(() -> new ServiceException(String.format("字典 %s 不存在", dictType)))
-                                .values()
-                        );
+                    Collection<String> values = Optional.ofNullable(dictService.getAllDictByDictType(dictType))
+                        .orElseThrow(() -> new ServiceException(String.format("字典 %s 不存在", dictType)))
+                        .values();
+                    options = new ArrayList<>(values);
                 } else if (StrUtil.isNotBlank(converterExp)) {
                     // 如果指定了确切的值，则直接解析确切的值
-                    options = StrUtil.split(
-                        converterExp,
-                        thisFiledExcelDictFormat.separator(),
-                        true,
-                        true);
+                    options = StrUtil.split(converterExp, format.separator(), true, true);
                 }
             } else if (fields[i].isAnnotationPresent(ExcelEnumFormat.class)) {
                 // 否则如果指定了@ExcelEnumFormat，则使用枚举的逻辑
-                ExcelEnumFormat thisFiledExcelEnumFormat = fields[i].getDeclaredAnnotation(ExcelEnumFormat.class);
-                options =
-                    EnumUtil
-                        .getFieldValues(
-                            thisFiledExcelEnumFormat.enumClass(),
-                            thisFiledExcelEnumFormat.textField()
-                        )
-                        .stream()
-                        .map(String::valueOf)
-                        .collect(Collectors.toList());
+                ExcelEnumFormat format = fields[i].getDeclaredAnnotation(ExcelEnumFormat.class);
+                List<Object> values = EnumUtil.getFieldValues(format.enumClass(), format.textField());
+                options = StreamUtils.toList(values, String::valueOf);
             }
             if (ObjectUtil.isNotEmpty(options)) {
                 // 仅当下拉可选项不为空时执行
@@ -165,7 +154,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
         if (ObjectUtil.isEmpty(value)) {
             return;
         }
-        this.markOptionsToSheet(helper, sheet, celIndex, helper.createExplicitListConstraint(value.toArray(new String[0])));
+        this.markOptionsToSheet(helper, sheet, celIndex, helper.createExplicitListConstraint(ArrayUtil.toArray(value, String.class)));
     }
 
     /**
@@ -206,9 +195,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
             // 本次循环的一级选项值
             String thisFirstOptionsValue = firstOptions.get(columIndex);
             // 创建第一行的数据
-            Optional
-                // 获取第一行
-                .ofNullable(linkedOptionsDataSheet.getRow(0))
+            Optional.ofNullable(linkedOptionsDataSheet.getRow(0))
                 // 如果不存在则创建第一行
                 .orElseGet(() -> linkedOptionsDataSheet.createRow(finalI))
                 // 第一行当前列
@@ -218,7 +205,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
 
             // 第二行开始，设置第二级别选项参数
             List<String> secondOptions = secoundOptionsMap.get(thisFirstOptionsValue);
-            if (ObjectUtil.isEmpty(secondOptions)) {
+            if (CollUtil.isEmpty(secondOptions)) {
                 // 必须保证至少有一个关联选项，否则将导致Excel解析错误
                 secondOptions = Collections.singletonList("暂无_0");
             }
@@ -251,8 +238,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
                 int finalRowIndex = rowIndex + 1;
                 int finalColumIndex = columIndex;
 
-                Row row = Optional
-                    .ofNullable(linkedOptionsDataSheet.getRow(finalRowIndex))
+                Row row = Optional.ofNullable(linkedOptionsDataSheet.getRow(finalRowIndex))
                     // 没有则创建
                     .orElseGet(() -> linkedOptionsDataSheet.createRow(finalRowIndex));
                 Optional
@@ -315,9 +301,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
     /**
      * 挂载下拉的列，仅限一级选项
      */
-    private void markOptionsToSheet(DataValidationHelper helper,
-                                    Sheet sheet,
-                                    Integer celIndex,
+    private void markOptionsToSheet(DataValidationHelper helper, Sheet sheet, Integer celIndex,
                                     DataValidationConstraint constraint) {
         // 设置数据有效性加载在哪个单元格上,四个参数分别是：起始行、终止行、起始列、终止列
         CellRangeAddressList addressList = new CellRangeAddressList(1, 1000, celIndex, celIndex);
@@ -327,11 +311,8 @@ public class ExcelDownHandler implements SheetWriteHandler {
     /**
      * 挂载下拉的列，仅限二级选项
      */
-    private void markLinkedOptionsToSheet(DataValidationHelper helper,
-                                          Sheet sheet,
-                                          Integer rowIndex,
-                                          Integer celIndex,
-                                          DataValidationConstraint constraint) {
+    private void markLinkedOptionsToSheet(DataValidationHelper helper, Sheet sheet, Integer rowIndex,
+                                          Integer celIndex, DataValidationConstraint constraint) {
         // 设置数据有效性加载在哪个单元格上,四个参数分别是：起始行、终止行、起始列、终止列
         CellRangeAddressList addressList = new CellRangeAddressList(rowIndex, rowIndex, celIndex, celIndex);
         markDataValidationToSheet(helper, sheet, constraint, addressList);
@@ -340,10 +321,8 @@ public class ExcelDownHandler implements SheetWriteHandler {
     /**
      * 应用数据校验
      */
-    private void markDataValidationToSheet(DataValidationHelper helper,
-                                           Sheet sheet,
-                                           DataValidationConstraint constraint,
-                                           CellRangeAddressList addressList) {
+    private void markDataValidationToSheet(DataValidationHelper helper, Sheet sheet,
+                                           DataValidationConstraint constraint, CellRangeAddressList addressList) {
         // 数据有效性对象
         DataValidation dataValidation = helper.createValidation(constraint, addressList);
         // 处理Excel兼容性问题
@@ -381,7 +360,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
         int thisCircleColumnIndex = columnIndex % 26;
         // 26一循环的次数大于0，则视为栏名至少两位
         String columnPrefix = columnCircleCount == 0
-            ? ""
+            ? StrUtil.EMPTY
             : StrUtil.subWithLength(EXCEL_COLUMN_NAME, columnCircleCount - 1, 1);
         // 从26一循环内取对应的栏位名
         String columnNext = StrUtil.subWithLength(EXCEL_COLUMN_NAME, thisCircleColumnIndex, 1);

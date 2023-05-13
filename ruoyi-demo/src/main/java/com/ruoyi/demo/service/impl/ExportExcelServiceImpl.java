@@ -1,7 +1,9 @@
 package com.ruoyi.demo.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.excel.DropDownOptions;
+import com.ruoyi.common.utils.StreamUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.demo.domain.vo.ExportDemoVo;
 import com.ruoyi.demo.service.IExportExcelService;
@@ -55,52 +57,31 @@ public class ExportExcelServiceImpl implements IExportExcelService {
 
         // 把所有的结果提取为规范的下拉选可选项
         // 规范的一级省，用于级联省-市
-        List<String> provinceOptions =
-            provinceList.stream()
-                .map(everyProvince ->
-                    DropDownOptions.createOptionValue(
-                        everyProvince.getName(),
-                        everyProvince.getId()
-                    ))
-                .collect(Collectors.toList());
+        List<String> provinceOptions = StreamUtils.toList(provinceList, everyProvince ->
+                DropDownOptions.createOptionValue(everyProvince.getName(), everyProvince.getId()));
         // 规范的二级市，用于级联省-市
         Map<String, List<String>> provinceToCityOptions = new HashMap<>();
-        cityList.stream()
-            .collect(Collectors.groupingBy(DemoCityData::getPData))
+        StreamUtils.groupByKey(cityList, DemoCityData::getPData)
             .forEach((province, thisProvinceCityList) -> {
                 // 每个省下二级的市可选项
-                provinceToCityOptions.put(
-                    DropDownOptions.createOptionValue(province.getName(), province.getId()),
-                    thisProvinceCityList.stream()
-                        .map(everyCity ->
-                            DropDownOptions.createOptionValue(everyCity.getName(), everyCity.getId())
-                        )
-                        .collect(Collectors.toList())
-                );
+                String optionValue = DropDownOptions.createOptionValue(province.getName(), province.getId());
+                List<String> list = StreamUtils.toList(thisProvinceCityList, everyCity ->
+                    DropDownOptions.createOptionValue(everyCity.getName(), everyCity.getId()));
+                provinceToCityOptions.put(optionValue, list);
             });
 
         // 规范的一级市，用于级联市-县
-        List<String> cityOptions = cityList.stream()
-            .map(everyCity ->
-                DropDownOptions.createOptionValue(
-                    everyCity.getName(),
-                    everyCity.getId()
-                ))
-            .collect(Collectors.toList());
+        List<String> cityOptions = StreamUtils.toList(cityList, everyCity ->
+            DropDownOptions.createOptionValue(everyCity.getName(), everyCity.getId()));
         // 规范的二级县，用于级联市-县
         Map<String, List<String>> cityToAreaOptions = new HashMap<>();
-        areaList.stream()
-            .collect(Collectors.groupingBy(DemoCityData::getPData))
+        StreamUtils.groupByKey(areaList, DemoCityData::getPData)
             .forEach((city, thisCityAreaList) -> {
                 // 每个市下二级的县可选项
-                cityToAreaOptions.put(
-                    DropDownOptions.createOptionValue(city.getName(), city.getId()),
-                    thisCityAreaList.stream()
-                        .map(everyArea ->
-                            DropDownOptions.createOptionValue(everyArea.getName(), everyArea.getId())
-                        )
-                        .collect(Collectors.toList())
-                );
+                String optionValue = DropDownOptions.createOptionValue(city.getName(), city.getId());
+                List<String> list = StreamUtils.toList(thisCityAreaList, everyCity ->
+                    DropDownOptions.createOptionValue(everyCity.getName(), everyCity.getId()));
+                cityToAreaOptions.put(optionValue, list);
             });
 
         // 因为省市县三个都是联动，省级联市，市级联县，因此需要创建两个级联下拉，分别以省和市为判断依据创建
@@ -129,14 +110,14 @@ public class ExportExcelServiceImpl implements IExportExcelService {
         // 到此为止所有的下拉框可选项已全部配置完毕
 
         // 接下来需要将Excel中的展示数据转换为对应的下拉选
-        List<ExportDemoVo> outList = excelDataList.stream().map(everyRowData -> {
+        List<ExportDemoVo> outList = StreamUtils.toList(excelDataList, everyRowData -> {
             // 只需要处理没有使用@ExcelDictFormat注解的下拉框
             // 一般来说，可以直接在数据库查询即查询出省市县信息，这里通过模拟操作赋值
             everyRowData.setProvince(buildOptions(provinceList, everyRowData.getProvinceId()));
             everyRowData.setCity(buildOptions(cityList, everyRowData.getCityId()));
             everyRowData.setArea(buildOptions(areaList, everyRowData.getAreaId()));
             return everyRowData;
-        }).collect(Collectors.toList());
+        });
 
         ExcelUtil.exportExcel(outList, "下拉框示例", ExportDemoVo.class, response, options);
     }
@@ -148,7 +129,7 @@ public class ExportExcelServiceImpl implements IExportExcelService {
             DemoCityData demoCityData = groupByIdMap.get(id).get(0);
             return DropDownOptions.createOptionValue(demoCityData.getName(), demoCityData.getId());
         } else {
-            return "";
+            return StrUtil.EMPTY;
         }
     }
 

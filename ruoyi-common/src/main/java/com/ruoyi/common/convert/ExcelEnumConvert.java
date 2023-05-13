@@ -52,6 +52,8 @@ public class ExcelEnumConvert implements Converter<Object> {
             case BOOLEAN:
                 textValue = cellData.getBooleanValue();
                 break;
+            default:
+                throw new IllegalArgumentException("单元格类型异常!");
         }
         // 如果是空值
         if (ObjectUtil.isNull(textValue)) {

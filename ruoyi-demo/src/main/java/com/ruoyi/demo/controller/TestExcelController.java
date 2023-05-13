@@ -1,6 +1,5 @@
 package com.ruoyi.demo.controller;
 
-import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.excel.ExcelResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -90,7 +89,6 @@ public class TestExcelController {
      *
      * @param response /
      */
-    @SaIgnore
     @GetMapping("/exportWithOptions")
     public void exportWithOptions(HttpServletResponse response) {
         exportExcelService.exportWithOptions(response);
@@ -99,7 +97,6 @@ public class TestExcelController {
     /**
      * 导入表格
      */
-    @SaIgnore
     @PostMapping(value = "/importWithOptions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public List<ExportDemoVo> importWithOptions(@RequestPart("file") MultipartFile file) throws Exception {
         // 处理解析结果

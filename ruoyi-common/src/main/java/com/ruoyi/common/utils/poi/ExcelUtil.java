@@ -85,7 +85,7 @@ public class ExcelUtil {
         try {
             resetResponse(sheetName, response);
             ServletOutputStream os = response.getOutputStream();
-            exportExcel(list, sheetName, clazz, false, os);
+            exportExcel(list, sheetName, clazz, false, os, null);
         } catch (IOException e) {
             throw new RuntimeException("导出Excel异常");
         }
@@ -123,7 +123,7 @@ public class ExcelUtil {
         try {
             resetResponse(sheetName, response);
             ServletOutputStream os = response.getOutputStream();
-            exportExcel(list, sheetName, clazz, merge, os);
+            exportExcel(list, sheetName, clazz, merge, os, null);
         } catch (IOException e) {
             throw new RuntimeException("导出Excel异常");
         }
@@ -158,7 +158,7 @@ public class ExcelUtil {
      * @param os        输出流
      */
     public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, OutputStream os) {
-        exportExcel(list, sheetName, clazz, false, os);
+        exportExcel(list, sheetName, clazz, false, os, null);
     }
 
     /**
@@ -183,7 +183,8 @@ public class ExcelUtil {
      * @param merge     是否合并单元格
      * @param os        输出流
      */
-    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge, OutputStream os) {
+    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge,
+                                       OutputStream os, List<DropDownOptions> options) {
         ExcelWriterSheetBuilder builder = EasyExcel.write(os, clazz)
             .autoCloseStream(false)
             // 自动适配
@@ -195,28 +196,9 @@ public class ExcelUtil {
             // 合并处理器
             builder.registerWriteHandler(new CellMergeStrategy(list, true));
         }
-        builder.doWrite(list);
-    }
-
-    /**
-     * 导出带有下拉框的Excel表格
-     *
-     * @param options 下拉框数据
-     */
-    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz,
-                                       boolean merge, OutputStream os, List<DropDownOptions> options) {
-        ExcelWriterSheetBuilder builder = EasyExcel.write(os, clazz)
-            .autoCloseStream(false)
-            // 自动适配
-            .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
-            // 大数值自动转换 防止失真
-            .registerConverter(new ExcelBigNumberConvert())
+        if (CollUtil.isNotEmpty(options)) {
             // 添加下拉框操作
-            .registerWriteHandler(new ExcelDownHandler(options))
-            .sheet(sheetName);
-        if (merge) {
-            // 合并处理器
-            builder.registerWriteHandler(new CellMergeStrategy(list, true));
+            builder.registerWriteHandler(new ExcelDownHandler(options));
         }
         builder.doWrite(list);
     }
