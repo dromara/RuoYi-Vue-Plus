@@ -28,20 +28,19 @@ import java.util.Map;
 @Slf4j
 public class CellMergeStrategy extends AbstractMergeStrategy {
 
-    private final List<?> list;
+    private final List<CellRangeAddress> cellList;
     private final boolean hasTitle;
     private int rowIndex;
 
     public CellMergeStrategy(List<?> list, boolean hasTitle) {
-        this.list = list;
         this.hasTitle = hasTitle;
         // 行合并开始下标
         this.rowIndex = hasTitle ? 1 : 0;
+        this.cellList = handle(list, hasTitle);
     }
 
     @Override
     protected void merge(Sheet sheet, Cell cell, Head head, Integer relativeRowIndex) {
-        List<CellRangeAddress> cellList = handle(list, hasTitle);
         // judge the list is not null
         if (CollUtil.isNotEmpty(cellList)) {
             // the judge is necessary
