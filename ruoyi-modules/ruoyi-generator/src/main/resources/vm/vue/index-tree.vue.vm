@@ -467,7 +467,7 @@ const handleUpdate = (row: ${BusinessName}VO) => {
 
 /** 提交按钮 */
 const submitForm = () => {
-  ${businessName}FormRef.value.validate((valid: boolean) => {
+  ${businessName}FormRef.value.validate(async (valid: boolean) => {
     if (valid) {
       buttonLoading.value = true;
 #foreach ($column in $columns)
@@ -476,9 +476,9 @@ const submitForm = () => {
 #end
 #end
       if (form.value.${pkColumn.javaField}) {
-        update${BusinessName}(form.value).finally(() => buttonLoading.value = false);
+        await update${BusinessName}(form.value).finally(() => buttonLoading.value = false);
       } else {
-        add${BusinessName}(form.value).finally(() => buttonLoading.value = false);
+        await add${BusinessName}(form.value).finally(() => buttonLoading.value = false);
       }
       proxy?.#[[$modal]]#.msgSuccess("操作成功");
       dialog.visible = false;
