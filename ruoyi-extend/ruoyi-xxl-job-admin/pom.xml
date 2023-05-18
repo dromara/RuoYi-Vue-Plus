@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <spring-boot.version>2.7.8</spring-boot.version>
+        <spring-boot.version>2.7.12</spring-boot.version>
         <spring-boot-admin.version>2.7.10</spring-boot-admin.version>
         <mybatis-spring-boot.version>2.2.2</mybatis-spring-boot.version>
     </properties>
