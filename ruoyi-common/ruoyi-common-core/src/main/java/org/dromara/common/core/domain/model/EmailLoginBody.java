@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * 短信登录对象
+ * 邮件登录对象
  *
  * @author Lion Li
  */
