@@ -61,7 +61,6 @@ public class SysUserBo extends BaseEntity {
     /**
      * 用户邮箱
      */
-    @Sensitive(strategy = SensitiveStrategy.EMAIL)
     @Email(message = "邮箱格式不正确")
     @Size(min = 0, max = 50, message = "邮箱长度不能超过{max}个字符")
     private String email;
@@ -69,7 +68,6 @@ public class SysUserBo extends BaseEntity {
     /**
      * 手机号码
      */
-    @Sensitive(strategy = SensitiveStrategy.PHONE)
     private String phonenumber;
 
     /**
