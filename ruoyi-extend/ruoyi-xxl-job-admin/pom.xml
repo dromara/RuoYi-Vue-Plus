@@ -5,7 +5,6 @@
         <artifactId>ruoyi-extend</artifactId>
         <groupId>org.dromara</groupId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>ruoyi-xxl-job-admin</artifactId>
     <packaging>jar</packaging>
