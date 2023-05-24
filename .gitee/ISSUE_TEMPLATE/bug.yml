@@ -24,8 +24,14 @@ body:
     attributes:
       label: 这个问题是否已经存在？
       options:
-        - label: 我已经搜索过现有的问题 (https://gitee.com/dromara/RuoYi-Vue-Plus/issues)
+        - label: 我已经搜索过现有的问题 (https://gitee.com/dromara/RuoYi-Cloud-Plus/issues)
           required: true
+  - type: textarea
+    attributes:
+      label: 异常模块
+      description: 此报错都涉及到那些系统模块。
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: 希望结果
