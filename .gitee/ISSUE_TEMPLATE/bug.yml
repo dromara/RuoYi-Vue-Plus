@@ -3,7 +3,7 @@ description: 当你中发现了一个 Bug，导致应用崩溃或抛出异常，
 title: "[Bug]: "
 labels: ["bug"]
 body:
-  - type: dropdown
+  - type: textarea
     id: version
     attributes:
       label: 版本
