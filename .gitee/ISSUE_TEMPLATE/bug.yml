@@ -35,16 +35,10 @@ body:
   - type: markdown
     attributes:
       label: 如何复现
-      description: 请详细告诉我们如何复现你遇到的问题，如涉及代码，可提供一个最小代码示例，并使用反引号```附上它
+      description: 请详细告诉我们如何复现你遇到的问题
       value: |
-        > 代码可按照如下形式提供或者截图均可 越详细越好
-        > 大多数问题都是 代码编写错误问题 逻辑问题 或者用法错误等问题
-
-        ```java
-        public class XXX {
-
-        }
-        ```
+        如涉及代码 可提供一个最小代码示例 并使用```附上它 或者截图均可 越详细越好<br>
+        大多数问题都是 代码编写错误问题 逻辑问题 或者用法错误等问题
     validations:
       required: true
   - type: textarea
