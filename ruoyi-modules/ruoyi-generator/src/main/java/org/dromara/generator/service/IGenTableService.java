@@ -43,7 +43,7 @@ public interface IGenTableService {
      * 查询据库列表
      *
      * @param tableNames 表名称组
-     * @param dataName
+     * @param dataName   数据源名称
      * @return 数据库表集合
      */
     List<GenTable> selectDbTableListByNames(String[] tableNames, String dataName);
@@ -67,7 +67,6 @@ public interface IGenTableService {
      * 修改业务
      *
      * @param genTable 业务信息
-     * @return 结果
      */
     void updateGenTable(GenTable genTable);
 
@@ -75,7 +74,6 @@ public interface IGenTableService {
      * 删除业务信息
      *
      * @param tableIds 需要删除的表数据ID
-     * @return 结果
      */
     void deleteGenTableByIds(Long[] tableIds);
 
@@ -83,7 +81,7 @@ public interface IGenTableService {
      * 导入表结构
      *
      * @param tableList 导入表列表
-     * @param dataName
+     * @param dataName  数据源名称
      */
     void importGenTable(List<GenTable> tableList, String dataName);
 
@@ -107,7 +105,6 @@ public interface IGenTableService {
      * 生成代码（自定义路径）
      *
      * @param tableId 表名称
-     * @return 数据
      */
     void generatorCode(Long tableId);
 

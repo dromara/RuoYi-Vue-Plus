@@ -18,7 +18,7 @@ public interface GenTableColumnMapper extends BaseMapperPlus<GenTableColumn, Gen
      * 根据表名称查询列信息
      *
      * @param tableName 表名称
-     * @param dataName
+     * @param dataName  数据源名称
      * @return 列信息
      */
     @DS("#dataName")

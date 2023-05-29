@@ -125,7 +125,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             and dt.table_name = uo.object_name
             and uo.object_type = 'TABLE'
             AND dt.table_name NOT LIKE 'XXL_JOB_%' AND dt.table_name NOT LIKE 'GEN_%'
-            AND dt.table_name NOT IN (select table_name from gen_table)
             and lower(dt.table_name) in
             <foreach collection="array" item="name" open="(" separator="," close=")">
                 #{name}
@@ -161,9 +160,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                     AND F.MINOR_ID = 0 AND D.XTYPE = 'U' AND D.NAME != 'DTPROPERTIES'
                     AND D.NAME NOT LIKE 'xxl_job_%' AND D.NAME NOT LIKE 'gen_%'
                     AND D.NAME in
-            <foreach collection="array" item="name" open="(" separator="," close=")">
-                #{name}
-            </foreach>
+                    <foreach collection="array" item="name" open="(" separator="," close=")">
+                        #{name}
+                    </foreach>
         </if>
     </select>
 
