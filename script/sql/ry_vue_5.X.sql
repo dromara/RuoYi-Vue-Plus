@@ -686,6 +686,7 @@ insert into sys_notice values('2', '000000', '维护通知：2018-07-01 系统�
 drop table if exists gen_table;
 create table gen_table (
   table_id          bigint(20)      not null                   comment '编号',
+  data_name         varchar(200)    default ''                 comment '数据源名称',
   table_name        varchar(200)    default ''                 comment '表名称',
   table_comment     varchar(500)    default ''                 comment '表描述',
   sub_table_name    varchar(64)     default null               comment '关联子表的表名',

@@ -1,5 +1,6 @@
 package org.dromara.generator.mapper;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
@@ -55,4 +56,6 @@ public interface GenTableMapper extends BaseMapperPlus<GenTable, GenTable> {
      */
     GenTable selectGenTableByName(String tableName);
 
+    @DS("")
+    List<String> selectTableNameList(String dataName);
 }

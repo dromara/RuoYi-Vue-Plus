@@ -910,6 +910,7 @@ insert into sys_notice values('2', '000000', '维护通知：2018-07-01 系统�
 -- ----------------------------
 create table gen_table (
   table_id          number(20)       not null,
+  data_name         varchar2(200)    default '',
   table_name        varchar2(200)    default '',
   table_comment     varchar2(500)    default '',
   sub_table_name    varchar(64)      default null,
@@ -936,6 +937,7 @@ alter table gen_table add constraint pk_gen_table primary key (table_id);
 
 comment on table  gen_table                   is '代码生成业务表';
 comment on column gen_table.table_id          is '编号';
+comment on column gen_table.data_name         is '数据源名称';
 comment on column gen_table.table_name        is '表名称';
 comment on column gen_table.table_comment     is '表描述';
 comment on column gen_table.sub_table_name    is '关联子表的表名';

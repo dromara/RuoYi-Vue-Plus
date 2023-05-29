@@ -254,6 +254,7 @@ GO
 CREATE TABLE gen_table
 (
     table_id          bigint                         NOT NULL,
+    data_name         nvarchar(200) DEFAULT ''       NULL,
     table_name        nvarchar(200) DEFAULT ''       NULL,
     table_comment     nvarchar(500) DEFAULT ''       NULL,
     sub_table_name    nvarchar(64)                   NULL,
@@ -286,6 +287,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'gen_table',
     'COLUMN', N'table_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'数据源名称' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'gen_table',
+    'COLUMN', N'data_name'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'表名称' ,

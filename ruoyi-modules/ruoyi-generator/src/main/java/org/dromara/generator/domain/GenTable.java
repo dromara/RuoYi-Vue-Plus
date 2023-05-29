@@ -32,6 +32,12 @@ public class GenTable extends BaseEntity {
     private Long tableId;
 
     /**
+     * 数据源名称
+     */
+    @NotBlank(message = "数据源名称不能为空")
+    private String dataName;
+
+    /**
      * 表名称
      */
     @NotBlank(message = "表名称不能为空")
