@@ -1,8 +1,8 @@
 package org.dromara.common.redis.utils;
 
-import org.dromara.common.core.utils.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.utils.SpringUtils;
 import org.redisson.api.*;
 
 import java.time.Duration;
@@ -372,6 +372,21 @@ public class RedisUtils {
     public static <T> T delCacheMapValue(final String key, final String hKey) {
         RMap<String, T> rMap = CLIENT.getMap(key);
         return rMap.remove(hKey);
+    }
+
+    /**
+     * 删除Hash中的数据
+     *
+     * @param key   Redis键
+     * @param hKeys Hash键
+     */
+    public static <T> void delMultiCacheMapValue(final String key, final Set<String> hKeys) {
+        RBatch batch = CLIENT.createBatch();
+        RMapAsync<String, T> rMap = batch.getMap(key);
+        for (String hKey : hKeys) {
+            rMap.removeAsync(hKey);
+        }
+        batch.execute();
     }
 
     /**
