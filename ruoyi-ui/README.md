@@ -1,9 +1,6 @@
 ## 开发
 
 ```bash
-# 克隆项目
-git clone https://gitee.com/y_project/RuoYi-Vue
-
 # 进入项目目录
 cd ruoyi-ui
 
