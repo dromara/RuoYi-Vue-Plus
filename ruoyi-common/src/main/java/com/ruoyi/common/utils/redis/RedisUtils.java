@@ -375,6 +375,21 @@ public class RedisUtils {
     }
 
     /**
+     * 删除Hash中的数据
+     *
+     * @param key   Redis键
+     * @param hKeys Hash键
+     */
+    public static <T> void delMultiCacheMapValue(final String key, final Set<String> hKeys) {
+        RBatch batch = CLIENT.createBatch();
+        RMapAsync<String, T> rMap = batch.getMap(key);
+        for (String hKey : hKeys) {
+            rMap.removeAsync(hKey);
+        }
+        batch.execute();
+    }
+
+    /**
      * 获取多个Hash中的数据
      *
      * @param key   Redis键
