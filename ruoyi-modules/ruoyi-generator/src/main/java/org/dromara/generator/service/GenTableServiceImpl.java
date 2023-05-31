@@ -178,11 +178,11 @@ public class GenTableServiceImpl implements IGenTableService {
     @DSTransactional
     @Override
     public void importGenTable(List<GenTable> tableList, String dataName) {
-        String operName = LoginHelper.getUsername();
+        Long operId = LoginHelper.getUserId();
         try {
             for (GenTable table : tableList) {
                 String tableName = table.getTableName();
-                GenUtils.initTable(table, operName);
+                GenUtils.initTable(table, operId);
                 table.setDataName(dataName);
                 int row = baseMapper.insert(table);
                 if (row > 0) {
