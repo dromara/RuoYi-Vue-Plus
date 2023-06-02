@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dromara.flow.ui.mapper.CustomMybatisMapper">
+
+    <!-- SELECT ALL PROCESS DEFINITION ID -->
+    <select id="selectProcessDefinitionDeploymentIdByKey" parameterType="String" resultType="String">
+        SELECT DEPLOYMENT_ID_ FROM ACT_RE_PROCDEF WHERE KEY_ = #{value}
+    </select>
+
+
+    <select id="selectUserList"  resultType="org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl">
+
+        select distinct
+            u.user_name as id,
+            u.nick_name as firstName,
+            u.nick_name as displayName,
+            u.email as email,
+            u.password as password
+        from sys_user u
+                 left join sys_user d on u.dept_id = d.dept_id
+        <where>
+            u.status = '0'
+            <if test="userName != null and userName != ''">
+                AND u.user_name = #{userName}
+            </if>
+        </where>
+
+    </select>
+
+
+    <select id="findGroupList"  resultType="org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl">
+        SELECT
+            CONCAT_WS(".",d.dept_id,r.role_id)  as id,
+            CONCAT_WS(".",d.dept_name,r.role_name)  as name
+        FROM sys_dept d,sys_role r
+        <where>
+            d.status = '0' and r.status = '0'
+            <if test="groupCodeBos !=null  and groupCodeBos.size() >0 ">
+                AND r.role_id in
+                <foreach collection="groupCodeBos" item="groupCodeBo" open="(" separator="," close=")">
+                    #{groupCodeBo}
+                </foreach>
+            </if>
+
+        </where>
+
+        UNION
+
+
+        SELECT
+            CONCAT_WS(".",d.dept_id,"*")  as id,
+            CONCAT_WS(".",d.dept_name,"*")  as name
+        FROM sys_dept d
+        <where>
+            d.status = '0'
+
+        </where>
+        UNION
+
+        SELECT
+            CONCAT_WS(".","*",r.role_id)  as id,
+            CONCAT_WS(".","*",r.role_name)  as name
+        FROM sys_role r
+        <where>
+           r.status = '0'
+
+        </where>
+    </select>
+
+</mapper>
