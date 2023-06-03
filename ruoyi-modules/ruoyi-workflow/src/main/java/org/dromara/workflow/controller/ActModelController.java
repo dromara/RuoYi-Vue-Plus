@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.log.annotation.Log;
@@ -18,6 +19,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Model;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author may
  */
+@Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/workflow/model")
@@ -63,7 +66,7 @@ public class ActModelController extends BaseController {
      */
     @Log(title = "模型管理", businessType = BusinessType.INSERT)
     @PostMapping("/rest/models")
-    public R<Void> saveNewModel(@RequestBody ModelBo modelBo) {
+    public R<Void> saveNewModel(@Validated(AddGroup.class) @RequestBody ModelBo modelBo) {
         return toAjax(iActModelService.saveNewModel(modelBo));
     }
 
