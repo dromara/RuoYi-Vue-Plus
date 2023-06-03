@@ -10,7 +10,9 @@ import org.springframework.boot.context.metrics.buffering.BufferingApplicationSt
  * @author Lion Li
  */
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+    org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration.class})
 public class DromaraApplication {
 
     public static void main(String[] args) {
