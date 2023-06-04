@@ -7,6 +7,7 @@ import org.dromara.system.domain.vo.SysOssVo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +26,8 @@ public interface ISysOssService {
     SysOssVo getById(Long ossId);
 
     SysOssVo upload(MultipartFile file);
+
+    SysOssVo upload(File file);
 
     void download(Long ossId, HttpServletResponse response) throws IOException;
 
