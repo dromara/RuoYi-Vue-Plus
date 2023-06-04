@@ -42,6 +42,11 @@ public class ActModelController extends BaseController {
     private final IActModelService iActModelService;
 
 
+    /**
+     * 分页查询模型
+     *
+     * @param modelBo 模型参数
+     */
     @GetMapping("/list")
     public TableDataInfo<Model> getByPage(ModelBo modelBo) {
         return iActModelService.getByPage(modelBo);
