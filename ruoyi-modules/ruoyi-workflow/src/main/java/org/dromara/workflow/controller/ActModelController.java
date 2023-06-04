@@ -1,6 +1,8 @@
 package org.dromara.workflow.controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
@@ -46,8 +48,7 @@ public class ActModelController extends BaseController {
     }
 
     /**
-     * 参考官方提供的响应数据
-     * "{\"id\":\"admin\",\"firstName\":\"Test\",\"lastName\":\"Administrator\",\"email\":\"admin@flowable.org\",\"fullName\":\"Test Administrator\",\"groups\":[],\"privileges\":[\"access-idm\",\"access-rest-api\",\"access-task\",\"access-modeler\",\"access-admin\"]}";
+     * 设计器登录信息
      */
     @GetMapping("/rest/account")
     public String getAccount() {
@@ -65,6 +66,7 @@ public class ActModelController extends BaseController {
      * @param modelBo 模型请求对象
      */
     @Log(title = "模型管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping("/rest/models")
     public R<Void> saveNewModel(@Validated(AddGroup.class) @RequestBody ModelBo modelBo) {
         return toAjax(iActModelService.saveNewModel(modelBo));
@@ -88,6 +90,7 @@ public class ActModelController extends BaseController {
      * @param values  模型数据
      */
     @Log(title = "模型管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PostMapping(value = "/rest/models/{modelId}/editor/json")
     public R<Void> editModel(@PathVariable String modelId, @RequestParam MultiValueMap<String, String> values) {
         return toAjax(iActModelService.editModel(modelId, values));
@@ -107,6 +110,30 @@ public class ActModelController extends BaseController {
             repositoryService.deleteModel(id);
         }
         return R.ok();
+    }
+
+    /**
+     * 模型部署
+     *
+     * @param id 模型id
+     */
+    @Log(title = "模型管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
+    @PostMapping("/modelDeploy/{id}")
+    public R<Void> deploy(@NotBlank(message = "模型id不能为空") @PathVariable("id") String id) {
+        return toAjax(iActModelService.modelDeploy(id));
+    }
+
+    /**
+     * 导出模型zip压缩包
+     *
+     * @param modelId  模型id
+     * @param response 相应
+     */
+    @GetMapping("/export/zip/{modelId}")
+    public void exportZip(@NotEmpty(message = "模型id不能为空") @PathVariable String modelId,
+                          HttpServletResponse response) {
+        iActModelService.exportZip(modelId, response);
     }
 
 }

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dromara.common.core.validate.AddGroup;
+import org.dromara.workflow.common.PageEntity;
 
 import java.io.Serial;
 import java.io.Serializable;

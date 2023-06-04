@@ -5,9 +5,11 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.common.core.exception.ServiceException;
@@ -22,6 +24,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.editor.constants.ModelDataJsonConstants;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.springframework.stereotype.Service;
@@ -31,11 +34,15 @@ import org.springframework.util.MultiValueMap;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import static org.dromara.workflow.common.constant.FlowConstant.NAMESPACE;
 import static org.flowable.editor.constants.ModelDataJsonConstants.*;
 
 /**
@@ -118,11 +125,10 @@ public class ActModelServiceImpl implements IActModelService {
             model.setMetaInfo(objectNode.toString());
             // 保存初始化的模型基本信息数据
             repositoryService.saveModel(model);
-            String namespace = "http://b3mn.org/stencilset/bpmn2.0#";
             // 封装模型对象基础数据json串
             ObjectNode editorNode = objectMapper.createObjectNode();
             ObjectNode stencilSetNode = objectMapper.createObjectNode();
-            stencilSetNode.put("namespace", namespace);
+            stencilSetNode.put("namespace", NAMESPACE);
             editorNode.replace("stencilset", stencilSetNode);
             // 标识key
             ObjectNode propertiesNode = objectMapper.createObjectNode();
@@ -206,10 +212,9 @@ public class ActModelServiceImpl implements IActModelService {
             // 获取唯一标识key
             String key = values.getFirst("key");
             List<Model> list = repositoryService.createModelQuery().modelKey(key).modelTenantId(LoginHelper.getTenantId()).list();
-            List<Model> modelList = list.stream().filter(e -> !e.getId().equals(model.getId())).collect(Collectors.toList());
-            if (CollectionUtil.isNotEmpty(modelList)) {
+            list.stream().filter(e -> !e.getId().equals(model.getId())).findFirst().ifPresent(e -> {
                 throw new ServiceException("模型key已存在!");
-            }
+            });
             model.setKey(key);
             repositoryService.saveModel(model);
             byte[] xmlBytes = WorkflowUtils.bpmnJsonToXmlBytes(Objects.requireNonNull(values.getFirst("json_xml")).getBytes(StandardCharsets.UTF_8));
@@ -217,24 +222,100 @@ public class ActModelServiceImpl implements IActModelService {
                 throw new ServiceException("模型不能为空!");
             }
             repositoryService.addModelEditorSource(model.getId(), xmlBytes);
-
-            /*InputStream svgStream = new ByteArrayInputStream(values.getFirst("svg_xml").getBytes(StandardCharsets.UTF_8));
-            TranscoderInput input = new TranscoderInput(svgStream);
-
-            PNGTranscoder transcoder = new PNGTranscoder();
-            // Setup output
-            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            TranscoderOutput output = new TranscoderOutput(outStream);
-
-            // Do the transformation
-            transcoder.transcode(input, output);
-            final byte[] result = outStream.toByteArray();
-            repositoryService.addModelEditorSourceExtra(model.getId(), result);
-            outStream.close();*/
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 模型部署
+     *
+     * @param id 模型id
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean modelDeploy(String id) {
+        try {
+            //查询流程定义模型xml
+            byte[] xmlBytes = repositoryService.getModelEditorSource(id);
+            if (ArrayUtil.isEmpty(xmlBytes)) {
+                throw new ServiceException("模型数据为空，请先设计流程定义模型，再进行部署！");
+            }
+            // 查询模型的基本信息
+            Model model = repositoryService.getModel(id);
+            // xml资源的名称 ，对应act_ge_bytearray表中的name_字段
+            String processName = model.getName() + ".bpmn20.xml";
+            //调用部署相关的api方法进行部署流程定义
+            Deployment deployment = repositoryService.createDeployment()
+                // 部署名称
+                .name(model.getName())
+                // 部署标识key
+                .key(model.getKey())
+                // 部署流程分类
+                .category(model.getCategory())
+                // bpmn20.xml资源
+                .addBytes(processName, xmlBytes)
+                // 租户id
+                .tenantId(LoginHelper.getTenantId())
+                .deploy();
+
+            // 更新 部署id 到流程定义模型数据表中
+            model.setDeploymentId(deployment.getId());
+            repositoryService.saveModel(model);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 导出模型zip压缩包
+     *
+     * @param modelId  模型id
+     * @param response 相应
+     */
+    @Override
+    public void exportZip(String modelId, HttpServletResponse response) {
+        ZipOutputStream zos = null;
+        try {
+            zos = ZipUtil.getZipOutputStream(response.getOutputStream(), StandardCharsets.UTF_8);
+            // 压缩包文件名
+            String zipName = "模型不存在";
+            //查询模型基本信息
+            Model model = repositoryService.getModel(modelId);
+            if (ObjectUtil.isNotNull(model)) {
+                // 查询流程定义模型的json字节码
+                byte[] xmlBytes = repositoryService.getModelEditorSource(modelId);
+                if (ArrayUtil.isEmpty(xmlBytes)) {
+                    zipName = "模型数据为空，请先设计流程定义模型，再进行部署！";
+                } else {
+                    String fileName = model.getName() + "-" + model.getKey();
+                    // 压缩包文件名
+                    zipName = fileName + ".zip";
+                    // 将xml添加到压缩包中(指定xml文件名：请假流程.bpmn20.xml
+                    zos.putNextEntry(new ZipEntry(fileName + ".bpmn20.xml"));
+                    zos.write(xmlBytes);
+                }
+            }
+            response.setHeader("Content-Disposition",
+                "attachment; filename=" + URLEncoder.encode(zipName, StandardCharsets.UTF_8) + ".zip");
+            // 刷出响应流
+            response.flushBuffer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (zos != null) {
+                try {
+                    zos.closeEntry();
+                    zos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

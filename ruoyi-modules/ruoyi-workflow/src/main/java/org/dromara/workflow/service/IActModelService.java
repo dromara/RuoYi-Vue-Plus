@@ -1,6 +1,7 @@
 package org.dromara.workflow.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ModelBo;
 import org.flowable.engine.repository.Model;
@@ -44,4 +45,20 @@ public interface IActModelService {
      * @return 结果
      */
     boolean editModel(String modelId, MultiValueMap<String, String> values);
+
+    /**
+     * 模型部署
+     *
+     * @param id 模型id
+     * @return 结果
+     */
+    boolean modelDeploy(String id);
+
+    /**
+     * 导出模型zip压缩包
+     *
+     * @param modelId  模型id
+     * @param response 相应
+     */
+    void exportZip(String modelId, HttpServletResponse response);
 }

@@ -1,4 +1,4 @@
-package org.dromara.workflow.domain.bo;
+package org.dromara.workflow.common;
 
 
 /**
