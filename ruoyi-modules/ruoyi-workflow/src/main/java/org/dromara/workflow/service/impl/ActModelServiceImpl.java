@@ -2,6 +2,7 @@ package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -33,6 +34,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.flowable.editor.constants.ModelDataJsonConstants.*;
 
@@ -56,6 +58,7 @@ public class ActModelServiceImpl implements IActModelService {
     @Override
     public TableDataInfo<Model> getByPage(ModelBo modelBo) {
         ModelQuery query = repositoryService.createModelQuery();
+        query.modelTenantId(LoginHelper.getTenantId());
         if (StringUtils.isNotEmpty(modelBo.getName())) {
             query.modelNameLike("%" + modelBo.getName() + "%");
         }
@@ -96,7 +99,7 @@ public class ActModelServiceImpl implements IActModelService {
             String key = modelBo.getKey();
             String name = modelBo.getName();
             String description = modelBo.getDescription();
-            Model checkModel = repositoryService.createModelQuery().modelKey(key).singleResult();
+            Model checkModel = repositoryService.createModelQuery().modelKey(key).modelTenantId(LoginHelper.getTenantId()).singleResult();
             if (ObjectUtil.isNotNull(checkModel)) {
                 throw new ServiceException("模型key已存在!");
             }
@@ -144,8 +147,7 @@ public class ActModelServiceImpl implements IActModelService {
     @Override
     public ObjectNode getModelInfo(String modelId) {
         ObjectNode modelNode = null;
-
-        Model model = repositoryService.getModel(modelId);
+        Model model = repositoryService.createModelQuery().modelId(modelId).modelTenantId(LoginHelper.getTenantId()).singleResult();
         ObjectMapper objectMapper = JsonUtils.getObjectMapper();
         if (model != null) {
             try {
@@ -190,25 +192,30 @@ public class ActModelServiceImpl implements IActModelService {
     @Transactional(rollbackFor = Exception.class)
     public boolean editModel(String modelId, MultiValueMap<String, String> values) {
         try {
-
-            Model model = repositoryService.getModel(modelId);
+            Model model = repositoryService.createModelQuery().modelId(modelId).modelTenantId(LoginHelper.getTenantId()).singleResult();
             ObjectMapper objectMapper = JsonUtils.getObjectMapper();
             ObjectNode modelJson = (ObjectNode) objectMapper.readTree(model.getMetaInfo());
 
             modelJson.put(MODEL_NAME, values.getFirst("name"));
             modelJson.put(MODEL_DESCRIPTION, values.getFirst("description"));
+            modelJson.put(MODEL_REVISION, model.getVersion() + 1);
             model.setMetaInfo(modelJson.toString());
             model.setName(values.getFirst("name"));
             // 每次保存把版本更新+1
             model.setVersion(model.getVersion() + 1);
             // 获取唯一标识key
-            String key = objectMapper.readTree(values.getFirst("json_xml")).get("properties").get("process_id").textValue();
+            String key = values.getFirst("key");
+            List<Model> list = repositoryService.createModelQuery().modelKey(key).modelTenantId(LoginHelper.getTenantId()).list();
+            List<Model> modelList = list.stream().filter(e -> !e.getId().equals(model.getId())).collect(Collectors.toList());
+            if (CollectionUtil.isNotEmpty(modelList)) {
+                throw new ServiceException("模型key已存在!");
+            }
             model.setKey(key);
-
-
             repositoryService.saveModel(model);
             byte[] xmlBytes = WorkflowUtils.bpmnJsonToXmlBytes(Objects.requireNonNull(values.getFirst("json_xml")).getBytes(StandardCharsets.UTF_8));
-
+            if (ArrayUtil.isEmpty(xmlBytes)) {
+                throw new ServiceException("模型不能为空!");
+            }
             repositoryService.addModelEditorSource(model.getId(), xmlBytes);
 
             /*InputStream svgStream = new ByteArrayInputStream(values.getFirst("svg_xml").getBytes(StandardCharsets.UTF_8));

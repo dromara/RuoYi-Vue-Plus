@@ -1,6 +1,5 @@
 package org.dromara.workflow.controller;
 
-import cn.dev33.satoken.annotation.SaIgnore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +47,6 @@ public class ActModelController extends BaseController {
      * "{\"id\":\"admin\",\"firstName\":\"Test\",\"lastName\":\"Administrator\",\"email\":\"admin@flowable.org\",\"fullName\":\"Test Administrator\",\"groups\":[],\"privileges\":[\"access-idm\",\"access-rest-api\",\"access-task\",\"access-modeler\",\"access-admin\"]}";
      */
     @GetMapping("/rest/account")
-    @SaIgnore
     public String getAccount() {
 
         AccountVo accountVo = new AccountVo();
@@ -76,7 +74,6 @@ public class ActModelController extends BaseController {
      * @param modelId 模型id
      */
     @GetMapping("/rest/models/{modelId}/editor/json")
-    @SaIgnore
     public ObjectNode getModelInfo(@PathVariable String modelId) {
         return iActModelService.getModelInfo(modelId);
     }
@@ -88,7 +85,6 @@ public class ActModelController extends BaseController {
      * @param modelId 模型id
      * @param values  模型数据
      */
-    @SaIgnore
     @Log(title = "模型管理", businessType = BusinessType.UPDATE)
     @PostMapping(value = "/rest/models/{modelId}/editor/json")
     public R<Void> editModel(@PathVariable String modelId, @RequestParam MultiValueMap<String, String> values) {

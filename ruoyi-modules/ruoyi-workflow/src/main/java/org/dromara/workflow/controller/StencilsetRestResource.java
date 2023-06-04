@@ -12,7 +12,6 @@
  */
 package org.dromara.workflow.controller;
 
-import cn.dev33.satoken.annotation.SaIgnore;
 import org.apache.commons.io.IOUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 @RequestMapping("/workflow/model")
 public class StencilsetRestResource {
 
-  @SaIgnore
   @GetMapping(value="/rest/stencil-sets/editor")
   public String getStencilset() {
     InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("static/stencilset.json");
