@@ -108,7 +108,7 @@ public class ActModelServiceImpl implements IActModelService {
             String description = modelBo.getDescription();
             Model checkModel = repositoryService.createModelQuery().modelKey(key).modelTenantId(LoginHelper.getTenantId()).singleResult();
             if (ObjectUtil.isNotNull(checkModel)) {
-                throw new ServiceException("模型key已存在!");
+                throw new ServiceException("模型key已存在！");
             }
             // 1. 初始空的模型
             Model model = repositoryService.newModel();
@@ -213,13 +213,17 @@ public class ActModelServiceImpl implements IActModelService {
             String key = values.getFirst("key");
             List<Model> list = repositoryService.createModelQuery().modelKey(key).modelTenantId(LoginHelper.getTenantId()).list();
             list.stream().filter(e -> !e.getId().equals(model.getId())).findFirst().ifPresent(e -> {
-                throw new ServiceException("模型key已存在!");
+                throw new ServiceException("模型key已存在！");
             });
             model.setKey(key);
             repositoryService.saveModel(model);
             byte[] xmlBytes = WorkflowUtils.bpmnJsonToXmlBytes(Objects.requireNonNull(values.getFirst("json_xml")).getBytes(StandardCharsets.UTF_8));
             if (ArrayUtil.isEmpty(xmlBytes)) {
-                throw new ServiceException("模型不能为空!");
+                throw new ServiceException("模型不能为空！");
+            }
+            byte[] toXmlBytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
+            if (ArrayUtil.isEmpty(toXmlBytes)) {
+                throw new ServiceException("模型不能为空，请至少设计一条主线流程！");
             }
             repositoryService.addModelEditorSource(model.getId(), xmlBytes);
             return true;
@@ -243,6 +247,10 @@ public class ActModelServiceImpl implements IActModelService {
             byte[] xmlBytes = repositoryService.getModelEditorSource(id);
             if (ArrayUtil.isEmpty(xmlBytes)) {
                 throw new ServiceException("模型数据为空，请先设计流程定义模型，再进行部署！");
+            }
+            byte[] toXmlBytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
+            if (ArrayUtil.isEmpty(toXmlBytes)) {
+                throw new ServiceException("模型不能为空，请至少设计一条主线流程！");
             }
             // 查询模型的基本信息
             Model model = repositoryService.getModel(id);
@@ -287,11 +295,17 @@ public class ActModelServiceImpl implements IActModelService {
             String zipName = "模型不存在";
             //查询模型基本信息
             Model model = repositoryService.getModel(modelId);
+            byte[] xmlBytes = repositoryService.getModelEditorSource(modelId);
             if (ObjectUtil.isNotNull(model)) {
-                // 查询流程定义模型的json字节码
-                byte[] xmlBytes = repositoryService.getModelEditorSource(modelId);
-                if (ArrayUtil.isEmpty(xmlBytes)) {
+                byte[] toXmlBytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
+                if (ArrayUtil.isEmpty(toXmlBytes)) {
+                    zipName = "模型不能为空，请至少设计一条主线流程！";
+                    zos.putNextEntry(new ZipEntry(zipName + ".txt"));
+                    zos.write(zipName.getBytes(StandardCharsets.UTF_8));
+                } else if (ArrayUtil.isEmpty(xmlBytes)) {
                     zipName = "模型数据为空，请先设计流程定义模型，再进行部署！";
+                    zos.putNextEntry(new ZipEntry(zipName + ".txt"));
+                    zos.write(zipName.getBytes(StandardCharsets.UTF_8));
                 } else {
                     String fileName = model.getName() + "-" + model.getKey();
                     // 压缩包文件名

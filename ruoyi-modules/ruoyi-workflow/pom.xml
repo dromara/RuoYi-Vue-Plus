@@ -17,8 +17,7 @@
     </description>
 
     <properties>
-        <xerces.version>2.11.0</xerces.version>
-        <batik.version>1.10</batik.version>
+        <flowable.version>6.8.0</flowable.version>
     </properties>
 
     <dependencies>
@@ -35,47 +34,23 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-ui-modeler-rest</artifactId>
-            <version>6.8.0</version>
-        </dependency>
         <!-- 绘制flowable流程图 -->
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-image-generator</artifactId>
         </dependency>
 
+        <!-- flowable json 转换 -->
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-json-converter</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+
         <!--系统模块-->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-system</artifactId>
-        </dependency>
-
-        <!-- svg转png图片工具-->
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-all</artifactId>
-            <version>${batik.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>xalan</groupId>
-                    <artifactId>xalan</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!--解决部署xml错误-->
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>${xerces.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-json-converter</artifactId>
-            <version>6.8.0</version>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>
