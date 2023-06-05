@@ -24,6 +24,7 @@ import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.properties.OssProperties;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
@@ -115,6 +116,18 @@ public class OssClient {
         return UploadResult.builder().url(getUrl() + "/" + path).filename(path).build();
     }
 
+    public UploadResult upload(File file, String path) {
+        try {
+            PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), path, file);
+            // 设置上传对象的 Acl 为公共读
+            putObjectRequest.setCannedAcl(getAccessPolicy().getAcl());
+            client.putObject(putObjectRequest);
+        } catch (Exception e) {
+            throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
+        }
+        return UploadResult.builder().url(getUrl() + "/" + path).filename(path).build();
+    }
+
     public void delete(String path) {
         path = path.replace(getUrl() + "/", "");
         try {
@@ -130,6 +143,10 @@ public class OssClient {
 
     public UploadResult uploadSuffix(InputStream inputStream, String suffix, String contentType) {
         return upload(inputStream, getPath(properties.getPrefix(), suffix), contentType);
+    }
+
+    public UploadResult uploadSuffix(File file, String suffix) {
+        return upload(file, getPath(properties.getPrefix(), suffix));
     }
 
     /**
