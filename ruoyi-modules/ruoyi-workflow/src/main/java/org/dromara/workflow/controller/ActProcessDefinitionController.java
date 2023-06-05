@@ -5,16 +5,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.log.annotation.Log;
+import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
 import org.dromara.workflow.service.IActProcessDefinitionService;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -76,5 +75,41 @@ public class ActProcessDefinitionController extends BaseController {
         map.put("xml", xml);
         map.put("xmlStr", xmlStr);
         return R.ok(map);
+    }
+
+    /**
+     * 删除流程定义
+     *
+     * @param deploymentId        部署id
+     * @param processDefinitionId 流程定义id
+     */
+    @Log(title = "流程定义管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{deploymentId}/{processDefinitionId}")
+    public R<Void> deleteDeployment(@NotBlank(message = "流程部署id不能为空") @PathVariable String deploymentId,
+                                    @NotBlank(message = "流程定义id不能为空") @PathVariable String processDefinitionId) {
+        return toAjax(iActProcessDefinitionService.deleteDeployment(deploymentId, processDefinitionId));
+    }
+
+    /**
+     * 激活或者挂起流程定义
+     *
+     * @param processDefinitionId 流程定义id
+     */
+    @Log(title = "流程定义管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/updateProcessDefState/{processDefinitionId}")
+    public R<Void> updateProcDefState(@PathVariable String processDefinitionId) {
+        return toAjax(iActProcessDefinitionService.updateProcessDefState(processDefinitionId));
+    }
+
+    /**
+     * 迁移流程定义
+     *
+     * @param currentProcessDefinitionId 当前流程定义id
+     * @param fromProcessDefinitionId    需要迁移到的流程定义id
+     */
+    @Log(title = "流程定义管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/migrationProcessDefinition/{currentProcessDefinitionId}/{fromProcessDefinitionId}")
+    public R<Void> migrationProcessDefinition(@PathVariable String currentProcessDefinitionId, @PathVariable String fromProcessDefinitionId) {
+        return toAjax(iActProcessDefinitionService.migrationProcessDefinition(currentProcessDefinitionId, fromProcessDefinitionId));
     }
 }

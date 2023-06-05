@@ -7,16 +7,20 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
 import org.dromara.workflow.service.IActProcessDefinitionService;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -36,6 +40,10 @@ import java.util.stream.Collectors;
 public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionService {
 
     private final RepositoryService repositoryService;
+
+    private final HistoryService historyService;
+
+    private final ProcessMigrationService processMigrationService;
 
     /**
      * 分页查询
@@ -162,5 +170,80 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             e.printStackTrace();
         }
         return xml.toString();
+    }
+
+    /**
+     * 删除流程定义
+     *
+     * @param deploymentId        部署id
+     * @param processDefinitionId 流程定义id
+     */
+    @Override
+    public boolean deleteDeployment(String deploymentId, String processDefinitionId) {
+        try {
+            List<HistoricTaskInstance> taskInstanceList = historyService.createHistoricTaskInstanceQuery().processDefinitionId(processDefinitionId).list();
+            if (CollectionUtil.isNotEmpty(taskInstanceList)) {
+                throw new ServiceException("当前流程定义已被使用不可删除！");
+            }
+            //删除流程定义
+            repositoryService.deleteDeployment(deploymentId);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 激活或者挂起流程定义
+     *
+     * @param processDefinitionId 流程定义id
+     */
+    @Override
+    public boolean updateProcessDefState(String processDefinitionId) {
+        try {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(processDefinitionId).singleResult();
+            //将当前为挂起状态更新为激活状态
+            //参数说明：参数1：流程定义id,参数2：是否激活（true是否级联对应流程实例，激活了则对应流程实例都可以审批），
+            //参数3：什么时候激活，如果为null则立即激活，如果为具体时间则到达此时间后激活
+            if (processDefinition.isSuspended()) {
+                repositoryService.activateProcessDefinitionById(processDefinitionId, true, null);
+            } else {
+                repositoryService.suspendProcessDefinitionById(processDefinitionId, true, null);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException("操作失败");
+        }
+    }
+
+    /**
+     * 迁移流程定义
+     *
+     * @param currentProcessDefinitionId 当前流程定义id
+     * @param fromProcessDefinitionId    需要迁移到的流程定义id
+     */
+
+    @Override
+    public boolean migrationProcessDefinition(String currentProcessDefinitionId, String fromProcessDefinitionId) {
+        try {
+            // 迁移验证
+            boolean migrationValid = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(currentProcessDefinitionId)
+                .validateMigrationOfProcessInstances(fromProcessDefinitionId)
+                .isMigrationValid();
+            if (!migrationValid) {
+                throw new ServiceException("流程定义差异过大无法迁移，请修改流程图");
+            }
+            // 已结束的流程实例不会迁移
+            processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(currentProcessDefinitionId)
+                .migrateProcessInstances(fromProcessDefinitionId);
+            return true;
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage());
+        }
     }
 }

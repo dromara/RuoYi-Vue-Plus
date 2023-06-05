@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
-import org.flowable.engine.repository.ProcessDefinition;
 
 import java.util.List;
 
@@ -45,4 +44,30 @@ public interface IActProcessDefinitionService {
      * @return 结果
      */
     String processDefinitionXml(String processDefinitionId);
+
+    /**
+     * 删除流程定义
+     *
+     * @param deploymentId        部署id
+     * @param processDefinitionId 流程定义id
+     * @return 结果
+     */
+    boolean deleteDeployment(String deploymentId, String processDefinitionId);
+
+    /**
+     * 激活或者挂起流程定义
+     *
+     * @param processDefinitionId 流程定义id
+     * @return 结果
+     */
+    boolean updateProcessDefState(String processDefinitionId);
+
+    /**
+     * 迁移流程定义
+     *
+     * @param currentProcessDefinitionId 当前流程定义id
+     * @param fromProcessDefinitionId    需要迁移到的流程定义id
+     * @return 结果
+     */
+    boolean migrationProcessDefinition(String currentProcessDefinitionId, String fromProcessDefinitionId);
 }
