@@ -173,11 +173,11 @@ public class ActModelServiceImpl implements IActModelService {
                     BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
                     BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
                     ObjectNode jsonNodes = bpmnJsonConverter.convertToJson(bpmnModel);
-                    modelNode.put("model", jsonNodes);
+                    modelNode.set("model", jsonNodes);
                 } else {
                     ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(
                         new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
-                    modelNode.put("model", editorJsonNode);
+                    modelNode.set("model", editorJsonNode);
                 }
 
             } catch (Exception e) {
