@@ -57,9 +57,9 @@ public class AuthController {
         LoginVo loginVo = new LoginVo();
         // 生成令牌
         String token = loginService.login(
-                body.getTenantId(),
-                body.getUsername(), body.getPassword(),
-                body.getCode(), body.getUuid());
+            body.getTenantId(),
+            body.getUsername(), body.getPassword(),
+            body.getCode(), body.getUuid());
         loginVo.setToken(token);
         return R.ok(loginVo);
     }
@@ -74,7 +74,8 @@ public class AuthController {
     public R<LoginVo> smsLogin(@Validated @RequestBody SmsLoginBody body) {
         LoginVo loginVo = new LoginVo();
         // 生成令牌
-        String token = loginService.smsLogin(body.getTenantId(), body.getPhonenumber(), body.getSmsCode());
+        String token =
+            loginService.smsLogin(body.getTenantId(), body.getPhonenumber(), body.getSmsCode());
         loginVo.setToken(token);
         return R.ok(loginVo);
     }
@@ -89,7 +90,8 @@ public class AuthController {
     public R<LoginVo> emailLogin(@Validated @RequestBody EmailLoginBody body) {
         LoginVo loginVo = new LoginVo();
         // 生成令牌
-        String token = loginService.emailLogin(body.getTenantId(), body.getEmail(), body.getEmailCode());
+        String token =
+            loginService.emailLogin(body.getTenantId(), body.getEmail(), body.getEmailCode());
         loginVo.setToken(token);
         return R.ok(loginVo);
     }
@@ -140,9 +142,19 @@ public class AuthController {
         List<SysTenantVo> tenantList = tenantService.queryList(new SysTenantBo());
         List<TenantListVo> voList = MapstructUtils.convert(tenantList, TenantListVo.class);
         // 获取域名
-        String host = new URL(request.getRequestURL().toString()).getHost();
+        String host = "";
+        String referer = request.getHeader("referer");
+        if (StringUtils.isNotBlank(referer)) {
+            //这里从referer中取值是为了本地使用hosts添加虚拟域名，方便本地环境调试
+            host = referer.split("//")[1].split("/")[0];
+        } else {
+            host = new URL(request.getRequestURL().toString()).getHost();
+        }
         // 根据域名进行筛选
-        List<TenantListVo> list = StreamUtils.filter(voList, vo -> StringUtils.equals(vo.getDomain(), host));
+        String finalHost = host;
+        List<TenantListVo> list =
+            StreamUtils.filter(voList, vo -> StringUtils.equals(vo.getDomain(),
+                finalHost));
         // 返回对象
         LoginTenantVo vo = new LoginTenantVo();
         vo.setVoList(CollUtil.isNotEmpty(list) ? list : voList);
