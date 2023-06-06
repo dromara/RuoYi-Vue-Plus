@@ -1,5 +1,7 @@
 package org.dromara.workflow.utils;
 
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dromara.common.json.utils.JsonUtils;
@@ -7,7 +9,13 @@ import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.rmi.ServerException;
 
 /**
  * 工作流工具
@@ -38,5 +46,17 @@ public class WorkflowUtils {
         }
         //2.将bpmnModel转为xml
         return new BpmnXMLConverter().convertToXML(bpmnModel);
+    }
+
+    /**
+     * xml转为bpmnModel
+     *
+     * @param xmlBytes xml
+     */
+    public static BpmnModel xmlToBpmnModel(byte[] xmlBytes) throws XMLStreamException {
+        ByteArrayInputStream byteArrayInputStream = IoUtil.toStream(xmlBytes);
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        XMLStreamReader xtr = xif.createXMLStreamReader(byteArrayInputStream);
+        return new BpmnXMLConverter().convertToBpmnModel(xtr);
     }
 }

@@ -1,7 +1,6 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -11,7 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -19,7 +20,6 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.workflow.domain.bo.ModelBo;
 import org.dromara.workflow.service.IActModelService;
 import org.dromara.workflow.utils.WorkflowUtils;
-import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.editor.constants.ModelDataJsonConstants;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
@@ -31,9 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -168,10 +165,7 @@ public class ActModelServiceImpl implements IActModelService {
                 Integer version = model.getVersion();
                 if (version > 0) {
                     byte[] modelEditorSource = repositoryService.getModelEditorSource(model.getId());
-                    ByteArrayInputStream byteArrayInputStream = IoUtil.toStream(modelEditorSource);
-                    XMLInputFactory xif = XMLInputFactory.newInstance();
-                    XMLStreamReader xtr = xif.createXMLStreamReader(byteArrayInputStream);
-                    BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
+                    BpmnModel bpmnModel = WorkflowUtils.xmlToBpmnModel(modelEditorSource);
                     BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
                     ObjectNode jsonNodes = bpmnJsonConverter.convertToJson(bpmnModel);
                     modelNode.set("model", jsonNodes);
@@ -245,9 +239,11 @@ public class ActModelServiceImpl implements IActModelService {
             if (ArrayUtil.isEmpty(xmlBytes)) {
                 throw new ServiceException("模型数据为空，请先设计流程定义模型，再进行部署！");
             }
-            byte[] toXmlBytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
-            if (ArrayUtil.isEmpty(toXmlBytes)) {
-                throw new ServiceException("模型不能为空，请至少设计一条主线流程！");
+            if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, Constants.UTF8))) {
+                byte[] bytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
+                if (ArrayUtil.isEmpty(bytes)) {
+                    throw new ServiceException("模型不能为空，请至少设计一条主线流程！");
+                }
             }
             // 查询模型的基本信息
             Model model = repositoryService.getModel(id);
@@ -294,8 +290,8 @@ public class ActModelServiceImpl implements IActModelService {
             Model model = repositoryService.getModel(modelId);
             byte[] xmlBytes = repositoryService.getModelEditorSource(modelId);
             if (ObjectUtil.isNotNull(model)) {
-                byte[] toXmlBytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
-                if (ArrayUtil.isEmpty(toXmlBytes)) {
+                byte[] bytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
+                if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, Constants.UTF8)) && ArrayUtil.isEmpty(bytes)) {
                     zipName = "模型不能为空，请至少设计一条主线流程！";
                     zos.putNextEntry(new ZipEntry(zipName + ".txt"));
                     zos.write(zipName.getBytes(StandardCharsets.UTF_8));
