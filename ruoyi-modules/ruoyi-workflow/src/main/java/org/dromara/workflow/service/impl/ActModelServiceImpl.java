@@ -164,6 +164,7 @@ public class ActModelServiceImpl implements IActModelService {
                     modelNode.put(MODEL_NAME, model.getName());
                 }
                 modelNode.put(MODEL_ID, model.getId());
+                modelNode.put("key", model.getKey());
                 Integer version = model.getVersion();
                 if (version > 0) {
                     byte[] modelEditorSource = repositoryService.getModelEditorSource(model.getId());
