@@ -1,12 +1,12 @@
 package org.dromara.workflow.utils;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dromara.common.json.utils.JsonUtils;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
-import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.*;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 
 import javax.xml.stream.XMLInputFactory;
@@ -14,8 +14,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.rmi.ServerException;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 工作流工具
@@ -58,5 +60,62 @@ public class WorkflowUtils {
         XMLInputFactory xif = XMLInputFactory.newInstance();
         XMLStreamReader xtr = xif.createXMLStreamReader(byteArrayInputStream);
         return new BpmnXMLConverter().convertToBpmnModel(xtr);
+    }
+
+    /**
+     * 校验模型
+     *
+     * @param bpmnModel bpmn模型
+     */
+    public static void checkBpmnModel(BpmnModel bpmnModel) throws ServerException {
+        Collection<FlowElement> flowElements = bpmnModel.getMainProcess().getFlowElements();
+
+        checkBpmnNode(flowElements, false);
+
+        List<SubProcess> subProcessList = flowElements.stream().filter(SubProcess.class::isInstance).map(SubProcess.class::cast).collect(Collectors.toList());
+        if (!CollUtil.isEmpty(subProcessList)) {
+            for (SubProcess subProcess : subProcessList) {
+                Collection<FlowElement> subProcessFlowElements = subProcess.getFlowElements();
+                checkBpmnNode(subProcessFlowElements, true);
+            }
+        }
+    }
+
+    /**
+     * 校验bpmn节点是否合法
+     *
+     * @param flowElements 节点集合
+     * @param subtask      是否子流程
+     */
+    private static void checkBpmnNode(Collection<FlowElement> flowElements, boolean subtask) throws ServerException {
+
+        if (CollUtil.isEmpty(flowElements)) {
+            throw new ServerException(subtask ? "子流程必须存在节点" : "" + "必须存在节点！");
+        }
+
+        List<StartEvent> startEventList = flowElements.stream().filter(StartEvent.class::isInstance).map(StartEvent.class::cast).collect(Collectors.toList());
+        if (CollUtil.isEmpty(startEventList)) {
+            throw new ServerException(subtask ? "子流程必须存在开始节点" : "" + "必须存在开始节点！");
+        }
+
+        if (startEventList.size() > 1) {
+            throw new ServerException(subtask ? "子流程只能存在一个开始节点" : "" + "只能存在一个开始节点！");
+        }
+
+        StartEvent startEvent = startEventList.get(0);
+        List<SequenceFlow> outgoingFlows = startEvent.getOutgoingFlows();
+        if (CollUtil.isEmpty(outgoingFlows)) {
+            throw new ServerException(subtask ? "子流程流程节点为空，请至少设计一条主线流程！" : "" + "流程节点为空，请至少设计一条主线流程！");
+        }
+
+        FlowElement targetFlowElement = outgoingFlows.get(0).getTargetFlowElement();
+        if (!(targetFlowElement instanceof UserTask)) {
+            throw new ServerException(subtask ? "子流程开始节点后第一个节点必须是用户任务！" : "" + "开始节点后第一个节点必须是用户任务！");
+        }
+
+        List<EndEvent> endEventList = flowElements.stream().filter(EndEvent.class::isInstance).map(EndEvent.class::cast).collect(Collectors.toList());
+        if (CollUtil.isEmpty(endEventList)) {
+            throw new ServerException(subtask ? "子流程必须存在结束节点！" : "" + "必须存在结束节点！");
+        }
     }
 }

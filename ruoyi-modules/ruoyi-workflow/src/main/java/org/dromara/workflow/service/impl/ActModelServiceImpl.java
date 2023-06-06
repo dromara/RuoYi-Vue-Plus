@@ -1,5 +1,6 @@
 package org.dromara.workflow.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -12,7 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -27,6 +27,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
+import org.flowable.validation.ValidationError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
@@ -36,6 +37,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -239,11 +241,19 @@ public class ActModelServiceImpl implements IActModelService {
             if (ArrayUtil.isEmpty(xmlBytes)) {
                 throw new ServiceException("模型数据为空，请先设计流程定义模型，再进行部署！");
             }
-            if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, Constants.UTF8))) {
+            if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, StandardCharsets.UTF_8.toString()))) {
                 byte[] bytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
                 if (ArrayUtil.isEmpty(bytes)) {
                     throw new ServiceException("模型不能为空，请至少设计一条主线流程！");
                 }
+            }
+            BpmnModel bpmnModel = WorkflowUtils.xmlToBpmnModel(xmlBytes);
+            // 校验模型
+            WorkflowUtils.checkBpmnModel(bpmnModel);
+            List<ValidationError> validationErrors = repositoryService.validateProcess(bpmnModel);
+            if (CollUtil.isNotEmpty(validationErrors)) {
+                String errorMsg = validationErrors.stream().map(ValidationError::getProblem).distinct().collect(Collectors.joining(","));
+                throw new ServiceException(errorMsg);
             }
             // 查询模型的基本信息
             Model model = repositoryService.getModel(id);
@@ -291,7 +301,7 @@ public class ActModelServiceImpl implements IActModelService {
             byte[] xmlBytes = repositoryService.getModelEditorSource(modelId);
             if (ObjectUtil.isNotNull(model)) {
                 byte[] bytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
-                if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, Constants.UTF8)) && ArrayUtil.isEmpty(bytes)) {
+                if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, StandardCharsets.UTF_8.toString())) && ArrayUtil.isEmpty(bytes)) {
                     zipName = "模型不能为空，请至少设计一条主线流程！";
                     zos.putNextEntry(new ZipEntry(zipName + ".txt"));
                     zos.write(zipName.getBytes(StandardCharsets.UTF_8));
