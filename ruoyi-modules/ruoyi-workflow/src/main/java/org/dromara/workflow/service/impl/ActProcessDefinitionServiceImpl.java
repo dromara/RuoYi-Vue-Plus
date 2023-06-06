@@ -181,7 +181,8 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     @Override
     public boolean deleteDeployment(String deploymentId, String processDefinitionId) {
         try {
-            List<HistoricTaskInstance> taskInstanceList = historyService.createHistoricTaskInstanceQuery().processDefinitionId(processDefinitionId).list();
+            List<HistoricTaskInstance> taskInstanceList = historyService.createHistoricTaskInstanceQuery()
+                .processDefinitionId(processDefinitionId).list();
             if (CollectionUtil.isNotEmpty(taskInstanceList)) {
                 throw new ServiceException("当前流程定义已被使用不可删除！");
             }
@@ -203,7 +204,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     public boolean updateProcessDefState(String processDefinitionId) {
         try {
             ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(processDefinitionId).singleResult();
+                .processDefinitionId(processDefinitionId).processDefinitionTenantId(LoginHelper.getTenantId()).singleResult();
             //将当前为挂起状态更新为激活状态
             //参数说明：参数1：流程定义id,参数2：是否激活（true是否级联对应流程实例，激活了则对应流程实例都可以审批），
             //参数3：什么时候激活，如果为null则立即激活，如果为具体时间则到达此时间后激活

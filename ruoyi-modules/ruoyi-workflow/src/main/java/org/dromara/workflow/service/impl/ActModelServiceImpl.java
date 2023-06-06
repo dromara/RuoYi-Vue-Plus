@@ -221,10 +221,6 @@ public class ActModelServiceImpl implements IActModelService {
             if (ArrayUtil.isEmpty(xmlBytes)) {
                 throw new ServiceException("模型不能为空！");
             }
-            byte[] toXmlBytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
-            if (ArrayUtil.isEmpty(toXmlBytes)) {
-                throw new ServiceException("模型不能为空，请至少设计一条主线流程！");
-            }
             repositoryService.addModelEditorSource(model.getId(), xmlBytes);
             return true;
         } catch (Exception e) {
