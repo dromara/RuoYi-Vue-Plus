@@ -3,6 +3,10 @@ package org.dromara.workflow.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ObjectUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +18,12 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
 import org.dromara.workflow.service.IActProcessDefinitionService;
+import org.flowable.editor.constants.ModelDataJsonConstants;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -244,6 +250,40 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 .migrateProcessInstances(fromProcessDefinitionId);
             return true;
         } catch (Exception e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 流程定义转换为模型
+     *
+     * @param processDefinitionId 流程定义id
+     */
+    @Override
+    public boolean convertToModel(String processDefinitionId) {
+        ProcessDefinition pd = repositoryService.createProcessDefinitionQuery()
+            .processDefinitionId(processDefinitionId).singleResult();
+        InputStream inputStream = repositoryService.getResourceAsStream(pd.getDeploymentId(), pd.getResourceName());
+        Model model = repositoryService.createModelQuery().modelKey(pd.getKey()).modelTenantId(LoginHelper.getTenantId()).singleResult();
+        try {
+            if (ObjectUtil.isNotNull(model)) {
+                repositoryService.addModelEditorSource(model.getId(), IoUtil.readBytes(inputStream));
+            } else {
+                Model modelData = repositoryService.newModel();
+                modelData.setKey(pd.getKey());
+                modelData.setName(pd.getName());
+                modelData.setTenantId(pd.getTenantId());
+                ObjectNode modelObjectNode = new ObjectMapper().createObjectNode();
+                modelObjectNode.put(ModelDataJsonConstants.MODEL_NAME, pd.getName());
+                modelObjectNode.put(ModelDataJsonConstants.MODEL_REVISION, modelData.getVersion());
+                modelObjectNode.put(ModelDataJsonConstants.MODEL_DESCRIPTION, pd.getDescription());
+                modelData.setMetaInfo(modelObjectNode.toString());
+                repositoryService.saveModel(modelData);
+                repositoryService.addModelEditorSource(modelData.getId(), IoUtil.readBytes(inputStream));
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new ServiceException(e.getMessage());
         }
     }

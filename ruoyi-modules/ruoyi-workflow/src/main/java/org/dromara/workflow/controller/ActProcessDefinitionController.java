@@ -112,4 +112,15 @@ public class ActProcessDefinitionController extends BaseController {
     public R<Void> migrationProcessDefinition(@PathVariable String currentProcessDefinitionId, @PathVariable String fromProcessDefinitionId) {
         return toAjax(iActProcessDefinitionService.migrationProcessDefinition(currentProcessDefinitionId, fromProcessDefinitionId));
     }
+
+    /**
+     * 流程定义转换为模型
+     *
+     * @param processDefinitionId 流程定义id
+     */
+    @Log(title = "流程定义管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/convertToModel/{processDefinitionId}")
+    public R<Void> convertToModel(@NotEmpty(message = "流程定义id不能为空") @PathVariable String processDefinitionId) {
+        return toAjax(iActProcessDefinitionService.convertToModel(processDefinitionId));
+    }
 }

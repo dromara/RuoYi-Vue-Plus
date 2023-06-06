@@ -70,4 +70,12 @@ public interface IActProcessDefinitionService {
      * @return 结果
      */
     boolean migrationProcessDefinition(String currentProcessDefinitionId, String fromProcessDefinitionId);
+
+    /**
+     * 流程定义转换为模型
+     *
+     * @param processDefinitionId 流程定义id
+     * @return 结果
+     */
+    boolean convertToModel(String processDefinitionId);
 }
