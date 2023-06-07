@@ -14,7 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
 import org.dromara.workflow.service.IActProcessDefinitionService;
@@ -60,7 +60,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     @Override
     public TableDataInfo<ProcessDefinitionVo> getByPage(ProcessDefinitionBo processDefinitionBo) {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
-        query.processDefinitionTenantId(LoginHelper.getTenantId());
+        query.processDefinitionTenantId(TenantHelper.getTenantId());
         if (StringUtils.isNotEmpty(processDefinitionBo.getKey())) {
             query.processDefinitionKey(processDefinitionBo.getKey());
         }
@@ -101,7 +101,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     public List<ProcessDefinitionVo> getProcessDefinitionListByKey(String key) {
         List<ProcessDefinitionVo> processDefinitionVoList = new ArrayList<>();
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
-        List<ProcessDefinition> definitionList = query.processDefinitionTenantId(LoginHelper.getTenantId()).processDefinitionKey(key).list();
+        List<ProcessDefinition> definitionList = query.processDefinitionTenantId(TenantHelper.getTenantId()).processDefinitionKey(key).list();
         List<Deployment> deploymentList = null;
         if (CollUtil.isNotEmpty(definitionList)) {
             List<String> deploymentIds = definitionList.stream().map(ProcessDefinition::getDeploymentId).collect(Collectors.toList());
@@ -210,7 +210,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     public boolean updateProcessDefState(String processDefinitionId) {
         try {
             ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(processDefinitionId).processDefinitionTenantId(LoginHelper.getTenantId()).singleResult();
+                .processDefinitionId(processDefinitionId).processDefinitionTenantId(TenantHelper.getTenantId()).singleResult();
             //将当前为挂起状态更新为激活状态
             //参数说明：参数1：流程定义id,参数2：是否激活（true是否级联对应流程实例，激活了则对应流程实例都可以审批），
             //参数3：什么时候激活，如果为null则立即激活，如果为具体时间则到达此时间后激活
@@ -264,7 +264,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         ProcessDefinition pd = repositoryService.createProcessDefinitionQuery()
             .processDefinitionId(processDefinitionId).singleResult();
         InputStream inputStream = repositoryService.getResourceAsStream(pd.getDeploymentId(), pd.getResourceName());
-        Model model = repositoryService.createModelQuery().modelKey(pd.getKey()).modelTenantId(LoginHelper.getTenantId()).singleResult();
+        Model model = repositoryService.createModelQuery().modelKey(pd.getKey()).modelTenantId(TenantHelper.getTenantId()).singleResult();
         try {
             if (ObjectUtil.isNotNull(model)) {
                 repositoryService.addModelEditorSource(model.getId(), IoUtil.readBytes(inputStream));

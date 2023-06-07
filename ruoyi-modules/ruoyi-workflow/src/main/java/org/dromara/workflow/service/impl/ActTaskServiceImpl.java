@@ -1,11 +1,11 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.domain.bo.StartProcessBo;
 import org.dromara.workflow.service.IActTaskService;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -63,9 +63,9 @@ public class ActTaskServiceImpl implements IActTaskService {
         variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         ProcessInstance pi;
         if (CollUtil.isNotEmpty(variables)) {
-            pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, LoginHelper.getTenantId());
+            pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());
         } else {
-            pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), LoginHelper.getTenantId());
+            pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), TenantHelper.getTenantId());
         }
         // 将流程定义名称 作为 流程实例名称
         runtimeService.setProcessInstanceName(pi.getProcessInstanceId(), pi.getProcessDefinitionName());

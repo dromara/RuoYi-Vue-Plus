@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.domain.bo.ModelBo;
 import org.dromara.workflow.service.IActModelService;
 import org.dromara.workflow.utils.WorkflowUtils;
@@ -64,7 +64,7 @@ public class ActModelServiceImpl implements IActModelService {
     @Override
     public TableDataInfo<Model> getByPage(ModelBo modelBo) {
         ModelQuery query = repositoryService.createModelQuery();
-        query.modelTenantId(LoginHelper.getTenantId());
+        query.modelTenantId(TenantHelper.getTenantId());
         if (StringUtils.isNotEmpty(modelBo.getName())) {
             query.modelNameLike("%" + modelBo.getName() + "%");
         }
@@ -105,7 +105,7 @@ public class ActModelServiceImpl implements IActModelService {
             String key = modelBo.getKey();
             String name = modelBo.getName();
             String description = modelBo.getDescription();
-            Model checkModel = repositoryService.createModelQuery().modelKey(key).modelTenantId(LoginHelper.getTenantId()).singleResult();
+            Model checkModel = repositoryService.createModelQuery().modelKey(key).modelTenantId(TenantHelper.getTenantId()).singleResult();
             if (ObjectUtil.isNotNull(checkModel)) {
                 throw new ServiceException("模型key已存在！");
             }
@@ -114,7 +114,7 @@ public class ActModelServiceImpl implements IActModelService {
             model.setKey(key);
             model.setName(name);
             model.setVersion(version);
-            model.setTenantId(LoginHelper.getTenantId());
+            model.setTenantId(TenantHelper.getTenantId());
             ObjectMapper objectMapper = JsonUtils.getObjectMapper();
             // 封装模型json对象
             ObjectNode objectNode = JsonUtils.getObjectMapper().createObjectNode();
@@ -152,7 +152,7 @@ public class ActModelServiceImpl implements IActModelService {
     @Override
     public ObjectNode getModelInfo(String modelId) {
         ObjectNode modelNode = null;
-        Model model = repositoryService.createModelQuery().modelId(modelId).modelTenantId(LoginHelper.getTenantId()).singleResult();
+        Model model = repositoryService.createModelQuery().modelId(modelId).modelTenantId(TenantHelper.getTenantId()).singleResult();
         ObjectMapper objectMapper = JsonUtils.getObjectMapper();
         if (model != null) {
             try {
@@ -195,7 +195,7 @@ public class ActModelServiceImpl implements IActModelService {
     @Transactional(rollbackFor = Exception.class)
     public boolean editModel(String modelId, MultiValueMap<String, String> values) {
         try {
-            Model model = repositoryService.createModelQuery().modelId(modelId).modelTenantId(LoginHelper.getTenantId()).singleResult();
+            Model model = repositoryService.createModelQuery().modelId(modelId).modelTenantId(TenantHelper.getTenantId()).singleResult();
             ObjectMapper objectMapper = JsonUtils.getObjectMapper();
             ObjectNode modelJson = (ObjectNode) objectMapper.readTree(model.getMetaInfo());
 
@@ -208,7 +208,7 @@ public class ActModelServiceImpl implements IActModelService {
             model.setVersion(model.getVersion() + 1);
             // 获取唯一标识key
             String key = values.getFirst("key");
-            List<Model> list = repositoryService.createModelQuery().modelKey(key).modelTenantId(LoginHelper.getTenantId()).list();
+            List<Model> list = repositoryService.createModelQuery().modelKey(key).modelTenantId(TenantHelper.getTenantId()).list();
             list.stream().filter(e -> !e.getId().equals(model.getId())).findFirst().ifPresent(e -> {
                 throw new ServiceException("模型key已存在！");
             });
@@ -270,7 +270,7 @@ public class ActModelServiceImpl implements IActModelService {
                 // bpmn20.xml资源
                 .addBytes(processName, xmlBytes)
                 // 租户id
-                .tenantId(LoginHelper.getTenantId())
+                .tenantId(TenantHelper.getTenantId())
                 .deploy();
 
             // 更新 部署id 到流程定义模型数据表中

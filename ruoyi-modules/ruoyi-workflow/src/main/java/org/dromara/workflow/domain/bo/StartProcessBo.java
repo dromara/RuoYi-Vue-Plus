@@ -32,7 +32,6 @@ public class StartProcessBo implements Serializable {
     private String processKey;
 
     /**
-     * 如果传实体 需要序列化后的
      * 流程变量，前端会提交一个元素{'entity': {业务详情数据对象}}
      */
     private Map<String, Object> variables;
