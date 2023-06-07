@@ -1,11 +1,14 @@
 package org.dromara.workflow.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.json.utils.JsonUtils;
@@ -14,16 +17,27 @@ import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
+import org.dromara.system.domain.SysRole;
+import org.dromara.system.domain.SysUser;
+import org.dromara.system.mapper.SysRoleMapper;
+import org.dromara.system.mapper.SysUserMapper;
+import org.dromara.system.service.ISysUserService;
 import org.dromara.workflow.domain.bo.ModelBo;
 import org.dromara.workflow.domain.vo.AccountVo;
+import org.dromara.workflow.domain.vo.GroupRepresentation;
+import org.dromara.workflow.domain.vo.ResultListDataRepresentation;
+import org.dromara.workflow.domain.vo.UserRepresentation;
 import org.dromara.workflow.service.IActModelService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Model;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -40,6 +54,10 @@ public class ActModelController extends BaseController {
     private final RepositoryService repositoryService;
 
     private final IActModelService iActModelService;
+
+    private final SysUserMapper sysUserMapper;
+
+    private final SysRoleMapper sysRoleMapper;
 
 
     /**
@@ -139,6 +157,50 @@ public class ActModelController extends BaseController {
     public void exportZip(@NotEmpty(message = "模型id不能为空") @PathVariable String modelId,
                           HttpServletResponse response) {
         iActModelService.exportZip(modelId, response);
+    }
+
+    /**
+     * 查询用户
+     *
+     * @param filter 参数
+     */
+    @GetMapping(value = "/rest/editor-users")
+    public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter) {
+        LambdaQueryWrapper<SysUser> wrapper = Wrappers.lambdaQuery();
+        wrapper.like(StringUtils.isNotBlank(filter), SysUser::getNickName, filter);
+        List<SysUser> sysUsers = sysUserMapper.selectList(wrapper);
+        List<UserRepresentation> userRepresentations = new ArrayList<>();
+        for (SysUser sysUser : sysUsers) {
+            UserRepresentation userRepresentation = new UserRepresentation();
+            userRepresentation.setFullName(sysUser.getNickName());
+            userRepresentation.setLastName(sysUser.getNickName());
+            userRepresentation.setTenantId(sysUser.getTenantId());
+            userRepresentation.setEmail(sysUser.getEmail());
+            userRepresentation.setId(sysUser.getUserId().toString());
+            userRepresentations.add(userRepresentation);
+        }
+        return new ResultListDataRepresentation(userRepresentations);
+    }
+
+    /**
+     * 查询用户组
+     *
+     * @param filter 参数
+     */
+    @GetMapping(value = "/rest/editor-groups")
+    public ResultListDataRepresentation getGroups(@RequestParam(required = false, value = "filter") String filter) {
+        LambdaQueryWrapper<SysRole> wrapper = Wrappers.lambdaQuery();
+        wrapper.like(StringUtils.isNotBlank(filter), SysRole::getRoleName, filter);
+        List<SysRole> sysRoles = sysRoleMapper.selectList(wrapper);
+        List<GroupRepresentation> result = new ArrayList<>();
+        for (SysRole sysRole : sysRoles) {
+            GroupRepresentation groupRepresentation = new GroupRepresentation();
+            groupRepresentation.setId(sysRole.getRoleId().toString());
+            groupRepresentation.setName(sysRole.getRoleName());
+            groupRepresentation.setType(sysRole.getRoleKey());
+            result.add(groupRepresentation);
+        }
+        return new ResultListDataRepresentation(result);
     }
 
 }
