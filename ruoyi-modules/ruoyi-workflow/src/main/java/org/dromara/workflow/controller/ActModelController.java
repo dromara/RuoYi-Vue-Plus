@@ -101,7 +101,7 @@ public class ActModelController extends BaseController {
      * @param modelId 模型id
      */
     @GetMapping("/rest/models/{modelId}/editor/json")
-    public ObjectNode getModelInfo(@PathVariable String modelId) {
+    public ObjectNode getModelInfo(@NotBlank(message = "模型id不能为空") @PathVariable String modelId) {
         return iActModelService.getModelInfo(modelId);
     }
 

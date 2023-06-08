@@ -13,4 +13,6 @@ public interface FlowConstant {
      */
     String NAMESPACE = "http://b3mn.org/stencilset/bpmn2.0#";
 
+    String MESSAGE_CURRENT_TASK_IS_NULL = "当前任务不存在或你不是任务办理人";
+
 }

@@ -97,7 +97,7 @@ public class ActProcessDefinitionController extends BaseController {
      */
     @Log(title = "流程定义管理", businessType = BusinessType.UPDATE)
     @PutMapping("/updateProcessDefState/{processDefinitionId}")
-    public R<Void> updateProcDefState(@PathVariable String processDefinitionId) {
+    public R<Void> updateProcDefState(@NotBlank(message = "流程定义id不能为空") @PathVariable String processDefinitionId) {
         return toAjax(iActProcessDefinitionService.updateProcessDefState(processDefinitionId));
     }
 
@@ -109,7 +109,8 @@ public class ActProcessDefinitionController extends BaseController {
      */
     @Log(title = "流程定义管理", businessType = BusinessType.UPDATE)
     @PutMapping("/migrationProcessDefinition/{currentProcessDefinitionId}/{fromProcessDefinitionId}")
-    public R<Void> migrationProcessDefinition(@PathVariable String currentProcessDefinitionId, @PathVariable String fromProcessDefinitionId) {
+    public R<Void> migrationProcessDefinition(@NotBlank(message = "当前流程定义id") @PathVariable String currentProcessDefinitionId,
+                                              @NotBlank(message = "需要迁移到的流程定义id") @PathVariable String fromProcessDefinitionId) {
         return toAjax(iActProcessDefinitionService.migrationProcessDefinition(currentProcessDefinitionId, fromProcessDefinitionId));
     }
 
