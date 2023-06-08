@@ -53,6 +53,7 @@ public class ActTaskServiceImpl implements IActTaskService {
      * @param startProcessBo 启动流程参数
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> startWorkFlow(StartProcessBo startProcessBo) {
         Map<String, Object> map = new HashMap<>();
         if (StringUtils.isBlank(startProcessBo.getBusinessKey())) {
@@ -74,12 +75,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         Map<String, Object> variables = startProcessBo.getVariables();
         // 启动跳过表达式
         variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
-        ProcessInstance pi;
-        if (CollUtil.isNotEmpty(variables)) {
-            pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());
-        } else {
-            pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), TenantHelper.getTenantId());
-        }
+        ProcessInstance pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());
         // 将流程定义名称 作为 流程实例名称
         runtimeService.setProcessInstanceName(pi.getProcessInstanceId(), pi.getProcessDefinitionName());
         // 申请人执行流程
@@ -116,10 +112,10 @@ public class ActTaskServiceImpl implements IActTaskService {
             if (task == null) {
                 throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
             }
-            //办理任务
-            taskService.complete(completeTaskBo.getTaskId(), completeTaskBo.getVariables());
             //办理意见
             taskService.addComment(completeTaskBo.getTaskId(), task.getProcessInstanceId(), StringUtils.isBlank(completeTaskBo.getMessage()) ? "同意" : completeTaskBo.getMessage());
+            //办理任务
+            taskService.complete(completeTaskBo.getTaskId(), completeTaskBo.getVariables());
             return true;
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());

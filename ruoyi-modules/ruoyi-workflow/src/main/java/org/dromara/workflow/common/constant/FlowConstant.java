@@ -15,4 +15,9 @@ public interface FlowConstant {
 
     String MESSAGE_CURRENT_TASK_IS_NULL = "当前任务不存在或你不是任务办理人";
 
+    /**
+     * 连线
+     */
+    String SEQUENCE_FLOW = "sequenceFlow";
+
 }
