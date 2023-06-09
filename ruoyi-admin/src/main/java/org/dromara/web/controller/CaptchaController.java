@@ -14,7 +14,6 @@ import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mail.config.properties.MailProperties;
 import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.common.redis.utils.RedisUtils;
-import org.dromara.common.sms.config.properties.SmsProperties;
 import org.dromara.common.web.config.properties.CaptchaProperties;
 import org.dromara.common.web.enums.CaptchaType;
 import org.dromara.sms4j.api.SmsBlend;
@@ -48,7 +47,6 @@ import java.util.LinkedHashMap;
 public class CaptchaController {
 
     private final CaptchaProperties captchaProperties;
-    private final SmsProperties smsProperties;
     private final MailProperties mailProperties;
 
     /**
