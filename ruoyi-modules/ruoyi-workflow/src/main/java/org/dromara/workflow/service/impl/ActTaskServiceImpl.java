@@ -138,7 +138,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             query.taskCandidateGroupIn(groupIds);
         }
         if (StringUtils.isNotBlank(taskBo.getName())) {
-            query.taskNameLike(taskBo.getName());
+            query.taskNameLike("%" + taskBo.getName() + "%");
         }
         List<Task> taskList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
         List<TaskVo> list = new ArrayList<>();
@@ -160,7 +160,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
             .taskAssignee(userId).taskTenantId(TenantHelper.getTenantId()).finished().orderByHistoricTaskInstanceStartTime().asc();
         if (StringUtils.isNotBlank(taskBo.getName())) {
-            query.taskNameLike(taskBo.getName());
+            query.taskNameLike("%" + taskBo.getName() + "%");
         }
         List<HistoricTaskInstance> taskInstanceList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
         List<TaskVo> list = new ArrayList<>();

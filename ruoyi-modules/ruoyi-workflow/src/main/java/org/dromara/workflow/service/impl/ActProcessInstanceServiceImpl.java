@@ -5,6 +5,7 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
@@ -94,7 +95,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             .orderByProcessInstanceEndTime().desc();
         query.processInstanceTenantId(TenantHelper.getTenantId());
         if (StringUtils.isNotEmpty(processInstanceBo.getName())) {
-            query.processInstanceNameLike(processInstanceBo.getName());
+            query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
         }
         if (StringUtils.isNotEmpty(processInstanceBo.getStartUserId())) {
             query.startedBy(processInstanceBo.getStartUserId());
@@ -160,7 +161,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             }
             List<String> highLightedNodeList = new ArrayList<>();
             //运行中的节点
-            List<String> redNodeCollect = highLightedNodes.stream().filter(e -> e.contains(Color.RED.toString())).toList();
+            List<String> redNodeCollect = StreamUtils.filter(highLightedNodes, e -> e.contains(Color.RED.toString()));
             //排除与运行中相同的节点
             for (String nodeId : highLightedNodes) {
                 if (!nodeId.contains(Color.RED.toString()) && !redNodeCollect.contains(Color.RED + nodeId)) {
