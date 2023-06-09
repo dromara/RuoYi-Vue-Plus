@@ -2,12 +2,19 @@ package org.dromara.workflow.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.common.tenant.helper.TenantHelper;
+import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.*;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.task.api.Task;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -16,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.rmi.ServerException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +37,8 @@ public class WorkflowUtils {
 
     public WorkflowUtils() {
     }
+
+    private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
 
     /**
      * bpmnModel转为xml
@@ -117,5 +128,29 @@ public class WorkflowUtils {
         if (CollUtil.isEmpty(endEventList)) {
             throw new ServerException(subtask ? "子流程必须存在结束节点！" : "" + "必须存在结束节点！");
         }
+    }
+
+    public static TaskEntity createNewTask(Task currentTask) {
+        TaskEntity task = null;
+        if (ObjectUtil.isNotEmpty(currentTask)) {
+            task = (TaskEntity) PROCESS_ENGINE.getTaskService().newTask();
+            task.setCategory(currentTask.getCategory());
+            task.setDescription(currentTask.getDescription());
+            task.setTenantId(currentTask.getTenantId());
+            task.setAssignee(currentTask.getAssignee());
+            task.setName(currentTask.getName());
+            task.setProcessDefinitionId(currentTask.getProcessDefinitionId());
+            task.setProcessInstanceId(currentTask.getProcessInstanceId());
+            task.setTaskDefinitionKey(currentTask.getTaskDefinitionKey());
+            task.setPriority(currentTask.getPriority());
+            task.setCreateTime(new Date());
+            task.setTenantId(TenantHelper.getTenantId());
+            PROCESS_ENGINE.getTaskService().saveTask(task);
+        }
+        if (ObjectUtil.isNotNull(task)) {
+            UpdateHiTaskInstCmd updateHiTaskInstCmd = new UpdateHiTaskInstCmd(Collections.singletonList(task.getId()), task.getProcessDefinitionId(), task.getProcessInstanceId());
+            PROCESS_ENGINE.getManagementService().executeCommand(updateHiTaskInstCmd);
+        }
+        return task;
     }
 }
