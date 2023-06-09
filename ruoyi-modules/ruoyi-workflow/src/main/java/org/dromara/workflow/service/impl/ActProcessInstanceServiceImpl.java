@@ -1,10 +1,16 @@
 package org.dromara.workflow.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
+import org.dromara.workflow.domain.bo.ProcessInstanceBo;
+import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.flowable.CustomDefaultProcessDiagramGenerator;
 import org.dromara.workflow.service.IActProcessInstanceService;
 import org.flowable.bpmn.model.BpmnModel;
@@ -13,7 +19,9 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +31,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 流程实例 服务层实现
@@ -47,6 +54,61 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
 
     @Value("${flowable.annotation-font-name}")
     private String annotationFontName;
+
+    /**
+     * 分页查询正在运行的流程实例
+     *
+     * @param processInstanceBo 参数
+     */
+    @Override
+    public TableDataInfo<ProcessInstanceVo> getProcessInstanceRunningByPage(ProcessInstanceBo processInstanceBo) {
+        List<ProcessInstanceVo> list = new ArrayList<>();
+        ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+        query.processInstanceTenantId(TenantHelper.getTenantId());
+        if (StringUtils.isNotBlank(processInstanceBo.getName())) {
+            query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
+        }
+        if (StringUtils.isNotBlank(processInstanceBo.getStartUserId())) {
+            query.startedBy(processInstanceBo.getStartUserId());
+        }
+        if (StringUtils.isNotBlank(processInstanceBo.getBusinessKey())) {
+            query.processInstanceBusinessKey(processInstanceBo.getBusinessKey());
+        }
+        List<ProcessInstance> processInstances = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
+        for (ProcessInstance processInstance : processInstances) {
+            list.add(BeanUtil.toBean(processInstance, ProcessInstanceVo.class));
+        }
+        long count = query.count();
+        return new TableDataInfo<>(list, count);
+    }
+
+    /**
+     * 分页查询已结束的流程实例
+     *
+     * @param processInstanceBo 参数
+     */
+    @Override
+    public TableDataInfo<ProcessInstanceVo> getProcessInstanceFinishByPage(ProcessInstanceBo processInstanceBo) {
+        List<ProcessInstanceVo> list = new ArrayList<>();
+        HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().finished()
+            .orderByProcessInstanceEndTime().desc();
+        query.processInstanceTenantId(TenantHelper.getTenantId());
+        if (StringUtils.isNotEmpty(processInstanceBo.getName())) {
+            query.processInstanceNameLike(processInstanceBo.getName());
+        }
+        if (StringUtils.isNotEmpty(processInstanceBo.getStartUserId())) {
+            query.startedBy(processInstanceBo.getStartUserId());
+        }
+        if (StringUtils.isNotBlank(processInstanceBo.getBusinessKey())) {
+            query.processInstanceBusinessKey(processInstanceBo.getBusinessKey());
+        }
+        List<HistoricProcessInstance> historicProcessInstances = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
+        for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
+            list.add(BeanUtil.toBean(historicProcessInstance, ProcessInstanceVo.class));
+        }
+        long count = query.count();
+        return new TableDataInfo<>(list, count);
+    }
 
     /**
      * 通过流程实例id获取历史流程图
@@ -98,7 +160,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             }
             List<String> highLightedNodeList = new ArrayList<>();
             //运行中的节点
-            List<String> redNodeCollect = highLightedNodes.stream().filter(e -> e.contains(Color.RED.toString())).collect(Collectors.toList());
+            List<String> redNodeCollect = highLightedNodes.stream().filter(e -> e.contains(Color.RED.toString())).toList();
             //排除与运行中相同的节点
             for (String nodeId : highLightedNodes) {
                 if (!nodeId.contains(Color.RED.toString()) && !redNodeCollect.contains(Color.RED + nodeId)) {
