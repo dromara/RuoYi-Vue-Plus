@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * <h1>Excel下拉可选项</h1>
@@ -87,5 +89,61 @@ public class DropDownOptions {
      */
     public static List<String> analyzeOptionValue(String option) {
         return StrUtil.split(option, DELIMITER, true, true);
+    }
+
+    /**
+     * 创建级联下拉选项
+     *
+     * @param parentList                  父实体可选项原始数据
+     * @param parentIndex                 父下拉选位置
+     * @param sonList                     子实体可选项原始数据
+     * @param sonIndex                    子下拉选位置
+     * @param parentHowToGetIdFunction    父类如何获取唯一标识
+     * @param sonHowToGetParentIdFunction 子类如何获取父类的唯一标识
+     * @param howToBuildEveryOption       如何生成下拉选内容
+     * @return 级联下拉选项
+     */
+    public static <T> DropDownOptions buildLinkedOptions(List<T> parentList,
+                                                         int parentIndex,
+                                                         List<T> sonList,
+                                                         int sonIndex,
+                                                         Function<T, Number> parentHowToGetIdFunction,
+                                                         Function<T, Number> sonHowToGetParentIdFunction,
+                                                         Function<T, String> howToBuildEveryOption) {
+        DropDownOptions parentLinkSonOptions = new DropDownOptions();
+        // 先创建父类的下拉
+        parentLinkSonOptions.setIndex(parentIndex);
+        parentLinkSonOptions.setOptions(
+            parentList.stream()
+                .map(howToBuildEveryOption)
+                .collect(Collectors.toList())
+        );
+        // 提取父-子级联下拉
+        Map<String, List<String>> sonOptions = new HashMap<>();
+        // 父级依据自己的ID分组
+        Map<Number, List<T>> parentGroupByIdMap =
+            parentList.stream().collect(Collectors.groupingBy(parentHowToGetIdFunction));
+        // 遍历每个子集，提取到Map中
+        sonList.forEach(everySon -> {
+            if (parentGroupByIdMap.containsKey(sonHowToGetParentIdFunction.apply(everySon))) {
+                // 找到对应的上级
+                T parentObj = parentGroupByIdMap.get(sonHowToGetParentIdFunction.apply(everySon)).get(0);
+                // 提取名称和ID作为Key
+                String key = howToBuildEveryOption.apply(parentObj);
+                // Key对应的Value
+                List<String> thisParentSonOptionList;
+                if (sonOptions.containsKey(key)) {
+                    thisParentSonOptionList = sonOptions.get(key);
+                } else {
+                    thisParentSonOptionList = new ArrayList<>();
+                    sonOptions.put(key, thisParentSonOptionList);
+                }
+                // 往Value中添加当前子集选项
+                thisParentSonOptionList.add(howToBuildEveryOption.apply(everySon));
+            }
+        });
+        parentLinkSonOptions.setNextIndex(sonIndex);
+        parentLinkSonOptions.setNextOptions(sonOptions);
+        return parentLinkSonOptions;
     }
 }

@@ -51,56 +51,36 @@ public class ExportExcelServiceImpl implements IExportExcelService {
 
         // 首先从数据库中查询下拉框内的可选项
         // 这里模拟查询结果
-        List<DemoCityData> provinceList = getProvinceList();
-        List<DemoCityData> cityList = getCityList(provinceList);
-        List<DemoCityData> areaList = getAreaList(cityList);
+        List<DemoCityData> provinceList = getProvinceList(),
+            cityList = getCityList(provinceList),
+            areaList = getAreaList(cityList);
+        int provinceIndex = 5, cityIndex = 6, areaIndex = 7;
 
-        // 把所有的结果提取为规范的下拉选可选项
-        // 规范的一级省，用于级联省-市
-        List<String> provinceOptions = StreamUtils.toList(provinceList, everyProvince ->
-                DropDownOptions.createOptionValue(everyProvince.getName(), everyProvince.getId()));
-        // 规范的二级市，用于级联省-市
-        Map<String, List<String>> provinceToCityOptions = new HashMap<>();
-        StreamUtils.groupByKey(cityList, DemoCityData::getPData)
-            .forEach((province, thisProvinceCityList) -> {
-                // 每个省下二级的市可选项
-                String optionValue = DropDownOptions.createOptionValue(province.getName(), province.getId());
-                List<String> list = StreamUtils.toList(thisProvinceCityList, everyCity ->
-                    DropDownOptions.createOptionValue(everyCity.getName(), everyCity.getId()));
-                provinceToCityOptions.put(optionValue, list);
-            });
+        DropDownOptions provinceToCity = DropDownOptions.buildLinkedOptions(
+            provinceList,
+            provinceIndex,
+            cityList,
+            cityIndex,
+            DemoCityData::getId,
+            DemoCityData::getPid,
+            everyOptions -> DropDownOptions.createOptionValue(
+                everyOptions.getName(),
+                everyOptions.getId()
+            )
+        );
 
-        // 规范的一级市，用于级联市-县
-        List<String> cityOptions = StreamUtils.toList(cityList, everyCity ->
-            DropDownOptions.createOptionValue(everyCity.getName(), everyCity.getId()));
-        // 规范的二级县，用于级联市-县
-        Map<String, List<String>> cityToAreaOptions = new HashMap<>();
-        StreamUtils.groupByKey(areaList, DemoCityData::getPData)
-            .forEach((city, thisCityAreaList) -> {
-                // 每个市下二级的县可选项
-                String optionValue = DropDownOptions.createOptionValue(city.getName(), city.getId());
-                List<String> list = StreamUtils.toList(thisCityAreaList, everyCity ->
-                    DropDownOptions.createOptionValue(everyCity.getName(), everyCity.getId()));
-                cityToAreaOptions.put(optionValue, list);
-            });
-
-        // 因为省市县三个都是联动，省级联市，市级联县，因此需要创建两个级联下拉，分别以省和市为判断依据创建
-        // 创建省-市级联
-        DropDownOptions provinceToCity = new DropDownOptions();
-        // 以省为一级
-        provinceToCity.setIndex(5);
-        // 以市为二级
-        provinceToCity.setNextIndex(6);
-        // 补充省的内容以及市的内容
-        provinceToCity.setOptions(provinceOptions);
-        provinceToCity.setNextOptions(provinceToCityOptions);
-
-        // 创建市-县级联
-        DropDownOptions cityToArea = new DropDownOptions();
-        cityToArea.setIndex(6);
-        cityToArea.setNextIndex(7);
-        cityToArea.setOptions(cityOptions);
-        cityToArea.setNextOptions(cityToAreaOptions);
+        DropDownOptions cityToArea = DropDownOptions.buildLinkedOptions(
+            cityList,
+            cityIndex,
+            areaList,
+            areaIndex,
+            DemoCityData::getId,
+            DemoCityData::getPid,
+            everyOptions -> DropDownOptions.createOptionValue(
+                everyOptions.getName(),
+                everyOptions.getId()
+            )
+        );
 
         // 把所有的下拉框存储
         List<DropDownOptions> options = new ArrayList<>();
