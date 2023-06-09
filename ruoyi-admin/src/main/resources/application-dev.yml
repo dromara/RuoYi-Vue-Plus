@@ -158,14 +158,16 @@ mail:
   # Socket连接超时值，单位毫秒，缺省值不超时
   connectionTimeout: 0
 
---- # sms 短信
+--- # sms 短信  https://wind.kim/doc/start/springboot.html
 sms:
-  enabled: false
+  enabled: true
   # 阿里云 dysmsapi.aliyuncs.com
-  # 腾讯云 sms.tencentcloudapi.com
-  endpoint: "dysmsapi.aliyuncs.com"
-  accessKeyId: xxxxxxx
-  accessKeySecret: xxxxxx
-  signName: 测试
-  # 腾讯专用
-  sdkAppId:
+  alibaba:
+    #阿里云的accessKey
+    accessKeyId: xxxxxxx
+    #阿里云的accessKeySecret
+    accessKeySecret: xxxxxxx
+    #短信签名
+    signature: 测试
+    #请求地址 默认为dysmsapi.aliyuncs.com 如无特殊改变可以不用设置
+    requestUrl: dysmsapi.aliyuncs.com

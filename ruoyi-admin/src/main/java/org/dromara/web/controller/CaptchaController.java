@@ -15,10 +15,11 @@ import org.dromara.common.mail.config.properties.MailProperties;
 import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.sms.config.properties.SmsProperties;
-import org.dromara.common.sms.core.SmsTemplate;
-import org.dromara.common.sms.entity.SmsResult;
 import org.dromara.common.web.config.properties.CaptchaProperties;
 import org.dromara.common.web.enums.CaptchaType;
+import org.dromara.sms4j.api.entity.SmsResponse;
+import org.dromara.sms4j.core.factory.SmsFactory;
+import org.dromara.sms4j.provider.enumerate.SupplierType;
 import org.dromara.web.domain.vo.CaptchaVo;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * 验证码操作处理
@@ -64,14 +64,13 @@ public class CaptchaController {
         String code = RandomUtil.randomNumbers(4);
         RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         // 验证码模板id 自行处理 (查数据库或写死均可)
-        String templateId = "";
-        Map<String, String> map = new HashMap<>(1);
+        String templateId = "SMS_460945446";
+        LinkedHashMap<String, String> map = new LinkedHashMap<>(1);
         map.put("code", code);
-        SmsTemplate smsTemplate = SpringUtils.getBean(SmsTemplate.class);
-        SmsResult result = smsTemplate.send(phonenumber, templateId, map);
-        if (!result.isSuccess()) {
-            log.error("验证码短信发送异常 => {}", result);
-            return R.fail(result.getMessage());
+        SmsResponse smsResponse = SmsFactory.createSmsBlend(SupplierType.ALIBABA).sendMessage(phonenumber, templateId, map);
+        if (!"OK".equals(smsResponse.getCode())) {
+            log.error("验证码短信发送异常 => {}", smsResponse);
+            return R.fail(smsResponse.getMessage());
         }
         return R.ok();
     }
