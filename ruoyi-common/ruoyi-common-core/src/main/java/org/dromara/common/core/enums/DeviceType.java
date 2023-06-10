@@ -26,7 +26,9 @@ public enum DeviceType {
     /**
      * 小程序端
      */
-    XCX("xcx");
+    XCX("xcx"),
+
+    auth("auth");
 
     private final String device;
 }

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
+import org.dromara.system.domain.SysAuthUser;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.apache.ibatis.annotations.Param;
@@ -123,8 +124,8 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
      * @return 用户对象信息
      */
     @DataPermission({
-        @DataColumn(key = "deptName", value = "d.dept_id"),
-        @DataColumn(key = "userName", value = "u.user_id")
+        @DataColumn(key = "deptName", value = "d.dept_id"),// 部门权限
+        @DataColumn(key = "userName", value = "u.user_id")// 用户权限
     })
     SysUserVo selectUserById(Long userId);
 
@@ -142,4 +143,44 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     })
     int updateById(@Param(Constants.ENTITY) SysUser user);
 
+    /**
+     * 根据用户编号查询授权列表
+     *
+     * @param userId 用户编号
+     * @return 授权列表
+     */
+    public List<SysAuthUser> selectAuthUserListByUserId(Long userId);
+
+    /**
+     * 根据uuid查询用户信息
+     *
+     * @param uuid 唯一信息
+     * @return 结果
+     */
+    public SysUserVo selectAuthUserByUuid(String uuid);
+
+    /**
+     * 校验source平台是否绑定
+     *
+     * @param userId 用户编号
+     * @param source 绑定平台
+     * @return 结果
+     */
+    public int checkAuthUser(@Param("userId") Long userId, @Param("source") String source);
+
+    /**
+     * 新增第三方授权信息
+     *
+     * @param authUser 用户信息
+     * @return 结果
+     */
+    public int insertAuthUser(SysAuthUser authUser);
+
+    /**
+     * 根据编号删除第三方授权信息
+     *
+     * @param authId 授权编号
+     * @return 结果
+     */
+    public int deleteAuthUser(Long authId);
 }

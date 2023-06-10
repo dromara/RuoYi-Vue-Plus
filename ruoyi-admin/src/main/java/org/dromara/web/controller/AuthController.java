@@ -2,9 +2,21 @@ package org.dromara.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import me.zhyd.oauth.cache.AuthDefaultStateCache;
+import me.zhyd.oauth.cache.AuthStateCache;
+import me.zhyd.oauth.model.AuthCallback;
+import me.zhyd.oauth.model.AuthResponse;
+import me.zhyd.oauth.model.AuthUser;
+import me.zhyd.oauth.request.AuthRequest;
+import me.zhyd.oauth.utils.AuthStateUtils;
+import org.dromara.common.auth.utils.AuthUtils;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.EmailLoginBody;
 import org.dromara.common.core.domain.model.LoginBody;
@@ -16,6 +28,8 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysTenantVo;
+import org.dromara.system.domain.vo.SysUserVo;
+import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.service.ISysConfigService;
 import org.dromara.system.service.ISysTenantService;
 import org.dromara.web.domain.vo.LoginTenantVo;
@@ -26,8 +40,11 @@ import org.dromara.web.service.SysRegisterService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 认证
@@ -41,10 +58,18 @@ import java.util.List;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private AuthStateCache authStateCache;
     private final SysLoginService loginService;
     private final SysRegisterService registerService;
     private final ISysConfigService configService;
     private final ISysTenantService tenantService;
+    private final SysUserMapper userMapper;
+    private final Map<String, String> auths = new HashMap<>();
+    {
+        auths.put("gitee", "{\"clientId\":\"38eaaa1b77b5e064313057a2f5745ce3a9f3e7686d9bd302c7df2f308ef6db81\",\"clientSecret\":\"2e633af8780cb9fe002c4c7291b722db944402e271efb99b062811f52d7da1ff\",\"redirectUri\":\"http://127.0.0.1:8888/social-login?source=gitee\"}");
+        auths.put("github", "{\"clientId\":\"Iv1.1be0cdcd71aca63b\",\"clientSecret\":\"0d59d28b43152bc8906011624db37b0fed88d154\",\"redirectUri\":\"http://127.0.0.1:80/social-login?source=github\"}");
+        authStateCache = AuthDefaultStateCache.INSTANCE;// 使用默认的缓存
+    }
 
     /**
      * 登录方法
@@ -114,6 +139,64 @@ public class AuthController {
         loginVo.setToken(token);
         return R.ok(loginVo);
     }
+
+
+
+
+    /**
+     * 认证授权
+     * @param source
+     * @throws IOException
+     */
+    @GetMapping("/binding/{source}")
+    @ResponseBody
+    public R<LoginVo> authBinding(@PathVariable("source") String source, HttpServletRequest request){
+        SysUserVo userLoding = new SysUserVo();
+        if (ObjectUtil.isNull(userLoding)) {
+            return R.fail("授权失败，请先登录再绑定");
+        }
+        if (userMapper.checkAuthUser(userLoding.getUserId(),source) > 0)
+        {
+            return R.fail(source + "平台账号已经绑定");
+        }
+        String obj = auths.get(source);
+        if (StringUtils.isEmpty(obj))
+        {
+            return R.fail(source + "平台账号暂不支持");
+        }
+        JSONObject json = JSONUtil.parseObj(obj);
+        AuthRequest authRequest = AuthUtils.getAuthRequest(source,
+            json.getStr("clientId"),
+            json.getStr("clientSecret"),
+            json.getStr("redirectUri"), authStateCache);
+        String authorizeUrl = authRequest.authorize(AuthStateUtils.createState());
+        return R.ok(authorizeUrl);
+    }
+
+    /**
+     * @param source
+     * @param callback
+     * @param request
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    @GetMapping("/social-login/{source}")
+    public R<String> socialLogin(@PathVariable("source") String source, AuthCallback callback, HttpServletRequest request) throws IOException {
+        String obj = auths.get(source);
+        if (StringUtils.isEmpty(obj))
+        {
+            return R.fail("第三方平台系统不支持或未提供来源");
+        }
+        JSONObject json = JSONUtil.parseObj(obj);
+        AuthRequest authRequest = AuthUtils.getAuthRequest(source,
+            json.getStr("clientId"),
+            json.getStr("clientSecret"),
+            json.getStr("redirectUri"), authStateCache);
+        AuthResponse<AuthUser> response = authRequest.login(callback);
+        return loginService.socialLogin(source, response, request);
+    }
+
+
 
     /**
      * 退出登录

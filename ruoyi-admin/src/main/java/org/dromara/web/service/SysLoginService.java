@@ -6,11 +6,15 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.model.AuthResponse;
+import me.zhyd.oauth.model.AuthUser;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.constant.TenantConstants;
+import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.domain.model.XcxLoginUser;
@@ -28,6 +32,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.exception.TenantException;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.config.properties.CaptchaProperties;
+import org.dromara.system.domain.SysAuthUser;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.domain.vo.SysUserVo;
@@ -37,6 +42,7 @@ import org.dromara.system.service.ISysTenantService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
@@ -153,6 +159,65 @@ public class SysLoginService {
         recordLoginInfo(user.getUserId());
         return StpUtil.getTokenValue();
     }
+
+
+    /**
+     * 认证授权登录
+     * @param source
+     * @throws IOException
+     */
+    /**
+     * 社交登录
+     * @param source   登录来源
+     * @param authUser   授权响应实体
+     * @param request   Http请求对象
+     * @return   统一响应实体
+     * @throws IOException
+     */
+    public R<String> socialLogin(String source, AuthResponse<AuthUser> authUser, HttpServletRequest request) throws IOException {
+        // 判断授权响应是否成功
+        if (!authUser.ok()) {
+            return R.fail("对不起，授权信息验证不通过，请联系管理员");
+        }
+        AuthUser authUserData = authUser.getData();
+        // 判断数据库中是否已存在该用户
+        SysUserVo user = userMapper.selectAuthUserByUuid(source + authUserData.getUuid());
+        if (ObjectUtil.isNotNull(user)) {
+            checkTenant(user.getTenantId());
+            SysUserVo dbUser = loadUserByUsername(user.getTenantId(), user.getUserName());
+            // 登录
+            LoginHelper.loginByDevice(buildLoginUser(dbUser), DeviceType.auth);
+            recordLogininfor(dbUser.getTenantId(), user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+            recordLoginInfo(user.getUserId());
+            return R.ok(StpUtil.getTokenValue());
+        } else {
+            if (LoginHelper.getUserId() == null) {
+                return R.fail("授权失败，请先登录再绑定");
+            }
+            // 组装授权用户信息
+            SysAuthUser sysAuthUser = new SysAuthUser();
+            sysAuthUser.setAvatar(authUserData.getAvatar());
+            sysAuthUser.setUuid(source + authUserData.getUuid());
+            sysAuthUser.setUserId(LoginHelper.getUserId());
+            sysAuthUser.setUserName(authUserData.getUsername());
+            sysAuthUser.setNickName(authUserData.getNickname());
+            sysAuthUser.setEmail(authUserData.getEmail());
+            sysAuthUser.setSource(source);
+            sysAuthUser.setCreateTime(new Date().toString());
+            // 新用户，绑定第三方账号
+            userMapper.insertAuthUser(sysAuthUser);
+            SysUserVo lodingData = loadUserByUsername(LoginHelper.getTenantId(), LoginHelper.getUsername());
+            checkTenant(lodingData.getTenantId());
+            LoginHelper.loginByDevice(buildLoginUser(lodingData), DeviceType.auth);
+            recordLogininfor(lodingData.getTenantId(), sysAuthUser.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+            recordLoginInfo(sysAuthUser.getUserId());
+            return R.ok(StpUtil.getTokenValue());
+        }
+    }
+
+
+
+
 
     /**
      * 退出登录
