@@ -60,4 +60,12 @@ public interface IActTaskService {
      * @return 结果
      */
     boolean terminationTask(TerminationBo terminationBo);
+
+    /**
+     * 转办任务
+     *
+     * @param transmitBo 参数
+     * @return 结果
+     */
+    boolean transferTask(TransmitBo transmitBo);
 }

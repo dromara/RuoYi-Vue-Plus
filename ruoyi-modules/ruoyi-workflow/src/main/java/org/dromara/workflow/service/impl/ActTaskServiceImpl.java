@@ -243,4 +243,32 @@ public class ActTaskServiceImpl implements IActTaskService {
             throw new ServiceException(e.getMessage());
         }
     }
+
+    /**
+     * 转办任务
+     *
+     * @param transmitBo 参数
+     */
+    @Override
+    public boolean transferTask(TransmitBo transmitBo) {
+        Task task = taskService.createTaskQuery().taskId(transmitBo.getTaskId()).taskTenantId(TenantHelper.getTenantId())
+            .taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
+        if (ObjectUtil.isEmpty(task)) {
+            throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
+        }
+        if (task.isSuspended()) {
+            throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
+        }
+        try {
+            TaskEntity newTask = WorkflowUtils.createNewTask(task);
+            taskService.addComment(newTask.getId(), task.getProcessInstanceId(),
+                StringUtils.isNotBlank(transmitBo.getComment()) ? transmitBo.getComment() : LoginHelper.getUsername() + "转办了任务");
+            taskService.complete(newTask.getId());
+            taskService.setAssignee(task.getId(), transmitBo.getUserId());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
+        }
+    }
 }

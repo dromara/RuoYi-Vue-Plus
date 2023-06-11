@@ -136,4 +136,15 @@ public class ActTaskController extends BaseController {
         return toAjax(iActTaskService.terminationTask(terminationBo));
     }
 
+    /**
+     * 转办任务
+     *
+     * @param transmitBo 参数
+     */
+    @Log(title = "任务管理", businessType = BusinessType.INSERT)
+    @PostMapping("/transferTask")
+    public R<Void> transferTask(@Validated({AddGroup.class}) @RequestBody TransmitBo transmitBo) {
+        return toAjax(iActTaskService.transferTask(transmitBo));
+    }
+
 }
