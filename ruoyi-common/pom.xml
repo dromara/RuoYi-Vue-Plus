@@ -11,7 +11,6 @@
 
     <modules>
         <module>ruoyi-common-bom</module>
-        <module>ruoyi-common-auth</module>
         <module>ruoyi-common-core</module>
         <module>ruoyi-common-doc</module>
         <module>ruoyi-common-excel</module>

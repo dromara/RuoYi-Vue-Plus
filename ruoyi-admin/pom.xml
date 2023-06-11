@@ -75,21 +75,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>me.zhyd.oauth</groupId>
-            <artifactId>JustAuth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-auth</artifactId>
-            <version>5.1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>credentials-java</artifactId>
-            <version>0.2.4</version>
-            <scope>compile</scope>
-        </dependency>
 
         <!-- skywalking 整合 logback -->
 <!--        <dependency>-->
