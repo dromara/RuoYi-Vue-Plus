@@ -72,10 +72,11 @@ public class ActTaskServiceImpl implements IActTaskService {
             map.put("taskId", taskResult.get(0).getId());
             return map;
         }
-        // 设置启动人
         Authentication.setAuthenticatedUserId(String.valueOf(LoginHelper.getUserId()));
         // 启动流程实例（提交申请）
         Map<String, Object> variables = startProcessBo.getVariables();
+        // 设置启动人
+        variables.put(FlowConstant.INITIATOR, String.valueOf(LoginHelper.getUserId()));
         // 启动跳过表达式
         variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         ProcessInstance pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());
@@ -114,6 +115,14 @@ public class ActTaskServiceImpl implements IActTaskService {
             Task task = taskQuery.singleResult();
             if (task == null) {
                 throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
+            }
+            //办理委托任务
+            if (ObjectUtil.isNotEmpty(task.getDelegationState()) && FlowConstant.PENDING.equals(task.getDelegationState().name())) {
+                taskService.resolveTask(completeTaskBo.getTaskId());
+                TaskEntity newTask = WorkflowUtils.createNewTask(task);
+                taskService.addComment(newTask.getId(), task.getProcessInstanceId(), completeTaskBo.getMessage());
+                taskService.complete(newTask.getId());
+                return true;
             }
             //办理意见
             taskService.addComment(completeTaskBo.getTaskId(), task.getProcessInstanceId(), StringUtils.isBlank(completeTaskBo.getMessage()) ? "同意" : completeTaskBo.getMessage());

@@ -15,11 +15,21 @@ public interface FlowConstant {
 
     String MESSAGE_CURRENT_TASK_IS_NULL = "当前任务不存在或你不是任务办理人";
 
-    String MESSAGE_SUSPENDED = "当前任务已";
+    String MESSAGE_SUSPENDED = "当前任务已挂起";
 
     /**
      * 连线
      */
     String SEQUENCE_FLOW = "sequenceFlow";
+
+    /**
+     * 流程委派标识
+     */
+    String PENDING = "PENDING";
+
+    /**
+     * 流程启动者
+     */
+    String INITIATOR = "initiator";
 
 }

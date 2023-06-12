@@ -130,6 +130,11 @@ public class WorkflowUtils {
         }
     }
 
+    /**
+     * 创建一个新任务
+     *
+     * @param currentTask 参数
+     */
     public static TaskEntity createNewTask(Task currentTask) {
         TaskEntity task = null;
         if (ObjectUtil.isNotEmpty(currentTask)) {
