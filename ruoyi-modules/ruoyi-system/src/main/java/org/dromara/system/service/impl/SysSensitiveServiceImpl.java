@@ -22,7 +22,7 @@ public class SysSensitiveServiceImpl implements SensitiveService {
     @Override
     public boolean isSensitive() {
         if (TenantHelper.isEnable()) {
-            return !LoginHelper.isSuperAdmin() || !LoginHelper.isTenantAdmin();
+            return !LoginHelper.isSuperAdmin() && !LoginHelper.isTenantAdmin();
         }
         return !LoginHelper.isSuperAdmin();
     }
