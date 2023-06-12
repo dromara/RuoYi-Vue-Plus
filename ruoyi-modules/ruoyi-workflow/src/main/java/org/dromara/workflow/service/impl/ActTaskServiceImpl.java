@@ -72,11 +72,10 @@ public class ActTaskServiceImpl implements IActTaskService {
             map.put("taskId", taskResult.get(0).getId());
             return map;
         }
+        // 设置启动人
         Authentication.setAuthenticatedUserId(String.valueOf(LoginHelper.getUserId()));
         // 启动流程实例（提交申请）
         Map<String, Object> variables = startProcessBo.getVariables();
-        // 设置启动人
-        variables.put(FlowConstant.INITIATOR, String.valueOf(LoginHelper.getUserId()));
         // 启动跳过表达式
         variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         ProcessInstance pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());

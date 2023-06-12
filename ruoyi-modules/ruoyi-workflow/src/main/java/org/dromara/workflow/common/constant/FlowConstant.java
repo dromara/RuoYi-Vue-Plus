@@ -27,9 +27,4 @@ public interface FlowConstant {
      */
     String PENDING = "PENDING";
 
-    /**
-     * 流程启动者
-     */
-    String INITIATOR = "initiator";
-
 }
