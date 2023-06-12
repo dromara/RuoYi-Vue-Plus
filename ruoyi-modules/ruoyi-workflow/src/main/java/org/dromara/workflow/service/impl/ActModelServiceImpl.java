@@ -300,8 +300,7 @@ public class ActModelServiceImpl implements IActModelService {
             Model model = repositoryService.getModel(modelId);
             byte[] xmlBytes = repositoryService.getModelEditorSource(modelId);
             if (ObjectUtil.isNotNull(model)) {
-                byte[] bytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
-                if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, StandardCharsets.UTF_8.toString())) && ArrayUtil.isEmpty(bytes)) {
+                if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, StandardCharsets.UTF_8.toString())) && ArrayUtil.isEmpty(WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes))) {
                     zipName = "模型不能为空，请至少设计一条主线流程！";
                     zos.putNextEntry(new ZipEntry(zipName + ".txt"));
                     zos.write(zipName.getBytes(StandardCharsets.UTF_8));
