@@ -28,7 +28,6 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
-import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
@@ -217,7 +216,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         //查询任务办理记录
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
             .processInstanceId(processInstanceId).taskTenantId(TenantHelper.getTenantId()).orderByHistoricTaskInstanceEndTime().desc().list();
-        list = StreamUtils.sorted(list, Comparator.comparing(HistoricTaskInstance::getEndTime, Comparator.nullsFirst(Date::compareTo)));
+        list = StreamUtils.sorted(list, Comparator.comparing(HistoricTaskInstance::getEndTime, Comparator.nullsFirst(Date::compareTo)).reversed());
         List<ActHistoryInfoVo> actHistoryInfoVoList = new ArrayList<>();
         for (HistoricTaskInstance historicTaskInstance : list) {
             ActHistoryInfoVo actHistoryInfoVo = new ActHistoryInfoVo();
@@ -243,6 +242,25 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
                 e.setNickName(ObjectUtil.isNotEmpty(sysUserVo) ? sysUserVo.getNickName() : "");
             });
         }
+        List<ActHistoryInfoVo> nodeInfoList = new ArrayList<>();
+        Map<String, List<ActHistoryInfoVo>> groupByKey = StreamUtils.groupByKey(actHistoryInfoVoList, ActHistoryInfoVo::getTaskDefinitionKey);
+        for (Map.Entry<String, List<ActHistoryInfoVo>> entry : groupByKey.entrySet()) {
+            ActHistoryInfoVo actHistoryInfoVo = BeanUtil.toBean(entry.getValue().get(0), ActHistoryInfoVo.class);
+            String nickName = entry.getValue().stream().filter(e -> StringUtils.isNotBlank(e.getNickName()) && e.getEndTime() == null).map(ActHistoryInfoVo::getNickName).toList().stream().distinct().collect(Collectors.joining(StringUtils.SEPARATOR));
+            if (StringUtils.isNotBlank(nickName)) {
+                actHistoryInfoVo.setNickName(nickName);
+            }
+            actHistoryInfoVoList.stream().filter(e -> e.getTaskDefinitionKey().equals(entry.getKey()) && e.getEndTime() == null).findFirst()
+                .ifPresent(e -> {
+                    actHistoryInfoVo.setStatus("待处理");
+                    actHistoryInfoVo.setStartTime(e.getStartTime());
+                    actHistoryInfoVo.setEndTime(null);
+                    actHistoryInfoVo.setRunDuration(null);
+                });
+            nodeInfoList.add(actHistoryInfoVo);
+        }
+        //节点信息
+        map.put("nodeListInfo", nodeInfoList);
         List<ActHistoryInfoVo> collect = new ArrayList<>();
         //待办理
         List<ActHistoryInfoVo> waitingTask = StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() == null);
