@@ -3,7 +3,10 @@ package org.dromara.workflow.service;
 import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
+import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
+
+import java.util.List;
 
 /**
  * 流程实例 服务层
@@ -34,4 +37,12 @@ public interface IActProcessInstanceService {
      * @return 结果
      */
     TableDataInfo<ProcessInstanceVo> getProcessInstanceFinishByPage(ProcessInstanceBo processInstanceBo);
+
+    /**
+     * 获取审批记录
+     *
+     * @param processInstanceId 流程实例id
+     * @return 结果
+     */
+    List<ActHistoryInfoVo> getHistoryRecord(String processInstanceId);
 }

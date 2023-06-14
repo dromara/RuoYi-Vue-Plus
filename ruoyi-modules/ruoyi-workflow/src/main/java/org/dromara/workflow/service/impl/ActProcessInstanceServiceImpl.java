@@ -1,6 +1,8 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +11,11 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
+import org.dromara.system.domain.vo.SysUserVo;
+import org.dromara.system.service.ISysUserService;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
+import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.flowable.CustomDefaultProcessDiagramGenerator;
 import org.dromara.workflow.service.IActProcessInstanceService;
@@ -18,20 +23,24 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.task.Comment;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 流程实例 服务层实现
@@ -46,6 +55,8 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     private final RepositoryService repositoryService;
     private final RuntimeService runtimeService;
     private final HistoryService historyService;
+    private final ISysUserService iSysUserService;
+    private final TaskService taskService;
 
     @Value("${flowable.activity-font-name}")
     private String activityFontName;
@@ -190,6 +201,80 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    /**
+     * 获取审批记录
+     *
+     * @param processInstanceId 流程实例id
+     */
+    @Override
+    public List<ActHistoryInfoVo> getHistoryRecord(String processInstanceId) {
+        //查询任务办理记录
+        List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
+            .processInstanceId(processInstanceId).taskTenantId(TenantHelper.getTenantId()).orderByHistoricTaskInstanceEndTime().desc().list();
+        list = StreamUtils.sorted(list, Comparator.comparing(HistoricTaskInstance::getEndTime, Comparator.nullsFirst(Date::compareTo)));
+        List<ActHistoryInfoVo> actHistoryInfoVoList = new ArrayList<>();
+        for (HistoricTaskInstance historicTaskInstance : list) {
+            ActHistoryInfoVo actHistoryInfoVo = new ActHistoryInfoVo();
+            BeanUtils.copyProperties(historicTaskInstance, actHistoryInfoVo);
+            actHistoryInfoVo.setStatus(actHistoryInfoVo.getEndTime() == null ? "待处理" : "已处理");
+            List<Comment> taskComments = taskService.getTaskComments(historicTaskInstance.getId());
+            if (CollUtil.isNotEmpty(taskComments)) {
+                actHistoryInfoVo.setCommentId(taskComments.get(0).getId());
+                String message = taskComments.stream().map(Comment::getFullMessage).collect(Collectors.joining("。"));
+                if (StringUtils.isNotBlank(message)) {
+                    actHistoryInfoVo.setComment(message);
+                }
+            }
+            if (ObjectUtil.isNotEmpty(historicTaskInstance.getDurationInMillis())) {
+                actHistoryInfoVo.setRunDuration(getDuration(historicTaskInstance.getDurationInMillis()));
+            }
+            actHistoryInfoVoList.add(actHistoryInfoVo);
+        }
+        //翻译人员名称
+        if (CollUtil.isNotEmpty(actHistoryInfoVoList)) {
+            actHistoryInfoVoList.forEach(e -> {
+                SysUserVo sysUserVo = iSysUserService.selectUserById(Long.valueOf(e.getAssignee()));
+                e.setNickName(ObjectUtil.isNotEmpty(sysUserVo) ? sysUserVo.getNickName() : "");
+            });
+        }
+        List<ActHistoryInfoVo> collect = new ArrayList<>();
+        //待办理
+        List<ActHistoryInfoVo> waitingTask = StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() == null);
+        //已办理
+        List<ActHistoryInfoVo> finishTask = StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() != null);
+        collect.addAll(waitingTask);
+        collect.addAll(finishTask);
+        return collect;
+    }
+
+    /**
+     * 任务完成时间处理
+     *
+     * @param time 时间
+     */
+    private String getDuration(long time) {
+
+        long day = time / (24 * 60 * 60 * 1000);
+        long hour = (time / (60 * 60 * 1000) - day * 24);
+        long minute = ((time / (60 * 1000)) - day * 24 * 60 - hour * 60);
+        long second = (time / 1000 - day * 24 * 60 * 60 - hour * 60 * 60 - minute * 60);
+
+        if (day > 0) {
+            return day + "天" + hour + "小时" + minute + "分钟";
+        }
+        if (hour > 0) {
+            return hour + "小时" + minute + "分钟";
+        }
+        if (minute > 0) {
+            return minute + "分钟";
+        }
+        if (second > 0) {
+            return second + "秒";
+        } else {
+            return 0 + "秒";
         }
     }
 }
