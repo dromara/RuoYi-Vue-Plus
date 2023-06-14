@@ -7,6 +7,7 @@ import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流程实例 服务层
@@ -44,5 +45,5 @@ public interface IActProcessInstanceService {
      * @param processInstanceId 流程实例id
      * @return 结果
      */
-    List<ActHistoryInfoVo> getHistoryRecord(String processInstanceId);
+    Map<String, Object> getHistoryRecord(String processInstanceId);
 }

@@ -7,13 +7,12 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
-import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.service.IActProcessInstanceService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * 流程实例管理 控制层
@@ -65,7 +64,7 @@ public class ActProcessInstanceController extends BaseController {
      * @param processInstanceId 流程实例id
      */
     @GetMapping("/getHistoryRecord/{processInstanceId}")
-    public R<List<ActHistoryInfoVo>> getHistoryRecord(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
+    public R<Map<String, Object>> getHistoryRecord(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
         return R.ok(iActProcessInstanceService.getHistoryRecord(processInstanceId));
     }
 }

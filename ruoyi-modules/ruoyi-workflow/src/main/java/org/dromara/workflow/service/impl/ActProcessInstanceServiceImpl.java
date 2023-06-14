@@ -16,10 +16,11 @@ import org.dromara.system.service.ISysUserService;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
+import org.dromara.workflow.domain.vo.GraphicInfoVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.flowable.CustomDefaultProcessDiagramGenerator;
 import org.dromara.workflow.service.IActProcessInstanceService;
-import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.*;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
@@ -27,6 +28,7 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
@@ -210,7 +212,8 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      * @param processInstanceId 流程实例id
      */
     @Override
-    public List<ActHistoryInfoVo> getHistoryRecord(String processInstanceId) {
+    public Map<String, Object> getHistoryRecord(String processInstanceId) {
+        Map<String, Object> map = new HashMap<>();
         //查询任务办理记录
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
             .processInstanceId(processInstanceId).taskTenantId(TenantHelper.getTenantId()).orderByHistoricTaskInstanceEndTime().desc().list();
@@ -247,7 +250,23 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         List<ActHistoryInfoVo> finishTask = StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() != null);
         collect.addAll(waitingTask);
         collect.addAll(finishTask);
-        return collect;
+        //审批记录
+        map.put("historyRecordList", collect);
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(list.get(0).getProcessDefinitionId());
+        List<GraphicInfoVo> graphicInfoVos = new ArrayList<>();
+        Collection<FlowElement> flowElements = bpmnModel.getMainProcess().getFlowElements();
+        for (FlowElement flowElement : flowElements) {
+            if (flowElement instanceof UserTask) {
+                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowElement.getId());
+                GraphicInfoVo graphicInfoVo = BeanUtil.toBean(graphicInfo, GraphicInfoVo.class);
+                graphicInfoVo.setNodeId(flowElement.getId());
+                graphicInfoVo.setNodeName(flowElement.getName());
+                graphicInfoVos.add(graphicInfoVo);
+            }
+        }
+        //节点图形信息
+        map.put("graphicInfoVos", graphicInfoVos);
+        return map;
     }
 
     /**
