@@ -1,0 +1,39 @@
+package org.dromara.common.social.config.properties;
+
+import lombok.Data;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+/**
+ * Social 配置属性
+ * @author thiszhc
+ */
+@Data
+@Component
+@ConfigurationProperties(prefix = "justauth")
+public class SocialProperties {
+
+    /**
+     * 是否启用
+     */
+    private boolean enabled;
+
+    /**
+     * 授权类型
+     */
+    private Map<String, ConfigProperties> type;
+
+    /**
+     * 授权过期时间
+     */
+    private long timeout;
+
+    /**
+     * 授权缓存配置
+     */
+    private CacheProperties cache = new CacheProperties();
+
+}
