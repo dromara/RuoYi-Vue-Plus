@@ -1,13 +1,13 @@
 package org.dromara.common.doc.config;
 
-import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.doc.config.properties.SwaggerProperties;
-import org.dromara.common.doc.handler.OpenApiHandler;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.doc.config.properties.SpringDocProperties;
+import org.dromara.common.doc.handler.OpenApiHandler;
 import org.springdoc.core.configuration.SpringDocConfiguration;
 import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
 import org.springdoc.core.customizers.OpenApiCustomizer;
@@ -36,18 +36,18 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 @AutoConfiguration(before = SpringDocConfiguration.class)
-@EnableConfigurationProperties(SwaggerProperties.class)
+@EnableConfigurationProperties(SpringDocProperties.class)
 @ConditionalOnProperty(name = "springdoc.api-docs.enabled", havingValue = "true", matchIfMissing = true)
-public class SwaggerConfig {
+public class SpringDocConfig {
 
     private final ServerProperties serverProperties;
 
     @Bean
     @ConditionalOnMissingBean(OpenAPI.class)
-    public OpenAPI openApi(SwaggerProperties swaggerProperties) {
+    public OpenAPI openApi(SpringDocProperties swaggerProperties) {
         OpenAPI openApi = new OpenAPI();
         // 文档基本信息
-        SwaggerProperties.InfoProperties infoProperties = swaggerProperties.getInfo();
+        SpringDocProperties.InfoProperties infoProperties = swaggerProperties.getInfo();
         Info info = convertInfo(infoProperties);
         openApi.info(info);
         // 扩展文档信息
@@ -65,7 +65,7 @@ public class SwaggerConfig {
         return openApi;
     }
 
-    private Info convertInfo(SwaggerProperties.InfoProperties infoProperties) {
+    private Info convertInfo(SpringDocProperties.InfoProperties infoProperties) {
         Info info = new Info();
         info.setTitle(infoProperties.getTitle());
         info.setDescription(infoProperties.getDescription());
