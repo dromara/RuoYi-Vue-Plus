@@ -4,9 +4,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.log.annotation.Log;
+import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
+import org.dromara.workflow.domain.bo.ProcessInvalidBo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.service.IActProcessInstanceService;
 import org.springframework.validation.annotation.Validated;
@@ -66,5 +69,38 @@ public class ActProcessInstanceController extends BaseController {
     @GetMapping("/getHistoryRecord/{processInstanceId}")
     public R<Map<String, Object>> getHistoryRecord(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
         return R.ok(iActProcessInstanceService.getHistoryRecord(processInstanceId));
+    }
+
+    /**
+     * 作废流程实例，不会删除历史记录(删除运行中的实例)
+     *
+     * @param processInvalidBo 参数
+     */
+    @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @PostMapping("/deleteRuntimeProcessInst")
+    public R<Void> deleteRuntimeProcessInst(@RequestBody ProcessInvalidBo processInvalidBo) {
+        return toAjax(iActProcessInstanceService.deleteRuntimeProcessInst(processInvalidBo));
+    }
+
+    /**
+     * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
+     *
+     * @param processInstanceId 流程实例id
+     */
+    @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/deleteRuntimeProcessAndHisInst/{processInstanceId}")
+    public R<Void> deleteRuntimeProcessAndHisInst(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
+        return toAjax(iActProcessInstanceService.deleteRuntimeProcessAndHisInst(processInstanceId));
+    }
+
+    /**
+     * 已完成的实例 删除程实例，删除历史记录，删除业务与流程关联信息
+     *
+     * @param processInstanceId 流程实例id
+     */
+    @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/deleteFinishProcessAndHisInst/{processInstanceId}")
+    public R<Void> deleteFinishProcessAndHisInst(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
+        return toAjax(iActProcessInstanceService.deleteFinishProcessAndHisInst(processInstanceId));
     }
 }

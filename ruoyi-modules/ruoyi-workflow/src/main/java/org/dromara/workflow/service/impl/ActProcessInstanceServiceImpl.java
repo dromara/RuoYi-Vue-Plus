@@ -7,14 +7,17 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.service.ISysUserService;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
+import org.dromara.workflow.domain.bo.ProcessInvalidBo;
 import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
 import org.dromara.workflow.domain.vo.GraphicInfoVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
@@ -31,6 +34,7 @@ import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -312,6 +316,80 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             return second + "秒";
         } else {
             return 0 + "秒";
+        }
+    }
+
+    /**
+     * 作废流程实例，不会删除历史记录(删除运行中的实例)
+     *
+     * @param processInvalidBo 参数
+     */
+    @Override
+    public boolean deleteRuntimeProcessInst(ProcessInvalidBo processInvalidBo) {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+            .processInstanceId(processInvalidBo.getProcessInstId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+        try {
+            List<Task> list = taskService.createTaskQuery().processInstanceId(processInvalidBo.getProcessInstId())
+                .taskTenantId(TenantHelper.getTenantId()).list();
+            List<Task> subTasks = list.stream().filter(e -> StringUtils.isNotBlank(e.getParentTaskId())).collect(Collectors.toList());
+            if (CollUtil.isNotEmpty(subTasks)) {
+                subTasks.forEach(e -> taskService.deleteTask(e.getId()));
+            }
+            String deleteReason = LoginHelper.getUsername() + "作废了当前申请！";
+            if (StringUtils.isNotBlank(processInvalidBo.getDeleteReason())) {
+                deleteReason = LoginHelper.getUsername() + "作废理由:" + processInvalidBo.getDeleteReason();
+            }
+            runtimeService.deleteProcessInstance(processInvalidBo.getProcessInstId(), deleteReason);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
+     *
+     * @param processInstanceId 流程实例id
+     * @return
+     */
+    @Override
+    public boolean deleteRuntimeProcessAndHisInst(String processInstanceId) {
+        try {
+            //1.删除运行中流程实例
+            List<Task> list = taskService.createTaskQuery().processInstanceId(processInstanceId)
+                .taskTenantId(TenantHelper.getTenantId()).list();
+            List<Task> subTasks = list.stream().filter(e -> StringUtils.isNotBlank(e.getParentTaskId())).collect(Collectors.toList());
+            if (CollUtil.isNotEmpty(subTasks)) {
+                subTasks.forEach(e -> taskService.deleteTask(e.getId()));
+            }
+            runtimeService.deleteProcessInstance(processInstanceId, LoginHelper.getUserId() + "删除了当前流程申请");
+            //2.删除历史记录
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceTenantId(TenantHelper.getTenantId()).processInstanceId(processInstanceId).singleResult();
+            if (ObjectUtil.isNotEmpty(historicProcessInstance)) {
+                historyService.deleteHistoricProcessInstance(processInstanceId);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 已完成的实例 删除程实例，删除历史记录，删除业务与流程关联信息
+     *
+     * @param processInstanceId 流程实例id
+     */
+    @Override
+    public boolean deleteFinishProcessAndHisInst(String processInstanceId) {
+        try {
+            historyService.deleteHistoricProcessInstance(processInstanceId);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 }
