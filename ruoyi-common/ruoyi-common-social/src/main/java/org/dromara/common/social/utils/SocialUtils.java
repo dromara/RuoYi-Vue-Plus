@@ -19,17 +19,17 @@ public class SocialUtils {
         AuthRequest authRequest = null;
         switch (source.toLowerCase()) {
             case "dingtalk" ->
-                authRequest = new AuthDingTalkRequest(AuthConfig.builder().
-                    clientId(clientId).
-                    clientSecret(clientSecret)
-                    .redirectUri(redirectUri).
-                    build());
+                authRequest = new AuthDingTalkRequest(AuthConfig.builder()
+                    .clientId(clientId)
+                    .clientSecret(clientSecret)
+                    .redirectUri(redirectUri)
+                    .build());
             case "baidu" ->
-                authRequest = new AuthBaiduRequest(AuthConfig.builder().
-                    clientId(clientId).
-                    clientSecret(clientSecret)
-                    .redirectUri(redirectUri).
-                    build());
+                authRequest = new AuthBaiduRequest(AuthConfig.builder()
+                    .clientId(clientId)
+                    .clientSecret(clientSecret)
+                    .redirectUri(redirectUri)
+                    .build());
             case "github" ->
                 authRequest = new AuthGithubRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret)
                     .redirectUri(redirectUri).build());

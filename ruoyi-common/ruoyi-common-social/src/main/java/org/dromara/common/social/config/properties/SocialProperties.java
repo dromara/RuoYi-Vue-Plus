@@ -24,7 +24,7 @@ public class SocialProperties {
     /**
      * 授权类型
      */
-    private Map<String, ConfigProperties> type;
+    private Map<String, SocialLoginConfigProperties> type;
 
     /**
      * 授权过期时间

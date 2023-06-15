@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Bean;
 public class SocialConfig {
 
     @Bean
-    public AuthStateCache redis() {
+    public AuthStateCache authStateCache() {
         return new AuthRedisStateCache();
     }
 

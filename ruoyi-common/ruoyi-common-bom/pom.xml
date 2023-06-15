@@ -117,6 +117,12 @@
                 <version>${revision}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-common-social</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- web服务 -->
             <dependency>
                 <groupId>org.dromara</groupId>

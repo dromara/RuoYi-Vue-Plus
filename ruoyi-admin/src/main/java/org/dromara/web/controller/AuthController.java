@@ -3,12 +3,9 @@ package org.dromara.web.controller;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
@@ -22,10 +19,8 @@ import org.dromara.common.core.domain.model.SmsLoginBody;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.social.config.SocialConfig;
-import org.dromara.common.social.config.properties.ConfigProperties;
+import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
-import org.dromara.common.social.utils.AuthRedisStateCache;
 import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.bo.SysTenantBo;
@@ -45,7 +40,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 认证
@@ -153,7 +147,7 @@ public class AuthController {
         {
             return R.fail(source + "平台账号已经被账号绑定");
         }
-        ConfigProperties obj = socialProperties.getType().get(source);
+        SocialLoginConfigProperties obj = socialProperties.getType().get(source);
         if (ObjectUtil.isNull(obj)){
             return R.fail(source + "平台账号暂不支持");
         }
@@ -175,7 +169,7 @@ public class AuthController {
     @SuppressWarnings("unchecked")
     @GetMapping("/social-login/{source}")
     public R<String> socialLogin(@PathVariable("source") String source, AuthCallback callback, HttpServletRequest request) throws IOException {
-        ConfigProperties obj = socialProperties.getType().get(source);
+        SocialLoginConfigProperties obj = socialProperties.getType().get(source);
         if (ObjectUtil.isNull(obj)){
             return R.fail(source + "平台账号暂不支持");
         }

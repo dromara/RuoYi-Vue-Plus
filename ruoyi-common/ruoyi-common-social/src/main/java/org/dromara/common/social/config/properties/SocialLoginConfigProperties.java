@@ -3,7 +3,7 @@ package org.dromara.common.social.config.properties;
 import lombok.Data;
 
 @Data
-public class ConfigProperties {
+public class SocialLoginConfigProperties {
 
     /**
      * 应用 ID

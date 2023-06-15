@@ -20,34 +20,10 @@ import java.util.List;
 public interface ISocialUserService {
 
     /**
-     * 查询授权关系
-     */
-    SocialUserVo queryById(Long id);
-
-    /**
-     * 查询授权列表
-     */
-    TableDataInfo<SocialUserVo> queryPageList(SocialUserBo bo, PageQuery pageQuery);
-
-    /**
-     * 查询授权列表
-     */
-    List<SocialUserVo> queryList(SocialUserBo bo);
-
-    /**
      * 新增授权关系
      */
     Boolean insertByBo(SocialUserBo bo);
 
-    /**
-     * 修改授权关系
-     */
-    Boolean updateByBo(SocialUserBo bo);
-
-    /**
-     * 校验并批量删除社会化关系信息
-     */
-    Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
 
     /**
      * 删除社会化关系信息

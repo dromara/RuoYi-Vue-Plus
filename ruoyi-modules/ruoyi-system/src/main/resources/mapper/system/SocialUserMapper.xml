@@ -8,61 +8,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <id property="id" column="id"/>
     </resultMap>
 
-    <sql id="selectSocialUser">
-        select id,
-               user_id,
-               tenant_id,
-               auth_id,
-               source,
-               open_id,
-               access_token,
-               expire_in,
-               refresh_token,
-               access_code,
-               union_id,
-               scope,
-               token_type,
-               id_token,
-               mac_algorithm,
-               mac_key,
-               code,
-               oauth_token,
-               oauth_token_secret,
-               create_dept,
-               create_by,
-               create_time,
-               update_by,
-               update_time
-        from social_user
-    </sql>
-
-    <!-- 根据userId查询SocialUser表对应userId的SysUser，返回SysUserBo的对象 -->
-    <select id="selectSocialUserByUserId" parameterType="String" resultMap="SocialUserAuthResult">
-        select b.*
-        from social_user a
-            left join sys_user b on a.user_id = b.user_id
-        where a.user_id = #{userId}
-    </select>
-
-
     <!-- 根据authId查询SocialUser表和SysUser表，返回SocialUserAuthResult映射的对象 -->
     <select id="selectSocialUserByAuthId" parameterType="String" resultMap="SocialUserAuthResult">
-        select b.user_id as userId,
-               b.tenant_id as tenantId,
-               b.user_name as userName,
-               b.password as password,
-               a.auth_id as authId,
-               a.source as source
+        select b.user_id,
+               b.tenant_id,
+               b.user_name,
+               b.password,
+               a.auth_id,
+               a.source
         from social_user a
-            left join sys_user b on a.user_id = b.user_id
+                 left join sys_user b on a.user_id = b.user_id
         where a.auth_id = #{authId}
-    </select>
-
-    <!-- 根据userId和source查询SocialUser表，返回int类型的结果 -->
-    <select id="checkSocialUser" parameterType="org.dromara.system.domain.vo.SocialUserVo" resultType="int">
-        select count(*)
-        from social_user
-        where user_id = #{userId} and source = #{source} limit 1
     </select>
 
 </mapper>

@@ -12,21 +12,7 @@ import java.time.Duration;
 
 public class AuthRedisStateCache implements AuthStateCache {
 
-    private final SocialProperties socialProperties;
-    private final RedisTemplate<String, String> redisTemplate;
-
-    private ValueOperations<String, String> valueOperations;
-
-    @PostConstruct
-    public void init() {
-        valueOperations = redisTemplate.opsForValue();
-    }
-
-
-    public AuthRedisStateCache() {
-        this.socialProperties = new SocialProperties();
-        redisTemplate = new RedisTemplate<>();
-    }
+    private SocialProperties socialProperties;
 
     /**
      * 存入缓存

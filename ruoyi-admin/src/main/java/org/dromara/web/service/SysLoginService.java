@@ -44,6 +44,7 @@ import org.dromara.system.service.ISocialUserService;
 import org.dromara.system.service.ISysPermissionService;
 import org.dromara.system.service.ISysTenantService;
 import org.dromara.system.service.ISysUserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -181,27 +182,49 @@ public class SysLoginService {
             return R.fail("对不起，授权信息验证不通过，请退出重试！");
         }
         AuthUser authUserData = authUser.getData();
-        // 查询社交用户信息，判断是否已经绑定，如果已经绑定则直接登录，否则验证是否登录，未登录则先登录再绑定
-        SocialUserVo user = socialUserService.selectSocialUserByAuthId(source + authUserData.getUuid());
+        String authId = source + authUserData.getUuid();
+
+        SocialUserVo user = socialUserService.selectSocialUserByAuthId(authId);
         if (ObjectUtil.isNotNull(user)) {
-            checkTenant(user.getTenantId());
-            SysUserVo dbUser = loadUserByUsername(user.getTenantId(), user.getUserName());
-            LoginHelper.loginByDevice(buildLoginUser(dbUser), DeviceType.SOCIAL);
-            recordLogininfor(dbUser.getTenantId(), user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
-            recordLoginInfo(user.getUserId());
+            //执行登录和记录登录信息操作
+            return loginAndRecord(user.getTenantId(), user.getUserName(), authUserData);
         } else {
             // 判断是否已登录
             if (LoginHelper.getUserId() == null) {
                 return R.fail("授权失败，请先登录再绑定");
             }
             SocialUserBo socialUserBo = new SocialUserBo();
-            socialUserService.insertByBo(setAuthUserData(authUserData, socialUserBo));
+            socialUserBo.setUserId(LoginHelper.getUserId());
+            socialUserBo.setAuthId(authUserData.getSource() + authUserData.getUuid());
+            socialUserBo.setSource(authUserData.getSource());
+            socialUserBo.setUserName(authUserData.getUsername());
+            socialUserBo.setNickName(authUserData.getNickname());
+            socialUserBo.setAvatar(authUserData.getAvatar());
+            socialUserBo.setOpenId(authUserData.getUuid());
+            BeanUtils.copyProperties(authUserData, socialUserBo);
+            BeanUtils.copyProperties(authUserData.getToken(), socialUserBo);
+
+            socialUserService.insertByBo(socialUserBo);
             SysUserVo lodingData = loadUserByUsername(LoginHelper.getTenantId(), LoginHelper.getUsername());
-            checkTenant(lodingData.getTenantId());
-            LoginHelper.loginByDevice(buildLoginUser(lodingData), DeviceType.SOCIAL);
-            recordLogininfor(lodingData.getTenantId(), socialUserBo.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
-            recordLoginInfo(socialUserBo.getUserId());
+            //执行登录和记录登录信息操作
+            return loginAndRecord(lodingData.getTenantId(), socialUserBo.getUserName(), authUserData);
         }
+    }
+
+    /**
+     * 执行登录和记录登录信息操作
+     *
+     * @param tenantId  租户ID
+     * @param userName  用户名
+     * @param authUser  授权用户信息
+     * @return 统一响应实体
+     */
+    private R<String> loginAndRecord(String tenantId, String userName, AuthUser authUser) {
+        checkTenant(tenantId);
+        SysUserVo dbUser = loadUserByUsername(tenantId, userName);
+        LoginHelper.loginByDevice(buildLoginUser(dbUser), DeviceType.SOCIAL);
+        recordLogininfor(dbUser.getTenantId(), userName, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+        recordLoginInfo(dbUser.getUserId());
         return R.ok(StpUtil.getTokenValue());
     }
 
@@ -440,29 +463,4 @@ public class SysLoginService {
         }
     }
 
-
-    public SocialUserBo setAuthUserData(AuthUser authUserData, SocialUserBo socialUser) {
-        socialUser.setUserId(LoginHelper.getUserId());
-        socialUser.setAuthId(authUserData.getSource() + authUserData.getUuid());
-        socialUser.setSource(authUserData.getSource());
-        socialUser.setUserName(authUserData.getUsername());
-        socialUser.setNickName(authUserData.getNickname());
-        socialUser.setAvatar(authUserData.getAvatar());
-        socialUser.setEmail(authUserData.getEmail());
-        socialUser.setOpenId(authUserData.getUuid());
-        socialUser.setAccessToken(authUserData.getToken().getAccessToken());
-        socialUser.setExpireIn(authUserData.getToken().getExpireIn());
-        socialUser.setRefreshToken(authUserData.getToken().getRefreshToken());
-        socialUser.setAccessCode(authUserData.getToken().getAccessCode());
-        socialUser.setUnionId(authUserData.getToken().getUnionId());
-        socialUser.setScope(authUserData.getToken().getScope());
-        socialUser.setTokenType(authUserData.getToken().getTokenType());
-        socialUser.setIdToken(authUserData.getToken().getIdToken());
-        socialUser.setMacAlgorithm(authUserData.getToken().getMacAlgorithm());
-        socialUser.setMacKey(authUserData.getToken().getMacKey());
-        socialUser.setCode(authUserData.getToken().getCode());
-        socialUser.setOauthToken(authUserData.getToken().getOauthToken());
-        socialUser.setOauthTokenSecret(authUserData.getToken().getOauthTokenSecret());
-        return socialUser;
-    }
 }

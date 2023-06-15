@@ -1,43 +1,40 @@
-
 -- ----------------------------
 -- 第三方平台授权表
 -- ----------------------------
-CREATE TABLE `social_user`
+DROP TABLE IF EXISTS social_user;
+CREATE TABLE social_user
 (
-    `id`                 bigint unsigned NOT NULL COMMENT '主键',
-    `user_id`            bigint          NOT NULL COMMENT '用户ID',
-    `tenant_id`          varchar(20)                                              DEFAULT NULL COMMENT '租户id',
-    `auth_id`            varchar(255)    NOT NULL COMMENT '授权+授权openid',
-    `source`             varchar(255)    NOT NULL COMMENT '用户来源',
-    `open_id`            varchar(255)                                             DEFAULT NULL COMMENT '原生open id',
-    `user_name`          varchar(30)     NOT NULL COMMENT '登录账号',
-    `nick_name`          varchar(30)                                              DEFAULT '' COMMENT '用户昵称',
-    `email`              varchar(255)                                             DEFAULT '' COMMENT '用户邮箱',
-    `avatar`             varchar(500)                                             DEFAULT '' COMMENT '头像地址',
-    `access_token`       varchar(255)    NOT NULL COMMENT '用户的授权令牌',
-    `expire_in`          int                                                      DEFAULT NULL COMMENT '用户的授权令牌的有效期，部分平台可能没有',
-    `refresh_token`      varchar(255)                                             DEFAULT NULL COMMENT '刷新令牌，部分平台可能没有',
-    `access_code`        varchar(255)                                             DEFAULT NULL COMMENT '平台的授权信息，部分平台可能没有',
-    `union_id`           varchar(255)                                             DEFAULT NULL COMMENT '用户的 unionid',
-    `scope`              varchar(255)                                             DEFAULT NULL COMMENT '授予的权限，部分平台可能没有',
-    `token_type`         varchar(255)                                             DEFAULT NULL COMMENT '个别平台的授权信息，部分平台可能没有',
-    `id_token`           varchar(255)                                             DEFAULT NULL COMMENT 'id token，部分平台可能没有',
-    `mac_algorithm`      varchar(255)                                             DEFAULT NULL COMMENT '小米平台用户的附带属性，部分平台可能没有',
-    `mac_key`            varchar(255)                                             DEFAULT NULL COMMENT '小米平台用户的附带属性，部分平台可能没有',
-    `code`               varchar(255)                                             DEFAULT NULL COMMENT '用户的授权code，部分平台可能没有',
-    `oauth_token`        varchar(255)                                             DEFAULT NULL COMMENT 'Twitter平台用户的附带属性，部分平台可能没有',
-    `oauth_token_secret` varchar(255)                                             DEFAULT NULL COMMENT 'Twitter平台用户的附带属性，部分平台可能没有',
-    `create_dept`        bigint                                                   DEFAULT NULL COMMENT '创建部门',
-    `create_by`          bigint          NOT NULL COMMENT '创建人',
-    `create_time`        datetime                                                 DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_by`          bigint          NOT NULL COMMENT '更新人',
-    `update_time`        datetime                                                 DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `del_flag`           char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci
-  ROW_FORMAT = DYNAMIC COMMENT ='社会化关系表';
+    id                 BIGINT UNSIGNED NOT NULL COMMENT '主键',
+    user_id            BIGINT          NOT NULL COMMENT '用户ID',
+    tenant_id          VARCHAR(20)  DEFAULT NULL COMMENT '租户id',
+    auth_id            VARCHAR(255)    NOT NULL COMMENT '授权+授权openid',
+    source             VARCHAR(255)    NOT NULL COMMENT '用户来源',
+    open_id            VARCHAR(255) DEFAULT NULL COMMENT '原生open id',
+    user_name          VARCHAR(30)     NOT NULL COMMENT '登录账号',
+    nick_name          VARCHAR(30)  DEFAULT '' COMMENT '用户昵称',
+    email              VARCHAR(255) DEFAULT '' COMMENT '用户邮箱',
+    avatar             VARCHAR(500) DEFAULT '' COMMENT '头像地址',
+    access_token       VARCHAR(255)    NOT NULL COMMENT '用户的授权令牌',
+    expire_in          INT          DEFAULT NULL COMMENT '用户的授权令牌的有效期，部分平台可能没有',
+    refresh_token      VARCHAR(255) DEFAULT NULL COMMENT '刷新令牌，部分平台可能没有',
+    access_code        VARCHAR(255) DEFAULT NULL COMMENT '平台的授权信息，部分平台可能没有',
+    union_id           VARCHAR(255) DEFAULT NULL COMMENT '用户的 unionid',
+    scope              VARCHAR(255) DEFAULT NULL COMMENT '授予的权限，部分平台可能没有',
+    token_type         VARCHAR(255) DEFAULT NULL COMMENT '个别平台的授权信息，部分平台可能没有',
+    id_token           VARCHAR(255) DEFAULT NULL COMMENT 'id token，部分平台可能没有',
+    mac_algorithm      VARCHAR(255) DEFAULT NULL COMMENT '小米平台用户的附带属性，部分平台可能没有',
+    mac_key            VARCHAR(255) DEFAULT NULL COMMENT '小米平台用户的附带属性，部分平台可能没有',
+    code               VARCHAR(255) DEFAULT NULL COMMENT '用户的授权code，部分平台可能没有',
+    oauth_token        VARCHAR(255) DEFAULT NULL COMMENT 'Twitter平台用户的附带属性，部分平台可能没有',
+    oauth_token_secret VARCHAR(255) DEFAULT NULL COMMENT 'Twitter平台用户的附带属性，部分平台可能没有',
+    create_dept        bigint(20) comment '创建部门',
+    create_by          bigint(20) comment '创建者',
+    create_time        datetime comment '创建时间',
+    update_by          bigint(20) comment '更新者',
+    update_time        datetime comment '更新时间',
+    del_flag           char(1)      default '0' comment '删除标志（0代表存在 2代表删除）',
+    PRIMARY KEY (id)
+) ENGINE = InnoDB COMMENT ='社会化关系表';
 
 -- ----------------------------
 -- 租户表

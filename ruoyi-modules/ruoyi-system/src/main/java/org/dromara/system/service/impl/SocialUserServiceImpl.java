@@ -34,56 +34,6 @@ public class SocialUserServiceImpl implements ISocialUserService {
     private final SocialUserMapper baseMapper;
 
     /**
-     * 查询社会化关系
-     */
-    @Override
-    public SocialUserVo queryById(Long id) {
-        return baseMapper.selectVoById(id);
-    }
-
-    /**
-     * 查询社会化关系列表
-     */
-    @Override
-    public TableDataInfo<SocialUserVo> queryPageList(SocialUserBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<SocialUser> lqw = buildQueryWrapper(bo);
-        Page<SocialUserVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
-        return TableDataInfo.build(result);
-    }
-
-    /**
-     * 查询社会化关系列表
-     */
-    @Override
-    public List<SocialUserVo> queryList(SocialUserBo bo) {
-        LambdaQueryWrapper<SocialUser> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
-    }
-
-    private LambdaQueryWrapper<SocialUser> buildQueryWrapper(SocialUserBo bo) {
-        Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<SocialUser> lqw = Wrappers.lambdaQuery();
-        lqw.eq(StringUtils.isNotBlank(bo.getAuthId()), SocialUser::getAuthId, bo.getAuthId());
-        lqw.eq(StringUtils.isNotBlank(bo.getSource()), SocialUser::getSource, bo.getSource());
-        lqw.eq(StringUtils.isNotBlank(bo.getAccessToken()), SocialUser::getAccessToken, bo.getAccessToken());
-        lqw.eq(bo.getExpireIn() !=  0, SocialUser::getExpireIn, bo.getExpireIn());
-        lqw.eq(StringUtils.isNotBlank(bo.getRefreshToken()), SocialUser::getRefreshToken, bo.getRefreshToken());
-        lqw.eq(StringUtils.isNotBlank(bo.getOpenId()), SocialUser::getOpenId, bo.getOpenId());
-        lqw.eq(StringUtils.isNotBlank(bo.getScope()), SocialUser::getScope, bo.getScope());
-        lqw.eq(StringUtils.isNotBlank(bo.getAccessCode()), SocialUser::getAccessCode, bo.getAccessCode());
-        lqw.eq(StringUtils.isNotBlank(bo.getUnionId()), SocialUser::getUnionId, bo.getUnionId());
-        lqw.eq(StringUtils.isNotBlank(bo.getScope()), SocialUser::getScope, bo.getScope());
-        lqw.eq(StringUtils.isNotBlank(bo.getTokenType()), SocialUser::getTokenType, bo.getTokenType());
-        lqw.eq(StringUtils.isNotBlank(bo.getIdToken()), SocialUser::getIdToken, bo.getIdToken());
-        lqw.eq(StringUtils.isNotBlank(bo.getMacAlgorithm()), SocialUser::getMacAlgorithm, bo.getMacAlgorithm());
-        lqw.eq(StringUtils.isNotBlank(bo.getMacKey()), SocialUser::getMacKey, bo.getMacKey());
-        lqw.eq(StringUtils.isNotBlank(bo.getCode()), SocialUser::getCode, bo.getCode());
-        lqw.eq(StringUtils.isNotBlank(bo.getOauthToken()), SocialUser::getOauthToken, bo.getOauthToken());
-        lqw.eq(StringUtils.isNotBlank(bo.getOauthTokenSecret()), SocialUser::getOauthTokenSecret, bo.getOauthTokenSecret());
-        return lqw;
-    }
-
-    /**
      * 新增社会化关系
      */
     @Override
@@ -97,15 +47,6 @@ public class SocialUserServiceImpl implements ISocialUserService {
         return flag;
     }
 
-    /**
-     * 修改社会化关系
-     */
-    @Override
-    public Boolean updateByBo(SocialUserBo bo) {
-        SocialUser update = MapstructUtils.convert(bo, SocialUser.class);
-        validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
-    }
 
     /**
      * 保存前的数据校验
@@ -114,16 +55,6 @@ public class SocialUserServiceImpl implements ISocialUserService {
         //TODO 做一些数据校验,如唯一约束
     }
 
-    /**
-     * 批量删除社会化关系
-     */
-    @Override
-    public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if (isValid) {
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
-        return baseMapper.deleteBatchIds(ids) > 0;
-    }
 
     /**
      * 删除社会化关系
