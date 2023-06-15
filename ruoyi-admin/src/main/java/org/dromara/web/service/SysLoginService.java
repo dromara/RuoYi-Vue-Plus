@@ -271,7 +271,7 @@ public class SysLoginService {
 
     private SysUserVo loadUserByEmail(String tenantId, String email) {
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getPhonenumber, SysUser::getStatus)
+            .select(SysUser::getEmail, SysUser::getStatus)
             .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
             .eq(SysUser::getEmail, email));
         if (ObjectUtil.isNull(user)) {
