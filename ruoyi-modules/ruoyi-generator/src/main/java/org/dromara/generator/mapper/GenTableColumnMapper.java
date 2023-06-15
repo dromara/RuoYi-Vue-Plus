@@ -2,6 +2,7 @@ package org.dromara.generator.mapper;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
+import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.generator.domain.GenTableColumn;
 
@@ -22,6 +23,6 @@ public interface GenTableColumnMapper extends BaseMapperPlus<GenTableColumn, Gen
      * @return 列信息
      */
     @DS("#dataName")
-    List<GenTableColumn> selectDbTableColumnsByName(String tableName, String dataName);
+    List<GenTableColumn> selectDbTableColumnsByName(@Param("tableName") String tableName, String dataName);
 
 }
