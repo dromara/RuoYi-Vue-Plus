@@ -2,16 +2,14 @@ package org.dromara.common.core.config;
 
 import cn.hutool.core.util.ArrayUtil;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.utils.SpringUtils;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.Arrays;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * 异步配置
@@ -22,16 +20,12 @@ import java.util.concurrent.ScheduledExecutorService;
 @AutoConfiguration
 public class AsyncConfig implements AsyncConfigurer {
 
-    @Autowired
-    @Qualifier("scheduledExecutorService")
-    private ScheduledExecutorService scheduledExecutorService;
-
     /**
      * 自定义 @Async 注解使用系统线程池
      */
     @Override
     public Executor getAsyncExecutor() {
-        return scheduledExecutorService;
+        return SpringUtils.getBean("scheduledExecutorService");
     }
 
     /**
