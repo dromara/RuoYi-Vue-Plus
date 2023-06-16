@@ -34,7 +34,7 @@
         <lock4j.version>2.2.4</lock4j.version>
         <dynamic-ds.version>3.6.1</dynamic-ds.version>
         <alibaba-ttl.version>2.14.2</alibaba-ttl.version>
-        <xxl-job.version>2.4.0</xxl-job.version>
+        <powerjob.version>4.3.3</powerjob.version>
         <mapstruct-plus.version>1.2.3</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.26</lombok.version>
@@ -264,12 +264,6 @@
                 <version>${lock4j.version}</version>
             </dependency>
 
-            <!-- xxl-job-core -->
-            <dependency>
-                <groupId>com.xuxueli</groupId>
-                <artifactId>xxl-job-core</artifactId>
-                <version>${xxl-job.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -326,6 +320,18 @@
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-demo</artifactId>
                 <version>${revision}</version>
+            </dependency>
+
+            <!-- PowerJob -->
+            <dependency>
+                <groupId>tech.powerjob</groupId>
+                <artifactId>powerjob-worker-spring-boot-starter</artifactId>
+                <version>${powerjob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tech.powerjob</groupId>
+                <artifactId>powerjob-official-processors</artifactId>
+                <version>${powerjob.version}</version>
             </dependency>
 
         </dependencies>

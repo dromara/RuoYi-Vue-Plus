@@ -23,11 +23,11 @@
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
-        <!-- 调度模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-job</artifactId>
         </dependency>
+
 
     </dependencies>
 
