@@ -1,14 +1,8 @@
 package org.dromara.system.service;
 
-import org.dromara.system.domain.SocialUser;
-import org.dromara.system.domain.bo.SysUserBo;
-import org.dromara.system.domain.vo.SocialUserVo;
 import org.dromara.system.domain.bo.SocialUserBo;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.system.domain.vo.SysUserVo;
+import org.dromara.system.domain.vo.SocialUserVo;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -18,6 +12,17 @@ import java.util.List;
  * @date 2023-06-12
  */
 public interface ISocialUserService {
+
+
+    /**
+     * 查询社会化关系
+     */
+    SocialUserVo queryById(String id);
+
+    /**
+     * 查询社会化关系列表
+     */
+    List<SocialUserVo> queryList();
 
     /**
      * 新增授权关系
@@ -29,12 +34,6 @@ public interface ISocialUserService {
      * 删除社会化关系信息
      */
     Boolean deleteWithValidById(Long id);
-
-
-    /**
-     * 根据用户ID查询授权关系
-     */
-    Boolean isExistByUserIdAndSource(Long userId, String source);
 
 
     /**

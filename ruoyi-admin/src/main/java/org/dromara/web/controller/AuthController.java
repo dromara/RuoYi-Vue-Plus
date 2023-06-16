@@ -25,7 +25,6 @@ import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysTenantVo;
-import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.service.ISocialUserService;
 import org.dromara.system.service.ISysConfigService;
 import org.dromara.system.service.ISysTenantService;
@@ -139,14 +138,6 @@ public class AuthController {
     @GetMapping("/binding/{source}")
     @ResponseBody
     public R<LoginVo> authBinding(@PathVariable("source") String source, HttpServletRequest request){
-        SysUserVo userLoding = new SysUserVo();
-        if (ObjectUtil.isNull(userLoding)) {
-            return R.fail("授权失败，请先登录再绑定");
-        }
-        if (socialUserService.isExistByUserIdAndSource(userLoding.getUserId(),source))
-        {
-            return R.fail(source + "平台账号已经被账号绑定");
-        }
         SocialLoginConfigProperties obj = socialProperties.getType().get(source);
         if (ObjectUtil.isNull(obj)){
             return R.fail(source + "平台账号暂不支持");
@@ -191,9 +182,6 @@ public class AuthController {
         Boolean rows = socialUserService.deleteWithValidById(socialId);
         return rows ? R.ok() : R.fail("取消授权失败");
     }
-
-
-
 
 
     /**

@@ -34,11 +34,9 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.config.properties.CaptchaProperties;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.bo.SocialUserBo;
-import org.dromara.system.domain.bo.SysUserBo;
 import org.dromara.system.domain.vo.SocialUserVo;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.domain.vo.SysUserVo;
-import org.dromara.system.mapper.SocialUserMapper;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.service.ISocialUserService;
 import org.dromara.system.service.ISysPermissionService;
@@ -66,7 +64,6 @@ public class SysLoginService {
 
     private final SysUserMapper userMapper;
     private final ISocialUserService socialUserService;
-    private final ISysUserService userService;
     private final CaptchaProperties captchaProperties;
     private final ISysPermissionService permissionService;
     private final ISysTenantService tenantService;
@@ -176,22 +173,20 @@ public class SysLoginService {
      * @param request  Http请求对象
      * @return 统一响应实体
      */
-    public R<String> socialLogin(String source, AuthResponse<AuthUser> authUser, HttpServletRequest request) throws IOException {
+    public R<String> socialLogin(String source, AuthResponse<AuthUser> authUser, HttpServletRequest request) {
         // 判断授权响应是否成功
         if (!authUser.ok()) {
             return R.fail("对不起，授权信息验证不通过，请退出重试！");
         }
         AuthUser authUserData = authUser.getData();
-        String authId = source + authUserData.getUuid();
-
-        SocialUserVo user = socialUserService.selectSocialUserByAuthId(authId);
+        SocialUserVo user = socialUserService.selectSocialUserByAuthId(authUserData.getSource() + authUserData.getUuid());
         if (ObjectUtil.isNotNull(user)) {
             //执行登录和记录登录信息操作
             return loginAndRecord(user.getTenantId(), user.getUserName(), authUserData);
         } else {
             // 判断是否已登录
             if (LoginHelper.getUserId() == null) {
-                return R.fail("授权失败，请先登录再绑定");
+                return R.fail("授权失败，请先登录才能绑定");
             }
             SocialUserBo socialUserBo = new SocialUserBo();
             socialUserBo.setUserId(LoginHelper.getUserId());
@@ -201,7 +196,6 @@ public class SysLoginService {
             socialUserBo.setNickName(authUserData.getNickname());
             socialUserBo.setAvatar(authUserData.getAvatar());
             socialUserBo.setOpenId(authUserData.getUuid());
-            BeanUtils.copyProperties(authUserData, socialUserBo);
             BeanUtils.copyProperties(authUserData.getToken(), socialUserBo);
 
             socialUserService.insertByBo(socialUserBo);
