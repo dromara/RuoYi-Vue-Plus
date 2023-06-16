@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -19,6 +20,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -101,14 +103,22 @@ public class ServletUtils extends JakartaServletUtil {
      * 获取request
      */
     public static HttpServletRequest getRequest() {
-        return getRequestAttributes().getRequest();
+        try {
+            return getRequestAttributes().getRequest();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
      * 获取response
      */
     public static HttpServletResponse getResponse() {
-        return getRequestAttributes().getResponse();
+        try {
+            return getRequestAttributes().getResponse();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -119,8 +129,33 @@ public class ServletUtils extends JakartaServletUtil {
     }
 
     public static ServletRequestAttributes getRequestAttributes() {
-        RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
-        return (ServletRequestAttributes) attributes;
+        try {
+            RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+            return (ServletRequestAttributes) attributes;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static String getHeader(HttpServletRequest request, String name) {
+        String value = request.getHeader(name);
+        if (StringUtils.isEmpty(value)) {
+            return StringUtils.EMPTY;
+        }
+        return urlDecode(value);
+    }
+
+    public static Map<String, String> getHeaders(HttpServletRequest request) {
+        Map<String, String> map = new LinkedCaseInsensitiveMap<>();
+        Enumeration<String> enumeration = request.getHeaderNames();
+        if (enumeration != null) {
+            while (enumeration.hasMoreElements()) {
+                String key = enumeration.nextElement();
+                String value = request.getHeader(key);
+                map.put(key, value);
+            }
+        }
+        return map;
     }
 
     /**
