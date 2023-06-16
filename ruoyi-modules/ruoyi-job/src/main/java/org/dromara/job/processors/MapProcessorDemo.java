@@ -4,8 +4,8 @@ import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.dromara.common.json.utils.JsonUtils;
 import org.springframework.stereotype.Component;
-import tech.powerjob.common.serialize.JsonUtils;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.MapProcessor;
@@ -37,7 +37,7 @@ public class MapProcessorDemo implements MapProcessor {
 
         log.info("============== MapProcessorDemo#process ==============");
         log.info("isRootTask:{}", isRootTask());
-        log.info("taskContext:{}", JsonUtils.toJSONString(context));
+        log.info("taskContext:{}", JsonUtils.toJsonString(context));
 
         if (isRootTask()) {
             log.info("==== MAP ====");

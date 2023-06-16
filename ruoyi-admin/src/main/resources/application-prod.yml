@@ -14,15 +14,16 @@ spring.boot.admin.client:
 --- # powerjob 配置
 powerjob:
   worker:
-    enabled: true
-    # 需要现在powerjob登录页执行应用注册后才能使用
+    # 如何开启调度中心请查看文档教程
+    enabled: false
+    # 需要先在 powerjob 登录页执行应用注册后才能使用
     app-name: ruoyi-worker
     enable-test-mode: false
     max-appended-wf-context-length: 4096
     max-result-length: 4096
     port: 27777
     protocol: http
-    server-address: 127.0.0.1:7700,127.0.0.1:7701
+    server-address: 127.0.0.1:7700
     store-strategy: disk
 
 --- # 数据源配置

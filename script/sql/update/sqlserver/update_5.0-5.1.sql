@@ -7,3 +7,6 @@ EXEC sp_addextendedproperty
     'TABLE', N'gen_table',
     'COLUMN', N'data_name'
 GO
+
+UPDATE sys_menu SET path = 'powerjob', component = 'monitor/powerjob/index', perms = 'monitor:powerjob:list', remark = 'powerjob控制台菜单' WHERE menu_id = 120
+GO
