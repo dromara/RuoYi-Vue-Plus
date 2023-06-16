@@ -20,6 +20,7 @@ import org.dromara.workflow.service.IActTaskService;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.IdentityService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -49,6 +50,7 @@ public class ActTaskServiceImpl implements IActTaskService {
     private final RuntimeService runtimeService;
     private final TaskService taskService;
     private final HistoryService historyService;
+    private final IdentityService identityService;
 
     /**
      * 启动任务
@@ -73,6 +75,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             return map;
         }
         // 设置启动人
+        identityService.setAuthenticatedUserId(String.valueOf(LoginHelper.getUserId()));
         Authentication.setAuthenticatedUserId(String.valueOf(LoginHelper.getUserId()));
         // 启动流程实例（提交申请）
         Map<String, Object> variables = startProcessBo.getVariables();
