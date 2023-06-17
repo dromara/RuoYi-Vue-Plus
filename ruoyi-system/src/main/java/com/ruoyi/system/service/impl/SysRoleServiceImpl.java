@@ -186,6 +186,20 @@ public class SysRoleServiceImpl implements ISysRoleService {
         if (ObjectUtil.isNotNull(role.getRoleId()) && role.isAdmin()) {
             throw new ServiceException("不允许操作超级管理员角色");
         }
+        // 新增不允许使用 管理员标识符
+        if (ObjectUtil.isNull(role.getRoleId())
+            && StringUtils.equals(role.getRoleKey(), UserConstants.ADMIN_ROLE_KEY)) {
+            throw new ServiceException("不允许使用系统内置管理员角色标识符!");
+        }
+        // 修改不允许修改 管理员标识符
+        if (ObjectUtil.isNotNull(role.getRoleId())) {
+            SysRole sysRole = baseMapper.selectById(role.getRoleId());
+            // 如果标识符不相等 判断为修改了管理员标识符
+            if (!StringUtils.equals(sysRole.getRoleKey(), role.getRoleKey())
+                && StringUtils.equals(sysRole.getRoleKey(), UserConstants.ADMIN_ROLE_KEY)) {
+                throw new ServiceException("不允许修改系统内置管理员角色标识符!");
+            }
+        }
     }
 
     /**
@@ -342,9 +356,9 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteRoleByIds(Long[] roleIds) {
         for (Long roleId : roleIds) {
-            checkRoleAllowed(new SysRole(roleId));
-            checkRoleDataScope(roleId);
             SysRole role = selectRoleById(roleId);
+            checkRoleAllowed(role);
+            checkRoleDataScope(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
                 throw new ServiceException(String.format("%1$s已分配,不能删除", role.getRoleName()));
             }
