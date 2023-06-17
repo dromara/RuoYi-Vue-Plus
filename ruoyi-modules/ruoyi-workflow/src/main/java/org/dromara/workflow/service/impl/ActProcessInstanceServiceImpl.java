@@ -94,7 +94,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         List<ProcessInstance> processInstances = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
         for (ProcessInstance processInstance : processInstances) {
-            list.add(BeanUtil.toBean(processInstance, ProcessInstanceVo.class));
+            ProcessInstanceVo processInstanceVo = BeanUtil.toBean(processInstance, ProcessInstanceVo.class);
+            processInstanceVo.setIsSuspended(processInstance.isSuspended());
+            list.add(processInstanceVo);
         }
         long count = query.count();
         return new TableDataInfo<>(list, count);

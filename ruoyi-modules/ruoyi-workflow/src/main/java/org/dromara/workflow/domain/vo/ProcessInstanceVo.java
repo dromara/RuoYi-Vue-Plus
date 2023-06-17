@@ -55,7 +55,7 @@ public class ProcessInstanceVo implements Serializable {
     /**
      * 是否挂起
      */
-    private boolean isSuspended;
+    private Boolean isSuspended;
 
     /**
      * 租户id
