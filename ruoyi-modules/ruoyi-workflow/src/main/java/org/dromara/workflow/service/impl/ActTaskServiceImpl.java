@@ -14,15 +14,14 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
+import org.dromara.workflow.common.enums.BusinessStatusEnum;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.TaskVo;
+import org.dromara.workflow.flowable.cmd.UpdateBusinessStatusCmd;
 import org.dromara.workflow.service.IActTaskService;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.common.engine.impl.identity.Authentication;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.IdentityService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
+import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
@@ -51,6 +50,7 @@ public class ActTaskServiceImpl implements IActTaskService {
     private final TaskService taskService;
     private final HistoryService historyService;
     private final IdentityService identityService;
+    private final ManagementService managementService;
 
     /**
      * 启动任务
@@ -65,11 +65,14 @@ public class ActTaskServiceImpl implements IActTaskService {
             throw new ServiceException("启动工作流时必须包含业务ID");
         }
         // 判断当前业务是否启动过流程
-        List<HistoricProcessInstance> instanceList = historyService.createHistoricProcessInstanceQuery()
-            .processInstanceBusinessKey(startProcessBo.getBusinessKey()).processInstanceTenantIdLike(TenantHelper.getTenantId()).list();
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+            .processInstanceBusinessKey(startProcessBo.getBusinessKey()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+        if (ObjectUtil.isNotEmpty(historicProcessInstance)) {
+            BusinessStatusEnum.checkStartStatus(historicProcessInstance.getBusinessStatus());
+        }
         TaskQuery taskQuery = taskService.createTaskQuery();
         List<Task> taskResult = taskQuery.processInstanceBusinessKey(startProcessBo.getBusinessKey()).taskTenantId(TenantHelper.getTenantId()).list();
-        if (CollUtil.isNotEmpty(instanceList)) {
+        if (CollUtil.isNotEmpty(taskResult)) {
             map.put("processInstanceId", taskResult.get(0).getProcessInstanceId());
             map.put("taskId", taskResult.get(0).getId());
             return map;
@@ -89,6 +92,8 @@ public class ActTaskServiceImpl implements IActTaskService {
         if (taskList.size() > 1) {
             throw new ServiceException("请检查流程第一个环节是否为申请人！");
         }
+
+        runtimeService.updateBusinessStatus(pi.getProcessInstanceId(), BusinessStatusEnum.DRAFT.getStatus());
         taskService.setAssignee(taskList.get(0).getId(), LoginHelper.getUserId().toString());
         taskService.setVariable(taskList.get(0).getId(), "processInstanceId", pi.getProcessInstanceId());
         map.put("processInstanceId", pi.getProcessInstanceId());
@@ -126,10 +131,16 @@ public class ActTaskServiceImpl implements IActTaskService {
                 taskService.complete(newTask.getId());
                 return true;
             }
+            runtimeService.updateBusinessStatus(task.getProcessInstanceId(), BusinessStatusEnum.WAITING.getStatus());
             //办理意见
             taskService.addComment(completeTaskBo.getTaskId(), task.getProcessInstanceId(), StringUtils.isBlank(completeTaskBo.getMessage()) ? "同意" : completeTaskBo.getMessage());
             //办理任务
             taskService.complete(completeTaskBo.getTaskId(), completeTaskBo.getVariables());
+            List<Task> list = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(task.getProcessInstanceId()).list();
+            if (CollUtil.isEmpty(list)) {
+                UpdateBusinessStatusCmd updateBusinessStatusCmd = new UpdateBusinessStatusCmd(task.getProcessInstanceId(), BusinessStatusEnum.FINISH.getStatus());
+                managementService.executeCommand(updateBusinessStatusCmd);
+            }
             return true;
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
@@ -233,6 +244,11 @@ public class ActTaskServiceImpl implements IActTaskService {
         if (task.isSuspended()) {
             throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
         }
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+            .processInstanceBusinessKey(task.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+        if (ObjectUtil.isNotEmpty(historicProcessInstance)) {
+            BusinessStatusEnum.checkStatus(historicProcessInstance.getBusinessStatus());
+        }
         try {
             if (StringUtils.isBlank(terminationBo.getComment())) {
                 terminationBo.setComment(LoginHelper.getUsername() + "终止了申请");
@@ -249,6 +265,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                 }
                 runtimeService.deleteProcessInstance(task.getProcessInstanceId(), StrUtil.EMPTY);
             }
+            runtimeService.updateBusinessStatus(task.getProcessInstanceId(), BusinessStatusEnum.TERMINATION.getStatus());
             return true;
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());

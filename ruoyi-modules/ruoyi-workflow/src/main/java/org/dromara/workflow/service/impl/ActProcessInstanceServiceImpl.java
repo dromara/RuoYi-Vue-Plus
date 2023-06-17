@@ -16,6 +16,7 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.service.ISysUserService;
 import org.dromara.workflow.common.constant.FlowConstant;
+import org.dromara.workflow.common.enums.BusinessStatusEnum;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
 import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
@@ -326,20 +327,24 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      */
     @Override
     public boolean deleteRuntimeProcessInst(ProcessInvalidBo processInvalidBo) {
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-            .processInstanceId(processInvalidBo.getProcessInstId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
         try {
-            List<Task> list = taskService.createTaskQuery().processInstanceId(processInvalidBo.getProcessInstId())
+            List<Task> list = taskService.createTaskQuery().processInstanceId(processInvalidBo.getProcessInstanceId())
                 .taskTenantId(TenantHelper.getTenantId()).list();
-            List<Task> subTasks = list.stream().filter(e -> StringUtils.isNotBlank(e.getParentTaskId())).collect(Collectors.toList());
+            List<Task> subTasks = StreamUtils.filter(list, e -> StringUtils.isNotBlank(e.getParentTaskId()));
             if (CollUtil.isNotEmpty(subTasks)) {
                 subTasks.forEach(e -> taskService.deleteTask(e.getId()));
+            }
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceBusinessKey(processInvalidBo.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+            if (ObjectUtil.isNotEmpty(historicProcessInstance)) {
+                BusinessStatusEnum.checkStatus(historicProcessInstance.getBusinessStatus());
             }
             String deleteReason = LoginHelper.getUsername() + "作废了当前申请！";
             if (StringUtils.isNotBlank(processInvalidBo.getDeleteReason())) {
                 deleteReason = LoginHelper.getUsername() + "作废理由:" + processInvalidBo.getDeleteReason();
             }
-            runtimeService.deleteProcessInstance(processInvalidBo.getProcessInstId(), deleteReason);
+            runtimeService.updateBusinessStatus(processInvalidBo.getProcessInstanceId(), BusinessStatusEnum.INVALID.getStatus());
+            runtimeService.deleteProcessInstance(processInvalidBo.getProcessInstanceId(), deleteReason);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -351,7 +356,6 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
      *
      * @param processInstanceId 流程实例id
-     * @return
      */
     @Override
     public boolean deleteRuntimeProcessAndHisInst(String processInstanceId) {

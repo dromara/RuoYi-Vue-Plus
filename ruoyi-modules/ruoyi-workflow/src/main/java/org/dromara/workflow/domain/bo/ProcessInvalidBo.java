@@ -1,6 +1,8 @@
 package org.dromara.workflow.domain.bo;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.dromara.common.core.validate.AddGroup;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -19,7 +21,8 @@ public class ProcessInvalidBo implements Serializable {
     /**
      * 流程实例id
      */
-    private String processInstId;
+    @NotBlank(message = "流程实例id不能为空", groups = {AddGroup.class})
+    private String processInstanceId;
 
     /**
      * 作废原因

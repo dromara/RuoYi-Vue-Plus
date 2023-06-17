@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -78,7 +79,7 @@ public class ActProcessInstanceController extends BaseController {
      */
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
     @PostMapping("/deleteRuntimeProcessInst")
-    public R<Void> deleteRuntimeProcessInst(@RequestBody ProcessInvalidBo processInvalidBo) {
+    public R<Void> deleteRuntimeProcessInst(@Validated(AddGroup.class) @RequestBody ProcessInvalidBo processInvalidBo) {
         return toAjax(iActProcessInstanceService.deleteRuntimeProcessInst(processInvalidBo));
     }
 
