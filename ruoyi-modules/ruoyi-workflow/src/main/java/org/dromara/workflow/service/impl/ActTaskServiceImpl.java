@@ -123,6 +123,9 @@ public class ActTaskServiceImpl implements IActTaskService {
             if (task == null) {
                 throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
             }
+            if (task.isSuspended()) {
+                throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
+            }
             //办理委托任务
             if (ObjectUtil.isNotEmpty(task.getDelegationState()) && FlowConstant.PENDING.equals(task.getDelegationState().name())) {
                 taskService.resolveTask(completeTaskBo.getTaskId());
