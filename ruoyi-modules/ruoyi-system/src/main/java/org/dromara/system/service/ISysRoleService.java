@@ -85,9 +85,9 @@ public interface ISysRoleService {
     /**
      * 校验角色是否允许操作
      *
-     * @param roleId 角色ID
+     * @param role 角色信息
      */
-    void checkRoleAllowed(Long roleId);
+    void checkRoleAllowed(SysRoleBo role);
 
     /**
      * 校验角色是否有数据权限
