@@ -4,10 +4,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
-import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,16 +57,16 @@ public interface IActProcessInstanceService {
     /**
      * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
      *
-     * @param processInstanceId 流程实例id
+     * @param processInstanceIds 流程实例id
      * @return 结果
      */
-    boolean deleteRuntimeProcessAndHisInst(String processInstanceId);
+    boolean deleteRuntimeProcessAndHisInst(String[] processInstanceIds);
 
     /**
      * 已完成的实例 删除程实例，删除历史记录，删除业务与流程关联信息
      *
-     * @param processInstanceId 流程实例id
+     * @param processInstanceIds 流程实例id
      * @return 结果
      */
-    boolean deleteFinishProcessAndHisInst(String processInstanceId);
+    boolean deleteFinishProcessAndHisInst(String[] processInstanceIds);
 }

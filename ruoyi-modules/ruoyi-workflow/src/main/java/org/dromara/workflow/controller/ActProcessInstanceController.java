@@ -2,6 +2,7 @@ package org.dromara.workflow.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
@@ -86,22 +87,22 @@ public class ActProcessInstanceController extends BaseController {
     /**
      * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
      *
-     * @param processInstanceId 流程实例id
+     * @param processInstanceIds 流程实例id
      */
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/deleteRuntimeProcessAndHisInst/{processInstanceId}")
-    public R<Void> deleteRuntimeProcessAndHisInst(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
-        return toAjax(iActProcessInstanceService.deleteRuntimeProcessAndHisInst(processInstanceId));
+    @DeleteMapping("/deleteRuntimeProcessAndHisInst/{processInstanceIds}")
+    public R<Void> deleteRuntimeProcessAndHisInst(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
+        return toAjax(iActProcessInstanceService.deleteRuntimeProcessAndHisInst(processInstanceIds));
     }
 
     /**
      * 已完成的实例 删除程实例，删除历史记录，删除业务与流程关联信息
      *
-     * @param processInstanceId 流程实例id
+     * @param processInstanceIds 流程实例id
      */
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/deleteFinishProcessAndHisInst/{processInstanceId}")
-    public R<Void> deleteFinishProcessAndHisInst(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
-        return toAjax(iActProcessInstanceService.deleteFinishProcessAndHisInst(processInstanceId));
+    @DeleteMapping("/deleteFinishProcessAndHisInst/{processInstanceIds}")
+    public R<Void> deleteFinishProcessAndHisInst(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
+        return toAjax(iActProcessInstanceService.deleteFinishProcessAndHisInst(processInstanceIds));
     }
 }
