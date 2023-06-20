@@ -39,6 +39,7 @@
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.26</lombok.version>
         <bouncycastle.version>1.72</bouncycastle.version>
+        <justauth.version>1.16.5</justauth.version>
         <!-- 离线IP地址定位库 -->
         <ip2region.version>2.7.0</ip2region.version>
 
@@ -108,6 +109,13 @@
                 <version>${hutool.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- JustAuth 的依赖配置-->
+            <dependency>
+                <groupId>me.zhyd.oauth</groupId>
+                <artifactId>JustAuth</artifactId>
+                <version>${justauth.version}</version>
             </dependency>
 
             <!-- common 的依赖配置-->

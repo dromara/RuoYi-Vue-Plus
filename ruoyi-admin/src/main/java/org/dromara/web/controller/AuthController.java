@@ -2,9 +2,15 @@ package org.dromara.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import me.zhyd.oauth.model.AuthCallback;
+import me.zhyd.oauth.model.AuthResponse;
+import me.zhyd.oauth.model.AuthUser;
+import me.zhyd.oauth.request.AuthRequest;
+import me.zhyd.oauth.utils.AuthStateUtils;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.EmailLoginBody;
 import org.dromara.common.core.domain.model.LoginBody;
@@ -13,9 +19,13 @@ import org.dromara.common.core.domain.model.SmsLoginBody;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
+import org.dromara.common.social.config.properties.SocialProperties;
+import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysTenantVo;
+import org.dromara.system.service.ISocialUserService;
 import org.dromara.system.service.ISysConfigService;
 import org.dromara.system.service.ISysTenantService;
 import org.dromara.web.domain.vo.LoginTenantVo;
@@ -26,6 +36,7 @@ import org.dromara.web.service.SysRegisterService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
@@ -41,10 +52,14 @@ import java.util.List;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private final SocialProperties socialProperties;
     private final SysLoginService loginService;
     private final SysRegisterService registerService;
     private final ISysConfigService configService;
     private final ISysTenantService tenantService;
+    private final ISocialUserService socialUserService;
+
+
 
     /**
      * 登录方法
@@ -114,6 +129,60 @@ public class AuthController {
         loginVo.setToken(token);
         return R.ok(loginVo);
     }
+
+
+    /**
+     * 认证授权
+     * @param source
+     */
+    @GetMapping("/binding/{source}")
+    @ResponseBody
+    public R<LoginVo> authBinding(@PathVariable("source") String source, HttpServletRequest request){
+        SocialLoginConfigProperties obj = socialProperties.getType().get(source);
+        if (ObjectUtil.isNull(obj)){
+            return R.fail(source + "平台账号暂不支持");
+        }
+        AuthRequest authRequest = SocialUtils.getAuthRequest(source,
+            obj.getClientId(),
+            obj.getClientSecret(),
+            obj.getRedirectUri());
+        String authorizeUrl = authRequest.authorize(AuthStateUtils.createState());
+        return R.ok(authorizeUrl);
+    }
+
+    /**
+     * 第三方登录回调业务处理
+     * @param source
+     * @param callback
+     * @param request
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    @GetMapping("/social-login/{source}")
+    public R<String> socialLogin(@PathVariable("source") String source, AuthCallback callback, HttpServletRequest request) throws IOException {
+        SocialLoginConfigProperties obj = socialProperties.getType().get(source);
+        if (ObjectUtil.isNull(obj)){
+            return R.fail(source + "平台账号暂不支持");
+        }
+        AuthRequest authRequest = SocialUtils.getAuthRequest(source,
+            obj.getClientId(),
+            obj.getClientSecret(),
+            obj.getRedirectUri());
+        AuthResponse<AuthUser> response = authRequest.login(callback);
+        return loginService.socialLogin(source, response, request);
+    }
+
+    /**
+     * 取消授权
+     * @param socialId
+     */
+    @DeleteMapping(value = "/unlock/{socialId}")
+    public R<Void> unlockSocial(@PathVariable Long socialId)
+    {
+        Boolean rows = socialUserService.deleteWithValidById(socialId);
+        return rows ? R.ok() : R.fail("取消授权失败");
+    }
+
 
     /**
      * 退出登录

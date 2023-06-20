@@ -45,6 +45,12 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-common-social</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.dromara</groupId>
             <artifactId>ruoyi-system</artifactId>
         </dependency>
 
@@ -75,6 +81,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>me.zhyd.oauth</groupId>
+            <artifactId>JustAuth</artifactId>
+        </dependency>
+
 
         <!-- skywalking 整合 logback -->
 <!--        <dependency>-->

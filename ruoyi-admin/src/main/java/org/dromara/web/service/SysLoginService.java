@@ -6,11 +6,15 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.model.AuthResponse;
+import me.zhyd.oauth.model.AuthUser;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.constant.TenantConstants;
+import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.domain.model.XcxLoginUser;
@@ -29,14 +33,20 @@ import org.dromara.common.tenant.exception.TenantException;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.config.properties.CaptchaProperties;
 import org.dromara.system.domain.SysUser;
+import org.dromara.system.domain.bo.SocialUserBo;
+import org.dromara.system.domain.vo.SocialUserVo;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
+import org.dromara.system.service.ISocialUserService;
 import org.dromara.system.service.ISysPermissionService;
 import org.dromara.system.service.ISysTenantService;
+import org.dromara.system.service.ISysUserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
@@ -53,6 +63,7 @@ import java.util.function.Supplier;
 public class SysLoginService {
 
     private final SysUserMapper userMapper;
+    private final ISocialUserService socialUserService;
     private final CaptchaProperties captchaProperties;
     private final ISysPermissionService permissionService;
     private final ISysTenantService tenantService;
@@ -155,6 +166,63 @@ public class SysLoginService {
     }
 
     /**
+     * 社交登录
+     *
+     * @param source   登录来源
+     * @param authUser 授权响应实体
+     * @param request  Http请求对象
+     * @return 统一响应实体
+     */
+    public R<String> socialLogin(String source, AuthResponse<AuthUser> authUser, HttpServletRequest request) {
+        // 判断授权响应是否成功
+        if (!authUser.ok()) {
+            return R.fail("对不起，授权信息验证不通过，请退出重试！");
+        }
+        AuthUser authUserData = authUser.getData();
+        SocialUserVo user = socialUserService.selectSocialUserByAuthId(authUserData.getSource() + authUserData.getUuid());
+        if (ObjectUtil.isNotNull(user)) {
+            //执行登录和记录登录信息操作
+            return loginAndRecord(user.getTenantId(), user.getUserName(), authUserData);
+        } else {
+            // 判断是否已登录
+            if (LoginHelper.getUserId() == null) {
+                return R.fail("授权失败，请先登录才能绑定");
+            }
+            SocialUserBo socialUserBo = new SocialUserBo();
+            socialUserBo.setUserId(LoginHelper.getUserId());
+            socialUserBo.setAuthId(authUserData.getSource() + authUserData.getUuid());
+            socialUserBo.setSource(authUserData.getSource());
+            socialUserBo.setUserName(authUserData.getUsername());
+            socialUserBo.setNickName(authUserData.getNickname());
+            socialUserBo.setAvatar(authUserData.getAvatar());
+            socialUserBo.setOpenId(authUserData.getUuid());
+            BeanUtils.copyProperties(authUserData.getToken(), socialUserBo);
+
+            socialUserService.insertByBo(socialUserBo);
+            SysUserVo lodingData = loadUserByUsername(LoginHelper.getTenantId(), LoginHelper.getUsername());
+            //执行登录和记录登录信息操作
+            return loginAndRecord(lodingData.getTenantId(), socialUserBo.getUserName(), authUserData);
+        }
+    }
+
+    /**
+     * 执行登录和记录登录信息操作
+     *
+     * @param tenantId  租户ID
+     * @param userName  用户名
+     * @param authUser  授权用户信息
+     * @return 统一响应实体
+     */
+    private R<String> loginAndRecord(String tenantId, String userName, AuthUser authUser) {
+        checkTenant(tenantId);
+        SysUserVo dbUser = loadUserByUsername(tenantId, userName);
+        LoginHelper.loginByDevice(buildLoginUser(dbUser), DeviceType.SOCIAL);
+        recordLogininfor(dbUser.getTenantId(), userName, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+        recordLoginInfo(dbUser.getUserId());
+        return R.ok(StpUtil.getTokenValue());
+    }
+
+    /**
      * 退出登录
      */
     public void logout() {
@@ -235,9 +303,9 @@ public class SysLoginService {
 
     private SysUserVo loadUserByUsername(String tenantId, String username) {
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-                .select(SysUser::getUserName, SysUser::getStatus)
-                .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
-                .eq(SysUser::getUserName, username));
+            .select(SysUser::getUserName, SysUser::getStatus)
+            .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
+            .eq(SysUser::getUserName, username));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", username);
             throw new UserException("user.not.exists", username);
@@ -253,9 +321,9 @@ public class SysLoginService {
 
     private SysUserVo loadUserByPhonenumber(String tenantId, String phonenumber) {
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-                .select(SysUser::getPhonenumber, SysUser::getStatus)
-                .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
-                .eq(SysUser::getPhonenumber, phonenumber));
+            .select(SysUser::getPhonenumber, SysUser::getStatus)
+            .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
+            .eq(SysUser::getPhonenumber, phonenumber));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", phonenumber);
             throw new UserException("user.not.exists", phonenumber);
@@ -382,7 +450,7 @@ public class SysLoginService {
             log.info("登录租户：{} 已被停用.", tenantId);
             throw new TenantException("tenant.blocked");
         } else if (ObjectUtil.isNotNull(tenant.getExpireTime())
-                && new Date().after(tenant.getExpireTime())) {
+            && new Date().after(tenant.getExpireTime())) {
             log.info("登录租户：{} 已超过有效期.", tenantId);
             throw new TenantException("tenant.expired");
         }
