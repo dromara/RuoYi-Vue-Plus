@@ -25,7 +25,7 @@ import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysTenantVo;
-import org.dromara.system.service.ISocialUserService;
+import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysConfigService;
 import org.dromara.system.service.ISysTenantService;
 import org.dromara.web.domain.vo.LoginTenantVo;
@@ -36,7 +36,6 @@ import org.dromara.web.service.SysRegisterService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
@@ -57,8 +56,7 @@ public class AuthController {
     private final SysRegisterService registerService;
     private final ISysConfigService configService;
     private final ISysTenantService tenantService;
-    private final ISocialUserService socialUserService;
-
+    private final ISysSocialService socialUserService;
 
 
     /**
@@ -133,13 +131,14 @@ public class AuthController {
 
     /**
      * 认证授权
-     * @param source
+     *
+     * @param source 登录来源
+     * @return 结果
      */
     @GetMapping("/binding/{source}")
-    @ResponseBody
-    public R<LoginVo> authBinding(@PathVariable("source") String source, HttpServletRequest request){
+    public R<String> authBinding(@PathVariable("source") String source) {
         SocialLoginConfigProperties obj = socialProperties.getType().get(source);
-        if (ObjectUtil.isNull(obj)){
+        if (ObjectUtil.isNull(obj)) {
             return R.fail(source + "平台账号暂不支持");
         }
         AuthRequest authRequest = SocialUtils.getAuthRequest(source,
@@ -152,16 +151,16 @@ public class AuthController {
 
     /**
      * 第三方登录回调业务处理
-     * @param source
-     * @param callback
-     * @param request
-     * @return
+     *
+     * @param source   登录来源
+     * @param callback 授权响应实体
+     * @return 结果
      */
     @SuppressWarnings("unchecked")
     @GetMapping("/social-login/{source}")
-    public R<String> socialLogin(@PathVariable("source") String source, AuthCallback callback, HttpServletRequest request) throws IOException {
+    public R<String> socialLogin(@PathVariable("source") String source, AuthCallback callback) {
         SocialLoginConfigProperties obj = socialProperties.getType().get(source);
-        if (ObjectUtil.isNull(obj)){
+        if (ObjectUtil.isNull(obj)) {
             return R.fail(source + "平台账号暂不支持");
         }
         AuthRequest authRequest = SocialUtils.getAuthRequest(source,
@@ -169,16 +168,16 @@ public class AuthController {
             obj.getClientSecret(),
             obj.getRedirectUri());
         AuthResponse<AuthUser> response = authRequest.login(callback);
-        return loginService.socialLogin(source, response, request);
+        return loginService.socialLogin(source, response);
     }
 
     /**
      * 取消授权
-     * @param socialId
+     *
+     * @param socialId socialId
      */
     @DeleteMapping(value = "/unlock/{socialId}")
-    public R<Void> unlockSocial(@PathVariable Long socialId)
-    {
+    public R<Void> unlockSocial(@PathVariable Long socialId) {
         Boolean rows = socialUserService.deleteWithValidById(socialId);
         return rows ? R.ok() : R.fail("取消授权失败");
     }

@@ -1,12 +1,13 @@
 package org.dromara.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.system.domain.SocialUser;
-import org.dromara.system.domain.bo.SocialUserBo;
-import org.dromara.system.domain.vo.SocialUserVo;
-import org.dromara.system.mapper.SocialUserMapper;
-import org.dromara.system.service.ISocialUserService;
+import org.dromara.system.domain.SysSocial;
+import org.dromara.system.domain.bo.SysSocialBo;
+import org.dromara.system.domain.vo.SysSocialVo;
+import org.dromara.system.mapper.SysSocialMapper;
+import org.dromara.system.service.ISysSocialService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,16 +20,16 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Service
-public class SocialUserServiceImpl implements ISocialUserService {
+public class SysSocialServiceImpl implements ISysSocialService {
 
-    private final SocialUserMapper baseMapper;
+    private final SysSocialMapper baseMapper;
 
 
     /**
      * 查询社会化关系
      */
     @Override
-    public SocialUserVo queryById(String id){
+    public SysSocialVo queryById(String id) {
         return baseMapper.selectVoById(id);
     }
 
@@ -36,24 +37,28 @@ public class SocialUserServiceImpl implements ISocialUserService {
      * 授权列表
      */
     @Override
-    public List<SocialUserVo> queryList() {
+    public List<SysSocialVo> queryList() {
         return baseMapper.selectVoList();
     }
 
+    @Override
+    public List<SysSocialVo> queryListByUserId(Long userId) {
+        return baseMapper.selectVoList(new LambdaQueryWrapper<SysSocial>().eq(SysSocial::getUserId, userId));
+    }
 
 
     /**
      * 新增社会化关系
      */
     @Override
-    public Boolean insertByBo(SocialUserBo bo) {
-        SocialUser add = MapstructUtils.convert(bo, SocialUser.class);
+    public Boolean insertByBo(SysSocialBo bo) {
+        SysSocial add = MapstructUtils.convert(bo, SysSocial.class);
         validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             if (add != null) {
                 bo.setId(add.getId());
-            }else {
+            } else {
                 return false;
             }
         }
@@ -64,7 +69,7 @@ public class SocialUserServiceImpl implements ISocialUserService {
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(SocialUser entity) {
+    private void validEntityBeforeSave(SysSocial entity) {
         //TODO 做一些数据校验,如唯一约束
     }
 
@@ -79,14 +84,14 @@ public class SocialUserServiceImpl implements ISocialUserService {
 
 
     /**
-     * 根据authId查询用户信息
+     * 根据 authId 查询用户信息
      *
      * @param authId 用户id
      * @return 用户信息
      */
     @Override
-    public SocialUserVo selectSocialUserByAuthId(String authId) {
-        return baseMapper.selectSocialUserByAuthId(authId);
+    public SysSocialVo selectByAuthId(String authId) {
+        return baseMapper.selectByAuthId(authId);
     }
 
 }

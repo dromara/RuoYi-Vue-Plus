@@ -1,6 +1,5 @@
 package org.dromara.common.social.utils;
 
-import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.exception.AuthException;
 import me.zhyd.oauth.request.*;
@@ -12,10 +11,8 @@ import me.zhyd.oauth.request.*;
  */
 public class SocialUtils {
 
-    public static AuthRequest getAuthRequest(String source,
-                                             String clientId,
-                                             String clientSecret,
-                                             String redirectUri) throws AuthException {
+    public static AuthRequest getAuthRequest(String source, String clientId,
+                                             String clientSecret, String redirectUri) throws AuthException {
         AuthRequest authRequest = null;
         switch (source.toLowerCase()) {
             case "dingtalk" ->

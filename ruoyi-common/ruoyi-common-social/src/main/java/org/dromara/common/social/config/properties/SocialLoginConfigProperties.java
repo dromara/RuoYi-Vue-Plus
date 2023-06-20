@@ -2,6 +2,11 @@ package org.dromara.common.social.config.properties;
 
 import lombok.Data;
 
+/**
+ * 社交登录配置
+ *
+ * @author thiszhc
+ */
 @Data
 public class SocialLoginConfigProperties {
 

@@ -3,9 +3,10 @@ package org.dromara.system.controller.system;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
-import org.dromara.system.domain.vo.SocialUserVo;
-import org.dromara.system.service.ISocialUserService;
+import org.dromara.system.domain.vo.SysSocialVo;
+import org.dromara.system.service.ISysSocialService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,18 +25,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/social")
-public class SocialUserController extends BaseController {
+public class SysSocialController extends BaseController {
 
-    private final ISocialUserService socialUserService;
+    private final ISysSocialService socialUserService;
 
     /**
      * 查询社会化关系列表
      */
-//    这里改成用户默认的。只能查看自己的权限更好哦
-//    @SaCheckPermission("system:user:list")
     @GetMapping("/list")
-    public R<List<SocialUserVo>> list() {
-        return R.ok(socialUserService.queryList());
+    public R<List<SysSocialVo>> list() {
+        return R.ok(socialUserService.queryListByUserId(LoginHelper.getUserId()));
     }
 
 
@@ -44,14 +43,10 @@ public class SocialUserController extends BaseController {
      *
      * @param id 主键
      */
-//    这里改成用户默认的。只能查看自己的权限更好哦
-//    @SaCheckPermission("system:user:query")
     @GetMapping("/{id}")
-    public R<SocialUserVo> getInfo(@NotNull(message = "主键不能为空")
+    public R<SysSocialVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable String id) {
         return R.ok(socialUserService.queryById(id));
     }
-
-
 
 }

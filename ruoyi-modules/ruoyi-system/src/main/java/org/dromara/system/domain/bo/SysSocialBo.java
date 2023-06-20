@@ -1,25 +1,26 @@
 package org.dromara.system.domain.bo;
 
-import org.dromara.common.tenant.core.TenantEntity;
-import org.dromara.system.domain.SocialUser;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
-import org.dromara.common.core.validate.AddGroup;
-import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import jakarta.validation.constraints.*;
+import lombok.NoArgsConstructor;
+import org.dromara.common.core.validate.AddGroup;
+import org.dromara.common.core.validate.EditGroup;
+import org.dromara.common.tenant.core.TenantEntity;
+import org.dromara.system.domain.SysSocial;
 
 /**
- * 社会化关系业务对象 social_user
+ * 社会化关系业务对象 sys_social
  *
  * @author Lion Li
- * @date 2023-06-12
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@AutoMapper(target = SocialUser.class, reverseConvertGenerate = false)
-public class SocialUserBo extends TenantEntity {
+@AutoMapper(target = SysSocial.class, reverseConvertGenerate = false)
+public class SysSocialBo extends TenantEntity {
 
     /**
      * 主键

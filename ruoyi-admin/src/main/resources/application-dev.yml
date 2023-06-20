@@ -179,150 +179,63 @@ sms:
     territory: ap-guangzhou
 
 
-
+--- # 三方授权
 justauth:
   enabled: true
   type:
-    QQ:
+    qq:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/qq/callback
+      redirect-uri: http://localhost:80/social-login?source=qq
       union-id: false
-    WEIBO:
+    weibo:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/weibo/callback
+      redirect-uri: http://localhost:80/social-login?source=weibo
     gitee:
-      client-id: 38eaaa1b77b5e064313057a2f5745ce3a9f3e7686d9bd302c7df2f308ef6db81
-      client-secret: 2e633af8780cb9fe002c4c7291b722db944402e271efb99b062811f52d7da1ff
+      client-id: 914******************98
+      client-secret: 02*****************ac
       redirect-uri: http://localhost:80/social-login?source=gitee
-    DINGTALK:
+    dingtalk:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/dingtalk/callback
-    BAIDU:
+      redirect-uri: http://localhost:80/social-login?source=dingtalk
+    baidu:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/baidu/callback
-    CSDN:
+      redirect-uri: http://localhost:80/social-login?source=baidu
+    csdn:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/csdn/callback
-    CODING:
+      redirect-uri: http://localhost:80/social-login?source=csdn
+    coding:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/coding/callback
+      redirect-uri: http://localhost:80/social-login?source=coding
       coding-group-name: xx
-    OSCHINA:
+    oschina:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/oschina/callback
-    ALIPAY:
+      redirect-uri: http://localhost:80/social-login?source=oschina
+    alipay:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/alipay/callback
+      redirect-uri: http://localhost:80/social-login?source=alipay
       alipay-public-key: MIIB**************DAQAB
-    WECHAT_OPEN:
+    wechat_open:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/wechat_open/callback
-    WECHAT_MP:
+      redirect-uri: http://localhost:80/social-login?source=wechat_open
+    wechat_mp:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/wechat_mp/callback
-    WECHAT_ENTERPRISE:
+      redirect-uri: http://localhost:80/social-login?source=wechat_mp
+    wechat_enterprise:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/wechat_enterprise/callback
+      redirect-uri: http://localhost:80/social-login?source=wechat_enterprise
       agent-id: 1000002
-    TAOBAO:
+    gitlab:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/taobao/callback
-    GOOGLE:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/google/callback
-    FACEBOOK:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/facebook/callback
-    DOUYIN:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/douyin/callback
-    LINKEDIN:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/linkedin/callback
-    MICROSOFT:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/microsoft/callback
-    MI:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/mi/callback
-    TOUTIAO:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/toutiao/callback
-    TEAMBITION:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/teambition/callback
-    RENREN:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/renren/callback
-    PINTEREST:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/pinterest/callback
-    STACK_OVERFLOW:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/stack_overflow/callback
-      stack-overflow-key: asd*********asd
-    HUAWEI:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/huawei/callback
-    KUJIALE:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/kujiale/callback
-    GITLAB:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/gitlab/callback
-    MEITUAN:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/meituan/callback
-    ELEME:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/eleme/callback
-    TWITTER:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/twitter/callback
-    XMLY:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/xmly/callback
-      # 设备唯一标识ID
-      device-id: xxxxxxxxxxxxxx
-      # 客户端操作系统类型，1-iOS系统，2-Android系统，3-Web
-      client-os-type: 3
-      # 客户端包名，如果 clientOsType 为1或2时必填。对Android客户端是包名，对IOS客户端是Bundle ID
-      #pack-id: xxxx
-    FEISHU:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/feishu/callback
-    JD:
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: http://oauth.xkcoding.com/demo/oauth/jd/callback
+      redirect-uri: http://localhost:80/social-login?source=gitlab

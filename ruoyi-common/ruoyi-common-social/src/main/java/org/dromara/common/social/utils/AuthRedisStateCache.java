@@ -1,18 +1,16 @@
 package org.dromara.common.social.utils;
 
-import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
 import me.zhyd.oauth.cache.AuthStateCache;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.social.config.properties.SocialProperties;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 
 import java.time.Duration;
 
+@AllArgsConstructor
 public class AuthRedisStateCache implements AuthStateCache {
 
-    private SocialProperties socialProperties;
+    private final SocialProperties socialProperties;
 
     /**
      * 存入缓存
@@ -22,7 +20,6 @@ public class AuthRedisStateCache implements AuthStateCache {
      */
     @Override
     public void cache(String key, String value) {
-        // TODO: 自定义存入缓存
         RedisUtils.setCacheObject(key, value, Duration.ofMillis(socialProperties.getTimeout()));
     }
 
@@ -35,7 +32,6 @@ public class AuthRedisStateCache implements AuthStateCache {
      */
     @Override
     public void cache(String key, String value, long timeout) {
-        // TODO: 自定义存入缓存
         RedisUtils.setCacheObject(key, value, Duration.ofMillis(timeout));
     }
 
@@ -47,7 +43,6 @@ public class AuthRedisStateCache implements AuthStateCache {
      */
     @Override
     public String get(String key) {
-        // TODO: 自定义获取缓存内容
         return RedisUtils.getCacheObject(key);
     }
 
@@ -59,7 +54,6 @@ public class AuthRedisStateCache implements AuthStateCache {
      */
     @Override
     public boolean containsKey(String key) {
-        // TODO: 自定义判断key是否存在
         return RedisUtils.hasKey(key);
     }
 }

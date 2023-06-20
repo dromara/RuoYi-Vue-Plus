@@ -6,7 +6,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthResponse;
@@ -33,20 +32,18 @@ import org.dromara.common.tenant.exception.TenantException;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.config.properties.CaptchaProperties;
 import org.dromara.system.domain.SysUser;
-import org.dromara.system.domain.bo.SocialUserBo;
-import org.dromara.system.domain.vo.SocialUserVo;
+import org.dromara.system.domain.bo.SysSocialBo;
+import org.dromara.system.domain.vo.SysSocialVo;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
-import org.dromara.system.service.ISocialUserService;
+import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysPermissionService;
 import org.dromara.system.service.ISysTenantService;
-import org.dromara.system.service.ISysUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
@@ -63,7 +60,7 @@ import java.util.function.Supplier;
 public class SysLoginService {
 
     private final SysUserMapper userMapper;
-    private final ISocialUserService socialUserService;
+    private final ISysSocialService sysSocialService;
     private final CaptchaProperties captchaProperties;
     private final ISysPermissionService permissionService;
     private final ISysTenantService tenantService;
@@ -170,47 +167,46 @@ public class SysLoginService {
      *
      * @param source   登录来源
      * @param authUser 授权响应实体
-     * @param request  Http请求对象
      * @return 统一响应实体
      */
-    public R<String> socialLogin(String source, AuthResponse<AuthUser> authUser, HttpServletRequest request) {
+    public R<String> socialLogin(String source, AuthResponse<AuthUser> authUser) {
         // 判断授权响应是否成功
         if (!authUser.ok()) {
             return R.fail("对不起，授权信息验证不通过，请退出重试！");
         }
         AuthUser authUserData = authUser.getData();
-        SocialUserVo user = socialUserService.selectSocialUserByAuthId(authUserData.getSource() + authUserData.getUuid());
+        SysSocialVo user = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
         if (ObjectUtil.isNotNull(user)) {
-            //执行登录和记录登录信息操作
+            // 执行登录和记录登录信息操作
             return loginAndRecord(user.getTenantId(), user.getUserName(), authUserData);
         } else {
             // 判断是否已登录
             if (LoginHelper.getUserId() == null) {
                 return R.fail("授权失败，请先登录才能绑定");
             }
-            SocialUserBo socialUserBo = new SocialUserBo();
-            socialUserBo.setUserId(LoginHelper.getUserId());
-            socialUserBo.setAuthId(authUserData.getSource() + authUserData.getUuid());
-            socialUserBo.setSource(authUserData.getSource());
-            socialUserBo.setUserName(authUserData.getUsername());
-            socialUserBo.setNickName(authUserData.getNickname());
-            socialUserBo.setAvatar(authUserData.getAvatar());
-            socialUserBo.setOpenId(authUserData.getUuid());
-            BeanUtils.copyProperties(authUserData.getToken(), socialUserBo);
+            SysSocialBo bo = new SysSocialBo();
+            bo.setUserId(LoginHelper.getUserId());
+            bo.setAuthId(authUserData.getSource() + authUserData.getUuid());
+            bo.setSource(authUserData.getSource());
+            bo.setUserName(authUserData.getUsername());
+            bo.setNickName(authUserData.getNickname());
+            bo.setAvatar(authUserData.getAvatar());
+            bo.setOpenId(authUserData.getUuid());
+            BeanUtils.copyProperties(authUserData.getToken(), bo);
 
-            socialUserService.insertByBo(socialUserBo);
-            SysUserVo lodingData = loadUserByUsername(LoginHelper.getTenantId(), LoginHelper.getUsername());
-            //执行登录和记录登录信息操作
-            return loginAndRecord(lodingData.getTenantId(), socialUserBo.getUserName(), authUserData);
+            sysSocialService.insertByBo(bo);
+            SysUserVo sysUser = loadUserByUsername(LoginHelper.getTenantId(), LoginHelper.getUsername());
+            // 执行登录和记录登录信息操作
+            return loginAndRecord(sysUser.getTenantId(), sysUser.getUserName(), authUserData);
         }
     }
 
     /**
      * 执行登录和记录登录信息操作
      *
-     * @param tenantId  租户ID
-     * @param userName  用户名
-     * @param authUser  授权用户信息
+     * @param tenantId 租户ID
+     * @param userName 用户名
+     * @param authUser 授权用户信息
      * @return 统一响应实体
      */
     private R<String> loginAndRecord(String tenantId, String userName, AuthUser authUser) {
