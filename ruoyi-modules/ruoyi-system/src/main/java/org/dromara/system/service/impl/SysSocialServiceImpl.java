@@ -86,12 +86,12 @@ public class SysSocialServiceImpl implements ISysSocialService {
     /**
      * 根据 authId 查询用户信息
      *
-     * @param authId 用户id
-     * @return 用户信息
+     * @param authId 认证id
+     * @return 授权信息
      */
     @Override
     public SysSocialVo selectByAuthId(String authId) {
-        return baseMapper.selectByAuthId(authId);
+        return baseMapper.selectVoOne(new LambdaQueryWrapper<SysSocial>().eq(SysSocial::getAuthId, authId));
     }
 
 }

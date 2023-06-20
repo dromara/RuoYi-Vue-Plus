@@ -30,6 +30,12 @@ public class SysSocialVo implements Serializable {
     private Long id;
 
     /**
+     * 用户ID
+     */
+    @ExcelProperty(value = "用户ID")
+    private Long userId;
+
+    /**
      * 租户ID
      */
     private String tenantId;
@@ -69,12 +75,6 @@ public class SysSocialVo implements Serializable {
      */
     @ExcelProperty(value = "用户的 open id")
     private String openId;
-
-    /**
-     * 用户的 ID
-     */
-    @ExcelProperty(value = "用户的 ID")
-    private Long userId;
 
     /**
      * 授权的第三方账号

@@ -28,6 +28,11 @@ public class SysSocial extends TenantEntity {
     private Long id;
 
     /**
+     * 用户ID
+     */
+    private Long userId;
+
+    /**
      * 的唯一ID
      */
     private String authId;
@@ -56,11 +61,6 @@ public class SysSocial extends TenantEntity {
      * 用户的 open id
      */
     private String openId;
-
-    /**
-     * 用户的 ID
-     */
-    private Long userId;
 
     /**
      * 授权的第三方账号

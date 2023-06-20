@@ -175,13 +175,15 @@ public class SysLoginService {
             return R.fail("对不起，授权信息验证不通过，请退出重试！");
         }
         AuthUser authUserData = authUser.getData();
-        SysSocialVo user = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
-        if (ObjectUtil.isNotNull(user)) {
+        SysSocialVo social = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
+        if (ObjectUtil.isNotNull(social)) {
+            SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+                .eq(SysUser::getUserId, social.getUserId()));
             // 执行登录和记录登录信息操作
             return loginAndRecord(user.getTenantId(), user.getUserName(), authUserData);
         } else {
             // 判断是否已登录
-            if (LoginHelper.getUserId() == null) {
+            if (!StpUtil.isLogin()) {
                 return R.fail("授权失败，请先登录才能绑定");
             }
             SysSocialBo bo = new SysSocialBo();
@@ -211,10 +213,10 @@ public class SysLoginService {
      */
     private R<String> loginAndRecord(String tenantId, String userName, AuthUser authUser) {
         checkTenant(tenantId);
-        SysUserVo dbUser = loadUserByUsername(tenantId, userName);
-        LoginHelper.loginByDevice(buildLoginUser(dbUser), DeviceType.SOCIAL);
-        recordLogininfor(dbUser.getTenantId(), userName, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
-        recordLoginInfo(dbUser.getUserId());
+        SysUserVo user = loadUserByUsername(tenantId, userName);
+        LoginHelper.loginByDevice(buildLoginUser(user), DeviceType.SOCIAL);
+        recordLogininfor(user.getTenantId(), userName, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+        recordLoginInfo(user.getUserId());
         return R.ok(StpUtil.getTokenValue());
     }
 

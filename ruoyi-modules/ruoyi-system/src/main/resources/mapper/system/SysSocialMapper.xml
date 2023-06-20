@@ -4,20 +4,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.system.mapper.SysSocialMapper">
 
-    <resultMap type="org.dromara.system.domain.vo.SysSocialVo" id="SysSocialAuthResult">
-        <id property="id" column="id"/>
-    </resultMap>
-
-    <select id="selectByAuthId" parameterType="String" resultMap="SysSocialAuthResult">
-        select b.user_id,
-               b.tenant_id,
-               b.user_name,
-               b.password,
-               a.auth_id,
-               a.source
-        from sys_social a
-                 left join sys_user b on a.user_id = b.user_id
-        where a.auth_id = #{authId}
-    </select>
-
 </mapper>
