@@ -49,7 +49,7 @@
         <!-- OSS 配置 -->
         <aws-java-sdk-s3.version>1.12.400</aws-java-sdk-s3.version>
         <!-- SMS 配置 -->
-        <sms4j.version>2.1.1</sms4j.version>
+        <sms4j.version>2.2.0</sms4j.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
