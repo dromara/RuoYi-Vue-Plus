@@ -87,6 +87,12 @@
             <artifactId>JustAuth</artifactId>
         </dependency>
 
+        <!-- 接口请求参数加密模块 -->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-common-cryptapi</artifactId>
+        </dependency>
+
 
         <!-- skywalking 整合 logback -->
 <!--        <dependency>-->

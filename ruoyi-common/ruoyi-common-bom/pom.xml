@@ -171,6 +171,13 @@
                 <artifactId>ruoyi-common-websocket</artifactId>
                 <version>${revision}</version>
             </dependency>
+
+            <!-- 接口请求参数加密模块 -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-common-cryptapi</artifactId>
+                <version>${revision}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
