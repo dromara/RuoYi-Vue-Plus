@@ -157,8 +157,8 @@ public class AuthController {
      * @return 结果
      */
     @SuppressWarnings("unchecked")
-    @GetMapping("/social-login/{source}")
-    public R<String> socialLogin(@PathVariable("source") String source, AuthCallback callback) {
+    @GetMapping("/social-login")
+    public R<String> socialLogin(String source, AuthCallback callback) {
         SocialLoginConfigProperties obj = socialProperties.getType().get(source);
         if (ObjectUtil.isNull(obj)) {
             return R.fail(source + "平台账号暂不支持");
