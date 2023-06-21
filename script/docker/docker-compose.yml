@@ -142,19 +142,17 @@ services:
     network_mode: "host"
 
   ruoyi-powerjob-server:
-    image: powerjob/powerjob-server:latest
-    restart: always
-    depends_on:
-      - mysql
+    image: ruoyi/ruoyi-powerjob-server:5.0.0
+    container_name: ruoyi-powerjob-server
     environment:
-      JVMOPTIONS: "-Xmx512m"
-      PARAMS: "--oms.mongodb.enable=false --spring.datasource.core.jdbc-url=jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai --spring.datasource.core.username=root --spring.datasource.core.password=root --oms.table-prefix=pj_"
+      # 时区上海
+      TZ: Asia/Shanghai
     ports:
       - "7700:7700"
       - "10086:10086"
       - "10010:10010"
     volumes:
-      - /docker/powerjob-data/powerjob-server:/root/powerjob/server/
+      - /docker/powerjob/logs/:/ruoyi/powerjob/logs
     privileged: true
     network_mode: "host"
 
