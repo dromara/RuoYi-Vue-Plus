@@ -69,4 +69,12 @@ public interface IActProcessInstanceService {
      * @return 结果
      */
     boolean deleteFinishProcessAndHisInst(String[] processInstanceIds);
+
+    /**
+     * 撤销流程申请
+     *
+     * @param processInstanceId 流程实例id
+     * @return 结果
+     */
+    boolean cancelProcessApply(String processInstanceId);
 }

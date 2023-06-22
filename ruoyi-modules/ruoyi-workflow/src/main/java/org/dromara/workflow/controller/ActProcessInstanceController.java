@@ -105,4 +105,15 @@ public class ActProcessInstanceController extends BaseController {
     public R<Void> deleteFinishProcessAndHisInst(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
         return toAjax(iActProcessInstanceService.deleteFinishProcessAndHisInst(processInstanceIds));
     }
+
+    /**
+     * 撤销流程申请
+     *
+     * @param processInstanceId 流程实例id
+     */
+    @Log(title = "流程实例管理", businessType = BusinessType.INSERT)
+    @PostMapping("/cancelProcessApply/{processInstanceId}")
+    public R<Void> cancelProcessApply(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
+        return toAjax(iActProcessInstanceService.cancelProcessApply(processInstanceId));
+    }
 }

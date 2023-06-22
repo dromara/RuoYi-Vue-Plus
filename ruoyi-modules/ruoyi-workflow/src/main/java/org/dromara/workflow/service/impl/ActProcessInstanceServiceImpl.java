@@ -401,4 +401,38 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             throw new ServiceException(e.getMessage());
         }
     }
+
+    /**
+     * 撤销流程申请
+     *
+     * @param processInstanceId 流程实例id
+     */
+    @Override
+    public boolean cancelProcessApply(String processInstanceId) {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+            .processInstanceId(processInstanceId).processInstanceTenantId(TenantHelper.getTenantId()).startedBy(String.valueOf(LoginHelper.getUserId())).singleResult();
+        if (ObjectUtil.isNull(processInstance)) {
+            throw new ServiceException("您不是流程发起人,撤销失败!");
+        }
+        if (processInstance.isSuspended()) {
+            throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
+        }
+        BusinessStatusEnum.checkStatus(processInstance.getBusinessStatus());
+        List<Task> taskList = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(processInstanceId).list();
+        for (Task task : taskList) {
+            taskService.addComment(task.getId(), processInstanceId, "申请人撤销申请");
+        }
+        try {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().finished().orderByHistoricTaskInstanceEndTime().finished().list().get(0);
+            List<String> nodeIds = StreamUtils.toList(taskList, Task::getTaskDefinitionKey);
+            runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstanceId)
+                .moveActivityIdsToSingleActivityId(nodeIds, historicTaskInstance.getTaskDefinitionKey()).changeState();
+            runtimeService.updateBusinessStatus(processInstanceId, BusinessStatusEnum.CANCEL.getStatus());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException("撤销失败:" + e.getMessage());
+        }
+    }
 }
