@@ -408,6 +408,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      * @param processInstanceId 流程实例id
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean cancelProcessApply(String processInstanceId) {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
             .processInstanceId(processInstanceId).processInstanceTenantId(TenantHelper.getTenantId()).startedBy(String.valueOf(LoginHelper.getUserId())).singleResult();
