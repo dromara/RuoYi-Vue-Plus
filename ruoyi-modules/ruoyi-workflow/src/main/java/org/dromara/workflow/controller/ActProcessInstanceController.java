@@ -116,4 +116,14 @@ public class ActProcessInstanceController extends BaseController {
     public R<Void> cancelProcessApply(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
         return toAjax(iActProcessInstanceService.cancelProcessApply(processInstanceId));
     }
+
+    /**
+     * 分页查询当前登录人单据
+     *
+     * @param processInstanceBo 参数
+     */
+    @GetMapping("/getCurrentSubmitByPage")
+    public TableDataInfo<ProcessInstanceVo> getCurrentSubmitByPage(ProcessInstanceBo processInstanceBo) {
+        return iActProcessInstanceService.getCurrentSubmitByPage(processInstanceBo);
+    }
 }

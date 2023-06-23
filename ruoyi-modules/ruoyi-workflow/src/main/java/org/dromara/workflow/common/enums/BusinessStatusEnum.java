@@ -53,6 +53,24 @@ public enum BusinessStatusEnum {
     private final String desc;
 
     /**
+     * 获取业务状态
+     *
+     * @param status 状态
+     */
+    public static String getEumByStatus(String status) {
+        if (StringUtils.isBlank(status)) {
+            return null;
+        }
+
+        for (BusinessStatusEnum statusEnum : BusinessStatusEnum.values()) {
+            if (statusEnum.getStatus().equals(status)) {
+                return statusEnum.getDesc();
+            }
+        }
+        return null;
+    }
+
+    /**
      * 启动流程校验
      *
      * @param status 状态

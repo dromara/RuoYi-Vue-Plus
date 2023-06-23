@@ -97,6 +97,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         for (ProcessInstance processInstance : processInstances) {
             ProcessInstanceVo processInstanceVo = BeanUtil.toBean(processInstance, ProcessInstanceVo.class);
             processInstanceVo.setIsSuspended(processInstance.isSuspended());
+            processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstance.getBusinessStatus()));
             list.add(processInstanceVo);
         }
         long count = query.count();
@@ -125,7 +126,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         List<HistoricProcessInstance> historicProcessInstances = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
         for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
-            list.add(BeanUtil.toBean(historicProcessInstance, ProcessInstanceVo.class));
+            ProcessInstanceVo processInstanceVo = BeanUtil.toBean(historicProcessInstance, ProcessInstanceVo.class);
+            processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(historicProcessInstance.getBusinessStatus()));
+            list.add(processInstanceVo);
         }
         long count = query.count();
         return new TableDataInfo<>(list, count);
@@ -246,8 +249,10 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         //翻译人员名称
         if (CollUtil.isNotEmpty(actHistoryInfoVoList)) {
             actHistoryInfoVoList.forEach(e -> {
-                SysUserVo sysUserVo = iSysUserService.selectUserById(Long.valueOf(e.getAssignee()));
-                e.setNickName(ObjectUtil.isNotEmpty(sysUserVo) ? sysUserVo.getNickName() : "");
+                if (StringUtils.isNotBlank(e.getAssignee())) {
+                    SysUserVo sysUserVo = iSysUserService.selectUserById(Long.valueOf(e.getAssignee()));
+                    e.setNickName(ObjectUtil.isNotEmpty(sysUserVo) ? sysUserVo.getNickName() : "");
+                }
             });
         }
         List<ActHistoryInfoVo> nodeInfoList = new ArrayList<>();
@@ -435,5 +440,32 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             e.printStackTrace();
             throw new ServiceException("撤销失败:" + e.getMessage());
         }
+    }
+
+    /**
+     * 分页查询当前登录人单据
+     *
+     * @param processInstanceBo 参数
+     */
+    @Override
+    public TableDataInfo<ProcessInstanceVo> getCurrentSubmitByPage(ProcessInstanceBo processInstanceBo) {
+        List<ProcessInstanceVo> list = new ArrayList<>();
+        HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+        query.processInstanceTenantId(TenantHelper.getTenantId());
+        query.startedBy(processInstanceBo.getStartUserId());
+        if (StringUtils.isNotBlank(processInstanceBo.getName())) {
+            query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
+        }
+        if (StringUtils.isNotBlank(processInstanceBo.getBusinessKey())) {
+            query.processInstanceBusinessKey(processInstanceBo.getBusinessKey());
+        }
+        List<HistoricProcessInstance> historicProcessInstanceList = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
+        for (HistoricProcessInstance processInstance : historicProcessInstanceList) {
+            ProcessInstanceVo processInstanceVo = BeanUtil.toBean(processInstance, ProcessInstanceVo.class);
+            processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstance.getBusinessStatus()));
+            list.add(processInstanceVo);
+        }
+        long count = query.count();
+        return new TableDataInfo<>(list, count);
     }
 }

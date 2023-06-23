@@ -96,4 +96,14 @@ public class TaskVo {
      * 认领时间
      */
     private Date claimTime;
+
+    /**
+     * 流程状态
+     */
+    private String businessStatus;
+
+    /**
+     * 流程状态
+     */
+    private String businessStatusName;
 }

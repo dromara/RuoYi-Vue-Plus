@@ -77,4 +77,12 @@ public interface IActProcessInstanceService {
      * @return 结果
      */
     boolean cancelProcessApply(String processInstanceId);
+
+    /**
+     * 分页查询当前登录人单据
+     *
+     * @param processInstanceBo 参数
+     * @return 结果
+     */
+    TableDataInfo<ProcessInstanceVo> getCurrentSubmitByPage(ProcessInstanceBo processInstanceBo);
 }

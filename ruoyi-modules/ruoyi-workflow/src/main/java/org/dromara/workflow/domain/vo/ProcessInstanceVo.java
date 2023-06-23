@@ -76,4 +76,14 @@ public class ProcessInstanceVo implements Serializable {
      * 启动人id
      */
     private String startUserId;
+
+    /**
+     * 流程状态
+     */
+    private String businessStatus;
+
+    /**
+     * 流程状态
+     */
+    private String businessStatusName;
 }

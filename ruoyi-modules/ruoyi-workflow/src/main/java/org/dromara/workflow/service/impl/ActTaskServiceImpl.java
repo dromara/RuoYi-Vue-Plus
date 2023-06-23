@@ -32,10 +32,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 任务 服务层实现
@@ -169,9 +166,19 @@ public class ActTaskServiceImpl implements IActTaskService {
             query.taskNameLike("%" + taskBo.getName() + "%");
         }
         List<Task> taskList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
+        List<ProcessInstance> processInstanceList = null;
+        if (CollUtil.isNotEmpty(taskList)) {
+            Set<String> processInstanceIds = StreamUtils.toSet(taskList, Task::getProcessInstanceId);
+            processInstanceList = runtimeService.createProcessInstanceQuery().processInstanceIds(processInstanceIds).list();
+        }
         List<TaskVo> list = new ArrayList<>();
         for (Task task : taskList) {
-            list.add(BeanUtil.toBean(task, TaskVo.class));
+            TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
+            processInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
+                taskVo.setBusinessStatus(e.getBusinessStatus());
+                taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
+            });
+            list.add(taskVo);
         }
         long count = query.count();
         return new TableDataInfo<>(list, count);
@@ -191,9 +198,19 @@ public class ActTaskServiceImpl implements IActTaskService {
             query.taskNameLike("%" + taskBo.getName() + "%");
         }
         List<HistoricTaskInstance> taskInstanceList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
+        List<HistoricProcessInstance> historicProcessInstanceList = null;
+        if (CollUtil.isNotEmpty(taskInstanceList)) {
+            Set<String> processInstanceIds = StreamUtils.toSet(taskInstanceList, HistoricTaskInstance::getProcessInstanceId);
+            historicProcessInstanceList = historyService.createHistoricProcessInstanceQuery().processInstanceIds(processInstanceIds).list();
+        }
         List<TaskVo> list = new ArrayList<>();
         for (HistoricTaskInstance task : taskInstanceList) {
-            list.add(BeanUtil.toBean(task, TaskVo.class));
+            TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
+            historicProcessInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
+                taskVo.setBusinessStatus(e.getBusinessStatus());
+                taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
+            });
+            list.add(taskVo);
         }
         long count = query.count();
         return new TableDataInfo<>(list, count);
