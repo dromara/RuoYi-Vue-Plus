@@ -182,4 +182,9 @@ public class LoginHelper {
     public static boolean isTenantAdmin(Set<String> rolePermission) {
         return rolePermission.contains(TenantConstants.TENANT_ADMIN_ROLE_KEY);
     }
+
+    public static boolean isTenantAdmin() {
+        return isTenantAdmin(getLoginUser().getRolePermission());
+    }
+
 }
