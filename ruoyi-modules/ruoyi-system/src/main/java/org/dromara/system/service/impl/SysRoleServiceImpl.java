@@ -461,7 +461,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         keys.parallelStream().forEach(key -> {
             String token = StringUtils.substringAfterLast(key, ":");
             // 如果已经过期则跳过
-            if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(token) < -1) {
+            if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
                 return;
             }
             LoginUser loginUser = LoginHelper.getLoginUser(token);

@@ -2,6 +2,7 @@ package org.dromara.common.satoken.utils;
 
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.context.model.SaStorage;
+import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.convert.Convert;
@@ -59,6 +60,14 @@ public class LoginHelper {
         if (ObjectUtil.isNotNull(deviceType)) {
             model.setDevice(deviceType.getDevice());
         }
+        // 自定义分配 不同用户体系 不同 token 授权时间 不设置默认走全局 yml 配置
+        // 例如: 后台用户30分钟过期 app用户1天过期
+//        UserType userType = UserType.getUserType(loginUser.getUserType());
+//        if (userType == UserType.SYS_USER) {
+//            model.setTimeout(86400).setActiveTimeout(1800);
+//        } else if (userType == UserType.APP_USER) {
+//            model.setTimeout(86400).setActiveTimeout(1800);
+//        }
         StpUtil.login(loginUser.getLoginId(),
             model.setExtra(TENANT_KEY, loginUser.getTenantId())
                 .setExtra(USER_KEY, loginUser.getUserId()));
@@ -73,7 +82,11 @@ public class LoginHelper {
         if (loginUser != null) {
             return loginUser;
         }
-        loginUser = (LoginUser) StpUtil.getTokenSession().get(LOGIN_USER_KEY);
+        SaSession session = StpUtil.getTokenSession();
+        if (ObjectUtil.isNull(session)) {
+            return null;
+        }
+        loginUser = (LoginUser) session.get(LOGIN_USER_KEY);
         SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
         return loginUser;
     }
@@ -82,7 +95,11 @@ public class LoginHelper {
      * 获取用户基于token
      */
     public static LoginUser getLoginUser(String token) {
-        return (LoginUser) StpUtil.getTokenSessionByToken(token).get(LOGIN_USER_KEY);
+        SaSession session = StpUtil.getTokenSessionByToken(token);
+        if (ObjectUtil.isNull(session)) {
+            return null;
+        }
+        return (LoginUser) session.get(LOGIN_USER_KEY);
     }
 
     /**
@@ -164,9 +181,4 @@ public class LoginHelper {
     public static boolean isTenantAdmin(Set<String> rolePermission) {
         return rolePermission.contains(TenantConstants.TENANT_ADMIN_ROLE_KEY);
     }
-
-    public static boolean isTenantAdmin() {
-        return isTenantAdmin(getLoginUser().getRolePermission());
-    }
-
 }
