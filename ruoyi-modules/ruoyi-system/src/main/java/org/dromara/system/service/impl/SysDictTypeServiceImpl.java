@@ -265,4 +265,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
         }
     }
 
+    @Override
+    public Map<String, String> getAllDictByDictType(String dictType) {
+        List<SysDictDataVo> list = selectDictDataByType(dictType);
+        return StreamUtils.toMap(list, SysDictDataVo::getDictValue, SysDictDataVo::getDictLabel);
+    }
+
 }
