@@ -63,7 +63,8 @@ public class LoginHelper {
 //        } else if (userType == UserType.APP_USER) {
 //            model.setTimeout(86400).setActiveTimeout(1800);
 //        }
-        StpUtil.login(loginUser.getLoginId(), model.setExtra(USER_KEY, loginUser.getUserId()));
+        StpUtil.stpLogic.setLoginType(loginUser.getUserType())
+            .login(loginUser.getLoginId(), model.setExtra(USER_KEY, loginUser.getUserId()));
         StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
     }
 
@@ -130,8 +131,8 @@ public class LoginHelper {
      * 获取用户类型
      */
     public static UserType getUserType() {
-        String loginId = StpUtil.getLoginIdAsString();
-        return UserType.getUserType(loginId);
+        String loginType = StpUtil.stpLogic.getLoginType();
+        return UserType.getUserType(loginType);
     }
 
     /**
