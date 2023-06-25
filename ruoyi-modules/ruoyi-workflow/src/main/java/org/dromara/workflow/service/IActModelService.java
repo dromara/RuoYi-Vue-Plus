@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ModelBo;
+import org.dromara.workflow.domain.vo.ResultListDataRepresentation;
 import org.flowable.engine.repository.Model;
 import org.springframework.util.MultiValueMap;
 
@@ -61,4 +62,20 @@ public interface IActModelService {
      * @param response 相应
      */
     void exportZip(String modelId, HttpServletResponse response);
+
+    /**
+     * 查询用户
+     *
+     * @param filter 参数
+     * @return 结果
+     */
+    ResultListDataRepresentation getUsers(String filter);
+
+    /**
+     * 查询用户组
+     *
+     * @param filter 参数
+     * @return 结果
+     */
+    ResultListDataRepresentation getGroups(String filter);
 }

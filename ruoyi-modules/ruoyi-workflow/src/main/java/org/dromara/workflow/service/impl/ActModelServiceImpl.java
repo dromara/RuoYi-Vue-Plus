@@ -7,6 +7,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +19,14 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
+import org.dromara.system.domain.SysRole;
+import org.dromara.system.domain.SysUser;
+import org.dromara.system.mapper.SysRoleMapper;
+import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.workflow.domain.bo.ModelBo;
+import org.dromara.workflow.domain.vo.GroupRepresentation;
+import org.dromara.workflow.domain.vo.ResultListDataRepresentation;
+import org.dromara.workflow.domain.vo.UserRepresentation;
 import org.dromara.workflow.service.IActModelService;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.bpmn.model.BpmnModel;
@@ -35,6 +44,7 @@ import org.springframework.util.MultiValueMap;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -54,6 +64,8 @@ import static org.flowable.editor.constants.ModelDataJsonConstants.*;
 public class ActModelServiceImpl implements IActModelService {
 
     private final RepositoryService repositoryService;
+    private final SysUserMapper sysUserMapper;
+    private final SysRoleMapper sysRoleMapper;
 
     /**
      * 分页查询模型
@@ -333,5 +345,41 @@ public class ActModelServiceImpl implements IActModelService {
                 }
             }
         }
+    }
+
+    @Override
+    public ResultListDataRepresentation getUsers(String filter) {
+
+        LambdaQueryWrapper<SysUser> wrapper = Wrappers.lambdaQuery();
+        wrapper.like(org.dromara.common.core.utils.StringUtils.isNotBlank(filter), SysUser::getNickName, filter);
+        List<SysUser> sysUsers = sysUserMapper.selectList(wrapper);
+        List<UserRepresentation> userRepresentations = new ArrayList<>();
+        for (SysUser sysUser : sysUsers) {
+            UserRepresentation userRepresentation = new UserRepresentation();
+            userRepresentation.setFullName(sysUser.getNickName());
+            userRepresentation.setLastName(sysUser.getNickName());
+            userRepresentation.setTenantId(sysUser.getTenantId());
+            userRepresentation.setEmail(sysUser.getEmail());
+            userRepresentation.setId(sysUser.getUserId().toString());
+            userRepresentations.add(userRepresentation);
+        }
+        return new ResultListDataRepresentation(userRepresentations);
+    }
+
+    @Override
+    public ResultListDataRepresentation getGroups(String filter) {
+
+        LambdaQueryWrapper<SysRole> wrapper = Wrappers.lambdaQuery();
+        wrapper.like(org.dromara.common.core.utils.StringUtils.isNotBlank(filter), SysRole::getRoleName, filter);
+        List<SysRole> sysRoles = sysRoleMapper.selectList(wrapper);
+        List<GroupRepresentation> result = new ArrayList<>();
+        for (SysRole sysRole : sysRoles) {
+            GroupRepresentation groupRepresentation = new GroupRepresentation();
+            groupRepresentation.setId(sysRole.getRoleId().toString());
+            groupRepresentation.setName(sysRole.getRoleName());
+            groupRepresentation.setType(sysRole.getRoleKey());
+            result.add(groupRepresentation);
+        }
+        return new ResultListDataRepresentation(result);
     }
 }
