@@ -174,10 +174,13 @@ public class ActTaskServiceImpl implements IActTaskService {
         List<TaskVo> list = new ArrayList<>();
         for (Task task : taskList) {
             TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
-            processInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
-                taskVo.setBusinessStatus(e.getBusinessStatus());
-                taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
-            });
+            if (CollUtil.isNotEmpty(processInstanceList)) {
+                processInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
+                    taskVo.setBusinessStatus(e.getBusinessStatus());
+                    taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
+                });
+            }
+            taskVo.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
             list.add(taskVo);
         }
         long count = query.count();
@@ -206,10 +209,12 @@ public class ActTaskServiceImpl implements IActTaskService {
         List<TaskVo> list = new ArrayList<>();
         for (HistoricTaskInstance task : taskInstanceList) {
             TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
-            historicProcessInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
-                taskVo.setBusinessStatus(e.getBusinessStatus());
-                taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
-            });
+            if (CollUtil.isNotEmpty(historicProcessInstanceList)) {
+                historicProcessInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
+                    taskVo.setBusinessStatus(e.getBusinessStatus());
+                    taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
+                });
+            }
             list.add(taskVo);
         }
         long count = query.count();

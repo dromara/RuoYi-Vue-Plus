@@ -3,16 +3,27 @@ package org.dromara.workflow.utils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.core.utils.StreamUtils;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
+import org.dromara.system.domain.SysUser;
+import org.dromara.system.domain.SysUserRole;
+import org.dromara.system.mapper.SysUserMapper;
+import org.dromara.system.mapper.SysUserRoleMapper;
+import org.dromara.workflow.common.constant.FlowConstant;
+import org.dromara.workflow.domain.vo.ParticipantVo;
 import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.*;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -22,10 +33,7 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.rmi.ServerException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +47,8 @@ public class WorkflowUtils {
     }
 
     private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
+    private static final SysUserMapper SYS_USER_MAPPER = SpringUtils.getBean(SysUserMapper.class);
+    private static final SysUserRoleMapper SYS_USER_ROLE_MAPPER = SpringUtils.getBean(SysUserRoleMapper.class);
 
     /**
      * bpmnModel转为xml
@@ -157,5 +167,61 @@ public class WorkflowUtils {
             PROCESS_ENGINE.getManagementService().executeCommand(updateHiTaskInstCmd);
         }
         return task;
+    }
+
+    /**
+     * 获取当前任务参与者
+     *
+     * @param taskId 任务id
+     */
+    public static ParticipantVo getCurrentTaskParticipant(String taskId) {
+        ParticipantVo participantVo = new ParticipantVo();
+        List<HistoricIdentityLink> linksForTask = PROCESS_ENGINE.getHistoryService().getHistoricIdentityLinksForTask(taskId);
+        Task task = PROCESS_ENGINE.getTaskService().createTaskQuery().taskTenantId(TenantHelper.getTenantId()).taskId(taskId).singleResult();
+        if (task != null && CollUtil.isNotEmpty(linksForTask)) {
+            List<HistoricIdentityLink> groupList = StreamUtils.filter(linksForTask, e -> StringUtils.isNotBlank(e.getGroupId()));
+            if (CollUtil.isNotEmpty(groupList)) {
+                List<Long> groupIds = StreamUtils.toList(groupList, e -> Long.valueOf(e.getGroupId()));
+                List<SysUserRole> sysUserRoles = SYS_USER_ROLE_MAPPER.selectList(new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, groupIds));
+                if (CollUtil.isNotEmpty(sysUserRoles)) {
+                    participantVo.setGroupIds(groupIds);
+                    List<Long> userIdList = StreamUtils.toList(sysUserRoles, SysUserRole::getUserId);
+                    List<SysUser> sysUsers = SYS_USER_MAPPER.selectList(
+                        new LambdaQueryWrapper<SysUser>().in(SysUser::getUserId, userIdList).eq(SysUser::getStatus, UserStatus.OK.getCode()));
+                    if (CollUtil.isNotEmpty(sysUsers)) {
+                        List<Long> userIds = StreamUtils.toList(sysUsers, SysUser::getUserId);
+                        List<String> nickNames = StreamUtils.toList(sysUsers, SysUser::getNickName);
+                        participantVo.setCandidate(userIds);
+                        participantVo.setCandidateName(nickNames);
+                        participantVo.setClaim(!StringUtils.isBlank(task.getAssignee()));
+                    }
+                }
+            } else {
+                List<HistoricIdentityLink> candidateList = StreamUtils.filter(linksForTask, e -> FlowConstant.CANDIDATE.equals(e.getType()));
+                List<Long> userIdList = new ArrayList<>();
+                for (HistoricIdentityLink historicIdentityLink : linksForTask) {
+                    try {
+                        userIdList.add(Long.valueOf(historicIdentityLink.getUserId()));
+                    } catch (NumberFormatException ignored) {
+
+                    }
+                }
+                List<SysUser> sysUsers = SYS_USER_MAPPER.selectList(
+                    new LambdaQueryWrapper<SysUser>().in(SysUser::getUserId, userIdList).eq(SysUser::getStatus, UserStatus.OK.getCode()));
+                if (CollUtil.isNotEmpty(sysUsers)) {
+                    List<Long> userIds = StreamUtils.toList(sysUsers, SysUser::getUserId);
+                    List<String> nickNames = StreamUtils.toList(sysUsers, SysUser::getNickName);
+                    participantVo.setCandidate(userIds);
+                    participantVo.setCandidateName(nickNames);
+                    if (StringUtils.isBlank(task.getAssignee()) && CollUtil.isNotEmpty(candidateList)) {
+                        participantVo.setClaim(false);
+                    }
+                    if (!StringUtils.isBlank(task.getAssignee()) && CollUtil.isNotEmpty(candidateList)) {
+                        participantVo.setClaim(true);
+                    }
+                }
+            }
+        }
+        return participantVo;
     }
 }

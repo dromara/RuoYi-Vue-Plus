@@ -106,4 +106,9 @@ public class TaskVo {
      * 流程状态
      */
     private String businessStatusName;
+
+    /**
+     * 参与者
+     */
+    private ParticipantVo participantVo;
 }

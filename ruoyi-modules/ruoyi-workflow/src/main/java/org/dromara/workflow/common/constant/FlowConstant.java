@@ -27,4 +27,9 @@ public interface FlowConstant {
      */
     String PENDING = "PENDING";
 
+    /**
+     * 候选人标识
+     */
+    String CANDIDATE = "candidate";
+
 }
