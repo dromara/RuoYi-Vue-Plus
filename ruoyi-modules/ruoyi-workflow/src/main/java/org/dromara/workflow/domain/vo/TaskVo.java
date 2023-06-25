@@ -68,6 +68,11 @@ public class TaskVo {
     private Date createTime;
 
     /**
+     * 结束时间
+     */
+    private Date endTime;
+
+    /**
      * 节点id
      */
     private String taskDefinitionKey;

@@ -196,7 +196,7 @@ public class ActTaskServiceImpl implements IActTaskService {
     public TableDataInfo<TaskVo> getTaskFinishByPage(TaskBo taskBo) {
         String userId = String.valueOf(LoginHelper.getUserId());
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
-            .taskAssignee(userId).taskTenantId(TenantHelper.getTenantId()).finished().orderByHistoricTaskInstanceStartTime().asc();
+            .taskAssignee(userId).taskTenantId(TenantHelper.getTenantId()).finished().orderByHistoricTaskInstanceStartTime().desc();
         if (StringUtils.isNotBlank(taskBo.getName())) {
             query.taskNameLike("%" + taskBo.getName() + "%");
         }

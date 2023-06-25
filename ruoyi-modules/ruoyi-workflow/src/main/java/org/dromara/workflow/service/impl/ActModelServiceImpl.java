@@ -347,6 +347,11 @@ public class ActModelServiceImpl implements IActModelService {
         }
     }
 
+    /**
+     * 查询用户
+     *
+     * @param filter 参数
+     */
     @Override
     public ResultListDataRepresentation getUsers(String filter) {
 
@@ -366,6 +371,11 @@ public class ActModelServiceImpl implements IActModelService {
         return new ResultListDataRepresentation(userRepresentations);
     }
 
+    /**
+     * 查询用户组
+     *
+     * @param filter 参数
+     */
     @Override
     public ResultListDataRepresentation getGroups(String filter) {
 
