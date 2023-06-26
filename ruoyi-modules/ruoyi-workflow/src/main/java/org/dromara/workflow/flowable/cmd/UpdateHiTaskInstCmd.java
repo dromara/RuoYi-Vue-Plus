@@ -38,7 +38,7 @@ public class UpdateHiTaskInstCmd implements Command<Boolean> {
                 HistoricTaskInstanceEntity historicTask = historicTaskService.getHistoricTask(taskId);
                 if (historicTask != null) {
                     historicTask.setProcessDefinitionId(processDefinitionId);
-                    historicTask.setProcessDefinitionId(processInstanceId);
+                    historicTask.setProcessInstanceId(processInstanceId);
                     historicTask.setCreateTime(new Date());
                     CommandContextUtil.getHistoricTaskService().updateHistoricTask(historicTask, true);
                 }
