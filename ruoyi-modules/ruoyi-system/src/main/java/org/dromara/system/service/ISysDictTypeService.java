@@ -75,7 +75,7 @@ public interface ISysDictTypeService {
      * @param bo 字典类型信息
      * @return 结果
      */
-    List<SysDictTypeVo> insertDictType(SysDictTypeBo bo);
+    List<SysDictDataVo> insertDictType(SysDictTypeBo bo);
 
     /**
      * 修改保存字典类型信息
