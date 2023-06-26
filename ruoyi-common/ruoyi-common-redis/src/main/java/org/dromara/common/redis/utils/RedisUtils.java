@@ -130,6 +130,18 @@ public class RedisUtils {
     }
 
     /**
+     * 如果不存在则设置 并返回 true 如果存在则返回 false
+     *
+     * @param key   缓存的键值
+     * @param value 缓存的值
+     * @return set成功或失败
+     */
+    public static <T> boolean setObjectIfAbsent(final String key, final T value, final Duration duration) {
+        RBucket<T> bucket = CLIENT.getBucket(key);
+        return bucket.setIfAbsent(value, duration);
+    }
+
+    /**
      * 注册对象监听器
      * <p>
      * key 监听器需开启 `notify-keyspace-events` 等 redis 相关配置
