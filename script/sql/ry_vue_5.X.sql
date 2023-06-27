@@ -794,3 +794,22 @@ insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'X
 insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','N', '',             '1' ,'1', '', 103, 1, sysdate(), 1, sysdate(), NULL);
 insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',   '1' ,'1', '', 103, 1, sysdate(), 1, sysdate(), NULL);
 insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','N', '',             '1' ,'1', '', 103, 1, sysdate(), 1, sysdate(), NULL);
+
+-- ----------------------------
+-- 流程表单信息表
+-- ----------------------------
+drop table if exists wf_form;
+create table wf_form (
+  form_id         bigint        not null                  comment '表单id',
+  tenant_id       varchar(20)             default '000000'comment '租户编号',
+  form_name       varchar(255)            default null    comment '表单名称',
+  form_config     longtext                                comment '表单配置',
+  content         longtext                                comment '表单内容',
+  create_dept     bigint                  default null    comment '创建部门',
+  create_by       bigint                  default null    comment '创建者',
+  create_time     datetime                default null    comment '创建时间',
+  update_by       bigint                  default null    comment '更新者',
+  update_time     datetime                default null    comment '更新时间',
+  remark          varchar(500)            default null    comment '备注',
+  primary key (form_id)
+) engine=innodb comment='流程表单信息表';

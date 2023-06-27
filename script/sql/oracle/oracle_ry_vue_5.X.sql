@@ -1106,6 +1106,37 @@ insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'X
 insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',  '1', '1', '', NULL, 103, 1, sysdate, 1, sysdate);
 insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','N', '',            '1', '1', '', NULL, 103, 1, sysdate, 1, sysdate);
 
+-- ----------------------------
+-- 流程表单信息表
+-- ----------------------------
+create table wf_form (
+  form_id     number(20)    not null,
+  form_name   varchar(64)   default '',
+  form_config nclob,
+  content     nclob,
+  create_dept number(20)    default null,
+  create_by   number(20)    default null,
+  create_time date,
+  update_by   number(20)    default null,
+  update_time date,
+  remark      varchar(255)  default '',
+  del_flag    char(1)       default '0'
+);
+
+alter table wf_form add constraint pk_wf_form primary key (form_id);
+
+comment on table wf_form              is '流程表单信息表';
+comment on column wf_form.form_id     is '表单主键';
+comment on column wf_form.form_name   is '表单名称';
+comment on column wf_form.form_config is '表单配置';
+comment on column wf_form.content     is '表单内容';
+comment on column wf_form.create_dept is '创建部门';
+comment on column wf_form.create_by   is '创建者';
+comment on column wf_form.create_time is '创建时间';
+comment on column wf_form.update_by   is '更新者';
+comment on column wf_form.update_time is '更新时间';
+comment on column wf_form.remark      is '备注';
+comment on column wf_form.del_flag    is '删除标志（0代表存在 2代表删除）';
 
 -- ----------------------------
 -- 钩子 ，用于session连接之后 自动设置默认的date类型格式化 简化时间查询

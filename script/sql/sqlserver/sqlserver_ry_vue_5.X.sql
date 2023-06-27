@@ -2812,3 +2812,94 @@ INSERT INTO sys_oss_config VALUES (N'4', N'000000', N'qcloud', N'XXXXXXXXXXXXXXX
 GO
 INSERT INTO sys_oss_config VALUES (N'5', N'000000', N'image',  N'ruoyi',           N'ruoyi123',        N'ruoyi',            N'image', N'127.0.0.1:9000',               N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
 GO
+
+CREATE TABLE wf_form
+(
+    form_id        bigint                          NOT NULL,
+    form_name      nvarchar(64)    DEFAULT ''      NULL,
+    form_config    nvarchar(max)                   NULL,
+    content        nvarchar(max)                   NULL,
+    create_dept    bigint                          NULL,
+    create_by      nvarchar(64)    DEFAULT ''      NULL,
+    create_time    datetime2(7)                    NULL,
+    update_by      nvarchar(64)    DEFAULT ''      NULL,
+    update_time    datetime2(7)                    NULL,
+    remark         nvarchar(255)                   NULL,
+    del_flag       nchar(1)        DEFAULT ('0')   NULL,
+    CONSTRAINT [PK__wf_form] PRIMARY KEY CLUSTERED ([form_id])
+        WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+        ON [PRIMARY]
+)
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'表单主键',
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form',
+    'COLUMN', N'form_id'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'表单名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form',
+    'COLUMN', N'form_name'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'表单配置',
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form',
+    'COLUMN', N'form_config'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'表单内容',
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form',
+    'COLUMN', N'content'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'创建部门' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form',
+    'COLUMN', N'create_dept'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form',
+    'COLUMN', N'create_by'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form',
+    'COLUMN', N'create_time'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form',
+    'COLUMN', N'update_by'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form',
+    'COLUMN', N'update_time'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form',
+    'COLUMN', N'remark'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'删除标志（0代表存在 2代表删除）',
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form',
+    'COLUMN', N'del_flag'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'流程表单信息表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'wf_form'
+GO

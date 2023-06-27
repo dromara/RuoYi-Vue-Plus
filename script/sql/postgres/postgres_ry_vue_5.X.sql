@@ -1130,6 +1130,39 @@ insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'X
 insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',         '','N', 'ap-beijing',  '1', '1', '', 103, 1, now(), 1, now(), null);
 insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',                 '','N', '',            '1', '1', '', 103, 1, now(), 1, now(), NULL);
 
+-- ----------------------------
+-- 流程表单信息表
+-- ----------------------------
+drop table if exists bpmn_form;
+create table if not exists bpmn_form
+(
+    form_id       int8,
+    tenant_id     varchar(20)  default '000000'::varchar,
+    form_name     varchar(255) default ''::varchar not null,
+    form_config   text,
+    content       text,
+    create_dept   int8,
+    create_by     int8,
+    create_time   timestamp,
+    update_by     int8,
+    update_time   timestamp,
+    remark        varchar(500) default ''::varchar,
+    constraint bpmn_form_pk primary key (bpmn_form)
+);
+
+comment on table wf_form is '流程表单信息表';
+comment on column bpmn_form.form_id     is '表单主键';
+comment on column bpmn_form.form_name   is '表单名称';
+comment on column bpmn_form.form_config is '表单配置';
+comment on column bpmn_form.content     is '表单内容';
+comment on column bpmn_form.create_dept is '创建部门';
+comment on column bpmn_form.create_by   is '创建者';
+comment on column bpmn_form.create_time is '创建时间';
+comment on column bpmn_form.update_by   is '更新者';
+comment on column bpmn_form.update_time is '更新时间';
+comment on column bpmn_form.remark      is '备注';
+comment on column bpmn_form.del_flag    is '删除标志（0代表存在 2代表删除）';
+
 -- 字符串自动转时间 避免框架时间查询报错问题
 create or replace function cast_varchar_to_timestamp(varchar) returns timestamptz as $$
 select to_timestamp($1, 'yyyy-mm-dd hh24:mi:ss');
