@@ -7,13 +7,12 @@ import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.model.LoginUser;
-import org.dromara.common.core.enums.DeviceType;
 import org.dromara.common.core.enums.UserType;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
@@ -37,40 +36,21 @@ public class LoginHelper {
     public static final String USER_KEY = "userId";
 
     /**
-     * 登录系统
-     *
-     * @param loginUser 登录用户信息
-     */
-    public static void login(LoginUser loginUser) {
-        loginByDevice(loginUser, null);
-    }
-
-    /**
      * 登录系统 基于 设备类型
      * 针对相同用户体系不同设备
      *
      * @param loginUser 登录用户信息
+     * @param model     配置参数
      */
-    public static void loginByDevice(LoginUser loginUser, DeviceType deviceType) {
+    public static void login(LoginUser loginUser, SaLoginModel model) {
         SaStorage storage = SaHolder.getStorage();
         storage.set(LOGIN_USER_KEY, loginUser);
         storage.set(TENANT_KEY, loginUser.getTenantId());
         storage.set(USER_KEY, loginUser.getUserId());
-        SaLoginModel model = new SaLoginModel();
-        if (ObjectUtil.isNotNull(deviceType)) {
-            model.setDevice(deviceType.getDevice());
-        }
-        // 自定义分配 不同用户体系 不同 token 授权时间 不设置默认走全局 yml 配置
-        // 例如: 后台用户30分钟过期 app用户1天过期
-//        UserType userType = UserType.getUserType(loginUser.getUserType());
-//        if (userType == UserType.SYS_USER) {
-//            model.setTimeout(86400).setActiveTimeout(1800);
-//        } else if (userType == UserType.APP_USER) {
-//            model.setTimeout(86400).setActiveTimeout(1800);
-//        }
+        model = ObjectUtil.defaultIfNull(model, new SaLoginModel());
         StpUtil.login(loginUser.getLoginId(),
-                model.setExtra(TENANT_KEY, loginUser.getTenantId())
-                    .setExtra(USER_KEY, loginUser.getUserId()));
+            model.setExtra(TENANT_KEY, loginUser.getTenantId())
+                .setExtra(USER_KEY, loginUser.getUserId()));
         StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
     }
 

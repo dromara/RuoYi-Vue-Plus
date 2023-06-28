@@ -37,14 +37,26 @@ public class ExcelEnumConvert implements Converter<Object> {
 
     @Override
     public Object convertToJavaData(ReadCellData<?> cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-        Object codeValue = cellData.getData();
+        cellData.checkEmpty();
+        // Excel中填入的是枚举中指定的描述
+        Object textValue = switch (cellData.getType()) {
+            case STRING, DIRECT_STRING, RICH_TEXT_STRING -> cellData.getStringValue();
+            case NUMBER -> cellData.getNumberValue();
+            case BOOLEAN -> cellData.getBooleanValue();
+            default -> throw new IllegalArgumentException("单元格类型异常!");
+        };
         // 如果是空值
-        if (ObjectUtil.isNull(codeValue)) {
+        if (ObjectUtil.isNull(textValue)) {
             return null;
         }
-        Map<Object, String> enumValueMap = beforeConvert(contentProperty);
-        String textValue = enumValueMap.get(codeValue);
-        return Convert.convert(contentProperty.getField().getType(), textValue);
+        Map<Object, String> enumCodeToTextMap = beforeConvert(contentProperty);
+        // 从Java输出至Excel是code转text
+        // 因此从Excel转Java应该将text与code对调
+        Map<Object, Object> enumTextToCodeMap = new HashMap<>();
+        enumCodeToTextMap.forEach((key, value) -> enumTextToCodeMap.put(value, key));
+        // 应该从text -> code中查找
+        Object codeValue = enumTextToCodeMap.get(textValue);
+        return Convert.convert(contentProperty.getField().getType(), codeValue);
     }
 
     @Override
