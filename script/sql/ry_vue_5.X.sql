@@ -813,3 +813,24 @@ create table wf_form (
   remark          varchar(500)            default null    comment '备注',
   primary key (form_id)
 ) engine=innodb comment='流程表单信息表';
+
+-- ----------------------------
+-- 流程分类信息表
+-- ----------------------------
+create table wf_category
+(
+    id            bigint                       not null comment '主键'
+        primary key,
+    category_name varchar(255)                 null comment '分类名称',
+    category_code varchar(255)                 null comment '分类编码',
+    parent_id     bigint                       null comment '父级id',
+    sort_num      int(19)                      null comment '排序',
+    tenant_id     varchar(20) default '000000' null comment '租户编号',
+    create_dept   bigint                       null comment '创建部门',
+    create_by     bigint                       null comment '创建者',
+    create_time   datetime                     null comment '创建时间',
+    update_by     bigint                       null comment '更新者',
+    update_time   datetime                     null comment '更新时间',
+    constraint uni_category_code
+        unique (category_code)
+) engine=innodb comment= '流程分类';
