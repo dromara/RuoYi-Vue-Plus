@@ -83,6 +83,9 @@ public class ActModelServiceImpl implements IActModelService {
         if (StringUtils.isNotEmpty(modelBo.getKey())) {
             query.modelKey(modelBo.getKey());
         }
+        if (StringUtils.isNotEmpty(modelBo.getCategoryCode())) {
+            query.modelCategory(modelBo.getCategoryCode());
+        }
         query.orderByLastUpdateTime().desc();
         //创建时间降序排列
         query.orderByCreateTime().desc();
@@ -125,6 +128,7 @@ public class ActModelServiceImpl implements IActModelService {
             Model model = repositoryService.newModel();
             model.setKey(key);
             model.setName(name);
+            model.setCategory(modelBo.getCategoryCode());
             model.setVersion(version);
             model.setTenantId(TenantHelper.getTenantId());
             ObjectMapper objectMapper = JsonUtils.getObjectMapper();
