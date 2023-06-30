@@ -272,6 +272,17 @@
                 <version>${lock4j.version}</version>
             </dependency>
 
+            <!-- PowerJob -->
+            <dependency>
+                <groupId>tech.powerjob</groupId>
+                <artifactId>powerjob-worker-spring-boot-starter</artifactId>
+                <version>${powerjob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tech.powerjob</groupId>
+                <artifactId>powerjob-official-processors</artifactId>
+                <version>${powerjob.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -328,18 +339,6 @@
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-demo</artifactId>
                 <version>${revision}</version>
-            </dependency>
-
-            <!-- PowerJob -->
-            <dependency>
-                <groupId>tech.powerjob</groupId>
-                <artifactId>powerjob-worker-spring-boot-starter</artifactId>
-                <version>${powerjob.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>tech.powerjob</groupId>
-                <artifactId>powerjob-official-processors</artifactId>
-                <version>${powerjob.version}</version>
             </dependency>
 
         </dependencies>
