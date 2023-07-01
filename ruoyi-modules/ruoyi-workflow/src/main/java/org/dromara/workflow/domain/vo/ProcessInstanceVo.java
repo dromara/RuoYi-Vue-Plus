@@ -5,6 +5,7 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 流程实例视图
@@ -86,4 +87,9 @@ public class ProcessInstanceVo implements Serializable {
      * 流程状态
      */
     private String businessStatusName;
+
+    /**
+     * 待办任务集合
+     */
+    private List<TaskVo> taskVoList;
 }

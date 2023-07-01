@@ -13,8 +13,6 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
-import org.dromara.system.domain.vo.SysUserVo;
-import org.dromara.system.service.ISysUserService;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.common.enums.BusinessStatusEnum;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
@@ -22,6 +20,7 @@ import org.dromara.workflow.domain.bo.ProcessInvalidBo;
 import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
 import org.dromara.workflow.domain.vo.GraphicInfoVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
+import org.dromara.workflow.domain.vo.TaskVo;
 import org.dromara.workflow.flowable.CustomDefaultProcessDiagramGenerator;
 import org.dromara.workflow.service.IActProcessInstanceService;
 import org.flowable.bpmn.model.*;
@@ -62,7 +61,6 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     private final RepositoryService repositoryService;
     private final RuntimeService runtimeService;
     private final HistoryService historyService;
-    private final ISysUserService iSysUserService;
     private final TaskService taskService;
 
     @Value("${flowable.activity-font-name}")
@@ -250,16 +248,12 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (ObjectUtil.isNotEmpty(historicTaskInstance.getDurationInMillis())) {
                 actHistoryInfoVo.setRunDuration(getDuration(historicTaskInstance.getDurationInMillis()));
             }
+            try {
+                actHistoryInfoVo.setAssignee(StringUtils.isNotBlank(historicTaskInstance.getAssignee()) ? Long.valueOf(historicTaskInstance.getAssignee()) : null);
+            } catch (NumberFormatException ignored) {
+
+            }
             actHistoryInfoVoList.add(actHistoryInfoVo);
-        }
-        //翻译人员名称
-        if (CollUtil.isNotEmpty(actHistoryInfoVoList)) {
-            actHistoryInfoVoList.forEach(e -> {
-                if (StringUtils.isNotBlank(e.getAssignee())) {
-                    SysUserVo sysUserVo = iSysUserService.selectUserById(Long.valueOf(e.getAssignee()));
-                    e.setNickName(ObjectUtil.isNotEmpty(sysUserVo) ? sysUserVo.getNickName() : "");
-                }
-            });
         }
         List<ActHistoryInfoVo> nodeInfoList = new ArrayList<>();
         Map<String, List<ActHistoryInfoVo>> groupByKey = StreamUtils.groupByKey(actHistoryInfoVoList, ActHistoryInfoVo::getTaskDefinitionKey);
@@ -421,25 +415,28 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean cancelProcessApply(String processInstanceId) {
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-            .processInstanceId(processInstanceId).processInstanceTenantId(TenantHelper.getTenantId()).startedBy(String.valueOf(LoginHelper.getUserId())).singleResult();
-        if (ObjectUtil.isNull(processInstance)) {
-            throw new ServiceException("您不是流程发起人,撤销失败!");
-        }
-        if (processInstance.isSuspended()) {
-            throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
-        }
-        BusinessStatusEnum.checkStatus(processInstance.getBusinessStatus());
-        List<Task> taskList = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(processInstanceId).list();
-        for (Task task : taskList) {
-            taskService.addComment(task.getId(), processInstanceId, "申请人撤销申请");
-        }
         try {
-            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().finished().orderByHistoricTaskInstanceEndTime().finished().list().get(0);
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId).processInstanceTenantId(TenantHelper.getTenantId()).startedBy(String.valueOf(LoginHelper.getUserId())).singleResult();
+            if (ObjectUtil.isNull(processInstance)) {
+                throw new ServiceException("您不是流程发起人,撤销失败!");
+            }
+            if (processInstance.isSuspended()) {
+                throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
+            }
+            BusinessStatusEnum.checkStatus(processInstance.getBusinessStatus());
+            List<Task> taskList = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(processInstanceId).list();
+            for (Task task : taskList) {
+                taskService.setAssignee(task.getId(), String.valueOf(LoginHelper.getUserId()));
+                taskService.addComment(task.getId(), processInstanceId, LoginHelper.getUsername() + "：撤销申请");
+            }
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().finished().orderByHistoricTaskInstanceEndTime().asc().list().get(0);
             List<String> nodeIds = StreamUtils.toList(taskList, Task::getTaskDefinitionKey);
             runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstanceId)
                 .moveActivityIdsToSingleActivityId(nodeIds, historicTaskInstance.getTaskDefinitionKey()).changeState();
+            Task task = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(processInstanceId).list().get(0);
+            taskService.setAssignee(task.getId(), historicTaskInstance.getAssignee());
             runtimeService.updateBusinessStatus(processInstanceId, BusinessStatusEnum.CANCEL.getStatus());
             return true;
         } catch (Exception e) {
@@ -465,10 +462,26 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         if (StringUtils.isNotBlank(processInstanceBo.getBusinessKey())) {
             query.processInstanceBusinessKey(processInstanceBo.getBusinessKey());
         }
+        if (StringUtils.isNotBlank(processInstanceBo.getCategoryCode())) {
+            query.processInstanceBusinessKey(processInstanceBo.getCategoryCode());
+        }
+        query.orderByProcessInstanceStartTime().desc();
         List<HistoricProcessInstance> historicProcessInstanceList = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
+        List<TaskVo> taskVoList = new ArrayList<>();
+        if (CollUtil.isNotEmpty(historicProcessInstanceList)) {
+            List<String> processInstanceIds = StreamUtils.toList(historicProcessInstanceList, HistoricProcessInstance::getId);
+            List<Task> taskList = taskService.createTaskQuery().processInstanceIdIn(processInstanceIds).taskTenantId(TenantHelper.getTenantId()).list();
+            for (Task task : taskList) {
+                taskVoList.add(BeanUtil.toBean(task, TaskVo.class));
+            }
+        }
         for (HistoricProcessInstance processInstance : historicProcessInstanceList) {
             ProcessInstanceVo processInstanceVo = BeanUtil.toBean(processInstance, ProcessInstanceVo.class);
             processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstance.getBusinessStatus()));
+            if (CollUtil.isNotEmpty(taskVoList)) {
+                List<TaskVo> collect = taskVoList.stream().filter(e -> e.getProcessInstanceId().equals(processInstance.getId())).collect(Collectors.toList());
+                processInstanceVo.setTaskVoList(CollUtil.isNotEmpty(collect) ? collect : Collections.emptyList());
+            }
             list.add(processInstanceVo);
         }
         long count = query.count();

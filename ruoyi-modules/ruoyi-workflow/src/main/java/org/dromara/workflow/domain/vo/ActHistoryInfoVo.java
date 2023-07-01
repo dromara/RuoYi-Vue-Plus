@@ -1,6 +1,8 @@
 package org.dromara.workflow.domain.vo;
 
 import lombok.Data;
+import org.dromara.common.translation.annotation.Translation;
+import org.dromara.common.translation.constant.TransConstant;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -51,11 +53,12 @@ public class ActHistoryInfoVo implements Serializable {
     /**
      * 办理人id
      */
-    private String assignee;
+    private Long assignee;
 
     /**
      * 办理人名称
      */
+    @Translation(type = TransConstant.USER_ID_TO_NICKNAME, mapper = "assignee")
     private String nickName;
 
     /**
