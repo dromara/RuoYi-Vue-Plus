@@ -180,6 +180,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                     taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
                 });
             }
+            taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
             taskVo.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
             list.add(taskVo);
         }
@@ -215,6 +216,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                     taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
                 });
             }
+            taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
             list.add(taskVo);
         }
         long count = query.count();
