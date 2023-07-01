@@ -85,6 +85,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         if (StringUtils.isNotBlank(processInstanceBo.getName())) {
             query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
         }
+        if (StringUtils.isNotBlank(processInstanceBo.getKey())) {
+            query.processDefinitionKey(processInstanceBo.getKey());
+        }
         if (StringUtils.isNotBlank(processInstanceBo.getStartUserId())) {
             query.startedBy(processInstanceBo.getStartUserId());
         }
@@ -118,6 +121,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         query.processInstanceTenantId(TenantHelper.getTenantId());
         if (StringUtils.isNotEmpty(processInstanceBo.getName())) {
             query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
+        }
+        if (StringUtils.isNotBlank(processInstanceBo.getKey())) {
+            query.processDefinitionKey(processInstanceBo.getKey());
         }
         if (StringUtils.isNotEmpty(processInstanceBo.getStartUserId())) {
             query.startedBy(processInstanceBo.getStartUserId());
@@ -459,11 +465,14 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         if (StringUtils.isNotBlank(processInstanceBo.getName())) {
             query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
         }
+        if (StringUtils.isNotBlank(processInstanceBo.getKey())) {
+            query.processDefinitionKey(processInstanceBo.getKey());
+        }
         if (StringUtils.isNotBlank(processInstanceBo.getBusinessKey())) {
             query.processInstanceBusinessKey(processInstanceBo.getBusinessKey());
         }
         if (StringUtils.isNotBlank(processInstanceBo.getCategoryCode())) {
-            query.processInstanceBusinessKey(processInstanceBo.getCategoryCode());
+            query.processDefinitionCategory(processInstanceBo.getCategoryCode());
         }
         query.orderByProcessInstanceStartTime().desc();
         List<HistoricProcessInstance> historicProcessInstanceList = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());

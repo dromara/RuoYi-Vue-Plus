@@ -122,6 +122,16 @@ public class TaskVo {
     private String businessStatusName;
 
     /**
+     * 流程定义名称
+     */
+    private String processDefinitionName;
+
+    /**
+     * 流程定义key
+     */
+    private String processDefinitionKey;
+
+    /**
      * 参与者
      */
     private ParticipantVo participantVo;

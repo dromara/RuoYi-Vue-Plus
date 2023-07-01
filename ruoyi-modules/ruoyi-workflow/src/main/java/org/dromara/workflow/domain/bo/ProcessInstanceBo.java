@@ -25,6 +25,11 @@ public class ProcessInstanceBo extends PageEntity implements Serializable {
     private String name;
 
     /**
+     * 流程key
+     */
+    private String key;
+
+    /**
      * 任务发起人
      */
     private String startUserId;

@@ -23,4 +23,14 @@ public class TaskBo extends PageEntity implements Serializable {
      * 任务名称
      */
     private String name;
+
+    /**
+     * 流程定义名称
+     */
+    private String processDefinitionName;
+
+    /**
+     * 流程定义key
+     */
+    private String processDefinitionKey;
 }

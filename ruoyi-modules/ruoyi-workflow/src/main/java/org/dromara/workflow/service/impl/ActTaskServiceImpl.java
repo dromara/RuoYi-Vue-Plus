@@ -165,6 +165,12 @@ public class ActTaskServiceImpl implements IActTaskService {
         if (StringUtils.isNotBlank(taskBo.getName())) {
             query.taskNameLike("%" + taskBo.getName() + "%");
         }
+        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionName())) {
+            query.processDefinitionNameLike("%" + taskBo.getProcessDefinitionName() + "%");
+        }
+        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
+            query.processDefinitionKey(taskBo.getProcessDefinitionKey() );
+        }
         List<Task> taskList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
         List<ProcessInstance> processInstanceList = null;
         if (CollUtil.isNotEmpty(taskList)) {
@@ -178,6 +184,8 @@ public class ActTaskServiceImpl implements IActTaskService {
                 processInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
                     taskVo.setBusinessStatus(e.getBusinessStatus());
                     taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
+                    taskVo.setProcessDefinitionKey(e.getProcessDefinitionKey());
+                    taskVo.setProcessDefinitionName(e.getProcessDefinitionName());
                 });
             }
             taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
@@ -201,6 +209,12 @@ public class ActTaskServiceImpl implements IActTaskService {
         if (StringUtils.isNotBlank(taskBo.getName())) {
             query.taskNameLike("%" + taskBo.getName() + "%");
         }
+        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionName())) {
+            query.processDefinitionNameLike("%" + taskBo.getProcessDefinitionName() + "%");
+        }
+        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
+            query.processDefinitionKey( taskBo.getProcessDefinitionKey() );
+        }
         List<HistoricTaskInstance> taskInstanceList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
         List<HistoricProcessInstance> historicProcessInstanceList = null;
         if (CollUtil.isNotEmpty(taskInstanceList)) {
@@ -214,6 +228,8 @@ public class ActTaskServiceImpl implements IActTaskService {
                 historicProcessInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
                     taskVo.setBusinessStatus(e.getBusinessStatus());
                     taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
+                    taskVo.setProcessDefinitionKey(e.getProcessDefinitionKey());
+                    taskVo.setProcessDefinitionName(e.getProcessDefinitionName());
                 });
             }
             taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
