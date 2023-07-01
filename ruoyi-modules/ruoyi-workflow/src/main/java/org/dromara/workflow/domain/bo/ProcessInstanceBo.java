@@ -33,4 +33,9 @@ public class ProcessInstanceBo extends PageEntity implements Serializable {
      * 业务id
      */
     private String businessKey;
+
+    /**
+     * 模型分类
+     */
+    private String categoryCode;
 }

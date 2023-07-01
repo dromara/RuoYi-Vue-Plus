@@ -93,6 +93,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         if (StringUtils.isNotBlank(processInstanceBo.getBusinessKey())) {
             query.processInstanceBusinessKey(processInstanceBo.getBusinessKey());
         }
+        if (StringUtils.isNotBlank(processInstanceBo.getCategoryCode())) {
+            query.processDefinitionCategory(processInstanceBo.getCategoryCode());
+        }
         List<ProcessInstance> processInstances = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
         for (ProcessInstance processInstance : processInstances) {
             ProcessInstanceVo processInstanceVo = BeanUtil.toBean(processInstance, ProcessInstanceVo.class);
@@ -123,6 +126,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (StringUtils.isNotBlank(processInstanceBo.getBusinessKey())) {
             query.processInstanceBusinessKey(processInstanceBo.getBusinessKey());
+        }
+        if (StringUtils.isNotBlank(processInstanceBo.getCategoryCode())) {
+            query.processDefinitionCategory(processInstanceBo.getCategoryCode());
         }
         List<HistoricProcessInstance> historicProcessInstances = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
         for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {

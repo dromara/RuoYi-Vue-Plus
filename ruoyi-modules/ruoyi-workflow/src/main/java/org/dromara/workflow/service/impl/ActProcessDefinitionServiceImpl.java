@@ -64,6 +64,9 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         if (StringUtils.isNotEmpty(processDefinitionBo.getKey())) {
             query.processDefinitionKey(processDefinitionBo.getKey());
         }
+        if (StringUtils.isNotEmpty(processDefinitionBo.getCategoryCode())) {
+            query.processDefinitionCategory(processDefinitionBo.getCategoryCode());
+        }
         if (StringUtils.isNotEmpty(processDefinitionBo.getName())) {
             query.processDefinitionNameLike("%" + processDefinitionBo.getName() + "%");
         }

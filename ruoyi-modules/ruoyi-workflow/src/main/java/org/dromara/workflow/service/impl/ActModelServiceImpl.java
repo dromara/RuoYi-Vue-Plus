@@ -36,6 +36,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.validation.ValidationError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -292,6 +293,9 @@ public class ActModelServiceImpl implements IActModelService {
             // 更新 部署id 到流程定义模型数据表中
             model.setDeploymentId(deployment.getId());
             repositoryService.saveModel(model);
+            // 更新分类
+            ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+            repositoryService.setProcessDefinitionCategory(definition.getId(), model.getCategory());
             return true;
         } catch (Exception e) {
             e.printStackTrace();

@@ -23,9 +23,15 @@ public class ProcessDefinitionBo extends PageEntity implements Serializable {
      * 流程定义名称key
      */
     private String key;
+
     /**
      * 流程定义名称
      */
     private String name;
+
+    /**
+     * 模型分类
+     */
+    private String categoryCode;
 
 }

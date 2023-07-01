@@ -34,7 +34,7 @@ public class ModelBo extends PageEntity implements Serializable {
     private String key;
 
     /**
-     * 模型标识key
+     * 模型分类
      */
     @NotBlank(message = "模型分类不能为空", groups = {AddGroup.class})
     private String categoryCode;
