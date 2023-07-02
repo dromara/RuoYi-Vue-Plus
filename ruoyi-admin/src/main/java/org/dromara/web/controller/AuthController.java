@@ -103,22 +103,21 @@ public class AuthController {
     }
 
     /**
-     * 第三方登录回调业务处理
-     *  绑定授权
-     * @param loginBody
+     * 第三方登录回调业务处理 绑定授权
+     *
+     * @param loginBody 请求体
      * @return 结果
      */
-    @SuppressWarnings("unchecked")
     @PostMapping("/social/callback")
-    public R<LoginVo> socialLogin(@RequestBody LoginBody loginBody) {
-            // 获取第三方登录信息
-            AuthResponse<AuthUser> response = SocialUtils.loginAuth(loginBody, socialProperties);
-            AuthUser authUserData = response.getData();
-            // 判断授权响应是否成功
-            if (!response.ok()) {
-                return R.fail(response.getMsg());
-            }
-            return loginService.sociaRegister(authUserData);
+    public R<LoginVo> socialCallback(@RequestBody LoginBody loginBody) {
+        // 获取第三方登录信息
+        AuthResponse<AuthUser> response = SocialUtils.loginAuth(loginBody, socialProperties);
+        AuthUser authUserData = response.getData();
+        // 判断授权响应是否成功
+        if (!response.ok()) {
+            return R.fail(response.getMsg());
+        }
+        return loginService.sociaRegister(authUserData);
     }
 
 

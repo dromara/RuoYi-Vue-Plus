@@ -67,13 +67,13 @@ public class SysLoginService {
     private final SysUserMapper userMapper;
 
 
-
     /**
      * 绑定第三方用户
+     *
      * @param authUserData 授权响应实体
      * @return 统一响应实体
      */
-    public R<LoginVo> sociaRegister(AuthUser authUserData ){
+    public R<LoginVo> sociaRegister(AuthUser authUserData) {
         SysSocialBo bo = new SysSocialBo();
         bo.setUserId(LoginHelper.getUserId());
         bo.setAuthId(authUserData.getSource() + authUserData.getUuid());
@@ -123,9 +123,9 @@ public class SysLoginService {
 
     private SysUserVo loadUserByUsername(String tenantId, String username) {
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-                .select(SysUser::getUserName, SysUser::getStatus)
-                .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
-                .eq(SysUser::getUserName, username));
+            .select(SysUser::getUserName, SysUser::getStatus)
+            .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
+            .eq(SysUser::getUserName, username));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", username);
             throw new UserException("user.not.exists", username);
@@ -225,7 +225,7 @@ public class SysLoginService {
             log.info("登录租户：{} 已被停用.", tenantId);
             throw new TenantException("tenant.blocked");
         } else if (ObjectUtil.isNotNull(tenant.getExpireTime())
-            && new Date().after(tenant.getExpireTime())) {
+                   && new Date().after(tenant.getExpireTime())) {
             log.info("登录租户：{} 已超过有效期.", tenantId);
             throw new TenantException("tenant.expired");
         }

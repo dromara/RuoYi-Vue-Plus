@@ -1,7 +1,6 @@
 package org.dromara.common.social.config.properties;
 
 import lombok.Data;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +19,7 @@ public class SocialProperties {
     /**
      * 是否启用
      */
-    private boolean enabled;
+    private Boolean enabled;
 
     /**
      * 授权类型
@@ -30,11 +29,6 @@ public class SocialProperties {
     /**
      * 授权过期时间
      */
-    private long timeout;
-
-    /**
-     * 授权缓存配置
-     */
-    private CacheProperties cache = new CacheProperties();
+    private Long timeout;
 
 }

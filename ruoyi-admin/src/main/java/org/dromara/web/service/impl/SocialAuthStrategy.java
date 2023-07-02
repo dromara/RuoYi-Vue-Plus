@@ -11,17 +11,21 @@ import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.domain.model.LoginBody;
-import org.dromara.common.core.domain.model.SocialLogin;
+import org.dromara.common.core.domain.model.LoginUser;
+import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.core.validate.auth.SocialGroup;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
+import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.vo.SysSocialVo;
+import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.service.ISysSocialService;
 import org.dromara.web.domain.vo.LoginVo;
@@ -37,7 +41,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service("social" + IAuthStrategy.BASE_NAME)
 @RequiredArgsConstructor
-public class socialAuthStrategy implements IAuthStrategy {
+public class SocialAuthStrategy implements IAuthStrategy {
 
     private final SocialProperties socialProperties;
     private final ISysSocialService sysSocialService;
@@ -52,13 +56,14 @@ public class socialAuthStrategy implements IAuthStrategy {
 
     /**
      * 登录-第三方授权登录
-     * @param clientId 客户端id
+     *
+     * @param clientId  客户端id
      * @param loginBody 登录信息
-     * @param client 客户端信息
+     * @param client    客户端信息
      */
     @Override
     public LoginVo login(String clientId, LoginBody loginBody, SysClient client) {
-        AuthResponse<AuthUser> response = SocialUtils.loginAuth(loginBody,socialProperties);
+        AuthResponse<AuthUser> response = SocialUtils.loginAuth(loginBody, socialProperties);
         if (!response.ok()) {
             throw new ServiceException(response.getMsg());
         }
@@ -66,30 +71,19 @@ public class socialAuthStrategy implements IAuthStrategy {
         SysSocialVo social = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
         if (!ObjectUtil.isNotNull(social)) {
             throw new ServiceException("你还没有绑定第三方账号，绑定后才可以登录！");
-        }//验证授权表里面的租户id是否包含当前租户id
-        if (ObjectUtil.isNotNull(social) && StrUtil.isNotBlank(social.getTenantId())
-            && !social.getTenantId().contains(loginBody.getTenantId())) {
+        }
+        // 验证授权表里面的租户id是否包含当前租户id
+        String tenantId = social.getTenantId();
+        if (ObjectUtil.isNotNull(social) && StrUtil.isNotBlank(tenantId)
+            && !tenantId.contains(loginBody.getTenantId())) {
             throw new ServiceException("对不起，你没有权限登录当前租户！");
         }
-        return loadinUser(social, client);
-    }
 
-    /**
-     * 登录用户信息
-     *
-     * @param social
-     * @param client
-     * @return
-     */
-    private LoginVo loadinUser(SysSocialVo social, SysClient client) {
-        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .eq(SysUser::getUserId, social.getUserId()));
-        SocialLogin loginUser = new SocialLogin();
-        loginUser.setUserId(user.getUserId());
-        loginUser.setTenantId(user.getTenantId());
-        loginUser.setUsername(user.getUserName());
-        loginUser.setUserType(user.getUserType());
-        // 执行登录
+        // 查找用户
+        SysUserVo user = loadUser(tenantId, social.getUserId());
+
+        // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
+        LoginUser loginUser = loginService.buildLoginUser(user);
         SaLoginModel model = new SaLoginModel();
         model.setDevice(client.getDeviceType());
         // 自定义分配 不同用户体系 不同 token 授权时间 不设置默认走全局 yml 配置
@@ -104,6 +98,24 @@ public class socialAuthStrategy implements IAuthStrategy {
         LoginVo loginVo = new LoginVo();
         loginVo.setAccessToken(StpUtil.getTokenValue());
         return loginVo;
+    }
+
+    private SysUserVo loadUser(String tenantId, Long userId) {
+        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+            .select(SysUser::getUserName, SysUser::getStatus)
+            .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
+            .eq(SysUser::getUserId, userId));
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", "");
+            throw new UserException("user.not.exists", "");
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", "");
+            throw new UserException("user.blocked", "");
+        }
+        if (TenantHelper.isEnable()) {
+            return userMapper.selectTenantUserByUserName(user.getUserName(), tenantId);
+        }
+        return userMapper.selectUserByUserName(user.getUserName());
     }
 
 }
