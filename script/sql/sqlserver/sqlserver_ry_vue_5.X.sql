@@ -1679,7 +1679,7 @@ INSERT sys_menu VALUES (121, N'租户管理', 6, 1, N'tenant', N'system/tenant/i
 GO
 INSERT sys_menu VALUES (122, N'租户套餐管理', 6, 2, N'tenantPackage', N'system/tenantPackage/index', N'', 1, 0, N'C', N'0', N'0', N'system:tenantPackage:list', N'code', 103, 1, getdate(), NULL, NULL, N'租户套餐管理菜单')
 GO
-INSERT sys_menu VALUES (123, N'客户端管理', 1, 1, N'client', N'system/client/index', N'', 1, 0, N'C', N'0', N'0', N'system:client:list', N'international', 103, 1, getdate(), NULL, NULL, N'客户端管理菜单')
+INSERT sys_menu VALUES (123, N'客户端管理', 1, 11, N'client', N'system/client/index', N'', 1, 0, N'C', N'0', N'0', N'system:client:list', N'international', 103, 1, getdate(), NULL, NULL, N'客户端管理菜单')
 GO
 INSERT sys_menu VALUES (117, N'Admin监控', 2, 5, N'Admin', N'monitor/admin/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:admin:list', N'dashboard', 103, 1, getdate(), NULL, NULL, N'Admin监控菜单');
 GO

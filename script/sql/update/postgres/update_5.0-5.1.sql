@@ -127,7 +127,7 @@ insert into sys_dict_data values(35, '000000', 0,  'PC端', 'pc',            'sy
 insert into sys_dict_data values(36, '000000', 0,  'APP端', 'app',          'sys_device_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, 'APP端');
 
 -- 二级菜单
-insert into sys_menu values('123',  '客户端管理',   '1',   '1', 'client',           'system/client/index',          '', '1', '0', 'C', '0', '0', 'system:client:list',          'international', 103, 1, now(), null, null, '客户端管理菜单');
+insert into sys_menu values('123',  '客户端管理',   '1',   '11', 'client',           'system/client/index',          '', '1', '0', 'C', '0', '0', 'system:client:list',          'international', 103, 1, now(), null, null, '客户端管理菜单');
 -- 客户端管理按钮
 insert into sys_menu values('1061', '客户端管理查询', '123', '1',  '#', '', '', '1', '0', 'F', '0', '0', 'system:client:query',        '#', 103, 1, now(), null, null, '');
 insert into sys_menu values('1062', '客户端管理新增', '123', '2',  '#', '', '', '1', '0', 'F', '0', '0', 'system:client:add',          '#', 103, 1, now(), null, null, '');

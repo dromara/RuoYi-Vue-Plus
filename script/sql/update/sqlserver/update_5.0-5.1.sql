@@ -377,7 +377,7 @@ INSERT sys_dict_data VALUES (36, N'000000', 0, N'APP端', N'`app`', N'sys_device
 GO
 
 -- 二级菜单
-INSERT sys_menu VALUES (123, N'客户端管理', 1, 1, N'client', N'system/client/index', N'', 1, 0, N'C', N'0', N'0', N'system:client:list', N'international', 103, 1, getdate(), NULL, NULL, N'客户端管理菜单')
+INSERT sys_menu VALUES (123, N'客户端管理', 1, 11, N'client', N'system/client/index', N'', 1, 0, N'C', N'0', N'0', N'system:client:list', N'international', 103, 1, getdate(), NULL, NULL, N'客户端管理菜单')
 GO
 -- 客户端管理按钮
 INSERT sys_menu VALUES (1061, N'客户端管理查询', 123, 1, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:client:query', N'#', 103, 1, getdate(), NULL, NULL, N'');
