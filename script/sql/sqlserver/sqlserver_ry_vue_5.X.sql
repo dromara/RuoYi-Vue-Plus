@@ -3085,8 +3085,8 @@ GO
 CREATE TABLE sys_client
 (
     id                  bigint                              NOT NULL,
-    client_id           nvarchar(20)  DEFAULT ''            NULL,
-    client_key          nvarchar(255) DEFAULT ''            NULL,
+    client_id           nvarchar(64)  DEFAULT ''            NULL,
+    client_key          nvarchar(32) DEFAULT ''            NULL,
     client_secret       nvarchar(255) DEFAULT ''            NULL,
     grant_type          nvarchar(255) DEFAULT ''            NULL,
     device_type         nvarchar(32) DEFAULT ''            NULL,
