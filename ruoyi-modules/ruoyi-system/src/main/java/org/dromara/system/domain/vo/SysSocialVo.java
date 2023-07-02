@@ -73,7 +73,7 @@ public class SysSocialVo implements Serializable {
     /**
      * 用户的 open id
      */
-    @ExcelProperty(value = "用户的 open id")
+    @ExcelProperty(value = "平台的唯一id")
     private String openId;
 
     /**
