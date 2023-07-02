@@ -99,7 +99,7 @@ public class AuthController {
         }
         AuthRequest authRequest = SocialUtils.getAuthRequest(source, socialProperties);
         String authorizeUrl = authRequest.authorize(AuthStateUtils.createState());
-        return R.ok(authorizeUrl);
+        return R.ok("操作成功", authorizeUrl);
     }
 
     /**

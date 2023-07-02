@@ -44,8 +44,7 @@ public class SocialUtils  {
             case "coding" -> new AuthCodingRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri).build());
             case "oschina" -> new AuthOschinaRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri).build());
             // 支付宝在创建回调地址时，不允许使用localhost或者127.0.0.1，所以这儿的回调地址使用的局域网内的ip
-            // 使用支付宝需要提供alipay公钥
-            // case "alipay" -> new AuthAlipayRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri).build(), alipayPublicKey);
+            case "alipay" -> new AuthAlipayRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri).build(), socialProperties.getType().get("alipay").getAlipayPublicKey());
             case "qq" -> new AuthQqRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri).build());
             case "wechat_open" -> new AuthWeChatOpenRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri).build());
             case "taobao" -> new AuthTaobaoRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri).build());

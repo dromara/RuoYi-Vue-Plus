@@ -61,7 +61,7 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
-    'MS_Description', N'授权+授权openid' ,
+    'MS_Description', N'平台+平台唯一id' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_social',
     'COLUMN', N'auth_id'
@@ -73,7 +73,7 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'source'
 GO
 EXEC sys.sp_addextendedproperty
-    'MS_Description', N'原生openid' ,
+    'MS_Description', N'平台编号唯一id' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_social',
     'COLUMN', N'open_id'
