@@ -147,4 +147,26 @@ public class ActTaskController extends BaseController {
         return toAjax(iActTaskService.transferTask(transmitBo));
     }
 
+    /**
+     * 会签任务加签
+     *
+     * @param addMultiBo 参数
+     */
+    @Log(title = "任务管理", businessType = BusinessType.INSERT)
+    @PostMapping("/addMultiInstanceExecution")
+    public R<Void> addMultiInstanceExecution(@Validated({AddGroup.class}) @RequestBody AddMultiBo addMultiBo) {
+        return toAjax(iActTaskService.addMultiInstanceExecution(addMultiBo));
+    }
+
+    /**
+     * 会签任务减签
+     *
+     * @param deleteMultiBo 参数
+     */
+    @Log(title = "任务管理", businessType = BusinessType.INSERT)
+    @PostMapping("/deleteMultiInstanceExecution")
+    public R<Void> deleteMultiInstanceExecution(@Validated({AddGroup.class}) @RequestBody DeleteMultiBo deleteMultiBo) {
+        return toAjax(iActTaskService.deleteMultiInstanceExecution(deleteMultiBo));
+    }
+
 }

@@ -16,13 +16,18 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.common.enums.BusinessStatusEnum;
 import org.dromara.workflow.domain.bo.*;
+import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.TaskVo;
+import org.dromara.workflow.flowable.cmd.AddSequenceMultiInstanceCmd;
+import org.dromara.workflow.flowable.cmd.DeleteSequenceMultiInstanceCmd;
 import org.dromara.workflow.flowable.cmd.UpdateBusinessStatusCmd;
 import org.dromara.workflow.service.IActTaskService;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
@@ -169,7 +174,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             query.processDefinitionNameLike("%" + taskBo.getProcessDefinitionName() + "%");
         }
         if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
-            query.processDefinitionKey(taskBo.getProcessDefinitionKey() );
+            query.processDefinitionKey(taskBo.getProcessDefinitionKey());
         }
         List<Task> taskList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
         List<ProcessInstance> processInstanceList = null;
@@ -213,7 +218,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             query.processDefinitionNameLike("%" + taskBo.getProcessDefinitionName() + "%");
         }
         if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
-            query.processDefinitionKey( taskBo.getProcessDefinitionKey() );
+            query.processDefinitionKey(taskBo.getProcessDefinitionKey());
         }
         List<HistoricTaskInstance> taskInstanceList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
         List<HistoricProcessInstance> historicProcessInstanceList = null;
@@ -336,6 +341,96 @@ public class ActTaskServiceImpl implements IActTaskService {
                 StringUtils.isNotBlank(transmitBo.getComment()) ? transmitBo.getComment() : LoginHelper.getUsername() + "转办了任务");
             taskService.complete(newTask.getId());
             taskService.setAssignee(task.getId(), transmitBo.getUserId());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 会签任务加签
+     *
+     * @param addMultiBo 参数
+     */
+    @Override
+    public boolean addMultiInstanceExecution(AddMultiBo addMultiBo) {
+        Task task = taskService.createTaskQuery().taskId(addMultiBo.getTaskId()).taskTenantId(TenantHelper.getTenantId())
+            .taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
+        if (ObjectUtil.isEmpty(task)) {
+            throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
+        }
+        if (task.isSuspended()) {
+            throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
+        }
+        String taskDefinitionKey = task.getTaskDefinitionKey();
+        String processInstanceId = task.getProcessInstanceId();
+        String processDefinitionId = task.getProcessDefinitionId();
+
+        try {
+            MultiInstanceVo multiInstanceVo = WorkflowUtils.isMultiInstance(processDefinitionId, taskDefinitionKey);
+            if (multiInstanceVo == null) {
+                throw new ServiceException("当前环节不是会签节点");
+            }
+            if (multiInstanceVo.getType() instanceof ParallelMultiInstanceBehavior) {
+                for (Long assignee : addMultiBo.getAssignees()) {
+                    runtimeService.addMultiInstanceExecution(taskDefinitionKey, processInstanceId, Collections.singletonMap(multiInstanceVo.getAssignee(), assignee));
+                }
+            } else if (multiInstanceVo.getType() instanceof SequentialMultiInstanceBehavior) {
+                AddSequenceMultiInstanceCmd addSequenceMultiInstanceCmd = new AddSequenceMultiInstanceCmd(task.getExecutionId(), multiInstanceVo.getAssigneeList(), addMultiBo.getAssignees());
+                managementService.executeCommand(addSequenceMultiInstanceCmd);
+            }
+            List<String> assigneeNames = addMultiBo.getAssigneeNames();
+            String username = LoginHelper.getUsername();
+            TaskEntity newTask = WorkflowUtils.createNewTask(task);
+            taskService.addComment(newTask.getId(), processInstanceId, username + "加签【" + String.join(StringUtils.SEPARATOR, assigneeNames) + "】");
+            taskService.complete(newTask.getId());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 会签任务减签
+     *
+     * @param deleteMultiBo 参数
+     */
+    @Override
+    public boolean deleteMultiInstanceExecution(DeleteMultiBo deleteMultiBo) {
+        Task task = taskService.createTaskQuery().taskId(deleteMultiBo.getTaskId()).taskTenantId(TenantHelper.getTenantId())
+            .taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
+        if (ObjectUtil.isEmpty(task)) {
+            throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
+        }
+        if (task.isSuspended()) {
+            throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
+        }
+        String taskDefinitionKey = task.getTaskDefinitionKey();
+        String processInstanceId = task.getProcessInstanceId();
+        String processDefinitionId = task.getProcessDefinitionId();
+        try {
+            MultiInstanceVo multiInstanceVo = WorkflowUtils.isMultiInstance(processDefinitionId, taskDefinitionKey);
+            if (multiInstanceVo == null) {
+                throw new ServiceException("当前环节不是会签节点");
+            }
+            if (multiInstanceVo.getType() instanceof ParallelMultiInstanceBehavior) {
+                for (String executionId : deleteMultiBo.getExecutionIds()) {
+                    runtimeService.deleteMultiInstanceExecution(executionId, false);
+                }
+                for (String taskId : deleteMultiBo.getTaskIds()) {
+                    historyService.deleteHistoricTaskInstance(taskId);
+                }
+            } else if (multiInstanceVo.getType() instanceof SequentialMultiInstanceBehavior) {
+                DeleteSequenceMultiInstanceCmd deleteSequenceMultiInstanceCmd = new DeleteSequenceMultiInstanceCmd(task.getAssignee(), task.getExecutionId(), multiInstanceVo.getAssigneeList(), deleteMultiBo.getAssigneeIds());
+                managementService.executeCommand(deleteSequenceMultiInstanceCmd);
+            }
+            List<String> assigneeNames = deleteMultiBo.getAssigneeNames();
+            String username = LoginHelper.getUsername();
+            TaskEntity newTask = WorkflowUtils.createNewTask(task);
+            taskService.addComment(newTask.getId(), processInstanceId, username + "减签【" + String.join(StringUtils.SEPARATOR, assigneeNames) + "】");
+            taskService.complete(newTask.getId());
             return true;
         } catch (Exception e) {
             e.printStackTrace();

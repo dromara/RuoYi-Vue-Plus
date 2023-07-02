@@ -303,6 +303,10 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         //节点图形信息
         map.put("graphicInfoVos", graphicInfoVos);
+        //作废理由
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId)
+            .processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+        map.put("deleteReason", historicProcessInstance.getDeleteReason());
         return map;
     }
 

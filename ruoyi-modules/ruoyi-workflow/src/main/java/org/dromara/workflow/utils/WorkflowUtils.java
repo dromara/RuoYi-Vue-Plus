@@ -17,12 +17,16 @@ import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.mapper.SysUserRoleMapper;
 import org.dromara.workflow.common.constant.FlowConstant;
+import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.ParticipantVo;
 import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.*;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -223,5 +227,37 @@ public class WorkflowUtils {
             }
         }
         return participantVo;
+    }
+
+    /**
+     * 判断当前节点是否为会签节点
+     *
+     * @param processDefinitionId 流程定义id
+     * @param taskDefinitionKey   流程定义id
+     */
+    public static MultiInstanceVo isMultiInstance(String processDefinitionId, String taskDefinitionKey) {
+        BpmnModel bpmnModel = PROCESS_ENGINE.getRepositoryService().getBpmnModel(processDefinitionId);
+        FlowNode flowNode = (FlowNode) bpmnModel.getFlowElement(taskDefinitionKey);
+        MultiInstanceVo multiInstanceVo = new MultiInstanceVo();
+        //判断是否为并行会签节点
+        if (flowNode.getBehavior() instanceof ParallelMultiInstanceBehavior behavior && behavior.getCollectionExpression() != null) {
+            Expression collectionExpression = behavior.getCollectionExpression();
+            String assigneeList = collectionExpression.getExpressionText();
+            String assignee = behavior.getCollectionElementVariable();
+            multiInstanceVo.setType(behavior);
+            multiInstanceVo.setAssignee(assignee);
+            multiInstanceVo.setAssigneeList(assigneeList);
+            return multiInstanceVo;
+            //判断是否为串行会签节点
+        } else if (flowNode.getBehavior() instanceof SequentialMultiInstanceBehavior behavior && behavior.getCollectionExpression() != null) {
+            Expression collectionExpression = behavior.getCollectionExpression();
+            String assigneeList = collectionExpression.getExpressionText();
+            String assignee = behavior.getCollectionElementVariable();
+            multiInstanceVo.setType(behavior);
+            multiInstanceVo.setAssignee(assignee);
+            multiInstanceVo.setAssigneeList(assigneeList);
+            return multiInstanceVo;
+        }
+        return null;
     }
 }

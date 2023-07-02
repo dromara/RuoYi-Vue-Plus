@@ -68,4 +68,20 @@ public interface IActTaskService {
      * @return 结果
      */
     boolean transferTask(TransmitBo transmitBo);
+
+    /**
+     * 会签任务加签
+     *
+     * @param addMultiBo 参数
+     * @return 结果
+     */
+    boolean addMultiInstanceExecution(AddMultiBo addMultiBo);
+
+    /**
+     * 会签任务减签
+     *
+     * @param deleteMultiBo 参数
+     * @return 结果
+     */
+    boolean deleteMultiInstanceExecution(DeleteMultiBo deleteMultiBo);
 }
