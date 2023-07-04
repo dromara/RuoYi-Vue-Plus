@@ -110,9 +110,6 @@ export default {
             }
           ]
         });
-        window.addEventListener("resize",()=>{
-          this.commandstats.resize()
-        });
         this.usedmemory = echarts.init(this.$refs.usedmemory, "macarons");
         this.usedmemory.setOption({
           tooltip: {
@@ -137,6 +134,7 @@ export default {
           ]
         });
         window.addEventListener("resize",()=>{
+          this.commandstats.resize()
           this.usedmemory.resize()
         });
       });
