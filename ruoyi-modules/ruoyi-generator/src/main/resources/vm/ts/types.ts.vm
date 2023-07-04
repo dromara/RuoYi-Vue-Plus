@@ -1,6 +1,6 @@
 export interface ${BusinessName}VO {
 #foreach ($column in $columns)
-#if($column.insert || $column.edit)
+#if($column.list)
   /**
    * $column.columnComment
    */
