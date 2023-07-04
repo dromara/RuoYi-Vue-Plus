@@ -14,7 +14,7 @@ create table sys_social
     email              varchar(255)     default ''::varchar,
     avatar             varchar(500)     default ''::varchar,
     access_token       varchar(255)     not null,
-    expire_in          int8             default null::varchar,
+    expire_in          int8             default null,
     refresh_token      varchar(255)     default null::varchar,
     access_code        varchar(255)     default null::varchar,
     union_id           varchar(255)     default null::varchar,
@@ -1225,11 +1225,11 @@ insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'r
 drop table if exists sys_client;
 create table sys_client (
     id                  int8,
-    client_id           varchar(64)   ''::varchar,
-    client_key          varchar(32)   ''::varchar,
-    client_secret       varchar(255)  ''::varchar,
-    grant_type          varchar(255)  ''::varchar,
-    device_type         varchar(32)   ''::varchar,
+    client_id           varchar(64)   default ''::varchar,
+    client_key          varchar(32)   default ''::varchar,
+    client_secret       varchar(255)  default ''::varchar,
+    grant_type          varchar(255)  default ''::varchar,
+    device_type         varchar(32)   default ''::varchar,
     active_timeout      int4          default 1800,
     timeout             int4          default 604800,
     status              char(1)       default '0'::bpchar,
@@ -1240,7 +1240,7 @@ create table sys_client (
     update_by           int8,
     update_time         timestamp,
     constraint sys_client_pk primary key (id)
-)
+);
 
 comment on table sys_client                         is '系统授权表';
 comment on column sys_client.id                     is '主建';
