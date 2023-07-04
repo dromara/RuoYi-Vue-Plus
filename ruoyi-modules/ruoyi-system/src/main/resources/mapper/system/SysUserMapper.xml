@@ -16,15 +16,13 @@
         <id property="deptId" column="dept_id"/>
         <id property="email" column="dept_email"/>
         <id property="status" column="dept_status"/>
-        <id property="create_by" column="dept_create_by"/>
-        <id property="create_time" column="dept_create_time"/>
+        <id property="createTime" column="dept_create_time"/>
     </resultMap>
 
     <resultMap id="RoleResult" type="org.dromara.system.domain.vo.SysRoleVo">
         <id property="roleId" column="role_id"/>
         <id property="status" column="role_status"/>
-        <id property="create_by" column="role_create_by"/>
-        <id property="create_time" column="role_create_time"/>
+        <id property="createTime" column="role_create_time"/>
     </resultMap>
 
     <sql id="selectUserVo">
@@ -53,6 +51,8 @@
                d.order_num,
                d.leader,
                d.status as dept_status,
+               d.email as dept_email,
+               d.create_time as dept_cteate_time,
                r.role_id,
                r.role_name,
                r.role_key,
