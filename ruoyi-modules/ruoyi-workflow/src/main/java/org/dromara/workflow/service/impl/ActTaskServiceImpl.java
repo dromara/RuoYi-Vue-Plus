@@ -202,6 +202,48 @@ public class ActTaskServiceImpl implements IActTaskService {
     }
 
     /**
+     * 查询当前租户所有待办任务
+     *
+     * @param taskBo 参数
+     */
+    @Override
+    public TableDataInfo<TaskVo> getAllTaskWaitByPage(TaskBo taskBo) {
+        TaskQuery query = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId());
+        if (StringUtils.isNotBlank(taskBo.getName())) {
+            query.taskNameLike("%" + taskBo.getName() + "%");
+        }
+        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionName())) {
+            query.processDefinitionNameLike("%" + taskBo.getProcessDefinitionName() + "%");
+        }
+        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
+            query.processDefinitionKey(taskBo.getProcessDefinitionKey());
+        }
+        List<Task> taskList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
+        List<ProcessInstance> processInstanceList = null;
+        if (CollUtil.isNotEmpty(taskList)) {
+            Set<String> processInstanceIds = StreamUtils.toSet(taskList, Task::getProcessInstanceId);
+            processInstanceList = runtimeService.createProcessInstanceQuery().processInstanceIds(processInstanceIds).list();
+        }
+        List<TaskVo> list = new ArrayList<>();
+        for (Task task : taskList) {
+            TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
+            if (CollUtil.isNotEmpty(processInstanceList)) {
+                processInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
+                    taskVo.setBusinessStatus(e.getBusinessStatus());
+                    taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
+                    taskVo.setProcessDefinitionKey(e.getProcessDefinitionKey());
+                    taskVo.setProcessDefinitionName(e.getProcessDefinitionName());
+                });
+            }
+            taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
+            taskVo.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
+            list.add(taskVo);
+        }
+        long count = query.count();
+        return new TableDataInfo<>(list, count);
+    }
+
+    /**
      * 查询当前用户的已办任务
      *
      * @param taskBo 参数
@@ -211,6 +253,48 @@ public class ActTaskServiceImpl implements IActTaskService {
         String userId = String.valueOf(LoginHelper.getUserId());
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
             .taskAssignee(userId).taskTenantId(TenantHelper.getTenantId()).finished().orderByHistoricTaskInstanceStartTime().desc();
+        if (StringUtils.isNotBlank(taskBo.getName())) {
+            query.taskNameLike("%" + taskBo.getName() + "%");
+        }
+        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionName())) {
+            query.processDefinitionNameLike("%" + taskBo.getProcessDefinitionName() + "%");
+        }
+        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
+            query.processDefinitionKey(taskBo.getProcessDefinitionKey());
+        }
+        List<HistoricTaskInstance> taskInstanceList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
+        List<HistoricProcessInstance> historicProcessInstanceList = null;
+        if (CollUtil.isNotEmpty(taskInstanceList)) {
+            Set<String> processInstanceIds = StreamUtils.toSet(taskInstanceList, HistoricTaskInstance::getProcessInstanceId);
+            historicProcessInstanceList = historyService.createHistoricProcessInstanceQuery().processInstanceIds(processInstanceIds).list();
+        }
+        List<TaskVo> list = new ArrayList<>();
+        for (HistoricTaskInstance task : taskInstanceList) {
+            TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
+            if (CollUtil.isNotEmpty(historicProcessInstanceList)) {
+                historicProcessInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
+                    taskVo.setBusinessStatus(e.getBusinessStatus());
+                    taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
+                    taskVo.setProcessDefinitionKey(e.getProcessDefinitionKey());
+                    taskVo.setProcessDefinitionName(e.getProcessDefinitionName());
+                });
+            }
+            taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
+            list.add(taskVo);
+        }
+        long count = query.count();
+        return new TableDataInfo<>(list, count);
+    }
+
+    /**
+     * 查询当前租户所有已办任务
+     *
+     * @param taskBo 参数
+     */
+    @Override
+    public TableDataInfo<TaskVo> getAllTaskFinishByPage(TaskBo taskBo) {
+        HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
+            .taskTenantId(TenantHelper.getTenantId()).finished().orderByHistoricTaskInstanceStartTime().desc();
         if (StringUtils.isNotBlank(taskBo.getName())) {
             query.taskNameLike("%" + taskBo.getName() + "%");
         }

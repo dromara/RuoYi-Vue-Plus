@@ -71,6 +71,16 @@ public class ActTaskController extends BaseController {
     }
 
     /**
+     * 查询当前租户所有待办任务
+     *
+     * @param taskBo 参数
+     */
+    @GetMapping("/getAllTaskWaitByPage")
+    public TableDataInfo<TaskVo> getAllTaskWaitByPage(TaskBo taskBo) {
+        return iActTaskService.getAllTaskWaitByPage(taskBo);
+    }
+
+    /**
      * 查询当前用户的已办任务
      *
      * @param taskBo 参数
@@ -78,6 +88,16 @@ public class ActTaskController extends BaseController {
     @GetMapping("/getTaskFinishByPage")
     public TableDataInfo<TaskVo> getTaskFinishByPage(TaskBo taskBo) {
         return iActTaskService.getTaskFinishByPage(taskBo);
+    }
+
+    /**
+     * 查询当前租户所有已办任务
+     *
+     * @param taskBo 参数
+     */
+    @GetMapping("/getAllTaskFinishByPage")
+    public TableDataInfo<TaskVo> getAllTaskFinishByPage(TaskBo taskBo) {
+        return iActTaskService.getAllTaskFinishByPage(taskBo);
     }
 
     /**

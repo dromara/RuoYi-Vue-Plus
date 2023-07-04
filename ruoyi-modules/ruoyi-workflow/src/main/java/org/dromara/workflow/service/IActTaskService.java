@@ -38,12 +38,29 @@ public interface IActTaskService {
     TableDataInfo<TaskVo> getTaskWaitByPage(TaskBo taskBo);
 
     /**
+     * 查询当前租户所有待办任务
+     *
+     * @param taskBo 参数
+     * @return 结果
+     */
+    TableDataInfo<TaskVo> getAllTaskWaitByPage(TaskBo taskBo);
+
+
+    /**
      * 查询当前用户的已办任务
      *
      * @param taskBo 参数
      * @return 结果
      */
     TableDataInfo<TaskVo> getTaskFinishByPage(TaskBo taskBo);
+
+    /**
+     * 查询当前租户所有已办任务
+     *
+     * @param taskBo 参数
+     * @return 结果
+     */
+    TableDataInfo<TaskVo> getAllTaskFinishByPage(TaskBo taskBo);
 
     /**
      * 委派任务
