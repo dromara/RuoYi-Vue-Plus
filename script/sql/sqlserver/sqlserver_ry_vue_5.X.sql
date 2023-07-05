@@ -43,12 +43,6 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'id'
 GO
 EXEC sys.sp_addextendedproperty
-    'MS_Description', N'主键' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_social',
-    'COLUMN', N'id'
-GO
-EXEC sys.sp_addextendedproperty
     'MS_Description', N'用户ID' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_social',
@@ -3116,7 +3110,7 @@ EXEC sys.sp_addextendedproperty
 'MS_Description', N'客户端id' ,
 'SCHEMA', N'dbo',
 'TABLE', N'sys_client',
-'COLUMN', N'tenant_id'
+'COLUMN', N'client_id'
 GO
 EXEC sp_addextendedproperty
 'MS_Description', N'客户端key',
