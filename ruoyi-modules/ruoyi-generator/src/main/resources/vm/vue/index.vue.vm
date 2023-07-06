@@ -148,7 +148,7 @@
       <el-form ref="${businessName}FormRef" :model="form" :rules="rules" label-width="80px">
 #foreach($column in $columns)
 #set($field=$column.javaField)
-#if($column.insert && !$column.pk)
+#if(($column.insert || $column.edit) && !$column.pk)
 #set($parentheseIndex=$column.columnComment.indexOf("（"))
 #if($parentheseIndex != -1)
 #set($comment=$column.columnComment.substring(0, $parentheseIndex))
