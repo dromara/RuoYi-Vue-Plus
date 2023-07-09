@@ -189,4 +189,15 @@ public class ActTaskController extends BaseController {
         return toAjax(iActTaskService.deleteMultiInstanceExecution(deleteMultiBo));
     }
 
+    /**
+     * 驳回审批
+     *
+     * @param backProcessBo 参数
+     */
+    @Log(title = "任务管理", businessType = BusinessType.INSERT)
+    @PostMapping("/backProcess")
+    public R<String> backProcess(@RequestBody BackProcessBo backProcessBo) {
+        return R.ok(iActTaskService.backProcess(backProcessBo));
+    }
+
 }

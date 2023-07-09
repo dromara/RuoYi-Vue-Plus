@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 任务 服务层实现
@@ -520,5 +521,49 @@ public class ActTaskServiceImpl implements IActTaskService {
             e.printStackTrace();
             throw new ServiceException(e.getMessage());
         }
+    }
+
+    /**
+     * 驳回审批
+     *
+     * @param backProcessBo 参数
+     */
+    @Override
+    public String backProcess(BackProcessBo backProcessBo) {
+        Task task = taskService.createTaskQuery().taskId(backProcessBo.getTaskId()).taskTenantId(TenantHelper.getTenantId())
+            .taskAssignee(String.valueOf(LoginHelper.getUserId())).singleResult();
+        if (ObjectUtil.isEmpty(task)) {
+            throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
+        }
+        if (task.isSuspended()) {
+            throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
+        }
+        try {
+            String processInstanceId = task.getProcessInstanceId();
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+            //校验单据
+            BusinessStatusEnum.checkStatus(processInstance.getBusinessStatus());
+            //判断是否有多个任务
+            List<Task> taskList = taskService.createTaskQuery().processInstanceId(processInstanceId).taskTenantId(TenantHelper.getTenantId()).list();
+            //申请人节点
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().finished().orderByHistoricTaskInstanceEndTime().asc().list().get(0);
+            String backTaskDefinitionKey = historicTaskInstance.getTaskDefinitionKey();
+            if (taskList.size() > 1) {
+                //当前多个任务驳回到单个节点
+                runtimeService.createChangeActivityStateBuilder().processInstanceId(processInstanceId)
+                    .moveActivityIdsToSingleActivityId(taskList.stream().map(Task::getTaskDefinitionKey).distinct().collect(Collectors.toList()), backTaskDefinitionKey)
+                    .changeState();
+            } else {
+                //当前单个节点驳回单个节点
+                runtimeService.createChangeActivityStateBuilder().processInstanceId(processInstanceId)
+                    .moveActivityIdTo(task.getTaskDefinitionKey(), backTaskDefinitionKey)
+                    .changeState();
+            }
+            taskService.setAssignee(task.getId(), historicTaskInstance.getAssignee());
+            runtimeService.updateBusinessStatus(processInstanceId, BusinessStatusEnum.BACK.getStatus());
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage());
+        }
+        return task.getProcessInstanceId();
     }
 }

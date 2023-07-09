@@ -101,4 +101,12 @@ public interface IActTaskService {
      * @return 结果
      */
     boolean deleteMultiInstanceExecution(DeleteMultiBo deleteMultiBo);
+
+    /**
+     * 驳回审批
+     *
+     * @param backProcessBo 参数
+     * @return 流程实例id
+     */
+    String backProcess(BackProcessBo backProcessBo);
 }
