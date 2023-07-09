@@ -529,6 +529,7 @@ public class ActTaskServiceImpl implements IActTaskService {
      * @param backProcessBo 参数
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String backProcess(BackProcessBo backProcessBo) {
         Task task = taskService.createTaskQuery().taskId(backProcessBo.getTaskId()).taskTenantId(TenantHelper.getTenantId())
             .taskAssignee(String.valueOf(LoginHelper.getUserId())).singleResult();
@@ -548,6 +549,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             //申请人节点
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().finished().orderByHistoricTaskInstanceEndTime().asc().list().get(0);
             String backTaskDefinitionKey = historicTaskInstance.getTaskDefinitionKey();
+            taskService.addComment(task.getId(), processInstanceId, StringUtils.isNotBlank(backProcessBo.getMessage()) ? backProcessBo.getMessage() : "退回");
             if (taskList.size() > 1) {
                 //当前多个任务驳回到单个节点
                 runtimeService.createChangeActivityStateBuilder().processInstanceId(processInstanceId)
@@ -559,7 +561,10 @@ public class ActTaskServiceImpl implements IActTaskService {
                     .moveActivityIdTo(task.getTaskDefinitionKey(), backTaskDefinitionKey)
                     .changeState();
             }
-            taskService.setAssignee(task.getId(), historicTaskInstance.getAssignee());
+            List<Task> list = taskService.createTaskQuery().processInstanceId(processInstanceId).taskTenantId(TenantHelper.getTenantId()).list();
+            for (Task t : list) {
+                taskService.setAssignee(t.getId(), historicTaskInstance.getAssignee());
+            }
             runtimeService.updateBusinessStatus(processInstanceId, BusinessStatusEnum.BACK.getStatus());
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());

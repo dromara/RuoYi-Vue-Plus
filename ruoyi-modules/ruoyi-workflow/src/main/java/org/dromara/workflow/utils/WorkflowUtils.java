@@ -25,10 +25,12 @@ import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import javax.xml.stream.XMLInputFactory;
@@ -259,5 +261,17 @@ public class WorkflowUtils {
             return multiInstanceVo;
         }
         return null;
+    }
+
+    /**
+     * 获取当前流程状态
+     *
+     * @param taskId 任务id
+     */
+    public static String getBusinessStatus(String taskId) {
+        HistoricTaskInstance historicTaskInstance = PROCESS_ENGINE.getHistoryService().createHistoricTaskInstanceQuery().taskId(taskId).taskTenantId(TenantHelper.getTenantId()).singleResult();
+        HistoricProcessInstance historicProcessInstance = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery()
+            .processInstanceId(historicTaskInstance.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+        return historicProcessInstance.getBusinessStatus();
     }
 }

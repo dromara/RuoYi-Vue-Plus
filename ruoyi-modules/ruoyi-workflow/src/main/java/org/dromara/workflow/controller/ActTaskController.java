@@ -13,6 +13,7 @@ import org.dromara.common.web.core.BaseController;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.TaskVo;
 import org.dromara.workflow.service.IActTaskService;
+import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.engine.TaskService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -199,5 +200,16 @@ public class ActTaskController extends BaseController {
     public R<String> backProcess(@RequestBody BackProcessBo backProcessBo) {
         return R.ok(iActTaskService.backProcess(backProcessBo));
     }
+
+    /**
+     * 获取流程状态
+     *
+     * @param taskId 任务id
+     */
+    @GetMapping("/getBusinessStatus/{taskId}")
+    public R<String> getBusinessStatus(@PathVariable String taskId) {
+        return R.ok("操作成功", WorkflowUtils.getBusinessStatus(taskId));
+    }
+
 
 }
