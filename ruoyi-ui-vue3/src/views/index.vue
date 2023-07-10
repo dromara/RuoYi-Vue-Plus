@@ -103,7 +103,7 @@
 </template>
 
 <script setup name="Index">
-const version = ref('4.7.0')
+const version = ref('4.8.0')
 
 function goTarget(url) {
   window.open(url, '__blank')
