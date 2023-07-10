@@ -116,7 +116,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @param dictType 字典类型
      * @return 字典类型
      */
-    @Cacheable(cacheNames = CacheNames.SYS_DICT, key = "#dictType")
     @Override
     public SysDictType selectDictTypeByType(String dictType) {
         return baseMapper.selectById(new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, dictType));
@@ -148,7 +147,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
         List<SysDictData> dictDataList = dictDataMapper.selectList(
             new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getStatus, UserConstants.DICT_NORMAL));
         Map<String, List<SysDictData>> dictDataMap = StreamUtils.groupByKey(dictDataList, SysDictData::getDictType);
-        dictDataMap.forEach((k,v) -> {
+        dictDataMap.forEach((k, v) -> {
             List<SysDictData> dictList = StreamUtils.sorted(v, Comparator.comparing(SysDictData::getDictSort));
             CacheUtils.put(CacheNames.SYS_DICT, k, dictList);
         });
@@ -182,6 +181,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     public List<SysDictData> insertDictType(SysDictType dict) {
         int row = baseMapper.insert(dict);
         if (row > 0) {
+            // 新增 type 下无 data 数据 返回空防止缓存穿透
             return new ArrayList<>();
         }
         throw new ServiceException("操作失败");
@@ -279,4 +279,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
         }
     }
 
+    @Override
+    public Map<String, String> getAllDictByDictType(String dictType) {
+        List<SysDictData> list = selectDictDataByType(dictType);
+        return StreamUtils.toMap(list, SysDictData::getDictValue, SysDictData::getDictLabel);
+    }
 }

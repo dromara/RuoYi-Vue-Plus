@@ -1,5 +1,7 @@
 package com.ruoyi.common.core.service;
 
+import java.util.Map;
+
 /**
  * 通用 字典服务
  *
@@ -54,4 +56,11 @@ public interface DictService {
      */
     String getDictValue(String dictType, String dictLabel, String separator);
 
+    /**
+     * 获取字典下所有的字典值与标签
+     *
+     * @param dictType 字典类型
+     * @return dictValue为key，dictLabel为值组成的Map
+     */
+    Map<String, String> getAllDictByDictType(String dictType);
 }

@@ -11,10 +11,7 @@ import com.alibaba.excel.write.metadata.fill.FillConfig;
 import com.alibaba.excel.write.metadata.fill.FillWrapper;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.ruoyi.common.convert.ExcelBigNumberConvert;
-import com.ruoyi.common.excel.CellMergeStrategy;
-import com.ruoyi.common.excel.DefaultExcelListener;
-import com.ruoyi.common.excel.ExcelListener;
-import com.ruoyi.common.excel.ExcelResult;
+import com.ruoyi.common.excel.*;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import lombok.AccessLevel;
@@ -88,7 +85,26 @@ public class ExcelUtil {
         try {
             resetResponse(sheetName, response);
             ServletOutputStream os = response.getOutputStream();
-            exportExcel(list, sheetName, clazz, false, os);
+            exportExcel(list, sheetName, clazz, false, os, null);
+        } catch (IOException e) {
+            throw new RuntimeException("导出Excel异常");
+        }
+    }
+
+    /**
+     * 导出excel
+     *
+     * @param list      导出数据集合
+     * @param sheetName 工作表的名称
+     * @param clazz     实体类
+     * @param response  响应体
+     * @param options   级联下拉选
+     */
+    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, HttpServletResponse response, List<DropDownOptions> options) {
+        try {
+            resetResponse(sheetName, response);
+            ServletOutputStream os = response.getOutputStream();
+            exportExcel(list, sheetName, clazz, false, os, options);
         } catch (IOException e) {
             throw new RuntimeException("导出Excel异常");
         }
@@ -107,7 +123,27 @@ public class ExcelUtil {
         try {
             resetResponse(sheetName, response);
             ServletOutputStream os = response.getOutputStream();
-            exportExcel(list, sheetName, clazz, merge, os);
+            exportExcel(list, sheetName, clazz, merge, os, null);
+        } catch (IOException e) {
+            throw new RuntimeException("导出Excel异常");
+        }
+    }
+
+    /**
+     * 导出excel
+     *
+     * @param list      导出数据集合
+     * @param sheetName 工作表的名称
+     * @param clazz     实体类
+     * @param merge     是否合并单元格
+     * @param response  响应体
+     * @param options   级联下拉选
+     */
+    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge, HttpServletResponse response, List<DropDownOptions> options) {
+        try {
+            resetResponse(sheetName, response);
+            ServletOutputStream os = response.getOutputStream();
+            exportExcel(list, sheetName, clazz, merge, os, options);
         } catch (IOException e) {
             throw new RuntimeException("导出Excel异常");
         }
@@ -122,7 +158,20 @@ public class ExcelUtil {
      * @param os        输出流
      */
     public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, OutputStream os) {
-        exportExcel(list, sheetName, clazz, false, os);
+        exportExcel(list, sheetName, clazz, false, os, null);
+    }
+
+    /**
+     * 导出excel
+     *
+     * @param list      导出数据集合
+     * @param sheetName 工作表的名称
+     * @param clazz     实体类
+     * @param os        输出流
+     * @param options   级联下拉选内容
+     */
+    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, OutputStream os, List<DropDownOptions> options) {
+        exportExcel(list, sheetName, clazz, false, os, options);
     }
 
     /**
@@ -134,7 +183,8 @@ public class ExcelUtil {
      * @param merge     是否合并单元格
      * @param os        输出流
      */
-    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge, OutputStream os) {
+    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge,
+                                       OutputStream os, List<DropDownOptions> options) {
         ExcelWriterSheetBuilder builder = EasyExcel.write(os, clazz)
             .autoCloseStream(false)
             // 自动适配
@@ -145,6 +195,10 @@ public class ExcelUtil {
         if (merge) {
             // 合并处理器
             builder.registerWriteHandler(new CellMergeStrategy(list, true));
+        }
+        if (CollUtil.isNotEmpty(options)) {
+            // 添加下拉框操作
+            builder.registerWriteHandler(new ExcelDownHandler(options));
         }
         builder.doWrite(list);
     }

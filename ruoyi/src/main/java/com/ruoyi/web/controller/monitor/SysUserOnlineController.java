@@ -47,7 +47,7 @@ public class SysUserOnlineController extends BaseController {
         for (String key : keys) {
             String token = StringUtils.substringAfterLast(key, ":");
             // 如果已经过期则跳过
-            if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(token) < -1) {
+            if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
                 continue;
             }
             userOnlineDTOList.add(RedisUtils.getCacheObject(CacheConstants.ONLINE_TOKEN_KEY + token));

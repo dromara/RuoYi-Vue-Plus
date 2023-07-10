@@ -1,6 +1,7 @@
 package com.ruoyi.framework.aspectj;
 
 import cn.dev33.satoken.SaManager;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.ruoyi.common.annotation.RepeatSubmit;
@@ -12,8 +13,6 @@ import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -28,14 +27,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * 防止重复提交(参考美团GTIS防重系统)
  *
  * @author Lion Li
  */
-@Slf4j
-@RequiredArgsConstructor
 @Aspect
 @Component
 public class RepeatSubmitAspect {
@@ -45,10 +43,8 @@ public class RepeatSubmitAspect {
     @Before("@annotation(repeatSubmit)")
     public void doBefore(JoinPoint point, RepeatSubmit repeatSubmit) throws Throwable {
         // 如果注解不为0 则使用注解数值
-        long interval = 0;
-        if (repeatSubmit.interval() > 0) {
-            interval = repeatSubmit.timeUnit().toMillis(repeatSubmit.interval());
-        }
+        long interval = repeatSubmit.timeUnit().toMillis(repeatSubmit.interval());
+
         if (interval < 1000) {
             throw new ServiceException("重复提交间隔时间不能小于'1'秒");
         }
@@ -64,9 +60,7 @@ public class RepeatSubmitAspect {
         submitKey = SecureUtil.md5(submitKey + ":" + nowParams);
         // 唯一标识（指定key + url + 消息头）
         String cacheRepeatKey = CacheConstants.REPEAT_SUBMIT_KEY + url + submitKey;
-        String key = RedisUtils.getCacheObject(cacheRepeatKey);
-        if (key == null) {
-            RedisUtils.setCacheObject(cacheRepeatKey, "", Duration.ofMillis(interval));
+        if (RedisUtils.setObjectIfAbsent(cacheRepeatKey, "", Duration.ofMillis(interval))) {
             KEY_CACHE.set(cacheRepeatKey);
         } else {
             String message = repeatSubmit.message();
@@ -114,19 +108,16 @@ public class RepeatSubmitAspect {
      * 参数拼装
      */
     private String argsArrayToString(Object[] paramsArray) {
-        StringBuilder params = new StringBuilder();
-        if (paramsArray != null && paramsArray.length > 0) {
-            for (Object o : paramsArray) {
-                if (ObjectUtil.isNotNull(o) && !isFilterObject(o)) {
-                    try {
-                        params.append(JsonUtils.toJsonString(o)).append(" ");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+        StringJoiner params = new StringJoiner(" ");
+        if (ArrayUtil.isEmpty(paramsArray)) {
+            return params.toString();
+        }
+        for (Object o : paramsArray) {
+            if (ObjectUtil.isNotNull(o) && !isFilterObject(o)) {
+                params.add(JsonUtils.toJsonString(o));
             }
         }
-        return params.toString().trim();
+        return params.toString();
     }
 
     /**
@@ -147,9 +138,8 @@ public class RepeatSubmitAspect {
             }
         } else if (Map.class.isAssignableFrom(clazz)) {
             Map map = (Map) o;
-            for (Object value : map.entrySet()) {
-                Map.Entry entry = (Map.Entry) value;
-                return entry.getValue() instanceof MultipartFile;
+            for (Object value : map.values()) {
+                return value instanceof MultipartFile;
             }
         }
         return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse

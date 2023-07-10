@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -11,7 +12,6 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.OssService;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.BeanCopyUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -31,9 +31,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -108,7 +112,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         }
         FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
-        OssClient storage = OssFactory.instance();
+        OssClient storage = OssFactory.instance(sysOss.getService());
         try(InputStream inputStream = storage.getObjectContent(sysOss.getUrl())) {
             int available = inputStream.available();
             IoUtil.copy(inputStream, response.getOutputStream(), available);
@@ -130,15 +134,28 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
             throw new ServiceException(e.getMessage());
         }
         // 保存文件信息
+        return buildResultEntity(originalfileName, suffix, storage.getConfigKey(), uploadResult);
+    }
+
+    @Override
+    public SysOssVo upload(File file) {
+        String originalfileName = file.getName();
+        String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
+        OssClient storage = OssFactory.instance();
+        UploadResult uploadResult = storage.uploadSuffix(file, suffix);
+        // 保存文件信息
+        return buildResultEntity(originalfileName, suffix, storage.getConfigKey(), uploadResult);
+    }
+
+    private SysOssVo buildResultEntity(String originalfileName, String suffix, String configKey, UploadResult uploadResult) {
         SysOss oss = new SysOss();
         oss.setUrl(uploadResult.getUrl());
         oss.setFileSuffix(suffix);
         oss.setFileName(uploadResult.getFilename());
         oss.setOriginalName(originalfileName);
-        oss.setService(storage.getConfigKey());
+        oss.setService(configKey);
         baseMapper.insert(oss);
-        SysOssVo sysOssVo = new SysOssVo();
-        BeanCopyUtils.copy(oss, sysOssVo);
+        SysOssVo sysOssVo = BeanUtil.toBean(oss, SysOssVo.class);
         return this.matchingUrl(sysOssVo);
     }
 

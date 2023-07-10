@@ -6,15 +6,15 @@
 
     <groupId>com.ruoyi</groupId>
     <artifactId>ruoyi-vue-plus</artifactId>
-    <version>4.7.0</version>
+    <version>4.8.0</version>
 
     <name>RuoYi-Vue-Plus</name>
     <url>https://gitee.com/dromara/RuoYi-Vue-Plus</url>
     <description>RuoYi-Vue-Plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>4.7.0</ruoyi-vue-plus.version>
-        <spring-boot.version>2.7.11</spring-boot.version>
+        <ruoyi-vue-plus.version>4.8.0</ruoyi-vue-plus.version>
+        <spring-boot.version>2.7.13</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -22,9 +22,9 @@
         <spring-boot.mybatis>2.2.2</spring-boot.mybatis>
         <springdoc.version>1.6.15</springdoc.version>
         <poi.version>5.2.3</poi.version>
-        <easyexcel.version>3.2.1</easyexcel.version>
+        <easyexcel.version>3.3.1</easyexcel.version>
         <velocity.version>2.3</velocity.version>
-        <satoken.version>1.34.0</satoken.version>
+        <satoken.version>1.35.0.RC</satoken.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.18</hutool.version>
@@ -46,8 +46,7 @@
         <!-- OSS 配置 -->
         <aws-java-sdk-s3.version>1.12.400</aws-java-sdk-s3.version>
         <!-- SMS 配置 -->
-        <aliyun.sms.version>2.0.23</aliyun.sms.version>
-        <tencent.sms.version>3.1.687</tencent.sms.version>
+        <sms4j.version>2.2.0</sms4j.version>
     </properties>
 
     <profiles>
@@ -200,16 +199,11 @@
                 <version>${aws-java-sdk-s3.version}</version>
             </dependency>
 
+            <!--短信sms4j-->
             <dependency>
-                <groupId>com.aliyun</groupId>
-                <artifactId>dysmsapi20170525</artifactId>
-                <version>${aliyun.sms.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.tencentcloudapi</groupId>
-                <artifactId>tencentcloud-sdk-java-sms</artifactId>
-                <version>${tencent.sms.version}</version>
+                <groupId>org.dromara.sms4j</groupId>
+                <artifactId>sms4j-spring-boot-starter</artifactId>
+                <version>${sms4j.version}</version>
             </dependency>
 
             <dependency>
@@ -356,8 +350,8 @@
     <repositories>
         <repository>
             <id>public</id>
-            <name>aliyun nexus</name>
-            <url>https://maven.aliyun.com/repository/public/</url>
+            <name>huawei nexus</name>
+            <url>https://mirrors.huaweicloud.com/repository/maven/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -367,8 +361,8 @@
     <pluginRepositories>
         <pluginRepository>
             <id>public</id>
-            <name>aliyun nexus</name>
-            <url>https://maven.aliyun.com/repository/public/</url>
+            <name>huawei nexus</name>
+            <url>https://mirrors.huaweicloud.com/repository/maven/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>

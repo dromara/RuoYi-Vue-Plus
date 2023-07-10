@@ -17,11 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * bean深拷贝工具(基于 cglib 性能优异)
+ * bean拷贝工具(基于 cglib 性能优异)
  * <p>
  * 重点 cglib 不支持 拷贝到链式对象
  * 例如: 源对象 拷贝到 目标(链式对象)
- * 请区分好`浅拷贝`和`深拷贝`再做使用
  *
  * @author Lion Li
  */

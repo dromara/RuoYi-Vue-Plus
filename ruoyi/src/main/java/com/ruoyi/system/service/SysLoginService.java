@@ -8,9 +8,9 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.core.domain.event.LogininforEvent;
 import com.ruoyi.common.core.domain.dto.RoleDTO;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.event.LogininforEvent;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.XcxLoginUser;
 import com.ruoyi.common.enums.DeviceType;
@@ -71,9 +71,10 @@ public class SysLoginService {
         if (captchaEnabled) {
             validateCaptcha(username, code, uuid);
         }
+        // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
         SysUser user = loadUserByUsername(username);
         checkLogin(LoginType.PASSWORD, username, () -> !BCrypt.checkpw(password, user.getPassword()));
-        // 此处可根据登录用户的数据不同 自行创建 loginUser
+        // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         LoginUser loginUser = buildLoginUser(user);
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.PC);
@@ -88,7 +89,7 @@ public class SysLoginService {
         SysUser user = loadUserByPhonenumber(phonenumber);
 
         checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode));
-        // 此处可根据登录用户的数据不同 自行创建 loginUser
+        // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         LoginUser loginUser = buildLoginUser(user);
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.APP);
@@ -99,11 +100,11 @@ public class SysLoginService {
     }
 
     public String emailLogin(String email, String emailCode) {
-        // 通过手机号查找用户
+        // 通过手邮箱查找用户
         SysUser user = loadUserByEmail(email);
 
         checkLogin(LoginType.EMAIL, user.getUserName(), () -> !validateEmailCode(email, emailCode));
-        // 此处可根据登录用户的数据不同 自行创建 loginUser
+        // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         LoginUser loginUser = buildLoginUser(user);
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.APP);
@@ -118,9 +119,11 @@ public class SysLoginService {
         // todo 以下自行实现
         // 校验 appid + appsrcret + xcxCode 调用登录凭证校验接口 获取 session_key 与 openid
         String openid = "";
+
+        // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
         SysUser user = loadUserByOpenid(openid);
 
-        // 此处可根据登录用户的数据不同 自行创建 loginUser
+        // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         XcxLoginUser loginUser = new XcxLoginUser();
         loginUser.setUserId(user.getUserId());
         loginUser.setUsername(user.getUserName());
@@ -301,25 +304,24 @@ public class SysLoginService {
         String errorKey = CacheConstants.PWD_ERR_CNT_KEY + username;
         String loginFail = Constants.LOGIN_FAIL;
 
-        // 获取用户登录错误次数(可自定义限制策略 例如: key + username + ip)
-        Integer errorNumber = RedisUtils.getCacheObject(errorKey);
+        // 获取用户登录错误次数，默认为0 (可自定义限制策略 例如: key + username + ip)
+        int errorNumber = ObjectUtil.defaultIfNull(RedisUtils.getCacheObject(errorKey), 0);
         // 锁定时间内登录 则踢出
-        if (ObjectUtil.isNotNull(errorNumber) && errorNumber.equals(maxRetryCount)) {
+        if (errorNumber >= maxRetryCount) {
             recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime));
             throw new UserException(loginType.getRetryLimitExceed(), maxRetryCount, lockTime);
         }
 
         if (supplier.get()) {
-            // 是否第一次
-            errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
+            // 错误次数递增
+            errorNumber++;
+            RedisUtils.setCacheObject(errorKey, errorNumber, Duration.ofMinutes(lockTime));
             // 达到规定错误次数 则锁定登录
-            if (errorNumber.equals(maxRetryCount)) {
-                RedisUtils.setCacheObject(errorKey, errorNumber, Duration.ofMinutes(lockTime));
+            if (errorNumber >= maxRetryCount) {
                 recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime));
                 throw new UserException(loginType.getRetryLimitExceed(), maxRetryCount, lockTime);
             } else {
-                // 未达到规定错误次数 则递增
-                RedisUtils.setCacheObject(errorKey, errorNumber);
+                // 未达到规定错误次数
                 recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitCount(), errorNumber));
                 throw new UserException(loginType.getRetryLimitCount(), errorNumber);
             }

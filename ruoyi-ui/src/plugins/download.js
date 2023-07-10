@@ -34,6 +34,7 @@ export default {
   },
   zip(url, name) {
     var url = baseURL + url
+    downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
     axios({
       method: 'get',
       url: url,
@@ -50,6 +51,11 @@ export default {
       } else {
         this.printErrMsg(res.data);
       }
+      downloadLoadingInstance.close();
+    }).catch((r) => {
+      console.error(r)
+      Message.error('下载文件出现错误，请联系管理员！')
+      downloadLoadingInstance.close();
     })
   },
   saveAs(text, name, opts) {
