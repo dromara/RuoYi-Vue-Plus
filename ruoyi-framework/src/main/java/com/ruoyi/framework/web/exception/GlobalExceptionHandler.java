@@ -16,8 +16,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -106,6 +108,26 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage(), e);
         Integer code = e.getCode();
         return ObjectUtil.isNotNull(code) ? R.fail(code, e.getMessage()) : R.fail(e.getMessage());
+    }
+
+    /**
+     * 请求路径中缺少必需的路径变量
+     */
+    @ExceptionHandler(MissingPathVariableException.class)
+    public R<Void> handleMissingPathVariableException(MissingPathVariableException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求路径中缺少必需的路径变量'{}',发生系统异常.", requestURI, e);
+        return R.fail(String.format("请求路径中缺少必需的路径变量[%s]", e.getVariableName()));
+    }
+
+    /**
+     * 请求参数类型不匹配
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public R<Void> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求参数类型不匹配'{}',发生系统异常.", requestURI, e);
+        return R.fail(String.format("请求参数类型不匹配，参数[%s]要求类型为：'%s'，但输入值为：'%s'", e.getName(), e.getRequiredType().getName(), e.getValue()));
     }
 
     /**

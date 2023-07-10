@@ -130,6 +130,18 @@ public class RedisUtils {
     }
 
     /**
+     * 如果不存在则设置 并返回 true 如果存在则返回 false
+     *
+     * @param key   缓存的键值
+     * @param value 缓存的值
+     * @return set成功或失败
+     */
+    public static <T> boolean setObjectIfAbsent(final String key, final T value, final Duration duration) {
+        RBucket<T> bucket = CLIENT.getBucket(key);
+        return bucket.setIfAbsent(value, duration);
+    }
+
+    /**
      * 注册对象监听器
      * <p>
      * key 监听器需开启 `notify-keyspace-events` 等 redis 相关配置
@@ -372,6 +384,21 @@ public class RedisUtils {
     public static <T> T delCacheMapValue(final String key, final String hKey) {
         RMap<String, T> rMap = CLIENT.getMap(key);
         return rMap.remove(hKey);
+    }
+
+    /**
+     * 删除Hash中的数据
+     *
+     * @param key   Redis键
+     * @param hKeys Hash键
+     */
+    public static <T> void delMultiCacheMapValue(final String key, final Set<String> hKeys) {
+        RBatch batch = CLIENT.createBatch();
+        RMapAsync<String, T> rMap = batch.getMap(key);
+        for (String hKey : hKeys) {
+            rMap.removeAsync(hKey);
+        }
+        batch.execute();
     }
 
     /**

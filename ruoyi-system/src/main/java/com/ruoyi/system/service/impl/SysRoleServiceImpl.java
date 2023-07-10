@@ -186,6 +186,20 @@ public class SysRoleServiceImpl implements ISysRoleService {
         if (ObjectUtil.isNotNull(role.getRoleId()) && role.isAdmin()) {
             throw new ServiceException("不允许操作超级管理员角色");
         }
+        // 新增不允许使用 管理员标识符
+        if (ObjectUtil.isNull(role.getRoleId())
+            && StringUtils.equals(role.getRoleKey(), UserConstants.ADMIN_ROLE_KEY)) {
+            throw new ServiceException("不允许使用系统内置管理员角色标识符!");
+        }
+        // 修改不允许修改 管理员标识符
+        if (ObjectUtil.isNotNull(role.getRoleId())) {
+            SysRole sysRole = baseMapper.selectById(role.getRoleId());
+            // 如果标识符不相等 判断为修改了管理员标识符
+            if (!StringUtils.equals(sysRole.getRoleKey(), role.getRoleKey())
+                && StringUtils.equals(sysRole.getRoleKey(), UserConstants.ADMIN_ROLE_KEY)) {
+                throw new ServiceException("不允许修改系统内置管理员角色标识符!");
+            }
+        }
     }
 
     /**
@@ -342,9 +356,9 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteRoleByIds(Long[] roleIds) {
         for (Long roleId : roleIds) {
-            checkRoleAllowed(new SysRole(roleId));
-            checkRoleDataScope(roleId);
             SysRole role = selectRoleById(roleId);
+            checkRoleAllowed(role);
+            checkRoleDataScope(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
                 throw new ServiceException(String.format("%1$s已分配,不能删除", role.getRoleName()));
             }
@@ -420,6 +434,11 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
     @Override
     public void cleanOnlineUserByRole(Long roleId) {
+        // 如果角色未绑定用户 直接返回
+        Long num = userRoleMapper.selectCount(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getRoleId, roleId));
+        if (num == 0) {
+            return;
+        }
         List<String> keys = StpUtil.searchTokenValue("", 0, -1, false);
         if (CollUtil.isEmpty(keys)) {
             return;
@@ -428,11 +447,11 @@ public class SysRoleServiceImpl implements ISysRoleService {
         keys.parallelStream().forEach(key -> {
             String token = StringUtils.substringAfterLast(key, ":");
             // 如果已经过期则跳过
-            if (StpUtil.stpLogic.getTokenActivityTimeoutByToken(token) < -1) {
+            if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
                 return;
             }
             LoginUser loginUser = LoginHelper.getLoginUser(token);
-            if (loginUser.getRoles().stream().anyMatch(r -> r.getRoleId().equals(roleId))) {
+            if (ObjectUtil.isNotNull(loginUser) && loginUser.getRoles().stream().anyMatch(r -> r.getRoleId().equals(roleId))) {
                 try {
                     StpUtil.logoutByTokenValue(token);
                 } catch (NotLoginException ignored) {

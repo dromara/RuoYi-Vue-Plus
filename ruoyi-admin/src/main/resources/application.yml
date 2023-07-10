@@ -104,8 +104,9 @@ sa-token:
   token-name: Authorization
   # token有效期 设为一天 (必定过期) 单位: 秒
   timeout: 86400
-  # token临时有效期 (指定时间无操作就过期) 单位: 秒
-  activity-timeout: 1800
+  # 多端不同 token 有效期 可查看 LoginHelper.loginByDevice 方法自定义
+  # token最低活跃时间 (指定时间无操作就过期) 单位: 秒
+  active-timeout: 1800
   # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
   is-concurrent: true
   # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)

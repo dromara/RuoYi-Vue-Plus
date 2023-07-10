@@ -1,17 +1,17 @@
 package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.sms.config.properties.SmsProperties;
-import com.ruoyi.sms.core.SmsTemplate;
 import lombok.RequiredArgsConstructor;
+import org.dromara.sms4j.api.SmsBlend;
+import org.dromara.sms4j.api.entity.SmsResponse;
+import org.dromara.sms4j.core.factory.SmsFactory;
+import org.dromara.sms4j.provider.enumerate.SupplierType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * 短信演示案例
@@ -26,10 +26,6 @@ import java.util.Map;
 @RequestMapping("/demo/sms")
 public class SmsController {
 
-    private final SmsProperties smsProperties;
-//    private final SmsTemplate smsTemplate; // 可以使用spring注入
-//    private final AliyunSmsTemplate smsTemplate; // 也可以注入某个厂家的模板工具
-
     /**
      * 发送短信Aliyun
      *
@@ -38,17 +34,11 @@ public class SmsController {
      */
     @GetMapping("/sendAliyun")
     public R<Object> sendAliyun(String phones, String templateId) {
-        if (!smsProperties.getEnabled()) {
-            return R.fail("当前系统没有开启短信功能！");
-        }
-        if (!SpringUtils.containsBean("aliyunSmsTemplate")) {
-            return R.fail("阿里云依赖未引入！");
-        }
-        SmsTemplate smsTemplate = SpringUtils.getBean(SmsTemplate.class);
-        Map<String, String> map = new HashMap<>(1);
+        LinkedHashMap<String, String> map = new LinkedHashMap<>(1);
         map.put("code", "1234");
-        Object send = smsTemplate.send(phones, templateId, map);
-        return R.ok(send);
+        SmsBlend smsBlend = SmsFactory.createSmsBlend(SupplierType.ALIBABA);
+        SmsResponse smsResponse = smsBlend.sendMessage(phones, templateId, map);
+        return R.ok(smsResponse);
     }
 
     /**
@@ -59,18 +49,12 @@ public class SmsController {
      */
     @GetMapping("/sendTencent")
     public R<Object> sendTencent(String phones, String templateId) {
-        if (!smsProperties.getEnabled()) {
-            return R.fail("当前系统没有开启短信功能！");
-        }
-        if (!SpringUtils.containsBean("tencentSmsTemplate")) {
-            return R.fail("腾讯云依赖未引入！");
-        }
-        SmsTemplate smsTemplate = SpringUtils.getBean(SmsTemplate.class);
-        Map<String, String> map = new HashMap<>(1);
+        LinkedHashMap<String, String> map = new LinkedHashMap<>(1);
 //        map.put("2", "测试测试");
         map.put("1", "1234");
-        Object send = smsTemplate.send(phones, templateId, map);
-        return R.ok(send);
+        SmsBlend smsBlend = SmsFactory.createSmsBlend(SupplierType.TENCENT);
+        SmsResponse smsResponse = smsBlend.sendMessage(phones, templateId, map);
+        return R.ok(smsResponse);
     }
 
 }

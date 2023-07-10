@@ -80,6 +80,7 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
     public R<Void> add(@Validated @RequestBody SysRole role) {
+        roleService.checkRoleAllowed(role);
         if (!roleService.checkRoleNameUnique(role)) {
             return R.fail("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
         } else if (!roleService.checkRoleKeyUnique(role)) {
