@@ -143,9 +143,13 @@ public class SysLoginService {
     public void logout() {
         try {
             LoginUser loginUser = LoginHelper.getLoginUser();
-            StpUtil.logout();
             recordLogininfor(loginUser.getUsername(), Constants.LOGOUT, MessageUtils.message("user.logout.success"));
         } catch (NotLoginException ignored) {
+        } finally {
+            try {
+                StpUtil.logout();
+            } catch (NotLoginException ignored) {
+            }
         }
     }
 
