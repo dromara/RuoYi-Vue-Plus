@@ -96,9 +96,13 @@ public class SysLoginService {
                 // 超级管理员 登出清除动态租户
                 TenantHelper.clearDynamic();
             }
-            StpUtil.logout();
             recordLogininfor(loginUser.getTenantId(), loginUser.getUsername(), Constants.LOGOUT, MessageUtils.message("user.logout.success"));
         } catch (NotLoginException ignored) {
+        } finally {
+            try {
+                StpUtil.logout();
+            } catch (NotLoginException ignored) {
+            }
         }
     }
 
@@ -225,7 +229,7 @@ public class SysLoginService {
             log.info("登录租户：{} 已被停用.", tenantId);
             throw new TenantException("tenant.blocked");
         } else if (ObjectUtil.isNotNull(tenant.getExpireTime())
-                   && new Date().after(tenant.getExpireTime())) {
+            && new Date().after(tenant.getExpireTime())) {
             log.info("登录租户：{} 已超过有效期.", tenantId);
             throw new TenantException("tenant.expired");
         }
