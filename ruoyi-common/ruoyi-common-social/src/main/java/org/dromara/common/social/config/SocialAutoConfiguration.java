@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
  */
 @AutoConfiguration
 @EnableConfigurationProperties(SocialProperties.class)
-public class SocialConfig {
+public class SocialAutoConfiguration {
 
     @Bean
     public AuthStateCache authStateCache(SocialProperties socialProperties) {
