@@ -26,9 +26,4 @@ public class SocialProperties {
      */
     private Map<String, SocialLoginConfigProperties> type;
 
-    /**
-     * 授权过期时间
-     */
-    private Long timeout;
-
 }
