@@ -51,6 +51,10 @@ public class ActHistoryInfoVo implements Serializable {
      */
     private String status;
     /**
+     * 状态
+     */
+    private String statusName;
+    /**
      * 办理人id
      */
     private Long assignee;

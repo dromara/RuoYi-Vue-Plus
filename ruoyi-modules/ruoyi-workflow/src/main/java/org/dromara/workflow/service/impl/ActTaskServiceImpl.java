@@ -15,6 +15,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.common.enums.BusinessStatusEnum;
+import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.TaskVo;
@@ -139,7 +140,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
             runtimeService.updateBusinessStatus(task.getProcessInstanceId(), BusinessStatusEnum.WAITING.getStatus());
             //办理意见
-            taskService.addComment(completeTaskBo.getTaskId(), task.getProcessInstanceId(), StringUtils.isBlank(completeTaskBo.getMessage()) ? "同意" : completeTaskBo.getMessage());
+            taskService.addComment(completeTaskBo.getTaskId(), task.getProcessInstanceId(), TaskStatusEnum.PASS.getStatus(), StringUtils.isBlank(completeTaskBo.getMessage()) ? "同意" : completeTaskBo.getMessage());
             //办理任务
             taskService.complete(completeTaskBo.getTaskId(), completeTaskBo.getVariables());
             List<Task> list = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(task.getProcessInstanceId()).list();
@@ -348,7 +349,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         }
         try {
             TaskEntity newTask = WorkflowUtils.createNewTask(task);
-            taskService.addComment(newTask.getId(), task.getProcessInstanceId(), "【" + LoginHelper.getUsername() + "】委派给【" + delegateBo.getNickName() + "】");
+            taskService.addComment(newTask.getId(), task.getProcessInstanceId(), TaskStatusEnum.PENDING.getStatus(), "【" + LoginHelper.getUsername() + "】委派给【" + delegateBo.getNickName() + "】");
             //委托任务
             taskService.delegateTask(delegateBo.getTaskId(), delegateBo.getUserId());
             //办理生成的任务记录
@@ -388,7 +389,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             } else {
                 terminationBo.setComment(LoginHelper.getUsername() + "终止了申请：" + terminationBo.getComment());
             }
-            taskService.addComment(task.getId(), task.getProcessInstanceId(), terminationBo.getComment());
+            taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.TERMINATION.getStatus(), terminationBo.getComment());
             List<Task> list = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId())
                 .processInstanceId(task.getProcessInstanceId()).list();
             if (CollectionUtil.isNotEmpty(list)) {
@@ -422,7 +423,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         }
         try {
             TaskEntity newTask = WorkflowUtils.createNewTask(task);
-            taskService.addComment(newTask.getId(), task.getProcessInstanceId(),
+            taskService.addComment(newTask.getId(), task.getProcessInstanceId(), TaskStatusEnum.TRANSFER.getStatus(),
                 StringUtils.isNotBlank(transmitBo.getComment()) ? transmitBo.getComment() : LoginHelper.getUsername() + "转办了任务");
             taskService.complete(newTask.getId());
             taskService.setAssignee(task.getId(), transmitBo.getUserId());
@@ -468,7 +469,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             List<String> assigneeNames = addMultiBo.getAssigneeNames();
             String username = LoginHelper.getUsername();
             TaskEntity newTask = WorkflowUtils.createNewTask(task);
-            taskService.addComment(newTask.getId(), processInstanceId, username + "加签【" + String.join(StringUtils.SEPARATOR, assigneeNames) + "】");
+            taskService.addComment(newTask.getId(), processInstanceId, TaskStatusEnum.SIGN.getStatus(), username + "加签【" + String.join(StringUtils.SEPARATOR, assigneeNames) + "】");
             taskService.complete(newTask.getId());
             return true;
         } catch (Exception e) {
@@ -514,7 +515,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             List<String> assigneeNames = deleteMultiBo.getAssigneeNames();
             String username = LoginHelper.getUsername();
             TaskEntity newTask = WorkflowUtils.createNewTask(task);
-            taskService.addComment(newTask.getId(), processInstanceId, username + "减签【" + String.join(StringUtils.SEPARATOR, assigneeNames) + "】");
+            taskService.addComment(newTask.getId(), processInstanceId, TaskStatusEnum.SIGN_OFF.getStatus(), username + "减签【" + String.join(StringUtils.SEPARATOR, assigneeNames) + "】");
             taskService.complete(newTask.getId());
             return true;
         } catch (Exception e) {
@@ -549,7 +550,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             //申请人节点
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().finished().orderByHistoricTaskInstanceEndTime().asc().list().get(0);
             String backTaskDefinitionKey = historicTaskInstance.getTaskDefinitionKey();
-            taskService.addComment(task.getId(), processInstanceId, StringUtils.isNotBlank(backProcessBo.getMessage()) ? backProcessBo.getMessage() : "退回");
+            taskService.addComment(task.getId(), processInstanceId, TaskStatusEnum.BACK.getStatus(), StringUtils.isNotBlank(backProcessBo.getMessage()) ? backProcessBo.getMessage() : "退回");
             if (taskList.size() > 1) {
                 //当前多个任务驳回到单个节点
                 runtimeService.createChangeActivityStateBuilder().processInstanceId(processInstanceId)

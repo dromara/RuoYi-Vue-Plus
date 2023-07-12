@@ -15,6 +15,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.common.enums.BusinessStatusEnum;
+import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
 import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
@@ -239,17 +240,22 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             .processInstanceId(processInstanceId).taskTenantId(TenantHelper.getTenantId()).orderByHistoricTaskInstanceEndTime().desc().list();
         list = StreamUtils.sorted(list, Comparator.comparing(HistoricTaskInstance::getEndTime, Comparator.nullsFirst(Date::compareTo)).reversed());
         List<ActHistoryInfoVo> actHistoryInfoVoList = new ArrayList<>();
+        List<Comment> processInstanceComments = taskService.getProcessInstanceComments(processInstanceId);
         for (HistoricTaskInstance historicTaskInstance : list) {
             ActHistoryInfoVo actHistoryInfoVo = new ActHistoryInfoVo();
             BeanUtils.copyProperties(historicTaskInstance, actHistoryInfoVo);
-            actHistoryInfoVo.setStatus(actHistoryInfoVo.getEndTime() == null ? "待处理" : "已处理");
-            List<Comment> taskComments = taskService.getTaskComments(historicTaskInstance.getId());
-            if (CollUtil.isNotEmpty(taskComments)) {
-                actHistoryInfoVo.setCommentId(taskComments.get(0).getId());
-                String message = taskComments.stream().map(Comment::getFullMessage).collect(Collectors.joining("。"));
-                if (StringUtils.isNotBlank(message)) {
-                    actHistoryInfoVo.setComment(message);
-                }
+            if (actHistoryInfoVo.getEndTime() == null) {
+                actHistoryInfoVo.setStatus(TaskStatusEnum.WAITING.getStatus());
+                actHistoryInfoVo.setStatusName(TaskStatusEnum.WAITING.getDesc());
+            }
+            if (CollUtil.isNotEmpty(processInstanceComments)) {
+                processInstanceComments.stream().filter(e -> e.getTaskId().equals(historicTaskInstance.getId())).findFirst().ifPresent(e -> {
+                    if (StringUtils.isNotBlank(e.getFullMessage())) {
+                        actHistoryInfoVo.setComment(e.getFullMessage());
+                        actHistoryInfoVo.setStatus(e.getType());
+                        actHistoryInfoVo.setStatusName(TaskStatusEnum.getEnumsByStatus(e.getType()));
+                    }
+                });
             }
             if (ObjectUtil.isNotEmpty(historicTaskInstance.getDurationInMillis())) {
                 actHistoryInfoVo.setRunDuration(getDuration(historicTaskInstance.getDurationInMillis()));
