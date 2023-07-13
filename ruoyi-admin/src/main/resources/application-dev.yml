@@ -182,13 +182,15 @@ sms:
 --- # 三方授权
 justauth:
   enabled: true
+  # 前端外网访问地址
   address: http://localhost:80
   type:
     maxkey:
       # maxkey 服务器地址
-      server-url: http://localhost:8080
-      client-id: 10**********6
-      client-secret: 1f7d08**********5b7**********29e
+      # 注意 如下均配置均不需要修改 maxkey 已经内置好了数据
+      server-url: http://sso.maxkey.top
+      client-id: 876892492581044224
+      client-secret: x1Y5MTMwNzIwMjMxNTM4NDc3Mzche8
       redirect-uri: ${justauth.address}/social-callback?source=maxkey
     qq:
       client-id: 10**********6
@@ -200,8 +202,8 @@ justauth:
       client-secret: 1f7d08**********5b7**********29e
       redirect-uri: ${justauth.address}/social-callback?source=weibo
     gitee:
-      client-id: 914******************98
-      client-secret: 02*****************ac
+      client-id: 91436b7940090d09c72c7daf85b959cfd5f215d67eea73acbf61b6b590751a98
+      client-secret: 02c6fcfd70342980cd8dd2f2c06c1a350645d76c754d7a264c4e125f9ba915ac
       redirect-uri: ${justauth.address}/social-callback?source=gitee
     dingtalk:
       client-id: 10**********6
