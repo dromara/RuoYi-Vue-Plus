@@ -36,6 +36,8 @@ create table sys_social
     PRIMARY KEY (id)
 ) engine=innodb comment = '社会化关系表';
 
+INSERT INTO sys_social VALUES (1, 1, '000000', 'GITEE1766278', 'GITEE', NULL, 'JavaLionLi', '', '', 'https://foruda.gitee.com/avatar/1676987709652631782/1766278_javalionli_1585201115.png', '2a25b8a8b6803939070d931cdb1f9540', 86400, '448155d0a9c35e6a036a346f7a090f9b3aa7fd41fd2e9563e71e38a7faffbe1c', NULL, NULL, 'user_info projects', 'bearer', NULL, NULL, NULL, NULL, NULL, NULL, 103, 1, '2023-07-13 17:12:01', 1, '2023-07-13 17:12:01', '0');
+
 -- ----------------------------
 -- 租户表
 -- ----------------------------
