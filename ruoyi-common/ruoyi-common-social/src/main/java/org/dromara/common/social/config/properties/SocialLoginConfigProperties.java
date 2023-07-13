@@ -60,4 +60,9 @@ public class SocialLoginConfigProperties {
      */
     private String clientOsType;
 
+    /**
+     * maxkey 服务器地址
+     */
+    private String serverUrl;
+
 }

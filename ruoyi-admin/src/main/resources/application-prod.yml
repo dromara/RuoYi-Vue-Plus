@@ -186,6 +186,12 @@ justauth:
   enabled: true
   address: http://localhost:80
   type:
+    maxkey:
+      # maxkey 服务器地址
+      server-url: http://localhost:8080
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=maxkey
     qq:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e

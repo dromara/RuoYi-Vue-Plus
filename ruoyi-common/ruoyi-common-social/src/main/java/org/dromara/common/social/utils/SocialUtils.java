@@ -11,6 +11,7 @@ import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
+import org.dromara.common.social.maxkey.AuthMaxKeyRequest;
 
 /**
  * 认证授权工具类
@@ -61,6 +62,7 @@ public class SocialUtils  {
             case "gitlab" -> new AuthGitlabRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri).build(), STATE_CACHE);
             case "wechat_mp" -> new AuthWeChatMpRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri).build(), STATE_CACHE);
             case "aliyun" -> new AuthAliyunRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri).build(), STATE_CACHE);
+            case "maxkey" -> new AuthMaxKeyRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret).redirectUri(redirectUri).build(), STATE_CACHE);
             default -> throw new AuthException("未获取到有效的Auth配置");
         };
     }
