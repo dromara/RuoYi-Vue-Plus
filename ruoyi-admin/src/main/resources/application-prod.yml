@@ -21,7 +21,8 @@ powerjob:
     enable-test-mode: false
     max-appended-wf-context-length: 4096
     max-result-length: 4096
-    port: 27777
+    # 28080 端口 随着主应用端口飘逸 避免集群冲突
+    port: 2${server.port}
     protocol: http
     server-address: 127.0.0.1:7700
     store-strategy: disk
