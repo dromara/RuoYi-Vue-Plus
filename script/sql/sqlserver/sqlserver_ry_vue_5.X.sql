@@ -211,9 +211,6 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'update_time'
 GO
 
-INSERT sys_social VALUES (1, 1, N'000000', N'GITEE1766278', N'GITEE', NULL, N'JavaLionLi', N'', N'', N'https://foruda.gitee.com/avatar/1676987709652631782/1766278_javalionli_1585201115.png', N'2a25b8a8b6803939070d931cdb1f9540', 86400, N'448155d0a9c35e6a036a346f7a090f9b3aa7fd41fd2e9563e71e38a7faffbe1c', NULL, NULL, N'user_info projects', N'bearer', NULL, NULL, NULL, NULL, NULL, NULL, 103, 1, N'2023-07-13 17:12:01', 1, N'2023-07-13 17:12:01', N'0');
-GO
-
 
 CREATE TABLE sys_tenant
 (

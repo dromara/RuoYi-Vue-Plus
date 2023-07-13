@@ -72,8 +72,6 @@ comment on column  sys_social.update_by         is '更新者';
 comment on column  sys_social.update_time       is '更新时间';
 comment on column  sys_social.del_flag          is '删除标志（0代表存在 2代表删除）';
 
-insert into sys_social values (1, 1, '000000', 'GITEE1766278', 'GITEE', NULL, 'JavaLionLi', '', '', 'https://foruda.gitee.com/avatar/1676987709652631782/1766278_javalionli_1585201115.png', '2a25b8a8b6803939070d931cdb1f9540', 86400, '448155d0a9c35e6a036a346f7a090f9b3aa7fd41fd2e9563e71e38a7faffbe1c', NULL, NULL, 'user_info projects', 'bearer', NULL, NULL, NULL, NULL, NULL, NULL, 103, 1, '2023-07-13 17:12:01', 1, '2023-07-13 17:12:01', '0');
-
 
 -- ----------------------------
 -- 系统授权表
