@@ -309,10 +309,6 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         //节点图形信息
         map.put("graphicInfoVos", graphicInfoVos);
-        //作废理由
-        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId)
-            .processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
-        map.put("deleteReason", historicProcessInstance.getDeleteReason());
         return map;
     }
 
@@ -359,14 +355,17 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (CollUtil.isNotEmpty(subTasks)) {
                 subTasks.forEach(e -> taskService.deleteTask(e.getId()));
             }
+            String deleteReason = LoginHelper.getUsername() + "作废了当前申请！";
+            if (StringUtils.isNotBlank(processInvalidBo.getDeleteReason())) {
+                deleteReason = LoginHelper.getUsername() + "作废理由:" + processInvalidBo.getDeleteReason();
+            }
+            for (Task task : StreamUtils.filter(list, e -> StringUtils.isBlank(e.getParentTaskId()))) {
+                taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.INVALID.getStatus(), deleteReason);
+            }
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceBusinessKey(processInvalidBo.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
             if (ObjectUtil.isNotEmpty(historicProcessInstance)) {
                 BusinessStatusEnum.checkStatus(historicProcessInstance.getBusinessStatus());
-            }
-            String deleteReason = LoginHelper.getUsername() + "作废了当前申请！";
-            if (StringUtils.isNotBlank(processInvalidBo.getDeleteReason())) {
-                deleteReason = LoginHelper.getUsername() + "作废理由:" + processInvalidBo.getDeleteReason();
             }
             runtimeService.updateBusinessStatus(processInvalidBo.getProcessInstanceId(), BusinessStatusEnum.INVALID.getStatus());
             runtimeService.deleteProcessInstance(processInvalidBo.getProcessInstanceId(), deleteReason);
