@@ -362,7 +362,7 @@ insert into sys_menu values ('1634', '动态表单新增', '1628', '2', '#', '',
 insert into sys_menu values ('1635', '动态表单修改', '1628', '3', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:form:edit',  '#', 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('1636', '动态表单删除', '1628', '4', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:form:remove','#', 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('1637', '动态表单导出', '1628', '5', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:form:export','#', 103, 1, sysdate(), NULL, NULL, '');
--- 流程分类管理相关按钮'''''''
+-- 流程分类管理相关按钮
 insert into sys_menu values ('1623', '流程分类查询', '1622', '1', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:query', '#', 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('1624', '流程分类新增', '1622', '2', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:add',   '#', 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('1625', '流程分类修改', '1622', '3', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:edit',  '#', 103, 1, sysdate(), NULL, NULL, '');
