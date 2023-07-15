@@ -46,4 +46,14 @@ public class WorkflowUserController extends BaseController {
     public R<List<TaskVo>> getWorkflowDeleteMultiInstanceList(@PathVariable String taskId) {
         return R.ok(iWorkflowUserService.getWorkflowDeleteMultiInstanceList(taskId));
     }
+
+    /**
+     * 按照用户id查询用户
+     *
+     * @param userIds 用户id
+     */
+    @GetMapping("/getUserListByIds/{userIds}")
+    public R<List<SysUserVo>> getUserListByIds(@PathVariable List<Long> userIds) {
+        return R.ok(iWorkflowUserService.getUserListByIds(userIds));
+    }
 }

@@ -267,6 +267,15 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             }
             actHistoryInfoVoList.add(actHistoryInfoVo);
         }
+        List<ActHistoryInfoVo> collect = new ArrayList<>();
+        //待办理
+        List<ActHistoryInfoVo> waitingTask = StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() == null);
+        //已办理
+        List<ActHistoryInfoVo> finishTask = StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() != null);
+        collect.addAll(waitingTask);
+        collect.addAll(finishTask);
+        //审批记录
+        map.put("historyRecordList", collect);
         List<ActHistoryInfoVo> nodeInfoList = new ArrayList<>();
         Map<String, List<ActHistoryInfoVo>> groupByKey = StreamUtils.groupByKey(actHistoryInfoVoList, ActHistoryInfoVo::getTaskDefinitionKey);
         for (Map.Entry<String, List<ActHistoryInfoVo>> entry : groupByKey.entrySet()) {
@@ -275,6 +284,11 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (StringUtils.isNotBlank(nickName)) {
                 actHistoryInfoVo.setNickName(nickName);
             }
+            actHistoryInfoVoList.stream().filter(e -> e.getTaskDefinitionKey().equals(entry.getKey()) && e.getEndTime() != null).findFirst()
+                .ifPresent(e -> {
+                    actHistoryInfoVo.setStatus("已处理");
+                    actHistoryInfoVo.setStartTime(e.getStartTime());
+                });
             actHistoryInfoVoList.stream().filter(e -> e.getTaskDefinitionKey().equals(entry.getKey()) && e.getEndTime() == null).findFirst()
                 .ifPresent(e -> {
                     actHistoryInfoVo.setStatus("待处理");
@@ -286,15 +300,6 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         //节点信息
         map.put("nodeListInfo", nodeInfoList);
-        List<ActHistoryInfoVo> collect = new ArrayList<>();
-        //待办理
-        List<ActHistoryInfoVo> waitingTask = StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() == null);
-        //已办理
-        List<ActHistoryInfoVo> finishTask = StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() != null);
-        collect.addAll(waitingTask);
-        collect.addAll(finishTask);
-        //审批记录
-        map.put("historyRecordList", collect);
         BpmnModel bpmnModel = repositoryService.getBpmnModel(list.get(0).getProcessDefinitionId());
         List<GraphicInfoVo> graphicInfoVos = new ArrayList<>();
         Collection<FlowElement> flowElements = bpmnModel.getMainProcess().getFlowElements();
@@ -443,7 +448,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             List<Task> taskList = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(processInstanceId).list();
             for (Task task : taskList) {
                 taskService.setAssignee(task.getId(), String.valueOf(LoginHelper.getUserId()));
-                taskService.addComment(task.getId(), processInstanceId, LoginHelper.getUsername() + "：撤销申请");
+                taskService.addComment(task.getId(), processInstanceId, TaskStatusEnum.CANCEL.getStatus(), LoginHelper.getUsername() + "：撤销申请");
             }
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().finished().orderByHistoricTaskInstanceEndTime().asc().list().get(0);
             List<String> nodeIds = StreamUtils.toList(taskList, Task::getTaskDefinitionKey);

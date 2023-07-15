@@ -29,4 +29,12 @@ public interface IWorkflowUserService {
      * @return 结果
      */
     List<TaskVo> getWorkflowDeleteMultiInstanceList(String taskId);
+
+    /**
+     * 按照用户id查询用户
+     *
+     * @param userIds 用户id
+     * @return 结果
+     */
+    List<SysUserVo> getUserListByIds(List<Long> userIds);
 }

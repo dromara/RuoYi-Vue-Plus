@@ -197,6 +197,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
             taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
             taskVo.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
+            taskVo.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
             list.add(taskVo);
         }
         long count = query.count();
@@ -239,6 +240,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
             taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
             taskVo.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
+            taskVo.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
             list.add(taskVo);
         }
         long count = query.count();

@@ -60,19 +60,20 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
             throw new ServiceException("任务不存在");
         }
         MultiInstanceVo multiInstance = WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
+        if (multiInstance == null) {
+            return TableDataInfo.build();
+        }
         LambdaQueryWrapper<SysUser> queryWrapper = Wrappers.lambdaQuery();
         //检索条件
         queryWrapper.eq(StringUtils.isNotEmpty(sysUserMultiBo.getDeptId()), SysUser::getDeptId, sysUserMultiBo.getDeptId());
         queryWrapper.eq(SysUser::getStatus, UserStatus.OK.getCode());
-        if (multiInstance != null) {
-            if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
-                List<Long> assigneeList = (List) runtimeService.getVariable(task.getExecutionId(), multiInstance.getAssigneeList());
-                queryWrapper.notIn(CollectionUtil.isNotEmpty(assigneeList), SysUser::getUserId, assigneeList);
-            } else {
-                List<Task> list = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
-                List<Long> userIds = StreamUtils.toList(list, e -> Long.valueOf(e.getAssignee()));
-                queryWrapper.notIn(CollectionUtil.isNotEmpty(userIds), SysUser::getUserId, userIds);
-            }
+        if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
+            List<Long> assigneeList = (List) runtimeService.getVariable(task.getExecutionId(), multiInstance.getAssigneeList());
+            queryWrapper.notIn(CollectionUtil.isNotEmpty(assigneeList), SysUser::getUserId, assigneeList);
+        } else {
+            List<Task> list = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
+            List<Long> userIds = StreamUtils.toList(list, e -> Long.valueOf(e.getAssignee()));
+            queryWrapper.notIn(CollectionUtil.isNotEmpty(userIds), SysUser::getUserId, userIds);
         }
         queryWrapper.like(StringUtils.isNotEmpty(sysUserMultiBo.getUserName()), SysUser::getUserName, sysUserMultiBo.getUserName());
         queryWrapper.like(StringUtils.isNotEmpty(sysUserMultiBo.getNickName()), SysUser::getNickName, sysUserMultiBo.getNickName());
@@ -171,5 +172,28 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
         });
         page.setRecords(records);
         return page;
+    }
+
+    /**
+     * 按照用户id查询用户
+     *
+     * @param userIds 用户id
+     */
+    @Override
+    public List<SysUserVo> getUserListByIds(List<Long> userIds) {
+        LambdaQueryWrapper<SysUser> queryWrapper = Wrappers.lambdaQuery();
+        //检索条件
+        queryWrapper.eq(SysUser::getStatus, UserStatus.OK.getCode());
+        queryWrapper.in(SysUser::getUserId, userIds);
+        List<SysUserVo> sysUserVos = sysUserMapper.selectVoList(queryWrapper);
+        List<Long> collectDeptId = sysUserVos.stream().map(SysUserVo::getDeptId).filter(Objects::nonNull).collect(Collectors.toList());
+        if (CollectionUtil.isEmpty(collectDeptId)) {
+            return sysUserVos;
+        }
+        List<SysDeptVo> sysDeptList = sysDeptMapper.selectVoBatchIds(collectDeptId);
+        sysUserVos.forEach(e -> {
+            sysDeptList.stream().filter(d -> d.getDeptId().equals(e.getDeptId())).findFirst().ifPresent(e::setDept);
+        });
+        return sysUserVos;
     }
 }

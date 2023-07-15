@@ -135,4 +135,9 @@ public class TaskVo {
      * 参与者
      */
     private ParticipantVo participantVo;
+
+    /**
+     * 是否会签
+     */
+    private Boolean multiInstance;
 }
