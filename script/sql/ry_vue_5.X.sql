@@ -231,6 +231,8 @@ insert into sys_menu values('6', '租户管理', '0', '2', 'tenant',           n
 insert into sys_menu values('2', '系统监控', '0', '3', 'monitor',          null, '', 1, 0, 'M', '0', '0', '', 'monitor',  103, 1, sysdate(), null, null, '系统监控目录');
 insert into sys_menu values('3', '系统工具', '0', '4', 'tool',             null, '', 1, 0, 'M', '0', '0', '', 'tool',     103, 1, sysdate(), null, null, '系统工具目录');
 insert into sys_menu values('4', 'PLUS官网', '0', '5', 'https://gitee.com/dromara/RuoYi-Vue-Plus', null, '', 0, 0, 'M', '0', '0', '', 'guide',    103, 1, sysdate(), null, null, 'RuoYi-Vue-Plus官网地址');
+insert into sys_menu values('1616', '工作流', 0, 6, 'workflow', NULL, NULL, 1, 0, 'M', '0', '0', NULL, 'tree-table', 103, 1, '2023-05-27 19:52:40', 1, '2023-05-27 19:52:40', '');
+
 -- 二级菜单
 insert into sys_menu values('100',  '用户管理',     '1',   '1', 'user',             'system/user/index',            '', 1, 0, 'C', '0', '0', 'system:user:list',            'user',          103, 1, sysdate(), null, null, '用户管理菜单');
 insert into sys_menu values('101',  '角色管理',     '1',   '2', 'role',             'system/role/index',            '', 1, 0, 'C', '0', '0', 'system:role:list',            'peoples',       103, 1, sysdate(), null, null, '角色管理菜单');
@@ -245,8 +247,14 @@ insert into sys_menu values('109',  '在线用户',     '2',   '1', 'online',   
 insert into sys_menu values('113',  '缓存监控',     '2',   '5', 'cache',            'monitor/cache/index',          '', 1, 0, 'C', '0', '0', 'monitor:cache:list',          'redis',         103, 1, sysdate(), null, null, '缓存监控菜单');
 insert into sys_menu values('114',  '表单构建',     '3',   '1', 'build',            'tool/build/index',             '', 1, 0, 'C', '0', '0', 'tool:build:list',             'build',         103, 1, sysdate(), null, null, '表单构建菜单');
 insert into sys_menu values('115',  '代码生成',     '3',   '2', 'gen',              'tool/gen/index',               '', 1, 0, 'C', '0', '0', 'tool:gen:list',               'code',          103, 1, sysdate(), null, null, '代码生成菜单');
-insert into sys_menu values ('121', '租户管理',     '6',   '1', 'tenant',           'system/tenant/index',          '', 1, 0, 'C', '0', '0', 'system:tenant:list',          'list',          103, 1, sysdate(), null, null, '租户管理菜单');
-insert into sys_menu values ('122', '租户套餐管理',  '6',   '2', 'tenantPackage',    'system/tenantPackage/index',   '', 1, 0, 'C', '0', '0', 'system:tenantPackage:list',   'form',          103, 1, sysdate(), null, null, '租户套餐管理菜单');
+insert into sys_menu values('121', '租户管理',     '6',   '1', 'tenant',            'system/tenant/index',          '', 1, 0, 'C', '0', '0', 'system:tenant:list',          'list',          103, 1, sysdate(), null, null, '租户管理菜单');
+insert into sys_menu values('122', '租户套餐管理',  '6',   '2', 'tenantPackage',     'system/tenantPackage/index',   '', 1, 0, 'C', '0', '0', 'system:tenantPackage:list',   'form',          103, 1, sysdate(), null, null, '租户套餐管理菜单');
+insert into sys_menu values('1617', '模型管理', '1616',   '1', 'model',             'workflow/model/index',         '', 1, 1, 'C', '0', '0', 'workflow:model:list',         'tree-table',    103, 1, sysdate(), null, null, '模型管理菜单');
+insert into sys_menu values('1618', '我的待办', '1616',   '4', 'task',              '',                             '', 1, 0, 'M', '0', '0', '',                            'tree-table',    103, 1, sysdate(), null, null, '我的待办菜单');
+insert into sys_menu values('1620', '流程定义', '1616',   '2', 'processDefinition', 'workflow/processDefinition/index', '', 1, 1, 'C', '0', '0', '',                        'tree-table',    103, 1, sysdate(), null, null, '流程定义菜单');
+insert into sys_menu values('1622', '流程分类', '1616',   '1', 'category',          'workflow/category/index',     '', 1, 0, 'C', '0', '0', 'workflow:category:list',       'tree-table',    103, 1, sysdate(), null, null, '流程分类菜单');
+insert into sys_menu values('1628', '动态表单', '1616',   '5', 'form',              'workflow/form/index',         '', 1, 1, 'C', '0', '0', '',                             'tree-table',    103, 1, sysdate(), null, null, '动态表单菜单');
+insert into sys_menu values('1630', '流程监控', '1616',   '3', 'monitor',           '',                            '', 1, 0, 'M', '0', '0', '',                             'tree-table',    103, 1, sysdate(), null, null, '流程监控菜单');
 
 -- springboot-admin监控
 insert into sys_menu values('117',  'Admin监控',   '2',   '5',  'Admin',            'monitor/admin/index',         '', 1, 0, 'C', '0', '0', 'monitor:admin:list',           'dashboard',     103, 1, sysdate(), null, null, 'Admin监控菜单');
@@ -256,8 +264,12 @@ insert into sys_menu values('118',  '文件管理',     '1',   '10', 'oss',     
 insert into sys_menu values('120',  '任务调度中心',  '2',   '5',  'XxlJob',           'monitor/xxljob/index',        '', 1, 0, 'C', '0', '0', 'monitor:xxljob:list',          'job',           103, 1, sysdate(), null, null, 'Xxl-Job控制台菜单');
 
 -- 三级菜单
-insert into sys_menu values('500',  '操作日志', '108', '1', 'operlog',    'monitor/operlog/index',    '', 1, 0, 'C', '0', '0', 'monitor:operlog:list',    'form',          103, 1, sysdate(), null, null, '操作日志菜单');
-insert into sys_menu values('501',  '登录日志', '108', '2', 'logininfor', 'monitor/logininfor/index', '', 1, 0, 'C', '0', '0', 'monitor:logininfor:list', 'logininfor',    103, 1, sysdate(), null, null, '登录日志菜单');
+insert into sys_menu values('500',  '操作日志', '108', '1', 'operlog',           'monitor/operlog/index',          '', 1, 0, 'C', '0', '0', 'monitor:operlog:list',    'form',          103, 1, sysdate(), null, null, '操作日志菜单');
+insert into sys_menu values('501',  '登录日志', '108', '2', 'logininfor',        'monitor/logininfor/index',       '', 1, 0, 'C', '0', '0', 'monitor:logininfor:list', 'logininfor',    103, 1, sysdate(), null, null, '登录日志菜单');
+insert into sys_menu values('1621', '流程实例', '1630','1', 'processInstance',   'workflow/processInstance/index', '', 1, 1, 'C', '0', '0', '',                        'tree-table',    103, 1, sysdate(), null, null, '流程实例');
+insert into sys_menu values('1631', '待办任务', '1630','2', 'allTaskWaiting',    'workflow/task/allTaskWaiting',   '', 1, 1, 'C', '0', '0', '',                        'tree-table',    103, 1, sysdate(), null, null, '待办任务');
+insert into sys_menu values('1619', '待办任务', '1618','2', 'taskWaiting',       'workflow/task/index',            '', 1, 1, 'C', '0', '0', '',                        'tree-table',    103, 1, sysdate(), null, null, '待办任务');
+insert into sys_menu values('1629', '我的单据', '1618','1', 'myDocument',        'workflow/task/myDocument',       '', 1, 1, 'C', '0', '0', '',                        'tree-table',    103, 1, sysdate(), null, null, '我的单据');
 -- 用户管理按钮
 insert into sys_menu values('1001', '用户查询', '100', '1',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:query',          '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values('1002', '用户新增', '100', '2',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:add',            '#', 103, 1, sysdate(), null, null, '');
@@ -344,7 +356,18 @@ insert into sys_menu values ('1612', '租户套餐新增', '122', '2', '#', '', 
 insert into sys_menu values ('1613', '租户套餐修改', '122', '3', '#', '', '', 1, 0, 'F', '0', '0', 'system:tenantPackage:edit',    '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values ('1614', '租户套餐删除', '122', '4', '#', '', '', 1, 0, 'F', '0', '0', 'system:tenantPackage:remove',  '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values ('1615', '租户套餐导出', '122', '5', '#', '', '', 1, 0, 'F', '0', '0', 'system:tenantPackage:export',  '#', 103, 1, sysdate(), null, null, '');
-
+-- 动态表单管理相关按钮
+insert into sys_menu values ('1633', '动态表单查询', '1628', '1', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:form:query', '#', 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('1634', '动态表单新增', '1628', '2', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:form:add',   '#', 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('1635', '动态表单修改', '1628', '3', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:form:edit',  '#', 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('1636', '动态表单删除', '1628', '4', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:form:remove','#', 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('1637', '动态表单导出', '1628', '5', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:form:export','#', 103, 1, sysdate(), NULL, NULL, '');
+-- 流程分类管理相关按钮'''''''
+insert into sys_menu values ('1623', '流程分类查询', '1622', '1', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:query', '#', 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('1624', '流程分类新增', '1622', '2', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:add',   '#', 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('1625', '流程分类修改', '1622', '3', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:edit',  '#', 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('1626', '流程分类删除', '1622', '4', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:remove','#', 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('1627', '流程分类导出', '1622', '5', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:export','#', 103, 1, sysdate(), NULL, NULL, '');
 
 -- ----------------------------
 -- 6、用户和角色关联表  用户N-1角色
