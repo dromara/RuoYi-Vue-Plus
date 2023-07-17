@@ -1,5 +1,10 @@
 package org.dromara.common.core.exception;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 import java.io.Serial;
 
 /**
@@ -7,6 +12,10 @@ import java.io.Serial;
  *
  * @author ruoyi
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public final class ServiceException extends RuntimeException {
 
     @Serial
@@ -26,12 +35,6 @@ public final class ServiceException extends RuntimeException {
      * 错误明细，内部调试错误
      */
     private String detailMessage;
-
-    /**
-     * 空构造方法，避免反序列化问题
-     */
-    public ServiceException() {
-    }
 
     public ServiceException(String message) {
         this.message = message;
