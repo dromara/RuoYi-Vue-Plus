@@ -36,6 +36,7 @@
         from sys_role r
                  left join sys_user_role sur on sur.role_id = r.role_id
                  left join sys_user u on u.user_id = sur.user_id
+                 left join sys_user us on us.user_name = r.create_by
                  left join sys_dept d on u.dept_id = d.dept_id
     </sql>
 
