@@ -46,7 +46,7 @@
 #elseif($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
           <el-form-item label="${comment}" style="width: 308px">
             <el-date-picker
-                v-model="daterange${AttrName}"
+                v-model="dateRange${AttrName}"
                 value-format="YYYY-MM-DD HH:mm:ss"
                 type="daterange"
                 range-separator="-"
@@ -268,9 +268,6 @@
 <script setup name="${BusinessName}" lang="ts">
 import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${BusinessName}, update${BusinessName} } from "@/api/${moduleName}/${businessName}";
 import { ${BusinessName}VO, ${BusinessName}Query, ${BusinessName}Form } from '@/api/${moduleName}/${businessName}/types';
-import { ComponentInternalInstance } from 'vue';
-import { ElForm, ElTable } from 'element-plus';
-
 
 type ${BusinessName}Option = {
   ${treeCode}: number;
@@ -292,9 +289,9 @@ const showSearch = ref(true);
 const isExpandAll = ref(true);
 const loading = ref(false);
 
-const queryFormRef = ref(ElForm);
-const ${businessName}FormRef = ref(ElForm);
-const ${businessName}TableRef = ref(ElTable)
+const queryFormRef = ref<ElFormInstance>();
+const ${businessName}FormRef = ref<ElFormInstance>();
+const ${businessName}TableRef = ref<ElTableInstance>()
 
 const dialog = reactive<DialogOption>({
     visible: false,
@@ -304,7 +301,7 @@ const dialog = reactive<DialogOption>({
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-const daterange${AttrName} = ref([]);
+const dateRange${AttrName} = ref<[DateModelType, DateModelType]>(['', '']);
 #end
 #end
 
@@ -325,9 +322,20 @@ const data = reactive<PageData<${BusinessName}Form, ${BusinessName}Query>>({
   queryParams: {
 #foreach ($column in $columns)
 #if($column.query)
+    #if($column.htmlType != "datetime" || $column.queryType != "BETWEEN")
     $column.javaField: undefined#if($foreach.count != $columns.size()),#end
+    #end
 #end
 #end
+    params: {
+      #foreach ($column in $columns)
+      #if($column.query)
+      #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+      $column.javaField: undefined#if($foreach.count != $columns.size()),#end
+      #end
+      #end
+      #end
+    }
   },
   rules: {
 #foreach ($column in $columns)
@@ -362,10 +370,7 @@ const getList = async () => {
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-  if (null != daterange${AttrName} && '' != daterange${AttrName}) {
-    queryParams.value.params["begin${AttrName}"] = daterange${AttrName}.value[0];
-    queryParams.value.params["end${AttrName}"] = daterange${AttrName}.value[1];
-  }
+  proxy?.addDateRange(queryParams.value, dateRange${AttrName}.value, '${AttrName}');
 #end
 #end
   const res = await list${BusinessName}(queryParams.value);
@@ -394,7 +399,7 @@ const cancel = () => {
 // 表单重置
 const reset = () => {
   form.value = {...initFormData}
-  ${businessName}FormRef.value.resetFields();
+  ${businessName}FormRef.value?.resetFields();
 }
 
 /** 搜索按钮操作 */
@@ -407,10 +412,10 @@ const resetQuery = () => {
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-  daterange${AttrName}.value = [];
+  dateRange${AttrName}.value = ['', ''];
 #end
 #end
-  queryFormRef.value.resetFields();
+  queryFormRef.value?.resetFields();
   handleQuery();
 }
 
@@ -438,7 +443,7 @@ const handleToggleExpandAll = () => {
 /** 展开/折叠操作 */
 const toggleExpandAll = (data: ${BusinessName}VO[], status: boolean) => {
   data.forEach((item) => {
-    ${businessName}TableRef.value.toggleRowExpansion(item, status)
+    ${businessName}TableRef.value?.toggleRowExpansion(item, status)
     if (item.children && item.children.length > 0) toggleExpandAll(item.children, status)
   })
 }
@@ -467,7 +472,7 @@ const handleUpdate = (row: ${BusinessName}VO) => {
 
 /** 提交按钮 */
 const submitForm = () => {
-  ${businessName}FormRef.value.validate(async (valid: boolean) => {
+  ${businessName}FormRef.value?.validate(async (valid: boolean) => {
     if (valid) {
       buttonLoading.value = true;
 #foreach ($column in $columns)
