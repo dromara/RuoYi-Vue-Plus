@@ -29,6 +29,10 @@ export interface ${BusinessName}Form extends BaseEntity {
 }
 
 export interface ${BusinessName}Query #if(!${treeCode})extends PageQuery #end{
+  /**
+   * 日期范围参数
+   */
+  params?: any;
 #foreach ($column in $columns)
 #if($column.query)
   /**
@@ -42,3 +46,6 @@ export interface ${BusinessName}Query #if(!${treeCode})extends PageQuery #end{
 #end
 #end
 }
+
+
+
