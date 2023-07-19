@@ -261,6 +261,6 @@ management:
 websocket:
   enabled: true
   # 路径
-  path: /websocket
+  path: /resource/websocket
   # 设置访问源地址
   allowedOrigins: '*'
