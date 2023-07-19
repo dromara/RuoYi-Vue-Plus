@@ -1,5 +1,6 @@
 package org.dromara.common.encrypt.filter;
 
+import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dromara.common.core.utils.StringUtils;
@@ -8,7 +9,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
-import java.util.Objects;
 
 
 /**
@@ -38,7 +38,8 @@ public class CryptoFilter implements Filter {
                 }
             }
         }
-        chain.doFilter(Objects.requireNonNullElse(requestWrapper, request), response);
+
+        chain.doFilter(ObjectUtil.defaultIfNull(requestWrapper, request), response);
     }
 
     @Override
