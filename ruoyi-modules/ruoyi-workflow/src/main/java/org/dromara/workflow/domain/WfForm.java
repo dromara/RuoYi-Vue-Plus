@@ -33,11 +33,6 @@ public class WfForm extends TenantEntity {
     private String formName;
 
     /**
-     * 表单配置
-     */
-    private String formConfig;
-
-    /**
      * 表单内容
      */
     private String content;

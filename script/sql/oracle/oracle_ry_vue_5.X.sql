@@ -1112,7 +1112,6 @@ insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'r
 create table wf_form (
   form_id     number(20)    not null,
   form_name   varchar(64)   default '',
-  form_config nclob,
   content     nclob,
   create_dept number(20)    default null,
   create_by   number(20)    default null,
@@ -1128,7 +1127,6 @@ alter table wf_form add constraint pk_wf_form primary key (form_id);
 comment on table wf_form              is '流程表单信息表';
 comment on column wf_form.form_id     is '表单主键';
 comment on column wf_form.form_name   is '表单名称';
-comment on column wf_form.form_config is '表单配置';
 comment on column wf_form.content     is '表单内容';
 comment on column wf_form.create_dept is '创建部门';
 comment on column wf_form.create_by   is '创建者';

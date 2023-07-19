@@ -826,7 +826,6 @@ create table wf_form (
   form_id         bigint        not null                  comment '表单id',
   tenant_id       varchar(20)             default '000000'comment '租户编号',
   form_name       varchar(255)            default null    comment '表单名称',
-  form_config     longtext                                comment '表单配置',
   content         longtext                                comment '表单内容',
   create_dept     bigint                  default null    comment '创建部门',
   create_by       bigint                  default null    comment '创建者',

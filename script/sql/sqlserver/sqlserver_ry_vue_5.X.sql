@@ -2817,7 +2817,6 @@ CREATE TABLE wf_form
 (
     form_id        bigint                          NOT NULL,
     form_name      nvarchar(64)    DEFAULT ''      NULL,
-    form_config    nvarchar(max)                   NULL,
     content        nvarchar(max)                   NULL,
     create_dept    bigint                          NULL,
     create_by      nvarchar(64)    DEFAULT ''      NULL,
@@ -2843,12 +2842,6 @@ EXEC sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'wf_form',
     'COLUMN', N'form_name'
-GO
-EXEC sp_addextendedproperty
-    'MS_Description', N'表单配置',
-    'SCHEMA', N'dbo',
-    'TABLE', N'wf_form',
-    'COLUMN', N'form_config'
 GO
 EXEC sp_addextendedproperty
     'MS_Description', N'表单内容',

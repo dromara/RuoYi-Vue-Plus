@@ -1139,7 +1139,6 @@ create table if not exists bpmn_form
     form_id       int8,
     tenant_id     varchar(20)  default '000000'::varchar,
     form_name     varchar(255) default ''::varchar not null,
-    form_config   text,
     content       text,
     create_dept   int8,
     create_by     int8,
@@ -1153,7 +1152,6 @@ create table if not exists bpmn_form
 comment on table wf_form is '流程表单信息表';
 comment on column bpmn_form.form_id     is '表单主键';
 comment on column bpmn_form.form_name   is '表单名称';
-comment on column bpmn_form.form_config is '表单配置';
 comment on column bpmn_form.content     is '表单内容';
 comment on column bpmn_form.create_dept is '创建部门';
 comment on column bpmn_form.create_by   is '创建者';
