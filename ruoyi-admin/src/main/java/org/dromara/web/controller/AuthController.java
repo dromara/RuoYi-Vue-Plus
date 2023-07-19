@@ -109,7 +109,7 @@ public class AuthController {
      * @return 结果
      */
     @PostMapping("/social/callback")
-    public R<LoginVo> socialCallback(@RequestBody LoginBody loginBody) {
+    public R<Void> socialCallback(@RequestBody LoginBody loginBody) {
         // 获取第三方登录信息
         AuthResponse<AuthUser> response = SocialUtils.loginAuth(loginBody, socialProperties);
         AuthUser authUserData = response.getData();
@@ -117,7 +117,8 @@ public class AuthController {
         if (!response.ok()) {
             return R.fail(response.getMsg());
         }
-        return loginService.sociaRegister(authUserData);
+        loginService.socialRegister(authUserData);
+        return R.ok();
     }
 
 
