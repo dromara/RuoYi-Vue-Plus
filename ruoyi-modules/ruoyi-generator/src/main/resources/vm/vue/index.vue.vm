@@ -413,14 +413,12 @@ const handleAdd = () => {
 
 /** 修改按钮操作 */
 const handleUpdate = (row?: ${BusinessName}VO) => {
-  loading.value = true
   dialog.visible = true;
   dialog.title = "修改${functionName}";
   nextTick(async () => {
     reset();
     const _${pkColumn.javaField} = row?.${pkColumn.javaField} || ids.value[0]
     const res = await get${BusinessName}(_${pkColumn.javaField});
-    loading.value = false;
     Object.assign(form.value, res.data);
 #foreach ($column in $columns)
 #if($column.htmlType == "checkbox")
