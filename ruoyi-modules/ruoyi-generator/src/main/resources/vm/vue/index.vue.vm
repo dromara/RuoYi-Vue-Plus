@@ -404,28 +404,24 @@ const handleSelectionChange = (selection: ${BusinessName}VO[]) => {
 
 /** 新增按钮操作 */
 const handleAdd = () => {
+  reset();
   dialog.visible = true;
   dialog.title = "添加${functionName}";
-  nextTick(() => {
-    reset();
-  });
 }
 
 /** 修改按钮操作 */
-const handleUpdate = (row?: ${BusinessName}VO) => {
+const handleUpdate = async (row?: ${BusinessName}VO) => {
+  reset();
+  const _${pkColumn.javaField} = row?.${pkColumn.javaField} || ids.value[0]
+  const res = await get${BusinessName}(_${pkColumn.javaField});
+  Object.assign(form.value, res.data);
+#foreach ($column in $columns)
+  #if($column.htmlType == "checkbox")
+  form.value.$column.javaField = form.value.${column.javaField}.split(",");
+  #end
+#end
   dialog.visible = true;
   dialog.title = "修改${functionName}";
-  nextTick(async () => {
-    reset();
-    const _${pkColumn.javaField} = row?.${pkColumn.javaField} || ids.value[0]
-    const res = await get${BusinessName}(_${pkColumn.javaField});
-    Object.assign(form.value, res.data);
-#foreach ($column in $columns)
-#if($column.htmlType == "checkbox")
-    form.value.$column.javaField = form.value.${column.javaField}.split(",");
-#end
-#end
-  });
 }
 
 /** 提交按钮 */

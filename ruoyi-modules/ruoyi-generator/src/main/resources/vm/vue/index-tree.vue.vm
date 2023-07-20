@@ -421,17 +421,15 @@ const resetQuery = () => {
 
 /** 新增按钮操作 */
 const handleAdd = (row?: ${BusinessName}VO) => {
+  reset();
+  getTreeselect();
+  if (row != null && row.${treeCode}) {
+      form.value.${treeParentCode} = row.${treeCode};
+  } else {
+      form.value.${treeParentCode} = 0;
+  }
   dialog.visible = true;
   dialog.title = "添加${functionName}";
-  nextTick(() => {
-    reset();
-    getTreeselect();
-    if (row != null && row.${treeCode}) {
-      form.value.${treeParentCode} = row.${treeCode};
-    } else {
-      form.value.${treeParentCode} = 0;
-    }
-  });
 }
 
 /** 展开/折叠操作 */
@@ -449,23 +447,21 @@ const toggleExpandAll = (data: ${BusinessName}VO[], status: boolean) => {
 }
 
 /** 修改按钮操作 */
-const handleUpdate = (row: ${BusinessName}VO) => {
+const handleUpdate = async (row: ${BusinessName}VO) => {
+  reset();
+  await getTreeselect();
+  if (row != null) {
+    form.value.${treeParentCode} = row.${treeCode};
+  }
+  const res = await get${BusinessName}(row.${treeCode});
+  Object.assign(form.value, res.data);
+#foreach ($column in $columns)
+  #if($column.htmlType == "checkbox")
+  form.value.$column.javaField = form.value.${column.javaField}.split(",");
+  #end
+#end
   dialog.visible = true;
   dialog.title = "修改${functionName}";
-  nextTick(async () => {
-    reset();
-    await getTreeselect();
-    if (row != null) {
-      form.value.${treeParentCode} = row.${treeCode};
-    }
-    const res = await get${BusinessName}(row.${treeCode});
-    Object.assign(form.value, res.data);
-#foreach ($column in $columns)
-#if($column.htmlType == "checkbox")
-    form.value.$column.javaField = form.value.${column.javaField}.split(",");
-#end
-#end
-  });
 }
 
 /** 提交按钮 */
