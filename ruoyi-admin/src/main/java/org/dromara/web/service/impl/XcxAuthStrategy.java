@@ -66,8 +66,12 @@ public class XcxAuthStrategy implements IAuthStrategy {
 
         loginService.recordLogininfor(loginUser.getTenantId(), user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         loginService.recordLoginInfo(user.getUserId());
+
         LoginVo loginVo = new LoginVo();
         loginVo.setAccessToken(StpUtil.getTokenValue());
+        loginVo.setExpireIn(StpUtil.getTokenTimeout());
+        loginVo.setClientId(clientId);
+        loginVo.setOpenid(openid);
         return loginVo;
     }
 

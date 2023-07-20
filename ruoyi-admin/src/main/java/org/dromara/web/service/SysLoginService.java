@@ -122,24 +122,6 @@ public class SysLoginService {
     }
 
 
-    private SysUserVo loadUserByUsername(String tenantId, String username) {
-        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getUserName, SysUser::getStatus)
-            .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
-            .eq(SysUser::getUserName, username));
-        if (ObjectUtil.isNull(user)) {
-            log.info("登录用户：{} 不存在.", username);
-            throw new UserException("user.not.exists", username);
-        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
-            log.info("登录用户：{} 已被停用.", username);
-            throw new UserException("user.blocked", username);
-        }
-        if (TenantHelper.isEnable()) {
-            return userMapper.selectTenantUserByUserName(username, tenantId);
-        }
-        return userMapper.selectUserByUserName(username);
-    }
-
     /**
      * 构建登录用户
      */
