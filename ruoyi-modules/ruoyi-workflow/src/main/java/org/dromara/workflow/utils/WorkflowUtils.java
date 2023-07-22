@@ -1,5 +1,6 @@
 package org.dromara.workflow.utils;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -7,9 +8,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dromara.common.core.enums.UserStatus;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysUser;
@@ -17,9 +20,13 @@ import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.mapper.SysUserRoleMapper;
 import org.dromara.workflow.common.constant.FlowConstant;
+import org.dromara.workflow.common.enums.BusinessStatusEnum;
+import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.ParticipantVo;
+import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
+import org.dromara.workflow.service.IActHiProcinstService;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -42,6 +49,8 @@ import java.rmi.ServerException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.dromara.workflow.common.constant.FlowConstant.PROCESS_INSTANCE_VO;
+
 /**
  * 工作流工具
  *
@@ -55,6 +64,7 @@ public class WorkflowUtils {
     private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
     private static final SysUserMapper SYS_USER_MAPPER = SpringUtils.getBean(SysUserMapper.class);
     private static final SysUserRoleMapper SYS_USER_ROLE_MAPPER = SpringUtils.getBean(SysUserRoleMapper.class);
+    private static final IActHiProcinstService I_ACT_HI_PROCINST_SERVICE = SpringUtils.getBean(IActHiProcinstService.class);
 
     /**
      * bpmnModel转为xml
@@ -272,6 +282,61 @@ public class WorkflowUtils {
         HistoricTaskInstance historicTaskInstance = PROCESS_ENGINE.getHistoryService().createHistoricTaskInstanceQuery().taskId(taskId).taskTenantId(TenantHelper.getTenantId()).singleResult();
         HistoricProcessInstance historicProcessInstance = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery()
             .processInstanceId(historicTaskInstance.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+
         return historicProcessInstance.getBusinessStatus();
+    }
+
+    /**
+     * 设置流程实例对象
+     *
+     * @param obj         业务对象
+     * @param businessKey 业务id
+     */
+    public static void setProcessInstanceVo(Object obj, String businessKey) {
+        ActHiProcinst actHiProcinst = I_ACT_HI_PROCINST_SERVICE.selectByBusinessKey(businessKey);
+        if (actHiProcinst == null) {
+            ProcessInstanceVo processInstanceVo = new ProcessInstanceVo();
+            processInstanceVo.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
+            ReflectUtils.invokeSetter(obj, PROCESS_INSTANCE_VO, processInstanceVo);
+            return;
+        }
+        ProcessInstanceVo processInstanceVo = BeanUtil.toBean(actHiProcinst, ProcessInstanceVo.class);
+        processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstanceVo.getBusinessStatus()));
+        ReflectUtils.invokeSetter(obj, PROCESS_INSTANCE_VO, processInstanceVo);
+    }
+
+    /**
+     * 设置流程实例对象
+     *
+     * @param obj       业务对象
+     * @param idList    业务id
+     * @param fieldName 主键属性名称
+     */
+    public static void setProcessInstanceListVo(Object obj, List<String> idList, String fieldName) {
+        List<ActHiProcinst> actHiProcinstList = I_ACT_HI_PROCINST_SERVICE.selectByBusinessKeyIn(idList);
+        if (obj instanceof Collection) {
+            Collection<?> collection = (Collection<?>) obj;
+            for (Object o : collection) {
+                if (o != null) {
+                    try {
+                        String fieldValue = ReflectUtils.invokeGetter(o, fieldName).toString();
+                        ActHiProcinst actHiProcinst = actHiProcinstList.stream().filter(e -> e.getBusinessKey().equals(fieldValue)).findFirst().orElse(null);
+                        if (ObjectUtil.isNotEmpty(actHiProcinst)) {
+                            ProcessInstanceVo processInstanceVo = BeanUtil.toBean(actHiProcinst, ProcessInstanceVo.class);
+                            processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstanceVo.getBusinessStatus()));
+                            ReflectUtils.invokeSetter(o, PROCESS_INSTANCE_VO, processInstanceVo);
+                        } else {
+                            ProcessInstanceVo processInstanceVo = new ProcessInstanceVo();
+                            processInstanceVo.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
+                            processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstanceVo.getBusinessStatus()));
+                            ReflectUtils.invokeSetter(o, PROCESS_INSTANCE_VO, processInstanceVo);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new ServiceException(e.getMessage());
+                    }
+                }
+            }
+        }
     }
 }

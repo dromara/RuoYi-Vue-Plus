@@ -14,6 +14,7 @@ import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
 import org.dromara.workflow.service.IActProcessDefinitionService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -123,5 +124,17 @@ public class ActProcessDefinitionController extends BaseController {
     @PutMapping("/convertToModel/{processDefinitionId}")
     public R<Void> convertToModel(@NotEmpty(message = "流程定义id不能为空") @PathVariable String processDefinitionId) {
         return toAjax(iActProcessDefinitionService.convertToModel(processDefinitionId));
+    }
+
+    /**
+     * 通过zip或xml部署流程定义
+     *
+     * @param file         文件
+     * @param categoryCode 分类
+     */
+    @Log(title = "流程定义管理", businessType = BusinessType.INSERT)
+    @PostMapping("/deployByFile")
+    public R<Void> deployByFile(@RequestParam("file") MultipartFile file, @RequestParam("categoryCode") String categoryCode) {
+        return toAjax(iActProcessDefinitionService.deployByFile(file, categoryCode));
     }
 }

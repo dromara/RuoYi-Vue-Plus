@@ -52,4 +52,11 @@ public interface FlowConstant {
      */
     String LOOP_COUNTER = "loopCounter";
 
+    String ZIP = "ZIP";
+
+    /**
+     * 流程实例对象
+     */
+    String PROCESS_INSTANCE_VO = "processInstanceVo";
+
 }

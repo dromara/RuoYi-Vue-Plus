@@ -15,6 +15,8 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
+import org.dromara.workflow.common.constant.FlowConstant;
+import org.dromara.workflow.domain.WfCategory;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
 import org.dromara.workflow.service.IActProcessDefinitionService;
@@ -28,6 +30,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.zip.ZipInputStream;
 
 /**
  * 流程定义 服务层实现
@@ -50,6 +54,8 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     private final HistoryService historyService;
 
     private final ProcessMigrationService processMigrationService;
+
+    private final WfCategoryServiceImpl wfCategoryService;
 
     /**
      * 分页查询
@@ -288,6 +294,57 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         } catch (Exception e) {
             e.printStackTrace();
             throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 通过zip或xml部署流程定义
+     *
+     * @param file         文件
+     * @param categoryCode 分类
+     */
+    @Override
+    public boolean deployByFile(MultipartFile file, String categoryCode) {
+        try {
+
+            WfCategory wfCategory = wfCategoryService.queryByCategoryCode(categoryCode);
+            if (wfCategory == null) {
+                throw new ServiceException("流程分类不存在");
+            }
+            // 文件名 = 流程名称-流程key
+            String filename = file.getOriginalFilename();
+            assert filename != null;
+            String[] splitFilename = filename.substring(0, filename.lastIndexOf(".")).split("-");
+            if (splitFilename.length < 2) {
+                throw new ServiceException("流程分类不能为空(文件名 = 流程名称-流程key)");
+            }
+            //流程名称
+            String processName = splitFilename[0];
+            //流程key
+            String processKey = splitFilename[1];
+            // 文件后缀名
+            String suffix = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
+            InputStream inputStream = file.getInputStream();
+            Deployment deployment;
+            if (FlowConstant.ZIP.equals(suffix)) {
+                // zip
+                deployment = repositoryService.createDeployment()
+                    .tenantId(TenantHelper.getTenantId())
+                    .addZipInputStream(new ZipInputStream(inputStream)).name(processName).key(processKey).category(categoryCode).deploy();
+            } else {
+                // xml 或 bpmn
+                deployment = repositoryService.createDeployment()
+                    .tenantId(TenantHelper.getTenantId())
+                    .addInputStream(filename, inputStream).name(processName).key(processKey).category(categoryCode).deploy();
+            }
+            // 更新分类
+            ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+            repositoryService.setProcessDefinitionCategory(definition.getId(), categoryCode);
+
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new ServiceException("部署失败" + e.getMessage());
         }
     }
 }

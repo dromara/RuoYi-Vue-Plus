@@ -1,5 +1,6 @@
 package org.dromara.workflow.service;
 
+import org.dromara.workflow.domain.WfCategory;
 import org.dromara.workflow.domain.vo.WfCategoryVo;
 import org.dromara.workflow.domain.bo.WfCategoryBo;
 
@@ -39,4 +40,12 @@ public interface IWfCategoryService {
      * 校验并批量删除流程分类信息
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 按照类别编码查询
+     *
+     * @param categoryCode 分类比吗
+     * @return 结果
+     */
+    WfCategory queryByCategoryCode(String categoryCode);
 }

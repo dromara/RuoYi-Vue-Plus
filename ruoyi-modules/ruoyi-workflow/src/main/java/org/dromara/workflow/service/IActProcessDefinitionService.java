@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -78,4 +79,13 @@ public interface IActProcessDefinitionService {
      * @return 结果
      */
     boolean convertToModel(String processDefinitionId);
+
+    /**
+     * 通过zip或xml部署流程定义
+     *
+     * @param file         文件
+     * @param categoryCode 分类
+     * @return 结果
+     */
+    boolean deployByFile(MultipartFile file, String categoryCode);
 }

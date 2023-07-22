@@ -37,6 +37,22 @@ CREATE TABLE test_tree
     PRIMARY KEY (id) USING BTREE
 ) ENGINE = InnoDB COMMENT = '测试树表';
 
+DROP TABLE if EXISTS test_leave;
+create table test_leave
+(
+    id          bigint                       not null comment '主键',
+    title       varchar(255)                 not null comment '标题',
+    leave_days  int(10)                      not null comment '请假天数',
+    remark      varchar(255)                 null comment '备注',
+    create_dept bigint                       null comment '创建部门',
+    create_by   bigint                       null comment '创建者',
+    create_time datetime                     null comment '创建时间',
+    update_by   bigint                       null comment '更新者',
+    update_time datetime                     null comment '更新时间',
+    tenant_id   varchar(20) default '000000' null comment '租户编号',
+    PRIMARY KEY (id) USING BTREE
+) ENGINE = InnoDB COMMENT = '请假表';
+
 INSERT INTO sys_user(user_id, tenant_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (3, '000000', 108, 'test', '本部门及以下 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate(), 103, 1, sysdate(), 3, sysdate(), NULL);
 INSERT INTO sys_user(user_id, tenant_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (4, '000000', 102, 'test1', '仅本人 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate(), 103, 1, sysdate(), 4, sysdate(), NULL);
 
@@ -55,6 +71,13 @@ INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (1509, '测试树表修改', 1506, 3, '#', '', 1, 0, 'F', '0', '0', 'demo:tree:edit', '#', 103, 1, sysdate(), NULL, NULL, '');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (1510, '测试树表删除', 1506, 4, '#', '', 1, 0, 'F', '0', '0', 'demo:tree:remove', '#', 103, 1, sysdate(), NULL, NULL, '');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (1511, '测试树表导出', 1506, 5, '#', '', 1, 0, 'F', '0', '0', 'demo:tree:export', '#', 103, 1, sysdate(), NULL, NULL, '');
+
+INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (1638, '请假申请', 5, 1, 'leave', 'demo/leave/index', 1, 0, 'C', '0', '0', 'demo:leave:list', '#', 103, 1, sysdate(), NULL, NULL, '请假申请菜单');
+INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (1639, '请假申请查询', 1638, 1, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:query', '#', 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (1640, '请假申请新增', 1638, 2, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:add', '#', 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (1641, '请假申请修改', 1638, 3, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:edit', '#', 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (1642, '请假申请删除', 1638, 4, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:remove', '#', 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (1643, '请假申请导出', 1638, 5, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:export', '#', 103, 1, sysdate(), NULL, NULL, '');
 
 INSERT INTO sys_role(role_id, tenant_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, del_flag, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (3, '000000', '本部门及以下', 'test1', 3, '4', 1, 1, '0', '0', 103, 1, sysdate(), 1, NULL, NULL);
 INSERT INTO sys_role(role_id, tenant_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, del_flag, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (4, '000000', '仅本人', 'test2', 4, '5', 1, 1, '0', '0', 103, 1, sysdate(), 1, NULL, NULL);
