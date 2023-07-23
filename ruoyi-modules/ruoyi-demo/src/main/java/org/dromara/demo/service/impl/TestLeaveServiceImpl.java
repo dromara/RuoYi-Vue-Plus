@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.workflow.service.IActProcessInstanceService;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.springframework.stereotype.Service;
 import org.dromara.demo.domain.bo.TestLeaveBo;
@@ -33,6 +34,7 @@ import java.util.Collection;
 public class TestLeaveServiceImpl implements ITestLeaveService {
 
     private final TestLeaveMapper baseMapper;
+    private final IActProcessInstanceService iActProcessInstanceService;
 
     /**
      * 查询请假
@@ -51,9 +53,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         Page<TestLeaveVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         TableDataInfo<TestLeaveVo> build = TableDataInfo.build(result);
         List<TestLeaveVo> rows = build.getRows();
-        if(CollUtil.isNotEmpty(rows)){
+        if (CollUtil.isNotEmpty(rows)) {
             List<String> ids = StreamUtils.toList(rows, e -> String.valueOf(e.getId()));
-            WorkflowUtils.setProcessInstanceListVo(rows,ids,"id");
+            WorkflowUtils.setProcessInstanceListVo(rows, ids, "id");
         }
         return build;
     }
@@ -110,10 +112,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      * 批量删除请假
      */
     @Override
-    public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if (isValid) {
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
+    public Boolean deleteWithValidByIds(Collection<Long> ids) {
+        List<String> idList = StreamUtils.toList(ids, String::valueOf);
+        iActProcessInstanceService.deleteRuntimeProcessAndHisInstByBusinessKeys(idList);
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 }

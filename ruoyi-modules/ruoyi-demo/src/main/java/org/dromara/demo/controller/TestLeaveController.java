@@ -101,6 +101,6 @@ public class TestLeaveController extends BaseController {
     @DeleteMapping("/{ids}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ids) {
-        return toAjax(testLeaveService.deleteWithValidByIds(List.of(ids), true));
+        return toAjax(testLeaveService.deleteWithValidByIds(List.of(ids)));
     }
 }

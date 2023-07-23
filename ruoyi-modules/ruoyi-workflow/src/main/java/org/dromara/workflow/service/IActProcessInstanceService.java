@@ -6,6 +6,7 @@ import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,7 +61,15 @@ public interface IActProcessInstanceService {
      * @param processInstanceIds 流程实例id
      * @return 结果
      */
-    boolean deleteRuntimeProcessAndHisInst(String[] processInstanceIds);
+    boolean deleteRuntimeProcessAndHisInst(List<String> processInstanceIds);
+
+    /**
+     * 按照业务id删除 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
+     *
+     * @param businessKeys 业务id
+     * @return 结果
+     */
+    boolean deleteRuntimeProcessAndHisInstByBusinessKeys(List<String> businessKeys);
 
     /**
      * 已完成的实例 删除程实例，删除历史记录，删除业务与流程关联信息
@@ -68,7 +77,7 @@ public interface IActProcessInstanceService {
      * @param processInstanceIds 流程实例id
      * @return 结果
      */
-    boolean deleteFinishProcessAndHisInst(String[] processInstanceIds);
+    boolean deleteFinishProcessAndHisInst(List<String> processInstanceIds);
 
     /**
      * 撤销流程申请

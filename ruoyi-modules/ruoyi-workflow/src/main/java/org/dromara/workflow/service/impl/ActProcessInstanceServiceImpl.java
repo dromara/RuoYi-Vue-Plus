@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
@@ -16,6 +17,7 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.common.enums.BusinessStatusEnum;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
+import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
 import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
@@ -23,6 +25,7 @@ import org.dromara.workflow.domain.vo.GraphicInfoVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.domain.vo.TaskVo;
 import org.dromara.workflow.flowable.CustomDefaultProcessDiagramGenerator;
+import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IActProcessInstanceService;
 import org.flowable.bpmn.model.*;
 import org.flowable.engine.HistoryService;
@@ -54,7 +57,7 @@ import java.util.stream.Collectors;
  *
  * @author may
  */
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ActProcessInstanceServiceImpl implements IActProcessInstanceService {
@@ -63,6 +66,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     private final RuntimeService runtimeService;
     private final HistoryService historyService;
     private final TaskService taskService;
+    private final IActHiProcinstService iActHiProcinstService;
 
     @Value("${flowable.activity-font-name}")
     private String activityFontName;
@@ -388,21 +392,57 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteRuntimeProcessAndHisInst(String[] processInstanceIds) {
+    public boolean deleteRuntimeProcessAndHisInst(List<String> processInstanceIds) {
         try {
             //1.删除运行中流程实例
-            List<Task> list = taskService.createTaskQuery().processInstanceIdIn(Arrays.asList(processInstanceIds))
+            List<Task> list = taskService.createTaskQuery().processInstanceIdIn(processInstanceIds)
                 .taskTenantId(TenantHelper.getTenantId()).list();
             List<Task> subTasks = StreamUtils.filter(list, e -> StringUtils.isNotBlank(e.getParentTaskId()));
             if (CollUtil.isNotEmpty(subTasks)) {
                 subTasks.forEach(e -> taskService.deleteTask(e.getId()));
             }
-            runtimeService.bulkDeleteProcessInstances(Arrays.asList(processInstanceIds), LoginHelper.getUserId() + "删除了当前流程申请");
+            runtimeService.bulkDeleteProcessInstances(processInstanceIds, LoginHelper.getUserId() + "删除了当前流程申请");
             //2.删除历史记录
             List<HistoricProcessInstance> historicProcessInstanceList = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceTenantId(TenantHelper.getTenantId()).processInstanceIds(new HashSet<>(Arrays.asList(processInstanceIds))).list();
+                .processInstanceTenantId(TenantHelper.getTenantId()).processInstanceIds(new HashSet<>(processInstanceIds)).list();
             if (ObjectUtil.isNotEmpty(historicProcessInstanceList)) {
-                historyService.bulkDeleteHistoricProcessInstances(Arrays.asList(processInstanceIds));
+                historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 按照业务id删除 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
+     *
+     * @param businessKeys 业务id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteRuntimeProcessAndHisInstByBusinessKeys(List<String> businessKeys) {
+        try {
+            //1.删除运行中流程实例
+            List<ActHiProcinst> actHiProcinsts = iActHiProcinstService.selectByBusinessKeyIn(businessKeys);
+            if (CollUtil.isEmpty(actHiProcinsts)) {
+                log.warn("当前业务为查询到流程实例！");
+                return false;
+            }
+            List<String> processInstanceIds = StreamUtils.toList(actHiProcinsts, ActHiProcinst::getId);
+            List<Task> list = taskService.createTaskQuery().processInstanceIdIn(processInstanceIds)
+                .taskTenantId(TenantHelper.getTenantId()).list();
+            List<Task> subTasks = StreamUtils.filter(list, e -> StringUtils.isNotBlank(e.getParentTaskId()));
+            if (CollUtil.isNotEmpty(subTasks)) {
+                subTasks.forEach(e -> taskService.deleteTask(e.getId()));
+            }
+            runtimeService.bulkDeleteProcessInstances(processInstanceIds, LoginHelper.getUserId() + "删除了当前流程申请");
+            //2.删除历史记录
+            List<HistoricProcessInstance> historicProcessInstanceList = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceTenantId(TenantHelper.getTenantId()).processInstanceIds(new HashSet<>(processInstanceIds)).list();
+            if (ObjectUtil.isNotEmpty(historicProcessInstanceList)) {
+                historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
             }
             return true;
         } catch (Exception e) {
@@ -417,9 +457,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      * @param processInstanceIds 流程实例id
      */
     @Override
-    public boolean deleteFinishProcessAndHisInst(String[] processInstanceIds) {
+    public boolean deleteFinishProcessAndHisInst(List<String> processInstanceIds) {
         try {
-            historyService.bulkDeleteHistoricProcessInstances(Arrays.asList(processInstanceIds));
+            historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -502,7 +542,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             ProcessInstanceVo processInstanceVo = BeanUtil.toBean(processInstance, ProcessInstanceVo.class);
             processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstance.getBusinessStatus()));
             if (CollUtil.isNotEmpty(taskVoList)) {
-                List<TaskVo> collect = taskVoList.stream().filter(e -> e.getProcessInstanceId().equals(processInstance.getId())).collect(Collectors.toList());
+                List<TaskVo> collect = StreamUtils.filter(taskVoList, e -> e.getProcessInstanceId().equals(processInstance.getId()));
                 processInstanceVo.setTaskVoList(CollUtil.isNotEmpty(collect) ? collect : Collections.emptyList());
             }
             list.add(processInstanceVo);

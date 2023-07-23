@@ -17,6 +17,7 @@ import org.dromara.workflow.service.IActProcessInstanceService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -92,7 +93,7 @@ public class ActProcessInstanceController extends BaseController {
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/deleteRuntimeProcessAndHisInst/{processInstanceIds}")
     public R<Void> deleteRuntimeProcessAndHisInst(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
-        return toAjax(iActProcessInstanceService.deleteRuntimeProcessAndHisInst(processInstanceIds));
+        return toAjax(iActProcessInstanceService.deleteRuntimeProcessAndHisInst(Arrays.asList(processInstanceIds)));
     }
 
     /**
@@ -103,7 +104,7 @@ public class ActProcessInstanceController extends BaseController {
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/deleteFinishProcessAndHisInst/{processInstanceIds}")
     public R<Void> deleteFinishProcessAndHisInst(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
-        return toAjax(iActProcessInstanceService.deleteFinishProcessAndHisInst(processInstanceIds));
+        return toAjax(iActProcessInstanceService.deleteFinishProcessAndHisInst(Arrays.asList(processInstanceIds)));
     }
 
     /**
