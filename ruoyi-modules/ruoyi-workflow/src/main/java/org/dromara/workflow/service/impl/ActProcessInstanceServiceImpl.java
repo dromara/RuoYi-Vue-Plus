@@ -427,7 +427,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             //1.删除运行中流程实例
             List<ActHiProcinst> actHiProcinsts = iActHiProcinstService.selectByBusinessKeyIn(businessKeys);
             if (CollUtil.isEmpty(actHiProcinsts)) {
-                log.warn("当前业务为查询到流程实例！");
+                log.warn("当前业务ID:{}查询到流程实例为空！", businessKeys);
                 return false;
             }
             List<String> processInstanceIds = StreamUtils.toList(actHiProcinsts, ActHiProcinst::getId);
