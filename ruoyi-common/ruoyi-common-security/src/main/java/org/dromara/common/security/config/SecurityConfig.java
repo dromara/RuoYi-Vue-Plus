@@ -1,9 +1,13 @@
 package org.dromara.common.security.config;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
+import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.security.config.properties.SecurityProperties;
 import org.dromara.common.security.handler.AllUrlHandler;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +47,18 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .check(() -> {
                     // 检查是否登录 是否有token
                     StpUtil.checkLogin();
+
+                    // 检查 header 里的 clientId 与 token 里的是否一致
+                    String headerCid = ServletUtils.getRequest().getHeader(LoginHelper.CLIENT_KEY);
+                    String clientId = StpUtil.getExtra(LoginHelper.CLIENT_KEY).toString();
+                    if (!StringUtils.equals(headerCid, clientId)) {
+                        // token 无效
+                        throw NotLoginException.newInstance(
+                            StpUtil.getLoginType(),
+                            NotLoginException.INVALID_TOKEN,
+                            NotLoginException.NOT_TOKEN_MESSAGE,
+                            StpUtil.getTokenValue());
+                    }
 
                     // 有效率影响 用于临时测试
                     // if (log.isDebugEnabled()) {
