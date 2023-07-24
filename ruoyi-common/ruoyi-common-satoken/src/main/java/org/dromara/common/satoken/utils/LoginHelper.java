@@ -34,6 +34,7 @@ public class LoginHelper {
     public static final String LOGIN_USER_KEY = "loginUser";
     public static final String TENANT_KEY = "tenantId";
     public static final String USER_KEY = "userId";
+    public static final String CLIENT_KEY = "clientid";
 
     /**
      * 登录系统 基于 设备类型
