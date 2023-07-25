@@ -1,7 +1,7 @@
 package com.ruoyi.framework.config;
 
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.framework.config.properties.SwaggerProperties;
+import com.ruoyi.framework.config.properties.SpringDocProperties;
 import com.ruoyi.framework.handler.OpenApiHandler;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
@@ -34,25 +34,24 @@ import java.util.Set;
 @Configuration
 @AutoConfigureBefore(SpringDocConfiguration.class)
 @ConditionalOnProperty(name = "springdoc.api-docs.enabled", havingValue = "true", matchIfMissing = true)
-public class SwaggerConfig {
+public class SpringDocConfig {
 
-    private final SwaggerProperties swaggerProperties;
     private final ServerProperties serverProperties;
 
     @Bean
     @ConditionalOnMissingBean(OpenAPI.class)
-    public OpenAPI openApi() {
+    public OpenAPI openApi(SpringDocProperties properties) {
         OpenAPI openApi = new OpenAPI();
         // 文档基本信息
-        SwaggerProperties.InfoProperties infoProperties = swaggerProperties.getInfo();
+        SpringDocProperties.InfoProperties infoProperties = properties.getInfo();
         Info info = convertInfo(infoProperties);
         openApi.info(info);
         // 扩展文档信息
-        openApi.externalDocs(swaggerProperties.getExternalDocs());
-        openApi.tags(swaggerProperties.getTags());
-        openApi.paths(swaggerProperties.getPaths());
-        openApi.components(swaggerProperties.getComponents());
-        Set<String> keySet = swaggerProperties.getComponents().getSecuritySchemes().keySet();
+        openApi.externalDocs(properties.getExternalDocs());
+        openApi.tags(properties.getTags());
+        openApi.paths(properties.getPaths());
+        openApi.components(properties.getComponents());
+        Set<String> keySet = properties.getComponents().getSecuritySchemes().keySet();
         List<SecurityRequirement> list = new ArrayList<>();
         SecurityRequirement securityRequirement = new SecurityRequirement();
         keySet.forEach(securityRequirement::addList);
@@ -62,7 +61,7 @@ public class SwaggerConfig {
         return openApi;
     }
 
-    private Info convertInfo(SwaggerProperties.InfoProperties infoProperties) {
+    private Info convertInfo(SpringDocProperties.InfoProperties infoProperties) {
         Info info = new Info();
         info.setTitle(infoProperties.getTitle());
         info.setDescription(infoProperties.getDescription());
