@@ -44,18 +44,18 @@ public class SpringDocConfig {
 
     @Bean
     @ConditionalOnMissingBean(OpenAPI.class)
-    public OpenAPI openApi(SpringDocProperties swaggerProperties) {
+    public OpenAPI openApi(SpringDocProperties properties) {
         OpenAPI openApi = new OpenAPI();
         // 文档基本信息
-        SpringDocProperties.InfoProperties infoProperties = swaggerProperties.getInfo();
+        SpringDocProperties.InfoProperties infoProperties = properties.getInfo();
         Info info = convertInfo(infoProperties);
         openApi.info(info);
         // 扩展文档信息
-        openApi.externalDocs(swaggerProperties.getExternalDocs());
-        openApi.tags(swaggerProperties.getTags());
-        openApi.paths(swaggerProperties.getPaths());
-        openApi.components(swaggerProperties.getComponents());
-        Set<String> keySet = swaggerProperties.getComponents().getSecuritySchemes().keySet();
+        openApi.externalDocs(properties.getExternalDocs());
+        openApi.tags(properties.getTags());
+        openApi.paths(properties.getPaths());
+        openApi.components(properties.getComponents());
+        Set<String> keySet = properties.getComponents().getSecuritySchemes().keySet();
         List<SecurityRequirement> list = new ArrayList<>();
         SecurityRequirement securityRequirement = new SecurityRequirement();
         keySet.forEach(securityRequirement::addList);
