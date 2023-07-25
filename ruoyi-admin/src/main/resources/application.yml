@@ -197,8 +197,13 @@ mybatis-encryptor:
   publicKey:
   privateKey:
 
-# Swagger配置
-swagger:
+springdoc:
+  api-docs:
+    # 是否开启接口文档
+    enabled: true
+#  swagger-ui:
+#    # 持久化认证数据
+#    persistAuthorization: true
   info:
     # 标题
     title: '标题：${ruoyi.name}后台管理系统_接口文档'
@@ -218,14 +223,6 @@ swagger:
         type: APIKEY
         in: HEADER
         name: ${sa-token.token-name}
-
-springdoc:
-  api-docs:
-    # 是否开启接口文档
-    enabled: true
-  swagger-ui:
-    # 持久化认证数据
-    persistAuthorization: true
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
     - group: 1.演示模块
