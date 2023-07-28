@@ -3,10 +3,14 @@ package org.dromara.monitor.admin.config;
 import de.codecentric.boot.admin.server.config.AdminServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * admin 监控 安全配置
@@ -30,23 +34,23 @@ public class SecurityConfig {
         successHandler.setDefaultTargetUrl(adminContextPath + "/");
 
         return httpSecurity
-                .headers().frameOptions().disable()
-                .and().authorizeHttpRequests()
-                .requestMatchers(adminContextPath + "/assets/**"
-                    , adminContextPath + "/login"
-                    , "/actuator"
-                    , "/actuator/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().loginPage(adminContextPath + "/login")
-                .successHandler(successHandler).and()
-                .logout().logoutUrl(adminContextPath + "/logout")
-                .and()
-                .httpBasic().and()
-                .csrf()
-                .disable()
-                .build();
+            .headers((header) ->
+                header.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+            .authorizeHttpRequests((authorize) ->
+                authorize.requestMatchers(
+                        new AntPathRequestMatcher(adminContextPath + "/assets/**"),
+                        new AntPathRequestMatcher(adminContextPath + "/login"),
+                        new AntPathRequestMatcher("/actuator"),
+                        new AntPathRequestMatcher("/actuator/**")
+                    ).permitAll()
+                    .anyRequest().authenticated())
+            .formLogin((formLogin) ->
+                formLogin.loginPage(adminContextPath + "/login").successHandler(successHandler))
+            .logout((logout) ->
+                logout.logoutUrl(adminContextPath + "/logout"))
+            .httpBasic(Customizer.withDefaults())
+            .csrf(AbstractHttpConfigurer::disable)
+            .build();
     }
 
 }
