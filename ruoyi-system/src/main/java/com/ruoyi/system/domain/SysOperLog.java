@@ -43,7 +43,7 @@ public class SysOperLog implements Serializable {
     /**
      * 业务类型（0其它 1新增 2修改 3删除）
      */
-    @ExcelProperty(value = "业务类型", converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "业务类型", index = 2, converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "sys_oper_type")
     private Integer businessType;
 
@@ -68,7 +68,7 @@ public class SysOperLog implements Serializable {
     /**
      * 操作类别（0其它 1后台用户 2手机端用户）
      */
-    @ExcelProperty(value = "操作类别", converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "操作类别", index = 5, converter = ExcelDictConvert.class)
     @ExcelDictFormat(readConverterExp = "0=其它,1=后台用户,2=手机端用户")
     private Integer operatorType;
 
@@ -117,7 +117,7 @@ public class SysOperLog implements Serializable {
     /**
      * 操作状态（0正常 1异常）
      */
-    @ExcelProperty(value = "状态", converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "状态", index = 13, converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "sys_common_status")
     private Integer status;
 
