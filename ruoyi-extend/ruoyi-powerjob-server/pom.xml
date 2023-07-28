@@ -10,7 +10,7 @@
     <artifactId>ruoyi-powerjob-server</artifactId>
 
     <properties>
-        <spring-boot.version>2.7.12</spring-boot.version>
+        <spring-boot.version>2.7.14</spring-boot.version>
         <spring-boot-admin.version>2.7.10</spring-boot-admin.version>
     </properties>
     <dependencyManagement>

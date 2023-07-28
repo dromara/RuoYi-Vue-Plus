@@ -109,7 +109,7 @@ spring.data:
     # 连接超时时间
     timeout: 10s
     # 是否开启ssl
-    ssl: false
+    ssl.enabled: false
 
 redisson:
   # redis key前缀
