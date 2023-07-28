@@ -82,7 +82,7 @@ public class SysClientVo implements Serializable {
     /**
      * 状态（0正常 1停用）
      */
-    @ExcelProperty(value = "状态", converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "状态", index = 7, converter = ExcelDictConvert.class)
     @ExcelDictFormat(readConverterExp = "0=正常,1=停用")
     private String status;
 

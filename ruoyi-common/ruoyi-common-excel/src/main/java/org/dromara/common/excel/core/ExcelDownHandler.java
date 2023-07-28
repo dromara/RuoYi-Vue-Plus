@@ -128,6 +128,9 @@ public class ExcelDownHandler implements SheetWriteHandler {
                 }
             }
         }
+        if (CollUtil.isEmpty(dropDownOptions)) {
+            return;
+        }
         dropDownOptions.forEach(everyOptions -> {
             // 如果传递了下拉框选择器参数
             if (!everyOptions.getNextOptions().isEmpty()) {
