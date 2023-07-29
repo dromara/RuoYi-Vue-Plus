@@ -1,4 +1,73 @@
 -- ----------------------------
+-- 第三方平台授权表
+-- ----------------------------
+create table sys_social
+(
+    id                 number(20)       not null,
+    user_id            number(20)       not null,
+    tenant_id          varchar2(20)      default null,
+    auth_id            varchar2(255)     not null,
+    source             varchar2(255)     not null,
+    open_id            varchar2(255)     default null,
+    user_name          varchar2(30)      not null,
+    nick_name          varchar2(30)      default '',
+    email              varchar2(255)     default '',
+    avatar             varchar2(500)     default '',
+    access_token       varchar2(255)     not null,
+    expire_in          number(100)      default null,
+    refresh_token      varchar2(255)     default null,
+    access_code        varchar2(255)     default null,
+    union_id           varchar2(255)     default null,
+    scope              varchar2(255)     default null,
+    token_type         varchar2(255)     default null,
+    id_token           varchar2(255)     default null,
+    mac_algorithm      varchar2(255)     default null,
+    mac_key            varchar2(255)     default null,
+    code               varchar2(255)     default null,
+    oauth_token        varchar2(255)     default null,
+    oauth_token_secret varchar2(255)     default null,
+    create_dept        number(20),
+    create_by          number(20),
+    create_time        date,
+    update_by          number(20),
+    update_time        date,
+    del_flag           char(1)          default '0'
+);
+
+alter table sys_social add constraint pk_sys_social primary key (id);
+
+comment on table   sys_social                   is '社会化关系表';
+comment on column  sys_social.id                is '主键';
+comment on column  sys_social.user_id           is '用户ID';
+comment on column  sys_social.tenant_id         is '租户id';
+comment on column  sys_social.auth_id           is '平台+平台唯一id';
+comment on column  sys_social.source            is '用户来源';
+comment on column  sys_social.open_id           is '平台编号唯一id';
+comment on column  sys_social.user_name         is '登录账号';
+comment on column  sys_social.nick_name         is '用户昵称';
+comment on column  sys_social.email             is '用户邮箱';
+comment on column  sys_social.avatar            is '头像地址';
+comment on column  sys_social.access_token      is '用户的授权令牌';
+comment on column  sys_social.expire_in         is '用户的授权令牌的有效期，部分平台可能没有';
+comment on column  sys_social.refresh_token     is '刷新令牌，部分平台可能没有';
+comment on column  sys_social.access_code       is '平台的授权信息，部分平台可能没有';
+comment on column  sys_social.union_id          is '用户的 unionid';
+comment on column  sys_social.scope             is '授予的权限，部分平台可能没有';
+comment on column  sys_social.token_type        is '个别平台的授权信息，部分平台可能没有';
+comment on column  sys_social.id_token          is 'id token，部分平台可能没有';
+comment on column  sys_social.mac_algorithm     is '小米平台用户的附带属性，部分平台可能没有';
+comment on column  sys_social.mac_key           is '小米平台用户的附带属性，部分平台可能没有';
+comment on column  sys_social.code              is '用户的授权code，部分平台可能没有';
+comment on column  sys_social.oauth_token       is 'Twitter平台用户的附带属性，部分平台可能没有';
+comment on column  sys_social.oauth_token_secret is 'Twitter平台用户的附带属性，部分平台可能没有';
+comment on column  sys_social.create_dept       is '创建部门';
+comment on column  sys_social.create_by         is '创建者';
+comment on column  sys_social.create_time       is '创建时间';
+comment on column  sys_social.update_by         is '更新者';
+comment on column  sys_social.update_time       is '更新时间';
+comment on column  sys_social.del_flag          is '删除标志（0代表存在 2代表删除）';
+
+-- ----------------------------
 -- 租户表
 -- ----------------------------
 create table sys_tenant (
@@ -303,9 +372,9 @@ create table sys_menu (
   menu_name         varchar2(50)    not null,
   parent_id         number(20)      default 0,
   order_num         number(4)       default 0,
-  path              varchar(200)    default '',
-  component         varchar(255)    default null,
-  query_param       varchar(255)    default null,
+  path              varchar2(200)    default '',
+  component         varchar2(255)    default null,
+  query_param       varchar2(255)    default null,
   is_frame          number(1)       default 1,
   is_cache          number(1)       default 0,
   menu_type         char(1)         default '',
@@ -369,13 +438,14 @@ insert into sys_menu values('113',  '缓存监控',     '2',   '5', 'cache',    
 insert into sys_menu values('114',  '表单构建',     '3',   '1', 'build',            'tool/build/index',             '', 1, 0, 'C', '0', '0', 'tool:build:list',             'build',         103, 1, sysdate, null, null, '表单构建菜单');
 insert into sys_menu values('115',  '代码生成',     '3',   '2', 'gen',              'tool/gen/index',               '', 1, 0, 'C', '0', '0', 'tool:gen:list',               'code',          103, 1, sysdate, null, null, '代码生成菜单');
 insert into sys_menu values('121',  '租户管理',     '6',   '1', 'tenant',           'system/tenant/index',          '', 1, 0, 'C', '0', '0', 'system:tenant:list',          'list',          103, 1, sysdate, null, null, '租户管理菜单');
-insert into sys_menu values('122',  '租户套餐管理',  '6',   '2', 'tenantPackage',    'system/tenantPackage/index',   '', 1, 0, 'C', '0', '0', 'system:tenantPackage:list',   'form',          103, 1, sysdate, null, null, '租户套餐管理菜单');
+insert into sys_menu values('122',  '租户套餐管理', '6',   '2', 'tenantPackage',    'system/tenantPackage/index',   '', 1, 0, 'C', '0', '0', 'system:tenantPackage:list',   'form',          103, 1, sysdate, null, null, '租户套餐管理菜单');
+insert into sys_menu values('123',  '客户端管理',   '1',   '11', 'client',           'system/client/index',          '', 1, 0, 'C', '0', '0', 'system:client:list',          'international', 103, 1, sysdate, null, null, '客户端管理菜单');
 -- springboot-admin监控
 insert into sys_menu values('117',  'Admin监控',   '2',    '5', 'Admin',            'monitor/admin/index',         '', 1, 0, 'C', '0', '0', 'monitor:admin:list',          'dashboard',     103, 1, sysdate, null, null, 'Admin监控菜单');
 -- oss菜单
 insert into sys_menu values('118',  '文件管理',     '1',    '10', 'oss',             'system/oss/index',            '', 1, 0, 'C', '0', '0', 'system:oss:list',             'upload',        103, 1, sysdate, null, null, '文件管理菜单');
--- xxl-job-admin控制台
-insert into sys_menu values('120',  '任务调度中心',  '2',    '5', 'XxlJob',           'monitor/xxljob/index',        '', 1, 0, 'C', '0', '0', 'monitor:xxljob:list',         'job',           103, 1, sysdate, null, null, 'Xxl-Job控制台菜单');
+-- powerjob server控制台
+insert into sys_menu values('120',  '任务调度中心',  '2',    '5', 'powerjob',           'monitor/powerjob/index',        '', 1, 0, 'C', '0', '0', 'monitor:powerjob:list',         'job',           103, 1, sysdate, null, null, 'PowerJob控制台菜单');
 
 -- 三级菜单
 insert into sys_menu values('500',  '操作日志', '108', '1', 'operlog',    'monitor/operlog/index',    '', 1, 0, 'C', '0', '0', 'monitor:operlog:list',    'form',          103, 1, sysdate, null, null, '操作日志菜单');
@@ -466,7 +536,12 @@ insert into sys_menu values('1612', '租户套餐新增', '122', '2', '#', '', '
 insert into sys_menu values('1613', '租户套餐修改', '122', '3', '#', '', '', 1, 0, 'F', '0', '0', 'system:tenantPackage:edit',    '#', 103, 1, sysdate, null, null, '');
 insert into sys_menu values('1614', '租户套餐删除', '122', '4', '#', '', '', 1, 0, 'F', '0', '0', 'system:tenantPackage:remove',  '#', 103, 1, sysdate, null, null, '');
 insert into sys_menu values('1615', '租户套餐导出', '122', '5', '#', '', '', 1, 0, 'F', '0', '0', 'system:tenantPackage:export',  '#', 103, 1, sysdate, null, null, '');
-
+-- 客户端管理按钮
+insert into sys_menu values('1061', '客户端管理查询', '123', '1',  '#', '', '', 1, 0, 'F', '0', '0', 'system:client:query',        '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1062', '客户端管理新增', '123', '2',  '#', '', '', 1, 0, 'F', '0', '0', 'system:client:add',          '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1063', '客户端管理修改', '123', '3',  '#', '', '', 1, 0, 'F', '0', '0', 'system:client:edit',         '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1064', '客户端管理删除', '123', '4',  '#', '', '', 1, 0, 'F', '0', '0', 'system:client:remove',       '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1065', '客户端管理导出', '123', '5',  '#', '', '', 1, 0, 'F', '0', '0', 'system:client:export',       '#', 103, 1, sysdate, null, null, '');
 
 -- ----------------------------
 -- 6、用户和角色关联表  用户N-1角色
@@ -585,6 +660,11 @@ insert into sys_role_menu values ('2', '1057');
 insert into sys_role_menu values ('2', '1058');
 insert into sys_role_menu values ('2', '1059');
 insert into sys_role_menu values ('2', '1060');
+insert into sys_role_menu values ('2', '1061');
+insert into sys_role_menu values ('2', '1062');
+insert into sys_role_menu values ('2', '1063');
+insert into sys_role_menu values ('2', '1064');
+insert into sys_role_menu values ('2', '1065');
 
 -- ----------------------------
 -- 8、角色和部门关联表  角色1-N部门
@@ -638,7 +718,7 @@ create table sys_oper_log (
   title             varchar2(50)    default '',
   business_type     number(2)       default 0,
   method            varchar2(100)   default '',
-  request_method    varchar(10)     default '',
+  request_method    varchar2(10)     default '',
   operator_type     number(1)       default 0,
   oper_name         varchar2(50)    default '',
   dept_name         varchar2(50)    default '',
@@ -719,7 +799,9 @@ insert into sys_dict_type values(6, '000000', '系统是否', 'sys_yes_no',     
 insert into sys_dict_type values(7, '000000', '通知类型', 'sys_notice_type',     '0', 103, 1, sysdate, null, null, '通知类型列表');
 insert into sys_dict_type values(8, '000000', '通知状态', 'sys_notice_status',   '0', 103, 1, sysdate, null, null, '通知状态列表');
 insert into sys_dict_type values(9, '000000', '操作类型', 'sys_oper_type',       '0', 103, 1, sysdate, null, null, '操作类型列表');
-insert into sys_dict_type values(10, '000000', '系统状态', 'sys_common_status',   '0', 103, 1, sysdate, null, null, '登录状态列表');
+insert into sys_dict_type values(10, '000000', '系统状态', 'sys_common_status',  '0', 103, 1, sysdate, null, null, '登录状态列表');
+insert into sys_dict_type values(11, '000000', '授权类型', 'sys_grant_type',     '0', 103, 1, sysdate, null, null, '认证授权类型');
+insert into sys_dict_type values(12, '000000', '设备类型', 'sys_device_type',    '0', 103, 1, sysdate, null, null, '客户端设备类型');
 
 
 -- ----------------------------
@@ -789,6 +871,13 @@ insert into sys_dict_data values(25, '000000', 8,  '生成代码', '8',       's
 insert into sys_dict_data values(26, '000000', 9,  '清空数据', '9',       'sys_oper_type',       '',   'danger',  'N', '0', 103, 1, sysdate, null, null, '清空操作');
 insert into sys_dict_data values(27, '000000', 1,  '成功',     '0',       'sys_common_status',   '',   'primary', 'N', '0', 103, 1, sysdate, null, null, '正常状态');
 insert into sys_dict_data values(28, '000000', 2,  '失败',     '1',       'sys_common_status',   '',   'danger',  'N', '0', 103, 1, sysdate, null, null, '停用状态');
+insert into sys_dict_data values(30, '000000', 0,  '密码认证', 'password',   'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '密码认证');
+insert into sys_dict_data values(31, '000000', 0,  '短信认证', 'sms',        'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '短信认证');
+insert into sys_dict_data values(32, '000000', 0,  '邮件认证', 'email',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '邮件认证');
+insert into sys_dict_data values(33, '000000', 0,  '小程序认证', 'xcx',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '小程序认证');
+insert into sys_dict_data values(34, '000000', 0,  '三方登录认证', 'social', 'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '三方登录认证');
+insert into sys_dict_data values(35, '000000', 0,  'PC端',      'pc',        'sys_device_type',  '',   'default', 'N', '0', 103, 1, sysdate, null, null, 'PC端');
+insert into sys_dict_data values(36, '000000', 0,  'APP端',     'app',       'sys_device_type',  '',   'default', 'N', '0', 103, 1, sysdate, null, null, 'APP端');
 
 
 -- ----------------------------
@@ -910,10 +999,11 @@ insert into sys_notice values('2', '000000', '维护通知：2018-07-01 系统�
 -- ----------------------------
 create table gen_table (
   table_id          number(20)       not null,
+  data_name         varchar2(200)    default '',
   table_name        varchar2(200)    default '',
   table_comment     varchar2(500)    default '',
-  sub_table_name    varchar(64)      default null,
-  sub_table_fk_name varchar(64)      default null,
+  sub_table_name    varchar2(64)      default null,
+  sub_table_fk_name varchar2(64)      default null,
   class_name        varchar2(100)    default '',
   tpl_category      varchar2(200)    default 'crud',
   package_name      varchar2(100),
@@ -936,6 +1026,7 @@ alter table gen_table add constraint pk_gen_table primary key (table_id);
 
 comment on table  gen_table                   is '代码生成业务表';
 comment on column gen_table.table_id          is '编号';
+comment on column gen_table.data_name         is '数据源名称';
 comment on column gen_table.table_name        is '表名称';
 comment on column gen_table.table_comment     is '表描述';
 comment on column gen_table.sub_table_name    is '关联子表的表名';
@@ -976,9 +1067,9 @@ create table gen_table_column (
   is_edit           char(1),
   is_list           char(1),
   is_query          char(1),
-  query_type        varchar(200)    default 'EQ',
-  html_type         varchar(200),
-  dict_type         varchar(200)    default '',
+  query_type        varchar2(200)    default 'EQ',
+  html_type         varchar2(200),
+  dict_type         varchar2(200)    default '',
   sort              number(4),
   create_dept       number(20)      default null,
   create_by         number(20)       default null,
@@ -1021,11 +1112,11 @@ comment on column gen_table_column.update_time    is '更新时间';
 create table sys_oss (
   oss_id          number(20)    not null,
   tenant_id       varchar2(20)  default '000000',
-  file_name       varchar(255)  not null,
-  original_name   varchar(255)  not null,
-  file_suffix     varchar(10)   not null,
-  url             varchar(500)  not null,
-  service         varchar(20)   default 'minio' not null,
+  file_name       varchar2(255)  not null,
+  original_name   varchar2(255)  not null,
+  file_suffix     varchar2(10)   not null,
+  url             varchar2(500)  not null,
+  service         varchar2(20)   default 'minio' not null,
   create_dept     number(20)    default null,
   create_by       number(20)    default null,
   create_time     date,
@@ -1056,19 +1147,19 @@ comment on column sys_oss.update_by         is '更新者';
 create table sys_oss_config (
   oss_config_id   number(20)    not null,
   tenant_id       varchar2(20)  default '000000',
-  config_key      varchar(20)   not null,
-  access_key      varchar(255)  default '',
-  secret_key      varchar(255)  default '',
-  bucket_name     varchar(255)  default '',
-  prefix          varchar(255)  default '',
-  endpoint        varchar(255)  default '',
-  domain          varchar(255)  default '',
+  config_key      varchar2(20)   not null,
+  access_key      varchar2(255)  default '',
+  secret_key      varchar2(255)  default '',
+  bucket_name     varchar2(255)  default '',
+  prefix          varchar2(255)  default '',
+  endpoint        varchar2(255)  default '',
+  domain          varchar2(255)  default '',
   is_https        char(1)       default 'N',
-  region          varchar(255)  default '',
+  region          varchar2(255)  default '',
   access_policy   char(1)       default '1' not null,
   status          char(1)       default '1',
-  ext1            varchar(255)  default '',
-  remark          varchar(500)  default null,
+  ext1            varchar2(255)  default '',
+  remark          varchar2(500)  default null,
   create_dept     number(20)    default null,
   create_by       number(20)    default null,
   create_time     date,
@@ -1135,6 +1226,50 @@ comment on column wf_form.update_by   is '更新者';
 comment on column wf_form.update_time is '更新时间';
 comment on column wf_form.remark      is '备注';
 comment on column wf_form.del_flag    is '删除标志（0代表存在 2代表删除）';
+
+-- ----------------------------
+-- 系统授权表
+-- ----------------------------
+create table sys_client (
+    id                  number(20)    not null,
+    client_id           varchar2(64)   default null,
+    client_key          varchar2(32)   default null,
+    client_secret       varchar2(255)  default null,
+    grant_type          varchar2(255)  default null,
+    device_type         varchar2(32)   default null,
+    active_timeout      number(11)    default 1800,
+    timeout             number(11)    default 604800,
+    status              char(1)       default '0',
+    del_flag            char(1)       default '0',
+    create_dept         number(20)    default null,
+    create_by           number(20)    default null,
+    create_time         date,
+    update_by           number(20)    default null,
+    update_time         date
+)
+
+alter table sys_client add constraint pk_sys_client primary key (id);
+
+comment on table sys_client                         is '系统授权表';
+comment on column sys_client.id                     is '主建';
+comment on column sys_client.client_id              is '客户端id';
+comment on column sys_client.client_key             is '客户端key';
+comment on column sys_client.client_secret          is '客户端秘钥';
+comment on column sys_client.grant_type             is '授权类型';
+comment on column sys_client.device_type            is '设备类型';
+comment on column sys_client.active_timeout         is 'token活跃超时时间';
+comment on column sys_client.timeout                is 'token固定超时';
+comment on column sys_client.status                 is '状态（0正常 1停用）';
+comment on column sys_client.del_flag               is '删除标志（0代表存在 2代表删除）';
+comment on column sys_client.create_dept            is '创建部门';
+comment on column sys_client.create_by              is '创建者';
+comment on column sys_client.create_time            is '创建时间';
+comment on column sys_client.update_by              is '更新者';
+comment on column sys_client.update_time            is '更新时间';
+
+insert into sys_client values (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password,social', 'pc', 1800, 604800, 0, 0, 103, 1, sysdate, 1, sysdate);
+insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms,social', 'app', 1800, 604800, 0, 0, 103, 1, sysdate, 1, sysdate);
+
 
 -- ----------------------------
 -- 钩子 ，用于session连接之后 自动设置默认的date类型格式化 简化时间查询

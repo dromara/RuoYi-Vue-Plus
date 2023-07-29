@@ -2,6 +2,7 @@ package org.dromara.common.log.aspect;
 
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import org.dromara.common.core.utils.ServletUtils;
@@ -28,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * 操作日志记录处理
@@ -170,26 +172,23 @@ public class LogAspect {
      * 参数拼装
      */
     private String argsArrayToString(Object[] paramsArray, String[] excludeParamNames) {
-        StringBuilder params = new StringBuilder();
-        if (paramsArray != null && paramsArray.length > 0) {
-            for (Object o : paramsArray) {
-                if (ObjectUtil.isNotNull(o) && !isFilterObject(o)) {
-                    try {
-                        String str = JsonUtils.toJsonString(o);
-                        Dict dict = JsonUtils.parseMap(str);
-                        if (MapUtil.isNotEmpty(dict)) {
-                            MapUtil.removeAny(dict, EXCLUDE_PROPERTIES);
-                            MapUtil.removeAny(dict, excludeParamNames);
-                            str = JsonUtils.toJsonString(dict);
-                        }
-                        params.append(str).append(" ");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+        StringJoiner params = new StringJoiner(" ");
+        if (ArrayUtil.isEmpty(paramsArray)) {
+            return params.toString();
+        }
+        for (Object o : paramsArray) {
+            if (ObjectUtil.isNotNull(o) && !isFilterObject(o)) {
+                String str = JsonUtils.toJsonString(o);
+                Dict dict = JsonUtils.parseMap(str);
+                if (MapUtil.isNotEmpty(dict)) {
+                    MapUtil.removeAny(dict, EXCLUDE_PROPERTIES);
+                    MapUtil.removeAny(dict, excludeParamNames);
+                    str = JsonUtils.toJsonString(dict);
                 }
+                params.add(str);
             }
         }
-        return params.toString().trim();
+        return params.toString();
     }
 
     /**
@@ -210,12 +209,11 @@ public class LogAspect {
             }
         } else if (Map.class.isAssignableFrom(clazz)) {
             Map map = (Map) o;
-            for (Object value : map.entrySet()) {
-                Map.Entry entry = (Map.Entry) value;
-                return entry.getValue() instanceof MultipartFile;
+            for (Object value : map.values()) {
+                return value instanceof MultipartFile;
             }
         }
         return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse
-            || o instanceof BindingResult;
+               || o instanceof BindingResult;
     }
 }

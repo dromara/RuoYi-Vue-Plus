@@ -1,6 +1,5 @@
 package org.dromara.workflow.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -57,11 +56,10 @@ public class ActProcessInstanceController extends BaseController {
      * 通过流程实例id获取历史流程图
      *
      * @param processInstanceId 流程实例id
-     * @param response          响应
      */
     @GetMapping("/getHistoryProcessImage/{processInstanceId}")
-    public void getHistoryProcessImage(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId, HttpServletResponse response) {
-        iActProcessInstanceService.getHistoryProcessImage(processInstanceId, response);
+    public R<String> getHistoryProcessImage(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
+        return R.ok("操作成功", iActProcessInstanceService.getHistoryProcessImage(processInstanceId));
     }
 
     /**

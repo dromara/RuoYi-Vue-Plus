@@ -1,6 +1,6 @@
 export interface ${BusinessName}VO {
 #foreach ($column in $columns)
-#if($column.insert || $column.edit)
+#if($column.list)
   /**
    * $column.columnComment
    */
@@ -10,6 +10,12 @@ export interface ${BusinessName}VO {
                         #else string;
                     #end
 #end
+#end
+#if ($table.tree)
+    /**
+     * 子对象
+     */
+    children: ${BusinessName}VO[];
 #end
 }
 
@@ -29,6 +35,7 @@ export interface ${BusinessName}Form extends BaseEntity {
 }
 
 export interface ${BusinessName}Query #if(!${treeCode})extends PageQuery #end{
+
 #foreach ($column in $columns)
 #if($column.query)
   /**
@@ -41,4 +48,11 @@ export interface ${BusinessName}Query #if(!${treeCode})extends PageQuery #end{
                     #end
 #end
 #end
+    /**
+     * 日期范围参数
+     */
+    params?: any;
 }
+
+
+

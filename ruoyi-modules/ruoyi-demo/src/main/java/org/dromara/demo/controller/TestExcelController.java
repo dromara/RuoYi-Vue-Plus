@@ -1,14 +1,19 @@
 package org.dromara.demo.controller;
 
 import cn.hutool.core.collection.CollUtil;
-import org.dromara.common.excel.utils.ExcelUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.dromara.common.excel.core.ExcelResult;
+import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.demo.domain.vo.ExportDemoVo;
+import org.dromara.demo.listener.ExportDemoListener;
+import org.dromara.demo.service.IExportExcelService;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,9 +24,12 @@ import java.util.Map;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/excel")
 public class TestExcelController {
+
+    private final IExportExcelService exportExcelService;
 
     /**
      * 单列表多数据
@@ -74,6 +82,26 @@ public class TestExcelController {
         multiListMap.put("data3", list3);
         multiListMap.put("data4", list4);
         ExcelUtil.exportTemplateMultiList(multiListMap, "多列表.xlsx", "excel/多列表.xlsx", response);
+    }
+
+    /**
+     * 导出下拉框
+     *
+     * @param response /
+     */
+    @GetMapping("/exportWithOptions")
+    public void exportWithOptions(HttpServletResponse response) {
+        exportExcelService.exportWithOptions(response);
+    }
+
+    /**
+     * 导入表格
+     */
+    @PostMapping(value = "/importWithOptions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public List<ExportDemoVo> importWithOptions(@RequestPart("file") MultipartFile file) throws Exception {
+        // 处理解析结果
+        ExcelResult<ExportDemoVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), ExportDemoVo.class, new ExportDemoListener());
+        return excelResult.getList();
     }
 
     @Data

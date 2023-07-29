@@ -112,7 +112,6 @@
         <!--            <groupId>com.tencentcloudapi</groupId>-->
         <!--            <artifactId>tencentcloud-sdk-java-sms</artifactId>-->
         <!--        </dependency>-->
-
     </dependencies>
 
 </project>

@@ -1,11 +1,11 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.dromara.common.core.exception.ServiceException;
@@ -46,7 +46,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.*;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.List;
@@ -153,82 +152,56 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      * 通过流程实例id获取历史流程图
      *
      * @param processInstanceId 流程实例id
-     * @param response          响应
      */
+    @SneakyThrows
     @Override
-    public void getHistoryProcessImage(String processInstanceId, HttpServletResponse response) {
-        // 设置页面不缓存
-        response.setHeader("Pragma", "no-cache");
-        response.addHeader("Cache-Control", "must-revalidate");
-        response.addHeader("Cache-Control", "no-cache");
-        response.addHeader("Cache-Control", "no-store");
-        response.setDateHeader("Expires", 0);
-        InputStream inputStream = null;
-        try {
-            String processDefinitionId;
-            // 获取当前的流程实例
-            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-            // 如果流程已经结束，则得到结束节点
-            if (Objects.isNull(processInstance)) {
-                HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-                processDefinitionId = pi.getProcessDefinitionId();
+    public String getHistoryProcessImage(String processInstanceId) {
+        String processDefinitionId;
+        // 获取当前的流程实例
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        // 如果流程已经结束，则得到结束节点
+        if (Objects.isNull(processInstance)) {
+            HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+            processDefinitionId = pi.getProcessDefinitionId();
+        } else {
+            // 根据流程实例ID获得当前处于活动状态的ActivityId合集
+            ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+            processDefinitionId = pi.getProcessDefinitionId();
+        }
+
+        // 获得活动的节点
+        List<HistoricActivityInstance> highLightedFlowList = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).orderByHistoricActivityInstanceStartTime().asc().list();
+
+        List<String> highLightedFlows = new ArrayList<>();
+        List<String> highLightedNodes = new ArrayList<>();
+        //高亮
+        for (HistoricActivityInstance tempActivity : highLightedFlowList) {
+            if (FlowConstant.SEQUENCE_FLOW.equals(tempActivity.getActivityType())) {
+                //高亮线
+                highLightedFlows.add(tempActivity.getActivityId());
             } else {
-                // 根据流程实例ID获得当前处于活动状态的ActivityId合集
-                ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-                processDefinitionId = pi.getProcessDefinitionId();
-            }
-
-            // 获得活动的节点
-            List<HistoricActivityInstance> highLightedFlowList = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).orderByHistoricActivityInstanceStartTime().asc().list();
-
-            List<String> highLightedFlows = new ArrayList<>();
-            List<String> highLightedNodes = new ArrayList<>();
-            //高亮
-            for (HistoricActivityInstance tempActivity : highLightedFlowList) {
-                if (FlowConstant.SEQUENCE_FLOW.equals(tempActivity.getActivityType())) {
-                    //高亮线
-                    highLightedFlows.add(tempActivity.getActivityId());
+                //高亮节点
+                if (tempActivity.getEndTime() == null) {
+                    highLightedNodes.add(Color.RED.toString() + tempActivity.getActivityId());
                 } else {
-                    //高亮节点
-                    if (tempActivity.getEndTime() == null) {
-                        highLightedNodes.add(Color.RED.toString() + tempActivity.getActivityId());
-                    } else {
-                        highLightedNodes.add(tempActivity.getActivityId());
-                    }
-                }
-            }
-            List<String> highLightedNodeList = new ArrayList<>();
-            //运行中的节点
-            List<String> redNodeCollect = StreamUtils.filter(highLightedNodes, e -> e.contains(Color.RED.toString()));
-            //排除与运行中相同的节点
-            for (String nodeId : highLightedNodes) {
-                if (!nodeId.contains(Color.RED.toString()) && !redNodeCollect.contains(Color.RED + nodeId)) {
-                    highLightedNodeList.add(nodeId);
-                }
-            }
-            highLightedNodeList.addAll(redNodeCollect);
-            BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
-            CustomDefaultProcessDiagramGenerator diagramGenerator = new CustomDefaultProcessDiagramGenerator();
-            inputStream = diagramGenerator.generateDiagram(bpmnModel, "png", highLightedNodeList, highLightedFlows, activityFontName, labelFontName, annotationFontName, null, 1.0, true);
-            // 响应相关图片
-            response.setContentType("image/png");
-
-            byte[] bytes = IOUtils.toByteArray(inputStream);
-            ServletOutputStream outputStream = response.getOutputStream();
-            outputStream.write(bytes);
-            outputStream.flush();
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    highLightedNodes.add(tempActivity.getActivityId());
                 }
             }
         }
+        List<String> highLightedNodeList = new ArrayList<>();
+        //运行中的节点
+        List<String> redNodeCollect = StreamUtils.filter(highLightedNodes, e -> e.contains(Color.RED.toString()));
+        //排除与运行中相同的节点
+        for (String nodeId : highLightedNodes) {
+            if (!nodeId.contains(Color.RED.toString()) && !redNodeCollect.contains(Color.RED + nodeId)) {
+                highLightedNodeList.add(nodeId);
+            }
+        }
+        highLightedNodeList.addAll(redNodeCollect);
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
+        CustomDefaultProcessDiagramGenerator diagramGenerator = new CustomDefaultProcessDiagramGenerator();
+        InputStream inputStream = diagramGenerator.generateDiagram(bpmnModel, "png", highLightedNodeList, highLightedFlows, activityFontName, labelFontName, annotationFontName, null, 1.0, true);
+        return Base64.encode(IOUtils.toByteArray(inputStream));
     }
 
     /**

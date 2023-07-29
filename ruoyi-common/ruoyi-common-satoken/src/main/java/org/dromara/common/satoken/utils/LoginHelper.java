@@ -2,17 +2,17 @@ package org.dromara.common.satoken.utils;
 
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.context.model.SaStorage;
+import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.model.LoginUser;
-import org.dromara.common.core.enums.DeviceType;
 import org.dromara.common.core.enums.UserType;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
@@ -34,31 +34,21 @@ public class LoginHelper {
     public static final String LOGIN_USER_KEY = "loginUser";
     public static final String TENANT_KEY = "tenantId";
     public static final String USER_KEY = "userId";
-
-    /**
-     * 登录系统
-     *
-     * @param loginUser 登录用户信息
-     */
-    public static void login(LoginUser loginUser) {
-        loginByDevice(loginUser, null);
-    }
+    public static final String CLIENT_KEY = "clientid";
 
     /**
      * 登录系统 基于 设备类型
      * 针对相同用户体系不同设备
      *
      * @param loginUser 登录用户信息
+     * @param model     配置参数
      */
-    public static void loginByDevice(LoginUser loginUser, DeviceType deviceType) {
+    public static void login(LoginUser loginUser, SaLoginModel model) {
         SaStorage storage = SaHolder.getStorage();
         storage.set(LOGIN_USER_KEY, loginUser);
         storage.set(TENANT_KEY, loginUser.getTenantId());
         storage.set(USER_KEY, loginUser.getUserId());
-        SaLoginModel model = new SaLoginModel();
-        if (ObjectUtil.isNotNull(deviceType)) {
-            model.setDevice(deviceType.getDevice());
-        }
+        model = ObjectUtil.defaultIfNull(model, new SaLoginModel());
         StpUtil.login(loginUser.getLoginId(),
             model.setExtra(TENANT_KEY, loginUser.getTenantId())
                 .setExtra(USER_KEY, loginUser.getUserId()));
@@ -73,7 +63,11 @@ public class LoginHelper {
         if (loginUser != null) {
             return loginUser;
         }
-        loginUser = (LoginUser) StpUtil.getTokenSession().get(LOGIN_USER_KEY);
+        SaSession session = StpUtil.getTokenSession();
+        if (ObjectUtil.isNull(session)) {
+            return null;
+        }
+        loginUser = (LoginUser) session.get(LOGIN_USER_KEY);
         SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
         return loginUser;
     }
@@ -82,7 +76,11 @@ public class LoginHelper {
      * 获取用户基于token
      */
     public static LoginUser getLoginUser(String token) {
-        return (LoginUser) StpUtil.getTokenSessionByToken(token).get(LOGIN_USER_KEY);
+        SaSession session = StpUtil.getTokenSessionByToken(token);
+        if (ObjectUtil.isNull(session)) {
+            return null;
+        }
+        return (LoginUser) session.get(LOGIN_USER_KEY);
     }
 
     /**
@@ -137,8 +135,8 @@ public class LoginHelper {
      * 获取用户类型
      */
     public static UserType getUserType() {
-        String loginId = StpUtil.getLoginIdAsString();
-        return UserType.getUserType(loginId);
+        String loginType = StpUtil.getLoginIdAsString();
+        return UserType.getUserType(loginType);
     }
 
     /**

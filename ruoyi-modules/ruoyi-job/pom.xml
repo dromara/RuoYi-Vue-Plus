@@ -20,15 +20,14 @@
         <!-- 通用工具-->
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-core</artifactId>
+            <artifactId>ruoyi-common-json</artifactId>
         </dependency>
 
-        <!-- 调度模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-job</artifactId>
         </dependency>
-
+        
     </dependencies>
 
 </project>

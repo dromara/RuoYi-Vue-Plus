@@ -96,20 +96,15 @@ spring:
 sa-token:
   # token名称 (同时也是cookie名称)
   token-name: Authorization
-  # token有效期 设为一天 (必定过期) 单位: 秒
-  timeout: 86400
-  # token临时有效期 (指定时间无操作就过期) 单位: 秒
-  activity-timeout: 1800
+  # token固定超时 设为七天 (必定过期) 单位: 秒
+  timeout: 604800
+  # 多端不同 token 有效期 可查看 LoginHelper.loginByDevice 方法自定义
+  # token最低活跃时间 (指定时间无操作就过期) 单位: 秒
+  active-timeout: 1800
   # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
   is-concurrent: true
   # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
   is-share: false
-  # 是否尝试从header里读取token
-  is-read-header: true
-  # 是否尝试从cookie里读取token
-  is-read-cookie: false
-  # token前缀
-  token-prefix: "Bearer"
   # jwt秘钥
   jwt-secret-key: abcdefghijklmnopqrstuvwxyz
 
@@ -145,6 +140,7 @@ tenant:
     - sys_role_menu
     - sys_user_post
     - sys_user_role
+    - sys_client
 
 # MyBatisPlus配置
 # https://baomidou.com/config/
@@ -156,39 +152,12 @@ mybatis-plus:
   mapperLocations: classpath*:mapper/**/*Mapper.xml
   # 实体扫描，多个package用逗号或者分号分隔
   typeAliasesPackage: org.dromara.**.domain
-  # 启动时是否检查 MyBatis XML 文件的存在，默认不检查
-  checkConfigLocation: false
-  configuration:
-    # 自动驼峰命名规则（camel case）映射
-    mapUnderscoreToCamelCase: true
-    # MyBatis 自动映射策略
-    # NONE：不启用 PARTIAL：只对非嵌套 resultMap 自动映射 FULL：对所有 resultMap 自动映射
-    autoMappingBehavior: FULL
-    # MyBatis 自动映射时未知列或未知属性处理策
-    # NONE：不做处理 WARNING：打印相关警告 FAILING：抛出异常和详细信息
-    autoMappingUnknownColumnBehavior: NONE
-    # 更详细的日志输出 会有性能损耗 org.apache.ibatis.logging.stdout.StdOutImpl
-    # 关闭日志记录 (可单纯使用 p6spy 分析) org.apache.ibatis.logging.nologging.NoLoggingImpl
-    # 默认日志输出 org.apache.ibatis.logging.slf4j.Slf4jImpl
-    logImpl: org.apache.ibatis.logging.nologging.NoLoggingImpl
   global-config:
-    # 是否打印 Logo banner
-    banner: true
     dbConfig:
       # 主键类型
       # AUTO 自增 NONE 空 INPUT 用户输入 ASSIGN_ID 雪花 ASSIGN_UUID 唯一 UUID
+      # 如需改为自增 需要将数据库表全部设置为自增
       idType: ASSIGN_ID
-      # 逻辑已删除值
-      logicDeleteValue: 2
-      # 逻辑未删除值
-      logicNotDeleteValue: 0
-      # 字段验证策略之 insert,在 insert 的时候的字段验证策略
-      # IGNORED 忽略 NOT_NULL 非NULL NOT_EMPTY 非空 DEFAULT 默认 NEVER 不加入 SQL
-      insertStrategy: NOT_NULL
-      # 字段验证策略之 update,在 update 的时候的字段验证策略
-      updateStrategy: NOT_NULL
-      # 字段验证策略之 select,在 select 的时候的字段验证策略既 wrapper 根据内部 entity 生成的 where 条件
-      where-strategy: NOT_NULL
 
 # 数据加密
 mybatis-encryptor:
@@ -204,8 +173,23 @@ mybatis-encryptor:
   publicKey:
   privateKey:
 
-# Swagger配置
-swagger:
+# api接口加密
+api-decrypt:
+  # 是否开启全局接口加密
+  enabled: true
+  # AES 加密头标识
+  headerFlag: encrypt-key
+  # 公私钥 非对称算法的公私钥 如：SM2，RSA 使用者请自行更换
+  publicKey: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKoR8mX0rGKLqzcWmOzbfj64K8ZIgOdHnzkXSOVOZbFu/TJhZ7rFAN+eaGkl3C4buccQd/EjEsj9ir7ijT7h96MCAwEAAQ==
+  privateKey: MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAqhHyZfSsYourNxaY7Nt+PrgrxkiA50efORdI5U5lsW79MmFnusUA355oaSXcLhu5xxB38SMSyP2KvuKNPuH3owIDAQABAkAfoiLyL+Z4lf4Myxk6xUDgLaWGximj20CUf+5BKKnlrK+Ed8gAkM0HqoTt2UZwA5E2MzS4EI2gjfQhz5X28uqxAiEA3wNFxfrCZlSZHb0gn2zDpWowcSxQAgiCstxGUoOqlW8CIQDDOerGKH5OmCJ4Z21v+F25WaHYPxCFMvwxpcw99EcvDQIgIdhDTIqD2jfYjPTY8Jj3EDGPbH2HHuffvflECt3Ek60CIQCFRlCkHpi7hthhYhovyloRYsM+IS9h/0BzlEAuO0ktMQIgSPT3aFAgJYwKpqRYKlLDVcflZFCKY7u3UP8iWi1Qw0Y=
+
+springdoc:
+  api-docs:
+    # 是否开启接口文档
+    enabled: true
+#  swagger-ui:
+#    # 持久化认证数据
+#    persistAuthorization: true
   info:
     # 标题
     title: '标题：${ruoyi.name}多租户管理系统_接口文档'
@@ -225,14 +209,6 @@ swagger:
         type: APIKEY
         in: HEADER
         name: ${sa-token.token-name}
-
-springdoc:
-  api-docs:
-    # 是否开启接口文档
-    enabled: true
-  swagger-ui:
-    # 持久化认证数据
-    persistAuthorization: true
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
     - group: 1.演示模块
@@ -285,6 +261,6 @@ management:
 websocket:
   enabled: true
   # 路径
-  path: /websocket
+  path: /resource/websocket
   # 设置访问源地址
   allowedOrigins: '*'

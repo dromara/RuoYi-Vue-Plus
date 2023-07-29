@@ -53,7 +53,7 @@ public class SysConfigVo implements Serializable {
     /**
      * 系统内置（Y是 N否）
      */
-    @ExcelProperty(value = "系统内置", converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "系统内置", index = 4, converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "sys_yes_no")
     private String configType;
 

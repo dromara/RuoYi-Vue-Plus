@@ -1,6 +1,5 @@
 package org.dromara.workflow.service;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
@@ -19,9 +18,9 @@ public interface IActProcessInstanceService {
      * 通过流程实例id获取历史流程图
      *
      * @param processInstanceId 流程实例id
-     * @param response          响应
+     * @return 结果
      */
-    void getHistoryProcessImage(String processInstanceId, HttpServletResponse response);
+    String getHistoryProcessImage(String processInstanceId);
 
     /**
      * 分页查询正在运行的流程实例

@@ -51,13 +51,13 @@ public class OssFactory {
         if (client == null) {
             CLIENT_CACHE.put(key, new OssClient(configKey, properties));
             log.info("创建OSS实例 key => {}", configKey);
-            return CLIENT_CACHE.get(configKey);
+            return CLIENT_CACHE.get(key);
         }
         // 配置不相同则重新构建
         if (!client.checkPropertiesSame(properties)) {
             CLIENT_CACHE.put(key, new OssClient(configKey, properties));
             log.info("重载OSS实例 key => {}", configKey);
-            return CLIENT_CACHE.get(configKey);
+            return CLIENT_CACHE.get(key);
         }
         return client;
     }

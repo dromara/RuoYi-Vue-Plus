@@ -70,7 +70,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
     @Override
     public List<Tree<Long>> selectDeptTreeList(SysDeptBo bo) {
         LambdaQueryWrapper<SysDept> lqw = buildQueryWrapper(bo);
-        List<SysDept> depts = baseMapper.selectList(lqw);
+        List<SysDeptVo> depts = baseMapper.selectDeptList(lqw);
         return buildDeptTreeSelect(depts);
     }
 
@@ -93,7 +93,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
      * @return 下拉树结构列表
      */
     @Override
-    public List<Tree<Long>> buildDeptTreeSelect(List<SysDept> depts) {
+    public List<Tree<Long>> buildDeptTreeSelect(List<SysDeptVo> depts) {
         if (CollUtil.isEmpty(depts)) {
             return CollUtil.newArrayList();
         }

@@ -8,27 +8,21 @@ spring.boot.admin.client:
   username: ruoyi
   password: 123456
 
---- # xxl-job 配置
-xxl.job:
-  # 执行器开关
-  enabled: true
-  # 调度中心地址：如调度中心集群部署存在多个地址则用逗号分隔。
-  admin-addresses: http://localhost:9100/xxl-job-admin
-  # 执行器通讯TOKEN：非空时启用
-  access-token: xxl-job
-  executor:
-    # 执行器AppName：执行器心跳注册分组依据；为空则关闭自动注册
-    appname: xxl-job-executor
-    # 执行器端口号 执行器从9101开始往后写
-    port: 9101
-    # 执行器注册：默认IP:PORT
-    address:
-    # 执行器IP：默认自动获取IP
-    ip:
-    # 执行器运行日志文件存储磁盘路径
-    logpath: ./logs/xxl-job
-    # 执行器日志文件保存天数：大于3生效
-    logretentiondays: 30
+--- # powerjob 配置
+powerjob:
+  worker:
+    # 如何开启调度中心请查看文档教程
+    enabled: false
+    # 需要先在 powerjob 登录页执行应用注册后才能使用
+    app-name: ruoyi-worker
+    enable-test-mode: false
+    max-appended-wf-context-length: 4096
+    max-result-length: 4096
+    # 28080 端口 随着主应用端口飘逸 避免集群冲突
+    port: 2${server.port}
+    protocol: http
+    server-address: 127.0.0.1:7700
+    store-strategy: disk
 
 --- # 数据源配置
 spring:
@@ -130,7 +124,7 @@ spring.data:
     # 连接超时时间
     timeout: 10s
     # 是否开启ssl
-    ssl: false
+    ssl.enabled: false
 
 redisson:
   # redis key前缀
@@ -176,14 +170,100 @@ mail:
   # Socket连接超时值，单位毫秒，缺省值不超时
   connectionTimeout: 0
 
---- # sms 短信
+--- # sms 短信 支持 阿里云 腾讯云 云片 等等各式各样的短信服务商
+# https://wind.kim/doc/start 文档地址 各个厂商可同时使用
 sms:
-  enabled: false
   # 阿里云 dysmsapi.aliyuncs.com
-  # 腾讯云 sms.tencentcloudapi.com
-  endpoint: "dysmsapi.aliyuncs.com"
-  accessKeyId: xxxxxxx
-  accessKeySecret: xxxxxx
-  signName: 测试
-  # 腾讯专用
-  sdkAppId:
+  alibaba:
+    #请求地址 默认为 dysmsapi.aliyuncs.com 如无特殊改变可以不用设置
+    requestUrl: dysmsapi.aliyuncs.com
+    #阿里云的accessKey
+    accessKeyId: xxxxxxx
+    #阿里云的accessKeySecret
+    accessKeySecret: xxxxxxx
+    #短信签名
+    signature: 测试
+  tencent:
+    #请求地址默认为 sms.tencentcloudapi.com 如无特殊改变可不用设置
+    requestUrl: sms.tencentcloudapi.com
+    #腾讯云的accessKey
+    accessKeyId: xxxxxxx
+    #腾讯云的accessKeySecret
+    accessKeySecret: xxxxxxx
+    #短信签名
+    signature: 测试
+    #短信sdkAppId
+    sdkAppId: appid
+    #地域信息默认为 ap-guangzhou 如无特殊改变可不用设置
+    territory: ap-guangzhou
+
+
+--- # 三方授权
+justauth:
+  enabled: true
+  # 前端外网访问地址
+  address: http://localhost:80
+  type:
+    maxkey:
+      # maxkey 服务器地址
+      # 注意 如下均配置均不需要修改 maxkey 已经内置好了数据
+      server-url: http://sso.maxkey.top
+      client-id: 876892492581044224
+      client-secret: x1Y5MTMwNzIwMjMxNTM4NDc3Mzche8
+      redirect-uri: ${justauth.address}/social-callback?source=maxkey
+    qq:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=qq
+      union-id: false
+    weibo:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=weibo
+    gitee:
+      client-id: 91436b7940090d09c72c7daf85b959cfd5f215d67eea73acbf61b6b590751a98
+      client-secret: 02c6fcfd70342980cd8dd2f2c06c1a350645d76c754d7a264c4e125f9ba915ac
+      redirect-uri: ${justauth.address}/social-callback?source=gitee
+    dingtalk:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=dingtalk
+    baidu:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=baidu
+    csdn:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=csdn
+    coding:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=coding
+      coding-group-name: xx
+    oschina:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=oschina
+    alipay:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=alipay
+      alipay-public-key: MIIB**************DAQAB
+    wechat_open:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=wechat_open
+    wechat_mp:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=wechat_mp
+    wechat_enterprise:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=wechat_enterprise
+      agent-id: 1000002
+    gitlab:
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=gitlab

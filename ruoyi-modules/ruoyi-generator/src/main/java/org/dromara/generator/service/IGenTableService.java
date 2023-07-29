@@ -43,9 +43,10 @@ public interface IGenTableService {
      * 查询据库列表
      *
      * @param tableNames 表名称组
+     * @param dataName   数据源名称
      * @return 数据库表集合
      */
-    List<GenTable> selectDbTableListByNames(String[] tableNames);
+    List<GenTable> selectDbTableListByNames(String[] tableNames, String dataName);
 
     /**
      * 查询所有表信息
@@ -66,7 +67,6 @@ public interface IGenTableService {
      * 修改业务
      *
      * @param genTable 业务信息
-     * @return 结果
      */
     void updateGenTable(GenTable genTable);
 
@@ -74,7 +74,6 @@ public interface IGenTableService {
      * 删除业务信息
      *
      * @param tableIds 需要删除的表数据ID
-     * @return 结果
      */
     void deleteGenTableByIds(Long[] tableIds);
 
@@ -82,8 +81,9 @@ public interface IGenTableService {
      * 导入表结构
      *
      * @param tableList 导入表列表
+     * @param dataName  数据源名称
      */
-    void importGenTable(List<GenTable> tableList);
+    void importGenTable(List<GenTable> tableList, String dataName);
 
     /**
      * 预览代码
@@ -96,33 +96,32 @@ public interface IGenTableService {
     /**
      * 生成代码（下载方式）
      *
-     * @param tableName 表名称
+     * @param tableId 表名称
      * @return 数据
      */
-    byte[] downloadCode(String tableName);
+    byte[] downloadCode(Long tableId);
 
     /**
      * 生成代码（自定义路径）
      *
-     * @param tableName 表名称
-     * @return 数据
+     * @param tableId 表名称
      */
-    void generatorCode(String tableName);
+    void generatorCode(Long tableId);
 
     /**
      * 同步数据库
      *
-     * @param tableName 表名称
+     * @param tableId 表名称
      */
-    void synchDb(String tableName);
+    void synchDb(Long tableId);
 
     /**
      * 批量生成代码（下载方式）
      *
-     * @param tableNames 表数组
+     * @param tableIds 表ID数组
      * @return 数据
      */
-    byte[] downloadCode(String[] tableNames);
+    byte[] downloadCode(String[] tableIds);
 
     /**
      * 修改保存参数校验
