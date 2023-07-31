@@ -4,7 +4,6 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthUser;
@@ -15,7 +14,6 @@ import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.TenantStatus;
-import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.MessageUtils;
@@ -34,7 +32,6 @@ import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.service.ISysPermissionService;
 import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysTenantService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -72,13 +69,13 @@ public class SysLoginService {
      * @return 统一响应实体
      */
     public void socialRegister(AuthUser authUserData) {
-        SysSocialBo bo = new SysSocialBo();
+        SysSocialBo bo = BeanUtil.toBean(authUserData, SysSocialBo.class);
+        BeanUtil.copyProperties(authUserData.getToken(), bo);
         bo.setUserId(LoginHelper.getUserId());
         bo.setAuthId(authUserData.getSource() + authUserData.getUuid());
         bo.setOpenId(authUserData.getUuid());
         bo.setUserName(authUserData.getUsername());
-        BeanUtils.copyProperties(authUserData, bo);
-        BeanUtils.copyProperties(authUserData.getToken(), bo);
+        bo.setNickName(authUserData.getNickname());
         sysSocialService.insertByBo(bo);
     }
 
