@@ -5,7 +5,9 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.metadata.FieldCache;
+import com.alibaba.excel.metadata.FieldWrapper;
+import com.alibaba.excel.util.ClassUtils;
 import com.alibaba.excel.write.handler.SheetWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
@@ -83,16 +85,18 @@ public class ExcelDownHandler implements SheetWriteHandler {
         Sheet sheet = writeSheetHolder.getSheet();
         // 开始设置下拉框 HSSFWorkbook
         DataValidationHelper helper = sheet.getDataValidationHelper();
-        Field[] fields = writeWorkbookHolder.getClazz().getDeclaredFields();
         Workbook workbook = writeWorkbookHolder.getWorkbook();
-        int length = fields.length;
-        for (int i = 0; i < length; i++) {
+        FieldCache fieldCache = ClassUtils.declaredFields(writeWorkbookHolder.getClazz(), writeWorkbookHolder);
+        for (Map.Entry<Integer, FieldWrapper> entry : fieldCache.getSortedFieldMap().entrySet()) {
+            Integer index = entry.getKey();
+            FieldWrapper wrapper = entry.getValue();
+            Field field = wrapper.getField();
             // 循环实体中的每个属性
             // 可选的下拉值
             List<String> options = new ArrayList<>();
-            if (fields[i].isAnnotationPresent(ExcelDictFormat.class)) {
+            if (field.isAnnotationPresent(ExcelDictFormat.class)) {
                 // 如果指定了@ExcelDictFormat，则使用字典的逻辑
-                ExcelDictFormat format = fields[i].getDeclaredAnnotation(ExcelDictFormat.class);
+                ExcelDictFormat format = field.getDeclaredAnnotation(ExcelDictFormat.class);
                 String dictType = format.dictType();
                 String converterExp = format.readConverterExp();
                 if (StrUtil.isNotBlank(dictType)) {
@@ -105,20 +109,14 @@ public class ExcelDownHandler implements SheetWriteHandler {
                     // 如果指定了确切的值，则直接解析确切的值
                     options = StrUtil.split(converterExp, format.separator(), true, true);
                 }
-            } else if (fields[i].isAnnotationPresent(ExcelEnumFormat.class)) {
+            } else if (field.isAnnotationPresent(ExcelEnumFormat.class)) {
                 // 否则如果指定了@ExcelEnumFormat，则使用枚举的逻辑
-                ExcelEnumFormat format = fields[i].getDeclaredAnnotation(ExcelEnumFormat.class);
+                ExcelEnumFormat format = field.getDeclaredAnnotation(ExcelEnumFormat.class);
                 List<Object> values = EnumUtil.getFieldValues(format.enumClass(), format.textField());
                 options = StreamUtils.toList(values, String::valueOf);
             }
             if (ObjectUtil.isNotEmpty(options)) {
                 // 仅当下拉可选项不为空时执行
-                // 获取列下标，默认为当前循环次数
-                int index = i;
-                if (fields[i].isAnnotationPresent(ExcelProperty.class)) {
-                    // 如果指定了列下标，以指定的为主
-                    index = fields[i].getDeclaredAnnotation(ExcelProperty.class).index();
-                }
                 if (options.size() > 20) {
                     // 这里限制如果可选项大于20，则使用额外表形式
                     dropDownWithSheet(helper, workbook, sheet, index, options);
