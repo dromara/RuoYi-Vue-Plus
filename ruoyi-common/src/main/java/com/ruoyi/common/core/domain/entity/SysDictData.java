@@ -77,14 +77,14 @@ public class SysDictData extends BaseEntity {
     /**
      * 是否默认（Y是 N否）
      */
-    @ExcelProperty(value = "是否默认", index = 5, converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "是否默认", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "sys_yes_no")
     private String isDefault;
 
     /**
      * 状态（0正常 1停用）
      */
-    @ExcelProperty(value = "状态", index = 6, converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "状态", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "sys_normal_disable")
     private String status;
 
