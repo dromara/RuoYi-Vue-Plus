@@ -3,6 +3,7 @@ package org.dromara.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.system.domain.SysSocial;
 import org.dromara.system.domain.bo.SysSocialBo;
 import org.dromara.system.domain.vo.SysSocialVo;
@@ -91,7 +92,11 @@ public class SysSocialServiceImpl implements ISysSocialService {
      */
     @Override
     public SysSocialVo selectByAuthId(String authId) {
-        return baseMapper.selectVoOne(new LambdaQueryWrapper<SysSocial>().eq(SysSocial::getAuthId, authId));
+        return baseMapper.selectVoOne(
+            new LambdaQueryWrapper<SysSocial>()
+                .eq(SysSocial::getAuthId, authId)
+                .orderByDesc(BaseEntity::getCreateTime)
+                .last("limit 1"));
     }
 
 }
