@@ -65,6 +65,15 @@ public class SysSocialServiceImpl implements ISysSocialService {
         return flag;
     }
 
+    /**
+     * 更新社会化关系
+     */
+    @Override
+    public Boolean updateByBo(SysSocialBo bo) {
+        SysSocial update = MapstructUtils.convert(bo, SysSocial.class);
+        validEntityBeforeSave(update);
+        return baseMapper.updateById(update) > 0;
+    }
 
     /**
      * 保存前的数据校验

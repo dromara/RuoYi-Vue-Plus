@@ -26,6 +26,7 @@ import org.dromara.common.tenant.exception.TenantException;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.bo.SysSocialBo;
+import org.dromara.system.domain.vo.SysSocialVo;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
@@ -69,14 +70,25 @@ public class SysLoginService {
      * @return 统一响应实体
      */
     public void socialRegister(AuthUser authUserData) {
+        String authId = authUserData.getSource() + authUserData.getUuid();
+        // 第三方用户信息
         SysSocialBo bo = BeanUtil.toBean(authUserData, SysSocialBo.class);
         BeanUtil.copyProperties(authUserData.getToken(), bo);
         bo.setUserId(LoginHelper.getUserId());
-        bo.setAuthId(authUserData.getSource() + authUserData.getUuid());
+        bo.setAuthId(authId);
         bo.setOpenId(authUserData.getUuid());
         bo.setUserName(authUserData.getUsername());
         bo.setNickName(authUserData.getNickname());
-        sysSocialService.insertByBo(bo);
+        // 查询是否已经绑定用户
+        SysSocialVo vo = sysSocialService.selectByAuthId(authId);
+        if (ObjectUtil.isEmpty(vo)) {
+            // 没有绑定用户, 新增用户信息
+            sysSocialService.insertByBo(bo);
+        } else {
+            // 更新用户信息
+            bo.setId(vo.getId());
+            sysSocialService.updateByBo(bo);
+        }
     }
 
 
