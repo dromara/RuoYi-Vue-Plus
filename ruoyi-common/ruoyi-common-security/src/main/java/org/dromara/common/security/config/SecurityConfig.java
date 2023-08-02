@@ -54,10 +54,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                     String clientId = StpUtil.getExtra(LoginHelper.CLIENT_KEY).toString();
                     if (!StringUtils.equalsAny(clientId, headerCid, paramCid)) {
                         // token 无效
-                        throw NotLoginException.newInstance(
-                            StpUtil.getLoginType(),
-                            NotLoginException.INVALID_TOKEN,
-                            NotLoginException.NOT_TOKEN_MESSAGE,
+                        throw NotLoginException.newInstance(StpUtil.getLoginType(),
+                            "-100", "客户端ID与Token不匹配",
                             StpUtil.getTokenValue());
                     }
 
