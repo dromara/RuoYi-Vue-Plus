@@ -33,6 +33,10 @@ public interface ISysSocialService {
      */
     Boolean insertByBo(SysSocialBo bo);
 
+    /**
+     * 更新社会化关系
+     */
+    Boolean updateByBo(SysSocialBo bo);
 
     /**
      * 删除社会化关系信息
