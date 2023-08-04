@@ -1,8 +1,11 @@
 package org.dromara.common.core.config;
 
+import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.config.properties.ThreadPoolProperties;
 import org.dromara.common.core.utils.Threads;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -18,6 +21,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  *
  * @author Lion Li
  **/
+@Slf4j
 @AutoConfiguration
 @EnableConfigurationProperties(ThreadPoolProperties.class)
 public class ThreadPoolConfig {
@@ -54,4 +58,18 @@ public class ThreadPoolConfig {
             }
         };
     }
+
+    /**
+     * 销毁事件
+     */
+    @PreDestroy
+    public void destroy(@Qualifier("scheduledExecutorService") ScheduledExecutorService scheduledExecutorService) {
+        try {
+            log.info("====关闭后台任务任务线程池====");
+            Threads.shutdownAndAwaitTermination(scheduledExecutorService);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
 }
