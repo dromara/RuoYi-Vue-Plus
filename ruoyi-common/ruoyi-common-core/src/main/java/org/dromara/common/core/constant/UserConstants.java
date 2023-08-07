@@ -53,6 +53,16 @@ public interface UserConstants {
     String DEPT_DISABLE = "1";
 
     /**
+     * 岗位正常状态
+     */
+    String POST_NORMAL = "0";
+
+    /**
+     * 岗位停用状态
+     */
+    String POST_DISABLE = "1";
+
+    /**
      * 字典正常状态
      */
     String DICT_NORMAL = "0";
