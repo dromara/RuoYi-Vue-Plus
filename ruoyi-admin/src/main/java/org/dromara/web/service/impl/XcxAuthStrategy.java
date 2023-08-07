@@ -52,6 +52,7 @@ public class XcxAuthStrategy implements IAuthStrategy {
         loginUser.setTenantId(user.getTenantId());
         loginUser.setUserId(user.getUserId());
         loginUser.setUsername(user.getUserName());
+        loginUser.setUsername(user.getNickName());
         loginUser.setUserType(user.getUserType());
         loginUser.setOpenid(openid);
 
