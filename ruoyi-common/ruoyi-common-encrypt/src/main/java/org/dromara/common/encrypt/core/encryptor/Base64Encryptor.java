@@ -1,9 +1,9 @@
 package org.dromara.common.encrypt.core.encryptor;
 
-import cn.hutool.core.codec.Base64;
 import org.dromara.common.encrypt.core.EncryptContext;
 import org.dromara.common.encrypt.enumd.AlgorithmType;
 import org.dromara.common.encrypt.enumd.EncodeType;
+import org.dromara.common.encrypt.utils.EncryptUtils;
 
 /**
  * Base64算法实现
@@ -33,7 +33,7 @@ public class Base64Encryptor extends AbstractEncryptor {
      */
     @Override
     public String encrypt(String value, EncodeType encodeType) {
-        return Base64.encode(value);
+        return EncryptUtils.encryptByBase64(value);
     }
 
     /**
@@ -43,6 +43,6 @@ public class Base64Encryptor extends AbstractEncryptor {
      */
     @Override
     public String decrypt(String value) {
-        return Base64.decodeStr(value);
+        return EncryptUtils.decryptByBase64(value);
     }
 }
