@@ -41,6 +41,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.dromara.workflow.common.constant.FlowConstant.FLOWABLE_SKIP_EXPRESSION_ENABLED;
+import static org.dromara.workflow.common.constant.FlowConstant.INITIATOR;
+
 /**
  * 任务 服务层实现
  *
@@ -87,7 +90,9 @@ public class ActTaskServiceImpl implements IActTaskService {
         // 启动流程实例（提交申请）
         Map<String, Object> variables = startProcessBo.getVariables();
         // 启动跳过表达式
-        variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
+        variables.put(FLOWABLE_SKIP_EXPRESSION_ENABLED, true);
+        // 流程发起人
+        variables.put(INITIATOR, (String.valueOf(LoginHelper.getUserId())));
         ProcessInstance pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());
         // 将流程定义名称 作为 流程实例名称
         runtimeService.setProcessInstanceName(pi.getProcessInstanceId(), pi.getProcessDefinitionName());

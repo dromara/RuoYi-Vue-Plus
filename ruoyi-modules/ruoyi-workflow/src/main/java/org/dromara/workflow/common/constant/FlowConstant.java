@@ -59,4 +59,14 @@ public interface FlowConstant {
      */
     String PROCESS_INSTANCE_VO = "processInstanceVo";
 
+    /**
+     * 流程发起人
+     */
+    String INITIATOR = "INITIATOR";
+
+    /**
+     * 开启跳过表达式变量
+     */
+    String FLOWABLE_SKIP_EXPRESSION_ENABLED = "_FLOWABLE_SKIP_EXPRESSION_ENABLED";
+
 }
