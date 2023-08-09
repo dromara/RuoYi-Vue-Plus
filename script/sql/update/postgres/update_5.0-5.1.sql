@@ -147,4 +147,4 @@ insert into sys_role_menu values ('2', '1065');
 
 
 update sys_dept set leader = null;
-alter table sys_dept modify column leader bigint null default null comment '负责人' after order_num;
+ALTER TABLE sys_dept ALTER COLUMN leader TYPE int8;
