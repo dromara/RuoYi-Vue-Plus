@@ -14,7 +14,7 @@
 
     <properties>
         <ruoyi-vue-plus.version>4.8.0</ruoyi-vue-plus.version>
-        <spring-boot.version>2.7.13</spring-boot.version>
+        <spring-boot.version>2.7.14</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -22,12 +22,12 @@
         <spring-boot.mybatis>2.2.2</spring-boot.mybatis>
         <springdoc.version>1.6.15</springdoc.version>
         <poi.version>5.2.3</poi.version>
-        <easyexcel.version>3.3.1</easyexcel.version>
+        <easyexcel.version>3.3.2</easyexcel.version>
         <velocity.version>2.3</velocity.version>
         <satoken.version>1.35.0.RC</satoken.version>
-        <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <mybatis-plus.version>3.5.3.2</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.8.18</hutool.version>
+        <hutool.version>5.8.20</hutool.version>
         <okhttp.version>4.10.0</okhttp.version>
         <spring-boot-admin.version>2.7.10</spring-boot-admin.version>
         <redisson.version>3.20.1</redisson.version>
