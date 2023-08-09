@@ -20,7 +20,7 @@ create table sys_social
     email              varchar2(255)     default '',
     avatar             varchar2(500)     default '',
     access_token       varchar2(255)     not null,
-    expire_in          number(100)      default null,
+    expire_in          number(20)        default null,
     refresh_token      varchar2(255)     default null,
     access_code        varchar2(255)     default null,
     union_id           varchar2(255)     default null,
@@ -93,7 +93,7 @@ create table sys_client (
     create_time         date,
     update_by           number(20)    default null,
     update_time         date
-)
+);
 
 alter table sys_client add constraint pk_sys_client primary key (id);
 

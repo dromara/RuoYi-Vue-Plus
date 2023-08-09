@@ -3,8 +3,8 @@
 -- ----------------------------
 create table sys_social
 (
-    id                 number(20)       not null,
-    user_id            number(20)       not null,
+    id                 number(20)        not null,
+    user_id            number(20)        not null,
     tenant_id          varchar2(20)      default null,
     auth_id            varchar2(255)     not null,
     source             varchar2(255)     not null,
@@ -14,7 +14,7 @@ create table sys_social
     email              varchar2(255)     default '',
     avatar             varchar2(500)     default '',
     access_token       varchar2(255)     not null,
-    expire_in          number(100)      default null,
+    expire_in          number(20)        default null,
     refresh_token      varchar2(255)     default null,
     access_code        varchar2(255)     default null,
     union_id           varchar2(255)     default null,
@@ -1000,8 +1000,8 @@ create table gen_table (
   data_name         varchar2(200)    default '',
   table_name        varchar2(200)    default '',
   table_comment     varchar2(500)    default '',
-  sub_table_name    varchar2(64)      default null,
-  sub_table_fk_name varchar2(64)      default null,
+  sub_table_name    varchar2(64)     default null,
+  sub_table_fk_name varchar2(64)     default null,
   class_name        varchar2(100)    default '',
   tpl_category      varchar2(200)    default 'crud',
   package_name      varchar2(100),
@@ -1069,7 +1069,7 @@ create table gen_table_column (
   html_type         varchar2(200),
   dict_type         varchar2(200)    default '',
   sort              number(4),
-  create_dept       number(20)      default null,
+  create_dept       number(20)       default null,
   create_by         number(20)       default null,
   create_time       date ,
   update_by         number(20)       default null,
@@ -1108,17 +1108,17 @@ comment on column gen_table_column.update_time    is '更新时间';
 -- OSS对象存储表
 -- ----------------------------
 create table sys_oss (
-  oss_id          number(20)    not null,
-  tenant_id       varchar2(20)  default '000000',
+  oss_id          number(20)     not null,
+  tenant_id       varchar2(20)   default '000000',
   file_name       varchar2(255)  not null,
   original_name   varchar2(255)  not null,
   file_suffix     varchar2(10)   not null,
   url             varchar2(500)  not null,
   service         varchar2(20)   default 'minio' not null,
-  create_dept     number(20)    default null,
-  create_by       number(20)    default null,
+  create_dept     number(20)     default null,
+  create_by       number(20)     default null,
   create_time     date,
-  update_by       number(20)    default null,
+  update_by       number(20)     default null,
   update_time     date
 );
 
@@ -1143,8 +1143,8 @@ comment on column sys_oss.update_by         is '更新者';
 -- OSS对象存储动态配置表
 -- ----------------------------
 create table sys_oss_config (
-  oss_config_id   number(20)    not null,
-  tenant_id       varchar2(20)  default '000000',
+  oss_config_id   number(20)     not null,
+  tenant_id       varchar2(20)   default '000000',
   config_key      varchar2(20)   not null,
   access_key      varchar2(255)  default '',
   secret_key      varchar2(255)  default '',
@@ -1152,16 +1152,16 @@ create table sys_oss_config (
   prefix          varchar2(255)  default '',
   endpoint        varchar2(255)  default '',
   domain          varchar2(255)  default '',
-  is_https        char(1)       default 'N',
+  is_https        char(1)        default 'N',
   region          varchar2(255)  default '',
-  access_policy   char(1)       default '1' not null,
-  status          char(1)       default '1',
+  access_policy   char(1)        default '1' not null,
+  status          char(1)        default '1',
   ext1            varchar2(255)  default '',
   remark          varchar2(500)  default null,
-  create_dept     number(20)    default null,
-  create_by       number(20)    default null,
+  create_dept     number(20)     default null,
+  create_by       number(20)     default null,
   create_time     date,
-  update_by       number(20)    default null,
+  update_by       number(20)     default null,
   update_time     date
 );
 
@@ -1199,22 +1199,22 @@ insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'r
 -- 系统授权表
 -- ----------------------------
 create table sys_client (
-    id                  number(20)    not null,
+    id                  number(20)     not null,
     client_id           varchar2(64)   default null,
     client_key          varchar2(32)   default null,
     client_secret       varchar2(255)  default null,
     grant_type          varchar2(255)  default null,
     device_type         varchar2(32)   default null,
-    active_timeout      number(11)    default 1800,
-    timeout             number(11)    default 604800,
-    status              char(1)       default '0',
-    del_flag            char(1)       default '0',
-    create_dept         number(20)    default null,
-    create_by           number(20)    default null,
+    active_timeout      number(11)     default 1800,
+    timeout             number(11)     default 604800,
+    status              char(1)        default '0',
+    del_flag            char(1)        default '0',
+    create_dept         number(20)     default null,
+    create_by           number(20)     default null,
     create_time         date,
-    update_by           number(20)    default null,
+    update_by           number(20)     default null,
     update_time         date
-)
+);
 
 alter table sys_client add constraint pk_sys_client primary key (id);
 
