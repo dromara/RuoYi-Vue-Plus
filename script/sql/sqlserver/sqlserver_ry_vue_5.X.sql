@@ -928,7 +928,7 @@ CREATE TABLE sys_dept
     ancestors   nvarchar(500)DEFAULT ''    NULL,
     dept_name   nvarchar(30) DEFAULT ''    NULL,
     order_num   int          DEFAULT ((0)) NULL,
-    leader      nvarchar(20)               NULL,
+    leader      bigint                     NULL,
     phone       nvarchar(11)               NULL,
     email       nvarchar(50)               NULL,
     status      nchar(1)     DEFAULT ('0') NULL,
@@ -1047,25 +1047,25 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dept'
 GO
 
-INSERT sys_dept VALUES (100, N'000000', 0, N'0', N'XXX科技', 0, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (100, N'000000', 0, N'0', N'XXX科技', 0, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (101, N'000000', 100, N'0,100', N'深圳总公司', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (101, N'000000', 100, N'0,100', N'深圳总公司', 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (102, N'000000', 100, N'0,100', N'长沙分公司', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (102, N'000000', 100, N'0,100', N'长沙分公司', 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (103, N'000000', 101, N'0,100,101', N'研发部门', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (103, N'000000', 101, N'0,100,101', N'研发部门', 1, 1, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (104, N'000000', 101, N'0,100,101', N'市场部门', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (104, N'000000', 101, N'0,100,101', N'市场部门', 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (105, N'000000', 101, N'0,100,101', N'测试部门', 3, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (105, N'000000', 101, N'0,100,101', N'测试部门', 3, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (106, N'000000', 101, N'0,100,101', N'财务部门', 4, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (106, N'000000', 101, N'0,100,101', N'财务部门', 4, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (107, N'000000', 101, N'0,100,101', N'运维部门', 5, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (107, N'000000', 101, N'0,100,101', N'运维部门', 5, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (108, N'000000', 102, N'0,100,102', N'市场部门', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (108, N'000000', 102, N'0,100,102', N'市场部门', 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (109, N'000000', 102, N'0,100,102', N'财务部门', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (109, N'000000', 102, N'0,100,102', N'财务部门', 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
 
 CREATE TABLE sys_dict_data

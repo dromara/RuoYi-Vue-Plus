@@ -61,7 +61,7 @@ public class SysDeptVo implements Serializable {
      * 负责人
      */
     @ExcelProperty(value = "负责人")
-    private String leader;
+    private Long leader;
 
     /**
      * 联系电话

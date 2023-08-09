@@ -94,6 +94,6 @@ public class SysUserExportVo implements Serializable {
      */
     @ReverseAutoMapping(target = "leader", source = "dept.leader")
     @ExcelProperty(value = "部门负责人")
-    private String leader;
+    private Long leader;
 
 }

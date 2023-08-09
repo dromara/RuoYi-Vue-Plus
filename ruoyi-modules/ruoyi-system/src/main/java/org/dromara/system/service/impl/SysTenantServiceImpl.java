@@ -132,7 +132,6 @@ public class SysTenantServiceImpl implements ISysTenantService {
         SysDept dept = new SysDept();
         dept.setTenantId(tenantId);
         dept.setDeptName(bo.getCompanyName());
-        dept.setLeader(bo.getUsername());
         dept.setParentId(Constants.TOP_PARENT_ID);
         dept.setAncestors(Constants.TOP_PARENT_ID.toString());
         deptMapper.insert(dept);
@@ -152,6 +151,11 @@ public class SysTenantServiceImpl implements ISysTenantService {
         user.setPassword(BCrypt.hashpw(bo.getPassword()));
         user.setDeptId(deptId);
         userMapper.insert(user);
+        //新增系统用户后，默认当前用户为部门的负责人
+        SysDept sd = new SysDept();
+        sd.setLeader(user.getUserId());
+        sd.setDeptId(deptId);
+        deptMapper.updateById(sd);
 
         // 用户和角色关联表
         SysUserRole userRole = new SysUserRole();
