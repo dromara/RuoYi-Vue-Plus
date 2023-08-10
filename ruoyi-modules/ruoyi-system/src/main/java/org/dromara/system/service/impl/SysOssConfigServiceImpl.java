@@ -13,6 +13,7 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.oss.constant.OssConstant;
@@ -65,7 +66,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
                     if ("0".equals(config.getStatus())) {
                         RedisUtils.setCacheObject(OssConstant.DEFAULT_CONFIG_KEY, configKey);
                     }
-                    CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), config);
+                    CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
                 }
             }
         } finally {
@@ -100,7 +101,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         validEntityBeforeSave(config);
         boolean flag = baseMapper.insert(config) > 0;
         if (flag) {
-            CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), config);
+            CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
         }
         return flag;
     }
@@ -117,7 +118,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         luw.eq(SysOssConfig::getOssConfigId, config.getOssConfigId());
         boolean flag = baseMapper.update(config, luw) > 0;
         if (flag) {
-            CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), config);
+            CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
         }
         return flag;
     }
