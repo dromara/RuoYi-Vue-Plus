@@ -52,7 +52,7 @@ public class LoginHelper {
         StpUtil.login(loginUser.getLoginId(),
             model.setExtra(TENANT_KEY, loginUser.getTenantId())
                 .setExtra(USER_KEY, loginUser.getUserId()));
-        StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
+        StpUtil.getSession().set(LOGIN_USER_KEY, loginUser);
     }
 
     /**
@@ -63,7 +63,7 @@ public class LoginHelper {
         if (loginUser != null) {
             return loginUser;
         }
-        SaSession session = StpUtil.getTokenSession();
+        SaSession session = StpUtil.getSession();
         if (ObjectUtil.isNull(session)) {
             return null;
         }
@@ -76,7 +76,8 @@ public class LoginHelper {
      * 获取用户基于token
      */
     public static LoginUser getLoginUser(String token) {
-        SaSession session = StpUtil.getTokenSessionByToken(token);
+        Object loginId = StpUtil.getLoginIdByToken(token);
+        SaSession session = StpUtil.getSessionByLoginId(loginId);
         if (ObjectUtil.isNull(session)) {
             return null;
         }
