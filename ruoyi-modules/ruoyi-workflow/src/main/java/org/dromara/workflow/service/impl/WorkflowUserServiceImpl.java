@@ -12,10 +12,12 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysUser;
+import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.vo.SysDeptVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysDeptMapper;
 import org.dromara.system.mapper.SysUserMapper;
+import org.dromara.system.mapper.SysUserRoleMapper;
 import org.dromara.workflow.domain.bo.SysUserMultiBo;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.TaskVo;
@@ -44,6 +46,7 @@ import java.util.stream.Collectors;
 public class WorkflowUserServiceImpl implements IWorkflowUserService {
 
     private final SysUserMapper sysUserMapper;
+    private final SysUserRoleMapper sysUserRoleMapper;
     private final SysDeptMapper sysDeptMapper;
     private final TaskService taskService;
     private final RuntimeService runtimeService;
@@ -90,8 +93,7 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
     @Override
     public List<TaskVo> getWorkflowDeleteMultiInstanceList(String taskId) {
         Task task = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).taskId(taskId).singleResult();
-        List<Task> taskList = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId())
-            .processInstanceId(task.getProcessInstanceId()).list();
+        List<Task> taskList = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(task.getProcessInstanceId()).list();
         MultiInstanceVo multiInstance = WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
         List<TaskVo> taskListVo = new ArrayList<>();
         if (multiInstance == null) {
@@ -124,8 +126,7 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
             }
             return taskListVo;
         } else if (multiInstance.getType() instanceof ParallelMultiInstanceBehavior) {
-            List<Task> tasks = StreamUtils.filter(taskList, e -> StringUtils.isBlank(e.getParentTaskId()) && !e.getExecutionId().equals(task.getExecutionId())
-                && e.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()));
+            List<Task> tasks = StreamUtils.filter(taskList, e -> StringUtils.isBlank(e.getParentTaskId()) && !e.getExecutionId().equals(task.getExecutionId()) && e.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()));
             if (CollectionUtil.isNotEmpty(tasks)) {
                 List<Long> userIds = StreamUtils.toList(tasks, e -> Long.valueOf(e.getAssignee()));
                 List<SysUserVo> sysUsers = null;
@@ -195,5 +196,15 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
             sysDeptList.stream().filter(d -> d.getDeptId().equals(e.getDeptId())).findFirst().ifPresent(e::setDept);
         });
         return sysUserVos;
+    }
+
+    /**
+     * 按照角色id查询关联用户id
+     *
+     * @param roleIds 角色id
+     */
+    @Override
+    public List<SysUserRole> getUserRoleListByRoleIds(List<Long> roleIds) {
+        return sysUserRoleMapper.selectList(new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, roleIds));
     }
 }

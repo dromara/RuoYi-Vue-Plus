@@ -4,10 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
@@ -15,10 +13,8 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
-import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.SysUserRole;
-import org.dromara.system.mapper.SysUserMapper;
-import org.dromara.system.mapper.SysUserRoleMapper;
+import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.common.enums.BusinessStatusEnum;
 import org.dromara.workflow.domain.ActHiProcinst;
@@ -27,6 +23,8 @@ import org.dromara.workflow.domain.vo.ParticipantVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
 import org.dromara.workflow.service.IActHiProcinstService;
+import org.dromara.workflow.service.IWorkflowUserService;
+import org.dromara.workflow.service.impl.WorkflowUserServiceImpl;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -62,8 +60,7 @@ public class WorkflowUtils {
     }
 
     private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
-    private static final SysUserMapper SYS_USER_MAPPER = SpringUtils.getBean(SysUserMapper.class);
-    private static final SysUserRoleMapper SYS_USER_ROLE_MAPPER = SpringUtils.getBean(SysUserRoleMapper.class);
+    private static final IWorkflowUserService I_WORK_FLOW_USER_SERVICE = SpringUtils.getBean(WorkflowUserServiceImpl.class);
     private static final IActHiProcinstService I_ACT_HI_PROCINST_SERVICE = SpringUtils.getBean(IActHiProcinstService.class);
 
     /**
@@ -198,15 +195,14 @@ public class WorkflowUtils {
             List<HistoricIdentityLink> groupList = StreamUtils.filter(linksForTask, e -> StringUtils.isNotBlank(e.getGroupId()));
             if (CollUtil.isNotEmpty(groupList)) {
                 List<Long> groupIds = StreamUtils.toList(groupList, e -> Long.valueOf(e.getGroupId()));
-                List<SysUserRole> sysUserRoles = SYS_USER_ROLE_MAPPER.selectList(new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, groupIds));
+                List<SysUserRole> sysUserRoles = I_WORK_FLOW_USER_SERVICE.getUserRoleListByRoleIds(groupIds);
                 if (CollUtil.isNotEmpty(sysUserRoles)) {
                     participantVo.setGroupIds(groupIds);
                     List<Long> userIdList = StreamUtils.toList(sysUserRoles, SysUserRole::getUserId);
-                    List<SysUser> sysUsers = SYS_USER_MAPPER.selectList(
-                        new LambdaQueryWrapper<SysUser>().in(SysUser::getUserId, userIdList).eq(SysUser::getStatus, UserStatus.OK.getCode()));
+                    List<SysUserVo> sysUsers = I_WORK_FLOW_USER_SERVICE.getUserListByIds(userIdList);
                     if (CollUtil.isNotEmpty(sysUsers)) {
-                        List<Long> userIds = StreamUtils.toList(sysUsers, SysUser::getUserId);
-                        List<String> nickNames = StreamUtils.toList(sysUsers, SysUser::getNickName);
+                        List<Long> userIds = StreamUtils.toList(sysUsers, SysUserVo::getUserId);
+                        List<String> nickNames = StreamUtils.toList(sysUsers, SysUserVo::getNickName);
                         participantVo.setCandidate(userIds);
                         participantVo.setCandidateName(nickNames);
                         participantVo.setClaim(!StringUtils.isBlank(task.getAssignee()));
@@ -222,11 +218,10 @@ public class WorkflowUtils {
 
                     }
                 }
-                List<SysUser> sysUsers = SYS_USER_MAPPER.selectList(
-                    new LambdaQueryWrapper<SysUser>().in(SysUser::getUserId, userIdList).eq(SysUser::getStatus, UserStatus.OK.getCode()));
+                List<SysUserVo> sysUsers = I_WORK_FLOW_USER_SERVICE.getUserListByIds(userIdList);
                 if (CollUtil.isNotEmpty(sysUsers)) {
-                    List<Long> userIds = StreamUtils.toList(sysUsers, SysUser::getUserId);
-                    List<String> nickNames = StreamUtils.toList(sysUsers, SysUser::getNickName);
+                    List<Long> userIds = StreamUtils.toList(sysUsers, SysUserVo::getUserId);
+                    List<String> nickNames = StreamUtils.toList(sysUsers, SysUserVo::getNickName);
                     participantVo.setCandidate(userIds);
                     participantVo.setCandidateName(nickNames);
                     if (StringUtils.isBlank(task.getAssignee()) && CollUtil.isNotEmpty(candidateList)) {

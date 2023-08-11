@@ -1,6 +1,7 @@
 package org.dromara.workflow.service;
 
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.workflow.domain.bo.SysUserMultiBo;
 import org.dromara.workflow.domain.vo.TaskVo;
@@ -37,4 +38,12 @@ public interface IWorkflowUserService {
      * @return 结果
      */
     List<SysUserVo> getUserListByIds(List<Long> userIds);
+
+    /**
+     * 按照角色id查询关联用户id
+     *
+     * @param roleIds 角色id
+     * @return 结果
+     */
+    List<SysUserRole> getUserRoleListByRoleIds(List<Long> roleIds);
 }
