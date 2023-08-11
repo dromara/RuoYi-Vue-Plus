@@ -337,9 +337,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (CollUtil.isNotEmpty(subTasks)) {
                 subTasks.forEach(e -> taskService.deleteTask(e.getId()));
             }
-            String deleteReason = LoginHelper.getUsername() + "作废了当前申请！";
+            String deleteReason = LoginHelper.getLoginUser().getNickname() + "作废了当前申请！";
             if (StringUtils.isNotBlank(processInvalidBo.getDeleteReason())) {
-                deleteReason = LoginHelper.getUsername() + "作废理由:" + processInvalidBo.getDeleteReason();
+                deleteReason = LoginHelper.getLoginUser().getNickname() + "作废理由:" + processInvalidBo.getDeleteReason();
             }
             for (Task task : StreamUtils.filter(list, e -> StringUtils.isBlank(e.getParentTaskId()))) {
                 taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.INVALID.getStatus(), deleteReason);
@@ -461,7 +461,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             List<Task> taskList = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(processInstanceId).list();
             for (Task task : taskList) {
                 taskService.setAssignee(task.getId(), String.valueOf(LoginHelper.getUserId()));
-                taskService.addComment(task.getId(), processInstanceId, TaskStatusEnum.CANCEL.getStatus(), LoginHelper.getUsername() + "：撤销申请");
+                taskService.addComment(task.getId(), processInstanceId, TaskStatusEnum.CANCEL.getStatus(), LoginHelper.getLoginUser().getNickname() + "：撤销申请");
             }
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().finished().orderByHistoricTaskInstanceEndTime().asc().list().get(0);
             List<String> nodeIds = StreamUtils.toList(taskList, Task::getTaskDefinitionKey);

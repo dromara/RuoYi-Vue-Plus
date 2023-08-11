@@ -356,7 +356,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         }
         try {
             TaskEntity newTask = WorkflowUtils.createNewTask(task);
-            taskService.addComment(newTask.getId(), task.getProcessInstanceId(), TaskStatusEnum.PENDING.getStatus(), "【" + LoginHelper.getUsername() + "】委派给【" + delegateBo.getNickName() + "】");
+            taskService.addComment(newTask.getId(), task.getProcessInstanceId(), TaskStatusEnum.PENDING.getStatus(), "【" + LoginHelper.getLoginUser().getNickname() + "】委派给【" + delegateBo.getNickName() + "】");
             //委托任务
             taskService.delegateTask(delegateBo.getTaskId(), delegateBo.getUserId());
             //办理生成的任务记录
@@ -392,9 +392,9 @@ public class ActTaskServiceImpl implements IActTaskService {
         }
         try {
             if (StringUtils.isBlank(terminationBo.getComment())) {
-                terminationBo.setComment(LoginHelper.getUsername() + "终止了申请");
+                terminationBo.setComment(LoginHelper.getLoginUser().getNickname() + "终止了申请");
             } else {
-                terminationBo.setComment(LoginHelper.getUsername() + "终止了申请：" + terminationBo.getComment());
+                terminationBo.setComment(LoginHelper.getLoginUser().getNickname() + "终止了申请：" + terminationBo.getComment());
             }
             taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.TERMINATION.getStatus(), terminationBo.getComment());
             List<Task> list = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId())
