@@ -58,10 +58,15 @@ public class SysDeptVo implements Serializable {
     private Integer orderNum;
 
     /**
+     * 负责人ID
+     */
+    private Long leader;
+
+    /**
      * 负责人
      */
     @ExcelProperty(value = "负责人")
-    private String leader;
+    private String leaderName;
 
     /**
      * 联系电话
@@ -78,7 +83,7 @@ public class SysDeptVo implements Serializable {
     /**
      * 部门状态（0正常 1停用）
      */
-    @ExcelProperty(value = "部门状态", index = 5, converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "部门状态", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "sys_normal_disable")
     private String status;
 

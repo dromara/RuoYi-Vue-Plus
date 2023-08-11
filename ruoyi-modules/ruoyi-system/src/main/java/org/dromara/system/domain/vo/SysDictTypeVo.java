@@ -45,13 +45,6 @@ public class SysDictTypeVo implements Serializable {
     private String dictType;
 
     /**
-     * 状态（0正常 1停用）
-     */
-    @ExcelProperty(value = "状态", index = 3, converter = ExcelDictConvert.class)
-    @ExcelDictFormat(dictType = "sys_normal_disable")
-    private String status;
-
-    /**
      * 备注
      */
     @ExcelProperty(value = "备注")

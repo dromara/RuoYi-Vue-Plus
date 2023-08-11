@@ -1,6 +1,7 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.common.log.annotation.Log;
@@ -88,6 +89,9 @@ public class SysPostController extends BaseController {
             return R.fail("修改岗位'" + post.getPostName() + "'失败，岗位名称已存在");
         } else if (!postService.checkPostCodeUnique(post)) {
             return R.fail("修改岗位'" + post.getPostName() + "'失败，岗位编码已存在");
+        } else if (UserConstants.POST_DISABLE.equals(post.getStatus())
+            && postService.countUserPostById(post.getPostId()) > 0) {
+            return R.fail("该岗位下存在已分配用户，不能禁用!");
         }
         return toAjax(postService.updatePost(post));
     }
@@ -109,7 +113,9 @@ public class SysPostController extends BaseController {
      */
     @GetMapping("/optionselect")
     public R<List<SysPostVo>> optionselect() {
-        List<SysPostVo> posts = postService.selectPostAll();
+        SysPostBo postBo = new SysPostBo();
+        postBo.setStatus(UserConstants.POST_NORMAL);
+        List<SysPostVo> posts = postService.selectPostList(postBo);
         return R.ok(posts);
     }
 }

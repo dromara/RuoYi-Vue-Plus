@@ -1,13 +1,9 @@
 package org.dromara.common.encrypt.core.encryptor;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.SmUtil;
-import cn.hutool.crypto.symmetric.SM4;
 import org.dromara.common.encrypt.core.EncryptContext;
 import org.dromara.common.encrypt.enumd.AlgorithmType;
 import org.dromara.common.encrypt.enumd.EncodeType;
-
-import java.nio.charset.StandardCharsets;
+import org.dromara.common.encrypt.utils.EncryptUtils;
 
 /**
  * sm4算法实现
@@ -17,19 +13,11 @@ import java.nio.charset.StandardCharsets;
  */
 public class Sm4Encryptor extends AbstractEncryptor {
 
-    private final SM4 sm4;
+    private final EncryptContext context;
 
     public Sm4Encryptor(EncryptContext context) {
         super(context);
-        String password = context.getPassword();
-        if (StrUtil.isBlank(password)) {
-            throw new IllegalArgumentException("SM4没有获得秘钥信息");
-        }
-        // sm4算法的秘钥要求是16位长度
-        if (16 != password.length()) {
-            throw new IllegalArgumentException("SM4秘钥长度应该为16位，实际为" + password.length() + "位");
-        }
-        this.sm4 = SmUtil.sm4(password.getBytes(StandardCharsets.UTF_8));
+        this.context = context;
     }
 
     /**
@@ -49,9 +37,9 @@ public class Sm4Encryptor extends AbstractEncryptor {
     @Override
     public String encrypt(String value, EncodeType encodeType) {
         if (encodeType == EncodeType.HEX) {
-            return sm4.encryptHex(value);
+            return EncryptUtils.encryptBySm4Hex(value, context.getPassword());
         } else {
-            return sm4.encryptBase64(value);
+            return EncryptUtils.encryptBySm4(value, context.getPassword());
         }
     }
 
@@ -62,6 +50,6 @@ public class Sm4Encryptor extends AbstractEncryptor {
      */
     @Override
     public String decrypt(String value) {
-        return this.sm4.decryptStr(value);
+        return EncryptUtils.decryptBySm4(value, context.getPassword());
     }
 }

@@ -59,14 +59,14 @@ public class SysUserExportVo implements Serializable {
     /**
      * 用户性别
      */
-    @ExcelProperty(value = "用户性别", index = 6, converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "用户性别", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "sys_user_sex")
     private String sex;
 
     /**
      * 帐号状态（0正常 1停用）
      */
-    @ExcelProperty(value = "帐号状态", index = 7, converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "帐号状态", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "sys_normal_disable")
     private String status;
 
@@ -92,8 +92,8 @@ public class SysUserExportVo implements Serializable {
     /**
      * 负责人
      */
-    @ReverseAutoMapping(target = "leader", source = "dept.leader")
+    @ReverseAutoMapping(target = "leaderName", source = "dept.leaderName")
     @ExcelProperty(value = "部门负责人")
-    private String leader;
+    private String leaderName;
 
 }

@@ -56,7 +56,6 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
         lqw.eq(bo.getDictSort() != null, SysDictData::getDictSort, bo.getDictSort());
         lqw.like(StringUtils.isNotBlank(bo.getDictLabel()), SysDictData::getDictLabel, bo.getDictLabel());
         lqw.eq(StringUtils.isNotBlank(bo.getDictType()), SysDictData::getDictType, bo.getDictType());
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), SysDictData::getStatus, bo.getStatus());
         lqw.orderByAsc(SysDictData::getDictSort);
         return lqw;
     }

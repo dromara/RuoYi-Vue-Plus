@@ -69,6 +69,8 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
      */
     @Override
     public List<Tree<Long>> selectDeptTreeList(SysDeptBo bo) {
+        // 只查询未禁用部门
+        bo.setStatus(UserConstants.DEPT_NORMAL);
         LambdaQueryWrapper<SysDept> lqw = buildQueryWrapper(bo);
         List<SysDeptVo> depts = baseMapper.selectDeptList(lqw);
         return buildDeptTreeSelect(depts);

@@ -1,8 +1,10 @@
 package org.dromara.common.core.config;
 
+import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.dromara.common.core.config.properties.ThreadPoolProperties;
 import org.dromara.common.core.utils.Threads;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -18,6 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  *
  * @author Lion Li
  **/
+@Slf4j
 @AutoConfiguration
 @EnableConfigurationProperties(ThreadPoolProperties.class)
 public class ThreadPoolConfig {
@@ -26,6 +29,8 @@ public class ThreadPoolConfig {
      * 核心线程数 = cpu 核心数 + 1
      */
     private final int core = Runtime.getRuntime().availableProcessors() + 1;
+
+    private ScheduledExecutorService scheduledExecutorService;
 
     @Bean(name = "threadPoolTaskExecutor")
     @ConditionalOnProperty(prefix = "thread-pool", name = "enabled", havingValue = "true")
@@ -44,7 +49,7 @@ public class ThreadPoolConfig {
      */
     @Bean(name = "scheduledExecutorService")
     protected ScheduledExecutorService scheduledExecutorService() {
-        return new ScheduledThreadPoolExecutor(core,
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(core,
             new BasicThreadFactory.Builder().namingPattern("schedule-pool-%d").daemon(true).build(),
             new ThreadPoolExecutor.CallerRunsPolicy()) {
             @Override
@@ -53,5 +58,21 @@ public class ThreadPoolConfig {
                 Threads.printException(r, t);
             }
         };
+        this.scheduledExecutorService = scheduledThreadPoolExecutor;
+        return scheduledThreadPoolExecutor;
     }
+
+    /**
+     * 销毁事件
+     */
+    @PreDestroy
+    public void destroy() {
+        try {
+            log.info("====关闭后台任务任务线程池====");
+            Threads.shutdownAndAwaitTermination(scheduledExecutorService);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
 }

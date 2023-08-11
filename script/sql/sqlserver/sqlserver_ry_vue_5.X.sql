@@ -928,7 +928,7 @@ CREATE TABLE sys_dept
     ancestors   nvarchar(500)DEFAULT ''    NULL,
     dept_name   nvarchar(30) DEFAULT ''    NULL,
     order_num   int          DEFAULT ((0)) NULL,
-    leader      nvarchar(20)               NULL,
+    leader      bigint                     NULL,
     phone       nvarchar(11)               NULL,
     email       nvarchar(50)               NULL,
     status      nchar(1)     DEFAULT ('0') NULL,
@@ -1047,25 +1047,25 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dept'
 GO
 
-INSERT sys_dept VALUES (100, N'000000', 0, N'0', N'XXX科技', 0, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (100, N'000000', 0, N'0', N'XXX科技', 0, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (101, N'000000', 100, N'0,100', N'深圳总公司', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (101, N'000000', 100, N'0,100', N'深圳总公司', 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (102, N'000000', 100, N'0,100', N'长沙分公司', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (102, N'000000', 100, N'0,100', N'长沙分公司', 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (103, N'000000', 101, N'0,100,101', N'研发部门', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (103, N'000000', 101, N'0,100,101', N'研发部门', 1, 1, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (104, N'000000', 101, N'0,100,101', N'市场部门', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (104, N'000000', 101, N'0,100,101', N'市场部门', 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (105, N'000000', 101, N'0,100,101', N'测试部门', 3, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (105, N'000000', 101, N'0,100,101', N'测试部门', 3, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (106, N'000000', 101, N'0,100,101', N'财务部门', 4, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (106, N'000000', 101, N'0,100,101', N'财务部门', 4, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (107, N'000000', 101, N'0,100,101', N'运维部门', 5, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (107, N'000000', 101, N'0,100,101', N'运维部门', 5, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (108, N'000000', 102, N'0,100,102', N'市场部门', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (108, N'000000', 102, N'0,100,102', N'市场部门', 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (109, N'000000', 102, N'0,100,102', N'财务部门', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (109, N'000000', 102, N'0,100,102', N'财务部门', 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
 
 CREATE TABLE sys_dict_data
@@ -1079,7 +1079,6 @@ CREATE TABLE sys_dict_data
     css_class   nvarchar(100)               NULL,
     list_class  nvarchar(100)               NULL,
     is_default  nchar(1)      DEFAULT ('N') NULL,
-    status      nchar(1)      DEFAULT ('0') NULL,
     create_dept bigint                      NULL,
     create_by   bigint                      NULL,
     create_time datetime2(7)                NULL,
@@ -1148,12 +1147,6 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'is_default'
 GO
 EXEC sys.sp_addextendedproperty
-    'MS_Description', N'状态（0正常 1停用）' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_dict_data',
-    'COLUMN', N'status'
-GO
-EXEC sys.sp_addextendedproperty
     'MS_Description', N'创建部门' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_dict_data',
@@ -1195,77 +1188,81 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dict_data'
 GO
 
-INSERT sys_dict_data VALUES (1, N'000000', 1, N'男', N'0', N'sys_user_sex', N'', N'', N'Y', N'0', 103, 1, getdate(), NULL, NULL, N'性别男')
+INSERT sys_dict_data VALUES (1, N'000000', 1, N'男', N'0', N'sys_user_sex', N'', N'', N'Y', 103, 1, getdate(), NULL, NULL, N'性别男')
 GO
-INSERT sys_dict_data VALUES (2, N'000000', 2, N'女', N'1', N'sys_user_sex', N'', N'', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'性别女')
+INSERT sys_dict_data VALUES (2, N'000000', 2, N'女', N'1', N'sys_user_sex', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'性别女')
 GO
-INSERT sys_dict_data VALUES (3, N'000000', 3, N'未知', N'2', N'sys_user_sex', N'', N'', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'性别未知')
+INSERT sys_dict_data VALUES (3, N'000000', 3, N'未知', N'2', N'sys_user_sex', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'性别未知')
 GO
-INSERT sys_dict_data VALUES (4, N'000000', 1, N'显示', N'0', N'sys_show_hide', N'', N'primary', N'Y', N'0', 103, 1, getdate(), NULL, NULL, N'显示菜单')
+INSERT sys_dict_data VALUES (4, N'000000', 1, N'显示', N'0', N'sys_show_hide', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'显示菜单')
 GO
-INSERT sys_dict_data VALUES (5, N'000000', 2, N'隐藏', N'1', N'sys_show_hide', N'', N'danger', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'隐藏菜单')
+INSERT sys_dict_data VALUES (5, N'000000', 2, N'隐藏', N'1', N'sys_show_hide', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'隐藏菜单')
 GO
-INSERT sys_dict_data VALUES (6, N'000000', 1, N'正常', N'0', N'sys_normal_disable', N'', N'primary', N'Y', N'0', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (6, N'000000', 1, N'正常', N'0', N'sys_normal_disable', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (7, N'000000', 2, N'停用', N'1', N'sys_normal_disable', N'', N'danger', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'停用状态')
+INSERT sys_dict_data VALUES (7, N'000000', 2, N'停用', N'1', N'sys_normal_disable', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
 GO
-INSERT sys_dict_data VALUES (8, N'000000', 1, N'正常', N'0', N'sys_job_status', N'', N'primary', N'Y', N'0', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (8, N'000000', 1, N'正常', N'0', N'sys_job_status', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (9, N'000000', 2, N'暂停', N'1', N'sys_job_status', N'', N'danger', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'停用状态')
+INSERT sys_dict_data VALUES (9, N'000000', 2, N'暂停', N'1', N'sys_job_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
 GO
-INSERT sys_dict_data VALUES (10, N'000000', 1, N'默认', N'DEFAULT', N'sys_job_group', N'', N'', N'Y', N'0', 103, 1, getdate(), NULL, NULL, N'默认分组')
+INSERT sys_dict_data VALUES (10, N'000000', 1, N'默认', N'DEFAULT', N'sys_job_group', N'', N'', N'Y', 103, 1, getdate(), NULL, NULL, N'默认分组')
 GO
-INSERT sys_dict_data VALUES (11, N'000000', 2, N'系统', N'SYSTEM', N'sys_job_group', N'', N'', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'系统分组')
+INSERT sys_dict_data VALUES (11, N'000000', 2, N'系统', N'SYSTEM', N'sys_job_group', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'系统分组')
 GO
-INSERT sys_dict_data VALUES (12, N'000000', 1, N'是', N'Y', N'sys_yes_no', N'', N'primary', N'Y', N'0', 103, 1, getdate(), NULL, NULL, N'系统默认是')
+INSERT sys_dict_data VALUES (12, N'000000', 1, N'是', N'Y', N'sys_yes_no', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'系统默认是')
 GO
-INSERT sys_dict_data VALUES (13, N'000000', 2, N'否', N'N', N'sys_yes_no', N'', N'danger', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'系统默认否')
+INSERT sys_dict_data VALUES (13, N'000000', 2, N'否', N'N', N'sys_yes_no', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'系统默认否')
 GO
-INSERT sys_dict_data VALUES (14, N'000000', 1, N'通知', N'1', N'sys_notice_type', N'', N'warning', N'Y', N'0', 103, 1, getdate(), NULL, NULL, N'通知')
+INSERT sys_dict_data VALUES (14, N'000000', 1, N'通知', N'1', N'sys_notice_type', N'', N'warning', N'Y', 103, 1, getdate(), NULL, NULL, N'通知')
 GO
-INSERT sys_dict_data VALUES (15, N'000000', 2, N'公告', N'2', N'sys_notice_type', N'', N'success', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'公告')
+INSERT sys_dict_data VALUES (15, N'000000', 2, N'公告', N'2', N'sys_notice_type', N'', N'success', N'N', 103, 1, getdate(), NULL, NULL, N'公告')
 GO
-INSERT sys_dict_data VALUES (16, N'000000', 1, N'正常', N'0', N'sys_notice_status', N'', N'primary', N'Y', N'0', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (16, N'000000', 1, N'正常', N'0', N'sys_notice_status', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (17, N'000000', 2, N'关闭', N'1', N'sys_notice_status', N'', N'danger', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'关闭状态')
+INSERT sys_dict_data VALUES (17, N'000000', 2, N'关闭', N'1', N'sys_notice_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'关闭状态')
 GO
-INSERT sys_dict_data VALUES (29, N'000000', 99, N'其他', N'0', N'sys_oper_type', N'', N'info', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'其他操作');
+INSERT sys_dict_data VALUES (29, N'000000', 99, N'其他', N'0', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'其他操作');
 GO
-INSERT sys_dict_data VALUES (18, N'000000', 1, N'新增', N'1', N'sys_oper_type', N'', N'info', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'新增操作')
+INSERT sys_dict_data VALUES (18, N'000000', 1, N'新增', N'1', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'新增操作')
 GO
-INSERT sys_dict_data VALUES (19, N'000000', 2, N'修改', N'2', N'sys_oper_type', N'', N'info', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'修改操作')
+INSERT sys_dict_data VALUES (19, N'000000', 2, N'修改', N'2', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'修改操作')
 GO
-INSERT sys_dict_data VALUES (20, N'000000', 3, N'删除', N'3', N'sys_oper_type', N'', N'danger', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'删除操作')
+INSERT sys_dict_data VALUES (20, N'000000', 3, N'删除', N'3', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'删除操作')
 GO
-INSERT sys_dict_data VALUES (21, N'000000', 4, N'授权', N'4', N'sys_oper_type', N'', N'primary', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'授权操作')
+INSERT sys_dict_data VALUES (21, N'000000', 4, N'授权', N'4', N'sys_oper_type', N'', N'primary', N'N', 103, 1, getdate(), NULL, NULL, N'授权操作')
 GO
-INSERT sys_dict_data VALUES (22, N'000000', 5, N'导出', N'5', N'sys_oper_type', N'', N'warning', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'导出操作')
+INSERT sys_dict_data VALUES (22, N'000000', 5, N'导出', N'5', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'导出操作')
 GO
-INSERT sys_dict_data VALUES (23, N'000000', 6, N'导入', N'6', N'sys_oper_type', N'', N'warning', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'导入操作')
+INSERT sys_dict_data VALUES (23, N'000000', 6, N'导入', N'6', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'导入操作')
 GO
-INSERT sys_dict_data VALUES (24, N'000000', 7, N'强退', N'7', N'sys_oper_type', N'', N'danger', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'强退操作')
+INSERT sys_dict_data VALUES (24, N'000000', 7, N'强退', N'7', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'强退操作')
 GO
-INSERT sys_dict_data VALUES (25, N'000000', 8, N'生成代码', N'8', N'sys_oper_type', N'', N'warning', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'生成操作')
+INSERT sys_dict_data VALUES (25, N'000000', 8, N'生成代码', N'8', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'生成操作')
 GO
-INSERT sys_dict_data VALUES (26, N'000000', 9, N'清空数据', N'9', N'sys_oper_type', N'', N'danger', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'清空操作')
+INSERT sys_dict_data VALUES (26, N'000000', 9, N'清空数据', N'9', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'清空操作')
 GO
-INSERT sys_dict_data VALUES (27, N'000000', 1, N'成功', N'0', N'sys_common_status', N'', N'primary', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (27, N'000000', 1, N'成功', N'0', N'sys_common_status', N'', N'primary', N'N', 103, 1, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (28, N'000000', 2, N'失败', N'1', N'sys_common_status', N'', N'danger', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'停用状态')
+INSERT sys_dict_data VALUES (28, N'000000', 2, N'失败', N'1', N'sys_common_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
 GO
-INSERT sys_dict_data VALUES (30, N'000000', 0, N'密码认证', N'password', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'密码认证')
+INSERT sys_dict_data VALUES (30, N'000000', 0, N'密码认证', N'password', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'密码认证')
 GO
-INSERT sys_dict_data VALUES (31, N'000000', 0, N'短信认证', N'sms', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'短信认证')
+INSERT sys_dict_data VALUES (31, N'000000', 0, N'短信认证', N'sms', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'短信认证')
 GO
-INSERT sys_dict_data VALUES (32, N'000000', 0, N'邮件认证', N'email', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'邮件认证')
+INSERT sys_dict_data VALUES (32, N'000000', 0, N'邮件认证', N'email', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'邮件认证')
 GO
-INSERT sys_dict_data VALUES (33, N'000000', 0, N'小程序认证', N'xcx', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'小程序认证')
+INSERT sys_dict_data VALUES (33, N'000000', 0, N'小程序认证', N'xcx', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'小程序认证')
 GO
-INSERT sys_dict_data VALUES (34, N'000000', 0, N'三方登录认证', N'`social`', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'三方登录认证')
+INSERT sys_dict_data VALUES (34, N'000000', 0, N'三方登录认证', N'`social`', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'三方登录认证')
 GO
-INSERT sys_dict_data VALUES (35, N'000000', 0, N'PC端', N'`pc`', N'sys_device_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'PC端')
+INSERT sys_dict_data VALUES (35, N'000000', 0, N'PC', N'`pc`', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'PC')
 GO
-INSERT sys_dict_data VALUES (36, N'000000', 0, N'APP端', N'`app`', N'sys_device_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'APP端')
+INSERT sys_dict_data VALUES (36, N'000000', 0, N'安卓', N'`android`', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'安卓')
+GO
+INSERT sys_dict_data VALUES (37, N'000000', 0, N'iOS', N'`ios`', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'iOS')
+GO
+INSERT sys_dict_data VALUES (38, N'000000', 0, N'小程序', N'`xcx`', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'小程序')
 GO
 
 CREATE TABLE sys_dict_type
@@ -1274,7 +1271,6 @@ CREATE TABLE sys_dict_type
     tenant_id   nvarchar(20)  DEFAULT ('000000') NULL,
     dict_name   nvarchar(100) DEFAULT ''    NULL,
     dict_type   nvarchar(100) DEFAULT ''    NULL,
-    status      nchar(1)      DEFAULT ('0') NULL,
     create_dept bigint                      NULL,
     create_by   bigint                      NULL,
     create_time datetime2(7)                NULL,
@@ -1314,12 +1310,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_dict_type',
     'COLUMN', N'dict_type'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'状态（0正常 1停用）' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_dict_type',
-    'COLUMN', N'status'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'创建部门' ,
@@ -1363,29 +1353,29 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dict_type'
 GO
 
-INSERT sys_dict_type VALUES (1, N'000000', N'用户性别', N'sys_user_sex', N'0', 103, 1, getdate(), NULL, NULL, N'用户性别列表')
+INSERT sys_dict_type VALUES (1, N'000000', N'用户性别', N'sys_user_sex', 103, 1, getdate(), NULL, NULL, N'用户性别列表')
 GO
-INSERT sys_dict_type VALUES (2, N'000000', N'菜单状态', N'sys_show_hide', N'0', 103, 1, getdate(), NULL, NULL, N'菜单状态列表')
+INSERT sys_dict_type VALUES (2, N'000000', N'菜单状态', N'sys_show_hide', 103, 1, getdate(), NULL, NULL, N'菜单状态列表')
 GO
-INSERT sys_dict_type VALUES (3, N'000000', N'系统开关', N'sys_normal_disable', N'0', 103, 1, getdate(), NULL, NULL, N'系统开关列表')
+INSERT sys_dict_type VALUES (3, N'000000', N'系统开关', N'sys_normal_disable', 103, 1, getdate(), NULL, NULL, N'系统开关列表')
 GO
-INSERT sys_dict_type VALUES (4, N'000000', N'任务状态', N'sys_job_status', N'0', 103, 1, getdate(), NULL, NULL, N'任务状态列表')
+INSERT sys_dict_type VALUES (4, N'000000', N'任务状态', N'sys_job_status', 103, 1, getdate(), NULL, NULL, N'任务状态列表')
 GO
-INSERT sys_dict_type VALUES (5, N'000000', N'任务分组', N'sys_job_group', N'0', 103, 1, getdate(), NULL, NULL, N'任务分组列表')
+INSERT sys_dict_type VALUES (5, N'000000', N'任务分组', N'sys_job_group', 103, 1, getdate(), NULL, NULL, N'任务分组列表')
 GO
-INSERT sys_dict_type VALUES (6, N'000000', N'系统是否', N'sys_yes_no', N'0', 103, 1, getdate(), NULL, NULL, N'系统是否列表')
+INSERT sys_dict_type VALUES (6, N'000000', N'系统是否', N'sys_yes_no', 103, 1, getdate(), NULL, NULL, N'系统是否列表')
 GO
-INSERT sys_dict_type VALUES (7, N'000000', N'通知类型', N'sys_notice_type', N'0', 103, 1, getdate(), NULL, NULL, N'通知类型列表')
+INSERT sys_dict_type VALUES (7, N'000000', N'通知类型', N'sys_notice_type', 103, 1, getdate(), NULL, NULL, N'通知类型列表')
 GO
-INSERT sys_dict_type VALUES (8, N'000000', N'通知状态', N'sys_notice_status', N'0', 103, 1, getdate(), NULL, NULL, N'通知状态列表')
+INSERT sys_dict_type VALUES (8, N'000000', N'通知状态', N'sys_notice_status', 103, 1, getdate(), NULL, NULL, N'通知状态列表')
 GO
-INSERT sys_dict_type VALUES (9, N'000000', N'操作类型', N'sys_oper_type', N'0', 103, 1, getdate(), NULL, NULL, N'操作类型列表')
+INSERT sys_dict_type VALUES (9, N'000000', N'操作类型', N'sys_oper_type', 103, 1, getdate(), NULL, NULL, N'操作类型列表')
 GO
-INSERT sys_dict_type VALUES (10, N'000000', N'系统状态', N'sys_common_status', N'0', 103, 1, getdate(), NULL, NULL, N'登录状态列表')
+INSERT sys_dict_type VALUES (10, N'000000', N'系统状态', N'sys_common_status', 103, 1, getdate(), NULL, NULL, N'登录状态列表')
 GO
-INSERT sys_dict_type VALUES (11, N'000000', N'授权类型', N'sys_grant_type', N'0', 103, 1, getdate(), NULL, NULL, N'认证授权类型')
+INSERT sys_dict_type VALUES (11, N'000000', N'授权类型', N'sys_grant_type', 103, 1, getdate(), NULL, NULL, N'认证授权类型')
 GO
-INSERT sys_dict_type VALUES (12, N'000000', N'设备类型', N'sys_device_type', N'0', 103, 1, getdate(), NULL, NULL, N'客户端设备类型')
+INSERT sys_dict_type VALUES (12, N'000000', N'设备类型', N'sys_device_type', 103, 1, getdate(), NULL, NULL, N'客户端设备类型')
 GO
 
 CREATE TABLE sys_logininfor
@@ -3280,5 +3270,5 @@ GO
 
 INSERT INTO sys_client VALUES (N'1', N'e5cd7e4891bf95d1d19206ce24a7b32e', N'pc', N'pc123', N'password,social', N'pc', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
 GO
-INSERT INTO sys_client VALUES (N'2', N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms,social', N'app', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
+INSERT INTO sys_client VALUES (N'2', N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms,social', N'android', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
 GO

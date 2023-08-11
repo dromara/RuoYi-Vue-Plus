@@ -513,6 +513,19 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         return flag;
     }
 
+    /**
+     * 通过部门id查询当前部门所有用户
+     *
+     * @param deptId
+     * @return
+     */
+    @Override
+    public List<SysUserVo> selectUserListByDept(Long deptId) {
+        LambdaQueryWrapper<SysUser> lqw = Wrappers.lambdaQuery();
+        lqw.eq(SysUser::getDeptId, deptId);
+        return baseMapper.selectVoList(lqw);
+    }
+
     @Cacheable(cacheNames = CacheNames.SYS_USER_NAME, key = "#userId")
     @Override
     public String selectUserNameById(Long userId) {
