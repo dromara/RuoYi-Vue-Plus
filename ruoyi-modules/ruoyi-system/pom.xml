@@ -84,6 +84,12 @@
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-sensitive</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-common-encrypt</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
