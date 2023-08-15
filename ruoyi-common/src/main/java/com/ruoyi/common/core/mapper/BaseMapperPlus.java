@@ -180,12 +180,12 @@ public interface BaseMapperPlus<M, T, V> extends BaseMapper<T> {
      * 分页查询VO
      */
     default <C, P extends IPage<C>> P selectVoPage(IPage<T> page, Wrapper<T> wrapper, Class<C> voClass) {
-        IPage<T> pageData = this.selectPage(page, wrapper);
-        IPage<C> voPage = new Page<>(pageData.getCurrent(), pageData.getSize(), pageData.getTotal());
-        if (CollUtil.isEmpty(pageData.getRecords())) {
+        List<T> list = this.selectList(page, wrapper);
+        IPage<C> voPage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
+        if (CollUtil.isEmpty(list)) {
             return (P) voPage;
         }
-        voPage.setRecords(BeanCopyUtils.copyList(pageData.getRecords(), voClass));
+        voPage.setRecords(BeanCopyUtils.copyList(list, voClass));
         return (P) voPage;
     }
 
