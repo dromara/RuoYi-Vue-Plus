@@ -79,7 +79,7 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
             }
         } catch (Exception e) {
             failureNum++;
-            String msg = "<br/>" + failureNum + "、账号 " + sysUser.getUserName() + " 导入失败：";
+            String msg = "<br/>" + failureNum + "、账号 " + userVo.getUserName() + " 导入失败：";
             failureMsg.append(msg).append(e.getMessage());
             log.error(msg, e);
         }
