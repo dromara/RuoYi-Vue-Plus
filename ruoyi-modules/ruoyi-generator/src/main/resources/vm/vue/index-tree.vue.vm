@@ -451,7 +451,7 @@ const handleUpdate = async (row: ${BusinessName}VO) => {
   reset();
   await getTreeselect();
   if (row != null) {
-    form.value.${treeParentCode} = row.${treeCode};
+    form.value.${treeParentCode} = row.${treeParentCode};
   }
   const res = await get${BusinessName}(row.${treeCode});
   Object.assign(form.value, res.data);
