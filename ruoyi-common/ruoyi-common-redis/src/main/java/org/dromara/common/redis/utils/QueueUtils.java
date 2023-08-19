@@ -132,17 +132,6 @@ public class QueueUtils {
     }
 
     /**
-     * 尝试设置 有界队列 容量 用于限制数量
-     *
-     * @param queueName 队列名
-     * @param capacity  容量
-     */
-    public static <T> boolean trySetBoundedQueueCapacity(String queueName, int capacity) {
-        RBoundedBlockingQueue<T> boundedBlockingQueue = CLIENT.getBoundedBlockingQueue(queueName);
-        return boundedBlockingQueue.trySetCapacity(capacity);
-    }
-
-    /**
      * 优先队列获取一个队列数据 没有数据返回 null(不支持延迟队列)
      *
      * @param queueName 队列名
@@ -166,6 +155,17 @@ public class QueueUtils {
     public static <T> boolean destroyPriorityQueue(String queueName) {
         RPriorityBlockingQueue<T> queue = CLIENT.getPriorityBlockingQueue(queueName);
         return queue.delete();
+    }
+
+    /**
+     * 尝试设置 有界队列 容量 用于限制数量
+     *
+     * @param queueName 队列名
+     * @param capacity  容量
+     */
+    public static <T> boolean trySetBoundedQueueCapacity(String queueName, int capacity) {
+        RBoundedBlockingQueue<T> boundedBlockingQueue = CLIENT.getBoundedBlockingQueue(queueName);
+        return boundedBlockingQueue.trySetCapacity(capacity);
     }
 
     /**
