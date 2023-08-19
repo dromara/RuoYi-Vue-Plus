@@ -132,6 +132,32 @@ public class QueueUtils {
     }
 
     /**
+     * 优先队列获取一个队列数据 没有数据返回 null(不支持延迟队列)
+     *
+     * @param queueName 队列名
+     */
+    public static <T> T getPriorityQueueObject(String queueName) {
+        RPriorityBlockingQueue<T> queue = CLIENT.getPriorityBlockingQueue(queueName);
+        return queue.poll();
+    }
+
+    /**
+     * 优先队列删除队列数据(不支持延迟队列)
+     */
+    public static <T> boolean removePriorityQueueObject(String queueName, T data) {
+        RPriorityBlockingQueue<T> queue = CLIENT.getPriorityBlockingQueue(queueName);
+        return queue.remove(data);
+    }
+
+    /**
+     * 优先队列销毁队列 所有阻塞监听 报错(不支持延迟队列)
+     */
+    public static <T> boolean destroyPriorityQueue(String queueName) {
+        RPriorityBlockingQueue<T> queue = CLIENT.getPriorityBlockingQueue(queueName);
+        return queue.delete();
+    }
+
+    /**
      * 尝试设置 有界队列 容量 用于限制数量
      *
      * @param queueName 队列名
@@ -167,6 +193,32 @@ public class QueueUtils {
     public static <T> boolean addBoundedQueueObject(String queueName, T data) {
         RBoundedBlockingQueue<T> boundedBlockingQueue = CLIENT.getBoundedBlockingQueue(queueName);
         return boundedBlockingQueue.offer(data);
+    }
+
+    /**
+     * 有界队列获取一个队列数据 没有数据返回 null(不支持延迟队列)
+     *
+     * @param queueName 队列名
+     */
+    public static <T> T getBoundedQueueObject(String queueName) {
+        RBoundedBlockingQueue<T> queue = CLIENT.getBoundedBlockingQueue(queueName);
+        return queue.poll();
+    }
+
+    /**
+     * 有界队列删除队列数据(不支持延迟队列)
+     */
+    public static <T> boolean removeBoundedQueueObject(String queueName, T data) {
+        RBoundedBlockingQueue<T> queue = CLIENT.getBoundedBlockingQueue(queueName);
+        return queue.remove(data);
+    }
+
+    /**
+     * 有界队列销毁队列 所有阻塞监听 报错(不支持延迟队列)
+     */
+    public static <T> boolean destroyBoundedQueue(String queueName) {
+        RBoundedBlockingQueue<T> queue = CLIENT.getBoundedBlockingQueue(queueName);
+        return queue.delete();
     }
 
     /**
