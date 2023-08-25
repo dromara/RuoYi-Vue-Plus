@@ -1,15 +1,15 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
@@ -134,38 +134,12 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
      * 查看流程定义图片
      *
      * @param processDefinitionId 流程定义id
-     * @param response            响应
      */
+    @SneakyThrows
     @Override
-    public void processDefinitionImage(String processDefinitionId, HttpServletResponse response) {
-        InputStream inputStream = null;
-        try {
-            // 设置页面不缓存
-            response.setHeader("Pragma", "no-cache");
-            response.addHeader("Cache-Control", "must-revalidate");
-            response.addHeader("Cache-Control", "no-cache");
-            response.addHeader("Cache-Control", "no-store");
-            response.setDateHeader("Expires", 0);
-            inputStream = repositoryService.getProcessDiagram(processDefinitionId);
-            // 响应相关图片
-            response.setContentType("image/png");
-
-            byte[] bytes = IOUtils.toByteArray(inputStream);
-            ServletOutputStream outputStream = response.getOutputStream();
-            outputStream.write(bytes);
-            outputStream.flush();
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    public String processDefinitionImage(String processDefinitionId) {
+        InputStream inputStream = repositoryService.getProcessDiagram(processDefinitionId);
+        return Base64.encode(IOUtils.toByteArray(inputStream));
     }
 
     /**

@@ -1,6 +1,5 @@
 package org.dromara.workflow.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
@@ -56,11 +55,10 @@ public class ActProcessDefinitionController extends BaseController {
      * 查看流程定义图片
      *
      * @param processDefinitionId 流程定义id
-     * @param response            响应
      */
     @GetMapping("/processDefinitionImage/{processDefinitionId}")
-    public void processDefinitionImage(@PathVariable String processDefinitionId, HttpServletResponse response) {
-        iActProcessDefinitionService.processDefinitionImage(processDefinitionId, response);
+    public R<String> processDefinitionImage(@PathVariable String processDefinitionId) {
+        return R.ok("操作成功", iActProcessDefinitionService.processDefinitionImage(processDefinitionId));
     }
 
     /**

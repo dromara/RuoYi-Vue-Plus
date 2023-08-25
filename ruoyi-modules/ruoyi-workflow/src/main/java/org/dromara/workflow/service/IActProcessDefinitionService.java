@@ -1,6 +1,5 @@
 package org.dromara.workflow.service;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
@@ -34,9 +33,9 @@ public interface IActProcessDefinitionService {
      * 查看流程定义图片
      *
      * @param processDefinitionId 流程定义id
-     * @param response            响应
+     * @return 结果
      */
-    void processDefinitionImage(String processDefinitionId, HttpServletResponse response);
+    String processDefinitionImage(String processDefinitionId);
 
     /**
      * 查看流程定义xml文件
