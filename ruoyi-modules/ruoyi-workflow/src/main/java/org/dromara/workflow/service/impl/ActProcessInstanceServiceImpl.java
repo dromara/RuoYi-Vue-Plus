@@ -430,6 +430,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      * @param processInstanceIds 流程实例id
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteFinishProcessAndHisInst(List<String> processInstanceIds) {
         try {
             historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);

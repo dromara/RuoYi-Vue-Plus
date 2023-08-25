@@ -5,12 +5,17 @@ import org.dromara.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.stereotype.Service;
 import org.dromara.workflow.domain.bo.WfCategoryBo;
 import org.dromara.workflow.domain.vo.WfCategoryVo;
 import org.dromara.workflow.domain.WfCategory;
 import org.dromara.workflow.mapper.WfCategoryMapper;
 import org.dromara.workflow.service.IWfCategoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Collection;
@@ -26,6 +31,8 @@ import java.util.Collection;
 public class WfCategoryServiceImpl implements IWfCategoryService {
 
     private final WfCategoryMapper baseMapper;
+
+    private final RepositoryService repositoryService;
 
     /**
      * 查询流程分类
@@ -70,9 +77,24 @@ public class WfCategoryServiceImpl implements IWfCategoryService {
      * 修改流程分类
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(WfCategoryBo bo) {
         WfCategory update = MapstructUtils.convert(bo, WfCategory.class);
         validEntityBeforeSave(update);
+        WfCategoryVo wfCategoryVo = baseMapper.selectVoById(bo.getId());
+        List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().processDefinitionCategory(wfCategoryVo.getCategoryCode()).list();
+        for (ProcessDefinition processDefinition : processDefinitionList) {
+            repositoryService.setProcessDefinitionCategory(processDefinition.getId(),bo.getCategoryCode());
+        }
+        List<Deployment> deploymentList = repositoryService.createDeploymentQuery().deploymentCategory(wfCategoryVo.getCategoryCode()).list();
+        for (Deployment deployment : deploymentList) {
+            repositoryService.setDeploymentCategory(deployment.getId(),bo.getCategoryCode());
+        }
+        List<Model> modelList = repositoryService.createModelQuery().modelCategory(wfCategoryVo.getCategoryCode()).list();
+        for (Model model : modelList) {
+            model.setCategory(bo.getCategoryCode());
+            repositoryService.saveModel(model);
+        }
         return baseMapper.updateById(update) > 0;
     }
 

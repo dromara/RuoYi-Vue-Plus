@@ -18,6 +18,7 @@ import org.dromara.demo.domain.vo.TestLeaveVo;
 import org.dromara.demo.domain.TestLeave;
 import org.dromara.demo.mapper.TestLeaveMapper;
 import org.dromara.demo.service.ITestLeaveService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -112,6 +113,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      * 批量删除请假
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
         List<String> idList = StreamUtils.toList(ids, String::valueOf);
         iActProcessInstanceService.deleteRuntimeProcessAndHisInstByBusinessKeys(idList);
