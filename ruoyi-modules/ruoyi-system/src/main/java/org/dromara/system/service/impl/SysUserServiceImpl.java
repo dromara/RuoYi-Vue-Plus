@@ -266,25 +266,6 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     }
 
     /**
-     * 校验部门是否有数据权限
-     *
-     * @param deptId 部门id
-     */
-    @Override
-    public void checkDeptDataScope(Long deptId) {
-        if (ObjectUtil.isNull(deptId)) {
-            return;
-        }
-        if (LoginHelper.isSuperAdmin()) {
-            return;
-        }
-        SysDeptVo dept = deptMapper.selectDeptById(deptId);
-        if (ObjectUtil.isNull(dept)) {
-            throw new ServiceException("没有权限访问部门数据！");
-        }
-    }
-
-    /**
      * 新增保存用户信息
      *
      * @param user 用户信息
@@ -293,7 +274,6 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int insertUser(SysUserBo user) {
-        this.checkDeptDataScope(user.getDeptId());
         SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
         // 新增用户信息
         int rows = baseMapper.insert(sysUser);
@@ -329,7 +309,6 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateUser(SysUserBo user) {
-        this.checkDeptDataScope(user.getDeptId());
         // 新增用户与角色管理
         insertUserRole(user, true);
         // 新增用户与岗位管理
