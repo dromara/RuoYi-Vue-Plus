@@ -120,6 +120,13 @@ public interface ISysUserService {
     void checkUserDataScope(Long userId);
 
     /**
+     * 校验部门是否有数据权限
+     *
+     * @param deptId 部门id
+     */
+    void checkDeptDataScope(Long deptId);
+
+    /**
      * 新增用户信息
      *
      * @param user 用户信息
