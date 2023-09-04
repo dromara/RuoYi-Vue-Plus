@@ -322,19 +322,19 @@ const data = reactive<PageData<${BusinessName}Form, ${BusinessName}Query>>({
   queryParams: {
 #foreach ($column in $columns)
 #if($column.query)
-    #if($column.htmlType != "datetime" || $column.queryType != "BETWEEN")
-    $column.javaField: undefined#if($foreach.count != $columns.size()),#end
-    #end
+#if($column.htmlType != "datetime" || $column.queryType != "BETWEEN")
+    $column.javaField: undefined,
+#end
 #end
 #end
     params: {
-      #foreach ($column in $columns)
-      #if($column.query)
-      #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#foreach ($column in $columns)
+#if($column.query)
+#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
       $column.javaField: undefined#if($foreach.count != $columns.size()),#end
-      #end
-      #end
-      #end
+#end
+#end
+#end
     }
   },
   rules: {
