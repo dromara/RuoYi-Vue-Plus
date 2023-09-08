@@ -112,6 +112,9 @@ public class SysUserController extends BaseController {
             TenantHelper.clearDynamic();
         }
         SysUserVo user = userService.selectUserById(loginUser.getUserId());
+        if (ObjectUtil.isNull(user)) {
+            return R.fail("没有权限访问用户数据!");
+        }
         userInfoVo.setUser(user);
         userInfoVo.setPermissions(loginUser.getMenuPermission());
         userInfoVo.setRoles(loginUser.getRolePermission());
