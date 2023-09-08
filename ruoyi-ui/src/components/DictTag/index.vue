@@ -53,13 +53,13 @@ export default {
   },
   computed: {
     values() {
-      if (this.value === null || typeof this.value !== 'undefined' || this.value === '') return []
+      if (this.value === null || typeof this.value === 'undefined' || this.value === '') return []
       return Array.isArray(this.value) ? this.value.map(item => '' + item) : String(this.value).split(this.separator)
     },
     unmatch() {
       this.unmatchArray = []
       // 没有value不显示
-      if (this.value === null || typeof this.value !== 'undefined' || this.value === '' || this.options.length === 0) return false
+      if (this.value === null || typeof this.value === 'undefined' || this.value === '' || this.options.length === 0) return false
       // 传入值为数组
       let unmatch = false // 添加一个标志来判断是否有未匹配项
       this.values.forEach(item => {
