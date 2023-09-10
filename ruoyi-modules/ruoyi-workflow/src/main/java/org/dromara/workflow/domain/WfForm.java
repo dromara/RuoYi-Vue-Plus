@@ -38,6 +38,11 @@ public class WfForm extends TenantEntity {
     private String content;
 
     /**
+     * 状态（0正常 1停用）
+     */
+    private String status;
+
+    /**
      * 备注
      */
     private String remark;

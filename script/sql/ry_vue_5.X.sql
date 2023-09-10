@@ -887,6 +887,7 @@ create table wf_form (
   form_id         bigint        not null                  comment '表单id',
   tenant_id       varchar(20)             default '000000'comment '租户编号',
   form_name       varchar(255)            default null    comment '表单名称',
+  status          char(1)                 default '1'     comment '状态（0正常 1停用）',
   content         longtext                                comment '表单内容',
   create_dept     bigint                  default null    comment '创建部门',
   create_by       bigint                  default null    comment '创建者',
@@ -917,6 +918,27 @@ create table wf_category
     constraint uni_category_code
         unique (category_code)
 ) engine=innodb comment= '流程分类';
+
+-- ----------------------------
+-- 流程分类信息表
+-- ----------------------------
+drop table if exists wf_form_definition;
+create table wf_form_definition
+(
+    id                         bigint                       not null comment '主键'
+        primary key,
+    form_id                    bigint                       not null comment '动态表单id',
+    process_definition_key     varchar(255)                 not null comment '流程定义key',
+    process_definition_name    varchar(255)                 not null comment '流程定义名称',
+    process_definition_id      varchar(255)                 not null comment '流程定义id',
+    process_definition_version int                          not null comment '流程定义版本',
+    tenant_id                  varchar(20) default '000000' null comment '租户编号',
+    create_dept                bigint                       null comment '创建部门',
+    create_by                  bigint                       null comment '创建者',
+    create_time                datetime                     null comment '创建时间',
+    update_by                  bigint                       null comment '更新者',
+    update_time                datetime                     null comment '更新时间'
+) engine=innodb comment= '动态表单与流程定义关联信息';
 
 -- ----------------------------
 -- 系统授权表

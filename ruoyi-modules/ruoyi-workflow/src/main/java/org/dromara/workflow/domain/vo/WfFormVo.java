@@ -40,7 +40,17 @@ public class WfFormVo implements Serializable {
     private String content;
 
     /**
+     * 状态（0正常 1停用）
+     */
+    private String status;
+
+    /**
      * 备注
      */
     private String remark;
+
+    /**
+     * 动态单与流程定义关联信息业务对象
+     */
+    private WfFormDefinitionVo wfFormDefinitionVo;
 }

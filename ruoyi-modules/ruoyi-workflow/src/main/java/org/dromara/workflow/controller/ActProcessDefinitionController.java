@@ -47,7 +47,7 @@ public class ActProcessDefinitionController extends BaseController {
      * @param key 流程定义key
      */
     @GetMapping("/getProcessDefinitionListByKey/{key}")
-    public R<List<ProcessDefinitionVo>> getProcessDefinitionList(@NotEmpty(message = "流程定义key不能为空") @PathVariable String key) {
+    public R<List<ProcessDefinitionVo>> getProcessDefinitionListByKey(@NotEmpty(message = "流程定义key不能为空") @PathVariable String key) {
         return R.ok("操作成功", iActProcessDefinitionService.getProcessDefinitionListByKey(key));
     }
 
