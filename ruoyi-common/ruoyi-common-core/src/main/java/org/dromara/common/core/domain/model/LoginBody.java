@@ -1,12 +1,11 @@
 package org.dromara.common.core.domain.model;
 
 import jakarta.validation.constraints.Email;
-import org.dromara.common.core.constant.UserConstants;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.validate.auth.*;
 import org.hibernate.validator.constraints.Length;
-
-import jakarta.validation.constraints.NotBlank;
 
 /**
  * 用户登录对象
@@ -42,7 +41,6 @@ public class LoginBody {
     /**
      * 租户ID
      */
-    @NotBlank(message = "{tenant.number.not.blank}")
     private String tenantId;
 
     /**

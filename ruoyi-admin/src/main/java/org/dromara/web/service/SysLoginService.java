@@ -15,10 +15,7 @@ import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.TenantStatus;
 import org.dromara.common.core.exception.user.UserException;
-import org.dromara.common.core.utils.DateUtils;
-import org.dromara.common.core.utils.MessageUtils;
-import org.dromara.common.core.utils.ServletUtils;
-import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.core.utils.*;
 import org.dromara.common.log.event.LogininforEvent;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -209,6 +206,9 @@ public class SysLoginService {
         }
         if (TenantConstants.DEFAULT_TENANT_ID.equals(tenantId)) {
             return;
+        }
+        if (StringUtils.isBlank(tenantId)) {
+            throw new TenantException("tenant.number.not.blank");
         }
         SysTenantVo tenant = tenantService.queryByTenantId(tenantId);
         if (ObjectUtil.isNull(tenant)) {
