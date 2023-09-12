@@ -1,4 +1,5 @@
-FROM findepi/graalvm:java17-native
+#FROM findepi/graalvm:java17-native
+FROM openjdk:17.0.2-oraclelinux8
 
 MAINTAINER Lion Li
 
