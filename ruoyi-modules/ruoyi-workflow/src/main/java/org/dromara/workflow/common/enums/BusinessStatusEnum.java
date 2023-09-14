@@ -1,9 +1,10 @@
 package org.dromara.workflow.common.enums;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.utils.StringUtils;
 
 /**
  * 业务状态枚举
@@ -59,7 +60,7 @@ public enum BusinessStatusEnum {
      */
     public static String getEumByStatus(String status) {
         if (StringUtils.isBlank(status)) {
-            return null;
+            return StrUtil.EMPTY;
         }
 
         for (BusinessStatusEnum statusEnum : BusinessStatusEnum.values()) {
@@ -67,7 +68,7 @@ public enum BusinessStatusEnum {
                 return statusEnum.getDesc();
             }
         }
-        return null;
+        return StrUtil.EMPTY;
     }
 
     /**
@@ -76,14 +77,16 @@ public enum BusinessStatusEnum {
      * @param status 状态
      */
     public static void checkStartStatus(String status) {
-        if (status.equals(WAITING.getStatus())) {
+        if (WAITING.getStatus().equals(status)) {
             throw new ServiceException("该单据已提交过申请,正在审批中！");
-        } else if (status.equals(FINISH.getStatus())) {
+        } else if (FINISH.getStatus().equals(status)) {
             throw new ServiceException("该单据已完成申请！");
-        } else if (status.equals(INVALID.getStatus())) {
+        } else if (INVALID.getStatus().equals(status)) {
             throw new ServiceException("该单据已作废！");
-        } else if (status.equals(TERMINATION.getStatus())) {
+        } else if (TERMINATION.getStatus().equals(status)) {
             throw new ServiceException("该单据已终止！");
+        } else if (StringUtils.isBlank(status)) {
+            throw new ServiceException("流程状态为空！");
         }
     }
 
@@ -93,16 +96,18 @@ public enum BusinessStatusEnum {
      * @param status 状态
      */
     public static void checkStatus(String status) {
-        if (status.equals(FINISH.getStatus())) {
+        if (FINISH.getStatus().equals(status)) {
             throw new ServiceException("该单据已完成申请！");
-        } else if (status.equals(INVALID.getStatus())) {
+        } else if (INVALID.getStatus().equals(status)) {
             throw new ServiceException("该单据已作废！");
-        } else if (status.equals(CANCEL.getStatus())) {
+        } else if (CANCEL.getStatus().equals(status)) {
             throw new ServiceException("该单据已撤销！");
-        } else if (status.equals(BACK.getStatus())) {
+        } else if (BACK.getStatus().equals(status)) {
             throw new ServiceException("该单据已退回！");
-        } else if (status.equals(TERMINATION.getStatus())) {
+        } else if (TERMINATION.getStatus().equals(status)) {
             throw new ServiceException("该单据已终止！");
+        } else if (StringUtils.isBlank(status)) {
+            throw new ServiceException("流程状态为空！");
         }
     }
 }
