@@ -65,6 +65,7 @@ public class TestDemoServiceImpl implements ITestDemoService {
         lqw.eq(StringUtils.isNotBlank(bo.getValue()), TestDemo::getValue, bo.getValue());
         lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
             TestDemo::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
+        lqw.orderByAsc(TestDemo::getId);
         return lqw;
     }
 

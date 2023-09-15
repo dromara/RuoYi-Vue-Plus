@@ -47,6 +47,7 @@ public class TestTreeServiceImpl implements ITestTreeService {
         lqw.like(StringUtils.isNotBlank(bo.getTreeName()), TestTree::getTreeName, bo.getTreeName());
         lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
             TestTree::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
+        lqw.orderByAsc(TestTree::getId);
         return lqw;
     }
 

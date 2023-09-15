@@ -93,6 +93,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
             SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
         lqw.eq(ObjectUtil.isNotNull(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
         lqw.eq(StringUtils.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
+        lqw.orderByAsc(SysOss::getOssId);
         return lqw;
     }
 

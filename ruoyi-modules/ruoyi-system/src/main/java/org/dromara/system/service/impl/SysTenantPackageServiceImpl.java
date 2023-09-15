@@ -1,30 +1,29 @@
 package org.dromara.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.system.domain.SysTenant;
-import org.dromara.system.mapper.SysTenantMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.dromara.system.domain.SysTenantPackage;
 import org.dromara.system.domain.bo.SysTenantPackageBo;
 import org.dromara.system.domain.vo.SysTenantPackageVo;
-import org.dromara.system.domain.SysTenantPackage;
+import org.dromara.system.mapper.SysTenantMapper;
 import org.dromara.system.mapper.SysTenantPackageMapper;
 import org.dromara.system.service.ISysTenantPackageService;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 租户套餐Service业务层处理
@@ -72,10 +71,10 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
     }
 
     private LambdaQueryWrapper<SysTenantPackage> buildQueryWrapper(SysTenantPackageBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysTenantPackage> lqw = Wrappers.lambdaQuery();
         lqw.like(StringUtils.isNotBlank(bo.getPackageName()), SysTenantPackage::getPackageName, bo.getPackageName());
         lqw.eq(StringUtils.isNotBlank(bo.getStatus()), SysTenantPackage::getStatus, bo.getStatus());
+        lqw.orderByAsc(SysTenantPackage::getPackageId);
         return lqw;
     }
 
