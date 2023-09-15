@@ -227,10 +227,10 @@ justauth:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
       redirect-uri: ${justauth.address}/social-callback?source=oschina
-    alipay:
+    alipay_wallet:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
-      redirect-uri: ${justauth.address}/social-callback?source=alipay
+      redirect-uri: ${justauth.address}/social-callback?source=alipay_wallet
       alipay-public-key: MIIB**************DAQAB
     wechat_open:
       client-id: 10**********6
