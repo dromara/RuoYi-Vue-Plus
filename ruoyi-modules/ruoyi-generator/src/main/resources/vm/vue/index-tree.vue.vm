@@ -15,7 +15,7 @@
 #end
 #if($column.htmlType == "input" || $column.htmlType == "textarea")
           <el-form-item label="${comment}" prop="${column.javaField}">
-            <el-input v-model="queryParams.${column.javaField}" placeholder="请输入${comment}" clearable @keyup.enter="handleQuery" />
+            <el-input v-model="queryParams.${column.javaField}" placeholder="请输入${comment}" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
 #elseif(($column.htmlType == "select" || $column.htmlType == "radio") && "" != $dictType)
           <el-form-item label="${comment}" prop="${column.javaField}">
