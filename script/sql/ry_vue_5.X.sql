@@ -289,12 +289,14 @@ insert into sys_menu values('115',  '代码生成',     '3',   '2', 'gen',      
 insert into sys_menu values('121', '租户管理',     '6',   '1', 'tenant',            'system/tenant/index',          '', 1, 0, 'C', '0', '0', 'system:tenant:list',          'list',          103, 1, sysdate(), null, null, '租户管理菜单');
 insert into sys_menu values('122', '租户套餐管理',  '6',   '2', 'tenantPackage',     'system/tenantPackage/index',   '', 1, 0, 'C', '0', '0', 'system:tenantPackage:list',   'form',          103, 1, sysdate(), null, null, '租户套餐管理菜单');
 insert into sys_menu values('123',  '客户端管理',   '1',   '11', 'client',           'system/client/index',          '', 1, 0, 'C', '0', '0', 'system:client:list',          'international', 103, 1, sysdate(), null, null, '客户端管理菜单');
-insert into sys_menu values('1617', '模型管理', '1616',   '1', 'model',             'workflow/model/index',         '', 1, 1, 'C', '0', '0', 'workflow:model:list',         'tree-table',    103, 1, sysdate(), null, null, '模型管理菜单');
-insert into sys_menu values('1618', '我的待办', '1616',   '4', 'task',              '',                             '', 1, 0, 'M', '0', '0', '',                            'tree-table',    103, 1, sysdate(), null, null, '我的待办菜单');
-insert into sys_menu values('1620', '流程定义', '1616',   '2', 'processDefinition', 'workflow/processDefinition/index', '', 1, 1, 'C', '0', '0', '',                        'tree-table',    103, 1, sysdate(), null, null, '流程定义菜单');
 insert into sys_menu values('1622', '流程分类', '1616',   '1', 'category',          'workflow/category/index',     '', 1, 0, 'C', '0', '0', 'workflow:category:list',       'tree-table',    103, 1, sysdate(), null, null, '流程分类菜单');
-insert into sys_menu values('1628', '动态表单', '1616',   '5', 'form',              'workflow/form/index',         '', 1, 1, 'C', '0', '0', '',                             'tree-table',    103, 1, sysdate(), null, null, '动态表单菜单');
-insert into sys_menu values('1630', '流程监控', '1616',   '3', 'monitor',           '',                            '', 1, 0, 'M', '0', '0', '',                             'tree-table',    103, 1, sysdate(), null, null, '流程监控菜单');
+insert into sys_menu values('1617', '模型管理', '1616',   '2', 'model',             'workflow/model/index',         '', 1, 1, 'C', '0', '0', 'workflow:model:list',         'tree-table',    103, 1, sysdate(), null, null, '模型管理菜单');
+insert into sys_menu values('1620', '流程定义', '1616',   '3', 'processDefinition', 'workflow/processDefinition/index', '', 1, 1, 'C', '0', '0', '',                        'tree-table',    103, 1, sysdate(), null, null, '流程定义菜单');
+insert into sys_menu values('1630', '流程监控', '1616',   '4', 'monitor',           '',                            '', 1, 0, 'M', '0', '0', '',                             'tree-table',    103, 1, sysdate(), null, null, '流程监控菜单');
+insert into sys_menu values('1618', '我的待办', '1616',   '5', 'task',              '',                             '', 1, 0, 'M', '0', '0', '',                            'tree-table',    103, 1, sysdate(), null, null, '我的待办菜单');
+insert into sys_menu values('1628', '动态表单', '1616',   '6', 'form',              'workflow/form/index',         '', 1, 1, 'C', '0', '0', '',                             'tree-table',    103, 1, sysdate(), null, null, '动态表单菜单');
+insert into sys_menu values('1638', '发起流程', '1616',   '7', 'businessForm',      'workflow/businessForm/index', '', 1, 1, 'C', '0', '0', 'workflow:businessForm:list',   'tree-table',    103, 1, sysdate(), null, null, '发起流程菜单');
+insert into sys_menu values('1639', '我的单据', '1616',   '8', 'businessFormList',  'workflow/businessForm/list',  '', 1, 1, 'C', '0', '0', 'workflow:businessForm:list',   'tree-table',    103, 1, sysdate(), null, null, '我的单据菜单');
 
 -- springboot-admin监控
 insert into sys_menu values('117',  'Admin监控',   '2',   '5',  'Admin',            'monitor/admin/index',         '', 1, 0, 'C', '0', '0', 'monitor:admin:list',           'dashboard',     103, 1, sysdate(), null, null, 'Admin监控菜单');
@@ -414,6 +416,12 @@ insert into sys_menu values('1062', '客户端管理新增', '123', '2',  '#', '
 insert into sys_menu values('1063', '客户端管理修改', '123', '3',  '#', '', '', 1, 0, 'F', '0', '0', 'system:client:edit',         '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values('1064', '客户端管理删除', '123', '4',  '#', '', '', 1, 0, 'F', '0', '0', 'system:client:remove',       '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values('1065', '客户端管理导出', '123', '5',  '#', '', '', 1, 0, 'F', '0', '0', 'system:client:export',       '#', 103, 1, sysdate(), null, null, '');
+-- 发起流程按钮
+insert into sys_menu values('1640', '发起流程查询', '1638', '1',  '#', '', '', 1, 0, 'F', '0', '0', 'workflow:businessForm:query', '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1641', '发起流程新增', '1638', '2',  '#', '', '', 1, 0, 'F', '0', '0', 'workflow:businessForm:add',   '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1642', '发起流程修改', '1638', '3',  '#', '', '', 1, 0, 'F', '0', '0', 'workflow:businessForm:edit',  '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1643', '发起流程删除', '1638', '4',  '#', '', '', 1, 0, 'F', '0', '0', 'workflow:businessForm:remove','#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1644', '发起流程导出', '1638', '5',  '#', '', '', 1, 0, 'F', '0', '0', 'workflow:businessForm:export','#', 103, 1, sysdate(), null, null, '');
 
 -- ----------------------------
 -- 6、用户和角色关联表  用户N-1角色
@@ -939,6 +947,28 @@ create table wf_form_definition
     update_by                  bigint                       null comment '更新者',
     update_time                datetime                     null comment '更新时间'
 ) engine=innodb comment= '动态表单与流程定义关联信息';
+
+-- ----------------------------
+-- 业务单据表
+-- ----------------------------
+drop table if exists wf_business_form;
+create table wf_business_form
+(
+    id            bigint                       not null comment '主键'
+        primary key,
+    apply_code    varchar(255)                 not null comment '申请编码',
+    form_id       bigint                       not null comment '表单id',
+    form_name     varchar(255)                 not null comment '表单名称',
+    content       longtext                     not null comment '表单内容',
+    tenant_id     varchar(20) default '000000' null comment '租户编号',
+    create_dept   bigint                       null comment '创建部门',
+    create_by     bigint                       null comment '创建者',
+    create_time   datetime                     null comment '创建时间',
+    update_by     bigint                       null comment '更新者',
+    update_time   datetime                     null comment '更新时间',
+    content_value longtext                     null comment '表单值'
+) engine=innodb comment= '业务单据表';
+
 
 -- ----------------------------
 -- 系统授权表

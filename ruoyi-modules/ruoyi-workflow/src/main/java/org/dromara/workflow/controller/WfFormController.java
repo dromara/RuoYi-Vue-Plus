@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.validate.QueryGroup;
 import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.common.log.annotation.Log;
@@ -41,6 +42,16 @@ public class WfFormController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<WfFormVo> list(@Validated(QueryGroup.class) WfFormBo bo, PageQuery pageQuery) {
         return formService.queryPageList(bo, pageQuery);
+    }
+
+    /**
+     * 查询流程表单列表
+     */
+    @SaCheckPermission("workflow:form:list")
+    @GetMapping("/queryList")
+    public R<List<WfFormVo>> queryList(WfFormBo bo) {
+        bo.setStatus(UserStatus.OK.getCode());
+        return R.ok(formService.queryList(bo));
     }
 
     /**

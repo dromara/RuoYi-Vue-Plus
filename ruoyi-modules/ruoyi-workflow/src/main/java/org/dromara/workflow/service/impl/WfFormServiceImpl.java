@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 流程表单Service业务层处理
@@ -47,7 +46,14 @@ public class WfFormServiceImpl implements IWfFormService {
      */
     @Override
     public WfFormVo queryById(Long formId) {
-        return baseMapper.selectVoById(formId);
+        WfFormVo wfFormVo = baseMapper.selectVoById(formId);
+        if (wfFormVo != null) {
+            WfFormDefinitionVo wfFormDefinitionVo = wfFormDefinitionMapper.selectVoOne(
+                new LambdaQueryWrapper<WfFormDefinition>().eq(WfFormDefinition::getFormId, wfFormVo.getFormId())
+            );
+            wfFormVo.setWfFormDefinitionVo(wfFormDefinitionVo);
+        }
+        return wfFormVo;
     }
 
     /**
@@ -61,14 +67,14 @@ public class WfFormServiceImpl implements IWfFormService {
         LambdaQueryWrapper<WfForm> lqw = buildQueryWrapper(bo);
         Page<WfFormVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         List<WfFormVo> records = result.getRecords();
-        if(CollUtil.isNotEmpty(records)){
+        if (CollUtil.isNotEmpty(records)) {
             List<Long> formIds = StreamUtils.toList(records, WfFormVo::getFormId);
             List<WfFormDefinitionVo> wfFormDefinitionVos = wfFormDefinitionMapper.selectVoList(
                 new LambdaQueryWrapper<WfFormDefinition>().in(WfFormDefinition::getFormId, formIds)
             );
             for (WfFormVo record : records) {
-                if(CollUtil.isNotEmpty(wfFormDefinitionVos)){
-                    wfFormDefinitionVos.stream().filter(e->String.valueOf(e.getFormId()).equals(String.valueOf(record.getFormId()))).findFirst().ifPresent(record::setWfFormDefinitionVo);
+                if (CollUtil.isNotEmpty(wfFormDefinitionVos)) {
+                    wfFormDefinitionVos.stream().filter(e -> String.valueOf(e.getFormId()).equals(String.valueOf(record.getFormId()))).findFirst().ifPresent(record::setWfFormDefinitionVo);
                 }
             }
         }
@@ -127,7 +133,6 @@ public class WfFormServiceImpl implements IWfFormService {
     }
 
     private LambdaQueryWrapper<WfForm> buildQueryWrapper(WfFormBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<WfForm> lqw = Wrappers.lambdaQuery();
         lqw.like(StringUtils.isNotBlank(bo.getFormName()), WfForm::getFormName, bo.getFormName());
         return lqw;

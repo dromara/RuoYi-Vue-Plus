@@ -6,6 +6,7 @@ import org.dromara.workflow.domain.WfForm;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 流程分类视图对象
@@ -48,6 +49,16 @@ public class WfFormVo implements Serializable {
      * 备注
      */
     private String remark;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 修改时间
+     */
+    private Date updateTime;
 
     /**
      * 动态单与流程定义关联信息业务对象

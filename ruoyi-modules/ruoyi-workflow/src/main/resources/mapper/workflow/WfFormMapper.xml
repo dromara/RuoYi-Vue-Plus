@@ -4,7 +4,4 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.workflow.mapper.WfFormMapper">
 
-    <resultMap type="org.dromara.workflow.domain.vo.WfFormVo" id="WfFormResult">
-    </resultMap>
-
 </mapper>
