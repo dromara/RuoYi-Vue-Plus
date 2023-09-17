@@ -6,7 +6,6 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -308,26 +307,25 @@ public class WorkflowUtils {
      */
     public static void setProcessInstanceListVo(Object obj, List<String> idList, String fieldName) {
         List<ActHiProcinst> actHiProcinstList = I_ACT_HI_PROCINST_SERVICE.selectByBusinessKeyIn(idList);
-        if (obj instanceof Collection) {
-            Collection<?> collection = (Collection<?>) obj;
+        if (obj instanceof Collection<?> collection) {
             for (Object o : collection) {
-                if (o != null) {
-                    try {
-                        String fieldValue = ReflectUtils.invokeGetter(o, fieldName).toString();
-                        ActHiProcinst actHiProcinst = actHiProcinstList.stream().filter(e -> e.getBusinessKey().equals(fieldValue)).findFirst().orElse(null);
-                        if (ObjectUtil.isNotEmpty(actHiProcinst)) {
-                            ProcessInstanceVo processInstanceVo = BeanUtil.toBean(actHiProcinst, ProcessInstanceVo.class);
-                            processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstanceVo.getBusinessStatus()));
-                            ReflectUtils.invokeSetter(o, PROCESS_INSTANCE_VO, processInstanceVo);
-                        } else {
-                            ProcessInstanceVo processInstanceVo = new ProcessInstanceVo();
-                            processInstanceVo.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
-                            processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstanceVo.getBusinessStatus()));
-                            ReflectUtils.invokeSetter(o, PROCESS_INSTANCE_VO, processInstanceVo);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new ServiceException(e.getMessage());
+                String fieldValue = ReflectUtils.invokeGetter(o, fieldName).toString();
+                if (CollUtil.isEmpty(actHiProcinstList)) {
+                    ProcessInstanceVo processInstanceVo = new ProcessInstanceVo();
+                    processInstanceVo.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
+                    processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstanceVo.getBusinessStatus()));
+                    ReflectUtils.invokeSetter(o, PROCESS_INSTANCE_VO, processInstanceVo);
+                } else {
+                    ActHiProcinst actHiProcinst = actHiProcinstList.stream().filter(e -> e.getBusinessKey().equals(fieldValue)).findFirst().orElse(null);
+                    if (ObjectUtil.isNotEmpty(actHiProcinst)) {
+                        ProcessInstanceVo processInstanceVo = BeanUtil.toBean(actHiProcinst, ProcessInstanceVo.class);
+                        processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstanceVo.getBusinessStatus()));
+                        ReflectUtils.invokeSetter(o, PROCESS_INSTANCE_VO, processInstanceVo);
+                    } else {
+                        ProcessInstanceVo processInstanceVo = new ProcessInstanceVo();
+                        processInstanceVo.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
+                        processInstanceVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(processInstanceVo.getBusinessStatus()));
+                        ReflectUtils.invokeSetter(o, PROCESS_INSTANCE_VO, processInstanceVo);
                     }
                 }
             }

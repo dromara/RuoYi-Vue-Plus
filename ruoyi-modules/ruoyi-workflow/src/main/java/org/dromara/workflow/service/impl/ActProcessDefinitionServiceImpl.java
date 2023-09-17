@@ -205,7 +205,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ServiceException("操作失败");
+            throw new ServiceException("操作失败:"+e.getMessage());
         }
     }
 

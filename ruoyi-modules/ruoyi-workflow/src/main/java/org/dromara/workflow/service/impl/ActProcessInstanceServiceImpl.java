@@ -240,7 +240,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             try {
                 actHistoryInfoVo.setAssignee(StringUtils.isNotBlank(historicTaskInstance.getAssignee()) ? Long.valueOf(historicTaskInstance.getAssignee()) : null);
             } catch (NumberFormatException ignored) {
-
+                log.warn("当前任务【{}】,办理人转换人员ID【{}】异常！", historicTaskInstance.getName(), historicTaskInstance.getAssignee());
             }
             actHistoryInfoVoList.add(actHistoryInfoVo);
         }
