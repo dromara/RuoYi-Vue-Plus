@@ -10,7 +10,7 @@ import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
 import java.util.Date;
 
-
+import java.io.Serializable;
 
 /**
  * ${functionName}视图对象 ${tableName}
@@ -20,7 +20,7 @@ import java.util.Date;
  */
 @Data
 @ExcelIgnoreUnannotated
-public class ${ClassName}Vo {
+public class ${ClassName}Vo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
