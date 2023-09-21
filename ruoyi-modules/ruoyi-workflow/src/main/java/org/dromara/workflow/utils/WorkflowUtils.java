@@ -306,6 +306,9 @@ public class WorkflowUtils {
      * @param fieldName 主键属性名称
      */
     public static void setProcessInstanceListVo(Object obj, List<String> idList, String fieldName) {
+        if (CollUtil.isEmpty(idList)) {
+            return;
+        }
         List<ActHiProcinst> actHiProcinstList = I_ACT_HI_PROCINST_SERVICE.selectByBusinessKeyIn(idList);
         if (obj instanceof Collection<?> collection) {
             for (Object o : collection) {

@@ -3,6 +3,7 @@ package org.dromara.workflow.service.impl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -11,6 +12,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.workflow.domain.WfFormDefinition;
+import org.dromara.workflow.domain.vo.WfFormDefinitionVo;
+import org.dromara.workflow.mapper.WfFormDefinitionMapper;
+import org.dromara.workflow.utils.WorkflowUtils;
 import org.springframework.stereotype.Service;
 import org.dromara.workflow.domain.bo.WfBusinessFormBo;
 import org.dromara.workflow.domain.vo.WfBusinessFormVo;
@@ -34,12 +39,21 @@ public class WfBusinessFormServiceImpl implements IWfBusinessFormService {
 
     private final WfBusinessFormMapper baseMapper;
 
+    private final WfFormDefinitionMapper wfFormDefinitionMapper;
+
     /**
      * 查询发起流程
      */
     @Override
     public WfBusinessFormVo queryById(Long id) {
-        return baseMapper.selectVoById(id);
+        WfBusinessFormVo wfBusinessFormVo = baseMapper.selectVoById(id);
+        if (wfBusinessFormVo != null) {
+            WfFormDefinitionVo wfFormDefinitionVo = wfFormDefinitionMapper.selectVoOne(
+                new LambdaQueryWrapper<WfFormDefinition>().eq(WfFormDefinition::getFormId, wfBusinessFormVo.getFormId())
+            );
+            wfBusinessFormVo.setWfFormDefinitionVo(wfFormDefinitionVo);
+        }
+        return wfBusinessFormVo;
     }
 
     /**
@@ -49,6 +63,8 @@ public class WfBusinessFormServiceImpl implements IWfBusinessFormService {
     public TableDataInfo<WfBusinessFormVo> queryPageList(WfBusinessFormBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<WfBusinessForm> lqw = buildQueryWrapper(bo);
         Page<WfBusinessFormVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        List<WfBusinessFormVo> records = result.getRecords();
+        WorkflowUtils.setProcessInstanceListVo(records,StreamUtils.toList(records, e -> String.valueOf(e.getId())),"id");
         return TableDataInfo.build(result);
     }
 

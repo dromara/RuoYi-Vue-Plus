@@ -60,4 +60,14 @@ public class WfBusinessFormVo implements Serializable {
     @ExcelProperty(value = "表单值")
     private String contentValue;
 
+    /**
+     * 动态单与流程定义关联信息业务对象
+     */
+    private WfFormDefinitionVo wfFormDefinitionVo;
+
+    /**
+     * 流程实例对象
+     */
+    private ProcessInstanceVo processInstanceVo;
+
 }
