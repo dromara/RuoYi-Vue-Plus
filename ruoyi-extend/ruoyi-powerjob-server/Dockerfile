@@ -1,10 +1,13 @@
-FROM findepi/graalvm:java17-native
+#FROM findepi/graalvm:java17-native
+FROM openjdk:17.0.2-oraclelinux8
 
 MAINTAINER Lion Li
 
 RUN mkdir -p /ruoyi/powerjob/logs
 
 WORKDIR /ruoyi/powerjob
+
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 EXPOSE 7700
 

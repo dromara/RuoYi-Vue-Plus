@@ -92,6 +92,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         lqw.eq(StringUtils.isNotBlank(bo.getConfigKey()), SysOssConfig::getConfigKey, bo.getConfigKey());
         lqw.like(StringUtils.isNotBlank(bo.getBucketName()), SysOssConfig::getBucketName, bo.getBucketName());
         lqw.eq(StringUtils.isNotBlank(bo.getStatus()), SysOssConfig::getStatus, bo.getStatus());
+        lqw.orderByAsc(SysOssConfig::getOssConfigId);
         return lqw;
     }
 

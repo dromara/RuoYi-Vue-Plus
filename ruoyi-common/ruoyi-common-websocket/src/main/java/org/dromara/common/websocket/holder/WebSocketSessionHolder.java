@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -29,6 +30,10 @@ public class WebSocketSessionHolder {
 
     public static WebSocketSession getSessions(Long sessionKey) {
         return USER_SESSION_MAP.get(sessionKey);
+    }
+
+    public static Set<Long> getSessionsAll() {
+        return USER_SESSION_MAP.keySet();
     }
 
     public static Boolean existSession(Long sessionKey) {

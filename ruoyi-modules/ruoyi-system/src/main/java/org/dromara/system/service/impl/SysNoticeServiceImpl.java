@@ -71,6 +71,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
             SysUserVo sysUser = userMapper.selectUserByUserName(bo.getCreateByName());
             lqw.eq(SysNotice::getCreateBy, ObjectUtil.isNotNull(sysUser) ? sysUser.getUserId() : null);
         }
+        lqw.orderByAsc(SysNotice::getNoticeId);
         return lqw;
     }
 

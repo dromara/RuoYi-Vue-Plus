@@ -15,7 +15,7 @@
 #end
 #if($column.htmlType == "input" || $column.htmlType == "textarea")
           <el-form-item label="${comment}" prop="${column.javaField}">
-            <el-input v-model="queryParams.${column.javaField}" placeholder="请输入${comment}" clearable @keyup.enter="handleQuery" />
+            <el-input v-model="queryParams.${column.javaField}" placeholder="请输入${comment}" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
 #elseif(($column.htmlType == "select" || $column.htmlType == "radio") && "" != $dictType)
           <el-form-item label="${comment}" prop="${column.javaField}">
@@ -322,19 +322,19 @@ const data = reactive<PageData<${BusinessName}Form, ${BusinessName}Query>>({
   queryParams: {
 #foreach ($column in $columns)
 #if($column.query)
-    #if($column.htmlType != "datetime" || $column.queryType != "BETWEEN")
-    $column.javaField: undefined#if($foreach.count != $columns.size()),#end
-    #end
+#if($column.htmlType != "datetime" || $column.queryType != "BETWEEN")
+    $column.javaField: undefined,
+#end
 #end
 #end
     params: {
-      #foreach ($column in $columns)
-      #if($column.query)
-      #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#foreach ($column in $columns)
+#if($column.query)
+#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
       $column.javaField: undefined#if($foreach.count != $columns.size()),#end
-      #end
-      #end
-      #end
+#end
+#end
+#end
     }
   },
   rules: {
@@ -451,7 +451,7 @@ const handleUpdate = async (row: ${BusinessName}VO) => {
   reset();
   await getTreeselect();
   if (row != null) {
-    form.value.${treeParentCode} = row.${treeCode};
+    form.value.${treeParentCode} = row.${treeParentCode};
   }
   const res = await get${BusinessName}(row.${treeCode});
   Object.assign(form.value, res.data);

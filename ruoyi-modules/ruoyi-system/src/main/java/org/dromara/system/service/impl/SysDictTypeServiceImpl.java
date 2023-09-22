@@ -76,6 +76,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
         lqw.like(StringUtils.isNotBlank(bo.getDictType()), SysDictType::getDictType, bo.getDictType());
         lqw.between(params.get("beginTime") != null && params.get("endTime") != null,
             SysDictType::getCreateTime, params.get("beginTime"), params.get("endTime"));
+        lqw.orderByAsc(SysDictType::getDictId);
         return lqw;
     }
 

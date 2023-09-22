@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 客户端管理Service业务层处理
@@ -75,12 +74,12 @@ public class SysClientServiceImpl implements ISysClientService {
     }
 
     private LambdaQueryWrapper<SysClient> buildQueryWrapper(SysClientBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysClient> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getClientId()), SysClient::getClientId, bo.getClientId());
         lqw.eq(StringUtils.isNotBlank(bo.getClientKey()), SysClient::getClientKey, bo.getClientKey());
         lqw.eq(StringUtils.isNotBlank(bo.getClientSecret()), SysClient::getClientSecret, bo.getClientSecret());
         lqw.eq(StringUtils.isNotBlank(bo.getStatus()), SysClient::getStatus, bo.getStatus());
+        lqw.orderByAsc(SysClient::getId);
         return lqw;
     }
 

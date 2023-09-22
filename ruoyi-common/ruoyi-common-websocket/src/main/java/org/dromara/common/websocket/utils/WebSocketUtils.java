@@ -1,13 +1,13 @@
 package org.dromara.common.websocket.utils;
 
 import cn.hutool.core.collection.CollUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
 import org.dromara.common.websocket.holder.WebSocketSessionHolder;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.PongMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -75,6 +75,22 @@ public class WebSocketUtils {
                     WEB_SOCKET_TOPIC, unsentSessionKeys, webSocketMessage.getMessage());
             });
         }
+    }
+
+    /**
+     * 发布订阅的消息(群发)
+     *
+     * @param message 消息内容
+     */
+    public static void publishAll(String message) {
+        WebSocketSessionHolder.getSessionsAll().forEach(key -> {
+            WebSocketUtils.sendMessage(key, message);
+        });
+        WebSocketMessageDto broadcastMessage = new WebSocketMessageDto();
+        broadcastMessage.setMessage(message);
+        RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage, consumer -> {
+            log.info(" WebSocket发送主题订阅消息topic:{} message:{}", WEB_SOCKET_TOPIC, message);
+        });
     }
 
     public static void sendPongMessage(WebSocketSession session) {

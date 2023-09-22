@@ -1,11 +1,12 @@
 package org.dromara.common.encrypt.core;
 
 import cn.hutool.core.util.ReflectUtil;
-import org.dromara.common.encrypt.annotation.EncryptField;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.encrypt.annotation.EncryptField;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,8 +36,13 @@ public class EncryptorManager {
      */
     public Set<Field> getFieldCache(Class<?> sourceClazz) {
         return fieldCache.computeIfAbsent(sourceClazz, clazz -> {
-            Field[] declaredFields = clazz.getDeclaredFields();
-            Set<Field> fieldSet = Arrays.stream(declaredFields).filter(field ->
+            Set<Field> fieldSet = new HashSet<>();
+            while (clazz != null) {
+                Field[] fields = clazz.getDeclaredFields();
+                fieldSet.addAll(Arrays.asList(fields));
+                clazz = clazz.getSuperclass();
+            }
+            fieldSet = fieldSet.stream().filter(field ->
                     field.isAnnotationPresent(EncryptField.class) && field.getType() == String.class)
                 .collect(Collectors.toSet());
             for (Field field : fieldSet) {
