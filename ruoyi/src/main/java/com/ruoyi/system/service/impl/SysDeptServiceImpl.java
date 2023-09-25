@@ -72,6 +72,8 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
      */
     @Override
     public List<Tree<Long>> selectDeptTreeList(SysDept dept) {
+        // 只查询未禁用部门
+        dept.setStatus(UserConstants.DEPT_NORMAL);
         List<SysDept> depts = this.selectDeptList(dept);
         return buildDeptTreeSelect(depts);
     }

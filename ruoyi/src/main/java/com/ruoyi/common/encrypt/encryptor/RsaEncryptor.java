@@ -1,12 +1,9 @@
 package com.ruoyi.common.encrypt.encryptor;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.crypto.SecureUtil;
-import cn.hutool.crypto.asymmetric.KeyType;
-import cn.hutool.crypto.asymmetric.RSA;
 import com.ruoyi.common.encrypt.EncryptContext;
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
+import com.ruoyi.common.utils.EncryptUtils;
 import com.ruoyi.common.utils.StringUtils;
 
 
@@ -18,7 +15,7 @@ import com.ruoyi.common.utils.StringUtils;
  */
 public class RsaEncryptor extends AbstractEncryptor {
 
-    private final RSA rsa;
+    private final EncryptContext context;
 
     public RsaEncryptor(EncryptContext context) {
         super(context);
@@ -27,7 +24,7 @@ public class RsaEncryptor extends AbstractEncryptor {
         if (StringUtils.isAnyEmpty(privateKey, publicKey)) {
             throw new IllegalArgumentException("RSA公私钥均需要提供，公钥加密，私钥解密。");
         }
-        this.rsa = SecureUtil.rsa(Base64.decode(privateKey), Base64.decode(publicKey));
+        this.context = context;
     }
 
     /**
@@ -47,9 +44,9 @@ public class RsaEncryptor extends AbstractEncryptor {
     @Override
     public String encrypt(String value, EncodeType encodeType) {
         if (encodeType == EncodeType.HEX) {
-            return rsa.encryptHex(value, KeyType.PublicKey);
+            return EncryptUtils.encryptByRsaHex(value, context.getPublicKey());
         } else {
-            return rsa.encryptBase64(value, KeyType.PublicKey);
+            return EncryptUtils.encryptByRsa(value, context.getPublicKey());
         }
     }
 
@@ -60,6 +57,6 @@ public class RsaEncryptor extends AbstractEncryptor {
      */
     @Override
     public String decrypt(String value) {
-        return this.rsa.decryptStr(value, KeyType.PrivateKey);
+        return EncryptUtils.decryptByRsa(value, context.getPrivateKey());
     }
 }

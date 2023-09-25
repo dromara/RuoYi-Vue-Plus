@@ -196,10 +196,8 @@ public class ExcelUtil {
             // 合并处理器
             builder.registerWriteHandler(new CellMergeStrategy(list, true));
         }
-        if (CollUtil.isNotEmpty(options)) {
-            // 添加下拉框操作
-            builder.registerWriteHandler(new ExcelDownHandler(options));
-        }
+        // 添加下拉框操作
+        builder.registerWriteHandler(new ExcelDownHandler(options));
         builder.doWrite(list);
     }
 

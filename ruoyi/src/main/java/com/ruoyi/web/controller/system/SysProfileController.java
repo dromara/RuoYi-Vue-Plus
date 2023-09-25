@@ -78,8 +78,8 @@ public class SysProfileController extends BaseController {
     /**
      * 重置密码
      *
-     * @param newPassword 旧密码
-     * @param oldPassword 新密码
+     * @param newPassword 新密码
+     * @param oldPassword 旧密码
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")

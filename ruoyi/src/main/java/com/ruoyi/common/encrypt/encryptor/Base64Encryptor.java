@@ -1,9 +1,9 @@
 package com.ruoyi.common.encrypt.encryptor;
 
-import cn.hutool.core.codec.Base64;
 import com.ruoyi.common.encrypt.EncryptContext;
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
+import com.ruoyi.common.utils.EncryptUtils;
 
 /**
  * Base64算法实现
@@ -33,7 +33,7 @@ public class Base64Encryptor extends AbstractEncryptor {
      */
     @Override
     public String encrypt(String value, EncodeType encodeType) {
-        return Base64.encode(value);
+        return EncryptUtils.encryptByBase64(value);
     }
 
     /**
@@ -43,6 +43,6 @@ public class Base64Encryptor extends AbstractEncryptor {
      */
     @Override
     public String decrypt(String value) {
-        return Base64.decodeStr(value);
+        return EncryptUtils.decryptByBase64(value);
     }
 }
