@@ -3,11 +3,11 @@
     <el-form ref="registerRef" :model="registerForm" :rules="registerRules" class="register-form">
       <h3 class="title">RuoYi-Vue-Plus后台管理系统</h3>
       <el-form-item prop="username">
-        <el-input 
-          v-model="registerForm.username" 
-          type="text" 
-          size="large" 
-          auto-complete="off" 
+        <el-input
+          v-model="registerForm.username"
+          type="text"
+          size="large"
+          auto-complete="off"
           placeholder="账号"
         >
           <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
@@ -17,7 +17,7 @@
         <el-input
           v-model="registerForm.password"
           type="password"
-          size="large" 
+          size="large"
           auto-complete="off"
           placeholder="密码"
           @keyup.enter="handleRegister"
@@ -29,7 +29,7 @@
         <el-input
           v-model="registerForm.confirmPassword"
           type="password"
-          size="large" 
+          size="large"
           auto-complete="off"
           placeholder="确认密码"
           @keyup.enter="handleRegister"
@@ -39,7 +39,7 @@
       </el-form-item>
       <el-form-item prop="code" v-if="captchaEnabled">
         <el-input
-          size="large" 
+          size="large"
           v-model="registerForm.code"
           auto-complete="off"
           placeholder="验证码"
@@ -55,7 +55,7 @@
       <el-form-item style="width:100%;">
         <el-button
           :loading="loading"
-          size="large" 
+          size="large"
           type="primary"
           style="width:100%;"
           @click.prevent="handleRegister"
@@ -143,10 +143,10 @@ function handleRegister() {
 
 function getCode() {
   getCodeImg().then(res => {
-    captchaEnabled.value = res.captchaEnabled === undefined ? true : res.captchaEnabled;
+    captchaEnabled.value = res.data.captchaEnabled === undefined ? true : res.data.captchaEnabled;
     if (captchaEnabled.value) {
-      codeUrl.value = "data:image/gif;base64," + res.img;
-      registerForm.value.uuid = res.uuid;
+      codeUrl.value = "data:image/gif;base64," + res.data.img;
+      registerForm.value.uuid = res.data.uuid;
     }
   });
 }

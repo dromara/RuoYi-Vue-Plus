@@ -1,13 +1,10 @@
 package com.ruoyi.common.encrypt.encryptor;
 
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.crypto.SmUtil;
-import cn.hutool.crypto.asymmetric.KeyType;
-import cn.hutool.crypto.asymmetric.SM2;
 import com.ruoyi.common.encrypt.EncryptContext;
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
+import com.ruoyi.common.utils.EncryptUtils;
 import com.ruoyi.common.utils.StringUtils;
 
 /**
@@ -18,7 +15,7 @@ import com.ruoyi.common.utils.StringUtils;
  */
 public class Sm2Encryptor extends AbstractEncryptor {
 
-    private final SM2 sm2;
+    private final EncryptContext context;
 
     public Sm2Encryptor(EncryptContext context) {
         super(context);
@@ -27,7 +24,7 @@ public class Sm2Encryptor extends AbstractEncryptor {
         if (StringUtils.isAnyEmpty(privateKey, publicKey)) {
             throw new IllegalArgumentException("SM2公私钥均需要提供，公钥加密，私钥解密。");
         }
-        this.sm2 = SmUtil.sm2(Base64.decode(privateKey), Base64.decode(publicKey));
+        this.context = context;
     }
 
     /**
@@ -47,9 +44,9 @@ public class Sm2Encryptor extends AbstractEncryptor {
     @Override
     public String encrypt(String value, EncodeType encodeType) {
         if (encodeType == EncodeType.HEX) {
-            return sm2.encryptHex(value, KeyType.PublicKey);
+            return EncryptUtils.encryptBySm2Hex(value, context.getPublicKey());
         } else {
-            return sm2.encryptBase64(value, KeyType.PublicKey);
+            return EncryptUtils.encryptBySm2(value, context.getPublicKey());
         }
     }
 
@@ -60,6 +57,6 @@ public class Sm2Encryptor extends AbstractEncryptor {
      */
     @Override
     public String decrypt(String value) {
-        return this.sm2.decryptStr(value, KeyType.PrivateKey);
+        return EncryptUtils.decryptBySm2(value, context.getPrivateKey());
     }
 }

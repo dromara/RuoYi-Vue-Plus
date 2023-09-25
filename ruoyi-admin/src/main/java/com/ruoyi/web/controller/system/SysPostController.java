@@ -88,6 +88,9 @@ public class SysPostController extends BaseController {
             return R.fail("修改岗位'" + post.getPostName() + "'失败，岗位名称已存在");
         } else if (!postService.checkPostCodeUnique(post)) {
             return R.fail("修改岗位'" + post.getPostName() + "'失败，岗位编码已存在");
+        } else if (UserConstants.POST_DISABLE.equals(post.getStatus())
+            && postService.countUserPostById(post.getPostId()) > 0) {
+            return R.fail("该岗位下存在已分配用户，不能禁用!");
         }
         return toAjax(postService.updatePost(post));
     }
@@ -109,7 +112,9 @@ public class SysPostController extends BaseController {
      */
     @GetMapping("/optionselect")
     public R<List<SysPost>> optionselect() {
-        List<SysPost> posts = postService.selectPostAll();
+        SysPost post = new SysPost();
+        post.setStatus(UserConstants.POST_NORMAL);
+        List<SysPost> posts = postService.selectPostList(post);
         return R.ok(posts);
     }
 }

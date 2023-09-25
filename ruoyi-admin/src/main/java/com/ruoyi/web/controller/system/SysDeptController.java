@@ -91,9 +91,12 @@ public class SysDeptController extends BaseController {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
         } else if (dept.getParentId().equals(deptId)) {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
-        } else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus())
-            && deptService.selectNormalChildrenDeptById(deptId) > 0) {
-            return R.fail("该部门包含未停用的子部门！");
+        } else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus())) {
+            if (deptService.selectNormalChildrenDeptById(deptId) > 0) {
+                return R.fail("该部门包含未停用的子部门!");
+            } else if (deptService.checkDeptExistUser(deptId)) {
+                return R.fail("该部门下存在已分配用户，不能禁用!");
+            }
         }
         return toAjax(deptService.updateDept(dept));
     }

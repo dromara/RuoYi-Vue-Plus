@@ -5,11 +5,7 @@ ruoyi:
   # 版本
   version: ${ruoyi-vue-plus.version}
   # 版权年份
-  copyrightYear: 2022
-  # 实例演示开关
-  demoEnabled: true
-  # 获取ip地址开关
-  addressEnabled: true
+  copyrightYear: 2023
   # 缓存懒加载
   cacheLazy: false
 
@@ -107,6 +103,8 @@ sa-token:
   # 多端不同 token 有效期 可查看 LoginHelper.loginByDevice 方法自定义
   # token最低活跃时间 (指定时间无操作就过期) 单位: 秒
   active-timeout: 1800
+  # 允许动态设置 token 有效期
+  dynamic-active-timeout: true
   # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
   is-concurrent: true
   # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)

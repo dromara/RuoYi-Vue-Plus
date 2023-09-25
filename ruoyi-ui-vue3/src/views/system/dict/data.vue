@@ -91,8 +91,8 @@
          <el-table-column label="字典编码" align="center" prop="dictCode" />
          <el-table-column label="字典标签" align="center" prop="dictLabel">
             <template #default="scope">
-               <span v-if="scope.row.listClass == '' || scope.row.listClass == 'default'">{{ scope.row.dictLabel }}</span>
-               <el-tag v-else :type="scope.row.listClass == 'primary' ? '' : scope.row.listClass">{{ scope.row.dictLabel }}</el-tag>
+              <span v-if="(scope.row.listClass == '' || scope.row.listClass == 'default') && (scope.row.cssClass == '' || scope.row.cssClass == null)">{{ scope.row.dictLabel }}</span>
+              <el-tag v-else :type="scope.row.listClass == 'primary' ? '' : scope.row.listClass" :class="scope.row.cssClass">{{ scope.row.dictLabel }}</el-tag>
             </template>
          </el-table-column>
          <el-table-column label="字典键值" align="center" prop="dictValue" />
@@ -197,8 +197,8 @@ const typeOptions = ref([]);
 const route = useRoute();
 // 数据标签回显样式
 const listClassOptions = ref([
-  { value: "default", label: "默认" }, 
-  { value: "primary", label: "主要" }, 
+  { value: "default", label: "默认" },
+  { value: "primary", label: "主要" },
   { value: "success", label: "成功" },
   { value: "info", label: "信息" },
   { value: "warning", label: "警告" },
