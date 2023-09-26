@@ -2,7 +2,6 @@ package org.dromara.system.domain.bo;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import org.dromara.common.core.validate.auth.PasswordGroup;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -19,12 +18,12 @@ public class SysUserPasswordBo implements Serializable {
     /**
      * 旧密码
      */
-    @NotBlank(message = "旧密码不能为空", groups = { PasswordGroup.class })
+    @NotBlank(message = "旧密码不能为空")
     private String oldPassword;
 
     /**
      * 新密码
      */
-    @NotBlank(message = "新密码不能为空", groups = { PasswordGroup.class })
+    @NotBlank(message = "新密码不能为空")
     private String newPassword;
 }
