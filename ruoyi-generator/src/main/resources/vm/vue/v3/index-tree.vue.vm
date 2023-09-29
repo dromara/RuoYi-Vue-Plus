@@ -398,7 +398,7 @@ function handleAdd(row) {
   reset();
   getTreeselect();
   if (row != null && row.${treeCode}) {
-    form.value.${treeParentCode} = row.${treeParentCode};
+    form.value.${treeParentCode} = row.${treeCode};
   } else {
     form.value.${treeParentCode} = 0;
   }
