@@ -434,7 +434,7 @@ export default {
       this.reset();
       this.getTreeselect();
       if (row != null && row.${treeCode}) {
-        this.form.${treeParentCode} = row.${treeParentCode};
+        this.form.${treeParentCode} = row.${treeCode};
       } else {
         this.form.${treeParentCode} = 0;
       }
