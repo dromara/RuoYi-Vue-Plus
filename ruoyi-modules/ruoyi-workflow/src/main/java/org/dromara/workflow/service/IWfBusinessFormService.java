@@ -45,5 +45,5 @@ public interface IWfBusinessFormService {
     /**
      * 校验并批量删除发起流程信息
      */
-    Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+    Boolean deleteWithValidByIds(Collection<Long> ids);
 }

@@ -1,5 +1,6 @@
 package org.dromara.workflow.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.MapstructUtils;
@@ -12,9 +13,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.domain.WfFormDefinition;
 import org.dromara.workflow.domain.vo.WfFormDefinitionVo;
 import org.dromara.workflow.mapper.WfFormDefinitionMapper;
+import org.dromara.workflow.service.IActHiProcinstService;
+import org.dromara.workflow.service.IActProcessInstanceService;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.springframework.stereotype.Service;
 import org.dromara.workflow.domain.bo.WfBusinessFormBo;
@@ -22,10 +26,12 @@ import org.dromara.workflow.domain.vo.WfBusinessFormVo;
 import org.dromara.workflow.domain.WfBusinessForm;
 import org.dromara.workflow.mapper.WfBusinessFormMapper;
 import org.dromara.workflow.service.IWfBusinessFormService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * 发起流程Service业务层处理
@@ -38,8 +44,9 @@ import java.util.Collection;
 public class WfBusinessFormServiceImpl implements IWfBusinessFormService {
 
     private final WfBusinessFormMapper baseMapper;
-
     private final WfFormDefinitionMapper wfFormDefinitionMapper;
+    private final IActProcessInstanceService iActProcessInstanceService;
+    private final IActHiProcinstService iActHiProcinstService;
 
     /**
      * 查询发起流程
@@ -64,7 +71,7 @@ public class WfBusinessFormServiceImpl implements IWfBusinessFormService {
         LambdaQueryWrapper<WfBusinessForm> lqw = buildQueryWrapper(bo);
         Page<WfBusinessFormVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         List<WfBusinessFormVo> records = result.getRecords();
-        WorkflowUtils.setProcessInstanceListVo(records,StreamUtils.toList(records, e -> String.valueOf(e.getId())),"id");
+        WorkflowUtils.setProcessInstanceListVo(records, StreamUtils.toList(records, e -> String.valueOf(e.getId())), "id");
         return TableDataInfo.build(result);
     }
 
@@ -90,7 +97,7 @@ public class WfBusinessFormServiceImpl implements IWfBusinessFormService {
     @Override
     public WfBusinessForm insertByBo(WfBusinessFormBo bo) {
         WfBusinessForm add = MapstructUtils.convert(bo, WfBusinessForm.class);
-        validEntityBeforeSave(add);
+        //规则自行修改
         add.setApplyCode(DateUtils.dateTimeNow());
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
@@ -110,7 +117,6 @@ public class WfBusinessFormServiceImpl implements IWfBusinessFormService {
     @Override
     public WfBusinessForm updateByBo(WfBusinessFormBo bo) {
         WfBusinessForm update = MapstructUtils.convert(bo, WfBusinessForm.class);
-        validEntityBeforeSave(update);
         baseMapper.updateById(update);
         if (StringUtils.isNotBlank(update.getContentValue())) {
             Map<String, Object> variable = JsonUtils.parseObject(update.getContentValue(), new TypeReference<>() {
@@ -121,19 +127,14 @@ public class WfBusinessFormServiceImpl implements IWfBusinessFormService {
     }
 
     /**
-     * 保存前的数据校验
-     */
-    private void validEntityBeforeSave(WfBusinessForm entity) {
-        //TODO 做一些数据校验,如唯一约束
-    }
-
-    /**
      * 批量删除发起流程
      */
     @Override
-    public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if (isValid) {
-            //TODO 做一些业务上的校验,判断是否需要校验
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean deleteWithValidByIds(Collection<Long> ids) {
+        List<ActHiProcinst> actHiProcinsts = iActHiProcinstService.selectByBusinessKeyIn(StreamUtils.toList(ids, String::valueOf));
+        if (CollUtil.isNotEmpty(actHiProcinsts)) {
+            iActProcessInstanceService.deleteRuntimeProcessAndHisInst(actHiProcinsts.stream().map(ActHiProcinst::getId).collect(Collectors.toList()));
         }
         return baseMapper.deleteBatchIds(ids) > 0;
     }

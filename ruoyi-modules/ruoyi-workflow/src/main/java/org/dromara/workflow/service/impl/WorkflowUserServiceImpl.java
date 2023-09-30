@@ -1,5 +1,6 @@
 package org.dromara.workflow.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -182,6 +183,9 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
      */
     @Override
     public List<SysUserVo> getUserListByIds(List<Long> userIds) {
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
         LambdaQueryWrapper<SysUser> queryWrapper = Wrappers.lambdaQuery();
         //检索条件
         queryWrapper.eq(SysUser::getStatus, UserStatus.OK.getCode());

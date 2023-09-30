@@ -101,6 +101,6 @@ public class WfBusinessFormController extends BaseController {
     @DeleteMapping("/{ids}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ids) {
-        return toAjax(wfBusinessFormService.deleteWithValidByIds(List.of(ids), true));
+        return toAjax(wfBusinessFormService.deleteWithValidByIds(List.of(ids)));
     }
 }
