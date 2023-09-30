@@ -453,7 +453,7 @@ const handleUpdate = async (row: ${BusinessName}VO) => {
   if (row != null) {
     form.value.${treeParentCode} = row.${treeParentCode};
   }
-  const res = await get${BusinessName}(row.${treeCode});
+  const res = await get${BusinessName}(row.${pkColumn.javaField});
   Object.assign(form.value, res.data);
 #foreach ($column in $columns)
   #if($column.htmlType == "checkbox")
