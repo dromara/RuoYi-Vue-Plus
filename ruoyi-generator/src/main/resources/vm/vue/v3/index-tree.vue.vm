@@ -421,7 +421,7 @@ async function handleUpdate(row) {
   reset();
   await getTreeselect();
   if (row != null) {
-    form.value.${treeParentCode} = row.${treeCode};
+    form.value.${treeParentCode} = row.${treeParentCode};
   }
   get${BusinessName}(row.${pkColumn.javaField}).then(response => {
     loading.value = false;
