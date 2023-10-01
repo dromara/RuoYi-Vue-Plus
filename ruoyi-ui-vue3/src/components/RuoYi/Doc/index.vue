@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-const url = ref('https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages');
+const url = ref('https://plus-doc.dromara.org');
 
 function goto() {
   window.open(url.value)
