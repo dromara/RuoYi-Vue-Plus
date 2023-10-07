@@ -19,9 +19,7 @@ import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.TaskVo;
-import org.dromara.workflow.flowable.cmd.AddSequenceMultiInstanceCmd;
-import org.dromara.workflow.flowable.cmd.DeleteSequenceMultiInstanceCmd;
-import org.dromara.workflow.flowable.cmd.UpdateBusinessStatusCmd;
+import org.dromara.workflow.flowable.cmd.*;
 import org.dromara.workflow.service.IActTaskService;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -29,6 +27,7 @@ import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
@@ -80,6 +79,9 @@ public class ActTaskServiceImpl implements IActTaskService {
         TaskQuery taskQuery = taskService.createTaskQuery();
         List<Task> taskResult = taskQuery.processInstanceBusinessKey(startProcessBo.getBusinessKey()).taskTenantId(TenantHelper.getTenantId()).list();
         if (CollUtil.isNotEmpty(taskResult)) {
+            if (CollUtil.isNotEmpty(startProcessBo.getVariables())) {
+                taskService.setVariables(taskResult.get(0).getId(), startProcessBo.getVariables());
+            }
             map.put("processInstanceId", taskResult.get(0).getProcessInstanceId());
             map.put("taskId", taskResult.get(0).getId());
             return map;
@@ -550,6 +552,9 @@ public class ActTaskServiceImpl implements IActTaskService {
         try {
             String processInstanceId = task.getProcessInstanceId();
             ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+            //获取并行网关执行后保留的执行实例数据
+            ExecutionChildByExecutionIdCmd childByExecutionIdCmd = new ExecutionChildByExecutionIdCmd(task.getExecutionId());
+            List<ExecutionEntity> executionEntities = managementService.executeCommand(childByExecutionIdCmd);
             //校验单据
             BusinessStatusEnum.checkStatus(processInstance.getBusinessStatus());
             //判断是否有多个任务
@@ -572,6 +577,11 @@ public class ActTaskServiceImpl implements IActTaskService {
             List<Task> list = taskService.createTaskQuery().processInstanceId(processInstanceId).taskTenantId(TenantHelper.getTenantId()).list();
             for (Task t : list) {
                 taskService.setAssignee(t.getId(), historicTaskInstance.getAssignee());
+            }
+            //删除流程实例垃圾数据
+            for (ExecutionEntity executionEntity : executionEntities) {
+                DeleteExecutionCmd deleteExecutionCmd = new DeleteExecutionCmd(executionEntity.getId());
+                managementService.executeCommand(deleteExecutionCmd);
             }
             runtimeService.updateBusinessStatus(processInstanceId, BusinessStatusEnum.BACK.getStatus());
         } catch (Exception e) {

@@ -25,16 +25,16 @@ import org.dromara.workflow.domain.vo.GraphicInfoVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.domain.vo.TaskVo;
 import org.dromara.workflow.flowable.CustomDefaultProcessDiagramGenerator;
+import org.dromara.workflow.flowable.cmd.DeleteExecutionCmd;
+import org.dromara.workflow.flowable.cmd.ExecutionChildByExecutionIdCmd;
 import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IActProcessInstanceService;
 import org.flowable.bpmn.model.*;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
+import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
@@ -66,6 +66,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     private final HistoryService historyService;
     private final TaskService taskService;
     private final IActHiProcinstService iActHiProcinstService;
+    private final ManagementService managementService;
 
     @Value("${flowable.activity-font-name}")
     private String activityFontName;
@@ -471,6 +472,14 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
                 .moveActivityIdsToSingleActivityId(nodeIds, historicTaskInstance.getTaskDefinitionKey()).changeState();
             Task task = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(processInstanceId).list().get(0);
             taskService.setAssignee(task.getId(), historicTaskInstance.getAssignee());
+            //获取并行网关执行后保留的执行实例数据
+            ExecutionChildByExecutionIdCmd childByExecutionIdCmd = new ExecutionChildByExecutionIdCmd(task.getExecutionId());
+            List<ExecutionEntity> executionEntities = managementService.executeCommand(childByExecutionIdCmd);
+            //删除流程实例垃圾数据
+            for (ExecutionEntity executionEntity : executionEntities) {
+                DeleteExecutionCmd deleteExecutionCmd = new DeleteExecutionCmd(executionEntity.getId());
+                managementService.executeCommand(deleteExecutionCmd);
+            }
             runtimeService.updateBusinessStatus(processInstanceId, BusinessStatusEnum.CANCEL.getStatus());
             return true;
         } catch (Exception e) {
