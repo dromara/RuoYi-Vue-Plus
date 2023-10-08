@@ -14,15 +14,15 @@
 
     <resultMap id="deptResult" type="org.dromara.system.domain.vo.SysDeptVo">
         <id property="deptId" column="dept_id"/>
-        <id property="email" column="dept_email"/>
-        <id property="status" column="dept_status"/>
-        <id property="createTime" column="dept_create_time"/>
+        <result property="email" column="dept_email"/>
+        <result property="status" column="dept_status"/>
+        <result property="createTime" column="dept_create_time"/>
     </resultMap>
 
     <resultMap id="RoleResult" type="org.dromara.system.domain.vo.SysRoleVo">
         <id property="roleId" column="role_id"/>
-        <id property="status" column="role_status"/>
-        <id property="createTime" column="role_create_time"/>
+        <result property="status" column="role_status"/>
+        <result property="createTime" column="role_create_time"/>
     </resultMap>
 
     <sql id="selectUserVo">
