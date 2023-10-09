@@ -127,7 +127,7 @@ function handleUploadSuccess(res, file) {
   // 如果上传成功
   if (res.code == 200) {
     // 获取富文本实例
-    let quill = toRaw(myQuillEditor.value).getQuill();
+    let quill = toRaw(quillEditorRef.value).getQuill();
     // 获取光标位置
     let length = quill.selection.savedRange.index;
     // 插入图片，res为服务器返回的图片链接地址
