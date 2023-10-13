@@ -49,11 +49,8 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
             .apply(DataBaseHelper.findInSet(deptId, "ancestors")));
         List<Long> ids = StreamUtils.toList(deptList, SysDept::getDeptId);
         ids.add(deptId);
-        List<SysDept> list = deptMapper.selectList(new LambdaQueryWrapper<SysDept>()
-            .select(SysDept::getDeptId)
-            .in(SysDept::getDeptId, ids));
-        if (CollUtil.isNotEmpty(list)) {
-            return StreamUtils.join(list, d -> Convert.toStr(d.getDeptId()));
+        if (CollUtil.isNotEmpty(ids)) {
+            return StreamUtils.join(ids, Convert::toStr);
         }
         return null;
     }
