@@ -1,7 +1,7 @@
 package org.dromara.common.core.validate.auth;
 
 /**
- * @Author Michelle.Chung
+ * @author Michelle.Chung
  */
 public interface SmsGroup {
 }

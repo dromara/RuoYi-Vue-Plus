@@ -102,6 +102,8 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         validEntityBeforeSave(config);
         boolean flag = baseMapper.insert(config) > 0;
         if (flag) {
+            // 从数据库查询完整的数据做缓存
+            config = baseMapper.selectById(config.getOssConfigId());
             CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
         }
         return flag;
@@ -119,6 +121,8 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         luw.eq(SysOssConfig::getOssConfigId, config.getOssConfigId());
         boolean flag = baseMapper.update(config, luw) > 0;
         if (flag) {
+            // 从数据库查询完整的数据做缓存
+            config = baseMapper.selectById(config.getOssConfigId());
             CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
         }
         return flag;

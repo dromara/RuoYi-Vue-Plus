@@ -34,6 +34,7 @@ public class LoginHelper {
     public static final String LOGIN_USER_KEY = "loginUser";
     public static final String TENANT_KEY = "tenantId";
     public static final String USER_KEY = "userId";
+    public static final String DEPT_KEY = "deptId";
     public static final String CLIENT_KEY = "clientid";
 
     /**
@@ -48,10 +49,12 @@ public class LoginHelper {
         storage.set(LOGIN_USER_KEY, loginUser);
         storage.set(TENANT_KEY, loginUser.getTenantId());
         storage.set(USER_KEY, loginUser.getUserId());
+        storage.set(DEPT_KEY, loginUser.getDeptId());
         model = ObjectUtil.defaultIfNull(model, new SaLoginModel());
         StpUtil.login(loginUser.getLoginId(),
             model.setExtra(TENANT_KEY, loginUser.getTenantId())
-                .setExtra(USER_KEY, loginUser.getUserId()));
+                .setExtra(USER_KEY, loginUser.getUserId())
+                .setExtra(DEPT_KEY, loginUser.getDeptId()));
         StpUtil.getSession().set(LOGIN_USER_KEY, loginUser);
     }
 
@@ -88,41 +91,35 @@ public class LoginHelper {
      * 获取用户id
      */
     public static Long getUserId() {
-        Long userId;
-        try {
-            userId = Convert.toLong(SaHolder.getStorage().get(USER_KEY));
-            if (ObjectUtil.isNull(userId)) {
-                userId = Convert.toLong(StpUtil.getExtra(USER_KEY));
-                SaHolder.getStorage().set(USER_KEY, userId);
-            }
-        } catch (Exception e) {
-            return null;
-        }
-        return userId;
+        return  Convert.toLong(getExtra(USER_KEY));
     }
 
     /**
      * 获取租户ID
      */
     public static String getTenantId() {
-        String tenantId;
-        try {
-            tenantId = (String) SaHolder.getStorage().get(TENANT_KEY);
-            if (ObjectUtil.isNull(tenantId)) {
-                tenantId = (String) StpUtil.getExtra(TENANT_KEY);
-                SaHolder.getStorage().set(TENANT_KEY, tenantId);
-            }
-        } catch (Exception e) {
-            return null;
-        }
-        return tenantId;
+        return Convert.toStr(getExtra(TENANT_KEY));
     }
 
     /**
      * 获取部门ID
      */
     public static Long getDeptId() {
-        return getLoginUser().getDeptId();
+        return Convert.toLong(getExtra(DEPT_KEY));
+    }
+
+    private static Object getExtra(String key) {
+        Object obj;
+        try {
+            obj = SaHolder.getStorage().get(key);
+            if (ObjectUtil.isNull(obj)) {
+                obj = StpUtil.getExtra(key);
+                SaHolder.getStorage().set(key, obj);
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return obj;
     }
 
     /**
