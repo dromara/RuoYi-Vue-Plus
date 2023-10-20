@@ -49,6 +49,8 @@
         <sms4j.version>2.2.0</sms4j.version>
         <!-- 修复其他依赖与poi兼容问题 -->
         <commons-io.version>2.13.0</commons-io.version>
+        <!-- 限制框架中的fastjson版本 -->
+        <fastjson.version>1.2.83</fastjson.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
@@ -313,6 +315,12 @@
                 <groupId>org.lionsoul</groupId>
                 <artifactId>ip2region</artifactId>
                 <version>${ip2region.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
             </dependency>
 
             <dependency>
