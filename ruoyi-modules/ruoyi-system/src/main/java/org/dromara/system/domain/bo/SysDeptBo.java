@@ -1,9 +1,5 @@
 package org.dromara.system.domain.bo;
 
-import org.dromara.common.core.validate.AddGroup;
-import org.dromara.common.core.validate.EditGroup;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
-import org.dromara.system.domain.SysDept;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -11,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dromara.common.mybatis.core.domain.BaseEntity;
+import org.dromara.system.domain.SysDept;
 
 /**
  * 部门业务对象 sys_dept
@@ -26,7 +24,7 @@ public class SysDeptBo extends BaseEntity {
     /**
      * 部门id
      */
-    @NotNull(message = "部门id不能为空", groups = { EditGroup.class })
+    @NotNull(message = "部门id不能为空")
     private Long deptId;
 
     /**
@@ -37,7 +35,7 @@ public class SysDeptBo extends BaseEntity {
     /**
      * 部门名称
      */
-    @NotBlank(message = "部门名称不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "部门名称不能为空")
     @Size(min = 0, max = 30, message = "部门名称长度不能超过{max}个字符")
     private String deptName;
 
