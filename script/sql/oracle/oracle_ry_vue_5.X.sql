@@ -925,6 +925,8 @@ create table sys_logininfor (
   info_id         number(20)     not null,
   tenant_id       varchar2(20)   default '000000',
   user_name       varchar2(50)   default '',
+  client_key      varchar2(32)   default '',
+  device_type     varchar2(32)   default '',
   ipaddr          varchar2(128)  default '',
   login_location  varchar2(255)  default '',
   browser         varchar2(50)   default '',
@@ -942,6 +944,8 @@ comment on table  sys_logininfor                is '系统访问记录';
 comment on column sys_logininfor.info_id        is '访问ID';
 comment on column sys_logininfor.tenant_id      is '租户编号';
 comment on column sys_logininfor.user_name      is '登录账号';
+comment on column sys_logininfor.client_key     is '客户端';
+comment on column sys_logininfor.device_type    is '设备类型';
 comment on column sys_logininfor.ipaddr         is '登录IP地址';
 comment on column sys_logininfor.login_location is '登录地点';
 comment on column sys_logininfor.browser        is '浏览器类型';

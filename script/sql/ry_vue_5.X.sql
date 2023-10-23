@@ -699,6 +699,8 @@ create table sys_logininfor (
     info_id        bigint(20)     not null                  comment '访问ID',
     tenant_id      varchar(20)    default '000000'          comment '租户编号',
     user_name      varchar(50)    default ''                comment '用户账号',
+    client_key     varchar(32)    default ''                comment '客户端',
+    device_type    varchar(32)    default ''                comment '设备类型',
     ipaddr         varchar(128)   default ''                comment '登录IP地址',
     login_location varchar(255)   default ''                comment '登录地点',
     browser        varchar(50)    default ''                comment '浏览器类型',

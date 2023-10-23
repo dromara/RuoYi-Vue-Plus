@@ -946,6 +946,8 @@ create table if not exists sys_logininfor
     info_id        int8,
     tenant_id      varchar(20)  default '000000'::varchar,
     user_name      varchar(50)  default ''::varchar,
+    client_key     varchar(32)  default ''::varchar,
+    device_type    varchar(32)  default ''::varchar,
     ipaddr         varchar(128) default ''::varchar,
     login_location varchar(255) default ''::varchar,
     browser        varchar(50)  default ''::varchar,
@@ -963,6 +965,8 @@ comment on table sys_logininfor                 is '系统访问记录';
 comment on column sys_logininfor.info_id        is '访问ID';
 comment on column sys_logininfor.tenant_id      is '租户编号';
 comment on column sys_logininfor.user_name      is '用户账号';
+comment on column sys_logininfor.client_key     is '客户端';
+comment on column sys_logininfor.device_type    is '设备类型';
 comment on column sys_logininfor.ipaddr         is '登录IP地址';
 comment on column sys_logininfor.login_location is '登录地点';
 comment on column sys_logininfor.browser        is '浏览器类型';
