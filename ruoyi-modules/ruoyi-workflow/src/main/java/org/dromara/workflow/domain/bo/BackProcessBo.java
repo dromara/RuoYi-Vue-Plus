@@ -6,6 +6,7 @@ import org.dromara.common.core.validate.AddGroup;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -24,6 +25,11 @@ public class BackProcessBo implements Serializable {
      */
     @NotBlank(message = "任务ID不能为空", groups = AddGroup.class)
     private String taskId;
+
+    /**
+     * 消息类型
+     */
+    private List<String> messageType;
 
     /**
      * 驳回的节点id(目前未使用，直接驳回到申请人)

@@ -7,6 +7,7 @@ import org.dromara.common.core.validate.AddGroup;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -26,6 +27,11 @@ public class CompleteTaskBo implements Serializable {
      */
     @NotBlank(message = "任务id不能为空", groups = {AddGroup.class})
     private String taskId;
+
+    /**
+     * 消息类型
+     */
+    private List<String> messageType;
 
     /**
      * 办理意见

@@ -31,11 +31,9 @@ public class ActHiProcinstServiceImpl implements IActHiProcinstService {
      */
     @Override
     public List<ActHiProcinst> selectByBusinessKeyIn(List<String> businessKeys) {
-        return TenantHelper.ignore(() ->
-            baseMapper.selectList(new LambdaQueryWrapper<ActHiProcinst>()
+        return baseMapper.selectList(new LambdaQueryWrapper<ActHiProcinst>()
                 .in(ActHiProcinst::getBusinessKey, businessKeys)
-                .eq(ActHiProcinst::getTenantId, TenantHelper.getTenantId()))
-        );
+                .eq(ActHiProcinst::getTenantId, TenantHelper.getTenantId()));
     }
 
     /**
@@ -45,10 +43,9 @@ public class ActHiProcinstServiceImpl implements IActHiProcinstService {
      */
     @Override
     public ActHiProcinst selectByBusinessKey(String businessKey) {
-        return TenantHelper.ignore(() ->
-            baseMapper.selectOne(new LambdaQueryWrapper<ActHiProcinst>()
+        return baseMapper.selectOne(new LambdaQueryWrapper<ActHiProcinst>()
                 .eq(ActHiProcinst::getBusinessKey, businessKey)
-                .eq(ActHiProcinst::getTenantId, TenantHelper.getTenantId()))
-        );
+                .eq(ActHiProcinst::getTenantId, TenantHelper.getTenantId()));
+
     }
 }

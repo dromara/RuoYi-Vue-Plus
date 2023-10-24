@@ -5,14 +5,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
@@ -23,7 +20,6 @@ import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.TaskVo;
 import org.dromara.workflow.flowable.cmd.*;
-import org.dromara.workflow.mapper.ActTaskMapper;
 import org.dromara.workflow.service.IActTaskService;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -38,6 +34,7 @@ import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,7 +58,6 @@ public class ActTaskServiceImpl implements IActTaskService {
     private final HistoryService historyService;
     private final IdentityService identityService;
     private final ManagementService managementService;
-    private final ActTaskMapper actTaskMapper;
 
     /**
      * 启动任务
@@ -142,6 +138,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             if (task.isSuspended()) {
                 throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
             }
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
             //办理委托任务
             if (ObjectUtil.isNotEmpty(task.getDelegationState()) && FlowConstant.PENDING.equals(task.getDelegationState().name())) {
                 taskService.resolveTask(completeTaskBo.getTaskId());
@@ -159,11 +156,26 @@ public class ActTaskServiceImpl implements IActTaskService {
             if (CollUtil.isEmpty(list)) {
                 UpdateBusinessStatusCmd updateBusinessStatusCmd = new UpdateBusinessStatusCmd(task.getProcessInstanceId(), BusinessStatusEnum.FINISH.getStatus());
                 managementService.executeCommand(updateBusinessStatusCmd);
+            } else {
+                sendMessage(list, processInstance.getName(), completeTaskBo.getMessageType(),null);
             }
             return true;
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
         }
+    }
+
+    /**
+     * 发送消息
+     *
+     * @param list        任务
+     * @param name        流程名称
+     * @param messageType 消息类型
+     * @param message 消息内容，为空则发送默认配置的消息内容
+     */
+    @Async
+    public void sendMessage(List<Task> list, String name, List<String> messageType,String message) {
+        WorkflowUtils.sendMessage(list, name, messageType,message);
     }
 
     /**
@@ -173,33 +185,47 @@ public class ActTaskServiceImpl implements IActTaskService {
      */
     @Override
     public TableDataInfo<TaskVo> getTaskWaitByPage(TaskBo taskBo) {
-        PageQuery pageQuery = new PageQuery();
-        pageQuery.setPageNum(taskBo.getPageNum());
-        pageQuery.setPageSize(taskBo.getPageSize());
-        QueryWrapper<TaskVo> queryWrapper = new QueryWrapper<>();
         List<RoleDTO> roles = LoginHelper.getLoginUser().getRoles();
         String userId = String.valueOf(LoginHelper.getUserId());
-        queryWrapper.eq("t.business_status_", BusinessStatusEnum.WAITING.getStatus());
-        queryWrapper.eq("t.tenant_id_", TenantHelper.getTenantId());
+        TaskQuery query = taskService.createTaskQuery();
+        query.taskTenantId(TenantHelper.getTenantId()).taskCandidateOrAssigned(userId);
+        if (CollUtil.isNotEmpty(roles)) {
+            List<String> groupIds = StreamUtils.toList(roles, e -> String.valueOf(e.getRoleId()));
+            query.taskCandidateGroupIn(groupIds);
+        }
         if (StringUtils.isNotBlank(taskBo.getName())) {
-            queryWrapper.like("t.name_", taskBo.getName());
+            query.taskNameLike("%" + taskBo.getName() + "%");
         }
         if (StringUtils.isNotBlank(taskBo.getProcessDefinitionName())) {
-            queryWrapper.like("t.processDefinitionName", taskBo.getProcessDefinitionName());
+            query.processDefinitionNameLike("%" + taskBo.getProcessDefinitionName() + "%");
         }
         if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
-            queryWrapper.eq("t.processDefinitionKey", taskBo.getProcessDefinitionKey());
+            query.processDefinitionKey(taskBo.getProcessDefinitionKey());
         }
-        Page<TaskVo> page = TenantHelper.ignore(() ->
-            actTaskMapper.getTaskWaitByPage(pageQuery.build(), queryWrapper, userId, StreamUtils.toList(roles, e -> String.valueOf(e.getRoleId())))
-        );
-        List<TaskVo> taskList = page.getRecords();
-        for (TaskVo task : taskList) {
-            task.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(task.getBusinessStatus()));
-            task.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
-            task.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
+        List<Task> taskList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
+        List<ProcessInstance> processInstanceList = null;
+        if (CollUtil.isNotEmpty(taskList)) {
+            Set<String> processInstanceIds = StreamUtils.toSet(taskList, Task::getProcessInstanceId);
+            processInstanceList = runtimeService.createProcessInstanceQuery().processInstanceIds(processInstanceIds).list();
         }
-        return new TableDataInfo<>(taskList, page.getTotal());
+        List<TaskVo> list = new ArrayList<>();
+        for (Task task : taskList) {
+            TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
+            if (CollUtil.isNotEmpty(processInstanceList)) {
+                processInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
+                    taskVo.setBusinessStatus(e.getBusinessStatus());
+                    taskVo.setBusinessStatusName(BusinessStatusEnum.getEumByStatus(taskVo.getBusinessStatus()));
+                    taskVo.setProcessDefinitionKey(e.getProcessDefinitionKey());
+                    taskVo.setProcessDefinitionName(e.getProcessDefinitionName());
+                });
+            }
+            taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
+            taskVo.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
+            taskVo.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
+            list.add(taskVo);
+        }
+        long count = query.count();
+        return new TableDataInfo<>(list, count);
     }
 
     /**
@@ -569,6 +595,9 @@ public class ActTaskServiceImpl implements IActTaskService {
             for (Task t : list) {
                 taskService.setAssignee(t.getId(), historicTaskInstance.getAssignee());
             }
+            //发送消息
+            String message = "您的【" + processInstance.getName() + "】单据已经被驳回，请您注意查收。";
+            sendMessage(list, processInstance.getName(), backProcessBo.getMessageType(),message);
             //删除流程实例垃圾数据
             for (ExecutionEntity executionEntity : executionEntities) {
                 DeleteExecutionCmd deleteExecutionCmd = new DeleteExecutionCmd(executionEntity.getId());

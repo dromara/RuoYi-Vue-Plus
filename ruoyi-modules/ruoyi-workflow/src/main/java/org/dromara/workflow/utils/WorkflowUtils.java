@@ -11,11 +11,15 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
+import org.dromara.common.websocket.dto.WebSocketMessageDto;
+import org.dromara.common.websocket.utils.WebSocketUtils;
 import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.common.enums.BusinessStatusEnum;
+import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.ParticipantVo;
@@ -36,7 +40,6 @@ import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -331,6 +334,47 @@ public class WorkflowUtils {
                         ReflectUtils.invokeSetter(o, PROCESS_INSTANCE_VO, processInstanceVo);
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * 发送消息
+     *
+     * @param list        任务
+     * @param name        流程名称
+     * @param messageType 消息类型
+     * @param message     消息内容，为空则发送默认配置的消息内容
+     */
+    public static void sendMessage(List<Task> list, String name, List<String> messageType,String message) {
+        Set<Long> userIds = new HashSet<>();
+        if(StringUtils.isBlank(message)){
+            message = "有新的【" + name + "】单据已经提交至您的待办，请及时处理。";
+        }
+        for (Task t : list) {
+            ParticipantVo taskParticipant = WorkflowUtils.getCurrentTaskParticipant(t.getId());
+            if (CollUtil.isNotEmpty(taskParticipant.getGroupIds())) {
+                List<SysUserRole> sysUserRoles = I_WORK_FLOW_USER_SERVICE.getUserRoleListByRoleIds(taskParticipant.getGroupIds());
+                if (CollUtil.isNotEmpty(sysUserRoles)) {
+                    userIds.addAll(StreamUtils.toList(sysUserRoles, SysUserRole::getUserId));
+                }
+            }
+            List<Long> candidate = taskParticipant.getCandidate();
+            if (CollUtil.isNotEmpty(candidate)) {
+                userIds.addAll(candidate);
+            }
+        }
+        if (CollUtil.isNotEmpty(userIds)) {
+            List<SysUserVo> sysUserVoList = I_WORK_FLOW_USER_SERVICE.getUserListByIds(new ArrayList<>(userIds));
+            if (messageType.contains(MessageTypeEnum.SYSTEM_MESSAGE.getCode())) {
+                WebSocketMessageDto dto = new WebSocketMessageDto();
+                dto.setSessionKeys(new ArrayList<>(userIds));
+                dto.setMessage(message);
+                WebSocketUtils.publishMessage(dto);
+            } else if (messageType.contains(MessageTypeEnum.EMAIL_MESSAGE.getCode())) {
+                MailUtils.sendText(StreamUtils.join(sysUserVoList, SysUserVo::getEmail), "单据审批提醒", message);
+            } else if (messageType.contains(MessageTypeEnum.SMS_MESSAGE.getCode())) {
+                //todo 短信发送
             }
         }
     }
