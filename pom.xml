@@ -21,7 +21,7 @@
         <spring-boot.mybatis>3.0.2</spring-boot.mybatis>
         <springdoc.version>2.2.0</springdoc.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
-        <poi.version>5.2.4</poi.version>
+        <poi.version>5.2.3</poi.version>
         <easyexcel.version>3.3.2</easyexcel.version>
         <velocity.version>2.3</velocity.version>
         <satoken.version>1.37.0</satoken.version>
@@ -47,8 +47,6 @@
         <aws-java-sdk-s3.version>1.12.540</aws-java-sdk-s3.version>
         <!-- SMS 配置 -->
         <sms4j.version>2.2.0</sms4j.version>
-        <!-- 修复其他依赖与poi兼容问题 -->
-        <commons-io.version>2.13.0</commons-io.version>
         <!-- 限制框架中的fastjson版本 -->
         <fastjson.version>1.2.83</fastjson.version>
 
@@ -166,12 +164,6 @@
                         <artifactId>poi-ooxml-schemas</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commons-io.version}</version>
             </dependency>
 
             <!-- velocity代码生成使用模板 -->
