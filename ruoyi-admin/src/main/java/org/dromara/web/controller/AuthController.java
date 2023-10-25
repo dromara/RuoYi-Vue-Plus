@@ -80,7 +80,7 @@ public class AuthController {
             log.info("客户端id: {} 认证类型：{} 异常!.", clientId, grantType);
             return R.fail(MessageUtils.message("auth.grant.type.error"));
         } else if (!UserConstants.NORMAL.equals(client.getStatus())) {
-            return R.fail(MessageUtils.message("auth.grant.type.stop"));
+            return R.fail(MessageUtils.message("auth.grant.type.blocked"));
         }
         // 校验租户
         loginService.checkTenant(loginBody.getTenantId());
