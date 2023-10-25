@@ -1,6 +1,8 @@
 package org.dromara.web.service;
 
 import cn.dev33.satoken.secure.BCrypt;
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.model.RegisterBody;
@@ -14,8 +16,11 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.log.event.LogininforEvent;
 import org.dromara.common.redis.utils.RedisUtils;
+import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.config.properties.CaptchaProperties;
+import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.bo.SysUserBo;
+import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +35,7 @@ import org.springframework.stereotype.Service;
 public class SysRegisterService {
 
     private final ISysUserService userService;
+    private final SysUserMapper userMapper;
     private final CaptchaProperties captchaProperties;
 
     /**
@@ -53,7 +59,11 @@ public class SysRegisterService {
         sysUser.setPassword(BCrypt.hashpw(password));
         sysUser.setUserType(userType);
 
-        if (!userService.checkUserNameUnique(sysUser)) {
+        boolean exist = userMapper.exists(new LambdaQueryWrapper<SysUser>()
+            .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
+            .eq(SysUser::getUserName, sysUser.getUserName())
+            .ne(ObjectUtil.isNotNull(sysUser.getUserId()), SysUser::getUserId, sysUser.getUserId()));
+        if (exist) {
             throw new UserException("user.register.save.error", username);
         }
         boolean regFlag = userService.registerUser(sysUser, tenantId);
