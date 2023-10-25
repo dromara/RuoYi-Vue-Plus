@@ -2,7 +2,6 @@ package org.dromara.system.domain.bo;
 
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -24,7 +23,6 @@ public class SysDictTypeBo extends BaseEntity {
     /**
      * 字典主键
      */
-    @NotNull(message = "字典主键不能为空")
     private Long dictId;
 
     /**

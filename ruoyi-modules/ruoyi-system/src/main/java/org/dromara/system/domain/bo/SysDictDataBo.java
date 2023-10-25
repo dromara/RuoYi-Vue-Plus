@@ -23,7 +23,6 @@ public class SysDictDataBo extends BaseEntity {
     /**
      * 字典编码
      */
-    @NotNull(message = "字典编码不能为空")
     private Long dictCode;
 
     /**

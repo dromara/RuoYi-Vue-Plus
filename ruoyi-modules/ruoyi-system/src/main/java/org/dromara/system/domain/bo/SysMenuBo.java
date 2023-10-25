@@ -24,7 +24,6 @@ public class SysMenuBo extends BaseEntity {
     /**
      * 菜单ID
      */
-    @NotNull(message = "菜单ID不能为空")
     private Long menuId;
 
     /**

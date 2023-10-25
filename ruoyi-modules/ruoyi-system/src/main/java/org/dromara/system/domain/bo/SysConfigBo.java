@@ -2,7 +2,6 @@ package org.dromara.system.domain.bo;
 
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,7 +22,6 @@ public class SysConfigBo extends BaseEntity {
     /**
      * 参数主键
      */
-    @NotNull(message = "参数主键不能为空")
     private Long configId;
 
     /**
