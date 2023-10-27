@@ -542,7 +542,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     @Transactional(rollbackFor = Exception.class)
     public boolean taskUrging(TaskUrgingBo taskUrgingBo) {
         try {
-            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(taskUrgingBo.getProcessInstanceId()).singleResult();
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(taskUrgingBo.getProcessInstanceId())
+                .processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
             if (processInstance == null) {
                 throw new ServiceException("任务已结束！");
             }
