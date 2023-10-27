@@ -157,7 +157,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                 UpdateBusinessStatusCmd updateBusinessStatusCmd = new UpdateBusinessStatusCmd(task.getProcessInstanceId(), BusinessStatusEnum.FINISH.getStatus());
                 managementService.executeCommand(updateBusinessStatusCmd);
             } else {
-                sendMessage(list, processInstance.getName(), completeTaskBo.getMessageType(),null);
+                sendMessage(list, processInstance.getName(), completeTaskBo.getMessageType(), null);
             }
             return true;
         } catch (Exception e) {
@@ -171,11 +171,11 @@ public class ActTaskServiceImpl implements IActTaskService {
      * @param list        任务
      * @param name        流程名称
      * @param messageType 消息类型
-     * @param message 消息内容，为空则发送默认配置的消息内容
+     * @param message     消息内容，为空则发送默认配置的消息内容
      */
     @Async
-    public void sendMessage(List<Task> list, String name, List<String> messageType,String message) {
-        WorkflowUtils.sendMessage(list, name, messageType,message);
+    public void sendMessage(List<Task> list, String name, List<String> messageType, String message) {
+        WorkflowUtils.sendMessage(list, name, messageType, message);
     }
 
     /**
@@ -597,7 +597,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
             //发送消息
             String message = "您的【" + processInstance.getName() + "】单据已经被驳回，请您注意查收。";
-            sendMessage(list, processInstance.getName(), backProcessBo.getMessageType(),message);
+            sendMessage(list, processInstance.getName(), backProcessBo.getMessageType(), message);
             //删除流程实例垃圾数据
             for (ExecutionEntity executionEntity : executionEntities) {
                 DeleteExecutionCmd deleteExecutionCmd = new DeleteExecutionCmd(executionEntity.getId());
@@ -608,5 +608,25 @@ public class ActTaskServiceImpl implements IActTaskService {
             throw new ServiceException(e.getMessage());
         }
         return task.getProcessInstanceId();
+    }
+
+    /**
+     * 修改任务办理人
+     *
+     * @param taskIds 任务id
+     * @param userId  办理人id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateAssignee(String[] taskIds, String userId) {
+        try {
+            List<Task> list = taskService.createTaskQuery().taskIds(Arrays.asList(taskIds)).taskTenantId(TenantHelper.getTenantId()).list();
+            for (Task task : list) {
+                taskService.setAssignee(task.getId(), userId);
+            }
+        } catch (Exception e) {
+            throw new ServiceException("修改失败：" + e.getMessage());
+        }
+        return true;
     }
 }

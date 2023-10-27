@@ -11,6 +11,7 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
+import org.dromara.workflow.domain.bo.TaskUrgingBo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.service.IActProcessInstanceService;
 import org.springframework.validation.annotation.Validated;
@@ -125,4 +126,16 @@ public class ActProcessInstanceController extends BaseController {
     public TableDataInfo<ProcessInstanceVo> getCurrentSubmitByPage(ProcessInstanceBo processInstanceBo) {
         return iActProcessInstanceService.getCurrentSubmitByPage(processInstanceBo);
     }
+
+    /**
+     * 任务催办(给当前任务办理人发送站内信，邮件，短信等)
+     *
+     * @param taskUrgingBo 任务催办
+     */
+    @Log(title = "流程实例管理", businessType = BusinessType.INSERT)
+    @PostMapping("/taskUrging")
+    public R<Void> taskUrging(@RequestBody TaskUrgingBo taskUrgingBo) {
+        return toAjax(iActProcessInstanceService.taskUrging(taskUrgingBo));
+    }
+
 }

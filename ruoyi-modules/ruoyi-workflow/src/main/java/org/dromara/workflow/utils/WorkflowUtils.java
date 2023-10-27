@@ -40,6 +40,7 @@ import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -346,10 +347,10 @@ public class WorkflowUtils {
      * @param messageType 消息类型
      * @param message     消息内容，为空则发送默认配置的消息内容
      */
-    public static void sendMessage(List<Task> list, String name, List<String> messageType,String message) {
+    public static void sendMessage(List<Task> list, String name, List<String> messageType, String message) {
         Set<Long> userIds = new HashSet<>();
-        if(StringUtils.isBlank(message)){
-            message = "有新的【" + name + "】单据已经提交至您的待办，请及时处理。";
+        if (StringUtils.isBlank(message)) {
+            message = "有新的【" + name + "】单据已经提交至您的待办，请您及时处理。";
         }
         for (Task t : list) {
             ParticipantVo taskParticipant = WorkflowUtils.getCurrentTaskParticipant(t.getId());

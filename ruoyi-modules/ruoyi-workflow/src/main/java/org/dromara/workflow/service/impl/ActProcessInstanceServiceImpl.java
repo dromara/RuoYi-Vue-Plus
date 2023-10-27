@@ -20,15 +20,14 @@ import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
-import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
-import org.dromara.workflow.domain.vo.GraphicInfoVo;
-import org.dromara.workflow.domain.vo.ProcessInstanceVo;
-import org.dromara.workflow.domain.vo.TaskVo;
+import org.dromara.workflow.domain.bo.TaskUrgingBo;
+import org.dromara.workflow.domain.vo.*;
 import org.dromara.workflow.flowable.CustomDefaultProcessDiagramGenerator;
 import org.dromara.workflow.flowable.cmd.DeleteExecutionCmd;
 import org.dromara.workflow.flowable.cmd.ExecutionChildByExecutionIdCmd;
 import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IActProcessInstanceService;
+import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.bpmn.model.*;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -532,5 +531,30 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         long count = query.count();
         return new TableDataInfo<>(list, count);
+    }
+
+    /**
+     * 任务催办(给当前任务办理人发送站内信，邮件，短信等)
+     *
+     * @param taskUrgingBo 任务催办
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean taskUrging(TaskUrgingBo taskUrgingBo) {
+        try {
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(taskUrgingBo.getProcessInstanceId()).singleResult();
+            if (processInstance == null) {
+                throw new ServiceException("任务已结束！");
+            }
+            String message = taskUrgingBo.getMessage();
+            if (StringUtils.isBlank(message)) {
+                message = "您的【" + processInstance.getName() + "】单据还未审批，请您及时处理。";
+            }
+            List<Task> list = taskService.createTaskQuery().processInstanceId(taskUrgingBo.getProcessInstanceId()).list();
+            WorkflowUtils.sendMessage(list, processInstance.getName(), taskUrgingBo.getMessageType(), message);
+        } catch (ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
+        return true;
     }
 }

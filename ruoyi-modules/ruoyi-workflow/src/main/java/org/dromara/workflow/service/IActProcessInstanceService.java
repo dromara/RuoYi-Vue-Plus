@@ -3,6 +3,7 @@ package org.dromara.workflow.service;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
+import org.dromara.workflow.domain.bo.TaskUrgingBo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 
 import java.util.List;
@@ -93,4 +94,12 @@ public interface IActProcessInstanceService {
      * @return 结果
      */
     TableDataInfo<ProcessInstanceVo> getCurrentSubmitByPage(ProcessInstanceBo processInstanceBo);
+
+    /**
+     * 任务催办(给当前任务办理人发送站内信，邮件，短信等)
+     *
+     * @param taskUrgingBo 任务催办
+     * @return 结果
+     */
+    boolean taskUrging(TaskUrgingBo taskUrgingBo);
 }

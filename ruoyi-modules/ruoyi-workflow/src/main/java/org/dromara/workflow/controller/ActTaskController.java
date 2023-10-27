@@ -212,4 +212,15 @@ public class ActTaskController extends BaseController {
     }
 
 
+    /**
+     * 修改任务办理人
+     *
+     * @param taskIds 任务id
+     * @param userId  办理人id
+     */
+    @Log(title = "任务管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/updateAssignee/{taskIds}/{userId}")
+    public R<Void> updateAssignee(@PathVariable String[] taskIds, @PathVariable String userId) {
+        return toAjax(iActTaskService.updateAssignee(taskIds, userId));
+    }
 }

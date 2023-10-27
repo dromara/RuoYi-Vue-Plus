@@ -109,4 +109,13 @@ public interface IActTaskService {
      * @return 流程实例id
      */
     String backProcess(BackProcessBo backProcessBo);
+
+    /**
+     * 修改任务办理人
+     *
+     * @param taskIds 任务id
+     * @param userId  办理人id
+     * @return 结果
+     */
+    boolean updateAssignee(String[] taskIds, String userId);
 }
