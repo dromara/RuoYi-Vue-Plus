@@ -63,7 +63,7 @@ public class WorkflowUtils {
     }
 
     private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
-    private static final IWorkflowUserService I_WORK_FLOW_USER_SERVICE = SpringUtils.getBean(WorkflowUserServiceImpl.class);
+    private static final IWorkflowUserService I_WORKFLOW_USER_SERVICE = SpringUtils.getBean(WorkflowUserServiceImpl.class);
     private static final IActHiProcinstService I_ACT_HI_PROCINST_SERVICE = SpringUtils.getBean(IActHiProcinstService.class);
 
     /**
@@ -198,11 +198,11 @@ public class WorkflowUtils {
             List<HistoricIdentityLink> groupList = StreamUtils.filter(linksForTask, e -> StringUtils.isNotBlank(e.getGroupId()));
             if (CollUtil.isNotEmpty(groupList)) {
                 List<Long> groupIds = StreamUtils.toList(groupList, e -> Long.valueOf(e.getGroupId()));
-                List<SysUserRole> sysUserRoles = I_WORK_FLOW_USER_SERVICE.getUserRoleListByRoleIds(groupIds);
+                List<SysUserRole> sysUserRoles = I_WORKFLOW_USER_SERVICE.getUserRoleListByRoleIds(groupIds);
                 if (CollUtil.isNotEmpty(sysUserRoles)) {
                     participantVo.setGroupIds(groupIds);
                     List<Long> userIdList = StreamUtils.toList(sysUserRoles, SysUserRole::getUserId);
-                    List<SysUserVo> sysUsers = I_WORK_FLOW_USER_SERVICE.getUserListByIds(userIdList);
+                    List<SysUserVo> sysUsers = I_WORKFLOW_USER_SERVICE.getUserListByIds(userIdList);
                     if (CollUtil.isNotEmpty(sysUsers)) {
                         List<Long> userIds = StreamUtils.toList(sysUsers, SysUserVo::getUserId);
                         List<String> nickNames = StreamUtils.toList(sysUsers, SysUserVo::getNickName);
@@ -221,7 +221,7 @@ public class WorkflowUtils {
 
                     }
                 }
-                List<SysUserVo> sysUsers = I_WORK_FLOW_USER_SERVICE.getUserListByIds(userIdList);
+                List<SysUserVo> sysUsers = I_WORKFLOW_USER_SERVICE.getUserListByIds(userIdList);
                 if (CollUtil.isNotEmpty(sysUsers)) {
                     List<Long> userIds = StreamUtils.toList(sysUsers, SysUserVo::getUserId);
                     List<String> nickNames = StreamUtils.toList(sysUsers, SysUserVo::getNickName);
@@ -355,7 +355,7 @@ public class WorkflowUtils {
         for (Task t : list) {
             ParticipantVo taskParticipant = WorkflowUtils.getCurrentTaskParticipant(t.getId());
             if (CollUtil.isNotEmpty(taskParticipant.getGroupIds())) {
-                List<SysUserRole> sysUserRoles = I_WORK_FLOW_USER_SERVICE.getUserRoleListByRoleIds(taskParticipant.getGroupIds());
+                List<SysUserRole> sysUserRoles = I_WORKFLOW_USER_SERVICE.getUserRoleListByRoleIds(taskParticipant.getGroupIds());
                 if (CollUtil.isNotEmpty(sysUserRoles)) {
                     userIds.addAll(StreamUtils.toList(sysUserRoles, SysUserRole::getUserId));
                 }
@@ -366,7 +366,7 @@ public class WorkflowUtils {
             }
         }
         if (CollUtil.isNotEmpty(userIds)) {
-            List<SysUserVo> sysUserVoList = I_WORK_FLOW_USER_SERVICE.getUserListByIds(new ArrayList<>(userIds));
+            List<SysUserVo> sysUserVoList = I_WORKFLOW_USER_SERVICE.getUserListByIds(new ArrayList<>(userIds));
             if (messageType.contains(MessageTypeEnum.SYSTEM_MESSAGE.getCode())) {
                 WebSocketMessageDto dto = new WebSocketMessageDto();
                 dto.setSessionKeys(new ArrayList<>(userIds));
