@@ -117,8 +117,10 @@
             </template>
          </el-table-column>
          <el-table-column label="操作人员" align="center" width="110" prop="operName" :show-overflow-tooltip="true" sortable="custom" :sort-orders="['descending', 'ascending']" />
+         <el-table-column label="部门" align="center" prop="deptName" width="130" :show-overflow-tooltip="true" />
          <el-table-column label="操作地址" align="center" prop="operIp" width="130" :show-overflow-tooltip="true" />
-         <el-table-column label="操作状态" align="center" prop="status">
+         <el-table-column label="操作地点" align="center" prop="operLocation" :show-overflow-tooltip="true" />
+        <el-table-column label="操作状态" align="center" prop="status">
             <template #default="scope">
                <dict-tag :options="sys_common_status" :value="scope.row.status" />
             </template>
@@ -152,15 +154,16 @@
       <el-dialog title="操作日志详细" v-model="open" width="700px" append-to-body>
          <el-form :model="form" label-width="100px">
             <el-row>
-               <el-col :span="12">
-                  <el-form-item label="操作模块：">{{ form.title }} / {{ typeFormat(form) }}</el-form-item>
+               <el-col :span="24">
                   <el-form-item
                     label="登录信息："
-                  >{{ form.operName }} / {{ form.operIp }} / {{ form.operLocation }}</el-form-item>
+                  >{{ form.operName }} / {{form.deptName}} / {{ form.operIp }} / {{ form.operLocation }}</el-form-item>
                </el-col>
                <el-col :span="12">
-                  <el-form-item label="请求地址：">{{ form.operUrl }}</el-form-item>
-                  <el-form-item label="请求方式：">{{ form.requestMethod }}</el-form-item>
+                  <el-form-item label="请求信息：">{{ form.requestMethod }} {{form.operUrl }}</el-form-item>
+               </el-col>
+               <el-col :span="12">
+                  <el-form-item label="操作模块：">{{ form.title }} / {{ typeFormat(form) }}</el-form-item>
                </el-col>
                <el-col :span="24">
                   <el-form-item label="操作方法：">{{ form.method }}</el-form-item>
