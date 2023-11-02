@@ -14,10 +14,9 @@ import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.RegisterBody;
-import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.MessageUtils;
-import org.dromara.common.core.utils.StreamUtils;
-import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.domain.model.SocialLoginBody;
+import org.dromara.common.core.utils.*;
+import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
@@ -66,11 +65,13 @@ public class AuthController {
     /**
      * 登录方法
      *
-     * @param loginBody 登录信息
+     * @param body 登录信息
      * @return 结果
      */
     @PostMapping("/login")
-    public R<LoginVo> login(@Validated @RequestBody LoginBody loginBody) {
+    public R<LoginVo> login(@Validated @RequestBody String body) {
+        LoginBody loginBody = JsonUtils.parseObject(body, LoginBody.class);
+        ValidatorUtils.validate(loginBody);
         // 授权类型和客户端id
         String clientId = loginBody.getClientId();
         String grantType = loginBody.getGrantType();
@@ -85,7 +86,7 @@ public class AuthController {
         // 校验租户
         loginService.checkTenant(loginBody.getTenantId());
         // 登录
-        return R.ok(IAuthStrategy.login(loginBody, client));
+        return R.ok(IAuthStrategy.login(body, client, grantType));
     }
 
     /**
@@ -112,9 +113,11 @@ public class AuthController {
      * @return 结果
      */
     @PostMapping("/social/callback")
-    public R<Void> socialCallback(@RequestBody LoginBody loginBody) {
+    public R<Void> socialCallback(@RequestBody SocialLoginBody loginBody) {
         // 获取第三方登录信息
-        AuthResponse<AuthUser> response = SocialUtils.loginAuth(loginBody, socialProperties);
+        AuthResponse<AuthUser> response = SocialUtils.loginAuth(
+                loginBody.getSource(), loginBody.getSocialCode(),
+                loginBody.getSocialState(), socialProperties);
         AuthUser authUserData = response.getData();
         // 判断授权响应是否成功
         if (!response.ok()) {
