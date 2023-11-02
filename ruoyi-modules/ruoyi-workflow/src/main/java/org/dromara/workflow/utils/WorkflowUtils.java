@@ -367,15 +367,19 @@ public class WorkflowUtils {
         }
         if (CollUtil.isNotEmpty(userIds)) {
             List<SysUserVo> sysUserVoList = I_WORKFLOW_USER_SERVICE.getUserListByIds(new ArrayList<>(userIds));
-            if (messageType.contains(MessageTypeEnum.SYSTEM_MESSAGE.getCode())) {
-                WebSocketMessageDto dto = new WebSocketMessageDto();
-                dto.setSessionKeys(new ArrayList<>(userIds));
-                dto.setMessage(message);
-                WebSocketUtils.publishMessage(dto);
-            } else if (messageType.contains(MessageTypeEnum.EMAIL_MESSAGE.getCode())) {
-                MailUtils.sendText(StreamUtils.join(sysUserVoList, SysUserVo::getEmail), "单据审批提醒", message);
-            } else if (messageType.contains(MessageTypeEnum.SMS_MESSAGE.getCode())) {
-                //todo 短信发送
+            for (String code : messageType) {
+                if (code.equals(MessageTypeEnum.SYSTEM_MESSAGE.getCode())) {
+                    WebSocketMessageDto dto = new WebSocketMessageDto();
+                    dto.setSessionKeys(new ArrayList<>(userIds));
+                    dto.setMessage(message);
+                    WebSocketUtils.publishMessage(dto);
+                }
+                if (code.equals(MessageTypeEnum.EMAIL_MESSAGE.getCode())) {
+                    MailUtils.sendText(StreamUtils.join(sysUserVoList, SysUserVo::getEmail), "单据审批提醒", message);
+                }
+                if (code.equals(MessageTypeEnum.SMS_MESSAGE.getCode())) {
+                    //todo 短信发送
+                }
             }
         }
     }
