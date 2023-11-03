@@ -10,7 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDbTableColumnsByName" parameterType="String" resultMap="GenTableColumnResult">
         <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isMySql()">
             select column_name,
-                   (case when (is_nullable = 'no' <![CDATA[ && ]]> column_key != 'PRI') then '1' else null end) as is_required,
+                   (case when (is_nullable = 'no' <![CDATA[ && ]]> column_key != 'PRI') then '1' else '0' end) as is_required,
                    (case when column_key = 'PRI' then '1' else '0' end) as is_pk,
                    ordinal_position as sort,
                    column_comment,
@@ -21,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </if>
         <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isOracle()">
             select lower(temp.column_name) as column_name,
-                    (case when (temp.nullable = 'N'  and  temp.constraint_type != 'P') then '1' else null end) as is_required,
+                    (case when (temp.nullable = 'N'  and  temp.constraint_type != 'P') then '1' else '0' end) as is_required,
                     (case when temp.constraint_type = 'P' then '1' else '0' end) as is_pk,
                     temp.column_id as sort,
                     temp.comments as column_comment,

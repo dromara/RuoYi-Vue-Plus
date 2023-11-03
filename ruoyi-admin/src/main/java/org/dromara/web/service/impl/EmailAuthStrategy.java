@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
-import org.dromara.common.core.domain.model.LoginBody;
+import org.dromara.common.core.domain.model.EmailLoginBody;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.UserStatus;
@@ -17,7 +17,7 @@ import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
-import org.dromara.common.core.validate.auth.EmailGroup;
+import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
@@ -44,12 +44,9 @@ public class EmailAuthStrategy implements IAuthStrategy {
     private final SysUserMapper userMapper;
 
     @Override
-    public void validate(LoginBody loginBody) {
-        ValidatorUtils.validate(loginBody, EmailGroup.class);
-    }
-
-    @Override
-    public LoginVo login(String clientId, LoginBody loginBody, SysClient client) {
+    public LoginVo login(String clientId, String body, SysClient client) {
+        EmailLoginBody loginBody = JsonUtils.parseObject(body, EmailLoginBody.class);
+        ValidatorUtils.validate(loginBody);
         String tenantId = loginBody.getTenantId();
         String email = loginBody.getEmail();
         String emailCode = loginBody.getEmailCode();
