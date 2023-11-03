@@ -81,9 +81,6 @@ public class WebSocketUtils {
      * @param message 消息内容
      */
     public static void publishAll(String message) {
-        WebSocketSessionHolder.getSessionsAll().forEach(key -> {
-            WebSocketUtils.sendMessage(key, message);
-        });
         WebSocketMessageDto broadcastMessage = new WebSocketMessageDto();
         broadcastMessage.setMessage(message);
         RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage, consumer -> {
