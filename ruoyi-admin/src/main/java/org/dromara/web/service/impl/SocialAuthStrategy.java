@@ -97,6 +97,8 @@ public class SocialAuthStrategy implements IAuthStrategy {
 
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         LoginUser loginUser = loginService.buildLoginUser(user);
+        loginUser.setClientKey(client.getClientKey());
+        loginUser.setDeviceType(client.getDeviceType());
         SaLoginModel model = new SaLoginModel();
         model.setDevice(client.getDeviceType());
         // 自定义分配 不同用户体系 不同 token 授权时间 不设置默认走全局 yml 配置

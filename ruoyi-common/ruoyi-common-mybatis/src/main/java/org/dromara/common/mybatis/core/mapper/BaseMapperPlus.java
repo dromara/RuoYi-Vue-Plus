@@ -6,12 +6,12 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
+import com.baomidou.mybatisplus.core.toolkit.reflect.GenericTypeUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
-import org.dromara.common.core.utils.MapstructUtils;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
+import org.dromara.common.core.utils.MapstructUtils;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -35,11 +35,12 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
     Log log = LogFactory.getLog(BaseMapperPlus.class);
 
     default Class<V> currentVoClass() {
-        return (Class<V>) ReflectionKit.getSuperClassGenericType(this.getClass(), BaseMapperPlus.class, 1);
+        GenericTypeUtils.resolveTypeArguments(this.getClass(), BaseMapperPlus.class);
+        return (Class<V>) GenericTypeUtils.resolveTypeArguments(this.getClass(), BaseMapperPlus.class)[1];
     }
 
     default Class<T> currentModelClass() {
-        return (Class<T>) ReflectionKit.getSuperClassGenericType(this.getClass(), BaseMapperPlus.class, 0);
+        return (Class<T>) GenericTypeUtils.resolveTypeArguments(this.getClass(), BaseMapperPlus.class)[0];
     }
 
     default List<T> selectList() {

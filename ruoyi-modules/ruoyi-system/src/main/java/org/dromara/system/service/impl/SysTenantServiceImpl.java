@@ -117,7 +117,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
 
         // 获取所有租户编号
         List<String> tenantIds = baseMapper.selectObjs(
-            new LambdaQueryWrapper<SysTenant>().select(SysTenant::getTenantId), Convert::toStr);
+            new LambdaQueryWrapper<SysTenant>().select(SysTenant::getTenantId), x -> {return Convert.toStr(x);});
         String tenantId = generateTenantId(tenantIds);
         add.setTenantId(tenantId);
         boolean flag = baseMapper.insert(add) > 0;
