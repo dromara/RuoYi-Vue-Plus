@@ -251,6 +251,7 @@ management:
 
 --- # websocket
 websocket:
+  # 如果关闭 需要和前端开关一起关闭
   enabled: true
   # 路径
   path: /resource/websocket
