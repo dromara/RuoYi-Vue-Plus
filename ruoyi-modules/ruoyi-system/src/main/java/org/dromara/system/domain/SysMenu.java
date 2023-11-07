@@ -185,7 +185,7 @@ public class SysMenu extends BaseEntity {
      * 内链域名特殊字符替换
      */
     public static String innerLinkReplaceEach(String path) {
-        return StringUtils.replaceEach(path, new String[]{Constants.HTTP, Constants.HTTPS, Constants.WWW, "."},
-            new String[]{"", "", "", "/"});
+        return StringUtils.replaceEach(path, new String[]{Constants.HTTP, Constants.HTTPS, Constants.WWW, ".", ":"},
+            new String[]{"", "", "", "/", "/"});
     }
 }
