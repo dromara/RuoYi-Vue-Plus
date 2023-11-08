@@ -54,12 +54,11 @@ public class SocialAuthStrategy implements IAuthStrategy {
     /**
      * 登录-第三方授权登录
      *
-     * @param clientId 客户端id
      * @param body     登录信息
      * @param client   客户端信息
      */
     @Override
-    public LoginVo login(String clientId, String body, SysClient client) {
+    public LoginVo login(String body, SysClient client) {
         SocialLoginBody loginBody = JsonUtils.parseObject(body, SocialLoginBody.class);
         ValidatorUtils.validate(loginBody);
         AuthResponse<AuthUser> response = SocialUtils.loginAuth(
@@ -103,7 +102,7 @@ public class SocialAuthStrategy implements IAuthStrategy {
         // 例如: 后台用户30分钟过期 app用户1天过期
         model.setTimeout(client.getTimeout());
         model.setActiveTimeout(client.getActiveTimeout());
-        model.setExtra(LoginHelper.CLIENT_KEY, clientId);
+        model.setExtra(LoginHelper.CLIENT_KEY, client.getClientId());
         // 生成token
         LoginHelper.login(loginUser, model);
 
@@ -113,7 +112,7 @@ public class SocialAuthStrategy implements IAuthStrategy {
         LoginVo loginVo = new LoginVo();
         loginVo.setAccessToken(StpUtil.getTokenValue());
         loginVo.setExpireIn(StpUtil.getTokenTimeout());
-        loginVo.setClientId(clientId);
+        loginVo.setClientId(client.getClientId());
         return loginVo;
     }
 
