@@ -50,8 +50,8 @@ public class SaTokenConfig implements WebMvcConfigurer {
 
                     // 有效率影响 用于临时测试
                     // if (log.isDebugEnabled()) {
-                    //     log.debug("剩余有效时间: {}", StpUtil.getTokenTimeout());
-                    //     log.debug("临时有效时间: {}", StpUtil.getTokenActiveTimeout());
+                    //     log.info("剩余有效时间: {}", StpUtil.getTokenTimeout());
+                    //     log.info("临时有效时间: {}", StpUtil.getTokenActiveTimeout());
                     // }
 
                 });
