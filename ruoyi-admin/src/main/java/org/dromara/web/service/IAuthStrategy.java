@@ -20,18 +20,17 @@ public interface IAuthStrategy {
      */
     static LoginVo login(String body, SysClient client, String grantType) {
         // 授权类型和客户端id
-        String clientId = client.getClientId();
         String beanName = grantType + BASE_NAME;
         if (!SpringUtils.containsBean(beanName)) {
             throw new ServiceException("授权类型不正确!");
         }
         IAuthStrategy instance = SpringUtils.getBean(beanName);
-        return instance.login(clientId, body, client);
+        return instance.login(body, client);
     }
 
     /**
      * 登录
      */
-    LoginVo login(String clientId, String body, SysClient client);
+    LoginVo login(String body, SysClient client);
 
 }
