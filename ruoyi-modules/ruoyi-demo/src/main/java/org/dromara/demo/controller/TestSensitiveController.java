@@ -50,25 +50,25 @@ public class TestSensitiveController extends BaseController {
         /**
          * 电话
          */
-        @Sensitive(strategy = SensitiveStrategy.PHONE)
+        @Sensitive(strategy = SensitiveStrategy.PHONE, roleKey = "common")
         private String phone;
 
         /**
          * 地址
          */
-        @Sensitive(strategy = SensitiveStrategy.ADDRESS)
+        @Sensitive(strategy = SensitiveStrategy.ADDRESS, perms = "system:user:query")
         private String address;
 
         /**
          * 邮箱
          */
-        @Sensitive(strategy = SensitiveStrategy.EMAIL)
+        @Sensitive(strategy = SensitiveStrategy.EMAIL, roleKey = "common", perms = "system:user:query1")
         private String email;
 
         /**
          * 银行卡
          */
-        @Sensitive(strategy = SensitiveStrategy.BANK_CARD)
+        @Sensitive(strategy = SensitiveStrategy.BANK_CARD, roleKey = "common1", perms = "system:user:query")
         private String bankCard;
 
     }
