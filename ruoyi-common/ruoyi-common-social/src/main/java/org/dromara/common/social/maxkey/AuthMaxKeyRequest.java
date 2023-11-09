@@ -63,9 +63,9 @@ public class AuthMaxKeyRequest extends AuthDefaultRequest {
             throw new AuthException(object.getStr("message"));
         }
         return AuthUser.builder()
-            .uuid(object.getStr("id"))
+            .uuid(object.getStr("userId"))
             .username(object.getStr("username"))
-            .nickname(object.getStr("name"))
+            .nickname(object.getStr("displayName"))
             .avatar(object.getStr("avatar_url"))
             .blog(object.getStr("web_url"))
             .company(object.getStr("organization"))
