@@ -30,17 +30,17 @@ public enum DataScopeType {
     /**
      * 自定数据权限
      */
-    CUSTOM("2", " #{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} ) ", ""),
+    CUSTOM("2", " #{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} ) ", " 1 = 0 "),
 
     /**
      * 部门数据权限
      */
-    DEPT("3", " #{#deptName} = #{#user.deptId} ", ""),
+    DEPT("3", " #{#deptName} = #{#user.deptId} ", " 1 = 0 "),
 
     /**
      * 部门及以下数据权限
      */
-    DEPT_AND_CHILD("4", " #{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )} )", ""),
+    DEPT_AND_CHILD("4", " #{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )} )", " 1 = 0 "),
 
     /**
      * 仅本人数据权限
