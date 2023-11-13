@@ -76,6 +76,11 @@ public class PlusDataPermissionInterceptor extends JsqlParserSupport implements 
             if (invalidCacheSet.contains(ms.getId())) {
                 return;
             }
+            DataColumn[] dataColumns = dataPermissionHandler.findAnnotation(ms.getId());
+            if (ArrayUtil.isEmpty(dataColumns)) {
+                invalidCacheSet.add(ms.getId());
+                return;
+            }
             PluginUtils.MPBoundSql mpBs = mpSh.mPBoundSql();
             mpBs.sql(parserMulti(mpBs.sql(), ms.getId()));
         }
