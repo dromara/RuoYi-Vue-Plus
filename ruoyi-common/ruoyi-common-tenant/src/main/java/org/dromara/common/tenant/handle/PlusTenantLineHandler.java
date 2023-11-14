@@ -2,15 +2,14 @@ package org.dromara.common.tenant.handle;
 
 import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.common.tenant.helper.TenantHelper;
-import org.dromara.common.tenant.properties.TenantProperties;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.StringValue;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.tenant.helper.TenantHelper;
+import org.dromara.common.tenant.properties.TenantProperties;
 
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class PlusTenantLineHandler implements TenantLineHandler {
 
     @Override
     public boolean ignoreTable(String tableName) {
-        String tenantId = LoginHelper.getTenantId();
+        String tenantId = TenantHelper.getTenantId();
         // 判断是否有租户
         if (StringUtils.isNotBlank(tenantId)) {
             // 不需要过滤租户的表
