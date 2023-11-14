@@ -27,15 +27,10 @@ public class PlusTenantLineHandler implements TenantLineHandler {
 
     @Override
     public Expression getTenantId() {
-        String tenantId = LoginHelper.getTenantId();
+        String tenantId = TenantHelper.getTenantId();
         if (StringUtils.isBlank(tenantId)) {
             log.error("无法获取有效的租户id -> Null");
             return new NullValue();
-        }
-        String dynamicTenantId = TenantHelper.getDynamic();
-        if (StringUtils.isNotBlank(dynamicTenantId)) {
-            // 返回动态租户
-            return new StringValue(dynamicTenantId);
         }
         // 返回固定租户
         return new StringValue(tenantId);

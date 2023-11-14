@@ -96,7 +96,7 @@ public class RedisConfig {
      * redis集群配置 yml
      *
      * --- # redis 集群配置(单机与集群只能开启一个另一个需要注释掉)
-     * spring:
+     * spring.data:
      *   redis:
      *     cluster:
      *       nodes:
@@ -108,7 +108,7 @@ public class RedisConfig {
      *     # 连接超时时间
      *     timeout: 10s
      *     # 是否开启ssl
-     *     ssl: false
+     *     ssl.enabled: false
      *
      * redisson:
      *   # 线程池数量

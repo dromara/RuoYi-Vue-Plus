@@ -21,4 +21,8 @@ import java.lang.annotation.Target;
 @JsonSerialize(using = SensitiveHandler.class)
 public @interface Sensitive {
     SensitiveStrategy strategy();
+
+    String roleKey() default "";
+
+    String perms() default "";
 }

@@ -64,7 +64,12 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         for (Long id : ossIds) {
             SysOssVo vo = SpringUtils.getAopProxy(this).getById(id);
             if (ObjectUtil.isNotNull(vo)) {
-                list.add(this.matchingUrl(vo));
+                try {
+                    list.add(this.matchingUrl(vo));
+                } catch (Exception ignored) {
+                    // 如果oss异常无法连接则将数据直接返回
+                    list.add(vo);
+                }
             }
         }
         return list;
@@ -76,7 +81,12 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         for (Long id : StringUtils.splitTo(ossIds, Convert::toLong)) {
             SysOssVo vo = SpringUtils.getAopProxy(this).getById(id);
             if (ObjectUtil.isNotNull(vo)) {
-                list.add(this.matchingUrl(vo).getUrl());
+                try {
+                    list.add(this.matchingUrl(vo).getUrl());
+                } catch (Exception ignored) {
+                    // 如果oss异常无法连接则将数据直接返回
+                    list.add(vo.getUrl());
+                }
             }
         }
         return String.join(StringUtils.SEPARATOR, list);

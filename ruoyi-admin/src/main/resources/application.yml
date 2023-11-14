@@ -93,11 +93,6 @@ spring:
 sa-token:
   # token名称 (同时也是cookie名称)
   token-name: Authorization
-  # token固定超时 设为七天 (必定过期) 单位: 秒
-  timeout: 604800
-  # 多端不同 token 有效期 可查看 LoginHelper.loginByDevice 方法自定义
-  # token最低活跃时间 (指定时间无操作就过期) 单位: 秒
-  active-timeout: 1800
   # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
   is-concurrent: true
   # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
@@ -256,6 +251,7 @@ management:
 
 --- # websocket
 websocket:
+  # 如果关闭 需要和前端开关一起关闭
   enabled: true
   # 路径
   path: /resource/websocket

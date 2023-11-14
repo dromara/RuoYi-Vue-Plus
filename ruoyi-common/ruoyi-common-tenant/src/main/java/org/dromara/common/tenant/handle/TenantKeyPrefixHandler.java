@@ -33,7 +33,7 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
         if (StringUtils.isBlank(tenantId)) {
             log.error("无法获取有效的租户id -> Null");
         }
-        if (StringUtils.startsWith(name, tenantId)) {
+        if (StringUtils.startsWith(name, tenantId + "")) {
             // 如果存在则直接返回
             return super.map(name);
         }
@@ -56,7 +56,7 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
         if (StringUtils.isBlank(tenantId)) {
             log.error("无法获取有效的租户id -> Null");
         }
-        if (StringUtils.startsWith(unmap, tenantId)) {
+        if (StringUtils.startsWith(unmap, tenantId + "")) {
             // 如果存在则删除
             return unmap.substring((tenantId + ":").length());
         }

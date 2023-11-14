@@ -1,16 +1,18 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import org.dromara.common.log.annotation.Log;
-import org.dromara.common.web.core.BaseController;
-import org.dromara.common.mybatis.core.page.PageQuery;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.service.DictService;
+import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
+import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.web.core.BaseController;
+import org.dromara.common.websocket.utils.WebSocketUtils;
 import org.dromara.system.domain.bo.SysNoticeBo;
 import org.dromara.system.domain.vo.SysNoticeVo;
 import org.dromara.system.service.ISysNoticeService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class SysNoticeController extends BaseController {
 
     private final ISysNoticeService noticeService;
+    private final DictService dictService;
 
     /**
      * 获取通知公告列表
@@ -54,7 +57,13 @@ public class SysNoticeController extends BaseController {
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
     public R<Void> add(@Validated @RequestBody SysNoticeBo notice) {
-        return toAjax(noticeService.insertNotice(notice));
+        int rows = noticeService.insertNotice(notice);
+        if (rows <= 0) {
+            return R.fail();
+        }
+        String type = dictService.getDictLabel("sys_notice_type", notice.getNoticeType());
+        WebSocketUtils.publishAll("[" + type + "] " + notice.getNoticeTitle());
+        return R.ok();
     }
 
     /**
