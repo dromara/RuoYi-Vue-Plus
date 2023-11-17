@@ -152,10 +152,10 @@ public class SysLoginService {
      *
      * @param userId 用户ID
      */
-    public void recordLoginInfo(Long userId) {
+    public void recordLoginInfo(Long userId, String ip) {
         SysUser sysUser = new SysUser();
         sysUser.setUserId(userId);
-        sysUser.setLoginIp(ServletUtils.getClientIP());
+        sysUser.setLoginIp(ip);
         sysUser.setLoginDate(DateUtils.getNowDate());
         sysUser.setUpdateBy(userId);
         userMapper.updateById(sysUser);
