@@ -17,6 +17,7 @@ import org.dromara.common.core.enums.TenantStatus;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.*;
 import org.dromara.common.log.event.LogininforEvent;
+import org.dromara.common.mybatis.helper.DataPermissionHelper;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.exception.TenantException;
@@ -158,7 +159,7 @@ public class SysLoginService {
         sysUser.setLoginIp(ip);
         sysUser.setLoginDate(DateUtils.getNowDate());
         sysUser.setUpdateBy(userId);
-        userMapper.updateById(sysUser);
+        DataPermissionHelper.ignore(() -> userMapper.updateById(sysUser));
     }
 
     /**
