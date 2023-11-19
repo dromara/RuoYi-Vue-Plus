@@ -2,9 +2,9 @@ package org.dromara.web.service.impl;
 
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -33,6 +33,9 @@ import org.dromara.web.domain.vo.LoginVo;
 import org.dromara.web.service.IAuthStrategy;
 import org.dromara.web.service.SysLoginService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * 第三方授权策略
@@ -76,19 +79,17 @@ public class SocialAuthStrategy implements IAuthStrategy {
                     .executeAsync();
         }
 
-        SysSocialVo social = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
-        if (!ObjectUtil.isNotNull(social)) {
+        List<SysSocialVo> list = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
+        if (CollUtil.isEmpty(list)) {
             throw new ServiceException("你还没有绑定第三方账号，绑定后才可以登录！");
         }
-        // 验证授权表里面的租户id是否包含当前租户id
-        String tenantId = social.getTenantId();
-        if (ObjectUtil.isNotNull(social) && StrUtil.isNotBlank(tenantId)
-                && !tenantId.contains(loginBody.getTenantId())) {
+        Optional<SysSocialVo> opt = list.stream().filter(x -> x.getTenantId().equals(loginBody.getTenantId())).findAny();
+        if (opt.isEmpty()) {
             throw new ServiceException("对不起，你没有权限登录当前租户！");
         }
-
+        SysSocialVo social = opt.get();
         // 查找用户
-        SysUserVo user = loadUser(tenantId, social.getUserId());
+        SysUserVo user = loadUser(social.getTenantId(), social.getUserId());
 
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         LoginUser loginUser = loginService.buildLoginUser(user);

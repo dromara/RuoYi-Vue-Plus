@@ -3,6 +3,7 @@ package org.dromara.web.service;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,13 +79,13 @@ public class SysLoginService {
         bo.setUserName(authUserData.getUsername());
         bo.setNickName(authUserData.getNickname());
         // 查询是否已经绑定用户
-        SysSocialVo vo = sysSocialService.selectByAuthId(authId);
-        if (ObjectUtil.isEmpty(vo)) {
+        List<SysSocialVo> list = sysSocialService.selectByAuthId(authId);
+        if (CollUtil.isEmpty(list)) {
             // 没有绑定用户, 新增用户信息
             sysSocialService.insertByBo(bo);
         } else {
             // 更新用户信息
-            bo.setId(vo.getId());
+            bo.setId(list.get(0).getId());
             sysSocialService.updateByBo(bo);
         }
     }
