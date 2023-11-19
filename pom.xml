@@ -30,7 +30,7 @@
         <hutool.version>5.8.22</hutool.version>
         <okhttp.version>4.10.0</okhttp.version>
         <spring-boot-admin.version>3.1.7</spring-boot-admin.version>
-        <redisson.version>3.24.1</redisson.version>
+        <redisson.version>3.24.3</redisson.version>
         <lock4j.version>2.2.5</lock4j.version>
         <dynamic-ds.version>4.2.0</dynamic-ds.version>
         <alibaba-ttl.version>2.14.2</alibaba-ttl.version>
