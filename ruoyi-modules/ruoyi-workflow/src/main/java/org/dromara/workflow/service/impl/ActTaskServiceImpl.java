@@ -151,7 +151,11 @@ public class ActTaskServiceImpl implements IActTaskService {
             //办理意见
             taskService.addComment(completeTaskBo.getTaskId(), task.getProcessInstanceId(), TaskStatusEnum.PASS.getStatus(), StringUtils.isBlank(completeTaskBo.getMessage()) ? "同意" : completeTaskBo.getMessage());
             //办理任务
-            taskService.complete(completeTaskBo.getTaskId(), completeTaskBo.getVariables());
+            if (CollUtil.isNotEmpty(completeTaskBo.getVariables())) {
+                taskService.complete(completeTaskBo.getTaskId(), completeTaskBo.getVariables());
+            } else {
+                taskService.complete(completeTaskBo.getTaskId());
+            }
             List<Task> list = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(task.getProcessInstanceId()).list();
             if (CollUtil.isEmpty(list)) {
                 UpdateBusinessStatusCmd updateBusinessStatusCmd = new UpdateBusinessStatusCmd(task.getProcessInstanceId(), BusinessStatusEnum.FINISH.getStatus());
