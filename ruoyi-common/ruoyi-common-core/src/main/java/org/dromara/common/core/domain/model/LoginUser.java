@@ -113,6 +113,16 @@ public class LoginUser implements Serializable {
     private Long roleId;
 
     /**
+     * 客户端
+     */
+    private String clientKey;
+
+    /**
+     * 设备类型
+     */
+    private String deviceType;
+
+    /**
      * 获取登录id
      */
     public String getLoginId() {

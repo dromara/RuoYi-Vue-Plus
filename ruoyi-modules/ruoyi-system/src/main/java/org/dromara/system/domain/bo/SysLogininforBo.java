@@ -34,6 +34,16 @@ public class SysLogininforBo {
     private String userName;
 
     /**
+     * 客户端
+     */
+    private String clientKey;
+
+    /**
+     * 设备类型
+     */
+    private String deviceType;
+
+    /**
      * 登录IP地址
      */
     private String ipaddr;

@@ -13,14 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
 import org.dromara.common.core.constant.Constants;
-import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.LoginUser;
+import org.dromara.common.core.domain.model.SocialLoginBody;
 import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
-import org.dromara.common.core.validate.auth.SocialGroup;
+import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
@@ -51,22 +51,20 @@ public class SocialAuthStrategy implements IAuthStrategy {
     private final SysUserMapper userMapper;
     private final SysLoginService loginService;
 
-
-    @Override
-    public void validate(LoginBody loginBody) {
-        ValidatorUtils.validate(loginBody, SocialGroup.class);
-    }
-
     /**
      * 登录-第三方授权登录
      *
-     * @param clientId  客户端id
-     * @param loginBody 登录信息
-     * @param client    客户端信息
+     * @param clientId 客户端id
+     * @param body     登录信息
+     * @param client   客户端信息
      */
     @Override
-    public LoginVo login(String clientId, LoginBody loginBody, SysClient client) {
-        AuthResponse<AuthUser> response = SocialUtils.loginAuth(loginBody, socialProperties);
+    public LoginVo login(String clientId, String body, SysClient client) {
+        SocialLoginBody loginBody = JsonUtils.parseObject(body, SocialLoginBody.class);
+        ValidatorUtils.validate(loginBody);
+        AuthResponse<AuthUser> response = SocialUtils.loginAuth(
+                loginBody.getSource(), loginBody.getSocialCode(),
+                loginBody.getSocialState(), socialProperties);
         if (!response.ok()) {
             throw new ServiceException(response.getMsg());
         }
@@ -74,11 +72,11 @@ public class SocialAuthStrategy implements IAuthStrategy {
         if ("GITEE".equals(authUserData.getSource())) {
             // 如用户使用 gitee 登录顺手 star 给作者一点支持 拒绝白嫖
             HttpUtil.createRequest(Method.PUT, "https://gitee.com/api/v5/user/starred/dromara/RuoYi-Vue-Plus")
-                .formStr(MapUtil.of("access_token", authUserData.getToken().getAccessToken()))
-                .executeAsync();
+                    .formStr(MapUtil.of("access_token", authUserData.getToken().getAccessToken()))
+                    .executeAsync();
             HttpUtil.createRequest(Method.PUT, "https://gitee.com/api/v5/user/starred/dromara/RuoYi-Cloud-Plus")
-                .formStr(MapUtil.of("access_token", authUserData.getToken().getAccessToken()))
-                .executeAsync();
+                    .formStr(MapUtil.of("access_token", authUserData.getToken().getAccessToken()))
+                    .executeAsync();
         }
 
         SysSocialVo social = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
@@ -88,7 +86,7 @@ public class SocialAuthStrategy implements IAuthStrategy {
         // 验证授权表里面的租户id是否包含当前租户id
         String tenantId = social.getTenantId();
         if (ObjectUtil.isNotNull(social) && StrUtil.isNotBlank(tenantId)
-            && !tenantId.contains(loginBody.getTenantId())) {
+                && !tenantId.contains(loginBody.getTenantId())) {
             throw new ServiceException("对不起，你没有权限登录当前租户！");
         }
 
@@ -97,6 +95,8 @@ public class SocialAuthStrategy implements IAuthStrategy {
 
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         LoginUser loginUser = loginService.buildLoginUser(user);
+        loginUser.setClientKey(client.getClientKey());
+        loginUser.setDeviceType(client.getDeviceType());
         SaLoginModel model = new SaLoginModel();
         model.setDevice(client.getDeviceType());
         // 自定义分配 不同用户体系 不同 token 授权时间 不设置默认走全局 yml 配置
@@ -119,9 +119,9 @@ public class SocialAuthStrategy implements IAuthStrategy {
 
     private SysUserVo loadUser(String tenantId, Long userId) {
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getUserName, SysUser::getStatus)
-            .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
-            .eq(SysUser::getUserId, userId));
+                .select(SysUser::getUserName, SysUser::getStatus)
+                .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
+                .eq(SysUser::getUserId, userId));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", "");
             throw new UserException("user.not.exists", "");

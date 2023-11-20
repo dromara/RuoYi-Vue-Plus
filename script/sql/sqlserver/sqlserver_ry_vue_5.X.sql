@@ -1383,6 +1383,8 @@ CREATE TABLE sys_logininfor
     info_id        bigint                      NOT NULL,
     tenant_id      nvarchar(20)  DEFAULT ('000000') NULL,
     user_name      nvarchar(50)  DEFAULT ''    NULL,
+    client_key     nvarchar(32)  DEFAULT ''    NULL,
+    device_type    nvarchar(32)  DEFAULT ''    NULL,
     ipaddr         nvarchar(128) DEFAULT ''    NULL,
     login_location nvarchar(255) DEFAULT ''    NULL,
     browser        nvarchar(50)  DEFAULT ''    NULL,
@@ -1419,6 +1421,18 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_logininfor',
     'COLUMN', N'user_name'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'客户端' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_logininfor',
+    'COLUMN', N'client_key'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'设备类型' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_logininfor',
+    'COLUMN', N'device_type'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'登录IP地址' ,
