@@ -336,7 +336,7 @@ function submitForm() {
   proxy.$refs["demoRef"].validate(valid => {
     if (valid) {
       buttonLoading.value = true;
-      if (form.value.ossConfigId != null) {
+      if (form.value.id != null) {
         updateDemo(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
