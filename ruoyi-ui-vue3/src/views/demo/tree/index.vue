@@ -243,7 +243,7 @@ function submitForm() {
   proxy.$refs["treeRef"].validate(valid => {
     if (valid) {
       buttonLoading.value = true;
-      if (form.value.ossConfigId != null) {
+      if (form.value.id != null) {
         updateTree(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
