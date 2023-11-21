@@ -1,15 +1,14 @@
 package org.dromara.system.mapper;
 
-import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.vo.SysUserVo;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -85,37 +84,6 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
      * @return 用户对象信息
      */
     SysUserVo selectUserByEmail(String email);
-
-    /**
-     * 通过用户名查询用户(不走租户插件)
-     *
-     * @param userName 用户名
-     * @param tenantId 租户id
-     * @return 用户对象信息
-     */
-    @InterceptorIgnore(tenantLine = "true")
-    SysUserVo selectTenantUserByUserName(@Param("userName") String userName, @Param("tenantId") String tenantId);
-
-    /**
-     * 通过手机号查询用户(不走租户插件)
-     *
-     * @param phonenumber 手机号
-     * @param tenantId    租户id
-     * @return 用户对象信息
-     */
-    @InterceptorIgnore(tenantLine = "true")
-    SysUserVo selectTenantUserByPhonenumber(@Param("phonenumber") String phonenumber, @Param("tenantId") String tenantId);
-
-    /**
-     * 通过邮箱查询用户(不走租户插件)
-     *
-     * @param email    邮箱
-     * @param tenantId 租户id
-     * @return 用户对象信息
-     */
-    @InterceptorIgnore(tenantLine = "true")
-    SysUserVo selectTenantUserByEmail(@Param("email") String email, @Param("tenantId") String tenantId);
-
 
     /**
      * 通过用户ID查询用户

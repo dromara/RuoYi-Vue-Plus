@@ -113,21 +113,19 @@ public class SocialAuthStrategy implements IAuthStrategy {
     }
 
     private SysUserVo loadUser(String tenantId, Long userId) {
-        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+        return TenantHelper.dynamic(tenantId, () -> {
+            SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
                 .select(SysUser::getUserName, SysUser::getStatus)
-                .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
                 .eq(SysUser::getUserId, userId));
-        if (ObjectUtil.isNull(user)) {
-            log.info("登录用户：{} 不存在.", "");
-            throw new UserException("user.not.exists", "");
-        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
-            log.info("登录用户：{} 已被停用.", "");
-            throw new UserException("user.blocked", "");
-        }
-        if (TenantHelper.isEnable()) {
-            return userMapper.selectTenantUserByUserName(user.getUserName(), tenantId);
-        }
-        return userMapper.selectUserByUserName(user.getUserName());
+            if (ObjectUtil.isNull(user)) {
+                log.info("登录用户：{} 不存在.", "");
+                throw new UserException("user.not.exists", "");
+            } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+                log.info("登录用户：{} 已被停用.", "");
+                throw new UserException("user.blocked", "");
+            }
+            return userMapper.selectUserByUserName(user.getUserName());
+        });
     }
 
 }

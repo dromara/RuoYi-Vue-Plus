@@ -57,9 +57,8 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
                 new LambdaQueryWrapper<SysOssConfig>().orderByAsc(TenantEntity::getTenantId))
         );
         Map<String, List<SysOssConfig>> map = StreamUtils.groupByKey(list, SysOssConfig::getTenantId);
-        try {
-            for (String tenantId : map.keySet()) {
-                TenantHelper.setDynamic(tenantId);
+        for (String tenantId : map.keySet()) {
+            TenantHelper.dynamic(tenantId, () -> {
                 // 加载OSS初始化配置
                 for (SysOssConfig config : map.get(tenantId)) {
                     String configKey = config.getConfigKey();
@@ -68,9 +67,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
                     }
                     CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
                 }
-            }
-        } finally {
-            TenantHelper.clearDynamic();
+            });
         }
     }
 
