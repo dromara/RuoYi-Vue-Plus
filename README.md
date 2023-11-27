@@ -3,6 +3,14 @@
 
 - - -
 
+## 版本状态说明
+
+由于 springboot 2.X 与 vue 2.X 官方均宣布停止维护, 故而 框架 4.X 版本 进入维护状态(只处理问题不更新功能)
+
+停止维护时间预计: 2024年6-10月具体根据使用人数动态决定, 此版本已经相当稳定 即便不更新功能也不影响使用
+
+如果依旧选择使用 jdk8 或者 jdk11 可以放心使用此版本, 如果希望使用 jdk17 或者 jdk21 可以选择使用 5.X 分支
+
 ## 平台简介
 
 [![码云Gitee](https://gitee.com/dromara/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/dromara/RuoYi-Vue-Plus)
@@ -10,7 +18,7 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus/blob/master/LICENSE)
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
 <br>
-[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-4.8.1-success.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus)
+[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-4.8.2-success.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7-blue.svg)]()
 [![JDK-8+](https://img.shields.io/badge/JDK-8-green.svg)]()
 [![JDK-11](https://img.shields.io/badge/JDK-11-green.svg)]()

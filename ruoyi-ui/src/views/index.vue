@@ -114,7 +114,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "4.8.1",
+      version: "4.8.2",
     };
   },
   methods: {
