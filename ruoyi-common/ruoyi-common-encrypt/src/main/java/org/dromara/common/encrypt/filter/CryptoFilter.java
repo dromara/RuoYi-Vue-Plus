@@ -94,7 +94,6 @@ public class CryptoFilter implements Filter {
         // 获取注解
         try {
             HandlerExecutionChain mappingHandler = handlerMapping.getHandler(servletRequest);
-            System.out.println(mappingHandler);
             if (ObjectUtil.isNotNull(mappingHandler)) {
                 Object handler = mappingHandler.getHandler();
                 if (ObjectUtil.isNotNull(handler)) {
