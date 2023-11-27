@@ -1,6 +1,6 @@
 {
   "name": "ruoyi-vue-plus",
-  "version": "4.8.1",
+  "version": "4.8.2",
   "description": "RuoYi-Vue-Plus后台管理系统",
   "author": "LionLi",
   "license": "MIT",
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "2.0.10",
-    "@vueup/vue-quill": "1.1.0",
+    "@vueup/vue-quill": "1.2.0",
     "@vueuse/core": "9.5.0",
     "axios": "0.27.2",
     "echarts": "5.4.0",

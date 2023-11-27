@@ -40,7 +40,7 @@ public class DelayedQueueController {
         QueueUtils.subscribeBlockingQueue(queueName, (String orderNum) -> {
             // 观察接收时间
             log.info("通道: {}, 收到数据: {}", queueName, orderNum);
-        });
+        }, true);
         return R.ok("操作成功");
     }
 

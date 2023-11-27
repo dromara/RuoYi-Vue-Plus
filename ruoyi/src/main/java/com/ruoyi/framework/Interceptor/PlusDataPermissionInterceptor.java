@@ -1,9 +1,12 @@
 package com.ruoyi.framework.interceptor;
 
+import cn.hutool.core.collection.ConcurrentHashSet;
+import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserSupport;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
+import com.ruoyi.common.annotation.DataColumn;
 import com.ruoyi.framework.handler.PlusDataPermissionHandler;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.delete.Delete;
@@ -23,6 +26,7 @@ import org.apache.ibatis.session.RowBounds;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 数据权限拦截器
@@ -33,6 +37,11 @@ import java.util.List;
 public class PlusDataPermissionInterceptor extends JsqlParserSupport implements InnerInterceptor {
 
     private final PlusDataPermissionHandler dataPermissionHandler = new PlusDataPermissionHandler();
+    /**
+     * 无效注解方法缓存用于快速返回
+     */
+    private final Set<String> invalidCacheSet = new ConcurrentHashSet<>();
+
 
     @Override
     public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
@@ -41,7 +50,12 @@ public class PlusDataPermissionInterceptor extends JsqlParserSupport implements 
             return;
         }
         // 检查是否无效 无数据权限注解
-        if (dataPermissionHandler.isInvalid(ms.getId())) {
+        if (invalidCacheSet.contains(ms.getId())) {
+            return;
+        }
+        DataColumn[] dataColumns = dataPermissionHandler.findAnnotation(ms.getId());
+        if (ArrayUtil.isEmpty(dataColumns)) {
+            invalidCacheSet.add(ms.getId());
             return;
         }
         // 解析 sql 分配对应方法
@@ -56,6 +70,15 @@ public class PlusDataPermissionInterceptor extends JsqlParserSupport implements 
         SqlCommandType sct = ms.getSqlCommandType();
         if (sct == SqlCommandType.UPDATE || sct == SqlCommandType.DELETE) {
             if (InterceptorIgnoreHelper.willIgnoreDataPermission(ms.getId())) {
+                return;
+            }
+            // 检查是否无效 无数据权限注解
+            if (invalidCacheSet.contains(ms.getId())) {
+                return;
+            }
+            DataColumn[] dataColumns = dataPermissionHandler.findAnnotation(ms.getId());
+            if (ArrayUtil.isEmpty(dataColumns)) {
+                invalidCacheSet.add(ms.getId());
                 return;
             }
             PluginUtils.MPBoundSql mpBs = mpSh.mPBoundSql();

@@ -9,14 +9,13 @@
         name="file"
         :show-file-list="false"
         :headers="headers"
-        style="display: none"
         ref="uploadRef"
         v-if="type == 'url'"
     >
     </el-upload>
     <div class="editor">
       <quill-editor
-          ref="myQuillEditor"
+          ref="quillEditorRef"
           v-model:content="content"
           contentType="html"
           @textChange="(e) => $emit('update:modelValue', content)"
@@ -68,7 +67,7 @@ const { proxy } = getCurrentInstance();
 // 上传的图片服务器地址
 const uploadUrl = ref(import.meta.env.VITE_APP_BASE_API + "/system/oss/upload");
 const headers = ref({ Authorization: "Bearer " + getToken() });
-const myQuillEditor = ref();
+const quillEditorRef = ref();
 
 const options = ref({
   theme: "snow",
@@ -101,7 +100,7 @@ const options = ref({
       },
     }
   },
-  placeholder: '请输入内容',
+  placeholder: "请输入内容",
   readOnly: props.readOnly,
 });
 
@@ -114,7 +113,7 @@ const styles = computed(() => {
     style.height = `${props.height}px`;
   }
   return style;
-})
+});
 
 const content = ref("");
 watch(() => props.modelValue, (v) => {
@@ -125,10 +124,10 @@ watch(() => props.modelValue, (v) => {
 
 // 图片上传成功返回图片地址
 function handleUploadSuccess(res, file) {
-  // 获取富文本实例
-  let quill = toRaw(myQuillEditor.value).getQuill();
   // 如果上传成功
   if (res.code == 200) {
+    // 获取富文本实例
+    let quill = toRaw(quillEditorRef.value).getQuill();
     // 获取光标位置
     let length = quill.selection.savedRange.index;
     // 插入图片，res为服务器返回的图片链接地址
@@ -144,6 +143,13 @@ function handleUploadSuccess(res, file) {
 
 // 图片上传前拦截
 function handleBeforeUpload(file) {
+  const type = ["image/jpeg", "image/jpg", "image/png", "image/svg"];
+  const isJPG = type.includes(file.type);
+  //检验文件格式
+  if (!isJPG) {
+    proxy.$modal.msgError(`图片格式错误!`);
+    return false;
+  }
   // 校检文件大小
   if (props.fileSize) {
     const isLt = file.size / 1024 / 1024 < props.fileSize;
@@ -164,6 +170,9 @@ function handleUploadError(err) {
 </script>
 
 <style>
+.editor-img-uploader {
+  display: none;
+}
 .editor, .ql-toolbar {
   white-space: pre-wrap !important;
   line-height: normal !important;

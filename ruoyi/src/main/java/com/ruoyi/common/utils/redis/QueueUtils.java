@@ -224,8 +224,12 @@ public class QueueUtils {
     /**
      * 订阅阻塞队列(可订阅所有实现类 例如: 延迟 优先 有界 等)
      */
-    public static <T> void subscribeBlockingQueue(String queueName, Consumer<T> consumer) {
+    public static <T> void subscribeBlockingQueue(String queueName, Consumer<T> consumer, boolean isDelayed) {
         RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
+        if (isDelayed) {
+            // 订阅延迟队列
+            CLIENT.getDelayedQueue(queue);
+        }
         queue.subscribeOnElements(consumer);
     }
 

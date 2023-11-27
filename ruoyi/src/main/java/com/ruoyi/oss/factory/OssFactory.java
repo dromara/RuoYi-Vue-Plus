@@ -39,7 +39,7 @@ public class OssFactory {
     /**
      * 根据类型获取实例
      */
-    public static OssClient instance(String configKey) {
+    public static synchronized OssClient instance(String configKey) {
         String json = CacheUtils.get(CacheNames.SYS_OSS_CONFIG, configKey);
         if (json == null) {
             throw new OssException("系统异常, '" + configKey + "'配置信息不存在!");

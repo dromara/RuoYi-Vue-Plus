@@ -51,6 +51,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     public TableDataInfo<SysOperLog> selectPageOperLogList(SysOperLog operLog, PageQuery pageQuery) {
         Map<String, Object> params = operLog.getParams();
         LambdaQueryWrapper<SysOperLog> lqw = new LambdaQueryWrapper<SysOperLog>()
+            .like(StringUtils.isNotBlank(operLog.getOperIp()), SysOperLog::getOperIp, operLog.getOperIp())
             .like(StringUtils.isNotBlank(operLog.getTitle()), SysOperLog::getTitle, operLog.getTitle())
             .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
                 SysOperLog::getBusinessType, operLog.getBusinessType())
@@ -93,6 +94,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     public List<SysOperLog> selectOperLogList(SysOperLog operLog) {
         Map<String, Object> params = operLog.getParams();
         return baseMapper.selectList(new LambdaQueryWrapper<SysOperLog>()
+            .like(StringUtils.isNotBlank(operLog.getOperIp()), SysOperLog::getOperIp, operLog.getOperIp())
             .like(StringUtils.isNotBlank(operLog.getTitle()), SysOperLog::getTitle, operLog.getTitle())
             .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
                 SysOperLog::getBusinessType, operLog.getBusinessType())
