@@ -95,6 +95,41 @@ public class TestExcelController {
     }
 
     /**
+     * 多个sheet导出
+     */
+    @GetMapping("/exportTemplateMultiSheet")
+    public void exportTemplateMultiSheet(HttpServletResponse response) {
+        List<TestObj1> list1 = new ArrayList<>();
+        list1.add(new TestObj1("list1测试1", "list1测试2", "list1测试3"));
+        list1.add(new TestObj1("list1测试4", "list1测试5", "list1测试6"));
+        List<TestObj1> list2 = new ArrayList<>();
+        list2.add(new TestObj1("list2测试1", "list2测试2", "list2测试3"));
+        list2.add(new TestObj1("list2测试4", "list2测试5", "list2测试6"));
+        List<TestObj1> list3 = new ArrayList<>();
+        list3.add(new TestObj1("list3测试1", "list3测试2", "list3测试3"));
+        list3.add(new TestObj1("list3测试4", "list3测试5", "list3测试6"));
+        List<TestObj1> list4 = new ArrayList<>();
+        list4.add(new TestObj1("list4测试1", "list4测试2", "list4测试3"));
+        list4.add(new TestObj1("list4测试4", "list4测试5", "list4测试6"));
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sheetMap1 = new HashMap<>();
+        sheetMap1.put("data1", list1);
+        Map<String, Object> sheetMap2 = new HashMap<>();
+        sheetMap2.put("data2", list2);
+        Map<String, Object> sheetMap3 = new HashMap<>();
+        sheetMap3.put("data3", list3);
+        Map<String, Object> sheetMap4 = new HashMap<>();
+        sheetMap4.put("data4", list4);
+
+        list.add(sheetMap1);
+        list.add(sheetMap2);
+        list.add(sheetMap3);
+        list.add(sheetMap4);
+        ExcelUtil.exportTemplateMultiSheet(list, "多sheet列表", "excel/多sheet列表.xlsx", response);
+    }
+
+    /**
      * 导入表格
      */
     @PostMapping(value = "/importWithOptions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
