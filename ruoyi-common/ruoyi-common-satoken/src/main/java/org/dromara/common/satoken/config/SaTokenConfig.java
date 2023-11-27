@@ -10,7 +10,6 @@ import org.dromara.common.satoken.core.service.SaPermissionImpl;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * sa-token 配置
@@ -19,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @AutoConfiguration
 @PropertySource(value = "classpath:common-satoken.yml", factory = YmlPropertySourceFactory.class)
-public class SaTokenConfig implements WebMvcConfigurer {
+public class SaTokenConfig {
 
     @Bean
     public StpLogic getStpLogicJwt() {
