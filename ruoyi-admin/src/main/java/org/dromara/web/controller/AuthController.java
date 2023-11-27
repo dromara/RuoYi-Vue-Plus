@@ -16,6 +16,7 @@ import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.RegisterBody;
 import org.dromara.common.core.domain.model.SocialLoginBody;
 import org.dromara.common.core.utils.*;
+import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
@@ -73,6 +74,7 @@ public class AuthController {
      * @param body 登录信息
      * @return 结果
      */
+    @ApiEncrypt(response = false)
     @PostMapping("/login")
     public R<LoginVo> login(@Validated @RequestBody String body) {
         LoginBody loginBody = JsonUtils.parseObject(body, LoginBody.class);

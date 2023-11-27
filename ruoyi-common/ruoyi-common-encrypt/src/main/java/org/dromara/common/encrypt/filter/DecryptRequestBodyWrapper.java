@@ -24,7 +24,7 @@ public class DecryptRequestBodyWrapper extends HttpServletRequestWrapper {
 
     private final byte[] body;
 
-    public DecryptRequestBodyWrapper(HttpServletRequest request, String publicKey, String privateKey, String headerFlag) throws IOException {
+    public DecryptRequestBodyWrapper(HttpServletRequest request, String privateKey, String headerFlag) throws IOException {
         super(request);
         // 获取 AES 密码 采用 RSA 加密
         String headerRsa = request.getHeader(headerFlag);
