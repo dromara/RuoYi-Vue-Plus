@@ -98,7 +98,7 @@ public class WebSocketUtils {
 
     private static void sendMessage(WebSocketSession session, WebSocketMessage<?> message) {
         if (session == null || !session.isOpen()) {
-            log.error("[send] session会话已经关闭");
+            log.warn("[send] session会话已经关闭");
         } else {
             try {
                 session.sendMessage(message);
