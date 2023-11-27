@@ -6,6 +6,7 @@ import cn.hutool.core.io.FileUtil;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.MimeTypeUtils;
+import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -79,6 +80,7 @@ public class SysProfileController extends BaseController {
      *
      * @param bo 新旧密码
      */
+    @ApiEncrypt
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
     public R<Void> updatePwd(@Validated @RequestBody SysUserPasswordBo bo) {

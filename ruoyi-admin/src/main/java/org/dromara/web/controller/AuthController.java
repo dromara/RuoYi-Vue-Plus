@@ -74,7 +74,7 @@ public class AuthController {
      * @param body 登录信息
      * @return 结果
      */
-    @ApiEncrypt(response = false)
+    @ApiEncrypt
     @PostMapping("/login")
     public R<LoginVo> login(@Validated @RequestBody String body) {
         LoginBody loginBody = JsonUtils.parseObject(body, LoginBody.class);
@@ -165,6 +165,7 @@ public class AuthController {
     /**
      * 用户注册
      */
+    @ApiEncrypt
     @PostMapping("/register")
     public R<Void> register(@Validated @RequestBody RegisterBody user) {
         if (!configService.selectRegisterEnabled(user.getTenantId())) {

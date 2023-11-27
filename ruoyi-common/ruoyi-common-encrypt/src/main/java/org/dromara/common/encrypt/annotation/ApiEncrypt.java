@@ -13,8 +13,8 @@ import java.lang.annotation.*;
 public @interface ApiEncrypt {
 
     /**
-     * 响应加密忽略，默认加密，为 false 时不加密
+     * 响应加密忽略，默认不加密，为 true 时加密
      */
-    boolean response() default true;
+    boolean response() default false;
 
 }

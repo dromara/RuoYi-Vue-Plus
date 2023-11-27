@@ -70,7 +70,6 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
     public String getEncryptContent(HttpServletResponse servletResponse, String publicKey, String headerFlag) throws IOException {
         // 生成秘钥
         String aesPassword = RandomUtil.randomString(32);
-        System.out.println("aesPassword = " + aesPassword);
         // 秘钥使用 Base64 编码
         String encryptAes = EncryptUtils.encryptByBase64(aesPassword);
         // Rsa 公钥加密 Base64 编码
