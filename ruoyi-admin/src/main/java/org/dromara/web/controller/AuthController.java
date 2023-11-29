@@ -52,7 +52,6 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @SaIgnore
-@Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/auth")
@@ -76,7 +75,7 @@ public class AuthController {
      */
     @ApiEncrypt
     @PostMapping("/login")
-    public R<LoginVo> login(@Validated @RequestBody String body) {
+    public R<LoginVo> login(@RequestBody String body) {
         LoginBody loginBody = JsonUtils.parseObject(body, LoginBody.class);
         ValidatorUtils.validate(loginBody);
         // 授权类型和客户端id
