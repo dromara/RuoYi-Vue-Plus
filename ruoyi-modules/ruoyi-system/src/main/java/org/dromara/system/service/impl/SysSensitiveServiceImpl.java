@@ -23,7 +23,7 @@ public class SysSensitiveServiceImpl implements SensitiveService {
      */
     @Override
     public boolean isSensitive(String roleKey, String perms) {
-        if (!StpUtil.isLogin()) {
+        if (!LoginHelper.isLogin()) {
             return true;
         }
         boolean roleExist = StringUtils.isNotBlank(roleKey);
