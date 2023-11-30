@@ -57,7 +57,7 @@ public class LoginHelper {
             model.setExtra(TENANT_KEY, loginUser.getTenantId())
                 .setExtra(USER_KEY, loginUser.getUserId())
                 .setExtra(DEPT_KEY, loginUser.getDeptId()));
-        StpUtil.getSession().set(LOGIN_USER_KEY, loginUser);
+        StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
     }
 
     /**
@@ -65,7 +65,7 @@ public class LoginHelper {
      */
     public static LoginUser getLoginUser() {
         return (LoginUser) getStorageIfAbsentSet(LOGIN_USER_KEY, () -> {
-            SaSession session = StpUtil.getSession();
+            SaSession session = StpUtil.getTokenSession();
             if (ObjectUtil.isNull(session)) {
                 return null;
             }
@@ -77,8 +77,7 @@ public class LoginHelper {
      * 获取用户基于token
      */
     public static LoginUser getLoginUser(String token) {
-        Object loginId = StpUtil.getLoginIdByToken(token);
-        SaSession session = StpUtil.getSessionByLoginId(loginId);
+        SaSession session = StpUtil.getTokenSessionByToken(token);
         if (ObjectUtil.isNull(session)) {
             return null;
         }
