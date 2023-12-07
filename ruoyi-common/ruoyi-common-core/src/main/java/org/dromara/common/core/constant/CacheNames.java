@@ -58,7 +58,7 @@ public interface CacheNames {
     /**
      * OSS配置
      */
-    String SYS_OSS_CONFIG = "sys_oss_config";
+    String SYS_OSS_CONFIG = GlobalConstants.GLOBAL_REDIS_KEY + "sys_oss_config";
 
     /**
      * 在线用户

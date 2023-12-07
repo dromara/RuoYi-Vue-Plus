@@ -133,6 +133,7 @@ tenant:
     - sys_user_post
     - sys_user_role
     - sys_client
+    - sys_oss_config
 
 # MyBatisPlus配置
 # https://baomidou.com/config/
