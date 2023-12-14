@@ -1,5 +1,5 @@
 name: Bug 反馈
-description: 当你中发现了一个 Bug，导致应用崩溃或抛出异常，或者有一个组件存在问题，或者某些地方看起来不对劲。
+description: 当你使用过程中发现了一个 Bug，导致应用崩溃或抛出异常，或者有一个组件存在问题，或者某些地方看起来不对劲，请在这里反馈。
 title: "[Bug]: "
 labels: ["bug"]
 body:
@@ -9,14 +9,14 @@ body:
       label: 版本
       description: 你当前正在使用我们软件的哪个版本(pom文件内的版本号)？
       value: |
-        jdk版本(带上尾号): 例如 1.8.0
-        框架版本(项目启动时输出的版本号): 例如 4.4.0
+        jdk版本(带上尾号): 例如 17.0.8
+        框架版本(项目启动时输出的版本号): 例如 5.1.1
         其他依赖版本(你觉得有必要的):
     validations:
       required: true
   - type: checkboxes
     attributes:
-      label: 功能不好用不会用是否已经看过项目文档?
+      label: 功能不好用不会用是否已经看过项目文档？
       options:
         - label: https://plus-doc.dromara.org
           required: true
@@ -35,10 +35,10 @@ body:
   - type: markdown
     attributes:
       label: 如何复现
-      description: 请详细告诉我们如何复现你遇到的问题
+      description: 请详细告诉我们如何复现你遇到的问题。
       value: |
-        如涉及代码 可提供一个最小代码示例 并使用```附上它 或者截图均可 越详细越好<br>
-        大多数问题都是 代码编写错误问题 逻辑问题 或者用法错误等问题
+        如涉及代码，可提供一个最小代码示例，并使用```附上它，或者截图均可，越详细越好。<br>
+        大多数问题都是：代码编写错误问题，逻辑问题，或者用法错误等问题。
     validations:
       required: true
   - type: textarea

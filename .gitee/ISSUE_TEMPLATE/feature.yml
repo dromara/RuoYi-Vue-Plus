@@ -1,5 +1,5 @@
 name: 功能建议
-description: 对本项目提出一个功能建议
+description: 对本项目提出一个功能建议。
 title: "[功能建议]: "
 labels: ["enhancement"]
 body:
@@ -39,5 +39,5 @@ body:
     attributes:
       label: 意向参与贡献
       options:
-        - label: 我有意向参与具体功能的开发实现并将代码贡献回到上游社区
+        - label: 我有意向参与具体功能的开发实现并将代码贡献回到上游社区。
           required: false
