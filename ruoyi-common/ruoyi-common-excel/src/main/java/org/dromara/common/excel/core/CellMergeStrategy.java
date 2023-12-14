@@ -98,9 +98,30 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
                             cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex - 1, colNum, colNum));
                         }
                         map.put(field, new RepeatCell(val, i));
-                    } else if (i == list.size() - 1) {
-                        if (i > repeatCell.getCurrent()) {
-                            cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
+                    } else if (j == 0) {
+                        if (i == list.size() - 1) {
+                            if (i > repeatCell.getCurrent()) {
+                                cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
+                            }
+                        }
+                    } else {
+                        // 判断前面的是否合并了
+                        RepeatCell firstCell = map.get(mergeFields.get(0));
+                        if (repeatCell.getCurrent() != firstCell.getCurrent()) {
+                            if (i == list.size() - 1) {
+                                if (i > repeatCell.getCurrent()) {
+                                    cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
+                                }
+                            } else if (repeatCell.getCurrent() < firstCell.getCurrent()) {
+                                if (i - repeatCell.getCurrent() > 1) {
+                                    cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex - 1, colNum, colNum));
+                                }
+                                map.put(field, new RepeatCell(val, i));
+                            }
+                        } else if (i == list.size() - 1) {
+                            if (i > repeatCell.getCurrent()) {
+                                cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
+                            }
                         }
                     }
                 }
