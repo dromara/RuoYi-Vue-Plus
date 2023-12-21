@@ -118,7 +118,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      */
     @Override
     public SysDictType selectDictTypeByType(String dictType) {
-        return baseMapper.selectById(new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, dictType));
+        return baseMapper.selectVoOne(new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, dictType));
     }
 
     /**
