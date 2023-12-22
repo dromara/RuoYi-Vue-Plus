@@ -1,9 +1,12 @@
 package org.dromara.common.mybatis.config;
 
 import cn.hutool.core.net.NetUtil;
+import com.baomidou.mybatisplus.autoconfigure.DdlApplicationRunner;
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.DefaultIdentifierGenerator;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
+import com.baomidou.mybatisplus.extension.ddl.IDdl;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
@@ -11,10 +14,13 @@ import org.dromara.common.core.factory.YmlPropertySourceFactory;
 import org.dromara.common.mybatis.handler.InjectionMetaObjectHandler;
 import org.dromara.common.mybatis.interceptor.PlusDataPermissionInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.util.List;
 
 /**
  * mybatis-plus配置类(下方注释有插件介绍)
@@ -22,7 +28,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @author Lion Li
  */
 @EnableTransactionManagement(proxyTargetClass = true)
-@AutoConfiguration
+@AutoConfiguration(before = MybatisPlusAutoConfiguration.class)
 @MapperScan("${mybatis-plus.mapperPackage}")
 @PropertySource(value = "classpath:common-mybatis.yml", factory = YmlPropertySourceFactory.class)
 public class MybatisPlusConfig {
@@ -101,5 +107,10 @@ public class MybatisPlusConfig {
      * DynamicTableNameInnerInterceptor 动态表名插件
      * https://baomidou.com/pages/2a45ff/
      */
+
+    @Bean
+    public DdlApplicationRunner ddlApplicationRunner(@Autowired(required = false) List<IDdl> ddlList) {
+        return new DdlApplicationRunner(ddlList);
+    }
 
 }
