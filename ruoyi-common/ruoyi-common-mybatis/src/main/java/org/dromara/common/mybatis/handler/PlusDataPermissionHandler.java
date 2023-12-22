@@ -149,7 +149,12 @@ public class PlusDataPermissionHandler {
         int index = sb.lastIndexOf(".");
         String clazzName = sb.substring(0, index);
         String methodName = sb.substring(index + 1, sb.length());
-        Class<?> clazz = ClassUtil.loadClass(clazzName);
+        Class<?> clazz;
+        try {
+            clazz = ClassUtil.loadClass(clazzName);
+        } catch (Exception e) {
+            return null;
+        }
         List<Method> methods = Arrays.stream(ClassUtil.getDeclaredMethods(clazz))
             .filter(method -> method.getName().equals(methodName)).toList();
         DataPermission dataPermission;

@@ -3,6 +3,7 @@ package org.dromara.web.service;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.dromara.common.core.enums.TenantStatus;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.*;
 import org.dromara.common.log.event.LogininforEvent;
+import org.dromara.common.mybatis.helper.DataPermissionHelper;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.exception.TenantException;
@@ -77,13 +79,13 @@ public class SysLoginService {
         bo.setUserName(authUserData.getUsername());
         bo.setNickName(authUserData.getNickname());
         // 查询是否已经绑定用户
-        SysSocialVo vo = sysSocialService.selectByAuthId(authId);
-        if (ObjectUtil.isEmpty(vo)) {
+        List<SysSocialVo> list = sysSocialService.selectByAuthId(authId);
+        if (CollUtil.isEmpty(list)) {
             // 没有绑定用户, 新增用户信息
             sysSocialService.insertByBo(bo);
         } else {
             // 更新用户信息
-            bo.setId(vo.getId());
+            bo.setId(list.get(0).getId());
             sysSocialService.updateByBo(bo);
         }
     }
@@ -95,6 +97,9 @@ public class SysLoginService {
     public void logout() {
         try {
             LoginUser loginUser = LoginHelper.getLoginUser();
+            if (ObjectUtil.isNull(loginUser)) {
+                return;
+            }
             if (TenantHelper.isEnable() && LoginHelper.isSuperAdmin()) {
                 // 超级管理员 登出清除动态租户
                 TenantHelper.clearDynamic();
@@ -152,13 +157,13 @@ public class SysLoginService {
      *
      * @param userId 用户ID
      */
-    public void recordLoginInfo(Long userId) {
+    public void recordLoginInfo(Long userId, String ip) {
         SysUser sysUser = new SysUser();
         sysUser.setUserId(userId);
-        sysUser.setLoginIp(ServletUtils.getClientIP());
+        sysUser.setLoginIp(ip);
         sysUser.setLoginDate(DateUtils.getNowDate());
         sysUser.setUpdateBy(userId);
-        userMapper.updateById(sysUser);
+        DataPermissionHelper.ignore(() -> userMapper.updateById(sysUser));
     }
 
     /**

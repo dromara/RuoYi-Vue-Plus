@@ -142,6 +142,18 @@ public class RedisUtils {
     }
 
     /**
+     * 如果存在则设置 并返回 true 如果存在则返回 false
+     *
+     * @param key   缓存的键值
+     * @param value 缓存的值
+     * @return set成功或失败
+     */
+    public static <T> boolean setObjectIfExists(final String key, final T value, final Duration duration) {
+        RBucket<T> bucket = CLIENT.getBucket(key);
+        return bucket.setIfExists(value, duration);
+    }
+
+    /**
      * 注册对象监听器
      * <p>
      * key 监听器需开启 `notify-keyspace-events` 等 redis 相关配置
@@ -243,6 +255,18 @@ public class RedisUtils {
     }
 
     /**
+     * 追加缓存List数据
+     *
+     * @param key  缓存的键值
+     * @param data 待缓存的数据
+     * @return 缓存的对象
+     */
+    public static <T> boolean addCacheList(final String key, final T data) {
+        RList<T> rList = CLIENT.getList(key);
+        return rList.add(data);
+    }
+
+    /**
      * 注册List监听器
      * <p>
      * key 监听器需开启 `notify-keyspace-events` 等 redis 相关配置
@@ -267,6 +291,19 @@ public class RedisUtils {
     }
 
     /**
+     * 获得缓存的list对象(范围)
+     *
+     * @param key  缓存的键值
+     * @param form 起始下标
+     * @param to   截止下标
+     * @return 缓存键值对应的数据
+     */
+    public static <T> List<T> getCacheListRange(final String key, int form, int to) {
+        RList<T> rList = CLIENT.getList(key);
+        return rList.range(form, to);
+    }
+
+    /**
      * 缓存Set
      *
      * @param key     缓存键值
@@ -276,6 +313,18 @@ public class RedisUtils {
     public static <T> boolean setCacheSet(final String key, final Set<T> dataSet) {
         RSet<T> rSet = CLIENT.getSet(key);
         return rSet.addAll(dataSet);
+    }
+
+    /**
+     * 追加缓存Set数据
+     *
+     * @param key  缓存的键值
+     * @param data 待缓存的数据
+     * @return 缓存的对象
+     */
+    public static <T> boolean addCacheSet(final String key, final T data) {
+        RSet<T> rSet = CLIENT.getSet(key);
+        return rSet.add(data);
     }
 
     /**

@@ -41,6 +41,11 @@ public interface CacheNames {
     String SYS_USER_NAME = "sys_user_name#30d";
 
     /**
+     * 用户名称
+     */
+    String SYS_NICKNAME = "sys_nickname#30d";
+
+    /**
      * 部门
      */
     String SYS_DEPT = "sys_dept#30d";
@@ -53,7 +58,7 @@ public interface CacheNames {
     /**
      * OSS配置
      */
-    String SYS_OSS_CONFIG = "sys_oss_config";
+    String SYS_OSS_CONFIG = GlobalConstants.GLOBAL_REDIS_KEY + "sys_oss_config";
 
     /**
      * 在线用户

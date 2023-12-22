@@ -1,5 +1,6 @@
 package org.dromara.demo.controller.queue;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.redis.utils.QueueUtils;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
  * @author Lion Li
  * @version 3.6.0
  */
+@SaIgnore
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -40,7 +42,7 @@ public class DelayedQueueController {
         QueueUtils.subscribeBlockingQueue(queueName, (String orderNum) -> {
             // 观察接收时间
             log.info("通道: {}, 收到数据: {}", queueName, orderNum);
-        });
+        }, true);
         return R.ok("操作成功");
     }
 

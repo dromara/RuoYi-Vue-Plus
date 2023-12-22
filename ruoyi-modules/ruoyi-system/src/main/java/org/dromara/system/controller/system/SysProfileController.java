@@ -6,6 +6,7 @@ import cn.hutool.core.io.FileUtil;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.MimeTypeUtils;
+import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -61,11 +62,12 @@ public class SysProfileController extends BaseController {
     @PutMapping
     public R<Void> updateProfile(@RequestBody SysUserProfileBo profile) {
         SysUserBo user = BeanUtil.toBean(profile, SysUserBo.class);
+        String username = LoginHelper.getUsername();
         if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
-            return R.fail("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
+            return R.fail("修改用户'" + username + "'失败，手机号码已存在");
         }
         if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
-            return R.fail("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+            return R.fail("修改用户'" + username + "'失败，邮箱账号已存在");
         }
         user.setUserId(LoginHelper.getUserId());
         if (userService.updateUserProfile(user) > 0) {
@@ -79,6 +81,7 @@ public class SysProfileController extends BaseController {
      *
      * @param bo 新旧密码
      */
+    @ApiEncrypt
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
     public R<Void> updatePwd(@Validated @RequestBody SysUserPasswordBo bo) {

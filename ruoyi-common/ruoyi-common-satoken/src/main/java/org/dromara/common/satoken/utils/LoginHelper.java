@@ -15,6 +15,7 @@ import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.UserType;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * 登录鉴权助手
@@ -36,6 +37,7 @@ public class LoginHelper {
     public static final String USER_KEY = "userId";
     public static final String DEPT_KEY = "deptId";
     public static final String CLIENT_KEY = "clientid";
+    public static final String TENANT_ADMIN_KEY = "isTenantAdmin";
 
     /**
      * 登录系统 基于 设备类型
@@ -55,32 +57,27 @@ public class LoginHelper {
             model.setExtra(TENANT_KEY, loginUser.getTenantId())
                 .setExtra(USER_KEY, loginUser.getUserId())
                 .setExtra(DEPT_KEY, loginUser.getDeptId()));
-        StpUtil.getSession().set(LOGIN_USER_KEY, loginUser);
+        StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
     }
 
     /**
      * 获取用户(多级缓存)
      */
     public static LoginUser getLoginUser() {
-        LoginUser loginUser = (LoginUser) SaHolder.getStorage().get(LOGIN_USER_KEY);
-        if (loginUser != null) {
-            return loginUser;
-        }
-        SaSession session = StpUtil.getSession();
-        if (ObjectUtil.isNull(session)) {
-            return null;
-        }
-        loginUser = (LoginUser) session.get(LOGIN_USER_KEY);
-        SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
-        return loginUser;
+        return (LoginUser) getStorageIfAbsentSet(LOGIN_USER_KEY, () -> {
+            SaSession session = StpUtil.getTokenSession();
+            if (ObjectUtil.isNull(session)) {
+                return null;
+            }
+            return session.get(LOGIN_USER_KEY);
+        });
     }
 
     /**
      * 获取用户基于token
      */
     public static LoginUser getLoginUser(String token) {
-        Object loginId = StpUtil.getLoginIdByToken(token);
-        SaSession session = StpUtil.getSessionByLoginId(loginId);
+        SaSession session = StpUtil.getTokenSessionByToken(token);
         if (ObjectUtil.isNull(session)) {
             return null;
         }
@@ -109,17 +106,7 @@ public class LoginHelper {
     }
 
     private static Object getExtra(String key) {
-        Object obj;
-        try {
-            obj = SaHolder.getStorage().get(key);
-            if (ObjectUtil.isNull(obj)) {
-                obj = StpUtil.getExtra(key);
-                SaHolder.getStorage().set(key, obj);
-            }
-        } catch (Exception e) {
-            return null;
-        }
-        return obj;
+        return getStorageIfAbsentSet(key, () -> StpUtil.getExtra(key));
     }
 
     /**
@@ -162,7 +149,26 @@ public class LoginHelper {
     }
 
     public static boolean isTenantAdmin() {
-        return isTenantAdmin(getLoginUser().getRolePermission());
+        Object value = getStorageIfAbsentSet(TENANT_ADMIN_KEY, () -> {
+            return isTenantAdmin(getLoginUser().getRolePermission());
+        });
+        return Convert.toBool(value);
     }
 
+    public static boolean isLogin() {
+        return getLoginUser() != null;
+    }
+
+    public static Object getStorageIfAbsentSet(String key, Supplier<Object> handle) {
+        try {
+            Object obj = SaHolder.getStorage().get(key);
+            if (ObjectUtil.isNull(obj)) {
+                obj = handle.get();
+                SaHolder.getStorage().set(key, obj);
+            }
+            return obj;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

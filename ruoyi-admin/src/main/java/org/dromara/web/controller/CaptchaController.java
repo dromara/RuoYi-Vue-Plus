@@ -13,6 +13,8 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mail.config.properties.MailProperties;
 import org.dromara.common.mail.utils.MailUtils;
+import org.dromara.common.ratelimiter.annotation.RateLimiter;
+import org.dromara.common.ratelimiter.enums.LimitType;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.web.config.properties.CaptchaProperties;
 import org.dromara.common.web.enums.CaptchaType;
@@ -54,6 +56,7 @@ public class CaptchaController {
      *
      * @param phonenumber 用户手机号
      */
+    @RateLimiter(key = "#phonenumber", time = 60, count = 1)
     @GetMapping("/resource/sms/code")
     public R<Void> smsCode(@NotBlank(message = "{user.phonenumber.not.blank}") String phonenumber) {
         String key = GlobalConstants.CAPTCHA_CODE_KEY + phonenumber;
@@ -77,6 +80,7 @@ public class CaptchaController {
      *
      * @param email 邮箱
      */
+    @RateLimiter(key = "#email", time = 60, count = 1)
     @GetMapping("/resource/email/code")
     public R<Void> emailCode(@NotBlank(message = "{user.email.not.blank}") String email) {
         if (!mailProperties.getEnabled()) {
@@ -97,6 +101,7 @@ public class CaptchaController {
     /**
      * 生成验证码
      */
+    @RateLimiter(time = 60, count = 10, limitType = LimitType.IP)
     @GetMapping("/auth/code")
     public R<CaptchaVo> getCode() {
         CaptchaVo captchaVo = new CaptchaVo();

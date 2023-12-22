@@ -18,7 +18,7 @@ powerjob:
     enabled: false
     # 需要先在 powerjob 登录页执行应用注册后才能使用
     app-name: ruoyi-worker
-    enable-test-mode: false
+    allow-lazy-connect-server: false
     max-appended-wf-context-length: 4096
     max-result-length: 4096
     # 28080 端口 随着主应用端口飘逸 避免集群冲突
@@ -63,8 +63,6 @@ spring:
 #          url: jdbc:oracle:thin:@//localhost:1521/XE
 #          username: ROOT
 #          password: root
-#          hikari:
-#            connectionTestQuery: SELECT 1 FROM DUAL
 #        postgres:
 #          type: ${spring.datasource.type}
 #          driverClassName: org.postgresql.Driver
@@ -90,8 +88,6 @@ spring:
         idleTimeout: 600000
         # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认30分钟
         maxLifetime: 1800000
-        # 连接测试query（配置检测连接是否有效）
-        connectionTestQuery: SELECT 1
         # 多久检查一次连接的活性
         keepaliveTime: 30000
 
