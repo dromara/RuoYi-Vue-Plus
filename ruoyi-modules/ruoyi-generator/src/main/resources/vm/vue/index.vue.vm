@@ -439,7 +439,7 @@ const submitForm = () => {
       } else {
         await add${BusinessName}(form.value).finally(() =>  buttonLoading.value = false);
       }
-      proxy?.#[[$modal]]#.msgSuccess("修改成功");
+      proxy?.#[[$modal]]#.msgSuccess("操作成功");
       dialog.visible = false;
       await getList();
     }
