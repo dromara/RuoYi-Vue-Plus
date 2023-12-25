@@ -17,6 +17,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysLogininfor;
 import org.dromara.system.domain.bo.SysLogininforBo;
+import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.vo.SysLogininforVo;
 import org.dromara.system.mapper.SysClientMapper;
 import org.dromara.system.mapper.SysLogininforMapper;
@@ -61,7 +62,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
         final String ip = ServletUtils.getClientIP(request);
         // 客户端信息
         String clientid = request.getHeader(LoginHelper.CLIENT_KEY);
-        SysClient client = null;
+        SysClientVo client = null;
         if (StringUtils.isNotBlank(clientid)) {
             client = clientService.queryByClientId(clientid);
         }

@@ -40,23 +40,17 @@
         WHERE r.del_flag = '0' and sur.user_id = #{userId}
     </select>
 
-    <select id="selectRoleListByUserId" parameterType="Long" resultType="Long">
-        select r.role_id
-        from sys_role r
-                 left join sys_user_role sur on sur.role_id = r.role_id
-                 left join sys_user u on u.user_id = sur.user_id
-        where u.user_id = #{userId}
-    </select>
-
-    <select id="selectRolesByUserName" parameterType="String" resultMap="SysRoleResult">
+    <select id="selectRolesByUserId" parameterType="Long" resultMap="SysRoleResult">
         select r.role_id,
                r.role_name,
                r.role_key,
-               r.role_sort
+               r.role_sort,
+               r.data_scope,
+               r.status
         from sys_role r
                  left join sys_user_role sur on sur.role_id = r.role_id
                  left join sys_user u on u.user_id = sur.user_id
-        WHERE r.del_flag = '0' and u.user_name = #{userName}
+        WHERE r.del_flag = '0' and sur.user_id = #{userId}
     </select>
 
     <select id="selectRoleById" resultMap="SysRoleResult">

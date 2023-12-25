@@ -25,6 +25,7 @@ import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysUser;
+import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.vo.SysSocialVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
@@ -59,7 +60,7 @@ public class SocialAuthStrategy implements IAuthStrategy {
      * @param client   客户端信息
      */
     @Override
-    public LoginVo login(String body, SysClient client) {
+    public LoginVo login(String body, SysClientVo client) {
         SocialLoginBody loginBody = JsonUtils.parseObject(body, SocialLoginBody.class);
         ValidatorUtils.validate(loginBody);
         AuthResponse<AuthUser> response = SocialUtils.loginAuth(
@@ -114,9 +115,7 @@ public class SocialAuthStrategy implements IAuthStrategy {
 
     private SysUserVo loadUser(String tenantId, Long userId) {
         return TenantHelper.dynamic(tenantId, () -> {
-            SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-                .select(SysUser::getUserName, SysUser::getStatus)
-                .eq(SysUser::getUserId, userId));
+            SysUserVo user = userMapper.selectVoById(userId);
             if (ObjectUtil.isNull(user)) {
                 log.info("登录用户：{} 不存在.", "");
                 throw new UserException("user.not.exists", "");
@@ -124,7 +123,7 @@ public class SocialAuthStrategy implements IAuthStrategy {
                 log.info("登录用户：{} 已被停用.", "");
                 throw new UserException("user.blocked", "");
             }
-            return userMapper.selectUserByUserName(user.getUserName());
+            return user;
         });
     }
 

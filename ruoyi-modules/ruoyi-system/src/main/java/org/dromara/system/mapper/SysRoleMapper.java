@@ -3,12 +3,12 @@ package org.dromara.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.SysRole;
 import org.dromara.system.domain.vo.SysRoleVo;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -51,21 +51,12 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRole, SysRoleVo> {
      */
     List<SysRoleVo> selectRolePermissionByUserId(Long userId);
 
-
-    /**
-     * 根据用户ID获取角色选择框列表
-     *
-     * @param userId 用户ID
-     * @return 选中角色ID列表
-     */
-    List<Long> selectRoleListByUserId(Long userId);
-
     /**
      * 根据用户ID查询角色
      *
-     * @param userName 用户名
+     * @param userId 用户ID
      * @return 角色列表
      */
-    List<SysRoleVo> selectRolesByUserName(String userName);
+    List<SysRoleVo> selectRolesByUserId(Long userId);
 
 }

@@ -141,7 +141,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public SysUserVo selectUserByUserName(String userName) {
-        return baseMapper.selectUserByUserName(userName);
+        return baseMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, userName));
     }
 
     /**
@@ -152,7 +152,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public SysUserVo selectUserByPhonenumber(String phonenumber) {
-        return baseMapper.selectUserByPhonenumber(phonenumber);
+        return baseMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhonenumber, phonenumber));
     }
 
     /**
@@ -163,18 +163,18 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public SysUserVo selectUserById(Long userId) {
-        return baseMapper.selectUserById(userId);
+        return baseMapper.selectVoById(userId);
     }
 
     /**
      * 查询用户所属角色组
      *
-     * @param userName 用户名
+     * @param userId 用户ID
      * @return 结果
      */
     @Override
-    public String selectUserRoleGroup(String userName) {
-        List<SysRoleVo> list = roleMapper.selectRolesByUserName(userName);
+    public String selectUserRoleGroup(Long userId) {
+        List<SysRoleVo> list = roleMapper.selectRolesByUserId(userId);
         if (CollUtil.isEmpty(list)) {
             return StringUtils.EMPTY;
         }
@@ -184,12 +184,12 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     /**
      * 查询用户所属岗位组
      *
-     * @param userName 用户名
+     * @param userId 用户ID
      * @return 结果
      */
     @Override
-    public String selectUserPostGroup(String userName) {
-        List<SysPostVo> list = postMapper.selectPostsByUserName(userName);
+    public String selectUserPostGroup(Long userId) {
+        List<SysPostVo> list = postMapper.selectPostsByUserId(userId);
         if (CollUtil.isEmpty(list)) {
             return StringUtils.EMPTY;
         }
@@ -261,7 +261,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         if (LoginHelper.isSuperAdmin()) {
             return;
         }
-        if (ObjectUtil.isNull(baseMapper.selectUserById(userId))) {
+        if (baseMapper.countUserById(userId) == 0) {
             throw new ServiceException("没有权限访问用户数据！");
         }
     }

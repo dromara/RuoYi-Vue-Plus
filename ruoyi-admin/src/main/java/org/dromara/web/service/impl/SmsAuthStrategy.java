@@ -23,6 +23,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysUser;
+import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.web.domain.vo.LoginVo;
@@ -44,7 +45,7 @@ public class SmsAuthStrategy implements IAuthStrategy {
     private final SysUserMapper userMapper;
 
     @Override
-    public LoginVo login(String body, SysClient client) {
+    public LoginVo login(String body, SysClientVo client) {
         SmsLoginBody loginBody = JsonUtils.parseObject(body, SmsLoginBody.class);
         ValidatorUtils.validate(loginBody);
         String tenantId = loginBody.getTenantId();
@@ -90,9 +91,7 @@ public class SmsAuthStrategy implements IAuthStrategy {
 
     private SysUserVo loadUserByPhonenumber(String tenantId, String phonenumber) {
         return TenantHelper.dynamic(tenantId, () -> {
-            SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-                .select(SysUser::getPhonenumber, SysUser::getStatus)
-                .eq(SysUser::getPhonenumber, phonenumber));
+            SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhonenumber, phonenumber));
             if (ObjectUtil.isNull(user)) {
                 log.info("登录用户：{} 不存在.", phonenumber);
                 throw new UserException("user.not.exists", phonenumber);
@@ -100,7 +99,7 @@ public class SmsAuthStrategy implements IAuthStrategy {
                 log.info("登录用户：{} 已被停用.", phonenumber);
                 throw new UserException("user.blocked", phonenumber);
             }
-            return userMapper.selectUserByPhonenumber(phonenumber);
+            return user;
         });
     }
 

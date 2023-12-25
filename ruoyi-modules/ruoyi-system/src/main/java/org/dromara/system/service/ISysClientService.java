@@ -25,7 +25,7 @@ public interface ISysClientService {
     /**
      * 查询客户端信息基于客户端id
      */
-    SysClient queryByClientId(String clientId);
+    SysClientVo queryByClientId(String clientId);
 
     /**
      * 查询客户端管理列表
@@ -50,7 +50,7 @@ public interface ISysClientService {
     /**
      * 修改状态
      */
-    int updateUserStatus(Long id, String status);
+    int updateUserStatus(String clientId, String status);
 
     /**
      * 校验并批量删除客户端管理信息

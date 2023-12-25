@@ -36,6 +36,14 @@ public interface ISysRoleService {
     List<SysRoleVo> selectRolesByUserId(Long userId);
 
     /**
+     * 根据用户ID查询角色列表(包含被授权状态)
+     *
+     * @param userId 用户ID
+     * @return 角色列表
+     */
+    List<SysRoleVo> selectRolesAuthByUserId(Long userId);
+
+    /**
      * 根据用户ID查询角色权限
      *
      * @param userId 用户ID
@@ -180,4 +188,5 @@ public interface ISysRoleService {
     int insertAuthUsers(Long roleId, Long[] userIds);
 
     void cleanOnlineUserByRole(Long roleId);
+
 }
