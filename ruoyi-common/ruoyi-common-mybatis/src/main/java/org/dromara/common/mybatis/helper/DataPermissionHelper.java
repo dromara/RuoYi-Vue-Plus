@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.context.ThreadLocalHolder;
 
 import java.util.HashMap;
 import java.util.Map;

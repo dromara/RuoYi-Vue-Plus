@@ -2,7 +2,7 @@ package org.dromara.common.web.interceptor;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.map.MapUtil;
-import com.alibaba.ttl.TransmittableThreadLocal;
+import org.dromara.common.core.context.ThreadLocalHolder;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
@@ -30,7 +30,7 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
 
     private final String prodProfile = "prod";
 
-    private final TransmittableThreadLocal<StopWatch> invokeTimeTL = new TransmittableThreadLocal<>();
+    private final String STOP_WATCH_KEY = "stopwatch";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -56,7 +56,7 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
             }
 
             StopWatch stopWatch = new StopWatch();
-            invokeTimeTL.set(stopWatch);
+            ThreadLocalHolder.set(STOP_WATCH_KEY, stopWatch);
             stopWatch.start();
         }
         return true;
@@ -70,10 +70,10 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         if (!prodProfile.equals(SpringUtils.getActiveProfile())) {
-            StopWatch stopWatch = invokeTimeTL.get();
+            StopWatch stopWatch = ThreadLocalHolder.get(STOP_WATCH_KEY);
             stopWatch.stop();
             log.info("[PLUS]结束请求 => URL[{}],耗时:[{}]毫秒", request.getMethod() + " " + request.getRequestURI(), stopWatch.getTime());
-            invokeTimeTL.remove();
+            ThreadLocalHolder.clear();
         }
     }
 

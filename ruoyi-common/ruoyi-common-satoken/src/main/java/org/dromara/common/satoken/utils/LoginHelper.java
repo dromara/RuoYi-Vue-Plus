@@ -1,7 +1,5 @@
 package org.dromara.common.satoken.utils;
 
-import cn.dev33.satoken.context.SaHolder;
-import cn.dev33.satoken.context.model.SaStorage;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
@@ -11,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.constant.UserConstants;
+import org.dromara.common.core.context.ThreadLocalHolder;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.UserType;
 
@@ -47,11 +46,10 @@ public class LoginHelper {
      * @param model     配置参数
      */
     public static void login(LoginUser loginUser, SaLoginModel model) {
-        SaStorage storage = SaHolder.getStorage();
-        storage.set(LOGIN_USER_KEY, loginUser);
-        storage.set(TENANT_KEY, loginUser.getTenantId());
-        storage.set(USER_KEY, loginUser.getUserId());
-        storage.set(DEPT_KEY, loginUser.getDeptId());
+        ThreadLocalHolder.set(LOGIN_USER_KEY, loginUser);
+        ThreadLocalHolder.set(TENANT_KEY, loginUser.getTenantId());
+        ThreadLocalHolder.set(USER_KEY, loginUser.getUserId());
+        ThreadLocalHolder.set(DEPT_KEY, loginUser.getDeptId());
         model = ObjectUtil.defaultIfNull(model, new SaLoginModel());
         StpUtil.login(loginUser.getLoginId(),
             model.setExtra(TENANT_KEY, loginUser.getTenantId())
@@ -161,10 +159,10 @@ public class LoginHelper {
 
     public static Object getStorageIfAbsentSet(String key, Supplier<Object> handle) {
         try {
-            Object obj = SaHolder.getStorage().get(key);
+            Object obj = ThreadLocalHolder.get(key);
             if (ObjectUtil.isNull(obj)) {
                 obj = handle.get();
-                SaHolder.getStorage().set(key, obj);
+                ThreadLocalHolder.set(key, obj);
             }
             return obj;
         } catch (Exception e) {

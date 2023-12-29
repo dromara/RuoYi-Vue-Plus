@@ -4,7 +4,7 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.ttl.TransmittableThreadLocal;
+import org.dromara.common.core.context.ThreadLocalHolder;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
@@ -49,9 +49,9 @@ public class LogAspect {
 
 
     /**
-     * 计算操作消耗时间
+     * 计时 key
      */
-    private static final ThreadLocal<StopWatch> TIME_THREADLOCAL = new TransmittableThreadLocal<>();
+    private static final String LOG_STOP_WATCH_KEY = "logStopwatch";
 
     /**
      * 处理请求前执行
@@ -59,7 +59,7 @@ public class LogAspect {
     @Before(value = "@annotation(controllerLog)")
     public void boBefore(JoinPoint joinPoint, Log controllerLog) {
         StopWatch stopWatch = new StopWatch();
-        TIME_THREADLOCAL.set(stopWatch);
+        ThreadLocalHolder.set(LOG_STOP_WATCH_KEY, stopWatch);
         stopWatch.start();
     }
 
@@ -112,7 +112,7 @@ public class LogAspect {
             // 处理设置注解上的参数
             getControllerMethodDescription(joinPoint, controllerLog, operLog, jsonResult);
             // 设置消耗时间
-            StopWatch stopWatch = TIME_THREADLOCAL.get();
+            StopWatch stopWatch = ThreadLocalHolder.get(LOG_STOP_WATCH_KEY);
             stopWatch.stop();
             operLog.setCostTime(stopWatch.getTime());
             // 发布事件保存数据库
@@ -122,7 +122,7 @@ public class LogAspect {
             log.error("异常信息:{}", exp.getMessage());
             exp.printStackTrace();
         } finally {
-            TIME_THREADLOCAL.remove();
+            ThreadLocalHolder.remove(LOG_STOP_WATCH_KEY);
         }
     }
 

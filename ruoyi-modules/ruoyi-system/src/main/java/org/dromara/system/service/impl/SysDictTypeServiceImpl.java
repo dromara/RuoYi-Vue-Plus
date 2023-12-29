@@ -1,6 +1,5 @@
 package org.dromara.system.service.impl;
 
-import cn.dev33.satoken.context.SaHolder;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -9,6 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.dromara.common.core.constant.CacheConstants;
 import org.dromara.common.core.constant.CacheNames;
+import org.dromara.common.core.context.ThreadLocalHolder;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.DictService;
 import org.dromara.common.core.utils.MapstructUtils;
@@ -221,10 +221,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public String getDictLabel(String dictType, String dictValue, String separator) {
         // 优先从本地缓存获取
-        List<SysDictDataVo> datas = (List<SysDictDataVo>) SaHolder.getStorage().get(CacheConstants.SYS_DICT_KEY + dictType);
+        List<SysDictDataVo> datas = ThreadLocalHolder.get(CacheConstants.SYS_DICT_KEY + dictType);
         if (ObjectUtil.isNull(datas)) {
             datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
-            SaHolder.getStorage().set(CacheConstants.SYS_DICT_KEY + dictType, datas);
+            ThreadLocalHolder.set(CacheConstants.SYS_DICT_KEY + dictType, datas);
         }
 
         Map<String, String> map = StreamUtils.toMap(datas, SysDictDataVo::getDictValue, SysDictDataVo::getDictLabel);
@@ -249,10 +249,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public String getDictValue(String dictType, String dictLabel, String separator) {
         // 优先从本地缓存获取
-        List<SysDictDataVo> datas = (List<SysDictDataVo>) SaHolder.getStorage().get(CacheConstants.SYS_DICT_KEY + dictType);
+        List<SysDictDataVo> datas = ThreadLocalHolder.get(CacheConstants.SYS_DICT_KEY + dictType);
         if (ObjectUtil.isNull(datas)) {
             datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
-            SaHolder.getStorage().set(CacheConstants.SYS_DICT_KEY + dictType, datas);
+            ThreadLocalHolder.set(CacheConstants.SYS_DICT_KEY + dictType, datas);
         }
 
         Map<String, String> map = StreamUtils.toMap(datas, SysDictDataVo::getDictLabel, SysDictDataVo::getDictValue);
