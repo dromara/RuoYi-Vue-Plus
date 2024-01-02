@@ -55,7 +55,9 @@ public class LoginHelper {
             model.setExtra(TENANT_KEY, loginUser.getTenantId())
                 .setExtra(USER_KEY, loginUser.getUserId())
                 .setExtra(DEPT_KEY, loginUser.getDeptId()));
-        StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
+        SaSession tokenSession = StpUtil.getTokenSession();
+        tokenSession.updateTimeout(model.getTimeout());
+        tokenSession.set(LOGIN_USER_KEY, loginUser);
     }
 
     /**
