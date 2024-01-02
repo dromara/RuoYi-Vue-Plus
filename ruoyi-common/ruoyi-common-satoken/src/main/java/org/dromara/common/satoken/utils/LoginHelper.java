@@ -9,12 +9,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.constant.UserConstants;
-import org.dromara.common.core.context.ThreadLocalHolder;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.UserType;
 
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * 登录鉴权助手
@@ -34,9 +32,10 @@ public class LoginHelper {
     public static final String LOGIN_USER_KEY = "loginUser";
     public static final String TENANT_KEY = "tenantId";
     public static final String USER_KEY = "userId";
+    public static final String USER_NAME_KEY = "userName";
     public static final String DEPT_KEY = "deptId";
+    public static final String DEPT_NAME_KEY = "deptName";
     public static final String CLIENT_KEY = "clientid";
-    public static final String TENANT_ADMIN_KEY = "isTenantAdmin";
 
     /**
      * 登录系统 基于 设备类型
@@ -46,15 +45,15 @@ public class LoginHelper {
      * @param model     配置参数
      */
     public static void login(LoginUser loginUser, SaLoginModel model) {
-        ThreadLocalHolder.set(LOGIN_USER_KEY, loginUser);
-        ThreadLocalHolder.set(TENANT_KEY, loginUser.getTenantId());
-        ThreadLocalHolder.set(USER_KEY, loginUser.getUserId());
-        ThreadLocalHolder.set(DEPT_KEY, loginUser.getDeptId());
         model = ObjectUtil.defaultIfNull(model, new SaLoginModel());
         StpUtil.login(loginUser.getLoginId(),
             model.setExtra(TENANT_KEY, loginUser.getTenantId())
                 .setExtra(USER_KEY, loginUser.getUserId())
-                .setExtra(DEPT_KEY, loginUser.getDeptId()));
+                .setExtra(DEPT_KEY, loginUser.getDeptId())
+                .setExtra(TENANT_KEY, loginUser.getTenantId())
+                .setExtra(DEPT_NAME_KEY, loginUser.getDeptName())
+                .setExtra(USER_NAME_KEY, loginUser.getUsername())
+        );
         SaSession tokenSession = StpUtil.getTokenSession();
         tokenSession.updateTimeout(model.getTimeout());
         tokenSession.set(LOGIN_USER_KEY, loginUser);
@@ -64,13 +63,11 @@ public class LoginHelper {
      * 获取用户(多级缓存)
      */
     public static LoginUser getLoginUser() {
-        return (LoginUser) getStorageIfAbsentSet(LOGIN_USER_KEY, () -> {
-            SaSession session = StpUtil.getTokenSession();
-            if (ObjectUtil.isNull(session)) {
-                return null;
-            }
-            return session.get(LOGIN_USER_KEY);
-        });
+        SaSession session = StpUtil.getTokenSession();
+        if (ObjectUtil.isNull(session)) {
+            return null;
+        }
+        return (LoginUser) session.get(LOGIN_USER_KEY);
     }
 
     /**
@@ -88,7 +85,7 @@ public class LoginHelper {
      * 获取用户id
      */
     public static Long getUserId() {
-        return  Convert.toLong(getExtra(USER_KEY));
+        return Convert.toLong(getExtra(USER_KEY));
     }
 
     /**
@@ -106,7 +103,12 @@ public class LoginHelper {
     }
 
     private static Object getExtra(String key) {
-        return getStorageIfAbsentSet(key, () -> StpUtil.getExtra(key));
+        try {
+            return StpUtil.getExtra(key);
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 
     /**
@@ -149,26 +151,11 @@ public class LoginHelper {
     }
 
     public static boolean isTenantAdmin() {
-        Object value = getStorageIfAbsentSet(TENANT_ADMIN_KEY, () -> {
-            return isTenantAdmin(getLoginUser().getRolePermission());
-        });
-        return Convert.toBool(value);
+        return Convert.toBool(isTenantAdmin(getLoginUser().getRolePermission()));
     }
 
     public static boolean isLogin() {
         return getLoginUser() != null;
     }
 
-    public static Object getStorageIfAbsentSet(String key, Supplier<Object> handle) {
-        try {
-            Object obj = ThreadLocalHolder.get(key);
-            if (ObjectUtil.isNull(obj)) {
-                obj = handle.get();
-                ThreadLocalHolder.set(key, obj);
-            }
-            return obj;
-        } catch (Exception e) {
-            return null;
-        }
-    }
 }

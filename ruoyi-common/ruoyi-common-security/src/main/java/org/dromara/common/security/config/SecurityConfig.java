@@ -4,17 +4,14 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.common.core.context.ThreadLocalHolder;
 import org.dromara.common.security.config.properties.SecurityProperties;
 import org.dromara.common.security.handler.AllUrlHandler;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -63,7 +60,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         }
 
                         // 保存用户信息
-                        ThreadLocalHolder.set(LoginHelper.LOGIN_USER_KEY, LoginHelper.getLoginUser());
+//                        ThreadLocalHolder.set(LoginHelper.LOGIN_USER_KEY, LoginHelper.getLoginUser());
 
                         // 有效率影响 用于临时测试
                         // if (log.isDebugEnabled()) {
@@ -73,12 +70,13 @@ public class SecurityConfig implements WebMvcConfigurer {
 
                     });
             })
-            {
-                @Override
-                public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-                    ThreadLocalHolder.remove(LoginHelper.LOGIN_USER_KEY);
-                }
-            }).addPathPatterns("/**")
+//            {
+//                @Override
+//                public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+//                    ThreadLocalHolder.clear();
+//                }
+//            }
+            ).addPathPatterns("/**")
             // 排除不需要拦截的路径
             .excludePathPatterns(securityProperties.getExcludes());
     }
