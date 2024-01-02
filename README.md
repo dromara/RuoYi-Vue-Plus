@@ -25,6 +25,12 @@
 
 > 文档地址: [plus-doc](https://plus-doc.dromara.org) - [plus-doc(国内备用)](https://dromara.gitee.io/plus-doc)
 
+## 赞助商
+
+MaxKey - https://gitee.com/dromara/MaxKey <br>
+CCFlow - https://gitee.com/opencc/RuoYi-JFlow <br>
+[如何成为赞助商 加群联系作者详谈](https://plus-doc.dromara.org/#/common/add_group)
+
 # 本框架与RuoYi的功能差异
 
 | 功能          | 本框架                                                                                                               | RuoYi                                                                              |
