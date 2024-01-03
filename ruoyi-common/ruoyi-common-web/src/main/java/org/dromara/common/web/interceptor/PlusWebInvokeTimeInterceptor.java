@@ -2,15 +2,14 @@ package org.dromara.common.web.interceptor;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.map.MapUtil;
-import org.dromara.common.core.context.ThreadLocalHolder;
-import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.common.web.filter.RepeatedlyRequestWrapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
+import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.common.web.filter.RepeatedlyRequestWrapper;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,7 +29,7 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
 
     private final String prodProfile = "prod";
 
-    private final String STOP_WATCH_KEY = "stopwatch";
+    private final static ThreadLocal<StopWatch> KEY_CACHE = new ThreadLocal<>();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -56,7 +55,7 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
             }
 
             StopWatch stopWatch = new StopWatch();
-            ThreadLocalHolder.set(STOP_WATCH_KEY, stopWatch);
+            KEY_CACHE.set(stopWatch);
             stopWatch.start();
         }
         return true;
@@ -70,10 +69,10 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         if (!prodProfile.equals(SpringUtils.getActiveProfile())) {
-            StopWatch stopWatch = ThreadLocalHolder.get(STOP_WATCH_KEY);
+            StopWatch stopWatch = KEY_CACHE.get();
             stopWatch.stop();
             log.info("[PLUS]结束请求 => URL[{}],耗时:[{}]毫秒", request.getMethod() + " " + request.getRequestURI(), stopWatch.getTime());
-            ThreadLocalHolder.clear();
+            KEY_CACHE.remove();
         }
     }
 

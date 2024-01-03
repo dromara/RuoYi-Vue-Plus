@@ -4,16 +4,6 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import org.dromara.common.core.context.ThreadLocalHolder;
-import org.dromara.common.core.domain.model.LoginUser;
-import org.dromara.common.core.utils.ServletUtils;
-import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.common.log.annotation.Log;
-import org.dromara.common.log.enums.BusinessStatus;
-import org.dromara.common.log.event.OperLogEvent;
-import org.dromara.common.satoken.utils.LoginHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +13,15 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.dromara.common.core.domain.model.LoginUser;
+import org.dromara.common.core.utils.ServletUtils;
+import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.common.log.annotation.Log;
+import org.dromara.common.log.enums.BusinessStatus;
+import org.dromara.common.log.event.OperLogEvent;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.http.HttpMethod;
 import org.springframework.validation.BindingResult;
@@ -51,7 +50,7 @@ public class LogAspect {
     /**
      * 计时 key
      */
-    private static final String LOG_STOP_WATCH_KEY = "logStopwatch";
+    private static final ThreadLocal<StopWatch> KEY_CACHE = new ThreadLocal<>();
 
     /**
      * 处理请求前执行
@@ -59,7 +58,7 @@ public class LogAspect {
     @Before(value = "@annotation(controllerLog)")
     public void boBefore(JoinPoint joinPoint, Log controllerLog) {
         StopWatch stopWatch = new StopWatch();
-        ThreadLocalHolder.set(LOG_STOP_WATCH_KEY, stopWatch);
+        KEY_CACHE.set(stopWatch);
         stopWatch.start();
     }
 
@@ -112,7 +111,7 @@ public class LogAspect {
             // 处理设置注解上的参数
             getControllerMethodDescription(joinPoint, controllerLog, operLog, jsonResult);
             // 设置消耗时间
-            StopWatch stopWatch = ThreadLocalHolder.get(LOG_STOP_WATCH_KEY);
+            StopWatch stopWatch = KEY_CACHE.get();
             stopWatch.stop();
             operLog.setCostTime(stopWatch.getTime());
             // 发布事件保存数据库
@@ -122,7 +121,7 @@ public class LogAspect {
             log.error("异常信息:{}", exp.getMessage());
             exp.printStackTrace();
         } finally {
-            ThreadLocalHolder.remove(LOG_STOP_WATCH_KEY);
+            KEY_CACHE.remove();
         }
     }
 
