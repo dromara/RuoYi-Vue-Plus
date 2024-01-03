@@ -59,9 +59,6 @@ public class SecurityConfig implements WebMvcConfigurer {
                                 StpUtil.getTokenValue());
                         }
 
-                        // 保存用户信息
-//                        ThreadLocalHolder.set(LoginHelper.LOGIN_USER_KEY, LoginHelper.getLoginUser());
-
                         // 有效率影响 用于临时测试
                         // if (log.isDebugEnabled()) {
                         //     log.info("剩余有效时间: {}", StpUtil.getTokenTimeout());
@@ -69,14 +66,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         // }
 
                     });
-            })
-//            {
-//                @Override
-//                public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-//                    ThreadLocalHolder.clear();
-//                }
-//            }
-            ).addPathPatterns("/**")
+            })).addPathPatterns("/**")
             // 排除不需要拦截的路径
             .excludePathPatterns(securityProperties.getExcludes());
     }
