@@ -23,7 +23,7 @@
 
 > 前端项目地址: [plus-ui](https://gitee.com/JavaLionLi/plus-ui)
 
-> 文档地址: [plus-doc](https://plus-doc.dromara.org) - [plus-doc(国内备用)](https://dromara.gitee.io/plus-doc)
+> 文档地址: [plus-doc](https://plus-doc.dromara.org)
 
 ## 赞助商
 
@@ -121,13 +121,12 @@ CCFlow - https://gitee.com/opencc/RuoYi-JFlow <br>
 >
 >[部署项目 必看](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy)
 >>[https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy)
-> 
+>
+>[如何加群](https://plus-doc.dromara.org/#/common/add_group)
+>>[https://plus-doc.dromara.org/#/common/add_group](https://plus-doc.dromara.org/#/common/add_group)
+>
 >[参考文档 Wiki](https://plus-doc.dromara.org)
 >>[https://plus-doc.dromara.org](https://plus-doc.dromara.org)
-> 
->[参考文档(国内备份)](https://dromara.gitee.io/plus-doc)
->>[https://dromara.gitee.io/plus-doc](https://dromara.gitee.io/plus-doc)
-
 
 ## 软件架构图
 
@@ -136,18 +135,6 @@ CCFlow - https://gitee.com/opencc/RuoYi-JFlow <br>
 ## 如何参与贡献
 
 [参与贡献的方式 https://plus-doc.dromara.org/#/common/contribution](https://plus-doc.dromara.org/#/common/contribution)
-
-### 其他
-
-* 定期同步升级 RuoYi-Vue 有用的更新
-* GitHub 地址 [RuoYi-Vue-Plus](https://github.com/dromara/RuoYi-Vue-Plus)
-* 微服务 分支 [RuoYi-Cloud-Plus](https://gitee.com/JavaLionLi/RuoYi-Cloud-Plus)
-* 前端项目 地址 [plus-ui](https://gitee.com/JavaLionLi/plus-ui)
-* 用户扩展项目 [扩展项目列表](https://plus-doc.dromara.org/#/ruoyi-vue-plus/extend-project/list)
-
-## 加群与捐献
->[加群与捐献](https://plus-doc.dromara.org/#/ruoyi-vue-plus/other/group_chat)
->>[https://plus-doc.dromara.org/#/ruoyi-vue-plus/other/group_chat](https://plus-doc.dromara.org/#/ruoyi-vue-plus/other/group_chat)
 
 ## 捐献作者
 作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  
