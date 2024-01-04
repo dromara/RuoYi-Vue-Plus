@@ -24,6 +24,10 @@ public class UndertowConfig implements WebServerFactoryCustomizer<UndertowServle
             WebSocketDeploymentInfo webSocketDeploymentInfo = new WebSocketDeploymentInfo();
             webSocketDeploymentInfo.setBuffers(new DefaultByteBufferPool(false, 512));
             deploymentInfo.addServletContextAttribute("io.undertow.websockets.jsr.WebSocketDeploymentInfo", webSocketDeploymentInfo);
+            // 使用虚拟线程 解除下方注释 仅限jdk21
+//            if (SpringUtils.getProperty("spring.threads.virtual.enabled", Boolean.class, false)) {
+//                deploymentInfo.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
+//            }
         });
     }
 
