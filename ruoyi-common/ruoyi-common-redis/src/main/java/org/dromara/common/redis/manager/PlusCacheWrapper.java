@@ -1,11 +1,10 @@
 package org.dromara.common.redis.manager;
 
 import cn.hutool.core.lang.Console;
-import com.github.benmanes.caffeine.cache.Caffeine;
+import org.dromara.common.core.utils.SpringUtils;
 import org.springframework.cache.Cache;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Cache 装饰器(用于扩展一级缓存)
@@ -14,14 +13,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class PlusCacheWrapper implements Cache {
 
-    private static final com.github.benmanes.caffeine.cache.Cache<Object, Object> CAFFEINE = Caffeine.newBuilder()
-        // 设置最后一次写入或访问后经过固定时间过期
-        .expireAfterWrite(30, TimeUnit.SECONDS)
-        // 初始的缓存空间大小
-        .initialCapacity(100)
-        // 缓存的最大条数
-        .maximumSize(1000)
-        .build();
+    private static final com.github.benmanes.caffeine.cache.Cache<Object, Object>
+        CAFFEINE = SpringUtils.getBean("caffeine");
 
     private final Cache cache;
 
