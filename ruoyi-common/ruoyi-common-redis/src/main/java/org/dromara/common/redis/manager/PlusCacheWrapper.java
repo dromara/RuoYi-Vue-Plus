@@ -49,7 +49,6 @@ public class PlusCacheWrapper implements Cache {
     @Override
     public void put(Object key, Object value) {
         cache.put(key, value);
-        CAFFEINE.put(key, value);
     }
 
     public ValueWrapper putIfAbsent(Object key, Object value) {

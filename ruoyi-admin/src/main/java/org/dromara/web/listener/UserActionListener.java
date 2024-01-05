@@ -17,6 +17,7 @@ import org.dromara.common.core.utils.ip.AddressUtils;
 import org.dromara.common.log.event.LogininforEvent;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.web.service.SysLoginService;
 import org.springframework.stereotype.Component;
 
@@ -50,18 +51,21 @@ public class UserActionListener implements SaTokenListener {
         dto.setLoginTime(System.currentTimeMillis());
         dto.setTokenId(tokenValue);
         String username = (String) loginModel.getExtra(LoginHelper.USER_NAME_KEY);
+        String tenantId = (String) loginModel.getExtra(LoginHelper.TENANT_KEY);
         dto.setUserName(username);
         dto.setClientKey((String) loginModel.getExtra(LoginHelper.CLIENT_KEY));
         dto.setDeviceType(loginModel.getDevice());
         dto.setDeptName((String) loginModel.getExtra(LoginHelper.DEPT_NAME_KEY));
-        if(tokenConfig.getTimeout() == -1) {
-            RedisUtils.setCacheObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto);
-        } else {
-            RedisUtils.setCacheObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto, Duration.ofSeconds(tokenConfig.getTimeout()));
-        }
+        TenantHelper.dynamic(tenantId, () -> {
+            if(tokenConfig.getTimeout() == -1) {
+                RedisUtils.setCacheObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto);
+            } else {
+                RedisUtils.setCacheObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto, Duration.ofSeconds(tokenConfig.getTimeout()));
+            }
+        });
         // 记录登录日志
         LogininforEvent logininforEvent = new LogininforEvent();
-        logininforEvent.setTenantId((String) loginModel.getExtra(LoginHelper.TENANT_KEY));
+        logininforEvent.setTenantId(tenantId);
         logininforEvent.setUsername(username);
         logininforEvent.setStatus(Constants.LOGIN_SUCCESS);
         logininforEvent.setMessage(MessageUtils.message("user.login.success"));
