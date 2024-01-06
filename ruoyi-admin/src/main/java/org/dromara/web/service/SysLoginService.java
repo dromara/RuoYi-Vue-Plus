@@ -57,7 +57,7 @@ public class SysLoginService {
     private final ISysPermissionService permissionService;
     private final ISysSocialService sysSocialService;
     private final ISysRoleService roleService;
-    private final SysDeptMapper deptMapper;
+    private final ISysDeptService deptService;
     private final SysUserMapper userMapper;
 
 
@@ -145,11 +145,9 @@ public class SysLoginService {
         loginUser.setUserType(user.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user.getUserId()));
         loginUser.setRolePermission(permissionService.getRolePermission(user.getUserId()));
-        SysDeptVo dept = deptMapper.selectVoById(user.getDeptId());
+        SysDeptVo dept = deptService.selectDeptById(user.getDeptId());
         loginUser.setDeptName(ObjectUtil.isNull(dept) ? "" : dept.getDeptName());
-        List<SysRoleVo> roles = DataPermissionHelper.ignore(() -> {
-            return roleService.selectRolesByUserId(user.getUserId());
-        });
+        List<SysRoleVo> roles = roleService.selectRolesByUserId(user.getUserId());
         loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
         return loginUser;
     }

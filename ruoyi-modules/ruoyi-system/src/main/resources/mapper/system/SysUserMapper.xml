@@ -4,31 +4,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.system.mapper.SysUserMapper">
 
-    <!-- 多结构嵌套自动映射需带上每个实体的主键id 否则映射会失败 -->
     <resultMap type="org.dromara.system.domain.vo.SysUserVo" id="SysUserResult">
         <id property="userId" column="user_id"/>
-        <result property="deptId" column="dept_id"/>
-        <association property="dept" column="dept_id" resultMap="deptResult"/>
     </resultMap>
-
-    <resultMap id="deptResult" type="org.dromara.system.domain.vo.SysDeptVo">
-        <id property="deptId" column="dept_id"/>
-        <result property="email" column="dept_email"/>
-        <result property="status" column="dept_status"/>
-        <result property="createTime" column="dept_create_time"/>
+    <resultMap type="org.dromara.system.domain.vo.SysUserExportVo" id="SysUserExportResult">
+        <id property="userId" column="user_id"/>
     </resultMap>
 
     <select id="selectPageUserList" resultMap="SysUserResult">
         select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
-            u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
-            d.dept_name, d.leader, u1.user_name as leaderName
+            u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark
         from sys_user u
-            left join sys_dept d on u.dept_id = d.dept_id
-            left join sys_user u1 on u1.user_id = d.leader
         ${ew.getCustomSqlSegment}
     </select>
 
-    <select id="selectUserList" resultMap="SysUserResult">
+    <select id="selectUserExportList" resultMap="SysUserExportResult">
         select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
             u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
             d.dept_name, d.leader, u1.user_name as leaderName
