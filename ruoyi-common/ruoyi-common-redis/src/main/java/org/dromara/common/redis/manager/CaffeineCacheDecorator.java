@@ -7,18 +7,18 @@ import org.springframework.cache.Cache;
 import java.util.concurrent.Callable;
 
 /**
- * Cache 装饰器(用于扩展一级缓存)
+ * Cache 装饰器模式(用于扩展 Caffeine 一级缓存)
  *
  * @author LionLi
  */
-public class PlusCacheWrapper implements Cache {
+public class CaffeineCacheDecorator implements Cache {
 
     private static final com.github.benmanes.caffeine.cache.Cache<Object, Object>
         CAFFEINE = SpringUtils.getBean("caffeine");
 
     private final Cache cache;
 
-    public PlusCacheWrapper(Cache cache) {
+    public CaffeineCacheDecorator(Cache cache) {
         this.cache = cache;
     }
 
