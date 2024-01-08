@@ -11,6 +11,7 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.maxkey.AuthMaxKeyRequest;
+import org.dromara.common.social.topiam.AuthTopIamRequest;
 
 /**
  * 认证授权工具类
@@ -38,7 +39,8 @@ public class SocialUtils  {
         AuthConfig.AuthConfigBuilder builder = AuthConfig.builder()
             .clientId(obj.getClientId())
             .clientSecret(obj.getClientSecret())
-            .redirectUri(obj.getRedirectUri());
+            .redirectUri(obj.getRedirectUri())
+            .scopes(obj.getScopes());
         return switch (source.toLowerCase()) {
             case "dingtalk" -> new AuthDingTalkRequest(builder.build(), STATE_CACHE);
             case "baidu" -> new AuthBaiduRequest(builder.build(), STATE_CACHE);
@@ -63,6 +65,7 @@ public class SocialUtils  {
             case "wechat_mp" -> new AuthWeChatMpRequest(builder.build(), STATE_CACHE);
             case "aliyun" -> new AuthAliyunRequest(builder.build(), STATE_CACHE);
             case "maxkey" -> new AuthMaxKeyRequest(builder.build(), STATE_CACHE);
+            case "topiam" -> new AuthTopIamRequest(builder.build(), STATE_CACHE);
             default -> throw new AuthException("未获取到有效的Auth配置");
         };
     }
