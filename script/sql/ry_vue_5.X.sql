@@ -21,7 +21,7 @@ create table sys_social
     union_id           varchar(255)     default null    comment '用户的 unionid',
     scope              varchar(255)     default null    comment '授予的权限，部分平台可能没有',
     token_type         varchar(255)     default null    comment '个别平台的授权信息，部分平台可能没有',
-    id_token           varchar(255)     default null    comment 'id token，部分平台可能没有',
+    id_token           text             default null    comment 'id token，部分平台可能没有',
     mac_algorithm      varchar(255)     default null    comment '小米平台用户的附带属性，部分平台可能没有',
     mac_key            varchar(255)     default null    comment '小米平台用户的附带属性，部分平台可能没有',
     code               varchar(255)     default null    comment '用户的授权code，部分平台可能没有',

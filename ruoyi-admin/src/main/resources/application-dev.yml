@@ -189,6 +189,13 @@ justauth:
       client-id: 876892492581044224
       client-secret: x1Y5MTMwNzIwMjMxNTM4NDc3Mzche8
       redirect-uri: ${justauth.address}/social-callback?source=maxkey
+    topiam:
+      # topiam 服务器地址
+      server-url: http://127.0.0.1:1989/api/v1/authorize/y0q************spq***********8ol
+      client-id: 449c4*********937************759
+      client-secret: ac7***********1e0************28d
+      redirect-uri: ${justauth.address}/social-callback?source=topiam
+      scopes: [openid, email, phone, profile]
     qq:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
