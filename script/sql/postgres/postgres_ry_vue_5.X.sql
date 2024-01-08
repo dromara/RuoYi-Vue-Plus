@@ -20,7 +20,7 @@ create table sys_social
     union_id           varchar(255)     default null::varchar,
     scope              varchar(255)     default null::varchar,
     token_type         varchar(255)     default null::varchar,
-    id_token           varchar(255)     default null::varchar,
+    id_token           varchar(2000)    default null::varchar,
     mac_algorithm      varchar(255)     default null::varchar,
     mac_key            varchar(255)     default null::varchar,
     code               varchar(255)     default null::varchar,

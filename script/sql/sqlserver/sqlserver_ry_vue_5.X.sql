@@ -17,7 +17,7 @@ create table sys_social
     union_id           nvarchar(255)     NULL,
     scope              nvarchar(255)     NULL,
     token_type         nvarchar(255)     NULL,
-    id_token           nvarchar(255)     NULL,
+    id_token           nvarchar(2000)    NULL,
     mac_algorithm      nvarchar(255)     NULL,
     mac_key            nvarchar(255)     NULL,
     code               nvarchar(255)     NULL,
