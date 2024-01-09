@@ -127,7 +127,7 @@ public class RepeatSubmitAspect {
     public boolean isFilterObject(final Object o) {
         Class<?> clazz = o.getClass();
         if (clazz.isArray()) {
-            return clazz.getComponentType().isAssignableFrom(MultipartFile.class);
+            return MultipartFile.class.isAssignableFrom(clazz.getComponentType());
         } else if (Collection.class.isAssignableFrom(clazz)) {
             Collection collection = (Collection) o;
             for (Object value : collection) {
