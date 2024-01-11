@@ -145,10 +145,12 @@ public class SysLoginService {
         loginUser.setUserType(user.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user.getUserId()));
         loginUser.setRolePermission(permissionService.getRolePermission(user.getUserId()));
-        SysDeptVo dept = deptService.selectDeptById(user.getDeptId());
-        loginUser.setDeptName(ObjectUtil.isNull(dept) ? "" : dept.getDeptName());
-        List<SysRoleVo> roles = roleService.selectRolesByUserId(user.getUserId());
-        loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
+        TenantHelper.dynamic(user.getTenantId(), () -> {
+            SysDeptVo dept = deptService.selectDeptById(user.getDeptId());
+            loginUser.setDeptName(ObjectUtil.isNull(dept) ? "" : dept.getDeptName());
+            List<SysRoleVo> roles = roleService.selectRolesByUserId(user.getUserId());
+            loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
+        });
         return loginUser;
     }
 
