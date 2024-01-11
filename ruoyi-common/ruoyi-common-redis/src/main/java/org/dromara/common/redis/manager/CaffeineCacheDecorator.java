@@ -32,17 +32,21 @@ public class CaffeineCacheDecorator implements Cache {
         return cache.getNativeCache();
     }
 
+    public String getUniqueKey(Object key) {
+        return cache.getName() + ":" + key;
+    }
+
     @Override
     public ValueWrapper get(Object key) {
-        Object o = CAFFEINE.get(key, k -> cache.get(key));
-        Console.log("redisson caffeine -> key: " + key + ",value:" + o);
+        Object o = CAFFEINE.get(getUniqueKey(key), k -> cache.get(key));
+        Console.log("redisson caffeine -> key: " + getUniqueKey(key) + ",value:" + o);
         return (ValueWrapper) o;
     }
 
     @SuppressWarnings("unchecked")
     public <T> T get(Object key, Class<T> type) {
-        Object o = CAFFEINE.get(key, k -> cache.get(key, type));
-        Console.log("redisson caffeine -> key: " + key + ",value:" + o);
+        Object o = CAFFEINE.get(getUniqueKey(key), k -> cache.get(key, type));
+        Console.log("redisson caffeine -> key: " + getUniqueKey(key) + ",value:" + o);
         return (T) o;
     }
 
@@ -63,7 +67,7 @@ public class CaffeineCacheDecorator implements Cache {
     public boolean evictIfPresent(Object key) {
         boolean b = cache.evictIfPresent(key);
         if (b) {
-            CAFFEINE.invalidate(key);
+            CAFFEINE.invalidate(getUniqueKey(key));
         }
         return b;
     }
@@ -80,8 +84,8 @@ public class CaffeineCacheDecorator implements Cache {
     @SuppressWarnings("unchecked")
     @Override
     public <T> T get(Object key, Callable<T> valueLoader) {
-        Object o = CAFFEINE.get(key, k -> cache.get(key, valueLoader));
-        Console.log("redisson caffeine -> key: " + key + ",value:" + o);
+        Object o = CAFFEINE.get(getUniqueKey(key), k -> cache.get(key, valueLoader));
+        Console.log("redisson caffeine -> key: " + getUniqueKey(key) + ",value:" + o);
         return (T) o;
     }
 
