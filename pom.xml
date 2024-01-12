@@ -31,7 +31,7 @@
         <okhttp.version>4.10.0</okhttp.version>
         <spring-boot-admin.version>3.2.0</spring-boot-admin.version>
         <redisson.version>3.25.2</redisson.version>
-        <lock4j.version>2.2.5</lock4j.version>
+        <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.0</dynamic-ds.version>
         <alibaba-ttl.version>2.14.4</alibaba-ttl.version>
         <powerjob.version>4.3.6</powerjob.version>
