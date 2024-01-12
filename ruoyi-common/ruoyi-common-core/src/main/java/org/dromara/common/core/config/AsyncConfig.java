@@ -5,18 +5,20 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 
 /**
  * 异步配置
+ * <p>
+ * 如果未使用虚拟线程则生效
  *
  * @author Lion Li
  */
-@EnableAsync(proxyTargetClass = true)
+@ConditionalOnProperty(prefix = "spring.threads.virtual", name = "enabled", havingValue = "false")
 @AutoConfiguration
 public class AsyncConfig implements AsyncConfigurer {
 
