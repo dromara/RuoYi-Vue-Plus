@@ -35,7 +35,6 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
     Log log = LogFactory.getLog(BaseMapperPlus.class);
 
     default Class<V> currentVoClass() {
-        GenericTypeUtils.resolveTypeArguments(this.getClass(), BaseMapperPlus.class);
         return (Class<V>) GenericTypeUtils.resolveTypeArguments(this.getClass(), BaseMapperPlus.class)[1];
     }
 
