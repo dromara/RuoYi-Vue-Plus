@@ -34,7 +34,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 
 /**
@@ -242,16 +241,13 @@ public class OssClient {
      * @throws OssException 如果下载失败，抛出自定义异常
      */
     public Path fileDownload(String path) {
-        // 从路径中移除 URL 前缀
-        String url = removeBaseUrl(path);
-
-        // 构建临时文件路径 文件名必须是唯一不存在的，路径必须是存在的
-        Path tempFilePath = Paths.get(extractFileName(url));
+        // 构建临时文件
+        Path tempFilePath = FileUtils.createTempFile().toPath();
         // 使用 S3TransferManager 下载文件
         FileDownload downloadFile = transferManager.downloadFile(
             x -> x.getObjectRequest(
                     y -> y.bucket(properties.getBucketName())
-                        .key(url)
+                        .key(removeBaseUrl(path))
                         .build())
                 .addTransferListener(LoggingTransferListener.create())
                 .destination(tempFilePath)
@@ -449,16 +445,6 @@ public class OssClient {
      */
     public String removeBaseUrl(String path) {
         return path.replace(getUrl() + StringUtils.SLASH, "");
-    }
-
-    /**
-     * 从文件路径中提取文件名
-     *
-     * @param path 文件路径
-     * @return 提取的文件名或默认文件名
-     */
-    public String extractFileName(String path) {
-        return FileUtils.getTmpDir() + StringUtils.SLASH + Paths.get(path).getFileName().toString();
     }
 
     /**
