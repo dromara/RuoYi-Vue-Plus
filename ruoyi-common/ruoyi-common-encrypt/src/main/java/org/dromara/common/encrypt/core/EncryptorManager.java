@@ -47,7 +47,7 @@ public class EncryptorManager {
      * @param typeAliasesPackage 实体类包
      */
     public EncryptorManager(String typeAliasesPackage) {
-        this.fieldCache = scanEncryptClasses(typeAliasesPackage);
+        scanEncryptClasses(typeAliasesPackage);
     }
 
 
@@ -109,8 +109,7 @@ public class EncryptorManager {
     /**
      * 通过 typeAliasesPackage 设置的扫描包 扫描缓存实体
      */
-    private Map<Class<?>, Set<Field>> scanEncryptClasses(String typeAliasesPackage) {
-        Map<Class<?>, Set<Field>> fieldCache = new HashMap<>();
+    private void scanEncryptClasses(String typeAliasesPackage) {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         CachingMetadataReaderFactory factory = new CachingMetadataReaderFactory();
         String[] packagePatternArray = StringUtils.splitPreserveAllTokens(typeAliasesPackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
@@ -131,7 +130,6 @@ public class EncryptorManager {
         } catch (Exception e) {
             log.error("初始化数据安全缓存时出错:{}", e.getMessage());
         }
-        return fieldCache;
     }
 
     /**
