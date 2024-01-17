@@ -1,16 +1,14 @@
 package org.dromara.common.encrypt.core;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.encrypt.annotation.EncryptField;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * 加密管理类
@@ -19,6 +17,7 @@ import java.util.stream.Collectors;
  * @version 4.6.0
  */
 @Slf4j
+@NoArgsConstructor
 public class EncryptorManager {
 
     /**
@@ -32,24 +31,23 @@ public class EncryptorManager {
     Map<Class<?>, Set<Field>> fieldCache = new ConcurrentHashMap<>();
 
     /**
+     * 构造方法传入类加密字段缓存
+     *
+     * @param fieldCache 类加密字段缓存
+     */
+    public EncryptorManager(Map<Class<?>, Set<Field>> fieldCache) {
+        this.fieldCache = fieldCache;
+    }
+
+
+    /**
      * 获取类加密字段缓存
      */
     public Set<Field> getFieldCache(Class<?> sourceClazz) {
-        return fieldCache.computeIfAbsent(sourceClazz, clazz -> {
-            Set<Field> fieldSet = new HashSet<>();
-            while (clazz != null) {
-                Field[] fields = clazz.getDeclaredFields();
-                fieldSet.addAll(Arrays.asList(fields));
-                clazz = clazz.getSuperclass();
-            }
-            fieldSet = fieldSet.stream().filter(field ->
-                    field.isAnnotationPresent(EncryptField.class) && field.getType() == String.class)
-                .collect(Collectors.toSet());
-            for (Field field : fieldSet) {
-                field.setAccessible(true);
-            }
-            return fieldSet;
-        });
+        if(ObjectUtil.isNotNull(fieldCache)) {
+            return fieldCache.get(sourceClazz);
+        }
+        return null;
     }
 
     /**
