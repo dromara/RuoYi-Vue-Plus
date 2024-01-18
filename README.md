@@ -29,7 +29,7 @@
 
 MaxKey 业界领先单点登录产品 - https://gitee.com/dromara/MaxKey <br>
 CCFlow 驰聘低代码-流程-表单 - https://gitee.com/opencc/RuoYi-JFlow <br>
-数驼科技 软件定制开发APP小程序等 - http://www.shuduokeji.com/ <br>
+数舵科技 软件定制开发APP小程序等 - http://www.shuduokeji.com/ <br>
 [如何成为赞助商 加群联系作者详谈](https://plus-doc.dromara.org/#/common/add_group)
 
 # 本框架与RuoYi的功能差异
