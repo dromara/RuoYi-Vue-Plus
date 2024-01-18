@@ -1,6 +1,5 @@
 package org.dromara.demo.controller;
 
-import cn.dev33.satoken.annotation.SaIgnore;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.sms4j.api.SmsBlend;
@@ -20,7 +19,6 @@ import java.util.LinkedHashMap;
  * @author Lion Li
  * @version 4.2.0
  */
-@SaIgnore
 @Validated
 @RequiredArgsConstructor
 @RestController
