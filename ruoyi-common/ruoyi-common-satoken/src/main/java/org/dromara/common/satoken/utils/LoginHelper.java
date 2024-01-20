@@ -101,13 +101,18 @@ public class LoginHelper {
         return Convert.toLong(getExtra(DEPT_KEY));
     }
 
+    /**
+     * 获取当前 Token 的扩展信息
+     *
+     * @param key 键值
+     * @return 对应的扩展数据
+     */
     private static Object getExtra(String key) {
         try {
             return StpUtil.getExtra(key);
         } catch (Exception e) {
             return null;
         }
-
     }
 
     /**
@@ -135,12 +140,17 @@ public class LoginHelper {
         return UserConstants.SUPER_ADMIN_ID.equals(userId);
     }
 
+    /**
+     * 是否为超级管理员
+     *
+     * @return 结果
+     */
     public static boolean isSuperAdmin() {
         return isSuperAdmin(getUserId());
     }
 
     /**
-     * 是否为超级管理员
+     * 是否为租户管理员
      *
      * @param rolePermission 角色权限标识组
      * @return 结果
@@ -149,10 +159,20 @@ public class LoginHelper {
         return rolePermission.contains(TenantConstants.TENANT_ADMIN_ROLE_KEY);
     }
 
+    /**
+     * 是否为租户管理员
+     *
+     * @return 结果
+     */
     public static boolean isTenantAdmin() {
         return Convert.toBool(isTenantAdmin(getLoginUser().getRolePermission()));
     }
 
+    /**
+     * 检查当前用户是否已登录
+     *
+     * @return 结果
+     */
     public static boolean isLogin() {
         return getLoginUser() != null;
     }
