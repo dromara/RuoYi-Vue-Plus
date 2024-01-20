@@ -120,6 +120,7 @@ public class CaptchaController {
         AbstractCaptcha captcha = SpringUtils.getBean(captchaProperties.getCategory().getClazz());
         captcha.setGenerator(codeGenerator);
         captcha.createCode();
+        // 如果是数学验证码，使用SpEL表达式处理验证码结果
         String code = captcha.getCode();
         if (isMath) {
             ExpressionParser parser = new SpelExpressionParser();

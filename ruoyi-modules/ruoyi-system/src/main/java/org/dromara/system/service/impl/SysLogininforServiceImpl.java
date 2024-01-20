@@ -59,10 +59,10 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
         final UserAgent userAgent = UserAgentUtil.parse(request.getHeader("User-Agent"));
         final String ip = ServletUtils.getClientIP(request);
         // 客户端信息
-        String clientid = request.getHeader(LoginHelper.CLIENT_KEY);
+        String clientId = request.getHeader(LoginHelper.CLIENT_KEY);
         SysClientVo client = null;
-        if (StringUtils.isNotBlank(clientid)) {
-            client = clientService.queryByClientId(clientid);
+        if (StringUtils.isNotBlank(clientId)) {
+            client = clientService.queryByClientId(clientId);
         }
 
         String address = AddressUtils.getRealAddressByIP(ip);

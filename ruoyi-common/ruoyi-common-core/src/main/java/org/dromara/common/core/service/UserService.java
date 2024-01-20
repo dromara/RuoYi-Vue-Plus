@@ -23,4 +23,20 @@ public interface UserService {
      */
     String selectNicknameById(Long userId);
 
+    /**
+     * 通过用户ID查询用户手机号
+     *
+     * @param userId 用户id
+     * @return 用户手机号
+     */
+    String selectPhonenumberById(Long userId);
+
+    /**
+     * 通过用户ID查询用户邮箱
+     *
+     * @param userId 用户id
+     * @return 用户邮箱
+     */
+    String selectEmailById(Long userId);
+
 }
