@@ -64,7 +64,6 @@ spring:
     name: ${ruoyi.name}
   threads:
     # 开启虚拟线程 仅jdk21可用
-    # 开启后还需更改 UndertowConfig 虚拟线程配置
     virtual:
       enabled: false
   # 资源信息
