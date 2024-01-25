@@ -24,8 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class OssFactory {
 
     private static final Map<String, OssClient> CLIENT_CACHE = new ConcurrentHashMap<>();
-
-    private static final ReentrantLock lock = new ReentrantLock();
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
     /**
      * 获取默认实例
@@ -53,7 +52,7 @@ public class OssFactory {
         OssClient client = CLIENT_CACHE.get(key);
         // 客户端不存在或配置不相同则重新构建
         if (client == null || !client.checkPropertiesSame(properties)) {
-            lock.lock();
+            LOCK.lock();
             try {
                 client = CLIENT_CACHE.get(key);
                 if (client == null || !client.checkPropertiesSame(properties)) {
@@ -62,7 +61,7 @@ public class OssFactory {
                     return CLIENT_CACHE.get(key);
                 }
             } finally {
-                lock.unlock();
+                LOCK.unlock();
             }
         }
         return client;
