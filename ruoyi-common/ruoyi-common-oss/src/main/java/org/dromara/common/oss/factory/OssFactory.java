@@ -25,6 +25,8 @@ public class OssFactory {
 
     private static final Map<String, OssClient> CLIENT_CACHE = new ConcurrentHashMap<>();
 
+    private static final ReentrantLock lock = new ReentrantLock();
+
     /**
      * 获取默认实例
      */
@@ -51,12 +53,14 @@ public class OssFactory {
         OssClient client = CLIENT_CACHE.get(key);
         // 客户端不存在或配置不相同则重新构建
         if (client == null || !client.checkPropertiesSame(properties)) {
-            ReentrantLock lock = new ReentrantLock();
             lock.lock();
             try {
-                CLIENT_CACHE.put(key, new OssClient(configKey, properties));
-                log.info("创建OSS实例 key => {}", configKey);
-                return CLIENT_CACHE.get(key);
+                client = CLIENT_CACHE.get(key);
+                if (client == null || !client.checkPropertiesSame(properties)) {
+                    CLIENT_CACHE.put(key, new OssClient(configKey, properties));
+                    log.info("创建OSS实例 key => {}", configKey);
+                    return CLIENT_CACHE.get(key);
+                }
             } finally {
                 lock.unlock();
             }
