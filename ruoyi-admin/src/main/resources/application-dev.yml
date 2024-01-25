@@ -183,7 +183,6 @@ sms:
 
 --- # 三方授权
 justauth:
-  enabled: true
   # 前端外网访问地址
   address: http://localhost:80
   type:
