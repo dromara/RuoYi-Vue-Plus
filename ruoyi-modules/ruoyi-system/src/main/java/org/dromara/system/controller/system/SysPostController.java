@@ -113,7 +113,7 @@ public class SysPostController extends BaseController {
      *
      * @param postIds 岗位ID串
      */
-    @SaCheckPermission("system:dept:query")
+    @SaCheckPermission("system:post:query")
     @GetMapping("/optionselect")
     public R<List<SysPostVo>> optionselect(@RequestParam(required = false) Long[] postIds) {
         return R.ok(postService.selectPostByIds(List.of(postIds)));
