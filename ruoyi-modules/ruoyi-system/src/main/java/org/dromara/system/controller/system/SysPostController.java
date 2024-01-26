@@ -1,6 +1,8 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.excel.utils.ExcelUtil;
@@ -12,8 +14,6 @@ import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysPostBo;
 import org.dromara.system.domain.vo.SysPostVo;
 import org.dromara.system.service.ISysPostService;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -110,12 +110,13 @@ public class SysPostController extends BaseController {
 
     /**
      * 获取岗位选择框列表
+     *
+     * @param postIds 岗位ID串
      */
+    @SaCheckPermission("system:dept:query")
     @GetMapping("/optionselect")
-    public R<List<SysPostVo>> optionselect() {
-        SysPostBo postBo = new SysPostBo();
-        postBo.setStatus(UserConstants.POST_NORMAL);
-        List<SysPostVo> posts = postService.selectPostList(postBo);
-        return R.ok(posts);
+    public R<List<SysPostVo>> optionselect(@RequestParam(required = false) Long[] postIds) {
+        return R.ok(postService.selectPostByIds(List.of(postIds)));
     }
+
 }

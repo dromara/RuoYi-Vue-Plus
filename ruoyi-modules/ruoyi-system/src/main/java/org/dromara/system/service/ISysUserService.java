@@ -67,6 +67,15 @@ public interface ISysUserService {
     SysUserVo selectUserById(Long userId);
 
     /**
+     * 通过用户ID串查询用户
+     *
+     * @param userIds 用户ID串
+     * @param deptId  部门id
+     * @return 用户列表信息
+     */
+    List<SysUserVo> selectUserByIds(List<Long> userIds, Long deptId);
+
+    /**
      * 根据用户ID查询用户所属角色组
      *
      * @param userId 用户ID

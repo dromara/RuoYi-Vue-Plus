@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginUser;
-import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
@@ -204,6 +203,19 @@ public class SysUserController extends BaseController {
             return R.fail("当前用户不能删除");
         }
         return toAjax(userService.deleteUserByIds(userIds));
+    }
+
+    /**
+     * 根据用户ID串批量获取用户基础信息
+     *
+     * @param userIds 用户ID串
+     * @param deptId  部门ID
+     */
+    @SaCheckPermission("system:user:query")
+    @GetMapping("/optionselect")
+    public R<List<SysUserVo>> optionselect(@RequestParam(required = false) Long[] userIds,
+                                           @RequestParam(required = false) Long deptId) {
+        return R.ok(userService.selectUserByIds(List.of(userIds), deptId));
     }
 
     /**

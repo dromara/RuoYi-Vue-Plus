@@ -167,6 +167,20 @@ public class SysRoleServiceImpl implements ISysRoleService {
     }
 
     /**
+     * 通过角色ID串查询角色
+     *
+     * @param roleIds 角色ID串
+     * @return 角色列表信息
+     */
+    @Override
+    public List<SysRoleVo> selectRoleByIds(List<Long> roleIds) {
+        return baseMapper.selectRoleList(new LambdaQueryWrapper<SysRole>()
+            .select(SysRole::getRoleId, SysRole::getRoleName, SysRole::getRoleKey)
+            .eq(SysRole::getStatus, UserConstants.ROLE_NORMAL)
+            .in(CollUtil.isNotEmpty(roleIds), SysRole::getRoleId, roleIds));
+    }
+
+    /**
      * 校验角色名称是否唯一
      *
      * @param role 角色信息
