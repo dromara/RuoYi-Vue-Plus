@@ -54,13 +54,12 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
                 Date current = new Date();
                 // 更新时间填充(不管为不为空)
                 baseEntity.setUpdateTime(current);
-                if (ObjectUtil.isNull(baseEntity.getUpdateBy())) {
-                    LoginUser loginUser = getLoginUser();
-                    // 当前已登录 更新人填充(不管为不为空)
-                    if (ObjectUtil.isNotNull(loginUser)) {
-                        baseEntity.setUpdateBy(loginUser.getUserId());
-                    }
+                // 当前已登录 更新人填充(不管为不为空)
+                Long userId = LoginHelper.getUserId();
+                if (ObjectUtil.isNotNull(userId)) {
+                    baseEntity.setUpdateBy(userId);
                 }
+
             }
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
