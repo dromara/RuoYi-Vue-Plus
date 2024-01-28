@@ -39,14 +39,12 @@ public class CaffeineCacheDecorator implements Cache {
     @Override
     public ValueWrapper get(Object key) {
         Object o = CAFFEINE.get(getUniqueKey(key), k -> cache.get(key));
-        Console.log("redisson caffeine -> key: " + getUniqueKey(key) + ",value:" + o);
         return (ValueWrapper) o;
     }
 
     @SuppressWarnings("unchecked")
     public <T> T get(Object key, Class<T> type) {
         Object o = CAFFEINE.get(getUniqueKey(key), k -> cache.get(key, type));
-        Console.log("redisson caffeine -> key: " + getUniqueKey(key) + ",value:" + o);
         return (T) o;
     }
 
@@ -85,7 +83,6 @@ public class CaffeineCacheDecorator implements Cache {
     @Override
     public <T> T get(Object key, Callable<T> valueLoader) {
         Object o = CAFFEINE.get(getUniqueKey(key), k -> cache.get(key, valueLoader));
-        Console.log("redisson caffeine -> key: " + getUniqueKey(key) + ",value:" + o);
         return (T) o;
     }
 

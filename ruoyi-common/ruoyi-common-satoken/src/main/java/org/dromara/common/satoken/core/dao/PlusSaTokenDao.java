@@ -37,7 +37,6 @@ public class PlusSaTokenDao implements SaTokenDao {
     @Override
     public String get(String key) {
         Object o = CAFFEINE.get(key, k -> RedisUtils.getCacheObject(key));
-        Console.log("caffeine -> key:" + key + ",value:" + o);
         return (String) o;
     }
 
@@ -101,7 +100,6 @@ public class PlusSaTokenDao implements SaTokenDao {
     @Override
     public Object getObject(String key) {
         Object o = CAFFEINE.get(key, k -> RedisUtils.getCacheObject(key));
-        Console.log("caffeine -> key:" + key + ",value:" + o);
         return o;
     }
 
