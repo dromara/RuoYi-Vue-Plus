@@ -8,7 +8,7 @@
     </resultMap>
 
     <select id="selectDeptList" resultMap="SysDeptResult">
-        select * from sys_dept ${ew.getCustomSqlSegment}
+        select ${ew.getSqlSelect} from sys_dept ${ew.getCustomSqlSegment}
     </select>
 
     <select id="countDeptById" resultType="Long">

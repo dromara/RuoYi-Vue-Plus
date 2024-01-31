@@ -129,7 +129,7 @@ public class SysDeptController extends BaseController {
     @SaCheckPermission("system:dept:query")
     @GetMapping("/optionselect")
     public R<List<SysDeptVo>> optionselect(@RequestParam(required = false) Long[] deptIds) {
-        return R.ok(deptService.selectDeptByIds(List.of(deptIds)));
+        return R.ok(deptService.selectDeptByIds(deptIds == null ? null : List.of(deptIds)));
     }
 
 }

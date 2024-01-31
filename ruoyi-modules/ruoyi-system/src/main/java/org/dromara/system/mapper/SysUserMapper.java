@@ -26,6 +26,12 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     })
     Page<SysUserVo> selectPageUserList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
 
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "user_id")
+    })
+    List<SysUserVo> selectUserList(@Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+
     /**
      * 根据条件分页查询用户列表
      *

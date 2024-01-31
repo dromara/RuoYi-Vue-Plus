@@ -181,7 +181,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public List<SysUserVo> selectUserByIds(List<Long> userIds, Long deptId) {
-        return baseMapper.selectVoList(new LambdaQueryWrapper<SysUser>()
+        return baseMapper.selectUserList(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName)
             .eq(SysUser::getStatus, UserConstants.USER_NORMAL)
             .eq(ObjectUtil.isNotNull(deptId), SysUser::getDeptId, deptId)

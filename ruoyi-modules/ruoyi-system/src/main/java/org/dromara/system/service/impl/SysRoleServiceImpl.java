@@ -174,10 +174,9 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public List<SysRoleVo> selectRoleByIds(List<Long> roleIds) {
-        return baseMapper.selectRoleList(new LambdaQueryWrapper<SysRole>()
-            .select(SysRole::getRoleId, SysRole::getRoleName, SysRole::getRoleKey)
-            .eq(SysRole::getStatus, UserConstants.ROLE_NORMAL)
-            .in(CollUtil.isNotEmpty(roleIds), SysRole::getRoleId, roleIds));
+        return baseMapper.selectRoleList(new QueryWrapper<SysRole>()
+            .eq("r.status", UserConstants.ROLE_NORMAL)
+            .in(CollUtil.isNotEmpty(roleIds), "r.role_id", roleIds));
     }
 
     /**
