@@ -18,7 +18,6 @@ import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 
 /**
@@ -37,8 +36,9 @@ public class CryptoFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest servletRequest = (HttpServletRequest) request;
         HttpServletResponse servletResponse = (HttpServletResponse) response;
-
-        boolean responseFlag = false;
+        // 获取加密注解
+        ApiEncrypt apiEncrypt = this.getApiEncryptAnnotation(servletRequest);
+        boolean responseFlag = apiEncrypt != null && apiEncrypt.response();
         ServletRequest requestWrapper = null;
         ServletResponse responseWrapper = null;
         EncryptResponseBodyWrapper responseBodyWrapper = null;
@@ -49,9 +49,6 @@ public class CryptoFilter implements Filter {
             if (HttpMethod.PUT.matches(servletRequest.getMethod()) || HttpMethod.POST.matches(servletRequest.getMethod())) {
                 // 是否存在加密标头
                 String headerValue = servletRequest.getHeader(properties.getHeaderFlag());
-                // 获取加密注解
-                ApiEncrypt apiEncrypt = this.getApiEncryptAnnotation(servletRequest);
-                responseFlag = apiEncrypt != null && apiEncrypt.response();
                 if (StringUtils.isNotBlank(headerValue)) {
                     // 请求解密
                     requestWrapper = new DecryptRequestBodyWrapper(servletRequest, properties.getPrivateKey(), properties.getHeaderFlag());
@@ -65,12 +62,12 @@ public class CryptoFilter implements Filter {
                         return;
                     }
                 }
-                // 判断是否响应加密
-                if (responseFlag) {
-                    responseBodyWrapper = new EncryptResponseBodyWrapper(servletResponse);
-                    responseWrapper = responseBodyWrapper;
-                }
             }
+        }
+        // 判断是否响应加密
+        if (responseFlag) {
+            responseBodyWrapper = new EncryptResponseBodyWrapper(servletResponse);
+            responseWrapper = responseBodyWrapper;
         }
 
         chain.doFilter(
