@@ -5,6 +5,8 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.metadata.Head;
+import com.alibaba.excel.write.handler.WorkbookWriteHandler;
+import com.alibaba.excel.write.handler.context.WorkbookWriteHandlerContext;
 import com.alibaba.excel.write.merge.AbstractMergeStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +27,7 @@ import java.util.*;
  * @author Lion Li
  */
 @Slf4j
-public class CellMergeStrategy extends AbstractMergeStrategy {
+public class CellMergeStrategy extends AbstractMergeStrategy implements WorkbookWriteHandler {
 
     private final List<CellRangeAddress> cellList;
     private final boolean hasTitle;
@@ -40,13 +42,24 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
 
     @Override
     protected void merge(Sheet sheet, Cell cell, Head head, Integer relativeRowIndex) {
-        // judge the list is not null
-        if (CollUtil.isNotEmpty(cellList)) {
-            // the judge is necessary
-            if (cell.getRowIndex() == rowIndex && cell.getColumnIndex() == 0) {
-                for (CellRangeAddress item : cellList) {
-                    sheet.addMergedRegion(item);
+        //单元格写入了,遍历合并区域,如果该Cell在区域内,但非首行,则清空
+        final int rowIndex = cell.getRowIndex();
+        if (CollUtil.isNotEmpty(cellList)){
+            for (CellRangeAddress cellAddresses : cellList) {
+                final int firstRow = cellAddresses.getFirstRow();
+                if (cellAddresses.isInRange(cell) && rowIndex != firstRow){
+                    cell.setBlank();
                 }
+            }
+        }
+    }
+
+    @Override
+    public void afterWorkbookDispose(final WorkbookWriteHandlerContext context) {
+        //当前表格写完后，统一写入
+        if (CollUtil.isNotEmpty(cellList)){
+            for (CellRangeAddress item : cellList) {
+                context.getWriteContext().writeSheetHolder().getSheet().addMergedRegion(item);
             }
         }
     }
