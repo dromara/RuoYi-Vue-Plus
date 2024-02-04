@@ -21,4 +21,9 @@ public @interface CellMerge {
 	 */
 	int index() default -1;
 
+    /**
+     * 合并需要依赖的其他字段名称
+     */
+    String[] mergeBy() default {};
+
 }

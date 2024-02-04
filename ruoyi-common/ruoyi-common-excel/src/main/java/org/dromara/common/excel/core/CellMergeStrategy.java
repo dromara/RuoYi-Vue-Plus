@@ -1,6 +1,8 @@
 package org.dromara.common.excel.core;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.metadata.Head;
 import com.alibaba.excel.write.merge.AbstractMergeStrategy;
@@ -15,10 +17,7 @@ import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.excel.annotation.CellMerge;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 列值重复合并策略
@@ -93,41 +92,39 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
                         // 空值跳过不合并
                         continue;
                     }
+
                     if (!cellValue.equals(val)) {
-                        if (i - repeatCell.getCurrent() > 1) {
+                        if ((i - repeatCell.getCurrent() > 1) && isMerge(list, i, field)) {
                             cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex - 1, colNum, colNum));
                         }
                         map.put(field, new RepeatCell(val, i));
-                    } else if (j == 0) {
-                        if (i == list.size() - 1) {
-                            if (i > repeatCell.getCurrent()) {
-                                cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
-                            }
-                        }
-                    } else {
-                        // 判断前面的是否合并了
-                        RepeatCell firstCell = map.get(mergeFields.get(0));
-                        if (repeatCell.getCurrent() != firstCell.getCurrent()) {
-                            if (i == list.size() - 1) {
-                                if (i > repeatCell.getCurrent()) {
-                                    cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
-                                }
-                            } else if (repeatCell.getCurrent() < firstCell.getCurrent()) {
-                                if (i - repeatCell.getCurrent() > 1) {
-                                    cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex - 1, colNum, colNum));
-                                }
-                                map.put(field, new RepeatCell(val, i));
-                            }
-                        } else if (i == list.size() - 1) {
-                            if (i > repeatCell.getCurrent()) {
-                                cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
-                            }
+                    } else if (i == list.size() - 1) {
+                        if (i > repeatCell.getCurrent() && isMerge(list, i, field)) {
+                            cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
                         }
                     }
                 }
             }
         }
         return cellList;
+    }
+
+    private boolean isMerge(List<?> list, int i, Field field) {
+        boolean isMerge = true;
+        CellMerge cm = field.getAnnotation(CellMerge.class);
+        final String[] mergeBy = cm.mergeBy();
+        if (StrUtil.isAllNotBlank(mergeBy)) {
+            //比对当前list(i)和list(i - 1)的各个属性值一一比对 如果全为真 则为真
+            for (String fieldName : mergeBy) {
+                final Object valCurrent = ReflectUtil.getFieldValue(list.get(i), fieldName);
+                final Object valPre = ReflectUtil.getFieldValue(list.get(i - 1), fieldName);
+                if (!Objects.equals(valPre, valCurrent)) {
+                    //依赖字段如有任一不等值,则标记为不可合并
+                    isMerge = false;
+                }
+            }
+        }
+        return isMerge;
     }
 
     @Data
