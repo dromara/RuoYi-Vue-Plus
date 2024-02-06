@@ -19,6 +19,7 @@
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-mybatis</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
