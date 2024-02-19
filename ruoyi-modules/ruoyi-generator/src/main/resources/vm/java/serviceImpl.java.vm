@@ -2,7 +2,7 @@ package ${packageName}.service.impl;
 
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
-#if($table.crud || $table.sub)
+#if($table.crud)
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -41,7 +41,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         return baseMapper.selectVoById(${pkColumn.javaField});
     }
 
-#if($table.crud || $table.sub)
+#if($table.crud)
     /**
      * 查询${functionName}列表
      */
