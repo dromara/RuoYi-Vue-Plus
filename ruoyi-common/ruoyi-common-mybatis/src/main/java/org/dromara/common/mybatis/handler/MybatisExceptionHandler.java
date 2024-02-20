@@ -2,6 +2,7 @@ package org.dromara.common.mybatis.handler;
 
 import org.dromara.common.core.domain.R;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.utils.StringUtils;
 import org.mybatis.spring.MyBatisSystemException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,7 +36,7 @@ public class MybatisExceptionHandler {
     public R<Void> handleCannotFindDataSourceException(MyBatisSystemException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         String message = e.getMessage();
-        if ("CannotFindDataSourceException".contains(message)) {
+        if (StringUtils.contains("CannotFindDataSourceException", message)) {
             log.error("请求地址'{}', 未找到数据源", requestURI);
             return R.fail("未找到数据源，请联系管理员确认");
         }
