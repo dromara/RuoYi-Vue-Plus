@@ -5,7 +5,7 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 
 import java.util.Arrays;
@@ -18,7 +18,6 @@ import java.util.concurrent.Executor;
  *
  * @author Lion Li
  */
-@ConditionalOnProperty(prefix = "spring.threads.virtual", name = "enabled", havingValue = "false")
 @AutoConfiguration
 public class AsyncConfig implements AsyncConfigurer {
 
@@ -27,6 +26,9 @@ public class AsyncConfig implements AsyncConfigurer {
      */
     @Override
     public Executor getAsyncExecutor() {
+        if(SpringUtils.isVirtual()) {
+            return new VirtualThreadTaskExecutor("async-");
+        }
         return SpringUtils.getBean("scheduledExecutorService");
     }
 
