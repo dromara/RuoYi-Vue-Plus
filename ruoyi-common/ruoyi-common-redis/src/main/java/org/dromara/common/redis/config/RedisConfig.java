@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.redis.config.properties.RedissonProperties;
 import org.dromara.common.redis.handler.KeyPrefixHandler;
 import org.redisson.client.codec.StringCodec;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.task.VirtualThreadTaskExecutor;
 
 /**
  * redis配置
@@ -48,6 +50,9 @@ public class RedisConfig {
                 // 缓存 Lua 脚本 减少网络传输(redisson 大部分的功能都是基于 Lua 脚本实现)
                 .setUseScriptCache(true)
                 .setCodec(codec);
+            if (SpringUtils.isVirtual()) {
+                config.setNettyExecutor(new VirtualThreadTaskExecutor("redisson-"));
+            }
             RedissonProperties.SingleServerConfig singleServerConfig = redissonProperties.getSingleServerConfig();
             if (ObjectUtil.isNotNull(singleServerConfig)) {
                 // 使用单机模式
