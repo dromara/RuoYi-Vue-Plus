@@ -143,8 +143,7 @@ tenant:
 # MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:
-  # 不支持多包, 如有需要可在注解配置 或 提升扫包等级
-  # 例如 com.**.**.mapper
+  # 多包名使用 例如 org.dromara.**.mapper,org.xxx.**.mapper
   mapperPackage: org.dromara.**.mapper
   # 对应的 XML 文件位置
   mapperLocations: classpath*:mapper/**/*Mapper.xml
