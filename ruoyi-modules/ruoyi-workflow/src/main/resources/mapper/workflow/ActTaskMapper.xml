@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.workflow.mapper.ActTaskMapper">
+    <resultMap type="org.dromara.workflow.domain.vo.TaskVo" id="TaskWaitingVoResult">
+        <result property="id" column="ID_"/>
+        <result property="name" column="NAME_"/>
+        <result property="description" column="DESCRIPTION_"/>
+        <result property="priority" column="PRIORITY_"/>
+        <result property="owner" column="OWNER_"/>
+        <result property="assignee" column="ASSIGNEE_"/>
+        <result property="processInstanceId" column="PROC_INST_ID_"/>
+        <result property="executionId" column="EXECUTION_ID_"/>
+        <result property="taskDefinitionId" column="TASK_DEF_ID_"/>
+        <result property="processDefinitionId" column="PROC_DEF_ID_"/>
+        <result property="createTime" column="CREATE_TIME_"/>
+        <result property="endTime" column="END_TIME_"/>
+        <result property="taskDefinitionKey" column="TASK_DEF_KEY_"/>
+        <result property="dueDate" column="DUE_DATE_"/>
+        <result property="processDefinitionKey" column="key_"/>
+        <result property="category" column="CATEGORY_"/>
+        <result property="parentTaskId" column="PARENT_TASK_ID_"/>
+        <result property="tenantId" column="TENANT_ID_"/>
+        <result property="claimTime" column="CLAIM_TIME"/>
+        <result property="businessStatus" column="BUSINESS_STATUS_"/>
+        <result property="processDefinitionName" column="processDefinitionName"/>
+        <result property="processDefinitionKey" column="processDefinitionName"/>
+
+    </resultMap>
+    <select id="getTaskWaitByPage" resultMap="TaskWaitingVoResult">
+        select *
+        from (SELECT RES.*,
+                     AHP.BUSINESS_STATUS_,
+                     ARP.NAME_ as processDefinitionName,
+                     ARP.KEY_  as processDefinitionKey,
+                     LINK.USER_ID_,
+                     LINK.GROUP_ID_
+              FROM ACT_RU_TASK RES
+                       INNER JOIN ACT_HI_PROCINST AHP ON RES.PROC_INST_ID_ = AHP.PROC_INST_ID_
+                       INNER JOIN ACT_RE_PROCDEF ARP ON ARP.ID_ = RES.PROC_DEF_ID_
+                       LEFT JOIN ACT_RU_IDENTITYLINK LINK ON LINK.TASK_ID_ = RES.ID_ AND LINK.TYPE_ = 'candidate'
+              WHERE RES.PARENT_TASK_ID_ is null
+              ORDER BY RES.CREATE_TIME_ DESC) t ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="getTaskCopyByPage" resultMap="TaskWaitingVoResult">
+        select *
+        from (SELECT AHT.*,
+                     AHP.BUSINESS_STATUS_,
+                     ARP.NAME_ as processDefinitionName,
+                     ARP.KEY_  as processDefinitionKey
+              FROM ACT_HI_TASKINST AHT
+                       INNER JOIN ACT_HI_PROCINST AHP ON AHT.PROC_INST_ID_ = AHP.PROC_INST_ID_
+                       INNER JOIN ACT_RE_PROCDEF ARP ON ARP.ID_ = AHT.PROC_DEF_ID_
+              WHERE AHT.PARENT_TASK_ID_ is not null
+                and AHT.scope_type_ = 'copy'
+              ORDER BY AHT.START_TIME_ DESC) t ${ew.getCustomSqlSegment}
+    </select>
+</mapper>

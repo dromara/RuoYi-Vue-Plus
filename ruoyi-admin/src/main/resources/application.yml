@@ -266,3 +266,21 @@ websocket:
   path: /resource/websocket
   # 设置访问源地址
   allowedOrigins: '*'
+
+--- #flowable配置
+flowable:
+  async-executor-activate: false #关闭定时任务JOB
+  #  将databaseSchemaUpdate设置为true。当Flowable发现库与数据库表结构不一致时，会自动将数据库表结构升级至新版本。
+  database-schema-update: true
+  activity-font-name: 宋体
+  label-font-name: 宋体
+  annotation-font-name: 宋体
+  # 关闭各个模块生成表，目前只使用工作流基础表
+  idm:
+    enabled: false
+  cmmn:
+    enabled: false
+  dmn:
+    enabled: false
+  app:
+    enabled: false

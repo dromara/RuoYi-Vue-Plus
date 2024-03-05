@@ -75,6 +75,12 @@
             <artifactId>ruoyi-demo</artifactId>
         </dependency>
 
+        <!--  工作流模块  -->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-workflow</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>de.codecentric</groupId>
             <artifactId>spring-boot-admin-starter-client</artifactId>
