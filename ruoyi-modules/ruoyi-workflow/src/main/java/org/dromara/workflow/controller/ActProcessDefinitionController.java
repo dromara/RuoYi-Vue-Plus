@@ -86,7 +86,6 @@ public class ActProcessDefinitionController extends BaseController {
      * @param processDefinitionId 流程定义id
      */
     @Log(title = "流程定义管理", businessType = BusinessType.DELETE)
-    @RepeatSubmit()
     @DeleteMapping("/{deploymentId}/{processDefinitionId}")
     public R<Void> deleteDeployment(@NotBlank(message = "流程部署id不能为空") @PathVariable String deploymentId,
                                     @NotBlank(message = "流程定义id不能为空") @PathVariable String processDefinitionId) {
@@ -138,9 +137,9 @@ public class ActProcessDefinitionController extends BaseController {
      * @param categoryCode 分类
      */
     @Log(title = "流程定义管理", businessType = BusinessType.INSERT)
-    @RepeatSubmit()
     @PostMapping("/deployByFile")
     public R<Void> deployByFile(@RequestParam("file") MultipartFile file, @RequestParam("categoryCode") String categoryCode) {
         return toAjax(actProcessDefinitionService.deployByFile(file, categoryCode));
     }
+
 }
