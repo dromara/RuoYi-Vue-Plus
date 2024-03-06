@@ -10,6 +10,7 @@ import org.dromara.workflow.domain.bo.WfCategoryBo;
 import org.dromara.workflow.domain.vo.WfCategoryVo;
 import org.dromara.workflow.mapper.WfCategoryMapper;
 import org.dromara.workflow.service.IWfCategoryService;
+import org.dromara.workflow.utils.QueryUtils;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
@@ -82,15 +83,15 @@ public class WfCategoryServiceImpl implements IWfCategoryService {
         WfCategory update = MapstructUtils.convert(bo, WfCategory.class);
         validEntityBeforeSave(update);
         WfCategoryVo wfCategoryVo = baseMapper.selectVoById(bo.getId());
-        List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().processDefinitionCategory(wfCategoryVo.getCategoryCode()).list();
+        List<ProcessDefinition> processDefinitionList = QueryUtils.definitionQuery().processDefinitionCategory(wfCategoryVo.getCategoryCode()).list();
         for (ProcessDefinition processDefinition : processDefinitionList) {
             repositoryService.setProcessDefinitionCategory(processDefinition.getId(), bo.getCategoryCode());
         }
-        List<Deployment> deploymentList = repositoryService.createDeploymentQuery().deploymentCategory(wfCategoryVo.getCategoryCode()).list();
+        List<Deployment> deploymentList = QueryUtils.deploymentQuery().deploymentCategory(wfCategoryVo.getCategoryCode()).list();
         for (Deployment deployment : deploymentList) {
             repositoryService.setDeploymentCategory(deployment.getId(), bo.getCategoryCode());
         }
-        List<Model> modelList = repositoryService.createModelQuery().modelCategory(wfCategoryVo.getCategoryCode()).list();
+        List<Model> modelList = QueryUtils.modelQuery().modelCategory(wfCategoryVo.getCategoryCode()).list();
         for (Model model : modelList) {
             model.setCategory(bo.getCategoryCode());
             repositoryService.saveModel(model);

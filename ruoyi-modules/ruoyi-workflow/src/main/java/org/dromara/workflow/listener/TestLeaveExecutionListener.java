@@ -2,6 +2,7 @@ package org.dromara.workflow.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.workflow.utils.QueryUtils;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -19,11 +20,9 @@ import org.springframework.stereotype.Component;
 @Component("testLeaveExecutionListener")
 public class TestLeaveExecutionListener implements ExecutionListener {
 
-    private final TaskService taskService;
-
     @Override
     public void notify(DelegateExecution execution) {
-        Task task = taskService.createTaskQuery().executionId(execution.getId()).singleResult();
+        Task task = QueryUtils.taskQuery().executionId(execution.getId()).singleResult();
         log.info("执行监听【" + task.getName() + "】");
     }
 }

@@ -20,7 +20,7 @@ import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
 import org.dromara.workflow.service.IActProcessDefinitionService;
 import org.dromara.workflow.service.IWfCategoryService;
-import org.flowable.engine.HistoryService;
+import org.dromara.workflow.utils.QueryUtils;
 import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
@@ -47,11 +47,7 @@ import java.util.zip.ZipInputStream;
 public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionService {
 
     private final RepositoryService repositoryService;
-
-    private final HistoryService historyService;
-
     private final ProcessMigrationService processMigrationService;
-
     private final IWfCategoryService wfCategoryService;
 
     /**
@@ -62,10 +58,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
      */
     @Override
     public TableDataInfo<ProcessDefinitionVo> page(ProcessDefinitionBo processDefinitionBo) {
-        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
-        if (TenantHelper.isEnable()) {
-            query.processDefinitionTenantId(TenantHelper.getTenantId());
-        }
+        ProcessDefinitionQuery query = QueryUtils.definitionQuery();
         if (StringUtils.isNotEmpty(processDefinitionBo.getKey())) {
             query.processDefinitionKey(processDefinitionBo.getKey());
         }
@@ -82,7 +75,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         List<Deployment> deploymentList = null;
         if (CollUtil.isNotEmpty(definitionList)) {
             List<String> deploymentIds = StreamUtils.toList(definitionList, ProcessDefinition::getDeploymentId);
-            deploymentList = repositoryService.createDeploymentQuery().deploymentIds(deploymentIds).list();
+            deploymentList = QueryUtils.deploymentQuery(deploymentIds).list();
         }
         for (ProcessDefinition processDefinition : definitionList) {
             ProcessDefinitionVo processDefinitionVo = BeanUtil.toBean(processDefinition, ProcessDefinitionVo.class);
@@ -108,16 +101,12 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     @Override
     public List<ProcessDefinitionVo> getProcessDefinitionListByKey(String key) {
         List<ProcessDefinitionVo> processDefinitionVoList = new ArrayList<>();
-        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
-        if (TenantHelper.isEnable()) {
-            query.processDefinitionTenantId(TenantHelper.getTenantId());
-        }
+        ProcessDefinitionQuery query = QueryUtils.definitionQuery();
         List<ProcessDefinition> definitionList = query.processDefinitionKey(key).list();
         List<Deployment> deploymentList = null;
         if (CollUtil.isNotEmpty(definitionList)) {
             List<String> deploymentIds = definitionList.stream().map(ProcessDefinition::getDeploymentId).collect(Collectors.toList());
-            deploymentList = repositoryService.createDeploymentQuery()
-                .deploymentIds(deploymentIds).list();
+            deploymentList = QueryUtils.deploymentQuery(deploymentIds).list();
         }
         for (ProcessDefinition processDefinition : definitionList) {
             ProcessDefinitionVo processDefinitionVo = BeanUtil.toBean(processDefinition, ProcessDefinitionVo.class);
@@ -172,7 +161,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     @Override
     public boolean deleteDeployment(String deploymentId, String processDefinitionId) {
         try {
-            List<HistoricTaskInstance> taskInstanceList = historyService.createHistoricTaskInstanceQuery()
+            List<HistoricTaskInstance> taskInstanceList = QueryUtils.hisTaskInstanceQuery()
                 .processDefinitionId(processDefinitionId).list();
             if (CollectionUtil.isNotEmpty(taskInstanceList)) {
                 throw new ServiceException("当前流程定义已被使用不可删除！");
@@ -194,11 +183,8 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     @Override
     public boolean updateProcessDefState(String processDefinitionId) {
         try {
-            ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
-            if (TenantHelper.isEnable()) {
-                query.processDefinitionTenantId(TenantHelper.getTenantId());
-            }
-            ProcessDefinition processDefinition = query.processDefinitionId(processDefinitionId).singleResult();
+            ProcessDefinition processDefinition = QueryUtils.definitionQuery()
+                .processDefinitionId(processDefinitionId).singleResult();
             //将当前为挂起状态更新为激活状态
             //参数说明：参数1：流程定义id,参数2：是否激活（true是否级联对应流程实例，激活了则对应流程实例都可以审批），
             //参数3：什么时候激活，如果为null则立即激活，如果为具体时间则到达此时间后激活
@@ -249,13 +235,10 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
      */
     @Override
     public boolean convertToModel(String processDefinitionId) {
-        ProcessDefinition pd = repositoryService.createProcessDefinitionQuery()
+        ProcessDefinition pd = QueryUtils.definitionQuery()
             .processDefinitionId(processDefinitionId).singleResult();
         InputStream inputStream = repositoryService.getResourceAsStream(pd.getDeploymentId(), pd.getResourceName());
-        ModelQuery query = repositoryService.createModelQuery();
-        if (TenantHelper.isEnable()) {
-            query.modelTenantId(TenantHelper.getTenantId());
-        }
+        ModelQuery query = QueryUtils.modelQuery();
         Model model = query.modelKey(pd.getKey()).singleResult();
         try {
             if (ObjectUtil.isNotNull(model)) {
@@ -304,11 +287,9 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             InputStream inputStream = file.getInputStream();
             Deployment deployment;
             if (FlowConstant.ZIP.equals(suffix)) {
-                DeploymentBuilder query = repositoryService.createDeployment();
-                if (TenantHelper.isEnable()) {
-                    query.tenantId(TenantHelper.getTenantId());
-                }
-                deployment = query.addZipInputStream(new ZipInputStream(inputStream))
+                DeploymentBuilder builder = repositoryService.createDeployment();
+                deployment = builder.addZipInputStream(new ZipInputStream(inputStream))
+                    .tenantId(TenantHelper.getTenantId())
                     .name(processName).key(processKey).category(categoryCode).deploy();
             } else {
                 String[] list = ResourceNameUtil.BPMN_RESOURCE_SUFFIXES;
@@ -320,18 +301,16 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                     }
                 }
                 if (flag) {
-                    DeploymentBuilder query = repositoryService.createDeployment();
-                    if (TenantHelper.isEnable()) {
-                        query.tenantId(TenantHelper.getTenantId());
-                    }
-                    deployment = query.addInputStream(filename, inputStream)
+                    DeploymentBuilder builder = repositoryService.createDeployment();
+                    deployment = builder.addInputStream(filename, inputStream)
+                        .tenantId(TenantHelper.getTenantId())
                         .name(processName).key(processKey).category(categoryCode).deploy();
                 } else {
                     throw new ServiceException("文件类型上传错误！");
                 }
             }
             // 更新分类
-            ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+            ProcessDefinition definition = QueryUtils.definitionQuery().deploymentId(deployment.getId()).singleResult();
             repositoryService.setProcessDefinitionCategory(definition.getId(), categoryCode);
 
             return true;

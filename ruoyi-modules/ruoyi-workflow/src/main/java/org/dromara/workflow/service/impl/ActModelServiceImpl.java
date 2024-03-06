@@ -22,6 +22,7 @@ import org.dromara.workflow.domain.bo.ModelBo;
 import org.dromara.workflow.domain.vo.ModelVo;
 import org.dromara.workflow.service.IActModelService;
 import org.dromara.workflow.utils.ModelUtils;
+import org.dromara.workflow.utils.QueryUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.*;
@@ -35,7 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -59,10 +60,7 @@ public class ActModelServiceImpl implements IActModelService {
      */
     @Override
     public TableDataInfo<Model> page(ModelBo modelBo) {
-        ModelQuery query = repositoryService.createModelQuery();
-        if (TenantHelper.isEnable()) {
-            query.modelTenantId(TenantHelper.getTenantId());
-        }
+        ModelQuery query = QueryUtils.modelQuery();
         if (StringUtils.isNotEmpty(modelBo.getName())) {
             query.modelNameLike("%" + modelBo.getName() + "%");
         }
@@ -98,12 +96,7 @@ public class ActModelServiceImpl implements IActModelService {
             String description = modelBo.getDescription();
             String categoryCode = modelBo.getCategoryCode();
             String xml = modelBo.getXml();
-            ModelQuery query = repositoryService.createModelQuery();
-            query.modelKey(key);
-            if (TenantHelper.isEnable()) {
-                query.modelTenantId(TenantHelper.getTenantId());
-            }
-            Model checkModel = query.singleResult();
+            Model checkModel = QueryUtils.modelQuery().modelKey(key).singleResult();
             if (ObjectUtil.isNotNull(checkModel)) {
                 throw new ServiceException("模型key已存在！");
             }
@@ -114,9 +107,7 @@ public class ActModelServiceImpl implements IActModelService {
             model.setVersion(version);
             model.setCategory(categoryCode);
             model.setMetaInfo(description);
-            if (TenantHelper.isEnable()) {
-                model.setTenantId(TenantHelper.getTenantId());
-            }
+            model.setTenantId(TenantHelper.getTenantId());
             //保存初始化的模型基本信息数据
             repositoryService.saveModel(model);
             repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(xml));
@@ -164,11 +155,7 @@ public class ActModelServiceImpl implements IActModelService {
     public boolean update(ModelBo modelBo) {
         try {
             Model model = repositoryService.getModel(modelBo.getId());
-            ModelQuery query = repositoryService.createModelQuery();
-            if (TenantHelper.isEnable()) {
-                query.modelTenantId(TenantHelper.getTenantId());
-            }
-            List<Model> list = query.modelKey(modelBo.getKey()).list();
+            List<Model> list = QueryUtils.modelQuery().modelKey(modelBo.getKey()).list();
             list.stream().filter(e -> !e.getId().equals(model.getId())).findFirst().ifPresent(e -> {
                 throw new ServiceException("模型KEY已存在！");
             });
@@ -199,11 +186,7 @@ public class ActModelServiceImpl implements IActModelService {
             BpmnModel bpmnModel = ModelUtils.xmlToBpmnModel(xml);
             ModelUtils.checkBpmnModel(bpmnModel);
             Model model = repositoryService.getModel(modelId);
-            ModelQuery query = repositoryService.createModelQuery();
-            if (TenantHelper.isEnable()) {
-                query.modelTenantId(TenantHelper.getTenantId());
-            }
-            List<Model> list = query.modelKey(key).list();
+            List<Model> list = QueryUtils.modelQuery().modelKey(key).list();
             list.stream().filter(e -> !e.getId().equals(model.getId())).findFirst().ifPresent(e -> {
                 throw new ServiceException("模型KEY已存在！");
             });
@@ -268,11 +251,7 @@ public class ActModelServiceImpl implements IActModelService {
             // xml资源的名称 ，对应act_ge_bytearray表中的name_字段
             String processName = model.getName() + ".bpmn20.xml";
             // 调用部署相关的api方法进行部署流程定义
-            DeploymentBuilder builder = repositoryService.createDeployment();
-            if (TenantHelper.isEnable()) {
-                builder.tenantId(TenantHelper.getTenantId());
-            }
-            Deployment deployment = builder
+            Deployment deployment = repositoryService.createDeployment()
                 // 部署名称
                 .name(model.getName())
                 // 部署标识key
@@ -281,13 +260,15 @@ public class ActModelServiceImpl implements IActModelService {
                 .category(model.getCategory())
                 // bpmn20.xml资源
                 .addBytes(processName, xmlBytes)
+                // 租户id
+                .tenantId(TenantHelper.getTenantId())
                 .deploy();
 
             // 更新 部署id 到流程定义模型数据表中
             model.setDeploymentId(deployment.getId());
             repositoryService.saveModel(model);
             // 更新分类
-            ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+            ProcessDefinition definition = QueryUtils.definitionQuery().deploymentId(deployment.getId()).singleResult();
             repositoryService.setProcessDefinitionCategory(definition.getId(), model.getCategory());
             return true;
         } catch (Exception e) {

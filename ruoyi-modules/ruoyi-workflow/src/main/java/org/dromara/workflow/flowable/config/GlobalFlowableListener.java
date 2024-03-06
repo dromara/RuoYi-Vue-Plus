@@ -2,6 +2,7 @@ package org.dromara.workflow.flowable.config;
 
 import cn.hutool.core.collection.CollUtil;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
+import org.dromara.workflow.utils.QueryUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -78,7 +79,7 @@ public class GlobalFlowableListener implements FlowableEventListener {
             String attachedToRefId = ((BoundaryEvent) flowElement).getAttachedToRefId();
             List<Execution> list = runtimeService.createExecutionQuery().activityId(attachedToRefId).list();
             for (Execution ex : list) {
-                Task task = taskService.createTaskQuery().executionId(ex.getId()).singleResult();
+                Task task = QueryUtils.taskQuery().executionId(ex.getId()).singleResult();
                 if (task != null) {
                     List<Comment> taskComments = taskService.getTaskComments(task.getId());
                     if (CollUtil.isEmpty(taskComments)) {

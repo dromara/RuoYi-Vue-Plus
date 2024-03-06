@@ -5,6 +5,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -28,38 +30,33 @@ import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
 import org.dromara.workflow.mapper.ActHiTaskinstMapper;
 import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IWorkflowUserService;
-import org.dromara.workflow.service.impl.WorkflowUserServiceImpl;
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowNode;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
-import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import java.util.*;
 
-import static org.dromara.workflow.common.constant.FlowConstant.*;
+import static org.dromara.workflow.common.constant.FlowConstant.PROCESS_INSTANCE_VO;
 
 /**
  * 工作流工具
  *
  * @author may
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WorkflowUtils {
 
-    public WorkflowUtils() {
-    }
-
     private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
-    private static final IWorkflowUserService I_WORKFLOW_USER_SERVICE = SpringUtils.getBean(WorkflowUserServiceImpl.class);
-    private static final IActHiProcinstService I_ACT_HI_PROCINST_SERVICE = SpringUtils.getBean(IActHiProcinstService.class);
+    private static final IWorkflowUserService WORKFLOW_USER_SERVICE = SpringUtils.getBean(IWorkflowUserService.class);
+    private static final IActHiProcinstService ACT_HI_PROCINST_SERVICE = SpringUtils.getBean(IActHiProcinstService.class);
     private static final ActHiTaskinstMapper ACT_HI_TASKINST_MAPPER = SpringUtils.getBean(ActHiTaskinstMapper.class);
 
     /**
@@ -81,9 +78,7 @@ public class WorkflowUtils {
             task.setTaskDefinitionKey(currentTask.getTaskDefinitionKey());
             task.setPriority(currentTask.getPriority());
             task.setCreateTime(new Date());
-            if (TenantHelper.isEnable()) {
-                task.setTenantId(TenantHelper.getTenantId());
-            }
+            task.setTenantId(TenantHelper.getTenantId());
             PROCESS_ENGINE.getTaskService().saveTask(task);
         }
         if (ObjectUtil.isNotNull(task)) {
@@ -110,9 +105,7 @@ public class WorkflowUtils {
                 newTask.setProcessDefinitionId(parentTask.getProcessDefinitionId());
                 newTask.setProcessInstanceId(parentTask.getProcessInstanceId());
                 newTask.setTaskDefinitionKey(parentTask.getTaskDefinitionKey());
-                if (TenantHelper.isEnable()) {
-                    newTask.setTenantId(TenantHelper.getTenantId());
-                }
+                newTask.setTenantId(TenantHelper.getTenantId());
                 list.add(newTask);
             }
         }
@@ -125,9 +118,7 @@ public class WorkflowUtils {
             actHiTaskinst.setProcDefId(processDefinitionId);
             actHiTaskinst.setProcInstId(processInstanceId);
             actHiTaskinst.setScopeType(TaskStatusEnum.COPY.getStatus());
-            if (TenantHelper.isEnable()) {
-                actHiTaskinst.setTenantId(TenantHelper.getTenantId());
-            }
+            actHiTaskinst.setTenantId(TenantHelper.getTenantId());
             LambdaUpdateWrapper<ActHiTaskinst> updateWrapper = new LambdaUpdateWrapper<>();
             updateWrapper.in(ActHiTaskinst::getId, taskIds);
             ACT_HI_TASKINST_MAPPER.update(actHiTaskinst, updateWrapper);
@@ -145,20 +136,16 @@ public class WorkflowUtils {
     public static ParticipantVo getCurrentTaskParticipant(String taskId) {
         ParticipantVo participantVo = new ParticipantVo();
         List<HistoricIdentityLink> linksForTask = PROCESS_ENGINE.getHistoryService().getHistoricIdentityLinksForTask(taskId);
-        TaskQuery query = PROCESS_ENGINE.getTaskService().createTaskQuery();
-        if (TenantHelper.isEnable()) {
-            query.taskTenantId(TenantHelper.getTenantId());
-        }
-        Task task = query.taskId(taskId).singleResult();
+        Task task = QueryUtils.taskQuery().taskId(taskId).singleResult();
         if (task != null && CollUtil.isNotEmpty(linksForTask)) {
             List<HistoricIdentityLink> groupList = StreamUtils.filter(linksForTask, e -> StringUtils.isNotBlank(e.getGroupId()));
             if (CollUtil.isNotEmpty(groupList)) {
                 List<Long> groupIds = StreamUtils.toList(groupList, e -> Long.valueOf(e.getGroupId()));
-                List<SysUserRole> sysUserRoles = I_WORKFLOW_USER_SERVICE.getUserRoleListByRoleIds(groupIds);
+                List<SysUserRole> sysUserRoles = WORKFLOW_USER_SERVICE.getUserRoleListByRoleIds(groupIds);
                 if (CollUtil.isNotEmpty(sysUserRoles)) {
                     participantVo.setGroupIds(groupIds);
                     List<Long> userIdList = StreamUtils.toList(sysUserRoles, SysUserRole::getUserId);
-                    List<SysUserVo> sysUsers = I_WORKFLOW_USER_SERVICE.getUserListByIds(userIdList);
+                    List<SysUserVo> sysUsers = WORKFLOW_USER_SERVICE.getUserListByIds(userIdList);
                     if (CollUtil.isNotEmpty(sysUsers)) {
                         List<Long> userIds = StreamUtils.toList(sysUsers, SysUserVo::getUserId);
                         List<String> nickNames = StreamUtils.toList(sysUsers, SysUserVo::getNickName);
@@ -177,7 +164,7 @@ public class WorkflowUtils {
 
                     }
                 }
-                List<SysUserVo> sysUsers = I_WORKFLOW_USER_SERVICE.getUserListByIds(userIdList);
+                List<SysUserVo> sysUsers = WORKFLOW_USER_SERVICE.getUserListByIds(userIdList);
                 if (CollUtil.isNotEmpty(sysUsers)) {
                     List<Long> userIds = StreamUtils.toList(sysUsers, SysUserVo::getUserId);
                     List<String> nickNames = StreamUtils.toList(sysUsers, SysUserVo::getNickName);
@@ -233,16 +220,8 @@ public class WorkflowUtils {
      * @param taskId 任务id
      */
     public static String getBusinessStatusByTaskId(String taskId) {
-        HistoricTaskInstanceQuery query = PROCESS_ENGINE.getHistoryService().createHistoricTaskInstanceQuery();
-        if (TenantHelper.isEnable()) {
-            query.taskTenantId(TenantHelper.getTenantId());
-        }
-        HistoricTaskInstance historicTaskInstance = query.taskId(taskId).singleResult();
-        HistoricProcessInstanceQuery query1 = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery();
-        if (TenantHelper.isEnable()) {
-            query1.processInstanceTenantId(TenantHelper.getTenantId());
-        }
-        HistoricProcessInstance historicProcessInstance = query1.processInstanceId(historicTaskInstance.getProcessInstanceId()).singleResult();
+        HistoricTaskInstance historicTaskInstance = QueryUtils.hisTaskInstanceQuery().taskId(taskId).singleResult();
+        HistoricProcessInstance historicProcessInstance = QueryUtils.hisInstanceQuery(historicTaskInstance.getProcessInstanceId()).singleResult();
         return historicProcessInstance.getBusinessStatus();
     }
 
@@ -252,11 +231,7 @@ public class WorkflowUtils {
      * @param processInstanceId 流程实例id
      */
     public static String getBusinessStatus(String processInstanceId) {
-        HistoricProcessInstanceQuery query = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery();
-        if (TenantHelper.isEnable()) {
-            query.processInstanceTenantId(TenantHelper.getTenantId());
-        }
-        HistoricProcessInstance historicProcessInstance = query.processInstanceId(processInstanceId).singleResult();
+        HistoricProcessInstance historicProcessInstance = QueryUtils.hisInstanceQuery(processInstanceId).singleResult();
         return historicProcessInstance.getBusinessStatus();
     }
 
@@ -270,7 +245,7 @@ public class WorkflowUtils {
         if (StringUtils.isBlank(businessKey)) {
             return;
         }
-        ActHiProcinst actHiProcinst = I_ACT_HI_PROCINST_SERVICE.selectByBusinessKey(businessKey);
+        ActHiProcinst actHiProcinst = ACT_HI_PROCINST_SERVICE.selectByBusinessKey(businessKey);
         if (actHiProcinst == null) {
             ProcessInstanceVo processInstanceVo = new ProcessInstanceVo();
             processInstanceVo.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
@@ -293,7 +268,7 @@ public class WorkflowUtils {
         if (CollUtil.isEmpty(idList)) {
             return;
         }
-        List<ActHiProcinst> actHiProcinstList = I_ACT_HI_PROCINST_SERVICE.selectByBusinessKeyIn(idList);
+        List<ActHiProcinst> actHiProcinstList = ACT_HI_PROCINST_SERVICE.selectByBusinessKeyIn(idList);
         if (obj instanceof Collection<?> collection) {
             for (Object o : collection) {
                 String fieldValue = ReflectUtils.invokeGetter(o, fieldName).toString();
@@ -335,7 +310,7 @@ public class WorkflowUtils {
         for (Task t : list) {
             ParticipantVo taskParticipant = WorkflowUtils.getCurrentTaskParticipant(t.getId());
             if (CollUtil.isNotEmpty(taskParticipant.getGroupIds())) {
-                List<SysUserRole> sysUserRoles = I_WORKFLOW_USER_SERVICE.getUserRoleListByRoleIds(taskParticipant.getGroupIds());
+                List<SysUserRole> sysUserRoles = WORKFLOW_USER_SERVICE.getUserRoleListByRoleIds(taskParticipant.getGroupIds());
                 if (CollUtil.isNotEmpty(sysUserRoles)) {
                     userIds.addAll(StreamUtils.toList(sysUserRoles, SysUserRole::getUserId));
                 }
@@ -346,7 +321,7 @@ public class WorkflowUtils {
             }
         }
         if (CollUtil.isNotEmpty(userIds)) {
-            List<SysUserVo> sysUserVoList = I_WORKFLOW_USER_SERVICE.getUserListByIds(new ArrayList<>(userIds));
+            List<SysUserVo> sysUserVoList = WORKFLOW_USER_SERVICE.getUserListByIds(new ArrayList<>(userIds));
             for (String code : messageType) {
                 if (code.equals(MessageTypeEnum.SYSTEM_MESSAGE.getCode())) {
                     WebSocketMessageDto dto = new WebSocketMessageDto();

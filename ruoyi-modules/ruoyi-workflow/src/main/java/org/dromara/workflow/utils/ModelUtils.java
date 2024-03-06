@@ -7,6 +7,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
@@ -32,9 +34,8 @@ import java.util.stream.Collectors;
  *
  * @author may
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ModelUtils {
-    public ModelUtils() {
-    }
 
     public static BpmnModel xmlToBpmnModel(String xml) throws IOException {
         if (xml == null) {

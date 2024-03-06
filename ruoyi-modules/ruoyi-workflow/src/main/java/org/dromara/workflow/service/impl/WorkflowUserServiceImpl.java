@@ -12,7 +12,6 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.bo.SysUserBo;
@@ -23,13 +22,12 @@ import org.dromara.workflow.domain.bo.SysUserMultiBo;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.TaskVo;
 import org.dromara.workflow.service.IWorkflowUserService;
+import org.dromara.workflow.utils.QueryUtils;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.task.api.Task;
-import org.flowable.task.api.TaskQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,7 +45,6 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
 
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleMapper sysUserRoleMapper;
-    private final TaskService taskService;
     private final RuntimeService runtimeService;
 
     /**
@@ -58,7 +55,7 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
     @Override
     @SuppressWarnings("unchecked")
     public TableDataInfo<SysUserVo> getWorkflowAddMultiInstanceByPage(SysUserMultiBo sysUserMultiBo) {
-        Task task = taskService.createTaskQuery().taskId(sysUserMultiBo.getTaskId()).singleResult();
+        Task task = QueryUtils.taskQuery().taskId(sysUserMultiBo.getTaskId()).singleResult();
         if (task == null) {
             throw new ServiceException("任务不存在");
         }
@@ -74,7 +71,7 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
             List<Long> assigneeList = (List<Long>) runtimeService.getVariable(task.getExecutionId(), multiInstance.getAssigneeList());
             queryWrapper.notIn(CollectionUtil.isNotEmpty(assigneeList), SysUser::getUserId, assigneeList);
         } else {
-            List<Task> list = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
+            List<Task> list = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
             List<Long> userIds = StreamUtils.toList(list, e -> Long.valueOf(e.getAssignee()));
             queryWrapper.notIn(CollectionUtil.isNotEmpty(userIds), SysUser::getUserId, userIds);
         }
@@ -93,16 +90,8 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
     @Override
     @SuppressWarnings("unchecked")
     public List<TaskVo> getWorkflowDeleteMultiInstanceList(String taskId) {
-        TaskQuery query = taskService.createTaskQuery();
-        if (TenantHelper.isEnable()) {
-            query.taskTenantId(TenantHelper.getTenantId());
-        }
-        Task task = query.taskId(taskId).singleResult();
-        TaskQuery query1 = taskService.createTaskQuery();
-        if (TenantHelper.isEnable()) {
-            query1.taskTenantId(TenantHelper.getTenantId());
-        }
-        List<Task> taskList = query1.processInstanceId(task.getProcessInstanceId()).list();
+        Task task = QueryUtils.taskQuery().taskId(taskId).singleResult();
+        List<Task> taskList = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
         MultiInstanceVo multiInstance = WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
         List<TaskVo> taskListVo = new ArrayList<>();
         if (multiInstance == null) {
