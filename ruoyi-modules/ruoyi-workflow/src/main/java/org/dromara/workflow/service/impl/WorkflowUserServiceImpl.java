@@ -29,6 +29,7 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -92,8 +93,16 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
     @Override
     @SuppressWarnings("unchecked")
     public List<TaskVo> getWorkflowDeleteMultiInstanceList(String taskId) {
-        Task task = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).taskId(taskId).singleResult();
-        List<Task> taskList = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(task.getProcessInstanceId()).list();
+        TaskQuery query = taskService.createTaskQuery();
+        if (TenantHelper.isEnable()) {
+            query.taskTenantId(TenantHelper.getTenantId());
+        }
+        Task task = query.taskId(taskId).singleResult();
+        TaskQuery query1 = taskService.createTaskQuery();
+        if (TenantHelper.isEnable()) {
+            query1.taskTenantId(TenantHelper.getTenantId());
+        }
+        List<Task> taskList = query1.processInstanceId(task.getProcessInstanceId()).list();
         MultiInstanceVo multiInstance = WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
         List<TaskVo> taskListVo = new ArrayList<>();
         if (multiInstance == null) {

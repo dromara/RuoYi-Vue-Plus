@@ -35,10 +35,12 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -84,12 +86,19 @@ public class ActTaskServiceImpl implements IActTaskService {
             throw new ServiceException("启动工作流时必须包含业务ID");
         }
         // 判断当前业务是否启动过流程
-        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey(startProcessBo.getBusinessKey()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+        HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+        if (TenantHelper.isEnable()) {
+            query.processInstanceTenantId(TenantHelper.getTenantId());
+        }
+        HistoricProcessInstance historicProcessInstance = query.processInstanceBusinessKey(startProcessBo.getBusinessKey()).singleResult();
         if (ObjectUtil.isNotEmpty(historicProcessInstance)) {
             BusinessStatusEnum.checkStartStatus(historicProcessInstance.getBusinessStatus());
         }
         TaskQuery taskQuery = taskService.createTaskQuery();
-        List<Task> taskResult = taskQuery.processInstanceBusinessKey(startProcessBo.getBusinessKey()).taskTenantId(TenantHelper.getTenantId()).list();
+        if (TenantHelper.isEnable()) {
+            taskQuery.taskTenantId(TenantHelper.getTenantId());
+        }
+        List<Task> taskResult = taskQuery.processInstanceBusinessKey(startProcessBo.getBusinessKey()).list();
         if (CollUtil.isNotEmpty(taskResult)) {
             if (CollUtil.isNotEmpty(startProcessBo.getVariables())) {
                 taskService.setVariables(taskResult.get(0).getId(), startProcessBo.getVariables());
@@ -109,14 +118,22 @@ public class ActTaskServiceImpl implements IActTaskService {
         variables.put(INITIATOR, (String.valueOf(LoginHelper.getUserId())));
         ProcessInstance pi;
         try {
-            pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());
+            if (TenantHelper.isEnable()) {
+                pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());
+            } else {
+                pi = runtimeService.startProcessInstanceByKey(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables);
+            }
         } catch (FlowableObjectNotFoundException e) {
             throw new ServiceException("找不到当前【" + startProcessBo.getProcessKey() + "】流程定义！");
         }
         // 将流程定义名称 作为 流程实例名称
         runtimeService.setProcessInstanceName(pi.getProcessInstanceId(), pi.getProcessDefinitionName());
         // 申请人执行流程
-        List<Task> taskList = taskService.createTaskQuery().processInstanceId(pi.getId()).taskTenantId(TenantHelper.getTenantId()).list();
+        TaskQuery taskQuery1 = taskService.createTaskQuery();
+        if (TenantHelper.isEnable()) {
+            taskQuery.taskTenantId(TenantHelper.getTenantId());
+        }
+        List<Task> taskList = taskQuery1.processInstanceId(pi.getId()).list();
         if (taskList.size() > 1) {
             throw new ServiceException("请检查流程第一个环节是否为申请人！");
         }
@@ -141,7 +158,10 @@ public class ActTaskServiceImpl implements IActTaskService {
             List<RoleDTO> roles = LoginHelper.getLoginUser().getRoles();
             String userId = String.valueOf(LoginHelper.getUserId());
             TaskQuery taskQuery = taskService.createTaskQuery();
-            taskQuery.taskId(completeTaskBo.getTaskId()).taskTenantId(TenantHelper.getTenantId()).taskCandidateOrAssigned(userId);
+            if (TenantHelper.isEnable()) {
+                taskQuery.taskTenantId(TenantHelper.getTenantId());
+            }
+            taskQuery.taskId(completeTaskBo.getTaskId()).taskCandidateOrAssigned(userId);
             if (CollUtil.isNotEmpty(roles)) {
                 List<String> groupIds = StreamUtils.toList(roles, e -> String.valueOf(e.getRoleId()));
                 taskQuery.taskCandidateGroupIn(groupIds);
@@ -186,8 +206,11 @@ public class ActTaskServiceImpl implements IActTaskService {
             } else {
                 taskService.complete(completeTaskBo.getTaskId());
             }
-            ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId())
-                .processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+            ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+            if (TenantHelper.isEnable()) {
+                query.processInstanceTenantId(TenantHelper.getTenantId());
+            }
+            ProcessInstance pi = query.processInstanceId(task.getProcessInstanceId()).singleResult();
             if (pi == null) {
                 UpdateBusinessStatusCmd updateBusinessStatusCmd = new UpdateBusinessStatusCmd(task.getProcessInstanceId(), BusinessStatusEnum.FINISH.getStatus());
                 managementService.executeCommand(updateBusinessStatusCmd);
@@ -195,7 +218,11 @@ public class ActTaskServiceImpl implements IActTaskService {
                     processHandler.handleProcess(processInstance.getBusinessKey(), BusinessStatusEnum.FINISH.getStatus(), false);
                 }
             } else {
-                List<Task> list = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(task.getProcessInstanceId()).list();
+                TaskQuery query1 = taskService.createTaskQuery();
+                if (TenantHelper.isEnable()) {
+                    query1.taskTenantId(TenantHelper.getTenantId());
+                }
+                List<Task> list = query1.processInstanceId(task.getProcessInstanceId()).list();
                 if (CollUtil.isNotEmpty(list) && CollUtil.isNotEmpty(completeTaskBo.getWfCopyList())) {
                     TaskEntity newTask = WorkflowUtils.createNewTask(task);
                     taskService.addComment(newTask.getId(), task.getProcessInstanceId(), TaskStatusEnum.COPY.getStatus(),
@@ -239,7 +266,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         List<RoleDTO> roles = LoginHelper.getLoginUser().getRoles();
         String userId = String.valueOf(LoginHelper.getUserId());
         queryWrapper.eq("t.business_status_", BusinessStatusEnum.WAITING.getStatus());
-        queryWrapper.eq("t.tenant_id_", TenantHelper.getTenantId());
+        queryWrapper.eq(TenantHelper.isEnable(), "t.tenant_id_", TenantHelper.getTenantId());
         queryWrapper.and(w1 ->
             w1.eq("t.assignee_", userId)
                 .or(w2 -> w2.isNull("t.assignee_")
@@ -272,7 +299,10 @@ public class ActTaskServiceImpl implements IActTaskService {
      */
     @Override
     public TableDataInfo<TaskVo> getAllTaskWaitByPage(TaskBo taskBo) {
-        TaskQuery query = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId());
+        TaskQuery query = taskService.createTaskQuery();
+        if (TenantHelper.isEnable()) {
+            query.taskTenantId(TenantHelper.getTenantId());
+        }
         if (StringUtils.isNotBlank(taskBo.getName())) {
             query.taskNameLike("%" + taskBo.getName() + "%");
         }
@@ -317,7 +347,11 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Override
     public TableDataInfo<TaskVo> getTaskFinishByPage(TaskBo taskBo) {
         String userId = String.valueOf(LoginHelper.getUserId());
-        HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskAssignee(userId).taskTenantId(TenantHelper.getTenantId()).finished().orderByHistoricTaskInstanceStartTime().desc();
+        HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+        if (TenantHelper.isEnable()) {
+            query.taskTenantId(TenantHelper.getTenantId());
+        }
+        query.taskAssignee(userId).finished().orderByHistoricTaskInstanceStartTime().desc();
         if (StringUtils.isNotBlank(taskBo.getName())) {
             query.taskNameLike("%" + taskBo.getName() + "%");
         }
@@ -390,7 +424,11 @@ public class ActTaskServiceImpl implements IActTaskService {
      */
     @Override
     public TableDataInfo<TaskVo> getAllTaskFinishByPage(TaskBo taskBo) {
-        HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskTenantId(TenantHelper.getTenantId()).finished().orderByHistoricTaskInstanceStartTime().desc();
+        HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+        if (TenantHelper.isEnable()) {
+            query.taskTenantId(TenantHelper.getTenantId());
+        }
+        query.finished().orderByHistoricTaskInstanceStartTime().desc();
         if (StringUtils.isNotBlank(taskBo.getName())) {
             query.taskNameLike("%" + taskBo.getName() + "%");
         }
@@ -432,7 +470,11 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean delegateTask(DelegateBo delegateBo) {
-        TaskEntity task = (TaskEntity) taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).taskId(delegateBo.getTaskId()).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
+        TaskQuery query = taskService.createTaskQuery();
+        if (TenantHelper.isEnable()) {
+            query.taskTenantId(TenantHelper.getTenantId());
+        }
+        TaskEntity task = (TaskEntity) query.taskId(delegateBo.getTaskId()).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }
@@ -461,7 +503,11 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean terminationTask(TerminationBo terminationBo) {
-        Task task = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).taskId(terminationBo.getTaskId()).singleResult();
+        TaskQuery query = taskService.createTaskQuery();
+        if (TenantHelper.isEnable()) {
+            query.taskTenantId(TenantHelper.getTenantId());
+        }
+        Task task = query.taskId(terminationBo.getTaskId()).singleResult();
 
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
@@ -469,7 +515,11 @@ public class ActTaskServiceImpl implements IActTaskService {
         if (task.isSuspended()) {
             throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
         }
-        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey(task.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+        HistoricProcessInstanceQuery query1 = historyService.createHistoricProcessInstanceQuery();
+        if (TenantHelper.isEnable()) {
+            query1.processInstanceTenantId(TenantHelper.getTenantId());
+        }
+        HistoricProcessInstance historicProcessInstance = query1.processInstanceBusinessKey(task.getProcessInstanceId()).singleResult();
         if (ObjectUtil.isNotEmpty(historicProcessInstance) && BusinessStatusEnum.TERMINATION.getStatus().equals(historicProcessInstance.getBusinessStatus())) {
             throw new ServiceException("该单据已终止！");
         }
@@ -480,7 +530,11 @@ public class ActTaskServiceImpl implements IActTaskService {
                 terminationBo.setComment(LoginHelper.getLoginUser().getNickname() + "终止了申请：" + terminationBo.getComment());
             }
             taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.TERMINATION.getStatus(), terminationBo.getComment());
-            List<Task> list = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(task.getProcessInstanceId()).list();
+            TaskQuery query2 = taskService.createTaskQuery();
+            if (TenantHelper.isEnable()) {
+                query2.taskTenantId(TenantHelper.getTenantId());
+            }
+            List<Task> list = query2.processInstanceId(task.getProcessInstanceId()).list();
             if (CollectionUtil.isNotEmpty(list)) {
                 List<Task> subTasks = StreamUtils.filter(list, e -> StringUtils.isNotBlank(e.getParentTaskId()));
                 if (CollectionUtil.isNotEmpty(subTasks)) {
@@ -506,7 +560,11 @@ public class ActTaskServiceImpl implements IActTaskService {
      */
     @Override
     public boolean transferTask(TransmitBo transmitBo) {
-        Task task = taskService.createTaskQuery().taskId(transmitBo.getTaskId()).taskTenantId(TenantHelper.getTenantId()).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
+        TaskQuery query = taskService.createTaskQuery();
+        if (TenantHelper.isEnable()) {
+            query.taskTenantId(TenantHelper.getTenantId());
+        }
+        Task task = query.taskId(transmitBo.getTaskId()).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }
@@ -534,7 +592,9 @@ public class ActTaskServiceImpl implements IActTaskService {
     public boolean addMultiInstanceExecution(AddMultiBo addMultiBo) {
         TaskQuery taskQuery = taskService.createTaskQuery();
         taskQuery.taskId(addMultiBo.getTaskId());
-        taskQuery.taskTenantId(TenantHelper.getTenantId());
+        if (TenantHelper.isEnable()) {
+            taskQuery.taskTenantId(TenantHelper.getTenantId());
+        }
         if (!LoginHelper.isSuperAdmin() && !LoginHelper.isTenantAdmin()) {
             taskQuery.taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId()));
         }
@@ -583,7 +643,9 @@ public class ActTaskServiceImpl implements IActTaskService {
     public boolean deleteMultiInstanceExecution(DeleteMultiBo deleteMultiBo) {
         TaskQuery taskQuery = taskService.createTaskQuery();
         taskQuery.taskId(deleteMultiBo.getTaskId());
-        taskQuery.taskTenantId(TenantHelper.getTenantId());
+        if (TenantHelper.isEnable()) {
+            taskQuery.taskTenantId(TenantHelper.getTenantId());
+        }
         if (!LoginHelper.isSuperAdmin() && !LoginHelper.isTenantAdmin()) {
             taskQuery.taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId()));
         }
@@ -633,7 +695,11 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String backProcess(BackProcessBo backProcessBo) {
-        Task task = taskService.createTaskQuery().taskId(backProcessBo.getTaskId()).taskTenantId(TenantHelper.getTenantId()).taskAssignee(String.valueOf(LoginHelper.getUserId())).singleResult();
+        TaskQuery query = taskService.createTaskQuery();
+        if (TenantHelper.isEnable()) {
+            query.taskTenantId(TenantHelper.getTenantId());
+        }
+        Task task = query.taskId(backProcessBo.getTaskId()).taskAssignee(String.valueOf(LoginHelper.getUserId())).singleResult();
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }
@@ -651,7 +717,11 @@ public class ActTaskServiceImpl implements IActTaskService {
                 throw new ServiceException("该单据已退回！");
             }
             //判断是否有多个任务
-            List<Task> taskList = taskService.createTaskQuery().processInstanceId(processInstanceId).taskTenantId(TenantHelper.getTenantId()).list();
+            TaskQuery query1 = taskService.createTaskQuery();
+            if (TenantHelper.isEnable()) {
+                query1.taskTenantId(TenantHelper.getTenantId());
+            }
+            List<Task> taskList = query.processInstanceId(processInstanceId).list();
             //申请人节点
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).finished().orderByHistoricTaskInstanceEndTime().asc().list().get(0);
             String backTaskDefinitionKey = historicTaskInstance.getTaskDefinitionKey();
@@ -663,7 +733,11 @@ public class ActTaskServiceImpl implements IActTaskService {
                 //当前单个节点驳回单个节点
                 runtimeService.createChangeActivityStateBuilder().processInstanceId(processInstanceId).moveActivityIdTo(task.getTaskDefinitionKey(), backTaskDefinitionKey).changeState();
             }
-            List<Task> list = taskService.createTaskQuery().processInstanceId(processInstanceId).taskTenantId(TenantHelper.getTenantId()).list();
+            TaskQuery query2 = taskService.createTaskQuery();
+            if (TenantHelper.isEnable()) {
+                query1.taskTenantId(TenantHelper.getTenantId());
+            }
+            List<Task> list = query2.processInstanceId(processInstanceId).list();
             for (Task t : list) {
                 taskService.setAssignee(t.getId(), historicTaskInstance.getAssignee());
             }
@@ -696,7 +770,11 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Transactional(rollbackFor = Exception.class)
     public boolean updateAssignee(String[] taskIds, String userId) {
         try {
-            List<Task> list = taskService.createTaskQuery().taskIds(Arrays.asList(taskIds)).taskTenantId(TenantHelper.getTenantId()).list();
+            TaskQuery query = taskService.createTaskQuery();
+            if (TenantHelper.isEnable()) {
+                query.taskTenantId(TenantHelper.getTenantId());
+            }
+            List<Task> list = query.taskIds(Arrays.asList(taskIds)).list();
             for (Task task : list) {
                 taskService.setAssignee(task.getId(), userId);
             }

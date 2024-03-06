@@ -24,10 +24,7 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
-import org.flowable.engine.repository.Deployment;
-import org.flowable.engine.repository.Model;
-import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.flowable.engine.repository.*;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,7 +63,9 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     @Override
     public TableDataInfo<ProcessDefinitionVo> page(ProcessDefinitionBo processDefinitionBo) {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
-        query.processDefinitionTenantId(TenantHelper.getTenantId());
+        if (TenantHelper.isEnable()) {
+            query.processDefinitionTenantId(TenantHelper.getTenantId());
+        }
         if (StringUtils.isNotEmpty(processDefinitionBo.getKey())) {
             query.processDefinitionKey(processDefinitionBo.getKey());
         }
@@ -110,7 +109,10 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     public List<ProcessDefinitionVo> getProcessDefinitionListByKey(String key) {
         List<ProcessDefinitionVo> processDefinitionVoList = new ArrayList<>();
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
-        List<ProcessDefinition> definitionList = query.processDefinitionTenantId(TenantHelper.getTenantId()).processDefinitionKey(key).list();
+        if (TenantHelper.isEnable()) {
+            query.processDefinitionTenantId(TenantHelper.getTenantId());
+        }
+        List<ProcessDefinition> definitionList = query.processDefinitionKey(key).list();
         List<Deployment> deploymentList = null;
         if (CollUtil.isNotEmpty(definitionList)) {
             List<String> deploymentIds = definitionList.stream().map(ProcessDefinition::getDeploymentId).collect(Collectors.toList());
@@ -192,8 +194,11 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     @Override
     public boolean updateProcessDefState(String processDefinitionId) {
         try {
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(processDefinitionId).processDefinitionTenantId(TenantHelper.getTenantId()).singleResult();
+            ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+            if (TenantHelper.isEnable()) {
+                query.processDefinitionTenantId(TenantHelper.getTenantId());
+            }
+            ProcessDefinition processDefinition = query.processDefinitionId(processDefinitionId).singleResult();
             //将当前为挂起状态更新为激活状态
             //参数说明：参数1：流程定义id,参数2：是否激活（true是否级联对应流程实例，激活了则对应流程实例都可以审批），
             //参数3：什么时候激活，如果为null则立即激活，如果为具体时间则到达此时间后激活
@@ -247,7 +252,11 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         ProcessDefinition pd = repositoryService.createProcessDefinitionQuery()
             .processDefinitionId(processDefinitionId).singleResult();
         InputStream inputStream = repositoryService.getResourceAsStream(pd.getDeploymentId(), pd.getResourceName());
-        Model model = repositoryService.createModelQuery().modelKey(pd.getKey()).modelTenantId(TenantHelper.getTenantId()).singleResult();
+        ModelQuery query = repositoryService.createModelQuery();
+        if (TenantHelper.isEnable()) {
+            query.modelTenantId(TenantHelper.getTenantId());
+        }
+        Model model = query.modelKey(pd.getKey()).singleResult();
         try {
             if (ObjectUtil.isNotNull(model)) {
                 repositoryService.addModelEditorSource(model.getId(), IoUtil.readBytes(inputStream));
@@ -295,9 +304,12 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             InputStream inputStream = file.getInputStream();
             Deployment deployment;
             if (FlowConstant.ZIP.equals(suffix)) {
-                deployment = repositoryService.createDeployment()
-                    .tenantId(TenantHelper.getTenantId())
-                    .addZipInputStream(new ZipInputStream(inputStream)).name(processName).key(processKey).category(categoryCode).deploy();
+                DeploymentBuilder query = repositoryService.createDeployment();
+                if (TenantHelper.isEnable()) {
+                    query.tenantId(TenantHelper.getTenantId());
+                }
+                deployment = query.addZipInputStream(new ZipInputStream(inputStream))
+                    .name(processName).key(processKey).category(categoryCode).deploy();
             } else {
                 String[] list = ResourceNameUtil.BPMN_RESOURCE_SUFFIXES;
                 boolean flag = false;
@@ -308,9 +320,12 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                     }
                 }
                 if (flag) {
-                    deployment = repositoryService.createDeployment()
-                        .tenantId(TenantHelper.getTenantId())
-                        .addInputStream(filename, inputStream).name(processName).key(processKey).category(categoryCode).deploy();
+                    DeploymentBuilder query = repositoryService.createDeployment();
+                    if (TenantHelper.isEnable()) {
+                        query.tenantId(TenantHelper.getTenantId());
+                    }
+                    deployment = query.addInputStream(filename, inputStream)
+                        .name(processName).key(processKey).category(categoryCode).deploy();
                 } else {
                     throw new ServiceException("文件类型上传错误！");
                 }

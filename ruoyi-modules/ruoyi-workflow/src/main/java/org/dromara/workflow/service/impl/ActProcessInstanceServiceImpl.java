@@ -45,7 +45,9 @@ import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -96,7 +98,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     public TableDataInfo<ProcessInstanceVo> getProcessInstanceRunningByPage(ProcessInstanceBo processInstanceBo) {
         List<ProcessInstanceVo> list = new ArrayList<>();
         ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-        query.processInstanceTenantId(TenantHelper.getTenantId());
+        if (TenantHelper.isEnable()) {
+            query.processInstanceTenantId(TenantHelper.getTenantId());
+        }
         if (StringUtils.isNotBlank(processInstanceBo.getName())) {
             query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
         }
@@ -134,7 +138,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         List<ProcessInstanceVo> list = new ArrayList<>();
         HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().finished()
             .orderByProcessInstanceEndTime().desc();
-        query.processInstanceTenantId(TenantHelper.getTenantId());
+        if (TenantHelper.isEnable()) {
+            query.processInstanceTenantId(TenantHelper.getTenantId());
+        }
         if (StringUtils.isNotEmpty(processInstanceBo.getName())) {
             query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
         }
@@ -315,8 +321,11 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     public Map<String, Object> getHistoryRecord(String processInstanceId) {
         Map<String, Object> map = new HashMap<>();
         // 查询任务办理记录
-        List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
-            .processInstanceId(processInstanceId).taskTenantId(TenantHelper.getTenantId()).orderByHistoricTaskInstanceEndTime().desc().list();
+        HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+        if (TenantHelper.isEnable()) {
+            query.taskTenantId(TenantHelper.getTenantId());
+        }
+        List<HistoricTaskInstance> list = query.processInstanceId(processInstanceId).orderByHistoricTaskInstanceEndTime().desc().list();
         list = StreamUtils.sorted(list, Comparator.comparing(HistoricTaskInstance::getEndTime, Comparator.nullsFirst(Date::compareTo)).reversed());
         List<ActHistoryInfoVo> actHistoryInfoVoList = new ArrayList<>();
         List<Comment> processInstanceComments = taskService.getProcessInstanceComments(processInstanceId);
@@ -454,8 +463,11 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteRuntimeProcessInst(ProcessInvalidBo processInvalidBo) {
         try {
-            List<Task> list = taskService.createTaskQuery().processInstanceId(processInvalidBo.getProcessInstanceId())
-                .taskTenantId(TenantHelper.getTenantId()).list();
+            TaskQuery query = taskService.createTaskQuery();
+            if (TenantHelper.isEnable()) {
+                query.taskTenantId(TenantHelper.getTenantId());
+            }
+            List<Task> list = query.processInstanceId(processInvalidBo.getProcessInstanceId()).list();
             List<Task> subTasks = StreamUtils.filter(list, e -> StringUtils.isNotBlank(e.getParentTaskId()));
             if (CollUtil.isNotEmpty(subTasks)) {
                 subTasks.forEach(e -> taskService.deleteTask(e.getId()));
@@ -467,8 +479,11 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             for (Task task : StreamUtils.filter(list, e -> StringUtils.isBlank(e.getParentTaskId()))) {
                 taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.INVALID.getStatus(), deleteReason);
             }
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceId(processInvalidBo.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+            HistoricProcessInstanceQuery query1 = historyService.createHistoricProcessInstanceQuery();
+            if (TenantHelper.isEnable()) {
+                query1.processInstanceTenantId(TenantHelper.getTenantId());
+            }
+            HistoricProcessInstance historicProcessInstance = query1.processInstanceId(processInvalidBo.getProcessInstanceId()).singleResult();
             if (ObjectUtil.isNotEmpty(historicProcessInstance) && BusinessStatusEnum.FINISH.getStatus().equals(historicProcessInstance.getBusinessStatus())) {
                 throw new ServiceException("该单据已完成申请！");
             }
@@ -495,16 +510,22 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     public boolean deleteRuntimeProcessAndHisInst(List<String> processInstanceIds) {
         try {
             // 1.删除运行中流程实例
-            List<Task> list = taskService.createTaskQuery().processInstanceIdIn(processInstanceIds)
-                .taskTenantId(TenantHelper.getTenantId()).list();
+            TaskQuery query = taskService.createTaskQuery();
+            if (TenantHelper.isEnable()) {
+                query.taskTenantId(TenantHelper.getTenantId());
+            }
+            List<Task> list = query.processInstanceIdIn(processInstanceIds).list();
             List<Task> subTasks = StreamUtils.filter(list, e -> StringUtils.isNotBlank(e.getParentTaskId()));
             if (CollUtil.isNotEmpty(subTasks)) {
                 subTasks.forEach(e -> taskService.deleteTask(e.getId()));
             }
             runtimeService.bulkDeleteProcessInstances(processInstanceIds, LoginHelper.getUserId() + "删除了当前流程申请");
             // 2.删除历史记录
-            List<HistoricProcessInstance> historicProcessInstanceList = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceTenantId(TenantHelper.getTenantId()).processInstanceIds(new HashSet<>(processInstanceIds)).list();
+            HistoricProcessInstanceQuery query1 = historyService.createHistoricProcessInstanceQuery();
+            if (TenantHelper.isEnable()) {
+                query1.processInstanceTenantId(TenantHelper.getTenantId());
+            }
+            List<HistoricProcessInstance> historicProcessInstanceList = query1.processInstanceIds(new HashSet<>(processInstanceIds)).list();
             if (ObjectUtil.isNotEmpty(historicProcessInstanceList)) {
                 historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
             }
@@ -531,16 +552,22 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
                 return false;
             }
             List<String> processInstanceIds = StreamUtils.toList(actHiProcinsts, ActHiProcinst::getId);
-            List<Task> list = taskService.createTaskQuery().processInstanceIdIn(processInstanceIds)
-                .taskTenantId(TenantHelper.getTenantId()).list();
+            TaskQuery query = taskService.createTaskQuery();
+            if (TenantHelper.isEnable()) {
+                query.taskTenantId(TenantHelper.getTenantId());
+            }
+            List<Task> list = query.processInstanceIdIn(processInstanceIds).list();
             List<Task> subTasks = StreamUtils.filter(list, e -> StringUtils.isNotBlank(e.getParentTaskId()));
             if (CollUtil.isNotEmpty(subTasks)) {
                 subTasks.forEach(e -> taskService.deleteTask(e.getId()));
             }
             runtimeService.bulkDeleteProcessInstances(processInstanceIds, LoginHelper.getUserId() + "删除了当前流程申请");
             // 2.删除历史记录
-            List<HistoricProcessInstance> historicProcessInstanceList = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceTenantId(TenantHelper.getTenantId()).processInstanceIds(new HashSet<>(processInstanceIds)).list();
+            HistoricProcessInstanceQuery query1 = historyService.createHistoricProcessInstanceQuery();
+            if (TenantHelper.isEnable()) {
+                query1.processInstanceTenantId(TenantHelper.getTenantId());
+            }
+            List<HistoricProcessInstance> historicProcessInstanceList = query1.processInstanceIds(new HashSet<>(processInstanceIds)).list();
             if (ObjectUtil.isNotEmpty(historicProcessInstanceList)) {
                 historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
             }
@@ -577,8 +604,12 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     @Transactional(rollbackFor = Exception.class)
     public boolean cancelProcessApply(String processInstanceId) {
         try {
-            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(processInstanceId).processInstanceTenantId(TenantHelper.getTenantId()).startedBy(String.valueOf(LoginHelper.getUserId())).singleResult();
+            ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+            if (TenantHelper.isEnable()) {
+                query.processInstanceTenantId(TenantHelper.getTenantId());
+            }
+            ProcessInstance processInstance = query.processInstanceId(processInstanceId)
+                .startedBy(String.valueOf(LoginHelper.getUserId())).singleResult();
             if (ObjectUtil.isNull(processInstance)) {
                 throw new ServiceException("您不是流程发起人,撤销失败!");
             }
@@ -588,7 +619,11 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (BusinessStatusEnum.CANCEL.getStatus().equals(processInstance.getBusinessStatus())) {
                 throw new ServiceException("该单据已撤销！");
             }
-            List<Task> taskList = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(processInstanceId).list();
+            TaskQuery query1 = taskService.createTaskQuery();
+            if (TenantHelper.isEnable()) {
+                query1.taskTenantId(TenantHelper.getTenantId());
+            }
+            List<Task> taskList = query1.processInstanceId(processInstanceId).list();
             for (Task task : taskList) {
                 taskService.setAssignee(task.getId(), String.valueOf(LoginHelper.getUserId()));
                 taskService.addComment(task.getId(), processInstanceId, TaskStatusEnum.CANCEL.getStatus(), LoginHelper.getLoginUser().getNickname() + "：撤销申请");
@@ -598,7 +633,11 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstanceId)
                 .moveActivityIdsToSingleActivityId(nodeIds, historicTaskInstance.getTaskDefinitionKey()).changeState();
-            Task task = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(processInstanceId).list().get(0);
+            TaskQuery query2 = taskService.createTaskQuery();
+            if (TenantHelper.isEnable()) {
+                query2.taskTenantId(TenantHelper.getTenantId());
+            }
+            Task task = query2.processInstanceId(processInstanceId).list().get(0);
             taskService.setAssignee(task.getId(), historicTaskInstance.getAssignee());
             //获取并行网关执行后保留的执行实例数据
             ExecutionChildByExecutionIdCmd childByExecutionIdCmd = new ExecutionChildByExecutionIdCmd(task.getExecutionId());
@@ -629,7 +668,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     public TableDataInfo<ProcessInstanceVo> getCurrentSubmitByPage(ProcessInstanceBo processInstanceBo) {
         List<ProcessInstanceVo> list = new ArrayList<>();
         HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
-        query.processInstanceTenantId(TenantHelper.getTenantId());
+        if (TenantHelper.isEnable()) {
+            query.processInstanceTenantId(TenantHelper.getTenantId());
+        }
         query.startedBy(processInstanceBo.getStartUserId());
         if (StringUtils.isNotBlank(processInstanceBo.getName())) {
             query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
@@ -648,7 +689,11 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         List<TaskVo> taskVoList = new ArrayList<>();
         if (CollUtil.isNotEmpty(historicProcessInstanceList)) {
             List<String> processInstanceIds = StreamUtils.toList(historicProcessInstanceList, HistoricProcessInstance::getId);
-            List<Task> taskList = taskService.createTaskQuery().processInstanceIdIn(processInstanceIds).taskTenantId(TenantHelper.getTenantId()).list();
+            TaskQuery query1 = taskService.createTaskQuery();
+            if (TenantHelper.isEnable()) {
+                query1.taskTenantId(TenantHelper.getTenantId());
+            }
+            List<Task> taskList = query1.processInstanceIdIn(processInstanceIds).list();
             for (Task task : taskList) {
                 taskVoList.add(BeanUtil.toBean(task, TaskVo.class));
             }
@@ -675,9 +720,11 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     @Transactional(rollbackFor = Exception.class)
     public boolean taskUrging(TaskUrgingBo taskUrgingBo) {
         try {
-            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(taskUrgingBo.getProcessInstanceId())
-                .processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+            ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+            if (TenantHelper.isEnable()) {
+                query.processInstanceTenantId(TenantHelper.getTenantId());
+            }
+            ProcessInstance processInstance = query.processInstanceId(taskUrgingBo.getProcessInstanceId()).singleResult();
             if (processInstance == null) {
                 throw new ServiceException("任务已结束！");
             }

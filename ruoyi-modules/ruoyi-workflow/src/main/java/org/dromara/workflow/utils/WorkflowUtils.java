@@ -33,11 +33,14 @@ import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import java.util.*;
@@ -78,7 +81,9 @@ public class WorkflowUtils {
             task.setTaskDefinitionKey(currentTask.getTaskDefinitionKey());
             task.setPriority(currentTask.getPriority());
             task.setCreateTime(new Date());
-            task.setTenantId(TenantHelper.getTenantId());
+            if (TenantHelper.isEnable()) {
+                task.setTenantId(TenantHelper.getTenantId());
+            }
             PROCESS_ENGINE.getTaskService().saveTask(task);
         }
         if (ObjectUtil.isNotNull(task)) {
@@ -105,7 +110,9 @@ public class WorkflowUtils {
                 newTask.setProcessDefinitionId(parentTask.getProcessDefinitionId());
                 newTask.setProcessInstanceId(parentTask.getProcessInstanceId());
                 newTask.setTaskDefinitionKey(parentTask.getTaskDefinitionKey());
-                newTask.setTenantId(TenantHelper.getTenantId());
+                if (TenantHelper.isEnable()) {
+                    newTask.setTenantId(TenantHelper.getTenantId());
+                }
                 list.add(newTask);
             }
         }
@@ -118,7 +125,9 @@ public class WorkflowUtils {
             actHiTaskinst.setProcDefId(processDefinitionId);
             actHiTaskinst.setProcInstId(processInstanceId);
             actHiTaskinst.setScopeType(TaskStatusEnum.COPY.getStatus());
-            actHiTaskinst.setTenantId(TenantHelper.getTenantId());
+            if (TenantHelper.isEnable()) {
+                actHiTaskinst.setTenantId(TenantHelper.getTenantId());
+            }
             LambdaUpdateWrapper<ActHiTaskinst> updateWrapper = new LambdaUpdateWrapper<>();
             updateWrapper.in(ActHiTaskinst::getId, taskIds);
             ACT_HI_TASKINST_MAPPER.update(actHiTaskinst, updateWrapper);
@@ -136,7 +145,11 @@ public class WorkflowUtils {
     public static ParticipantVo getCurrentTaskParticipant(String taskId) {
         ParticipantVo participantVo = new ParticipantVo();
         List<HistoricIdentityLink> linksForTask = PROCESS_ENGINE.getHistoryService().getHistoricIdentityLinksForTask(taskId);
-        Task task = PROCESS_ENGINE.getTaskService().createTaskQuery().taskTenantId(TenantHelper.getTenantId()).taskId(taskId).singleResult();
+        TaskQuery query = PROCESS_ENGINE.getTaskService().createTaskQuery();
+        if (TenantHelper.isEnable()) {
+            query.taskTenantId(TenantHelper.getTenantId());
+        }
+        Task task = query.taskId(taskId).singleResult();
         if (task != null && CollUtil.isNotEmpty(linksForTask)) {
             List<HistoricIdentityLink> groupList = StreamUtils.filter(linksForTask, e -> StringUtils.isNotBlank(e.getGroupId()));
             if (CollUtil.isNotEmpty(groupList)) {
@@ -220,8 +233,16 @@ public class WorkflowUtils {
      * @param taskId 任务id
      */
     public static String getBusinessStatusByTaskId(String taskId) {
-        HistoricTaskInstance historicTaskInstance = PROCESS_ENGINE.getHistoryService().createHistoricTaskInstanceQuery().taskId(taskId).taskTenantId(TenantHelper.getTenantId()).singleResult();
-        HistoricProcessInstance historicProcessInstance = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery().processInstanceId(historicTaskInstance.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+        HistoricTaskInstanceQuery query = PROCESS_ENGINE.getHistoryService().createHistoricTaskInstanceQuery();
+        if (TenantHelper.isEnable()) {
+            query.taskTenantId(TenantHelper.getTenantId());
+        }
+        HistoricTaskInstance historicTaskInstance = query.taskId(taskId).singleResult();
+        HistoricProcessInstanceQuery query1 = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery();
+        if (TenantHelper.isEnable()) {
+            query1.processInstanceTenantId(TenantHelper.getTenantId());
+        }
+        HistoricProcessInstance historicProcessInstance = query1.processInstanceId(historicTaskInstance.getProcessInstanceId()).singleResult();
         return historicProcessInstance.getBusinessStatus();
     }
 
@@ -231,7 +252,11 @@ public class WorkflowUtils {
      * @param processInstanceId 流程实例id
      */
     public static String getBusinessStatus(String processInstanceId) {
-        HistoricProcessInstance historicProcessInstance = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+        HistoricProcessInstanceQuery query = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery();
+        if (TenantHelper.isEnable()) {
+            query.processInstanceTenantId(TenantHelper.getTenantId());
+        }
+        HistoricProcessInstance historicProcessInstance = query.processInstanceId(processInstanceId).singleResult();
         return historicProcessInstance.getBusinessStatus();
     }
 
