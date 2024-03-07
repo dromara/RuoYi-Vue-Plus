@@ -474,9 +474,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         }
         HistoricProcessInstance historicProcessInstance = QueryUtils.hisInstanceQuery()
             .processInstanceBusinessKey(task.getProcessInstanceId()).singleResult();
-        if (ObjectUtil.isNotEmpty(historicProcessInstance) && BusinessStatusEnum.TERMINATION.getStatus().equals(historicProcessInstance.getBusinessStatus())) {
-            throw new ServiceException("该单据已终止！");
-        }
+        BusinessStatusEnum.checkInvalidStatus(historicProcessInstance.getBusinessStatus());
         try {
             if (StringUtils.isBlank(terminationBo.getComment())) {
                 terminationBo.setComment(LoginHelper.getLoginUser().getNickname() + "终止了申请");
@@ -654,6 +652,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             if (BusinessStatusEnum.BACK.getStatus().equals(processInstance.getBusinessStatus())) {
                 throw new ServiceException("该单据已退回！");
             }
+            BusinessStatusEnum.checkBackStatus(processInstance.getBusinessStatus());
             //判断是否有多个任务
             List<Task> taskList = QueryUtils.taskQuery(processInstanceId).list();
             //申请人节点

@@ -60,7 +60,6 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 /**
  * 流程实例 服务层实现
  *
@@ -464,10 +463,8 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             for (Task task : StreamUtils.filter(list, e -> StringUtils.isBlank(e.getParentTaskId()))) {
                 taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.INVALID.getStatus(), deleteReason);
             }
-            HistoricProcessInstance historicProcessInstance =  QueryUtils.hisInstanceQuery(processInvalidBo.getProcessInstanceId()).singleResult();
-            if (ObjectUtil.isNotEmpty(historicProcessInstance) && BusinessStatusEnum.FINISH.getStatus().equals(historicProcessInstance.getBusinessStatus())) {
-                throw new ServiceException("该单据已完成申请！");
-            }
+            HistoricProcessInstance historicProcessInstance = QueryUtils.hisInstanceQuery(processInvalidBo.getProcessInstanceId()).singleResult();
+            BusinessStatusEnum.checkInvalidStatus(historicProcessInstance.getBusinessStatus());
             runtimeService.updateBusinessStatus(processInvalidBo.getProcessInstanceId(), BusinessStatusEnum.INVALID.getStatus());
             runtimeService.deleteProcessInstance(processInvalidBo.getProcessInstanceId(), deleteReason);
             FlowProcessEventHandler processHandler = flowEventStrategy.getProcessHandler(historicProcessInstance.getProcessDefinitionKey());
@@ -577,9 +574,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (processInstance.isSuspended()) {
                 throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
             }
-            if (BusinessStatusEnum.CANCEL.getStatus().equals(processInstance.getBusinessStatus())) {
-                throw new ServiceException("该单据已撤销！");
-            }
+            BusinessStatusEnum.checkCancelStatus(processInstance.getBusinessStatus());
             List<Task> taskList = QueryUtils.taskQuery(processInstanceId).list();
             for (Task task : taskList) {
                 taskService.setAssignee(task.getId(), String.valueOf(LoginHelper.getUserId()));
