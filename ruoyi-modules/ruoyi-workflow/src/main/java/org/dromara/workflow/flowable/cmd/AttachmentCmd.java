@@ -19,9 +19,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 串行加签
+ * 附件上传
  *
- * @author 附件上传
+ * @author may
  */
 public class AttachmentCmd implements Command<Boolean> {
 

@@ -107,9 +107,7 @@ public class ActModelServiceImpl implements IActModelService {
             model.setVersion(version);
             model.setCategory(categoryCode);
             model.setMetaInfo(description);
-            if (TenantHelper.isEnable()) {
-                model.setTenantId(TenantHelper.getTenantId());
-            }
+            model.setTenantId(TenantHelper.getTenantId());
             //保存初始化的模型基本信息数据
             repositoryService.saveModel(model);
             repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(xml));

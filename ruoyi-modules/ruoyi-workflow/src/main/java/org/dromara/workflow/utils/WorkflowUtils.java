@@ -77,9 +77,7 @@ public class WorkflowUtils {
             task.setTaskDefinitionKey(currentTask.getTaskDefinitionKey());
             task.setPriority(currentTask.getPriority());
             task.setCreateTime(new Date());
-            if (TenantHelper.isEnable()) {
-                task.setTenantId(TenantHelper.getTenantId());
-            }
+            task.setTenantId(TenantHelper.getTenantId());
             PROCESS_ENGINE.getTaskService().saveTask(task);
         }
         if (ObjectUtil.isNotNull(task)) {
@@ -119,9 +117,7 @@ public class WorkflowUtils {
             actHiTaskinst.setProcDefId(processDefinitionId);
             actHiTaskinst.setProcInstId(processInstanceId);
             actHiTaskinst.setScopeType(TaskStatusEnum.COPY.getStatus());
-            if (TenantHelper.isEnable()) {
-                actHiTaskinst.setTenantId(TenantHelper.getTenantId());
-            }
+            actHiTaskinst.setTenantId(TenantHelper.getTenantId());
             LambdaUpdateWrapper<ActHiTaskinst> updateWrapper = new LambdaUpdateWrapper<>();
             updateWrapper.in(ActHiTaskinst::getId, taskIds);
             ACT_HI_TASKINST_MAPPER.update(actHiTaskinst, updateWrapper);
