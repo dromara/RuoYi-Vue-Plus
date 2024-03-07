@@ -35,7 +35,7 @@ create table TEST_LEAVE
     CREATE_TIME DATE,
     UPDATE_BY   NUMBER(20),
     UPDATE_TIME DATE,
-    TENANT_ID   VARCHAR2(255) default '000000'
+    TENANT_ID   VARCHAR2(20) default '000000'
 );
 
 comment on table TEST_LEAVE is '请假申请表'
@@ -64,7 +64,7 @@ create table WF_CATEGORY
         unique,
     PARENT_ID     NUMBER(20),
     SORT_NUM      NUMBER(10),
-    TENANT_ID     NUMBER(20),
+    TENANT_ID     VARCHAR2(20) default '000000'
     CREATE_DEPT   NUMBER(20),
     CREATE_BY     NUMBER(20),
     CREATE_TIME   DATE,
