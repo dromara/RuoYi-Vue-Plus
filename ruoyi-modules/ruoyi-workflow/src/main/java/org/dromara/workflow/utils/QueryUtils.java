@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
-import org.dromara.workflow.domain.vo.ParticipantVo;
 import org.dromara.workflow.domain.vo.TaskVo;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
@@ -147,8 +146,9 @@ public class QueryUtils {
             return null;
         }
         TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
-        ParticipantVo participantVo = WorkflowUtils.getCurrentTaskParticipant(taskId);
-        taskVo.setParticipantVo(participantVo);
+        taskVo.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
+        String businessStatus = WorkflowUtils.getBusinessStatus(taskVo.getProcessInstanceId());
+        taskVo.setBusinessStatus(businessStatus);
         return taskVo;
     }
 }
