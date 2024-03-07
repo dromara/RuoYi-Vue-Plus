@@ -21,6 +21,7 @@ public interface IWorkflowUserService {
      * 分页查询工作流选择加签人员
      *
      * @param sysUserMultiBo 参数
+     * @param pageQuery      分页
      * @return 结果
      */
     TableDataInfo<SysUserVo> getPageByAddMultiInstance(SysUserMultiBo sysUserMultiBo, PageQuery pageQuery);

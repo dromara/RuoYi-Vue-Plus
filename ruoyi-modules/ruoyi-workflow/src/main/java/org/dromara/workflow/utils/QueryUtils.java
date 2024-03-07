@@ -1,9 +1,12 @@
 package org.dromara.workflow.utils;
 
+import cn.hutool.core.bean.BeanUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
+import org.dromara.workflow.domain.vo.ParticipantVo;
+import org.dromara.workflow.domain.vo.TaskVo;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
@@ -11,6 +14,7 @@ import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 
@@ -130,5 +134,21 @@ public class QueryUtils {
 
     public static TaskQuery taskQuery(Collection<String> processInstanceIds) {
         return taskQuery().processInstanceIdIn(processInstanceIds);
+    }
+
+    /**
+     * 按照任务id查询当前任务
+     *
+     * @param taskId 任务id
+     */
+    public static TaskVo getTask(String taskId) {
+        Task task = PROCESS_ENGINE.getTaskService().createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            return null;
+        }
+        TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
+        ParticipantVo participantVo = WorkflowUtils.getCurrentTaskParticipant(taskId);
+        taskVo.setParticipantVo(participantVo);
+        return taskVo;
     }
 }
