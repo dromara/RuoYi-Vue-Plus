@@ -1,8 +1,6 @@
 package org.dromara.workflow.domain.bo;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.dromara.workflow.common.PageEntity;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -13,8 +11,7 @@ import java.io.Serializable;
  * @author may
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class ProcessDefinitionBo extends PageEntity implements Serializable {
+public class ProcessDefinitionBo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

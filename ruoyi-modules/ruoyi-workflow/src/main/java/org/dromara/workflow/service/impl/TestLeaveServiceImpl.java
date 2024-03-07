@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 请假Service业务层处理
@@ -118,7 +117,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
         List<String> idList = StreamUtils.toList(ids, String::valueOf);
-        iActProcessInstanceService.deleteRuntimeProcessAndHisInstByBusinessKeys(idList);
+        iActProcessInstanceService.deleteRunAndHisInstanceByBusinessKeys(idList);
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 }

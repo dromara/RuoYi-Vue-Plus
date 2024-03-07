@@ -1,7 +1,9 @@
 package org.dromara.workflow.domain.bo;
 
 import lombok.Data;
-import org.dromara.workflow.common.PageEntity;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 
 /**
@@ -10,8 +12,11 @@ import org.dromara.workflow.common.PageEntity;
  * @author may
  */
 @Data
+public class SysUserMultiBo implements Serializable {
 
-public class SysUserMultiBo extends PageEntity {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     /**
      * 人员名称
      */

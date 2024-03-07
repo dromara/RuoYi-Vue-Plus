@@ -11,6 +11,7 @@ import org.apache.commons.io.IOUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
@@ -90,29 +91,29 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     /**
      * 分页查询正在运行的流程实例
      *
-     * @param processInstanceBo 参数
+     * @param bo 参数
      */
     @Override
-    public TableDataInfo<ProcessInstanceVo> getProcessInstanceRunningByPage(ProcessInstanceBo processInstanceBo) {
+    public TableDataInfo<ProcessInstanceVo> getPageByRunning(ProcessInstanceBo bo, PageQuery pageQuery) {
         List<ProcessInstanceVo> list = new ArrayList<>();
         ProcessInstanceQuery query = QueryUtils.instanceQuery();
-        if (StringUtils.isNotBlank(processInstanceBo.getName())) {
-            query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
+        if (StringUtils.isNotBlank(bo.getName())) {
+            query.processInstanceNameLikeIgnoreCase("%" + bo.getName() + "%");
         }
-        if (StringUtils.isNotBlank(processInstanceBo.getKey())) {
-            query.processDefinitionKey(processInstanceBo.getKey());
+        if (StringUtils.isNotBlank(bo.getKey())) {
+            query.processDefinitionKey(bo.getKey());
         }
-        if (StringUtils.isNotBlank(processInstanceBo.getStartUserId())) {
-            query.startedBy(processInstanceBo.getStartUserId());
+        if (StringUtils.isNotBlank(bo.getStartUserId())) {
+            query.startedBy(bo.getStartUserId());
         }
-        if (StringUtils.isNotBlank(processInstanceBo.getBusinessKey())) {
-            query.processInstanceBusinessKey(processInstanceBo.getBusinessKey());
+        if (StringUtils.isNotBlank(bo.getBusinessKey())) {
+            query.processInstanceBusinessKey(bo.getBusinessKey());
         }
-        if (StringUtils.isNotBlank(processInstanceBo.getCategoryCode())) {
-            query.processDefinitionCategory(processInstanceBo.getCategoryCode());
+        if (StringUtils.isNotBlank(bo.getCategoryCode())) {
+            query.processDefinitionCategory(bo.getCategoryCode());
         }
         query.orderByStartTime().desc();
-        List<ProcessInstance> processInstances = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
+        List<ProcessInstance> processInstances = query.listPage(pageQuery.getFirstNum(), pageQuery.getPageSize());
         for (ProcessInstance processInstance : processInstances) {
             ProcessInstanceVo processInstanceVo = BeanUtil.toBean(processInstance, ProcessInstanceVo.class);
             processInstanceVo.setIsSuspended(processInstance.isSuspended());
@@ -126,29 +127,29 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     /**
      * 分页查询已结束的流程实例
      *
-     * @param processInstanceBo 参数
+     * @param bo 参数
      */
     @Override
-    public TableDataInfo<ProcessInstanceVo> getProcessInstanceFinishByPage(ProcessInstanceBo processInstanceBo) {
+    public TableDataInfo<ProcessInstanceVo> getPageByFinish(ProcessInstanceBo bo, PageQuery pageQuery) {
         List<ProcessInstanceVo> list = new ArrayList<>();
         HistoricProcessInstanceQuery query = QueryUtils.hisInstanceQuery()
             .finished().orderByProcessInstanceEndTime().desc();
-        if (StringUtils.isNotEmpty(processInstanceBo.getName())) {
-            query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
+        if (StringUtils.isNotEmpty(bo.getName())) {
+            query.processInstanceNameLikeIgnoreCase("%" + bo.getName() + "%");
         }
-        if (StringUtils.isNotBlank(processInstanceBo.getKey())) {
-            query.processDefinitionKey(processInstanceBo.getKey());
+        if (StringUtils.isNotBlank(bo.getKey())) {
+            query.processDefinitionKey(bo.getKey());
         }
-        if (StringUtils.isNotEmpty(processInstanceBo.getStartUserId())) {
-            query.startedBy(processInstanceBo.getStartUserId());
+        if (StringUtils.isNotEmpty(bo.getStartUserId())) {
+            query.startedBy(bo.getStartUserId());
         }
-        if (StringUtils.isNotBlank(processInstanceBo.getBusinessKey())) {
-            query.processInstanceBusinessKey(processInstanceBo.getBusinessKey());
+        if (StringUtils.isNotBlank(bo.getBusinessKey())) {
+            query.processInstanceBusinessKey(bo.getBusinessKey());
         }
-        if (StringUtils.isNotBlank(processInstanceBo.getCategoryCode())) {
-            query.processDefinitionCategory(processInstanceBo.getCategoryCode());
+        if (StringUtils.isNotBlank(bo.getCategoryCode())) {
+            query.processDefinitionCategory(bo.getCategoryCode());
         }
-        List<HistoricProcessInstance> historicProcessInstances = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
+        List<HistoricProcessInstance> historicProcessInstances = query.listPage(pageQuery.getFirstNum(), pageQuery.getPageSize());
         for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
             ProcessInstanceVo processInstanceVo = BeanUtil.toBean(historicProcessInstance, ProcessInstanceVo.class);
             processInstanceVo.setBusinessStatusName(BusinessStatusEnum.findByStatus(historicProcessInstance.getBusinessStatus()));
@@ -165,7 +166,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      */
     @SneakyThrows
     @Override
-    public String getHistoryProcessImage(String processInstanceId) {
+    public String getHistoryImage(String processInstanceId) {
         String processDefinitionId;
         // 获取当前的流程实例
         ProcessInstance processInstance = QueryUtils.instanceQuery(processInstanceId).singleResult();
@@ -220,7 +221,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      * @param processInstanceId 流程实例id
      */
     @Override
-    public Map<String, Object> getHistoryProcessList(String processInstanceId) {
+    public Map<String, Object> getHistoryList(String processInstanceId) {
         Map<String, Object> map = new HashMap<>();
         List<Map<String, Object>> taskList = new ArrayList<>();
         HistoricProcessInstance historicProcessInstance = QueryUtils.hisInstanceQuery(processInstanceId).singleResult();
@@ -449,7 +450,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteRuntimeProcessInst(ProcessInvalidBo processInvalidBo) {
+    public boolean deleteRunInstance(ProcessInvalidBo processInvalidBo) {
         try {
             List<Task> list = QueryUtils.taskQuery(processInvalidBo.getProcessInstanceId()).list();
             List<Task> subTasks = StreamUtils.filter(list, e -> StringUtils.isNotBlank(e.getParentTaskId()));
@@ -487,7 +488,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteRuntimeProcessAndHisInst(List<String> processInstanceIds) {
+    public boolean deleteRunAndHisInstance(List<String> processInstanceIds) {
         try {
             // 1.删除运行中流程实例
             List<Task> list = QueryUtils.taskQuery(processInstanceIds).list();
@@ -515,7 +516,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteRuntimeProcessAndHisInstByBusinessKeys(List<String> businessKeys) {
+    public boolean deleteRunAndHisInstanceByBusinessKeys(List<String> businessKeys) {
         try {
             // 1.删除运行中流程实例
             List<ActHiProcinst> actHiProcinsts = actHiProcinstService.selectByBusinessKeyIn(businessKeys);
@@ -549,7 +550,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteFinishProcessAndHisInst(List<String> processInstanceIds) {
+    public boolean deleteFinishAndHisInstance(List<String> processInstanceIds) {
         try {
             historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
             return true;
@@ -614,27 +615,27 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     /**
      * 分页查询当前登录人单据
      *
-     * @param processInstanceBo 参数
+     * @param bo 参数
      */
     @Override
-    public TableDataInfo<ProcessInstanceVo> getCurrentSubmitByPage(ProcessInstanceBo processInstanceBo) {
+    public TableDataInfo<ProcessInstanceVo> getPageByCurrent(ProcessInstanceBo bo, PageQuery pageQuery) {
         List<ProcessInstanceVo> list = new ArrayList<>();
         HistoricProcessInstanceQuery query = QueryUtils.hisInstanceQuery();
-        query.startedBy(processInstanceBo.getStartUserId());
-        if (StringUtils.isNotBlank(processInstanceBo.getName())) {
-            query.processInstanceNameLikeIgnoreCase("%" + processInstanceBo.getName() + "%");
+        query.startedBy(bo.getStartUserId());
+        if (StringUtils.isNotBlank(bo.getName())) {
+            query.processInstanceNameLikeIgnoreCase("%" + bo.getName() + "%");
         }
-        if (StringUtils.isNotBlank(processInstanceBo.getKey())) {
-            query.processDefinitionKey(processInstanceBo.getKey());
+        if (StringUtils.isNotBlank(bo.getKey())) {
+            query.processDefinitionKey(bo.getKey());
         }
-        if (StringUtils.isNotBlank(processInstanceBo.getBusinessKey())) {
-            query.processInstanceBusinessKey(processInstanceBo.getBusinessKey());
+        if (StringUtils.isNotBlank(bo.getBusinessKey())) {
+            query.processInstanceBusinessKey(bo.getBusinessKey());
         }
-        if (StringUtils.isNotBlank(processInstanceBo.getCategoryCode())) {
-            query.processDefinitionCategory(processInstanceBo.getCategoryCode());
+        if (StringUtils.isNotBlank(bo.getCategoryCode())) {
+            query.processDefinitionCategory(bo.getCategoryCode());
         }
         query.orderByProcessInstanceStartTime().desc();
-        List<HistoricProcessInstance> historicProcessInstanceList = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
+        List<HistoricProcessInstance> historicProcessInstanceList = query.listPage(pageQuery.getFirstNum(), pageQuery.getPageSize());
         List<TaskVo> taskVoList = new ArrayList<>();
         if (CollUtil.isNotEmpty(historicProcessInstanceList)) {
             List<String> processInstanceIds = StreamUtils.toList(historicProcessInstanceList, HistoricProcessInstance::getId);

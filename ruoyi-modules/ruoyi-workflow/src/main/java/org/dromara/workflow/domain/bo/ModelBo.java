@@ -3,10 +3,8 @@ package org.dromara.workflow.domain.bo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
-import org.dromara.workflow.common.PageEntity;
 import org.dromara.workflow.common.constant.FlowConstant;
 
 import java.io.Serial;
@@ -18,8 +16,7 @@ import java.io.Serializable;
  * @author may
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class ModelBo extends PageEntity implements Serializable {
+public class ModelBo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

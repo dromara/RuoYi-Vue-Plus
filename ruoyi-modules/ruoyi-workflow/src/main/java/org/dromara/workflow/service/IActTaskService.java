@@ -1,5 +1,6 @@
 package org.dromara.workflow.service;
 
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.TaskVo;
@@ -35,7 +36,7 @@ public interface IActTaskService {
      * @param taskBo 参数
      * @return 结果
      */
-    TableDataInfo<TaskVo> getTaskWaitByPage(TaskBo taskBo);
+    TableDataInfo<TaskVo> getPageByTaskWait(TaskBo taskBo, PageQuery pageQuery);
 
     /**
      * 查询当前租户所有待办任务
@@ -43,7 +44,7 @@ public interface IActTaskService {
      * @param taskBo 参数
      * @return 结果
      */
-    TableDataInfo<TaskVo> getAllTaskWaitByPage(TaskBo taskBo);
+    TableDataInfo<TaskVo> getPageByAllTaskWait(TaskBo taskBo, PageQuery pageQuery);
 
 
     /**
@@ -52,7 +53,7 @@ public interface IActTaskService {
      * @param taskBo 参数
      * @return 结果
      */
-    TableDataInfo<TaskVo> getTaskFinishByPage(TaskBo taskBo);
+    TableDataInfo<TaskVo> getPageByTaskFinish(TaskBo taskBo, PageQuery pageQuery);
 
     /**
      * 查询当前用户的抄送
@@ -60,7 +61,7 @@ public interface IActTaskService {
      * @param taskBo 参数
      * @return 结果
      */
-    TableDataInfo<TaskVo> getTaskCopyByPage(TaskBo taskBo);
+    TableDataInfo<TaskVo> getPageByTaskCopy(TaskBo taskBo, PageQuery pageQuery);
 
     /**
      * 查询当前租户所有已办任务
@@ -68,7 +69,7 @@ public interface IActTaskService {
      * @param taskBo 参数
      * @return 结果
      */
-    TableDataInfo<TaskVo> getAllTaskFinishByPage(TaskBo taskBo);
+    TableDataInfo<TaskVo> getPageByAllTaskFinish(TaskBo taskBo, PageQuery pageQuery);
 
     /**
      * 委派任务

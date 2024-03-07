@@ -15,6 +15,7 @@ import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
@@ -59,7 +60,7 @@ public class ActModelServiceImpl implements IActModelService {
      * @return 返回分页列表
      */
     @Override
-    public TableDataInfo<Model> page(ModelBo modelBo) {
+    public TableDataInfo<Model> page(ModelBo modelBo, PageQuery pageQuery) {
         ModelQuery query = QueryUtils.modelQuery();
         if (StringUtils.isNotEmpty(modelBo.getName())) {
             query.modelNameLike("%" + modelBo.getName() + "%");
@@ -74,7 +75,7 @@ public class ActModelServiceImpl implements IActModelService {
         // 创建时间降序排列
         query.orderByCreateTime().desc();
         // 分页查询
-        List<Model> modelList = query.listPage(modelBo.getPageNum(), modelBo.getPageSize());
+        List<Model> modelList = query.listPage(pageQuery.getFirstNum(), pageQuery.getPageSize());
         // 总记录数
         long total = query.count();
         return new TableDataInfo<>(modelList, total);

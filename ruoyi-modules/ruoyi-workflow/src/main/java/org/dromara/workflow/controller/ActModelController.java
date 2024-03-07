@@ -10,6 +10,7 @@ import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.workflow.domain.bo.ModelBo;
@@ -45,8 +46,8 @@ public class ActModelController extends BaseController {
      * @param modelBo 模型参数
      */
     @GetMapping("/list")
-    public TableDataInfo<Model> page(ModelBo modelBo) {
-        return actModelService.page(modelBo);
+    public TableDataInfo<Model> page(ModelBo modelBo, PageQuery pageQuery) {
+        return actModelService.page(modelBo, pageQuery);
     }
 
     /**

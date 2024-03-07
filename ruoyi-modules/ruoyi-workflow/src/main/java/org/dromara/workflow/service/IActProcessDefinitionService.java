@@ -1,5 +1,6 @@
 package org.dromara.workflow.service;
 
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
@@ -19,7 +20,7 @@ public interface IActProcessDefinitionService {
      * @param processDefinitionBo 参数
      * @return 返回分页列表
      */
-    TableDataInfo<ProcessDefinitionVo> page(ProcessDefinitionBo processDefinitionBo);
+    TableDataInfo<ProcessDefinitionVo> page(ProcessDefinitionBo processDefinitionBo, PageQuery pageQuery);
 
     /**
      * 查询历史流程定义列表
@@ -27,7 +28,7 @@ public interface IActProcessDefinitionService {
      * @param key 流程定义key
      * @return 结果
      */
-    List<ProcessDefinitionVo> getProcessDefinitionListByKey(String key);
+    List<ProcessDefinitionVo> getListByKey(String key);
 
     /**
      * 查看流程定义图片
@@ -35,7 +36,7 @@ public interface IActProcessDefinitionService {
      * @param processDefinitionId 流程定义id
      * @return 结果
      */
-    String processDefinitionImage(String processDefinitionId);
+    String definitionImage(String processDefinitionId);
 
     /**
      * 查看流程定义xml文件
@@ -43,7 +44,7 @@ public interface IActProcessDefinitionService {
      * @param processDefinitionId 流程定义id
      * @return 结果
      */
-    String processDefinitionXml(String processDefinitionId);
+    String definitionXml(String processDefinitionId);
 
     /**
      * 删除流程定义
@@ -60,7 +61,7 @@ public interface IActProcessDefinitionService {
      * @param processDefinitionId 流程定义id
      * @return 结果
      */
-    boolean updateProcessDefState(String processDefinitionId);
+    boolean updateDefinitionState(String processDefinitionId);
 
     /**
      * 迁移流程定义
@@ -69,7 +70,7 @@ public interface IActProcessDefinitionService {
      * @param fromProcessDefinitionId    需要迁移到的流程定义id
      * @return 结果
      */
-    boolean migrationProcessDefinition(String currentProcessDefinitionId, String fromProcessDefinitionId);
+    boolean migrationDefinition(String currentProcessDefinitionId, String fromProcessDefinitionId);
 
     /**
      * 流程定义转换为模型

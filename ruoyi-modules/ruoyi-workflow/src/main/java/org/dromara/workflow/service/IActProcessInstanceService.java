@@ -1,5 +1,6 @@
 package org.dromara.workflow.service;
 
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
@@ -21,7 +22,7 @@ public interface IActProcessInstanceService {
      * @param processInstanceId 流程实例id
      * @return 结果
      */
-    String getHistoryProcessImage(String processInstanceId);
+    String getHistoryImage(String processInstanceId);
 
     /**
      * 通过流程实例id获取历史流程图运行中，历史等节点
@@ -29,7 +30,7 @@ public interface IActProcessInstanceService {
      * @param processInstanceId 流程实例id
      * @return 结果
      */
-    Map<String, Object> getHistoryProcessList(String processInstanceId);
+    Map<String, Object> getHistoryList(String processInstanceId);
 
     /**
      * 分页查询正在运行的流程实例
@@ -37,7 +38,7 @@ public interface IActProcessInstanceService {
      * @param processInstanceBo 参数
      * @return 结果
      */
-    TableDataInfo<ProcessInstanceVo> getProcessInstanceRunningByPage(ProcessInstanceBo processInstanceBo);
+    TableDataInfo<ProcessInstanceVo> getPageByRunning(ProcessInstanceBo processInstanceBo, PageQuery pageQuery);
 
     /**
      * 分页查询已结束的流程实例
@@ -45,7 +46,7 @@ public interface IActProcessInstanceService {
      * @param processInstanceBo 参数
      * @return 结果
      */
-    TableDataInfo<ProcessInstanceVo> getProcessInstanceFinishByPage(ProcessInstanceBo processInstanceBo);
+    TableDataInfo<ProcessInstanceVo> getPageByFinish(ProcessInstanceBo processInstanceBo, PageQuery pageQuery);
 
     /**
      * 获取审批记录
@@ -61,7 +62,7 @@ public interface IActProcessInstanceService {
      * @param processInvalidBo 参数
      * @return 结果
      */
-    boolean deleteRuntimeProcessInst(ProcessInvalidBo processInvalidBo);
+    boolean deleteRunInstance(ProcessInvalidBo processInvalidBo);
 
     /**
      * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
@@ -69,7 +70,7 @@ public interface IActProcessInstanceService {
      * @param processInstanceIds 流程实例id
      * @return 结果
      */
-    boolean deleteRuntimeProcessAndHisInst(List<String> processInstanceIds);
+    boolean deleteRunAndHisInstance(List<String> processInstanceIds);
 
     /**
      * 按照业务id删除 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
@@ -77,7 +78,7 @@ public interface IActProcessInstanceService {
      * @param businessKeys 业务id
      * @return 结果
      */
-    boolean deleteRuntimeProcessAndHisInstByBusinessKeys(List<String> businessKeys);
+    boolean deleteRunAndHisInstanceByBusinessKeys(List<String> businessKeys);
 
     /**
      * 已完成的实例 删除程实例，删除历史记录，删除业务与流程关联信息
@@ -85,7 +86,7 @@ public interface IActProcessInstanceService {
      * @param processInstanceIds 流程实例id
      * @return 结果
      */
-    boolean deleteFinishProcessAndHisInst(List<String> processInstanceIds);
+    boolean deleteFinishAndHisInstance(List<String> processInstanceIds);
 
     /**
      * 撤销流程申请
@@ -101,7 +102,7 @@ public interface IActProcessInstanceService {
      * @param processInstanceBo 参数
      * @return 结果
      */
-    TableDataInfo<ProcessInstanceVo> getCurrentSubmitByPage(ProcessInstanceBo processInstanceBo);
+    TableDataInfo<ProcessInstanceVo> getPageByCurrent(ProcessInstanceBo processInstanceBo, PageQuery pageQuery);
 
     /**
      * 任务催办(给当前任务办理人发送站内信，邮件，短信等)

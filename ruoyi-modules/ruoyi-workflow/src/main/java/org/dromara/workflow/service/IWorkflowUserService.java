@@ -23,7 +23,7 @@ public interface IWorkflowUserService {
      * @param sysUserMultiBo 参数
      * @return 结果
      */
-    TableDataInfo<SysUserVo> getWorkflowAddMultiInstanceByPage(SysUserMultiBo sysUserMultiBo);
+    TableDataInfo<SysUserVo> getPageByAddMultiInstance(SysUserMultiBo sysUserMultiBo, PageQuery pageQuery);
 
     /**
      * 查询工作流选择减签人员
@@ -31,7 +31,7 @@ public interface IWorkflowUserService {
      * @param taskId 任务id
      * @return 结果
      */
-    List<TaskVo> getWorkflowDeleteMultiInstanceList(String taskId);
+    List<TaskVo> getListByDeleteMultiInstance(String taskId);
 
     /**
      * 按照用户id查询用户
@@ -56,5 +56,5 @@ public interface IWorkflowUserService {
      * @param pageQuery 分页
      * @return 结果
      */
-    TableDataInfo<SysUserVo> getUserListByPage(SysUserBo sysUserBo, PageQuery pageQuery);
+    TableDataInfo<SysUserVo> getPageByUserList(SysUserBo sysUserBo, PageQuery pageQuery);
 }

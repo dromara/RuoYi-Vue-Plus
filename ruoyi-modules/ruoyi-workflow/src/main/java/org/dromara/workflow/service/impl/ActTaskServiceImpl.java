@@ -236,10 +236,7 @@ public class ActTaskServiceImpl implements IActTaskService {
      * @param taskBo 参数
      */
     @Override
-    public TableDataInfo<TaskVo> getTaskWaitByPage(TaskBo taskBo) {
-        PageQuery pageQuery = new PageQuery();
-        pageQuery.setPageNum(taskBo.getPageNum());
-        pageQuery.setPageSize(taskBo.getPageSize());
+    public TableDataInfo<TaskVo> getPageByTaskWait(TaskBo taskBo, PageQuery pageQuery) {
         QueryWrapper<TaskVo> queryWrapper = new QueryWrapper<>();
         List<RoleDTO> roles = LoginHelper.getLoginUser().getRoles();
         String userId = String.valueOf(LoginHelper.getUserId());
@@ -276,7 +273,7 @@ public class ActTaskServiceImpl implements IActTaskService {
      * @param taskBo 参数
      */
     @Override
-    public TableDataInfo<TaskVo> getAllTaskWaitByPage(TaskBo taskBo) {
+    public TableDataInfo<TaskVo> getPageByAllTaskWait(TaskBo taskBo, PageQuery pageQuery) {
         TaskQuery query = QueryUtils.taskQuery();
         if (StringUtils.isNotBlank(taskBo.getName())) {
             query.taskNameLike("%" + taskBo.getName() + "%");
@@ -288,7 +285,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             query.processDefinitionKey(taskBo.getProcessDefinitionKey());
         }
         query.orderByTaskCreateTime().desc();
-        List<Task> taskList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
+        List<Task> taskList = query.listPage(pageQuery.getFirstNum(), pageQuery.getPageSize());
         List<ProcessInstance> processInstanceList = null;
         if (CollUtil.isNotEmpty(taskList)) {
             Set<String> processInstanceIds = StreamUtils.toSet(taskList, Task::getProcessInstanceId);
@@ -320,7 +317,7 @@ public class ActTaskServiceImpl implements IActTaskService {
      * @param taskBo 参数
      */
     @Override
-    public TableDataInfo<TaskVo> getTaskFinishByPage(TaskBo taskBo) {
+    public TableDataInfo<TaskVo> getPageByTaskFinish(TaskBo taskBo, PageQuery pageQuery) {
         String userId = String.valueOf(LoginHelper.getUserId());
         HistoricTaskInstanceQuery query = QueryUtils.hisTaskInstanceQuery();
         query.taskAssignee(userId).finished().orderByHistoricTaskInstanceStartTime().desc();
@@ -333,7 +330,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
             query.processDefinitionKey(taskBo.getProcessDefinitionKey());
         }
-        List<HistoricTaskInstance> taskInstanceList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
+        List<HistoricTaskInstance> taskInstanceList = query.listPage(pageQuery.getFirstNum(), pageQuery.getPageSize());
         List<HistoricProcessInstance> historicProcessInstanceList = null;
         if (CollUtil.isNotEmpty(taskInstanceList)) {
             Set<String> processInstanceIds = StreamUtils.toSet(taskInstanceList, HistoricTaskInstance::getProcessInstanceId);
@@ -363,10 +360,7 @@ public class ActTaskServiceImpl implements IActTaskService {
      * @param taskBo 参数
      */
     @Override
-    public TableDataInfo<TaskVo> getTaskCopyByPage(TaskBo taskBo) {
-        PageQuery pageQuery = new PageQuery();
-        pageQuery.setPageNum(taskBo.getPageNum());
-        pageQuery.setPageSize(taskBo.getPageSize());
+    public TableDataInfo<TaskVo> getPageByTaskCopy(TaskBo taskBo, PageQuery pageQuery) {
         QueryWrapper<TaskVo> queryWrapper = new QueryWrapper<>();
         String userId = String.valueOf(LoginHelper.getUserId());
         if (StringUtils.isNotBlank(taskBo.getName())) {
@@ -395,7 +389,7 @@ public class ActTaskServiceImpl implements IActTaskService {
      * @param taskBo 参数
      */
     @Override
-    public TableDataInfo<TaskVo> getAllTaskFinishByPage(TaskBo taskBo) {
+    public TableDataInfo<TaskVo> getPageByAllTaskFinish(TaskBo taskBo, PageQuery pageQuery) {
         HistoricTaskInstanceQuery query = QueryUtils.hisTaskInstanceQuery();
         query.finished().orderByHistoricTaskInstanceStartTime().desc();
         if (StringUtils.isNotBlank(taskBo.getName())) {
@@ -407,7 +401,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
             query.processDefinitionKey(taskBo.getProcessDefinitionKey());
         }
-        List<HistoricTaskInstance> taskInstanceList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
+        List<HistoricTaskInstance> taskInstanceList = query.listPage(pageQuery.getFirstNum(), pageQuery.getPageSize());
         List<HistoricProcessInstance> historicProcessInstanceList = null;
         if (CollUtil.isNotEmpty(taskInstanceList)) {
             Set<String> processInstanceIds = StreamUtils.toSet(taskInstanceList, HistoricTaskInstance::getProcessInstanceId);

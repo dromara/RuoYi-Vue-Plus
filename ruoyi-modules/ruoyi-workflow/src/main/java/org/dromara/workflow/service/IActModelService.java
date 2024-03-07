@@ -1,6 +1,7 @@
 package org.dromara.workflow.service;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ModelBo;
 import org.dromara.workflow.domain.vo.ModelVo;
@@ -19,7 +20,7 @@ public interface IActModelService {
      * @param modelBo 模型参数
      * @return 返回分页列表
      */
-    TableDataInfo<Model> page(ModelBo modelBo);
+    TableDataInfo<Model> page(ModelBo modelBo, PageQuery pageQuery);
 
     /**
      * 新增模型

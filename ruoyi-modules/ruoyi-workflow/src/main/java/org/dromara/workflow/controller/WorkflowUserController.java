@@ -32,11 +32,11 @@ public class WorkflowUserController extends BaseController {
     /**
      * 分页查询工作流选择加签人员
      *
-     * @param sysUserMultiBo 参数
+     * @param bo 参数
      */
-    @GetMapping("/getWorkflowAddMultiListByPage")
-    public TableDataInfo<SysUserVo> getWorkflowAddMultiInstanceByPage(SysUserMultiBo sysUserMultiBo) {
-        return workflowUserService.getWorkflowAddMultiInstanceByPage(sysUserMultiBo);
+    @GetMapping("/getPageByAddMultiInstance")
+    public TableDataInfo<SysUserVo> getPageByAddMultiInstance(SysUserMultiBo bo, PageQuery pageQuery) {
+        return workflowUserService.getPageByAddMultiInstance(bo, pageQuery);
     }
 
     /**
@@ -44,9 +44,9 @@ public class WorkflowUserController extends BaseController {
      *
      * @param taskId 任务id
      */
-    @GetMapping("/getWorkflowDeleteMultiInstanceList/{taskId}")
-    public R<List<TaskVo>> getWorkflowDeleteMultiInstanceList(@PathVariable String taskId) {
-        return R.ok(workflowUserService.getWorkflowDeleteMultiInstanceList(taskId));
+    @GetMapping("/getListByDeleteMultiInstance/{taskId}")
+    public R<List<TaskVo>> getListByDeleteMultiInstance(@PathVariable String taskId) {
+        return R.ok(workflowUserService.getListByDeleteMultiInstance(taskId));
     }
 
     /**
@@ -65,8 +65,8 @@ public class WorkflowUserController extends BaseController {
      * @param sysUserBo 参数
      * @param pageQuery 分页
      */
-    @GetMapping("/getUserListByPage")
-    public TableDataInfo<SysUserVo> getUserListByPage(SysUserBo sysUserBo, PageQuery pageQuery) {
-        return workflowUserService.getUserListByPage(sysUserBo, pageQuery);
+    @GetMapping("/getPageByUserList")
+    public TableDataInfo<SysUserVo> getPageByUserList(SysUserBo sysUserBo, PageQuery pageQuery) {
+        return workflowUserService.getPageByUserList(sysUserBo, pageQuery);
     }
 }

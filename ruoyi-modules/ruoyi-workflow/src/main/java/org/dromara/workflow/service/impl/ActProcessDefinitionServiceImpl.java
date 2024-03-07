@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
@@ -53,25 +54,25 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     /**
      * 分页查询
      *
-     * @param processDefinitionBo 参数
+     * @param bo 参数
      * @return 返回分页列表
      */
     @Override
-    public TableDataInfo<ProcessDefinitionVo> page(ProcessDefinitionBo processDefinitionBo) {
+    public TableDataInfo<ProcessDefinitionVo> page(ProcessDefinitionBo bo, PageQuery pageQuery) {
         ProcessDefinitionQuery query = QueryUtils.definitionQuery();
-        if (StringUtils.isNotEmpty(processDefinitionBo.getKey())) {
-            query.processDefinitionKey(processDefinitionBo.getKey());
+        if (StringUtils.isNotEmpty(bo.getKey())) {
+            query.processDefinitionKey(bo.getKey());
         }
-        if (StringUtils.isNotEmpty(processDefinitionBo.getCategoryCode())) {
-            query.processDefinitionCategory(processDefinitionBo.getCategoryCode());
+        if (StringUtils.isNotEmpty(bo.getCategoryCode())) {
+            query.processDefinitionCategory(bo.getCategoryCode());
         }
-        if (StringUtils.isNotEmpty(processDefinitionBo.getName())) {
-            query.processDefinitionNameLike("%" + processDefinitionBo.getName() + "%");
+        if (StringUtils.isNotEmpty(bo.getName())) {
+            query.processDefinitionNameLike("%" + bo.getName() + "%");
         }
         query.orderByDeploymentId().desc();
         // 分页查询
         List<ProcessDefinitionVo> processDefinitionVoList = new ArrayList<>();
-        List<ProcessDefinition> definitionList = query.latestVersion().listPage(processDefinitionBo.getPageNum(), processDefinitionBo.getPageSize());
+        List<ProcessDefinition> definitionList = query.latestVersion().listPage(pageQuery.getFirstNum(), pageQuery.getPageSize());
         List<Deployment> deploymentList = null;
         if (CollUtil.isNotEmpty(definitionList)) {
             List<String> deploymentIds = StreamUtils.toList(definitionList, ProcessDefinition::getDeploymentId);
@@ -99,7 +100,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
      * @param key 流程定义key
      */
     @Override
-    public List<ProcessDefinitionVo> getProcessDefinitionListByKey(String key) {
+    public List<ProcessDefinitionVo> getListByKey(String key) {
         List<ProcessDefinitionVo> processDefinitionVoList = new ArrayList<>();
         ProcessDefinitionQuery query = QueryUtils.definitionQuery();
         List<ProcessDefinition> definitionList = query.processDefinitionKey(key).list();
@@ -128,7 +129,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
      */
     @SneakyThrows
     @Override
-    public String processDefinitionImage(String processDefinitionId) {
+    public String definitionImage(String processDefinitionId) {
         InputStream inputStream = repositoryService.getProcessDiagram(processDefinitionId);
         return Base64.encode(IOUtils.toByteArray(inputStream));
     }
@@ -139,7 +140,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
      * @param processDefinitionId 流程定义id
      */
     @Override
-    public String processDefinitionXml(String processDefinitionId) {
+    public String definitionXml(String processDefinitionId) {
         StringBuilder xml = new StringBuilder();
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
         InputStream inputStream;
@@ -181,7 +182,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
      * @param processDefinitionId 流程定义id
      */
     @Override
-    public boolean updateProcessDefState(String processDefinitionId) {
+    public boolean updateDefinitionState(String processDefinitionId) {
         try {
             ProcessDefinition processDefinition = QueryUtils.definitionQuery()
                 .processDefinitionId(processDefinitionId).singleResult();
@@ -208,7 +209,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
      */
 
     @Override
-    public boolean migrationProcessDefinition(String currentProcessDefinitionId, String fromProcessDefinitionId) {
+    public boolean migrationDefinition(String currentProcessDefinitionId, String fromProcessDefinitionId) {
         try {
             // 迁移验证
             boolean migrationValid = processMigrationService.createProcessInstanceMigrationBuilder()

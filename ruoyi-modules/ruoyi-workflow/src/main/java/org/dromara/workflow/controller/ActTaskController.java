@@ -8,6 +8,7 @@ import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
@@ -67,9 +68,9 @@ public class ActTaskController extends BaseController {
      *
      * @param taskBo 参数
      */
-    @GetMapping("/getTaskWaitByPage")
-    public TableDataInfo<TaskVo> getTaskWaitByPage(TaskBo taskBo) {
-        return actTaskService.getTaskWaitByPage(taskBo);
+    @GetMapping("/getPageByTaskWait")
+    public TableDataInfo<TaskVo> getPageByTaskWait(TaskBo taskBo, PageQuery pageQuery) {
+        return actTaskService.getPageByTaskWait(taskBo, pageQuery);
     }
 
     /**
@@ -77,9 +78,9 @@ public class ActTaskController extends BaseController {
      *
      * @param taskBo 参数
      */
-    @GetMapping("/getAllTaskWaitByPage")
-    public TableDataInfo<TaskVo> getAllTaskWaitByPage(TaskBo taskBo) {
-        return actTaskService.getAllTaskWaitByPage(taskBo);
+    @GetMapping("/getPageByAllTaskWait")
+    public TableDataInfo<TaskVo> getPageByAllTaskWait(TaskBo taskBo, PageQuery pageQuery) {
+        return actTaskService.getPageByAllTaskWait(taskBo, pageQuery);
     }
 
     /**
@@ -87,9 +88,9 @@ public class ActTaskController extends BaseController {
      *
      * @param taskBo 参数
      */
-    @GetMapping("/getTaskFinishByPage")
-    public TableDataInfo<TaskVo> getTaskFinishByPage(TaskBo taskBo) {
-        return actTaskService.getTaskFinishByPage(taskBo);
+    @GetMapping("/getPageByTaskFinish")
+    public TableDataInfo<TaskVo> getPageByTaskFinish(TaskBo taskBo, PageQuery pageQuery) {
+        return actTaskService.getPageByTaskFinish(taskBo, pageQuery);
     }
 
     /**
@@ -97,9 +98,9 @@ public class ActTaskController extends BaseController {
      *
      * @param taskBo 参数
      */
-    @GetMapping("/getTaskCopyByPage")
-    public TableDataInfo<TaskVo> getTaskCopyByPage(TaskBo taskBo) {
-        return actTaskService.getTaskCopyByPage(taskBo);
+    @GetMapping("/getPageByTaskCopy")
+    public TableDataInfo<TaskVo> getPageByTaskCopy(TaskBo taskBo, PageQuery pageQuery) {
+        return actTaskService.getPageByTaskCopy(taskBo, pageQuery);
     }
 
     /**
@@ -107,9 +108,9 @@ public class ActTaskController extends BaseController {
      *
      * @param taskBo 参数
      */
-    @GetMapping("/getAllTaskFinishByPage")
-    public TableDataInfo<TaskVo> getAllTaskFinishByPage(TaskBo taskBo) {
-        return actTaskService.getAllTaskFinishByPage(taskBo);
+    @GetMapping("/getPageByAllTaskFinish")
+    public TableDataInfo<TaskVo> getPageByAllTaskFinish(TaskBo taskBo, PageQuery pageQuery) {
+        return actTaskService.getPageByAllTaskFinish(taskBo, pageQuery);
     }
 
     /**

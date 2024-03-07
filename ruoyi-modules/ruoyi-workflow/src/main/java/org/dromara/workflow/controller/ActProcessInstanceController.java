@@ -8,6 +8,7 @@ import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
@@ -37,21 +38,21 @@ public class ActProcessInstanceController extends BaseController {
     /**
      * 分页查询正在运行的流程实例
      *
-     * @param processInstanceBo 参数
+     * @param bo 参数
      */
-    @GetMapping("/getProcessInstanceRunningByPage")
-    public TableDataInfo<ProcessInstanceVo> getProcessInstanceRunningByPage(ProcessInstanceBo processInstanceBo) {
-        return actProcessInstanceService.getProcessInstanceRunningByPage(processInstanceBo);
+    @GetMapping("/getPageByRunning")
+    public TableDataInfo<ProcessInstanceVo> getPageByRunning(ProcessInstanceBo bo, PageQuery pageQuery) {
+        return actProcessInstanceService.getPageByRunning(bo, pageQuery);
     }
 
     /**
      * 分页查询已结束的流程实例
      *
-     * @param processInstanceBo 参数
+     * @param bo 参数
      */
-    @GetMapping("/getProcessInstanceFinishByPage")
-    public TableDataInfo<ProcessInstanceVo> getProcessInstanceFinishByPage(ProcessInstanceBo processInstanceBo) {
-        return actProcessInstanceService.getProcessInstanceFinishByPage(processInstanceBo);
+    @GetMapping("/getPageByFinish")
+    public TableDataInfo<ProcessInstanceVo> getPageByFinish(ProcessInstanceBo bo, PageQuery pageQuery) {
+        return actProcessInstanceService.getPageByFinish(bo, pageQuery);
     }
 
     /**
@@ -59,9 +60,9 @@ public class ActProcessInstanceController extends BaseController {
      *
      * @param processInstanceId 流程实例id
      */
-    @GetMapping("/getHistoryProcessImage/{processInstanceId}")
-    public R<String> getHistoryProcessImage(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
-        return R.ok("操作成功", actProcessInstanceService.getHistoryProcessImage(processInstanceId));
+    @GetMapping("/getHistoryImage/{processInstanceId}")
+    public R<String> getHistoryImage(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
+        return R.ok("操作成功", actProcessInstanceService.getHistoryImage(processInstanceId));
     }
 
     /**
@@ -69,9 +70,9 @@ public class ActProcessInstanceController extends BaseController {
      *
      * @param processInstanceId 流程实例id
      */
-    @GetMapping("/getHistoryProcessList/{processInstanceId}")
-    public R<Map<String, Object>> getHistoryProcessList(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
-        return R.ok("操作成功", actProcessInstanceService.getHistoryProcessList(processInstanceId));
+    @GetMapping("/getHistoryList/{processInstanceId}")
+    public R<Map<String, Object>> getHistoryList(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
+        return R.ok("操作成功", actProcessInstanceService.getHistoryList(processInstanceId));
     }
 
     /**
@@ -91,9 +92,9 @@ public class ActProcessInstanceController extends BaseController {
      */
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
     @RepeatSubmit()
-    @PostMapping("/deleteRuntimeProcessInst")
-    public R<Void> deleteRuntimeProcessInst(@Validated(AddGroup.class) @RequestBody ProcessInvalidBo processInvalidBo) {
-        return toAjax(actProcessInstanceService.deleteRuntimeProcessInst(processInvalidBo));
+    @PostMapping("/deleteRunInstance")
+    public R<Void> deleteRunInstance(@Validated(AddGroup.class) @RequestBody ProcessInvalidBo processInvalidBo) {
+        return toAjax(actProcessInstanceService.deleteRunInstance(processInvalidBo));
     }
 
     /**
@@ -103,9 +104,9 @@ public class ActProcessInstanceController extends BaseController {
      */
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
     @RepeatSubmit()
-    @DeleteMapping("/deleteRuntimeProcessAndHisInst/{processInstanceIds}")
-    public R<Void> deleteRuntimeProcessAndHisInst(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
-        return toAjax(actProcessInstanceService.deleteRuntimeProcessAndHisInst(Arrays.asList(processInstanceIds)));
+    @DeleteMapping("/deleteRunAndHisInstance/{processInstanceIds}")
+    public R<Void> deleteRunAndHisInstance(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
+        return toAjax(actProcessInstanceService.deleteRunAndHisInstance(Arrays.asList(processInstanceIds)));
     }
 
     /**
@@ -115,9 +116,9 @@ public class ActProcessInstanceController extends BaseController {
      */
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
     @RepeatSubmit()
-    @DeleteMapping("/deleteFinishProcessAndHisInst/{processInstanceIds}")
-    public R<Void> deleteFinishProcessAndHisInst(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
-        return toAjax(actProcessInstanceService.deleteFinishProcessAndHisInst(Arrays.asList(processInstanceIds)));
+    @DeleteMapping("/deleteFinishAndHisInstance/{processInstanceIds}")
+    public R<Void> deleteFinishAndHisInstance(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
+        return toAjax(actProcessInstanceService.deleteFinishAndHisInstance(Arrays.asList(processInstanceIds)));
     }
 
     /**
@@ -135,11 +136,11 @@ public class ActProcessInstanceController extends BaseController {
     /**
      * 分页查询当前登录人单据
      *
-     * @param processInstanceBo 参数
+     * @param bo 参数
      */
-    @GetMapping("/getCurrentSubmitByPage")
-    public TableDataInfo<ProcessInstanceVo> getCurrentSubmitByPage(ProcessInstanceBo processInstanceBo) {
-        return actProcessInstanceService.getCurrentSubmitByPage(processInstanceBo);
+    @GetMapping("/getPageByCurrent")
+    public TableDataInfo<ProcessInstanceVo> getPageByCurrent(ProcessInstanceBo bo, PageQuery pageQuery) {
+        return actProcessInstanceService.getPageByCurrent(bo, pageQuery);
     }
 
     /**

@@ -7,6 +7,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
@@ -38,11 +39,11 @@ public class ActProcessDefinitionController extends BaseController {
     /**
      * 分页查询
      *
-     * @param processDefinitionBo 参数
+     * @param bo 参数
      */
     @GetMapping("/list")
-    public TableDataInfo<ProcessDefinitionVo> page(ProcessDefinitionBo processDefinitionBo) {
-        return actProcessDefinitionService.page(processDefinitionBo);
+    public TableDataInfo<ProcessDefinitionVo> page(ProcessDefinitionBo bo, PageQuery pageQuery) {
+        return actProcessDefinitionService.page(bo, pageQuery);
     }
 
     /**
@@ -50,9 +51,9 @@ public class ActProcessDefinitionController extends BaseController {
      *
      * @param key 流程定义key
      */
-    @GetMapping("/getProcessDefinitionListByKey/{key}")
-    public R<List<ProcessDefinitionVo>> getProcessDefinitionListByKey(@NotEmpty(message = "流程定义key不能为空") @PathVariable String key) {
-        return R.ok("操作成功", actProcessDefinitionService.getProcessDefinitionListByKey(key));
+    @GetMapping("/getListByKey/{key}")
+    public R<List<ProcessDefinitionVo>> getListByKey(@NotEmpty(message = "流程定义key不能为空") @PathVariable String key) {
+        return R.ok("操作成功", actProcessDefinitionService.getListByKey(key));
     }
 
     /**
@@ -60,9 +61,9 @@ public class ActProcessDefinitionController extends BaseController {
      *
      * @param processDefinitionId 流程定义id
      */
-    @GetMapping("/processDefinitionImage/{processDefinitionId}")
-    public R<String> processDefinitionImage(@PathVariable String processDefinitionId) {
-        return R.ok("操作成功", actProcessDefinitionService.processDefinitionImage(processDefinitionId));
+    @GetMapping("/definitionImage/{processDefinitionId}")
+    public R<String> definitionImage(@PathVariable String processDefinitionId) {
+        return R.ok("操作成功", actProcessDefinitionService.definitionImage(processDefinitionId));
     }
 
     /**
@@ -70,10 +71,10 @@ public class ActProcessDefinitionController extends BaseController {
      *
      * @param processDefinitionId 流程定义id
      */
-    @GetMapping("/processDefinitionXml/{processDefinitionId}")
-    public R<Map<String, Object>> getXml(@NotBlank(message = "流程定义id不能为空") @PathVariable String processDefinitionId) {
+    @GetMapping("/definitionXml/{processDefinitionId}")
+    public R<Map<String, Object>> definitionXml(@NotBlank(message = "流程定义id不能为空") @PathVariable String processDefinitionId) {
         Map<String, Object> map = new HashMap<>();
-        String xmlStr = actProcessDefinitionService.processDefinitionXml(processDefinitionId);
+        String xmlStr = actProcessDefinitionService.definitionXml(processDefinitionId);
         map.put("xml", Arrays.asList(xmlStr.split("\n")));
         map.put("xmlStr", xmlStr);
         return R.ok(map);
@@ -99,9 +100,9 @@ public class ActProcessDefinitionController extends BaseController {
      */
     @Log(title = "流程定义管理", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
-    @PutMapping("/updateProcessDefState/{processDefinitionId}")
-    public R<Void> updateProcDefState(@NotBlank(message = "流程定义id不能为空") @PathVariable String processDefinitionId) {
-        return toAjax(actProcessDefinitionService.updateProcessDefState(processDefinitionId));
+    @PutMapping("/updateDefinitionState/{processDefinitionId}")
+    public R<Void> updateDefinitionState(@NotBlank(message = "流程定义id不能为空") @PathVariable String processDefinitionId) {
+        return toAjax(actProcessDefinitionService.updateDefinitionState(processDefinitionId));
     }
 
     /**
@@ -112,10 +113,10 @@ public class ActProcessDefinitionController extends BaseController {
      */
     @Log(title = "流程定义管理", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
-    @PutMapping("/migrationProcessDefinition/{currentProcessDefinitionId}/{fromProcessDefinitionId}")
-    public R<Void> migrationProcessDefinition(@NotBlank(message = "当前流程定义id") @PathVariable String currentProcessDefinitionId,
+    @PutMapping("/migrationDefinition/{currentProcessDefinitionId}/{fromProcessDefinitionId}")
+    public R<Void> migrationDefinition(@NotBlank(message = "当前流程定义id") @PathVariable String currentProcessDefinitionId,
                                               @NotBlank(message = "需要迁移到的流程定义id") @PathVariable String fromProcessDefinitionId) {
-        return toAjax(actProcessDefinitionService.migrationProcessDefinition(currentProcessDefinitionId, fromProcessDefinitionId));
+        return toAjax(actProcessDefinitionService.migrationDefinition(currentProcessDefinitionId, fromProcessDefinitionId));
     }
 
     /**

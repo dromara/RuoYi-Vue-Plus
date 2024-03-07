@@ -50,12 +50,12 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
     /**
      * 分页查询工作流选择加签人员
      *
-     * @param sysUserMultiBo 参数
+     * @param bo 参数
      */
     @Override
     @SuppressWarnings("unchecked")
-    public TableDataInfo<SysUserVo> getWorkflowAddMultiInstanceByPage(SysUserMultiBo sysUserMultiBo) {
-        Task task = QueryUtils.taskQuery().taskId(sysUserMultiBo.getTaskId()).singleResult();
+    public TableDataInfo<SysUserVo> getPageByAddMultiInstance(SysUserMultiBo bo, PageQuery pageQuery) {
+        Task task = QueryUtils.taskQuery().taskId(bo.getTaskId()).singleResult();
         if (task == null) {
             throw new ServiceException("任务不存在");
         }
@@ -65,7 +65,7 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
         }
         LambdaQueryWrapper<SysUser> queryWrapper = Wrappers.lambdaQuery();
         //检索条件
-        queryWrapper.eq(StringUtils.isNotEmpty(sysUserMultiBo.getDeptId()), SysUser::getDeptId, sysUserMultiBo.getDeptId());
+        queryWrapper.eq(StringUtils.isNotEmpty(bo.getDeptId()), SysUser::getDeptId, bo.getDeptId());
         queryWrapper.eq(SysUser::getStatus, UserStatus.OK.getCode());
         if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
             List<Long> assigneeList = (List<Long>) runtimeService.getVariable(task.getExecutionId(), multiInstance.getAssigneeList());
@@ -75,9 +75,9 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
             List<Long> userIds = StreamUtils.toList(list, e -> Long.valueOf(e.getAssignee()));
             queryWrapper.notIn(CollectionUtil.isNotEmpty(userIds), SysUser::getUserId, userIds);
         }
-        queryWrapper.like(StringUtils.isNotEmpty(sysUserMultiBo.getUserName()), SysUser::getUserName, sysUserMultiBo.getUserName());
-        queryWrapper.like(StringUtils.isNotEmpty(sysUserMultiBo.getNickName()), SysUser::getNickName, sysUserMultiBo.getNickName());
-        Page<SysUser> page = new Page<>(sysUserMultiBo.getPageNum(), sysUserMultiBo.getPageSize());
+        queryWrapper.like(StringUtils.isNotEmpty(bo.getUserName()), SysUser::getUserName, bo.getUserName());
+        queryWrapper.like(StringUtils.isNotEmpty(bo.getNickName()), SysUser::getNickName, bo.getNickName());
+        Page<SysUser> page = new Page<>(pageQuery.getFirstNum(), pageQuery.getPageSize());
         Page<SysUserVo> userPage = sysUserMapper.selectVoPage(page, queryWrapper);
         return TableDataInfo.build(recordPage(userPage));
     }
@@ -89,7 +89,7 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<TaskVo> getWorkflowDeleteMultiInstanceList(String taskId) {
+    public List<TaskVo> getListByDeleteMultiInstance(String taskId) {
         Task task = QueryUtils.taskQuery().taskId(taskId).singleResult();
         List<Task> taskList = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
         MultiInstanceVo multiInstance = WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
@@ -202,7 +202,7 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
      * @param pageQuery 分页
      */
     @Override
-    public TableDataInfo<SysUserVo> getUserListByPage(SysUserBo sysUserBo, PageQuery pageQuery) {
+    public TableDataInfo<SysUserVo> getPageByUserList(SysUserBo sysUserBo, PageQuery pageQuery) {
         LambdaQueryWrapper<SysUser> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(sysUserBo.getDeptId() != null, SysUser::getDeptId, sysUserBo.getDeptId());
         queryWrapper.eq(SysUser::getStatus, UserStatus.OK.getCode());
