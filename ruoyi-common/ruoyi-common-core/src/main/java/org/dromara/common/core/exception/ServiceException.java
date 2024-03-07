@@ -1,9 +1,6 @@
 package org.dromara.common.core.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serial;
 
@@ -45,17 +42,9 @@ public final class ServiceException extends RuntimeException {
         this.code = code;
     }
 
-    public String getDetailMessage() {
-        return detailMessage;
-    }
-
     @Override
     public String getMessage() {
         return message;
-    }
-
-    public Integer getCode() {
-        return code;
     }
 
     public ServiceException setMessage(String message) {
