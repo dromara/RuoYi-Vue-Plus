@@ -35,7 +35,7 @@ create table test_leave
     create_time timestamp,
     update_by   bigint,
     update_time timestamp,
-    tenant_id   varchar(20)
+    tenant_id   varchar(20) default '000000'::varchar
 );
 
 comment on table test_leave is '请假申请表';
@@ -76,7 +76,7 @@ create table wf_category
     category_code varchar(255),
     parent_id     bigint,
     sort_num      bigint,
-    tenant_id     bigint,
+    tenant_id     varchar(20) default '000000'::varchar,
     create_dept   bigint,
     create_by     bigint,
     create_time   timestamp,
