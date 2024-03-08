@@ -281,6 +281,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         for (HistoricTaskInstance historicTaskInstance : list) {
             ActHistoryInfoVo actHistoryInfoVo = new ActHistoryInfoVo();
             BeanUtils.copyProperties(historicTaskInstance, actHistoryInfoVo);
+            actHistoryInfoVo.setAssignee(StringUtils.isNotBlank(historicTaskInstance.getAssignee()) ? Long.valueOf(historicTaskInstance.getAssignee()) : null);
             actHistoryInfoVo.setStatus(actHistoryInfoVo.getEndTime() == null ? "待处理" : "已处理");
             if (ObjectUtil.isNotEmpty(historicTaskInstance.getDurationInMillis())) {
                 actHistoryInfoVo.setRunDuration(getDuration(historicTaskInstance.getDurationInMillis()));
