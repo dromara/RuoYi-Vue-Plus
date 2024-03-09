@@ -32,15 +32,12 @@
         select *
         from (SELECT RES.*,
                      AHP.BUSINESS_STATUS_,
-                     ARP.NAME_ as processDefinitionName,
-                     ARP.KEY_  as processDefinitionKey,
-                     LINK.USER_ID_,
-                     LINK.GROUP_ID_
+                     ARP.NAME_ AS processDefinitionName,
+                     ARP.KEY_  AS processDefinitionKey
               FROM ACT_RU_TASK RES
                        INNER JOIN ACT_HI_PROCINST AHP ON RES.PROC_INST_ID_ = AHP.PROC_INST_ID_
                        INNER JOIN ACT_RE_PROCDEF ARP ON ARP.ID_ = RES.PROC_DEF_ID_
-                       LEFT JOIN ACT_RU_IDENTITYLINK LINK ON LINK.TASK_ID_ = RES.ID_ AND LINK.TYPE_ = 'candidate'
-              WHERE RES.PARENT_TASK_ID_ is null
+              WHERE RES.PARENT_TASK_ID_ IS NULL
               ORDER BY RES.CREATE_TIME_ DESC) t ${ew.getCustomSqlSegment}
     </select>
 

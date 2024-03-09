@@ -241,13 +241,15 @@ public class ActTaskServiceImpl implements IActTaskService {
     public TableDataInfo<TaskVo> getPageByTaskWait(TaskBo taskBo, PageQuery pageQuery) {
         QueryWrapper<TaskVo> queryWrapper = new QueryWrapper<>();
         List<RoleDTO> roles = LoginHelper.getLoginUser().getRoles();
+        List<String> roleIds = StreamUtils.toList(roles, e -> String.valueOf(e.getRoleId()));
         String userId = String.valueOf(LoginHelper.getUserId());
         queryWrapper.eq("t.business_status_", BusinessStatusEnum.WAITING.getStatus());
         queryWrapper.eq(TenantHelper.isEnable(), "t.tenant_id_", TenantHelper.getTenantId());
         queryWrapper.and(w1 ->
             w1.eq("t.assignee_", userId)
                 .or(w2 -> w2.isNull("t.assignee_")
-                    .and(w3 -> w3.eq("t.user_id_", userId).or().in("t.group_id_", StreamUtils.toList(roles, RoleDTO::getRoleId))))
+                    .apply("exists ( select LINK.ID_ from ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = t.ID_ and LINK.TYPE_ = 'candidate' " +
+                        "and (LINK.USER_ID_ = {0} or ( LINK.GROUP_ID_ IN " + getInParam(roleIds) + " ) ))", userId))
         );
         if (StringUtils.isNotBlank(taskBo.getName())) {
             queryWrapper.like("t.name_", taskBo.getName());
@@ -267,6 +269,19 @@ public class ActTaskServiceImpl implements IActTaskService {
             task.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
         }
         return new TableDataInfo<>(taskList, page.getTotal());
+    }
+
+    private String getInParam(List<String> param) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(");
+        for (int i = 0; i < param.size(); i++) {
+            sb.append("'").append(param.get(i)).append("'");
+            if (i != param.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append(")");
+        return sb.toString();
     }
 
     /**
