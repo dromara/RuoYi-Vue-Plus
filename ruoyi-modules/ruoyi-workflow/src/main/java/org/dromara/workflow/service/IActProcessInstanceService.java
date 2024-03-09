@@ -36,6 +36,7 @@ public interface IActProcessInstanceService {
      * 分页查询正在运行的流程实例
      *
      * @param processInstanceBo 参数
+     * @param pageQuery         分页
      * @return 结果
      */
     TableDataInfo<ProcessInstanceVo> getPageByRunning(ProcessInstanceBo processInstanceBo, PageQuery pageQuery);
@@ -44,6 +45,7 @@ public interface IActProcessInstanceService {
      * 分页查询已结束的流程实例
      *
      * @param processInstanceBo 参数
+     * @param pageQuery         分页
      * @return 结果
      */
     TableDataInfo<ProcessInstanceVo> getPageByFinish(ProcessInstanceBo processInstanceBo, PageQuery pageQuery);

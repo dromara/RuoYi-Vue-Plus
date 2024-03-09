@@ -25,12 +25,6 @@ public class TerminationBo implements Serializable {
     private String taskId;
 
     /**
-     * 转办人id
-     */
-    @NotBlank(message = "转办人不能为空", groups = AddGroup.class)
-    private String userId;
-
-    /**
      * 审批意见
      */
     private String comment;

@@ -17,7 +17,8 @@ public interface IActModelService {
     /**
      * 分页查询模型
      *
-     * @param modelBo 模型参数
+     * @param modelBo   模型参数
+     * @param pageQuery 参数
      * @return 返回分页列表
      */
     TableDataInfo<Model> page(ModelBo modelBo, PageQuery pageQuery);

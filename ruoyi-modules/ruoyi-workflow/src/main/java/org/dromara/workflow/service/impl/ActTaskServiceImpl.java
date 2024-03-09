@@ -473,7 +473,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
         }
         HistoricProcessInstance historicProcessInstance = QueryUtils.hisInstanceQuery()
-            .processInstanceBusinessKey(task.getProcessInstanceId()).singleResult();
+            .processInstanceId(task.getProcessInstanceId()).singleResult();
         BusinessStatusEnum.checkInvalidStatus(historicProcessInstance.getBusinessStatus());
         try {
             if (StringUtils.isBlank(terminationBo.getComment())) {
@@ -488,9 +488,9 @@ public class ActTaskServiceImpl implements IActTaskService {
                 if (CollectionUtil.isNotEmpty(subTasks)) {
                     subTasks.forEach(e -> taskService.deleteTask(e.getId()));
                 }
+                runtimeService.updateBusinessStatus(task.getProcessInstanceId(), BusinessStatusEnum.TERMINATION.getStatus());
                 runtimeService.deleteProcessInstance(task.getProcessInstanceId(), StrUtil.EMPTY);
             }
-            runtimeService.updateBusinessStatus(task.getProcessInstanceId(), BusinessStatusEnum.TERMINATION.getStatus());
             FlowProcessEventHandler processHandler = flowEventStrategy.getProcessHandler(historicProcessInstance.getProcessDefinitionKey());
             if (processHandler != null) {
                 processHandler.handleProcess(historicProcessInstance.getBusinessKey(), BusinessStatusEnum.TERMINATION.getStatus(), false);

@@ -18,6 +18,7 @@ public interface IActProcessDefinitionService {
      * 分页查询
      *
      * @param processDefinitionBo 参数
+     * @param pageQuery           分页
      * @return 返回分页列表
      */
     TableDataInfo<ProcessDefinitionVo> page(ProcessDefinitionBo processDefinitionBo, PageQuery pageQuery);
