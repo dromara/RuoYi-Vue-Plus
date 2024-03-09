@@ -23,6 +23,7 @@ import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.TaskVo;
+import org.dromara.workflow.domain.vo.VariableVo;
 import org.dromara.workflow.domain.vo.WfCopy;
 import org.dromara.workflow.flowable.cmd.*;
 import org.dromara.workflow.flowable.strategy.FlowEventStrategy;
@@ -46,6 +47,7 @@ import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,8 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.dromara.workflow.common.constant.FlowConstant.FLOWABLE_SKIP_EXPRESSION_ENABLED;
-import static org.dromara.workflow.common.constant.FlowConstant.INITIATOR;
+import static org.dromara.workflow.common.constant.FlowConstant.*;
 
 /**
  * 任务 服务层实现
@@ -96,7 +97,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             if (CollUtil.isNotEmpty(startProcessBo.getVariables())) {
                 taskService.setVariables(taskResult.get(0).getId(), startProcessBo.getVariables());
             }
-            map.put("processInstanceId", taskResult.get(0).getProcessInstanceId());
+            map.put(PROCESS_INSTANCE_ID, taskResult.get(0).getProcessInstanceId());
             map.put("taskId", taskResult.get(0).getId());
             return map;
         }
@@ -129,7 +130,8 @@ public class ActTaskServiceImpl implements IActTaskService {
 
         runtimeService.updateBusinessStatus(pi.getProcessInstanceId(), BusinessStatusEnum.DRAFT.getStatus());
         taskService.setAssignee(taskList.get(0).getId(), LoginHelper.getUserId().toString());
-        taskService.setVariable(taskList.get(0).getId(), "processInstanceId", pi.getProcessInstanceId());
+        taskService.setVariable(taskList.get(0).getId(), PROCESS_INSTANCE_ID, pi.getProcessInstanceId());
+        taskService.setVariable(taskList.get(0).getId(), BUSINESS_KEY, pi.getBusinessKey());
         map.put("processInstanceId", pi.getProcessInstanceId());
         map.put("taskId", taskList.get(0).getId());
         return map;
@@ -704,5 +706,25 @@ public class ActTaskServiceImpl implements IActTaskService {
             throw new ServiceException("修改失败：" + e.getMessage());
         }
         return true;
+    }
+
+    /**
+     * 查询流程变量
+     *
+     * @param taskId 任务id
+     */
+    @Override
+    public List<VariableVo> getInstanceVariable(String taskId) {
+        List<VariableVo> variableVoList = new ArrayList<>();
+        Map<String, VariableInstance> variableInstances = taskService.getVariableInstances(taskId);
+        if (CollectionUtil.isNotEmpty(variableInstances)) {
+            for (Map.Entry<String, VariableInstance> entry : variableInstances.entrySet()) {
+                VariableVo variableVo = new VariableVo();
+                variableVo.setKey(entry.getKey());
+                variableVo.setValue(entry.getValue().getValue().toString());
+                variableVoList.add(variableVo);
+            }
+        }
+        return variableVoList;
     }
 }

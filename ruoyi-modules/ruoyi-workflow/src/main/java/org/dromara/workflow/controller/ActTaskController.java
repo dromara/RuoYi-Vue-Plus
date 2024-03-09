@@ -14,6 +14,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.TaskVo;
+import org.dromara.workflow.domain.vo.VariableVo;
 import org.dromara.workflow.service.IActTaskService;
 import org.dromara.workflow.utils.QueryUtils;
 import org.dromara.workflow.utils.WorkflowUtils;
@@ -21,6 +22,7 @@ import org.flowable.engine.TaskService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -244,5 +246,15 @@ public class ActTaskController extends BaseController {
     @PutMapping("/updateAssignee/{taskIds}/{userId}")
     public R<Void> updateAssignee(@PathVariable String[] taskIds, @PathVariable String userId) {
         return toAjax(actTaskService.updateAssignee(taskIds, userId));
+    }
+
+    /**
+     * 查询流程变量
+     *
+     * @param taskId 任务id
+     */
+    @GetMapping("/getInstanceVariable/{taskId}")
+    public R<List<VariableVo>> getProcessInstVariable(@PathVariable String taskId) {
+        return R.ok(actTaskService.getInstanceVariable(taskId));
     }
 }

@@ -81,6 +81,16 @@ public interface FlowConstant {
     String INITIATOR = "initiator";
 
     /**
+     * 流程实例id
+     */
+    String PROCESS_INSTANCE_ID = "processInstanceId";
+
+    /**
+     * 业务id
+     */
+    String BUSINESS_KEY = "businessKey";
+
+    /**
      * 开启跳过表达式变量
      */
     String FLOWABLE_SKIP_EXPRESSION_ENABLED = "_FLOWABLE_SKIP_EXPRESSION_ENABLED";

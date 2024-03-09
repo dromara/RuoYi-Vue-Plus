@@ -4,7 +4,9 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.TaskVo;
+import org.dromara.workflow.domain.vo.VariableVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -132,4 +134,12 @@ public interface IActTaskService {
      * @return 结果
      */
     boolean updateAssignee(String[] taskIds, String userId);
+
+    /**
+     * 查询流程变量
+     *
+     * @param taskId 任务id
+     * @return 结果
+     */
+    List<VariableVo> getInstanceVariable(String taskId);
 }
