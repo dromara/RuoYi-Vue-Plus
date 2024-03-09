@@ -146,6 +146,7 @@ exec sp_addextendedproperty 'MS_Description', N'更新时间', 'SCHEMA', 'dbo', 
      'update_time'
 go
 
+INSERT INTO wf_category values (1, 'OA', 'OA', 0, 0, '000000', 103, 1, getdate(), 1, getdate());
 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11638, '请假申请', 5, 1, 'leave', 'workflow/leave/index', 1, 0, 'C', '0', '0', 'demo:leave:list', '#', 103, 1, getdate(), NULL, NULL, '请假申请菜单');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11639, '请假申请查询', 11638, 1, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:query', '#', 103, 1, getdate(), NULL, NULL, '');
