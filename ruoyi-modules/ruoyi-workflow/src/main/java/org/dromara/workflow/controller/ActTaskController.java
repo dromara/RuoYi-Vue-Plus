@@ -17,13 +17,13 @@ import org.dromara.workflow.domain.vo.TaskVo;
 import org.dromara.workflow.domain.vo.VariableVo;
 import org.dromara.workflow.service.IActTaskService;
 import org.dromara.workflow.utils.QueryUtils;
-import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.engine.TaskService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 任务管理 控制层
@@ -256,5 +256,15 @@ public class ActTaskController extends BaseController {
     @GetMapping("/getInstanceVariable/{taskId}")
     public R<List<VariableVo>> getProcessInstVariable(@PathVariable String taskId) {
         return R.ok(actTaskService.getInstanceVariable(taskId));
+    }
+
+    /**
+     * 获取可驳回得任务节点
+     *
+     * @param processInstanceId 流程实例id
+     */
+    @GetMapping("/getTaskNodeList/{processInstanceId}")
+    public R<Set<TaskVo>> getNodeList(@PathVariable String processInstanceId) {
+        return R.ok(actTaskService.getTaskNodeList(processInstanceId));
     }
 }

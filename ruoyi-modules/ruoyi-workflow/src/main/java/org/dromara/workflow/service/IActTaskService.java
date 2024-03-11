@@ -8,6 +8,7 @@ import org.dromara.workflow.domain.vo.VariableVo;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 任务 服务层
@@ -142,4 +143,12 @@ public interface IActTaskService {
      * @return 结果
      */
     List<VariableVo> getInstanceVariable(String taskId);
+
+    /**
+     * 获取可驳回得任务节点
+     *
+     * @param processInstanceId 流程实例id
+     * @return 结果
+     */
+    Set<TaskVo> getTaskNodeList(String processInstanceId);
 }

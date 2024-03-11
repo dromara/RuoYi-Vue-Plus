@@ -336,39 +336,18 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Override
     public TableDataInfo<TaskVo> getPageByTaskFinish(TaskBo taskBo, PageQuery pageQuery) {
         String userId = String.valueOf(LoginHelper.getUserId());
-        HistoricTaskInstanceQuery query = QueryUtils.hisTaskInstanceQuery();
-        query.taskAssignee(userId).finished().orderByHistoricTaskInstanceStartTime().desc();
-        if (StringUtils.isNotBlank(taskBo.getName())) {
-            query.taskNameLike("%" + taskBo.getName() + "%");
+        QueryWrapper<TaskVo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotBlank(taskBo.getName()), "t.name_", taskBo.getName());
+        queryWrapper.like(StringUtils.isNotBlank(taskBo.getProcessDefinitionName()), "t.processDefinitionName", taskBo.getProcessDefinitionName());
+        queryWrapper.eq(StringUtils.isNotBlank(taskBo.getProcessDefinitionKey()), "t.processDefinitionKey", taskBo.getProcessDefinitionKey());
+        queryWrapper.eq("t.assignee_", userId);
+        Page<TaskVo> page = actTaskMapper.getTaskFinishByPage(pageQuery.build(), queryWrapper);
+
+        List<TaskVo> taskList = page.getRecords();
+        for (TaskVo task : taskList) {
+            task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
         }
-        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionName())) {
-            query.processDefinitionNameLike("%" + taskBo.getProcessDefinitionName() + "%");
-        }
-        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
-            query.processDefinitionKey(taskBo.getProcessDefinitionKey());
-        }
-        List<HistoricTaskInstance> taskInstanceList = query.listPage(pageQuery.getFirstNum(), pageQuery.getPageSize());
-        List<HistoricProcessInstance> historicProcessInstanceList = null;
-        if (CollUtil.isNotEmpty(taskInstanceList)) {
-            Set<String> processInstanceIds = StreamUtils.toSet(taskInstanceList, HistoricTaskInstance::getProcessInstanceId);
-            historicProcessInstanceList = QueryUtils.hisInstanceQuery(processInstanceIds).list();
-        }
-        List<TaskVo> list = new ArrayList<>();
-        for (HistoricTaskInstance task : taskInstanceList) {
-            TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
-            if (CollUtil.isNotEmpty(historicProcessInstanceList)) {
-                historicProcessInstanceList.stream().filter(e -> e.getId().equals(task.getProcessInstanceId())).findFirst().ifPresent(e -> {
-                    taskVo.setBusinessStatus(e.getBusinessStatus());
-                    taskVo.setBusinessStatusName(BusinessStatusEnum.findByStatus(taskVo.getBusinessStatus()));
-                    taskVo.setProcessDefinitionKey(e.getProcessDefinitionKey());
-                    taskVo.setProcessDefinitionName(e.getProcessDefinitionName());
-                });
-            }
-            taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
-            list.add(taskVo);
-        }
-        long count = query.count();
-        return new TableDataInfo<>(list, count);
+        return new TableDataInfo<>(taskList, page.getTotal());
     }
 
     /**
@@ -741,5 +720,25 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
         }
         return variableVoList;
+    }
+
+    /**
+     * 获取可驳回得任务节点
+     *
+     * @param processInstanceId 流程实例id
+     */
+    @Override
+    public Set<TaskVo> getTaskNodeList(String processInstanceId) {
+        Set<TaskVo> list = new HashSet<>();
+        List<HistoricTaskInstance> historicTaskInstances = QueryUtils.hisTaskInstanceQuery(processInstanceId).orderByHistoricTaskInstanceEndTime().desc().list();
+        for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+            if (historicTaskInstance.getEndTime() != null) {
+                TaskVo taskVo = new TaskVo();
+                taskVo.setName(historicTaskInstance.getName());
+                taskVo.setTaskDefinitionKey(historicTaskInstance.getTaskDefinitionKey());
+                list.add(taskVo);
+            }
+        }
+        return list;
     }
 }

@@ -82,6 +82,11 @@ public class TaskVo implements Serializable {
     private Date createTime;
 
     /**
+     * 已办任务-创建时间
+     */
+    private Date startTime;
+
+    /**
      * 结束时间
      */
     private Date endTime;

@@ -3,7 +3,7 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.workflow.mapper.ActTaskMapper">
-    <resultMap type="org.dromara.workflow.domain.vo.TaskVo" id="TaskWaitingVoResult">
+    <resultMap type="org.dromara.workflow.domain.vo.TaskVo" id="TaskVoResult">
         <result property="id" column="ID_"/>
         <result property="name" column="NAME_"/>
         <result property="description" column="DESCRIPTION_"/>
@@ -15,6 +15,7 @@
         <result property="taskDefinitionId" column="TASK_DEF_ID_"/>
         <result property="processDefinitionId" column="PROC_DEF_ID_"/>
         <result property="createTime" column="CREATE_TIME_"/>
+        <result property="startTime" column="START_TIME_"/>
         <result property="endTime" column="END_TIME_"/>
         <result property="taskDefinitionKey" column="TASK_DEF_KEY_"/>
         <result property="dueDate" column="DUE_DATE_"/>
@@ -28,7 +29,7 @@
         <result property="processDefinitionKey" column="processDefinitionName"/>
 
     </resultMap>
-    <select id="getTaskWaitByPage" resultMap="TaskWaitingVoResult">
+    <select id="getTaskWaitByPage" resultMap="TaskVoResult">
         select *
         from (SELECT RES.*,
                      AHP.BUSINESS_STATUS_,
@@ -41,7 +42,20 @@
               ORDER BY RES.CREATE_TIME_ DESC) t ${ew.getCustomSqlSegment}
     </select>
 
-    <select id="getTaskCopyByPage" resultMap="TaskWaitingVoResult">
+    <select id="getTaskFinishByPage" resultMap="TaskVoResult">
+        select *
+        from (SELECT HTI.*,
+                     AHP.BUSINESS_STATUS_,
+                     ARP.NAME_ AS processDefinitionName,
+                     ARP.KEY_  AS processDefinitionKey
+              FROM ACT_HI_TASKINST HTI
+                       INNER JOIN ACT_HI_PROCINST AHP ON HTI.PROC_INST_ID_ = AHP.PROC_INST_ID_
+                       INNER JOIN ACT_RE_PROCDEF ARP ON ARP.ID_ = HTI.PROC_DEF_ID_
+              WHERE HTI.PARENT_TASK_ID_ IS NULL
+              ORDER BY HTI.START_TIME_ DESC) t ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="getTaskCopyByPage" resultMap="TaskVoResult">
         select *
         from (SELECT AHT.*,
                      AHP.BUSINESS_STATUS_,

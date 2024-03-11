@@ -28,6 +28,15 @@ public interface ActTaskMapper extends BaseMapperPlus<TaskVo, TaskVo> {
     Page<TaskVo> getTaskWaitByPage(@Param("page") Page<TaskVo> page, @Param(Constants.WRAPPER) Wrapper<TaskVo> queryWrapper);
 
     /**
+     * 获取已办
+     *
+     * @param page         分页
+     * @param queryWrapper 条件
+     * @return 结果
+     */
+    Page<TaskVo> getTaskFinishByPage(@Param("page") Page<TaskVo> page, @Param(Constants.WRAPPER) Wrapper<TaskVo> queryWrapper);
+
+    /**
      * 查询当前用户的抄送
      *
      * @param page         分页
