@@ -17,6 +17,11 @@ public interface RegexConstants extends RegexPool {
     public static final String DICTIONARY_TYPE = "^[a-z][a-z0-9_]*$";
 
     /**
+     * 权限标识必须符合 tool:build:list 格式，或者空字符串
+     */
+    public static final String PERMISSION_STRING = "^(|^[a-zA-Z0-9_]+:[a-zA-Z0-9_]+:[a-zA-Z0-9_]+)$";
+
+    /**
      * 身份证号码（后6位）
      */
     public static final String ID_CARD_LAST_6 = "^(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$";

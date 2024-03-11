@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dromara.common.core.constant.RegexConstants;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.system.domain.SysMenu;
 
@@ -92,6 +94,7 @@ public class SysMenuBo extends BaseEntity {
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @Size(min = 0, max = 100, message = "权限标识长度不能超过{max}个字符")
+    @Pattern(regexp = RegexConstants.PERMISSION_STRING, message = "权限标识必须符合 tool:build:list 格式")
     private String perms;
 
     /**
@@ -103,6 +106,5 @@ public class SysMenuBo extends BaseEntity {
      * 备注
      */
     private String remark;
-
 
 }
