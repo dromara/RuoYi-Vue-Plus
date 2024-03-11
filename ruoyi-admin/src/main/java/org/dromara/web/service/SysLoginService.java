@@ -26,7 +26,6 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.bo.SysSocialBo;
 import org.dromara.system.domain.vo.*;
-import org.dromara.system.mapper.SysDeptMapper;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.service.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -146,7 +145,10 @@ public class SysLoginService {
         loginUser.setMenuPermission(permissionService.getMenuPermission(user.getUserId()));
         loginUser.setRolePermission(permissionService.getRolePermission(user.getUserId()));
         TenantHelper.dynamic(user.getTenantId(), () -> {
-            SysDeptVo dept = deptService.selectDeptById(user.getDeptId());
+            SysDeptVo dept = null;
+            if (ObjectUtil.isNotNull(user.getDeptId())) {
+                dept = deptService.selectDeptById(user.getDeptId());
+            }
             loginUser.setDeptName(ObjectUtil.isNull(dept) ? "" : dept.getDeptName());
             List<SysRoleVo> roles = roleService.selectRolesByUserId(user.getUserId());
             loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
