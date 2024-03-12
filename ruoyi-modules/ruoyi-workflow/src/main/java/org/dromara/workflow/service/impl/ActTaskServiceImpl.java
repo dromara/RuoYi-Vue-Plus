@@ -607,7 +607,7 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Transactional(rollbackFor = Exception.class)
     public String backProcess(BackProcessBo backProcessBo) {
         TaskQuery query = QueryUtils.taskQuery();
-        Task task = query.taskId(backProcessBo.getTaskId()).taskAssignee(String.valueOf(LoginHelper.getUserId())).singleResult();
+        Task task = query.taskId(backProcessBo.getTaskId()).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }
