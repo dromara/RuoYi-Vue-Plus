@@ -169,10 +169,10 @@ public class WorkflowUtils {
                     List<String> nickNames = StreamUtils.toList(sysUsers, SysUserVo::getNickName);
                     participantVo.setCandidate(userIds);
                     participantVo.setCandidateName(nickNames);
-                    if (StringUtils.isBlank(task.getAssignee()) && CollUtil.isNotEmpty(candidateList)) {
+                    if (StringUtils.isBlank(task.getAssignee()) && CollUtil.isNotEmpty(candidateList) && candidateList.size() > 1) {
                         participantVo.setClaim(false);
                     }
-                    if (!StringUtils.isBlank(task.getAssignee()) && CollUtil.isNotEmpty(candidateList)) {
+                    if (!StringUtils.isBlank(task.getAssignee()) && CollUtil.isNotEmpty(candidateList) && candidateList.size() > 1) {
                         participantVo.setClaim(true);
                     }
                 }
