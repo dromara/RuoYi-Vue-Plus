@@ -16,10 +16,8 @@ CREATE TABLE `namespace`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='命名空间';
 
-INSERT INTO `namespace` (`id`, `name`, `unique_id`, `create_dt`, `update_dt`, `deleted`)
-VALUES (1, 'Development', 'dev', now(), now(), 0);
-INSERT INTO `namespace` (`id`, `name`, `unique_id`, `create_dt`, `update_dt`, `deleted`)
-VALUES (2, 'Production', 'prod', now(), now(), 0);
+INSERT INTO `namespace` VALUES (1, 'Development', 'dev', '', now(), now(), 0);
+INSERT INTO `namespace` VALUES (2, 'Production', 'prod', '', now(), now(), 0);
 
 DROP TABLE IF EXISTS `group_config`;
 CREATE TABLE `group_config`
@@ -43,8 +41,7 @@ CREATE TABLE `group_config`
   DEFAULT CHARSET = utf8mb4 COMMENT ='组配置'
 ;
 
-INSERT INTO `ry-vue`.group_config (id, namespace_id, group_name, description, group_status, version, group_partition, id_generator_mode, init_scene, bucket_index, create_dt, update_dt)
-VALUES (1, 'dev', 'ruoyi_group', '', 1, 1, 0, 1, 1, 4, '2024-03-13 23:21:41', '2024-03-13 23:21:40');
+INSERT INTO `group_config` VALUES (1, 'dev', 'ruoyi_group', '', 1, 1, 0, 1, 1, 4, now(), now());
 
 DROP TABLE IF EXISTS `notify_config`;
 CREATE TABLE `notify_config`
@@ -254,8 +251,7 @@ CREATE TABLE `system_user`
   DEFAULT CHARSET = utf8mb4 COMMENT ='系统用户表';
 
 -- pwd: admin
-INSERT INTO system_user (username, password, role)
-VALUES ('admin', '465c194afb65670f38322df087f0a9bb225cc257e43eb4ac5a0c98ef5b3173ac', 2);
+INSERT INTO `system_user` VALUES (1, 'admin', '465c194afb65670f38322df087f0a9bb225cc257e43eb4ac5a0c98ef5b3173ac', 2, now(), now());
 
 DROP TABLE IF EXISTS `system_user_permission`;
 CREATE TABLE `system_user_permission`
@@ -323,8 +319,7 @@ CREATE TABLE `job`
   AUTO_INCREMENT = 0
   DEFAULT CHARSET = utf8mb4 COMMENT ='任务信息';
 
-INSERT INTO job (id, namespace_id, group_name, job_name, args_str, args_type, next_trigger_at, job_status, task_type, route_key, executor_type, executor_info, trigger_type, trigger_interval, block_strategy, executor_timeout, max_retry_times, parallel_num, retry_interval, bucket_index, resident, description, ext_attrs, create_dt, update_dt, deleted)
-VALUES (1, 'dev', 'ruoyi_group', 'demo-job', null, 1, 1710344035622, 1, 1, 4, 1, 'testJobExecutor', 2, '60', 1, 60, 3, 1, 1, 116, 0, '', '', '2024-03-13 22:59:39', '2024-03-13 23:32:52', 0);
+INSERT INTO `job` VALUES (1, 'dev', 'ruoyi_group', 'demo-job', null, 1, 1710344035622, 1, 1, 4, 1, 'testJobExecutor', 2, '60', 1, 60, 3, 1, 1, 116, 0, '', '', now(), now(), 0);
 
 DROP TABLE IF EXISTS `job_log_message`;
 CREATE TABLE `job_log_message`

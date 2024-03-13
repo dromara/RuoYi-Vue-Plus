@@ -22,8 +22,8 @@ COMMENT ON COLUMN namespace.update_dt IS '修改时间';
 COMMENT ON COLUMN namespace.deleted IS '逻辑删除 1、删除';
 COMMENT ON TABLE namespace IS '命名空间';
 
-INSERT INTO namespace (name, unique_id, create_dt, update_dt, deleted)
-VALUES ('Default', '764d604ec6fc45f68cd92514c40e9e1a', now(), now(), 0);
+INSERT INTO namespace VALUES (1, 'Development', 'dev', '', now(), now(), 0);
+INSERT INTO namespace VALUES (2, 'Production', 'prod', '', now(), now(), 0);
 
 CREATE TABLE group_config
 (
@@ -57,10 +57,7 @@ COMMENT ON COLUMN "group_config"."create_dt" IS '创建时间';
 COMMENT ON COLUMN "group_config"."update_dt" IS '修改时间';
 COMMENT ON TABLE "group_config" IS '组配置';
 
-INSERT INTO `namespace` (`id`, `name`, `unique_id`, `create_dt`, `update_dt`, `deleted`)
-VALUES (1, 'Development', 'dev', now(), now(), 0);
-INSERT INTO `namespace` (`id`, `name`, `unique_id`, `create_dt`, `update_dt`, `deleted`)
-VALUES (2, 'Production', 'prod', now(), now(), 0);
+INSERT INTO group_config VALUES (1, 'dev', 'ruoyi_group', '', 1, 1, 0, 1, 1, 4, now(), now());
 
 CREATE TABLE notify_config
 (
@@ -353,8 +350,8 @@ COMMENT ON COLUMN "system_user"."update_dt" IS '修改时间';
 COMMENT ON TABLE "system_user" IS '系统用户表';
 
 -- pwd: admin
-INSERT INTO system_user (username, password, role)
-VALUES ('admin', '465c194afb65670f38322df087f0a9bb225cc257e43eb4ac5a0c98ef5b3173ac', 2);
+INSERT INTO system_user VALUES (1, 'admin', '465c194afb65670f38322df087f0a9bb225cc257e43eb4ac5a0c98ef5b3173ac', 2, now(), now());
+
 
 CREATE TABLE system_user_permission
 (
@@ -459,8 +456,7 @@ COMMENT ON COLUMN "job"."deleted" IS '逻辑删除 1、删除';
 COMMENT ON COLUMN "job"."update_dt" IS '更新时间';
 COMMENT ON TABLE "job" IS '任务信息';
 
-INSERT INTO job (id, namespace_id, group_name, job_name, args_str, args_type, next_trigger_at, job_status, task_type, route_key, executor_type, executor_info, trigger_type, trigger_interval, block_strategy, executor_timeout, max_retry_times, parallel_num, retry_interval, bucket_index, resident, description, ext_attrs, create_dt, update_dt, deleted)
-VALUES (1, 'dev', 'ruoyi_group', 'demo-job', null, 1, 1710344035622, 1, 1, 4, 1, 'testJobExecutor', 2, '60', 1, 60, 3, 1, 1, 116, 0, '', '', '2024-03-13 22:59:39', '2024-03-13 23:32:52', 0);
+INSERT INTO job VALUES (1, 'dev', 'ruoyi_group', 'demo-job', null, 1, 1710344035622, 1, 1, 4, 1, 'testJobExecutor', 2, '60', 1, 60, 3, 1, 1, 116, 0, '', '', now(), now(), 0);
 
 CREATE TABLE job_log_message
 (
