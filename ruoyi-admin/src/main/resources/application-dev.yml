@@ -24,6 +24,18 @@ powerjob:
     server-address: 127.0.0.1:7700
     store-strategy: disk
 
+--- # easy-retry 配置
+easy-retry:
+  enabled: true
+  # 需要在EasyRetry后台组管理创建对应名称的组,然后创建任务的时候选择对应的组,才能正确分派任务
+  group-name: "ruoyi_group"
+  server:
+    host: 127.0.0.1
+    port: 1788
+  # 详见 script/sql/easy_retry.sql `namespace` 表
+  namespace: ${spring.profiles.active}
+
+
 --- # 数据源配置
 spring:
   datasource:

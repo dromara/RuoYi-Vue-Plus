@@ -1,0 +1,88 @@
+<configuration>
+
+    <property name="log.base" value="./logs/ruoyi-easyretry-server" />
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{256} - %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="fileInfo"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base}/info.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{256} - %msg%n</pattern>
+        </layout>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="fileWarn" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/warn.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base}/warn.%d{yyyy-MM-dd}.log
+            </FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{256} - %msg%n</pattern>
+        </layout>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="fileError" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base}/error.%d{yyyy-MM-dd}.log
+            </FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{256} - %msg%n</pattern>
+        </layout>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name ="asyncInfo" class= "ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold >100</discardingThreshold>
+        <queueSize>1024</queueSize>
+        <appender-ref ref ="fileInfo"/>
+    </appender>
+
+    <appender name ="asyncWarn" class= "ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold >100</discardingThreshold>
+        <queueSize>1024</queueSize>
+        <appender-ref ref ="fileWarn"/>
+    </appender>
+
+    <appender name ="asyncError" class= "ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold >100</discardingThreshold>
+        <queueSize>1024</queueSize>
+        <appender-ref ref ="fileError"/>
+    </appender>
+
+    <!-- 控制台输出日志级别 -->
+    <root level="info">
+        <appender-ref ref="stdout" />
+        <appender-ref ref="asyncInfo" />
+        <appender-ref ref="asyncWarn" />
+        <appender-ref ref="asyncError" />
+    </root>
+</configuration>

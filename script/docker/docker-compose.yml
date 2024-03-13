@@ -156,3 +156,16 @@ services:
     privileged: true
     network_mode: "host"
 
+  ruoyi-easyretry-server:
+    image: ruoyi/ruoyi-easyretry-server:5.2.0
+    container_name: ruoyi-easyretry-server
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+    ports:
+      - "8800:8800"
+      - "1788:1788"
+    volumes:
+      - /docker/easyretry/logs/:/ruoyi/easyretry/logs
+    privileged: true
+    network_mode: "host"

@@ -123,6 +123,9 @@ security:
     # actuator 监控配置
     - /actuator
     - /actuator/**
+    # EasyRetry Job 分派 @see com.aizuda.easy.retry.client.job.core.client.JobEndPoint
+    - /job/dispatch/v1
+    - /job/stop/v1
 
 # 多租户配置
 tenant:

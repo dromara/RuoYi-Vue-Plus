@@ -38,6 +38,20 @@
             <artifactId>powerjob-official-processors</artifactId>
         </dependency>
 
+        <!-- EasyRetry client -->
+        <dependency>
+            <groupId>com.aizuda</groupId>
+            <artifactId>easy-retry-client-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.aizuda</groupId>
+            <artifactId>easy-retry-client-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.aizuda</groupId>
+            <artifactId>easy-retry-client-job-core</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
