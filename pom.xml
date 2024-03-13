@@ -35,6 +35,7 @@
         <dynamic-ds.version>4.3.0</dynamic-ds.version>
         <alibaba-ttl.version>2.14.4</alibaba-ttl.version>
         <powerjob.version>4.3.6</powerjob.version>
+        <easyretry.version>3.1.0</easyretry.version>
         <mapstruct-plus.version>1.3.6</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.30</lombok.version>
@@ -306,6 +307,23 @@
                 <groupId>tech.powerjob</groupId>
                 <artifactId>powerjob-official-processors</artifactId>
                 <version>${powerjob.version}</version>
+            </dependency>
+
+            <!--  EasyRetry Client -->
+            <dependency>
+                <groupId>com.aizuda</groupId>
+                <artifactId>easy-retry-client-starter</artifactId>
+                <version>${easyretry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aizuda</groupId>
+                <artifactId>easy-retry-client-core</artifactId>
+                <version>${easyretry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aizuda</groupId>
+                <artifactId>easy-retry-client-job-core</artifactId>
+                <version>${easyretry.version}</version>
             </dependency>
 
             <dependency>

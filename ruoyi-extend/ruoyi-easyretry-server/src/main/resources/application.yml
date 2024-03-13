@@ -1,0 +1,66 @@
+server:
+  port: 8800
+  servlet:
+    context-path: /easy-retry
+spring:
+  application:
+    name: ruoyi-easyretry-server
+  profiles:
+    active: @profiles.active@
+  datasource:
+    name: ry-vue
+    url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      minimum-idle: 5
+      maximum-pool-size: 20
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: easy_retry
+      max-lifetime: 1800000
+  web:
+    resources:
+      static-locations: classpath:admin/
+
+mybatis-plus:
+  typeAliasesPackage: com.aizuda.easy.retry.template.datasource.persistence.po
+  global-config:
+    db-config:
+      where-strategy: NOT_EMPTY
+      capital-mode: false
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+logging:
+  config: classpath:logback-boot.xml
+
+easy-retry:
+  retry-pull-page-size: 1000 # 拉取重试数据的每批次的大小
+  job-pull-page-size: 1000 # 拉取重试数据的每批次的大小
+  netty-port: 1788  # 服务端netty端口
+  total-partition: 2  # 重试和死信表的分区总数
+  limiter: 1000 # 一个客户端每秒最多接收的重试数量指令
+  step: 100 # 号段模式下步长配置
+  log-storage: 90 # 日志保存时间(单位: day)
+  callback: # 回调配置
+    max-count: 288 #回调最大执行次数
+    trigger-interval: 900 #间隔时间
+  db-type: mysql #当前使用的数据库
+  mode: all
+  retry-max-pull-count: 10
+
+--- # 监控中心配置
+spring.boot.admin.client:
+  # 增加客户端开关
+  enabled: true
+  url: http://localhost:9090/admin
+  instance:
+    service-host-type: IP
+  username: ruoyi
+  password: 123456
