@@ -295,7 +295,7 @@ insert into sys_menu values('118',  '文件管理',     '1',   '10', 'oss',     
 -- powerjob server控制台
 insert into sys_menu values('120',  '任务调度中心',  '2',   '5',  'powerjob',           'monitor/powerjob/index',    '', 1, 0, 'C', '0', '0', 'monitor:powerjob:list',          'job',           103, 1, sysdate(), null, null, 'PowerJob控制台菜单');
 -- retry server控制台
-insert into sys_menu values('130',  'EasyRetry服务器',  '2',   '6',  'easyretry',     'monitor/easyretry/index',    '', 1, 0, 'C', '0', '0', 'monitor:easyretry:list',          'job',           103, 1, sysdate(), null, null, 'EasyRetry控制台菜单');
+insert into sys_menu values('130',  'EasyRetry控制台',  '2',   '6',  'easyretry',     'monitor/easyretry/index',    '', 1, 0, 'C', '0', '0', 'monitor:easyretry:list',          'job',           103, 1, sysdate(), null, null, 'EasyRetry控制台菜单');
 
 -- 三级菜单
 insert into sys_menu values('500',  '操作日志', '108', '1', 'operlog',    'monitor/operlog/index',    '', 1, 0, 'C', '0', '0', 'monitor:operlog:list',    'form',          103, 1, sysdate(), null, null, '操作日志菜单');
