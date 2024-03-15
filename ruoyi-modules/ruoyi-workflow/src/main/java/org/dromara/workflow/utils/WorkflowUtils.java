@@ -95,6 +95,7 @@ public class WorkflowUtils {
      */
     public static void createCopyTask(List<Task> parentTaskList, List<Long> userIds) {
         List<Task> list = new ArrayList<>();
+        String tenantId = TenantHelper.getTenantId();
         for (Task parentTask : parentTaskList) {
             for (Long userId : userIds) {
                 TaskEntity newTask = (TaskEntity) PROCESS_ENGINE.getTaskService().newTask();
@@ -104,7 +105,7 @@ public class WorkflowUtils {
                 newTask.setProcessDefinitionId(parentTask.getProcessDefinitionId());
                 newTask.setProcessInstanceId(parentTask.getProcessInstanceId());
                 newTask.setTaskDefinitionKey(parentTask.getTaskDefinitionKey());
-                newTask.setTenantId(TenantHelper.getTenantId());
+                newTask.setTenantId(tenantId);
                 list.add(newTask);
             }
         }
@@ -117,7 +118,7 @@ public class WorkflowUtils {
             actHiTaskinst.setProcDefId(processDefinitionId);
             actHiTaskinst.setProcInstId(processInstanceId);
             actHiTaskinst.setScopeType(TaskStatusEnum.COPY.getStatus());
-            actHiTaskinst.setTenantId(TenantHelper.getTenantId());
+            actHiTaskinst.setTenantId(tenantId);
             LambdaUpdateWrapper<ActHiTaskinst> updateWrapper = new LambdaUpdateWrapper<>();
             updateWrapper.in(ActHiTaskinst::getId, taskIds);
             ACT_HI_TASKINST_MAPPER.update(actHiTaskinst, updateWrapper);
@@ -169,11 +170,10 @@ public class WorkflowUtils {
                     List<String> nickNames = StreamUtils.toList(sysUsers, SysUserVo::getNickName);
                     participantVo.setCandidate(userIds);
                     participantVo.setCandidateName(nickNames);
-                    if (StringUtils.isBlank(task.getAssignee()) && CollUtil.isNotEmpty(candidateList) && candidateList.size() > 1) {
-                        participantVo.setClaim(false);
-                    }
-                    if (!StringUtils.isBlank(task.getAssignee()) && CollUtil.isNotEmpty(candidateList) && candidateList.size() > 1) {
-                        participantVo.setClaim(true);
+                    // 判断当前任务是否具有多个办理人
+                    if (CollUtil.isNotEmpty(candidateList) && candidateList.size() > 1) {
+                        // 如果 assignee 存在，则设置当前任务已经被认领
+                        participantVo.setClaim(StringUtils.isNotBlank(task.getAssignee()));
                     }
                 }
             }
@@ -322,17 +322,22 @@ public class WorkflowUtils {
         if (CollUtil.isNotEmpty(userIds)) {
             List<SysUserVo> sysUserVoList = WORKFLOW_USER_SERVICE.getUserListByIds(new ArrayList<>(userIds));
             for (String code : messageType) {
-                if (code.equals(MessageTypeEnum.SYSTEM_MESSAGE.getCode())) {
-                    WebSocketMessageDto dto = new WebSocketMessageDto();
-                    dto.setSessionKeys(new ArrayList<>(userIds));
-                    dto.setMessage(message);
-                    WebSocketUtils.publishMessage(dto);
-                }
-                if (code.equals(MessageTypeEnum.EMAIL_MESSAGE.getCode())) {
-                    MailUtils.sendText(StreamUtils.join(sysUserVoList, SysUserVo::getEmail), "单据审批提醒", message);
-                }
-                if (code.equals(MessageTypeEnum.SMS_MESSAGE.getCode())) {
-                    //todo 短信发送
+                MessageTypeEnum messageTypeEnum = MessageTypeEnum.getByCode(code);
+                if (ObjectUtil.isNotEmpty(messageTypeEnum)) {
+                    switch (messageTypeEnum) {
+                        case SYSTEM_MESSAGE:
+                            WebSocketMessageDto dto = new WebSocketMessageDto();
+                            dto.setSessionKeys(new ArrayList<>(userIds));
+                            dto.setMessage(message);
+                            WebSocketUtils.publishMessage(dto);
+                            break;
+                        case EMAIL_MESSAGE:
+                            MailUtils.sendText(StreamUtils.join(sysUserVoList, SysUserVo::getEmail), "单据审批提醒", message);
+                            break;
+                        case SMS_MESSAGE:
+                            //todo 短信发送
+                            break;
+                    }
                 }
             }
         }
