@@ -115,7 +115,7 @@ public class ActProcessDefinitionController extends BaseController {
     @RepeatSubmit()
     @PutMapping("/migrationDefinition/{currentProcessDefinitionId}/{fromProcessDefinitionId}")
     public R<Void> migrationDefinition(@NotBlank(message = "当前流程定义id") @PathVariable String currentProcessDefinitionId,
-                                              @NotBlank(message = "需要迁移到的流程定义id") @PathVariable String fromProcessDefinitionId) {
+                                       @NotBlank(message = "需要迁移到的流程定义id") @PathVariable String fromProcessDefinitionId) {
         return toAjax(actProcessDefinitionService.migrationDefinition(currentProcessDefinitionId, fromProcessDefinitionId));
     }
 
@@ -139,8 +139,8 @@ public class ActProcessDefinitionController extends BaseController {
      */
     @Log(title = "流程定义管理", businessType = BusinessType.INSERT)
     @PostMapping("/deployByFile")
-    public R<Void> deployByFile(@RequestParam("file") MultipartFile file, @RequestParam("categoryCode") String categoryCode) {
-        return toAjax(actProcessDefinitionService.deployByFile(file, categoryCode));
+    public void deployByFile(@RequestParam("file") MultipartFile file, @RequestParam("categoryCode") String categoryCode) {
+        actProcessDefinitionService.deployByFile(file, categoryCode);
     }
 
 }

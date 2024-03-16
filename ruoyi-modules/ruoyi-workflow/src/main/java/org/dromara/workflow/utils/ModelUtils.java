@@ -195,7 +195,7 @@ public class ModelUtils {
      *
      * @param processDefinitionId 流程定义id
      */
-    public Map<String, List<ExtensionElement>> getExtensionElements(String processDefinitionId) {
+    public static Map<String, List<ExtensionElement>> getExtensionElements(String processDefinitionId) {
         Map<String, List<ExtensionElement>> map = new HashMap<>();
         List<FlowElement> flowElements = getFlowElements(processDefinitionId);
         for (FlowElement flowElement : flowElements) {
@@ -212,7 +212,7 @@ public class ModelUtils {
      * @param processDefinitionId 流程定义id
      * @param flowElementId       节点id
      */
-    public Map<String, List<ExtensionElement>> getExtensionElement(String processDefinitionId, String flowElementId) {
+    public static Map<String, List<ExtensionElement>> getExtensionElement(String processDefinitionId, String flowElementId) {
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
         Process process = bpmnModel.getMainProcess();
         FlowElement flowElement = process.getFlowElement(flowElementId);

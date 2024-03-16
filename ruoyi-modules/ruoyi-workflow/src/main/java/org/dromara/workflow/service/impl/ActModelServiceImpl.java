@@ -281,35 +281,37 @@ public class ActModelServiceImpl implements IActModelService {
     /**
      * 导出模型zip压缩包
      *
-     * @param modelId  模型id
+     * @param modelIds  模型id
      * @param response 相应
      */
     @Override
-    public void exportZip(String modelId, HttpServletResponse response) {
+    public void exportZip(List<String> modelIds, HttpServletResponse response) {
         ZipOutputStream zos = null;
         try {
             zos = ZipUtil.getZipOutputStream(response.getOutputStream(), StandardCharsets.UTF_8);
             // 压缩包文件名
             String zipName = "模型不存在";
             // 查询模型基本信息
-            Model model = repositoryService.getModel(modelId);
-            byte[] xmlBytes = repositoryService.getModelEditorSource(modelId);
-            if (ObjectUtil.isNotNull(model)) {
-                if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, StandardCharsets.UTF_8.toString())) && ArrayUtil.isEmpty(ModelUtils.bpmnJsonToXmlBytes(xmlBytes))) {
-                    zipName = "模型不能为空，请至少设计一条主线流程！";
-                    zos.putNextEntry(new ZipEntry(zipName + ".txt"));
-                    zos.write(zipName.getBytes(StandardCharsets.UTF_8));
-                } else if (ArrayUtil.isEmpty(xmlBytes)) {
-                    zipName = "模型数据为空，请先设计流程定义模型，再进行部署！";
-                    zos.putNextEntry(new ZipEntry(zipName + ".txt"));
-                    zos.write(zipName.getBytes(StandardCharsets.UTF_8));
-                } else {
-                    String fileName = model.getName() + "-" + model.getKey();
-                    // 压缩包文件名
-                    zipName = fileName + ".zip";
-                    // 将xml添加到压缩包中(指定xml文件名：请假流程.bpmn20.xml
-                    zos.putNextEntry(new ZipEntry(fileName + ".bpmn20.xml"));
-                    zos.write(xmlBytes);
+            for (String modelId : modelIds) {
+                Model model = repositoryService.getModel(modelId);
+                byte[] xmlBytes = repositoryService.getModelEditorSource(modelId);
+                if (ObjectUtil.isNotNull(model)) {
+                    if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, StandardCharsets.UTF_8.toString())) && ArrayUtil.isEmpty(ModelUtils.bpmnJsonToXmlBytes(xmlBytes))) {
+                        zipName = "模型不能为空，请至少设计一条主线流程！";
+                        zos.putNextEntry(new ZipEntry(zipName + ".txt"));
+                        zos.write(zipName.getBytes(StandardCharsets.UTF_8));
+                    } else if (ArrayUtil.isEmpty(xmlBytes)) {
+                        zipName = "模型数据为空，请先设计流程定义模型，再进行部署！";
+                        zos.putNextEntry(new ZipEntry(zipName + ".txt"));
+                        zos.write(zipName.getBytes(StandardCharsets.UTF_8));
+                    } else {
+                        String fileName = model.getName() + "-" + model.getKey();
+                        // 压缩包文件名
+                        zipName = fileName + ".zip";
+                        // 将xml添加到压缩包中(指定xml文件名：请假流程.bpmn20.xml
+                        zos.putNextEntry(new ZipEntry(fileName + ".bpmn20.xml"));
+                        zos.write(xmlBytes);
+                    }
                 }
             }
             response.setHeader("Content-Disposition",
