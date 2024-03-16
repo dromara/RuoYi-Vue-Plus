@@ -23,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 模型管理 控制层
@@ -125,12 +126,12 @@ public class ActModelController extends BaseController {
     /**
      * 导出模型zip压缩包
      *
-     * @param modelId  模型id
+     * @param modelIds  模型id
      * @param response 相应
      */
-    @GetMapping("/export/zip/{modelId}")
-    public void exportZip(@NotEmpty(message = "模型id不能为空") @PathVariable String modelId,
+    @GetMapping("/export/zip/{modelIds}")
+    public void exportZip(@NotEmpty(message = "模型id不能为空") @PathVariable List<String> modelIds,
                           HttpServletResponse response) {
-        actModelService.exportZip(modelId, response);
+        actModelService.exportZip(modelIds, response);
     }
 }
