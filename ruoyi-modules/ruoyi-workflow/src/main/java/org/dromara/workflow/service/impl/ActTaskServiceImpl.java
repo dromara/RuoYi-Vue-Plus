@@ -19,6 +19,8 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.common.enums.BusinessStatusEnum;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
+import org.dromara.workflow.domain.ActHiTaskinst;
+import org.dromara.workflow.domain.WfTaskBackNode;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.TaskVo;
@@ -28,8 +30,10 @@ import org.dromara.workflow.flowable.cmd.*;
 import org.dromara.workflow.flowable.strategy.FlowEventStrategy;
 import org.dromara.workflow.flowable.strategy.FlowProcessEventHandler;
 import org.dromara.workflow.flowable.strategy.FlowTaskEventHandler;
+import org.dromara.workflow.mapper.ActHiTaskinstMapper;
 import org.dromara.workflow.mapper.ActTaskMapper;
 import org.dromara.workflow.service.IActTaskService;
+import org.dromara.workflow.service.IWfTaskBackNodeService;
 import org.dromara.workflow.utils.QueryUtils;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -71,6 +75,8 @@ public class ActTaskServiceImpl implements IActTaskService {
     private final ManagementService managementService;
     private final FlowEventStrategy flowEventStrategy;
     private final ActTaskMapper actTaskMapper;
+    private final IWfTaskBackNodeService iWfTaskBackNodeService;
+    private final ActHiTaskinstMapper actHiTaskinstMapper;
 
     /**
      * 启动任务
@@ -187,12 +193,14 @@ public class ActTaskServiceImpl implements IActTaskService {
             //办理意见
             taskService.addComment(completeTaskBo.getTaskId(), task.getProcessInstanceId(), TaskStatusEnum.PASS.getStatus(), StringUtils.isBlank(completeTaskBo.getMessage()) ? "同意" : completeTaskBo.getMessage());
             //办理任务
-            taskService.setAssignee(task.getId(),userId);
+            taskService.setAssignee(task.getId(), userId);
             if (CollUtil.isNotEmpty(completeTaskBo.getVariables())) {
                 taskService.complete(completeTaskBo.getTaskId(), completeTaskBo.getVariables());
             } else {
                 taskService.complete(completeTaskBo.getTaskId());
             }
+            //记录执行过的流程任务节点
+            iWfTaskBackNodeService.recordExecuteNode(task);
             ProcessInstance pi = QueryUtils.instanceQuery(task.getProcessInstanceId()).singleResult();
             if (pi == null) {
                 UpdateBusinessStatusCmd updateBusinessStatusCmd = new UpdateBusinessStatusCmd(task.getProcessInstanceId(), BusinessStatusEnum.FINISH.getStatus());
@@ -204,8 +212,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                 List<Task> list = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
                 if (CollUtil.isNotEmpty(list) && CollUtil.isNotEmpty(completeTaskBo.getWfCopyList())) {
                     TaskEntity newTask = WorkflowUtils.createNewTask(task);
-                    taskService.addComment(newTask.getId(), task.getProcessInstanceId(), TaskStatusEnum.COPY.getStatus(),
-                        LoginHelper.getLoginUser().getNickname() + "【抄送】给" + String.join(",", StreamUtils.toList(completeTaskBo.getWfCopyList(), WfCopy::getUserName)));
+                    taskService.addComment(newTask.getId(), task.getProcessInstanceId(), TaskStatusEnum.COPY.getStatus(), LoginHelper.getLoginUser().getNickname() + "【抄送】给" + String.join(",", StreamUtils.toList(completeTaskBo.getWfCopyList(), WfCopy::getUserName)));
                     taskService.complete(newTask.getId());
                     List<Task> taskList = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
                     WorkflowUtils.createCopyTask(taskList, StreamUtils.toList(completeTaskBo.getWfCopyList(), WfCopy::getUserId));
@@ -244,12 +251,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         String userId = String.valueOf(LoginHelper.getUserId());
         queryWrapper.eq("t.business_status_", BusinessStatusEnum.WAITING.getStatus());
         queryWrapper.eq(TenantHelper.isEnable(), "t.tenant_id_", TenantHelper.getTenantId());
-        queryWrapper.and(w1 ->
-            w1.eq("t.assignee_", userId)
-                .or(w2 -> w2.isNull("t.assignee_")
-                    .apply("exists ( select LINK.ID_ from ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = t.ID_ and LINK.TYPE_ = 'candidate' " +
-                        "and (LINK.USER_ID_ = {0} or ( LINK.GROUP_ID_ IN " + getInParam(roleIds) + " ) ))", userId))
-        );
+        queryWrapper.and(w1 -> w1.eq("t.assignee_", userId).or(w2 -> w2.isNull("t.assignee_").apply("exists ( select LINK.ID_ from ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = t.ID_ and LINK.TYPE_ = 'candidate' " + "and (LINK.USER_ID_ = {0} or ( LINK.GROUP_ID_ IN " + getInParam(roleIds) + " ) ))", userId)));
         if (StringUtils.isNotBlank(taskBo.getName())) {
             queryWrapper.like("t.name_", taskBo.getName());
         }
@@ -444,8 +446,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         if (task.isSuspended()) {
             throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
         }
-        HistoricProcessInstance historicProcessInstance = QueryUtils.hisInstanceQuery()
-            .processInstanceId(task.getProcessInstanceId()).singleResult();
+        HistoricProcessInstance historicProcessInstance = QueryUtils.hisInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
         BusinessStatusEnum.checkInvalidStatus(historicProcessInstance.getBusinessStatus());
         try {
             if (StringUtils.isBlank(terminationBo.getComment())) {
@@ -480,8 +481,7 @@ public class ActTaskServiceImpl implements IActTaskService {
      */
     @Override
     public boolean transferTask(TransmitBo transmitBo) {
-        Task task = QueryUtils.taskQuery().taskId(transmitBo.getTaskId())
-            .taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
+        Task task = QueryUtils.taskQuery().taskId(transmitBo.getTaskId()).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }
@@ -607,7 +607,8 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Transactional(rollbackFor = Exception.class)
     public String backProcess(BackProcessBo backProcessBo) {
         TaskQuery query = QueryUtils.taskQuery();
-        Task task = query.taskId(backProcessBo.getTaskId()).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
+        String userId = String.valueOf(LoginHelper.getUserId());
+        Task task = query.taskId(backProcessBo.getTaskId()).taskCandidateOrAssigned(userId).singleResult();
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }
@@ -624,20 +625,33 @@ public class ActTaskServiceImpl implements IActTaskService {
             BusinessStatusEnum.checkBackStatus(processInstance.getBusinessStatus());
             //判断是否有多个任务
             List<Task> taskList = QueryUtils.taskQuery(processInstanceId).list();
-            //申请人节点
-            HistoricTaskInstance historicTaskInstance = QueryUtils.hisTaskInstanceQuery(processInstanceId).finished().orderByHistoricTaskInstanceEndTime().asc().list().get(0);
-            String backTaskDefinitionKey = historicTaskInstance.getTaskDefinitionKey();
+            String backTaskDefinitionKey = backProcessBo.getTargetActivityId();
             taskService.addComment(task.getId(), processInstanceId, TaskStatusEnum.BACK.getStatus(), StringUtils.isNotBlank(backProcessBo.getMessage()) ? backProcessBo.getMessage() : "退回");
             if (taskList.size() > 1) {
                 //当前多个任务驳回到单个节点
                 runtimeService.createChangeActivityStateBuilder().processInstanceId(processInstanceId).moveActivityIdsToSingleActivityId(taskList.stream().map(Task::getTaskDefinitionKey).distinct().collect(Collectors.toList()), backTaskDefinitionKey).changeState();
+                ActHiTaskinst actHiTaskinst = new ActHiTaskinst();
+                actHiTaskinst.setAssignee(userId);
+                actHiTaskinst.setId(task.getId());
+                actHiTaskinstMapper.updateById(actHiTaskinst);
             } else {
                 //当前单个节点驳回单个节点
                 runtimeService.createChangeActivityStateBuilder().processInstanceId(processInstanceId).moveActivityIdTo(task.getTaskDefinitionKey(), backTaskDefinitionKey).changeState();
             }
+            //删除并行环节未办理记录
+            MultiInstanceVo multiInstance = WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
+            if (multiInstance == null && taskList.size() > 1) {
+                List<Task> tasks = StreamUtils.filter(taskList, e -> !e.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()));
+                actHiTaskinstMapper.deleteBatchIds(StreamUtils.toList(tasks, Task::getId));
+            }
+
+
+            List<HistoricTaskInstance> instanceList = QueryUtils.hisTaskInstanceQuery(processInstanceId).finished().orderByHistoricTaskInstanceEndTime().desc().list();
             List<Task> list = QueryUtils.taskQuery(processInstanceId).list();
             for (Task t : list) {
-                taskService.setAssignee(t.getId(), historicTaskInstance.getAssignee());
+                instanceList.stream().filter(e -> e.getTaskDefinitionKey().equals(t.getTaskDefinitionKey())).findFirst().ifPresent(e -> {
+                    taskService.setAssignee(t.getId(), e.getAssignee());
+                });
             }
             //发送消息
             String message = "您的【" + processInstance.getName() + "】单据已经被驳回，请您注意查收。";
@@ -647,11 +661,17 @@ public class ActTaskServiceImpl implements IActTaskService {
                 DeleteExecutionCmd deleteExecutionCmd = new DeleteExecutionCmd(executionEntity.getId());
                 managementService.executeCommand(deleteExecutionCmd);
             }
-            runtimeService.updateBusinessStatus(processInstanceId, BusinessStatusEnum.BACK.getStatus());
-            FlowProcessEventHandler processHandler = flowEventStrategy.getProcessHandler(processInstance.getProcessDefinitionKey());
-            if (processHandler != null) {
-                processHandler.handleProcess(processInstance.getBusinessKey(), BusinessStatusEnum.BACK.getStatus(), false);
+
+            WfTaskBackNode wfTaskBackNode = iWfTaskBackNodeService.getListByInstanceIdAndNodeId(task.getProcessInstanceId(), backProcessBo.getTargetActivityId());
+            if (ObjectUtil.isNotNull(wfTaskBackNode) && wfTaskBackNode.getOrderNo() == 0) {
+                runtimeService.updateBusinessStatus(processInstanceId, BusinessStatusEnum.BACK.getStatus());
+                FlowProcessEventHandler processHandler = flowEventStrategy.getProcessHandler(processInstance.getProcessDefinitionKey());
+                if (processHandler != null) {
+                    processHandler.handleProcess(processInstance.getBusinessKey(), BusinessStatusEnum.BACK.getStatus(), false);
+                }
             }
+            //删除驳回后的流程节点
+            iWfTaskBackNodeService.deleteBackTaskNode(processInstanceId, backProcessBo.getTargetActivityId());
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
         }
@@ -696,25 +716,5 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
         }
         return variableVoList;
-    }
-
-    /**
-     * 获取可驳回得任务节点
-     *
-     * @param processInstanceId 流程实例id
-     */
-    @Override
-    public Set<TaskVo> getTaskNodeList(String processInstanceId) {
-        Set<TaskVo> list = new HashSet<>();
-        List<HistoricTaskInstance> historicTaskInstances = QueryUtils.hisTaskInstanceQuery(processInstanceId).orderByHistoricTaskInstanceEndTime().desc().list();
-        for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
-            if (historicTaskInstance.getEndTime() != null) {
-                TaskVo taskVo = new TaskVo();
-                taskVo.setName(historicTaskInstance.getName());
-                taskVo.setTaskDefinitionKey(historicTaskInstance.getTaskDefinitionKey());
-                list.add(taskVo);
-            }
-        }
-        return list;
     }
 }

@@ -58,6 +58,26 @@ create table wf_category
 ) engine=innodb comment= '流程分类';
 INSERT INTO wf_category values (1, 'OA', 'OA', 0, 0, '000000', 103, 1, sysdate(), 1, sysdate());
 
+DROP TABLE if EXISTS wf_task_back_node;
+create table wf_task_back_node
+(
+    id          varchar(255)                 not null
+        primary key,
+    node_id     varchar(255)                 not null comment '节点id',
+    node_name   varchar(255)                 not null comment '节点名称',
+    order_no    int                          not null comment '排序',
+    instance_id varchar(255)                 null comment '流程实例id',
+    task_type   varchar(255)                 not null comment '节点类型',
+    assignee    varchar(2000)                not null comment '审批人',
+    tenant_id   varchar(20) default '000000' null comment '租户编号',
+    create_dept bigint                       null comment '创建部门',
+    create_by   bigint                       null comment '创建者',
+    create_time datetime                     null comment '创建时间',
+    update_by   bigint                       null comment '更新者',
+    update_time datetime                     null comment '更新时间'
+)
+    comment '节点审批记录';
+
 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11638, '请假申请', 5, 1, 'leave', 'workflow/leave/index', 1, 0, 'C', '0', '0', 'demo:leave:list', '#', 103, 1, sysdate(), NULL, NULL, '请假申请菜单');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11639, '请假申请查询', 11638, 1, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:query', '#', 103, 1, sysdate(), NULL, NULL, '');

@@ -32,6 +32,7 @@ import org.dromara.workflow.flowable.strategy.FlowEventStrategy;
 import org.dromara.workflow.flowable.strategy.FlowProcessEventHandler;
 import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IActProcessInstanceService;
+import org.dromara.workflow.service.IWfTaskBackNodeService;
 import org.dromara.workflow.utils.QueryUtils;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.bpmn.model.*;
@@ -77,6 +78,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     private final IActHiProcinstService actHiProcinstService;
     private final ManagementService managementService;
     private final FlowEventStrategy flowEventStrategy;
+    private final IWfTaskBackNodeService iWfTaskBackNodeService;
 
     @Value("${flowable.activity-font-name}")
     private String activityFontName;
@@ -500,6 +502,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (ObjectUtil.isNotEmpty(historicProcessInstanceList)) {
                 historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
             }
+            iWfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -534,6 +537,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (ObjectUtil.isNotEmpty(historicProcessInstanceList)) {
                 historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
             }
+            iWfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -551,6 +555,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     public boolean deleteFinishAndHisInstance(List<String> processInstanceIds) {
         try {
             historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
+            iWfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
