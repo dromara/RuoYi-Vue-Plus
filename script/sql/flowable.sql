@@ -61,7 +61,7 @@ INSERT INTO wf_category values (1, 'OA', 'OA', 0, 0, '000000', 103, 1, sysdate()
 DROP TABLE if EXISTS wf_task_back_node;
 create table wf_task_back_node
 (
-    id          varchar(255)                 not null
+    id          bigint                       not null
         primary key,
     node_id     varchar(255)                 not null comment '节点id',
     node_name   varchar(255)                 not null comment '节点名称',
