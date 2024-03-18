@@ -102,6 +102,7 @@ public interface IActProcessInstanceService {
      * 分页查询当前登录人单据
      *
      * @param processInstanceBo 参数
+     * @param pageQuery         分页
      * @return 结果
      */
     TableDataInfo<ProcessInstanceVo> getPageByCurrent(ProcessInstanceBo processInstanceBo, PageQuery pageQuery);

@@ -583,7 +583,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             BusinessStatusEnum.checkCancelStatus(processInstance.getBusinessStatus());
             List<Task> taskList = QueryUtils.taskQuery(processInstanceId).list();
             for (Task task : taskList) {
-                taskService.setAssignee(task.getId(), String.valueOf(LoginHelper.getUserId()));
+                taskService.setAssignee(task.getId(), null);
                 taskService.addComment(task.getId(), processInstanceId, TaskStatusEnum.CANCEL.getStatus(), LoginHelper.getLoginUser().getNickname() + "：撤销申请");
             }
             HistoricTaskInstance historicTaskInstance = QueryUtils.hisTaskInstanceQuery().finished().orderByHistoricTaskInstanceEndTime().asc().list().get(0);
@@ -622,7 +622,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     public TableDataInfo<ProcessInstanceVo> getPageByCurrent(ProcessInstanceBo bo, PageQuery pageQuery) {
         List<ProcessInstanceVo> list = new ArrayList<>();
         HistoricProcessInstanceQuery query = QueryUtils.hisInstanceQuery();
-        query.startedBy(bo.getStartUserId());
+        query.startedBy(String.valueOf(LoginHelper.getUserId()));
         if (StringUtils.isNotBlank(bo.getName())) {
             query.processInstanceNameLikeIgnoreCase("%" + bo.getName() + "%");
         }
