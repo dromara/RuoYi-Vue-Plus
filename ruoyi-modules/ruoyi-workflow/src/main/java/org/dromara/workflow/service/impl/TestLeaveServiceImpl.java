@@ -42,7 +42,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      */
     @Override
     public TestLeaveVo queryById(Long id) {
-        return baseMapper.selectVoById(id);
+        TestLeaveVo testLeaveVo = baseMapper.selectVoById(id);
+        WorkflowUtils.setProcessInstanceVo(testLeaveVo,String.valueOf(id));
+        return testLeaveVo;
     }
 
     /**

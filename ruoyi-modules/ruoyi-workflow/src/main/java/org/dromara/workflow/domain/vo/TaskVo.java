@@ -150,4 +150,14 @@ public class TaskVo implements Serializable {
      * 是否会签
      */
     private Boolean multiInstance;
+
+    /**
+     * 业务id
+     */
+    private String businessKey;
+
+    /**
+     * 表单配置
+     */
+    private WfFormDefinitionVo wfFormDefinitionVo;
 }

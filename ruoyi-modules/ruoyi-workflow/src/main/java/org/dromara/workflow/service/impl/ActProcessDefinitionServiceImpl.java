@@ -20,8 +20,10 @@ import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.WfCategory;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
+import org.dromara.workflow.domain.vo.WfFormDefinitionVo;
 import org.dromara.workflow.service.IActProcessDefinitionService;
 import org.dromara.workflow.service.IWfCategoryService;
+import org.dromara.workflow.service.IWfFormDefinitionService;
 import org.dromara.workflow.utils.QueryUtils;
 import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
@@ -37,7 +39,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -53,6 +54,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     private final RepositoryService repositoryService;
     private final ProcessMigrationService processMigrationService;
     private final IWfCategoryService wfCategoryService;
+    private final IWfFormDefinitionService iWfFormDefinitionService;
 
     /**
      * 分页查询
@@ -81,15 +83,22 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             List<String> deploymentIds = StreamUtils.toList(definitionList, ProcessDefinition::getDeploymentId);
             deploymentList = QueryUtils.deploymentQuery(deploymentIds).list();
         }
-        for (ProcessDefinition processDefinition : definitionList) {
-            ProcessDefinitionVo processDefinitionVo = BeanUtil.toBean(processDefinition, ProcessDefinitionVo.class);
-            if (CollUtil.isNotEmpty(deploymentList)) {
-                // 部署时间
-                deploymentList.stream().filter(e -> e.getId().equals(processDefinition.getDeploymentId())).findFirst().ifPresent(e -> {
-                    processDefinitionVo.setDeploymentTime(e.getDeploymentTime());
-                });
+        if (CollUtil.isNotEmpty(definitionList)) {
+            List<String> ids = StreamUtils.toList(definitionList, ProcessDefinition::getId);
+            List<WfFormDefinitionVo> wfFormDefinitionVos = iWfFormDefinitionService.queryList(ids);
+            for (ProcessDefinition processDefinition : definitionList) {
+                ProcessDefinitionVo processDefinitionVo = BeanUtil.toBean(processDefinition, ProcessDefinitionVo.class);
+                if (CollUtil.isNotEmpty(deploymentList)) {
+                    // 部署时间
+                    deploymentList.stream().filter(e -> e.getId().equals(processDefinition.getDeploymentId())).findFirst().ifPresent(e -> {
+                        processDefinitionVo.setDeploymentTime(e.getDeploymentTime());
+                    });
+                }
+                if (CollUtil.isNotEmpty(wfFormDefinitionVos)) {
+                    wfFormDefinitionVos.stream().filter(e -> e.getDefinitionId().equals(processDefinition.getId())).findFirst().ifPresent(processDefinitionVo::setWfFormDefinitionVo);
+                }
+                processDefinitionVoList.add(processDefinitionVo);
             }
-            processDefinitionVoList.add(processDefinitionVo);
         }
         // 总记录数
         long total = query.count();
@@ -109,18 +118,25 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         List<ProcessDefinition> definitionList = query.processDefinitionKey(key).list();
         List<Deployment> deploymentList = null;
         if (CollUtil.isNotEmpty(definitionList)) {
-            List<String> deploymentIds = definitionList.stream().map(ProcessDefinition::getDeploymentId).collect(Collectors.toList());
+            List<String> deploymentIds = StreamUtils.toList(definitionList, ProcessDefinition::getDeploymentId);
             deploymentList = QueryUtils.deploymentQuery(deploymentIds).list();
         }
-        for (ProcessDefinition processDefinition : definitionList) {
-            ProcessDefinitionVo processDefinitionVo = BeanUtil.toBean(processDefinition, ProcessDefinitionVo.class);
-            if (CollUtil.isNotEmpty(deploymentList)) {
-                // 部署时间
-                deploymentList.stream().filter(e -> e.getId().equals(processDefinition.getDeploymentId())).findFirst().ifPresent(e -> {
-                    processDefinitionVo.setDeploymentTime(e.getDeploymentTime());
-                });
+        if (CollUtil.isNotEmpty(definitionList)) {
+            List<String> ids = StreamUtils.toList(definitionList, ProcessDefinition::getId);
+            List<WfFormDefinitionVo> wfFormDefinitionVos = iWfFormDefinitionService.queryList(ids);
+            for (ProcessDefinition processDefinition : definitionList) {
+                ProcessDefinitionVo processDefinitionVo = BeanUtil.toBean(processDefinition, ProcessDefinitionVo.class);
+                if (CollUtil.isNotEmpty(deploymentList)) {
+                    // 部署时间
+                    deploymentList.stream().filter(e -> e.getId().equals(processDefinition.getDeploymentId())).findFirst().ifPresent(e -> {
+                        processDefinitionVo.setDeploymentTime(e.getDeploymentTime());
+                    });
+                    if (CollUtil.isNotEmpty(wfFormDefinitionVos)) {
+                        wfFormDefinitionVos.stream().filter(e -> e.getDefinitionId().equals(processDefinition.getId())).findFirst().ifPresent(processDefinitionVo::setWfFormDefinitionVo);
+                    }
+                }
+                processDefinitionVoList.add(processDefinitionVo);
             }
-            processDefinitionVoList.add(processDefinitionVo);
         }
         return CollectionUtil.reverse(processDefinitionVoList);
     }

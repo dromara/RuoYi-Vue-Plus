@@ -264,10 +264,14 @@ public class ActTaskServiceImpl implements IActTaskService {
         Page<TaskVo> page = actTaskMapper.getTaskWaitByPage(pageQuery.build(), queryWrapper);
 
         List<TaskVo> taskList = page.getRecords();
-        for (TaskVo task : taskList) {
-            task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
-            task.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
-            task.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
+        if (CollUtil.isNotEmpty(taskList)) {
+            for (TaskVo task : taskList) {
+                task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
+                task.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
+                task.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
+            }
+            List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
+            WorkflowUtils.setWfFormDefinitionVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         return new TableDataInfo<>(taskList, page.getTotal());
     }
@@ -345,8 +349,12 @@ public class ActTaskServiceImpl implements IActTaskService {
         Page<TaskVo> page = actTaskMapper.getTaskFinishByPage(pageQuery.build(), queryWrapper);
 
         List<TaskVo> taskList = page.getRecords();
-        for (TaskVo task : taskList) {
-            task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
+        if (CollUtil.isNotEmpty(taskList)) {
+            for (TaskVo task : taskList) {
+                task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
+            }
+            List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
+            WorkflowUtils.setWfFormDefinitionVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         return new TableDataInfo<>(taskList, page.getTotal());
     }

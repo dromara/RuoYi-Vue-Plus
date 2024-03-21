@@ -26,9 +26,11 @@ import org.dromara.workflow.domain.ActHiTaskinst;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.ParticipantVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
+import org.dromara.workflow.domain.vo.WfFormDefinitionVo;
 import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
 import org.dromara.workflow.mapper.ActHiTaskinstMapper;
 import org.dromara.workflow.service.IActHiProcinstService;
+import org.dromara.workflow.service.IWfFormDefinitionService;
 import org.dromara.workflow.service.IWorkflowUserService;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowNode;
@@ -45,6 +47,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import java.util.*;
 
 import static org.dromara.workflow.common.constant.FlowConstant.PROCESS_INSTANCE_VO;
+import static org.dromara.workflow.common.constant.FlowConstant.WF_FORM_DEFINITION_VO;
 
 /**
  * 工作流工具
@@ -58,6 +61,7 @@ public class WorkflowUtils {
     private static final IWorkflowUserService WORKFLOW_USER_SERVICE = SpringUtils.getBean(IWorkflowUserService.class);
     private static final IActHiProcinstService ACT_HI_PROCINST_SERVICE = SpringUtils.getBean(IActHiProcinstService.class);
     private static final ActHiTaskinstMapper ACT_HI_TASKINST_MAPPER = SpringUtils.getBean(ActHiTaskinstMapper.class);
+    private static final IWfFormDefinitionService I_WF_FORM_DEFINITION_SERVICE = SpringUtils.getBean(IWfFormDefinitionService.class);
 
     /**
      * 创建一个新任务
@@ -241,7 +245,7 @@ public class WorkflowUtils {
      * @param businessKey 业务id
      */
     public static void setProcessInstanceVo(Object obj, String businessKey) {
-        if (StringUtils.isBlank(businessKey)) {
+        if (StringUtils.isBlank(businessKey) || obj == null) {
             return;
         }
         ActHiProcinst actHiProcinst = ACT_HI_PROCINST_SERVICE.selectByBusinessKey(businessKey);
@@ -264,7 +268,7 @@ public class WorkflowUtils {
      * @param fieldName 主键属性名称
      */
     public static void setProcessInstanceListVo(Object obj, List<String> idList, String fieldName) {
-        if (CollUtil.isEmpty(idList)) {
+        if (CollUtil.isEmpty(idList) || obj == null) {
             return;
         }
         List<ActHiProcinst> actHiProcinstList = ACT_HI_PROCINST_SERVICE.selectByBusinessKeyIn(idList);
@@ -292,6 +296,31 @@ public class WorkflowUtils {
             }
         }
     }
+
+    /**
+     * 设置流程表单配置
+     *
+     * @param obj       业务对象
+     * @param idList    流程定义id
+     * @param fieldName 流程定义ID属性名称
+     */
+    public static void setWfFormDefinitionVo(Object obj, List<String> idList, String fieldName) {
+        if (CollUtil.isEmpty(idList) || obj == null) {
+            return;
+        }
+        List<WfFormDefinitionVo> wfFormDefinitionVoList = I_WF_FORM_DEFINITION_SERVICE.queryList(idList);
+        if (obj instanceof Collection<?> collection) {
+            for (Object o : collection) {
+                String fieldValue = ReflectUtils.invokeGetter(o, fieldName).toString();
+                if (!CollUtil.isEmpty(wfFormDefinitionVoList)) {
+                    wfFormDefinitionVoList.stream().filter(e -> e.getDefinitionId().equals(fieldValue)).findFirst().ifPresent(e -> {
+                        ReflectUtils.invokeSetter(o, WF_FORM_DEFINITION_VO, BeanUtil.toBean(e, WfFormDefinitionVo.class));
+                    });
+                }
+            }
+        }
+    }
+
 
     /**
      * 发送消息

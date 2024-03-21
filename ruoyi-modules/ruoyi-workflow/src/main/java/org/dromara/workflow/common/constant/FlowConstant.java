@@ -76,6 +76,11 @@ public interface FlowConstant {
     String PROCESS_INSTANCE_VO = "processInstanceVo";
 
     /**
+     * 流程表单配置对象
+     */
+    String WF_FORM_DEFINITION_VO = "wfFormDefinitionVo";
+
+    /**
      * 流程发起人
      */
     String INITIATOR = "initiator";
@@ -89,6 +94,11 @@ public interface FlowConstant {
      * 业务id
      */
     String BUSINESS_KEY = "businessKey";
+
+    /**
+     * 流程定义id
+     */
+    String PROCESS_DEFINITION_ID = "processDefinitionId";
 
     /**
      * 开启跳过表达式变量

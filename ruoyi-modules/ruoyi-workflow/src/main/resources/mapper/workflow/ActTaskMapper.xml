@@ -27,12 +27,14 @@
         <result property="businessStatus" column="BUSINESS_STATUS_"/>
         <result property="processDefinitionName" column="processDefinitionName"/>
         <result property="processDefinitionKey" column="processDefinitionName"/>
+        <result property="businessKey" column="BUSINESS_KEY_"/>
 
     </resultMap>
     <select id="getTaskWaitByPage" resultMap="TaskVoResult">
         select *
         from (SELECT RES.*,
                      AHP.BUSINESS_STATUS_,
+                     AHP.BUSINESS_KEY_,
                      ARP.NAME_ AS processDefinitionName,
                      ARP.KEY_  AS processDefinitionKey
               FROM ACT_RU_TASK RES
@@ -46,6 +48,7 @@
         select *
         from (SELECT HTI.*,
                      AHP.BUSINESS_STATUS_,
+                     AHP.BUSINESS_KEY_,
                      ARP.NAME_ AS processDefinitionName,
                      ARP.KEY_  AS processDefinitionKey
               FROM ACT_HI_TASKINST HTI
@@ -59,6 +62,7 @@
         select *
         from (SELECT AHT.*,
                      AHP.BUSINESS_STATUS_,
+                     AHP.BUSINESS_KEY_,
                      ARP.NAME_ as processDefinitionName,
                      ARP.KEY_  as processDefinitionKey
               FROM ACT_HI_TASKINST AHT
