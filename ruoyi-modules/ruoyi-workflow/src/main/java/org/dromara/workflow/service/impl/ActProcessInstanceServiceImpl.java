@@ -61,6 +61,8 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.dromara.workflow.common.constant.FlowConstant.PROCESS_DEFINITION_ID;
+
 /**
  * 流程实例 服务层实现
  *
@@ -653,6 +655,10 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
                 processInstanceVo.setTaskVoList(CollUtil.isNotEmpty(collect) ? collect : Collections.emptyList());
             }
             list.add(processInstanceVo);
+        }
+        if (CollUtil.isNotEmpty(list)) {
+            List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
+            WorkflowUtils.setWfFormDefinitionVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         long count = query.count();
         return new TableDataInfo<>(list, count);

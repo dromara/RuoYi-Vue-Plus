@@ -35,12 +35,12 @@ public interface ITestLeaveService {
     /**
      * 新增请假
      */
-    TestLeave insertByBo(TestLeaveBo bo);
+    TestLeaveVo insertByBo(TestLeaveBo bo);
 
     /**
      * 修改请假
      */
-    TestLeave updateByBo(TestLeaveBo bo);
+    TestLeaveVo updateByBo(TestLeaveBo bo);
 
     /**
      * 校验并批量删除请假信息

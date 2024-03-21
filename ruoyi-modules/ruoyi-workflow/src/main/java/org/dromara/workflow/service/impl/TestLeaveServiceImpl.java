@@ -43,7 +43,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Override
     public TestLeaveVo queryById(Long id) {
         TestLeaveVo testLeaveVo = baseMapper.selectVoById(id);
-        WorkflowUtils.setProcessInstanceVo(testLeaveVo,String.valueOf(id));
+        WorkflowUtils.setProcessInstanceVo(testLeaveVo, String.valueOf(id));
         return testLeaveVo;
     }
 
@@ -75,8 +75,8 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     private LambdaQueryWrapper<TestLeave> buildQueryWrapper(TestLeaveBo bo) {
         LambdaQueryWrapper<TestLeave> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getLeaveType()), TestLeave::getLeaveType, bo.getLeaveType());
-        lqw.ge(bo.getStartLeaveDays() != null,TestLeave::getLeaveDays, bo.getStartLeaveDays());
-        lqw.le(bo.getEndLeaveDays() != null,TestLeave::getLeaveDays, bo.getEndLeaveDays());
+        lqw.ge(bo.getStartLeaveDays() != null, TestLeave::getLeaveDays, bo.getStartLeaveDays());
+        lqw.le(bo.getEndLeaveDays() != null, TestLeave::getLeaveDays, bo.getEndLeaveDays());
         lqw.orderByDesc(BaseEntity::getCreateTime);
         return lqw;
     }
@@ -85,31 +85,27 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      * 新增请假
      */
     @Override
-    public TestLeave insertByBo(TestLeaveBo bo) {
+    public TestLeaveVo insertByBo(TestLeaveBo bo) {
         TestLeave add = MapstructUtils.convert(bo, TestLeave.class);
-        validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
         }
-        return add;
+        TestLeaveVo testLeaveVo = MapstructUtils.convert(add, TestLeaveVo.class);
+        WorkflowUtils.setProcessInstanceVo(testLeaveVo, String.valueOf(add.getId()));
+        return testLeaveVo;
     }
 
     /**
      * 修改请假
      */
     @Override
-    public TestLeave updateByBo(TestLeaveBo bo) {
+    public TestLeaveVo updateByBo(TestLeaveBo bo) {
         TestLeave update = MapstructUtils.convert(bo, TestLeave.class);
-        validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0 ? update : null;
-    }
-
-    /**
-     * 保存前的数据校验
-     */
-    private void validEntityBeforeSave(TestLeave entity) {
-        //TODO 做一些数据校验,如唯一约束
+        baseMapper.updateById(update);
+        TestLeaveVo testLeaveVo = MapstructUtils.convert(update, TestLeaveVo.class);
+        WorkflowUtils.setProcessInstanceVo(testLeaveVo, String.valueOf(update.getId()));
+        return testLeaveVo;
     }
 
     /**

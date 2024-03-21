@@ -77,7 +77,7 @@ public class TestLeaveController extends BaseController {
     @Log(title = "请假", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
-    public R<TestLeave> add(@Validated(AddGroup.class) @RequestBody TestLeaveBo bo) {
+    public R<TestLeaveVo> add(@Validated(AddGroup.class) @RequestBody TestLeaveBo bo) {
         return R.ok(testLeaveService.insertByBo(bo));
     }
 
@@ -88,7 +88,7 @@ public class TestLeaveController extends BaseController {
     @Log(title = "请假", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
-    public R<TestLeave> edit(@Validated(EditGroup.class) @RequestBody TestLeaveBo bo) {
+    public R<TestLeaveVo> edit(@Validated(EditGroup.class) @RequestBody TestLeaveBo bo) {
         return R.ok(testLeaveService.updateByBo(bo));
     }
 
