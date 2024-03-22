@@ -123,6 +123,10 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             processInstanceVo.setBusinessStatusName(BusinessStatusEnum.findByStatus(processInstance.getBusinessStatus()));
             list.add(processInstanceVo);
         }
+        if (CollUtil.isNotEmpty(list)) {
+            List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
+            WorkflowUtils.setWfFormDefinitionVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
+        }
         long count = query.count();
         return new TableDataInfo<>(list, count);
     }
@@ -157,6 +161,10 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             ProcessInstanceVo processInstanceVo = BeanUtil.toBean(historicProcessInstance, ProcessInstanceVo.class);
             processInstanceVo.setBusinessStatusName(BusinessStatusEnum.findByStatus(historicProcessInstance.getBusinessStatus()));
             list.add(processInstanceVo);
+        }
+        if (CollUtil.isNotEmpty(list)) {
+            List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
+            WorkflowUtils.setWfFormDefinitionVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         long count = query.count();
         return new TableDataInfo<>(list, count);

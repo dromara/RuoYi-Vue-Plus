@@ -322,12 +322,17 @@ public class ActTaskServiceImpl implements IActTaskService {
                     taskVo.setBusinessStatusName(BusinessStatusEnum.findByStatus(taskVo.getBusinessStatus()));
                     taskVo.setProcessDefinitionKey(e.getProcessDefinitionKey());
                     taskVo.setProcessDefinitionName(e.getProcessDefinitionName());
+                    taskVo.setBusinessKey(e.getBusinessKey());
                 });
             }
             taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
             taskVo.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
             taskVo.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
             list.add(taskVo);
+        }
+        if (CollUtil.isNotEmpty(list)) {
+            List<String> processDefinitionIds = StreamUtils.toList(list, TaskVo::getProcessDefinitionId);
+            WorkflowUtils.setWfFormDefinitionVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         long count = query.count();
         return new TableDataInfo<>(list, count);
@@ -403,6 +408,10 @@ public class ActTaskServiceImpl implements IActTaskService {
         List<TaskVo> taskList = page.getRecords();
         for (TaskVo task : taskList) {
             task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
+        }
+        if (CollUtil.isNotEmpty(taskList)) {
+            List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
+            WorkflowUtils.setWfFormDefinitionVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         return new TableDataInfo<>(taskList, page.getTotal());
     }
