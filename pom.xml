@@ -45,8 +45,8 @@
         <ip2region.version>2.7.0</ip2region.version>
 
         <!-- OSS 配置 -->
-        <aws.sdk.version>2.23.0</aws.sdk.version>
-        <aws.crt.version>0.29.6</aws.crt.version>
+        <aws.sdk.version>2.25.15</aws.sdk.version>
+        <aws.crt.version>0.29.13</aws.crt.version>
         <!-- SMS 配置 -->
         <sms4j.version>3.1.1</sms4j.version>
         <!-- 限制框架中的fastjson版本 -->
