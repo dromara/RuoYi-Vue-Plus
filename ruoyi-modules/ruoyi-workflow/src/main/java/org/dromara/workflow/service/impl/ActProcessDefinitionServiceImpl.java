@@ -179,6 +179,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
      * @param processDefinitionId 流程定义id
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteDeployment(String deploymentId, String processDefinitionId) {
         try {
             List<HistoricTaskInstance> taskInstanceList = QueryUtils.hisTaskInstanceQuery()
@@ -188,6 +189,8 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             }
             //删除流程定义
             repositoryService.deleteDeployment(deploymentId);
+            //删除表单配置
+            iWfFormDefinitionService.getByDefId(processDefinitionId);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

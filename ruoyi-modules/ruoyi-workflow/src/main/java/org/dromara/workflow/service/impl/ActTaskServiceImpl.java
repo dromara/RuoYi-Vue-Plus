@@ -389,6 +389,10 @@ public class ActTaskServiceImpl implements IActTaskService {
         for (TaskVo task : taskList) {
             task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
         }
+        if (CollUtil.isNotEmpty(taskList)) {
+            List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
+            WorkflowUtils.setWfFormDefinitionVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
+        }
         return new TableDataInfo<>(taskList, page.getTotal());
     }
 
