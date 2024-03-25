@@ -215,7 +215,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                 for (Task t : list) {
                     if (ModelUtils.isUserTask(t.getProcessDefinitionId(), t.getTaskDefinitionKey())) {
                         List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(t.getId());
-                        if (CollUtil.isEmpty(links)) {
+                        if (CollUtil.isEmpty(links) && StringUtils.isBlank(t.getAssignee())) {
                             throw new ServiceException("下一节点【" + t.getName() + "】没有办理人!");
                         }
                     }
