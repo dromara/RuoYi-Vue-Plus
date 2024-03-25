@@ -20,8 +20,11 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.bo.ModelBo;
+import org.dromara.workflow.domain.bo.WfFormDefinitionBo;
 import org.dromara.workflow.domain.vo.ModelVo;
+import org.dromara.workflow.domain.vo.WfFormDefinitionVo;
 import org.dromara.workflow.service.IActModelService;
+import org.dromara.workflow.service.IWfFormDefinitionService;
 import org.dromara.workflow.utils.ModelUtils;
 import org.dromara.workflow.utils.QueryUtils;
 import org.flowable.bpmn.model.BpmnModel;
@@ -52,6 +55,7 @@ import java.util.zip.ZipOutputStream;
 public class ActModelServiceImpl implements IActModelService {
 
     private final RepositoryService repositoryService;
+    private final IWfFormDefinitionService iWfFormDefinitionService;
 
     /**
      * 分页查询模型
@@ -249,6 +253,7 @@ public class ActModelServiceImpl implements IActModelService {
             }
             // 查询模型的基本信息
             Model model = repositoryService.getModel(id);
+            ProcessDefinition processDefinition = QueryUtils.definitionQuery().processDefinitionKey(model.getKey()).latestVersion().singleResult();
             // xml资源的名称 ，对应act_ge_bytearray表中的name_字段
             String processName = model.getName() + ".bpmn20.xml";
             // 调用部署相关的api方法进行部署流程定义
@@ -271,6 +276,17 @@ public class ActModelServiceImpl implements IActModelService {
             // 更新分类
             ProcessDefinition definition = QueryUtils.definitionQuery().deploymentId(deployment.getId()).singleResult();
             repositoryService.setProcessDefinitionCategory(definition.getId(), model.getCategory());
+            if (processDefinition != null) {
+                WfFormDefinitionVo definitionVo = iWfFormDefinitionService.getByDefId(processDefinition.getId());
+                if (definitionVo != null) {
+                    WfFormDefinitionBo wfFormDefinition = new WfFormDefinitionBo();
+                    wfFormDefinition.setDefinitionId(definition.getId());
+                    wfFormDefinition.setProcessKey(definition.getKey());
+                    wfFormDefinition.setPath(definitionVo.getPath());
+                    wfFormDefinition.setRemark(definitionVo.getRemark());
+                    iWfFormDefinitionService.saveOrUpdate(wfFormDefinition);
+                }
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -281,7 +297,7 @@ public class ActModelServiceImpl implements IActModelService {
     /**
      * 导出模型zip压缩包
      *
-     * @param modelIds  模型id
+     * @param modelIds 模型id
      * @param response 相应
      */
     @Override

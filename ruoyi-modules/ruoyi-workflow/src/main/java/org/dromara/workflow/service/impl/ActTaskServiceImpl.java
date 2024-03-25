@@ -34,6 +34,7 @@ import org.dromara.workflow.mapper.ActHiTaskinstMapper;
 import org.dromara.workflow.mapper.ActTaskMapper;
 import org.dromara.workflow.service.IActTaskService;
 import org.dromara.workflow.service.IWfTaskBackNodeService;
+import org.dromara.workflow.utils.ModelUtils;
 import org.dromara.workflow.utils.QueryUtils;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -45,6 +46,7 @@ import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -210,6 +212,15 @@ public class ActTaskServiceImpl implements IActTaskService {
                 }
             } else {
                 List<Task> list = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
+                for (Task t : list) {
+                    if (ModelUtils.isUserTask(t.getProcessDefinitionId(), t.getTaskDefinitionKey())) {
+                        List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(t.getId());
+                        if (CollUtil.isEmpty(links)) {
+                            throw new ServiceException("下一节点【" + t.getName() + "】没有办理人!");
+                        }
+                    }
+                }
+
                 if (CollUtil.isNotEmpty(list) && CollUtil.isNotEmpty(completeTaskBo.getWfCopyList())) {
                     TaskEntity newTask = WorkflowUtils.createNewTask(task);
                     taskService.addComment(newTask.getId(), task.getProcessInstanceId(), TaskStatusEnum.COPY.getStatus(), LoginHelper.getLoginUser().getNickname() + "【抄送】给" + String.join(",", StreamUtils.toList(completeTaskBo.getWfCopyList(), WfCopy::getUserName)));

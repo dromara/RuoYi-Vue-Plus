@@ -218,4 +218,16 @@ public class ModelUtils {
         FlowElement flowElement = process.getFlowElement(flowElementId);
         return flowElement.getExtensionElements();
     }
+
+    /**
+     * 判断当前节点是否为用户任务
+     *
+     * @param processDefinitionId 流程定义id
+     * @param taskDefinitionKey   流程定义id
+     */
+    public static boolean isUserTask(String processDefinitionId, String taskDefinitionKey) {
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+        FlowNode flowNode = (FlowNode) bpmnModel.getFlowElement(taskDefinitionKey);
+        return flowNode instanceof UserTask;
+    }
 }
