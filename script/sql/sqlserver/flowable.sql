@@ -34,7 +34,7 @@ create table test_leave
     create_time datetime2,
     update_by   bigint,
     update_time datetime2,
-    tenant_id   nvarchar(20) default '000000'
+    tenant_id   nvarchar(20)
 )
 go
 
@@ -95,7 +95,7 @@ create table wf_category
         unique,
     parent_id     bigint,
     sort_num      int,
-    tenant_id     nvarchar(20) default '000000',
+    tenant_id     nvarchar(20),
     create_dept   bigint,
     create_by     bigint,
     create_time   datetime2,
@@ -147,6 +147,129 @@ exec sp_addextendedproperty 'MS_Description', N'更新时间', 'SCHEMA', 'dbo', 
 go
 
 INSERT INTO wf_category values (1, 'OA', 'OA', 0, 0, '000000', 103, 1, getdate(), 1, getdate());
+
+create table wf_task_back_node
+(
+    id            bigint not null primary key,
+    node_id       nvarchar(255) not null,
+    node_name     nvarchar(255) not null,
+    order_no      int not null,
+    instance_id   nvarchar(255) not null,
+    task_type     nvarchar(255) not null,
+    assignee      nvarchar(2000) not null,
+    tenant_id     nvarchar(20),
+    create_dept   bigint,
+    create_by     bigint,
+    create_time   datetime2,
+    update_by     bigint,
+    update_time   datetime2
+)
+
+go
+exec sp_addextendedproperty 'MS_Description', N'节点审批记录', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'主键', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN', 'id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'节点id', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN',
+     'node_id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'节点名称', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN',
+     'node_name'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'排序', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN', 'order_no'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'流程实例id', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN', 'instance_id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'节点类型', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN', 'task_type'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'审批人', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN', 'assignee'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'租户编号', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN',
+     'tenant_id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建部门', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN',
+     'create_dept'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建者', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN', 'create_by'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN',
+     'create_time'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'更新者', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN', 'update_by'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'更新时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_task_back_node', 'COLUMN',
+     'update_time'
+go
+
+create table wf_form_definition
+(
+    id            bigint(20) not null primary key,
+    path          nvarchar(200) not null,
+    definition_id nvarchar(255)
+        constraint uni_definition_id
+        unique,
+    process_key   nvarchar(255)  not null,
+    tenant_id     nvarchar(20),
+    create_dept   bigint,
+    create_by     bigint,
+    create_time   datetime2,
+    update_by     bigint,
+    update_time   datetime2
+)
+
+go
+exec sp_addextendedproperty 'MS_Description', N'表单配置', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'主键', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN', 'id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'路由地址', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+     'path'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'流程定义ID', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+     'definition_id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'流程KEY', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+     'process_key'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'租户编号', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+     'tenant_id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建部门', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+     'create_dept'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建者', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN', 'create_by'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+     'create_time'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'更新者', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN', 'update_by'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'更新时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+     'update_time'
+go
 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11638, '请假申请', 5, 1, 'leave', 'workflow/leave/index', 1, 0, 'C', '0', '0', 'demo:leave:list', '#', 103, 1, getdate(), NULL, NULL, '请假申请菜单');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11639, '请假申请查询', 11638, 1, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:query', '#', 103, 1, getdate(), NULL, NULL, '');

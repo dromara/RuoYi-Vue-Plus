@@ -33,7 +33,7 @@ create table test_leave
     create_time datetime                     null comment '创建时间',
     update_by   bigint                       null comment '更新者',
     update_time datetime                     null comment '更新时间',
-    tenant_id   varchar(20) default '000000' null comment '租户编号',
+    tenant_id   varchar(20)                  null comment '租户编号',
     PRIMARY KEY (id) USING BTREE
 ) ENGINE = InnoDB COMMENT = '请假申请表';
 
@@ -47,7 +47,7 @@ create table wf_category
     category_code varchar(255)                 null comment '分类编码',
     parent_id     bigint                       null comment '父级id',
     sort_num      int(19)                      null comment '排序',
-    tenant_id     varchar(20) default '000000' null comment '租户编号',
+    tenant_id     varchar(20)                  null comment '租户编号',
     create_dept   bigint                       null comment '创建部门',
     create_by     bigint                       null comment '创建者',
     create_time   datetime                     null comment '创建时间',
@@ -69,7 +69,7 @@ create table wf_task_back_node
     instance_id varchar(255)                 null comment '流程实例id',
     task_type   varchar(255)                 not null comment '节点类型',
     assignee    varchar(2000)                not null comment '审批人',
-    tenant_id   varchar(20) default '000000' null comment '租户编号',
+    tenant_id   varchar(20)                  null comment '租户编号',
     create_dept bigint                       null comment '创建部门',
     create_by   bigint                       null comment '创建者',
     create_time datetime                     null comment '创建时间',
@@ -78,6 +78,7 @@ create table wf_task_back_node
 )
     comment '节点审批记录';
 
+DROP TABLE if EXISTS wf_form_definition;
 create table wf_form_definition
 (
     id            bigint                        not null comment '主键'
@@ -91,7 +92,7 @@ create table wf_form_definition
     update_by     bigint                        null comment '更新者',
     update_time   datetime                      null comment '更新时间',
     remark        varchar(500) default ''       null comment '备注',
-    tenant_id     varchar(20)  default '000000' null comment '租户编号',
+    tenant_id     varchar(20)                   null comment '租户编号',
     constraint uni_definition_id
         unique (definition_id)
 )

@@ -35,7 +35,7 @@ create table test_leave
     create_time timestamp,
     update_by   bigint,
     update_time timestamp,
-    tenant_id   varchar(20) default '000000'::varchar
+    tenant_id   varchar(20)
 );
 
 comment on table test_leave is '请假申请表';
@@ -76,7 +76,7 @@ create table wf_category
     category_code varchar(255),
     parent_id     bigint,
     sort_num      bigint,
-    tenant_id     varchar(20) default '000000'::varchar,
+    tenant_id     varchar(20),
     create_dept   bigint,
     create_by     bigint,
     create_time   timestamp,
@@ -115,6 +115,99 @@ create unique index uni_category_code
     on wf_category (category_code);
 
 INSERT INTO wf_category values (1, 'OA', 'OA', 0, 0, '000000', 103, 1, now(), 1, now());
+
+create table wf_task_back_node
+(
+    id            bigint not null
+        constraint pk_wf_task_back_node
+        primary key,
+    node_id       varchar(255) not null,
+    node_name     varchar(255) not null,
+    order_no      bigint not null,
+    instance_id   varchar(255) not null,
+    task_type     varchar(255) not null,
+    assignee      varchar(2000) not null,
+    tenant_id     varchar(20),
+    create_dept   bigint,
+    create_by     bigint,
+    create_time   timestamp,
+    update_by     bigint,
+    update_time   timestamp
+);
+
+comment on table wf_task_back_node is '节点审批记录';
+
+comment on column wf_task_back_node.id is '主键';
+
+comment on column wf_task_back_node.node_id is '节点id';
+
+comment on column wf_task_back_node.node_name is '节点名称';
+
+comment on column wf_task_back_node.order_no is '排序';
+
+comment on column wf_task_back_node.instance_id is '流程实例id';
+
+comment on column wf_task_back_node.task_type is '节点类型';
+
+comment on column wf_task_back_node.assignee is '审批人';
+
+comment on column wf_task_back_node.tenant_id is '租户id';
+
+comment on column wf_task_back_node.create_dept is '创建部门';
+
+comment on column wf_task_back_node.create_by is '创建者';
+
+comment on column wf_task_back_node.create_time is '创建时间';
+
+comment on column wf_task_back_node.update_by is '修改者';
+
+comment on column wf_task_back_node.update_time is '修改时间';
+
+alter table wf_task_back_node
+    owner to postgres;
+
+create table wf_form_definition
+(
+    id            bigint(20) not null
+        constraint pk_wf_form_definition
+        primary key,
+    path          varchar(200) not null,
+    definition_id varchar(255) not null,
+    process_key   varchar(255)  not null,
+    tenant_id     varchar(20),
+    create_dept   bigint,
+    create_by     bigint,
+    create_time   timestamp,
+    update_by     bigint,
+    update_time   timestamp
+);
+
+comment on table wf_form_definition is '表单配置';
+
+comment on column wf_form_definition.id is '主键';
+
+comment on column wf_form_definition.path is '路由地址';
+
+comment on column wf_form_definition.definition_id is '流程定义ID';
+
+comment on column wf_form_definition.process_key is '流程KEY';
+
+comment on column wf_form_definition.tenant_id is '租户id';
+
+comment on column wf_form_definition.create_dept is '创建部门';
+
+comment on column wf_form_definition.create_by is '创建者';
+
+comment on column wf_form_definition.create_time is '创建时间';
+
+comment on column wf_form_definition.update_by is '修改者';
+
+comment on column wf_form_definition.update_time is '修改时间';
+
+alter table wf_form_definition
+    owner to postgres;
+create unique index uni_definition_id
+    on wf_form_definition (definition_id);
 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11638, '请假申请', 5, 1, 'leave', 'workflow/leave/index', 1, 0, 'C', '0', '0', 'demo:leave:list', '#', 103, 1, now(), NULL, NULL, '请假申请菜单');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11639, '请假申请查询', 11638, 1, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:query', '#', 103, 1, now(), NULL, NULL, '');

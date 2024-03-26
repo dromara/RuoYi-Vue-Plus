@@ -35,7 +35,7 @@ create table TEST_LEAVE
     CREATE_TIME DATE,
     UPDATE_BY   NUMBER(20),
     UPDATE_TIME DATE,
-    TENANT_ID   VARCHAR2(20) default '000000'
+    TENANT_ID   VARCHAR2(20)
 );
 
 comment on table TEST_LEAVE is '请假申请表'
@@ -64,7 +64,7 @@ create table WF_CATEGORY
         unique,
     PARENT_ID     NUMBER(20),
     SORT_NUM      NUMBER(10),
-    TENANT_ID     VARCHAR2(20) default '000000'
+    TENANT_ID     VARCHAR2(20),
     CREATE_DEPT   NUMBER(20),
     CREATE_BY     NUMBER(20),
     CREATE_TIME   DATE,
@@ -85,6 +85,68 @@ comment on column WF_CATEGORY.CREATE_TIME is '创建时间'
 comment on column WF_CATEGORY.UPDATE_BY is '更新者'
 comment on column WF_CATEGORY.UPDATE_TIME is '更新时间'
 INSERT INTO wf_category values (1, 'OA', 'OA', 0, 0, '000000', 103, 1, sysdate, 1, sysdate);
+
+create table WF_TASK_BACK_NODE
+(
+    ID            NUMBER(20) not null
+        constraint PK_WF_TASK_BACK_NODE
+        primary key,
+    NODE_ID       VARCHAR2(255) not null,
+    NODE_NAME     VARCHAR2(255) not null,
+    ORDER_NO      NUMBER(20) not null,
+    INSTANCE_ID   VARCHAR2(255) not null,
+    TASK_TYPE     VARCHAR2(255) not null,
+    ASSIGNEE      VARCHAR2(2000) not null,
+    TENANT_ID     VARCHAR2(20),
+    CREATE_DEPT   NUMBER(20),
+    CREATE_BY     NUMBER(20),
+    CREATE_TIME   DATE,
+    UPDATE_BY     NUMBER(20),
+    UPDATE_TIME   DATE
+);
+comment on table WF_TASK_BACK_NODE is '节点审批记录'
+comment on column WF_TASK_BACK_NODE.ID is '主键'
+comment on column WF_TASK_BACK_NODE.NODE_ID is '节点id'
+comment on column WF_TASK_BACK_NODE.NODE_NAME is '节点名称'
+comment on column WF_TASK_BACK_NODE.ORDER_NO is '排序'
+comment on column WF_TASK_BACK_NODE.SORT_NUM is '排序'
+comment on column WF_TASK_BACK_NODE.INSTANCE_ID is '流程实例id'
+comment on column WF_TASK_BACK_NODE.TASK_TYPE is '节点类型'
+comment on column WF_TASK_BACK_NODE.ASSIGNEE is '审批人'
+comment on column WF_TASK_BACK_NODE.TENANT_ID is '租户编号'
+comment on column WF_TASK_BACK_NODE.CREATE_DEPT is '创建部门'
+comment on column WF_TASK_BACK_NODE.CREATE_BY is '创建者'
+comment on column WF_TASK_BACK_NODE.CREATE_TIME is '创建时间'
+comment on column WF_TASK_BACK_NODE.UPDATE_BY is '更新者'
+comment on column WF_TASK_BACK_NODE.UPDATE_TIME is '更新时间'
+
+create table WF_FORM_DEFINITION
+(
+    ID            NUMBER(20) NOT NULL
+        CONSTRAINT PK_WF_FORM_DEFINITION
+        PRIMARY KEY,
+    PATH          VARCHAR2(200) NOT NULL,
+    DEFINITION_ID VARCHAR2(255) NOT NULL,
+    PROCESS_KEY   VARCHAR2(255)  NOT NULL,
+    TENANT_ID     VARCHAR2(20),
+    CREATE_DEPT   NUMBER(20),
+    CREATE_BY     NUMBER(20),
+    CREATE_TIME   DATE,
+    UPDATE_BY     NUMBER(20),
+    UPDATE_TIME   DATE,
+    constraint uni_definition_id
+        unique (definition_id)
+);
+comment on table WF_FORM_DEFINITION is '表单配置'
+comment on column WF_FORM_DEFINITION.ID is '主键'
+comment on column WF_FORM_DEFINITION.DEFINITION_ID is '流程定义ID'
+comment on column WF_FORM_DEFINITION.PROCESS_KEY is '流程KEY'
+comment on column WF_FORM_DEFINITION.TENANT_ID is '租户编号'
+comment on column WF_FORM_DEFINITION.CREATE_DEPT is '创建部门'
+comment on column WF_FORM_DEFINITION.CREATE_BY is '创建者'
+comment on column WF_FORM_DEFINITION.CREATE_TIME is '创建时间'
+comment on column WF_FORM_DEFINITION.UPDATE_BY is '更新者'
+comment on column WF_FORM_DEFINITION.UPDATE_TIME is '更新时间'
 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11638, '请假申请', 5, 1, 'leave', 'workflow/leave/index', 1, 0, 'C', '0', '0', 'demo:leave:list', '#', 103, 1, sysdate, NULL, NULL, '请假申请菜单');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11639, '请假申请查询', 11638, 1, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:query', '#', 103, 1, sysdate, NULL, NULL, '');
