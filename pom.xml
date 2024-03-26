@@ -14,12 +14,12 @@
 
     <properties>
         <revision>5.2.0-SNAPSHOT</revision>
-        <spring-boot.version>3.2.3</spring-boot.version>
+        <spring-boot.version>3.2.4</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
         <spring-boot.mybatis>3.0.3</spring-boot.mybatis>
-        <springdoc.version>2.3.0</springdoc.version>
+        <springdoc.version>2.4.0</springdoc.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
         <poi.version>5.2.3</poi.version>
         <easyexcel.version>3.3.3</easyexcel.version>
@@ -29,8 +29,8 @@
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.26</hutool.version>
         <okhttp.version>4.10.0</okhttp.version>
-        <spring-boot-admin.version>3.2.2</spring-boot-admin.version>
-        <redisson.version>3.27.0</redisson.version>
+        <spring-boot-admin.version>3.2.3</spring-boot-admin.version>
+        <redisson.version>3.27.2</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.0</dynamic-ds.version>
         <alibaba-ttl.version>2.14.4</alibaba-ttl.version>
@@ -48,7 +48,7 @@
         <aws.sdk.version>2.25.15</aws.sdk.version>
         <aws.crt.version>0.29.13</aws.crt.version>
         <!-- SMS 配置 -->
-        <sms4j.version>3.1.1</sms4j.version>
+        <sms4j.version>3.2.0</sms4j.version>
         <!-- 限制框架中的fastjson版本 -->
         <fastjson.version>1.2.83</fastjson.version>
 
