@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
     <property name="log.path" value="./logs/ruoyi-easyretry-server" />
     <property name="console.log.pattern"
               value="%red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{36}%n) - %msg%n"/>
@@ -50,7 +50,7 @@
     </appender>
 
     <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/error.log</file>
+        <file>${log.path}/error.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>${log.base}/error.%d{yyyy-MM-dd}.log
             </FileNamePattern>
