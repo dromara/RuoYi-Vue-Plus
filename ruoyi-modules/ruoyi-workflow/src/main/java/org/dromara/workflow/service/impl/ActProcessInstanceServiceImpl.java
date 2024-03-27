@@ -21,10 +21,7 @@ import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
 import org.dromara.workflow.domain.bo.TaskUrgingBo;
-import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
-import org.dromara.workflow.domain.vo.GraphicInfoVo;
-import org.dromara.workflow.domain.vo.ProcessInstanceVo;
-import org.dromara.workflow.domain.vo.TaskVo;
+import org.dromara.workflow.domain.vo.*;
 import org.dromara.workflow.flowable.CustomDefaultProcessDiagramGenerator;
 import org.dromara.workflow.flowable.cmd.DeleteExecutionCmd;
 import org.dromara.workflow.flowable.cmd.ExecutionChildByExecutionIdCmd;
@@ -128,7 +125,10 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             WorkflowUtils.setWfFormDefinitionVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         long count = query.count();
-        return new TableDataInfo<>(list, count);
+        TableDataInfo<ProcessInstanceVo> build = TableDataInfo.build();
+        build.setRows(list);
+        build.setTotal(count);
+        return build;
     }
 
     /**
@@ -167,7 +167,10 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             WorkflowUtils.setWfFormDefinitionVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         long count = query.count();
-        return new TableDataInfo<>(list, count);
+        TableDataInfo<ProcessInstanceVo> build = TableDataInfo.build();
+        build.setRows(list);
+        build.setTotal(count);
+        return build;
     }
 
     /**
@@ -669,7 +672,10 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             WorkflowUtils.setWfFormDefinitionVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         long count = query.count();
-        return new TableDataInfo<>(list, count);
+        TableDataInfo<ProcessInstanceVo> build = TableDataInfo.build();
+        build.setRows(list);
+        build.setTotal(count);
+        return build;
     }
 
     /**

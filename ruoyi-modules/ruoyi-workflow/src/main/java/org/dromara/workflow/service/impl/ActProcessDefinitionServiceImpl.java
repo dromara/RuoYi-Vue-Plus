@@ -102,8 +102,10 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         }
         // 总记录数
         long total = query.count();
-
-        return new TableDataInfo<>(processDefinitionVoList, total);
+        TableDataInfo<ProcessDefinitionVo> build = TableDataInfo.build();
+        build.setRows(processDefinitionVoList);
+        build.setTotal(total);
+        return build;
     }
 
     /**

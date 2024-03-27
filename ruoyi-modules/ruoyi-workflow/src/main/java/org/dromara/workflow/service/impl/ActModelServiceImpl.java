@@ -82,7 +82,10 @@ public class ActModelServiceImpl implements IActModelService {
         List<Model> modelList = query.listPage(pageQuery.getFirstNum(), pageQuery.getPageSize());
         // 总记录数
         long total = query.count();
-        return new TableDataInfo<>(modelList, total);
+        TableDataInfo<Model> build = TableDataInfo.build();
+        build.setRows(modelList);
+        build.setTotal(total);
+        return build;
     }
 
     /**

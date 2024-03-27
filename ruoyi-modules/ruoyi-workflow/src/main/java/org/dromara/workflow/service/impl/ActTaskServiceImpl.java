@@ -22,10 +22,7 @@ import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.ActHiTaskinst;
 import org.dromara.workflow.domain.WfTaskBackNode;
 import org.dromara.workflow.domain.bo.*;
-import org.dromara.workflow.domain.vo.MultiInstanceVo;
-import org.dromara.workflow.domain.vo.TaskVo;
-import org.dromara.workflow.domain.vo.VariableVo;
-import org.dromara.workflow.domain.vo.WfCopy;
+import org.dromara.workflow.domain.vo.*;
 import org.dromara.workflow.flowable.cmd.*;
 import org.dromara.workflow.flowable.strategy.FlowEventStrategy;
 import org.dromara.workflow.flowable.strategy.FlowProcessEventHandler;
@@ -284,7 +281,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
             WorkflowUtils.setWfFormDefinitionVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
-        return new TableDataInfo<>(taskList, page.getTotal());
+        return TableDataInfo.build(page);
     }
 
     private String getInParam(List<String> param) {
@@ -346,7 +343,10 @@ public class ActTaskServiceImpl implements IActTaskService {
             WorkflowUtils.setWfFormDefinitionVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         long count = query.count();
-        return new TableDataInfo<>(list, count);
+        TableDataInfo<TaskVo> build = TableDataInfo.build();
+        build.setRows(list);
+        build.setTotal(count);
+        return build;
     }
 
     /**
@@ -372,7 +372,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
             WorkflowUtils.setWfFormDefinitionVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
-        return new TableDataInfo<>(taskList, page.getTotal());
+        return TableDataInfo.build(page);
     }
 
     /**
@@ -404,7 +404,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
             WorkflowUtils.setWfFormDefinitionVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
-        return new TableDataInfo<>(taskList, page.getTotal());
+        return TableDataInfo.build(page);
     }
 
     /**
@@ -428,7 +428,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
             WorkflowUtils.setWfFormDefinitionVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
-        return new TableDataInfo<>(taskList, page.getTotal());
+        return TableDataInfo.build(page);
     }
 
     /**
