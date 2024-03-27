@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
@@ -17,7 +18,7 @@ import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
-import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.ProcessEngine;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -36,6 +37,8 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ModelUtils {
+
+    private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
 
     public static BpmnModel xmlToBpmnModel(String xml) throws IOException {
         if (xml == null) {
@@ -166,7 +169,7 @@ public class ModelUtils {
      * @param processDefinitionId 流程定义id
      */
     public static List<FlowElement> getFlowElements(String processDefinitionId) {
-        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+        BpmnModel bpmnModel = PROCESS_ENGINE.getRepositoryService().getBpmnModel(processDefinitionId);
         List<FlowElement> list = new ArrayList<>();
         List<Process> processes = bpmnModel.getProcesses();
         Collection<FlowElement> flowElements = processes.get(0).getFlowElements();
@@ -213,7 +216,7 @@ public class ModelUtils {
      * @param flowElementId       节点id
      */
     public static Map<String, List<ExtensionElement>> getExtensionElement(String processDefinitionId, String flowElementId) {
-        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+        BpmnModel bpmnModel = PROCESS_ENGINE.getRepositoryService().getBpmnModel(processDefinitionId);
         Process process = bpmnModel.getMainProcess();
         FlowElement flowElement = process.getFlowElement(flowElementId);
         return flowElement.getExtensionElements();
@@ -226,7 +229,7 @@ public class ModelUtils {
      * @param taskDefinitionKey   流程定义id
      */
     public static boolean isUserTask(String processDefinitionId, String taskDefinitionKey) {
-        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+        BpmnModel bpmnModel = PROCESS_ENGINE.getRepositoryService().getBpmnModel(processDefinitionId);
         FlowNode flowNode = (FlowNode) bpmnModel.getFlowElement(taskDefinitionKey);
         return flowNode instanceof UserTask;
     }
