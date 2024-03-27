@@ -1,8 +1,7 @@
 package org.dromara.workflow.flowable.config;
 
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.dromara.workflow.flowable.handler.TaskTimeoutJobHandler;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +27,6 @@ public class FlowableConfig implements EngineConfigurationConfigurer<SpringProce
     public void configure(SpringProcessEngineConfiguration processEngineConfiguration) {
         processEngineConfiguration.setIdGenerator(() -> identifierGenerator.nextId(null).toString());
         processEngineConfiguration.setEventListeners(Collections.singletonList(globalFlowableListener));
+        processEngineConfiguration.addCustomJobHandler(new TaskTimeoutJobHandler());
     }
 }

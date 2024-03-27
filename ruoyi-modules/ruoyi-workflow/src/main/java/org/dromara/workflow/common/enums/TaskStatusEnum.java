@@ -58,7 +58,11 @@ public enum TaskStatusEnum {
     /**
      * 减签
      */
-    SIGN_OFF("sign_off", "减签");
+    SIGN_OFF("sign_off", "减签"),
+    /**
+     * 超时
+     */
+    TIMEOUT("timeout", "超时");
 
     /**
      * 状态
