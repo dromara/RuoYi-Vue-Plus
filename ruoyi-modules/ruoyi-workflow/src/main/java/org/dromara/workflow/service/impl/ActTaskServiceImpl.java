@@ -187,7 +187,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             String key = processInstance.getProcessDefinitionKey() + "_" + task.getTaskDefinitionKey();
             FlowTaskEventHandler taskHandler = flowEventStrategy.getTaskHandler(key);
             if (taskHandler != null) {
-                taskHandler.handleTask(task, processInstance.getBusinessKey());
+                taskHandler.handleTask(task.getId(), processInstance.getBusinessKey());
             }
             //办理意见
             taskService.addComment(completeTaskBo.getTaskId(), task.getProcessInstanceId(), TaskStatusEnum.PASS.getStatus(), StringUtils.isBlank(completeTaskBo.getMessage()) ? "同意" : completeTaskBo.getMessage());

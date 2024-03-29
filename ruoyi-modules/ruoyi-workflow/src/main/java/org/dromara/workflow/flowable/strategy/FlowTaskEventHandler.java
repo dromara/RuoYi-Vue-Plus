@@ -1,6 +1,5 @@
 package org.dromara.workflow.flowable.strategy;
 
-import org.flowable.task.api.Task;
 
 /**
  * 流程任务监听
@@ -13,8 +12,8 @@ public interface FlowTaskEventHandler {
     /**
      * 执行办理任务监听
      *
-     * @param task        任务
+     * @param taskId      任务ID
      * @param businessKey 业务id
      */
-    void handleTask(Task task, String businessKey);
+    void handleTask(String taskId, String businessKey);
 }
