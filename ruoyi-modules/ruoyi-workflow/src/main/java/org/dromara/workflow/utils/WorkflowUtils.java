@@ -55,7 +55,7 @@ public class WorkflowUtils {
     private static final IWorkflowUserService WORKFLOW_USER_SERVICE = SpringUtils.getBean(IWorkflowUserService.class);
     private static final IActHiProcinstService ACT_HI_PROCINST_SERVICE = SpringUtils.getBean(IActHiProcinstService.class);
     private static final ActHiTaskinstMapper ACT_HI_TASKINST_MAPPER = SpringUtils.getBean(ActHiTaskinstMapper.class);
-    private static final IWfDefinitionConfigService I_WF_FORM_DEFINITION_SERVICE = SpringUtils.getBean(IWfDefinitionConfigService.class);
+    private static final IWfDefinitionConfigService I_WF_DEFINITION_CONFIG_SERVICE = SpringUtils.getBean(IWfDefinitionConfigService.class);
     private static final IWfFormManageService I_WF_FORM_MANAGE_SERVICE = SpringUtils.getBean(IWfFormManageService.class);
 
     /**
@@ -293,7 +293,7 @@ public class WorkflowUtils {
     }
 
     /**
-     * 设置流程表单配置
+     * 设置流程流程定义配置
      *
      * @param obj       业务对象
      * @param idList    流程定义id
@@ -303,7 +303,7 @@ public class WorkflowUtils {
         if (CollUtil.isEmpty(idList) || obj == null) {
             return;
         }
-        List<WfDefinitionConfigVo> wfDefinitionConfigVoList = I_WF_FORM_DEFINITION_SERVICE.queryList(idList);
+        List<WfDefinitionConfigVo> wfDefinitionConfigVoList = I_WF_DEFINITION_CONFIG_SERVICE.queryList(idList);
         if (CollUtil.isNotEmpty(wfDefinitionConfigVoList)) {
             List<Long> formIds = StreamUtils.toList(wfDefinitionConfigVoList, WfDefinitionConfigVo::getFormId);
             List<WfFormManageVo> wfFormManageVos = I_WF_FORM_MANAGE_SERVICE.queryByIds(formIds);

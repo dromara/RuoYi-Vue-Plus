@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 表单配置Service接口
+ * 流程定义配置Service接口
  *
  * @author may
  * @date 2024-03-18
@@ -15,7 +15,7 @@ import java.util.List;
 public interface IWfDefinitionConfigService {
 
     /**
-     * 查询表单配置
+     * 查询流程定义配置
      *
      * @param definitionId 流程定义id
      * @return 结果
@@ -23,7 +23,7 @@ public interface IWfDefinitionConfigService {
     WfDefinitionConfigVo getByDefId(String definitionId);
 
     /**
-     * 查询表单配置列表
+     * 查询流程定义配置列表
      *
      * @param definitionIds 流程定义id
      * @return 结果
@@ -32,7 +32,7 @@ public interface IWfDefinitionConfigService {
 
 
     /**
-     * 新增表单配置
+     * 新增流程定义配置
      *
      * @param bo 参数
      * @return 结果

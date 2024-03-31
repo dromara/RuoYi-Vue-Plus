@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Collection;
 
 /**
- * 表单配置Service业务层处理
+ * 流程定义配置Service业务层处理
  *
  * @author may
  * @date 2024-03-18
@@ -27,7 +27,7 @@ public class WfDefinitionConfigServiceImpl implements IWfDefinitionConfigService
     private final WfDefinitionConfigMapper baseMapper;
 
     /**
-     * 查询表单配置
+     * 查询流程定义配置
      */
     @Override
     public WfDefinitionConfigVo getByDefId(String definitionId) {
@@ -35,7 +35,7 @@ public class WfDefinitionConfigServiceImpl implements IWfDefinitionConfigService
     }
 
     /**
-     * 查询表单配置列表
+     * 查询流程定义配置列表
      */
     @Override
     public List<WfDefinitionConfigVo> queryList(List<String> definitionIds) {
@@ -43,7 +43,7 @@ public class WfDefinitionConfigServiceImpl implements IWfDefinitionConfigService
     }
 
     /**
-     * 新增表单配置
+     * 新增流程定义配置
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -57,7 +57,7 @@ public class WfDefinitionConfigServiceImpl implements IWfDefinitionConfigService
     }
 
     /**
-     * 批量删除表单配置
+     * 批量删除流程定义配置
      */
     @Override
     public Boolean deleteByIds(Collection<Long> ids) {

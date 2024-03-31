@@ -199,7 +199,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             }
             //删除流程定义
             repositoryService.deleteDeployment(deploymentId);
-            //删除表单配置
+            //删除流程定义配置
             iWfDefinitionConfigService.deleteByDefIds(Collections.singletonList(processDefinitionId));
             //删除节点配置
             iWfNodeConfigService.deleteByDefIds(Collections.singletonList(processDefinitionId));

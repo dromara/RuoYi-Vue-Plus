@@ -17,7 +17,7 @@ import org.dromara.workflow.domain.vo.WfDefinitionConfigVo;
 import org.dromara.workflow.service.IWfDefinitionConfigService;
 
 /**
- * 表单配置
+ * 流程定义配置
  *
  * @author may
  * @date 2024-03-18
@@ -32,7 +32,7 @@ public class WfDefinitionConfigController extends BaseController {
 
 
     /**
-     * 获取表单配置详细信息
+     * 获取流程定义配置详细信息
      *
      * @param definitionId 主键
      */
@@ -43,9 +43,9 @@ public class WfDefinitionConfigController extends BaseController {
     }
 
     /**
-     * 新增表单配置
+     * 新增流程定义配置
      */
-    @Log(title = "表单配置", businessType = BusinessType.INSERT)
+    @Log(title = "流程定义配置", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping("/saveOrUpdate")
     public R<Void> saveOrUpdate(@Validated(AddGroup.class) @RequestBody WfDefinitionConfigBo bo) {
@@ -53,11 +53,11 @@ public class WfDefinitionConfigController extends BaseController {
     }
 
     /**
-     * 删除表单配置
+     * 删除流程定义配置
      *
      * @param ids 主键串
      */
-    @Log(title = "表单配置", businessType = BusinessType.DELETE)
+    @Log(title = "流程定义配置", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ids) {

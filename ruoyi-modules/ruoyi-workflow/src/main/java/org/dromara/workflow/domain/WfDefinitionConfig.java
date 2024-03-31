@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serial;
 
 /**
- * 表单配置对象 wf_form_definition
+ * 流程定义配置对象 wf_definition_config
  *
  * @author may
  * @date 2024-03-18

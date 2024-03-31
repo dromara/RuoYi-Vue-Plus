@@ -63,7 +63,7 @@ public class ProcessDefinitionVo implements Serializable {
     private Date deploymentTime;
 
     /**
-     * 表单配置
+     * 流程定义配置
      */
     private WfDefinitionConfigVo wfDefinitionConfigVo;
 

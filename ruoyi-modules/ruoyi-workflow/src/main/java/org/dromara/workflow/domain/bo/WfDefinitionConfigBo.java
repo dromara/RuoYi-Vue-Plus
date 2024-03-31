@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 
 /**
- * 表单配置业务对象 wf_form_definition
+ * 流程定义配置业务对象 wf_form_definition
  *
  * @author may
  * @date 2024-03-18

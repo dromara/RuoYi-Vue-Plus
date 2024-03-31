@@ -157,7 +157,7 @@ public class TaskVo implements Serializable {
     private String businessKey;
 
     /**
-     * 表单配置
+     * 流程定义配置
      */
     private WfDefinitionConfigVo wfDefinitionConfigVo;
 
