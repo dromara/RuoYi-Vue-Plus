@@ -142,3 +142,23 @@ INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11641, '请假申请修改', 11638, 3, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:edit', '#', 103, 1, sysdate(), NULL, NULL, '');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11642, '请假申请删除', 11638, 4, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:remove', '#', 103, 1, sysdate(), NULL, NULL, '');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11643, '请假申请导出', 11638, 5, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:export', '#', 103, 1, sysdate(), NULL, NULL, '');
+
+-- 表单管理 SQL
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11628, '表单管理', '11616', '5', 'formManage', 'workflow/formManage/index', 1, 0, 'C', '0', '0', 'workflow:formManage:list', 'tree-table', 103, 1, sysdate(), null, null, '表单管理菜单');
+
+-- 表单管理按钮 SQL
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11644, '表单管理查询', 11628, '1',  '#', '', 1, 0, 'F', '0', '0', 'workflow:formManage:query',        '', 103, 1, sysdate(), null, null, '');
+
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11645, '表单管理新增', 11628, '2',  '#', '', 1, 0, 'F', '0', '0', 'workflow:formManage:add',          '', 103, 1, sysdate(), null, null, '');
+
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11646, '表单管理修改', 11628, '3',  '#', '', 1, 0, 'F', '0', '0', 'workflow:formManage:edit',         '', 103, 1, sysdate(), null, null, '');
+
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11647, '表单管理删除', 11628, '4',  '#', '', 1, 0, 'F', '0', '0', 'workflow:formManage:remove',       '', 103, 1, sysdate(), null, null, '');
+
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11648, '表单管理导出', 11628, '5',  '#', '', 1, 0, 'F', '0', '0', 'workflow:formManage:export',       'tree-table', 103, 1, sysdate(), null, null, '');
