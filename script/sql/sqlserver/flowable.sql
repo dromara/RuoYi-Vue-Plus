@@ -216,8 +216,8 @@ go
 
 create table wf_definition_config
 (
-    id            bigint(20) not null primary key,
-    form_id       bigint(20) not null,
+    id            bigint not null primary key,
+    form_id       bigint not null,
     definition_id nvarchar(255)
         constraint uni_definition_id
         unique,
@@ -271,9 +271,169 @@ exec sp_addextendedproperty 'MS_Description', N'更新时间', 'SCHEMA', 'dbo', 
      'update_time'
 go
 
+create table wf_form_manage
+(
+    id            bigint not null primary key,
+    form_name     nvarchar(255) not null,
+    form_type     nvarchar(255) not null,
+    router        nvarchar(255) not null,
+    remark        nvarchar(500) null,
+    tenant_id     nvarchar(20),
+    create_dept   bigint,
+    create_by     bigint,
+    create_time   datetime2,
+    update_by     bigint,
+    update_time   datetime2
+)
+
+go
+exec sp_addextendedproperty 'MS_Description', N'表单管理', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'主键', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage', 'COLUMN', 'id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'表单名称', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage', 'COLUMN',
+     'form_name'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'表单类型', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage', 'COLUMN',
+     'form_type'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'路由地址/表单ID', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage', 'COLUMN',
+     'router'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'备注', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage', 'COLUMN',
+     'remark'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'租户编号', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage', 'COLUMN',
+     'tenant_id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建部门', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage', 'COLUMN',
+     'create_dept'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建者', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage', 'COLUMN', 'create_by'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage', 'COLUMN',
+     'create_time'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'更新者', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage', 'COLUMN', 'update_by'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'更新时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_manage', 'COLUMN',
+     'update_time'
+go
+
+insert into wf_form_manage(id, form_name, form_type, router, remark, tenant_id, create_dept, create_by, create_time, update_by, update_time) VALUES (1, '请假申请', 'static', '/demo/leaveEdit/index', NULL, '000000', 103, 1, getdate(), 1, getdate());
+
+create table wf_node_config
+(
+    id            bigint not null primary key,
+    form_id       bigint,
+    form_type     nvarchar(255) ,
+    node_name     nvarchar(255) not null,
+    node_id       nvarchar(255) not null,
+    definition_id nvarchar(255) not null,
+    tenant_id     nvarchar(20),
+    create_dept   bigint,
+    create_by     bigint,
+    create_time   datetime2,
+    update_by     bigint,
+    update_time   datetime2
+)
+
+go
+exec sp_addextendedproperty 'MS_Description', N'节点配置', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'主键', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN', 'id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'表单id', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
+     'form_id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'表单类型', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
+     'form_type'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'节点名称', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
+     'node_name'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'节点id', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
+     'node_id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'流程定义id', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
+     'definition_id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'租户编号', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
+     'tenant_id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建部门', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
+     'create_dept'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建者', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN', 'create_by'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'创建时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
+     'create_time'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'更新者', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN', 'update_by'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'更新时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
+     'update_time'
+go
+
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11638, '请假申请', 5, 1, 'leave', 'workflow/leave/index', 1, 0, 'C', '0', '0', 'demo:leave:list', '#', 103, 1, getdate(), NULL, NULL, '请假申请菜单');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11639, '请假申请查询', 11638, 1, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:query', '#', 103, 1, getdate(), NULL, NULL, '');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11640, '请假申请新增', 11638, 2, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:add', '#', 103, 1, getdate(), NULL, NULL, '');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11641, '请假申请修改', 11638, 3, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:edit', '#', 103, 1, getdate(), NULL, NULL, '');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11642, '请假申请删除', 11638, 4, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:remove', '#', 103, 1, getdate(), NULL, NULL, '');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11643, '请假申请导出', 11638, 5, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:export', '#', 103, 1, getdate(), NULL, NULL, '');
+
+INSERT INTO sys_dict_type(dict_id, tenant_id, dict_name, dict_type, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (13, '000000', '业务状态', 'wf_business_status', 103, 1, getdate(), NULL, NULL, '业务状态列表');
+INSERT INTO sys_dict_type(dict_id, tenant_id, dict_name, dict_type, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (14, '000000', '表单类型', 'wf_form_type', 103, 1, getdate(), NULL, NULL, '表单类型列表');
+
+INSERT INTO sys_dict_data(dict_code, tenant_id, dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (39, '000000', 1, '已撤销', 'cancel', 'wf_business_status', '', 'danger', 'N', 103, 1, getdate(), NULL, NULL, '已撤销');
+INSERT INTO sys_dict_data(dict_code, tenant_id, dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (40, '000000', 2, '草稿', 'draft', 'wf_business_status', '', 'info', 'N', 103, 1, getdate(), NULL, NULL, '草稿');
+INSERT INTO sys_dict_data(dict_code, tenant_id, dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (41, '000000', 3, '待审核', 'waiting', 'wf_business_status', '', 'primary', 'N', 103, 1,getdate(), NULL, NULL, '待审核');
+INSERT INTO sys_dict_data(dict_code, tenant_id, dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (42, '000000', 4, '已完成', 'finish', 'wf_business_status', '', 'success', 'N', 103, 1, getdate(), NULL, NULL, '已完成');
+INSERT INTO sys_dict_data(dict_code, tenant_id, dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (43, '000000', 5, '已作废', 'invalid', 'wf_business_status', '', 'danger', 'N', 103, 1, getdate(), NULL, NULL, '已作废');
+INSERT INTO sys_dict_data(dict_code, tenant_id, dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (44, '000000', 6, '已退回', 'back', 'wf_business_status', '', 'danger', 'N', 103, 1, getdate(), NULL, NULL, '已退回');
+INSERT INTO sys_dict_data(dict_code, tenant_id, dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (45, '000000', 7, '已终止', 'termination', 'wf_business_status', '', 'danger', 'N', 103, 1,getdate(), NULL, NULL, '已终止');
+INSERT INTO sys_dict_data(dict_code, tenant_id, dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (46, '000000', 1, '自定义表单', 'static', 'wf_form_type', '', 'success', 'N', 103, 1, getdate(), NULL, NULL, '自定义表单');
+INSERT INTO sys_dict_data(dict_code, tenant_id, dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (47 '000000', 2, '动态表单', 'dynamic', 'wf_form_type', '', 'primary', 'N', 103, 1, getdate(), NULL, NULL, '动态表单');
+
+-- 表单管理 SQL
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11628, '表单管理', '11616', '5', 'formManage', 'workflow/formManage/index', 1, 0, 'C', '0', '0', 'workflow:formManage:list', 'tree-table', 103, 1, getdate(), null, null, '表单管理菜单');
+
+-- 表单管理按钮 SQL
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11644, '表单管理查询', 11628, '1',  '#', '', 1, 0, 'F', '0', '0', 'workflow:formManage:query',        '', 103, 1, getdate(), null, null, '');
+
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11645, '表单管理新增', 11628, '2',  '#', '', 1, 0, 'F', '0', '0', 'workflow:formManage:add',          '', 103, 1, getdate(), null, null, '');
+
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11646, '表单管理修改', 11628, '3',  '#', '', 1, 0, 'F', '0', '0', 'workflow:formManage:edit',         '', 103, 1, getdate(), null, null, '');
+
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11647, '表单管理删除', 11628, '4',  '#', '', 1, 0, 'F', '0', '0', 'workflow:formManage:remove',       '', 103, 1, getdate(), null, null, '');
+
+insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
+values(11648, '表单管理导出', 11628, '5',  '#', '', 1, 0, 'F', '0', '0', 'workflow:formManage:export',       'tree-table', 103, 1, getdate(), null, null, '');
