@@ -2340,8 +2340,6 @@ GO
 
 INSERT sys_role VALUES (1, N'000000', N'超级管理员', N'superadmin', 1, N'1', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'超级管理员')
 GO
-INSERT sys_role VALUES (2, N'000000', N'普通角色', N'common', 2, N'2', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'普通角色')
-GO
 
 CREATE TABLE sys_role_dept
 (
@@ -2372,13 +2370,6 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_role_dept'
 GO
 
-INSERT sys_role_dept VALUES (2, 100)
-GO
-INSERT sys_role_dept VALUES (2, 101)
-GO
-INSERT sys_role_dept VALUES (2, 105)
-GO
-
 CREATE TABLE sys_role_menu
 (
     role_id bigint NOT NULL,
@@ -2406,181 +2397,6 @@ EXEC sys.sp_addextendedproperty
     'MS_Description', N'角色和菜单关联表' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_role_menu'
-GO
-
-INSERT sys_role_menu VALUES (2, 1)
-GO
-INSERT sys_role_menu VALUES (2, 2)
-GO
-INSERT sys_role_menu VALUES (2, 3)
-GO
-INSERT sys_role_menu VALUES (2, 100)
-GO
-INSERT sys_role_menu VALUES (2, 101)
-GO
-INSERT sys_role_menu VALUES (2, 102)
-GO
-INSERT sys_role_menu VALUES (2, 103)
-GO
-INSERT sys_role_menu VALUES (2, 104)
-GO
-INSERT sys_role_menu VALUES (2, 105)
-GO
-INSERT sys_role_menu VALUES (2, 106)
-GO
-INSERT sys_role_menu VALUES (2, 107)
-GO
-INSERT sys_role_menu VALUES (2, 108)
-GO
-INSERT sys_role_menu VALUES (2, 109)
-GO
-INSERT sys_role_menu VALUES (2, 110)
-GO
-INSERT sys_role_menu VALUES (2, 111)
-GO
-INSERT sys_role_menu VALUES (2, 112)
-GO
-INSERT sys_role_menu VALUES (2, 113)
-GO
-INSERT sys_role_menu VALUES (2, 114)
-GO
-INSERT sys_role_menu VALUES (2, 115)
-GO
-INSERT sys_role_menu VALUES (2, 116)
-GO
-INSERT sys_role_menu VALUES (2, 500)
-GO
-INSERT sys_role_menu VALUES (2, 501)
-GO
-INSERT sys_role_menu VALUES (2, 1001)
-GO
-INSERT sys_role_menu VALUES (2, 1002)
-GO
-INSERT sys_role_menu VALUES (2, 1003)
-GO
-INSERT sys_role_menu VALUES (2, 1004)
-GO
-INSERT sys_role_menu VALUES (2, 1005)
-GO
-INSERT sys_role_menu VALUES (2, 1006)
-GO
-INSERT sys_role_menu VALUES (2, 1007)
-GO
-INSERT sys_role_menu VALUES (2, 1008)
-GO
-INSERT sys_role_menu VALUES (2, 1009)
-GO
-INSERT sys_role_menu VALUES (2, 1010)
-GO
-INSERT sys_role_menu VALUES (2, 1011)
-GO
-INSERT sys_role_menu VALUES (2, 1012)
-GO
-INSERT sys_role_menu VALUES (2, 1013)
-GO
-INSERT sys_role_menu VALUES (2, 1014)
-GO
-INSERT sys_role_menu VALUES (2, 1015)
-GO
-INSERT sys_role_menu VALUES (2, 1016)
-GO
-INSERT sys_role_menu VALUES (2, 1017)
-GO
-INSERT sys_role_menu VALUES (2, 1018)
-GO
-INSERT sys_role_menu VALUES (2, 1019)
-GO
-INSERT sys_role_menu VALUES (2, 1020)
-GO
-INSERT sys_role_menu VALUES (2, 1021)
-GO
-INSERT sys_role_menu VALUES (2, 1022)
-GO
-INSERT sys_role_menu VALUES (2, 1023)
-GO
-INSERT sys_role_menu VALUES (2, 1024)
-GO
-INSERT sys_role_menu VALUES (2, 1025)
-GO
-INSERT sys_role_menu VALUES (2, 1026)
-GO
-INSERT sys_role_menu VALUES (2, 1027)
-GO
-INSERT sys_role_menu VALUES (2, 1028)
-GO
-INSERT sys_role_menu VALUES (2, 1029)
-GO
-INSERT sys_role_menu VALUES (2, 1030)
-GO
-INSERT sys_role_menu VALUES (2, 1031)
-GO
-INSERT sys_role_menu VALUES (2, 1032)
-GO
-INSERT sys_role_menu VALUES (2, 1033)
-GO
-INSERT sys_role_menu VALUES (2, 1034)
-GO
-INSERT sys_role_menu VALUES (2, 1035)
-GO
-INSERT sys_role_menu VALUES (2, 1036)
-GO
-INSERT sys_role_menu VALUES (2, 1037)
-GO
-INSERT sys_role_menu VALUES (2, 1038)
-GO
-INSERT sys_role_menu VALUES (2, 1039)
-GO
-INSERT sys_role_menu VALUES (2, 1040)
-GO
-INSERT sys_role_menu VALUES (2, 1041)
-GO
-INSERT sys_role_menu VALUES (2, 1042)
-GO
-INSERT sys_role_menu VALUES (2, 1043)
-GO
-INSERT sys_role_menu VALUES (2, 1044)
-GO
-INSERT sys_role_menu VALUES (2, 1045)
-GO
-INSERT sys_role_menu VALUES (2, 1046)
-GO
-INSERT sys_role_menu VALUES (2, 1047)
-GO
-INSERT sys_role_menu VALUES (2, 1048)
-GO
-INSERT sys_role_menu VALUES (2, 1049)
-GO
-INSERT sys_role_menu VALUES (2, 1050)
-GO
-INSERT sys_role_menu VALUES (2, 1051)
-GO
-INSERT sys_role_menu VALUES (2, 1052)
-GO
-INSERT sys_role_menu VALUES (2, 1053)
-GO
-INSERT sys_role_menu VALUES (2, 1054)
-GO
-INSERT sys_role_menu VALUES (2, 1055)
-GO
-INSERT sys_role_menu VALUES (2, 1056)
-GO
-INSERT sys_role_menu VALUES (2, 1057)
-GO
-INSERT sys_role_menu VALUES (2, 1058)
-GO
-INSERT sys_role_menu VALUES (2, 1059)
-GO
-INSERT sys_role_menu VALUES (2, 1060)
-GO
-INSERT sys_role_menu VALUES (2, 1061)
-GO
-INSERT sys_role_menu VALUES (2, 1062)
-GO
-INSERT sys_role_menu VALUES (2, 1063)
-GO
-INSERT sys_role_menu VALUES (2, 1064)
-GO
-INSERT sys_role_menu VALUES (2, 1065)
 GO
 
 CREATE TABLE sys_user
@@ -2747,8 +2563,6 @@ GO
 
 INSERT sys_user VALUES (1, N'000000', 103,  N'admin', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@163.com', N'15888888888', N'1', NULL, N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), NULL, NULL, N'管理员')
 GO
-INSERT sys_user VALUES (2, N'000000', 105,  N'lionli', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@qq.com', N'15666666666', N'1', NULL, N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), NULL, NULL, N'测试员')
-GO
 
 CREATE TABLE sys_user_post
 (
@@ -2781,8 +2595,6 @@ GO
 
 INSERT sys_user_post VALUES (1, 1)
 GO
-INSERT sys_user_post VALUES (2, 2)
-GO
 
 CREATE TABLE sys_user_role
 (
@@ -2814,8 +2626,6 @@ EXEC sys.sp_addextendedproperty
 GO
 
 INSERT sys_user_role VALUES (1, 1)
-GO
-INSERT sys_user_role VALUES (2, 2)
 GO
 
 CREATE TABLE sys_oss
