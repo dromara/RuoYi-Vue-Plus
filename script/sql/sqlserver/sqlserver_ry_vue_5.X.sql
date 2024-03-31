@@ -2368,9 +2368,9 @@ GO
 
 INSERT sys_role VALUES (1, N'000000', N'超级管理员', N'superadmin', 1, N'1', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'超级管理员')
 GO
-INSERT sys_role VALUES (3, N'000000', N'本部门及以下', N'test1', 3, N'4', 1, 1, N'0', N'0', 103, 1, getdate(), 1, NULL, NULL);
+INSERT sys_role VALUES (3, N'000000', N'本部门及以下', N'test1', 3, N'4', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'');
 GO
-INSERT sys_role VALUES (4, N'000000', N'仅本人', N'test2', 4, N'5', 1, 1, N'0', N'0', 103, 1, getdate(), 1, NULL, NULL);
+INSERT sys_role VALUES (4, N'000000', N'仅本人', N'test2', 4, N'5', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'');
 GO
 
 CREATE TABLE sys_role_dept

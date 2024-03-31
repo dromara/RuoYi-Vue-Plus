@@ -269,8 +269,8 @@ comment on column sys_user.remark       is '备注';
 -- 初始化-用户信息表数据
 -- ----------------------------
 insert into sys_user values(1, '000000', 103, 'admin', '疯狂的狮子Li', 'sys_user', 'crazyLionLi@163.com', '15888888888', '1', null, '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate, 103, 1, sysdate, null, null, '管理员');
-insert into sys_user values (3, '000000', 108, 'test', '本部门及以下 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate, 103, 1, sysdate, 3, sysdate, null, '');
-insert into sys_user values (4, '000000', 102, 'test1', '仅本人 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate, 103, 1, sysdate, 4, sysdate, null, '');
+insert into sys_user values(3, '000000', 108, 'test', '本部门及以下 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate, 103, 1, sysdate, null, null, '');
+insert into sys_user values(4, '000000', 102, 'test1', '仅本人 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', sysdate, 103, 1, sysdate, null, null, '');
 
 -- ----------------------------
 -- 3、岗位信息表
@@ -546,18 +546,18 @@ insert into sys_menu values('1063', '客户端管理修改', '123', '3',  '#', '
 insert into sys_menu values('1064', '客户端管理删除', '123', '4',  '#', '', '', 1, 0, 'F', '0', '0', 'system:client:remove',       '#', 103, 1, sysdate, null, null, '');
 insert into sys_menu values('1065', '客户端管理导出', '123', '5',  '#', '', '', 1, 0, 'F', '0', '0', 'system:client:export',       '#', 103, 1, sysdate, null, null, '');
 -- 测试菜单
-insert into sys_menu values('1500', '测试单表',     '5',   '1', 'demo', 'demo/demo/index', 1, 0, 'C', '0', '0', 'demo:demo:list', '#', 103, 1, sysdate, null, null, '测试单表菜单');
-insert into sys_menu values('1501', '测试单表查询', '1500', '1', '#', '', 1, 0, 'F', '0', '0', 'demo:demo:query', '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1502', '测试单表新增', '1500', '2', '#', '', 1, 0, 'F', '0', '0', 'demo:demo:add', '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1503', '测试单表修改', '1500', '3', '#', '', 1, 0, 'F', '0', '0', 'demo:demo:edit', '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1504', '测试单表删除', '1500', '4', '#', '', 1, 0, 'F', '0', '0', 'demo:demo:remove', '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1505', '测试单表导出', '1500', '5', '#', '', 1, 0, 'F', '0', '0', 'demo:demo:export', '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1506', '测试树表',     '5',   '1', 'tree', 'demo/tree/index', 1, 0, 'C', '0', '0', 'demo:tree:list', '#', 103, 1, sysdate, null, null, '测试树表菜单');
-insert into sys_menu values('1507', '测试树表查询', '1506', '1', '#', '', 1, 0, 'F', '0', '0', 'demo:tree:query', '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1508', '测试树表新增', '1506', '2', '#', '', 1, 0, 'F', '0', '0', 'demo:tree:add', '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1509', '测试树表修改', '1506', '3', '#', '', 1, 0, 'F', '0', '0', 'demo:tree:edit', '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1510', '测试树表删除', '1506', '4', '#', '', 1, 0, 'F', '0', '0', 'demo:tree:remove', '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1511', '测试树表导出', '1506', '5', '#', '', 1, 0, 'F', '0', '0', 'demo:tree:export', '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1500', '测试单表',     '5',   '1', 'demo', 'demo/demo/index', '',  1, 0, 'C', '0', '0', 'demo:demo:list', '#', 103, 1, sysdate, null, null, '测试单表菜单');
+insert into sys_menu values('1501', '测试单表查询', '1500', '1', '#', '', '',  1, 0, 'F', '0', '0', 'demo:demo:query', '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1502', '测试单表新增', '1500', '2', '#', '', '',  1, 0, 'F', '0', '0', 'demo:demo:add', '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1503', '测试单表修改', '1500', '3', '#', '', '',  1, 0, 'F', '0', '0', 'demo:demo:edit', '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1504', '测试单表删除', '1500', '4', '#', '', '',  1, 0, 'F', '0', '0', 'demo:demo:remove', '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1505', '测试单表导出', '1500', '5', '#', '', '',  1, 0, 'F', '0', '0', 'demo:demo:export', '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1506', '测试树表',     '5',   '1', 'tree', 'demo/tree/index', '',  1, 0, 'C', '0', '0', 'demo:tree:list', '#', 103, 1, sysdate, null, null, '测试树表菜单');
+insert into sys_menu values('1507', '测试树表查询', '1506', '1', '#', '', '',  1, 0, 'F', '0', '0', 'demo:tree:query', '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1508', '测试树表新增', '1506', '2', '#', '', '',  1, 0, 'F', '0', '0', 'demo:tree:add', '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1509', '测试树表修改', '1506', '3', '#', '', '',  1, 0, 'F', '0', '0', 'demo:tree:edit', '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1510', '测试树表删除', '1506', '4', '#', '', '',  1, 0, 'F', '0', '0', 'demo:tree:remove', '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1511', '测试树表导出', '1506', '5', '#', '', '',  1, 0, 'F', '0', '0', 'demo:tree:export', '#', 103, 1, sysdate, null, null, '');
 
 
 -- ----------------------------
