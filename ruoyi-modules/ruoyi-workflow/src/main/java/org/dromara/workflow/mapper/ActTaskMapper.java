@@ -13,7 +13,7 @@ import org.dromara.workflow.domain.vo.TaskVo;
 /**
  * 任务信息Mapper接口
  *
- * @author gssong
+ * @author may
  * @date 2024-03-02
  */
 @InterceptorIgnore(tenantLine = "true")

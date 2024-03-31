@@ -120,12 +120,12 @@ comment on column WF_TASK_BACK_NODE.CREATE_TIME is '创建时间'
 comment on column WF_TASK_BACK_NODE.UPDATE_BY is '更新者'
 comment on column WF_TASK_BACK_NODE.UPDATE_TIME is '更新时间'
 
-create table WF_FORM_DEFINITION
+create table WF_DEFINITION_CONFIG
 (
     ID            NUMBER(20) NOT NULL
-        CONSTRAINT PK_WF_FORM_DEFINITION
+        CONSTRAINT PK_WF_DEFINITION_CONFIG
         PRIMARY KEY,
-    PATH          VARCHAR2(200) NOT NULL,
+    FORM_ID       NUMBER(20) NOT NULL,
     DEFINITION_ID VARCHAR2(255) NOT NULL,
     PROCESS_KEY   VARCHAR2(255)  NOT NULL,
     TENANT_ID     VARCHAR2(20),
@@ -137,16 +137,17 @@ create table WF_FORM_DEFINITION
     constraint uni_definition_id
         unique (definition_id)
 );
-comment on table WF_FORM_DEFINITION is '表单配置'
-comment on column WF_FORM_DEFINITION.ID is '主键'
-comment on column WF_FORM_DEFINITION.DEFINITION_ID is '流程定义ID'
-comment on column WF_FORM_DEFINITION.PROCESS_KEY is '流程KEY'
-comment on column WF_FORM_DEFINITION.TENANT_ID is '租户编号'
-comment on column WF_FORM_DEFINITION.CREATE_DEPT is '创建部门'
-comment on column WF_FORM_DEFINITION.CREATE_BY is '创建者'
-comment on column WF_FORM_DEFINITION.CREATE_TIME is '创建时间'
-comment on column WF_FORM_DEFINITION.UPDATE_BY is '更新者'
-comment on column WF_FORM_DEFINITION.UPDATE_TIME is '更新时间'
+comment on table WF_DEFINITION_CONFIG is '流程定义配置'
+comment on column WF_DEFINITION_CONFIG.ID is '主键'
+comment on column WF_DEFINITION_CONFIG.FORM_ID is '表单ID'
+comment on column WF_DEFINITION_CONFIG.DEFINITION_ID is '流程定义ID'
+comment on column WF_DEFINITION_CONFIG.PROCESS_KEY is '流程KEY'
+comment on column WF_DEFINITION_CONFIG.TENANT_ID is '租户编号'
+comment on column WF_DEFINITION_CONFIG.CREATE_DEPT is '创建部门'
+comment on column WF_DEFINITION_CONFIG.CREATE_BY is '创建者'
+comment on column WF_DEFINITION_CONFIG.CREATE_TIME is '创建时间'
+comment on column WF_DEFINITION_CONFIG.UPDATE_BY is '更新者'
+comment on column WF_DEFINITION_CONFIG.UPDATE_TIME is '更新时间'
 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11638, '请假申请', 5, 1, 'leave', 'workflow/leave/index', 1, 0, 'C', '0', '0', 'demo:leave:list', '#', 103, 1, sysdate, NULL, NULL, '请假申请菜单');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11639, '请假申请查询', 11638, 1, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:query', '#', 103, 1, sysdate, NULL, NULL, '');

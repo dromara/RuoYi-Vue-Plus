@@ -214,10 +214,10 @@ exec sp_addextendedproperty 'MS_Description', N'更新时间', 'SCHEMA', 'dbo', 
      'update_time'
 go
 
-create table wf_form_definition
+create table wf_definition_config
 (
     id            bigint(20) not null primary key,
-    path          nvarchar(200) not null,
+    form_id       bigint(20) not null,
     definition_id nvarchar(255)
         constraint uni_definition_id
         unique,
@@ -231,43 +231,43 @@ create table wf_form_definition
 )
 
 go
-exec sp_addextendedproperty 'MS_Description', N'表单配置', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition'
+exec sp_addextendedproperty 'MS_Description', N'流程定义配置', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config'
 go
 
-exec sp_addextendedproperty 'MS_Description', N'主键', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN', 'id'
+exec sp_addextendedproperty 'MS_Description', N'主键', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN', 'id'
 go
 
-exec sp_addextendedproperty 'MS_Description', N'路由地址', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
-     'path'
+exec sp_addextendedproperty 'MS_Description', N'表单ID', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
+     'form_id'
 go
 
-exec sp_addextendedproperty 'MS_Description', N'流程定义ID', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+exec sp_addextendedproperty 'MS_Description', N'流程定义ID', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
      'definition_id'
 go
 
-exec sp_addextendedproperty 'MS_Description', N'流程KEY', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+exec sp_addextendedproperty 'MS_Description', N'流程KEY', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
      'process_key'
 go
 
-exec sp_addextendedproperty 'MS_Description', N'租户编号', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+exec sp_addextendedproperty 'MS_Description', N'租户编号', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
      'tenant_id'
 go
 
-exec sp_addextendedproperty 'MS_Description', N'创建部门', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+exec sp_addextendedproperty 'MS_Description', N'创建部门', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
      'create_dept'
 go
 
-exec sp_addextendedproperty 'MS_Description', N'创建者', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN', 'create_by'
+exec sp_addextendedproperty 'MS_Description', N'创建者', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN', 'create_by'
 go
 
-exec sp_addextendedproperty 'MS_Description', N'创建时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+exec sp_addextendedproperty 'MS_Description', N'创建时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
      'create_time'
 go
 
-exec sp_addextendedproperty 'MS_Description', N'更新者', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN', 'update_by'
+exec sp_addextendedproperty 'MS_Description', N'更新者', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN', 'update_by'
 go
 
-exec sp_addextendedproperty 'MS_Description', N'更新时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_form_definition', 'COLUMN',
+exec sp_addextendedproperty 'MS_Description', N'更新时间', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
      'update_time'
 go
 

@@ -65,6 +65,6 @@ public class ProcessDefinitionVo implements Serializable {
     /**
      * 表单配置
      */
-    private WfFormDefinitionVo wfFormDefinitionVo;
+    private WfDefinitionConfigVo wfDefinitionConfigVo;
 
 }

@@ -164,6 +164,37 @@ public class ModelUtils {
     }
 
     /**
+     * 获取流程全部用户节点
+     *
+     * @param processDefinitionId 流程定义id
+     */
+    public static List<UserTask> getuserTaskFlowElements(String processDefinitionId) {
+        BpmnModel bpmnModel = PROCESS_ENGINE.getRepositoryService().getBpmnModel(processDefinitionId);
+        List<UserTask> list = new ArrayList<>();
+        List<Process> processes = bpmnModel.getProcesses();
+        Collection<FlowElement> flowElements = processes.get(0).getFlowElements();
+        buildUserTaskFlowElements(flowElements, list);
+        return list;
+    }
+
+    /**
+     * 递归获取所有节点
+     *
+     * @param flowElements 节点信息
+     * @param list         集合
+     */
+    private static void buildUserTaskFlowElements(Collection<FlowElement> flowElements, List<UserTask> list) {
+        for (FlowElement flowElement : flowElements) {
+            if (flowElement instanceof SubProcess) {
+                Collection<FlowElement> subFlowElements = ((SubProcess) flowElement).getFlowElements();
+                buildUserTaskFlowElements(subFlowElements, list);
+            } else if (flowElement instanceof UserTask) {
+                list.add((UserTask) flowElement);
+            }
+        }
+    }
+
+    /**
      * 获取流程全部节点
      *
      * @param processDefinitionId 流程定义id

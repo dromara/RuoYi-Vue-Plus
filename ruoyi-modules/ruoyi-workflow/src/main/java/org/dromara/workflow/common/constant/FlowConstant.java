@@ -76,9 +76,9 @@ public interface FlowConstant {
     String PROCESS_INSTANCE_VO = "processInstanceVo";
 
     /**
-     * 流程表单配置对象
+     * 流程定义配置
      */
-    String WF_FORM_DEFINITION_VO = "wfFormDefinitionVo";
+    String WF_DEFINITION_CONFIG_VO = "wfDefinitionConfigVo";
 
     /**
      * 流程发起人

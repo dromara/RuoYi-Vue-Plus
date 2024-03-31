@@ -78,12 +78,12 @@ create table wf_task_back_node
 )
     comment '节点审批记录';
 
-DROP TABLE if EXISTS wf_form_definition;
-create table wf_form_definition
+DROP TABLE if EXISTS wf_definition_config;
+create table wf_definition_config
 (
     id            bigint                        not null comment '主键'
         primary key,
-    path          varchar(200) default ''       not null comment '路由地址',
+    form_id       bigint                        not null comment '表单ID',
     definition_id varchar(255)                  not null comment '流程定义ID',
     process_key   varchar(255)                  not null comment '流程KEY',
     create_dept   bigint                        null comment '创建部门',
@@ -96,8 +96,44 @@ create table wf_form_definition
     constraint uni_definition_id
         unique (definition_id)
 )
-    comment '表单配置';
+    comment '流程定义配置';
 
+create table wf_form_manage
+(
+    id          bigint       not null comment '主键'
+        primary key,
+    form_name   varchar(255) not null comment '表单名称',
+    form_type   varchar(255) not null comment '表单类型',
+    router      varchar(255) not null comment '路由地址/表单ID',
+    remark      varchar(500) null comment '备注',
+    tenant_id   varchar(20)  null comment '租户编号',
+    create_dept bigint       null comment '创建部门',
+    create_by   bigint       null comment '创建者',
+    create_time datetime     null comment '创建时间',
+    update_by   bigint       null comment '更新者',
+    update_time datetime     null comment '更新时间'
+)
+    comment '表单管理';
+
+insert into wf_form_manage(id, form_name, form_type, router, remark, tenant_id, create_dept, create_by, create_time, update_by, update_time) VALUES (1, '请假申请', 'static', '/demo/leaveEdit/index', NULL, '000000', 103, 1, sysdate(), 1, sysdate());
+
+create table wf_node_config
+(
+    id            bigint       not null comment '主键'
+        primary key,
+    form_id       bigint       null comment '表单id',
+    form_type     varchar(255) null comment '表单类型',
+    node_name     varchar(255) not null comment '节点名称',
+    node_id       varchar(255) not null comment '节点id',
+    definition_id varchar(255) not null comment '流程定义id',
+    create_dept   bigint       null comment '创建部门',
+    create_by     bigint       null comment '创建者',
+    create_time   datetime     null comment '创建时间',
+    update_by     bigint       null comment '更新者',
+    update_time   datetime     null comment '更新时间',
+    tenant_id     varchar(20)  null comment '租户编号'
+)
+    comment '节点配置';
 
 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11638, '请假申请', 5, 1, 'leave', 'workflow/leave/index', 1, 0, 'C', '0', '0', 'demo:leave:list', '#', 103, 1, sysdate(), NULL, NULL, '请假申请菜单');

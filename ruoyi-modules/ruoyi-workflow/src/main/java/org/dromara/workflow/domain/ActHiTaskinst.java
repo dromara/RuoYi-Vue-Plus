@@ -11,7 +11,7 @@ import java.io.Serial;
 /**
  * 流程历史任务对象 act_hi_taskinst
  *
- * @author gssong
+ * @author may
  * @date 2024-03-02
  */
 @Data

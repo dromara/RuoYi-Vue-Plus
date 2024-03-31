@@ -1,6 +1,6 @@
 package org.dromara.workflow.domain.bo;
 
-import org.dromara.workflow.domain.WfFormDefinition;
+import org.dromara.workflow.domain.WfDefinitionConfig;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
@@ -12,13 +12,13 @@ import jakarta.validation.constraints.*;
 /**
  * 表单配置业务对象 wf_form_definition
  *
- * @author gssong
+ * @author may
  * @date 2024-03-18
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@AutoMapper(target = WfFormDefinition.class, reverseConvertGenerate = false)
-public class WfFormDefinitionBo extends BaseEntity {
+@AutoMapper(target = WfDefinitionConfig.class, reverseConvertGenerate = false)
+public class WfDefinitionConfigBo extends BaseEntity {
 
     /**
      * 主键
@@ -27,10 +27,10 @@ public class WfFormDefinitionBo extends BaseEntity {
     private Long id;
 
     /**
-     * 路由地址
+     * 表单ID
      */
-    @NotBlank(message = "路由地址不能为空", groups = {AddGroup.class})
-    private String path;
+    @NotNull(message = "表单ID不能为空", groups = {AddGroup.class})
+    private Long formId;
 
     /**
      * 流程定义ID

@@ -166,12 +166,12 @@ comment on column wf_task_back_node.update_time is '修改时间';
 alter table wf_task_back_node
     owner to postgres;
 
-create table wf_form_definition
+create table wf_definition_config
 (
     id            bigint(20) not null
-        constraint pk_wf_form_definition
+        constraint pk_wf_definition_config
         primary key,
-    path          varchar(200) not null,
+    form_id       bigint(20) not null,
     definition_id varchar(255) not null,
     process_key   varchar(255)  not null,
     tenant_id     varchar(20),
@@ -182,32 +182,32 @@ create table wf_form_definition
     update_time   timestamp
 );
 
-comment on table wf_form_definition is '表单配置';
+comment on table wf_definition_config is '流程定义配置';
 
-comment on column wf_form_definition.id is '主键';
+comment on column wf_definition_config.id is '主键';
 
-comment on column wf_form_definition.path is '路由地址';
+comment on column wf_definition_config.form_id is '表单ID';
 
-comment on column wf_form_definition.definition_id is '流程定义ID';
+comment on column wf_definition_config.definition_id is '流程定义ID';
 
-comment on column wf_form_definition.process_key is '流程KEY';
+comment on column wf_definition_config.process_key is '流程KEY';
 
-comment on column wf_form_definition.tenant_id is '租户id';
+comment on column wf_definition_config.tenant_id is '租户id';
 
-comment on column wf_form_definition.create_dept is '创建部门';
+comment on column wf_definition_config.create_dept is '创建部门';
 
-comment on column wf_form_definition.create_by is '创建者';
+comment on column wf_definition_config.create_by is '创建者';
 
-comment on column wf_form_definition.create_time is '创建时间';
+comment on column wf_definition_config.create_time is '创建时间';
 
-comment on column wf_form_definition.update_by is '修改者';
+comment on column wf_definition_config.update_by is '修改者';
 
-comment on column wf_form_definition.update_time is '修改时间';
+comment on column wf_definition_config.update_time is '修改时间';
 
-alter table wf_form_definition
+alter table wf_definition_config
     owner to postgres;
 create unique index uni_definition_id
-    on wf_form_definition (definition_id);
+    on wf_definition_config (definition_id);
 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11638, '请假申请', 5, 1, 'leave', 'workflow/leave/index', 1, 0, 'C', '0', '0', 'demo:leave:list', '#', 103, 1, now(), NULL, NULL, '请假申请菜单');
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11639, '请假申请查询', 11638, 1, '#', '', 1, 0, 'F', '0', '0', 'demo:leave:query', '#', 103, 1, now(), NULL, NULL, '');

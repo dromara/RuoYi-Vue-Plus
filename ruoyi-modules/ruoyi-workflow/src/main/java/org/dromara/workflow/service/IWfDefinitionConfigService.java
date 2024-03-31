@@ -1,7 +1,7 @@
 package org.dromara.workflow.service;
 
-import org.dromara.workflow.domain.vo.WfFormDefinitionVo;
-import org.dromara.workflow.domain.bo.WfFormDefinitionBo;
+import org.dromara.workflow.domain.vo.WfDefinitionConfigVo;
+import org.dromara.workflow.domain.bo.WfDefinitionConfigBo;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,10 +9,10 @@ import java.util.List;
 /**
  * 表单配置Service接口
  *
- * @author gssong
+ * @author may
  * @date 2024-03-18
  */
-public interface IWfFormDefinitionService {
+public interface IWfDefinitionConfigService {
 
     /**
      * 查询表单配置
@@ -20,7 +20,7 @@ public interface IWfFormDefinitionService {
      * @param definitionId 流程定义id
      * @return 结果
      */
-    WfFormDefinitionVo getByDefId(String definitionId);
+    WfDefinitionConfigVo getByDefId(String definitionId);
 
     /**
      * 查询表单配置列表
@@ -28,7 +28,7 @@ public interface IWfFormDefinitionService {
      * @param definitionIds 流程定义id
      * @return 结果
      */
-    List<WfFormDefinitionVo> queryList(List<String> definitionIds);
+    List<WfDefinitionConfigVo> queryList(List<String> definitionIds);
 
 
     /**
@@ -37,7 +37,7 @@ public interface IWfFormDefinitionService {
      * @param bo 参数
      * @return 结果
      */
-    Boolean saveOrUpdate(WfFormDefinitionBo bo);
+    Boolean saveOrUpdate(WfDefinitionConfigBo bo);
 
     /**
      * 删除
@@ -46,4 +46,12 @@ public interface IWfFormDefinitionService {
      * @return 结果
      */
     Boolean deleteByIds(Collection<Long> ids);
+
+    /**
+     * 按照流程定义id删除
+     *
+     * @param ids 流程定义id
+     * @return 结果
+     */
+    Boolean deleteByDefIds(Collection<String> ids);
 }

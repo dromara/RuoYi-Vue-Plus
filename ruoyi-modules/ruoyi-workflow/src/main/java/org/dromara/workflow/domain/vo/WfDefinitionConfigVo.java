@@ -1,0 +1,63 @@
+package org.dromara.workflow.domain.vo;
+
+import org.dromara.workflow.domain.WfDefinitionConfig;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
+import io.github.linpeilie.annotations.AutoMapper;
+import lombok.Data;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+
+/**
+ * 表单配置视图对象 wf_form_definition
+ *
+ * @author may
+ * @date 2024-03-18
+ */
+@Data
+@ExcelIgnoreUnannotated
+@AutoMapper(target = WfDefinitionConfig.class)
+public class WfDefinitionConfigVo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 主键
+     */
+    @ExcelProperty(value = "主键")
+    private Long id;
+
+    /**
+     * 表单ID
+     */
+    @ExcelProperty(value = "表单ID")
+    private Long formId;
+
+    /**
+     * 流程定义ID
+     */
+    @ExcelProperty(value = "流程定义ID")
+    private String definitionId;
+
+    /**
+     * 流程KEY
+     */
+    @ExcelProperty(value = "流程KEY")
+    private String processKey;
+
+    /**
+     * 备注
+     */
+    @ExcelProperty(value = "备注")
+    private String remark;
+
+    /**
+     * 表单管理
+     */
+    private WfFormManageVo wfFormManageVo;
+
+
+}

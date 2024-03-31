@@ -1,6 +1,6 @@
 package org.dromara.workflow.domain;
 
-import org.dromara.common.mybatis.core.domain.BaseEntity;
+import org.dromara.common.tenant.core.TenantEntity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,15 +8,15 @@ import lombok.EqualsAndHashCode;
 import java.io.Serial;
 
 /**
- * 表单配置对象 wf_form_definition
+ * 表单管理对象 wf_form_manage
  *
- * @author gssong
- * @date 2024-03-18
+ * @author may
+ * @date 2024-03-29
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("wf_form_definition")
-public class WfFormDefinition extends BaseEntity {
+@TableName("wf_form_manage")
+public class WfFormManage extends TenantEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -28,19 +28,19 @@ public class WfFormDefinition extends BaseEntity {
     private Long id;
 
     /**
-     * 路由地址
+     * 表单名称
      */
-    private String path;
+    private String formName;
 
     /**
-     * 流程定义ID
+     * 表单类型
      */
-    private String definitionId;
+    private String formType;
 
     /**
-     * 流程KEY
+     * 路由地址/表单ID
      */
-    private String processKey;
+    private String router;
 
     /**
      * 备注

@@ -1,6 +1,6 @@
 package org.dromara.workflow.domain.vo;
 
-import org.dromara.workflow.domain.WfFormDefinition;
+import org.dromara.workflow.domain.WfFormManage;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.github.linpeilie.annotations.AutoMapper;
@@ -10,17 +10,16 @@ import java.io.Serial;
 import java.io.Serializable;
 
 
-
 /**
- * 表单配置视图对象 wf_form_definition
+ * 表单管理视图对象 wf_form_manage
  *
- * @author gssong
- * @date 2024-03-18
+ * @author may
+ * @date 2024-03-29
  */
 @Data
 @ExcelIgnoreUnannotated
-@AutoMapper(target = WfFormDefinition.class)
-public class WfFormDefinitionVo implements Serializable {
+@AutoMapper(target = WfFormManage.class)
+public class WfFormManageVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -32,22 +31,27 @@ public class WfFormDefinitionVo implements Serializable {
     private Long id;
 
     /**
-     * 路由地址
+     * 表单名称
      */
-    @ExcelProperty(value = "路由地址")
-    private String path;
+    @ExcelProperty(value = "表单名称")
+    private String formName;
 
     /**
-     * 流程定义ID
+     * 表单类型
      */
-    @ExcelProperty(value = "流程定义ID")
-    private String definitionId;
+    @ExcelProperty(value = "表单类型")
+    private String formType;
 
     /**
-     * 流程KEY
+     * 表单类型名称
      */
-    @ExcelProperty(value = "流程KEY")
-    private String processKey;
+    private String formTypeName;
+
+    /**
+     * 路由地址/表单ID
+     */
+    @ExcelProperty(value = "路由地址/表单ID")
+    private String router;
 
     /**
      * 备注

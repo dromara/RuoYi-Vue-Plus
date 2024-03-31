@@ -23,15 +23,10 @@ import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.domain.ActHiTaskinst;
-import org.dromara.workflow.domain.vo.MultiInstanceVo;
-import org.dromara.workflow.domain.vo.ParticipantVo;
-import org.dromara.workflow.domain.vo.ProcessInstanceVo;
-import org.dromara.workflow.domain.vo.WfFormDefinitionVo;
+import org.dromara.workflow.domain.vo.*;
 import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
 import org.dromara.workflow.mapper.ActHiTaskinstMapper;
-import org.dromara.workflow.service.IActHiProcinstService;
-import org.dromara.workflow.service.IWfFormDefinitionService;
-import org.dromara.workflow.service.IWorkflowUserService;
+import org.dromara.workflow.service.*;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -46,8 +41,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import java.util.*;
 
-import static org.dromara.workflow.common.constant.FlowConstant.PROCESS_INSTANCE_VO;
-import static org.dromara.workflow.common.constant.FlowConstant.WF_FORM_DEFINITION_VO;
+import static org.dromara.workflow.common.constant.FlowConstant.*;
 
 /**
  * 工作流工具
@@ -61,7 +55,8 @@ public class WorkflowUtils {
     private static final IWorkflowUserService WORKFLOW_USER_SERVICE = SpringUtils.getBean(IWorkflowUserService.class);
     private static final IActHiProcinstService ACT_HI_PROCINST_SERVICE = SpringUtils.getBean(IActHiProcinstService.class);
     private static final ActHiTaskinstMapper ACT_HI_TASKINST_MAPPER = SpringUtils.getBean(ActHiTaskinstMapper.class);
-    private static final IWfFormDefinitionService I_WF_FORM_DEFINITION_SERVICE = SpringUtils.getBean(IWfFormDefinitionService.class);
+    private static final IWfDefinitionConfigService I_WF_FORM_DEFINITION_SERVICE = SpringUtils.getBean(IWfDefinitionConfigService.class);
+    private static final IWfFormManageService I_WF_FORM_MANAGE_SERVICE = SpringUtils.getBean(IWfFormManageService.class);
 
     /**
      * 创建一个新任务
@@ -304,17 +299,26 @@ public class WorkflowUtils {
      * @param idList    流程定义id
      * @param fieldName 流程定义ID属性名称
      */
-    public static void setWfFormDefinitionVo(Object obj, List<String> idList, String fieldName) {
+    public static void setWfDefinitionConfigVo(Object obj, List<String> idList, String fieldName) {
         if (CollUtil.isEmpty(idList) || obj == null) {
             return;
         }
-        List<WfFormDefinitionVo> wfFormDefinitionVoList = I_WF_FORM_DEFINITION_SERVICE.queryList(idList);
+        List<WfDefinitionConfigVo> wfDefinitionConfigVoList = I_WF_FORM_DEFINITION_SERVICE.queryList(idList);
+        if (CollUtil.isNotEmpty(wfDefinitionConfigVoList)) {
+            List<Long> formIds = StreamUtils.toList(wfDefinitionConfigVoList, WfDefinitionConfigVo::getFormId);
+            List<WfFormManageVo> wfFormManageVos = I_WF_FORM_MANAGE_SERVICE.queryByIds(formIds);
+            if (CollUtil.isNotEmpty(wfFormManageVos)) {
+                for (WfDefinitionConfigVo wfDefinitionConfigVo : wfDefinitionConfigVoList) {
+                    wfFormManageVos.stream().filter(e -> ObjectUtil.equals(wfDefinitionConfigVo.getFormId(), e.getId())).findFirst().ifPresent(wfDefinitionConfigVo::setWfFormManageVo);
+                }
+            }
+        }
         if (obj instanceof Collection<?> collection) {
             for (Object o : collection) {
                 String fieldValue = ReflectUtils.invokeGetter(o, fieldName).toString();
-                if (!CollUtil.isEmpty(wfFormDefinitionVoList)) {
-                    wfFormDefinitionVoList.stream().filter(e -> e.getDefinitionId().equals(fieldValue)).findFirst().ifPresent(e -> {
-                        ReflectUtils.invokeSetter(o, WF_FORM_DEFINITION_VO, BeanUtil.toBean(e, WfFormDefinitionVo.class));
+                if (!CollUtil.isEmpty(wfDefinitionConfigVoList)) {
+                    wfDefinitionConfigVoList.stream().filter(e -> e.getDefinitionId().equals(fieldValue)).findFirst().ifPresent(e -> {
+                        ReflectUtils.invokeSetter(o, WF_DEFINITION_CONFIG_VO, BeanUtil.toBean(e, WfDefinitionConfigVo.class));
                     });
                 }
             }

@@ -122,7 +122,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            WorkflowUtils.setWfFormDefinitionVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
+            WorkflowUtils.setWfDefinitionConfigVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         long count = query.count();
         TableDataInfo<ProcessInstanceVo> build = TableDataInfo.build();
@@ -164,7 +164,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            WorkflowUtils.setWfFormDefinitionVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
+            WorkflowUtils.setWfDefinitionConfigVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         long count = query.count();
         TableDataInfo<ProcessInstanceVo> build = TableDataInfo.build();
@@ -669,7 +669,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            WorkflowUtils.setWfFormDefinitionVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
+            WorkflowUtils.setWfDefinitionConfigVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         long count = query.count();
         TableDataInfo<ProcessInstanceVo> build = TableDataInfo.build();

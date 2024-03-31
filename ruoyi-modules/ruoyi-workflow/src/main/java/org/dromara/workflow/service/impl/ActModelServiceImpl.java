@@ -7,27 +7,30 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.excel.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
+import org.dromara.workflow.domain.WfNodeConfig;
 import org.dromara.workflow.domain.bo.ModelBo;
-import org.dromara.workflow.domain.bo.WfFormDefinitionBo;
+import org.dromara.workflow.domain.bo.WfDefinitionConfigBo;
 import org.dromara.workflow.domain.vo.ModelVo;
-import org.dromara.workflow.domain.vo.WfFormDefinitionVo;
+import org.dromara.workflow.domain.vo.WfDefinitionConfigVo;
 import org.dromara.workflow.service.IActModelService;
-import org.dromara.workflow.service.IWfFormDefinitionService;
+import org.dromara.workflow.service.IWfDefinitionConfigService;
+import org.dromara.workflow.service.IWfNodeConfigService;
 import org.dromara.workflow.utils.ModelUtils;
 import org.dromara.workflow.utils.QueryUtils;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.*;
 import org.flowable.validation.ValidationError;
@@ -40,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -55,7 +59,8 @@ import java.util.zip.ZipOutputStream;
 public class ActModelServiceImpl implements IActModelService {
 
     private final RepositoryService repositoryService;
-    private final IWfFormDefinitionService iWfFormDefinitionService;
+    private final IWfDefinitionConfigService iWfDefinitionConfigService;
+    private final IWfNodeConfigService iWfNodeConfigService;
 
     /**
      * 分页查询模型
@@ -66,13 +71,13 @@ public class ActModelServiceImpl implements IActModelService {
     @Override
     public TableDataInfo<Model> page(ModelBo modelBo, PageQuery pageQuery) {
         ModelQuery query = QueryUtils.modelQuery();
-        if (StringUtils.isNotEmpty(modelBo.getName())) {
+        if (StringUtils.isNotBlank(modelBo.getName())) {
             query.modelNameLike("%" + modelBo.getName() + "%");
         }
-        if (StringUtils.isNotEmpty(modelBo.getKey())) {
+        if (StringUtils.isNotBlank(modelBo.getKey())) {
             query.modelKey(modelBo.getKey());
         }
-        if (StringUtils.isNotEmpty(modelBo.getCategoryCode())) {
+        if (StringUtils.isNotBlank(modelBo.getCategoryCode())) {
             query.modelCategory(modelBo.getCategoryCode());
         }
         query.orderByLastUpdateTime().desc();
@@ -279,16 +284,35 @@ public class ActModelServiceImpl implements IActModelService {
             // 更新分类
             ProcessDefinition definition = QueryUtils.definitionQuery().deploymentId(deployment.getId()).singleResult();
             repositoryService.setProcessDefinitionCategory(definition.getId(), model.getCategory());
+            //更新流程定义表单
             if (processDefinition != null) {
-                WfFormDefinitionVo definitionVo = iWfFormDefinitionService.getByDefId(processDefinition.getId());
+                WfDefinitionConfigVo definitionVo = iWfDefinitionConfigService.getByDefId(processDefinition.getId());
                 if (definitionVo != null) {
-                    WfFormDefinitionBo wfFormDefinition = new WfFormDefinitionBo();
+                    WfDefinitionConfigBo wfFormDefinition = new WfDefinitionConfigBo();
                     wfFormDefinition.setDefinitionId(definition.getId());
                     wfFormDefinition.setProcessKey(definition.getKey());
-                    wfFormDefinition.setPath(definitionVo.getPath());
+                    wfFormDefinition.setFormId(ObjectUtil.isNotNull(definitionVo.getFormId()) ? definitionVo.getFormId() : null);
                     wfFormDefinition.setRemark(definitionVo.getRemark());
-                    iWfFormDefinitionService.saveOrUpdate(wfFormDefinition);
+                    iWfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
                 }
+            }
+            //更新流程节点配置表单
+            List<UserTask> userTasks = ModelUtils.getuserTaskFlowElements(definition.getId());
+            List<WfNodeConfig> wfNodeConfigList = new ArrayList<>();
+            for (UserTask userTask : userTasks) {
+                if (StringUtils.isNotBlank(userTask.getFormKey()) && userTask.getFormKey().contains(StrUtil.COLON)) {
+                    WfNodeConfig wfNodeConfig = new WfNodeConfig();
+                    wfNodeConfig.setNodeId(userTask.getId());
+                    wfNodeConfig.setNodeName(userTask.getName());
+                    wfNodeConfig.setDefinitionId(definition.getId());
+                    String[] split = userTask.getFormKey().split(StrUtil.COLON);
+                    wfNodeConfig.setFormType(split[0]);
+                    wfNodeConfig.setFormId(Long.valueOf(split[1]));
+                    wfNodeConfigList.add(wfNodeConfig);
+                }
+            }
+            if (CollUtil.isNotEmpty(wfNodeConfigList)) {
+                iWfNodeConfigService.saveOrUpdate(wfNodeConfigList);
             }
             return true;
         } catch (Exception e) {
