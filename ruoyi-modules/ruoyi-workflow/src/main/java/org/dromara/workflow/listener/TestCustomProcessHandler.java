@@ -17,6 +17,13 @@ import org.springframework.stereotype.Component;
 public class TestCustomProcessHandler implements FlowProcessEventHandler {
 
 
+    /**
+     * 执行办理任务监听
+     *
+     * @param businessKey 业务id
+     * @param status      状态
+     * @param submit      当为true时为申请人节点办理
+     */
     @Override
     public void handleProcess(String businessKey, String status, boolean submit) {
         log.info("业务ID:" + businessKey + ",状态:" + status);
