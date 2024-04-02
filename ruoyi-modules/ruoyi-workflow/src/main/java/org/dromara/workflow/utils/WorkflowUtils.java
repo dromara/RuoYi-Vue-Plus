@@ -318,7 +318,7 @@ public class WorkflowUtils {
                 String fieldValue = ReflectUtils.invokeGetter(o, fieldName).toString();
                 if (!CollUtil.isEmpty(wfDefinitionConfigVoList)) {
                     wfDefinitionConfigVoList.stream().filter(e -> e.getDefinitionId().equals(fieldValue)).findFirst().ifPresent(e -> {
-                        ReflectUtils.invokeSetter(o, WF_DEFINITION_CONFIG_VO, BeanUtil.toBean(e, WfDefinitionConfigVo.class));
+                        ReflectUtils.invokeSetter(o, WF_DEFINITION_CONFIG_VO, e);
                     });
                 }
             }
