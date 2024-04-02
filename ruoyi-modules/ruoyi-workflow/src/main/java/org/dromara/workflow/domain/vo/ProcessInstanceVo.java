@@ -41,7 +41,7 @@ public class ProcessInstanceVo implements Serializable {
     /**
      * 流程定义版本
      */
-    private String processDefinitionVersion;
+    private Integer processDefinitionVersion;
 
     /**
      * 部署id

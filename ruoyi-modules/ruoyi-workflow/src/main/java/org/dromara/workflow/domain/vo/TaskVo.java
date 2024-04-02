@@ -142,6 +142,11 @@ public class TaskVo implements Serializable {
     private String processDefinitionKey;
 
     /**
+     * 流程定义版本
+     */
+    private Integer processDefinitionVersion;
+
+    /**
      * 参与者
      */
     private ParticipantVo participantVo;

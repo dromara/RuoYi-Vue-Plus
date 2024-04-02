@@ -339,6 +339,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                         taskVo.setBusinessStatusName(BusinessStatusEnum.findByStatus(taskVo.getBusinessStatus()));
                         taskVo.setProcessDefinitionKey(e.getProcessDefinitionKey());
                         taskVo.setProcessDefinitionName(e.getProcessDefinitionName());
+                        taskVo.setProcessDefinitionVersion(e.getProcessDefinitionVersion());
                         taskVo.setBusinessKey(e.getBusinessKey());
                     });
                 }
