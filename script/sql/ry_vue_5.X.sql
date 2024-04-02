@@ -869,7 +869,6 @@ insert into sys_client values (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc1
 insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms,social', 'android', 1800, 604800, 0, 0, 103, 1, sysdate(), 1, sysdate());
 
 
-DROP TABLE if EXISTS test_demo;
 CREATE TABLE test_demo
 (
     id          bigint(0)    NOT NULL COMMENT '主键',
@@ -889,7 +888,6 @@ CREATE TABLE test_demo
     PRIMARY KEY (id) USING BTREE
 ) ENGINE = InnoDB COMMENT = '测试单表';
 
-DROP TABLE if EXISTS test_tree;
 CREATE TABLE test_tree
 (
     id          bigint(0)    NOT NULL COMMENT '主键',
