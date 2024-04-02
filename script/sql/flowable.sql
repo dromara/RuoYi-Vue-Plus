@@ -19,7 +19,6 @@ insert into sys_menu values ('11625', '流程分类修改', '11622', '3', '#', '
 insert into sys_menu values ('11626', '流程分类删除', '11622', '4', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:remove','#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values ('11627', '流程分类导出', '11622', '5', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:export','#', 103, 1, sysdate(), null, null, '');
 -- 请假单信息
-DROP TABLE if EXISTS test_leave;
 create table test_leave
 (
     id          bigint                       not null comment '主键',
@@ -38,7 +37,6 @@ create table test_leave
 ) ENGINE = InnoDB COMMENT = '请假申请表';
 
 -- 流程分类信息表
-DROP TABLE if EXISTS wf_category;
 create table wf_category
 (
     id            bigint                       not null comment '主键'
@@ -58,7 +56,6 @@ create table wf_category
 ) engine=innodb comment= '流程分类';
 INSERT INTO wf_category values (1, 'OA', 'OA', 0, 0, '000000', 103, 1, sysdate(), 1, sysdate());
 
-DROP TABLE if EXISTS wf_task_back_node;
 create table wf_task_back_node
 (
     id          bigint                       not null
@@ -78,7 +75,6 @@ create table wf_task_back_node
 )
     comment '节点审批记录';
 
-DROP TABLE if EXISTS wf_definition_config;
 create table wf_definition_config
 (
     id            bigint                        not null comment '主键'

@@ -69,7 +69,6 @@ comment on column  sys_social.del_flag          is '删除标志（0代表存在
 -- ----------------------------
 -- 租户表
 -- ----------------------------
-drop table if exists sys_tenant;
 create table if not exists sys_tenant
 (
     id                int8,
@@ -128,7 +127,6 @@ insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有�
 -- ----------------------------
 -- 租户套餐表
 -- ----------------------------
-drop table if exists sys_tenant_package;
 create table if not exists sys_tenant_package
 (
     package_id          int8,
@@ -164,7 +162,6 @@ comment on column  sys_tenant_package.update_time        is '更新时间';
 -- ----------------------------
 -- 1、部门表
 -- ----------------------------
-drop table if exists sys_dept;
 create table if not exists sys_dept
 (
     dept_id     int8,
@@ -221,7 +218,6 @@ insert into sys_dept values(109, '000000', 102, '0,100,102',  '财务部门',   
 -- ----------------------------
 -- 2、用户信息表
 -- ----------------------------
-drop table if exists sys_user;
 create table if not exists sys_user
 (
     user_id     int8,
@@ -282,7 +278,6 @@ insert into sys_user VALUES(4, '000000', 102, 'test1', '仅本人 密码666666',
 -- ----------------------------
 -- 3、岗位信息表
 -- ----------------------------
-drop table if exists sys_post;
 create table if not exists sys_post
 (
     post_id     int8,
@@ -325,7 +320,6 @@ insert into sys_post values(4, '000000', 'user', '普通员工',  4, '0', 103, 1
 -- ----------------------------
 -- 4、角色信息表
 -- ----------------------------
-drop table if exists sys_role;
 create table if not exists sys_role
 (
     role_id             int8,
@@ -375,7 +369,6 @@ insert into sys_role values('4', '000000', '仅本人', 'test2', 4, '5', 't', 't
 -- ----------------------------
 -- 5、菜单权限表
 -- ----------------------------
-drop table if exists sys_menu;
 create table if not exists sys_menu
 (
     menu_id     int8,
@@ -575,7 +568,6 @@ INSERT INTO sys_menu VALUES('1511', '测试树表导出', '1506', '5', '#', '', 
 -- ----------------------------
 -- 6、用户和角色关联表  用户N-1角色
 -- ----------------------------
-drop table if exists sys_user_role;
 create table if not exists sys_user_role
 (
     user_id int8 not null,
@@ -597,7 +589,6 @@ insert into sys_user_role values ('4', '4');
 -- ----------------------------
 -- 7、角色和菜单关联表  角色1-N菜单
 -- ----------------------------
-drop table if exists sys_role_menu;
 create table if not exists sys_role_menu
 (
     role_id int8 not null,
@@ -699,7 +690,6 @@ insert into sys_role_menu values ('4', '1511');
 -- ----------------------------
 -- 8、角色和部门关联表  角色1-N部门
 -- ----------------------------
-drop table if exists sys_role_dept;
 create table if not exists sys_role_dept
 (
     role_id int8 not null,
@@ -715,7 +705,6 @@ comment on column sys_role_dept.dept_id     is '部门ID';
 -- ----------------------------
 -- 9、用户与岗位关联表  用户1-N岗位
 -- ----------------------------
-drop table if exists sys_user_post;
 create table if not exists sys_user_post
 (
     user_id int8 not null,
@@ -735,7 +724,6 @@ insert into sys_user_post values ('1', '1');
 -- ----------------------------
 -- 10、操作日志记录
 -- ----------------------------
-drop table if exists sys_oper_log;
 create table if not exists sys_oper_log
 (
     oper_id        int8,
@@ -786,7 +774,6 @@ comment on column sys_oper_log.cost_time        is '消耗时间';
 -- ----------------------------
 -- 11、字典类型表
 -- ----------------------------
-drop table if exists sys_dict_type;
 create table if not exists sys_dict_type
 (
     dict_id     int8,
@@ -830,7 +817,6 @@ insert into sys_dict_type values(12, '000000', '设备类型', 'sys_device_type'
 -- ----------------------------
 -- 12、字典数据表
 -- ----------------------------
-drop table if exists sys_dict_data;
 create table if not exists sys_dict_data
 (
     dict_code   int8,
@@ -907,7 +893,6 @@ insert into sys_dict_data values(38, '000000', 0,  '小程序', 'xcx',         '
 -- ----------------------------
 -- 13、参数配置表
 -- ----------------------------
-drop table if exists sys_config;
 create table if not exists sys_config
 (
     config_id    int8,
@@ -949,7 +934,6 @@ insert into sys_config values(11, '000000', 'OSS预览列表资源开关',      
 -- ----------------------------
 -- 14、系统访问记录
 -- ----------------------------
-drop table if exists sys_logininfor;
 create table if not exists sys_logininfor
 (
     info_id        int8,
@@ -987,7 +971,6 @@ comment on column sys_logininfor.login_time     is '访问时间';
 -- ----------------------------
 -- 17、通知公告表
 -- ----------------------------
-drop table if exists sys_notice;
 create table if not exists sys_notice
 (
     notice_id      int8,
@@ -1029,7 +1012,6 @@ insert into sys_notice values('2', '000000', '维护通知：2018-07-01 系统�
 -- ----------------------------
 -- 18、代码生成业务表
 -- ----------------------------
-drop table if exists gen_table;
 create table if not exists gen_table
 (
     table_id          int8,
@@ -1084,7 +1066,6 @@ comment on column gen_table.remark is '备注';
 -- ----------------------------
 -- 19、代码生成业务表字段
 -- ----------------------------
-drop table if exists gen_table_column;
 create table if not exists gen_table_column
 (
     column_id      int8,
@@ -1141,7 +1122,6 @@ comment on column gen_table_column.update_time is '更新时间';
 -- ----------------------------
 -- OSS对象存储表
 -- ----------------------------
-drop table if exists sys_oss;
 create table if not exists sys_oss
 (
     oss_id        int8,
@@ -1176,7 +1156,6 @@ comment on column sys_oss.service           is '服务商';
 -- ----------------------------
 -- OSS对象存储动态配置表
 -- ----------------------------
-drop table if exists sys_oss_config;
 create table if not exists sys_oss_config
 (
     oss_config_id int8,
@@ -1233,7 +1212,6 @@ insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'r
 -- ----------------------------
 -- 系统授权表
 -- ----------------------------
-drop table if exists sys_client;
 create table sys_client (
     id                  int8,
     client_id           varchar(64)   default ''::varchar,
@@ -1273,7 +1251,6 @@ comment on column sys_client.update_time            is '更新时间';
 insert into sys_client values (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password,social', 'pc', 1800, 604800, 0, 0, 103, 1, now(), 1, now());
 insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms,social', 'android', 1800, 604800, 0, 0, 103, 1, now(), 1, now());
 
-DROP TABLE if EXISTS test_demo;
 create table if not exists test_demo
 (
     id          int8,
@@ -1308,7 +1285,6 @@ comment on column test_demo.update_time is '更新时间';
 comment on column test_demo.update_by is '更新人';
 comment on column test_demo.del_flag is '删除标志';
 
-DROP TABLE if EXISTS test_tree;
 create table if not exists test_tree
 (
     id          int8,

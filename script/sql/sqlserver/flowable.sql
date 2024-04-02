@@ -19,7 +19,6 @@ insert into sys_menu values ('11625', '流程分类修改', '11622', '3', '#', '
 insert into sys_menu values ('11626', '流程分类删除', '11622', '4', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:remove','#', 103, 1, getdate(), null, null, '');
 insert into sys_menu values ('11627', '流程分类导出', '11622', '5', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:export','#', 103, 1, getdate(), null, null, '');
 -- 请假单信息
-DROP TABLE if EXISTS test_leave;
 create table test_leave
 (
     id          bigint        not null
@@ -84,7 +83,6 @@ exec sp_addextendedproperty 'MS_Description', N'租户编号', 'SCHEMA', 'dbo', 
 go
 
 -- 流程分类信息表
-DROP TABLE if EXISTS wf_category;
 create table wf_category
 (
     id            bigint not null
