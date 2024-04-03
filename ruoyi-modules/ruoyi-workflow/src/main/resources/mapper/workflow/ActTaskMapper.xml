@@ -19,14 +19,14 @@
         <result property="endTime" column="END_TIME_"/>
         <result property="taskDefinitionKey" column="TASK_DEF_KEY_"/>
         <result property="dueDate" column="DUE_DATE_"/>
-        <result property="processDefinitionKey" column="key_"/>
         <result property="category" column="CATEGORY_"/>
         <result property="parentTaskId" column="PARENT_TASK_ID_"/>
         <result property="tenantId" column="TENANT_ID_"/>
         <result property="claimTime" column="CLAIM_TIME"/>
         <result property="businessStatus" column="BUSINESS_STATUS_"/>
         <result property="processDefinitionName" column="processDefinitionName"/>
-        <result property="processDefinitionKey" column="processDefinitionName"/>
+        <result property="processDefinitionKey" column="processDefinitionKey"/>
+        <result property="processDefinitionVersion" column="processDefinitionVersion"/>
         <result property="businessKey" column="BUSINESS_KEY_"/>
 
     </resultMap>
