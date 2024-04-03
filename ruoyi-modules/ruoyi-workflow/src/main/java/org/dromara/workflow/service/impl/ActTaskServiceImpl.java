@@ -171,7 +171,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             if (ObjectUtil.isNotEmpty(task.getDelegationState()) && FlowConstant.PENDING.equals(task.getDelegationState().name())) {
                 taskService.resolveTask(completeTaskBo.getTaskId());
                 TaskEntity newTask = WorkflowUtils.createNewTask(task);
-                taskService.addComment(newTask.getId(), task.getProcessInstanceId(), completeTaskBo.getMessage());
+                taskService.addComment(newTask.getId(), task.getProcessInstanceId(), TaskStatusEnum.PASS.getStatus(), StringUtils.isNotBlank(completeTaskBo.getMessage()) ? completeTaskBo.getMessage() : StrUtil.EMPTY);
                 taskService.complete(newTask.getId());
                 return true;
             }
