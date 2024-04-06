@@ -56,7 +56,7 @@
               FROM ACT_HI_TASKINST HTI
                        INNER JOIN ACT_HI_PROCINST AHP ON HTI.PROC_INST_ID_ = AHP.PROC_INST_ID_
                        INNER JOIN ACT_RE_PROCDEF ARP ON ARP.ID_ = HTI.PROC_DEF_ID_
-              WHERE HTI.PARENT_TASK_ID_ IS NULL
+              WHERE HTI.PARENT_TASK_ID_ IS NULL AND HTI.END_TIME_ IS NOT NULL
               ORDER BY HTI.START_TIME_ DESC) t ${ew.getCustomSqlSegment}
     </select>
 
@@ -71,7 +71,7 @@
               FROM ACT_HI_TASKINST AHT
                        INNER JOIN ACT_HI_PROCINST AHP ON AHT.PROC_INST_ID_ = AHP.PROC_INST_ID_
                        INNER JOIN ACT_RE_PROCDEF ARP ON ARP.ID_ = AHT.PROC_DEF_ID_
-              WHERE AHT.PARENT_TASK_ID_ is not null
+              WHERE AHT.PARENT_TASK_ID_ IS NOT NULL
                 and AHT.scope_type_ = 'copy'
               ORDER BY AHT.START_TIME_ DESC) t ${ew.getCustomSqlSegment}
     </select>
