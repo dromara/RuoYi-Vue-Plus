@@ -23,6 +23,32 @@ public interface IWfDefinitionConfigService {
     WfDefinitionConfigVo getByDefId(String definitionId);
 
     /**
+     * 查询流程定义配置
+     *
+     * @param tableName 表名
+     * @return 结果
+     */
+    WfDefinitionConfigVo getByTableNameLastVersion(String tableName);
+
+    /**
+     * 查询流程定义配置
+     *
+     * @param definitionId 流程定义id
+     * @param tableName    表名
+     * @return 结果
+     */
+    WfDefinitionConfigVo getByDefIdAndTableName(String definitionId, String tableName);
+
+    /**
+     * 查询流程定义配置排除当前查询的流程定义
+     *
+     * @param definitionId 流程定义id
+     * @param tableName    表名
+     * @return 结果
+     */
+    List<WfDefinitionConfigVo> getByTableNameNotDefId(String tableName, String definitionId);
+
+    /**
      * 查询流程定义配置列表
      *
      * @param definitionIds 流程定义id

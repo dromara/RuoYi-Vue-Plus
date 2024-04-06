@@ -1,7 +1,9 @@
 package org.dromara.workflow.domain.bo;
 
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.dromara.common.core.validate.AddGroup;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -23,12 +25,14 @@ public class StartProcessBo implements Serializable {
     /**
      * 业务唯一值id
      */
+    @NotBlank(message = "业务ID不能为空", groups = {AddGroup.class})
     private String businessKey;
 
     /**
-     * 流程执行key
+     * 表名
      */
-    private String processKey;
+    @NotBlank(message = "表名不能为空", groups = {AddGroup.class})
+    private String tableName;
 
     /**
      * 流程变量，前端会提交一个元素{'entity': {业务详情数据对象}}

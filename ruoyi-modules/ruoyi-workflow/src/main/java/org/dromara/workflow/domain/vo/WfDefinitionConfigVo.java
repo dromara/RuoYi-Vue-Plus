@@ -31,10 +31,10 @@ public class WfDefinitionConfigVo implements Serializable {
     private Long id;
 
     /**
-     * 表单ID
+     * 表名
      */
-    @ExcelProperty(value = "表单ID")
-    private Long formId;
+    @ExcelProperty(value = "表名")
+    private String tableName;
 
     /**
      * 流程定义ID
@@ -47,6 +47,13 @@ public class WfDefinitionConfigVo implements Serializable {
      */
     @ExcelProperty(value = "流程KEY")
     private String processKey;
+
+
+    /**
+     * 流程版本
+     */
+    @ExcelProperty(value = "流程版本")
+    private Integer version;
 
     /**
      * 备注

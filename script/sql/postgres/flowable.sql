@@ -169,9 +169,10 @@ create table wf_definition_config
     id            bigint not null
         constraint pk_wf_definition_config
         primary key,
-    form_id       bigint(20) not null,
+    table_name    varchar(255) not null,
     definition_id varchar(255) not null,
-    process_key   varchar(255)  not null,
+    process_key   varchar(255) not null,
+    version       bigint       not null,
     tenant_id     varchar(20),
     create_dept   bigint,
     create_by     bigint,
@@ -184,11 +185,13 @@ comment on table wf_definition_config is '流程定义配置';
 
 comment on column wf_definition_config.id is '主键';
 
-comment on column wf_definition_config.form_id is '表单ID';
+comment on column wf_definition_config.table_name is '表名';
 
 comment on column wf_definition_config.definition_id is '流程定义ID';
 
 comment on column wf_definition_config.process_key is '流程KEY';
+
+comment on column wf_definition_config.version is '流程版本';
 
 comment on column wf_definition_config.tenant_id is '租户id';
 

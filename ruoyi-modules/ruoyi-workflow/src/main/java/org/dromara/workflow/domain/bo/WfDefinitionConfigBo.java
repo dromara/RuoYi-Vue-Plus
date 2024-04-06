@@ -27,10 +27,10 @@ public class WfDefinitionConfigBo extends BaseEntity {
     private Long id;
 
     /**
-     * 表单ID
+     * 表名
      */
-    @NotNull(message = "表单ID不能为空", groups = {AddGroup.class})
-    private Long formId;
+    @NotBlank(message = "表名不能为空", groups = {AddGroup.class})
+    private String tableName;
 
     /**
      * 流程定义ID
@@ -43,6 +43,12 @@ public class WfDefinitionConfigBo extends BaseEntity {
      */
     @NotBlank(message = "流程KEY不能为空", groups = {AddGroup.class})
     private String processKey;
+
+    /**
+     * 流程版本
+     */
+    @NotNull(message = "流程版本不能为空", groups = {AddGroup.class})
+    private Integer version;
 
     /**
      * 备注

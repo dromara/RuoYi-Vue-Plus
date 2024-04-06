@@ -30,6 +30,7 @@ import org.dromara.workflow.flowable.strategy.FlowTaskEventHandler;
 import org.dromara.workflow.mapper.ActHiTaskinstMapper;
 import org.dromara.workflow.mapper.ActTaskMapper;
 import org.dromara.workflow.service.IActTaskService;
+import org.dromara.workflow.service.IWfDefinitionConfigService;
 import org.dromara.workflow.service.IWfNodeConfigService;
 import org.dromara.workflow.service.IWfTaskBackNodeService;
 import org.dromara.workflow.utils.ModelUtils;
@@ -78,6 +79,7 @@ public class ActTaskServiceImpl implements IActTaskService {
     private final IWfTaskBackNodeService iWfTaskBackNodeService;
     private final ActHiTaskinstMapper actHiTaskinstMapper;
     private final IWfNodeConfigService iWfNodeConfigService;
+    private final IWfDefinitionConfigService iWfDefinitionConfigService;
 
     /**
      * 启动任务
@@ -106,6 +108,10 @@ public class ActTaskServiceImpl implements IActTaskService {
             map.put("taskId", taskResult.get(0).getId());
             return map;
         }
+        WfDefinitionConfigVo wfDefinitionConfigVo = iWfDefinitionConfigService.getByTableNameLastVersion(startProcessBo.getTableName());
+        if (wfDefinitionConfigVo == null) {
+            throw new ServiceException("请到流程定义绑定业务表名与流程KEY！");
+        }
         // 设置启动人
         identityService.setAuthenticatedUserId(String.valueOf(LoginHelper.getUserId()));
         Authentication.setAuthenticatedUserId(String.valueOf(LoginHelper.getUserId()));
@@ -118,12 +124,12 @@ public class ActTaskServiceImpl implements IActTaskService {
         ProcessInstance pi;
         try {
             if (TenantHelper.isEnable()) {
-                pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());
+                pi = runtimeService.startProcessInstanceByKeyAndTenantId(wfDefinitionConfigVo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());
             } else {
-                pi = runtimeService.startProcessInstanceByKey(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables);
+                pi = runtimeService.startProcessInstanceByKey(wfDefinitionConfigVo.getProcessKey(), startProcessBo.getBusinessKey(), variables);
             }
         } catch (FlowableObjectNotFoundException e) {
-            throw new ServiceException("找不到当前【" + startProcessBo.getProcessKey() + "】流程定义！");
+            throw new ServiceException("找不到当前【" + wfDefinitionConfigVo.getProcessKey() + "】流程定义！");
         }
         // 将流程定义名称 作为 流程实例名称
         runtimeService.setProcessInstanceName(pi.getProcessInstanceId(), pi.getProcessDefinitionName());

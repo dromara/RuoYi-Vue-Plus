@@ -1,5 +1,6 @@
 package org.dromara.workflow.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import org.dromara.common.core.utils.MapstructUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,49 @@ public class WfDefinitionConfigServiceImpl implements IWfDefinitionConfigService
     }
 
     /**
+     * 查询流程定义配置
+     *
+     * @param tableName 表名
+     * @return 结果
+     */
+    @Override
+    public WfDefinitionConfigVo getByTableNameLastVersion(String tableName) {
+        List<WfDefinitionConfigVo> wfDefinitionConfigVos = baseMapper.selectVoList(
+            new LambdaQueryWrapper<WfDefinitionConfig>().eq(WfDefinitionConfig::getTableName, tableName).orderByDesc(WfDefinitionConfig::getVersion));
+        if (CollUtil.isNotEmpty(wfDefinitionConfigVos)) {
+            return wfDefinitionConfigVos.get(0);
+        }
+        return null;
+    }
+
+    /**
+     * 查询流程定义配置
+     *
+     * @param definitionId 流程定义id
+     * @param tableName    表名
+     * @return 结果
+     */
+    @Override
+    public WfDefinitionConfigVo getByDefIdAndTableName(String definitionId, String tableName) {
+        return baseMapper.selectVoOne(new LambdaQueryWrapper<WfDefinitionConfig>()
+            .eq(WfDefinitionConfig::getDefinitionId, definitionId)
+            .eq(WfDefinitionConfig::getTableName, tableName));
+    }
+
+    /**
+     * 查询流程定义配置排除当前查询的流程定义
+     *
+     * @param tableName    表名
+     * @param definitionId 流程定义id
+     */
+    @Override
+    public List<WfDefinitionConfigVo> getByTableNameNotDefId(String tableName, String definitionId) {
+        return baseMapper.selectVoList(new LambdaQueryWrapper<WfDefinitionConfig>()
+            .eq(WfDefinitionConfig::getTableName, tableName)
+            .ne(WfDefinitionConfig::getDefinitionId, definitionId));
+    }
+
+    /**
      * 查询流程定义配置列表
      */
     @Override
@@ -49,6 +93,8 @@ public class WfDefinitionConfigServiceImpl implements IWfDefinitionConfigService
     @Transactional(rollbackFor = Exception.class)
     public Boolean saveOrUpdate(WfDefinitionConfigBo bo) {
         WfDefinitionConfig add = MapstructUtils.convert(bo, WfDefinitionConfig.class);
+        baseMapper.delete(new LambdaQueryWrapper<WfDefinitionConfig>().eq(WfDefinitionConfig::getTableName, bo.getTableName()));
+        add.setTableName(add.getTableName().toLowerCase());
         boolean flag = baseMapper.insertOrUpdate(add);
         if (baseMapper.insertOrUpdate(add)) {
             bo.setId(add.getId());

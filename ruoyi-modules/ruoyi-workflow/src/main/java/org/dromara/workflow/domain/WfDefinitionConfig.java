@@ -28,9 +28,9 @@ public class WfDefinitionConfig extends BaseEntity {
     private Long id;
 
     /**
-     * 表单ID
+     * 表名
      */
-    private Long formId;
+    private String tableName;
 
     /**
      * 流程定义ID
@@ -41,6 +41,11 @@ public class WfDefinitionConfig extends BaseEntity {
      * 流程KEY
      */
     private String processKey;
+
+    /**
+     * 流程版本
+     */
+    private Integer version;
 
     /**
      * 备注

@@ -125,9 +125,10 @@ create table WF_DEFINITION_CONFIG
     ID            NUMBER(20) NOT NULL
         CONSTRAINT PK_WF_DEFINITION_CONFIG
         PRIMARY KEY,
-    FORM_ID       NUMBER(20) NOT NULL,
+    TABLE_NAME    VARCHAR2(255) NOT NULL,
     DEFINITION_ID VARCHAR2(255) NOT NULL,
-    PROCESS_KEY   VARCHAR2(255)  NOT NULL,
+    PROCESS_KEY   VARCHAR2(255) NOT NULL,
+    VERSION       NUMBER(10)    NOT NULL,
     TENANT_ID     VARCHAR2(20),
     CREATE_DEPT   NUMBER(20),
     CREATE_BY     NUMBER(20),
@@ -139,9 +140,10 @@ create table WF_DEFINITION_CONFIG
 );
 comment on table WF_DEFINITION_CONFIG is '流程定义配置'
 comment on column WF_DEFINITION_CONFIG.ID is '主键'
-comment on column WF_DEFINITION_CONFIG.FORM_ID is '表单ID'
+comment on column WF_DEFINITION_CONFIG.TABLE_NAME is '表名'
 comment on column WF_DEFINITION_CONFIG.DEFINITION_ID is '流程定义ID'
 comment on column WF_DEFINITION_CONFIG.PROCESS_KEY is '流程KEY'
+comment on column WF_DEFINITION_CONFIG.VERSION is '流程版本'
 comment on column WF_DEFINITION_CONFIG.TENANT_ID is '租户编号'
 comment on column WF_DEFINITION_CONFIG.CREATE_DEPT is '创建部门'
 comment on column WF_DEFINITION_CONFIG.CREATE_BY is '创建者'

@@ -53,7 +53,7 @@ public class ActTaskController extends BaseController {
     @Log(title = "任务管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping("/startWorkFlow")
-    public R<Map<String, Object>> startWorkFlow(@RequestBody StartProcessBo startProcessBo) {
+    public R<Map<String, Object>> startWorkFlow(@Validated(AddGroup.class) @RequestBody StartProcessBo startProcessBo) {
         Map<String, Object> map = actTaskService.startWorkFlow(startProcessBo);
         return R.ok("提交成功", map);
     }

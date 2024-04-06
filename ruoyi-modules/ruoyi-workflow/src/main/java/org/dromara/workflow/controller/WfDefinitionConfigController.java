@@ -38,7 +38,7 @@ public class WfDefinitionConfigController extends BaseController {
      */
     @GetMapping("/getByDefId/{definitionId}")
     public R<WfDefinitionConfigVo> getByDefId(@NotBlank(message = "流程定义ID不能为空")
-                                            @PathVariable String definitionId) {
+                                              @PathVariable String definitionId) {
         return R.ok(wfDefinitionConfigService.getByDefId(definitionId));
     }
 
@@ -63,4 +63,17 @@ public class WfDefinitionConfigController extends BaseController {
                           @PathVariable Long[] ids) {
         return toAjax(wfDefinitionConfigService.deleteByIds(List.of(ids)));
     }
+
+    /**
+     * 查询流程定义配置排除当前查询的流程定义
+     *
+     * @param tableName    表名
+     * @param definitionId 流程定义id
+     */
+    @GetMapping("/getByTableNameNotDefId/{tableName}/{definitionId}")
+    public R<List<WfDefinitionConfigVo>> getByTableNameNotDefId(@NotBlank(message = "表名不能为空") @PathVariable String tableName,
+                                                                @NotBlank(message = "流程定义ID不能为空") @PathVariable String definitionId) {
+        return R.ok(wfDefinitionConfigService.getByTableNameNotDefId(tableName, definitionId));
+    }
+
 }

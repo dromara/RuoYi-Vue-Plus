@@ -215,11 +215,12 @@ go
 create table wf_definition_config
 (
     id            bigint not null primary key,
-    form_id       bigint not null,
-    definition_id nvarchar(255)
+    table_name    nvarchar(255)  not null,
+    definition_id nvarchar(255)  not null
         constraint uni_definition_id
         unique,
     process_key   nvarchar(255)  not null,
+    version       bigint         not null,
     tenant_id     nvarchar(20),
     create_dept   bigint,
     create_by     bigint,
@@ -235,8 +236,8 @@ go
 exec sp_addextendedproperty 'MS_Description', N'主键', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN', 'id'
 go
 
-exec sp_addextendedproperty 'MS_Description', N'表单ID', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
-     'form_id'
+exec sp_addextendedproperty 'MS_Description', N'表名', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
+     'table_name'
 go
 
 exec sp_addextendedproperty 'MS_Description', N'流程定义ID', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
@@ -245,6 +246,10 @@ go
 
 exec sp_addextendedproperty 'MS_Description', N'流程KEY', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
      'process_key'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'流程版本', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
+     'version'
 go
 
 exec sp_addextendedproperty 'MS_Description', N'租户编号', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',

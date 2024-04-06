@@ -79,9 +79,10 @@ create table wf_definition_config
 (
     id            bigint                        not null comment '主键'
         primary key,
-    form_id       bigint                        not null comment '表单ID',
+    table_name    varchar(255)                  not null comment '表名',
     definition_id varchar(255)                  not null comment '流程定义ID',
     process_key   varchar(255)                  not null comment '流程KEY',
+    version       int(10)                       not null comment '流程版本',
     create_dept   bigint                        null comment '创建部门',
     create_by     bigint                        null comment '创建者',
     create_time   datetime                      null comment '创建时间',
