@@ -115,19 +115,20 @@ insert into wf_form_manage(id, form_name, form_type, router, remark, tenant_id, 
 
 create table wf_node_config
 (
-    id            bigint       not null comment '主键'
+    id               bigint       not null comment '主键'
         primary key,
-    form_id       bigint       null comment '表单id',
-    form_type     varchar(255) null comment '表单类型',
-    node_name     varchar(255) not null comment '节点名称',
-    node_id       varchar(255) not null comment '节点id',
-    definition_id varchar(255) not null comment '流程定义id',
-    create_dept   bigint       null comment '创建部门',
-    create_by     bigint       null comment '创建者',
-    create_time   datetime     null comment '创建时间',
-    update_by     bigint       null comment '更新者',
-    update_time   datetime     null comment '更新时间',
-    tenant_id     varchar(20)  null comment '租户编号'
+    form_id          bigint       null comment '表单id',
+    form_type        varchar(255) null comment '表单类型',
+    node_name        varchar(255) not null comment '节点名称',
+    node_id          varchar(255) not null comment '节点id',
+    definition_id    varchar(255) not null comment '流程定义id',
+    apply_user_task  char(1)      default '0'     comment '是否为申请人节点 （0是 1否）',
+    create_dept      bigint       null comment '创建部门',
+    create_by        bigint       null comment '创建者',
+    create_time      datetime     null comment '创建时间',
+    update_by        bigint       null comment '更新者',
+    update_time      datetime     null comment '更新时间',
+    tenant_id        varchar(20)  null comment '租户编号'
 )
     comment '节点配置';
 

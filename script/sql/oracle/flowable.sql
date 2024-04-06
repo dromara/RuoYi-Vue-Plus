@@ -183,20 +183,21 @@ insert into wf_form_manage(id, form_name, form_type, router, remark, tenant_id, 
 
 create table WF_NODE_CONFIG
 (
-    ID            NUMBER(20) NOT NULL
+    ID               NUMBER(20) NOT NULL
         CONSTRAINT PK_WF_NODE_CONFIG
         PRIMARY KEY,
-    FORM_ID       NUMBER(20),
-    FORM_TYPE     VARCHAR2(255),
-    NODE_NAME     VARCHAR2(255) NOT NULL,
-    NODE_ID       VARCHAR2(255) NOT NULL,
-    DEFINITION_ID VARCHAR2(255) NOT NULL,
-    TENANT_ID     VARCHAR2(20),
-    CREATE_DEPT   NUMBER(20),
-    CREATE_BY     NUMBER(20),
-    CREATE_TIME   DATE,
-    UPDATE_BY     NUMBER(20),
-    UPDATE_TIME   DATE
+    FORM_ID          NUMBER(20),
+    FORM_TYPE        VARCHAR2(255),
+    NODE_NAME        VARCHAR2(255) NOT NULL,
+    NODE_ID          VARCHAR2(255) NOT NULL,
+    DEFINITION_ID    VARCHAR2(255) NOT NULL,
+    APPLY_USER_TASK  CHAR(1) DEFAULT '0',
+    TENANT_ID        VARCHAR2(20),
+    CREATE_DEPT      NUMBER(20),
+    CREATE_BY        NUMBER(20),
+    CREATE_TIME      DATE,
+    UPDATE_BY        NUMBER(20),
+    UPDATE_TIME      DATE
 );
 
 comment on table WF_NODE_CONFIG is '节点配置'
@@ -206,6 +207,7 @@ comment on column WF_NODE_CONFIG.FORM_TYPE is '表单类型'
 comment on column WF_NODE_CONFIG.NODE_ID is '节点id'
 comment on column WF_NODE_CONFIG.NODE_NAME is '节点名称'
 comment on column WF_NODE_CONFIG.DEFINITION_ID is '流程定义id'
+comment on column WF_NODE_CONFIG.APPLY_USER_TASK is '是否为申请人节点 （0是 1否）'
 comment on column WF_NODE_CONFIG.TENANT_ID is '租户编号'
 comment on column WF_NODE_CONFIG.CREATE_DEPT is '创建部门'
 comment on column WF_NODE_CONFIG.CREATE_BY is '创建者'

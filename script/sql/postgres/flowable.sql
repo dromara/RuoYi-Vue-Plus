@@ -252,20 +252,21 @@ insert into wf_form_manage(id, form_name, form_type, router, remark, tenant_id, 
 
 create table wf_node_config
 (
-    id            bigint not null
+    id               bigint not null
         constraint pk_wf_node_config
             primary key,
-    form_id       bigint,
-    form_type     varchar(255),
-    node_name     varchar(255) not null,
-    node_id       varchar(255) not null,
-    definition_id varchar(255) not null,
-    tenant_id     varchar(20),
-    create_dept   bigint,
-    create_by     bigint,
-    create_time   timestamp,
-    update_by     bigint,
-    update_time   timestamp
+    form_id          bigint,
+    form_type        varchar(255),
+    node_name        varchar(255) not null,
+    node_id          varchar(255) not null,
+    definition_id    varchar(255) not null,
+    apply_user_task  char(1) default '0',
+    tenant_id        varchar(20),
+    create_dept      bigint,
+    create_by        bigint,
+    create_time      timestamp,
+    update_by        bigint,
+    update_time      timestamp
 );
 
 comment on table wf_node_config is '节点配置';
@@ -281,6 +282,8 @@ comment on column wf_node_config.node_id is '节点id';
 comment on column wf_node_config.node_name is '节点名称';
 
 comment on column wf_node_config.definition_id is '流程定义id';
+
+comment on column wf_node_config.apply_user_task is '是否为申请人节点 （0是 1否）';
 
 comment on column wf_node_config.tenant_id is '租户id';
 

@@ -333,18 +333,19 @@ insert into wf_form_manage(id, form_name, form_type, router, remark, tenant_id, 
 
 create table wf_node_config
 (
-    id            bigint not null primary key,
-    form_id       bigint,
-    form_type     nvarchar(255) ,
-    node_name     nvarchar(255) not null,
-    node_id       nvarchar(255) not null,
-    definition_id nvarchar(255) not null,
-    tenant_id     nvarchar(20),
-    create_dept   bigint,
-    create_by     bigint,
-    create_time   datetime2,
-    update_by     bigint,
-    update_time   datetime2
+    id               bigint not null primary key,
+    form_id          bigint,
+    form_type        nvarchar(255) ,
+    node_name        nvarchar(255) not null,
+    node_id          nvarchar(255) not null,
+    definition_id    nvarchar(255) not null,
+    apply_user_task  nchar default ('0')  null,
+    tenant_id        nvarchar(20),
+    create_dept      bigint,
+    create_by        bigint,
+    create_time      datetime2,
+    update_by        bigint,
+    update_time      datetime2
 )
 
 go
@@ -372,6 +373,10 @@ go
 
 exec sp_addextendedproperty 'MS_Description', N'流程定义id', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
      'definition_id'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'是否为申请人节点 （0是 1否）', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
+     'apply_user_task'
 go
 
 exec sp_addextendedproperty 'MS_Description', N'租户编号', 'SCHEMA', 'dbo', 'TABLE', 'wf_node_config', 'COLUMN',
