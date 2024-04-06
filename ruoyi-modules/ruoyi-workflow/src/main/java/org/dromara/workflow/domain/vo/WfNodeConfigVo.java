@@ -61,6 +61,12 @@ public class WfNodeConfigVo implements Serializable {
     private String definitionId;
 
     /**
+     * 是否为申请人节点 （0是 1否）
+     */
+    @ExcelProperty(value = "是否为申请人节点 （0是 1否）")
+    private String applyUserTask;
+
+    /**
      * 表单管理
      */
     private WfFormManageVo wfFormManageVo;

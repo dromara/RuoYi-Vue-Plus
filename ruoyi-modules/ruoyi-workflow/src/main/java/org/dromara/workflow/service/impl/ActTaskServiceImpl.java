@@ -282,10 +282,10 @@ public class ActTaskServiceImpl implements IActTaskService {
                 task.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
                 task.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
-                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && e.getNodeId().equals(task.getTaskDefinitionKey())).findFirst().ifPresent(task::setWfNodeConfigVo);
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(task::setWfNodeConfigVo);
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && e.getNodeId().equals(task.getTaskDefinitionKey()) && FlowConstant.FALSE.equals(e.getApplyUserTask())).findFirst().ifPresent(task::setWfNodeConfigVo);
                 }
             }
-            WorkflowUtils.setWfDefinitionConfigVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         return TableDataInfo.build(page);
     }
@@ -347,11 +347,11 @@ public class ActTaskServiceImpl implements IActTaskService {
                 taskVo.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
                 taskVo.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
-                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && e.getNodeId().equals(task.getTaskDefinitionKey())).findFirst().ifPresent(taskVo::setWfNodeConfigVo);
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(taskVo::setWfNodeConfigVo);
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && e.getNodeId().equals(task.getTaskDefinitionKey()) && FlowConstant.FALSE.equals(e.getApplyUserTask())).findFirst().ifPresent(taskVo::setWfNodeConfigVo);
                 }
                 list.add(taskVo);
             }
-            WorkflowUtils.setWfDefinitionConfigVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         long count = query.count();
         TableDataInfo<TaskVo> build = TableDataInfo.build();
@@ -382,10 +382,10 @@ public class ActTaskServiceImpl implements IActTaskService {
             for (TaskVo task : taskList) {
                 task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
-                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && e.getNodeId().equals(task.getTaskDefinitionKey())).findFirst().ifPresent(task::setWfNodeConfigVo);
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(task::setWfNodeConfigVo);
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && e.getNodeId().equals(task.getTaskDefinitionKey()) && FlowConstant.FALSE.equals(e.getApplyUserTask())).findFirst().ifPresent(task::setWfNodeConfigVo);
                 }
             }
-            WorkflowUtils.setWfDefinitionConfigVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
         }
         return TableDataInfo.build(page);
     }
@@ -418,11 +418,10 @@ public class ActTaskServiceImpl implements IActTaskService {
             for (TaskVo task : taskList) {
                 task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
-                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && e.getNodeId().equals(task.getTaskDefinitionKey())).findFirst().ifPresent(task::setWfNodeConfigVo);
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(task::setWfNodeConfigVo);
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && e.getNodeId().equals(task.getTaskDefinitionKey()) && FlowConstant.FALSE.equals(e.getApplyUserTask())).findFirst().ifPresent(task::setWfNodeConfigVo);
                 }
             }
-            WorkflowUtils.setWfDefinitionConfigVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
-
         }
         return TableDataInfo.build(page);
     }
@@ -441,12 +440,16 @@ public class ActTaskServiceImpl implements IActTaskService {
         Page<TaskVo> page = actTaskMapper.getTaskFinishByPage(pageQuery.build(), queryWrapper);
 
         List<TaskVo> taskList = page.getRecords();
-        for (TaskVo task : taskList) {
-            task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
-        }
         if (CollUtil.isNotEmpty(taskList)) {
             List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
-            WorkflowUtils.setWfDefinitionConfigVo(taskList, processDefinitionIds, PROCESS_DEFINITION_ID);
+            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            for (TaskVo task : taskList) {
+                task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
+                if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(task::setWfNodeConfigVo);
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && e.getNodeId().equals(task.getTaskDefinitionKey()) && FlowConstant.FALSE.equals(e.getApplyUserTask())).findFirst().ifPresent(task::setWfNodeConfigVo);
+                }
+            }
         }
         return TableDataInfo.build(page);
     }

@@ -52,5 +52,10 @@ public class WfNodeConfig extends TenantEntity {
      */
     private String definitionId;
 
+    /**
+     * 是否为申请人节点 （0是 1否）
+     */
+    private String applyUserTask;
+
 
 }

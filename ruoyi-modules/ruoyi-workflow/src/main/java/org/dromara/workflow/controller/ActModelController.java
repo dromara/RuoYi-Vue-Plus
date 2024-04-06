@@ -126,12 +126,22 @@ public class ActModelController extends BaseController {
     /**
      * 导出模型zip压缩包
      *
-     * @param modelIds  模型id
+     * @param modelIds 模型id
      * @param response 相应
      */
     @GetMapping("/export/zip/{modelIds}")
     public void exportZip(@NotEmpty(message = "模型id不能为空") @PathVariable List<String> modelIds,
                           HttpServletResponse response) {
         actModelService.exportZip(modelIds, response);
+    }
+
+    /**
+     * 复制模型
+     *
+     * @param modelBo 模型数据
+     */
+    @PostMapping("/copyModel")
+    public R<Void> copyModel(@RequestBody ModelBo modelBo) {
+        return toAjax(actModelService.copyModel(modelBo));
     }
 }

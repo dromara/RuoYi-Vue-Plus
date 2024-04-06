@@ -23,7 +23,7 @@ public class WfNodeConfigBo extends BaseEntity {
     /**
      * 主键
      */
-    @NotNull(message = "主键不能为空", groups = { EditGroup.class })
+    @NotNull(message = "主键不能为空", groups = {EditGroup.class})
     private Long id;
 
     /**
@@ -39,20 +39,25 @@ public class WfNodeConfigBo extends BaseEntity {
     /**
      * 节点名称
      */
-    @NotBlank(message = "节点名称不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "节点名称不能为空", groups = {AddGroup.class, EditGroup.class})
     private String nodeName;
 
     /**
      * 节点id
      */
-    @NotBlank(message = "节点id不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "节点id不能为空", groups = {AddGroup.class, EditGroup.class})
     private String nodeId;
 
     /**
      * 流程定义id
      */
-    @NotBlank(message = "流程定义id不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "流程定义id不能为空", groups = {AddGroup.class, EditGroup.class})
     private String definitionId;
 
+    /**
+     * 是否为申请人节点 （0是 1否）
+     */
+    @NotBlank(message = "是否为申请人节点不能为空", groups = {AddGroup.class, EditGroup.class})
+    private String applyUserTask;
 
 }

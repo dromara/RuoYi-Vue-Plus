@@ -68,8 +68,16 @@ public interface IActModelService {
     /**
      * 导出模型zip压缩包
      *
-     * @param modelIds  模型id
-     * @param response 相应
+     * @param modelIds 模型id
+     * @param response 响应
      */
     void exportZip(List<String> modelIds, HttpServletResponse response);
+
+    /**
+     * 复制模型
+     *
+     * @param modelBo 模型数据
+     * @return 结果
+     */
+    boolean copyModel(ModelBo modelBo);
 }

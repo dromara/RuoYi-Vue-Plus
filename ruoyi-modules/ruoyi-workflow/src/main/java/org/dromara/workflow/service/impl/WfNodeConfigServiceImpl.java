@@ -53,6 +53,8 @@ public class WfNodeConfigServiceImpl implements IWfNodeConfigService {
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 
+
+
     @Override
     public Boolean deleteByDefIds(Collection<String> ids) {
         return baseMapper.delete(new LambdaQueryWrapper<WfNodeConfig>().in(WfNodeConfig::getDefinitionId, ids)) > 0;

@@ -156,7 +156,13 @@ public class ModelUtils {
         if (!(targetFlowElement instanceof UserTask) && !subtask) {
             throw new ServerException("开始节点后第一个节点必须是用户任务！");
         }
-
+        //开始节点后第一个节点申请人节点
+        if ((targetFlowElement instanceof UserTask) && !subtask) {
+            UserTask userTask = (UserTask) targetFlowElement;
+            if (StringUtils.isBlank(userTask.getFormKey())) {
+                throw new ServerException("申请人节点必须选择表单！");
+            }
+        }
         List<EndEvent> endEventList = flowElements.stream().filter(EndEvent.class::isInstance).map(EndEvent.class::cast).collect(Collectors.toList());
         if (CollUtil.isEmpty(endEventList)) {
             throw new ServerException(subtask ? "子流程必须存在结束节点！" : "必须存在结束节点！");
@@ -168,7 +174,7 @@ public class ModelUtils {
      *
      * @param processDefinitionId 流程定义id
      */
-    public static List<UserTask> getuserTaskFlowElements(String processDefinitionId) {
+    public static List<UserTask> getUserTaskFlowElements(String processDefinitionId) {
         BpmnModel bpmnModel = PROCESS_ENGINE.getRepositoryService().getBpmnModel(processDefinitionId);
         List<UserTask> list = new ArrayList<>();
         List<Process> processes = bpmnModel.getProcesses();
@@ -263,5 +269,21 @@ public class ModelUtils {
         BpmnModel bpmnModel = PROCESS_ENGINE.getRepositoryService().getBpmnModel(processDefinitionId);
         FlowNode flowNode = (FlowNode) bpmnModel.getFlowElement(taskDefinitionKey);
         return flowNode instanceof UserTask;
+    }
+
+    /**
+     * 获取申请人节点
+     *
+     * @param processDefinitionId 流程定义id
+     * @return 结果
+     */
+    public static UserTask getApplyUserTask(String processDefinitionId) {
+        BpmnModel bpmnModel = PROCESS_ENGINE.getRepositoryService().getBpmnModel(processDefinitionId);
+        Collection<FlowElement> flowElements = bpmnModel.getMainProcess().getFlowElements();
+        List<StartEvent> startEventList = flowElements.stream().filter(StartEvent.class::isInstance).map(StartEvent.class::cast).collect(Collectors.toList());
+        StartEvent startEvent = startEventList.get(0);
+        List<SequenceFlow> outgoingFlows = startEvent.getOutgoingFlows();
+        FlowElement targetFlowElement = outgoingFlows.get(0).getTargetFlowElement();
+        return (UserTask) targetFlowElement;
     }
 }

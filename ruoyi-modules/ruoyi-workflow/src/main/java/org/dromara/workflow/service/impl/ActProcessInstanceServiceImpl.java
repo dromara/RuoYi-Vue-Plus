@@ -29,6 +29,7 @@ import org.dromara.workflow.flowable.strategy.FlowEventStrategy;
 import org.dromara.workflow.flowable.strategy.FlowProcessEventHandler;
 import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IActProcessInstanceService;
+import org.dromara.workflow.service.IWfNodeConfigService;
 import org.dromara.workflow.service.IWfTaskBackNodeService;
 import org.dromara.workflow.utils.QueryUtils;
 import org.dromara.workflow.utils.WorkflowUtils;
@@ -58,8 +59,6 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.dromara.workflow.common.constant.FlowConstant.PROCESS_DEFINITION_ID;
-
 /**
  * 流程实例 服务层实现
  *
@@ -78,6 +77,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     private final ManagementService managementService;
     private final FlowEventStrategy flowEventStrategy;
     private final IWfTaskBackNodeService iWfTaskBackNodeService;
+    private final IWfNodeConfigService iWfNodeConfigService;
 
     @Value("${flowable.activity-font-name}")
     private String activityFontName;
@@ -122,7 +122,12 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            WorkflowUtils.setWfDefinitionConfigVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
+            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            for (ProcessInstanceVo processInstanceVo : list) {
+                if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(processInstanceVo.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(processInstanceVo::setWfNodeConfigVo);
+                }
+            }
         }
         long count = query.count();
         TableDataInfo<ProcessInstanceVo> build = TableDataInfo.build();
@@ -164,7 +169,12 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            WorkflowUtils.setWfDefinitionConfigVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
+            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            for (ProcessInstanceVo processInstanceVo : list) {
+                if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(processInstanceVo.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(processInstanceVo::setWfNodeConfigVo);
+                }
+            }
         }
         long count = query.count();
         TableDataInfo<ProcessInstanceVo> build = TableDataInfo.build();
@@ -669,7 +679,12 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            WorkflowUtils.setWfDefinitionConfigVo(list, processDefinitionIds, PROCESS_DEFINITION_ID);
+            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            for (ProcessInstanceVo processInstanceVo : list) {
+                if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(processInstanceVo.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(processInstanceVo::setWfNodeConfigVo);
+                }
+            }
         }
         long count = query.count();
         TableDataInfo<ProcessInstanceVo> build = TableDataInfo.build();

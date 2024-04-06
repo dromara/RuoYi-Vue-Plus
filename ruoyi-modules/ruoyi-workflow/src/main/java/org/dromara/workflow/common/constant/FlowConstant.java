@@ -81,6 +81,11 @@ public interface FlowConstant {
     String WF_DEFINITION_CONFIG_VO = "wfDefinitionConfigVo";
 
     /**
+     * 节点配置
+     */
+    String WF_NODE_CONFIG_VO = "wfNodeConfigVo";
+
+    /**
      * 流程发起人
      */
     String INITIATOR = "initiator";
@@ -119,4 +124,14 @@ public interface FlowConstant {
      * 会签
      */
     String MULTI_INSTANCE = "multiInstance";
+
+    /**
+     * 是
+     */
+    String TRUE = "0";
+
+    /**
+     * 否
+     */
+    String FALSE = "1";
 }

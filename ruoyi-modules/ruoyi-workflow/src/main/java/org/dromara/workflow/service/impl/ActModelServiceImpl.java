@@ -6,6 +6,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,15 +22,14 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.WfNodeConfig;
 import org.dromara.workflow.domain.bo.ModelBo;
-import org.dromara.workflow.domain.bo.WfDefinitionConfigBo;
 import org.dromara.workflow.domain.vo.ModelVo;
-import org.dromara.workflow.domain.vo.WfDefinitionConfigVo;
 import org.dromara.workflow.service.IActModelService;
-import org.dromara.workflow.service.IWfDefinitionConfigService;
 import org.dromara.workflow.service.IWfNodeConfigService;
 import org.dromara.workflow.utils.ModelUtils;
 import org.dromara.workflow.utils.QueryUtils;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.*;
@@ -59,7 +59,6 @@ import java.util.zip.ZipOutputStream;
 public class ActModelServiceImpl implements IActModelService {
 
     private final RepositoryService repositoryService;
-    private final IWfDefinitionConfigService iWfDefinitionConfigService;
     private final IWfNodeConfigService iWfNodeConfigService;
 
     /**
@@ -261,7 +260,6 @@ public class ActModelServiceImpl implements IActModelService {
             }
             // 查询模型的基本信息
             Model model = repositoryService.getModel(id);
-            ProcessDefinition processDefinition = QueryUtils.definitionQuery().processDefinitionKey(model.getKey()).latestVersion().singleResult();
             // xml资源的名称 ，对应act_ge_bytearray表中的name_字段
             String processName = model.getName() + ".bpmn20.xml";
             // 调用部署相关的api方法进行部署流程定义
@@ -284,20 +282,9 @@ public class ActModelServiceImpl implements IActModelService {
             // 更新分类
             ProcessDefinition definition = QueryUtils.definitionQuery().deploymentId(deployment.getId()).singleResult();
             repositoryService.setProcessDefinitionCategory(definition.getId(), model.getCategory());
-            //更新流程定义表单
-            if (processDefinition != null) {
-                WfDefinitionConfigVo definitionVo = iWfDefinitionConfigService.getByDefId(processDefinition.getId());
-                if (definitionVo != null) {
-                    WfDefinitionConfigBo wfFormDefinition = new WfDefinitionConfigBo();
-                    wfFormDefinition.setDefinitionId(definition.getId());
-                    wfFormDefinition.setProcessKey(definition.getKey());
-                    wfFormDefinition.setFormId(ObjectUtil.isNotNull(definitionVo.getFormId()) ? definitionVo.getFormId() : null);
-                    wfFormDefinition.setRemark(definitionVo.getRemark());
-                    iWfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
-                }
-            }
             //更新流程节点配置表单
-            List<UserTask> userTasks = ModelUtils.getuserTaskFlowElements(definition.getId());
+            List<UserTask> userTasks = ModelUtils.getUserTaskFlowElements(definition.getId());
+            UserTask applyUserTask = ModelUtils.getApplyUserTask(definition.getId());
             List<WfNodeConfig> wfNodeConfigList = new ArrayList<>();
             for (UserTask userTask : userTasks) {
                 if (StringUtils.isNotBlank(userTask.getFormKey()) && userTask.getFormKey().contains(StrUtil.COLON)) {
@@ -308,6 +295,7 @@ public class ActModelServiceImpl implements IActModelService {
                     String[] split = userTask.getFormKey().split(StrUtil.COLON);
                     wfNodeConfig.setFormType(split[0]);
                     wfNodeConfig.setFormId(Long.valueOf(split[1]));
+                    wfNodeConfig.setApplyUserTask(applyUserTask.getId().equals(userTask.getId()) ? FlowConstant.TRUE : FlowConstant.FALSE);
                     wfNodeConfigList.add(wfNodeConfig);
                 }
             }
@@ -373,5 +361,53 @@ public class ActModelServiceImpl implements IActModelService {
                 }
             }
         }
+    }
+
+    /**
+     * 复制模型
+     *
+     * @param modelBo 模型数据
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean copyModel(ModelBo modelBo) {
+        try {
+            String key = modelBo.getKey();
+            if (StringUtils.isNotBlank(key)) {
+                // 查询模型
+                Model model = repositoryService.createModelQuery().modelId(modelBo.getId()).singleResult();
+                if (ObjectUtil.isNotNull(model)) {
+                    byte[] modelEditorSource = repositoryService.getModelEditorSource(model.getId());
+                    List<Model> list = QueryUtils.modelQuery().modelKey(key).list();
+                    if (CollUtil.isNotEmpty(list)) {
+                        throw new ServiceException("模型KEY已存在！");
+                    }
+                    // 校验key命名规范
+                    if (!Validator.isMatchRegex(FlowConstant.MODEL_KEY_PATTERN, key)) {
+                        throw new ServiceException("模型标识KEY只能字符或者下划线开头！");
+                    }
+                    // 复制模型数据
+                    Model newModel = repositoryService.newModel();
+                    newModel.setKey(modelBo.getKey());
+                    newModel.setName(modelBo.getName());
+                    newModel.setCategory(modelBo.getCategoryCode());
+                    newModel.setVersion(1);
+                    newModel.setMetaInfo(modelBo.getDescription());
+                    newModel.setTenantId(TenantHelper.getTenantId());
+                    String xml = StrUtil.utf8Str(modelEditorSource);
+                    BpmnModel bpmnModel = ModelUtils.xmlToBpmnModel(xml);
+                    Process mainProcess = bpmnModel.getMainProcess();
+                    mainProcess.setId(modelBo.getKey());
+                    mainProcess.setName(modelBo.getName());
+                    byte[] xmlBytes = new BpmnXMLConverter().convertToXML(bpmnModel);
+                    repositoryService.saveModel(newModel);
+                    repositoryService.addModelEditorSource(newModel.getId(), xmlBytes);
+                }
+            }
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage());
+        }
+        return true;
     }
 }
