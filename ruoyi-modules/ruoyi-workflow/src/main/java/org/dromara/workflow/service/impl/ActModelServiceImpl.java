@@ -6,7 +6,6 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,8 +21,11 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.WfNodeConfig;
 import org.dromara.workflow.domain.bo.ModelBo;
+import org.dromara.workflow.domain.bo.WfDefinitionConfigBo;
 import org.dromara.workflow.domain.vo.ModelVo;
+import org.dromara.workflow.domain.vo.WfDefinitionConfigVo;
 import org.dromara.workflow.service.IActModelService;
+import org.dromara.workflow.service.IWfDefinitionConfigService;
 import org.dromara.workflow.service.IWfNodeConfigService;
 import org.dromara.workflow.utils.ModelUtils;
 import org.dromara.workflow.utils.QueryUtils;
@@ -44,6 +46,8 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -60,6 +64,7 @@ public class ActModelServiceImpl implements IActModelService {
 
     private final RepositoryService repositoryService;
     private final IWfNodeConfigService iWfNodeConfigService;
+    private final IWfDefinitionConfigService iWfDefinitionConfigService;
 
     /**
      * 分页查询模型
@@ -260,6 +265,7 @@ public class ActModelServiceImpl implements IActModelService {
             }
             // 查询模型的基本信息
             Model model = repositoryService.getModel(id);
+            ProcessDefinition processDefinition = QueryUtils.definitionQuery().processDefinitionKey(model.getKey()).latestVersion().singleResult();
             // xml资源的名称 ，对应act_ge_bytearray表中的name_字段
             String processName = model.getName() + ".bpmn20.xml";
             // 调用部署相关的api方法进行部署流程定义
@@ -282,6 +288,20 @@ public class ActModelServiceImpl implements IActModelService {
             // 更新分类
             ProcessDefinition definition = QueryUtils.definitionQuery().deploymentId(deployment.getId()).singleResult();
             repositoryService.setProcessDefinitionCategory(definition.getId(), model.getCategory());
+            //更新流程定义配置
+            if (processDefinition != null) {
+                WfDefinitionConfigVo definitionVo = iWfDefinitionConfigService.getByDefId(processDefinition.getId());
+                if (definitionVo != null) {
+                    iWfDefinitionConfigService.deleteByDefIds(Collections.singletonList(processDefinition.getId()));
+                    WfDefinitionConfigBo wfFormDefinition = new WfDefinitionConfigBo();
+                    wfFormDefinition.setDefinitionId(definition.getId());
+                    wfFormDefinition.setProcessKey(definition.getKey());
+                    wfFormDefinition.setTableName(definitionVo.getTableName());
+                    wfFormDefinition.setVersion(definition.getVersion());
+                    wfFormDefinition.setRemark(definitionVo.getRemark());
+                    iWfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
+                }
+            }
             //更新流程节点配置表单
             List<UserTask> userTasks = ModelUtils.getUserTaskFlowElements(definition.getId());
             UserTask applyUserTask = ModelUtils.getApplyUserTask(definition.getId());

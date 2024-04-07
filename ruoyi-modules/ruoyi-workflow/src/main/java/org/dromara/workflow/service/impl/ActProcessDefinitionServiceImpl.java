@@ -21,6 +21,7 @@ import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.WfCategory;
 import org.dromara.workflow.domain.WfNodeConfig;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
+import org.dromara.workflow.domain.bo.WfDefinitionConfigBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
 import org.dromara.workflow.domain.vo.WfDefinitionConfigVo;
 import org.dromara.workflow.service.IActProcessDefinitionService;
@@ -322,13 +323,14 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                     String processName = splitFilename[0];
                     //流程key
                     String processKey = splitFilename[1];
+                    ProcessDefinition oldProcessDefinition = QueryUtils.definitionQuery().processDefinitionKey(processKey).latestVersion().singleResult();
                     DeploymentBuilder builder = repositoryService.createDeployment();
                     Deployment deployment = builder.addInputStream(filename, zipInputStream)
                         .tenantId(TenantHelper.getTenantId())
                         .name(processName).key(processKey).category(categoryCode).deploy();
                     ProcessDefinition definition = QueryUtils.definitionQuery().deploymentId(deployment.getId()).singleResult();
                     repositoryService.setProcessDefinitionCategory(definition.getId(), categoryCode);
-                    setWfNodeConfig(definition);
+                    setWfConfig(oldProcessDefinition, definition);
                     zipInputStream.closeEntry();
                 }
             } catch (IOException e) {
@@ -351,7 +353,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 String processName = splitFilename[0];
                 //流程key
                 String processKey = splitFilename[1];
-
+                ProcessDefinition oldProcessDefinition = QueryUtils.definitionQuery().processDefinitionKey(processKey).latestVersion().singleResult();
                 DeploymentBuilder builder = repositoryService.createDeployment();
                 Deployment deployment = builder.addInputStream(originalFilename, inputStream)
                     .tenantId(TenantHelper.getTenantId())
@@ -359,8 +361,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 // 更新分类
                 ProcessDefinition definition = QueryUtils.definitionQuery().deploymentId(deployment.getId()).singleResult();
                 repositoryService.setProcessDefinitionCategory(definition.getId(), categoryCode);
-                setWfNodeConfig(definition);
-
+                setWfConfig(oldProcessDefinition, definition);
             } else {
                 throw new ServiceException("文件类型上传错误！");
             }
@@ -371,9 +372,24 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     /**
      * 设置表单内容
      *
-     * @param definition 部署后最新流程定义
+     * @param oldProcessDefinition 部署前最新流程定义
+     * @param definition           部署后最新流程定义
      */
-    private void setWfNodeConfig(ProcessDefinition definition) {
+    private void setWfConfig(ProcessDefinition oldProcessDefinition, ProcessDefinition definition) {
+        //更新流程定义表单
+        if (oldProcessDefinition != null) {
+            WfDefinitionConfigVo definitionVo = iWfDefinitionConfigService.getByDefId(oldProcessDefinition.getId());
+            if (definitionVo != null) {
+                iWfDefinitionConfigService.deleteByDefIds(Collections.singletonList(oldProcessDefinition.getId()));
+                WfDefinitionConfigBo wfFormDefinition = new WfDefinitionConfigBo();
+                wfFormDefinition.setDefinitionId(definition.getId());
+                wfFormDefinition.setProcessKey(definition.getKey());
+                wfFormDefinition.setTableName(definitionVo.getTableName());
+                wfFormDefinition.setVersion(definition.getVersion());
+                wfFormDefinition.setRemark(definitionVo.getRemark());
+                iWfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
+            }
+        }
         //更新流程节点配置表单
         List<UserTask> userTasks = ModelUtils.getUserTaskFlowElements(definition.getId());
         UserTask applyUserTask = ModelUtils.getApplyUserTask(definition.getId());
