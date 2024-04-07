@@ -129,6 +129,7 @@ create table WF_DEFINITION_CONFIG
     DEFINITION_ID VARCHAR2(255) NOT NULL,
     PROCESS_KEY   VARCHAR2(255) NOT NULL,
     VERSION       NUMBER(10)    NOT NULL,
+    REMARK        VARCHAR2(500),
     TENANT_ID     VARCHAR2(20),
     CREATE_DEPT   NUMBER(20),
     CREATE_BY     NUMBER(20),
@@ -145,6 +146,7 @@ comment on column WF_DEFINITION_CONFIG.DEFINITION_ID is '流程定义ID'
 comment on column WF_DEFINITION_CONFIG.PROCESS_KEY is '流程KEY'
 comment on column WF_DEFINITION_CONFIG.VERSION is '流程版本'
 comment on column WF_DEFINITION_CONFIG.TENANT_ID is '租户编号'
+comment on column WF_DEFINITION_CONFIG.REMARK is '备注'
 comment on column WF_DEFINITION_CONFIG.CREATE_DEPT is '创建部门'
 comment on column WF_DEFINITION_CONFIG.CREATE_BY is '创建者'
 comment on column WF_DEFINITION_CONFIG.CREATE_TIME is '创建时间'
