@@ -188,7 +188,7 @@ EXEC sp_addextendedproperty
      'TABLE', N'er_group_config'
 GO
 
-INSERT INTO er_group_config VALUES (N'1', N'dev', N'ruoyi_group', N'', N'ER_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT', N'1', N'1', N'0', N'1', N'1', N'4', getdate(), getdate());
+INSERT INTO er_group_config(namespace_id, group_name, description, token, group_status, version, group_partition, id_generator_mode, init_scene, bucket_index, create_dt, update_dt) VALUES (N'dev', N'ruoyi_group', N'', N'ER_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT', N'1', N'1', N'0', N'1', N'1', N'4', getdate(), getdate());
 GO
 
 -- er_job
@@ -1154,8 +1154,8 @@ EXEC sp_addextendedproperty
      'TABLE', N'er_namespace'
 GO
 
-INSERT INTO er_namespace VALUES (N'1', N'Development', N'dev', N'', getdate(), getdate(), N'0');
-INSERT INTO er_namespace VALUES (N'2', N'Production', N'prod', N'', getdate(), getdate(), N'0');
+INSERT INTO er_namespace(name, unique_id, description, create_dt, update_dt, deleted) VALUES (N'Development', N'dev', N'', getdate(), getdate(), N'0');
+INSERT INTO er_namespace(name, unique_id, description, create_dt, update_dt, deleted) VALUES (N'Production', N'prod', N'', getdate(), getdate(), N'0');
 GO
 
 -- er_notify_config
@@ -1423,7 +1423,7 @@ CREATE TABLE er_retry_summary
 GO
 
 CREATE UNIQUE NONCLUSTERED INDEX uk_scene_name_trigger_at ON er_retry_summary (namespace_id ASC, group_name ASC,
-                                                                            scene_name ASC, trigger_at ASC)
+                                                                               scene_name ASC, trigger_at ASC)
 GO
 
 EXEC sp_addextendedproperty
@@ -2187,8 +2187,8 @@ EXEC sp_addextendedproperty
      'TABLE', N'er_server_node'
 GO
 
--- er_system_user_
-CREATE TABLE er_system_user_
+-- er_system_user
+CREATE TABLE er_system_user
 (
     id        bigint PRIMARY KEY IDENTITY,
     username  nvarchar(64)  NOT NULL,
@@ -2199,59 +2199,59 @@ CREATE TABLE er_system_user_
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_username ON er_system_user_ (username ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_username ON er_system_user (username ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'er_system_user_',
+     'TABLE', N'er_system_user',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'账号',
      'SCHEMA', N'dbo',
-     'TABLE', N'er_system_user_',
+     'TABLE', N'er_system_user',
      'COLUMN', N'username'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'密码',
      'SCHEMA', N'dbo',
-     'TABLE', N'er_system_user_',
+     'TABLE', N'er_system_user',
      'COLUMN', N'password'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'角色：1-普通用户、2-管理员',
      'SCHEMA', N'dbo',
-     'TABLE', N'er_system_user_',
+     'TABLE', N'er_system_user',
      'COLUMN', N'role'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'er_system_user_',
+     'TABLE', N'er_system_user',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'er_system_user_',
+     'TABLE', N'er_system_user',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'系统用户表',
      'SCHEMA', N'dbo',
-     'TABLE', N'er_system_user_'
+     'TABLE', N'er_system_user'
 GO
 
 -- pwd: admin
-INSERT INTO er_system_user_ VALUES (N'1', N'admin', N'465c194afb65670f38322df087f0a9bb225cc257e43eb4ac5a0c98ef5b3173ac', N'2', getdate(), getdate());
+INSERT INTO er_system_user(username, password, role, create_dt, update_dt) VALUES (N'admin', N'465c194afb65670f38322df087f0a9bb225cc257e43eb4ac5a0c98ef5b3173ac', N'2', getdate(), getdate());
 GO
 
 -- er_system_user_permission
