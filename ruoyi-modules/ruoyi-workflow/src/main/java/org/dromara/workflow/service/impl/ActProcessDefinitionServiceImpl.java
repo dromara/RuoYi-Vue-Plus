@@ -19,11 +19,13 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.WfCategory;
+import org.dromara.workflow.domain.WfDefinitionConfig;
 import org.dromara.workflow.domain.WfNodeConfig;
 import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.bo.WfDefinitionConfigBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
 import org.dromara.workflow.domain.vo.WfDefinitionConfigVo;
+import org.dromara.workflow.mapper.WfDefinitionConfigMapper;
 import org.dromara.workflow.service.IActProcessDefinitionService;
 import org.dromara.workflow.service.IWfCategoryService;
 import org.dromara.workflow.service.IWfDefinitionConfigService;
@@ -62,6 +64,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     private final ProcessMigrationService processMigrationService;
     private final IWfCategoryService wfCategoryService;
     private final IWfDefinitionConfigService iWfDefinitionConfigService;
+    private final WfDefinitionConfigMapper wfDefinitionConfigMapper;
     private final IWfNodeConfigService iWfNodeConfigService;
 
     /**
@@ -340,6 +343,8 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                     zipInputStream.close();
                 }
             }
+            //初始化配置数据（demo使用，不用可删除）
+            initWfDefConfig();
         } else {
             String originalFilename = file.getOriginalFilename();
             String bpmnResourceSuffix = ResourceNameUtil.BPMN_RESOURCE_SUFFIXES[0];
@@ -364,6 +369,25 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 setWfConfig(oldProcessDefinition, definition);
             } else {
                 throw new ServiceException("文件类型上传错误！");
+            }
+        }
+
+    }
+
+    /**
+     * 初始化配置数据（demo使用，不用可删除）
+     */
+    private void initWfDefConfig() {
+        List<WfDefinitionConfig> wfDefinitionConfigs = wfDefinitionConfigMapper.selectList();
+        if (CollUtil.isEmpty(wfDefinitionConfigs)) {
+            ProcessDefinition processDefinition = QueryUtils.definitionQuery().processDefinitionKey("leave1").latestVersion().singleResult();
+            if (processDefinition != null) {
+                WfDefinitionConfigBo wfFormDefinition = new WfDefinitionConfigBo();
+                wfFormDefinition.setDefinitionId(processDefinition.getId());
+                wfFormDefinition.setProcessKey(processDefinition.getKey());
+                wfFormDefinition.setTableName("test_leave");
+                wfFormDefinition.setVersion(processDefinition.getVersion());
+                iWfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
             }
         }
 
