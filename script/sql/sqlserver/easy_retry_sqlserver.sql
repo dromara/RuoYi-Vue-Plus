@@ -11,62 +11,62 @@ CREATE TABLE er_distributed_lock
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_name ON distributed_lock (name ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_name ON er_distributed_lock (name ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'distributed_lock',
+     'TABLE', N'er_distributed_lock',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'锁名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'distributed_lock',
+     'TABLE', N'er_distributed_lock',
      'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'锁定时长',
      'SCHEMA', N'dbo',
-     'TABLE', N'distributed_lock',
+     'TABLE', N'er_distributed_lock',
      'COLUMN', N'lock_until'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'锁定时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'distributed_lock',
+     'TABLE', N'er_distributed_lock',
      'COLUMN', N'locked_at'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'锁定者',
      'SCHEMA', N'dbo',
-     'TABLE', N'distributed_lock',
+     'TABLE', N'er_distributed_lock',
      'COLUMN', N'locked_by'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'distributed_lock',
+     'TABLE', N'er_distributed_lock',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'distributed_lock',
+     'TABLE', N'er_distributed_lock',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'锁定表',
      'SCHEMA', N'dbo',
-     'TABLE', N'distributed_lock'
+     'TABLE', N'er_distributed_lock'
 GO
 
 -- er_group_config
@@ -88,104 +88,104 @@ CREATE TABLE er_group_config
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_namespace_id_group_name ON group_config (namespace_id ASC, group_name ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_namespace_id_group_name ON er_group_config (namespace_id ASC, group_name ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组描述',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'description'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'token',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'token'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组状态 0、未启用 1、启用',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'group_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'版本号',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'version'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'分区',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'group_partition'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'唯一id生成模式 默认号段模式',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'id_generator_mode'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'是否初始化场景 0:否 1:是',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'init_scene'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'bucket',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'bucket_index'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config',
+     'TABLE', N'er_group_config',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组配置',
      'SCHEMA', N'dbo',
-     'TABLE', N'group_config'
+     'TABLE', N'er_group_config'
 GO
 
 INSERT INTO er_group_config VALUES (N'1', N'dev', N'ruoyi_group', N'', N'ER_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT', N'1', N'1', N'0', N'1', N'1', N'4', getdate(), getdate());
@@ -223,199 +223,199 @@ CREATE TABLE er_job
 )
 GO
 
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON job (namespace_id ASC, group_name ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON er_job (namespace_id ASC, group_name ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_job_status_bucket_index ON job (job_status ASC, bucket_index ASC)
+CREATE NONCLUSTERED INDEX idx_job_status_bucket_index ON er_job (job_status ASC, bucket_index ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_create_dt ON job (create_dt ASC)
+CREATE NONCLUSTERED INDEX idx_create_dt ON er_job (create_dt ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'job_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行方法参数',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'args_str'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'参数类型 ',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'args_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'下次触发时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'next_trigger_at'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务状态 0、关闭、1、开启',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'job_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务类型 1、集群 2、广播 3、切片',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'task_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'路由策略',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'route_key'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行器类型',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'executor_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行器名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'executor_info'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'触发类型 1.CRON 表达式 2. 固定时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'trigger_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'间隔时长',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'trigger_interval'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'阻塞策略 1、丢弃 2、覆盖 3、并行',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'block_strategy'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务执行超时时间，单位秒',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'executor_timeout'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'最大重试次数',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'max_retry_times'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'并行数',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'parallel_num'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'重试间隔(s)',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'retry_interval'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'bucket',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'bucket_index'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'是否是常驻任务',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'resident'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'描述',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'description'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'扩展字段',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'ext_attrs'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'逻辑删除 1、删除',
      'SCHEMA', N'dbo',
-     'TABLE', N'job',
+     'TABLE', N'er_job',
      'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务信息',
      'SCHEMA', N'dbo',
-     'TABLE', N'job'
+     'TABLE', N'er_job'
 GO
 
 
@@ -436,94 +436,94 @@ CREATE TABLE er_job_log_message
 )
 GO
 
-CREATE NONCLUSTERED INDEX idx_task_batch_id_task_id ON job_log_message (task_batch_id ASC, task_id ASC)
+CREATE NONCLUSTERED INDEX idx_task_batch_id_task_id ON er_job_log_message (task_batch_id ASC, task_id ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_create_dt ON job_log_message (create_dt ASC)
+CREATE NONCLUSTERED INDEX idx_create_dt ON er_job_log_message (create_dt ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON job_log_message (namespace_id ASC, group_name ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON er_job_log_message (namespace_id ASC, group_name ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message',
+     'TABLE', N'er_job_log_message',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message',
+     'TABLE', N'er_job_log_message',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message',
+     'TABLE', N'er_job_log_message',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务信息id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message',
+     'TABLE', N'er_job_log_message',
      'COLUMN', N'job_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务批次id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message',
+     'TABLE', N'er_job_log_message',
      'COLUMN', N'task_batch_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'调度任务id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message',
+     'TABLE', N'er_job_log_message',
      'COLUMN', N'task_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'调度信息',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message',
+     'TABLE', N'er_job_log_message',
      'COLUMN', N'message'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'日志数量',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message',
+     'TABLE', N'er_job_log_message',
      'COLUMN', N'log_num'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'上报时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message',
+     'TABLE', N'er_job_log_message',
      'COLUMN', N'real_time'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message',
+     'TABLE', N'er_job_log_message',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'扩展字段',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message',
+     'TABLE', N'er_job_log_message',
      'COLUMN', N'ext_attrs'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'调度日志',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_log_message'
+     'TABLE', N'er_job_log_message'
 GO
 
 
@@ -547,111 +547,111 @@ CREATE TABLE er_job_notify_config
 )
 GO
 
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_job_id ON job_notify_config (namespace_id ASC, group_name ASC, job_id ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_job_id ON er_job_notify_config (namespace_id ASC, group_name ASC, job_id ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'job_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'通知状态 0、未启用 1、启用',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'notify_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'通知类型 1、钉钉 2、邮件 3、企业微信',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'notify_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'配置属性',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'notify_attribute'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'通知阈值',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'notify_threshold'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'通知场景',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'notify_scene'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'限流状态 0、未启用 1、启用',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'rate_limiter_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'每秒限流阈值',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'rate_limiter_threshold'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'描述',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'description'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config',
+     'TABLE', N'er_job_notify_config',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'job通知配置',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_notify_config'
+     'TABLE', N'er_job_notify_config'
 GO
 
 
@@ -676,120 +676,120 @@ CREATE TABLE er_job_summary
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_trigger_at_system_task_type_business_id ON job_summary (trigger_at ASC, system_task_type ASC, business_id ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_trigger_at_system_task_type_business_id ON er_job_summary (trigger_at ASC, system_task_type ASC, business_id ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_business_id ON job_summary (namespace_id ASC, group_name ASC, business_id ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_business_id ON er_job_summary (namespace_id ASC, group_name ASC, business_id ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'业务id (job_id或workflow_id)',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'business_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务类型 3、JOB任务 4、WORKFLOW任务',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'system_task_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'统计时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'trigger_at'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行成功-日志数量',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'success_num'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行失败-日志数量',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'fail_num'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'失败原因',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'fail_reason'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行失败-日志数量',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'stop_num'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'失败原因',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'stop_reason'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行失败-日志数量',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'cancel_num'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'失败原因',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'cancel_reason'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary',
+     'TABLE', N'er_job_summary',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'DashBoard_Job',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_summary'
+     'TABLE', N'er_job_summary'
 GO
 
 
@@ -814,122 +814,122 @@ CREATE TABLE er_job_task
 )
 GO
 
-CREATE NONCLUSTERED INDEX idx_task_batch_id_task_status ON job_task (task_batch_id ASC, task_status ASC)
+CREATE NONCLUSTERED INDEX idx_task_batch_id_task_status ON er_job_task (task_batch_id ASC, task_status ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_create_dt ON job_task (create_dt ASC)
+CREATE NONCLUSTERED INDEX idx_create_dt ON er_job_task (create_dt ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON job_task (namespace_id ASC, group_name ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON er_job_task (namespace_id ASC, group_name ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务信息id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'job_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'调度任务id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'task_batch_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'父执行器id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'parent_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行的状态 0、失败 1、成功',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'task_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'重试次数',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'retry_count'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'客户端地址 clientId#ip:port',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'client_info'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行结果',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'result_message'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行方法参数',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'args_str'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'参数类型 ',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'args_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'扩展字段',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'ext_attrs'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task',
+     'TABLE', N'er_job_task',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务实例',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task'
+     'TABLE', N'er_job_task'
 GO
 
 -- er_job_task_batch
@@ -954,131 +954,131 @@ CREATE TABLE er_job_task_batch
 )
 GO
 
-CREATE NONCLUSTERED INDEX idx_job_id_task_batch_status ON job_task_batch (job_id ASC, task_batch_status ASC)
+CREATE NONCLUSTERED INDEX idx_job_id_task_batch_status ON er_job_task_batch (job_id ASC, task_batch_status ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_create_dt ON job_task_batch (create_dt ASC)
+CREATE NONCLUSTERED INDEX idx_create_dt ON er_job_task_batch (create_dt ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON job_task_batch (namespace_id ASC, group_name ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON er_job_task_batch (namespace_id ASC, group_name ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_workflow_task_batch_id_workflow_node_id ON job_task_batch (workflow_task_batch_id ASC, workflow_node_id ASC)
+CREATE NONCLUSTERED INDEX idx_workflow_task_batch_id_workflow_node_id ON er_job_task_batch (workflow_task_batch_id ASC, workflow_node_id ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'job_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'工作流节点id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'workflow_node_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'工作流任务父批次id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'parent_workflow_node_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'工作流任务批次id',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'workflow_task_batch_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务批次状态 0、失败 1、成功',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'task_batch_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'操作原因',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'operation_reason'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务执行时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'execution_at'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务类型 3、JOB任务 4、WORKFLOW任务',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'system_task_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'父节点',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'parent_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'逻辑删除 1、删除',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'扩展字段',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch',
+     'TABLE', N'er_job_task_batch',
      'COLUMN', N'ext_attrs'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务批次',
      'SCHEMA', N'dbo',
-     'TABLE', N'job_task_batch'
+     'TABLE', N'er_job_task_batch'
 GO
 
 -- er_namespace
@@ -1094,64 +1094,64 @@ CREATE TABLE er_namespace
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_unique_id ON namespace (unique_id ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_unique_id ON er_namespace (unique_id ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_name ON namespace (name ASC)
+CREATE NONCLUSTERED INDEX idx_name ON er_namespace (name ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'namespace',
+     'TABLE', N'er_namespace',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'namespace',
+     'TABLE', N'er_namespace',
      'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'唯一id',
      'SCHEMA', N'dbo',
-     'TABLE', N'namespace',
+     'TABLE', N'er_namespace',
      'COLUMN', N'unique_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'描述',
      'SCHEMA', N'dbo',
-     'TABLE', N'namespace',
+     'TABLE', N'er_namespace',
      'COLUMN', N'description'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'namespace',
+     'TABLE', N'er_namespace',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'namespace',
+     'TABLE', N'er_namespace',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'逻辑删除 1、删除',
      'SCHEMA', N'dbo',
-     'TABLE', N'namespace',
+     'TABLE', N'er_namespace',
      'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间',
      'SCHEMA', N'dbo',
-     'TABLE', N'namespace'
+     'TABLE', N'er_namespace'
 GO
 
 INSERT INTO er_namespace VALUES (N'1', N'Development', N'dev', N'', getdate(), getdate(), N'0');
@@ -1178,111 +1178,111 @@ CREATE TABLE er_notify_config
 )
 GO
 
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_scene_name ON notify_config (namespace_id ASC, group_name ASC, scene_name ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_scene_name ON er_notify_config (namespace_id ASC, group_name ASC, scene_name ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'场景名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'scene_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'通知状态 0、未启用 1、启用',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'notify_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'通知类型 1、钉钉 2、邮件 3、企业微信',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'notify_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'配置属性',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'notify_attribute'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'通知阈值',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'notify_threshold'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'通知场景',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'notify_scene'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'限流状态 0、未启用 1、启用',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'rate_limiter_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'每秒限流阈值',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'rate_limiter_threshold'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'描述',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'description'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config',
+     'TABLE', N'er_notify_config',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'通知配置',
      'SCHEMA', N'dbo',
-     'TABLE', N'notify_config'
+     'TABLE', N'er_notify_config'
 GO
 
 -- er_retry_dead_letter_0
@@ -1303,105 +1303,105 @@ CREATE TABLE er_retry_dead_letter_0
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_namespace_id_group_name_unique_id ON retry_dead_letter_0 (namespace_id ASC, group_name ASC, unique_id ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_namespace_id_group_name_unique_id ON er_retry_dead_letter_0 (namespace_id ASC, group_name ASC, unique_id ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_scene_name ON retry_dead_letter_0 (namespace_id ASC, group_name ASC, scene_name ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_scene_name ON er_retry_dead_letter_0 (namespace_id ASC, group_name ASC, scene_name ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_idempotent_id ON retry_dead_letter_0 (idempotent_id ASC)
+CREATE NONCLUSTERED INDEX idx_idempotent_id ON er_retry_dead_letter_0 (idempotent_id ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_biz_no ON retry_dead_letter_0 (biz_no ASC)
+CREATE NONCLUSTERED INDEX idx_biz_no ON er_retry_dead_letter_0 (biz_no ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_create_dt ON retry_dead_letter_0 (create_dt ASC)
+CREATE NONCLUSTERED INDEX idx_create_dt ON er_retry_dead_letter_0 (create_dt ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'同组下id唯一',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'unique_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'场景名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'scene_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'幂等id',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'idempotent_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'业务编号',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'biz_no'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行器名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'executor_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行方法参数',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'args_str'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'扩展字段',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'ext_attrs'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务类型 1、重试数据 2、回调数据',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'task_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0',
+     'TABLE', N'er_retry_dead_letter_0',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'死信队列表',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_dead_letter_0'
+     'TABLE', N'er_retry_dead_letter_0'
 GO
 
 
@@ -1422,91 +1422,91 @@ CREATE TABLE er_retry_summary
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_scene_name_trigger_at ON retry_summary (namespace_id ASC, group_name ASC,
+CREATE UNIQUE NONCLUSTERED INDEX uk_scene_name_trigger_at ON er_retry_summary (namespace_id ASC, group_name ASC,
                                                                             scene_name ASC, trigger_at ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary',
+     'TABLE', N'er_retry_summary',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary',
+     'TABLE', N'er_retry_summary',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary',
+     'TABLE', N'er_retry_summary',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'场景名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary',
+     'TABLE', N'er_retry_summary',
      'COLUMN', N'scene_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'统计时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary',
+     'TABLE', N'er_retry_summary',
      'COLUMN', N'trigger_at'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'重试中-日志数量',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary',
+     'TABLE', N'er_retry_summary',
      'COLUMN', N'running_num'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'重试完成-日志数量',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary',
+     'TABLE', N'er_retry_summary',
      'COLUMN', N'finish_num'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'重试到达最大次数-日志数量',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary',
+     'TABLE', N'er_retry_summary',
      'COLUMN', N'max_count_num'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'暂停重试-日志数量',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary',
+     'TABLE', N'er_retry_summary',
      'COLUMN', N'suspend_num'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary',
+     'TABLE', N'er_retry_summary',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary',
+     'TABLE', N'er_retry_summary',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'DashBoard_Retry',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_summary'
+     'TABLE', N'er_retry_summary'
 GO
 
 -- er_retry_task_0
@@ -1531,137 +1531,137 @@ CREATE TABLE er_retry_task_0
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_name_unique_id ON retry_task_0 (namespace_id ASC, group_name ASC, unique_id ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_name_unique_id ON er_retry_task_0 (namespace_id ASC, group_name ASC, unique_id ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_scene_name ON retry_task_0 (namespace_id ASC, group_name ASC, scene_name ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_scene_name ON er_retry_task_0 (namespace_id ASC, group_name ASC, scene_name ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_task_type ON retry_task_0 (namespace_id ASC, group_name ASC, task_type ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_task_type ON er_retry_task_0 (namespace_id ASC, group_name ASC, task_type ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_retry_status ON retry_task_0 (namespace_id ASC, group_name ASC, retry_status ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_retry_status ON er_retry_task_0 (namespace_id ASC, group_name ASC, retry_status ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_idempotent_id ON retry_task_0 (idempotent_id ASC)
+CREATE NONCLUSTERED INDEX idx_idempotent_id ON er_retry_task_0 (idempotent_id ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_biz_no ON retry_task_0 (biz_no ASC)
+CREATE NONCLUSTERED INDEX idx_biz_no ON er_retry_task_0 (biz_no ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_create_dt ON retry_task_0 (create_dt ASC)
+CREATE NONCLUSTERED INDEX idx_create_dt ON er_retry_task_0 (create_dt ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'同组下id唯一',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'unique_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'场景名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'scene_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'幂等id',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'idempotent_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'业务编号',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'biz_no'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行器名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'executor_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行方法参数',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'args_str'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'扩展字段',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'ext_attrs'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'下次触发时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'next_trigger_at'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'重试次数',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'retry_count'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'重试状态 0、重试中 1、成功 2、最大重试次数',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'retry_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务类型 1、重试数据 2、回调数据',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'task_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0',
+     'TABLE', N'er_retry_task_0',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务表',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_0'
+     'TABLE', N'er_retry_task_0'
 GO
 
 -- er_retry_task_log
@@ -1684,121 +1684,121 @@ CREATE TABLE er_retry_task_log
 )
 GO
 
-CREATE NONCLUSTERED INDEX idx_group_name_scene_name ON retry_task_log (namespace_id ASC, group_name ASC, scene_name ASC)
+CREATE NONCLUSTERED INDEX idx_group_name_scene_name ON er_retry_task_log (namespace_id ASC, group_name ASC, scene_name ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_retry_status ON retry_task_log (retry_status ASC)
+CREATE NONCLUSTERED INDEX idx_retry_status ON er_retry_task_log (retry_status ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_idempotent_id ON retry_task_log (idempotent_id ASC)
+CREATE NONCLUSTERED INDEX idx_idempotent_id ON er_retry_task_log (idempotent_id ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_unique_id ON retry_task_log (unique_id ASC)
+CREATE NONCLUSTERED INDEX idx_unique_id ON er_retry_task_log (unique_id ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_biz_no ON retry_task_log (biz_no ASC)
+CREATE NONCLUSTERED INDEX idx_biz_no ON er_retry_task_log (biz_no ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_create_dt ON retry_task_log (create_dt ASC)
+CREATE NONCLUSTERED INDEX idx_create_dt ON er_retry_task_log (create_dt ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'同组下id唯一',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'unique_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'场景名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'scene_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'幂等id',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'idempotent_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'业务编号',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'biz_no'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行器名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'executor_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'执行方法参数',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'args_str'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'扩展字段',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'ext_attrs'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'重试状态 0、重试中 1、成功 2、最大次数',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'retry_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务类型 1、重试数据 2、回调数据',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'task_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log',
+     'TABLE', N'er_retry_task_log',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务日志基础信息表',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log'
+     'TABLE', N'er_retry_task_log'
 GO
 
 -- er_retry_task_log_message
@@ -1815,71 +1815,71 @@ CREATE TABLE er_retry_task_log_message
 )
 GO
 
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_scene_name ON retry_task_log_message (namespace_id ASC, group_name ASC, unique_id ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name_scene_name ON er_retry_task_log_message (namespace_id ASC, group_name ASC, unique_id ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_create_dt ON retry_task_log_message (create_dt ASC)
+CREATE NONCLUSTERED INDEX idx_create_dt ON er_retry_task_log_message (create_dt ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log_message',
+     'TABLE', N'er_retry_task_log_message',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log_message',
+     'TABLE', N'er_retry_task_log_message',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log_message',
+     'TABLE', N'er_retry_task_log_message',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'同组下id唯一',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log_message',
+     'TABLE', N'er_retry_task_log_message',
      'COLUMN', N'unique_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log_message',
+     'TABLE', N'er_retry_task_log_message',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'异常信息',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log_message',
+     'TABLE', N'er_retry_task_log_message',
      'COLUMN', N'message'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'日志数量',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log_message',
+     'TABLE', N'er_retry_task_log_message',
      'COLUMN', N'log_num'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'上报时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log_message',
+     'TABLE', N'er_retry_task_log_message',
      'COLUMN', N'real_time'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务调度日志信息记录表',
      'SCHEMA', N'dbo',
-     'TABLE', N'retry_task_log_message'
+     'TABLE', N'er_retry_task_log_message'
 GO
 
 -- er_scene_config
@@ -1902,111 +1902,111 @@ CREATE TABLE er_scene_config
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_namespace_id_group_name_scene_name ON scene_config (namespace_id ASC, group_name ASC, scene_name ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_namespace_id_group_name_scene_name ON er_scene_config (namespace_id ASC, group_name ASC, scene_name ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'场景名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'scene_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组状态 0、未启用 1、启用',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'scene_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'最大重试次数',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'max_retry_count'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'1、默认等级 2、固定间隔时间 3、CRON 表达式',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'back_off'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'间隔时长',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'trigger_interval'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'Deadline Request 调用链超时 单位毫秒',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'deadline_request'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务执行超时时间，单位秒',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'executor_timeout'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'路由策略',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'route_key'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'描述',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'description'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config',
+     'TABLE', N'er_scene_config',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'场景配置',
      'SCHEMA', N'dbo',
-     'TABLE', N'scene_config'
+     'TABLE', N'er_scene_config'
 GO
 
 -- er_sequence_alloc
@@ -2021,55 +2021,55 @@ CREATE TABLE er_sequence_alloc
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_namespace_id_group_name ON sequence_alloc (namespace_id ASC, group_name ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_namespace_id_group_name ON er_sequence_alloc (namespace_id ASC, group_name ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'sequence_alloc',
+     'TABLE', N'er_sequence_alloc',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'sequence_alloc',
+     'TABLE', N'er_sequence_alloc',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'sequence_alloc',
+     'TABLE', N'er_sequence_alloc',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'最大id',
      'SCHEMA', N'dbo',
-     'TABLE', N'sequence_alloc',
+     'TABLE', N'er_sequence_alloc',
      'COLUMN', N'max_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'步长',
      'SCHEMA', N'dbo',
-     'TABLE', N'sequence_alloc',
+     'TABLE', N'er_sequence_alloc',
      'COLUMN', N'step'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'更新时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'sequence_alloc',
+     'TABLE', N'er_sequence_alloc',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'号段模式序号ID分配表',
      'SCHEMA', N'dbo',
-     'TABLE', N'sequence_alloc'
+     'TABLE', N'er_sequence_alloc'
 GO
 
 -- er_server_node
@@ -2090,101 +2090,101 @@ CREATE TABLE er_server_node
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_host_id_host_ip ON server_node (host_id ASC, host_ip ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_host_id_host_ip ON er_server_node (host_id ASC, host_ip ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON server_node (namespace_id ASC, group_name ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON er_server_node (namespace_id ASC, group_name ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_expire_at_node_type ON server_node (expire_at ASC, node_type ASC)
+CREATE NONCLUSTERED INDEX idx_expire_at_node_type ON er_server_node (expire_at ASC, node_type ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主机id',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'host_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'机器ip',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'host_ip'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'客户端上下文路径 server.servlet.context-path',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'context_path'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'机器端口',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'host_port'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'过期时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'expire_at'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'节点类型 1、客户端 2、是服务端',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'node_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'扩展字段',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'ext_attrs'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node',
+     'TABLE', N'er_server_node',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'服务器节点',
      'SCHEMA', N'dbo',
-     'TABLE', N'server_node'
+     'TABLE', N'er_server_node'
 GO
 
 -- er_system_user_
@@ -2199,55 +2199,55 @@ CREATE TABLE er_system_user_
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_username ON system_user_ (username ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_username ON er_system_user_ (username ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_',
+     'TABLE', N'er_system_user_',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'账号',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_',
+     'TABLE', N'er_system_user_',
      'COLUMN', N'username'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'密码',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_',
+     'TABLE', N'er_system_user_',
      'COLUMN', N'password'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'角色：1-普通用户、2-管理员',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_',
+     'TABLE', N'er_system_user_',
      'COLUMN', N'role'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_',
+     'TABLE', N'er_system_user_',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_',
+     'TABLE', N'er_system_user_',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'系统用户表',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_'
+     'TABLE', N'er_system_user_'
 GO
 
 -- pwd: admin
@@ -2266,55 +2266,55 @@ CREATE TABLE er_system_user_permission
 )
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX uk_namespace_id_group_name_system_user_id ON system_user_permission (namespace_id ASC, group_name ASC, system_user_id ASC)
+CREATE UNIQUE NONCLUSTERED INDEX uk_namespace_id_group_name_system_user_id ON er_system_user_permission (namespace_id ASC, group_name ASC, system_user_id ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_permission',
+     'TABLE', N'er_system_user_permission',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_permission',
+     'TABLE', N'er_system_user_permission',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_permission',
+     'TABLE', N'er_system_user_permission',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'系统用户id',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_permission',
+     'TABLE', N'er_system_user_permission',
      'COLUMN', N'system_user_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_permission',
+     'TABLE', N'er_system_user_permission',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_permission',
+     'TABLE', N'er_system_user_permission',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'系统用户权限表',
      'SCHEMA', N'dbo',
-     'TABLE', N'system_user_permission'
+     'TABLE', N'er_system_user_permission'
 GO
 
 
@@ -2342,142 +2342,142 @@ CREATE TABLE er_workflow
 )
 GO
 
-CREATE NONCLUSTERED INDEX idx_create_dt ON workflow (create_dt ASC)
+CREATE NONCLUSTERED INDEX idx_create_dt ON er_workflow (create_dt ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON workflow (namespace_id ASC, group_name ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON er_workflow (namespace_id ASC, group_name ASC)
 GO
 
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'工作流名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'workflow_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'工作流状态 0、关闭、1、开启',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'workflow_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'触发类型 1.CRON 表达式 2. 固定时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'trigger_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'间隔时长',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'trigger_interval'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'下次触发时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'next_trigger_at'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'阻塞策略 1、丢弃 2、覆盖 3、并行',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'block_strategy'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务执行超时时间，单位秒',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'executor_timeout'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'描述',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'description'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'流程信息',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'flow_info'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'bucket',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'bucket_index'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'版本号',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'version'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'逻辑删除 1、删除',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'扩展字段',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow',
+     'TABLE', N'er_workflow',
      'COLUMN', N'ext_attrs'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'工作流',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow'
+     'TABLE', N'er_workflow'
 GO
 
 -- er_workflow_node
@@ -2503,134 +2503,134 @@ CREATE TABLE er_workflow_node
 )
 GO
 
-CREATE NONCLUSTERED INDEX idx_create_dt ON workflow_node (create_dt ASC)
+CREATE NONCLUSTERED INDEX idx_create_dt ON er_workflow_node (create_dt ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON workflow_node (namespace_id ASC, group_name ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON er_workflow_node (namespace_id ASC, group_name ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'节点名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'node_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务信息id',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'job_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'工作流ID',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'workflow_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'1、任务节点 2、条件节点',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'node_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'1、SpEl、2、Aviator 3、QL',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'expression_type'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'失败策略 1、跳过 2、阻塞',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'fail_strategy'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'工作流节点状态 0、关闭、1、开启',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'workflow_node_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'优先级',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'priority_level'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'节点信息 ',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'node_info'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'版本号',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'version'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'逻辑删除 1、删除',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'扩展字段',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node',
+     'TABLE', N'er_workflow_node',
      'COLUMN', N'ext_attrs'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'工作流节点',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_node'
+     'TABLE', N'er_workflow_node'
 GO
 
 -- er_workflow_task_batch
@@ -2651,99 +2651,99 @@ CREATE TABLE er_workflow_task_batch
 )
 GO
 
-CREATE NONCLUSTERED INDEX idx_job_id_task_batch_status ON workflow_task_batch (workflow_id ASC, task_batch_status ASC)
+CREATE NONCLUSTERED INDEX idx_job_id_task_batch_status ON er_workflow_task_batch (workflow_id ASC, task_batch_status ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_create_dt ON workflow_task_batch (create_dt ASC)
+CREATE NONCLUSTERED INDEX idx_create_dt ON er_workflow_task_batch (create_dt ASC)
 GO
-CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON workflow_task_batch (namespace_id ASC, group_name ASC)
+CREATE NONCLUSTERED INDEX idx_namespace_id_group_name ON er_workflow_task_batch (namespace_id ASC, group_name ASC)
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'命名空间id',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'namespace_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'组名称',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'group_name'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'工作流任务id',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'workflow_id'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务批次状态 0、失败 1、成功',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'task_batch_status'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'操作原因',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'operation_reason'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'流程信息',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'flow_info'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'任务执行时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'execution_at'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'创建时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'create_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'修改时间',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'update_dt'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'逻辑删除 1、删除',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'扩展字段',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch',
+     'TABLE', N'er_workflow_task_batch',
      'COLUMN', N'ext_attrs'
 GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'工作流批次',
      'SCHEMA', N'dbo',
-     'TABLE', N'workflow_task_batch'
+     'TABLE', N'er_workflow_task_batch'
 GO
