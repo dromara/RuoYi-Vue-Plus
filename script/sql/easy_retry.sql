@@ -1,7 +1,6 @@
 SET NAMES utf8mb4;
 
-DROP TABLE IF EXISTS `namespace`;
-CREATE TABLE `namespace`
+CREATE TABLE `er_namespace`
 (
     `id`          bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `name`        varchar(64)         NOT NULL COMMENT '名称',
@@ -16,16 +15,17 @@ CREATE TABLE `namespace`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='命名空间';
 
-INSERT INTO `namespace` VALUES (1, 'Development', 'dev', '', now(), now(), 0);
-INSERT INTO `namespace` VALUES (2, 'Production', 'prod', '', now(), now(), 0);
+INSERT INTO `er_namespace` VALUES (1, 'Development', 'dev', '', now(), now(), 0);
+INSERT INTO `er_namespace` VALUES (2, 'Production', 'prod', '', now(), now(), 0);
 
-DROP TABLE IF EXISTS `group_config`;
-CREATE TABLE `group_config`
+
+CREATE TABLE `er_group_config`
 (
     `id`                bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`      varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
     `group_name`        varchar(64)         NOT NULL DEFAULT '' COMMENT '组名称',
     `description`       varchar(256)        NOT NULL DEFAULT '' COMMENT '组描述',
+    `token`             varchar(64)        NOT NULL DEFAULT 'ER_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT' COMMENT 'token',
     `group_status`      tinyint(4)          NOT NULL DEFAULT '0' COMMENT '组状态 0、未启用 1、启用',
     `version`           int(11)             NOT NULL COMMENT '版本号',
     `group_partition`   int(11)             NOT NULL COMMENT '分区',
@@ -41,10 +41,10 @@ CREATE TABLE `group_config`
   DEFAULT CHARSET = utf8mb4 COMMENT ='组配置'
 ;
 
-INSERT INTO `group_config` VALUES (1, 'dev', 'ruoyi_group', '', 1, 1, 0, 1, 1, 4, now(), now());
+INSERT INTO `er_group_config` VALUES (1, 'dev', 'ruoyi_group', '', 'ER_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT', 1, 1, 0, 1, 1, 4, now(), now());
 
-DROP TABLE IF EXISTS `notify_config`;
-CREATE TABLE `notify_config`
+
+CREATE TABLE `er_notify_config`
 (
     `id`                     bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`           varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -67,8 +67,7 @@ CREATE TABLE `notify_config`
   DEFAULT CHARSET = utf8mb4 COMMENT ='通知配置'
 ;
 
-DROP TABLE IF EXISTS `retry_dead_letter_0`;
-CREATE TABLE `retry_dead_letter_0`
+CREATE TABLE `er_retry_dead_letter_0`
 (
     `id`            bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`  varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -93,8 +92,7 @@ CREATE TABLE `retry_dead_letter_0`
   DEFAULT CHARSET = utf8mb4 COMMENT ='死信队列表'
 ;
 
-DROP TABLE IF EXISTS `retry_task_0`;
-CREATE TABLE `retry_task_0`
+CREATE TABLE `er_retry_task_0`
 (
     `id`              bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`    varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -125,8 +123,7 @@ CREATE TABLE `retry_task_0`
   DEFAULT CHARSET = utf8mb4 COMMENT ='任务表'
 ;
 
-DROP TABLE IF EXISTS `retry_task_log`;
-CREATE TABLE `retry_task_log`
+CREATE TABLE `er_retry_task_log`
 (
     `id`            bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`  varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -141,6 +138,7 @@ CREATE TABLE `retry_task_log`
     `retry_status`  tinyint(4)          NOT NULL DEFAULT '0' COMMENT '重试状态 0、重试中 1、成功 2、最大次数',
     `task_type`     tinyint(4)          NOT NULL DEFAULT '1' COMMENT '任务类型 1、重试数据 2、回调数据',
     `create_dt`     datetime            NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_dt`     datetime            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     PRIMARY KEY (`id`),
     KEY `idx_group_name_scene_name` (`namespace_id`, `group_name`, `scene_name`),
     KEY `idx_retry_status` (`retry_status`),
@@ -153,16 +151,16 @@ CREATE TABLE `retry_task_log`
   DEFAULT CHARSET = utf8mb4 COMMENT ='任务日志基础信息表'
 ;
 
-DROP TABLE IF EXISTS `retry_task_log_message`;
-CREATE TABLE `retry_task_log_message`
+CREATE TABLE `er_retry_task_log_message`
 (
     `id`           bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id` varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
     `group_name`   varchar(64)         NOT NULL COMMENT '组名称',
     `unique_id`    varchar(64)         NOT NULL COMMENT '同组下id唯一',
     `create_dt`    datetime            NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `message`      text                NOT NULL COMMENT '异常信息',
-    `client_info`  varchar(128)                 DEFAULT NULL COMMENT '客户端地址 clientId#ip:port',
+    `message`      longtext                NOT NULL COMMENT '异常信息',
+    `log_num`      int(11)             NOT NULL DEFAULT 1 COMMENT '日志数量',
+    `real_time`    bigint(13)          NOT NULL DEFAULT 0 COMMENT '上报时间',
     PRIMARY KEY (`id`),
     KEY `idx_namespace_id_group_name_scene_name` (`namespace_id`, `group_name`, `unique_id`),
     KEY `idx_create_dt` (`create_dt`)
@@ -171,8 +169,7 @@ CREATE TABLE `retry_task_log_message`
   DEFAULT CHARSET = utf8mb4 COMMENT ='任务调度日志信息记录表'
 ;
 
-DROP TABLE IF EXISTS `scene_config`;
-CREATE TABLE `scene_config`
+CREATE TABLE `er_scene_config`
 (
     `id`               bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`     varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -195,8 +192,7 @@ CREATE TABLE `scene_config`
   DEFAULT CHARSET = utf8mb4 COMMENT ='场景配置'
 ;
 
-DROP TABLE IF EXISTS `server_node`;
-CREATE TABLE `server_node`
+CREATE TABLE `er_server_node`
 (
     `id`           bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id` varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -219,8 +215,7 @@ CREATE TABLE `server_node`
   DEFAULT CHARSET = utf8mb4 COMMENT ='服务器节点'
 ;
 
-DROP TABLE IF EXISTS `distributed_lock`;
-CREATE TABLE `distributed_lock`
+CREATE TABLE `er_distributed_lock`
 (
     `id`         bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `name`       varchar(64)         NOT NULL COMMENT '锁名称',
@@ -236,8 +231,7 @@ CREATE TABLE `distributed_lock`
   DEFAULT CHARSET = utf8mb4 COMMENT ='锁定表'
 ;
 
-DROP TABLE IF EXISTS `system_user`;
-CREATE TABLE `system_user`
+CREATE TABLE `er_system_user`
 (
     `id`        bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `username`  varchar(64)         NOT NULL COMMENT '账号',
@@ -251,10 +245,9 @@ CREATE TABLE `system_user`
   DEFAULT CHARSET = utf8mb4 COMMENT ='系统用户表';
 
 -- pwd: admin
-INSERT INTO `system_user` VALUES (1, 'admin', '465c194afb65670f38322df087f0a9bb225cc257e43eb4ac5a0c98ef5b3173ac', 2, now(), now());
+INSERT INTO `er_system_user` VALUES (1, 'admin', '465c194afb65670f38322df087f0a9bb225cc257e43eb4ac5a0c98ef5b3173ac', 2, now(), now());
 
-DROP TABLE IF EXISTS `system_user_permission`;
-CREATE TABLE `system_user_permission`
+CREATE TABLE `er_system_user_permission`
 (
     `id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `group_name`     varchar(64)         NOT NULL COMMENT '组名称',
@@ -267,8 +260,7 @@ CREATE TABLE `system_user_permission`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='系统用户权限表';
 
-DROP TABLE IF EXISTS `sequence_alloc`;
-CREATE TABLE `sequence_alloc`
+CREATE TABLE `er_sequence_alloc`
 (
     `id`           bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id` varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -282,8 +274,7 @@ CREATE TABLE `sequence_alloc`
   DEFAULT CHARSET = utf8mb4 COMMENT ='号段模式序号ID分配表';
 
 -- 分布式调度DDL
-DROP TABLE IF EXISTS `job`;
-CREATE TABLE `job`
+CREATE TABLE `er_job`
 (
     `id`               bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`     varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -319,10 +310,7 @@ CREATE TABLE `job`
   AUTO_INCREMENT = 0
   DEFAULT CHARSET = utf8mb4 COMMENT ='任务信息';
 
-INSERT INTO `job` VALUES (1, 'dev', 'ruoyi_group', 'demo-job', null, 1, 1710344035622, 1, 1, 4, 1, 'testJobExecutor', 2, '60', 1, 60, 3, 1, 1, 116, 0, '', '', now(), now(), 0);
-
-DROP TABLE IF EXISTS `job_log_message`;
-CREATE TABLE `job_log_message`
+CREATE TABLE `er_job_log_message`
 (
     `id`            bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`  varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -343,8 +331,7 @@ CREATE TABLE `job_log_message`
   AUTO_INCREMENT = 0
   DEFAULT CHARSET = utf8mb4 COMMENT ='调度日志';
 
-DROP TABLE IF EXISTS `job_task`;
-CREATE TABLE `job_task`
+CREATE TABLE `er_job_task`
 (
     `id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`   varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -369,8 +356,7 @@ CREATE TABLE `job_task`
   AUTO_INCREMENT = 0
   DEFAULT CHARSET = utf8mb4 COMMENT ='任务实例';
 
-DROP TABLE IF EXISTS `job_task_batch`;
-CREATE TABLE `job_task_batch`
+CREATE TABLE `er_job_task_batch`
 (
     `id`                      bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`            varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -392,13 +378,12 @@ CREATE TABLE `job_task_batch`
     KEY `idx_job_id_task_batch_status` (`job_id`, `task_batch_status`),
     KEY `idx_create_dt` (`create_dt`),
     KEY `idx_namespace_id_group_name` (`namespace_id`, `group_name`),
-    KEY `idx_workflow_task_batch_id_workflow_node_id` (`workflow_task_batch_id`,`workflow_node_id`)
+    KEY `idx_workflow_task_batch_id_workflow_node_id` (`workflow_task_batch_id`, `workflow_node_id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 0
   DEFAULT CHARSET = utf8mb4 COMMENT ='任务批次';
 
-DROP TABLE IF EXISTS `job_notify_config`;
-CREATE TABLE `job_notify_config`
+CREATE TABLE `er_job_notify_config`
 (
     `id`                     bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`           varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -420,32 +405,31 @@ CREATE TABLE `job_notify_config`
   AUTO_INCREMENT = 4
   DEFAULT CHARSET = utf8mb4 COMMENT ='job通知配置';
 
-DROP TABLE IF EXISTS `job_summary`;
-CREATE TABLE `job_summary`
+CREATE TABLE `er_job_summary`
 (
-    `id`            bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `namespace_id`  VARCHAR(64)     NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
-    `group_name`    VARCHAR(64)     NOT NULL DEFAULT '' COMMENT '组名称',
-    `job_id`        bigint          NOT NULL COMMENT '任务信息id',
-    `trigger_at`    datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '统计时间',
-    `success_num`   int             NOT NULL DEFAULT '0' COMMENT '执行成功-日志数量',
-    `fail_num`      int             NOT NULL DEFAULT '0' COMMENT '执行失败-日志数量',
-    `fail_reason`   varchar(512)    NOT NULL DEFAULT '' COMMENT '失败原因',
-    `stop_num`      int             NOT NULL DEFAULT '0' COMMENT '执行失败-日志数量',
-    `stop_reason`   varchar(512)    NOT NULL DEFAULT '' COMMENT '失败原因',
-    `cancel_num`    int             NOT NULL DEFAULT '0' COMMENT '执行失败-日志数量',
-    `cancel_reason` varchar(512)    NOT NULL DEFAULT '' COMMENT '失败原因',
-    `create_dt`     datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_dt`     datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    `id`               bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `namespace_id`     VARCHAR(64)     NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
+    `group_name`       VARCHAR(64)     NOT NULL DEFAULT '' COMMENT '组名称',
+    `business_id`      bigint          NOT NULL COMMENT '业务id (job_id或workflow_id)',
+    `system_task_type` tinyint(4)      NOT NULL DEFAULT '3' COMMENT '任务类型 3、JOB任务 4、WORKFLOW任务',
+    `trigger_at`       datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '统计时间',
+    `success_num`      int             NOT NULL DEFAULT '0' COMMENT '执行成功-日志数量',
+    `fail_num`         int             NOT NULL DEFAULT '0' COMMENT '执行失败-日志数量',
+    `fail_reason`      varchar(512)    NOT NULL DEFAULT '' COMMENT '失败原因',
+    `stop_num`         int             NOT NULL DEFAULT '0' COMMENT '执行失败-日志数量',
+    `stop_reason`      varchar(512)    NOT NULL DEFAULT '' COMMENT '失败原因',
+    `cancel_num`       int             NOT NULL DEFAULT '0' COMMENT '执行失败-日志数量',
+    `cancel_reason`    varchar(512)    NOT NULL DEFAULT '' COMMENT '失败原因',
+    `create_dt`        datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_dt`        datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     PRIMARY KEY (`id`),
-    KEY `idx_namespace_id_group_name_job_id` (`namespace_id`, `group_name`, job_id),
-    UNIQUE KEY `uk_job_id_trigger_at` (`job_id`, `trigger_at`) USING BTREE
+    KEY `idx_namespace_id_group_name_business_id` (`namespace_id`, `group_name`, business_id),
+    UNIQUE KEY `uk_trigger_at_system_task_type_business_id` (`trigger_at`, `system_task_type`, `business_id`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4 COMMENT ='DashBoard_Job';
 
-DROP TABLE IF EXISTS `retry_summary`;
-CREATE TABLE `retry_summary`
+CREATE TABLE `er_retry_summary`
 (
     `id`            bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`  VARCHAR(64)     NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -459,13 +443,13 @@ CREATE TABLE `retry_summary`
     `create_dt`     datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_dt`     datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     PRIMARY KEY (`id`),
+    KEY `idx_trigger_at` (`trigger_at`),
     UNIQUE KEY `uk_scene_name_trigger_at` (`namespace_id`, `group_name`, `scene_name`, `trigger_at`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4 COMMENT ='DashBoard_Retry';
 
-DROP TABLE IF EXISTS `workflow`;
-CREATE TABLE `workflow`
+CREATE TABLE `er_workflow`
 (
     `id`               bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `workflow_name`    varchar(64)         NOT NULL COMMENT '工作流名称',
@@ -492,8 +476,7 @@ CREATE TABLE `workflow`
   AUTO_INCREMENT = 0
   DEFAULT CHARSET = utf8mb4 COMMENT ='工作流';
 
-DROP TABLE IF EXISTS `workflow_node`;
-CREATE TABLE `workflow_node`
+CREATE TABLE `er_workflow_node`
 (
     `id`                   bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`         varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
@@ -519,8 +502,7 @@ CREATE TABLE `workflow_node`
   AUTO_INCREMENT = 0
   DEFAULT CHARSET = utf8mb4 COMMENT ='工作流节点';
 
-DROP TABLE IF EXISTS `workflow_task_batch`;
-CREATE TABLE `workflow_task_batch`
+CREATE TABLE `er_workflow_task_batch`
 (
     `id`                bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`      varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
