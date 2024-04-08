@@ -2,6 +2,7 @@ package org.dromara.workflow.controller;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
@@ -83,14 +84,14 @@ public class ActProcessDefinitionController extends BaseController {
     /**
      * 删除流程定义
      *
-     * @param deploymentId        部署id
-     * @param processDefinitionId 流程定义id
+     * @param deploymentIds        部署id
+     * @param processDefinitionIds 流程定义id
      */
     @Log(title = "流程定义管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{deploymentId}/{processDefinitionId}")
-    public R<Void> deleteDeployment(@NotBlank(message = "流程部署id不能为空") @PathVariable String deploymentId,
-                                    @NotBlank(message = "流程定义id不能为空") @PathVariable String processDefinitionId) {
-        return toAjax(actProcessDefinitionService.deleteDeployment(deploymentId, processDefinitionId));
+    @DeleteMapping("/{deploymentIds}/{processDefinitionIds}")
+    public R<Void> deleteDeployment(@NotNull(message = "流程部署id不能为空") @PathVariable List<String> deploymentIds,
+                                    @NotNull(message = "流程定义id不能为空") @PathVariable List<String> processDefinitionIds) {
+        return toAjax(actProcessDefinitionService.deleteDeployment(deploymentIds, processDefinitionIds));
     }
 
     /**

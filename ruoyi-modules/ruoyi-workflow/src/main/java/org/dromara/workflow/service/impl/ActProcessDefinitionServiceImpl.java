@@ -35,6 +35,7 @@ import org.dromara.workflow.utils.QueryUtils;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.*;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -45,9 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -188,24 +187,30 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     /**
      * 删除流程定义
      *
-     * @param deploymentId        部署id
-     * @param processDefinitionId 流程定义id
+     * @param deploymentIds        部署id
+     * @param processDefinitionIds 流程定义id
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteDeployment(String deploymentId, String processDefinitionId) {
+    public boolean deleteDeployment(List<String> deploymentIds, List<String> processDefinitionIds) {
         try {
-            List<HistoricTaskInstance> taskInstanceList = QueryUtils.hisTaskInstanceQuery()
-                .processDefinitionId(processDefinitionId).list();
-            if (CollectionUtil.isNotEmpty(taskInstanceList)) {
-                throw new ServiceException("当前流程定义已被使用不可删除！");
+            List<HistoricProcessInstance> historicProcessInstances = QueryUtils.hisInstanceQuery().deploymentIdIn(deploymentIds).list();
+            if (CollectionUtil.isNotEmpty(historicProcessInstances)) {
+                Set<String> defIds = StreamUtils.toSet(historicProcessInstances, HistoricProcessInstance::getProcessDefinitionId);
+                List<ProcessDefinition> processDefinitions = QueryUtils.definitionQuery().processDefinitionIds(defIds).list();
+                if (CollUtil.isNotEmpty(processDefinitions)) {
+                    Set<String> keys = StreamUtils.toSet(processDefinitions, ProcessDefinition::getKey);
+                    throw new ServiceException("当前【" + String.join(",", keys) + "】流程定义已被使用不可删除！");
+                }
             }
             //删除流程定义
-            repositoryService.deleteDeployment(deploymentId);
+            for (String deploymentId : deploymentIds) {
+                repositoryService.deleteDeployment(deploymentId);
+            }
             //删除流程定义配置
-            iWfDefinitionConfigService.deleteByDefIds(Collections.singletonList(processDefinitionId));
+            iWfDefinitionConfigService.deleteByDefIds(processDefinitionIds);
             //删除节点配置
-            iWfNodeConfigService.deleteByDefIds(Collections.singletonList(processDefinitionId));
+            iWfNodeConfigService.deleteByDefIds(processDefinitionIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
