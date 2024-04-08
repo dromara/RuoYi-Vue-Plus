@@ -16,6 +16,7 @@ mybatis-plus:
   typeAliasesPackage: com.aizuda.easy.retry.template.datasource.persistence.po
   global-config:
     db-config:
+      table-prefix: er_
       where-strategy: NOT_EMPTY
       capital-mode: false
       logic-delete-value: 1

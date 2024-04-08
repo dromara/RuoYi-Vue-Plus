@@ -1,6 +1,3 @@
-easy-retry:
-  # 当前使用的数据库类型
-  db-type: mysql
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource

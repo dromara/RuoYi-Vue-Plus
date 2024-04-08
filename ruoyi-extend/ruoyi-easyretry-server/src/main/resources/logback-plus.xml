@@ -79,7 +79,7 @@
     </appender>
 
     <!-- EasyRetry appender -->
-    <appender name="easy_log_server_appender" class="com.aizuda.easy.retry.server.job.task.support.appender.EasyRetryServerLogbackAppender">
+    <appender name="easy_log_server_appender" class="com.aizuda.easy.retry.server.common.appender.EasyRetryServerLogbackAppender">
     </appender>
 
     <!-- 控制台输出日志级别 -->
