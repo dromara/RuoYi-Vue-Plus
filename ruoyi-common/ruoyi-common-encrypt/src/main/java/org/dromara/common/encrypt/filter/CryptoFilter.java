@@ -11,7 +11,6 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.encrypt.properties.ApiDecryptProperties;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.HandlerExecutionChain;
@@ -43,27 +42,25 @@ public class CryptoFilter implements Filter {
         ServletResponse responseWrapper = null;
         EncryptResponseBodyWrapper responseBodyWrapper = null;
 
-        // 是否为 json 请求
-        if (StringUtils.startsWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE)) {
-            // 是否为 put 或者 post 请求
-            if (HttpMethod.PUT.matches(servletRequest.getMethod()) || HttpMethod.POST.matches(servletRequest.getMethod())) {
-                // 是否存在加密标头
-                String headerValue = servletRequest.getHeader(properties.getHeaderFlag());
-                if (StringUtils.isNotBlank(headerValue)) {
-                    // 请求解密
-                    requestWrapper = new DecryptRequestBodyWrapper(servletRequest, properties.getPrivateKey(), properties.getHeaderFlag());
-                } else {
-                    // 是否有注解，有就报错，没有放行
-                    if (ObjectUtil.isNotNull(apiEncrypt)) {
-                        HandlerExceptionResolver exceptionResolver = SpringUtils.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-                        exceptionResolver.resolveException(
-                            servletRequest, servletResponse, null,
-                            new ServiceException("没有访问权限，请联系管理员授权", HttpStatus.FORBIDDEN));
-                        return;
-                    }
+        // 是否为 put 或者 post 请求
+        if (HttpMethod.PUT.matches(servletRequest.getMethod()) || HttpMethod.POST.matches(servletRequest.getMethod())) {
+            // 是否存在加密标头
+            String headerValue = servletRequest.getHeader(properties.getHeaderFlag());
+            if (StringUtils.isNotBlank(headerValue)) {
+                // 请求解密
+                requestWrapper = new DecryptRequestBodyWrapper(servletRequest, properties.getPrivateKey(), properties.getHeaderFlag());
+            } else {
+                // 是否有注解，有就报错，没有放行
+                if (ObjectUtil.isNotNull(apiEncrypt)) {
+                    HandlerExceptionResolver exceptionResolver = SpringUtils.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+                    exceptionResolver.resolveException(
+                        servletRequest, servletResponse, null,
+                        new ServiceException("没有访问权限，请联系管理员授权", HttpStatus.FORBIDDEN));
+                    return;
                 }
             }
         }
+
         // 判断是否响应加密
         if (responseFlag) {
             responseBodyWrapper = new EncryptResponseBodyWrapper(servletResponse);
