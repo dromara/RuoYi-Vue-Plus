@@ -36,7 +36,7 @@
     <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.path}/info.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/info.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${log.path}/info.%d{yyyy-MM-dd}.log</FileNamePattern>
             <MaxHistory>60</MaxHistory>
         </rollingPolicy>
         <encoder>
@@ -52,7 +52,7 @@
     <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.path}/error.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/error.%d{yyyy-MM-dd}.log
+            <FileNamePattern>${log.path}/error.%d{yyyy-MM-dd}.log
             </FileNamePattern>
             <MaxHistory>60</MaxHistory>
         </rollingPolicy>
