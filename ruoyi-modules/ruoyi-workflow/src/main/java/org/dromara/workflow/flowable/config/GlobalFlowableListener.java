@@ -23,6 +23,7 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +51,9 @@ public class GlobalFlowableListener implements FlowableEventListener {
     @Lazy
     private RepositoryService repositoryService;
 
+    @Value("${flowable.async-executor-activate}")
+    private boolean asyncExecutorActivate;
+
     @Override
     public void onEvent(FlowableEvent flowableEvent) {
         if (flowableEvent instanceof FlowableEngineEvent flowableEngineEvent) {
@@ -60,7 +64,7 @@ public class GlobalFlowableListener implements FlowableEventListener {
                     FlowableEntityEvent flowableEntityEvent = (FlowableEntityEvent) flowableEngineEvent;
                     Object entityObject = flowableEntityEvent.getEntity();
                     TaskEntity task = (TaskEntity) entityObject;
-                    if (task.getDueDate() != null && task.getDueDate().after(new Date())) {
+                    if (asyncExecutorActivate && task.getDueDate() != null && task.getDueDate().after(new Date())) {
                         //删除之前已经存在的定时任务
                         TimerJobService timerJobService = CommandContextUtil.getTimerJobService();
                         List<TimerJobEntity> timerJobEntityList = timerJobService.findTimerJobsByProcessInstanceId(task.getProcessInstanceId());
