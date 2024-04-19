@@ -7,7 +7,6 @@ import lombok.Data;
  *
  * @author Lion Li
  */
-
 @Data
 public class SysUserOnline {
 
