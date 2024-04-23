@@ -2,7 +2,6 @@ package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -517,9 +516,9 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
             taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.TERMINATION.getStatus(), terminationBo.getComment());
             List<Task> list = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
-            if (CollectionUtil.isNotEmpty(list)) {
+            if (CollUtil.isNotEmpty(list)) {
                 List<Task> subTasks = StreamUtils.filter(list, e -> StringUtils.isNotBlank(e.getParentTaskId()));
-                if (CollectionUtil.isNotEmpty(subTasks)) {
+                if (CollUtil.isNotEmpty(subTasks)) {
                     subTasks.forEach(e -> taskService.deleteTask(e.getId()));
                 }
                 runtimeService.updateBusinessStatus(task.getProcessInstanceId(), BusinessStatusEnum.TERMINATION.getStatus());
@@ -768,7 +767,7 @@ public class ActTaskServiceImpl implements IActTaskService {
     public List<VariableVo> getInstanceVariable(String taskId) {
         List<VariableVo> variableVoList = new ArrayList<>();
         Map<String, VariableInstance> variableInstances = taskService.getVariableInstances(taskId);
-        if (CollectionUtil.isNotEmpty(variableInstances)) {
+        if (CollUtil.isNotEmpty(variableInstances)) {
             for (Map.Entry<String, VariableInstance> entry : variableInstances.entrySet()) {
                 VariableVo variableVo = new VariableVo();
                 variableVo.setKey(entry.getKey());
