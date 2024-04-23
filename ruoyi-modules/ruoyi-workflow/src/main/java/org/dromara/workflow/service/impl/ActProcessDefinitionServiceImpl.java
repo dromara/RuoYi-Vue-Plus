@@ -3,7 +3,6 @@ package org.dromara.workflow.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -150,7 +149,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 processDefinitionVoList.add(processDefinitionVo);
             }
         }
-        return CollectionUtil.reverse(processDefinitionVoList);
+        return CollUtil.reverse(processDefinitionVoList);
     }
 
     /**
@@ -195,7 +194,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     public boolean deleteDeployment(List<String> deploymentIds, List<String> processDefinitionIds) {
         try {
             List<HistoricProcessInstance> historicProcessInstances = QueryUtils.hisInstanceQuery().deploymentIdIn(deploymentIds).list();
-            if (CollectionUtil.isNotEmpty(historicProcessInstances)) {
+            if (CollUtil.isNotEmpty(historicProcessInstances)) {
                 Set<String> defIds = StreamUtils.toSet(historicProcessInstances, HistoricProcessInstance::getProcessDefinitionId);
                 List<ProcessDefinition> processDefinitions = QueryUtils.definitionQuery().processDefinitionIds(defIds).list();
                 if (CollUtil.isNotEmpty(processDefinitions)) {

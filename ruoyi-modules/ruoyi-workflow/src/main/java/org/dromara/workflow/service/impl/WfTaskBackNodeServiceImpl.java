@@ -1,6 +1,6 @@
 package org.dromara.workflow.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,7 @@ public class WfTaskBackNodeServiceImpl implements IWfTaskBackNodeService {
         } else {
             wfTaskBackNode.setTaskType(USER_TASK);
         }
-        if (CollectionUtil.isEmpty(list)) {
+        if (CollUtil.isEmpty(list)) {
             wfTaskBackNode.setOrderNo(0);
             wfTaskBackNodeMapper.insert(wfTaskBackNode);
         } else {
@@ -96,14 +96,14 @@ public class WfTaskBackNodeServiceImpl implements IWfTaskBackNodeService {
                 Integer orderNo = actTaskNode.getOrderNo();
                 List<WfTaskBackNode> taskNodeList = getListByInstanceId(processInstanceId);
                 List<Long> ids = new ArrayList<>();
-                if (CollectionUtil.isNotEmpty(taskNodeList)) {
+                if (CollUtil.isNotEmpty(taskNodeList)) {
                     for (WfTaskBackNode taskNode : taskNodeList) {
                         if (taskNode.getOrderNo() >= orderNo) {
                             ids.add(taskNode.getId());
                         }
                     }
                 }
-                if (CollectionUtil.isNotEmpty(ids)) {
+                if (CollUtil.isNotEmpty(ids)) {
                     wfTaskBackNodeMapper.deleteBatchIds(ids);
                 }
             }

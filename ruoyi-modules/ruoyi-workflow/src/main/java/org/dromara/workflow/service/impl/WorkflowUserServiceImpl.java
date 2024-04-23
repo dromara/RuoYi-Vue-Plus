@@ -1,7 +1,6 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -70,11 +69,11 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
         queryWrapper.eq(SysUser::getStatus, UserStatus.OK.getCode());
         if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
             List<Long> assigneeList = (List<Long>) runtimeService.getVariable(task.getExecutionId(), multiInstance.getAssigneeList());
-            queryWrapper.notIn(CollectionUtil.isNotEmpty(assigneeList), SysUser::getUserId, assigneeList);
+            queryWrapper.notIn(CollUtil.isNotEmpty(assigneeList), SysUser::getUserId, assigneeList);
         } else {
             List<Task> list = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
             List<Long> userIds = StreamUtils.toList(list, e -> Long.valueOf(e.getAssignee()));
-            queryWrapper.notIn(CollectionUtil.isNotEmpty(userIds), SysUser::getUserId, userIds);
+            queryWrapper.notIn(CollUtil.isNotEmpty(userIds), SysUser::getUserId, userIds);
         }
         queryWrapper.like(StringUtils.isNotEmpty(bo.getUserName()), SysUser::getUserName, bo.getUserName());
         queryWrapper.like(StringUtils.isNotEmpty(bo.getNickName()), SysUser::getNickName, bo.getNickName());
@@ -109,7 +108,7 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
         if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
             List<Long> userIds = StreamUtils.filter(assigneeList, e -> !String.valueOf(e).equals(task.getAssignee()));
             List<SysUserVo> sysUsers = null;
-            if (CollectionUtil.isNotEmpty(userIds)) {
+            if (CollUtil.isNotEmpty(userIds)) {
                 sysUsers = sysUserMapper.selectVoBatchIds(userIds);
             }
             for (Long userId : userIds) {
@@ -119,7 +118,7 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
                 taskVo.setProcessInstanceId(task.getProcessInstanceId());
                 taskVo.setName(task.getName());
                 taskVo.setAssignee(userId);
-                if (CollectionUtil.isNotEmpty(sysUsers)) {
+                if (CollUtil.isNotEmpty(sysUsers)) {
                     sysUsers.stream().filter(u -> u.getUserId().toString().equals(userId.toString())).findFirst().ifPresent(u -> taskVo.setAssigneeName(u.getNickName()));
                 }
                 taskListVo.add(taskVo);
@@ -127,10 +126,10 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
             return taskListVo;
         } else if (multiInstance.getType() instanceof ParallelMultiInstanceBehavior) {
             List<Task> tasks = StreamUtils.filter(taskList, e -> StringUtils.isBlank(e.getParentTaskId()) && !e.getExecutionId().equals(task.getExecutionId()) && e.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()));
-            if (CollectionUtil.isNotEmpty(tasks)) {
+            if (CollUtil.isNotEmpty(tasks)) {
                 List<Long> userIds = StreamUtils.toList(tasks, e -> Long.valueOf(e.getAssignee()));
                 List<SysUserVo> sysUsers = null;
-                if (CollectionUtil.isNotEmpty(userIds)) {
+                if (CollUtil.isNotEmpty(userIds)) {
                     sysUsers = sysUserMapper.selectVoBatchIds(userIds);
                 }
                 for (Task t : tasks) {
@@ -140,7 +139,7 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
                     taskVo.setProcessInstanceId(t.getProcessInstanceId());
                     taskVo.setName(t.getName());
                     taskVo.setAssignee(Long.valueOf(t.getAssignee()));
-                    if (CollectionUtil.isNotEmpty(sysUsers)) {
+                    if (CollUtil.isNotEmpty(sysUsers)) {
                         sysUsers.stream().filter(u -> u.getUserId().toString().equals(t.getAssignee())).findFirst().ifPresent(e -> taskVo.setAssigneeName(e.getNickName()));
                     }
                     taskListVo.add(taskVo);
