@@ -318,7 +318,7 @@ comment on column sys_post.remark       is '备注';
 -- ----------------------------
 -- 初始化-岗位信息表数据
 -- ----------------------------
-insert into sys_post values(1, '000000', 100, 'ceo',  null, '董事长',    1, '0', 103, 1, now(), null, null, '');
+insert into sys_post values(1, '000000', 103, 'ceo',  null, '董事长',    1, '0', 103, 1, now(), null, null, '');
 insert into sys_post values(2, '000000', 100, 'se',   null, '项目经理',  2, '0', 103, 1, now(), null, null, '');
 insert into sys_post values(3, '000000', 100, 'hr',   null, '人力资源',  3, '0', 103, 1, now(), null, null, '');
 insert into sys_post values(4, '000000', 100, 'user', null, '普通员工',  4, '0', 103, 1, now(), null, null, '');
