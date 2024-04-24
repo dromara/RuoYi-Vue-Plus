@@ -927,7 +927,7 @@ CREATE TABLE sys_dept
     parent_id   bigint       DEFAULT ((0)) NULL,
     ancestors   nvarchar(500)DEFAULT ''    NULL,
     dept_name   nvarchar(30)               NULL,
-    dept_category   nvarchar(100) DEFAULT ''    NULL,
+    dept_category nvarchar(100) DEFAULT '' NULL,
     order_num   int          DEFAULT ((0)) NULL,
     leader      bigint                     NULL,
     phone       nvarchar(11)               NULL,
@@ -2144,7 +2144,7 @@ CREATE TABLE sys_post
     tenant_id   nvarchar(20) DEFAULT ('000000') NULL,
     dept_id     bigint                          NOT NULL,
     post_code   nvarchar(64)                    NOT NULL,
-    post_category   nvarchar(100)               NULL,
+    post_category nvarchar(100)                 NULL,
     post_name   nvarchar(50)                    NOT NULL,
     post_sort   int                             NOT NULL,
     status      nchar(1)                        NOT NULL,
@@ -2176,8 +2176,8 @@ GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'部门id' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'dept_id',
-    'COLUMN', N'tenant_id'
+    'TABLE', N'sys_post',
+    'COLUMN', N'dept_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'岗位编码' ,
@@ -2251,13 +2251,13 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_post'
 GO
 
-INSERT sys_post VALUES (1, N'000000', 100, N'ceo',NULL,  N'董事长', 1, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (1, N'000000', 103, N'ceo', NULL,  N'董事长', 1, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (2, N'000000', 100, N'se',NULL,  N'项目经理', 2, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (2, N'000000', 100, N'se', NULL,  N'项目经理', 2, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (3, N'000000', 100, N'hr',NULL,  N'人力资源', 3, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (3, N'000000', 100, N'hr', NULL,  N'人力资源', 3, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (4, N'000000', 100, N'user',NULL,  N'普通员工', 4, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (4, N'000000', 100, N'user', NULL,  N'普通员工', 4, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
 
 CREATE TABLE sys_role
