@@ -165,6 +165,7 @@ create table sys_dept (
   parent_id         number(20)      default 0,
   ancestors         varchar2(500)   default '',
   dept_name         varchar2(30)    default '',
+  dept_category     varchar2(100)   default null,
   order_num         number(4)       default 0,
   leader            number(20)     default null,
   phone             varchar2(11)    default null,
@@ -186,6 +187,7 @@ comment on column sys_dept.tenant_id    is '租户编号';
 comment on column sys_dept.parent_id    is '父部门id';
 comment on column sys_dept.ancestors    is '祖级列表';
 comment on column sys_dept.dept_name    is '部门名称';
+comment on column sys_dept.dept_category is '部门类别编码';
 comment on column sys_dept.order_num    is '显示顺序';
 comment on column sys_dept.leader       is '负责人';
 comment on column sys_dept.phone        is '联系电话';
@@ -201,16 +203,17 @@ comment on column sys_dept.update_time  is '更新时间';
 -- ----------------------------
 -- 初始化-部门表数据
 -- ----------------------------
-insert into sys_dept values(100, '000000', 0,   '0',          'XXX科技',   0, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(101, '000000', 100, '0,100',      '深圳总公司', 1, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(102, '000000', 100, '0,100',      '长沙分公司', 2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(103, '000000', 101, '0,100,101',  '研发部门',   1, 1, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(104, '000000', 101, '0,100,101',  '市场部门',   2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(105, '000000', 101, '0,100,101',  '测试部门',   3, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(106, '000000', 101, '0,100,101',  '财务部门',   4, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(107, '000000', 101, '0,100,101',  '运维部门',   5, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(108, '000000', 102, '0,100,102',  '市场部门',   1, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(109, '000000', 102, '0,100,102',  '财务部门',   2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+
+insert into sys_dept values(100, '000000', 0,   '0',          'XXX科技',   null,0, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(101, '000000', 100, '0,100',      '深圳总公司', null,1, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(102, '000000', 100, '0,100',      '长沙分公司', null,2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(103, '000000', 101, '0,100,101',  '研发部门',   null,1, 1, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(104, '000000', 101, '0,100,101',  '市场部门',   null,2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(105, '000000', 101, '0,100,101',  '测试部门',   null,3, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(106, '000000', 101, '0,100,101',  '财务部门',   null,4, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(107, '000000', 101, '0,100,101',  '运维部门',   null,5, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(108, '000000', 102, '0,100,102',  '市场部门',   null,1, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(109, '000000', 102, '0,100,102',  '财务部门',   null,2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
 
 
 -- ----------------------------
@@ -278,7 +281,9 @@ insert into sys_user values(4, '000000', 102, 'test1', '仅本人 密码666666',
 create table sys_post (
   post_id           number(20)      not null,
   tenant_id         varchar2(20)    default '000000',
+  dept_id           number(20)      not null,
   post_code         varchar2(64)    not null,
+  post_category     varchar2(64)    default null,
   post_name         varchar2(50)    not null,
   post_sort         number(4)       not null,
   status            char(1)         not null,
@@ -295,7 +300,9 @@ alter table sys_post add constraint pk_sys_post primary key (post_id);
 comment on table  sys_post              is '岗位信息表';
 comment on column sys_post.post_id      is '岗位ID';
 comment on column sys_post.tenant_id    is '租户编号';
+comment on column sys_post.dept_id      is '部门id';
 comment on column sys_post.post_code    is '岗位编码';
+comment on column sys_post.post_category is '岗位类别编码';
 comment on column sys_post.post_name    is '岗位名称';
 comment on column sys_post.post_sort    is '显示顺序';
 comment on column sys_post.status       is '状态（0正常 1停用）';
@@ -309,10 +316,10 @@ comment on column sys_post.remark       is '备注';
 -- ----------------------------
 -- 初始化-岗位信息表数据
 -- ----------------------------
-insert into sys_post values(1, '000000', 'ceo',  '董事长',    1, '0', 103, 1, sysdate, null, null, '');
-insert into sys_post values(2, '000000', 'se',   '项目经理',  2, '0', 103, 1, sysdate, null, null, '');
-insert into sys_post values(3, '000000', 'hr',   '人力资源',  3, '0', 103, 1, sysdate, null, null, '');
-insert into sys_post values(4, '000000', 'user', '普通员工',  4, '0', 103, 1, sysdate, null, null, '');
+insert into sys_post values(1, '000000', 100, 'ceo',  null, '董事长',    1, '0', 103, 1, sysdate, null, null, '');
+insert into sys_post values(2, '000000', 100, 'se',   null, '项目经理',  2, '0', 103, 1, sysdate, null, null, '');
+insert into sys_post values(3, '000000', 100, 'hr',   null, '人力资源',  3, '0', 103, 1, sysdate, null, null, '');
+insert into sys_post values(4, '000000', 100, 'user', null, '普通员工',  4, '0', 103, 1, sysdate, null, null, '');
 
 
 -- ----------------------------

@@ -132,16 +132,19 @@ public class SysUserController extends BaseController {
         SysUserInfoVo userInfoVo = new SysUserInfoVo();
         SysRoleBo roleBo = new SysRoleBo();
         roleBo.setStatus(UserConstants.ROLE_NORMAL);
-        SysPostBo postBo = new SysPostBo();
-        postBo.setStatus(UserConstants.POST_NORMAL);
         List<SysRoleVo> roles = roleService.selectRoleList(roleBo);
         userInfoVo.setRoles(LoginHelper.isSuperAdmin(userId) ? roles : StreamUtils.filter(roles, r -> !r.isSuperAdmin()));
-        userInfoVo.setPosts(postService.selectPostList(postBo));
         if (ObjectUtil.isNotNull(userId)) {
             SysUserVo sysUser = userService.selectUserById(userId);
             userInfoVo.setUser(sysUser);
             userInfoVo.setRoleIds(roleService.selectRoleListByUserId(userId));
-            userInfoVo.setPostIds(postService.selectPostListByUserId(userId));
+            Long deptId = sysUser.getDeptId();
+            if (ObjectUtil.isNotNull(deptId)) {
+                SysPostBo postBo = new SysPostBo();
+                postBo.setDeptId(deptId);
+                userInfoVo.setPosts(postService.selectPostList(postBo));
+                userInfoVo.setPostIds(postService.selectPostListByUserId(userId));
+            }
         }
         return R.ok(userInfoVo);
     }

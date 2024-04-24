@@ -926,7 +926,8 @@ CREATE TABLE sys_dept
     tenant_id   nvarchar(20) DEFAULT ('000000') NULL,
     parent_id   bigint       DEFAULT ((0)) NULL,
     ancestors   nvarchar(500)DEFAULT ''    NULL,
-    dept_name   nvarchar(30) DEFAULT ''    NULL,
+    dept_name   nvarchar(30)               NULL,
+    dept_category   nvarchar(100) DEFAULT ''    NULL,
     order_num   int          DEFAULT ((0)) NULL,
     leader      bigint                     NULL,
     phone       nvarchar(11)               NULL,
@@ -974,6 +975,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_dept',
     'COLUMN', N'dept_name'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'部门类别编码' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_dept',
+    'COLUMN', N'dept_category'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'显示顺序' ,
@@ -1047,25 +1054,25 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dept'
 GO
 
-INSERT sys_dept VALUES (100, N'000000', 0, N'0', N'XXX科技', 0, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (100, N'000000', 0, N'0', N'XXX科技', NULL, 0, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (101, N'000000', 100, N'0,100', N'深圳总公司', 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (101, N'000000', 100, N'0,100', N'深圳总公司', NULL, 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (102, N'000000', 100, N'0,100', N'长沙分公司', 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (102, N'000000', 100, N'0,100', N'长沙分公司', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (103, N'000000', 101, N'0,100,101', N'研发部门', 1, 1, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (103, N'000000', 101, N'0,100,101', N'研发部门', NULL, 1, 1, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (104, N'000000', 101, N'0,100,101', N'市场部门', 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (104, N'000000', 101, N'0,100,101', N'市场部门', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (105, N'000000', 101, N'0,100,101', N'测试部门', 3, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (105, N'000000', 101, N'0,100,101', N'测试部门', NULL, 3, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (106, N'000000', 101, N'0,100,101', N'财务部门', 4, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (106, N'000000', 101, N'0,100,101', N'财务部门', NULL, 4, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (107, N'000000', 101, N'0,100,101', N'运维部门', 5, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (107, N'000000', 101, N'0,100,101', N'运维部门', NULL, 5, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (108, N'000000', 102, N'0,100,102', N'市场部门', 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (108, N'000000', 102, N'0,100,102', N'市场部门', NULL, 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (109, N'000000', 102, N'0,100,102', N'财务部门', 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (109, N'000000', 102, N'0,100,102', N'财务部门', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
 
 CREATE TABLE sys_dict_data
@@ -2135,7 +2142,9 @@ CREATE TABLE sys_post
 (
     post_id     bigint                          NOT NULL,
     tenant_id   nvarchar(20) DEFAULT ('000000') NULL,
+    dept_id     bigint                          NOT NULL,
     post_code   nvarchar(64)                    NOT NULL,
+    post_category   nvarchar(100)               NULL,
     post_name   nvarchar(50)                    NOT NULL,
     post_sort   int                             NOT NULL,
     status      nchar(1)                        NOT NULL,
@@ -2165,9 +2174,21 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
+    'MS_Description', N'部门id' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'dept_id',
+    'COLUMN', N'tenant_id'
+GO
+EXEC sys.sp_addextendedproperty
     'MS_Description', N'岗位编码' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_post',
+    'COLUMN', N'post_code'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'岗位类别编码' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'post_category',
     'COLUMN', N'post_code'
 GO
 EXEC sys.sp_addextendedproperty
@@ -2230,13 +2251,13 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_post'
 GO
 
-INSERT sys_post VALUES (1, N'000000', N'ceo', N'董事长', 1, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (1, N'000000', 100, N'ceo',NULL,  N'董事长', 1, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (2, N'000000', N'se', N'项目经理', 2, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (2, N'000000', 100, N'se',NULL,  N'项目经理', 2, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (3, N'000000', N'hr', N'人力资源', 3, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (3, N'000000', 100, N'hr',NULL,  N'人力资源', 3, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (4, N'000000', N'user', N'普通员工', 4, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (4, N'000000', 100, N'user',NULL,  N'普通员工', 4, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
 
 CREATE TABLE sys_role
