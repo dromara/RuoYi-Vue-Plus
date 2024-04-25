@@ -3,11 +3,11 @@ package org.dromara.workflow.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -52,7 +52,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.*;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -236,7 +235,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
         CustomDefaultProcessDiagramGenerator diagramGenerator = new CustomDefaultProcessDiagramGenerator();
         InputStream inputStream = diagramGenerator.generateDiagram(bpmnModel, "png", highLightedNodeList, highLightedFlows, activityFontName, labelFontName, annotationFontName, null, 1.0, true);
-        return Base64.encode(IOUtils.toByteArray(inputStream));
+        return Base64.encode(IoUtil.readBytes(inputStream));
     }
 
     /**
@@ -282,14 +281,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         map.put("taskList", taskList);
         List<ActHistoryInfoVo> historyTaskList = getHistoryTaskList(processInstanceId);
         map.put("historyList", historyTaskList);
-        InputStream inputStream;
-        try {
-            inputStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getResourceName());
-            xml.append(IOUtils.toString(inputStream, String.valueOf(StandardCharsets.UTF_8)));
-            map.put("xml", xml.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        InputStream inputStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getResourceName());
+        xml.append(IoUtil.read(inputStream, StandardCharsets.UTF_8));
+        map.put("xml", xml.toString());
         return map;
     }
 

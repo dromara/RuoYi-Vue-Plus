@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
-import org.apache.commons.io.IOUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -34,7 +33,10 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.repository.*;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ModelQuery;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.validation.ValidationError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +48,6 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -249,7 +250,7 @@ public class ActModelServiceImpl implements IActModelService {
             if (ArrayUtil.isEmpty(xmlBytes)) {
                 throw new ServiceException("模型数据为空，请先设计流程定义模型，再进行部署！");
             }
-            if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, StandardCharsets.UTF_8.toString()))) {
+            if (JSONUtil.isTypeJSON(new String(xmlBytes, StandardCharsets.UTF_8))) {
                 byte[] bytes = ModelUtils.bpmnJsonToXmlBytes(xmlBytes);
                 if (ArrayUtil.isEmpty(bytes)) {
                     throw new ServiceException("模型不能为空，请至少设计一条主线流程！");
@@ -337,9 +338,7 @@ public class ActModelServiceImpl implements IActModelService {
      */
     @Override
     public void exportZip(List<String> modelIds, HttpServletResponse response) {
-        ZipOutputStream zos = null;
-        try {
-            zos = ZipUtil.getZipOutputStream(response.getOutputStream(), StandardCharsets.UTF_8);
+        try (ZipOutputStream zos = ZipUtil.getZipOutputStream(response.getOutputStream(), StandardCharsets.UTF_8)) {
             // 压缩包文件名
             String zipName = "模型不存在";
             // 查询模型基本信息
@@ -347,7 +346,7 @@ public class ActModelServiceImpl implements IActModelService {
                 Model model = repositoryService.getModel(modelId);
                 byte[] xmlBytes = repositoryService.getModelEditorSource(modelId);
                 if (ObjectUtil.isNotNull(model)) {
-                    if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, StandardCharsets.UTF_8.toString())) && ArrayUtil.isEmpty(ModelUtils.bpmnJsonToXmlBytes(xmlBytes))) {
+                    if (JSONUtil.isTypeJSON(new String(xmlBytes, StandardCharsets.UTF_8)) && ArrayUtil.isEmpty(ModelUtils.bpmnJsonToXmlBytes(xmlBytes))) {
                         zipName = "模型不能为空，请至少设计一条主线流程！";
                         zos.putNextEntry(new ZipEntry(zipName + ".txt"));
                         zos.write(zipName.getBytes(StandardCharsets.UTF_8));
@@ -367,19 +366,11 @@ public class ActModelServiceImpl implements IActModelService {
             }
             response.setHeader("Content-Disposition",
                 "attachment; filename=" + URLEncoder.encode(zipName, StandardCharsets.UTF_8) + ".zip");
+            response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
             // 刷出响应流
             response.flushBuffer();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (zos != null) {
-                try {
-                    zos.closeEntry();
-                    zos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
