@@ -20,8 +20,8 @@ import java.util.List;
 public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
 
     @DataPermission({
-        @DataColumn(key = "deptName", value = "d.dept_id"),
-        @DataColumn(key = "userName", value = "p.create_by")
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "create_by")
     })
     Page<SysPostVo> selectPagePostList(@Param("page") Page<SysPostVo> page, @Param(Constants.WRAPPER) Wrapper<SysPost> queryWrapper);
 
