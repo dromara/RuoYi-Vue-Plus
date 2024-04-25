@@ -2188,8 +2188,8 @@ GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'岗位类别编码' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'post_category',
-    'COLUMN', N'post_code'
+    'TABLE', N'sys_post',
+    'COLUMN', N'post_category'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'岗位名称' ,
