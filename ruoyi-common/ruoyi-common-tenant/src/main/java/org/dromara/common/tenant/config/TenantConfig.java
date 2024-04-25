@@ -16,6 +16,7 @@ import org.redisson.config.ClusterServersConfig;
 import org.redisson.config.SingleServerConfig;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
@@ -28,16 +29,22 @@ import org.springframework.context.annotation.Primary;
  * @author Lion Li
  */
 @EnableConfigurationProperties(TenantProperties.class)
-@AutoConfiguration(after = {RedisConfig.class, MybatisPlusConfig.class})
+@AutoConfiguration(after = {RedisConfig.class})
 @ConditionalOnProperty(value = "tenant.enable", havingValue = "true")
 public class TenantConfig {
 
-    /**
-     * 多租户插件
-     */
-    @Bean
-    public TenantLineInnerInterceptor tenantLineInnerInterceptor(TenantProperties tenantProperties) {
-        return new TenantLineInnerInterceptor(new PlusTenantLineHandler(tenantProperties));
+    @ConditionalOnBean(MybatisPlusConfig.class)
+    @AutoConfiguration(after = {MybatisPlusConfig.class})
+    static class MybatisPlusConfigation {
+
+        /**
+         * 多租户插件
+         */
+        @Bean
+        public TenantLineInnerInterceptor tenantLineInnerInterceptor(TenantProperties tenantProperties) {
+            return new TenantLineInnerInterceptor(new PlusTenantLineHandler(tenantProperties));
+        }
+
     }
 
     @Bean
