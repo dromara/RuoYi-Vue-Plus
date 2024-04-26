@@ -382,12 +382,12 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         if (CollUtil.isEmpty(wfDefinitionConfigs)) {
             ProcessDefinition processDefinition = QueryUtils.definitionQuery().processDefinitionKey("leave1").latestVersion().singleResult();
             if (processDefinition != null) {
-                WfDefinitionConfigBo wfFormDefinition = new WfDefinitionConfigBo();
-                wfFormDefinition.setDefinitionId(processDefinition.getId());
-                wfFormDefinition.setProcessKey(processDefinition.getKey());
-                wfFormDefinition.setTableName("test_leave");
-                wfFormDefinition.setVersion(processDefinition.getVersion());
-                iWfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
+                WfDefinitionConfigBo wfDefinitionConfigBo = new WfDefinitionConfigBo();
+                wfDefinitionConfigBo.setDefinitionId(processDefinition.getId());
+                wfDefinitionConfigBo.setProcessKey(processDefinition.getKey());
+                wfDefinitionConfigBo.setTableName("test_leave");
+                wfDefinitionConfigBo.setVersion(processDefinition.getVersion());
+                iWfDefinitionConfigService.saveOrUpdate(wfDefinitionConfigBo);
             }
         }
 
@@ -405,13 +405,13 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             WfDefinitionConfigVo definitionVo = iWfDefinitionConfigService.getByDefId(oldProcessDefinition.getId());
             if (definitionVo != null) {
                 iWfDefinitionConfigService.deleteByDefIds(Collections.singletonList(oldProcessDefinition.getId()));
-                WfDefinitionConfigBo wfFormDefinition = new WfDefinitionConfigBo();
-                wfFormDefinition.setDefinitionId(definition.getId());
-                wfFormDefinition.setProcessKey(definition.getKey());
-                wfFormDefinition.setTableName(definitionVo.getTableName());
-                wfFormDefinition.setVersion(definition.getVersion());
-                wfFormDefinition.setRemark(definitionVo.getRemark());
-                iWfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
+                WfDefinitionConfigBo wfDefinitionConfigBo = new WfDefinitionConfigBo();
+                wfDefinitionConfigBo.setDefinitionId(definition.getId());
+                wfDefinitionConfigBo.setProcessKey(definition.getKey());
+                wfDefinitionConfigBo.setTableName(definitionVo.getTableName());
+                wfDefinitionConfigBo.setVersion(definition.getVersion());
+                wfDefinitionConfigBo.setRemark(definitionVo.getRemark());
+                iWfDefinitionConfigService.saveOrUpdate(wfDefinitionConfigBo);
             }
         }
         //更新流程节点配置表单
