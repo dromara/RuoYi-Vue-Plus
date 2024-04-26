@@ -316,8 +316,8 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public boolean registerUser(SysUserBo user, String tenantId) {
-        user.setCreateBy(user.getUserId());
-        user.setUpdateBy(user.getUserId());
+        user.setCreateBy(0L);
+        user.setUpdateBy(0L);
         SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
         sysUser.setTenantId(tenantId);
         return baseMapper.insert(sysUser) > 0;
