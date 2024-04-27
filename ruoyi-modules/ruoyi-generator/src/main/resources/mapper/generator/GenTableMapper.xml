@@ -41,8 +41,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             where dt.table_name = dtc.table_name
             and dt.table_name = uo.object_name
             and uo.object_type = 'TABLE'
-            AND dt.table_name NOT LIKE 'pj_%' AND dt.table_name NOT LIKE 'GEN_%'
-            AND dt.table_name NOT LIKE 'act_%' AND dt.table_name NOT LIKE 'flw_%'
+            AND dt.table_name NOT LIKE 'PJ_%' AND dt.table_name NOT LIKE 'GEN_%'
+            AND dt.table_name NOT LIKE 'ACT_%' AND dt.table_name NOT LIKE 'FLW_%'
             <if test="genTable.params.genTableNames != null and genTable.params.genTableNames.size > 0">
                 AND lower(dt.table_name) NOT IN
                 <foreach collection="genTable.params.genTableNames" open="(" close=")" separator="," item="item">
@@ -130,8 +130,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             where dt.table_name = dtc.table_name
             and dt.table_name = uo.object_name
             and uo.object_type = 'TABLE'
-            and dt.table_name NOT LIKE 'pj_%' AND dt.table_name NOT LIKE 'GEN_%'
-            and dt.table_name NOT LIKE 'act_%' AND dt.table_name NOT LIKE 'flw_%'
+            and dt.table_name NOT LIKE 'PJ_%' AND dt.table_name NOT LIKE 'GEN_%'
+            and dt.table_name NOT LIKE 'ACT_%' AND dt.table_name NOT LIKE 'FLW_%'
             and lower(dt.table_name) in
             <foreach collection="array" item="name" open="(" separator="," close=")">
                 #{name}
@@ -189,8 +189,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             where dt.table_name = dtc.table_name
             and dt.table_name = uo.object_name
             and uo.object_type = 'TABLE'
-            AND dt.table_name NOT LIKE 'pj_%' AND dt.table_name NOT LIKE 'GEN_%'
-            AND dt.table_name NOT LIKE 'act_%' AND dt.table_name NOT LIKE 'flw_%'
+            AND dt.table_name NOT LIKE 'PJ_%' AND dt.table_name NOT LIKE 'GEN_%'
+            AND dt.table_name NOT LIKE 'ACT_%' AND dt.table_name NOT LIKE 'FLW_%'
             AND dt.table_name NOT IN (select table_name from gen_table)
             and lower(dt.table_name) = #{tableName}
         </if>
