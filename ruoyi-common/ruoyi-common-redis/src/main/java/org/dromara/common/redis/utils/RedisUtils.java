@@ -107,7 +107,11 @@ public class RedisUtils {
                 bucket.setAndKeepTTL(value);
             } catch (Exception e) {
                 long timeToLive = bucket.remainTimeToLive();
-                setCacheObject(key, value, Duration.ofMillis(timeToLive));
+                if (timeToLive == -1) {
+                    setCacheObject(key, value);
+                } else {
+                    setCacheObject(key, value, Duration.ofMillis(timeToLive));
+                }
             }
         } else {
             bucket.set(value);
