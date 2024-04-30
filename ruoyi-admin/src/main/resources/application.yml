@@ -80,6 +80,8 @@ spring:
       # 设置总上传的文件大小
       max-request-size: 20MB
   mvc:
+    # 设置静态资源路径 防止所有请求都去查静态资源
+    static-path-pattern: /static/**
     format:
       date-time: yyyy-MM-dd HH:mm:ss
   jackson:
