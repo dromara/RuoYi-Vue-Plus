@@ -418,6 +418,8 @@ EXEC sp_addextendedproperty
      'TABLE', N'er_job'
 GO
 
+INSERT INTO `er_job` VALUES (1, N'dev', N'ruoyi_group', N'demo-job', null, 1, 1710344035622, 1, 1, 4, 1, N'testJobExecutor', 2, N'60', 1, 60, 3, 1, 1, 116, 0, N'', N'', getdate(), getdate(), 0);
+GO
 
 -- er_job_log_message
 CREATE TABLE er_job_log_message

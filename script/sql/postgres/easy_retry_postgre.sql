@@ -463,6 +463,8 @@ COMMENT ON COLUMN er_job.deleted IS '逻辑删除 1、删除';
 COMMENT ON COLUMN er_job.update_dt IS '更新时间';
 COMMENT ON TABLE er_job IS '任务信息';
 
+INSERT INTO er_job VALUES (1, 'dev', 'ruoyi_group', 'demo-job', null, 1, 1710344035622, 1, 1, 4, 1, 'testJobExecutor', 2, '60', 1, 60, 3, 1, 1, 116, 0, '', '', now(), now(), 0);
+
 CREATE TABLE er_job_log_message
 (
     id            BIGSERIAL PRIMARY KEY,

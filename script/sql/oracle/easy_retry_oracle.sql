@@ -474,8 +474,11 @@ COMMENT ON COLUMN er_job.resident IS '是否是常驻任务';
 COMMENT ON COLUMN er_job.description IS '描述';
 COMMENT ON COLUMN er_job.ext_attrs IS '扩展字段';
 COMMENT ON COLUMN er_job.create_dt IS '创建时间';
-COMMENT ON COLUMN er_job.deleted IS '逻辑删除 1、删除';
 COMMENT ON COLUMN er_job.update_dt IS '更新时间';
+COMMENT ON COLUMN er_job.deleted IS '逻辑删除 1、删除';
+
+INSERT INTO er_job (namespace_id, group_name, job_name, args_str, args_type, next_trigger_at, job_status, task_type, route_key, executor_type, executor_info, trigger_type, trigger_interval, block_strategy,executor_timeout, max_retry_times, parallel_num, retry_interval, bucket_index, resident, description, ext_attrs, create_dt, update_dt, deleted)
+VALUES ('dev', 'ruoyi_group', 'demo-job', NULL, 1, 1710344035622, 1, 1, 4, 1, 'testJobExecutor', 2, '60', 1, 60, 3, 1, 1, 116, 0, '', '', SYSDATE, SYSDATE, 0);
 
 -- er_job_log_message
 CREATE TABLE er_job_log_message
