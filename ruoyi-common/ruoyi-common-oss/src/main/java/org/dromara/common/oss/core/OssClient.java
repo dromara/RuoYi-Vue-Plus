@@ -83,6 +83,9 @@ public class OssClient {
             StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
                 AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey()));
 
+            //MinIO 使用 HTTPS 限制使用域名访问，站点填域名。需要启用路径样式访问
+            boolean isStyle = !StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
+
             //创建AWS基于 CRT 的 S3 客户端
             this.client = S3AsyncClient.crtBuilder()
                 .credentialsProvider(credentialsProvider)
@@ -91,15 +94,15 @@ public class OssClient {
                 .targetThroughputInGbps(20.0)
                 .minimumPartSizeInBytes(10 * 1025 * 1024L)
                 .checksumValidationEnabled(false)
+                .forcePathStyle(isStyle)
                 .build();
 
             //AWS基于 CRT 的 S3 AsyncClient 实例用作 S3 传输管理器的底层客户端
             this.transferManager = S3TransferManager.builder().s3Client(this.client).build();
 
-            // 检查是否连接到 MinIO，MinIO 使用 HTTPS 限制使用域名访问，需要启用路径样式访问
+            // 创建 S3 配置对象
             S3Configuration config = S3Configuration.builder().chunkedEncodingEnabled(false)
-                // minio 使用https限制使用域名访问 需要此配置 站点填域名
-                .pathStyleAccessEnabled(!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)).build();
+                .pathStyleAccessEnabled(isStyle).build();
 
             // 创建 预签名 URL 的生成器 实例，用于生成 S3 预签名 URL
             this.presigner = S3Presigner.builder()
