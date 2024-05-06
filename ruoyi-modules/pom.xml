@@ -15,6 +15,7 @@
         <module>ruoyi-job</module>
         <module>ruoyi-system</module>
         <module>ruoyi-workflow</module>
+        <module>ruoyi-datasource</module>
     </modules>
 
     <artifactId>ruoyi-modules</artifactId>
