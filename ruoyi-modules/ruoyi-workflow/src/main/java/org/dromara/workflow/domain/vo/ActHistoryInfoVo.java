@@ -59,7 +59,7 @@ public class ActHistoryInfoVo implements Serializable {
     /**
      * 办理人id
      */
-    private Long assignee;
+    private String assignee;
 
     /**
      * 办理人名称

@@ -1,6 +1,7 @@
 package org.dromara.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -16,6 +17,7 @@ import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -27,16 +29,14 @@ import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.SysUserPost;
 import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.bo.SysUserBo;
-import org.dromara.system.domain.vo.SysPostVo;
-import org.dromara.system.domain.vo.SysRoleVo;
-import org.dromara.system.domain.vo.SysUserExportVo;
-import org.dromara.system.domain.vo.SysUserVo;
+import org.dromara.system.domain.vo.*;
 import org.dromara.system.mapper.*;
 import org.dromara.system.service.ISysUserService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -577,6 +577,24 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         SysUser sysUser = baseMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getNickName).eq(SysUser::getUserId, userId));
         return ObjectUtil.isNull(sysUser) ? null : sysUser.getNickName();
+    }
+
+    /**
+     * 通过用户ID查询用户账户
+     *
+     * @param userIds 用户ID 多个用逗号隔开
+     * @return 用户账户
+     */
+    @Override
+    public String selectNicknameByIds(String userIds) {
+        List<String> list = new ArrayList<>();
+        for (Long id : StringUtils.splitTo(userIds, Convert::toLong)) {
+            String nickname = SpringUtils.getAopProxy(this).selectNicknameById(id);
+            if (StringUtils.isNotBlank(nickname)) {
+                list.add(nickname);
+            }
+        }
+        return String.join(StringUtils.SEPARATOR, list);
     }
 
     /**
