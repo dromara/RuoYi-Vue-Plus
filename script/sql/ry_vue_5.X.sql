@@ -292,6 +292,8 @@ insert into sys_menu values('118',  '文件管理',     '1',   '10', 'oss',     
 insert into sys_menu values('120',  '任务调度中心',  '2',   '5',  'powerjob',           'monitor/powerjob/index',    '', 1, 0, 'C', '0', '0', 'monitor:powerjob:list',          'job',           103, 1, sysdate(), null, null, 'PowerJob控制台菜单');
 -- retry server控制台
 insert into sys_menu values('130',  'EasyRetry控制台',  '2',   '6',  'easyretry',     'monitor/easyretry/index',    '', 1, 0, 'C', '0', '0', 'monitor:easyretry:list',          'job',           103, 1, sysdate(), null, null, 'EasyRetry控制台菜单');
+-- 动态数据源管理
+insert into sys_menu values('124',  '数据源管理',   '1',   '12', 'datasource',       'system/datasource/index',      '', 1, 0, 'C', '0', '0', 'system:datasource:list',      'redis',         103, 1, sysdate(), null, null, '数据源管理菜单');
 
 -- 三级菜单
 insert into sys_menu values('500',  '操作日志', '108', '1', 'operlog',    'monitor/operlog/index',    '', 1, 0, 'C', '0', '0', 'monitor:operlog:list',    'form',          103, 1, sysdate(), null, null, '操作日志菜单');
@@ -404,6 +406,12 @@ insert into sys_menu values('1508', '测试树表新增',   '1506', '2', '#',   
 insert into sys_menu values('1509', '测试树表修改',   '1506', '3', '#',    '', '',  1, 0, 'F', '0', '0', 'demo:tree:edit',                '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values('1510', '测试树表删除',   '1506', '4', '#',    '', '',  1, 0, 'F', '0', '0', 'demo:tree:remove',              '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values('1511', '测试树表导出',   '1506', '5', '#',    '', '',  1, 0, 'F', '0', '0', 'demo:tree:export',              '#', 103, 1, sysdate(), null, null, '');
+-- 动态数据源管理按钮
+insert into sys_menu values('1700', '动态数据源查询', '124', '1',  '#', '', '', 1, 0, 'F', '0', '0', 'system:datasource:query',        '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1701', '动态数据源新增', '124', '2',  '#', '', '', 1, 0, 'F', '0', '0', 'system:datasource:add',          '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1702', '动态数据源修改', '124', '3',  '#', '', '', 1, 0, 'F', '0', '0', 'system:datasource:edit',         '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1703', '动态数据源删除', '124', '4',  '#', '', '', 1, 0, 'F', '0', '0', 'system:datasource:remove',       '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1704', '动态数据源导出', '124', '5',  '#', '', '', 1, 0, 'F', '0', '0', 'system:datasource:export',       '#', 103, 1, sysdate(), null, null, '');
 
 -- ----------------------------
 -- 6、用户和角色关联表  用户N-1角色
@@ -936,3 +944,27 @@ INSERT INTO test_tree VALUES (10, '000000', 7, 108, 3, '子节点66', 0, 103, sy
 INSERT INTO test_tree VALUES (11, '000000', 7, 108, 3, '子节点77', 0, 103, sysdate(), 1, NULL, NULL, 0);
 INSERT INTO test_tree VALUES (12, '000000', 10, 108, 3, '子节点88', 0, 103, sysdate(), 1, NULL, NULL, 0);
 INSERT INTO test_tree VALUES (13, '000000', 10, 108, 3, '子节点99', 0, 103, sysdate(), 1, NULL, NULL, 0);
+
+-- ------------------------
+--  动态数据源表
+-- ------------------------
+drop table if exists sys_datasource;
+create table sys_datasource
+(
+    id                bigint(20) not null auto_increment comment '主键',
+    tenant_id         varchar(20)  default '000000' comment '租户编号',
+    ds_type           varchar(20) comment '数据源类型',
+    ds_name           varchar(255) comment '数据源名称',
+    conn_url          varchar(1000) comment '数据源url',
+    username          varchar(50) comment '数据源用户名',
+    password          varchar(50) comment '数据源密码',
+    driver_class_name varchar(50) comment '驱动类名',
+    del_flag          char(1)      default '0' comment '删除标志（0代表存在 2代表删除）',
+    create_dept       bigint(20)   default null comment '创建部门',
+    create_by         bigint(20)   default null comment '创建者',
+    create_time       datetime     default null comment '创建时间',
+    update_by         bigint(20)   default null comment '更新者',
+    update_time       datetime     default null comment '更新时间',
+    remark            varchar(500) default null comment '备注',
+    primary key (id, ds_name)
+) engine = innodb comment ='动态数据源';
