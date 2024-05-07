@@ -58,8 +58,6 @@ public class MybatisPlusConfig {
      */
     public PaginationInnerInterceptor paginationInnerInterceptor() {
         PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
-        // 设置最大单页限制数量，默认 500 条，-1 不受限制
-        paginationInnerInterceptor.setMaxLimit(-1L);
         // 分页合理化
         paginationInnerInterceptor.setOverflow(true);
         return paginationInnerInterceptor;
