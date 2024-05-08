@@ -13,5 +13,6 @@ EXPOSE 9090
 
 ADD ./target/ruoyi-monitor-admin.jar ./app.jar
 
-ENTRYPOINT java -Djava.security.egd=file:/dev/./urandom -jar app.jar \
-           -XX:+HeapDumpOnOutOfMemoryError -Xlog:gc*,:time,tags,level -XX:+UseZGC ${JAVA_OPTS}
+ENTRYPOINT java -Djava.security.egd=file:/dev/./urandom \
+           -XX:+HeapDumpOnOutOfMemoryError -XX:+UseZGC ${JAVA_OPTS} \
+           -jar app.jar

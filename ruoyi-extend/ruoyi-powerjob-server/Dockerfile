@@ -14,4 +14,4 @@ EXPOSE 7700
 ADD ./target/ruoyi-powerjob-server.jar ./app.jar
 
 ENTRYPOINT java -Djava.security.egd=file:/dev/./urandom -jar app.jar \
-           -XX:+HeapDumpOnOutOfMemoryError -Xlog:gc*,:time,tags,level -XX:+UseZGC ${JAVA_OPTS}
+           -XX:+HeapDumpOnOutOfMemoryError -XX:+UseZGC ${JAVA_OPTS}

@@ -14,5 +14,6 @@ EXPOSE 1788
 
 ADD ./target/ruoyi-easyretry-server.jar ./app.jar
 
-ENTRYPOINT java -Djava.security.egd=file:/dev/./urandom -jar app.jar \
-           -XX:+HeapDumpOnOutOfMemoryError -Xlog:gc*,:time,tags,level -XX:+UseZGC ${JAVA_OPTS}
+ENTRYPOINT java -Djava.security.egd=file:/dev/./urandom \
+           -XX:+HeapDumpOnOutOfMemoryError -XX:+UseZGC ${JAVA_OPTS} \
+           -jar app.jar
