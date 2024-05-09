@@ -143,7 +143,19 @@ public interface IActTaskService {
      */
     List<VariableVo> getInstanceVariable(String taskId);
 
+    /**
+     * 查询工作流任务用户选择加签人员
+     *
+     * @param taskId 任务id
+     * @return 结果
+     */
     String getTaskUserIdsByAddMultiInstance(String taskId);
 
+    /**
+     * 查询工作流选择减签人员
+     *
+     * @param taskId 任务id
+     * @return 结果
+     */
     List<TaskVo> getListByDeleteMultiInstance(String taskId);
 }

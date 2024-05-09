@@ -781,6 +781,12 @@ public class ActTaskServiceImpl implements IActTaskService {
         return variableVoList;
     }
 
+    /**
+     * 查询工作流任务用户选择加签人员
+     *
+     * @param taskId 任务id
+     * @return
+     */
     @Override
     @SuppressWarnings("unchecked")
     public String getTaskUserIdsByAddMultiInstance(String taskId) {
