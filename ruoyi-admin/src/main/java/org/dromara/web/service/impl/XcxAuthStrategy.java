@@ -20,7 +20,7 @@ import org.dromara.web.service.SysLoginService;
 import org.springframework.stereotype.Service;
 
 /**
- * 邮件认证策略
+ * 小程序认证策略
  *
  * @author Michelle.Chung
  */
