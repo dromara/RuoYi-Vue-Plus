@@ -42,7 +42,7 @@ public class ActTaskController extends BaseController {
 
     private final TaskService taskService;
 
-    private final IWfTaskBackNodeService iWfTaskBackNodeService;
+    private final IWfTaskBackNodeService wfTaskBackNodeService;
 
 
     /**
@@ -269,7 +269,7 @@ public class ActTaskController extends BaseController {
      */
     @GetMapping("/getTaskNodeList/{processInstanceId}")
     public R<List<WfTaskBackNode>> getNodeList(@PathVariable String processInstanceId) {
-        return R.ok(CollUtil.reverse(iWfTaskBackNodeService.getListByInstanceId(processInstanceId)));
+        return R.ok(CollUtil.reverse(wfTaskBackNodeService.getListByInstanceId(processInstanceId)));
     }
 
     /**

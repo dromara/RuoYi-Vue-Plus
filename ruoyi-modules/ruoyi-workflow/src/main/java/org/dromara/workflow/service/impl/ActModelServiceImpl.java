@@ -64,8 +64,8 @@ import java.util.zip.ZipOutputStream;
 public class ActModelServiceImpl implements IActModelService {
 
     private final RepositoryService repositoryService;
-    private final IWfNodeConfigService iWfNodeConfigService;
-    private final IWfDefinitionConfigService iWfDefinitionConfigService;
+    private final IWfNodeConfigService wfNodeConfigService;
+    private final IWfDefinitionConfigService wfDefinitionConfigService;
 
     /**
      * 分页查询模型
@@ -291,16 +291,16 @@ public class ActModelServiceImpl implements IActModelService {
             repositoryService.setProcessDefinitionCategory(definition.getId(), model.getCategory());
             //更新流程定义配置
             if (processDefinition != null) {
-                WfDefinitionConfigVo definitionVo = iWfDefinitionConfigService.getByDefId(processDefinition.getId());
+                WfDefinitionConfigVo definitionVo = wfDefinitionConfigService.getByDefId(processDefinition.getId());
                 if (definitionVo != null) {
-                    iWfDefinitionConfigService.deleteByDefIds(Collections.singletonList(processDefinition.getId()));
+                    wfDefinitionConfigService.deleteByDefIds(Collections.singletonList(processDefinition.getId()));
                     WfDefinitionConfigBo wfFormDefinition = new WfDefinitionConfigBo();
                     wfFormDefinition.setDefinitionId(definition.getId());
                     wfFormDefinition.setProcessKey(definition.getKey());
                     wfFormDefinition.setTableName(definitionVo.getTableName());
                     wfFormDefinition.setVersion(definition.getVersion());
                     wfFormDefinition.setRemark(definitionVo.getRemark());
-                    iWfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
+                    wfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
                 }
             }
             //更新流程节点配置表单
@@ -321,7 +321,7 @@ public class ActModelServiceImpl implements IActModelService {
                 }
             }
             if (CollUtil.isNotEmpty(wfNodeConfigList)) {
-                iWfNodeConfigService.saveOrUpdate(wfNodeConfigList);
+                wfNodeConfigService.saveOrUpdate(wfNodeConfigList);
             }
             return true;
         } catch (Exception e) {

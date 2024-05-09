@@ -27,7 +27,7 @@ import java.util.List;
 public class WfNodeConfigServiceImpl implements IWfNodeConfigService {
 
     private final WfNodeConfigMapper baseMapper;
-    private final IWfFormManageService iWfFormManageService;
+    private final IWfFormManageService wfFormManageService;
 
     /**
      * 查询节点配置
@@ -65,7 +65,7 @@ public class WfNodeConfigServiceImpl implements IWfNodeConfigService {
         List<WfNodeConfigVo> wfNodeConfigVos = baseMapper.selectVoList(new LambdaQueryWrapper<WfNodeConfig>().in(WfNodeConfig::getDefinitionId, ids));
         if (CollUtil.isNotEmpty(wfNodeConfigVos)) {
             List<Long> formIds = StreamUtils.toList(wfNodeConfigVos, WfNodeConfigVo::getFormId);
-            List<WfFormManageVo> wfFormManageVos = iWfFormManageService.queryByIds(formIds);
+            List<WfFormManageVo> wfFormManageVos = wfFormManageService.queryByIds(formIds);
             for (WfNodeConfigVo wfNodeConfigVo : wfNodeConfigVos) {
                 wfFormManageVos.stream().filter(e -> ObjectUtil.equals(e.getId(), wfNodeConfigVo.getFormId())).findFirst().ifPresent(wfNodeConfigVo::setWfFormManageVo);
             }

@@ -62,9 +62,9 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     private final RepositoryService repositoryService;
     private final ProcessMigrationService processMigrationService;
     private final IWfCategoryService wfCategoryService;
-    private final IWfDefinitionConfigService iWfDefinitionConfigService;
+    private final IWfDefinitionConfigService wfDefinitionConfigService;
     private final WfDefinitionConfigMapper wfDefinitionConfigMapper;
-    private final IWfNodeConfigService iWfNodeConfigService;
+    private final IWfNodeConfigService wfNodeConfigService;
 
     /**
      * 分页查询
@@ -95,7 +95,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         }
         if (CollUtil.isNotEmpty(definitionList)) {
             List<String> ids = StreamUtils.toList(definitionList, ProcessDefinition::getId);
-            List<WfDefinitionConfigVo> wfDefinitionConfigVos = iWfDefinitionConfigService.queryList(ids);
+            List<WfDefinitionConfigVo> wfDefinitionConfigVos = wfDefinitionConfigService.queryList(ids);
             for (ProcessDefinition processDefinition : definitionList) {
                 ProcessDefinitionVo processDefinitionVo = BeanUtil.toBean(processDefinition, ProcessDefinitionVo.class);
                 if (CollUtil.isNotEmpty(deploymentList)) {
@@ -135,7 +135,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         }
         if (CollUtil.isNotEmpty(definitionList)) {
             List<String> ids = StreamUtils.toList(definitionList, ProcessDefinition::getId);
-            List<WfDefinitionConfigVo> wfDefinitionConfigVos = iWfDefinitionConfigService.queryList(ids);
+            List<WfDefinitionConfigVo> wfDefinitionConfigVos = wfDefinitionConfigService.queryList(ids);
             for (ProcessDefinition processDefinition : definitionList) {
                 ProcessDefinitionVo processDefinitionVo = BeanUtil.toBean(processDefinition, ProcessDefinitionVo.class);
                 if (CollUtil.isNotEmpty(deploymentList)) {
@@ -203,9 +203,9 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 repositoryService.deleteDeployment(deploymentId);
             }
             //删除流程定义配置
-            iWfDefinitionConfigService.deleteByDefIds(processDefinitionIds);
+            wfDefinitionConfigService.deleteByDefIds(processDefinitionIds);
             //删除节点配置
-            iWfNodeConfigService.deleteByDefIds(processDefinitionIds);
+            wfNodeConfigService.deleteByDefIds(processDefinitionIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -387,7 +387,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 wfDefinitionConfigBo.setProcessKey(processDefinition.getKey());
                 wfDefinitionConfigBo.setTableName("test_leave");
                 wfDefinitionConfigBo.setVersion(processDefinition.getVersion());
-                iWfDefinitionConfigService.saveOrUpdate(wfDefinitionConfigBo);
+                wfDefinitionConfigService.saveOrUpdate(wfDefinitionConfigBo);
             }
         }
 
@@ -402,16 +402,16 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     private void setWfConfig(ProcessDefinition oldProcessDefinition, ProcessDefinition definition) {
         //更新流程定义表单
         if (oldProcessDefinition != null) {
-            WfDefinitionConfigVo definitionVo = iWfDefinitionConfigService.getByDefId(oldProcessDefinition.getId());
+            WfDefinitionConfigVo definitionVo = wfDefinitionConfigService.getByDefId(oldProcessDefinition.getId());
             if (definitionVo != null) {
-                iWfDefinitionConfigService.deleteByDefIds(Collections.singletonList(oldProcessDefinition.getId()));
+                wfDefinitionConfigService.deleteByDefIds(Collections.singletonList(oldProcessDefinition.getId()));
                 WfDefinitionConfigBo wfDefinitionConfigBo = new WfDefinitionConfigBo();
                 wfDefinitionConfigBo.setDefinitionId(definition.getId());
                 wfDefinitionConfigBo.setProcessKey(definition.getKey());
                 wfDefinitionConfigBo.setTableName(definitionVo.getTableName());
                 wfDefinitionConfigBo.setVersion(definition.getVersion());
                 wfDefinitionConfigBo.setRemark(definitionVo.getRemark());
-                iWfDefinitionConfigService.saveOrUpdate(wfDefinitionConfigBo);
+                wfDefinitionConfigService.saveOrUpdate(wfDefinitionConfigBo);
             }
         }
         //更新流程节点配置表单
@@ -432,7 +432,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             }
         }
         if (CollUtil.isNotEmpty(wfNodeConfigList)) {
-            iWfNodeConfigService.saveOrUpdate(wfNodeConfigList);
+            wfNodeConfigService.saveOrUpdate(wfNodeConfigList);
         }
     }
 }

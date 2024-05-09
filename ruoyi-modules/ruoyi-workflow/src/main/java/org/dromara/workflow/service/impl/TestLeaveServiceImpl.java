@@ -35,7 +35,7 @@ import java.util.List;
 public class TestLeaveServiceImpl implements ITestLeaveService {
 
     private final TestLeaveMapper baseMapper;
-    private final IActProcessInstanceService iActProcessInstanceService;
+    private final IActProcessInstanceService actProcessInstanceService;
 
     /**
      * 查询请假
@@ -115,7 +115,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
         List<String> idList = StreamUtils.toList(ids, String::valueOf);
-        iActProcessInstanceService.deleteRunAndHisInstanceByBusinessKeys(idList);
+        actProcessInstanceService.deleteRunAndHisInstanceByBusinessKeys(idList);
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 }

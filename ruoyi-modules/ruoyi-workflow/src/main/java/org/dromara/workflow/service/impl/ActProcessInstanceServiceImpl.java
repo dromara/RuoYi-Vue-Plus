@@ -76,8 +76,8 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     private final IActHiProcinstService actHiProcinstService;
     private final ManagementService managementService;
     private final FlowEventStrategy flowEventStrategy;
-    private final IWfTaskBackNodeService iWfTaskBackNodeService;
-    private final IWfNodeConfigService iWfNodeConfigService;
+    private final IWfTaskBackNodeService wfTaskBackNodeService;
+    private final IWfNodeConfigService wfNodeConfigService;
 
     @Value("${flowable.activity-font-name}")
     private String activityFontName;
@@ -122,7 +122,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (ProcessInstanceVo processInstanceVo : list) {
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
                     wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(processInstanceVo.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(processInstanceVo::setWfNodeConfigVo);
@@ -169,7 +169,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (ProcessInstanceVo processInstanceVo : list) {
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
                     wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(processInstanceVo.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(processInstanceVo::setWfNodeConfigVo);
@@ -523,7 +523,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (ObjectUtil.isNotEmpty(historicProcessInstanceList)) {
                 historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
             }
-            iWfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
+            wfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -558,7 +558,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (ObjectUtil.isNotEmpty(historicProcessInstanceList)) {
                 historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
             }
-            iWfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
+            wfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -576,7 +576,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     public boolean deleteFinishAndHisInstance(List<String> processInstanceIds) {
         try {
             historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
-            iWfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
+            wfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -677,7 +677,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (ProcessInstanceVo processInstanceVo : list) {
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
                     wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(processInstanceVo.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(processInstanceVo::setWfNodeConfigVo);
