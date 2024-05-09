@@ -2,7 +2,6 @@ package org.dromara.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -37,7 +36,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -177,13 +175,8 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
         OssClient storage = OssFactory.instance(sysOss.getService());
-        try (InputStream inputStream = storage.getObjectContent(sysOss.getUrl())) {
-            int available = inputStream.available();
-            IoUtil.copy(inputStream, response.getOutputStream(), available);
-            response.setContentLength(available);
-        } catch (Exception e) {
-            throw new ServiceException(e.getMessage());
-        }
+        long contentLength = storage.download(sysOss.getFileName(), response.getOutputStream());
+        response.setContentLengthLong(contentLength);
     }
 
     /**

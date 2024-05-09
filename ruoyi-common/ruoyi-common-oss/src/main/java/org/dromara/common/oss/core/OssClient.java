@@ -14,11 +14,14 @@ import org.dromara.common.oss.exception.OssException;
 import org.dromara.common.oss.properties.OssProperties;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.core.async.BlockingInputStreamAsyncRequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -26,10 +29,7 @@ import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.*;
 import software.amazon.awssdk.transfer.s3.progress.LoggingTransferListener;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
@@ -258,6 +258,37 @@ public class OssClient {
         // 等待文件下载操作完成
         downloadFile.completionFuture().join();
         return tempFilePath;
+    }
+
+    /**
+     * 下载文件从 Amazon S3 到 输出流
+     *
+     * @param key 文件在 Amazon S3 中的对象键
+     * @param out 输出流
+     * @return 输出流中写入的字节数（长度）
+     * @throws OssException 如果下载失败，抛出自定义异常
+     */
+    public long download(String key, OutputStream out) {
+        try {
+            // 构建下载请求
+            DownloadRequest<ResponseInputStream<GetObjectResponse>> downloadRequest = DownloadRequest.builder()
+                // 文件对象
+                .getObjectRequest(y -> y.bucket(properties.getBucketName())
+                    .key(key)
+                    .build())
+                .addTransferListener(LoggingTransferListener.create())
+                // 使用订阅转换器
+                .responseTransformer(AsyncResponseTransformer.toBlockingInputStream())
+                .build();
+            // 使用 S3TransferManager 下载文件
+            Download<ResponseInputStream<GetObjectResponse>> responseFuture = transferManager.download(downloadRequest);
+            // 输出到流中
+            try (ResponseInputStream<GetObjectResponse> responseStream = responseFuture.completionFuture().join().result()) { // auto-closeable stream
+                return responseStream.transferTo(out); // 阻塞调用线程 blocks the calling thread
+            }
+        } catch (Exception e) {
+            throw new OssException("文件下载失败，错误信息:[" + e.getMessage() + "]");
+        }
     }
 
     /**
