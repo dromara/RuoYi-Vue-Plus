@@ -296,4 +296,5 @@ public class SysUserController extends BaseController {
     public R<List<SysUserVo>> listByDept(@PathVariable @NotNull Long deptId) {
         return R.ok(userService.selectUserListByDept(deptId));
     }
+
 }

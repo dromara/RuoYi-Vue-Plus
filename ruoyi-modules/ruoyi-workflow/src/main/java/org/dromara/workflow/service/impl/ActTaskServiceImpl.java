@@ -8,7 +8,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.dto.RoleDTO;
+import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -79,6 +81,7 @@ public class ActTaskServiceImpl implements IActTaskService {
     private final ActHiTaskinstMapper actHiTaskinstMapper;
     private final IWfNodeConfigService iWfNodeConfigService;
     private final IWfDefinitionConfigService iWfDefinitionConfigService;
+    private final UserService userService;
 
     /**
      * 启动任务
@@ -776,5 +779,88 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
         }
         return variableVoList;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public String getTaskUserIdsByAddMultiInstance(String taskId) {
+        Task task = QueryUtils.taskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new ServiceException("任务不存在");
+        }
+        MultiInstanceVo multiInstance = WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
+        if (multiInstance == null) {
+            return "";
+        }
+        List<Long> userIds;
+        if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
+            userIds = (List<Long>) runtimeService.getVariable(task.getExecutionId(), multiInstance.getAssigneeList());
+        } else {
+            List<Task> list = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
+            userIds = StreamUtils.toList(list, e -> Long.valueOf(e.getAssignee()));
+        }
+        return StringUtils.join(userIds, StringUtils.SEPARATOR);
+    }
+
+    /**
+     * 查询工作流选择减签人员
+     *
+     * @param taskId 任务id 任务id
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<TaskVo> getListByDeleteMultiInstance(String taskId) {
+        Task task = QueryUtils.taskQuery().taskId(taskId).singleResult();
+        List<Task> taskList = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
+        MultiInstanceVo multiInstance = WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
+        List<TaskVo> taskListVo = new ArrayList<>();
+        if (multiInstance == null) {
+            return List.of();
+        }
+        List<Long> assigneeList = new ArrayList<>();
+        if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
+            List<Object> variable = (List<Object>) runtimeService.getVariable(task.getExecutionId(), multiInstance.getAssigneeList());
+            for (Object o : variable) {
+                assigneeList.add(Long.valueOf(o.toString()));
+            }
+        }
+
+        if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
+            List<Long> userIds = StreamUtils.filter(assigneeList, e -> !String.valueOf(e).equals(task.getAssignee()));
+            List<UserDTO> userList = userService.selectListByIds(userIds);
+            for (Long userId : userIds) {
+                TaskVo taskVo = new TaskVo();
+                taskVo.setId("串行会签");
+                taskVo.setExecutionId("串行会签");
+                taskVo.setProcessInstanceId(task.getProcessInstanceId());
+                taskVo.setName(task.getName());
+                taskVo.setAssignee(userId);
+                if (CollUtil.isNotEmpty(userList)) {
+                    userList.stream().filter(u -> u.getUserId().toString().equals(userId.toString())).findFirst().ifPresent(u -> taskVo.setAssigneeName(u.getNickName()));
+                }
+                taskListVo.add(taskVo);
+            }
+            return taskListVo;
+        } else if (multiInstance.getType() instanceof ParallelMultiInstanceBehavior) {
+            List<Task> tasks = StreamUtils.filter(taskList, e -> StringUtils.isBlank(e.getParentTaskId()) && !e.getExecutionId().equals(task.getExecutionId()) && e.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()));
+            if (CollUtil.isNotEmpty(tasks)) {
+                List<Long> userIds = StreamUtils.toList(tasks, e -> Long.valueOf(e.getAssignee()));
+                List<UserDTO> userList = userService.selectListByIds(userIds);
+                for (Task t : tasks) {
+                    TaskVo taskVo = new TaskVo();
+                    taskVo.setId(t.getId());
+                    taskVo.setExecutionId(t.getExecutionId());
+                    taskVo.setProcessInstanceId(t.getProcessInstanceId());
+                    taskVo.setName(t.getName());
+                    taskVo.setAssignee(Long.valueOf(t.getAssignee()));
+                    if (CollUtil.isNotEmpty(userList)) {
+                        userList.stream().filter(u -> u.getUserId().toString().equals(t.getAssignee())).findFirst().ifPresent(e -> taskVo.setAssigneeName(e.getNickName()));
+                    }
+                    taskListVo.add(taskVo);
+                }
+                return taskListVo;
+            }
+        }
+        return List.of();
     }
 }

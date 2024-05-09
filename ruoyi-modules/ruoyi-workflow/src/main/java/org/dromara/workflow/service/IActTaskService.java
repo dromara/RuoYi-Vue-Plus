@@ -142,4 +142,8 @@ public interface IActTaskService {
      * @return 结果
      */
     List<VariableVo> getInstanceVariable(String taskId);
+
+    String getTaskUserIdsByAddMultiInstance(String taskId);
+
+    List<TaskVo> getListByDeleteMultiInstance(String taskId);
 }
