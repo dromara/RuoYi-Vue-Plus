@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerIntercept
 import org.dromara.common.core.factory.YmlPropertySourceFactory;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.mybatis.handler.InjectionMetaObjectHandler;
+import org.dromara.common.mybatis.handler.MybatisExceptionHandler;
 import org.dromara.common.mybatis.interceptor.PlusDataPermissionInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.BeansException;
@@ -85,6 +86,14 @@ public class MybatisPlusConfig {
     @Bean
     public IdentifierGenerator idGenerator() {
         return new DefaultIdentifierGenerator(NetUtil.getLocalhost());
+    }
+
+    /**
+     * 异常处理器
+     */
+    @Bean
+    public MybatisExceptionHandler mybatisExceptionHandler() {
+        return new MybatisExceptionHandler();
     }
 
     /**
