@@ -25,7 +25,7 @@ public class SysOssConfigVo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主建
+     * 主键
      */
     private Long ossConfigId;
 

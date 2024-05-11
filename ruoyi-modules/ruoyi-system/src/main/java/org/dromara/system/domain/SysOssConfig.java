@@ -17,7 +17,7 @@ import org.dromara.common.mybatis.core.domain.BaseEntity;
 public class SysOssConfig extends BaseEntity {
 
     /**
-     * 主建
+     * 主键
      */
     @TableId(value = "oss_config_id")
     private Long ossConfigId;

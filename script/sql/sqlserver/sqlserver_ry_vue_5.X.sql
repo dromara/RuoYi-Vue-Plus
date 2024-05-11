@@ -2988,7 +2988,7 @@ ON [PRIMARY]
 GO
 
 EXEC sp_addextendedproperty
-    'MS_Description', N'主建',
+    'MS_Description', N'主键',
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oss_config',
     'COLUMN', N'oss_config_id'
@@ -3150,7 +3150,7 @@ ON [PRIMARY]
 GO
 
 EXEC sp_addextendedproperty
-    'MS_Description', N'主建',
+    'MS_Description', N'主键',
     'SCHEMA', N'dbo',
     'TABLE', N'sys_client',
     'COLUMN', N'id'
