@@ -1,8 +1,10 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.system.domain.SysSocial;
 import org.dromara.system.domain.bo.SysSocialBo;
 import org.dromara.system.domain.vo.SysSocialVo;
@@ -37,8 +39,12 @@ public class SysSocialServiceImpl implements ISysSocialService {
      * 授权列表
      */
     @Override
-    public List<SysSocialVo> queryList() {
-        return baseMapper.selectVoList();
+    public List<SysSocialVo> queryList(SysSocialBo bo) {
+        LambdaQueryWrapper<SysSocial> lqw = new LambdaQueryWrapper<SysSocial>()
+            .eq(ObjectUtil.isNotNull(bo.getUserId()), SysSocial::getUserId, bo.getUserId())
+            .eq(StringUtils.isNotBlank(bo.getAuthId()), SysSocial::getAuthId, bo.getAuthId())
+            .eq(StringUtils.isNotBlank(bo.getSource()), SysSocial::getSource, bo.getSource());
+        return baseMapper.selectVoList(lqw);
     }
 
     @Override
