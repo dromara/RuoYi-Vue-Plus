@@ -817,7 +817,7 @@ create table sys_oss (
 -- OSS对象存储动态配置表
 -- ----------------------------
 create table sys_oss_config (
-    oss_config_id   bigint(20)    not null                  comment '主建',
+    oss_config_id   bigint(20)    not null                  comment '主键',
     tenant_id       varchar(20)             default '000000'comment '租户编号',
     config_key      varchar(20)   not null  default ''      comment '配置key',
     access_key      varchar(255)            default ''      comment 'accessKey',

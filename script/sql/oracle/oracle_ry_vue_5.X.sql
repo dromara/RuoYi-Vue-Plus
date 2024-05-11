@@ -1186,7 +1186,7 @@ create table sys_oss_config (
 alter table sys_oss_config add constraint pk_sys_oss_config primary key (oss_config_id);
 
 comment on table sys_oss_config                 is '对象存储配置表';
-comment on column sys_oss_config.oss_config_id  is '主建';
+comment on column sys_oss_config.oss_config_id  is '主键';
 comment on column sys_oss_config.tenant_id      is '租户编码';
 comment on column sys_oss_config.config_key     is '配置key';
 comment on column sys_oss_config.access_key     is 'accesskey';
@@ -1237,7 +1237,7 @@ create table sys_client (
 alter table sys_client add constraint pk_sys_client primary key (id);
 
 comment on table sys_client                         is '系统授权表';
-comment on column sys_client.id                     is '主建';
+comment on column sys_client.id                     is '主键';
 comment on column sys_client.client_id              is '客户端id';
 comment on column sys_client.client_key             is '客户端key';
 comment on column sys_client.client_secret          is '客户端秘钥';

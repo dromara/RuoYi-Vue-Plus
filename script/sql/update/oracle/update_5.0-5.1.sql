@@ -98,7 +98,7 @@ create table sys_client (
 alter table sys_client add constraint pk_sys_client primary key (id);
 
 comment on table sys_client                         is '系统授权表';
-comment on column sys_client.id                     is '主建';
+comment on column sys_client.id                     is '主键';
 comment on column sys_client.client_id              is '客户端id';
 comment on column sys_client.client_key             is '客户端key';
 comment on column sys_client.client_secret          is '客户端秘钥';
