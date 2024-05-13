@@ -16,6 +16,7 @@ import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.TenantStatus;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.*;
 import org.dromara.common.log.event.LogininforEvent;
@@ -78,6 +79,10 @@ public class SysLoginService {
         bo.setOpenId(authUserData.getUuid());
         bo.setUserName(authUserData.getUsername());
         bo.setNickName(authUserData.getNickname());
+        List<SysSocialVo> checkList = sysSocialService.selectByAuthId(authId);
+        if (CollUtil.isNotEmpty(checkList)) {
+            throw new ServiceException("此三方账号已经被绑定!");
+        }
         // 查询是否已经绑定用户
         SysSocialBo params = new SysSocialBo();
         params.setUserId(userId);
