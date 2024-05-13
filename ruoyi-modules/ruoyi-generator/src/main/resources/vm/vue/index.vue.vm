@@ -208,9 +208,9 @@
               v-for="dict in ${dictType}"
               :key="dict.value"
 #if($column.javaType == "Integer" || $column.javaType == "Long")
-              :label="parseInt(dict.value)"
+              :value="parseInt(dict.value)"
 #else
-              :label="dict.value"
+              :value="dict.value"
 #end
             >{{dict.label}}</el-radio>
           </el-radio-group>
@@ -218,7 +218,7 @@
 #elseif($column.htmlType == "radio" && $dictType)
         <el-form-item label="${comment}" prop="${field}">
           <el-radio-group v-model="form.${field}">
-            <el-radio label="1">请选择字典生成</el-radio>
+            <el-radio value="1">请选择字典生成</el-radio>
           </el-radio-group>
         </el-form-item>
 #elseif($column.htmlType == "datetime")
