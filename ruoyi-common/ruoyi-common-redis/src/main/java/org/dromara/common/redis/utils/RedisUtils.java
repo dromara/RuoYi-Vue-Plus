@@ -65,6 +65,12 @@ public class RedisUtils {
         consumer.accept(msg);
     }
 
+    /**
+     * 发布消息到指定的频道
+     *
+     * @param channelKey 通道key
+     * @param msg        发送数据
+     */
     public static <T> void publish(String channelKey, T msg) {
         RTopic topic = CLIENT.getTopic(channelKey);
         topic.publish(msg);
