@@ -46,7 +46,6 @@ logging:
   level:
     org.dromara: @logging.level@
     org.springframework: warn
-    tech.powerjob.worker.background: warn
     org.mybatis.spring.mapper: error
   config: classpath:logback-plus.xml
 
