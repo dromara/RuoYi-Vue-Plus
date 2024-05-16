@@ -42,11 +42,6 @@ public class SysDeptVo implements Serializable {
     private String parentName;
 
     /**
-     * 父部门类别编码
-     */
-    private String parentCategory;
-
-    /**
      * 祖级列表
      */
     private String ancestors;

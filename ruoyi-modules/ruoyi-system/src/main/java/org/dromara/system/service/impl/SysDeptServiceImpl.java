@@ -135,11 +135,8 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
             return null;
         }
         SysDeptVo parentDept = baseMapper.selectVoOne(new LambdaQueryWrapper<SysDept>()
-            .select(SysDept::getDeptName, SysDept::getDeptCategory).eq(SysDept::getDeptId, dept.getParentId()));
-        if (ObjectUtil.isNotNull(parentDept)) {
-            dept.setParentName(parentDept.getDeptName());
-            dept.setParentCategory(parentDept.getDeptCategory());
-        }
+            .select(SysDept::getDeptName).eq(SysDept::getDeptId, dept.getParentId()));
+        dept.setParentName(ObjectUtil.isNotNull(parentDept) ? parentDept.getDeptName() : null);
         return dept;
     }
 
