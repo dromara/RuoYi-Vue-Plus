@@ -22,22 +22,6 @@
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
 
-        <!--PowerJob-->
-        <dependency>
-            <groupId>tech.powerjob</groupId>
-            <artifactId>powerjob-worker-spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>powerjob-remote-impl-akka</artifactId>
-                    <groupId>tech.powerjob</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>tech.powerjob</groupId>
-            <artifactId>powerjob-official-processors</artifactId>
-        </dependency>
-
         <!-- EasyRetry client -->
         <dependency>
             <groupId>com.aizuda</groupId>

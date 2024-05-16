@@ -141,21 +141,6 @@ services:
     privileged: true
     network_mode: "host"
 
-  ruoyi-powerjob-server:
-    image: ruoyi/ruoyi-powerjob-server:5.2.0
-    container_name: ruoyi-powerjob-server
-    environment:
-      # 时区上海
-      TZ: Asia/Shanghai
-    ports:
-      - "7700:7700"
-      - "10086:10086"
-      - "10010:10010"
-    volumes:
-      - /docker/powerjob/logs/:/ruoyi/powerjob/logs
-    privileged: true
-    network_mode: "host"
-
   ruoyi-easyretry-server:
     image: ruoyi/ruoyi-easyretry-server:5.2.0
     container_name: ruoyi-easyretry-server
