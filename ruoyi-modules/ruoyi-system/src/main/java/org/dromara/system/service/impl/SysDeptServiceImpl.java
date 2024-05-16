@@ -135,8 +135,11 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
             return null;
         }
         SysDeptVo parentDept = baseMapper.selectVoOne(new LambdaQueryWrapper<SysDept>()
-            .select(SysDept::getDeptName).eq(SysDept::getDeptId, dept.getParentId()));
-        dept.setParentName(ObjectUtil.isNotNull(parentDept) ? parentDept.getDeptName() : null);
+            .select(SysDept::getDeptName, SysDept::getDeptCategory).eq(SysDept::getDeptId, dept.getParentId()));
+        if (ObjectUtil.isNotNull(parentDept)) {
+            dept.setParentName(parentDept.getDeptName());
+            dept.setParentCategory(parentDept.getDeptCategory());
+        }
         return dept;
     }
 
@@ -214,6 +217,20 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDept>()
             .eq(SysDept::getDeptName, dept.getDeptName())
             .eq(SysDept::getParentId, dept.getParentId())
+            .ne(ObjectUtil.isNotNull(dept.getDeptId()), SysDept::getDeptId, dept.getDeptId()));
+        return !exist;
+    }
+
+    /**
+     * 校验部门类别编码是否唯一
+     *
+     * @param dept 部门信息
+     * @return 结果
+     */
+    @Override
+    public boolean checkDeptCategoryUnique(SysDeptBo dept) {
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDept>()
+            .eq(SysDept::getDeptCategory, dept.getDeptCategory())
             .ne(ObjectUtil.isNotNull(dept.getDeptId()), SysDept::getDeptId, dept.getDeptId()));
         return !exist;
     }

@@ -14,7 +14,6 @@ import java.util.Set;
  *
  * @author Lion Li
  */
-
 @Data
 @NoArgsConstructor
 public class LoginUser implements Serializable {
@@ -36,6 +35,11 @@ public class LoginUser implements Serializable {
      * 部门ID
      */
     private Long deptId;
+
+    /**
+     * 部门类别编码
+     */
+    private String deptCategory;
 
     /**
      * 部门名

@@ -142,7 +142,6 @@ public class SysLoginService {
         SpringUtils.context().publishEvent(logininforEvent);
     }
 
-
     /**
      * 构建登录用户
      */
@@ -162,6 +161,7 @@ public class SysLoginService {
                 dept = deptService.selectDeptById(user.getDeptId());
             }
             loginUser.setDeptName(ObjectUtil.isNull(dept) ? "" : dept.getDeptName());
+            loginUser.setDeptCategory(ObjectUtil.isNull(dept) ? "" : dept.getDeptCategory());
             List<SysRoleVo> roles = roleService.selectRolesByUserId(user.getUserId());
             loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
         });
