@@ -11,22 +11,6 @@ spring.boot.admin.client:
   username: ruoyi
   password: 123456
 
---- # powerjob 配置
-powerjob:
-  worker:
-    # 如何开启调度中心请查看文档教程
-    enabled: false
-    # 需要先在 powerjob 登录页执行应用注册后才能使用
-    app-name: ruoyi-worker
-    allow-lazy-connect-server: false
-    max-appended-wf-context-length: 4096
-    max-result-length: 4096
-    # 28080 端口 随着主应用端口飘逸 避免集群冲突
-    port: 2${server.port}
-    protocol: http
-    server-address: 127.0.0.1:7700
-    store-strategy: disk
-
 --- # easy-retry 配置
 easy-retry:
   enabled: false
