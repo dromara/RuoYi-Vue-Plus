@@ -8,17 +8,17 @@ spring.boot.admin.client:
   username: ruoyi
   password: 123456
 
---- # easy-retry 配置
-easy-retry:
+--- # snail-job 配置
+snail-job:
   enabled: true
-  # 需要在EasyRetry后台组管理创建对应名称的组,然后创建任务的时候选择对应的组,才能正确分派任务
+  # 需要在 SnailJob 后台组管理创建对应名称的组,然后创建任务的时候选择对应的组,才能正确分派任务
   group-name: "ruoyi_group"
-  # EasyRetry接入验证令牌 详见 script/sql/easy_retry.sql `er_group_config` 表
-  token: "ER_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT"
+  # SnailJob 接入验证令牌 详见 script/sql/snail_job.sql `sj_group_config` 表
+  token: "SJ_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT"
   server:
     host: 127.0.0.1
     port: 1788
-  # 详见 script/sql/easy_retry.sql `er_namespace` 表
+  # 详见 script/sql/snail_job.sql `sj_namespace` 表
   namespace: ${spring.profiles.active}
 
 

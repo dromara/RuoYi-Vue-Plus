@@ -1,13 +1,13 @@
-package org.dromara.job.easyretry;
+package org.dromara.job.snailjob;
 
-import com.aizuda.easy.retry.client.job.core.dto.JobArgs;
-import com.aizuda.easy.retry.client.job.core.executor.AbstractJobExecutor;
-import com.aizuda.easy.retry.client.model.ExecuteResult;
+import com.aizuda.snailjob.client.job.core.dto.JobArgs;
+import com.aizuda.snailjob.client.job.core.executor.AbstractJobExecutor;
+import com.aizuda.snailjob.client.model.ExecuteResult;
 import org.springframework.stereotype.Component;
 
 /**
- * @author www.byteblogs.com
- * @date 2023-09-28 22:54:07
+ * @author opensnail
+ * @date 2024-05-17
  */
 @Component
 public class TestClassJobExecutor extends AbstractJobExecutor {

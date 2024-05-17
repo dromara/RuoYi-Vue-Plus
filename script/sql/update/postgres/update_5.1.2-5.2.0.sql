@@ -6,3 +6,4 @@ ALTER TABLE sys_post ADD COLUMN post_category varchar(100) default null::varchar
 COMMENT ON COLUMN sys_post.post_category IS '岗位类别编码';
 UPDATE sys_post SET dept_id = 100;
 UPDATE sys_post SET dept_id = 103 where post_id = 1;
+UPDATE sys_menu SET path = 'snailjob', component = 'monitor/snailjob/index', perms = 'monitor:snailjob:list', remark = 'SnailJob控制台菜单' WHERE menu_id = 120;

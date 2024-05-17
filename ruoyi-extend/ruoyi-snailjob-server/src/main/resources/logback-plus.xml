@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="log.path" value="./logs/ruoyi-easyretry-server" />
+    <property name="log.path" value="./logs/ruoyi-snailjob-server" />
     <property name="console.log.pattern"
               value="%red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{36}%n) - %msg%n"/>
     <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"/>
@@ -78,8 +78,8 @@
         <appender-ref ref ="file_error"/>
     </appender>
 
-    <!-- EasyRetry appender -->
-    <appender name="easy_log_server_appender" class="com.aizuda.easy.retry.server.common.appender.EasyRetryServerLogbackAppender">
+    <!-- SnailJob appender -->
+    <appender name="snail_log_server_appender" class="com.aizuda.snailjob.server.common.appender.SnailJobServerLogbackAppender">
     </appender>
 
     <!-- 控制台输出日志级别 -->
@@ -87,6 +87,6 @@
         <appender-ref ref="console" />
         <appender-ref ref="async_info" />
         <appender-ref ref="async_error" />
-        <appender-ref ref="easy_log_server_appender" />
+        <appender-ref ref="snail_log_server_appender" />
     </root>
 </configuration>

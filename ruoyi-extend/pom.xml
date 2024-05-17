@@ -13,7 +13,7 @@
 
     <modules>
         <module>ruoyi-monitor-admin</module>
-        <module>ruoyi-easyretry-server</module>
+        <module>ruoyi-snailjob-server</module>
     </modules>
 
 </project>

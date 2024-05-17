@@ -1692,7 +1692,7 @@ INSERT sys_menu VALUES (117, N'Admin监控', 2, 5, N'Admin', N'monitor/admin/ind
 GO
 INSERT sys_menu VALUES (118, N'文件管理', 1, 10, N'oss', N'system/oss/index', N'', 1, 0, N'C', '0', N'0', N'system:oss:list', N'upload', 103, 1, getdate(), NULL, NULL, N'文件管理菜单');
 GO
-INSERT sys_menu VALUES (120, N'任务调度中心', 2, 5, N'easyretry', N'monitor/easyretry/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:easyretry:list', N'job', 103, 1, getdate(), NULL, NULL, N'easyretry控制台菜单');
+INSERT sys_menu VALUES (120, N'任务调度中心', 2, 5, N'snailjob', N'monitor/snailjob/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:snailjob:list', N'job', 103, 1, getdate(), NULL, NULL, N'SnailJob控制台菜单');
 GO
 INSERT sys_menu VALUES (500, N'操作日志', 108, 1, N'operlog', N'monitor/operlog/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:operlog:list', N'form', 103, 1, getdate(), NULL, NULL, N'操作日志菜单')
 GO

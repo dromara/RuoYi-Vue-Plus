@@ -1,11 +1,11 @@
 server:
   port: 8800
   servlet:
-    context-path: /easy-retry
+    context-path: /snail-job
 
 spring:
   application:
-    name: ruoyi-easyretry-server
+    name: ruoyi-snailjob-server
   profiles:
     active: @profiles.active@
   web:
@@ -13,10 +13,9 @@ spring:
       static-locations: classpath:admin/
 
 mybatis-plus:
-  typeAliasesPackage: com.aizuda.easy.retry.template.datasource.persistence.po
+  typeAliasesPackage: com.aizuda.snailjob.template.datasource.persistence.po
   global-config:
     db-config:
-      table-prefix: er_
       where-strategy: NOT_EMPTY
       capital-mode: false
       logic-delete-value: 1
@@ -37,4 +36,4 @@ management:
     health:
       show-details: ALWAYS
     logfile:
-      external-file: ./logs/ruoyi-easyretry-server/console.log
+      external-file: ./logs/ruoyi-snailjob-server/console.log

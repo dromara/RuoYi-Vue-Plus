@@ -34,7 +34,7 @@
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.0</dynamic-ds.version>
         <alibaba-ttl.version>2.14.4</alibaba-ttl.version>
-        <easyretry.version>3.2.0</easyretry.version>
+        <snailjob.version>1.0.0-beta1</snailjob.version>
         <mapstruct-plus.version>1.3.6</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.32</lombok.version>
@@ -296,21 +296,16 @@
                 <version>${lock4j.version}</version>
             </dependency>
 
-            <!--  EasyRetry Client -->
+            <!-- SnailJob Client -->
             <dependency>
                 <groupId>com.aizuda</groupId>
-                <artifactId>easy-retry-client-starter</artifactId>
-                <version>${easyretry.version}</version>
+                <artifactId>snail-job-client-starter</artifactId>
+                <version>${snailjob.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.aizuda</groupId>
-                <artifactId>easy-retry-client-core</artifactId>
-                <version>${easyretry.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aizuda</groupId>
-                <artifactId>easy-retry-client-job-core</artifactId>
-                <version>${easyretry.version}</version>
+                <artifactId>snail-job-client-job-core</artifactId>
+                <version>${snailjob.version}</version>
             </dependency>
 
             <dependency>

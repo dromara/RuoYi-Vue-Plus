@@ -141,9 +141,9 @@ services:
     privileged: true
     network_mode: "host"
 
-  ruoyi-easyretry-server:
-    image: ruoyi/ruoyi-easyretry-server:5.2.0
-    container_name: ruoyi-easyretry-server
+  ruoyi-snailjob-server:
+    image: ruoyi/ruoyi-snailjob-server:5.2.0
+    container_name: ruoyi-snailjob-server
     environment:
       # 时区上海
       TZ: Asia/Shanghai
@@ -151,6 +151,6 @@ services:
       - "8800:8800"
       - "1788:1788"
     volumes:
-      - /docker/easyretry/logs/:/ruoyi/easyretry/logs
+      - /docker/snailjob/logs/:/ruoyi/snailjob/logs
     privileged: true
     network_mode: "host"

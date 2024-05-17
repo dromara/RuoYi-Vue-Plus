@@ -9,13 +9,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <artifactId>ruoyi-easyretry-server</artifactId>
+    <artifactId>ruoyi-snailjob-server</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.aizuda</groupId>
-            <artifactId>easy-retry-server-starter</artifactId>
-            <version>${easyretry.version}</version>
+            <artifactId>snail-job-server-starter</artifactId>
+            <version>${snailjob.version}</version>
         </dependency>
 
         <dependency>
