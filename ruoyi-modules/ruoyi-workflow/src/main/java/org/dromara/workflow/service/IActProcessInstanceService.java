@@ -5,6 +5,7 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
 import org.dromara.workflow.domain.bo.ProcessInvalidBo;
 import org.dromara.workflow.domain.bo.TaskUrgingBo;
+import org.dromara.workflow.domain.vo.ActHistoryInfoVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 
 import java.util.List;
@@ -56,7 +57,7 @@ public interface IActProcessInstanceService {
      * @param processInstanceId 流程实例id
      * @return 结果
      */
-    Map<String, Object> getHistoryRecord(String processInstanceId);
+    List<ActHistoryInfoVo> getHistoryRecord(String processInstanceId);
 
     /**
      * 作废流程实例，不会删除历史记录(删除运行中的实例)

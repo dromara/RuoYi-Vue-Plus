@@ -336,8 +336,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      * @param processInstanceId 流程实例id
      */
     @Override
-    public Map<String, Object> getHistoryRecord(String processInstanceId) {
-        Map<String, Object> map = new HashMap<>();
+    public List<ActHistoryInfoVo> getHistoryRecord(String processInstanceId) {
         // 查询任务办理记录
         List<HistoricTaskInstance> list = QueryUtils.hisTaskInstanceQuery(processInstanceId).orderByHistoricTaskInstanceEndTime().desc().list();
         list = StreamUtils.sorted(list, Comparator.comparing(HistoricTaskInstance::getEndTime, Comparator.nullsFirst(Date::compareTo)).reversed());
@@ -378,16 +377,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             }
             actHistoryInfoVoList.add(actHistoryInfoVo);
         }
-        List<ActHistoryInfoVo> collect = new ArrayList<>();
-        // 待办理
-        List<ActHistoryInfoVo> waitingTask = StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() == null);
-        // 已办理
-        List<ActHistoryInfoVo> finishTask = StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() != null);
-        collect.addAll(waitingTask);
-        collect.addAll(finishTask);
         // 审批记录
-        map.put("historyRecordList", collect);
-        List<ActHistoryInfoVo> nodeInfoList = new ArrayList<>();
         Map<String, List<ActHistoryInfoVo>> groupByKey = StreamUtils.groupByKey(actHistoryInfoVoList, ActHistoryInfoVo::getTaskDefinitionKey);
         for (Map.Entry<String, List<ActHistoryInfoVo>> entry : groupByKey.entrySet()) {
             ActHistoryInfoVo actHistoryInfoVo = BeanUtil.toBean(entry.getValue().get(0), ActHistoryInfoVo.class);
@@ -403,39 +393,14 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
                     actHistoryInfoVo.setEndTime(null);
                     actHistoryInfoVo.setRunDuration(null);
                 });
-            nodeInfoList.add(actHistoryInfoVo);
         }
-        // 节点信息
-        map.put("nodeListInfo", nodeInfoList);
-        BpmnModel bpmnModel = repositoryService.getBpmnModel(list.get(0).getProcessDefinitionId());
-        List<GraphicInfoVo> graphicInfoVos = new ArrayList<>();
-        Collection<FlowElement> flowElements = bpmnModel.getMainProcess().getFlowElements();
-        //节点图形信息
-        buildGraphicInfo(flowElements, graphicInfoVos, bpmnModel);
-        map.put("graphicInfoVos", graphicInfoVos);
-        return map;
-    }
+        List<ActHistoryInfoVo> recordList = new ArrayList<>();
+        // 待办理
+        recordList.addAll(StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() == null));
+        // 已办理
+        recordList.addAll(StreamUtils.filter(actHistoryInfoVoList, e -> e.getEndTime() != null));
 
-    /**
-     * 构建节点图形信息
-     *
-     * @param flowElements 节点
-     */
-    private static void buildGraphicInfo(Collection<FlowElement> flowElements, List<GraphicInfoVo> graphicInfoVos, BpmnModel bpmnModel) {
-        for (FlowElement flowElement : flowElements) {
-            if (flowElement instanceof SubProcess) {
-                Collection<FlowElement> subFlowElements = ((SubProcess) flowElement).getFlowElements();
-                buildGraphicInfo(subFlowElements, graphicInfoVos, bpmnModel);
-            } else {
-                if (flowElement instanceof UserTask) {
-                    GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowElement.getId());
-                    GraphicInfoVo graphicInfoVo = BeanUtil.toBean(graphicInfo, GraphicInfoVo.class);
-                    graphicInfoVo.setNodeId(flowElement.getId());
-                    graphicInfoVo.setNodeName(flowElement.getName());
-                    graphicInfoVos.add(graphicInfoVo);
-                }
-            }
-        }
+        return recordList;
     }
 
     /**
