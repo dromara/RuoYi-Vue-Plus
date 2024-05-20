@@ -22,20 +22,14 @@
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
 
-        <!--PowerJob-->
+        <!-- SnailJob client -->
         <dependency>
-            <groupId>tech.powerjob</groupId>
-            <artifactId>powerjob-worker-spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>powerjob-remote-impl-akka</artifactId>
-                    <groupId>tech.powerjob</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.aizuda</groupId>
+            <artifactId>snail-job-client-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>tech.powerjob</groupId>
-            <artifactId>powerjob-official-processors</artifactId>
+            <groupId>com.aizuda</groupId>
+            <artifactId>snail-job-client-job-core</artifactId>
         </dependency>
 
         <dependency>

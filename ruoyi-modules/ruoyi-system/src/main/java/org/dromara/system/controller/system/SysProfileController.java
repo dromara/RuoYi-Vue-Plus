@@ -19,6 +19,7 @@ import org.dromara.system.domain.vo.ProfileVo;
 import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.service.ISysOssService;
+import org.dromara.system.service.ISysRoleService;
 import org.dromara.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -50,8 +51,8 @@ public class SysProfileController extends BaseController {
         SysUserVo user = userService.selectUserById(LoginHelper.getUserId());
         ProfileVo profileVo = new ProfileVo();
         profileVo.setUser(user);
-        profileVo.setRoleGroup(userService.selectUserRoleGroup(user.getUserName()));
-        profileVo.setPostGroup(userService.selectUserPostGroup(user.getUserName()));
+        profileVo.setRoleGroup(userService.selectUserRoleGroup(user.getUserId()));
+        profileVo.setPostGroup(userService.selectUserPostGroup(user.getUserId()));
         return R.ok(profileVo);
     }
 

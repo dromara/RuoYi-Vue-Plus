@@ -8,11 +8,18 @@
     </resultMap>
 
     <select id="selectDeptList" resultMap="SysDeptResult">
-        select * from sys_dept ${ew.getCustomSqlSegment}
+        select
+        <if test="ew.getSqlSelect != null">
+            ${ew.getSqlSelect}
+        </if>
+        <if test="ew.getSqlSelect == null">
+            *
+        </if>
+        from sys_dept ${ew.getCustomSqlSegment}
     </select>
 
-    <select id="selectDeptById" resultMap="SysDeptResult">
-        select * from sys_dept where del_flag = '0' and dept_id = #{deptId}
+    <select id="countDeptById" resultType="Long">
+        select count(*) from sys_dept where del_flag = '0' and dept_id = #{deptId}
     </select>
 
     <select id="selectDeptListByRoleId" resultType="Long">

@@ -1,7 +1,6 @@
 package org.dromara.web.service;
 
 import cn.dev33.satoken.secure.BCrypt;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.Constants;
@@ -61,8 +60,7 @@ public class SysRegisterService {
 
         boolean exist = TenantHelper.dynamic(tenantId, () -> {
             return userMapper.exists(new LambdaQueryWrapper<SysUser>()
-                .eq(SysUser::getUserName, sysUser.getUserName())
-                .ne(ObjectUtil.isNotNull(sysUser.getUserId()), SysUser::getUserId, sysUser.getUserId()));
+                .eq(SysUser::getUserName, sysUser.getUserName()));
         });
         if (exist) {
             throw new UserException("user.register.save.error", username);
@@ -82,7 +80,7 @@ public class SysRegisterService {
      * @param uuid     唯一标识
      */
     public void validateCaptcha(String tenantId, String username, String code, String uuid) {
-        String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
+        String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.blankToDefault(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {

@@ -149,11 +149,13 @@ public class SysRoleController extends BaseController {
 
     /**
      * 获取角色选择框列表
+     *
+     * @param roleIds 角色ID串
      */
     @SaCheckPermission("system:role:query")
     @GetMapping("/optionselect")
-    public R<List<SysRoleVo>> optionselect() {
-        return R.ok(roleService.selectRoleAll());
+    public R<List<SysRoleVo>> optionselect(@RequestParam(required = false) Long[] roleIds) {
+        return R.ok(roleService.selectRoleByIds(roleIds == null ? null : List.of(roleIds)));
     }
 
     /**

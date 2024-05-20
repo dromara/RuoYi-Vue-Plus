@@ -5,18 +5,19 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 
 /**
  * 异步配置
+ * <p>
+ * 如果未使用虚拟线程则生效
  *
  * @author Lion Li
  */
-@EnableAsync(proxyTargetClass = true)
 @AutoConfiguration
 public class AsyncConfig implements AsyncConfigurer {
 
@@ -25,6 +26,9 @@ public class AsyncConfig implements AsyncConfigurer {
      */
     @Override
     public Executor getAsyncExecutor() {
+        if(SpringUtils.isVirtual()) {
+            return new VirtualThreadTaskExecutor("async-");
+        }
         return SpringUtils.getBean("scheduledExecutorService");
     }
 

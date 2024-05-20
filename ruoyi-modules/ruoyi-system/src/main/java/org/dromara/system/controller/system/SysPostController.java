@@ -1,6 +1,9 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.hutool.core.util.ObjectUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.excel.utils.ExcelUtil;
@@ -12,11 +15,10 @@ import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysPostBo;
 import org.dromara.system.domain.vo.SysPostVo;
 import org.dromara.system.service.ISysPostService;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -110,12 +112,22 @@ public class SysPostController extends BaseController {
 
     /**
      * 获取岗位选择框列表
+     *
+     * @param postIds 岗位ID串
+     * @param deptId  部门id
      */
+    @SaCheckPermission("system:post:query")
     @GetMapping("/optionselect")
-    public R<List<SysPostVo>> optionselect() {
-        SysPostBo postBo = new SysPostBo();
-        postBo.setStatus(UserConstants.POST_NORMAL);
-        List<SysPostVo> posts = postService.selectPostList(postBo);
-        return R.ok(posts);
+    public R<List<SysPostVo>> optionselect(@RequestParam(required = false) Long[] postIds, @RequestParam(required = false) Long deptId) {
+        List<SysPostVo> list = new ArrayList<>();
+        if (ObjectUtil.isNotNull(deptId)) {
+            SysPostBo post = new SysPostBo();
+            post.setDeptId(deptId);
+            list = postService.selectPostList(post);
+        } else if (postIds != null) {
+            list = postService.selectPostByIds(List.of(postIds));
+        }
+        return R.ok(list);
     }
+
 }

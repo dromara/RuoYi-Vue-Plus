@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.workflow.mapper.ActTaskMapper">
+    <resultMap type="org.dromara.workflow.domain.vo.TaskVo" id="TaskVoResult">
+        <result property="id" column="ID_"/>
+        <result property="name" column="NAME_"/>
+        <result property="description" column="DESCRIPTION_"/>
+        <result property="priority" column="PRIORITY_"/>
+        <result property="owner" column="OWNER_"/>
+        <result property="assignee" column="ASSIGNEE_"/>
+        <result property="processInstanceId" column="PROC_INST_ID_"/>
+        <result property="executionId" column="EXECUTION_ID_"/>
+        <result property="taskDefinitionId" column="TASK_DEF_ID_"/>
+        <result property="processDefinitionId" column="PROC_DEF_ID_"/>
+        <result property="createTime" column="CREATE_TIME_"/>
+        <result property="startTime" column="START_TIME_"/>
+        <result property="endTime" column="END_TIME_"/>
+        <result property="taskDefinitionKey" column="TASK_DEF_KEY_"/>
+        <result property="dueDate" column="DUE_DATE_"/>
+        <result property="category" column="CATEGORY_"/>
+        <result property="parentTaskId" column="PARENT_TASK_ID_"/>
+        <result property="tenantId" column="TENANT_ID_"/>
+        <result property="claimTime" column="CLAIM_TIME"/>
+        <result property="businessStatus" column="BUSINESS_STATUS_"/>
+        <result property="processDefinitionName" column="processDefinitionName"/>
+        <result property="processDefinitionKey" column="processDefinitionKey"/>
+        <result property="processDefinitionVersion" column="processDefinitionVersion"/>
+        <result property="businessKey" column="BUSINESS_KEY_"/>
+
+    </resultMap>
+    <select id="getTaskWaitByPage" resultMap="TaskVoResult">
+        select *
+        from (SELECT RES.*,
+                     AHP.BUSINESS_STATUS_,
+                     AHP.BUSINESS_KEY_,
+                     ARP.NAME_ AS processDefinitionName,
+                     ARP.KEY_  AS processDefinitionKey,
+                     ARP.VERSION_  AS processDefinitionVersion
+              FROM ACT_RU_TASK RES
+                       INNER JOIN ACT_HI_PROCINST AHP ON RES.PROC_INST_ID_ = AHP.PROC_INST_ID_
+                       INNER JOIN ACT_RE_PROCDEF ARP ON ARP.ID_ = RES.PROC_DEF_ID_
+              WHERE RES.PARENT_TASK_ID_ IS NULL
+              ORDER BY RES.CREATE_TIME_ DESC) t ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="getTaskFinishByPage" resultMap="TaskVoResult">
+        select *
+        from (SELECT HTI.*,
+                     AHP.BUSINESS_STATUS_,
+                     AHP.BUSINESS_KEY_,
+                     ARP.NAME_ AS processDefinitionName,
+                     ARP.KEY_  AS processDefinitionKey,
+                     ARP.VERSION_  AS processDefinitionVersion
+              FROM ACT_HI_TASKINST HTI
+                       INNER JOIN ACT_HI_PROCINST AHP ON HTI.PROC_INST_ID_ = AHP.PROC_INST_ID_
+                       INNER JOIN ACT_RE_PROCDEF ARP ON ARP.ID_ = HTI.PROC_DEF_ID_
+              WHERE HTI.PARENT_TASK_ID_ IS NULL AND HTI.END_TIME_ IS NOT NULL
+              ORDER BY HTI.START_TIME_ DESC) t ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="getTaskCopyByPage" resultMap="TaskVoResult">
+        select *
+        from (SELECT AHT.*,
+                     AHP.BUSINESS_STATUS_,
+                     AHP.BUSINESS_KEY_,
+                     ARP.NAME_ as processDefinitionName,
+                     ARP.KEY_  as processDefinitionKey,
+                     ARP.VERSION_  AS processDefinitionVersion
+              FROM ACT_HI_TASKINST AHT
+                       INNER JOIN ACT_HI_PROCINST AHP ON AHT.PROC_INST_ID_ = AHP.PROC_INST_ID_
+                       INNER JOIN ACT_RE_PROCDEF ARP ON ARP.ID_ = AHT.PROC_DEF_ID_
+              WHERE AHT.PARENT_TASK_ID_ IS NOT NULL
+                and AHT.scope_type_ = 'copy'
+              ORDER BY AHT.START_TIME_ DESC) t ${ew.getCustomSqlSegment}
+    </select>
+</mapper>

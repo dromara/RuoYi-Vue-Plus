@@ -1,5 +1,6 @@
 package org.dromara.common.oss.factory;
 
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
@@ -9,10 +10,10 @@ import org.dromara.common.oss.exception.OssException;
 import org.dromara.common.oss.properties.OssProperties;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.common.redis.utils.RedisUtils;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 文件上传Factory
@@ -23,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OssFactory {
 
     private static final Map<String, OssClient> CLIENT_CACHE = new ConcurrentHashMap<>();
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
     /**
      * 获取默认实例
@@ -39,7 +41,7 @@ public class OssFactory {
     /**
      * 根据类型获取实例
      */
-    public static synchronized OssClient instance(String configKey) {
+    public static OssClient instance(String configKey) {
         String json = CacheUtils.get(CacheNames.SYS_OSS_CONFIG, configKey);
         if (json == null) {
             throw new OssException("系统异常, '" + configKey + "'配置信息不存在!");
@@ -48,16 +50,19 @@ public class OssFactory {
         // 使用租户标识避免多个租户相同key实例覆盖
         String key = properties.getTenantId() + ":" + configKey;
         OssClient client = CLIENT_CACHE.get(key);
-        if (client == null) {
-            CLIENT_CACHE.put(key, new OssClient(configKey, properties));
-            log.info("创建OSS实例 key => {}", configKey);
-            return CLIENT_CACHE.get(key);
-        }
-        // 配置不相同则重新构建
-        if (!client.checkPropertiesSame(properties)) {
-            CLIENT_CACHE.put(key, new OssClient(configKey, properties));
-            log.info("重载OSS实例 key => {}", configKey);
-            return CLIENT_CACHE.get(key);
+        // 客户端不存在或配置不相同则重新构建
+        if (client == null || !client.checkPropertiesSame(properties)) {
+            LOCK.lock();
+            try {
+                client = CLIENT_CACHE.get(key);
+                if (client == null || !client.checkPropertiesSame(properties)) {
+                    CLIENT_CACHE.put(key, new OssClient(configKey, properties));
+                    log.info("创建OSS实例 key => {}", configKey);
+                    return CLIENT_CACHE.get(key);
+                }
+            } finally {
+                LOCK.unlock();
+            }
         }
         return client;
     }

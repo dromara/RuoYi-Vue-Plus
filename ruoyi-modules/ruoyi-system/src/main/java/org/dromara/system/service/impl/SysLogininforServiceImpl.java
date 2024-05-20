@@ -5,30 +5,29 @@ import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.log.event.LogininforEvent;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ip.AddressUtils;
+import org.dromara.common.log.event.LogininforEvent;
+import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysLogininfor;
 import org.dromara.system.domain.bo.SysLogininforBo;
+import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.vo.SysLogininforVo;
-import org.dromara.system.mapper.SysClientMapper;
 import org.dromara.system.mapper.SysLogininforMapper;
 import org.dromara.system.service.ISysClientService;
 import org.dromara.system.service.ISysLogininforService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -60,10 +59,10 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
         final UserAgent userAgent = UserAgentUtil.parse(request.getHeader("User-Agent"));
         final String ip = ServletUtils.getClientIP(request);
         // 客户端信息
-        String clientid = request.getHeader(LoginHelper.CLIENT_KEY);
-        SysClient client = null;
-        if (StringUtils.isNotBlank(clientid)) {
-            client = clientService.queryByClientId(clientid);
+        String clientId = request.getHeader(LoginHelper.CLIENT_KEY);
+        SysClientVo client = null;
+        if (StringUtils.isNotBlank(clientId)) {
+            client = clientService.queryByClientId(clientId);
         }
 
         String address = AddressUtils.getRealAddressByIP(ip);

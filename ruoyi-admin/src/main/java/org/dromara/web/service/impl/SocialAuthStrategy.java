@@ -7,7 +7,6 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthResponse;
@@ -23,8 +22,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
-import org.dromara.system.domain.SysClient;
-import org.dromara.system.domain.SysUser;
+import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.vo.SysSocialVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
@@ -59,7 +57,7 @@ public class SocialAuthStrategy implements IAuthStrategy {
      * @param client   客户端信息
      */
     @Override
-    public LoginVo login(String body, SysClient client) {
+    public LoginVo login(String body, SysClientVo client) {
         SocialLoginBody loginBody = JsonUtils.parseObject(body, SocialLoginBody.class);
         ValidatorUtils.validate(loginBody);
         AuthResponse<AuthUser> response = SocialUtils.loginAuth(
@@ -83,11 +81,16 @@ public class SocialAuthStrategy implements IAuthStrategy {
         if (CollUtil.isEmpty(list)) {
             throw new ServiceException("你还没有绑定第三方账号，绑定后才可以登录！");
         }
-        Optional<SysSocialVo> opt = list.stream().filter(x -> x.getTenantId().equals(loginBody.getTenantId())).findAny();
-        if (opt.isEmpty()) {
-            throw new ServiceException("对不起，你没有权限登录当前租户！");
+        SysSocialVo social;
+        if (TenantHelper.isEnable()) {
+            Optional<SysSocialVo> opt = list.stream().filter(x -> x.getTenantId().equals(loginBody.getTenantId())).findAny();
+            if (opt.isEmpty()) {
+                throw new ServiceException("对不起，你没有权限登录当前租户！");
+            }
+            social = opt.get();
+        } else {
+            social = list.get(0);
         }
-        SysSocialVo social = opt.get();
         // 查找用户
         SysUserVo user = loadUser(social.getTenantId(), social.getUserId());
 
@@ -114,9 +117,7 @@ public class SocialAuthStrategy implements IAuthStrategy {
 
     private SysUserVo loadUser(String tenantId, Long userId) {
         return TenantHelper.dynamic(tenantId, () -> {
-            SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-                .select(SysUser::getUserName, SysUser::getStatus)
-                .eq(SysUser::getUserId, userId));
+            SysUserVo user = userMapper.selectVoById(userId);
             if (ObjectUtil.isNull(user)) {
                 log.info("登录用户：{} 不存在.", "");
                 throw new UserException("user.not.exists", "");
@@ -124,7 +125,7 @@ public class SocialAuthStrategy implements IAuthStrategy {
                 log.info("登录用户：{} 已被停用.", "");
                 throw new UserException("user.blocked", "");
             }
-            return userMapper.selectUserByUserName(user.getUserName());
+            return user;
         });
     }
 

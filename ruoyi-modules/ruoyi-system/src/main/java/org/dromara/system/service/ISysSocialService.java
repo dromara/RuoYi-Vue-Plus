@@ -21,7 +21,7 @@ public interface ISysSocialService {
     /**
      * 查询社会化关系列表
      */
-    List<SysSocialVo> queryList();
+    List<SysSocialVo> queryList(SysSocialBo bo);
 
     /**
      * 查询社会化关系列表
@@ -45,9 +45,7 @@ public interface ISysSocialService {
 
 
     /**
-     * 根据 authId 查询 SysSocial 表和 SysUser 表，返回 SysSocialAuthResult 映射的对象
-     * @param authId 认证ID
-     * @return SysSocial
+     * 根据 authId 查询
      */
     List<SysSocialVo> selectByAuthId(String authId);
 

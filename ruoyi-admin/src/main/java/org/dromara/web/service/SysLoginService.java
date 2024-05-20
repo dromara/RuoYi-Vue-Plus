@@ -5,6 +5,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.lock.annotation.Lock4j;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthUser;
@@ -15,6 +16,7 @@ import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.TenantStatus;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.*;
 import org.dromara.common.log.event.LogininforEvent;
@@ -25,13 +27,9 @@ import org.dromara.common.tenant.exception.TenantException;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.bo.SysSocialBo;
-import org.dromara.system.domain.vo.SysSocialVo;
-import org.dromara.system.domain.vo.SysTenantVo;
-import org.dromara.system.domain.vo.SysUserVo;
+import org.dromara.system.domain.vo.*;
 import org.dromara.system.mapper.SysUserMapper;
-import org.dromara.system.service.ISysPermissionService;
-import org.dromara.system.service.ISysSocialService;
-import org.dromara.system.service.ISysTenantService;
+import org.dromara.system.service.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +57,8 @@ public class SysLoginService {
     private final ISysTenantService tenantService;
     private final ISysPermissionService permissionService;
     private final ISysSocialService sysSocialService;
+    private final ISysRoleService roleService;
+    private final ISysDeptService deptService;
     private final SysUserMapper userMapper;
 
 
@@ -66,20 +66,28 @@ public class SysLoginService {
      * 绑定第三方用户
      *
      * @param authUserData 授权响应实体
-     * @return 统一响应实体
      */
+    @Lock4j
     public void socialRegister(AuthUser authUserData) {
         String authId = authUserData.getSource() + authUserData.getUuid();
         // 第三方用户信息
         SysSocialBo bo = BeanUtil.toBean(authUserData, SysSocialBo.class);
         BeanUtil.copyProperties(authUserData.getToken(), bo);
-        bo.setUserId(LoginHelper.getUserId());
+        Long userId = LoginHelper.getUserId();
+        bo.setUserId(userId);
         bo.setAuthId(authId);
         bo.setOpenId(authUserData.getUuid());
         bo.setUserName(authUserData.getUsername());
         bo.setNickName(authUserData.getNickname());
+        List<SysSocialVo> checkList = sysSocialService.selectByAuthId(authId);
+        if (CollUtil.isNotEmpty(checkList)) {
+            throw new ServiceException("此三方账号已经被绑定!");
+        }
         // 查询是否已经绑定用户
-        List<SysSocialVo> list = sysSocialService.selectByAuthId(authId);
+        SysSocialBo params = new SysSocialBo();
+        params.setUserId(userId);
+        params.setSource(bo.getSource());
+        List<SysSocialVo> list = sysSocialService.queryList(params);
         if (CollUtil.isEmpty(list)) {
             // 没有绑定用户, 新增用户信息
             sysSocialService.insertByBo(bo);
@@ -87,6 +95,8 @@ public class SysLoginService {
             // 更新用户信息
             bo.setId(list.get(0).getId());
             sysSocialService.updateByBo(bo);
+            // 如果要绑定的平台账号已经被绑定过了 是否抛异常自行决断
+            // throw new ServiceException("此平台账号已经被绑定!");
         }
     }
 
@@ -132,7 +142,6 @@ public class SysLoginService {
         SpringUtils.context().publishEvent(logininforEvent);
     }
 
-
     /**
      * 构建登录用户
      */
@@ -146,9 +155,16 @@ public class SysLoginService {
         loginUser.setUserType(user.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user.getUserId()));
         loginUser.setRolePermission(permissionService.getRolePermission(user.getUserId()));
-        loginUser.setDeptName(ObjectUtil.isNull(user.getDept()) ? "" : user.getDept().getDeptName());
-        List<RoleDTO> roles = BeanUtil.copyToList(user.getRoles(), RoleDTO.class);
-        loginUser.setRoles(roles);
+        TenantHelper.dynamic(user.getTenantId(), () -> {
+            SysDeptVo dept = null;
+            if (ObjectUtil.isNotNull(user.getDeptId())) {
+                dept = deptService.selectDeptById(user.getDeptId());
+            }
+            loginUser.setDeptName(ObjectUtil.isNull(dept) ? "" : dept.getDeptName());
+            loginUser.setDeptCategory(ObjectUtil.isNull(dept) ? "" : dept.getDeptCategory());
+            List<SysRoleVo> roles = roleService.selectRolesByUserId(user.getUserId());
+            loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
+        });
         return loginUser;
     }
 

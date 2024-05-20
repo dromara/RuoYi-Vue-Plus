@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 在线用户监控
@@ -87,4 +88,43 @@ public class SysUserOnlineController extends BaseController {
         }
         return R.ok();
     }
+
+    /**
+     * 获取当前用户登录在线设备
+     */
+    @GetMapping()
+    public TableDataInfo<SysUserOnline> getInfo() {
+        // 获取指定账号 id 的 token 集合
+        List<String> tokenIds = StpUtil.getTokenValueListByLoginId(StpUtil.getLoginIdAsString());
+        List<UserOnlineDTO> userOnlineDTOList = tokenIds.stream()
+            .filter(token -> StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) >= -1)
+            .map(token -> (UserOnlineDTO) RedisUtils.getCacheObject(CacheConstants.ONLINE_TOKEN_KEY + token))
+            .collect(Collectors.toList());
+        //复制和处理 SysUserOnline 对象列表
+        Collections.reverse(userOnlineDTOList);
+        userOnlineDTOList.removeAll(Collections.singleton(null));
+        List<SysUserOnline> userOnlineList = BeanUtil.copyToList(userOnlineDTOList, SysUserOnline.class);
+        return TableDataInfo.build(userOnlineList);
+    }
+
+    /**
+     * 强退当前在线设备
+     *
+     * @param tokenId token值
+     */
+    @Log(title = "在线设备", businessType = BusinessType.FORCE)
+    @PostMapping("/{tokenId}")
+    public R<Void> remove(@PathVariable("tokenId") String tokenId) {
+        try {
+            // 获取指定账号 id 的 token 集合
+            List<String> keys = StpUtil.getTokenValueListByLoginId(StpUtil.getLoginIdAsString());
+            keys.stream()
+                .filter(key -> key.equals(tokenId))
+                .findFirst()
+                .ifPresent(key -> StpUtil.kickoutByTokenValue(tokenId));
+        } catch (NotLoginException ignored) {
+        }
+        return R.ok();
+    }
+
 }

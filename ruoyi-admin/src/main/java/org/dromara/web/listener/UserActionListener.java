@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.CacheConstants;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.domain.dto.UserOnlineDTO;
-import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
@@ -18,6 +17,7 @@ import org.dromara.common.core.utils.ip.AddressUtils;
 import org.dromara.common.log.event.LogininforEvent;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.web.service.SysLoginService;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +43,6 @@ public class UserActionListener implements SaTokenListener {
     public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginModel loginModel) {
         UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
         String ip = ServletUtils.getClientIP();
-        LoginUser user = LoginHelper.getLoginUser();
         UserOnlineDTO dto = new UserOnlineDTO();
         dto.setIpaddr(ip);
         dto.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
@@ -51,25 +50,29 @@ public class UserActionListener implements SaTokenListener {
         dto.setOs(userAgent.getOs().getName());
         dto.setLoginTime(System.currentTimeMillis());
         dto.setTokenId(tokenValue);
-        dto.setUserName(user.getUsername());
-        dto.setClientKey(user.getClientKey());
-        dto.setDeviceType(user.getDeviceType());
-        dto.setDeptName(user.getDeptName());
-        if(tokenConfig.getTimeout() == -1) {
-            RedisUtils.setCacheObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto);
-        } else {
-            RedisUtils.setCacheObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto, Duration.ofSeconds(tokenConfig.getTimeout()));
-        }
+        String username = (String) loginModel.getExtra(LoginHelper.USER_NAME_KEY);
+        String tenantId = (String) loginModel.getExtra(LoginHelper.TENANT_KEY);
+        dto.setUserName(username);
+        dto.setClientKey((String) loginModel.getExtra(LoginHelper.CLIENT_KEY));
+        dto.setDeviceType(loginModel.getDevice());
+        dto.setDeptName((String) loginModel.getExtra(LoginHelper.DEPT_NAME_KEY));
+        TenantHelper.dynamic(tenantId, () -> {
+            if(tokenConfig.getTimeout() == -1) {
+                RedisUtils.setCacheObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto);
+            } else {
+                RedisUtils.setCacheObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto, Duration.ofSeconds(tokenConfig.getTimeout()));
+            }
+        });
         // 记录登录日志
         LogininforEvent logininforEvent = new LogininforEvent();
-        logininforEvent.setTenantId(user.getTenantId());
-        logininforEvent.setUsername(user.getUsername());
+        logininforEvent.setTenantId(tenantId);
+        logininforEvent.setUsername(username);
         logininforEvent.setStatus(Constants.LOGIN_SUCCESS);
         logininforEvent.setMessage(MessageUtils.message("user.login.success"));
         logininforEvent.setRequest(ServletUtils.getRequest());
         SpringUtils.context().publishEvent(logininforEvent);
         // 更新登录信息
-        loginService.recordLoginInfo(user.getUserId(), ip);
+        loginService.recordLoginInfo((Long) loginModel.getExtra(LoginHelper.USER_KEY), ip);
         log.info("user doLogin, userId:{}, token:{}", loginId, tokenValue);
     }
 

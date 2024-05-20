@@ -23,6 +23,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysUser;
+import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.web.domain.vo.LoginVo;
@@ -44,7 +45,7 @@ public class EmailAuthStrategy implements IAuthStrategy {
     private final SysUserMapper userMapper;
 
     @Override
-    public LoginVo login(String body, SysClient client) {
+    public LoginVo login(String body, SysClientVo client) {
         EmailLoginBody loginBody = JsonUtils.parseObject(body, EmailLoginBody.class);
         ValidatorUtils.validate(loginBody);
         String tenantId = loginBody.getTenantId();
@@ -90,9 +91,7 @@ public class EmailAuthStrategy implements IAuthStrategy {
 
     private SysUserVo loadUserByEmail(String tenantId, String email) {
         return TenantHelper.dynamic(tenantId, () -> {
-            SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-                .select(SysUser::getEmail, SysUser::getStatus)
-                .eq(SysUser::getEmail, email));
+            SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getEmail, email));
             if (ObjectUtil.isNull(user)) {
                 log.info("登录用户：{} 不存在.", email);
                 throw new UserException("user.not.exists", email);
@@ -100,7 +99,7 @@ public class EmailAuthStrategy implements IAuthStrategy {
                 log.info("登录用户：{} 已被停用.", email);
                 throw new UserException("user.blocked", email);
             }
-            return userMapper.selectUserByEmail(email);
+            return user;
         });
     }
 

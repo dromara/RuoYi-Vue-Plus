@@ -11,21 +11,18 @@ spring.boot.admin.client:
   username: ruoyi
   password: 123456
 
---- # powerjob 配置
-powerjob:
-  worker:
-    # 如何开启调度中心请查看文档教程
-    enabled: false
-    # 需要先在 powerjob 登录页执行应用注册后才能使用
-    app-name: ruoyi-worker
-    allow-lazy-connect-server: false
-    max-appended-wf-context-length: 4096
-    max-result-length: 4096
-    # 28080 端口 随着主应用端口飘逸 避免集群冲突
-    port: 2${server.port}
-    protocol: http
-    server-address: 127.0.0.1:7700
-    store-strategy: disk
+--- # snail-job 配置
+snail-job:
+  enabled: false
+  # 需要在 SnailJob 后台组管理创建对应名称的组,然后创建任务的时候选择对应的组,才能正确分派任务
+  group-name: "ruoyi_group"
+  # SnailJob 接入验证令牌 详见 script/sql/snail_job.sql `sj_group_config` 表
+  token: "SJ_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT"
+  server:
+    host: 127.0.0.1
+    port: 1788
+  # 详见 script/sql/snail_job.sql `sj_namespace` 表
+  namespace: ${spring.profiles.active}
 
 --- # 数据源配置
 spring:
@@ -46,7 +43,7 @@ spring:
           driverClassName: com.mysql.cj.jdbc.Driver
           # jdbc 所有参数配置参考 https://lionli.blog.csdn.net/article/details/122018562
           # rewriteBatchedStatements=true 批处理优化 大幅提升批量插入更新删除性能(对数据库有性能损耗 使用批量操作应考虑性能问题)
-          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
           username: root
           password: root
         # 从库数据源
@@ -54,7 +51,7 @@ spring:
           lazy: true
           type: ${spring.datasource.type}
           driverClassName: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
           username:
           password:
 #        oracle:
@@ -152,35 +149,39 @@ mail:
   connectionTimeout: 0
 
 --- # sms 短信 支持 阿里云 腾讯云 云片 等等各式各样的短信服务商
-# https://wind.kim/doc/start 文档地址 各个厂商可同时使用
+# https://sms4j.com/doc3/ 差异配置文档地址 支持单厂商多配置，可以配置多个同时使用
 sms:
-  # 阿里云 dysmsapi.aliyuncs.com
-  alibaba:
-    #请求地址 默认为 dysmsapi.aliyuncs.com 如无特殊改变可以不用设置
-    requestUrl: dysmsapi.aliyuncs.com
-    #阿里云的accessKey
-    accessKeyId: xxxxxxx
-    #阿里云的accessKeySecret
-    accessKeySecret: xxxxxxx
-    #短信签名
-    signature: 测试
-  tencent:
-    #请求地址默认为 sms.tencentcloudapi.com 如无特殊改变可不用设置
-    requestUrl: sms.tencentcloudapi.com
-    #腾讯云的accessKey
-    accessKeyId: xxxxxxx
-    #腾讯云的accessKeySecret
-    accessKeySecret: xxxxxxx
-    #短信签名
-    signature: 测试
-    #短信sdkAppId
-    sdkAppId: appid
-    #地域信息默认为 ap-guangzhou 如无特殊改变可不用设置
-    territory: ap-guangzhou
+  # 配置源类型用于标定配置来源(interface,yaml)
+  config-type: yaml
+  # 用于标定yml中的配置是否开启短信拦截，接口配置不受此限制
+  restricted: true
+  # 短信拦截限制单手机号每分钟最大发送，只对开启了拦截的配置有效
+  minute-max: 1
+  # 短信拦截限制单手机号每日最大发送量，只对开启了拦截的配置有效
+  account-max: 30
+  # 以下配置来自于 org.dromara.sms4j.provider.config.BaseConfig类中
+  blends:
+    # 唯一ID 用于发送短信寻找具体配置 随便定义别用中文即可
+    # 可以同时存在两个相同厂商 例如: ali1 ali2 两个不同的阿里短信账号 也可用于区分租户
+    config1:
+      # 框架定义的厂商名称标识，标定此配置是哪个厂商，详细请看厂商标识介绍部分
+      supplier: alibaba
+      # 有些称为accessKey有些称之为apiKey，也有称为sdkKey或者appId。
+      access-key-id: 您的accessKey
+      # 称为accessSecret有些称之为apiSecret
+      access-key-secret: 您的accessKeySecret
+      signature: 您的短信签名
+      sdk-app-id: 您的sdkAppId
+    config2:
+      # 厂商标识，标定此配置是哪个厂商，详细请看厂商标识介绍部分
+      supplier: tencent
+      access-key-id: 您的accessKey
+      access-key-secret: 您的accessKeySecret
+      signature: 您的短信签名
+      sdk-app-id: 您的sdkAppId
 
 --- # 三方授权
 justauth:
-  enabled: true
   # 前端外网访问地址
   address: http://localhost:80
   type:
@@ -191,6 +192,13 @@ justauth:
       client-id: 876892492581044224
       client-secret: x1Y5MTMwNzIwMjMxNTM4NDc3Mzche8
       redirect-uri: ${justauth.address}/social-callback?source=maxkey
+    topiam:
+      # topiam 服务器地址
+      server-url: http://127.0.0.1:1989/api/v1/authorize/y0q************spq***********8ol
+      client-id: 449c4*********937************759
+      client-secret: ac7***********1e0************28d
+      redirect-uri: ${justauth.address}/social-callback?source=topiam
+      scopes: [ openid, email, phone, profile ]
     qq:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e

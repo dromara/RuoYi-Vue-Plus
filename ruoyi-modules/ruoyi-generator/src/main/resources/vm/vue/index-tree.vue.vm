@@ -1,8 +1,9 @@
 <template>
   <div class="p-2">
     <transition :enter-active-class="proxy?.animate.searchAnimate.enter" :leave-active-class="proxy?.animate.searchAnimate.leave">
-      <div class="search" v-show="showSearch">
-        <el-form :model="queryParams" ref="queryFormRef" :inline="true" label-width="68px">
+      <div v-show="showSearch" class="mb-[10px]">
+        <el-card shadow="hover">
+          <el-form ref="queryFormRef" :model="queryParams" :inline="true">
 #foreach($column in $columns)
 #if($column.query)
 #set($dictType=$column.dictType)
@@ -14,38 +15,33 @@
 #set($comment=$column.columnComment)
 #end
 #if($column.htmlType == "input" || $column.htmlType == "textarea")
-          <el-form-item label="${comment}" prop="${column.javaField}">
-            <el-input v-model="queryParams.${column.javaField}" placeholder="请输入${comment}" clearable style="width: 240px" @keyup.enter="handleQuery" />
-          </el-form-item>
+            <el-form-item label="${comment}" prop="${column.javaField}">
+              <el-input v-model="queryParams.${column.javaField}" placeholder="请输入${comment}" clearable @keyup.enter="handleQuery" />
+            </el-form-item>
 #elseif(($column.htmlType == "select" || $column.htmlType == "radio") && "" != $dictType)
-          <el-form-item label="${comment}" prop="${column.javaField}">
-            <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${comment}" clearable>
-              <el-option
-                  v-for="dict in ${dictType}"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-              />
-            </el-select>
-          </el-form-item>
+            <el-form-item label="${comment}" prop="${column.javaField}">
+              <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${comment}" clearable>
+                <el-option v-for="dict in ${dictType}" :key="dict.value" :label="dict.label" :value="dict.value"/>
+              </el-select>
+            </el-form-item>
 #elseif(($column.htmlType == "select" || $column.htmlType == "radio") && $dictType)
-          <el-form-item label="${comment}" prop="${column.javaField}">
-            <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${comment}" clearable>
-              <el-option label="请选择字典生成" value="" />
-            </el-select>
-          </el-form-item>
+            <el-form-item label="${comment}" prop="${column.javaField}">
+              <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${comment}" clearable>
+                <el-option label="请选择字典生成" value="" />
+              </el-select>
+            </el-form-item>
 #elseif($column.htmlType == "datetime" && $column.queryType != "BETWEEN")
-          <el-form-item label="${comment}" prop="${column.javaField}">
-            <el-date-picker clearable
+            <el-form-item label="${comment}" prop="${column.javaField}">
+              <el-date-picker clearable
                 v-model="queryParams.${column.javaField}"
                 type="date"
                 value-format="YYYY-MM-DD"
                 placeholder="选择${comment}"
-            />
-          </el-form-item>
+              />
+            </el-form-item>
 #elseif($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-          <el-form-item label="${comment}" style="width: 308px">
-            <el-date-picker
+            <el-form-item label="${comment}" style="width: 308px">
+              <el-date-picker
                 v-model="dateRange${AttrName}"
                 value-format="YYYY-MM-DD HH:mm:ss"
                 type="daterange"
@@ -53,16 +49,17 @@
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 1, 1, 23, 59, 59)]"
-            />
-          </el-form-item>
+              />
+            </el-form-item>
 #end
 #end
 #end
-          <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-          </el-form-item>
-        </el-form>
+            <el-form-item>
+              <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+              <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+            </el-form-item>
+          </el-form>
+        </el-card>
       </div>
     </transition>
 
@@ -79,12 +76,12 @@
         </el-row>
       </template>
       <el-table
+        ref="${businessName}TableRef"
         v-loading="loading"
         :data="${businessName}List"
         row-key="${treeCode}"
         :default-expand-all="isExpandAll"
-        :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
-        ref="${businessName}TableRef"
+        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       >
 #foreach($column in $columns)
 #set($javaField=$column.javaField)
@@ -225,9 +222,9 @@
               v-for="dict in ${dictType}"
               :key="dict.value"
 #if($column.javaType == "Integer" || $column.javaType == "Long")
-              :label="parseInt(dict.value)"
+              :value="parseInt(dict.value)"
 #else
-              :label="dict.value"
+              :value="dict.value"
 #end
             >{{dict.label}}</el-radio>
           </el-radio-group>
@@ -235,7 +232,7 @@
 #elseif($column.htmlType == "radio" && $dictType)
         <el-form-item label="${comment}" prop="${field}">
           <el-radio-group v-model="form.${field}">
-            <el-radio label="1">请选择字典生成</el-radio>
+            <el-radio value="1">请选择字典生成</el-radio>
           </el-radio-group>
         </el-form-item>
 #elseif($column.htmlType == "datetime")
@@ -424,9 +421,9 @@ const handleAdd = (row?: ${BusinessName}VO) => {
   reset();
   getTreeselect();
   if (row != null && row.${treeCode}) {
-      form.value.${treeParentCode} = row.${treeCode};
+    form.value.${treeParentCode} = row.${treeCode};
   } else {
-      form.value.${treeParentCode} = 0;
+    form.value.${treeParentCode} = 0;
   }
   dialog.visible = true;
   dialog.title = "添加${functionName}";

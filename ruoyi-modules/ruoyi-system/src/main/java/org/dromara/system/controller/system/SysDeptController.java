@@ -2,6 +2,7 @@ package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.convert.Convert;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StringUtils;
@@ -11,7 +12,6 @@ import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysDeptBo;
 import org.dromara.system.domain.vo.SysDeptVo;
 import org.dromara.system.service.ISysDeptService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,6 +75,8 @@ public class SysDeptController extends BaseController {
     public R<Void> add(@Validated @RequestBody SysDeptBo dept) {
         if (!deptService.checkDeptNameUnique(dept)) {
             return R.fail("新增部门'" + dept.getDeptName() + "'失败，部门名称已存在");
+        } else if (StringUtils.isNotBlank(dept.getDeptCategory()) && !deptService.checkDeptCategoryUnique(dept)) {
+            return R.fail("新增部门'" + dept.getDeptName() + "'失败，部门类别编码已存在");
         }
         return toAjax(deptService.insertDept(dept));
     }
@@ -90,6 +92,8 @@ public class SysDeptController extends BaseController {
         deptService.checkDeptDataScope(deptId);
         if (!deptService.checkDeptNameUnique(dept)) {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
+        } else if (StringUtils.isNotBlank(dept.getDeptCategory()) && !deptService.checkDeptCategoryUnique(dept)) {
+            return R.fail("修改部门'" + dept.getDeptName() + "'失败，部门类别编码已存在");
         } else if (dept.getParentId().equals(deptId)) {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
         } else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus())) {
@@ -120,4 +124,16 @@ public class SysDeptController extends BaseController {
         deptService.checkDeptDataScope(deptId);
         return toAjax(deptService.deleteDeptById(deptId));
     }
+
+    /**
+     * 获取部门选择框列表
+     *
+     * @param deptIds 部门ID串
+     */
+    @SaCheckPermission("system:dept:query")
+    @GetMapping("/optionselect")
+    public R<List<SysDeptVo>> optionselect(@RequestParam(required = false) Long[] deptIds) {
+        return R.ok(deptService.selectDeptByIds(deptIds == null ? null : List.of(deptIds)));
+    }
+
 }

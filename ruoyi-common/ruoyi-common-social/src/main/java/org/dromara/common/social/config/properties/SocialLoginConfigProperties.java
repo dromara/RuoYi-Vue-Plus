@@ -2,6 +2,8 @@ package org.dromara.common.social.config.properties;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 社交登录配置
  *
@@ -64,5 +66,10 @@ public class SocialLoginConfigProperties {
      * maxkey 服务器地址
      */
     private String serverUrl;
+
+    /**
+     * 请求范围
+     */
+    private List<String> scopes;
 
 }

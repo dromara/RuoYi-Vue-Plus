@@ -73,7 +73,11 @@ public class MybatisDecryptInterceptor implements Interceptor {
             list.forEach(this::decryptHandler);
             return;
         }
+        // 不在缓存中的类,就是没有加密注解的类(当然也有可能是typeAliasesPackage写错)
         Set<Field> fields = encryptorManager.getFieldCache(sourceObject.getClass());
+        if(ObjectUtil.isNull(fields)){
+            return;
+        }
         try {
             for (Field field : fields) {
                 field.set(sourceObject, this.decryptField(Convert.toStr(field.get(sourceObject)), field));

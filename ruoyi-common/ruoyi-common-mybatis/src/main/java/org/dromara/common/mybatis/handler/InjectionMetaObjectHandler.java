@@ -29,16 +29,17 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
                     ? baseEntity.getCreateTime() : new Date();
                 baseEntity.setCreateTime(current);
                 baseEntity.setUpdateTime(current);
-                LoginUser loginUser = getLoginUser();
-                if (ObjectUtil.isNotNull(loginUser)) {
-                    Long userId = ObjectUtil.isNotNull(baseEntity.getCreateBy())
-                        ? baseEntity.getCreateBy() : loginUser.getUserId();
-                    // 当前已登录 且 创建人为空 则填充
-                    baseEntity.setCreateBy(userId);
-                    // 当前已登录 且 更新人为空 则填充
-                    baseEntity.setUpdateBy(userId);
-                    baseEntity.setCreateDept(ObjectUtil.isNotNull(baseEntity.getCreateDept())
-                        ? baseEntity.getCreateDept() : loginUser.getDeptId());
+                if (ObjectUtil.isNull(baseEntity.getCreateBy())) {
+                    LoginUser loginUser = getLoginUser();
+                    if (ObjectUtil.isNotNull(loginUser)) {
+                        Long userId = loginUser.getUserId();
+                        // 当前已登录 且 创建人为空 则填充
+                        baseEntity.setCreateBy(userId);
+                        // 当前已登录 且 更新人为空 则填充
+                        baseEntity.setUpdateBy(userId);
+                        baseEntity.setCreateDept(ObjectUtil.isNotNull(baseEntity.getCreateDept())
+                            ? baseEntity.getCreateDept() : loginUser.getDeptId());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -53,11 +54,12 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
                 Date current = new Date();
                 // 更新时间填充(不管为不为空)
                 baseEntity.setUpdateTime(current);
-                LoginUser loginUser = getLoginUser();
                 // 当前已登录 更新人填充(不管为不为空)
-                if (ObjectUtil.isNotNull(loginUser)) {
-                    baseEntity.setUpdateBy(loginUser.getUserId());
+                Long userId = LoginHelper.getUserId();
+                if (ObjectUtil.isNotNull(userId)) {
+                    baseEntity.setUpdateBy(userId);
                 }
+
             }
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);

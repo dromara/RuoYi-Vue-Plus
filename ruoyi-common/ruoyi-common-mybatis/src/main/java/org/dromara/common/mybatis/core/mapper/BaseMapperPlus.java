@@ -35,7 +35,6 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
     Log log = LogFactory.getLog(BaseMapperPlus.class);
 
     default Class<V> currentVoClass() {
-        GenericTypeUtils.resolveTypeArguments(this.getClass(), BaseMapperPlus.class);
         return (Class<V>) GenericTypeUtils.resolveTypeArguments(this.getClass(), BaseMapperPlus.class)[1];
     }
 
@@ -145,11 +144,22 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
         return selectVoOne(wrapper, this.currentVoClass());
     }
 
+    default V selectVoOne(Wrapper<T> wrapper, boolean throwEx) {
+        return selectVoOne(wrapper, this.currentVoClass(), throwEx);
+    }
+
     /**
      * 根据 entity 条件，查询一条记录
      */
     default <C> C selectVoOne(Wrapper<T> wrapper, Class<C> voClass) {
-        T obj = this.selectOne(wrapper);
+        return selectVoOne(wrapper, voClass, true);
+    }
+
+    /**
+     * 根据 entity 条件，查询一条记录
+     */
+    default <C> C selectVoOne(Wrapper<T> wrapper, Class<C> voClass, boolean throwEx) {
+        T obj = this.selectOne(wrapper, throwEx);
         if (ObjectUtil.isNull(obj)) {
             return null;
         }

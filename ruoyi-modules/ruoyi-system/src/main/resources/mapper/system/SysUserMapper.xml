@@ -4,78 +4,40 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.system.mapper.SysUserMapper">
 
-    <!-- 多结构嵌套自动映射需带上每个实体的主键id 否则映射会失败 -->
     <resultMap type="org.dromara.system.domain.vo.SysUserVo" id="SysUserResult">
         <id property="userId" column="user_id"/>
-        <result property="deptId" column="dept_id"/>
-        <association property="dept" column="dept_id" resultMap="deptResult"/>
-        <collection property="roles" javaType="java.util.List" resultMap="RoleResult"/>
     </resultMap>
-
-    <resultMap id="deptResult" type="org.dromara.system.domain.vo.SysDeptVo">
-        <id property="deptId" column="dept_id"/>
-        <result property="email" column="dept_email"/>
-        <result property="status" column="dept_status"/>
-        <result property="createTime" column="dept_create_time"/>
+    <resultMap type="org.dromara.system.domain.vo.SysUserExportVo" id="SysUserExportResult">
+        <id property="userId" column="user_id"/>
     </resultMap>
-
-    <resultMap id="RoleResult" type="org.dromara.system.domain.vo.SysRoleVo">
-        <id property="roleId" column="role_id"/>
-        <result property="status" column="role_status"/>
-        <result property="createTime" column="role_create_time"/>
-    </resultMap>
-
-    <sql id="selectUserVo">
-        select u.user_id,
-               u.tenant_id,
-               u.dept_id,
-               u.user_name,
-               u.nick_name,
-               u.user_type,
-               u.email,
-               u.avatar,
-               u.phonenumber,
-               u.password,
-               u.sex,
-               u.status,
-               u.del_flag,
-               u.login_ip,
-               u.login_date,
-               u.create_by,
-               u.create_time,
-               u.remark,
-               d.dept_id,
-               d.parent_id,
-               d.ancestors,
-               d.dept_name,
-               d.order_num,
-               d.leader,
-               d.status as dept_status,
-               d.email as dept_email,
-               d.create_time as dept_cteate_time,
-               r.role_id,
-               r.role_name,
-               r.role_key,
-               r.role_sort,
-               r.data_scope,
-               r.status as role_status
-        from sys_user u
-            left join sys_dept d on u.dept_id = d.dept_id
-            left join sys_user_role sur on u.user_id = sur.user_id
-            left join sys_role r on r.role_id = sur.role_id
-    </sql>
 
     <select id="selectPageUserList" resultMap="SysUserResult">
-        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
-            u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
-            d.dept_name, d.leader, u1.user_name as leaderName
+        select
+        <if test="ew.getSqlSelect != null">
+            ${ew.getSqlSelect}
+        </if>
+        <if test="ew.getSqlSelect == null">
+            u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
+            u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark
+        </if>
         from sys_user u
-            left join sys_dept d on u.dept_id = d.dept_id
-            left join sys_user u1 on u1.user_id = d.leader
         ${ew.getCustomSqlSegment}
     </select>
 
     <select id="selectUserList" resultMap="SysUserResult">
+        select
+        <if test="ew.getSqlSelect != null">
+            ${ew.getSqlSelect}
+        </if>
+        <if test="ew.getSqlSelect == null">
+            u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
+            u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark
+        </if>
+        from sys_user u
+        ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="selectUserExportList" resultMap="SysUserExportResult">
         select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
             u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
             d.dept_name, d.leader, u1.user_name as leaderName
@@ -103,24 +65,8 @@
         ${ew.getCustomSqlSegment}
     </select>
 
-    <select id="selectUserByUserName" parameterType="String" resultMap="SysUserResult">
-        <include refid="selectUserVo"/>
-        where u.del_flag = '0' and u.user_name = #{userName}
-    </select>
-
-    <select id="selectUserByPhonenumber" parameterType="String" resultMap="SysUserResult">
-        <include refid="selectUserVo"/>
-        where u.del_flag = '0' and u.phonenumber = #{phonenumber}
-    </select>
-
-    <select id="selectUserByEmail" parameterType="String" resultMap="SysUserResult">
-        <include refid="selectUserVo"/>
-        where u.del_flag = '0' and u.email = #{email}
-    </select>
-
-    <select id="selectUserById" parameterType="Long" resultMap="SysUserResult">
-        <include refid="selectUserVo"/>
-        where u.del_flag = '0' and u.user_id = #{userId}
+    <select id="countUserById" resultType="Long">
+        select count(*) from sys_user where del_flag = '0' and user_id = #{userId}
     </select>
 
 

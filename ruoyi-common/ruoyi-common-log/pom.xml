@@ -27,11 +27,6 @@
             <artifactId>ruoyi-common-json</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>transmittable-thread-local</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

@@ -1,18 +1,16 @@
 package org.dromara.common.mybatis.interceptor;
 
-import cn.hutool.core.collection.ConcurrentHashSet;
-import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
-import com.baomidou.mybatisplus.extension.parser.JsqlParserSupport;
+import com.baomidou.mybatisplus.extension.plugins.handler.MultiDataPermissionHandler;
+import com.baomidou.mybatisplus.extension.plugins.inner.BaseMultiTableInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
-import org.dromara.common.mybatis.annotation.DataColumn;
-import org.dromara.common.mybatis.handler.PlusDataPermissionHandler;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.SetOperationList;
 import net.sf.jsqlparser.statement.update.Update;
 import org.apache.ibatis.executor.Executor;
@@ -22,11 +20,11 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
+import org.dromara.common.mybatis.handler.PlusDataPermissionHandler;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 数据权限拦截器
@@ -34,13 +32,14 @@ import java.util.Set;
  * @author Lion Li
  * @version 3.5.0
  */
-public class PlusDataPermissionInterceptor extends JsqlParserSupport implements InnerInterceptor {
+@Slf4j
+public class PlusDataPermissionInterceptor extends BaseMultiTableInnerInterceptor implements InnerInterceptor {
 
-    private final PlusDataPermissionHandler dataPermissionHandler = new PlusDataPermissionHandler();
-    /**
-     * 无效注解方法缓存用于快速返回
-     */
-    private final Set<String> invalidCacheSet = new ConcurrentHashSet<>();
+    private final PlusDataPermissionHandler dataPermissionHandler;
+
+    public PlusDataPermissionInterceptor(String mapperPackage) {
+        this.dataPermissionHandler = new PlusDataPermissionHandler(mapperPackage);
+    }
 
     @Override
     public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
@@ -49,12 +48,7 @@ public class PlusDataPermissionInterceptor extends JsqlParserSupport implements 
             return;
         }
         // 检查是否无效 无数据权限注解
-        if (invalidCacheSet.contains(ms.getId())) {
-            return;
-        }
-        DataColumn[] dataColumns = dataPermissionHandler.findAnnotation(ms.getId());
-        if (ArrayUtil.isEmpty(dataColumns)) {
-            invalidCacheSet.add(ms.getId());
+        if (dataPermissionHandler.invalid(ms.getId())) {
             return;
         }
         // 解析 sql 分配对应方法
@@ -72,12 +66,7 @@ public class PlusDataPermissionInterceptor extends JsqlParserSupport implements 
                 return;
             }
             // 检查是否无效 无数据权限注解
-            if (invalidCacheSet.contains(ms.getId())) {
-                return;
-            }
-            DataColumn[] dataColumns = dataPermissionHandler.findAnnotation(ms.getId());
-            if (ArrayUtil.isEmpty(dataColumns)) {
-                invalidCacheSet.add(ms.getId());
+            if (dataPermissionHandler.invalid(ms.getId())) {
                 return;
             }
             PluginUtils.MPBoundSql mpBs = mpSh.mPBoundSql();
@@ -87,11 +76,10 @@ public class PlusDataPermissionInterceptor extends JsqlParserSupport implements 
 
     @Override
     protected void processSelect(Select select, int index, String sql, Object obj) {
-        SelectBody selectBody = select.getSelectBody();
-        if (selectBody instanceof PlainSelect plainSelect) {
-            this.setWhere(plainSelect, (String) obj);
-        } else if (selectBody instanceof SetOperationList setOperationList) {
-            List<SelectBody> selectBodyList = setOperationList.getSelects();
+        if (select instanceof PlainSelect) {
+            this.setWhere((PlainSelect) select, (String) obj);
+        } else if (select instanceof SetOperationList setOperationList) {
+            List<Select> selectBodyList = setOperationList.getSelects();
             selectBodyList.forEach(s -> this.setWhere((PlainSelect) s, (String) obj));
         }
     }
@@ -125,5 +113,11 @@ public class PlusDataPermissionInterceptor extends JsqlParserSupport implements 
         }
     }
 
+    @Override
+    public Expression buildTableExpression(Table table, Expression where, String whereSegment) {
+        // 只有新版数据权限处理器才会执行到这里
+        final MultiDataPermissionHandler handler = (MultiDataPermissionHandler) dataPermissionHandler;
+        return handler.getSqlSegment(table, where, whereSegment);
+    }
 }
 

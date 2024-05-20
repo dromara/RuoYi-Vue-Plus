@@ -3,6 +3,7 @@ package org.dromara.common.core.domain.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -14,6 +15,9 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 public class RoleDTO implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 角色ID

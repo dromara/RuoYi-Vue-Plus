@@ -5,7 +5,7 @@ ruoyi:
   # 版本
   version: ${revision}
   # 版权年份
-  copyrightYear: 2023
+  copyrightYear: 2024
 
 captcha:
   enable: true
@@ -46,7 +46,7 @@ logging:
   level:
     org.dromara: @logging.level@
     org.springframework: warn
-    tech.powerjob.worker.background: warn
+    org.mybatis.spring.mapper: error
   config: classpath:logback-plus.xml
 
 # 用户配置
@@ -61,6 +61,10 @@ user:
 spring:
   application:
     name: ${ruoyi.name}
+  threads:
+    # 开启虚拟线程 仅jdk21可用
+    virtual:
+      enabled: false
   # 资源信息
   messages:
     # 国际化资源文件路径
@@ -75,6 +79,8 @@ spring:
       # 设置总上传的文件大小
       max-request-size: 20MB
   mvc:
+    # 设置静态资源路径 防止所有请求都去查静态资源
+    static-path-pattern: /static/**
     format:
       date-time: yyyy-MM-dd HH:mm:ss
   jackson:
@@ -138,8 +144,7 @@ tenant:
 # MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:
-  # 不支持多包, 如有需要可在注解配置 或 提升扫包等级
-  # 例如 com.**.**.mapper
+  # 多包名使用 例如 org.dromara.**.mapper,org.xxx.**.mapper
   mapperPackage: org.dromara.**.mapper
   # 对应的 XML 文件位置
   mapperLocations: classpath*:mapper/**/*Mapper.xml
@@ -226,6 +231,7 @@ xss:
   urlPatterns: /system/*,/monitor/*,/tool/*
 
 # 全局线程池相关配置
+# 如使用JDK21请直接使用虚拟线程 不要开启此配置
 thread-pool:
   # 是否开启线程池
   enabled: false
@@ -261,3 +267,21 @@ websocket:
   path: /resource/websocket
   # 设置访问源地址
   allowedOrigins: '*'
+
+--- #flowable配置
+flowable:
+  async-executor-activate: false #关闭定时任务JOB
+  #  将databaseSchemaUpdate设置为true。当Flowable发现库与数据库表结构不一致时，会自动将数据库表结构升级至新版本。
+  database-schema-update: true
+  activity-font-name: 宋体
+  label-font-name: 宋体
+  annotation-font-name: 宋体
+  # 关闭各个模块生成表，目前只使用工作流基础表
+  idm:
+    enabled: false
+  cmmn:
+    enabled: false
+  dmn:
+    enabled: false
+  app:
+    enabled: false
