@@ -221,6 +221,7 @@ create table wf_definition_config
         unique,
     process_key   nvarchar(255)  not null,
     version       bigint         not null,
+    remark        nvarchar(500) DEFAULT ('') null,
     tenant_id     nvarchar(20),
     create_dept   bigint,
     create_by     bigint,
@@ -250,6 +251,10 @@ go
 
 exec sp_addextendedproperty 'MS_Description', N'流程版本', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
      'version'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'备注', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
+     'remark'
 go
 
 exec sp_addextendedproperty 'MS_Description', N'租户编号', 'SCHEMA', 'dbo', 'TABLE', 'wf_definition_config', 'COLUMN',
