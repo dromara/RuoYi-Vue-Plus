@@ -162,13 +162,14 @@ public class OssClient {
     /**
      * 上传文件到 Amazon S3，并返回上传结果
      *
-     * @param filePath  本地文件路径
-     * @param key       在 Amazon S3 中的对象键
-     * @param md5Digest 本地文件的 MD5 哈希值（可选）
+     * @param filePath    本地文件路径
+     * @param key         在 Amazon S3 中的对象键
+     * @param md5Digest   本地文件的 MD5 哈希值（可选）
+     * @param contentType 文件内容类型
      * @return UploadResult 包含上传后的文件信息
      * @throws OssException 如果上传失败，抛出自定义异常
      */
-    public UploadResult upload(Path filePath, String key, String md5Digest) {
+    public UploadResult upload(Path filePath, String key, String md5Digest, String contentType) {
         try {
             // 构建上传请求对象
             FileUpload fileUpload = transferManager.uploadFile(
@@ -176,6 +177,7 @@ public class OssClient {
                         y -> y.bucket(properties.getBucketName())
                             .key(key)
                             .contentMD5(StringUtils.isNotEmpty(md5Digest) ? md5Digest : null)
+                            .contentType(contentType)
                             .build())
                     .addTransferListener(LoggingTransferListener.create())
                     .source(filePath).build());
@@ -362,7 +364,7 @@ public class OssClient {
      * @throws OssException 如果上传失败，抛出自定义异常
      */
     public UploadResult uploadSuffix(File file, String suffix) {
-        return upload(file.toPath(), getPath(properties.getPrefix(), suffix), null);
+        return upload(file.toPath(), getPath(properties.getPrefix(), suffix), null, FileUtils.getMimeType(suffix));
     }
 
     /**
