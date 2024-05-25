@@ -21,7 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "snail-job", name = "enabled", havingValue = "true")
 @EnableScheduling
-@EnableSnailJob(group = "${snail-job.group}")
+@EnableSnailJob(group = "${snail-job.group-name}")
 public class SnailJobConfig {
 
     @EventListener(SnailClientStartingEvent.class)
