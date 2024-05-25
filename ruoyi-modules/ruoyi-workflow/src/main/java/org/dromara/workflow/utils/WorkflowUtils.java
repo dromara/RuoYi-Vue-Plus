@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.SpringUtils;
@@ -14,6 +15,7 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mail.utils.MailUtils;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
 import org.dromara.common.websocket.utils.WebSocketUtils;
@@ -38,6 +40,7 @@ import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -339,5 +342,24 @@ public class WorkflowUtils {
                 }
             }
         }
+    }
+
+    /**
+     * 根据任务id查询 当前用户的任务，检查 当前人员 是否是该 taskId 的办理人
+     * @param taskId 任务id
+     * @return
+     */
+    public static Task getTaskByCurrUser(String taskId){
+        TaskQuery taskQuery = QueryUtils.taskQuery();
+        taskQuery.taskId(taskId).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId()));
+
+        List<RoleDTO> roles = LoginHelper.getLoginUser().getRoles();
+        if (CollUtil.isNotEmpty(roles)) {
+            List<String> groupIds = StreamUtils.toList(roles, e -> String.valueOf(e.getRoleId()));
+            taskQuery.taskCandidateGroupIn(groupIds);
+        }
+        Task task = taskQuery.singleResult();
+
+        return task;
     }
 }
