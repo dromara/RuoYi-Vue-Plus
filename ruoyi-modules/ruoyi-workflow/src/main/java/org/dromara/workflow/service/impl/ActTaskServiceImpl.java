@@ -159,15 +159,8 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Transactional(rollbackFor = Exception.class)
     public boolean completeTask(CompleteTaskBo completeTaskBo) {
         try {
-            List<RoleDTO> roles = LoginHelper.getLoginUser().getRoles();
             String userId = String.valueOf(LoginHelper.getUserId());
-            TaskQuery taskQuery = QueryUtils.taskQuery();
-            taskQuery.taskId(completeTaskBo.getTaskId()).taskCandidateOrAssigned(userId);
-            if (CollUtil.isNotEmpty(roles)) {
-                List<String> groupIds = StreamUtils.toList(roles, e -> String.valueOf(e.getRoleId()));
-                taskQuery.taskCandidateGroupIn(groupIds);
-            }
-            Task task = taskQuery.singleResult();
+            Task task = WorkflowUtils.getTaskByCurrUser(completeTaskBo.getTaskId());
             if (task == null) {
                 throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
             }
@@ -470,8 +463,8 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean delegateTask(DelegateBo delegateBo) {
-        TaskQuery query = QueryUtils.taskQuery();
-        TaskEntity task = (TaskEntity) query.taskId(delegateBo.getTaskId()).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
+        Task task = WorkflowUtils.getTaskByCurrUser(delegateBo.getTaskId());
+
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }
@@ -544,7 +537,7 @@ public class ActTaskServiceImpl implements IActTaskService {
      */
     @Override
     public boolean transferTask(TransmitBo transmitBo) {
-        Task task = QueryUtils.taskQuery().taskId(transmitBo.getTaskId()).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
+        Task task = WorkflowUtils.getTaskByCurrUser(transmitBo.getTaskId());
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }
@@ -669,9 +662,9 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String backProcess(BackProcessBo backProcessBo) {
-        TaskQuery query = QueryUtils.taskQuery();
         String userId = String.valueOf(LoginHelper.getUserId());
-        Task task = query.taskId(backProcessBo.getTaskId()).taskCandidateOrAssigned(userId).singleResult();
+        Task task = WorkflowUtils.getTaskByCurrUser(backProcessBo.getTaskId());
+
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }
