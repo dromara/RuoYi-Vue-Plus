@@ -62,7 +62,7 @@ public class SysProfileController extends BaseController {
     @RepeatSubmit
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> updateProfile(@RequestBody SysUserProfileBo profile) {
+    public R<Void> updateProfile(@Validated @RequestBody SysUserProfileBo profile) {
         SysUserBo user = BeanUtil.toBean(profile, SysUserBo.class);
         user.setUserId(LoginHelper.getUserId());
         String username = LoginHelper.getUsername();
