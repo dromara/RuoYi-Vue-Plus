@@ -23,7 +23,7 @@ public class RedisExceptionHandler {
     @ExceptionHandler(LockFailureException.class)
     public R<Void> handleLockFailureException(LockFailureException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("获取锁失败了'{}',发生Lock4j异常." + requestURI, e.getMessage());
+        log.error("获取锁失败了'{}',发生Lock4j异常.", requestURI, e);
         return R.fail(HttpStatus.HTTP_UNAVAILABLE, "业务处理中，请稍后再试...");
     }
 
