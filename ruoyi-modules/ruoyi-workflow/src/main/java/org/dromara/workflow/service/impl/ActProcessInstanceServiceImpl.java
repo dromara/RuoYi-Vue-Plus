@@ -572,7 +572,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
                 taskService.setAssignee(task.getId(), null);
                 taskService.addComment(task.getId(), processInstanceId, TaskStatusEnum.CANCEL.getStatus(), LoginHelper.getLoginUser().getNickname() + "：撤销申请");
             }
-            HistoricTaskInstance historicTaskInstance = QueryUtils.hisTaskInstanceQuery().finished().orderByHistoricTaskInstanceEndTime().asc().list().get(0);
+            HistoricTaskInstance historicTaskInstance = QueryUtils.hisTaskInstanceQuery(processInstanceId).finished().orderByHistoricTaskInstanceEndTime().asc().list().get(0);
             List<String> nodeIds = StreamUtils.toList(taskList, Task::getTaskDefinitionKey);
             runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstanceId)
