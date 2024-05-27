@@ -225,7 +225,7 @@ public class ActTaskController extends BaseController {
     @RepeatSubmit()
     @PostMapping("/backProcess")
     public R<String> backProcess(@Validated({AddGroup.class}) @RequestBody BackProcessBo backProcessBo) {
-        return R.ok(actTaskService.backProcess(backProcessBo));
+        return R.ok("操作成功", actTaskService.backProcess(backProcessBo));
     }
 
     /**
@@ -279,7 +279,7 @@ public class ActTaskController extends BaseController {
      */
     @GetMapping("/getTaskUserIdsByAddMultiInstance/{taskId}")
     public R<String> getTaskUserIdsByAddMultiInstance(@PathVariable String taskId) {
-        return R.ok(actTaskService.getTaskUserIdsByAddMultiInstance(taskId));
+        return R.ok("操作成功", actTaskService.getTaskUserIdsByAddMultiInstance(taskId));
     }
 
     /**
