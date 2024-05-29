@@ -2,7 +2,6 @@ package org.dromara.common.satoken.core.dao;
 
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.util.SaFoxUtil;
-import cn.hutool.core.lang.Console;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.dromara.common.redis.utils.RedisUtils;
@@ -54,7 +53,7 @@ public class PlusSaTokenDao implements SaTokenDao {
         } else {
             RedisUtils.setCacheObject(key, value, Duration.ofSeconds(timeout));
         }
-        CAFFEINE.put(key, value);
+        CAFFEINE.invalidate(key);
     }
 
     /**
@@ -64,7 +63,7 @@ public class PlusSaTokenDao implements SaTokenDao {
     public void update(String key, String value) {
         if (RedisUtils.hasKey(key)) {
             RedisUtils.setCacheObject(key, value, true);
-            CAFFEINE.put(key, value);
+            CAFFEINE.invalidate(key);
         }
     }
 
@@ -117,7 +116,7 @@ public class PlusSaTokenDao implements SaTokenDao {
         } else {
             RedisUtils.setCacheObject(key, object, Duration.ofSeconds(timeout));
         }
-        CAFFEINE.put(key, object);
+        CAFFEINE.invalidate(key);
     }
 
     /**
@@ -127,7 +126,7 @@ public class PlusSaTokenDao implements SaTokenDao {
     public void updateObject(String key, Object object) {
         if (RedisUtils.hasKey(key)) {
             RedisUtils.setCacheObject(key, object, true);
-            CAFFEINE.put(key, object);
+            CAFFEINE.invalidate(key);
         }
     }
 
