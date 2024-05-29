@@ -35,7 +35,7 @@ public class TenantConfig {
 
     @ConditionalOnBean(MybatisPlusConfig.class)
     @AutoConfiguration(after = {MybatisPlusConfig.class})
-    static class MybatisPlusConfigation {
+    static class MybatisPlusConfiguration {
 
         /**
          * 多租户插件
