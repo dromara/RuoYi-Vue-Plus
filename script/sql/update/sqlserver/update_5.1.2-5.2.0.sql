@@ -25,5 +25,5 @@ UPDATE sys_post SET dept_id = 100
 GO
 UPDATE sys_post SET dept_id = 103 where post_id = 1
 GO
-UPDATE sys_menu SET path = N'snailjob', component = N'monitor/snailjob/index', perms = N'monitor:snailjob:list', remark = N'SnailJob控制台菜单' WHERE menu_id = 120
+UPDATE sys_menu SET menu_name = N'SnailJob控制台', path = N'snailjob', component = N'monitor/snailjob/index', perms = N'monitor:snailjob:list', remark = N'SnailJob控制台菜单' WHERE menu_id = 120
 GO
