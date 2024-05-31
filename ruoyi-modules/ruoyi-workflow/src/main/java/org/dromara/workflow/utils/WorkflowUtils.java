@@ -228,10 +228,10 @@ public class WorkflowUtils {
     /**
      * 获取当前流程状态
      *
-     * @param processInstanceId 流程实例id
+     * @param businessKey 业务id
      */
-    public static String getBusinessStatus(String processInstanceId) {
-        HistoricProcessInstance historicProcessInstance = QueryUtils.hisInstanceQuery(processInstanceId).singleResult();
+    public static String getBusinessStatus(String businessKey) {
+        HistoricProcessInstance historicProcessInstance = QueryUtils.hisBusinessKeyQuery(businessKey).singleResult();
         return historicProcessInstance.getBusinessStatus();
     }
 

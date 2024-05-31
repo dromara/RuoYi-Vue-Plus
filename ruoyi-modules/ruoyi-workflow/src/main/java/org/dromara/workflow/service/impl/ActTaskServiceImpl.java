@@ -180,7 +180,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             AttachmentCmd attachmentCmd = new AttachmentCmd(completeTaskBo.getFileId(), task.getId(), task.getProcessInstanceId());
             managementService.executeCommand(attachmentCmd);
             FlowProcessEventHandler processHandler = flowEventStrategy.getProcessHandler(processInstance.getProcessDefinitionKey());
-            String businessStatus = WorkflowUtils.getBusinessStatus(task.getProcessInstanceId());
+            String businessStatus = WorkflowUtils.getBusinessStatus(processInstance.getBusinessKey());
             if (BusinessStatusEnum.DRAFT.getStatus().equals(businessStatus) || BusinessStatusEnum.BACK.getStatus().equals(businessStatus) || BusinessStatusEnum.CANCEL.getStatus().equals(businessStatus)) {
                 if (processHandler != null) {
                     processHandler.handleProcess(processInstance.getBusinessKey(), businessStatus, true);

@@ -159,7 +159,7 @@ public class QueryUtils {
         }
         TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
         taskVo.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
-        String businessStatus = WorkflowUtils.getBusinessStatus(taskVo.getProcessInstanceId());
+        String businessStatus = WorkflowUtils.getBusinessStatus(taskVo.getBusinessKey());
         taskVo.setBusinessStatus(businessStatus);
         return taskVo;
     }
