@@ -20,18 +20,18 @@ public interface IActProcessInstanceService {
     /**
      * 通过流程实例id获取历史流程图
      *
-     * @param processInstanceId 流程实例id
+     * @param businessKey 流程实例id
      * @return 结果
      */
-    String getHistoryImage(String processInstanceId);
+    String getHistoryImage(String businessKey);
 
     /**
-     * 通过流程实例id获取历史流程图运行中，历史等节点
+     * 通过业务id获取历史流程图运行中，历史等节点
      *
-     * @param processInstanceId 流程实例id
+     * @param businessKey 业务id
      * @return 结果
      */
-    Map<String, Object> getHistoryList(String processInstanceId);
+    Map<String, Object> getHistoryList(String businessKey);
 
     /**
      * 分页查询正在运行的流程实例
@@ -54,10 +54,10 @@ public interface IActProcessInstanceService {
     /**
      * 获取审批记录
      *
-     * @param processInstanceId 流程实例id
+     * @param businessKey 业务id
      * @return 结果
      */
-    List<ActHistoryInfoVo> getHistoryRecord(String processInstanceId);
+    List<ActHistoryInfoVo> getHistoryRecord(String businessKey);
 
     /**
      * 作废流程实例，不会删除历史记录(删除运行中的实例)
@@ -70,34 +70,26 @@ public interface IActProcessInstanceService {
     /**
      * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
      *
-     * @param processInstanceIds 流程实例id
-     * @return 结果
-     */
-    boolean deleteRunAndHisInstance(List<String> processInstanceIds);
-
-    /**
-     * 按照业务id删除 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
-     *
      * @param businessKeys 业务id
      * @return 结果
      */
-    boolean deleteRunAndHisInstanceByBusinessKeys(List<String> businessKeys);
+    boolean deleteRunAndHisInstance(List<String> businessKeys);
 
     /**
      * 已完成的实例 删除程实例，删除历史记录，删除业务与流程关联信息
      *
-     * @param processInstanceIds 流程实例id
+     * @param businessKeys 业务id
      * @return 结果
      */
-    boolean deleteFinishAndHisInstance(List<String> processInstanceIds);
+    boolean deleteFinishAndHisInstance(List<String> businessKeys);
 
     /**
      * 撤销流程申请
      *
-     * @param processInstanceId 流程实例id
+     * @param businessKey 业务id
      * @return 结果
      */
-    boolean cancelProcessApply(String processInstanceId);
+    boolean cancelProcessApply(String businessKey);
 
     /**
      * 分页查询当前登录人单据

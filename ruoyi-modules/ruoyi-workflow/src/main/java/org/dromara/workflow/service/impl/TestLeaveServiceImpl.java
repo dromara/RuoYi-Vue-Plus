@@ -115,7 +115,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
         List<String> idList = StreamUtils.toList(ids, String::valueOf);
-        actProcessInstanceService.deleteRunAndHisInstanceByBusinessKeys(idList);
+        actProcessInstanceService.deleteRunAndHisInstance(idList);
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 }
