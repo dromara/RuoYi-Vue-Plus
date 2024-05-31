@@ -2,7 +2,7 @@ package org.dromara.workflow.flowable.strategy;
 
 
 /**
- * 流程监听
+ * 总体流程监听(例如: 撤销 提交 退回 等)
  *
  * @author may
  * @date 2023-12-27

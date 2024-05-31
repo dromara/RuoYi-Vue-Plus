@@ -2,7 +2,7 @@ package org.dromara.workflow.flowable.strategy;
 
 
 /**
- * 流程任务监听
+ * 流程任务监听(例如: 节点的审批等)
  *
  * @author may
  * @date 2023-12-27
