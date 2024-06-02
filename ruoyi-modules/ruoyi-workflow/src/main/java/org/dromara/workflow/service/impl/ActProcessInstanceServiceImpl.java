@@ -26,8 +26,7 @@ import org.dromara.workflow.domain.vo.*;
 import org.dromara.workflow.flowable.CustomDefaultProcessDiagramGenerator;
 import org.dromara.workflow.flowable.cmd.DeleteExecutionCmd;
 import org.dromara.workflow.flowable.cmd.ExecutionChildByExecutionIdCmd;
-import org.dromara.workflow.flowable.strategy.FlowEventStrategy;
-import org.dromara.workflow.flowable.strategy.FlowProcessEventHandler;
+import org.dromara.workflow.flowable.handler.FlowProcessEventHandler;
 import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IActProcessInstanceService;
 import org.dromara.workflow.service.IWfNodeConfigService;
@@ -75,9 +74,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     private final TaskService taskService;
     private final IActHiProcinstService actHiProcinstService;
     private final ManagementService managementService;
-    private final FlowEventStrategy flowEventStrategy;
     private final IWfTaskBackNodeService wfTaskBackNodeService;
     private final IWfNodeConfigService wfNodeConfigService;
+    private final FlowProcessEventHandler flowProcessEventHandler;
 
     @Value("${flowable.activity-font-name}")
     private String activityFontName;
@@ -460,10 +459,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             BusinessStatusEnum.checkInvalidStatus(historicProcessInstance.getBusinessStatus());
             runtimeService.updateBusinessStatus(processInstanceId, BusinessStatusEnum.INVALID.getStatus());
             runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
-            FlowProcessEventHandler processHandler = flowEventStrategy.getProcessHandler(historicProcessInstance.getProcessDefinitionKey());
-            if (processHandler != null) {
-                processHandler.handleProcess(historicProcessInstance.getBusinessKey(), BusinessStatusEnum.INVALID.getStatus(), false);
-            }
+            //流程作废监听
+            flowProcessEventHandler.processHandler(historicProcessInstance.getProcessDefinitionKey(),
+                historicProcessInstance.getBusinessKey(), BusinessStatusEnum.INVALID.getStatus(), false);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -570,10 +568,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
                 managementService.executeCommand(deleteExecutionCmd);
             }
             runtimeService.updateBusinessStatus(processInstanceId, BusinessStatusEnum.CANCEL.getStatus());
-            FlowProcessEventHandler processHandler = flowEventStrategy.getProcessHandler(processInstance.getProcessDefinitionKey());
-            if (processHandler != null) {
-                processHandler.handleProcess(processInstance.getBusinessKey(), BusinessStatusEnum.CANCEL.getStatus(), false);
-            }
+            //流程作废监听
+            flowProcessEventHandler.processHandler(processInstance.getProcessDefinitionKey(),
+                processInstance.getBusinessKey(), BusinessStatusEnum.CANCEL.getStatus(), false);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

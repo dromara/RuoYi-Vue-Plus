@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.event.ProcessEvent;
+import org.dromara.common.core.domain.event.ProcessTaskEvent;
 import org.dromara.common.core.service.WorkflowService;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
@@ -17,6 +20,7 @@ import org.dromara.workflow.domain.bo.TestLeaveBo;
 import org.dromara.workflow.domain.vo.TestLeaveVo;
 import org.dromara.workflow.mapper.TestLeaveMapper;
 import org.dromara.workflow.service.ITestLeaveService;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +35,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class TestLeaveServiceImpl implements ITestLeaveService {
 
     private final TestLeaveMapper baseMapper;
@@ -117,4 +122,26 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         workflowService.deleteRunAndHisInstance(idList);
         return baseMapper.deleteBatchIds(ids) > 0;
     }
+
+    /**
+     * 总体流程监听(例如: 提交 退回 撤销 终止 作废等)
+     *
+     * @param processEvent 参数
+     */
+    @EventListener(condition = "#processEvent.key=='leave1'")
+    public void processHandler(ProcessEvent processEvent) {
+        log.info("当前任务执行了{}", processEvent.toString());
+    }
+
+    /**
+     * 执行办理任务监听
+     *
+     * @param processTaskEvent 参数
+     */
+    @EventListener(condition = "#processTaskEvent.keyNode=='leave1_Activity_14633hx'")
+    public void processTaskHandler(ProcessTaskEvent processTaskEvent) {
+        log.info("当前任务执行了{}", processTaskEvent.toString());
+    }
+
+
 }
