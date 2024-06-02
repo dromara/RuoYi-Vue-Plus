@@ -65,7 +65,7 @@ public class TestLeaveVo implements Serializable {
     /**
      * 状态
      */
-    @ExcelProperty(value = "请假原因")
+    @ExcelProperty(value = "状态")
     private String status;
 
     /**
