@@ -3,7 +3,6 @@ package org.dromara.workflow.listener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.workflow.utils.QueryUtils;
-import org.flowable.engine.TaskService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.task.api.Task;
