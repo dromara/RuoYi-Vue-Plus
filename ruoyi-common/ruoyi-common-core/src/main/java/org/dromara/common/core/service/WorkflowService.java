@@ -1,6 +1,7 @@
 package org.dromara.common.core.service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 通用 工作流服务
@@ -47,4 +48,38 @@ public interface WorkflowService {
      * @param fieldName 主键属性名称
      */
     void setBusinessInstanceListDTO(Object obj, List<String> idList, String fieldName);
+
+    /**
+     * 设置流程变量(全局变量)
+     *
+     * @param taskId       任务id
+     * @param variableName 变量名称
+     * @param value        变量值
+     */
+    void setVariable(String taskId, String variableName, Object value);
+
+    /**
+     * 设置流程变量(全局变量)
+     *
+     * @param taskId    任务id
+     * @param variables 流程变量
+     */
+    void setVariables(String taskId, Map<String, Object> variables);
+
+    /**
+     * 设置流程变量(本地变量,非全局变量)
+     *
+     * @param taskId       任务id
+     * @param variableName 变量名称
+     * @param value        变量值
+     */
+    void setVariableLocal(String taskId, String variableName, Object value);
+
+    /**
+     * 设置流程变量(本地变量,非全局变量)
+     *
+     * @param taskId    任务id
+     * @param variables 流程变量
+     */
+    void setVariablesLocal(String taskId, Map<String, Object> variables);
 }
