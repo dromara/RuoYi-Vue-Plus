@@ -160,7 +160,7 @@ public class ActTaskServiceImpl implements IActTaskService {
     public boolean completeTask(CompleteTaskBo completeTaskBo) {
         try {
             String userId = String.valueOf(LoginHelper.getUserId());
-            Task task = WorkflowUtils.getTaskByCurrUser(completeTaskBo.getTaskId());
+            Task task = WorkflowUtils.getTaskByCurrentUser(completeTaskBo.getTaskId());
             if (task == null) {
                 throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
             }
@@ -463,7 +463,7 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean delegateTask(DelegateBo delegateBo) {
-        Task task = WorkflowUtils.getTaskByCurrUser(delegateBo.getTaskId());
+        Task task = WorkflowUtils.getTaskByCurrentUser(delegateBo.getTaskId());
 
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
@@ -537,7 +537,7 @@ public class ActTaskServiceImpl implements IActTaskService {
      */
     @Override
     public boolean transferTask(TransmitBo transmitBo) {
-        Task task = WorkflowUtils.getTaskByCurrUser(transmitBo.getTaskId());
+        Task task = WorkflowUtils.getTaskByCurrentUser(transmitBo.getTaskId());
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }
@@ -663,7 +663,7 @@ public class ActTaskServiceImpl implements IActTaskService {
     @Transactional(rollbackFor = Exception.class)
     public String backProcess(BackProcessBo backProcessBo) {
         String userId = String.valueOf(LoginHelper.getUserId());
-        Task task = WorkflowUtils.getTaskByCurrUser(backProcessBo.getTaskId());
+        Task task = WorkflowUtils.getTaskByCurrentUser(backProcessBo.getTaskId());
 
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);

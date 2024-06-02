@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.service.WorkflowService;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -15,9 +16,7 @@ import org.dromara.workflow.domain.TestLeave;
 import org.dromara.workflow.domain.bo.TestLeaveBo;
 import org.dromara.workflow.domain.vo.TestLeaveVo;
 import org.dromara.workflow.mapper.TestLeaveMapper;
-import org.dromara.workflow.service.IActProcessInstanceService;
 import org.dromara.workflow.service.ITestLeaveService;
-import org.dromara.workflow.utils.WorkflowUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +34,7 @@ import java.util.List;
 public class TestLeaveServiceImpl implements ITestLeaveService {
 
     private final TestLeaveMapper baseMapper;
-    private final IActProcessInstanceService actProcessInstanceService;
+    private final WorkflowService workflowService;
 
     /**
      * 查询请假
@@ -43,7 +42,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Override
     public TestLeaveVo queryById(Long id) {
         TestLeaveVo testLeaveVo = baseMapper.selectVoById(id);
-        WorkflowUtils.setProcessInstanceVo(testLeaveVo, String.valueOf(id));
+        workflowService.setBusinessInstanceDTO(testLeaveVo, String.valueOf(id));
         return testLeaveVo;
     }
 
@@ -58,7 +57,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         List<TestLeaveVo> rows = build.getRows();
         if (CollUtil.isNotEmpty(rows)) {
             List<String> ids = StreamUtils.toList(rows, e -> String.valueOf(e.getId()));
-            WorkflowUtils.setProcessInstanceListVo(rows, ids, "id");
+            workflowService.setBusinessInstanceListDTO(rows, ids, "id");
         }
         return build;
     }
@@ -92,7 +91,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
             bo.setId(add.getId());
         }
         TestLeaveVo testLeaveVo = MapstructUtils.convert(add, TestLeaveVo.class);
-        WorkflowUtils.setProcessInstanceVo(testLeaveVo, String.valueOf(add.getId()));
+        workflowService.setBusinessInstanceDTO(testLeaveVo, String.valueOf(add.getId()));
         return testLeaveVo;
     }
 
@@ -104,7 +103,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         TestLeave update = MapstructUtils.convert(bo, TestLeave.class);
         baseMapper.updateById(update);
         TestLeaveVo testLeaveVo = MapstructUtils.convert(update, TestLeaveVo.class);
-        WorkflowUtils.setProcessInstanceVo(testLeaveVo, String.valueOf(update.getId()));
+        workflowService.setBusinessInstanceDTO(testLeaveVo, String.valueOf(update.getId()));
         return testLeaveVo;
     }
 
@@ -115,7 +114,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
         List<String> idList = StreamUtils.toList(ids, String::valueOf);
-        actProcessInstanceService.deleteRunAndHisInstance(idList);
+        workflowService.deleteRunAndHisInstance(idList);
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 }
