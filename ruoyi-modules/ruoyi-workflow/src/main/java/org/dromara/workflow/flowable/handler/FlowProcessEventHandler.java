@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 public class FlowProcessEventHandler {
 
     /**
+     * 总体流程监听(例如: 提交 退回 撤销 终止 作废等)
+     *
      * @param key         流程key
      * @param businessKey 业务id
      * @param status      状态

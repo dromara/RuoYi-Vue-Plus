@@ -18,8 +18,6 @@ public class ProcessEvent implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-
-
     /**
      * 流程定义key
      */
