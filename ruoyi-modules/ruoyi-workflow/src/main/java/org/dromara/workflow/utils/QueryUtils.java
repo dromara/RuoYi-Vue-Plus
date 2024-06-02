@@ -8,6 +8,7 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.domain.vo.TaskVo;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.ModelQuery;
@@ -157,7 +158,9 @@ public class QueryUtils {
         if (task == null) {
             return null;
         }
+        HistoricProcessInstance instance = QueryUtils.hisInstanceQuery(task.getProcessInstanceId()).singleResult();
         TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
+        taskVo.setBusinessKey(instance.getBusinessKey());
         taskVo.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
         String businessStatus = WorkflowUtils.getBusinessStatus(taskVo.getBusinessKey());
         taskVo.setBusinessStatus(businessStatus);
