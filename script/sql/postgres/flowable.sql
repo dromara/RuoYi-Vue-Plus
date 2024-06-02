@@ -29,6 +29,7 @@ create table test_leave
     end_date    timestamp,
     leave_days  bigint,
     remark      varchar(255),
+    status      varchar(255),
     create_dept bigint,
     create_by   bigint,
     create_time timestamp,
@@ -48,6 +49,8 @@ comment on column test_leave.start_date is '开始时间';
 comment on column test_leave.end_date is '结束时间';
 
 comment on column test_leave.remark is '请假原因';
+
+comment on column test_leave.status is '状态';
 
 comment on column test_leave.create_dept is '创建部门';
 

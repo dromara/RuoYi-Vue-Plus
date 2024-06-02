@@ -63,6 +63,12 @@ public class TestLeaveVo implements Serializable {
     private String remark;
 
     /**
+     * 状态
+     */
+    @ExcelProperty(value = "请假原因")
+    private String status;
+
+    /**
      * 业务与流程实例关联对象
      */
     private BusinessInstanceDTO businessInstanceDTO;

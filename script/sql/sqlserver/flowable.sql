@@ -28,6 +28,7 @@ create table test_leave
     end_date    datetime2     not null,
     leave_days  int           not null,
     remark      nvarchar(255),
+    status      nvarchar(255),
     create_dept bigint,
     create_by   bigint,
     create_time datetime2,
@@ -59,6 +60,9 @@ exec sp_addextendedproperty 'MS_Description', N'请假天数', 'SCHEMA', 'dbo', 
 go
 
 exec sp_addextendedproperty 'MS_Description', N'请假原因', 'SCHEMA', 'dbo', 'TABLE', 'test_leave', 'COLUMN', 'remark'
+go
+
+exec sp_addextendedproperty 'MS_Description', N'状态', 'SCHEMA', 'dbo', 'TABLE', 'test_leave', 'COLUMN', 'status'
 go
 
 exec sp_addextendedproperty 'MS_Description', N'创建部门', 'SCHEMA', 'dbo', 'TABLE', 'test_leave', 'COLUMN',

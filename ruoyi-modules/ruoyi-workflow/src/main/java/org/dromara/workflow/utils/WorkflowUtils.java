@@ -21,7 +21,7 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
 import org.dromara.common.websocket.utils.WebSocketUtils;
 import org.dromara.workflow.common.constant.FlowConstant;
-import org.dromara.workflow.common.enums.BusinessStatusEnum;
+import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.ActHiProcinst;

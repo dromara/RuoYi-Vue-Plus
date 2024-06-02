@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.event.ProcessEvent;
 import org.dromara.common.core.domain.event.ProcessTaskEvent;
+import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.service.WorkflowService;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
@@ -131,6 +132,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @EventListener(condition = "#processEvent.key=='leave1'")
     public void processHandler(ProcessEvent processEvent) {
         log.info("当前任务执行了{}", processEvent.toString());
+        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processEvent.getBusinessKey()));
+        testLeave.setStatus(processEvent.getStatus());
+        baseMapper.updateById(testLeave);
     }
 
     /**
@@ -141,6 +145,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @EventListener(condition = "#processTaskEvent.keyNode=='leave1_Activity_14633hx'")
     public void processTaskHandler(ProcessTaskEvent processTaskEvent) {
         log.info("当前任务执行了{}", processTaskEvent.toString());
+        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processTaskEvent.getBusinessKey()));
+        testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
+        baseMapper.updateById(testLeave);
     }
 
 

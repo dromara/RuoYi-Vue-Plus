@@ -30,6 +30,7 @@ create table TEST_LEAVE
     END_DATE    DATE,
     LEAVE_DAYS  NUMBER(10),
     REMARK      VARCHAR2(255),
+    STATUS      VARCHAR2(255),
     CREATE_DEPT NUMBER(20),
     CREATE_BY   NUMBER(20),
     CREATE_TIME DATE,
@@ -45,6 +46,7 @@ comment on column TEST_LEAVE.START_DATE is '开始时间';
 comment on column TEST_LEAVE.END_DATE is '结束时间';
 comment on column TEST_LEAVE.LEAVE_DAYS is '请假天数';
 comment on column TEST_LEAVE.REMARK is '请假原因';
+comment on column TEST_LEAVE.STATUS is '状态';
 comment on column TEST_LEAVE.CREATE_DEPT is '创建部门';
 comment on column TEST_LEAVE.CREATE_BY is '创建者';
 comment on column TEST_LEAVE.CREATE_TIME is '创建时间';

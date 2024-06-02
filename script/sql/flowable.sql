@@ -27,6 +27,7 @@ create table test_leave
     end_date     datetime                     not null comment '结束时间',
     leave_days  int(10)                      not null comment '请假天数',
     remark      varchar(255)                 null comment '请假原因',
+    status      varchar(255)                 null comment '状态',
     create_dept bigint                       null comment '创建部门',
     create_by   bigint                       null comment '创建者',
     create_time datetime                     null comment '创建时间',
