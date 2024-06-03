@@ -25,7 +25,6 @@ import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.ParticipantVo;
 import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
 import org.dromara.workflow.mapper.ActHiTaskinstMapper;
-import org.dromara.workflow.service.IActHiProcinstService;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -51,7 +50,6 @@ public class WorkflowUtils {
 
     private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
     private static final UserService USER_SERVICE = SpringUtils.getBean(UserService.class);
-    private static final IActHiProcinstService ACT_HI_PROCINST_SERVICE = SpringUtils.getBean(IActHiProcinstService.class);
     private static final ActHiTaskinstMapper ACT_HI_TASKINST_MAPPER = SpringUtils.getBean(ActHiTaskinstMapper.class);
 
     /**
