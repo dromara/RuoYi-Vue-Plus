@@ -101,7 +101,7 @@ spring.data:
     # 是否开启ssl
     ssl.enabled: false
 
---- # redisson 配置
+# redisson 配置
 redisson:
   # redis key前缀
   keyPrefix:
