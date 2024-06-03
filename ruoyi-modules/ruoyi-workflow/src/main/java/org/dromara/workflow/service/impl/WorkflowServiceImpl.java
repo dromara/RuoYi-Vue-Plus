@@ -54,29 +54,6 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     /**
-     * 设置流程实例对象
-     *
-     * @param obj         业务对象
-     * @param businessKey 业务id
-     */
-    @Override
-    public void setBusinessInstanceDTO(Object obj, String businessKey) {
-        WorkflowUtils.setBusinessInstanceDTO(obj, businessKey);
-    }
-
-    /**
-     * 设置流程实例对象
-     *
-     * @param obj       业务对象
-     * @param idList    业务id
-     * @param fieldName 主键属性名称
-     */
-    @Override
-    public void setBusinessInstanceListDTO(Object obj, List<String> idList, String fieldName) {
-        WorkflowUtils.setBusinessInstanceListDTO(obj, idList, fieldName);
-    }
-
-    /**
      * 设置流程变量(全局变量)
      *
      * @param taskId       任务id
