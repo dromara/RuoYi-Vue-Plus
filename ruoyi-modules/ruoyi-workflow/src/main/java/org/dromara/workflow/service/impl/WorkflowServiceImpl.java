@@ -1,7 +1,10 @@
 package org.dromara.workflow.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.service.WorkflowService;
+import org.dromara.workflow.domain.ActHiProcinst;
+import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IActProcessInstanceService;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.engine.RuntimeService;
@@ -21,7 +24,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     private final IActProcessInstanceService iActProcessInstanceService;
     private final RuntimeService runtimeService;
-
+    private final IActHiProcinstService iActHiProcinstService;
     /**
      * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
      *
@@ -97,5 +100,20 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public void setVariablesLocal(String taskId, Map<String, Object> variables) {
         runtimeService.setVariablesLocal(taskId, variables);
+    }
+
+    /**
+     * 按照业务id查询流程实例id
+     *
+     * @param businessKey 业务id
+     * @return 结果
+     */
+    @Override
+    public String getInstanceIdByBusinessKey(String businessKey) {
+        ActHiProcinst actHiProcinst = iActHiProcinstService.selectByBusinessKey(businessKey);
+        if (actHiProcinst == null) {
+            return StrUtil.EMPTY;
+        }
+        return actHiProcinst.getId();
     }
 }
