@@ -1,6 +1,5 @@
 package org.dromara.common.core.domain.event;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 
 import java.io.Serial;
@@ -32,10 +31,5 @@ public class ProcessTaskEvent implements Serializable {
      * 业务id
      */
     private String businessKey;
-
-    /**
-     * 请求体
-     */
-    private HttpServletRequest request;
 
 }
