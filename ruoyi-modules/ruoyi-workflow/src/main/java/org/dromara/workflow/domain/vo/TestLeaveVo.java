@@ -67,10 +67,4 @@ public class TestLeaveVo implements Serializable {
     @ExcelProperty(value = "状态")
     private String status;
 
-    /**
-     * 流程实例id
-     */
-    @ExcelProperty(value = "流程实例id")
-    private String processInstanceId;
-
 }
