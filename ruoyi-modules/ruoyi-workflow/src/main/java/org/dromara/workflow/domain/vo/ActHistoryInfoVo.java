@@ -37,6 +37,10 @@ public class ActHistoryInfoVo implements Serializable {
      */
     private String processInstanceId;
     /**
+     * 版本
+     */
+    private Integer version;
+    /**
      * 开始时间
      */
     private Date startTime;

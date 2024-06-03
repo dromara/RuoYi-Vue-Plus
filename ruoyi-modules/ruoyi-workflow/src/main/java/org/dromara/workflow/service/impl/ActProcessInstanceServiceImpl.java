@@ -280,7 +280,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             }
         }
         map.put("taskList", taskList);
-        List<ActHistoryInfoVo> historyTaskList = getHistoryTaskList(processInstanceId);
+        List<ActHistoryInfoVo> historyTaskList = getHistoryTaskList(processInstanceId, processInstance.getProcessDefinitionVersion());
         map.put("historyList", historyTaskList);
         InputStream inputStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getResourceName());
         xml.append(IoUtil.read(inputStream, StandardCharsets.UTF_8));
@@ -292,8 +292,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
      * 获取历史任务节点信息
      *
      * @param processInstanceId 流程实例id
+     * @param version           版本
      */
-    private List<ActHistoryInfoVo> getHistoryTaskList(String processInstanceId) {
+    private List<ActHistoryInfoVo> getHistoryTaskList(String processInstanceId, Integer version) {
         //查询任务办理记录
         List<HistoricTaskInstance> list = QueryUtils.hisTaskInstanceQuery(processInstanceId).orderByHistoricTaskInstanceEndTime().desc().list();
         list = StreamUtils.sorted(list, Comparator.comparing(HistoricTaskInstance::getEndTime, Comparator.nullsFirst(Date::compareTo)).reversed());
@@ -305,6 +306,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (ObjectUtil.isNotEmpty(historicTaskInstance.getDurationInMillis())) {
                 actHistoryInfoVo.setRunDuration(getDuration(historicTaskInstance.getDurationInMillis()));
             }
+            actHistoryInfoVo.setVersion(version);
             actHistoryInfoVoList.add(actHistoryInfoVo);
         }
         List<ActHistoryInfoVo> historyInfoVoList = new ArrayList<>();
