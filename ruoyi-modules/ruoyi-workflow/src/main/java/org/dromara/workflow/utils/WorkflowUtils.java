@@ -1,30 +1,25 @@
 package org.dromara.workflow.utils;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.dromara.common.core.domain.dto.BusinessInstanceDTO;
 import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
 import org.dromara.common.websocket.utils.WebSocketUtils;
 import org.dromara.workflow.common.constant.FlowConstant;
-import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
-import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.domain.ActHiTaskinst;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.ParticipantVo;
@@ -45,8 +40,6 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import java.util.*;
-
-import static org.dromara.workflow.common.constant.FlowConstant.BUSINESS_INSTANCE_DTO;
 
 /**
  * 工作流工具
@@ -233,67 +226,6 @@ public class WorkflowUtils {
     public static String getBusinessStatus(String businessKey) {
         HistoricProcessInstance historicProcessInstance = QueryUtils.hisBusinessKeyQuery(businessKey).singleResult();
         return historicProcessInstance.getBusinessStatus();
-    }
-
-    /**
-     * 设置流程实例对象
-     *
-     * @param obj         业务对象
-     * @param businessKey 业务id
-     */
-    public static void setBusinessInstanceDTO(Object obj, String businessKey) {
-        if (StringUtils.isBlank(businessKey) || obj == null) {
-            return;
-        }
-        ActHiProcinst actHiProcinst = ACT_HI_PROCINST_SERVICE.selectByBusinessKey(businessKey);
-        if (actHiProcinst == null) {
-            BusinessInstanceDTO businessInstanceDTO = new BusinessInstanceDTO();
-            businessInstanceDTO.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
-            ReflectUtils.invokeSetter(obj, BUSINESS_INSTANCE_DTO, businessInstanceDTO);
-            return;
-        }
-        BusinessInstanceDTO businessInstanceDTO = BeanUtil.toBean(actHiProcinst, BusinessInstanceDTO.class);
-        businessInstanceDTO.setBusinessStatusName(BusinessStatusEnum.findByStatus(businessInstanceDTO.getBusinessStatus()));
-        businessInstanceDTO.setProcessDefinitionId(actHiProcinst.getProcDefId());
-        ReflectUtils.invokeSetter(obj, BUSINESS_INSTANCE_DTO, businessInstanceDTO);
-    }
-
-    /**
-     * 设置流程实例对象
-     *
-     * @param obj       业务对象
-     * @param idList    业务id
-     * @param fieldName 主键属性名称
-     */
-    public static void setBusinessInstanceListDTO(Object obj, List<String> idList, String fieldName) {
-        if (CollUtil.isEmpty(idList) || obj == null) {
-            return;
-        }
-        List<ActHiProcinst> actHiProcinstList = ACT_HI_PROCINST_SERVICE.selectByBusinessKeyIn(idList);
-        if (obj instanceof Collection<?> collection) {
-            for (Object o : collection) {
-                String fieldValue = ReflectUtils.invokeGetter(o, fieldName).toString();
-                if (CollUtil.isEmpty(actHiProcinstList)) {
-                    BusinessInstanceDTO businessInstanceDTO = new BusinessInstanceDTO();
-                    businessInstanceDTO.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
-                    businessInstanceDTO.setBusinessStatusName(BusinessStatusEnum.findByStatus(businessInstanceDTO.getBusinessStatus()));
-                    ReflectUtils.invokeSetter(o, BUSINESS_INSTANCE_DTO, businessInstanceDTO);
-                } else {
-                    ActHiProcinst actHiProcinst = actHiProcinstList.stream().filter(e -> e.getBusinessKey().equals(fieldValue)).findFirst().orElse(null);
-                    if (ObjectUtil.isNotEmpty(actHiProcinst)) {
-                        BusinessInstanceDTO businessInstanceDTO = BeanUtil.toBean(actHiProcinst, BusinessInstanceDTO.class);
-                        businessInstanceDTO.setBusinessStatusName(BusinessStatusEnum.findByStatus(businessInstanceDTO.getBusinessStatus()));
-                        businessInstanceDTO.setProcessDefinitionId(actHiProcinst.getProcDefId());
-                        ReflectUtils.invokeSetter(o, BUSINESS_INSTANCE_DTO, businessInstanceDTO);
-                    } else {
-                        BusinessInstanceDTO businessInstanceDTO = new BusinessInstanceDTO();
-                        businessInstanceDTO.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
-                        businessInstanceDTO.setBusinessStatusName(BusinessStatusEnum.findByStatus(businessInstanceDTO.getBusinessStatus()));
-                        ReflectUtils.invokeSetter(o, BUSINESS_INSTANCE_DTO, businessInstanceDTO);
-                    }
-                }
-            }
-        }
     }
 
     /**
