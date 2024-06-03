@@ -34,7 +34,7 @@
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.0</dynamic-ds.version>
         <alibaba-ttl.version>2.14.4</alibaba-ttl.version>
-        <snailjob.version>1.0.0-beta2</snailjob.version>
+        <snailjob.version>1.0.0-beta3</snailjob.version>
         <mapstruct-plus.version>1.3.6</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.32</lombok.version>
