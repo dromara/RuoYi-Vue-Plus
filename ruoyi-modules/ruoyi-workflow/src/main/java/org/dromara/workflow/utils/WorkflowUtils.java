@@ -49,7 +49,6 @@ import java.util.*;
 public class WorkflowUtils {
 
     private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
-    private static final UserService USER_SERVICE = SpringUtils.getBean(UserService.class);
     private static final ActHiTaskinstMapper ACT_HI_TASKINST_MAPPER = SpringUtils.getBean(ActHiTaskinstMapper.class);
 
     /**
@@ -127,6 +126,7 @@ public class WorkflowUtils {
      * @param taskId 任务id
      */
     public static ParticipantVo getCurrentTaskParticipant(String taskId) {
+        UserService userService = SpringUtils.getBean(UserService.class);
         ParticipantVo participantVo = new ParticipantVo();
         List<HistoricIdentityLink> linksForTask = PROCESS_ENGINE.getHistoryService().getHistoricIdentityLinksForTask(taskId);
         Task task = QueryUtils.taskQuery().taskId(taskId).singleResult();
@@ -134,10 +134,10 @@ public class WorkflowUtils {
             List<HistoricIdentityLink> groupList = StreamUtils.filter(linksForTask, e -> StringUtils.isNotBlank(e.getGroupId()));
             if (CollUtil.isNotEmpty(groupList)) {
                 List<Long> groupIds = StreamUtils.toList(groupList, e -> Long.valueOf(e.getGroupId()));
-                List<Long> userIds = USER_SERVICE.selectUserIdsByRoleIds(groupIds);
+                List<Long> userIds = userService.selectUserIdsByRoleIds(groupIds);
                 if (CollUtil.isNotEmpty(userIds)) {
                     participantVo.setGroupIds(groupIds);
-                    List<UserDTO> userList = USER_SERVICE.selectListByIds(userIds);
+                    List<UserDTO> userList = userService.selectListByIds(userIds);
                     if (CollUtil.isNotEmpty(userList)) {
                         List<Long> userIdList = StreamUtils.toList(userList, UserDTO::getUserId);
                         List<String> nickNames = StreamUtils.toList(userList, UserDTO::getNickName);
@@ -156,7 +156,7 @@ public class WorkflowUtils {
 
                     }
                 }
-                List<UserDTO> userList = USER_SERVICE.selectListByIds(userIdList);
+                List<UserDTO> userList = userService.selectListByIds(userIdList);
                 if (CollUtil.isNotEmpty(userList)) {
                     List<Long> userIds = StreamUtils.toList(userList, UserDTO::getUserId);
                     List<String> nickNames = StreamUtils.toList(userList, UserDTO::getNickName);
@@ -235,6 +235,7 @@ public class WorkflowUtils {
      * @param message     消息内容，为空则发送默认配置的消息内容
      */
     public static void sendMessage(List<Task> list, String name, List<String> messageType, String message) {
+        UserService userService = SpringUtils.getBean(UserService.class);
         Set<Long> userIds = new HashSet<>();
         if (StringUtils.isBlank(message)) {
             message = "有新的【" + name + "】单据已经提交至您的待办，请您及时处理。";
@@ -242,7 +243,7 @@ public class WorkflowUtils {
         for (Task t : list) {
             ParticipantVo taskParticipant = WorkflowUtils.getCurrentTaskParticipant(t.getId());
             if (CollUtil.isNotEmpty(taskParticipant.getGroupIds())) {
-                List<Long> userIdList = USER_SERVICE.selectUserIdsByRoleIds(taskParticipant.getGroupIds());
+                List<Long> userIdList = userService.selectUserIdsByRoleIds(taskParticipant.getGroupIds());
                 if (CollUtil.isNotEmpty(userIdList)) {
                     userIds.addAll(userIdList);
                 }
@@ -253,7 +254,7 @@ public class WorkflowUtils {
             }
         }
         if (CollUtil.isNotEmpty(userIds)) {
-            List<UserDTO> userList = USER_SERVICE.selectListByIds(new ArrayList<>(userIds));
+            List<UserDTO> userList = userService.selectListByIds(new ArrayList<>(userIds));
             for (String code : messageType) {
                 MessageTypeEnum messageTypeEnum = MessageTypeEnum.getByCode(code);
                 if (ObjectUtil.isNotEmpty(messageTypeEnum)) {
