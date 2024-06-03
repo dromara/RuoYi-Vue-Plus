@@ -92,6 +92,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Override
     public TestLeaveVo insertByBo(TestLeaveBo bo) {
         TestLeave add = MapstructUtils.convert(bo, TestLeave.class);
+        if (StringUtils.isBlank(add.getStatus())) {
+            add.setStatus(BusinessStatusEnum.DRAFT.getStatus());
+        }
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
