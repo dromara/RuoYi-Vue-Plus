@@ -1,6 +1,5 @@
 package org.dromara.workflow.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -47,9 +46,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      */
     @Override
     public TestLeaveVo queryById(Long id) {
-        TestLeaveVo testLeaveVo = baseMapper.selectVoById(id);
-        workflowService.setBusinessInstanceDTO(testLeaveVo, String.valueOf(id));
-        return testLeaveVo;
+        return baseMapper.selectVoById(id);
     }
 
     /**
@@ -59,13 +56,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     public TableDataInfo<TestLeaveVo> queryPageList(TestLeaveBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestLeave> lqw = buildQueryWrapper(bo);
         Page<TestLeaveVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
-        TableDataInfo<TestLeaveVo> build = TableDataInfo.build(result);
-        List<TestLeaveVo> rows = build.getRows();
-        if (CollUtil.isNotEmpty(rows)) {
-            List<String> ids = StreamUtils.toList(rows, e -> String.valueOf(e.getId()));
-            workflowService.setBusinessInstanceListDTO(rows, ids, "id");
-        }
-        return build;
+        return TableDataInfo.build(result);
     }
 
     /**
@@ -99,9 +90,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         if (flag) {
             bo.setId(add.getId());
         }
-        TestLeaveVo testLeaveVo = MapstructUtils.convert(add, TestLeaveVo.class);
-        workflowService.setBusinessInstanceDTO(testLeaveVo, String.valueOf(add.getId()));
-        return testLeaveVo;
+        return MapstructUtils.convert(add, TestLeaveVo.class);
     }
 
     /**
@@ -111,9 +100,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     public TestLeaveVo updateByBo(TestLeaveBo bo) {
         TestLeave update = MapstructUtils.convert(bo, TestLeave.class);
         baseMapper.updateById(update);
-        TestLeaveVo testLeaveVo = MapstructUtils.convert(update, TestLeaveVo.class);
-        workflowService.setBusinessInstanceDTO(testLeaveVo, String.valueOf(update.getId()));
-        return testLeaveVo;
+        return MapstructUtils.convert(update, TestLeaveVo.class);
     }
 
     /**
