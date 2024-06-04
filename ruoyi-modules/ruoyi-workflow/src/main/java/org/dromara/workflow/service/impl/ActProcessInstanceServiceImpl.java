@@ -280,7 +280,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             }
         }
         map.put("taskList", taskList);
-        List<ActHistoryInfoVo> historyTaskList = getHistoryTaskList(processInstanceId, processInstance.getProcessDefinitionVersion());
+        List<ActHistoryInfoVo> historyTaskList = getHistoryTaskList(processInstanceId, processDefinition.getVersion());
         map.put("historyList", historyTaskList);
         InputStream inputStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getResourceName());
         xml.append(IoUtil.read(inputStream, StandardCharsets.UTF_8));
