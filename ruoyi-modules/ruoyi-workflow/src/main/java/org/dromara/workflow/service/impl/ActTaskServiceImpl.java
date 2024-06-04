@@ -690,7 +690,9 @@ public class ActTaskServiceImpl implements IActTaskService {
             MultiInstanceVo multiInstance = WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
             if (multiInstance == null && taskList.size() > 1) {
                 List<Task> tasks = StreamUtils.filter(taskList, e -> !e.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()));
-                actHiTaskinstMapper.deleteBatchIds(StreamUtils.toList(tasks, Task::getId));
+                if (CollUtil.isNotEmpty(tasks)) {
+                    actHiTaskinstMapper.deleteBatchIds(StreamUtils.toList(tasks, Task::getId));
+                }
             }
 
 
