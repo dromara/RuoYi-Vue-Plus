@@ -6,4 +6,4 @@ ALTER TABLE sys_post ADD (post_category VARCHAR2(100) DEFAULT NULL) COMMENT '岗
 COMMENT ON COLUMN sys_post.post_category IS '岗位类别编码';
 UPDATE sys_post SET dept_id = 100;
 UPDATE sys_post SET dept_id = 103 where post_id = 1;
-UPDATE sys_menu SET path = 'snailjob', component = 'monitor/snailjob/index', perms = 'monitor:snailjob:list', remark = 'SnailJob控制台菜单' WHERE menu_id = 120;
+UPDATE sys_menu SET menu_name = 'SnailJob控制台', path = 'snailjob', component = 'monitor/snailjob/index', perms = 'monitor:snailjob:list', remark = 'SnailJob控制台菜单' WHERE menu_id = 120;

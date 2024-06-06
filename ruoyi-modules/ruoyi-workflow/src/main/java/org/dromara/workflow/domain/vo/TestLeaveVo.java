@@ -62,9 +62,9 @@ public class TestLeaveVo implements Serializable {
     private String remark;
 
     /**
-     * 流程实例对象
+     * 状态
      */
-    private ProcessInstanceVo processInstanceVo;
-
+    @ExcelProperty(value = "状态")
+    private String status;
 
 }

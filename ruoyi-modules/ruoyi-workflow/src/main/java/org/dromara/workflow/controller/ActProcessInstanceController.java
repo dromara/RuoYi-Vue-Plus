@@ -58,33 +58,33 @@ public class ActProcessInstanceController extends BaseController {
     }
 
     /**
-     * 通过流程实例id获取历史流程图
+     * 通过业务id获取历史流程图
      *
-     * @param processInstanceId 流程实例id
+     * @param businessKey 业务id
      */
-    @GetMapping("/getHistoryImage/{processInstanceId}")
-    public R<String> getHistoryImage(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
-        return R.ok("操作成功", actProcessInstanceService.getHistoryImage(processInstanceId));
+    @GetMapping("/getHistoryImage/{businessKey}")
+    public R<String> getHistoryImage(@NotBlank(message = "业务id不能为空") @PathVariable String businessKey) {
+        return R.ok("操作成功", actProcessInstanceService.getHistoryImage(businessKey));
     }
 
     /**
-     * 通过流程实例id获取历史流程图运行中，历史等节点
+     * 通过业务id获取历史流程图运行中，历史等节点
      *
-     * @param processInstanceId 流程实例id
+     * @param businessKey 业务id
      */
-    @GetMapping("/getHistoryList/{processInstanceId}")
-    public R<Map<String, Object>> getHistoryList(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
-        return R.ok("操作成功", actProcessInstanceService.getHistoryList(processInstanceId));
+    @GetMapping("/getHistoryList/{businessKey}")
+    public R<Map<String, Object>> getHistoryList(@NotBlank(message = "业务id不能为空") @PathVariable String businessKey) {
+        return R.ok("操作成功", actProcessInstanceService.getHistoryList(businessKey));
     }
 
     /**
      * 获取审批记录
      *
-     * @param processInstanceId 流程实例id
+     * @param businessKey 业务id
      */
-    @GetMapping("/getHistoryRecord/{processInstanceId}")
-    public R<List<ActHistoryInfoVo>> getHistoryRecord(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
-        return R.ok(actProcessInstanceService.getHistoryRecord(processInstanceId));
+    @GetMapping("/getHistoryRecord/{businessKey}")
+    public R<List<ActHistoryInfoVo>> getHistoryRecord(@NotBlank(message = "业务id不能为空") @PathVariable String businessKey) {
+        return R.ok(actProcessInstanceService.getHistoryRecord(businessKey));
     }
 
     /**
@@ -102,37 +102,37 @@ public class ActProcessInstanceController extends BaseController {
     /**
      * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
      *
-     * @param processInstanceIds 流程实例id
+     * @param businessKeys 业务id
      */
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
     @RepeatSubmit()
-    @DeleteMapping("/deleteRunAndHisInstance/{processInstanceIds}")
-    public R<Void> deleteRunAndHisInstance(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
-        return toAjax(actProcessInstanceService.deleteRunAndHisInstance(Arrays.asList(processInstanceIds)));
+    @DeleteMapping("/deleteRunAndHisInstance/{businessKeys}")
+    public R<Void> deleteRunAndHisInstance(@NotNull(message = "业务id不能为空") @PathVariable String[] businessKeys) {
+        return toAjax(actProcessInstanceService.deleteRunAndHisInstance(Arrays.asList(businessKeys)));
     }
 
     /**
      * 已完成的实例 删除程实例，删除历史记录，删除业务与流程关联信息
      *
-     * @param processInstanceIds 流程实例id
+     * @param businessKeys 业务id
      */
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
     @RepeatSubmit()
-    @DeleteMapping("/deleteFinishAndHisInstance/{processInstanceIds}")
-    public R<Void> deleteFinishAndHisInstance(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
-        return toAjax(actProcessInstanceService.deleteFinishAndHisInstance(Arrays.asList(processInstanceIds)));
+    @DeleteMapping("/deleteFinishAndHisInstance/{businessKeys}")
+    public R<Void> deleteFinishAndHisInstance(@NotNull(message = "业务id不能为空") @PathVariable String[] businessKeys) {
+        return toAjax(actProcessInstanceService.deleteFinishAndHisInstance(Arrays.asList(businessKeys)));
     }
 
     /**
      * 撤销流程申请
      *
-     * @param processInstanceId 流程实例id
+     * @param businessKey 业务id
      */
     @Log(title = "流程实例管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()
-    @PostMapping("/cancelProcessApply/{processInstanceId}")
-    public R<Void> cancelProcessApply(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
-        return toAjax(actProcessInstanceService.cancelProcessApply(processInstanceId));
+    @PostMapping("/cancelProcessApply/{businessKey}")
+    public R<Void> cancelProcessApply(@NotBlank(message = "业务id不能为空") @PathVariable String businessKey) {
+        return toAjax(actProcessInstanceService.cancelProcessApply(businessKey));
     }
 
     /**

@@ -1,10 +1,14 @@
 package org.dromara.workflow.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.event.ProcessEvent;
+import org.dromara.common.core.domain.event.ProcessTaskEvent;
+import org.dromara.common.core.enums.BusinessStatusEnum;
+import org.dromara.common.core.service.WorkflowService;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -15,9 +19,8 @@ import org.dromara.workflow.domain.TestLeave;
 import org.dromara.workflow.domain.bo.TestLeaveBo;
 import org.dromara.workflow.domain.vo.TestLeaveVo;
 import org.dromara.workflow.mapper.TestLeaveMapper;
-import org.dromara.workflow.service.IActProcessInstanceService;
 import org.dromara.workflow.service.ITestLeaveService;
-import org.dromara.workflow.utils.WorkflowUtils;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,19 +35,18 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class TestLeaveServiceImpl implements ITestLeaveService {
 
     private final TestLeaveMapper baseMapper;
-    private final IActProcessInstanceService actProcessInstanceService;
+    private final WorkflowService workflowService;
 
     /**
      * 查询请假
      */
     @Override
     public TestLeaveVo queryById(Long id) {
-        TestLeaveVo testLeaveVo = baseMapper.selectVoById(id);
-        WorkflowUtils.setProcessInstanceVo(testLeaveVo, String.valueOf(id));
-        return testLeaveVo;
+        return baseMapper.selectVoById(id);
     }
 
     /**
@@ -54,13 +56,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     public TableDataInfo<TestLeaveVo> queryPageList(TestLeaveBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestLeave> lqw = buildQueryWrapper(bo);
         Page<TestLeaveVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
-        TableDataInfo<TestLeaveVo> build = TableDataInfo.build(result);
-        List<TestLeaveVo> rows = build.getRows();
-        if (CollUtil.isNotEmpty(rows)) {
-            List<String> ids = StreamUtils.toList(rows, e -> String.valueOf(e.getId()));
-            WorkflowUtils.setProcessInstanceListVo(rows, ids, "id");
-        }
-        return build;
+        return TableDataInfo.build(result);
     }
 
     /**
@@ -87,13 +83,14 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Override
     public TestLeaveVo insertByBo(TestLeaveBo bo) {
         TestLeave add = MapstructUtils.convert(bo, TestLeave.class);
+        if (StringUtils.isBlank(add.getStatus())) {
+            add.setStatus(BusinessStatusEnum.DRAFT.getStatus());
+        }
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
         }
-        TestLeaveVo testLeaveVo = MapstructUtils.convert(add, TestLeaveVo.class);
-        WorkflowUtils.setProcessInstanceVo(testLeaveVo, String.valueOf(add.getId()));
-        return testLeaveVo;
+        return MapstructUtils.convert(add, TestLeaveVo.class);
     }
 
     /**
@@ -103,9 +100,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     public TestLeaveVo updateByBo(TestLeaveBo bo) {
         TestLeave update = MapstructUtils.convert(bo, TestLeave.class);
         baseMapper.updateById(update);
-        TestLeaveVo testLeaveVo = MapstructUtils.convert(update, TestLeaveVo.class);
-        WorkflowUtils.setProcessInstanceVo(testLeaveVo, String.valueOf(update.getId()));
-        return testLeaveVo;
+        return MapstructUtils.convert(update, TestLeaveVo.class);
     }
 
     /**
@@ -115,7 +110,38 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
         List<String> idList = StreamUtils.toList(ids, String::valueOf);
-        actProcessInstanceService.deleteRunAndHisInstanceByBusinessKeys(idList);
+        workflowService.deleteRunAndHisInstance(idList);
         return baseMapper.deleteBatchIds(ids) > 0;
     }
+
+    /**
+     * 总体流程监听(例如: 提交 退回 撤销 终止 作废等)
+     *
+     * @param processEvent 参数
+     */
+    @EventListener(condition = "#processEvent.key=='leave1'")
+    public void processHandler(ProcessEvent processEvent) {
+        log.info("当前任务执行了{}", processEvent.toString());
+        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processEvent.getBusinessKey()));
+        testLeave.setStatus(processEvent.getStatus());
+        if (processEvent.isSubmit()) {
+            testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
+        }
+        baseMapper.updateById(testLeave);
+    }
+
+    /**
+     * 执行办理任务监听
+     *
+     * @param processTaskEvent 参数
+     */
+    @EventListener(condition = "#processTaskEvent.keyNode=='leave1_Activity_14633hx'")
+    public void processTaskHandler(ProcessTaskEvent processTaskEvent) {
+        log.info("当前任务执行了{}", processTaskEvent.toString());
+        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processTaskEvent.getBusinessKey()));
+        testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
+        baseMapper.updateById(testLeave);
+    }
+
+
 }

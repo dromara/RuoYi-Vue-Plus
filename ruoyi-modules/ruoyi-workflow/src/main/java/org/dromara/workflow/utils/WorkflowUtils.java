@@ -1,34 +1,30 @@
 package org.dromara.workflow.utils;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mail.utils.MailUtils;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
 import org.dromara.common.websocket.utils.WebSocketUtils;
 import org.dromara.workflow.common.constant.FlowConstant;
-import org.dromara.workflow.common.enums.BusinessStatusEnum;
 import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
-import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.domain.ActHiTaskinst;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.ParticipantVo;
-import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
 import org.dromara.workflow.mapper.ActHiTaskinstMapper;
-import org.dromara.workflow.service.IActHiProcinstService;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -38,12 +34,11 @@ import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import java.util.*;
-
-import static org.dromara.workflow.common.constant.FlowConstant.PROCESS_INSTANCE_VO;
 
 /**
  * 工作流工具
@@ -54,8 +49,6 @@ import static org.dromara.workflow.common.constant.FlowConstant.PROCESS_INSTANCE
 public class WorkflowUtils {
 
     private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
-    private static final UserService USER_SERVICE = SpringUtils.getBean(UserService.class);
-    private static final IActHiProcinstService ACT_HI_PROCINST_SERVICE = SpringUtils.getBean(IActHiProcinstService.class);
     private static final ActHiTaskinstMapper ACT_HI_TASKINST_MAPPER = SpringUtils.getBean(ActHiTaskinstMapper.class);
 
     /**
@@ -133,6 +126,7 @@ public class WorkflowUtils {
      * @param taskId 任务id
      */
     public static ParticipantVo getCurrentTaskParticipant(String taskId) {
+        UserService userService = SpringUtils.getBean(UserService.class);
         ParticipantVo participantVo = new ParticipantVo();
         List<HistoricIdentityLink> linksForTask = PROCESS_ENGINE.getHistoryService().getHistoricIdentityLinksForTask(taskId);
         Task task = QueryUtils.taskQuery().taskId(taskId).singleResult();
@@ -140,10 +134,10 @@ public class WorkflowUtils {
             List<HistoricIdentityLink> groupList = StreamUtils.filter(linksForTask, e -> StringUtils.isNotBlank(e.getGroupId()));
             if (CollUtil.isNotEmpty(groupList)) {
                 List<Long> groupIds = StreamUtils.toList(groupList, e -> Long.valueOf(e.getGroupId()));
-                List<Long> userIds = USER_SERVICE.selectUserIdsByRoleIds(groupIds);
+                List<Long> userIds = userService.selectUserIdsByRoleIds(groupIds);
                 if (CollUtil.isNotEmpty(userIds)) {
                     participantVo.setGroupIds(groupIds);
-                    List<UserDTO> userList = USER_SERVICE.selectListByIds(userIds);
+                    List<UserDTO> userList = userService.selectListByIds(userIds);
                     if (CollUtil.isNotEmpty(userList)) {
                         List<Long> userIdList = StreamUtils.toList(userList, UserDTO::getUserId);
                         List<String> nickNames = StreamUtils.toList(userList, UserDTO::getNickName);
@@ -162,7 +156,7 @@ public class WorkflowUtils {
 
                     }
                 }
-                List<UserDTO> userList = USER_SERVICE.selectListByIds(userIdList);
+                List<UserDTO> userList = userService.selectListByIds(userIdList);
                 if (CollUtil.isNotEmpty(userList)) {
                     List<Long> userIds = StreamUtils.toList(userList, UserDTO::getUserId);
                     List<String> nickNames = StreamUtils.toList(userList, UserDTO::getNickName);
@@ -225,70 +219,11 @@ public class WorkflowUtils {
     /**
      * 获取当前流程状态
      *
-     * @param processInstanceId 流程实例id
-     */
-    public static String getBusinessStatus(String processInstanceId) {
-        HistoricProcessInstance historicProcessInstance = QueryUtils.hisInstanceQuery(processInstanceId).singleResult();
-        return historicProcessInstance.getBusinessStatus();
-    }
-
-    /**
-     * 设置流程实例对象
-     *
-     * @param obj         业务对象
      * @param businessKey 业务id
      */
-    public static void setProcessInstanceVo(Object obj, String businessKey) {
-        if (StringUtils.isBlank(businessKey) || obj == null) {
-            return;
-        }
-        ActHiProcinst actHiProcinst = ACT_HI_PROCINST_SERVICE.selectByBusinessKey(businessKey);
-        if (actHiProcinst == null) {
-            ProcessInstanceVo processInstanceVo = new ProcessInstanceVo();
-            processInstanceVo.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
-            ReflectUtils.invokeSetter(obj, PROCESS_INSTANCE_VO, processInstanceVo);
-            return;
-        }
-        ProcessInstanceVo processInstanceVo = BeanUtil.toBean(actHiProcinst, ProcessInstanceVo.class);
-        processInstanceVo.setBusinessStatusName(BusinessStatusEnum.findByStatus(processInstanceVo.getBusinessStatus()));
-        ReflectUtils.invokeSetter(obj, PROCESS_INSTANCE_VO, processInstanceVo);
-    }
-
-    /**
-     * 设置流程实例对象
-     *
-     * @param obj       业务对象
-     * @param idList    业务id
-     * @param fieldName 主键属性名称
-     */
-    public static void setProcessInstanceListVo(Object obj, List<String> idList, String fieldName) {
-        if (CollUtil.isEmpty(idList) || obj == null) {
-            return;
-        }
-        List<ActHiProcinst> actHiProcinstList = ACT_HI_PROCINST_SERVICE.selectByBusinessKeyIn(idList);
-        if (obj instanceof Collection<?> collection) {
-            for (Object o : collection) {
-                String fieldValue = ReflectUtils.invokeGetter(o, fieldName).toString();
-                if (CollUtil.isEmpty(actHiProcinstList)) {
-                    ProcessInstanceVo processInstanceVo = new ProcessInstanceVo();
-                    processInstanceVo.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
-                    processInstanceVo.setBusinessStatusName(BusinessStatusEnum.findByStatus(processInstanceVo.getBusinessStatus()));
-                    ReflectUtils.invokeSetter(o, PROCESS_INSTANCE_VO, processInstanceVo);
-                } else {
-                    ActHiProcinst actHiProcinst = actHiProcinstList.stream().filter(e -> e.getBusinessKey().equals(fieldValue)).findFirst().orElse(null);
-                    if (ObjectUtil.isNotEmpty(actHiProcinst)) {
-                        ProcessInstanceVo processInstanceVo = BeanUtil.toBean(actHiProcinst, ProcessInstanceVo.class);
-                        processInstanceVo.setBusinessStatusName(BusinessStatusEnum.findByStatus(processInstanceVo.getBusinessStatus()));
-                        ReflectUtils.invokeSetter(o, PROCESS_INSTANCE_VO, processInstanceVo);
-                    } else {
-                        ProcessInstanceVo processInstanceVo = new ProcessInstanceVo();
-                        processInstanceVo.setBusinessStatus(BusinessStatusEnum.DRAFT.getStatus());
-                        processInstanceVo.setBusinessStatusName(BusinessStatusEnum.findByStatus(processInstanceVo.getBusinessStatus()));
-                        ReflectUtils.invokeSetter(o, PROCESS_INSTANCE_VO, processInstanceVo);
-                    }
-                }
-            }
-        }
+    public static String getBusinessStatus(String businessKey) {
+        HistoricProcessInstance historicProcessInstance = QueryUtils.hisBusinessKeyQuery(businessKey).singleResult();
+        return historicProcessInstance.getBusinessStatus();
     }
 
     /**
@@ -300,6 +235,7 @@ public class WorkflowUtils {
      * @param message     消息内容，为空则发送默认配置的消息内容
      */
     public static void sendMessage(List<Task> list, String name, List<String> messageType, String message) {
+        UserService userService = SpringUtils.getBean(UserService.class);
         Set<Long> userIds = new HashSet<>();
         if (StringUtils.isBlank(message)) {
             message = "有新的【" + name + "】单据已经提交至您的待办，请您及时处理。";
@@ -307,7 +243,7 @@ public class WorkflowUtils {
         for (Task t : list) {
             ParticipantVo taskParticipant = WorkflowUtils.getCurrentTaskParticipant(t.getId());
             if (CollUtil.isNotEmpty(taskParticipant.getGroupIds())) {
-                List<Long> userIdList = USER_SERVICE.selectUserIdsByRoleIds(taskParticipant.getGroupIds());
+                List<Long> userIdList = userService.selectUserIdsByRoleIds(taskParticipant.getGroupIds());
                 if (CollUtil.isNotEmpty(userIdList)) {
                     userIds.addAll(userIdList);
                 }
@@ -318,7 +254,7 @@ public class WorkflowUtils {
             }
         }
         if (CollUtil.isNotEmpty(userIds)) {
-            List<UserDTO> userList = USER_SERVICE.selectListByIds(new ArrayList<>(userIds));
+            List<UserDTO> userList = userService.selectListByIds(new ArrayList<>(userIds));
             for (String code : messageType) {
                 MessageTypeEnum messageTypeEnum = MessageTypeEnum.getByCode(code);
                 if (ObjectUtil.isNotEmpty(messageTypeEnum)) {
@@ -339,5 +275,23 @@ public class WorkflowUtils {
                 }
             }
         }
+    }
+
+    /**
+     * 根据任务id查询 当前用户的任务，检查 当前人员 是否是该 taskId 的办理人
+     *
+     * @param taskId 任务id
+     * @return 结果
+     */
+    public static Task getTaskByCurrentUser(String taskId) {
+        TaskQuery taskQuery = QueryUtils.taskQuery();
+        taskQuery.taskId(taskId).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId()));
+
+        List<RoleDTO> roles = LoginHelper.getLoginUser().getRoles();
+        if (CollUtil.isNotEmpty(roles)) {
+            List<String> groupIds = StreamUtils.toList(roles, e -> String.valueOf(e.getRoleId()));
+            taskQuery.taskCandidateGroupIn(groupIds);
+        }
+        return taskQuery.singleResult();
     }
 }

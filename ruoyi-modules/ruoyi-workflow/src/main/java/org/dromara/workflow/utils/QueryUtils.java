@@ -12,6 +12,7 @@ import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
@@ -75,6 +76,10 @@ public class QueryUtils {
         return hisTaskInstanceQuery().processInstanceId(processInstanceId);
     }
 
+    public static HistoricTaskInstanceQuery hisTaskBusinessKeyQuery(String businessKey) {
+        return hisTaskInstanceQuery().processInstanceBusinessKey(businessKey);
+    }
+
     public static ProcessInstanceQuery instanceQuery() {
         ProcessInstanceQuery query = PROCESS_ENGINE.getRuntimeService().createProcessInstanceQuery();
         if (TenantHelper.isEnable()) {
@@ -85,6 +90,10 @@ public class QueryUtils {
 
     public static ProcessInstanceQuery instanceQuery(String processInstanceId) {
         return instanceQuery().processInstanceId(processInstanceId);
+    }
+
+    public static ProcessInstanceQuery businessKeyQuery(String businessKey) {
+        return instanceQuery().processInstanceBusinessKey(businessKey);
     }
 
     public static ProcessInstanceQuery instanceQuery(Set<String> processInstanceIds) {
@@ -101,6 +110,10 @@ public class QueryUtils {
 
     public static HistoricProcessInstanceQuery hisInstanceQuery(String processInstanceId) {
         return hisInstanceQuery().processInstanceId(processInstanceId);
+    }
+
+    public static HistoricProcessInstanceQuery hisBusinessKeyQuery(String businessKey) {
+        return hisInstanceQuery().processInstanceBusinessKey(businessKey);
     }
 
     public static HistoricProcessInstanceQuery hisInstanceQuery(Set<String> processInstanceIds) {
@@ -145,9 +158,11 @@ public class QueryUtils {
         if (task == null) {
             return null;
         }
+        ProcessInstance processInstance = QueryUtils.instanceQuery(task.getProcessInstanceId()).singleResult();
         TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
+        taskVo.setBusinessKey(processInstance.getBusinessKey());
         taskVo.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
-        String businessStatus = WorkflowUtils.getBusinessStatus(taskVo.getProcessInstanceId());
+        String businessStatus = WorkflowUtils.getBusinessStatus(taskVo.getBusinessKey());
         taskVo.setBusinessStatus(businessStatus);
         return taskVo;
     }

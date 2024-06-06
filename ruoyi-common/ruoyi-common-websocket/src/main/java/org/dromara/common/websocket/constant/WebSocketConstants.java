@@ -6,6 +6,7 @@ package org.dromara.common.websocket.constant;
  * @author zendwang
  */
 public interface WebSocketConstants {
+
     /**
      * websocketSession中的参数的key
      */

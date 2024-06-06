@@ -144,7 +144,7 @@ public class SysTenantController extends BaseController {
     @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @GetMapping("/dynamic/{tenantId}")
     public R<Void> dynamicTenant(@NotBlank(message = "租户ID不能为空") @PathVariable String tenantId) {
-        TenantHelper.setDynamic(tenantId);
+        TenantHelper.setDynamic(tenantId, true);
         return R.ok();
     }
 

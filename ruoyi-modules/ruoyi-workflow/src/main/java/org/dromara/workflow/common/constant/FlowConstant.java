@@ -71,9 +71,9 @@ public interface FlowConstant {
     String ZIP = "ZIP";
 
     /**
-     * 流程实例对象
+     * 业务与流程实例关联对象
      */
-    String PROCESS_INSTANCE_VO = "processInstanceVo";
+    String BUSINESS_INSTANCE_DTO = "businessInstanceDTO";
 
     /**
      * 流程定义配置
