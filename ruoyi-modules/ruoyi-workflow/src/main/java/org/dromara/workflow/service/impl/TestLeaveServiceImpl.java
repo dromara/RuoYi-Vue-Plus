@@ -115,112 +115,33 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     }
 
     /**
+     * 总体流程监听(例如: 提交 退回 撤销 终止 作废等)
+     * 正常使用只需#processEvent.key=='leave1'
+     * 示例为了方便则使用startsWith匹配了全部示例key
+     *
+     * @param processEvent 参数
+     */
+    @EventListener(condition = "#processEvent.key.startsWith('leave')")
+    public void processHandler(ProcessEvent processEvent) {
+        log.info("当前任务执行了{}", processEvent.toString());
+        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processEvent.getBusinessKey()));
+        testLeave.setStatus(processEvent.getStatus());
+        if (processEvent.isSubmit()) {
+            testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
+        }
+        baseMapper.updateById(testLeave);
+    }
+
+    /**
      * 执行办理任务监听
      *
      * @param processTaskEvent 参数
      */
     @EventListener(condition = "#processTaskEvent.keyNode=='leave1_Activity_14633hx'")
-    public void leave1Task(ProcessTaskEvent processTaskEvent) {
+    public void processTaskHandler(ProcessTaskEvent processTaskEvent) {
         log.info("当前任务执行了{}", processTaskEvent.toString());
         TestLeave testLeave = baseMapper.selectById(Long.valueOf(processTaskEvent.getBusinessKey()));
         testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
-        baseMapper.updateById(testLeave);
-    }
-
-
-    /**
-     * 总体流程监听(例如: 提交 退回 撤销 终止 作废等)
-     *
-     * @param processEvent 参数
-     */
-    @EventListener(condition = "#processEvent.key=='leave1'")
-    public void leave1(ProcessEvent processEvent) {
-        log.info("当前任务执行了{}", processEvent.toString());
-        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processEvent.getBusinessKey()));
-        testLeave.setStatus(processEvent.getStatus());
-        if (processEvent.isSubmit()) {
-            testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
-        }
-        baseMapper.updateById(testLeave);
-    }
-
-    /**
-     * 总体流程监听(例如: 提交 退回 撤销 终止 作废等)
-     *
-     * @param processEvent 参数
-     */
-    @EventListener(condition = "#processEvent.key=='leave2'")
-    public void leave2(ProcessEvent processEvent) {
-        log.info("当前任务执行了{}", processEvent.toString());
-        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processEvent.getBusinessKey()));
-        testLeave.setStatus(processEvent.getStatus());
-        if (processEvent.isSubmit()) {
-            testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
-        }
-        baseMapper.updateById(testLeave);
-    }
-
-    /**
-     * 总体流程监听(例如: 提交 退回 撤销 终止 作废等)
-     *
-     * @param processEvent 参数
-     */
-    @EventListener(condition = "#processEvent.key=='leave3'")
-    public void leave3(ProcessEvent processEvent) {
-        log.info("当前任务执行了{}", processEvent.toString());
-        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processEvent.getBusinessKey()));
-        testLeave.setStatus(processEvent.getStatus());
-        if (processEvent.isSubmit()) {
-            testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
-        }
-        baseMapper.updateById(testLeave);
-    }
-
-    /**
-     * 总体流程监听(例如: 提交 退回 撤销 终止 作废等)
-     *
-     * @param processEvent 参数
-     */
-    @EventListener(condition = "#processEvent.key=='leave4'")
-    public void leave4(ProcessEvent processEvent) {
-        log.info("当前任务执行了{}", processEvent.toString());
-        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processEvent.getBusinessKey()));
-        testLeave.setStatus(processEvent.getStatus());
-        if (processEvent.isSubmit()) {
-            testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
-        }
-        baseMapper.updateById(testLeave);
-    }
-
-    /**
-     * 总体流程监听(例如: 提交 退回 撤销 终止 作废等)
-     *
-     * @param processEvent 参数
-     */
-    @EventListener(condition = "#processEvent.key=='leave5'")
-    public void leave5(ProcessEvent processEvent) {
-        log.info("当前任务执行了{}", processEvent.toString());
-        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processEvent.getBusinessKey()));
-        testLeave.setStatus(processEvent.getStatus());
-        if (processEvent.isSubmit()) {
-            testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
-        }
-        baseMapper.updateById(testLeave);
-    }
-
-    /**
-     * 总体流程监听(例如: 提交 退回 撤销 终止 作废等)
-     *
-     * @param processEvent 参数
-     */
-    @EventListener(condition = "#processEvent.key=='leave6'")
-    public void leave6(ProcessEvent processEvent) {
-        log.info("当前任务执行了{}", processEvent.toString());
-        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processEvent.getBusinessKey()));
-        testLeave.setStatus(processEvent.getStatus());
-        if (processEvent.isSubmit()) {
-            testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
-        }
         baseMapper.updateById(testLeave);
     }
 }
