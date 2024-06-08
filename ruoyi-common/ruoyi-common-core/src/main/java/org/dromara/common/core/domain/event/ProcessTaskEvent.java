@@ -18,9 +18,14 @@ public class ProcessTaskEvent implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 流程定义key与流程节点标识(拼接方式：流程定义key_流程节点)
+     * 流程定义key
      */
-    private String keyNode;
+    private String key;
+
+    /**
+     * 审批节点key
+     */
+    private String taskDefinitionKey;
 
     /**
      * 任务id

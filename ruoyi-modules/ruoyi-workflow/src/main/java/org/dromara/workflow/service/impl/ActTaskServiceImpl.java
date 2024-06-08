@@ -184,8 +184,8 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
             runtimeService.updateBusinessStatus(task.getProcessInstanceId(), BusinessStatusEnum.WAITING.getStatus());
             //办理监听
-            String keyNode = processInstance.getProcessDefinitionKey() + "_" + task.getTaskDefinitionKey();
-            flowProcessEventHandler.processTaskHandler(keyNode, task.getId(), processInstance.getBusinessKey());
+            flowProcessEventHandler.processTaskHandler(processInstance.getProcessDefinitionKey(), task.getTaskDefinitionKey(),
+                task.getId(), processInstance.getBusinessKey());
             //办理意见
             taskService.addComment(completeTaskBo.getTaskId(), task.getProcessInstanceId(), TaskStatusEnum.PASS.getStatus(), StringUtils.isBlank(completeTaskBo.getMessage()) ? "同意" : completeTaskBo.getMessage());
             //办理任务

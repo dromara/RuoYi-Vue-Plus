@@ -34,13 +34,15 @@ public class FlowProcessEventHandler {
     /**
      * 执行办理任务监听
      *
-     * @param keyNode     流程定义key与流程节点标识(拼接方式：流程定义key_流程节点)
-     * @param taskId      任务id
-     * @param businessKey 业务id
+     * @param key               流程key
+     * @param taskDefinitionKey 审批节点key
+     * @param taskId            任务id
+     * @param businessKey       业务id
      */
-    public void processTaskHandler(String keyNode, String taskId, String businessKey) {
+    public void processTaskHandler(String key, String taskDefinitionKey, String taskId, String businessKey) {
         ProcessTaskEvent processTaskEvent = new ProcessTaskEvent();
-        processTaskEvent.setKeyNode(keyNode);
+        processTaskEvent.setKey(key);
+        processTaskEvent.setTaskDefinitionKey(taskDefinitionKey);
         processTaskEvent.setTaskId(taskId);
         processTaskEvent.setBusinessKey(businessKey);
         SpringUtils.context().publishEvent(processTaskEvent);

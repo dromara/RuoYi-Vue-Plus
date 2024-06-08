@@ -134,10 +134,15 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
 
     /**
      * 执行办理任务监听
+     * 示例：也可通过  @EventListener(condition = "#processTaskEvent.key=='leave1'")进行判断
+     * 在方法中判断流程节点key
+     * if ("xxx".equals(processTaskEvent.getTaskDefinitionKey())) {
+     * //执行业务逻辑
+     * }
      *
      * @param processTaskEvent 参数
      */
-    @EventListener(condition = "#processTaskEvent.keyNode=='leave1_Activity_14633hx'")
+    @EventListener(condition = "#processTaskEvent.key=='leave1' && #processTaskEvent.taskDefinitionKey=='Activity_14633hx'")
     public void processTaskHandler(ProcessTaskEvent processTaskEvent) {
         log.info("当前任务执行了{}", processTaskEvent.toString());
         TestLeave testLeave = baseMapper.selectById(Long.valueOf(processTaskEvent.getBusinessKey()));
