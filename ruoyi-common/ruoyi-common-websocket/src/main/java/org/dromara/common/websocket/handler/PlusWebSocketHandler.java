@@ -30,7 +30,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
         if (ObjectUtil.isNull(loginUser)) {
             session.close(CloseStatus.BAD_DATA);
-            log.info("[disconnect] invalid token received. sessionId: {}", session.getId());
+            log.info("[connect] invalid token received. sessionId: {}", session.getId());
             return;
         }
         WebSocketSessionHolder.addSession(loginUser.getUserId(), session);
