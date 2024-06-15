@@ -10,8 +10,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * @author Lion Li
  */
 @AutoConfiguration
-// 表示通过aop框架暴露该代理对象,AopContext能够访问
-@EnableAspectJAutoProxy(exposeProxy = true)
+@EnableAspectJAutoProxy
 @EnableAsync(proxyTargetClass = true)
 public class ApplicationConfig {
 
