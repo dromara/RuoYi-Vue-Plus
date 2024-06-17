@@ -3,7 +3,6 @@ package org.dromara.workflow.flowable.cmd;
 import cn.hutool.core.collection.CollUtil;
 import org.dromara.common.core.domain.dto.OssDTO;
 import org.dromara.common.core.service.OssService;
-import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -28,17 +27,20 @@ public class AttachmentCmd implements Command<Boolean> {
 
     private final String processInstanceId;
 
-    public AttachmentCmd(String fileId, String taskId, String processInstanceId) {
+    private final OssService ossService;
+
+    public AttachmentCmd(String fileId, String taskId, String processInstanceId, OssService ossService) {
         this.fileId = fileId;
         this.taskId = taskId;
         this.processInstanceId = processInstanceId;
+        this.ossService = ossService;
     }
 
     @Override
     public Boolean execute(CommandContext commandContext) {
         try {
             if (StringUtils.isNotBlank(fileId)) {
-                List<OssDTO> ossList = SpringUtils.getBean(OssService.class).selectByIds(fileId);
+                List<OssDTO> ossList = ossService.selectByIds(fileId);
                 if (CollUtil.isNotEmpty(ossList)) {
                     for (OssDTO oss : ossList) {
                         AttachmentEntityManager attachmentEntityManager = CommandContextUtil.getAttachmentEntityManager();

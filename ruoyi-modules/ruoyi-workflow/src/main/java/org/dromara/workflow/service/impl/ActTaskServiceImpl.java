@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.service.OssService;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -78,8 +79,9 @@ public class ActTaskServiceImpl implements IActTaskService {
     private final ActHiTaskinstMapper actHiTaskinstMapper;
     private final IWfNodeConfigService wfNodeConfigService;
     private final IWfDefinitionConfigService wfDefinitionConfigService;
-    private final UserService userService;
     private final FlowProcessEventHandler flowProcessEventHandler;
+    private final UserService userService;
+    private final OssService ossService;
 
     /**
      * 启动任务
@@ -175,7 +177,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                 return true;
             }
             //附件上传
-            AttachmentCmd attachmentCmd = new AttachmentCmd(completeTaskBo.getFileId(), task.getId(), task.getProcessInstanceId());
+            AttachmentCmd attachmentCmd = new AttachmentCmd(completeTaskBo.getFileId(), task.getId(), task.getProcessInstanceId(), ossService);
             managementService.executeCommand(attachmentCmd);
             String businessStatus = WorkflowUtils.getBusinessStatus(processInstance.getBusinessKey());
             //流程提交监听
@@ -239,7 +241,7 @@ public class ActTaskServiceImpl implements IActTaskService {
      */
     @Async
     public void sendMessage(List<Task> list, String name, List<String> messageType, String message) {
-        WorkflowUtils.sendMessage(list, name, messageType, message);
+        WorkflowUtils.sendMessage(list, name, messageType, message, userService);
     }
 
     /**
@@ -273,7 +275,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (TaskVo task : taskList) {
                 task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
-                task.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
+                task.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId(), userService));
                 task.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
                     wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(task::setWfNodeConfigVo);
@@ -338,7 +340,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                     });
                 }
                 taskVo.setAssignee(StringUtils.isNotBlank(task.getAssignee()) ? Long.valueOf(task.getAssignee()) : null);
-                taskVo.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
+                taskVo.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId(), userService));
                 taskVo.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
                     wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(task.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(taskVo::setWfNodeConfigVo);
