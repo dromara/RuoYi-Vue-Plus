@@ -88,13 +88,6 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
         return Db.saveOrUpdateBatch(entityList, batchSize);
     }
 
-    /**
-     * 插入或更新(包含限制条数)
-     */
-    default boolean insertOrUpdate(T entity) {
-        return Db.saveOrUpdate(entity);
-    }
-
     default V selectVoById(Serializable id) {
         return selectVoById(id, this.currentVoClass());
     }
