@@ -31,7 +31,12 @@ public enum DataBaseType {
     /**
      * SQL Server
      */
-    SQL_SERVER("Microsoft SQL Server");
+    SQL_SERVER("Microsoft SQL Server"),
+
+    /**
+     * MariaDB
+     */
+    MARIA_DB("MariaDB");
 
     private final String type;
 

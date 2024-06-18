@@ -41,7 +41,7 @@ public class DataBaseHelper {
     }
 
     public static boolean isMySql() {
-        return DataBaseType.MY_SQL == getDataBaseType();
+        return DataBaseType.MY_SQL == getDataBaseType() || DataBaseType.MARIA_DB == getDataBaseType();
     }
 
     public static boolean isOracle() {
