@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -29,6 +30,7 @@ import static org.dromara.workflow.common.constant.FlowConstant.USER_TASK;
  * @author may
  * @date 2024-03-13
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class WfTaskBackNodeServiceImpl implements IWfTaskBackNodeService {
@@ -109,7 +111,7 @@ public class WfTaskBackNodeServiceImpl implements IWfTaskBackNodeService {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
             throw new ServiceException("删除失败");
         }
     }
