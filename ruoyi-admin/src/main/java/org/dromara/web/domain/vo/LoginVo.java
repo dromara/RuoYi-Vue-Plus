@@ -51,9 +51,4 @@ public class LoginVo {
      */
     private String openid;
 
-    /**
-     * 域名
-     */
-    private String domain;
-
 }

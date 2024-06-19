@@ -221,17 +221,17 @@ public class SysLoginService {
      *
      * @param tenantId 租户ID
      */
-    public SysTenantVo checkTenant(String tenantId) {
+    public void checkTenant(String tenantId) {
         if (!TenantHelper.isEnable()) {
-            return null;
+            return;
+        }
+        if (TenantConstants.DEFAULT_TENANT_ID.equals(tenantId)) {
+            return;
         }
         if (StringUtils.isBlank(tenantId)) {
             throw new TenantException("tenant.number.not.blank");
         }
         SysTenantVo tenant = tenantService.queryByTenantId(tenantId);
-        if (TenantConstants.DEFAULT_TENANT_ID.equals(tenantId)) {
-            return tenant;
-        }
         if (ObjectUtil.isNull(tenant)) {
             log.info("登录租户：{} 不存在.", tenantId);
             throw new TenantException("tenant.not.exists");
@@ -243,7 +243,6 @@ public class SysLoginService {
             log.info("登录租户：{} 已超过有效期.", tenantId);
             throw new TenantException("tenant.expired");
         }
-        return tenant;
     }
 
 }

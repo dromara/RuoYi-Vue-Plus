@@ -91,7 +91,7 @@ public class AuthController {
             return R.fail(MessageUtils.message("auth.grant.type.blocked"));
         }
         // 校验租户
-        SysTenantVo tenant = loginService.checkTenant(loginBody.getTenantId());
+        loginService.checkTenant(loginBody.getTenantId());
         // 登录
         LoginVo loginVo = IAuthStrategy.login(body, client, grantType);
 
@@ -102,10 +102,6 @@ public class AuthController {
             dto.setSessionKeys(List.of(userId));
             WebSocketUtils.publishMessage(dto);
         }, 3, TimeUnit.SECONDS);
-
-        if (StringUtils.isNotBlank(tenant.getTenantId())) {
-            loginVo.setDomain(tenant.getDomain());
-        }
         return R.ok(loginVo);
     }
 
@@ -133,7 +129,7 @@ public class AuthController {
      * @return 结果
      */
     @PostMapping("/social/callback")
-    public R<LoginVo> socialCallback(@RequestBody SocialLoginBody loginBody) {
+    public R<Void> socialCallback(@RequestBody SocialLoginBody loginBody) {
         // 获取第三方登录信息
         AuthResponse<AuthUser> response = SocialUtils.loginAuth(
                 loginBody.getSource(), loginBody.getSocialCode(),
@@ -144,13 +140,7 @@ public class AuthController {
             return R.fail(response.getMsg());
         }
         loginService.socialRegister(authUserData);
-
-        LoginVo loginVo = new LoginVo();
-        SysTenantVo tenant = tenantService.queryByTenantId(LoginHelper.getTenantId());
-        if (StringUtils.isNotBlank(tenant.getTenantId())) {
-            loginVo.setDomain(tenant.getDomain());
-        }
-        return R.ok(loginVo);
+        return R.ok();
     }
 
 
