@@ -20,6 +20,8 @@ snail-job:
     port: 1788
   # 详见 script/sql/snail_job.sql `sj_namespace` 表
   namespace: ${spring.profiles.active}
+  # 随主应用端口飘逸
+  port: 2${server.port}
 
 --- # 数据源配置
 spring:
