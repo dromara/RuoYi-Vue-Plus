@@ -9,6 +9,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -55,6 +56,7 @@ import java.util.zip.ZipInputStream;
  *
  * @author may
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionService {
@@ -208,7 +210,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             wfNodeConfigService.deleteByDefIds(processDefinitionIds);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
     }
@@ -233,7 +235,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
             throw new ServiceException("操作失败:" + e.getMessage());
         }
     }
@@ -262,6 +264,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 .migrateProcessInstances(fromProcessDefinitionId);
             return true;
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
     }
@@ -291,7 +294,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
     }

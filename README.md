@@ -10,7 +10,7 @@
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
 <br>
 [![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-5.2.0-success.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1-blue.svg)]()
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-blue.svg)]()
 [![JDK-17](https://img.shields.io/badge/JDK-17-green.svg)]()
 [![JDK-21](https://img.shields.io/badge/JDK-21-green.svg)]()
 

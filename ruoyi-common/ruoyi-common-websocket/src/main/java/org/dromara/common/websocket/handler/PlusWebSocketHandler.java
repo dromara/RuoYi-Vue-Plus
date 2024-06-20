@@ -1,5 +1,6 @@
 package org.dromara.common.websocket.handler;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
@@ -8,6 +9,7 @@ import org.dromara.common.websocket.utils.WebSocketUtils;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.dromara.common.websocket.constant.WebSocketConstants.LOGIN_USER_KEY;
@@ -24,8 +26,13 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
      * 连接成功后
      */
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
+    public void afterConnectionEstablished(WebSocketSession session) throws IOException {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
+        if (ObjectUtil.isNull(loginUser)) {
+            session.close(CloseStatus.BAD_DATA);
+            log.info("[connect] invalid token received. sessionId: {}", session.getId());
+            return;
+        }
         WebSocketSessionHolder.addSession(loginUser.getUserId(), session);
         log.info("[connect] sessionId: {},userId:{},userType:{}", session.getId(), loginUser.getUserId(), loginUser.getUserType());
     }
@@ -94,6 +101,10 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
+        if (ObjectUtil.isNull(loginUser)) {
+            log.info("[disconnect] invalid token received. sessionId: {}", session.getId());
+            return;
+        }
         WebSocketSessionHolder.removeSession(loginUser.getUserId());
         log.info("[disconnect] sessionId: {},userId:{},userType:{}", session.getId(), loginUser.getUserId(), loginUser.getUserType());
     }
