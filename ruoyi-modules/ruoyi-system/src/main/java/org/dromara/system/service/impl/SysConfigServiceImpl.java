@@ -178,7 +178,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
             }
             CacheUtils.evict(CacheNames.SYS_CONFIG, config.getConfigKey());
         }
-        baseMapper.deleteBatchIds(Arrays.asList(configIds));
+        baseMapper.deleteByIds(Arrays.asList(configIds));
     }
 
     /**

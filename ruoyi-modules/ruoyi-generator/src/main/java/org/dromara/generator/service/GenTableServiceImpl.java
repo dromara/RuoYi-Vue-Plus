@@ -165,7 +165,7 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public void deleteGenTableByIds(Long[] tableIds) {
         List<Long> ids = Arrays.asList(tableIds);
-        baseMapper.deleteBatchIds(ids);
+        baseMapper.deleteByIds(ids);
         genTableColumnMapper.delete(new LambdaQueryWrapper<GenTableColumn>().in(GenTableColumn::getTableId, ids));
     }
 
@@ -332,7 +332,7 @@ public class GenTableServiceImpl implements IGenTableService {
         if (CollUtil.isNotEmpty(delColumns)) {
             List<Long> ids = StreamUtils.toList(delColumns, GenTableColumn::getColumnId);
             if (CollUtil.isNotEmpty(ids)) {
-                genTableColumnMapper.deleteBatchIds(ids);
+                genTableColumnMapper.deleteByIds(ids);
             }
         }
     }

@@ -125,8 +125,7 @@ public class WorkflowUtils {
      *
      * @param taskId 任务id
      */
-    public static ParticipantVo getCurrentTaskParticipant(String taskId) {
-        UserService userService = SpringUtils.getBean(UserService.class);
+    public static ParticipantVo getCurrentTaskParticipant(String taskId, UserService userService) {
         ParticipantVo participantVo = new ParticipantVo();
         List<HistoricIdentityLink> linksForTask = PROCESS_ENGINE.getHistoryService().getHistoricIdentityLinksForTask(taskId);
         Task task = QueryUtils.taskQuery().taskId(taskId).singleResult();
@@ -234,14 +233,13 @@ public class WorkflowUtils {
      * @param messageType 消息类型
      * @param message     消息内容，为空则发送默认配置的消息内容
      */
-    public static void sendMessage(List<Task> list, String name, List<String> messageType, String message) {
-        UserService userService = SpringUtils.getBean(UserService.class);
+    public static void sendMessage(List<Task> list, String name, List<String> messageType, String message, UserService userService) {
         Set<Long> userIds = new HashSet<>();
         if (StringUtils.isBlank(message)) {
             message = "有新的【" + name + "】单据已经提交至您的待办，请您及时处理。";
         }
         for (Task t : list) {
-            ParticipantVo taskParticipant = WorkflowUtils.getCurrentTaskParticipant(t.getId());
+            ParticipantVo taskParticipant = WorkflowUtils.getCurrentTaskParticipant(t.getId(), userService);
             if (CollUtil.isNotEmpty(taskParticipant.getGroupIds())) {
                 List<Long> userIdList = userService.selectUserIdsByRoleIds(taskParticipant.getGroupIds());
                 if (CollUtil.isNotEmpty(userIdList)) {

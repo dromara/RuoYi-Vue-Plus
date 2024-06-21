@@ -10,6 +10,7 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
@@ -57,6 +58,7 @@ import java.util.zip.ZipOutputStream;
  *
  * @author may
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ActModelServiceImpl implements IActModelService {
@@ -128,7 +130,7 @@ public class ActModelServiceImpl implements IActModelService {
             repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(xml));
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
     }
@@ -154,6 +156,7 @@ public class ActModelServiceImpl implements IActModelService {
                 modelVo.setDescription(model.getMetaInfo());
                 return modelVo;
             } catch (Exception e) {
+                log.error(e.getMessage(), e);
                 throw new ServiceException(e.getMessage());
             }
         }
@@ -178,6 +181,7 @@ public class ActModelServiceImpl implements IActModelService {
             model.setMetaInfo(modelBo.getDescription());
             repositoryService.saveModel(model);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
         return true;
@@ -227,7 +231,7 @@ public class ActModelServiceImpl implements IActModelService {
             repositoryService.addModelEditorSourceExtra(model.getId(), result);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
     }
@@ -333,7 +337,7 @@ public class ActModelServiceImpl implements IActModelService {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
     }
@@ -377,7 +381,7 @@ public class ActModelServiceImpl implements IActModelService {
             // 刷出响应流
             response.flushBuffer();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -424,6 +428,7 @@ public class ActModelServiceImpl implements IActModelService {
                 }
             }
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
         return true;

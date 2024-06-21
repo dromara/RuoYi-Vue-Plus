@@ -106,6 +106,6 @@ public class WfFormManageServiceImpl implements IWfFormManageService {
      */
     @Override
     public Boolean deleteByIds(Collection<Long> ids) {
-        return baseMapper.deleteBatchIds(ids) > 0;
+        return baseMapper.deleteByIds(ids) > 0;
     }
 }

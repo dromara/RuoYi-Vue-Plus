@@ -1,14 +1,15 @@
 package org.dromara.demo.controller.queue;
 
 import cn.dev33.satoken.annotation.SaIgnore;
-import org.dromara.common.core.domain.R;
-import org.dromara.common.redis.utils.QueueUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.R;
+import org.dromara.common.redis.utils.QueueUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,6 +43,10 @@ public class DelayedQueueController {
         QueueUtils.subscribeBlockingQueue(queueName, (String orderNum) -> {
             // 观察接收时间
             log.info("通道: {}, 收到数据: {}", queueName, orderNum);
+            return CompletableFuture.runAsync(() -> {
+                // 异步处理数据逻辑 不要在上方处理业务逻辑
+                log.info("数据处理: {}", orderNum);
+            });
         }, true);
         return R.ok("操作成功");
     }
