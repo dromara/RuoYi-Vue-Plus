@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ModelBo;
+import org.dromara.workflow.domain.bo.ModelDeployBo;
 import org.dromara.workflow.domain.vo.ModelVo;
 import org.flowable.engine.repository.Model;
 
@@ -60,10 +61,10 @@ public interface IActModelService {
     /**
      * 模型部署
      *
-     * @param id 模型id
+     * @param modelDeployBo 参数
      * @return 结果
      */
-    boolean modelDeploy(String id);
+    boolean modelDeploy(ModelDeployBo modelDeployBo);
 
     /**
      * 导出模型zip压缩包

@@ -14,6 +14,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.workflow.domain.bo.ModelBo;
+import org.dromara.workflow.domain.bo.ModelDeployBo;
 import org.dromara.workflow.domain.vo.ModelVo;
 import org.dromara.workflow.service.IActModelService;
 import org.flowable.engine.RepositoryService;
@@ -114,13 +115,13 @@ public class ActModelController extends BaseController {
     /**
      * 模型部署
      *
-     * @param id 模型id
+     * @param modelDeployBo 参数
      */
     @Log(title = "模型管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()
-    @PostMapping("/modelDeploy/{id}")
-    public R<Void> deploy(@NotBlank(message = "模型id不能为空") @PathVariable("id") String id) {
-        return toAjax(actModelService.modelDeploy(id));
+    @PostMapping("/modelDeploy")
+    public R<Void> deploy(@RequestBody ModelDeployBo modelDeployBo) {
+        return toAjax(actModelService.modelDeploy(modelDeployBo));
     }
 
     /**

@@ -20,6 +20,7 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.WfNodeConfig;
 import org.dromara.workflow.domain.bo.ModelBo;
+import org.dromara.workflow.domain.bo.ModelDeployBo;
 import org.dromara.workflow.domain.bo.WfDefinitionConfigBo;
 import org.dromara.workflow.domain.vo.ModelVo;
 import org.dromara.workflow.domain.vo.WfDefinitionConfigVo;
@@ -33,10 +34,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.repository.Deployment;
-import org.flowable.engine.repository.Model;
-import org.flowable.engine.repository.ModelQuery;
-import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.*;
 import org.flowable.validation.ValidationError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,7 +123,6 @@ public class ActModelServiceImpl implements IActModelService {
             model.setVersion(version);
             model.setCategory(categoryCode);
             model.setMetaInfo(description);
-            model.setTenantId(TenantHelper.getTenantId());
             //保存初始化的模型基本信息数据
             repositoryService.saveModel(model);
             repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(xml));
@@ -238,15 +235,16 @@ public class ActModelServiceImpl implements IActModelService {
     /**
      * 模型部署
      *
-     * @param id 模型id
+     * @param modelDeployBo 参数
      * @return 结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean modelDeploy(String id) {
+    public boolean modelDeploy(ModelDeployBo modelDeployBo) {
         try {
+            String modelId = modelDeployBo.getModelId();
             // 查询流程定义模型xml
-            byte[] xmlBytes = repositoryService.getModelEditorSource(id);
+            byte[] xmlBytes = repositoryService.getModelEditorSource(modelId);
             if (ArrayUtil.isEmpty(xmlBytes)) {
                 throw new ServiceException("模型数据为空，请先设计流程定义模型，再进行部署！");
             }
@@ -265,12 +263,12 @@ public class ActModelServiceImpl implements IActModelService {
                 throw new ServiceException(errorMsg);
             }
             // 查询模型的基本信息
-            Model model = repositoryService.getModel(id);
+            Model model = repositoryService.getModel(modelId);
             ProcessDefinition processDefinition = QueryUtils.definitionQuery().processDefinitionKey(model.getKey()).latestVersion().singleResult();
             // xml资源的名称 ，对应act_ge_bytearray表中的name_字段
             String processName = model.getName() + ".bpmn20.xml";
             // 调用部署相关的api方法进行部署流程定义
-            Deployment deployment = repositoryService.createDeployment()
+            DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
                 // 部署名称
                 .name(model.getName())
                 // 部署标识key
@@ -278,11 +276,11 @@ public class ActModelServiceImpl implements IActModelService {
                 // 部署流程分类
                 .category(model.getCategory())
                 // bpmn20.xml资源
-                .addBytes(processName, xmlBytes)
-                // 租户id
-                .tenantId(TenantHelper.getTenantId())
-                .deploy();
-
+                .addBytes(processName, xmlBytes);
+            if (TenantHelper.isEnable()) {
+                deploymentBuilder.tenantId(modelDeployBo.getTenantId());
+            }
+            Deployment deployment = deploymentBuilder.deploy();
             // 更新 部署id 到流程定义模型数据表中
             model.setDeploymentId(deployment.getId());
             repositoryService.saveModel(model);
@@ -300,7 +298,12 @@ public class ActModelServiceImpl implements IActModelService {
                     wfFormDefinition.setTableName(definitionVo.getTableName());
                     wfFormDefinition.setVersion(definition.getVersion());
                     wfFormDefinition.setRemark(definitionVo.getRemark());
-                    wfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
+                    if (TenantHelper.isEnable()) {
+                        wfFormDefinition.setTenantId(modelDeployBo.getTenantId());
+                    }
+                    TenantHelper.ignore(() -> {
+                        wfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
+                    });
                 }
             }
             //更新流程节点配置表单
@@ -317,11 +320,16 @@ public class ActModelServiceImpl implements IActModelService {
                     wfNodeConfig.setFormType(split[0]);
                     wfNodeConfig.setFormId(Long.valueOf(split[1]));
                     wfNodeConfig.setApplyUserTask(applyUserTask.getId().equals(userTask.getId()) ? FlowConstant.TRUE : FlowConstant.FALSE);
+                    if (TenantHelper.isEnable()) {
+                        wfNodeConfig.setTenantId(modelDeployBo.getTenantId());
+                    }
                     wfNodeConfigList.add(wfNodeConfig);
                 }
             }
             if (CollUtil.isNotEmpty(wfNodeConfigList)) {
-                wfNodeConfigService.saveOrUpdate(wfNodeConfigList);
+                TenantHelper.ignore(() -> {
+                    wfNodeConfigService.saveOrUpdate(wfNodeConfigList);
+                });
             }
             return true;
         } catch (Exception e) {
@@ -364,8 +372,7 @@ public class ActModelServiceImpl implements IActModelService {
                     }
                 }
             }
-            response.setHeader("Content-Disposition",
-                "attachment; filename=" + URLEncoder.encode(zipName, StandardCharsets.UTF_8) + ".zip");
+            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(zipName, StandardCharsets.UTF_8) + ".zip");
             response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
             // 刷出响应流
             response.flushBuffer();

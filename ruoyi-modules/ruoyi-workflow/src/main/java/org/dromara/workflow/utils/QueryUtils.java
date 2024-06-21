@@ -33,11 +33,7 @@ public class QueryUtils {
     private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
 
     public static ModelQuery modelQuery() {
-        ModelQuery query = PROCESS_ENGINE.getRepositoryService().createModelQuery();
-        if (TenantHelper.isEnable()) {
-            query.modelTenantId(TenantHelper.getTenantId());
-        }
-        return query;
+        return PROCESS_ENGINE.getRepositoryService().createModelQuery();
     }
 
     public static ProcessDefinitionQuery definitionQuery() {
