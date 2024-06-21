@@ -202,7 +202,7 @@ public class SysPostServiceImpl implements ISysPostService {
                 throw new ServiceException(String.format("%1$s已分配，不能删除!", post.getPostName()));
             }
         }
-        return baseMapper.deleteBatchIds(Arrays.asList(postIds));
+        return baseMapper.deleteByIds(Arrays.asList(postIds));
     }
 
     /**

@@ -163,7 +163,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
      */
     @Override
     public int deleteLogininforByIds(Long[] infoIds) {
-        return baseMapper.deleteBatchIds(Arrays.asList(infoIds));
+        return baseMapper.deleteByIds(Arrays.asList(infoIds));
     }
 
     /**

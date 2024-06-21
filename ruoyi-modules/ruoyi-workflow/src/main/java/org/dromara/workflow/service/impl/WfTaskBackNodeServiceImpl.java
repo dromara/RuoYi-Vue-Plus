@@ -106,7 +106,7 @@ public class WfTaskBackNodeServiceImpl implements IWfTaskBackNodeService {
                     }
                 }
                 if (CollUtil.isNotEmpty(ids)) {
-                    wfTaskBackNodeMapper.deleteBatchIds(ids);
+                    wfTaskBackNodeMapper.deleteByIds(ids);
                 }
             }
             return true;

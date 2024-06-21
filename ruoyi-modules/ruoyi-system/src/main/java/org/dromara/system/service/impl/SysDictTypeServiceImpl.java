@@ -141,7 +141,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
             }
             CacheUtils.evict(CacheNames.SYS_DICT, dictType.getDictType());
         }
-        baseMapper.deleteBatchIds(Arrays.asList(dictIds));
+        baseMapper.deleteByIds(Arrays.asList(dictIds));
     }
 
     /**

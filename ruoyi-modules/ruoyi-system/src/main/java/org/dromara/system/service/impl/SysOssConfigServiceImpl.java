@@ -135,7 +135,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
             SysOssConfig config = baseMapper.selectById(configId);
             list.add(config);
         }
-        boolean flag = baseMapper.deleteBatchIds(ids) > 0;
+        boolean flag = baseMapper.deleteByIds(ids) > 0;
         if (flag) {
             list.forEach(sysOssConfig ->
                 CacheUtils.evict(CacheNames.SYS_OSS_CONFIG, sysOssConfig.getConfigKey()));

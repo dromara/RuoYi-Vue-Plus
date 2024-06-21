@@ -119,6 +119,6 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      */
     @Override
     public int deleteNoticeByIds(Long[] noticeIds) {
-        return baseMapper.deleteBatchIds(Arrays.asList(noticeIds));
+        return baseMapper.deleteByIds(Arrays.asList(noticeIds));
     }
 }

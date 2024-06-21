@@ -107,7 +107,7 @@ public class WfDefinitionConfigServiceImpl implements IWfDefinitionConfigService
      */
     @Override
     public Boolean deleteByIds(Collection<Long> ids) {
-        return baseMapper.deleteBatchIds(ids) > 0;
+        return baseMapper.deleteByIds(ids) > 0;
     }
 
     @Override

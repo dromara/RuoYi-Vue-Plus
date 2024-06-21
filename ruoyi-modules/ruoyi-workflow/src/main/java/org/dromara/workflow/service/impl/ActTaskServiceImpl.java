@@ -696,7 +696,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             if (multiInstance == null && taskList.size() > 1) {
                 List<Task> tasks = StreamUtils.filter(taskList, e -> !e.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()));
                 if (CollUtil.isNotEmpty(tasks)) {
-                    actHiTaskinstMapper.deleteBatchIds(StreamUtils.toList(tasks, Task::getId));
+                    actHiTaskinstMapper.deleteByIds(StreamUtils.toList(tasks, Task::getId));
                 }
             }
 
