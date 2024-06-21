@@ -223,6 +223,7 @@ public class OssClient {
                         y -> y.bucket(properties.getBucketName())
                             .key(key)
                             .contentType(contentType)
+                            .acl(getAccessPolicy().getObjectCannedACL())
                             .build())
                     .build());
 
