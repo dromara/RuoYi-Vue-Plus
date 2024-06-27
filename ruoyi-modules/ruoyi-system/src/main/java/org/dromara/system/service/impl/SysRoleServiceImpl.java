@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 角色 业务层处理
@@ -104,12 +105,11 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public List<SysRoleVo> selectRolesAuthByUserId(Long userId) {
         List<SysRoleVo> userRoles = baseMapper.selectRolePermissionByUserId(userId);
         List<SysRoleVo> roles = selectRoleAll();
+        // 使用HashSet提高查找效率
+        Set<Long> userRoleIds = userRoles.stream().map(SysRoleVo::getRoleId).collect(Collectors.toSet());
         for (SysRoleVo role : roles) {
-            for (SysRoleVo userRole : userRoles) {
-                if (role.getRoleId().longValue() == userRole.getRoleId().longValue()) {
-                    role.setFlag(true);
-                    break;
-                }
+            if (userRoleIds.contains(role.getRoleId())) {
+                role.setFlag(true);
             }
         }
         return roles;
