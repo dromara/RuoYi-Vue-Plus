@@ -14,7 +14,6 @@ import java.util.List;
  *
  * @author Lion Li
  */
-
 @Data
 @NoArgsConstructor
 public class TableDataInfo<T> implements Serializable {
@@ -53,6 +52,9 @@ public class TableDataInfo<T> implements Serializable {
         this.total = total;
     }
 
+    /**
+     * 根据分页对象构建表格分页数据对象
+     */
     public static <T> TableDataInfo<T> build(IPage<T> page) {
         TableDataInfo<T> rspData = new TableDataInfo<>();
         rspData.setCode(HttpStatus.HTTP_OK);
@@ -62,6 +64,9 @@ public class TableDataInfo<T> implements Serializable {
         return rspData;
     }
 
+    /**
+     * 根据数据列表构建表格分页数据对象
+     */
     public static <T> TableDataInfo<T> build(List<T> list) {
         TableDataInfo<T> rspData = new TableDataInfo<>();
         rspData.setCode(HttpStatus.HTTP_OK);
@@ -71,6 +76,9 @@ public class TableDataInfo<T> implements Serializable {
         return rspData;
     }
 
+    /**
+     * 构建表格分页数据对象
+     */
     public static <T> TableDataInfo<T> build() {
         TableDataInfo<T> rspData = new TableDataInfo<>();
         rspData.setCode(HttpStatus.HTTP_OK);

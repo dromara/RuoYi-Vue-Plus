@@ -1,19 +1,22 @@
 package org.dromara.common.mybatis.enums;
 
-import org.dromara.common.core.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.dromara.common.core.domain.model.LoginUser;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.helper.DataPermissionHelper;
 
 /**
- * 数据权限类型
+ * 数据权限类型枚举
  * <p>
- * 语法支持 spel 模板表达式
- * <p>
- * 内置数据 user 当前用户 内容参考 LoginUser
- * 如需扩展数据 可使用 {@link DataPermissionHelper} 操作
- * 内置服务 sdss 系统数据权限服务 内容参考 SysDataScopeService
- * 如需扩展更多自定义服务 可以参考 sdss 自行编写
+ * 支持使用 SpEL 模板表达式定义 SQL 查询条件
+ * 内置数据：
+ * - {@code user}: 当前登录用户信息，参考 {@link LoginUser}
+ * 内置服务：
+ * - {@code sdss}: 系统数据权限服务，参考 {@link ISysDataScopeService}
+ * 如需扩展数据，可以通过 {@link DataPermissionHelper} 进行操作
+ * 如需扩展服务，可以通过 {@link ISysDataScopeService} 自行编写
+ * </p>
  *
  * @author Lion Li
  * @version 3.5.0
@@ -29,36 +32,50 @@ public enum DataScopeType {
 
     /**
      * 自定数据权限
+     * 使用 SpEL 表达式：`#{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} )`
+     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     CUSTOM("2", " #{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} ) ", " 1 = 0 "),
 
     /**
      * 部门数据权限
+     * 使用 SpEL 表达式：`#{#deptName} = #{#user.deptId}`
+     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     DEPT("3", " #{#deptName} = #{#user.deptId} ", " 1 = 0 "),
 
     /**
      * 部门及以下数据权限
+     * 使用 SpEL 表达式：`#{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )}`
+     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     DEPT_AND_CHILD("4", " #{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )} )", " 1 = 0 "),
 
     /**
      * 仅本人数据权限
+     * 使用 SpEL 表达式：`#{#userName} = #{#user.userId}`
+     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     SELF("5", " #{#userName} = #{#user.userId} ", " 1 = 0 ");
 
     private final String code;
 
     /**
-     * 语法 采用 spel 模板表达式
+     * SpEL 模板表达式，用于构建 SQL 查询条件
      */
     private final String sqlTemplate;
 
     /**
-     * 不满足 sqlTemplate 则填充
+     * 如果不满足 {@code sqlTemplate} 的条件，则使用此默认 SQL 表达式
      */
     private final String elseSql;
 
+    /**
+     * 根据枚举代码查找对应的枚举值
+     *
+     * @param code 枚举代码
+     * @return 对应的枚举值，如果未找到则返回 null
+     */
     public static DataScopeType findCode(String code) {
         if (StringUtils.isBlank(code)) {
             return null;

@@ -17,7 +17,6 @@ import java.util.Map;
  *
  * @author Lion Li
  */
-
 @Data
 public class BaseEntity implements Serializable {
 
