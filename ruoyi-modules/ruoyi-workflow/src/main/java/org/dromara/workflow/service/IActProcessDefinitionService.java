@@ -7,6 +7,7 @@ import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流程定义 服务层
@@ -88,4 +89,12 @@ public interface IActProcessDefinitionService {
      * @param categoryCode 分类
      */
     void deployByFile(MultipartFile file, String categoryCode);
+
+    /**
+     * 查询流程定义配置
+     *
+     * @param processDefinitionId 流程定义id
+     * @return 参数
+     */
+    Map<String, Object> getUserTaskSetting(String processDefinitionId);
 }

@@ -44,10 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -437,5 +434,22 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         if (CollUtil.isNotEmpty(wfNodeConfigList)) {
             wfNodeConfigService.saveOrUpdate(wfNodeConfigList);
         }
+    }
+
+    /**
+     * 查询流程定义配置
+     *
+     * @param processDefinitionId 流程定义id
+     * @return 参数
+     */
+    @Override
+    public Map<String, Object> getUserTaskSetting(String processDefinitionId) {
+        Map<String, Object> map = new HashMap<>();
+        ProcessDefinition pd = QueryUtils.definitionQuery()
+            .processDefinitionId(processDefinitionId).singleResult();
+        InputStream inputStream = repositoryService.getResourceAsStream(pd.getDeploymentId(), pd.getResourceName());
+        String xml = IoUtil.read(inputStream, StandardCharsets.UTF_8);
+        map.put("xml", xml);
+        return map;
     }
 }

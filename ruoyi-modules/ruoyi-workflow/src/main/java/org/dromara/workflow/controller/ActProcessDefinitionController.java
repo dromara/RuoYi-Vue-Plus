@@ -144,4 +144,16 @@ public class ActProcessDefinitionController extends BaseController {
         actProcessDefinitionService.deployByFile(file, categoryCode);
     }
 
+    /**
+     * 查询流程定义配置
+     *
+     * @param processDefinitionId 流程定义id
+     */
+    @Log(title = "流程定义管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @GetMapping("/getUserTaskSetting/{processDefinitionId}")
+    public R<Map<String, Object>> getUserTaskSetting(@NotEmpty(message = "流程定义id不能为空") @PathVariable String processDefinitionId) {
+        return R.ok(actProcessDefinitionService.getUserTaskSetting(processDefinitionId));
+    }
+
 }

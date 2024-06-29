@@ -67,6 +67,60 @@ public class WfNodeConfigVo implements Serializable {
     private String applyUserTask;
 
     /**
+     * 是否会签,0非会签,1会签
+     */
+    @ExcelProperty(value = "是否会签,0非会签,1会签")
+    private boolean multiple;
+
+    /**
+     * 会签保存人员KEY值
+     */
+    @ExcelProperty(value = "会签保存人员KEY值")
+    private boolean multipleColumn;
+
+    /**
+     * 是否可退回到当前节点,0不可退回,1可退回
+     */
+    @ExcelProperty(value = "是否可退回到当前节点,0不可退回,1可退回")
+    private boolean back;
+
+    /**
+     * 是否可委托,0不可委托,1可委托
+     */
+    @ExcelProperty(value = "是否可委托,0不可委托,1可委托")
+    private boolean delegate;
+
+    /**
+     * 是否可转办,0不可转办,1可转办
+     */
+    @ExcelProperty(value = "是否可转办,0不可转办,1可转办")
+    private boolean transfer;
+
+    /**
+     * 是否可抄送,0不可抄送,1可抄送
+     */
+    @ExcelProperty(value = "是否可抄送,0不可抄送,1可抄送")
+    private boolean copy;
+
+    /**
+     * 是否可加签,0不可加签,1可加签
+     */
+    @ExcelProperty(value = "是否可加签,0不可加签,1可加签")
+    private boolean addMultiInstance;
+
+    /**
+     * 是否可加签,0不可减签,1可减签
+     */
+    @ExcelProperty(value = "是否可加签,0不可减签,1可减签")
+    private boolean deleteMultiInstance;
+
+    /**
+     * 当前节点是否显示驳回,0不显示驳回按钮,1显示驳回按钮
+     */
+    @ExcelProperty(value = "当前节点是否显示驳回,0不显示驳回按钮,1显示驳回按钮")
+    private boolean showBack;
+
+    /**
      * 表单管理
      */
     private WfFormManageVo wfFormManageVo;
