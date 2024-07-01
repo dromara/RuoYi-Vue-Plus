@@ -17,7 +17,7 @@ snail-job:
   token: "SJ_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT"
   server:
     host: 127.0.0.1
-    port: 1788
+    port: 11788
   # 详见 script/sql/snail_job.sql `sj_namespace` 表
   namespace: ${spring.profiles.active}
   # 随主应用端口飘逸
