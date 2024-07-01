@@ -3,6 +3,7 @@ package org.dromara.common.satoken.utils;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.AccessLevel;
@@ -170,6 +171,9 @@ public class LoginHelper {
      * @return 结果
      */
     public static boolean isTenantAdmin(Set<String> rolePermission) {
+        if (CollUtil.isEmpty(rolePermission)) {
+            return false;
+        }
         return rolePermission.contains(TenantConstants.TENANT_ADMIN_ROLE_KEY);
     }
 
