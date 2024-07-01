@@ -149,7 +149,7 @@ services:
       TZ: Asia/Shanghai
     ports:
       - "8800:8800"
-      - "11788:11788"
+      - "17888:17888"
     volumes:
       - /docker/snailjob/logs/:/ruoyi/snailjob/logs
     privileged: true
