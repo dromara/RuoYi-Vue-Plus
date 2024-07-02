@@ -93,14 +93,6 @@ public interface ISysDeptService {
     boolean checkDeptNameUnique(SysDeptBo dept);
 
     /**
-     * 校验部门类别编码是否唯一
-     *
-     * @param dept 部门信息
-     * @return 结果
-     */
-    boolean checkDeptCategoryUnique(SysDeptBo dept);
-
-    /**
      * 校验部门是否有数据权限
      *
      * @param deptId 部门id
