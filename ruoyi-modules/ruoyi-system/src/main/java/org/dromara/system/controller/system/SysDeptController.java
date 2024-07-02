@@ -75,8 +75,6 @@ public class SysDeptController extends BaseController {
     public R<Void> add(@Validated @RequestBody SysDeptBo dept) {
         if (!deptService.checkDeptNameUnique(dept)) {
             return R.fail("新增部门'" + dept.getDeptName() + "'失败，部门名称已存在");
-        } else if (StringUtils.isNotBlank(dept.getDeptCategory()) && !deptService.checkDeptCategoryUnique(dept)) {
-            return R.fail("新增部门'" + dept.getDeptName() + "'失败，部门类别编码已存在");
         }
         return toAjax(deptService.insertDept(dept));
     }
