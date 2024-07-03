@@ -96,8 +96,8 @@ spring.data:
     port: 6379
     # 数据库索引
     database: 0
-    # 密码(如没有密码请注释掉)
-    # password:
+    # redis 密码必须配置
+    password: ruoyi123
     # 连接超时时间
     timeout: 10s
     # 是否开启ssl
