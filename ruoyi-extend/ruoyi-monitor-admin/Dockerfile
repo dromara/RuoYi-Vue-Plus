@@ -1,7 +1,9 @@
+# 贝尔实验室 Spring 官方推荐镜像 JDK下载地址 https://bell-sw.com/pages/downloads/
+FROM bellsoft/liberica-openjdk-alpine:17.0.11-cds
+#FROM bellsoft/liberica-openjdk-alpine:21.0.3-cds
 #FROM findepi/graalvm:java17-native
-FROM openjdk:17.0.2-oraclelinux8
 
-MAINTAINER Lion Li
+LABEL maintainer="Lion Li"
 
 RUN mkdir -p /ruoyi/monitor/logs
 
