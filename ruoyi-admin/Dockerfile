@@ -11,6 +11,10 @@ RUN mkdir -p /ruoyi/server/logs \
 
 WORKDIR /ruoyi/server
 
+# 补全alpine镜像缺失字体问题
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+RUN apk add fontconfig && apk add --update ttf-dejavu && fc-cache --force
+
 ENV SERVER_PORT=8080 LANG=C.UTF-8 LC_ALL=C.UTF-8 JAVA_OPTS=""
 
 EXPOSE ${SERVER_PORT}
