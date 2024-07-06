@@ -9,6 +9,7 @@ import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.StreamUtils;
@@ -17,7 +18,6 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.workflow.common.constant.FlowConstant;
-import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.domain.bo.ProcessInstanceBo;
@@ -34,7 +34,7 @@ import org.dromara.workflow.service.IWfNodeConfigService;
 import org.dromara.workflow.service.IWfTaskBackNodeService;
 import org.dromara.workflow.utils.QueryUtils;
 import org.dromara.workflow.utils.WorkflowUtils;
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -57,7 +57,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 流程实例 服务层实现
@@ -257,15 +256,15 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         List<HistoricActivityInstance> highLightedFlowList = QueryUtils.hisActivityInstanceQuery(processInstanceId).orderByHistoricActivityInstanceStartTime().asc().list();
         for (HistoricActivityInstance tempActivity : highLightedFlowList) {
             Map<String, Object> task = new HashMap<>();
-            if (!FlowConstant.SEQUENCE_FLOW.equals(tempActivity.getActivityType()) &&
-                !FlowConstant.PARALLEL_GATEWAY.equals(tempActivity.getActivityType()) &&
-                !FlowConstant.EXCLUSIVE_GATEWAY.equals(tempActivity.getActivityType()) &&
-                !FlowConstant.INCLUSIVE_GATEWAY.equals(tempActivity.getActivityType())
-            ) {
-                task.put("key", tempActivity.getActivityId());
-                task.put("completed", tempActivity.getEndTime() != null);
-                task.put("activityType", tempActivity.getActivityType());
-                taskList.add(task);
+            switch (tempActivity.getActivityType()) {
+                case FlowConstant.SEQUENCE_FLOW, FlowConstant.PARALLEL_GATEWAY,
+                     FlowConstant.EXCLUSIVE_GATEWAY, FlowConstant.INCLUSIVE_GATEWAY -> {}
+                default -> {
+                    task.put("key", tempActivity.getActivityId());
+                    task.put("completed", tempActivity.getEndTime() != null);
+                    task.put("activityType", tempActivity.getActivityType());
+                    taskList.add(task);
+                }
             }
         }
         ProcessInstance processInstance = QueryUtils.instanceQuery(processInstanceId).singleResult();
