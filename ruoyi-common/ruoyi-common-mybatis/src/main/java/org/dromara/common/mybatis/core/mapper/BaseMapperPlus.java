@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.toolkit.Db;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.StreamUtils;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -341,7 +342,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 查询到的符合条件的对象列表，经过转换为指定类型的对象后返回
      */
     default <C> List<C> selectObjs(Wrapper<T> wrapper, Function<? super Object, C> mapper) {
-        return this.selectObjs(wrapper).stream().filter(Objects::nonNull).map(mapper).collect(Collectors.toList());
+        return StreamUtils.toList(this.selectObjs(wrapper), mapper);
     }
 
 }

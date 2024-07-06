@@ -16,6 +16,7 @@ import org.dromara.common.core.domain.model.SocialLoginBody;
 import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.exception.user.UserException;
+import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -83,7 +84,7 @@ public class SocialAuthStrategy implements IAuthStrategy {
         }
         SysSocialVo social;
         if (TenantHelper.isEnable()) {
-            Optional<SysSocialVo> opt = list.stream().filter(x -> x.getTenantId().equals(loginBody.getTenantId())).findAny();
+            Optional<SysSocialVo> opt = StreamUtils.findAny(list, x -> x.getTenantId().equals(loginBody.getTenantId()));
             if (opt.isEmpty()) {
                 throw new ServiceException("对不起，你没有权限登录当前租户！");
             }
