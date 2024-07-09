@@ -192,7 +192,11 @@ public class LoginHelper {
      * @return 结果
      */
     public static boolean isLogin() {
-        return getLoginUser() != null;
+        try {
+            return getLoginUser() != null;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }
