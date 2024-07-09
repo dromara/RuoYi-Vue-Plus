@@ -1,8 +1,8 @@
 package org.dromara.common.mybatis.enums;
 
-import org.dromara.common.core.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.dromara.common.core.utils.StringUtils;
 
 /**
  * 数据库类型
@@ -33,8 +33,17 @@ public enum DataBaseType {
      */
     SQL_SERVER("Microsoft SQL Server");
 
+    /**
+     * 数据库类型
+     */
     private final String type;
 
+    /**
+     * 根据数据库产品名称查找对应的数据库类型
+     *
+     * @param databaseProductName 数据库产品名称
+     * @return 对应的数据库类型枚举值，如果未找到则返回 null
+     */
     public static DataBaseType find(String databaseProductName) {
         if (StringUtils.isBlank(databaseProductName)) {
             return null;

@@ -21,7 +21,7 @@ snail-job:
   # 拉取重试数据的每批次的大小
   job-pull-page-size: 1000
   # 服务端 netty 端口
-  netty-port: 1788
+  netty-port: 17888
   # 一个客户端每秒最多接收的重试数量指令
   limiter: 1000
   # 号段模式下步长配置

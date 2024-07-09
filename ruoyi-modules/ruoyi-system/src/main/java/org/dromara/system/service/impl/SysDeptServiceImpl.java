@@ -219,20 +219,6 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
     }
 
     /**
-     * 校验部门类别编码是否唯一
-     *
-     * @param dept 部门信息
-     * @return 结果
-     */
-    @Override
-    public boolean checkDeptCategoryUnique(SysDeptBo dept) {
-        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDept>()
-            .eq(SysDept::getDeptCategory, dept.getDeptCategory())
-            .ne(ObjectUtil.isNotNull(dept.getDeptId()), SysDept::getDeptId, dept.getDeptId()));
-        return !exist;
-    }
-
-    /**
      * 校验部门是否有数据权限
      *
      * @param deptId 部门id

@@ -122,7 +122,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      */
     @Override
     public int deleteOperLogByIds(Long[] operIds) {
-        return baseMapper.deleteBatchIds(Arrays.asList(operIds));
+        return baseMapper.deleteByIds(Arrays.asList(operIds));
     }
 
     /**

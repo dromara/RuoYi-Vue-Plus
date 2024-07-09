@@ -39,29 +39,17 @@ create table test_leave
 );
 
 comment on table test_leave is '请假申请表';
-
 comment on column test_leave.id is '主键';
-
 comment on column test_leave.leave_type is '请假类型';
-
 comment on column test_leave.start_date is '开始时间';
-
 comment on column test_leave.end_date is '结束时间';
-
 comment on column test_leave.remark is '请假原因';
-
 comment on column test_leave.status is '状态';
-
 comment on column test_leave.create_dept is '创建部门';
-
 comment on column test_leave.create_by is '创建者';
-
 comment on column test_leave.create_time is '创建时间';
-
 comment on column test_leave.update_by is '更新者';
-
 comment on column test_leave.update_time is '更新时间';
-
 comment on column test_leave.tenant_id is '租户编码';
 
 alter table test_leave
@@ -86,27 +74,16 @@ create table wf_category
 );
 
 comment on table wf_category is '流程分类';
-
 comment on column wf_category.id is '主键';
-
 comment on column wf_category.category_name is '分类名称';
-
 comment on column wf_category.category_code is '分类编码';
-
 comment on column wf_category.parent_id is '父级id';
-
 comment on column wf_category.sort_num is '排序';
-
 comment on column wf_category.tenant_id is '租户id';
-
 comment on column wf_category.create_dept is '创建部门';
-
 comment on column wf_category.create_by is '创建者';
-
 comment on column wf_category.create_time is '创建时间';
-
 comment on column wf_category.update_by is '修改者';
-
 comment on column wf_category.update_time is '修改时间';
 
 alter table wf_category
@@ -137,31 +114,18 @@ create table wf_task_back_node
 );
 
 comment on table wf_task_back_node is '节点审批记录';
-
 comment on column wf_task_back_node.id is '主键';
-
 comment on column wf_task_back_node.node_id is '节点id';
-
 comment on column wf_task_back_node.node_name is '节点名称';
-
 comment on column wf_task_back_node.order_no is '排序';
-
 comment on column wf_task_back_node.instance_id is '流程实例id';
-
 comment on column wf_task_back_node.task_type is '节点类型';
-
 comment on column wf_task_back_node.assignee is '审批人';
-
 comment on column wf_task_back_node.tenant_id is '租户id';
-
 comment on column wf_task_back_node.create_dept is '创建部门';
-
 comment on column wf_task_back_node.create_by is '创建者';
-
 comment on column wf_task_back_node.create_time is '创建时间';
-
 comment on column wf_task_back_node.update_by is '修改者';
-
 comment on column wf_task_back_node.update_time is '修改时间';
 
 alter table wf_task_back_node
@@ -177,6 +141,7 @@ create table wf_definition_config
     process_key   varchar(255) not null,
     version       bigint       not null,
     tenant_id     varchar(20),
+    remark        varchar(500),
     create_dept   bigint,
     create_by     bigint,
     create_time   timestamp,
@@ -185,27 +150,17 @@ create table wf_definition_config
 );
 
 comment on table wf_definition_config is '流程定义配置';
-
 comment on column wf_definition_config.id is '主键';
-
 comment on column wf_definition_config.table_name is '表名';
-
 comment on column wf_definition_config.definition_id is '流程定义ID';
-
 comment on column wf_definition_config.process_key is '流程KEY';
-
 comment on column wf_definition_config.version is '流程版本';
-
 comment on column wf_definition_config.tenant_id is '租户id';
-
+comment on column wf_definition_config.remark is '备注';
 comment on column wf_definition_config.create_dept is '创建部门';
-
 comment on column wf_definition_config.create_by is '创建者';
-
 comment on column wf_definition_config.create_time is '创建时间';
-
 comment on column wf_definition_config.update_by is '修改者';
-
 comment on column wf_definition_config.update_time is '修改时间';
 
 alter table wf_definition_config
@@ -231,27 +186,16 @@ create table wf_form_manage
 );
 
 comment on table wf_form_manage is '表单管理';
-
 comment on column wf_form_manage.id is '主键';
-
 comment on column wf_form_manage.form_name is '表单名称';
-
 comment on column wf_form_manage.form_type is '表单类型';
-
 comment on column wf_form_manage.router is '路由地址/表单ID';
-
 comment on column wf_form_manage.remark is '备注';
-
 comment on column wf_form_manage.tenant_id is '租户id';
-
 comment on column wf_form_manage.create_dept is '创建部门';
-
 comment on column wf_form_manage.create_by is '创建者';
-
 comment on column wf_form_manage.create_time is '创建时间';
-
 comment on column wf_form_manage.update_by is '修改者';
-
 comment on column wf_form_manage.update_time is '修改时间';
 
 insert into wf_form_manage(id, form_name, form_type, router, remark, tenant_id, create_dept, create_by, create_time, update_by, update_time) VALUES (1, '请假申请', 'static', '/workflow/leaveEdit/index', NULL, '000000', 103, 1, now(), 1, now());
@@ -276,31 +220,18 @@ create table wf_node_config
 );
 
 comment on table wf_node_config is '节点配置';
-
 comment on column wf_node_config.id is '主键';
-
 comment on column wf_node_config.form_id is '表单id';
-
 comment on column wf_node_config.form_type is '表单类型';
-
 comment on column wf_node_config.node_id is '节点id';
-
 comment on column wf_node_config.node_name is '节点名称';
-
 comment on column wf_node_config.definition_id is '流程定义id';
-
 comment on column wf_node_config.apply_user_task is '是否为申请人节点 （0是 1否）';
-
 comment on column wf_node_config.tenant_id is '租户id';
-
 comment on column wf_node_config.create_dept is '创建部门';
-
 comment on column wf_node_config.create_by is '创建者';
-
 comment on column wf_node_config.create_time is '创建时间';
-
 comment on column wf_node_config.update_by is '修改者';
-
 comment on column wf_node_config.update_time is '修改时间';
 
 INSERT INTO sys_menu(menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (11638, '请假申请', 5, 1, 'leave', 'workflow/leave/index', 1, 0, 'C', '0', '0', 'workflow:leave:list', '#', 103, 1, now(), NULL, NULL, '请假申请菜单');

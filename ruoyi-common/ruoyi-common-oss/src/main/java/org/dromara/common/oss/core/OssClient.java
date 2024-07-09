@@ -178,6 +178,7 @@ public class OssClient {
                             .key(key)
                             .contentMD5(StringUtils.isNotEmpty(md5Digest) ? md5Digest : null)
                             .contentType(contentType)
+                            .acl(getAccessPolicy().getObjectCannedACL())
                             .build())
                     .addTransferListener(LoggingTransferListener.create())
                     .source(filePath).build());
@@ -223,6 +224,7 @@ public class OssClient {
                         y -> y.bucket(properties.getBucketName())
                             .key(key)
                             .contentType(contentType)
+                            .acl(getAccessPolicy().getObjectCannedACL())
                             .build())
                     .build());
 

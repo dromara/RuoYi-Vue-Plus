@@ -102,14 +102,13 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public List<SysRoleVo> selectRolesAuthByUserId(Long userId) {
-        List<SysRoleVo> userRoles = baseMapper.selectRolePermissionByUserId(userId);
+        List<SysRoleVo> userRoles = baseMapper.selectRolesByUserId(userId);
         List<SysRoleVo> roles = selectRoleAll();
+        // 使用HashSet提高查找效率
+        Set<Long> userRoleIds = StreamUtils.toSet(userRoles, SysRoleVo::getRoleId);
         for (SysRoleVo role : roles) {
-            for (SysRoleVo userRole : userRoles) {
-                if (role.getRoleId().longValue() == userRole.getRoleId().longValue()) {
-                    role.setFlag(true);
-                    break;
-                }
+            if (userRoleIds.contains(role.getRoleId())) {
+                role.setFlag(true);
             }
         }
         return roles;
@@ -123,7 +122,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public Set<String> selectRolePermissionByUserId(Long userId) {
-        List<SysRoleVo> perms = baseMapper.selectRolePermissionByUserId(userId);
+        List<SysRoleVo> perms = baseMapper.selectRolesByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (SysRoleVo perm : perms) {
             if (ObjectUtil.isNotNull(perm)) {
@@ -417,7 +416,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, ids));
         // 删除角色与部门关联
         roleDeptMapper.delete(new LambdaQueryWrapper<SysRoleDept>().in(SysRoleDept::getRoleId, ids));
-        return baseMapper.deleteBatchIds(ids);
+        return baseMapper.deleteByIds(ids);
     }
 
     /**

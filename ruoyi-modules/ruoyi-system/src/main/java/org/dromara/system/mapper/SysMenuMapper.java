@@ -19,13 +19,6 @@ import java.util.List;
 public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
 
     /**
-     * 根据用户所有权限
-     *
-     * @return 权限列表
-     */
-    List<String> selectMenuPerms();
-
-    /**
      * 根据用户查询系统菜单列表
      *
      * @param queryWrapper 查询条件

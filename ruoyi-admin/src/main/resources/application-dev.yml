@@ -17,7 +17,7 @@ snail-job:
   token: "SJ_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT"
   server:
     host: 127.0.0.1
-    port: 1788
+    port: 17888
   # 详见 script/sql/snail_job.sql `sj_namespace` 表
   namespace: ${spring.profiles.active}
   # 随主应用端口飘逸
@@ -96,8 +96,8 @@ spring.data:
     port: 6379
     # 数据库索引
     database: 0
-    # 密码(如没有密码请注释掉)
-    # password:
+    # redis 密码必须配置
+    password: ruoyi123
     # 连接超时时间
     timeout: 10s
     # 是否开启ssl

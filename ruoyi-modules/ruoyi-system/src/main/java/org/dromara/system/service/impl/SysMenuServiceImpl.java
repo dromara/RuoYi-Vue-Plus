@@ -75,7 +75,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 .orderByAsc(SysMenu::getOrderNum));
         } else {
             QueryWrapper<SysMenu> wrapper = Wrappers.query();
-            wrapper.eq("sur.user_id", userId)
+            wrapper.inSql("r.role_id", "select role_id from sys_user_role where user_id = " + userId)
                 .like(StringUtils.isNotBlank(menu.getMenuName()), "m.menu_name", menu.getMenuName())
                 .eq(StringUtils.isNotBlank(menu.getVisible()), "m.visible", menu.getVisible())
                 .eq(StringUtils.isNotBlank(menu.getStatus()), "m.status", menu.getStatus())
@@ -178,6 +178,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
 
     /**
      * 构建前端路由所需要的菜单
+     * 路由name命名规则 path首字母转大写 + id
      *
      * @param menus 菜单列表
      * @return 路由列表
@@ -186,9 +187,10 @@ public class SysMenuServiceImpl implements ISysMenuService {
     public List<RouterVo> buildMenus(List<SysMenu> menus) {
         List<RouterVo> routers = new LinkedList<>();
         for (SysMenu menu : menus) {
+            String name = menu.getRouteName() + menu.getMenuId();
             RouterVo router = new RouterVo();
             router.setHidden("1".equals(menu.getVisible()));
-            router.setName(menu.getRouteName());
+            router.setName(name);
             router.setPath(menu.getRouterPath());
             router.setComponent(menu.getComponentInfo());
             router.setQuery(menu.getQueryParam());
@@ -199,12 +201,13 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 router.setRedirect("noRedirect");
                 router.setChildren(buildMenus(cMenus));
             } else if (menu.isMenuFrame()) {
+                String frameName = StringUtils.capitalize(menu.getPath()) + menu.getMenuId();
                 router.setMeta(null);
                 List<RouterVo> childrenList = new ArrayList<>();
                 RouterVo children = new RouterVo();
                 children.setPath(menu.getPath());
                 children.setComponent(menu.getComponent());
-                children.setName(StringUtils.capitalize(menu.getPath()));
+                children.setName(frameName);
                 children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StringUtils.equals("1", menu.getIsCache()), menu.getPath()));
                 children.setQuery(menu.getQueryParam());
                 childrenList.add(children);
@@ -215,9 +218,10 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 List<RouterVo> childrenList = new ArrayList<>();
                 RouterVo children = new RouterVo();
                 String routerPath = SysMenu.innerLinkReplaceEach(menu.getPath());
+                String innerLinkName = StringUtils.capitalize(routerPath) + menu.getMenuId();
                 children.setPath(routerPath);
                 children.setComponent(UserConstants.INNER_LINK);
-                children.setName(StringUtils.capitalize(routerPath));
+                children.setName(innerLinkName);
                 children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), menu.getPath()));
                 childrenList.add(children);
                 router.setChildren(childrenList);

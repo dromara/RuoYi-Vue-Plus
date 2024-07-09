@@ -11,6 +11,7 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.dromara.common.core.utils.StreamUtils;
 import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
 import org.springdoc.core.customizers.ServerBaseUrlCustomizer;
 import org.springdoc.core.properties.SpringDocConfigProperties;
@@ -230,7 +231,7 @@ public class OpenApiHandler extends OpenAPIService {
             .flatMap(x -> Stream.of(x.value())).collect(Collectors.toSet());
         methodTags.addAll(AnnotatedElementUtils.findAllMergedAnnotations(method, io.swagger.v3.oas.annotations.tags.Tag.class));
         if (!CollectionUtils.isEmpty(methodTags)) {
-            tagsStr.addAll(methodTags.stream().map(tag -> propertyResolverUtils.resolve(tag.name(), locale)).collect(Collectors.toSet()));
+            tagsStr.addAll(StreamUtils.toSet(methodTags, tag -> propertyResolverUtils.resolve(tag.name(), locale)));
             List<io.swagger.v3.oas.annotations.tags.Tag> allTags = new ArrayList<>(methodTags);
             addTags(allTags, tags, locale);
         }

@@ -1,12 +1,13 @@
 package org.dromara.common.redis.utils;
 
-import org.dromara.common.core.utils.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.utils.SpringUtils;
 import org.redisson.api.*;
 
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * 分布式队列工具
@@ -224,7 +225,7 @@ public class QueueUtils {
     /**
      * 订阅阻塞队列(可订阅所有实现类 例如: 延迟 优先 有界 等)
      */
-    public static <T> void subscribeBlockingQueue(String queueName, Consumer<T> consumer, boolean isDelayed) {
+    public static <T> void subscribeBlockingQueue(String queueName, Function<T, CompletionStage<Void>> consumer, boolean isDelayed) {
         RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
         if (isDelayed) {
             // 订阅延迟队列
