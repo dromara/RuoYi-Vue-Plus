@@ -20,4 +20,11 @@ public @interface DataPermission {
      */
     DataColumn[] value();
 
+    /**
+     * 权限拼接标识符(用于指定连接语句的sql符号)
+     * 如不填 默认 select 用 OR 其他语句用 AND
+     * 内容 OR 或者 AND
+     */
+    String joinStr() default "";
+
 }
