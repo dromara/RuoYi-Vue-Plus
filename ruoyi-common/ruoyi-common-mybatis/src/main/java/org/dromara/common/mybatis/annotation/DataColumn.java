@@ -30,4 +30,11 @@ public @interface DataColumn {
      */
     String[] value() default "dept_id";
 
+    /**
+     * 权限标识符 用于通过菜单权限标识符来获取数据权限
+     * 拥有此标识符的角色 将不会拼接此角色的数据过滤sql
+     *
+     * @return 权限标识符
+     */
+    String permission() default "";
 }

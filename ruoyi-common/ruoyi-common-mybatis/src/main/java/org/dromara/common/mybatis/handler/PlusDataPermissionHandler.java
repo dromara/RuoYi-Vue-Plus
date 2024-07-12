@@ -158,6 +158,12 @@ public class PlusDataPermissionHandler {
                 )) {
                     continue;
                 }
+                // 包含权限标识符 这直接跳过
+                if (StringUtils.isNotBlank(dataColumn.permission()) &&
+                    CollUtil.contains(user.getMenuPermission(), dataColumn.permission())
+                ) {
+                    continue;
+                }
                 // 设置注解变量 key 为表达式变量 value 为变量值
                 for (int i = 0; i < dataColumn.key().length; i++) {
                     context.setVariable(dataColumn.key()[i], dataColumn.value()[i]);
