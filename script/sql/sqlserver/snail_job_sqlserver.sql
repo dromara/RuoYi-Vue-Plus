@@ -2,7 +2,7 @@
  SnailJob Database Transfer Tool
  Source Server Type    : MySQL
  Target Server Type    : Microsoft SQL Server
- Date: 2024-05-13 23:03:34
+ Date: 2024-07-06 12:55:47
 */
 
 
@@ -370,7 +370,7 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'通知类型 1、钉钉 2、邮件 3、企业微信 4 飞书',
+     'MS_Description', N'通知类型 1、钉钉 2、邮件 3、企业微信 4 飞书 5 webhook',
      'SCHEMA', N'dbo',
      'TABLE', N'sj_notify_recipient',
      'COLUMN', N'notify_type'
@@ -1142,21 +1142,13 @@ GO
 -- sj_distributed_lock
 CREATE TABLE sj_distributed_lock
 (
-    id         bigint        NOT NULL PRIMARY KEY IDENTITY,
-    name       nvarchar(64)  NOT NULL,
+    name       nvarchar(64)  NOT NULL PRIMARY KEY,
     lock_until datetime2     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     locked_at  datetime2     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     locked_by  nvarchar(255) NOT NULL,
     create_dt  datetime2     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_dt  datetime2     NOT NULL DEFAULT CURRENT_TIMESTAMP
 )
-GO
-
-EXEC sp_addextendedproperty
-     'MS_Description', N'主键',
-     'SCHEMA', N'dbo',
-     'TABLE', N'sj_distributed_lock',
-     'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
@@ -1745,7 +1737,11 @@ CREATE TABLE sj_job_task
     parent_id      bigint        NOT NULL DEFAULT 0,
     task_status    tinyint       NOT NULL DEFAULT 0,
     retry_count    int           NOT NULL DEFAULT 0,
+    mr_stage       tinyint       NULL     DEFAULT NULL,
+    leaf           tinyint       NOT NULL DEFAULT '1',
+    task_name      nvarchar(255) NOT NULL DEFAULT '',
     client_info    nvarchar(128) NULL     DEFAULT NULL,
+    wf_context     nvarchar(max) NULL     DEFAULT NULL,
     result_message nvarchar(max) NOT NULL,
     args_str       nvarchar(max) NULL     DEFAULT NULL,
     args_type      tinyint       NOT NULL DEFAULT 1,
@@ -1819,10 +1815,38 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
+     'MS_Description', N'动态分片所处阶段 1:map 2:reduce 3:mergeReduce',
+     'SCHEMA', N'dbo',
+     'TABLE', N'sj_job_task',
+     'COLUMN', N'mr_stage'
+GO
+
+EXEC sp_addextendedproperty
+     'MS_Description', N'叶子节点',
+     'SCHEMA', N'dbo',
+     'TABLE', N'sj_job_task',
+     'COLUMN', N'leaf'
+GO
+
+EXEC sp_addextendedproperty
+     'MS_Description', N'任务名称',
+     'SCHEMA', N'dbo',
+     'TABLE', N'sj_job_task',
+     'COLUMN', N'task_name'
+GO
+
+EXEC sp_addextendedproperty
      'MS_Description', N'客户端地址 clientId#ip:port',
      'SCHEMA', N'dbo',
      'TABLE', N'sj_job_task',
      'COLUMN', N'client_info'
+GO
+
+EXEC sp_addextendedproperty
+     'MS_Description', N'工作流全局上下文',
+     'SCHEMA', N'dbo',
+     'TABLE', N'sj_job_task',
+     'COLUMN', N'wf_context'
 GO
 
 EXEC sp_addextendedproperty
@@ -2281,6 +2305,7 @@ CREATE TABLE sj_workflow
     executor_timeout int           NOT NULL DEFAULT 0,
     description      nvarchar(256) NOT NULL DEFAULT '',
     flow_info        nvarchar(max) NULL     DEFAULT NULL,
+    wf_context       nvarchar(max) NULL     DEFAULT NULL,
     bucket_index     int           NOT NULL DEFAULT 0,
     version          int           NOT NULL,
     ext_attrs        nvarchar(256) NULL     DEFAULT '',
@@ -2377,6 +2402,13 @@ EXEC sp_addextendedproperty
      'SCHEMA', N'dbo',
      'TABLE', N'sj_workflow',
      'COLUMN', N'flow_info'
+GO
+
+EXEC sp_addextendedproperty
+     'MS_Description', N'上下文',
+     'SCHEMA', N'dbo',
+     'TABLE', N'sj_workflow',
+     'COLUMN', N'wf_context'
 GO
 
 EXEC sp_addextendedproperty
@@ -2590,8 +2622,10 @@ CREATE TABLE sj_workflow_task_batch
     task_batch_status tinyint       NOT NULL DEFAULT 0,
     operation_reason  tinyint       NOT NULL DEFAULT 0,
     flow_info         nvarchar(max) NULL     DEFAULT NULL,
+    wf_context        nvarchar(max) NULL     DEFAULT NULL,
     execution_at      bigint        NOT NULL DEFAULT 0,
     ext_attrs         nvarchar(256) NULL     DEFAULT '',
+    version           int           NOT NULL DEFAULT 1,
     deleted           tinyint       NOT NULL DEFAULT 0,
     create_dt         datetime2     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_dt         datetime2     NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -2655,6 +2689,13 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
+     'MS_Description', N'全局上下文',
+     'SCHEMA', N'dbo',
+     'TABLE', N'sj_workflow_task_batch',
+     'COLUMN', N'wf_context'
+GO
+
+EXEC sp_addextendedproperty
      'MS_Description', N'任务执行时间',
      'SCHEMA', N'dbo',
      'TABLE', N'sj_workflow_task_batch',
@@ -2666,6 +2707,13 @@ EXEC sp_addextendedproperty
      'SCHEMA', N'dbo',
      'TABLE', N'sj_workflow_task_batch',
      'COLUMN', N'ext_attrs'
+GO
+
+EXEC sp_addextendedproperty
+     'MS_Description', N'版本号',
+     'SCHEMA', N'dbo',
+     'TABLE', N'sj_workflow_task_batch',
+     'COLUMN', N'version'
 GO
 
 EXEC sp_addextendedproperty
