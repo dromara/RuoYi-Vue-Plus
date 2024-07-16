@@ -296,8 +296,8 @@ CREATE TABLE sj_retry_task_log_message
 ALTER TABLE sj_retry_task_log_message
     ADD CONSTRAINT pk_sj_retry_task_log_message PRIMARY KEY (id);
 
-CREATE INDEX idx_sj_retry_task_log_message_01 ON sj_retry_task_log_message (namespace_id, group_name, unique_id);
-CREATE INDEX idx_sj_retry_task_log_message_02 ON sj_retry_task_log_message (create_dt);
+CREATE INDEX idx_sj_rt_log_message_01 ON sj_retry_task_log_message (namespace_id, group_name, unique_id);
+CREATE INDEX idx_sj_rt_log_message_02 ON sj_retry_task_log_message (create_dt);
 
 COMMENT ON COLUMN sj_retry_task_log_message.id IS '主键';
 COMMENT ON COLUMN sj_retry_task_log_message.namespace_id IS '命名空间id';
@@ -447,7 +447,7 @@ CREATE TABLE sj_system_user_permission
 ALTER TABLE sj_system_user_permission
     ADD CONSTRAINT pk_sj_system_user_permission PRIMARY KEY (id);
 
-CREATE UNIQUE INDEX uk_sj_system_user_permission_01 ON sj_system_user_permission (namespace_id, group_name, system_user_id);
+CREATE UNIQUE INDEX uk_sj_su_permission_01 ON sj_system_user_permission (namespace_id, group_name, system_user_id);
 
 COMMENT ON COLUMN sj_system_user_permission.id IS '主键';
 COMMENT ON COLUMN sj_system_user_permission.group_name IS '组名称';
