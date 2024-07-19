@@ -640,7 +640,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
             return List.of();
         }
         List<SysUserVo> list = baseMapper.selectVoList(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName)
+            .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName, SysUser::getEmail, SysUser::getPhonenumber)
             .eq(SysUser::getStatus, UserConstants.USER_NORMAL)
             .in(CollUtil.isNotEmpty(userIds), SysUser::getUserId, userIds));
         return BeanUtil.copyToList(list, UserDTO.class);
