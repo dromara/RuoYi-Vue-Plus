@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ruoyi-snailjob-server" type="docker-deploy" factoryName="dockerfile" server-name="演示机">
+  <configuration default="false" name="ruoyi-snailjob-server" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
     <deployment type="dockerfile">
       <settings>
         <option name="imageTag" value="ruoyi/ruoyi-snailjob-server:5.2.1" />
