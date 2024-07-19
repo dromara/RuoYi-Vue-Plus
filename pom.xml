@@ -342,36 +342,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.anyline</groupId>
-                <artifactId>anyline-environment-spring-data-jdbc</artifactId>
-                <version>${anyline.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.anyline</groupId>
-                <artifactId>anyline-data-jdbc-mysql</artifactId>
-                <version>${anyline.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.anyline</groupId>
-                <artifactId>anyline-data-jdbc-oracle</artifactId>
-                <version>${anyline.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.anyline</groupId>
-                <artifactId>anyline-data-jdbc-postgresql</artifactId>
-                <version>${anyline.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.anyline</groupId>
-                <artifactId>anyline-data-jdbc-mssql</artifactId>
-                <version>${anyline.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-system</artifactId>
                 <version>${revision}</version>
