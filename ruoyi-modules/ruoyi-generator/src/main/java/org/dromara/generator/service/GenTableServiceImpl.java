@@ -9,10 +9,12 @@ import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.anyline.proxy.ServiceProxy;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -41,11 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -99,7 +97,7 @@ public class GenTableServiceImpl implements IGenTableService {
         Map<String, Object> params = genTable.getParams();
         QueryWrapper<GenTable> wrapper = Wrappers.query();
         wrapper
-            .eq(StringUtils.isNotEmpty(genTable.getDataName()),"data_name", genTable.getDataName())
+            .eq(StringUtils.isNotEmpty(genTable.getDataName()), "data_name", genTable.getDataName())
             .like(StringUtils.isNotBlank(genTable.getTableName()), "lower(table_name)", StringUtils.lowerCase(genTable.getTableName()))
             .like(StringUtils.isNotBlank(genTable.getTableComment()), "lower(table_comment)", StringUtils.lowerCase(genTable.getTableComment()))
             .between(params.get("beginTime") != null && params.get("endTime") != null,
@@ -107,11 +105,52 @@ public class GenTableServiceImpl implements IGenTableService {
         return wrapper;
     }
 
+    /**
+     * 查询数据库列表
+     *
+     * @param genTable  包含查询条件的GenTable对象
+     * @param pageQuery 包含分页信息的PageQuery对象
+     * @return 包含分页结果的TableDataInfo对象
+     */
     @DS("#genTable.dataName")
     @Override
     public TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable, PageQuery pageQuery) {
-        genTable.getParams().put("genTableNames",baseMapper.selectTableNameList(genTable.getDataName()));
-        Page<GenTable> page = baseMapper.selectPageDbTableList(pageQuery.build(), genTable);
+        // 获取查询条件
+        String tableName = genTable.getTableName();
+        String tableComment = genTable.getTableComment();
+        // 获取分页参数
+        Integer pageNum = pageQuery.getPageNum();
+        Integer pageSize = pageQuery.getPageSize();
+
+        // 过滤并转换表格数据
+        List<GenTable> tables = ServiceProxy.metadata().tables().values().stream()
+            .filter(x -> {
+                boolean nameMatches = true;
+                boolean commentMatches = true;
+                // 进行表名称的模糊查询
+                if (StringUtils.isNotBlank(tableName)) {
+                    nameMatches = StringUtils.containsIgnoreCase(x.getName(), tableName);
+                }
+                // 进行表描述的模糊查询
+                if (StringUtils.isNotBlank(tableComment)) {
+                    commentMatches = StringUtils.containsIgnoreCase(x.getComment(), tableComment);
+                }
+                // 同时匹配名称和描述
+                return nameMatches && commentMatches;
+            })
+            .map(x -> {
+                GenTable gen = new GenTable();
+                gen.setTableName(x.getName());
+                gen.setTableComment(x.getComment());
+                gen.setCreateTime(x.getCreateTime());
+                gen.setUpdateTime(x.getUpdateTime());
+                return gen;
+            }).toList();
+
+        // 创建分页对象，并设置总记录数
+        IPage<GenTable> page = new Page<>(pageNum, pageSize, tables.size());
+        // 使用CollUtil进行分页，并设置分页记录
+        page.setRecords(CollUtil.page(pageNum - 1, pageSize, tables));
         return TableDataInfo.build(page);
     }
 
