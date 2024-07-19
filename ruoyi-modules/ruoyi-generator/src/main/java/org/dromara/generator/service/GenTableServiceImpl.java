@@ -3,6 +3,7 @@ package org.dromara.generator.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
@@ -124,8 +125,12 @@ public class GenTableServiceImpl implements IGenTableService {
         Integer pageNum = pageQuery.getPageNum();
         Integer pageSize = pageQuery.getPageSize();
 
+        LinkedHashMap<String, Table> tablesMap = ServiceProxy.metadata().tables();
+        if (CollUtil.isEmpty(tablesMap)) {
+            return TableDataInfo.build();
+        }
         // 过滤并转换表格数据
-        List<GenTable> tables = ServiceProxy.metadata().tables().values().stream()
+        List<GenTable> tables = tablesMap.values().stream()
             .filter(x -> {
                 boolean nameMatches = true;
                 boolean commentMatches = true;
@@ -167,9 +172,18 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public List<GenTable> selectDbTableListByNames(String[] tableNames, String dataName) {
         Set<String> tableNameSet = new HashSet<>(List.of(tableNames));
-        List<Table> tableList = ServiceProxy.metadata().tables().values().stream()
+        LinkedHashMap<String, Table> tablesMap = ServiceProxy.metadata().tables();
+
+        if (CollUtil.isEmpty(tablesMap)) {
+            return new ArrayList<>();
+        }
+
+        List<Table> tableList = tablesMap.values().stream()
             .filter(x -> tableNameSet.contains(x.getName())).toList();
 
+        if (ArrayUtil.isEmpty(tableList)) {
+            return new ArrayList<>();
+        }
         return tableList.stream().map(x -> {
             GenTable gen = new GenTable();
             gen.setDataName(dataName);
