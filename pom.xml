@@ -14,12 +14,12 @@
 
     <properties>
         <revision>5.2.1</revision>
-        <spring-boot.version>3.2.6</spring-boot.version>
+        <spring-boot.version>3.2.8</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
         <mybatis.version>3.5.16</mybatis.version>
-        <springdoc.version>2.5.0</springdoc.version>
+        <springdoc.version>2.6.0</springdoc.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
         <poi.version>5.2.3</poi.version>
         <easyexcel.version>3.3.4</easyexcel.version>
@@ -27,10 +27,10 @@
         <satoken.version>1.38.0</satoken.version>
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.8.27</hutool.version>
+        <hutool.version>5.8.29</hutool.version>
         <okhttp.version>4.10.0</okhttp.version>
         <spring-boot-admin.version>3.2.3</spring-boot-admin.version>
-        <redisson.version>3.31.0</redisson.version>
+        <redisson.version>3.33.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
         <alibaba-ttl.version>2.14.4</alibaba-ttl.version>
@@ -51,7 +51,7 @@
         <!-- 限制框架中的fastjson版本 -->
         <fastjson.version>1.2.83</fastjson.version>
         <!--工作流配置-->
-        <flowable.version>7.0.0</flowable.version>
+        <flowable.version>7.0.1</flowable.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
