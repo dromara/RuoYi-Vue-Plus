@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.anyline.metadata.Table;
 import org.anyline.proxy.ServiceProxy;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -164,7 +165,19 @@ public class GenTableServiceImpl implements IGenTableService {
     @DS("#dataName")
     @Override
     public List<GenTable> selectDbTableListByNames(String[] tableNames, String dataName) {
-        return baseMapper.selectDbTableListByNames(tableNames);
+        Set<String> tableNameSet = new HashSet<>(List.of(tableNames));
+        List<Table> tableList = ServiceProxy.metadata().tables().values().stream()
+            .filter(x -> tableNameSet.contains(x.getName())).toList();
+
+        return tableList.stream().map(x -> {
+            GenTable gen = new GenTable();
+            gen.setDataName(dataName);
+            gen.setTableName(x.getName());
+            gen.setTableComment(x.getComment());
+            gen.setCreateTime(x.getCreateTime());
+            gen.setUpdateTime(x.getUpdateTime());
+            return gen;
+        }).toList();
     }
 
     /**

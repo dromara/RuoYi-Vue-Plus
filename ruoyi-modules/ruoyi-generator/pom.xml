@@ -58,20 +58,20 @@
             <artifactId>anyline-data-jdbc-mysql</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.anyline</groupId>
-            <artifactId>anyline-data-jdbc-oracle</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.anyline</groupId>-->
+<!--            <artifactId>anyline-data-jdbc-oracle</artifactId>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.anyline</groupId>
-            <artifactId>anyline-data-jdbc-postgresql</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.anyline</groupId>-->
+<!--            <artifactId>anyline-data-jdbc-postgresql</artifactId>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.anyline</groupId>
-            <artifactId>anyline-data-jdbc-mssql</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.anyline</groupId>-->
+<!--            <artifactId>anyline-data-jdbc-mssql</artifactId>-->
+<!--        </dependency>-->
 
     </dependencies>
 
