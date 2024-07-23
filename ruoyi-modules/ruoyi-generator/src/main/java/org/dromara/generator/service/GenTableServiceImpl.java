@@ -64,6 +64,8 @@ public class GenTableServiceImpl implements IGenTableService {
     private final GenTableColumnMapper genTableColumnMapper;
     private final IdentifierGenerator identifierGenerator;
 
+    private static final String[] TABLE_IGNORE = new String[]{"sj_", "act_", "flw_", "gen_"};
+
     /**
      * 查询业务字段列表
      *
@@ -131,6 +133,7 @@ public class GenTableServiceImpl implements IGenTableService {
         }
         // 过滤并转换表格数据
         List<GenTable> tables = tablesMap.values().stream()
+            .filter(x -> !StringUtils.containsAnyIgnoreCase(x.getName(), TABLE_IGNORE))
             .filter(x -> {
                 boolean nameMatches = true;
                 boolean commentMatches = true;
@@ -179,6 +182,7 @@ public class GenTableServiceImpl implements IGenTableService {
         }
 
         List<Table<?>> tableList = tablesMap.values().stream()
+            .filter(x -> !StringUtils.containsAnyIgnoreCase(x.getName(), TABLE_IGNORE))
             .filter(x -> tableNameSet.contains(x.getName())).toList();
 
         if (ArrayUtil.isEmpty(tableList)) {
