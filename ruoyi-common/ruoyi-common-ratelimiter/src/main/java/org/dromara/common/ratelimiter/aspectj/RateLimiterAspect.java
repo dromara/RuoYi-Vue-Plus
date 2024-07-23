@@ -80,11 +80,11 @@ public class RateLimiterAspect {
 
     private String getCombineKey(RateLimiter rateLimiter, JoinPoint point) {
         String key = rateLimiter.key();
-        if (StringUtils.isNotBlank(key)) {
+        // 判断 key 不为空 和 不是表达式
+        if (StringUtils.isNotBlank(key) && StringUtils.containsAny(key, "#")) {
             MethodSignature signature = (MethodSignature) point.getSignature();
             Method targetMethod = signature.getMethod();
             Object[] args = point.getArgs();
-            //noinspection DataFlowIssue
             MethodBasedEvaluationContext context =
                 new MethodBasedEvaluationContext(null, targetMethod, args, pnd);
             context.setBeanResolver(new BeanFactoryResolver(SpringUtils.getBeanFactory()));
