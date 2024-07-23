@@ -350,8 +350,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             initWfDefConfig();
         } else {
             String originalFilename = file.getOriginalFilename();
-            String bpmnResourceSuffix = ResourceNameUtil.BPMN_RESOURCE_SUFFIXES[0];
-            if (originalFilename.contains(bpmnResourceSuffix)) {
+            if (StringUtils.containsAny(originalFilename, ResourceNameUtil.BPMN_RESOURCE_SUFFIXES)) {
                 // 文件名 = 流程名称-流程key
                 String[] splitFilename = originalFilename.substring(0, originalFilename.lastIndexOf(".")).split("-");
                 if (splitFilename.length < 2) {
