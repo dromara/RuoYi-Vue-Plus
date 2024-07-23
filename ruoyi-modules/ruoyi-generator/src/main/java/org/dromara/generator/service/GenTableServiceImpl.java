@@ -125,7 +125,7 @@ public class GenTableServiceImpl implements IGenTableService {
         Integer pageNum = pageQuery.getPageNum();
         Integer pageSize = pageQuery.getPageSize();
 
-        LinkedHashMap<String, Table> tablesMap = ServiceProxy.metadata().tables();
+        LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.metadata().tables();
         if (CollUtil.isEmpty(tablesMap)) {
             return TableDataInfo.build();
         }
@@ -172,13 +172,13 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public List<GenTable> selectDbTableListByNames(String[] tableNames, String dataName) {
         Set<String> tableNameSet = new HashSet<>(List.of(tableNames));
-        LinkedHashMap<String, Table> tablesMap = ServiceProxy.metadata().tables();
+        LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.metadata().tables();
 
         if (CollUtil.isEmpty(tablesMap)) {
             return new ArrayList<>();
         }
 
-        List<Table> tableList = tablesMap.values().stream()
+        List<Table<?>> tableList = tablesMap.values().stream()
             .filter(x -> tableNameSet.contains(x.getName())).toList();
 
         if (ArrayUtil.isEmpty(tableList)) {
@@ -279,7 +279,11 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     @DS("#dataName")
     private List<GenTableColumn> selectDbTableColumnsByName(String tableName, String dataName) {
-        LinkedHashMap<String, Column> columns = ServiceProxy.service().metadata().table(tableName).getColumns();
+        Table<?> table = ServiceProxy.metadata().table(tableName);
+        if (Objects.isNull(table)) {
+            return new ArrayList<>();
+        }
+        LinkedHashMap<String, Column> columns = table.getColumns();
         List<GenTableColumn> tableColumns = new ArrayList<>();
         columns.forEach((columnName, column) -> {
             GenTableColumn tableColumn = new GenTableColumn();
