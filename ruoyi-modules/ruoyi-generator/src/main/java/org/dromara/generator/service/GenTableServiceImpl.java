@@ -123,9 +123,6 @@ public class GenTableServiceImpl implements IGenTableService {
         // 获取查询条件
         String tableName = genTable.getTableName();
         String tableComment = genTable.getTableComment();
-        // 获取分页参数
-        Integer pageNum = pageQuery.getPageNum();
-        Integer pageSize = pageQuery.getPageSize();
 
         LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.metadata().tables();
         if (CollUtil.isEmpty(tablesMap)) {
