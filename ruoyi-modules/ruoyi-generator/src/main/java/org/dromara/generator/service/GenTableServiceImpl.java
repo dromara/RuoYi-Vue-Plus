@@ -170,10 +170,10 @@ public class GenTableServiceImpl implements IGenTableService {
                 return gen;
             }).toList();
 
-        // 创建分页对象，并设置总记录数
-        IPage<GenTable> page = new Page<>(pageNum, pageSize, tables.size());
-        // 使用CollUtil进行分页，并设置分页记录
-        page.setRecords(CollUtil.page(pageNum - 1, pageSize, tables));
+        IPage<GenTable> page = pageQuery.build();
+        page.setTotal(tables.size());
+        // 手动分页 set数据
+        page.setRecords(CollUtil.page((int) page.getCurrent() - 1, (int) page.getSize(), tables));
         return TableDataInfo.build(page);
     }
 
