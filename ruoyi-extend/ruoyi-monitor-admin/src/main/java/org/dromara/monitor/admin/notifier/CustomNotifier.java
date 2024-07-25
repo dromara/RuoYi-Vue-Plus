@@ -6,8 +6,6 @@ import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceStatusChangedEvent;
 import de.codecentric.boot.admin.server.notify.AbstractEventNotifier;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.monitor.admin.event.NotifierEvent;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -51,13 +49,6 @@ public class CustomNotifier extends AbstractEventNotifier {
                 };
                 log.info("Instance Status Change: 状态名称【{}】, 注册名称【{}】, 实例ID【{}】, 状态【{}】, 服务URL【{}】",
                     statusName, registName, instanceId, status, serviceUrl);
-                NotifierEvent notifier = new NotifierEvent();
-                notifier.setRegistName(registName);
-                notifier.setStatusName(statusName);
-                notifier.setInstanceId(instanceId);
-                notifier.setStatus(status);
-                notifier.setServiceUrl(serviceUrl);
-                SpringUtils.context().publishEvent(notifier);
             }
         });
     }
