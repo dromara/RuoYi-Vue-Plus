@@ -121,9 +121,6 @@ security:
     # swagger 文档配置
     - /*/api-docs
     - /*/api-docs/**
-    # actuator 监控配置
-    - /actuator
-    - /actuator/**
 
 # 多租户配置
 tenant:
