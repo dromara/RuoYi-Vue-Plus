@@ -162,6 +162,7 @@ public class PlusDataPermissionHandler {
                 if (StringUtils.isNotBlank(dataColumn.permission()) &&
                     CollUtil.contains(user.getMenuPermission(), dataColumn.permission())
                 ) {
+                    isSuccess = true;
                     continue;
                 }
                 // 设置注解变量 key 为表达式变量 value 为变量值
