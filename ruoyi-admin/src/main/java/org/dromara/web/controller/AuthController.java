@@ -106,7 +106,7 @@ public class AuthController {
             dto.setMessage("欢迎登录RuoYi-Vue-Plus后台管理系统");
             dto.setUserIds(List.of(userId));
             SseMessageUtils.publishMessage(dto);
-        }, 20, TimeUnit.SECONDS);
+        }, 5, TimeUnit.SECONDS);
         return R.ok(loginVo);
     }
 

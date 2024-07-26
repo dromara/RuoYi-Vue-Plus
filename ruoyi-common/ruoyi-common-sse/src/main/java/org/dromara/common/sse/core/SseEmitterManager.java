@@ -30,6 +30,7 @@ public class SseEmitterManager {
 
         emitter.onCompletion(() -> emitters.remove(token));
         emitter.onTimeout(() -> emitters.remove(token));
+        emitter.onError((e) -> emitters.remove(token));
 
         try {
             emitter.send(SseEmitter.event().comment("connected"));
@@ -72,7 +73,7 @@ public class SseEmitterManager {
                 try {
                     entry.getValue().send(SseEmitter.event()
                         .name("message")
-                        .reconnectTime(10000L)
+                        .reconnectTime(-1L)
                         .data(message));
                 } catch (Exception e) {
                     emitters.remove(entry.getKey());
