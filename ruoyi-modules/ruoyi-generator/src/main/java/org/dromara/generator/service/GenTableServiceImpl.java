@@ -186,7 +186,7 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public List<GenTable> selectDbTableListByNames(String[] tableNames, String dataName) {
         Set<String> tableNameSet = new HashSet<>(List.of(tableNames));
-        LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.service(dataName).metadata().tables();
+        LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.metadata().tables();
 
         if (CollUtil.isEmpty(tablesMap)) {
             return new ArrayList<>();
