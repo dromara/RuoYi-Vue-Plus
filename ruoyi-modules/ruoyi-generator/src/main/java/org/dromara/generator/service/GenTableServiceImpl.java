@@ -186,7 +186,7 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public List<GenTable> selectDbTableListByNames(String[] tableNames, String dataName) {
         Set<String> tableNameSet = new HashSet<>(List.of(tableNames));
-        LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.metadata().tables();
+        LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.service(dataName).metadata().tables();
 
         if (CollUtil.isEmpty(tablesMap)) {
             return new ArrayList<>();
@@ -294,11 +294,9 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     @DS("#dataName")
     private List<GenTableColumn> selectDbTableColumnsByName(String tableName, String dataName) {
-        Table<?> table = ServiceProxy.metadata().table(tableName);
-        if (Objects.isNull(table)) {
-            return new ArrayList<>();
-        }
-        LinkedHashMap<String, Column> columns = table.getColumns();
+        // 清理anyline缓存
+        CacheProxy.clear();
+        LinkedHashMap<String, Column> columns = ServiceProxy.metadata().columns(tableName);
         List<GenTableColumn> tableColumns = new ArrayList<>();
         columns.forEach((columnName, column) -> {
             GenTableColumn tableColumn = new GenTableColumn();
