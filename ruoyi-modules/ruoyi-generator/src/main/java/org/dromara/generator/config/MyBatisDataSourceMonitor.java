@@ -15,6 +15,11 @@ import java.sql.DatabaseMetaData;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * anyline 适配 动态数据源改造
+ *
+ * @author Lion Li
+ */
 @Slf4j
 @Component
 public class MyBatisDataSourceMonitor implements DataSourceMonitor {
@@ -22,6 +27,8 @@ public class MyBatisDataSourceMonitor implements DataSourceMonitor {
     public MyBatisDataSourceMonitor() {
         // 调整执行模式为自定义
         ConfigTable.KEEP_ADAPTER = 2;
+        // 禁用缓存
+        ConfigTable.METADATA_CACHE_SCOPE = 0;
     }
 
     private final Map<String, String> features = new HashMap<>();
