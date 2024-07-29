@@ -73,7 +73,6 @@ public class SseEmitterManager {
                 try {
                     entry.getValue().send(SseEmitter.event()
                         .name("message")
-                        .reconnectTime(-1L)
                         .data(message));
                 } catch (Exception e) {
                     emitters.remove(entry.getKey());
