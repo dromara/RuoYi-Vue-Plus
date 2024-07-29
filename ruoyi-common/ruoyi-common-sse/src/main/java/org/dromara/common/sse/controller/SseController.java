@@ -1,5 +1,6 @@
 package org.dromara.common.sse.controller;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
@@ -26,6 +27,7 @@ public class SseController {
         return sseEmitterManager.connect(userId, tokenValue);
     }
 
+    @SaIgnore
     @GetMapping(value = "${sse.path}/close")
     public R<Void> close() {
         String tokenValue = StpUtil.getTokenValue();
