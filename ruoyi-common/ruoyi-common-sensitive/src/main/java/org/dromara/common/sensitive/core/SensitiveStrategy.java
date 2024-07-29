@@ -52,7 +52,12 @@ public enum SensitiveStrategy {
     /**
      * 用户ID
      */
-    user_ID(s -> String.valueOf(DesensitizedUtil.userId())),
+    USER_ID(s -> String.valueOf(DesensitizedUtil.userId())),
+
+    /**
+     * 密码
+     */
+    PASSWORD(DesensitizedUtil::password),
 
     /**
      * ipv4
