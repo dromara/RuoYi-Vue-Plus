@@ -1,5 +1,6 @@
 package org.dromara.common.sse.core;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.redis.utils.RedisUtils;
@@ -71,6 +72,11 @@ public class SseEmitterManager {
         if (emitters != null) {
             for (Map.Entry<String, SseEmitter> entry : emitters.entrySet()) {
                 try {
+                    // token 无效或已过期
+                    if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(entry.getKey()) < -1) {
+                        emitters.remove(entry.getKey());
+                        continue;
+                    }
                     entry.getValue().send(SseEmitter.event()
                         .name("message")
                         .data(message));
