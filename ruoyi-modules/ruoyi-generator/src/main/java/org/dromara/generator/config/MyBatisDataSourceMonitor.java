@@ -4,6 +4,7 @@ import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.anyline.data.datasource.DataSourceMonitor;
+import org.anyline.data.runtime.DataRuntime;
 import org.anyline.util.ConfigTable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -41,7 +42,7 @@ public class MyBatisDataSourceMonitor implements DataSourceMonitor {
      * @return String 返回null由上层自动提取
      */
     @Override
-    public String feature(Object datasource) {
+    public String feature(DataRuntime runtime, Object datasource) {
         String feature = null;
         if (datasource instanceof JdbcTemplate jdbc) {
             DataSource ds = jdbc.getDataSource();
@@ -70,6 +71,22 @@ public class MyBatisDataSourceMonitor implements DataSourceMonitor {
     }
 
     /**
+     * 数据源唯一标识 如果不实现则默认feature
+     * @param datasource 数据源
+     * @return String 返回null由上层自动提取
+     */
+    @Override
+    public String key(DataRuntime runtime, Object datasource) {
+        if(datasource instanceof JdbcTemplate jdbc){
+            DataSource ds = jdbc.getDataSource();
+            if(ds instanceof DynamicRoutingDataSource){
+                return DynamicDataSourceContextHolder.peek();
+            }
+        }
+        return runtime.getKey();
+    }
+
+    /**
      * ConfigTable.KEEP_ADAPTER=2 : 根据当前接口判断是否保持同一个数据源绑定同一个adapter<br/>
      * DynamicRoutingDataSource类型的返回false,因为同一个DynamicRoutingDataSource可能对应多类数据库, 如果项目中只有一种数据库 应该直接返回true
      *
@@ -77,7 +94,7 @@ public class MyBatisDataSourceMonitor implements DataSourceMonitor {
      * @return boolean
      */
     @Override
-    public boolean keepAdapter(Object datasource) {
+    public boolean keepAdapter(DataRuntime runtime, Object datasource) {
         if (datasource instanceof JdbcTemplate jdbc) {
             DataSource ds = jdbc.getDataSource();
             return !(ds instanceof DynamicRoutingDataSource);
