@@ -143,7 +143,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 if (CollUtil.isEmpty(tableNames)) {
                     return true;
                 }
-                return !StringUtils.containsAnyIgnoreCase(x.getName(), tableArrays);
+                return !StringUtils.equalsAnyIgnoreCase(x.getName(), tableArrays);
             })
             .filter(x -> {
                 boolean nameMatches = true;
