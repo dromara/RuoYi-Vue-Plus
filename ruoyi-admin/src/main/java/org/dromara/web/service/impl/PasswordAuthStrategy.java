@@ -62,11 +62,12 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         if (captchaEnabled) {
             validateCaptcha(tenantId, username, code, uuid);
         }
-
-        SysUserVo user = loadUserByUsername(tenantId, username);
-        loginService.checkLogin(LoginType.PASSWORD, tenantId, username, () -> !BCrypt.checkpw(password, user.getPassword()));
-        // 此处可根据登录用户的数据不同 自行创建 loginUser
-        LoginUser loginUser = loginService.buildLoginUser(user);
+        LoginUser loginUser = TenantHelper.dynamic(tenantId, () -> {
+            SysUserVo user = loadUserByUsername(username);
+            loginService.checkLogin(LoginType.PASSWORD, tenantId, username, () -> !BCrypt.checkpw(password, user.getPassword()));
+            // 此处可根据登录用户的数据不同 自行创建 loginUser
+            return loginService.buildLoginUser(user);
+        });
         loginUser.setClientKey(client.getClientKey());
         loginUser.setDeviceType(client.getDeviceType());
         SaLoginModel model = new SaLoginModel();
@@ -107,18 +108,16 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         }
     }
 
-    private SysUserVo loadUserByUsername(String tenantId, String username) {
-        return TenantHelper.dynamic(tenantId, () -> {
-            SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, username));
-            if (ObjectUtil.isNull(user)) {
-                log.info("登录用户：{} 不存在.", username);
-                throw new UserException("user.not.exists", username);
-            } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
-                log.info("登录用户：{} 已被停用.", username);
-                throw new UserException("user.blocked", username);
-            }
-            return user;
-        });
+    private SysUserVo loadUserByUsername(String username) {
+        SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, username));
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", username);
+            throw new UserException("user.not.exists", username);
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", username);
+            throw new UserException("user.blocked", username);
+        }
+        return user;
     }
 
 }
