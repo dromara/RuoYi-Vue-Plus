@@ -288,6 +288,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 Model modelData = repositoryService.newModel();
                 modelData.setKey(pd.getKey());
                 modelData.setName(pd.getName());
+                modelData.setCategory(pd.getCategory());
                 modelData.setTenantId(pd.getTenantId());
                 repositoryService.saveModel(modelData);
                 repositoryService.addModelEditorSource(modelData.getId(), IoUtil.readBytes(inputStream));
