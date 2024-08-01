@@ -28,11 +28,6 @@ public interface GlobalConstants {
     String RATE_LIMIT_KEY = GLOBAL_REDIS_KEY + "rate_limit:";
 
     /**
-     * 登录账户密码错误次数 redis key
-     */
-    String PWD_ERR_CNT_KEY = GLOBAL_REDIS_KEY + "pwd_err_cnt:";
-
-    /**
      * 三方认证 redis key
      */
     String SOCIAL_AUTH_CODE_KEY = GLOBAL_REDIS_KEY + "social_auth_codes:";
