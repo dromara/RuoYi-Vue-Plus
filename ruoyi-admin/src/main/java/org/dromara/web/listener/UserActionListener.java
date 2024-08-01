@@ -3,6 +3,8 @@ package org.dromara.web.listener;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.stp.SaLoginModel;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import lombok.RequiredArgsConstructor;
@@ -81,7 +83,10 @@ public class UserActionListener implements SaTokenListener {
      */
     @Override
     public void doLogout(String loginType, Object loginId, String tokenValue) {
-        RedisUtils.deleteObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue);
+        String tenantId = Convert.toStr(StpUtil.getExtra(tokenValue, LoginHelper.TENANT_KEY));
+        TenantHelper.dynamic(tenantId, () -> {
+            RedisUtils.deleteObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue);
+        });
         log.info("user doLogout, userId:{}, token:{}", loginId, tokenValue);
     }
 
@@ -90,7 +95,10 @@ public class UserActionListener implements SaTokenListener {
      */
     @Override
     public void doKickout(String loginType, Object loginId, String tokenValue) {
-        RedisUtils.deleteObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue);
+        String tenantId = Convert.toStr(StpUtil.getExtra(tokenValue, LoginHelper.TENANT_KEY));
+        TenantHelper.dynamic(tenantId, () -> {
+            RedisUtils.deleteObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue);
+        });
         log.info("user doKickout, userId:{}, token:{}", loginId, tokenValue);
     }
 
@@ -99,7 +107,10 @@ public class UserActionListener implements SaTokenListener {
      */
     @Override
     public void doReplaced(String loginType, Object loginId, String tokenValue) {
-        RedisUtils.deleteObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue);
+        String tenantId = Convert.toStr(StpUtil.getExtra(tokenValue, LoginHelper.TENANT_KEY));
+        TenantHelper.dynamic(tenantId, () -> {
+            RedisUtils.deleteObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue);
+        });
         log.info("user doReplaced, userId:{}, token:{}", loginId, tokenValue);
     }
 
