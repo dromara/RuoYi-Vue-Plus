@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.workflow.mapper.FlwTaskMapper">
+    <resultMap type="org.dromara.workflow.domain.vo.FlowTaskVo" id="FlowTaskResult">
+        <result property="id" column="id"/>
+        <result property="nodeCode" column="node_code"/>
+        <result property="nodeName" column="node_name"/>
+        <result property="nodeType" column="node_type"/>
+        <result property="definitionId" column="definition_id"/>
+        <result property="instanceId" column="instance_id"/>
+        <result property="flowStatus" column="flow_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="businessId" column="business_id"/>
+        <result property="flowName" column="flow_name"/>
+        <result property="flowCode" column="flow_code"/>
+        <result property="fromCustom" column="from_custom"/>
+        <result property="fromPath" column="from_path"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+    <resultMap type="org.dromara.workflow.domain.vo.FlowHisTaskVo" id="FlowHisTaskResult">
+        <result property="id" column="id"/>
+        <result property="nodeCode" column="node_code"/>
+        <result property="nodeName" column="node_name"/>
+        <result property="nodeType" column="node_type"/>
+        <result property="targetNodeCode" column="target_node_code"/>
+        <result property="targetNodeName" column="target_node_name"/>
+        <result property="approver" column="approver"/>
+        <result property="collaborator" column="collaborator"/>
+        <result property="definitionId" column="definition_id"/>
+        <result property="instanceId" column="instance_id"/>
+        <result property="taskId" column="task_id"/>
+        <result property="cooperateType" column="cooperate_type"/>
+        <result property="flowStatus" column="flow_status"/>
+        <result property="message" column="message"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="businessId" column="business_id"/>
+        <result property="nodeName" column="node_name"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="flowName" column="flow_name"/>
+        <result property="flowCode" column="flow_code"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+    <resultMap type="org.dromara.workflow.domain.vo.FlowTaskVo" id="TaskVoResult">
+        <result property="id" column="id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="nodeCode" column="node_code"/>
+        <result property="nodeType" column="node_type"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="definitionId" column="definition_id"/>
+        <result property="instanceId" column="instance_id"/>
+        <result property="flowName" column="flow_name"/>
+        <result property="flowCode" column="flow_code"/>
+    </resultMap>
+    <select id="getTaskWaitByPage" resultMap="TaskVoResult">
+        select*from (
+         SELECT
+         distinct t.id,
+         t.node_code,
+         t.node_name,
+         t.node_type,
+         t.definition_id,
+         t.instance_id,
+         t.create_time,
+         t.update_time,
+         t.tenant_id,
+         i.business_id,
+         i.flow_status,
+         d.flow_name,
+         d.flow_code,
+         d.from_custom,
+         d.from_path,
+         uu.processed_by
+         FROM flow_task AS t
+         LEFT JOIN flow_user uu ON uu.associated = t.id
+         LEFT JOIN flow_definition d on t.definition_id = d.id
+         LEFT JOIN flow_instance i on t.instance_id = i.id where t.node_type = 1 and i.flow_status = '1') t
+         ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="getTaskFinishByPage" resultMap="TaskVoResult">
+        select * from (
+            select
+            t.id,
+            t.node_code,
+            t.node_name,
+            t.cooperate_type,
+            t.approver,
+            t.collaborator,
+            t.node_type,
+            t.target_node_code,
+            t.target_node_name,
+            t.definition_id,
+            t.instance_id,
+            i.flow_status,
+            t.message,
+            t.ext,
+            t.create_time,
+            t.update_time,
+            t.tenant_id,
+            i.business_id,
+            i.node_name,
+            d.from_path fromPath,
+            d.flow_name,
+            d.flow_code
+            from ( SELECT MAX(id) as id
+            FROM flow_his_task
+            <where>
+                flow_status <![CDATA[<> '10']]>
+                <if test="flowTaskBo.permissionList != null and flowTaskBo.permissionList.size > 0">
+                    AND approver in
+                    <foreach item="permission" collection="flowTaskBo.permissionList" open="(" separator="," close=")">
+                        #{permission}
+                    </foreach>
+                </if>
+                <if test="flowTaskBo.nodeName != null  and flowTaskBo.nodeName != ''">and node_name like concat('%',
+                    #{flowTaskBo.nodeName}, '%')
+                </if>
+                <if test="flowTaskBo.instanceId != null ">and instance_id = #{flowTaskBo.instanceId}</if>
+            </where>
+            GROUP BY instance_id ) tmp
+            LEFT JOIN flow_his_task t ON t.id = tmp.id
+            LEFT JOIN flow_definition d on t.definition_id = d.id
+            LEFT JOIN flow_instance i on t.instance_id = i.id
+            order by t.create_time desc ) t ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="getTaskCopyByPage" resultMap="FlowTaskResult">
+       select * from (
+         SELECT
+             b.flow_status,
+             b.business_id,
+             a.create_time,
+             b.node_name,
+             b.node_code,
+             b.id ,
+             d.flow_name,
+             d.flow_code,
+         FROM
+             `flow_user` a
+             LEFT JOIN flow_instance b ON a.associated = b.id
+             LEFT JOIN flow_definition d on b.definition_id=d.id
+         WHERE
+             a.type = 4 ORDER BY create_time DESC
+       ) t ${ew.getCustomSqlSegment}
+    </select>
+</mapper>

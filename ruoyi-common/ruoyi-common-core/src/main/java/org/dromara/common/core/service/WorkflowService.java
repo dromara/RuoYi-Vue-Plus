@@ -16,7 +16,7 @@ public interface WorkflowService {
      * @param businessKeys 业务id
      * @return 结果
      */
-    boolean deleteRunAndHisInstance(List<String> businessKeys);
+    boolean deleteInstance(List<Long> businessKeys);
 
     /**
      * 获取当前流程状态

@@ -53,7 +53,7 @@ public class WfDefinitionConfigVo implements Serializable {
      * 流程版本
      */
     @ExcelProperty(value = "流程版本")
-    private Integer version;
+    private String version;
 
     /**
      * 备注

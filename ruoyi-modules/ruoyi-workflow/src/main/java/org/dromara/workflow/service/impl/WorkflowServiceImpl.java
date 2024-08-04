@@ -1,13 +1,8 @@
 package org.dromara.workflow.service.impl;
 
-import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.service.WorkflowService;
-import org.dromara.workflow.domain.ActHiProcinst;
-import org.dromara.workflow.service.IActHiProcinstService;
-import org.dromara.workflow.service.IActProcessInstanceService;
-import org.dromara.workflow.utils.WorkflowUtils;
-import org.flowable.engine.RuntimeService;
+import org.dromara.workflow.service.IFlwInstanceService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,18 +17,17 @@ import java.util.Map;
 @Service
 public class WorkflowServiceImpl implements WorkflowService {
 
-    private final IActProcessInstanceService iActProcessInstanceService;
-    private final RuntimeService runtimeService;
-    private final IActHiProcinstService iActHiProcinstService;
+    private final IFlwInstanceService iFlwInstanceService;
+
     /**
-     * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
+     * 删除流程实例
      *
      * @param businessKeys 业务id
      * @return 结果
      */
     @Override
-    public boolean deleteRunAndHisInstance(List<String> businessKeys) {
-        return iActProcessInstanceService.deleteRunAndHisInstance(businessKeys);
+    public boolean deleteInstance(List<Long> businessKeys) {
+        return iFlwInstanceService.deleteByBusinessIds(businessKeys);
     }
 
     /**
@@ -43,7 +37,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public String getBusinessStatusByTaskId(String taskId) {
-        return WorkflowUtils.getBusinessStatusByTaskId(taskId);
+        return "";
     }
 
     /**
@@ -53,7 +47,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public String getBusinessStatus(String businessKey) {
-        return WorkflowUtils.getBusinessStatus(businessKey);
+        return "";
     }
 
     /**
@@ -65,7 +59,6 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public void setVariable(String taskId, String variableName, Object value) {
-        runtimeService.setVariable(taskId, variableName, value);
     }
 
     /**
@@ -76,7 +69,6 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public void setVariables(String taskId, Map<String, Object> variables) {
-        runtimeService.setVariables(taskId, variables);
     }
 
     /**
@@ -88,7 +80,6 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public void setVariableLocal(String taskId, String variableName, Object value) {
-        runtimeService.setVariableLocal(taskId, variableName, value);
     }
 
     /**
@@ -99,7 +90,6 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public void setVariablesLocal(String taskId, Map<String, Object> variables) {
-        runtimeService.setVariablesLocal(taskId, variables);
     }
 
     /**
@@ -110,10 +100,6 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public String getInstanceIdByBusinessKey(String businessKey) {
-        ActHiProcinst actHiProcinst = iActHiProcinstService.selectByBusinessKey(businessKey);
-        if (actHiProcinst == null) {
-            return StrUtil.EMPTY;
-        }
-        return actHiProcinst.getId();
+        return null;
     }
 }

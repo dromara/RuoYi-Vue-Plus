@@ -53,7 +53,7 @@
         <!-- 面向运行时的D-ORM依赖 -->
         <anyline.version>8.7.2-20240722</anyline.version>
         <!--工作流配置-->
-        <flowable.version>7.0.1</flowable.version>
+        <warm-flow>1.2.3</warm-flow>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
@@ -116,12 +116,11 @@
             </dependency>
 
             <dependency>
-                <groupId>org.flowable</groupId>
-                <artifactId>flowable-bom</artifactId>
-                <version>${flowable.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>io.github.minliuhua</groupId>
+                <artifactId>warm-flow-mybatis-plus-sb-starter</artifactId>
+                <version>${warm-flow}</version>
             </dependency>
+
 
             <!-- JustAuth 的依赖配置-->
             <dependency>

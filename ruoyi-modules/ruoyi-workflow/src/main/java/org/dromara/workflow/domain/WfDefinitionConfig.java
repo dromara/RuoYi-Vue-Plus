@@ -45,7 +45,7 @@ public class WfDefinitionConfig extends BaseEntity {
     /**
      * 流程版本
      */
-    private Integer version;
+    private String version;
 
     /**
      * 备注

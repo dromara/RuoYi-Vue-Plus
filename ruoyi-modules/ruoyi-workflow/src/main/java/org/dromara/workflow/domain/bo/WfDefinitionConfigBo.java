@@ -47,8 +47,8 @@ public class WfDefinitionConfigBo extends BaseEntity {
     /**
      * 流程版本
      */
-    @NotNull(message = "流程版本不能为空", groups = {AddGroup.class})
-    private Integer version;
+    @NotBlank(message = "流程版本不能为空", groups = {AddGroup.class})
+    private String version;
 
     /**
      * 备注

@@ -1,12 +1,16 @@
 package org.dromara.workflow.domain.bo;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.dromara.common.core.validate.AddGroup;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -23,8 +27,8 @@ public class BackProcessBo implements Serializable {
     /**
      * 任务ID
      */
-    @NotBlank(message = "任务ID不能为空", groups = AddGroup.class)
-    private String taskId;
+    @NotNull(message = "任务ID不能为空", groups = AddGroup.class)
+    private Long taskId;
 
     /**
      * 消息类型
@@ -35,10 +39,23 @@ public class BackProcessBo implements Serializable {
      * 驳回的节点id(目前未使用，直接驳回到申请人)
      */
     @NotBlank(message = "驳回的节点不能为空", groups = AddGroup.class)
-    private String targetActivityId;
+    private String targetNodeCode;
 
     /**
      * 办理意见
      */
     private String message;
+
+    /**
+     * 流程变量
+     */
+    private Map<String, Object> variables;
+
+    public Map<String, Object> getVariables() {
+        if (variables == null) {
+            return new HashMap<>(16);
+        }
+        variables.entrySet().removeIf(entry -> Objects.isNull(entry.getValue()));
+        return variables;
+    }
 }
