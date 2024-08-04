@@ -156,7 +156,7 @@ public class PlusSpringCacheManager implements CacheManager {
     private Cache createMap(String name, CacheConfig config) {
         RMap<Object, Object> map = RedisUtils.getClient().getMap(name);
 
-        Cache cache = new CaffeineCacheDecorator(new RedissonCache(map, allowNullValues));
+        Cache cache = new CaffeineCacheDecorator(name, new RedissonCache(map, allowNullValues));
         if (transactionAware) {
             cache = new TransactionAwareCacheDecorator(cache);
         }
@@ -170,7 +170,7 @@ public class PlusSpringCacheManager implements CacheManager {
     private Cache createMapCache(String name, CacheConfig config) {
         RMapCache<Object, Object> map = RedisUtils.getClient().getMapCache(name);
 
-        Cache cache = new CaffeineCacheDecorator(new RedissonCache(map, config, allowNullValues));
+        Cache cache = new CaffeineCacheDecorator(name, new RedissonCache(map, config, allowNullValues));
         if (transactionAware) {
             cache = new TransactionAwareCacheDecorator(cache);
         }
