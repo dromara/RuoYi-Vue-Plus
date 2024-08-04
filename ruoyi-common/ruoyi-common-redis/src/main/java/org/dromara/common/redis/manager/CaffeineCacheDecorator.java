@@ -15,15 +15,17 @@ public class CaffeineCacheDecorator implements Cache {
     private static final com.github.benmanes.caffeine.cache.Cache<Object, Object>
         CAFFEINE = SpringUtils.getBean("caffeine");
 
+    private final String name;
     private final Cache cache;
 
-    public CaffeineCacheDecorator(Cache cache) {
+    public CaffeineCacheDecorator(String name, Cache cache) {
+        this.name = name;
         this.cache = cache;
     }
 
     @Override
     public String getName() {
-        return cache.getName();
+        return name;
     }
 
     @Override
@@ -32,7 +34,7 @@ public class CaffeineCacheDecorator implements Cache {
     }
 
     public String getUniqueKey(Object key) {
-        return cache.getName() + ":" + key;
+        return name + ":" + key;
     }
 
     @Override
