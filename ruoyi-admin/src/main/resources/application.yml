@@ -273,7 +273,7 @@ websocket:
 --- #flowable配置
 flowable:
   # 开关 用于启动/停用工作流
-  enabled: false
+  enabled: true
   process.enabled: ${flowable.enabled}
   eventregistry.enabled: ${flowable.enabled}
   async-executor-activate: false #关闭定时任务JOB
