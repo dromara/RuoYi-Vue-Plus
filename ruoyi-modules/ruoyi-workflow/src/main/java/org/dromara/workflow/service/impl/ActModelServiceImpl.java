@@ -39,6 +39,7 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.validation.ValidationError;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +66,8 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class ActModelServiceImpl implements IActModelService {
 
-    private final RepositoryService repositoryService;
+    @Autowired(required = false)
+    private RepositoryService repositoryService;
     private final IWfNodeConfigService wfNodeConfigService;
     private final IWfDefinitionConfigService wfDefinitionConfigService;
 

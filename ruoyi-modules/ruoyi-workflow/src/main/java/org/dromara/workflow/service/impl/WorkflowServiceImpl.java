@@ -8,6 +8,7 @@ import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IActProcessInstanceService;
 import org.dromara.workflow.utils.WorkflowUtils;
 import org.flowable.engine.RuntimeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +23,9 @@ import java.util.Map;
 @Service
 public class WorkflowServiceImpl implements WorkflowService {
 
+    @Autowired(required = false)
+    private RuntimeService runtimeService;
     private final IActProcessInstanceService iActProcessInstanceService;
-    private final RuntimeService runtimeService;
     private final IActHiProcinstService iActHiProcinstService;
     /**
      * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息

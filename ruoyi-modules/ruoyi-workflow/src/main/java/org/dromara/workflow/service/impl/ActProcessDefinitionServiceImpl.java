@@ -37,6 +37,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,8 +62,10 @@ import java.util.zip.ZipInputStream;
 @Service
 public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionService {
 
-    private final RepositoryService repositoryService;
-    private final ProcessMigrationService processMigrationService;
+    @Autowired(required = false)
+    private RepositoryService repositoryService;
+    @Autowired(required = false)
+    private ProcessMigrationService processMigrationService;
     private final IWfCategoryService wfCategoryService;
     private final IWfDefinitionConfigService wfDefinitionConfigService;
     private final WfDefinitionConfigMapper wfDefinitionConfigMapper;

@@ -48,6 +48,7 @@ import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,12 +69,17 @@ import java.util.*;
 @Service
 public class ActProcessInstanceServiceImpl implements IActProcessInstanceService {
 
-    private final RepositoryService repositoryService;
-    private final RuntimeService runtimeService;
-    private final HistoryService historyService;
-    private final TaskService taskService;
+    @Autowired(required = false)
+    private RepositoryService repositoryService;
+    @Autowired(required = false)
+    private RuntimeService runtimeService;
+    @Autowired(required = false)
+    private HistoryService historyService;
+    @Autowired(required = false)
+    private TaskService taskService;
+    @Autowired(required = false)
+    private ManagementService managementService;
     private final IActHiProcinstService actHiProcinstService;
-    private final ManagementService managementService;
     private final IWfTaskBackNodeService wfTaskBackNodeService;
     private final IWfNodeConfigService wfNodeConfigService;
     private final FlowProcessEventHandler flowProcessEventHandler;
