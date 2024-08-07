@@ -107,7 +107,7 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements Workbook
                     }
 
                     if (!cellValue.equals(val)) {
-                        if ((i - repeatCell.getCurrent() > 1) && isMerge(list, i, field)) {
+                        if ((i - repeatCell.getCurrent() > 1)) {
                             cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex - 1, colNum, colNum));
                         }
                         map.put(field, new RepeatCell(val, i));
@@ -115,6 +115,11 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements Workbook
                         if (i > repeatCell.getCurrent() && isMerge(list, i, field)) {
                             cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
                         }
+                    } else if (!isMerge(list, i, field)) {
+                        if ((i - repeatCell.getCurrent() > 1)) {
+                            cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex - 1, colNum, colNum));
+                        }
+                        map.put(field, new RepeatCell(val, i));
                     }
                 }
             }
