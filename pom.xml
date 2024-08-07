@@ -42,6 +42,7 @@
         <justauth.version>1.16.6</justauth.version>
         <!-- 离线IP地址定位库 -->
         <ip2region.version>2.7.0</ip2region.version>
+        <undertow.version>2.3.15.Final</undertow.version>
 
         <!-- OSS 配置 -->
         <aws.sdk.version>2.25.15</aws.sdk.version>
