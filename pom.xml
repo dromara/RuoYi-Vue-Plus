@@ -51,7 +51,7 @@
         <!-- 限制框架中的fastjson版本 -->
         <fastjson.version>1.2.83</fastjson.version>
         <!-- 面向运行时的D-ORM依赖 -->
-        <anyline.version>8.7.2-20240728</anyline.version>
+        <anyline.version>8.7.2-20240808</anyline.version>
         <!--工作流配置-->
         <flowable.version>7.0.1</flowable.version>
 
