@@ -8,7 +8,7 @@ import org.dromara.common.sse.core.SseEmitterManager;
 import org.dromara.common.sse.dto.SseMessageDto;
 
 /**
- * 工具类
+ * SSE工具类
  *
  * @author Lion Li
  */
