@@ -3,7 +3,6 @@ package org.dromara.generator.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
@@ -196,7 +195,7 @@ public class GenTableServiceImpl implements IGenTableService {
             .filter(x -> !StringUtils.containsAnyIgnoreCase(x.getName(), TABLE_IGNORE))
             .filter(x -> tableNameSet.contains(x.getName())).toList();
 
-        if (ArrayUtil.isEmpty(tableList)) {
+        if (CollUtil.isEmpty(tableList)) {
             return new ArrayList<>();
         }
         return tableList.stream().map(x -> {
