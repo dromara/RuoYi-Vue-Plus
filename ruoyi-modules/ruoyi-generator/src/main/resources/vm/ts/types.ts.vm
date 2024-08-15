@@ -9,6 +9,12 @@ export interface ${BusinessName}VO {
                         #elseif($column.javaType == 'Boolean') boolean;
                         #else string;
                     #end
+#if($column.htmlType == "imageUpload")
+  /**
+   * ${column.columnComment}Url
+   */
+  ${column.javaField}Url: string;
+#end
 #end
 #end
 #if ($table.tree)
