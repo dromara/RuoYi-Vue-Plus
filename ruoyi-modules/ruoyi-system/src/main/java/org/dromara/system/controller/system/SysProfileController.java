@@ -11,6 +11,7 @@ import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
+import org.dromara.common.mybatis.helper.DataPermissionHelper;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysUserBo;
@@ -72,7 +73,8 @@ public class SysProfileController extends BaseController {
         if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
             return R.fail("修改用户'" + username + "'失败，邮箱账号已存在");
         }
-        if (userService.updateUserProfile(user) > 0) {
+        int rows = DataPermissionHelper.ignore(() -> userService.updateUserProfile(user));
+        if (rows > 0) {
             return R.ok();
         }
         return R.fail("修改个人信息异常，请联系管理员");
