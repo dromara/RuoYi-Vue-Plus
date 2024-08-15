@@ -32,29 +32,21 @@ public enum DataScopeType {
 
     /**
      * 自定数据权限
-     * 使用 SpEL 表达式：`#{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} )`
-     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     CUSTOM("2", " #{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} ) ", " 1 = 0 "),
 
     /**
      * 部门数据权限
-     * 使用 SpEL 表达式：`#{#deptName} = #{#user.deptId}`
-     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     DEPT("3", " #{#deptName} = #{#user.deptId} ", " 1 = 0 "),
 
     /**
      * 部门及以下数据权限
-     * 使用 SpEL 表达式：`#{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )}`
-     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     DEPT_AND_CHILD("4", " #{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )} )", " 1 = 0 "),
 
     /**
      * 仅本人数据权限
-     * 使用 SpEL 表达式：`#{#userName} = #{#user.userId}`
-     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     SELF("5", " #{#userName} = #{#user.userId} ", " 1 = 0 ");
 
