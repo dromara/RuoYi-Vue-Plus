@@ -293,6 +293,10 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Transactional(rollbackFor = Exception.class)
     public int updateRole(SysRoleBo bo) {
         SysRole role = MapstructUtils.convert(bo, SysRole.class);
+
+        if (UserConstants.ROLE_DISABLE.equals(role.getStatus()) && this.countUserRoleByRoleId(role.getRoleId()) > 0) {
+            throw new ServiceException("角色已分配，不能禁用!");
+        }
         // 修改角色信息
         baseMapper.updateById(role);
         // 删除角色与菜单关联
