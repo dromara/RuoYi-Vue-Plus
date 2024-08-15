@@ -13,9 +13,9 @@ import org.dromara.common.mybatis.helper.DataPermissionHelper;
  * 内置数据：
  * - {@code user}: 当前登录用户信息，参考 {@link LoginUser}
  * 内置服务：
- * - {@code sdss}: 系统数据权限服务，参考 {@link ISysDataScopeService}
+ * - {@code sdss}: 系统数据权限服务，参考 ISysDataScopeService
  * 如需扩展数据，可以通过 {@link DataPermissionHelper} 进行操作
- * 如需扩展服务，可以通过 {@link ISysDataScopeService} 自行编写
+ * 如需扩展服务，可以通过 ISysDataScopeService 自行编写
  * </p>
  *
  * @author Lion Li
