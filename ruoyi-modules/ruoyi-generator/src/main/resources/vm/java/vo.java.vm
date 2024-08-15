@@ -53,6 +53,13 @@ public class ${ClassName}Vo implements Serializable {
 #end
     private $column.javaType $column.javaField;
 
+#if($column.htmlType == "imageUpload")
+    /**
+     * ${column.columnComment}Url
+     */
+    @Translation(type = TransConstant.OSS_ID_TO_URL, mapper = "${column.javaField}")
+    private String ${column.javaField}Url";
+#end
 #end
 #end
 

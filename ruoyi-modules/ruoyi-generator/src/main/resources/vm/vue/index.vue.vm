@@ -101,9 +101,9 @@
           </template>
         </el-table-column>
 #elseif($column.list && $column.htmlType == "imageUpload")
-        <el-table-column label="${comment}" align="center" prop="${javaField}" width="100">
+        <el-table-column label="${comment}" align="center" prop="${javaField}Url" width="100">
           <template #default="scope">
-            <image-preview :src="scope.row.${javaField}" :width="50" :height="50"/>
+            <image-preview :src="scope.row.${javaField}Url" :width="50" :height="50"/>
           </template>
         </el-table-column>
 #elseif($column.list && $column.dictType && "" != $column.dictType)

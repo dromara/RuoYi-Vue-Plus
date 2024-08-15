@@ -55,7 +55,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
     @Async
     @EventListener
     public void recordLogininfor(LogininforEvent logininforEvent) {
-        HttpServletRequest request = logininforEvent.getRequest();
+        HttpServletRequest request = ServletUtils.getRequest();
         final UserAgent userAgent = UserAgentUtil.parse(request.getHeader("User-Agent"));
         final String ip = ServletUtils.getClientIP(request);
         // 客户端信息

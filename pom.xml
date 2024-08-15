@@ -26,7 +26,7 @@
         <satoken.version>1.38.0</satoken.version>
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.8.29</hutool.version>
+        <hutool.version>5.8.31</hutool.version>
         <okhttp.version>4.10.0</okhttp.version>
         <spring-boot-admin.version>3.2.3</spring-boot-admin.version>
         <redisson.version>3.34.1</redisson.version>

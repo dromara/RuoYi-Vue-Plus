@@ -92,6 +92,9 @@ public class SysTenantPackageController extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysTenantPackageBo bo) {
+        if (!tenantPackageService.checkPackageNameUnique(bo)) {
+            return R.fail("新增套餐'" + bo.getPackageName() + "'失败，套餐名称已存在");
+        }
         return toAjax(tenantPackageService.insertByBo(bo));
     }
 
@@ -104,6 +107,9 @@ public class SysTenantPackageController extends BaseController {
     @RepeatSubmit()
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysTenantPackageBo bo) {
+        if (!tenantPackageService.checkPackageNameUnique(bo)) {
+            return R.fail("修改套餐'" + bo.getPackageName() + "'失败，套餐名称已存在");
+        }
         return toAjax(tenantPackageService.updateByBo(bo));
     }
 

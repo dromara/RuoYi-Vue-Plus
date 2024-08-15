@@ -13,9 +13,9 @@ import org.dromara.common.mybatis.helper.DataPermissionHelper;
  * 内置数据：
  * - {@code user}: 当前登录用户信息，参考 {@link LoginUser}
  * 内置服务：
- * - {@code sdss}: 系统数据权限服务，参考 {@link ISysDataScopeService}
+ * - {@code sdss}: 系统数据权限服务，参考 ISysDataScopeService
  * 如需扩展数据，可以通过 {@link DataPermissionHelper} 进行操作
- * 如需扩展服务，可以通过 {@link ISysDataScopeService} 自行编写
+ * 如需扩展服务，可以通过 ISysDataScopeService 自行编写
  * </p>
  *
  * @author Lion Li
@@ -32,29 +32,21 @@ public enum DataScopeType {
 
     /**
      * 自定数据权限
-     * 使用 SpEL 表达式：`#{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} )`
-     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     CUSTOM("2", " #{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} ) ", " 1 = 0 "),
 
     /**
      * 部门数据权限
-     * 使用 SpEL 表达式：`#{#deptName} = #{#user.deptId}`
-     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     DEPT("3", " #{#deptName} = #{#user.deptId} ", " 1 = 0 "),
 
     /**
      * 部门及以下数据权限
-     * 使用 SpEL 表达式：`#{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )}`
-     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     DEPT_AND_CHILD("4", " #{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )} )", " 1 = 0 "),
 
     /**
      * 仅本人数据权限
-     * 使用 SpEL 表达式：`#{#userName} = #{#user.userId}`
-     * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
     SELF("5", " #{#userName} = #{#user.userId} ", " 1 = 0 ");
 
