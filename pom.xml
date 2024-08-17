@@ -292,12 +292,6 @@
                 <version>${snailjob.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>transmittable-thread-local</artifactId>
-                <version>${alibaba-ttl.version}</version>
-            </dependency>
-
             <!-- 加密包引入 -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
