@@ -1,10 +1,13 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.warm.flow.core.entity.Definition;
+import com.warm.flow.core.enums.PublishStatus;
 import com.warm.flow.core.service.DefService;
 import com.warm.flow.core.utils.page.Page;
 import com.warm.flow.orm.entity.FlowDefinition;
+import com.warm.flow.orm.mapper.FlowDefinitionMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,8 @@ import org.dromara.workflow.service.IFlwDefinitionService;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 流程定义 服务层实现
@@ -29,6 +34,8 @@ import java.io.IOException;
 @Service
 public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
     private final DefService defService;
+
+    private final FlowDefinitionMapper flowDefinitionMapper;
 
     /**
      * 分页查询
@@ -44,6 +51,20 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
         build.setRows(BeanUtil.copyToList(page.getList(), FlowDefinitionVo.class));
         build.setTotal(page.getTotal());
         return build;
+    }
+
+    /**
+     * 获取历史流程定义列表
+     *
+     * @param flowCode 参数
+     */
+    @Override
+    public List<FlowDefinitionVo> getHisListByKey(String flowCode) {
+        LambdaQueryWrapper<FlowDefinition> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(FlowDefinition::getFlowCode, flowCode);
+        wrapper.in(FlowDefinition::getIsPublish, Arrays.asList(PublishStatus.UNPUBLISHED.getKey(), PublishStatus.EXPIRED.getKey()));
+        List<FlowDefinition> list = flowDefinitionMapper.selectList(wrapper);
+        return BeanUtil.copyToList(list, FlowDefinitionVo.class);
     }
 
     /**

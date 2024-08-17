@@ -47,6 +47,16 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
+     * 获取历史流程定义列表
+     *
+     * @param flowCode 参数
+     */
+    @GetMapping("/getHisListByKey/{flowCode}")
+    public R<List<FlowDefinitionVo>> getHisListByKey(@PathVariable String flowCode) {
+        return R.ok(iFlwDefinitionService.getHisListByKey(flowCode));
+    }
+
+    /**
      * 获取流程定义详细信息
      *
      * @param id 流程定义id
@@ -86,7 +96,7 @@ public class FlwDefinitionController extends BaseController {
      * @param id 流程定义id
      */
     @Log(title = "流程定义", businessType = BusinessType.INSERT)
-    @GetMapping("/publish/{id}")
+    @PutMapping("/publish/{id}")
     @Transactional(rollbackFor = Exception.class)
     public R<Boolean> publish(@PathVariable Long id) {
         return R.ok(defService.publish(id));
@@ -98,11 +108,10 @@ public class FlwDefinitionController extends BaseController {
      * @param id 流程定义id
      */
     @Log(title = "流程定义", businessType = BusinessType.INSERT)
-    @GetMapping("/unPublish/{id}")
+    @PutMapping("/unPublish/{id}")
     @Transactional(rollbackFor = Exception.class)
-    public R<Void> unPublish(@PathVariable Long id) {
-        defService.unPublish(id);
-        return R.ok();
+    public R<Boolean> unPublish(@PathVariable Long id) {
+        return R.ok(defService.unPublish(id));
     }
 
     /**
