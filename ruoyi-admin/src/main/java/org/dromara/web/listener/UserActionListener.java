@@ -71,6 +71,7 @@ public class UserActionListener implements SaTokenListener {
         logininforEvent.setUsername(username);
         logininforEvent.setStatus(Constants.LOGIN_SUCCESS);
         logininforEvent.setMessage(MessageUtils.message("user.login.success"));
+        logininforEvent.setRequest(ServletUtils.getRequest());
         SpringUtils.context().publishEvent(logininforEvent);
         // 更新登录信息
         loginService.recordLoginInfo((Long) loginModel.getExtra(LoginHelper.USER_KEY), ip);

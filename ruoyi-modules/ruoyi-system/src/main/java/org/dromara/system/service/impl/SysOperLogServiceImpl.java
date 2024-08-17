@@ -3,23 +3,18 @@ package org.dromara.system.service.impl;
 import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.ServletUtils;
-import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.core.utils.ip.AddressUtils;
-import org.dromara.common.log.enums.BusinessStatus;
-import org.dromara.common.log.event.OperLogEvent;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.ip.AddressUtils;
+import org.dromara.common.log.event.OperLogEvent;
 import org.dromara.system.domain.SysOperLog;
 import org.dromara.system.domain.bo.SysOperLogBo;
 import org.dromara.system.domain.vo.SysOperLogVo;
 import org.dromara.system.mapper.SysOperLogMapper;
 import org.dromara.system.service.ISysOperLogService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -49,18 +44,6 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     @EventListener
     public void recordOper(OperLogEvent operLogEvent) {
         SysOperLogBo operLog = MapstructUtils.convert(operLogEvent, SysOperLogBo.class);
-        operLog.setTenantId(LoginHelper.getTenantId());
-        operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
-        // 请求的地址
-        String ip = ServletUtils.getClientIP();
-        operLog.setOperIp(ip);
-        HttpServletRequest request = ServletUtils.getRequest();
-        operLog.setOperUrl(StringUtils.substring(request.getRequestURI(), 0, 255));
-        LoginUser loginUser = LoginHelper.getLoginUser();
-        operLog.setOperName(loginUser.getUsername());
-        operLog.setDeptName(loginUser.getDeptName());
-        // 设置请求方式
-        operLog.setRequestMethod(request.getMethod());
         // 远程查询操作地点
         operLog.setOperLocation(AddressUtils.getRealAddressByIP(operLog.getOperIp()));
         insertOperlog(operLog);
