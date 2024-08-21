@@ -119,7 +119,6 @@ public class DataPermissionHelper {
 
     /**
      * 在忽略数据权限中执行
-     * <p>禁止在忽略数据权限中执行忽略数据权限</p>
      *
      * @param handle 处理执行方法
      */
@@ -134,7 +133,6 @@ public class DataPermissionHelper {
 
     /**
      * 在忽略数据权限中执行
-     * <p>禁止在忽略数据权限中执行忽略数据权限</p>
      *
      * @param handle 处理执行方法
      */
