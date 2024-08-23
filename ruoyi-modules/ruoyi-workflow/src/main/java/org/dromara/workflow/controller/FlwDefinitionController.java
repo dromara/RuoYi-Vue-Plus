@@ -184,4 +184,19 @@ public class FlwDefinitionController extends BaseController {
         return R.ok(defService.flowChart(instanceId));
     }
 
+    /**
+     * 激活/挂起流程定义
+     *
+     * @param id     流程定义id
+     * @param active 激活/挂起
+     */
+    @PutMapping("/updateDefinitionState/{id}/{active}")
+    public R<Boolean> active(@PathVariable Long id, @PathVariable boolean active) {
+        if (active) {
+            return R.ok(defService.unActive(id));
+        } else {
+            return R.ok(defService.active(id));
+        }
+    }
+
 }

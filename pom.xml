@@ -53,7 +53,7 @@
         <!-- 面向运行时的D-ORM依赖 -->
         <anyline.version>8.7.2-20240808</anyline.version>
         <!--工作流配置-->
-        <warm-flow>1.2.3</warm-flow>
+        <warm-flow>1.2.4</warm-flow>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>

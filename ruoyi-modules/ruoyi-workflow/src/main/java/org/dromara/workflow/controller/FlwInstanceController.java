@@ -1,6 +1,7 @@
 package org.dromara.workflow.controller;
 
 import com.warm.flow.core.entity.Instance;
+import com.warm.flow.core.service.InsService;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -24,6 +25,7 @@ import java.util.List;
 public class FlwInstanceController extends BaseController {
 
     private final IFlwInstanceService flwInstanceService;
+    private final InsService insService;
 
     /**
      * 分页查询正在运行的流程实例
@@ -75,5 +77,20 @@ public class FlwInstanceController extends BaseController {
     @PutMapping("/cancelProcessApply/{businessId}")
     public R<Void> cancelProcessApply(@PathVariable String businessId) {
         return toAjax(flwInstanceService.cancelProcessApply(businessId));
+    }
+
+    /**
+     * 激活/挂起流程定义
+     *
+     * @param id     流程定义id
+     * @param active 激活/挂起
+     */
+    @PutMapping("/active/{id}/{active}")
+    public R<Boolean> active(@PathVariable Long id, @PathVariable boolean active) {
+        if (active) {
+            return R.ok(insService.unActive(id));
+        } else {
+            return R.ok(insService.active(id));
+        }
     }
 }
