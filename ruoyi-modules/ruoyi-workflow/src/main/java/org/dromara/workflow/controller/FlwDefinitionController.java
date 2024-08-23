@@ -140,14 +140,12 @@ public class FlwDefinitionController extends BaseController {
      * 导入流程定义
      *
      * @param file 文件
-     * @throws Exception 异常
      */
     @Log(title = "流程定义", businessType = BusinessType.IMPORT)
     @PostMapping("/importDefinition")
     @Transactional(rollbackFor = Exception.class)
-    public R<Void> importDefinition(MultipartFile file) throws Exception {
-        defService.importXml(file.getInputStream());
-        return R.ok();
+    public R<Boolean> importDefinition(MultipartFile file) {
+        return R.ok(iFlwDefinitionService.importXml(file));
     }
 
     /**

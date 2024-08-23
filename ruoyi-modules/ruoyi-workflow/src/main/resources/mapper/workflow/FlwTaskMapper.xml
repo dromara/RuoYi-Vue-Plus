@@ -17,8 +17,8 @@
         <result property="businessId" column="business_id"/>
         <result property="flowName" column="flow_name"/>
         <result property="flowCode" column="flow_code"/>
-        <result property="fromCustom" column="from_custom"/>
-        <result property="fromPath" column="from_path"/>
+        <result property="formCustom" column="form_custom"/>
+        <result property="formPath" column="form_path"/>
         <result property="delFlag" column="del_flag"/>
     </resultMap>
     <resultMap type="org.dromara.workflow.domain.vo.FlowHisTaskVo" id="FlowHisTaskResult">
@@ -74,8 +74,8 @@
          i.flow_status,
          d.flow_name,
          d.flow_code,
-         d.from_custom,
-         d.from_path,
+         d.form_custom,
+         d.form_path,
          uu.processed_by
          FROM flow_task AS t
          LEFT JOIN flow_user uu ON uu.associated = t.id
@@ -105,8 +105,7 @@
             t.update_time,
             t.tenant_id,
             i.business_id,
-            i.node_name,
-            d.from_path fromPath,
+            d.form_path fromPath,
             d.flow_name,
             d.flow_code
             from ( SELECT MAX(id) as id
