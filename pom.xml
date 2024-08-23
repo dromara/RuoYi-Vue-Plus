@@ -14,7 +14,7 @@
 
     <properties>
         <revision>5.2.1</revision>
-        <spring-boot.version>3.2.8</spring-boot.version>
+        <spring-boot.version>3.2.9</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
