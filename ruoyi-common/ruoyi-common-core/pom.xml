@@ -94,18 +94,6 @@
             <artifactId>ip2region</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>transmittable-thread-local</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.faces</groupId>
-            <artifactId>jakarta.faces-api</artifactId>
-            <version>4.1.0</version>
-            <optional>true</optional>
-        </dependency>
-
     </dependencies>
 
 </project>

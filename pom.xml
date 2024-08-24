@@ -14,7 +14,7 @@
 
     <properties>
         <revision>5.2.1</revision>
-        <spring-boot.version>3.2.8</spring-boot.version>
+        <spring-boot.version>3.2.9</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
@@ -32,9 +32,8 @@
         <redisson.version>3.34.1</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
-        <alibaba-ttl.version>2.14.4</alibaba-ttl.version>
-        <snailjob.version>1.1.1</snailjob.version>
-        <mapstruct-plus.version>1.4.3</mapstruct-plus.version>
+        <snailjob.version>1.1.2</snailjob.version>
+        <mapstruct-plus.version>1.4.4</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.34</lombok.version>
         <bouncycastle.version>1.76</bouncycastle.version>
@@ -290,12 +289,6 @@
                 <groupId>com.aizuda</groupId>
                 <artifactId>snail-job-client-job-core</artifactId>
                 <version>${snailjob.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>transmittable-thread-local</artifactId>
-                <version>${alibaba-ttl.version}</version>
             </dependency>
 
             <!-- 加密包引入 -->

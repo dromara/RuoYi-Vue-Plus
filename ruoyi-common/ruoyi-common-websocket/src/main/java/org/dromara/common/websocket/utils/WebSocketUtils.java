@@ -113,7 +113,7 @@ public class WebSocketUtils {
      * @param session WebSocket会话
      * @param message 要发送的WebSocket消息对象
      */
-    private static void sendMessage(WebSocketSession session, WebSocketMessage<?> message) {
+    private synchronized static void sendMessage(WebSocketSession session, WebSocketMessage<?> message) {
         if (session == null || !session.isOpen()) {
             log.warn("[send] session会话已经关闭");
         } else {
