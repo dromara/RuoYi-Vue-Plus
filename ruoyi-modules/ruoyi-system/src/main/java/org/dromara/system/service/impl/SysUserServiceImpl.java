@@ -647,4 +647,26 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         return StreamUtils.toList(userRoles, SysUserRole::getUserId);
     }
 
+    @Override
+    public List<UserDTO> selectUsersByRoleIds(List<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return List.of();
+        }
+        List<SysUserRole> userRoles = userRoleMapper.selectList(
+            new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, roleIds));
+        List<Long> userIds = StreamUtils.toList(userRoles, SysUserRole::getUserId);
+        return selectListByIds(userIds);
+    }
+
+    @Override
+    public List<UserDTO> selectUsersByDeptIds(List<Long> deptIds) {
+        if (CollUtil.isEmpty(deptIds)) {
+            return List.of();
+        }
+        List<SysUserVo> list = baseMapper.selectVoList(new LambdaQueryWrapper<SysUser>()
+            .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName, SysUser::getEmail, SysUser::getPhonenumber)
+            .eq(SysUser::getStatus, UserConstants.USER_NORMAL)
+            .in(CollUtil.isNotEmpty(deptIds), SysUser::getDeptId, deptIds));
+        return BeanUtil.copyToList(list, UserDTO.class);
+    }
 }
