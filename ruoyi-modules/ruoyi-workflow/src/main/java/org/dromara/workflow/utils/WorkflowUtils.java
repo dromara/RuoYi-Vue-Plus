@@ -119,23 +119,17 @@ public class WorkflowUtils {
                     deptIds.add(Long.valueOf(StringUtils.substringAfter(user.getProcessedBy(), StrUtil.C_COLON)));
                 }
             }
-            if (CollUtil.isNotEmpty(userIds)) {
-                List<UserDTO> users = userService.selectListByIds(userIds);
-                if (CollUtil.isNotEmpty(users)) {
-                    userDTOList.addAll(users);
-                }
+            List<UserDTO> users = userService.selectListByIds(userIds);
+            if (CollUtil.isNotEmpty(users)) {
+                userDTOList.addAll(users);
             }
-            if (CollUtil.isNotEmpty(roleIds)) {
-                List<UserDTO> users = userService.selectUsersByRoleIds(roleIds);
-                if (CollUtil.isNotEmpty(users)) {
-                    userDTOList.addAll(users);
-                }
+            List<UserDTO> roleUsers = userService.selectUsersByRoleIds(roleIds);
+            if (CollUtil.isNotEmpty(roleUsers)) {
+                userDTOList.addAll(roleUsers);
             }
-            if (CollUtil.isNotEmpty(deptIds)) {
-                List<UserDTO> users = userService.selectUsersByDeptIds(deptIds);
-                if (CollUtil.isNotEmpty(users)) {
-                    userDTOList.addAll(users);
-                }
+            List<UserDTO> deptUsers = userService.selectUsersByDeptIds(deptIds);
+            if (CollUtil.isNotEmpty(deptUsers)) {
+                userDTOList.addAll(deptUsers);
             }
         }
         return userDTOList;
