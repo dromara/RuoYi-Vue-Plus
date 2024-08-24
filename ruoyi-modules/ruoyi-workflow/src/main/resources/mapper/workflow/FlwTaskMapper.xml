@@ -80,7 +80,7 @@
          FROM flow_task AS t
          LEFT JOIN flow_user uu ON uu.associated = t.id
          LEFT JOIN flow_definition d on t.definition_id = d.id
-         LEFT JOIN flow_instance i on t.instance_id = i.id where t.node_type = 1 and i.flow_status = '1') t
+         LEFT JOIN flow_instance i on t.instance_id = i.id where t.node_type = 1 and i.flow_status = '1' and t.del_flag = '0') t
          ${ew.getCustomSqlSegment}
     </select>
 

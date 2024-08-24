@@ -2,12 +2,15 @@ package org.dromara.workflow.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.warm.flow.core.entity.Task;
+import com.warm.flow.core.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.service.UserService;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mail.utils.MailUtils;
@@ -90,5 +93,51 @@ public class WorkflowUtils {
         permissionList.add(String.valueOf(userId));
         permissionList.add("dept:" + deptId);
         return permissionList;
+    }
+
+    /**
+     * 获取办理人
+     *
+     * @param userList 办理用户
+     * @return 用户
+     */
+    public static List<UserDTO> getHandlerUser(List<User> userList) {
+        List<UserDTO> userDTOList = new ArrayList<>();
+        if (CollUtil.isNotEmpty(userList)) {
+            UserService userService = SpringUtils.getBean(UserService.class);
+            List<Long> userIds = new ArrayList<>();
+            List<Long> roleIds = new ArrayList<>();
+            List<Long> deptIds = new ArrayList<>();
+            for (User user : userList) {
+                if (user.getProcessedBy().startsWith("user:")) {
+                    userIds.add(Long.valueOf(StringUtils.substringAfter(user.getProcessedBy(), StrUtil.C_COLON)));
+                }
+                if (user.getProcessedBy().startsWith("role:")) {
+                    roleIds.add(Long.valueOf(StringUtils.substringAfter(user.getProcessedBy(), StrUtil.C_COLON)));
+                }
+                if (user.getProcessedBy().startsWith("dept:")) {
+                    deptIds.add(Long.valueOf(StringUtils.substringAfter(user.getProcessedBy(), StrUtil.C_COLON)));
+                }
+            }
+            if (CollUtil.isNotEmpty(userIds)) {
+                List<UserDTO> users = userService.selectListByIds(userIds);
+                if (CollUtil.isNotEmpty(users)) {
+                    userDTOList.addAll(users);
+                }
+            }
+            if (CollUtil.isNotEmpty(roleIds)) {
+                List<UserDTO> users = userService.selectUsersByRoleIds(roleIds);
+                if (CollUtil.isNotEmpty(users)) {
+                    userDTOList.addAll(users);
+                }
+            }
+            if (CollUtil.isNotEmpty(deptIds)) {
+                List<UserDTO> users = userService.selectUsersByDeptIds(deptIds);
+                if (CollUtil.isNotEmpty(users)) {
+                    userDTOList.addAll(users);
+                }
+            }
+        }
+        return userDTOList;
     }
 }

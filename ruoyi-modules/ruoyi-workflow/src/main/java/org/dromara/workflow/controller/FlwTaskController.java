@@ -1,10 +1,14 @@
 package org.dromara.workflow.controller;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.warm.flow.core.dto.FlowParams;
 import com.warm.flow.core.dto.ModifyHandler;
 import com.warm.flow.core.entity.Instance;
 import com.warm.flow.core.entity.Task;
 import com.warm.flow.core.enums.CooperateType;
+import com.warm.flow.core.enums.FlowStatus;
+import com.warm.flow.core.service.InsService;
 import com.warm.flow.core.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
@@ -40,6 +44,7 @@ public class FlwTaskController extends BaseController {
 
     private final IFlwTaskService flwTaskService;
     private final TaskService taskService;
+    private final InsService insService;
 
 
     /**
@@ -107,8 +112,16 @@ public class FlwTaskController extends BaseController {
      * @param taskId 任务id
      */
     @GetMapping("/getTaskById/{taskId}")
-    public R<Task> getTaskById(@PathVariable Long taskId) {
-        return R.ok(taskService.getById(taskId));
+    public R<FlowTaskVo> getTaskById(@PathVariable Long taskId) {
+        Task task = taskService.getById(taskId);
+        if (ObjectUtil.isNotNull(task)) {
+            FlowTaskVo flowTaskVo = BeanUtil.toBean(task, FlowTaskVo.class);
+            Instance instance = insService.getById(task.getInstanceId());
+            flowTaskVo.setFlowStatus(instance.getFlowStatus());
+            flowTaskVo.setFlowStatusName(FlowStatus.getValueByKey(instance.getFlowStatus()));
+            return R.ok(flowTaskVo);
+        }
+        return R.fail();
     }
 
     /**

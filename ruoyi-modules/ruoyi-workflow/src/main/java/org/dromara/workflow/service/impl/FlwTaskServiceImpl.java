@@ -1,18 +1,22 @@
 package org.dromara.workflow.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.warm.flow.core.dto.FlowParams;
 import com.warm.flow.core.entity.Instance;
 import com.warm.flow.core.entity.Task;
+import com.warm.flow.core.entity.User;
 import com.warm.flow.core.enums.SkipType;
 import com.warm.flow.core.service.InsService;
 import com.warm.flow.core.service.TaskService;
+import com.warm.flow.core.service.UserService;
 import com.warm.flow.orm.entity.FlowInstance;
 import com.warm.flow.orm.entity.FlowTask;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -44,6 +48,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     private final TaskService taskService;
     private final InsService insService;
     private final FlwTaskMapper flwTaskMapper;
+    private final UserService userService;
     private final IWfDefinitionConfigService wfDefinitionConfigService;
     private final IFlwInstanceService iFlwInstanceService;
 
@@ -133,6 +138,18 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         QueryWrapper<FlowTaskBo> queryWrapper = getFlowTaskBoQueryWrapper(flowTaskBo);
         queryWrapper.in("t.processed_by", WorkflowUtils.permissionList());
         Page<FlowTaskVo> page = flwTaskMapper.getTaskWaitByPage(pageQuery.build(), queryWrapper);
+        List<FlowTaskVo> records = page.getRecords();
+        if (CollUtil.isNotEmpty(records)) {
+            List<Long> taskIds = StreamUtils.toList(records, FlowTaskVo::getId);
+            List<User> userList = userService.getByAssociateds(taskIds);
+            for (FlowTaskVo record : records) {
+                if (CollUtil.isNotEmpty(userList)) {
+                    List<User> users = StreamUtils.filter(userList, e -> e.getAssociated().toString().equals(record.getId().toString()));
+                    record.setUserList(CollUtil.isEmpty(users) ? Collections.emptyList() : users);
+                    record.setUserDTOList(WorkflowUtils.getHandlerUser(users));
+                }
+            }
+        }
         return TableDataInfo.build(page);
     }
 
