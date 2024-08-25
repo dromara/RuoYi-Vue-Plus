@@ -45,20 +45,7 @@
         <result property="flowCode" column="flow_code"/>
         <result property="delFlag" column="del_flag"/>
     </resultMap>
-    <resultMap type="org.dromara.workflow.domain.vo.FlowTaskVo" id="TaskVoResult">
-        <result property="id" column="id"/>
-        <result property="createTime" column="create_time"/>
-        <result property="updateTime" column="update_time"/>
-        <result property="nodeCode" column="node_code"/>
-        <result property="nodeType" column="node_type"/>
-        <result property="tenantId" column="tenant_id"/>
-        <result property="delFlag" column="del_flag"/>
-        <result property="definitionId" column="definition_id"/>
-        <result property="instanceId" column="instance_id"/>
-        <result property="flowName" column="flow_name"/>
-        <result property="flowCode" column="flow_code"/>
-    </resultMap>
-    <select id="getTaskWaitByPage" resultMap="TaskVoResult">
+    <select id="getTaskWaitByPage" resultMap="FlowTaskResult">
         select*from (
          SELECT
          distinct t.id,
@@ -84,7 +71,7 @@
          ${ew.getCustomSqlSegment}
     </select>
 
-    <select id="getTaskFinishByPage" resultMap="TaskVoResult">
+    <select id="getTaskFinishByPage" resultMap="FlowHisTaskResult">
         select * from (
             select
             t.id,
@@ -111,7 +98,7 @@
             from ( SELECT MAX(id) as id
             FROM flow_his_task
             <where>
-                flow_status <![CDATA[<> '10']]>
+                flow_status <![CDATA[<> '10']]> and node_type = 1
                 <if test="flowTaskBo.permissionList != null and flowTaskBo.permissionList.size > 0">
                     AND approver in
                     <foreach item="permission" collection="flowTaskBo.permissionList" open="(" separator="," close=")">

@@ -4,6 +4,7 @@ import com.warm.flow.core.entity.Instance;
 import com.warm.flow.orm.entity.FlowInstance;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.workflow.domain.vo.FlowInstanceVo;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface IFlwInstanceService {
      * @param pageQuery 分页
      * @return 结果
      */
-    TableDataInfo<Instance> getPageByRunning(Instance instance, PageQuery pageQuery);
+    TableDataInfo<FlowInstanceVo> getPageByRunning(Instance instance, PageQuery pageQuery);
 
     /**
      * 分页查询已结束的流程实例
@@ -30,7 +31,7 @@ public interface IFlwInstanceService {
      * @param pageQuery 分页
      * @return 结果
      */
-    TableDataInfo<Instance> getPageByFinish(Instance instance, PageQuery pageQuery);
+    TableDataInfo<FlowInstanceVo> getPageByFinish(Instance instance, PageQuery pageQuery);
 
     /**
      * 按照业务id查询流程实例

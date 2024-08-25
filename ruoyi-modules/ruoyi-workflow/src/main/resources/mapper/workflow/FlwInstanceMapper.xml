@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.workflow.mapper.FlwInstanceMapper">
+    <resultMap type="org.dromara.workflow.domain.vo.FlowInstanceVo" id="FlowInstanceResult">
+        <result property="id" column="id"/>
+        <result property="nodeCode" column="node_code"/>
+        <result property="nodeName" column="node_name"/>
+        <result property="nodeType" column="node_type"/>
+        <result property="definitionId" column="definition_id"/>
+        <result property="flowStatus" column="flow_status"/>
+        <result property="activityStatus" column="activity_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="businessId" column="business_id"/>
+        <result property="flowName" column="flow_name"/>
+        <result property="flowCode" column="flow_code"/>
+        <result property="formCustom" column="form_custom"/>
+        <result property="formPath" column="form_path"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="ext" column="ext"/>
+    </resultMap>
+    <select id="page" resultMap="FlowInstanceResult">
+        select *
+        from (SELECT a.id,
+                     a.create_time,
+                     a.update_time,
+                     a.tenant_id,
+                     a.del_flag,
+                     a.definition_id,
+                     a.business_id,
+                     a.node_type,
+                     a.node_code,
+                     a.node_name,
+                     a.variable,
+                     a.flow_status,
+                     a.activity_status,
+                     a.create_by,
+                     a.ext,
+                     b.flow_name,
+                     b.flow_code,
+                     b.version
+              FROM flow_instance a
+                       LEFT JOIN flow_definition b ON a.definition_id = b.id) t
+            ${ew.getCustomSqlSegment}
+    </select>
+
+</mapper>

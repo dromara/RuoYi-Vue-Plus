@@ -7,6 +7,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
+import org.dromara.workflow.domain.vo.FlowInstanceVo;
 import org.dromara.workflow.service.IFlwInstanceService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class FlwInstanceController extends BaseController {
      * @param pageQuery 分页
      */
     @GetMapping("/getPageByRunning")
-    public TableDataInfo<Instance> getPageByRunning(Instance instance, PageQuery pageQuery) {
+    public TableDataInfo<FlowInstanceVo> getPageByRunning(Instance instance, PageQuery pageQuery) {
         return flwInstanceService.getPageByRunning(instance, pageQuery);
     }
 
@@ -45,7 +46,7 @@ public class FlwInstanceController extends BaseController {
      * @param pageQuery 分页
      */
     @GetMapping("/getPageByFinish")
-    public TableDataInfo<Instance> getPageByFinish(Instance instance, PageQuery pageQuery) {
+    public TableDataInfo<FlowInstanceVo> getPageByFinish(Instance instance, PageQuery pageQuery) {
         return flwInstanceService.getPageByFinish(instance, pageQuery);
     }
 

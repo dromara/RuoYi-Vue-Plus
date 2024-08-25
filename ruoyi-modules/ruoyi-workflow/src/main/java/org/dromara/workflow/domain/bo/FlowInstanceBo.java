@@ -1,6 +1,5 @@
 package org.dromara.workflow.domain.bo;
 
-import jakarta.validation.constraints.Future;
 import lombok.Data;
 
 import java.io.Serial;
@@ -13,7 +12,7 @@ import java.util.List;
  * @author may
  */
 @Data
-public class FlowTaskBo implements Serializable {
+public class FlowInstanceBo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
