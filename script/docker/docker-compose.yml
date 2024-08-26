@@ -100,7 +100,7 @@ services:
     network_mode: "host"
 
   ruoyi-server1:
-    image: ruoyi/ruoyi-server:5.2.1
+    image: ruoyi/ruoyi-server:5.2.2
     container_name: ruoyi-server1
     environment:
       # 时区上海
@@ -115,7 +115,7 @@ services:
     network_mode: "host"
 
   ruoyi-server2:
-    image: ruoyi/ruoyi-server:5.2.1
+    image: ruoyi/ruoyi-server:5.2.2
     container_name: ruoyi-server2
     environment:
       # 时区上海
@@ -130,7 +130,7 @@ services:
     network_mode: "host"
 
   ruoyi-monitor-admin:
-    image: ruoyi/ruoyi-monitor-admin:5.2.1
+    image: ruoyi/ruoyi-monitor-admin:5.2.2
     container_name: ruoyi-monitor-admin
     environment:
       # 时区上海
@@ -142,7 +142,7 @@ services:
     network_mode: "host"
 
   ruoyi-snailjob-server:
-    image: ruoyi/ruoyi-snailjob-server:5.2.1
+    image: ruoyi/ruoyi-snailjob-server:5.2.2
     container_name: ruoyi-snailjob-server
     environment:
       # 时区上海
