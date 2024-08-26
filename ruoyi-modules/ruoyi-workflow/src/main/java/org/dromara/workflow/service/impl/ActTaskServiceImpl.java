@@ -52,6 +52,7 @@ import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,11 +72,16 @@ import static org.dromara.workflow.common.constant.FlowConstant.*;
 @Service
 public class ActTaskServiceImpl implements IActTaskService {
 
-    private final RuntimeService runtimeService;
-    private final TaskService taskService;
-    private final HistoryService historyService;
-    private final IdentityService identityService;
-    private final ManagementService managementService;
+    @Autowired(required = false)
+    private RuntimeService runtimeService;
+    @Autowired(required = false)
+    private TaskService taskService;
+    @Autowired(required = false)
+    private HistoryService historyService;
+    @Autowired(required = false)
+    private IdentityService identityService;
+    @Autowired(required = false)
+    private ManagementService managementService;
     private final ActTaskMapper actTaskMapper;
     private final IWfTaskBackNodeService wfTaskBackNodeService;
     private final ActHiTaskinstMapper actHiTaskinstMapper;
@@ -261,7 +267,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         queryWrapper.eq("t.business_status_", BusinessStatusEnum.WAITING.getStatus());
         queryWrapper.eq(TenantHelper.isEnable(), "t.tenant_id_", TenantHelper.getTenantId());
         String ids = StreamUtils.join(roleIds, x -> "'" + x + "'");
-        queryWrapper.and(w1 -> w1.eq("t.assignee_", userId).or(w2 -> w2.isNull("t.assignee_").apply("exists ( select LINK.ID_ from ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = t.ID_ and LINK.TYPE_ = 'candidate' and (LINK.USER_ID_ = {0} or ( LINK.GROUP_ID_ IN ({1}) ) ))", userId, ids)));
+        queryWrapper.and(w1 -> w1.eq("t.assignee_", userId).or(w2 -> w2.isNull("t.assignee_").apply("exists ( select LINK.ID_ from ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = t.ID_ and LINK.TYPE_ = 'candidate' and (LINK.USER_ID_ = {0} or ( LINK.GROUP_ID_ IN (" + ids + ") ) ))", userId)));
         if (StringUtils.isNotBlank(taskBo.getName())) {
             queryWrapper.like("t.name_", taskBo.getName());
         }

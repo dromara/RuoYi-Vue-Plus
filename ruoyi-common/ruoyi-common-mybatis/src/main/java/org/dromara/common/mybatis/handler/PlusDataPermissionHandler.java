@@ -99,7 +99,7 @@ public class PlusDataPermissionHandler {
             return where;
         }
         // 构造数据过滤条件的 SQL 片段
-        String dataFilterSql = buildDataFilter(dataPermission.value(), isSelect);
+        String dataFilterSql = buildDataFilter(dataPermission, isSelect);
         if (StringUtils.isBlank(dataFilterSql)) {
             return where;
         }
@@ -120,14 +120,17 @@ public class PlusDataPermissionHandler {
     /**
      * 构建数据过滤条件的 SQL 语句
      *
-     * @param dataColumns 数据权限注解中的列信息
-     * @param isSelect    标志当前操作是否为查询操作，查询操作和更新或删除操作在处理过滤条件时会有不同的处理方式
+     * @param dataPermission 数据权限注解
+     * @param isSelect       标志当前操作是否为查询操作，查询操作和更新或删除操作在处理过滤条件时会有不同的处理方式
      * @return 构建的数据过滤条件的 SQL 语句
      * @throws ServiceException 如果角色的数据范围异常或者 key 与 value 的长度不匹配，则抛出 ServiceException 异常
      */
-    private String buildDataFilter(DataColumn[] dataColumns, boolean isSelect) {
+    private String buildDataFilter(DataPermission dataPermission, boolean isSelect) {
         // 更新或删除需满足所有条件
         String joinStr = isSelect ? " OR " : " AND ";
+        if (StringUtils.isNotBlank(dataPermission.joinStr())) {
+            joinStr = " " + dataPermission.joinStr() + " ";
+        }
         LoginUser user = DataPermissionHelper.getVariable("user");
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setBeanResolver(beanResolver);
@@ -145,7 +148,7 @@ public class PlusDataPermissionHandler {
                 return "";
             }
             boolean isSuccess = false;
-            for (DataColumn dataColumn : dataColumns) {
+            for (DataColumn dataColumn : dataPermission.value()) {
                 if (dataColumn.key().length != dataColumn.value().length) {
                     throw new ServiceException("角色数据范围异常 => key与value长度不匹配");
                 }
@@ -153,6 +156,13 @@ public class PlusDataPermissionHandler {
                 if (!StringUtils.containsAny(type.getSqlTemplate(),
                     Arrays.stream(dataColumn.key()).map(key -> "#" + key).toArray(String[]::new)
                 )) {
+                    continue;
+                }
+                // 包含权限标识符 这直接跳过
+                if (StringUtils.isNotBlank(dataColumn.permission()) &&
+                    CollUtil.contains(user.getMenuPermission(), dataColumn.permission())
+                ) {
+                    isSuccess = true;
                     continue;
                 }
                 // 设置注解变量 key 为表达式变量 value 为变量值

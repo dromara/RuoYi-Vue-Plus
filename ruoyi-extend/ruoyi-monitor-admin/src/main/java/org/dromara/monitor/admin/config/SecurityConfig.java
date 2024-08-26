@@ -39,9 +39,7 @@ public class SecurityConfig {
             .authorizeHttpRequests((authorize) ->
                 authorize.requestMatchers(
                         new AntPathRequestMatcher(adminContextPath + "/assets/**"),
-                        new AntPathRequestMatcher(adminContextPath + "/login"),
-                        new AntPathRequestMatcher("/actuator"),
-                        new AntPathRequestMatcher("/actuator/**")
+                        new AntPathRequestMatcher(adminContextPath + "/login")
                     ).permitAll()
                     .anyRequest().authenticated())
             .formLogin((formLogin) ->

@@ -4,14 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.poi.ss.formula.functions.T;
+import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.demo.domain.TestDemo;
 import org.dromara.demo.domain.vo.TestDemoVo;
-import org.apache.ibatis.annotations.Param;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,16 +44,17 @@ public interface TestDemoMapper extends BaseMapperPlus<TestDemo, TestDemoVo> {
     List<TestDemo> selectList(@Param(Constants.WRAPPER) Wrapper<TestDemo> queryWrapper);
 
     @Override
-    @DataPermission({
+    @DataPermission(value = {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "user_id")
-    })
-    int updateById(@Param(Constants.ENTITY) TestDemo entity);
+    }, joinStr = "AND")
+    List<TestDemo> selectBatchIds(@Param(Constants.COLL) Collection<? extends Serializable> idList);
 
     @Override
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "user_id")
     })
-    int deleteByIds(@Param(Constants.COLL) Collection<?> idList);
+    int updateById(@Param(Constants.ENTITY) TestDemo entity);
+
 }

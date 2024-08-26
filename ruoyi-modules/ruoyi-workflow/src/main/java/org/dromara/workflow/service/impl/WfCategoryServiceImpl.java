@@ -15,6 +15,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +33,8 @@ import java.util.List;
 public class WfCategoryServiceImpl implements IWfCategoryService {
 
     private final WfCategoryMapper baseMapper;
-
-    private final RepositoryService repositoryService;
+    @Autowired(required = false)
+    private RepositoryService repositoryService;
 
     /**
      * 查询流程分类

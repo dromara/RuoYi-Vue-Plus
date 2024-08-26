@@ -121,9 +121,6 @@ security:
     # swagger 文档配置
     - /*/api-docs
     - /*/api-docs/**
-    # actuator 监控配置
-    - /actuator
-    - /actuator/**
 
 # 多租户配置
 tenant:
@@ -259,10 +256,15 @@ management:
     logfile:
       external-file: ./logs/sys-console.log
 
+--- # 默认/推荐使用sse推送
+sse:
+  enabled: true
+  path: /resource/sse
+
 --- # websocket
 websocket:
   # 如果关闭 需要和前端开关一起关闭
-  enabled: true
+  enabled: false
   # 路径
   path: /resource/websocket
   # 设置访问源地址
@@ -270,6 +272,10 @@ websocket:
 
 --- #flowable配置
 flowable:
+  # 开关 用于启动/停用工作流
+  enabled: true
+  process.enabled: ${flowable.enabled}
+  eventregistry.enabled: ${flowable.enabled}
   async-executor-activate: false #关闭定时任务JOB
   #  将databaseSchemaUpdate设置为true。当Flowable发现库与数据库表结构不一致时，会自动将数据库表结构升级至新版本。
   database-schema-update: true

@@ -4,13 +4,14 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.lock.annotation.Lock4j;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthUser;
+import org.dromara.common.core.constant.CacheConstants;
 import org.dromara.common.core.constant.Constants;
-import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.model.LoginUser;
@@ -155,16 +156,13 @@ public class SysLoginService {
         loginUser.setUserType(user.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user.getUserId()));
         loginUser.setRolePermission(permissionService.getRolePermission(user.getUserId()));
-        TenantHelper.dynamic(user.getTenantId(), () -> {
-            SysDeptVo dept = null;
-            if (ObjectUtil.isNotNull(user.getDeptId())) {
-                dept = deptService.selectDeptById(user.getDeptId());
-            }
-            loginUser.setDeptName(ObjectUtil.isNull(dept) ? "" : dept.getDeptName());
-            loginUser.setDeptCategory(ObjectUtil.isNull(dept) ? "" : dept.getDeptCategory());
-            List<SysRoleVo> roles = roleService.selectRolesByUserId(user.getUserId());
-            loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
-        });
+        if (ObjectUtil.isNotNull(user.getDeptId())) {
+            Opt<SysDeptVo> deptOpt = Opt.of(user.getDeptId()).map(deptService::selectDeptById);
+            loginUser.setDeptName(deptOpt.map(SysDeptVo::getDeptName).orElse(StringUtils.EMPTY));
+            loginUser.setDeptCategory(deptOpt.map(SysDeptVo::getDeptCategory).orElse(StringUtils.EMPTY));
+        }
+        List<SysRoleVo> roles = roleService.selectRolesByUserId(user.getUserId());
+        loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
         return loginUser;
     }
 
@@ -186,7 +184,7 @@ public class SysLoginService {
      * 登录校验
      */
     public void checkLogin(LoginType loginType, String tenantId, String username, Supplier<Boolean> supplier) {
-        String errorKey = GlobalConstants.PWD_ERR_CNT_KEY + username;
+        String errorKey = CacheConstants.PWD_ERR_CNT_KEY + username;
         String loginFail = Constants.LOGIN_FAIL;
 
         // 获取用户登录错误次数，默认为0 (可自定义限制策略 例如: key + username + ip)

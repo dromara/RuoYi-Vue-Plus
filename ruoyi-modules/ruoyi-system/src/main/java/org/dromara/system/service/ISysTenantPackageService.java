@@ -1,9 +1,9 @@
 package org.dromara.system.service;
 
-import org.dromara.system.domain.vo.SysTenantPackageVo;
-import org.dromara.system.domain.bo.SysTenantPackageBo;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.system.domain.bo.SysTenantPackageBo;
+import org.dromara.system.domain.vo.SysTenantPackageVo;
 
 import java.util.Collection;
 import java.util.List;
@@ -44,6 +44,11 @@ public interface ISysTenantPackageService {
      * 修改租户套餐
      */
     Boolean updateByBo(SysTenantPackageBo bo);
+
+    /**
+     * 校验套餐名称是否唯一
+     */
+    boolean checkPackageNameUnique(SysTenantPackageBo bo);
 
     /**
      * 修改套餐状态

@@ -48,6 +48,10 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
                             ? baseEntity.getCreateDept() : loginUser.getDeptId());
                     }
                 }
+            } else {
+                Date date = new Date();
+                this.strictInsertFill(metaObject, "createTime", Date.class, date);
+                this.strictInsertFill(metaObject, "updateTime", Date.class, date);
             }
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
@@ -72,6 +76,8 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
                 if (ObjectUtil.isNotNull(userId)) {
                     baseEntity.setUpdateBy(userId);
                 }
+            } else {
+                this.strictUpdateFill(metaObject, "updateTime", Date.class, new Date());
             }
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);

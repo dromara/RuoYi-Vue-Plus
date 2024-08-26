@@ -92,11 +92,11 @@ public class SocialAuthStrategy implements IAuthStrategy {
         } else {
             social = list.get(0);
         }
-        // 查找用户
-        SysUserVo user = loadUser(social.getTenantId(), social.getUserId());
-
-        // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
-        LoginUser loginUser = loginService.buildLoginUser(user);
+        LoginUser loginUser = TenantHelper.dynamic(social.getTenantId(), () -> {
+            SysUserVo user = loadUser(social.getUserId());
+            // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
+            return loginService.buildLoginUser(user);
+        });
         loginUser.setClientKey(client.getClientKey());
         loginUser.setDeviceType(client.getDeviceType());
         SaLoginModel model = new SaLoginModel();
@@ -116,18 +116,16 @@ public class SocialAuthStrategy implements IAuthStrategy {
         return loginVo;
     }
 
-    private SysUserVo loadUser(String tenantId, Long userId) {
-        return TenantHelper.dynamic(tenantId, () -> {
-            SysUserVo user = userMapper.selectVoById(userId);
-            if (ObjectUtil.isNull(user)) {
-                log.info("登录用户：{} 不存在.", "");
-                throw new UserException("user.not.exists", "");
-            } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
-                log.info("登录用户：{} 已被停用.", "");
-                throw new UserException("user.blocked", "");
-            }
-            return user;
-        });
+    private SysUserVo loadUser(Long userId) {
+        SysUserVo user = userMapper.selectVoById(userId);
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", "");
+            throw new UserException("user.not.exists", "");
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", "");
+            throw new UserException("user.blocked", "");
+        }
+        return user;
     }
 
 }

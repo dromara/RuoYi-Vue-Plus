@@ -14,7 +14,7 @@
     </description>
 
     <properties>
-        <revision>5.2.1</revision>
+        <revision>5.2.2</revision>
     </properties>
 
     <dependencyManagement>
@@ -169,6 +169,13 @@
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-common-websocket</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- SSE模块 -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-common-sse</artifactId>
                 <version>${revision}</version>
             </dependency>
 

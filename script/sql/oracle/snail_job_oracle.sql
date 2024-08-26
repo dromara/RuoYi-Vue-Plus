@@ -2,7 +2,7 @@
  SnailJob Database Transfer Tool
  Source Server Type    : MySQL
  Target Server Type    : Oracle
- Date: 2024-05-14 23:36:38
+ Date: 2024-07-06 12:49:36
 */
 
 
@@ -136,7 +136,7 @@ CREATE INDEX idx_sj_notify_recipient_01 ON sj_notify_recipient (namespace_id);
 COMMENT ON COLUMN sj_notify_recipient.id IS '主键';
 COMMENT ON COLUMN sj_notify_recipient.namespace_id IS '命名空间id';
 COMMENT ON COLUMN sj_notify_recipient.recipient_name IS '接收人名称';
-COMMENT ON COLUMN sj_notify_recipient.notify_type IS '通知类型 1、钉钉 2、邮件 3、企业微信 4 飞书';
+COMMENT ON COLUMN sj_notify_recipient.notify_type IS '通知类型 1、钉钉 2、邮件 3、企业微信 4 飞书 5 webhook';
 COMMENT ON COLUMN sj_notify_recipient.notify_attribute IS '配置属性';
 COMMENT ON COLUMN sj_notify_recipient.description IS '描述';
 COMMENT ON COLUMN sj_notify_recipient.create_dt IS '创建时间';
@@ -296,8 +296,8 @@ CREATE TABLE sj_retry_task_log_message
 ALTER TABLE sj_retry_task_log_message
     ADD CONSTRAINT pk_sj_retry_task_log_message PRIMARY KEY (id);
 
-CREATE INDEX idx_sj_retry_task_log_message_01 ON sj_retry_task_log_message (namespace_id, group_name, unique_id);
-CREATE INDEX idx_sj_retry_task_log_message_02 ON sj_retry_task_log_message (create_dt);
+CREATE INDEX idx_sj_rt_log_message_01 ON sj_retry_task_log_message (namespace_id, group_name, unique_id);
+CREATE INDEX idx_sj_rt_log_message_02 ON sj_retry_task_log_message (create_dt);
 
 COMMENT ON COLUMN sj_retry_task_log_message.id IS '主键';
 COMMENT ON COLUMN sj_retry_task_log_message.namespace_id IS '命名空间id';
@@ -389,8 +389,7 @@ COMMENT ON TABLE sj_server_node IS '服务器节点';
 -- sj_distributed_lock
 CREATE TABLE sj_distributed_lock
 (
-    id         number GENERATED ALWAYS AS IDENTITY,
-    name       varchar2(64)                              NULL,
+    name       varchar2(64)                              NOT NULL,
     lock_until timestamp(3) DEFAULT CURRENT_TIMESTAMP(3) NOT NULL,
     locked_at  timestamp(3) DEFAULT CURRENT_TIMESTAMP(3) NOT NULL,
     locked_by  varchar2(255)                             NULL,
@@ -399,9 +398,8 @@ CREATE TABLE sj_distributed_lock
 );
 
 ALTER TABLE sj_distributed_lock
-    ADD CONSTRAINT pk_sj_distributed_lock PRIMARY KEY (id);
+    ADD CONSTRAINT pk_sj_distributed_lock PRIMARY KEY (name);
 
-COMMENT ON COLUMN sj_distributed_lock.id IS '主键';
 COMMENT ON COLUMN sj_distributed_lock.name IS '锁名称';
 COMMENT ON COLUMN sj_distributed_lock.lock_until IS '锁定时长';
 COMMENT ON COLUMN sj_distributed_lock.locked_at IS '锁定时间';
@@ -449,7 +447,7 @@ CREATE TABLE sj_system_user_permission
 ALTER TABLE sj_system_user_permission
     ADD CONSTRAINT pk_sj_system_user_permission PRIMARY KEY (id);
 
-CREATE UNIQUE INDEX uk_sj_system_user_permission_01 ON sj_system_user_permission (namespace_id, group_name, system_user_id);
+CREATE UNIQUE INDEX uk_sj_su_permission_01 ON sj_system_user_permission (namespace_id, group_name, system_user_id);
 
 COMMENT ON COLUMN sj_system_user_permission.id IS '主键';
 COMMENT ON COLUMN sj_system_user_permission.group_name IS '组名称';
@@ -598,7 +596,11 @@ CREATE TABLE sj_job_task
     parent_id      number        DEFAULT 0                                  NOT NULL,
     task_status    smallint      DEFAULT 0                                  NOT NULL,
     retry_count    number        DEFAULT 0                                  NOT NULL,
+    mr_stage       smallint      DEFAULT NULL                               NULL,
+    leaf           smallint      DEFAULT '1'                                NOT NULL,
+    task_name      varchar2(255) DEFAULT ''                                 NULL,
     client_info    varchar2(128) DEFAULT NULL                               NULL,
+    wf_context     clob          DEFAULT NULL                               NULL,
     result_message clob                                                     NULL,
     args_str       clob          DEFAULT NULL                               NULL,
     args_type      smallint      DEFAULT 1                                  NOT NULL,
@@ -622,7 +624,11 @@ COMMENT ON COLUMN sj_job_task.task_batch_id IS '调度任务id';
 COMMENT ON COLUMN sj_job_task.parent_id IS '父执行器id';
 COMMENT ON COLUMN sj_job_task.task_status IS '执行的状态 0、失败 1、成功';
 COMMENT ON COLUMN sj_job_task.retry_count IS '重试次数';
+COMMENT ON COLUMN sj_job_task.mr_stage IS '动态分片所处阶段 1:map 2:reduce 3:mergeReduce';
+COMMENT ON COLUMN sj_job_task.leaf IS '叶子节点';
+COMMENT ON COLUMN sj_job_task.task_name IS '任务名称';
 COMMENT ON COLUMN sj_job_task.client_info IS '客户端地址 clientId#ip:port';
+COMMENT ON COLUMN sj_job_task.wf_context IS '工作流全局上下文';
 COMMENT ON COLUMN sj_job_task.result_message IS '执行结果';
 COMMENT ON COLUMN sj_job_task.args_str IS '执行方法参数';
 COMMENT ON COLUMN sj_job_task.args_type IS '参数类型 ';
@@ -773,6 +779,7 @@ CREATE TABLE sj_workflow
     executor_timeout number        DEFAULT 0                                  NOT NULL,
     description      varchar2(256) DEFAULT ''                                 NULL,
     flow_info        clob          DEFAULT NULL                               NULL,
+    wf_context       clob          DEFAULT NULL                               NULL,
     bucket_index     number        DEFAULT 0                                  NOT NULL,
     version          number                                                   NOT NULL,
     ext_attrs        varchar2(256) DEFAULT ''                                 NULL,
@@ -799,6 +806,7 @@ COMMENT ON COLUMN sj_workflow.block_strategy IS '阻塞策略 1、丢弃 2、覆
 COMMENT ON COLUMN sj_workflow.executor_timeout IS '任务执行超时时间，单位秒';
 COMMENT ON COLUMN sj_workflow.description IS '描述';
 COMMENT ON COLUMN sj_workflow.flow_info IS '流程信息';
+COMMENT ON COLUMN sj_workflow.wf_context IS '上下文';
 COMMENT ON COLUMN sj_workflow.bucket_index IS 'bucket';
 COMMENT ON COLUMN sj_workflow.version IS '版本号';
 COMMENT ON COLUMN sj_workflow.ext_attrs IS '扩展字段';
@@ -864,8 +872,10 @@ CREATE TABLE sj_workflow_task_batch
     task_batch_status smallint      DEFAULT 0                                  NOT NULL,
     operation_reason  smallint      DEFAULT 0                                  NOT NULL,
     flow_info         clob          DEFAULT NULL                               NULL,
+    wf_context        clob          DEFAULT NULL                               NULL,
     execution_at      number        DEFAULT 0                                  NOT NULL,
     ext_attrs         varchar2(256) DEFAULT ''                                 NULL,
+    version           number        DEFAULT 1                                  NOT NULL,
     deleted           smallint      DEFAULT 0                                  NOT NULL,
     create_dt         date          DEFAULT CURRENT_TIMESTAMP                  NOT NULL,
     update_dt         date          DEFAULT CURRENT_TIMESTAMP                  NOT NULL
@@ -885,10 +895,11 @@ COMMENT ON COLUMN sj_workflow_task_batch.workflow_id IS '工作流任务id';
 COMMENT ON COLUMN sj_workflow_task_batch.task_batch_status IS '任务批次状态 0、失败 1、成功';
 COMMENT ON COLUMN sj_workflow_task_batch.operation_reason IS '操作原因';
 COMMENT ON COLUMN sj_workflow_task_batch.flow_info IS '流程信息';
+COMMENT ON COLUMN sj_workflow_task_batch.wf_context IS '全局上下文';
 COMMENT ON COLUMN sj_workflow_task_batch.execution_at IS '任务执行时间';
 COMMENT ON COLUMN sj_workflow_task_batch.ext_attrs IS '扩展字段';
+COMMENT ON COLUMN sj_workflow_task_batch.version IS '版本号';
 COMMENT ON COLUMN sj_workflow_task_batch.deleted IS '逻辑删除 1、删除';
 COMMENT ON COLUMN sj_workflow_task_batch.create_dt IS '创建时间';
 COMMENT ON COLUMN sj_workflow_task_batch.update_dt IS '修改时间';
 COMMENT ON TABLE sj_workflow_task_batch IS '工作流批次';
-

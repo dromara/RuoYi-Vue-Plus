@@ -37,6 +37,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,8 +62,10 @@ import java.util.zip.ZipInputStream;
 @Service
 public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionService {
 
-    private final RepositoryService repositoryService;
-    private final ProcessMigrationService processMigrationService;
+    @Autowired(required = false)
+    private RepositoryService repositoryService;
+    @Autowired(required = false)
+    private ProcessMigrationService processMigrationService;
     private final IWfCategoryService wfCategoryService;
     private final IWfDefinitionConfigService wfDefinitionConfigService;
     private final WfDefinitionConfigMapper wfDefinitionConfigMapper;
@@ -288,6 +291,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 Model modelData = repositoryService.newModel();
                 modelData.setKey(pd.getKey());
                 modelData.setName(pd.getName());
+                modelData.setCategory(pd.getCategory());
                 modelData.setTenantId(pd.getTenantId());
                 repositoryService.saveModel(modelData);
                 repositoryService.addModelEditorSource(modelData.getId(), IoUtil.readBytes(inputStream));
@@ -350,8 +354,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             initWfDefConfig();
         } else {
             String originalFilename = file.getOriginalFilename();
-            String bpmnResourceSuffix = ResourceNameUtil.BPMN_RESOURCE_SUFFIXES[0];
-            if (originalFilename.contains(bpmnResourceSuffix)) {
+            if (StringUtils.containsAny(originalFilename, ResourceNameUtil.BPMN_RESOURCE_SUFFIXES)) {
                 // 文件名 = 流程名称-流程key
                 String[] splitFilename = originalFilename.substring(0, originalFilename.lastIndexOf(".")).split("-");
                 if (splitFilename.length < 2) {

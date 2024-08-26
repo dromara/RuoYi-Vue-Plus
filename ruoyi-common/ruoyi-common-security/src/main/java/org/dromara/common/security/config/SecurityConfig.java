@@ -1,11 +1,15 @@
 package org.dromara.common.security.config;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.filter.SaServletFilter;
+import cn.dev33.satoken.httpauth.basic.SaHttpBasicUtil;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.util.SaResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.constant.HttpStatus;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -14,6 +18,7 @@ import org.dromara.common.security.config.properties.SecurityProperties;
 import org.dromara.common.security.handler.AllUrlHandler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -69,6 +74,21 @@ public class SecurityConfig implements WebMvcConfigurer {
             })).addPathPatterns("/**")
             // 排除不需要拦截的路径
             .excludePathPatterns(securityProperties.getExcludes());
+    }
+
+    /**
+     * 对 actuator 健康检查接口 做账号密码鉴权
+     */
+    @Bean
+    public SaServletFilter getSaServletFilter() {
+        String username = SpringUtils.getProperty("spring.boot.admin.client.username");
+        String password = SpringUtils.getProperty("spring.boot.admin.client.password");
+        return new SaServletFilter()
+            .addInclude("/actuator", "/actuator/**")
+            .setAuth(obj -> {
+                SaHttpBasicUtil.check(username + ":" + password);
+            })
+            .setError(e -> SaResult.error(e.getMessage()).setCode(HttpStatus.UNAUTHORIZED));
     }
 
 }

@@ -5,6 +5,9 @@ spring.boot.admin.client:
   url: http://localhost:9090/admin
   instance:
     service-host-type: IP
+    metadata:
+      username: ${spring.boot.admin.client.username}
+      userpassword: ${spring.boot.admin.client.password}
   username: ruoyi
   password: 123456
 

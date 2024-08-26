@@ -1,8 +1,9 @@
 package org.dromara.common.tenant.helper;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
-import com.alibaba.ttl.TransmittableThreadLocal;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.AccessLevel;
@@ -11,9 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 
+import java.util.Stack;
 import java.util.function.Supplier;
 
 /**
@@ -27,7 +30,9 @@ public class TenantHelper {
 
     private static final String DYNAMIC_TENANT_KEY = GlobalConstants.GLOBAL_REDIS_KEY + "dynamicTenant";
 
-    private static final ThreadLocal<String> TEMP_DYNAMIC_TENANT = new TransmittableThreadLocal<>();
+    private static final ThreadLocal<String> TEMP_DYNAMIC_TENANT = new ThreadLocal<>();
+
+    private static final ThreadLocal<Stack<Integer>> REENTRANT_IGNORE = ThreadLocal.withInitial(Stack::new);
 
     /**
      * 租户功能是否启用
@@ -36,18 +41,49 @@ public class TenantHelper {
         return Convert.toBool(SpringUtils.getProperty("tenant.enable"), false);
     }
 
+    private static IgnoreStrategy getIgnoreStrategy() {
+        Object ignoreStrategyLocal = ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
+        if (ignoreStrategyLocal instanceof ThreadLocal<?> IGNORE_STRATEGY_LOCAL) {
+            if (IGNORE_STRATEGY_LOCAL.get() instanceof IgnoreStrategy ignoreStrategy) {
+                return ignoreStrategy;
+            }
+        }
+        return null;
+    }
+
     /**
      * 开启忽略租户(开启后需手动调用 {@link #disableIgnore()} 关闭)
      */
     public static void enableIgnore() {
-        InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
+        IgnoreStrategy ignoreStrategy = getIgnoreStrategy();
+        if (ObjectUtil.isNull(ignoreStrategy)) {
+            InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
+        } else {
+            ignoreStrategy.setTenantLine(true);
+        }
+        Stack<Integer> reentrantStack = REENTRANT_IGNORE.get();
+        reentrantStack.push(reentrantStack.size() + 1);
     }
 
     /**
      * 关闭忽略租户
      */
     public static void disableIgnore() {
-        InterceptorIgnoreHelper.clearIgnoreStrategy();
+        IgnoreStrategy ignoreStrategy = getIgnoreStrategy();
+        if (ObjectUtil.isNotNull(ignoreStrategy)) {
+            boolean noOtherIgnoreStrategy = !Boolean.TRUE.equals(ignoreStrategy.getDynamicTableName())
+                && !Boolean.TRUE.equals(ignoreStrategy.getBlockAttack())
+                && !Boolean.TRUE.equals(ignoreStrategy.getIllegalSql())
+                && !Boolean.TRUE.equals(ignoreStrategy.getDataPermission())
+                && CollectionUtil.isEmpty(ignoreStrategy.getOthers());
+            Stack<Integer> reentrantStack = REENTRANT_IGNORE.get();
+            boolean empty = reentrantStack.isEmpty() || reentrantStack.pop() == 1;
+            if (noOtherIgnoreStrategy && empty) {
+                InterceptorIgnoreHelper.clearIgnoreStrategy();
+            } else if (empty) {
+                ignoreStrategy.setTenantLine(false);
+            }
+        }
     }
 
     /**

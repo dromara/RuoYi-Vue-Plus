@@ -68,6 +68,16 @@ public interface UserConstants {
     String DICT_NORMAL = "0";
 
     /**
+     * 通用存在标志
+     */
+    String DEL_FLAG_NORMAL = "0";
+
+    /**
+     * 通用删除标志
+     */
+    String DEL_FLAG_REMOVED  = "2";
+
+    /**
      * 是否为系统默认（是）
      */
     String YES = "Y";

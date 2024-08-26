@@ -178,6 +178,17 @@ public class SysPostServiceImpl implements ISysPostService {
     }
 
     /**
+     * 通过部门ID查询岗位使用数量
+     *
+     * @param deptId 部门id
+     * @return 结果
+     */
+    @Override
+    public long countPostByDeptId(Long deptId) {
+        return baseMapper.selectCount(new LambdaQueryWrapper<SysPost>().eq(SysPost::getDeptId, deptId));
+    }
+
+    /**
      * 删除岗位信息
      *
      * @param postId 岗位ID
