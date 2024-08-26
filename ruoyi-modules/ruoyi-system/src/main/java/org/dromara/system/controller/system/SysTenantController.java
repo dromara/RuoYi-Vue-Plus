@@ -176,4 +176,18 @@ public class SysTenantController extends BaseController {
         return toAjax(TenantHelper.ignore(() -> tenantService.syncTenantPackage(tenantId, packageId)));
     }
 
+    /**
+     * 同步租户字典
+     */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    @Log(title = "同步租户字典", businessType = BusinessType.INSERT)
+    @GetMapping("/syncTenantDict")
+    public R<Void> syncTenantDict() {
+        if (!TenantHelper.isEnable()) {
+            return R.fail("当前未开启租户模式");
+        }
+        tenantService.syncTenantDict();
+        return R.ok("同步租户字典成功");
+    }
+
 }
