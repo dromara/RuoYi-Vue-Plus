@@ -275,6 +275,8 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
                 dept.setAncestors(newAncestors);
                 updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
             }
+        } else {
+            dept.setAncestors(oldDept.getAncestors());
         }
         int result = baseMapper.updateById(dept);
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
