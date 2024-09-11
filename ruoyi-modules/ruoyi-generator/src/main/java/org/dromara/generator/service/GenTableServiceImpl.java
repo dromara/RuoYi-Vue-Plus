@@ -137,7 +137,7 @@ public class GenTableServiceImpl implements IGenTableService {
         }
         // 过滤并转换表格数据
         List<GenTable> tables = tablesMap.values().stream()
-            .filter(x -> !StringUtils.containsAnyIgnoreCase(x.getName(), TABLE_IGNORE))
+            .filter(x -> !startWithAnyIgnoreCase(x.getName(), TABLE_IGNORE))
             .filter(x -> {
                 if (CollUtil.isEmpty(tableNames)) {
                     return true;
@@ -172,6 +172,16 @@ public class GenTableServiceImpl implements IGenTableService {
         // 手动分页 set数据
         page.setRecords(CollUtil.page((int) page.getCurrent() - 1, (int) page.getSize(), tables));
         return TableDataInfo.build(page);
+    }
+
+    public static boolean startWithAnyIgnoreCase(CharSequence cs, CharSequence... searchCharSequences) {
+        // 判断是否是以指定字符串开头
+        for (CharSequence searchCharSequence : searchCharSequences) {
+            if (StringUtils.startsWithIgnoreCase(cs, searchCharSequence)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -548,7 +558,7 @@ public class GenTableServiceImpl implements IGenTableService {
             String treeCode = paramsObj.getStr(GenConstants.TREE_CODE);
             String treeParentCode = paramsObj.getStr(GenConstants.TREE_PARENT_CODE);
             String treeName = paramsObj.getStr(GenConstants.TREE_NAME);
-            String parentMenuId = paramsObj.getStr(GenConstants.PARENT_MENU_ID);
+            Long parentMenuId = paramsObj.getLong(GenConstants.PARENT_MENU_ID);
             String parentMenuName = paramsObj.getStr(GenConstants.PARENT_MENU_NAME);
 
             genTable.setTreeCode(treeCode);

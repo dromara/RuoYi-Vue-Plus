@@ -74,6 +74,7 @@ COMMENT ON COLUMN sj_group_config.update_dt IS '修改时间';
 COMMENT ON TABLE sj_group_config IS '组配置';
 
 INSERT INTO sj_group_config (namespace_id, group_name, description, token, group_status, version, group_partition, id_generator_mode, init_scene, bucket_index, create_dt, update_dt) VALUES ('dev', 'ruoyi_group', '', 'SJ_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT', 1, 1, 0, 1, 1, 4, sysdate, sysdate);
+INSERT INTO sj_group_config (namespace_id, group_name, description, token, group_status, version, group_partition, id_generator_mode, init_scene, bucket_index, create_dt, update_dt) VALUES ('prod', 'ruoyi_group', '', 'SJ_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT', 1, 1, 0, 1, 1, 4, sysdate, sysdate);
 
 -- sj_notify_config
 CREATE TABLE sj_notify_config

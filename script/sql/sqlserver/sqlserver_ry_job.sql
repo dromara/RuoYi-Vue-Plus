@@ -203,6 +203,8 @@ GO
 
 INSERT INTO sj_group_config(namespace_id, group_name, description, token, group_status, version, group_partition, id_generator_mode, init_scene, bucket_index, create_dt, update_dt) VALUES (N'dev', N'ruoyi_group', N'', N'SJ_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT', N'1', N'1', N'0', N'1', N'1', N'4', getdate(), getdate())
 GO
+INSERT INTO sj_group_config(namespace_id, group_name, description, token, group_status, version, group_partition, id_generator_mode, init_scene, bucket_index, create_dt, update_dt) VALUES (N'prod', N'ruoyi_group', N'', N'SJ_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT', N'1', N'1', N'0', N'1', N'1', N'4', getdate(), getdate())
+GO
 
 -- sj_notify_config
 CREATE TABLE sj_notify_config
