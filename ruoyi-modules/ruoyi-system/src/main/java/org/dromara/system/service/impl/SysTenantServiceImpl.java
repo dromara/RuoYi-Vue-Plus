@@ -270,7 +270,6 @@ public class SysTenantServiceImpl implements ISysTenantService {
     public int updateTenantStatus(SysTenantBo bo) {
         SysTenant tenant = new SysTenant();
         tenant.setId(bo.getId());
-        tenant.setTenantId(bo.getTenantId());
         tenant.setStatus(bo.getStatus());
         return baseMapper.updateById(tenant);
     }
