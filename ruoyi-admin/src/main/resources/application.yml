@@ -223,9 +223,10 @@ xss:
   # 过滤开关
   enabled: true
   # 排除链接（多个用逗号分隔）
-  excludes: /system/notice
-  # 匹配链接
-  urlPatterns: /system/*,/monitor/*,/tool/*
+  excludeUrls:
+    - /system/notice
+    - /workflow/model/save
+    - /workflow/model/editModelXml
 
 # 全局线程池相关配置
 # 如使用JDK21请直接使用虚拟线程 不要开启此配置
