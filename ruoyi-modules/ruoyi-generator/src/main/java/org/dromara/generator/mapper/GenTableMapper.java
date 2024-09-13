@@ -2,10 +2,8 @@ package org.dromara.generator.mapper;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.generator.domain.GenTable;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -40,6 +38,14 @@ public interface GenTableMapper extends BaseMapperPlus<GenTable, GenTable> {
      */
     GenTable selectGenTableByName(String tableName);
 
+    /**
+     * 查询指定数据源下的所有表名列表
+     *
+     * @param dataName 数据源名称，用于选择不同的数据源
+     * @return 当前数据库中的表名列表
+     *
+     * @DS("") 使用默认数据源执行查询操作
+     */
     @DS("")
     List<String> selectTableNameList(String dataName);
 }
