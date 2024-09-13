@@ -3,6 +3,7 @@ package org.dromara.system.listener;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.BCrypt;
+import cn.hutool.http.HtmlUtil;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import jakarta.validation.ConstraintViolation;
@@ -82,7 +83,7 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
             }
         } catch (Exception e) {
             failureNum++;
-            String msg = "<br/>" + failureNum + "、账号 " + userVo.getUserName() + " 导入失败：";
+            String msg = "<br/>" + failureNum + "、账号 " + HtmlUtil.cleanHtmlTag(userVo.getUserName()) + " 导入失败：";
             String message = e.getMessage();
             if (e instanceof ConstraintViolationException cvException) {
                 message = StreamUtils.join(cvException.getConstraintViolations(), ConstraintViolation::getMessage, ", ");
