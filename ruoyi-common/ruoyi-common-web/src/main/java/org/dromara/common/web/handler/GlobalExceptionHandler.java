@@ -2,6 +2,7 @@ package org.dromara.common.web.handler;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -10,6 +11,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.exception.base.BaseException;
 import org.dromara.common.core.utils.StreamUtils;
+import org.dromara.common.core.utils.StringUtils;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -51,6 +53,22 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage());
         Integer code = e.getCode();
         return ObjectUtil.isNotNull(code) ? R.fail(code, e.getMessage()) : R.fail(e.getMessage());
+    }
+
+    /**
+     * servlet异常
+     */
+    @ExceptionHandler(ServletException.class)
+    public R<Void> handleServletException(ServletException e, HttpServletRequest request) {
+        if (StringUtils.contains(e.getMessage(), "NotLoginException")) {
+            String requestURI = request.getRequestURI();
+            log.error("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI, e.getMessage());
+            return R.fail(HttpStatus.HTTP_UNAUTHORIZED, "认证失败，无法访问系统资源");
+        } else {
+            String requestURI = request.getRequestURI();
+            log.error("请求地址'{}',发生未知异常.", requestURI, e);
+            return R.fail(e.getMessage());
+        }
     }
 
     /**

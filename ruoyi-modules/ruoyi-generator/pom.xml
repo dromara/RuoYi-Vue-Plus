@@ -64,19 +64,19 @@
 <!--        <dependency>-->
 <!--            <groupId>org.anyline</groupId>-->
 <!--            <artifactId>anyline-data-jdbc-oracle</artifactId>-->
-<!--        <version>${anyline.version}</version>-->
+<!--            <version>${anyline.version}</version>-->
 <!--        </dependency>-->
 
 <!--        <dependency>-->
 <!--            <groupId>org.anyline</groupId>-->
 <!--            <artifactId>anyline-data-jdbc-postgresql</artifactId>-->
-<!--        <version>${anyline.version}</version>-->
+<!--            <version>${anyline.version}</version>-->
 <!--        </dependency>-->
 
 <!--        <dependency>-->
 <!--            <groupId>org.anyline</groupId>-->
 <!--            <artifactId>anyline-data-jdbc-mssql</artifactId>-->
-<!--        <version>${anyline.version}</version>-->
+<!--            <version>${anyline.version}</version>-->
 <!--        </dependency>-->
 
     </dependencies>

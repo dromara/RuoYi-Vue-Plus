@@ -162,7 +162,7 @@ public class GenTable extends BaseEntity {
      * 上级菜单ID字段
      */
     @TableField(exist = false)
-    private String parentMenuId;
+    private Long parentMenuId;
 
     /**
      * 上级菜单名称字段

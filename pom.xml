@@ -13,7 +13,7 @@
     <description>RuoYi-Vue-Plus多租户管理系统</description>
 
     <properties>
-        <revision>5.2.1</revision>
+        <revision>5.2.2</revision>
         <spring-boot.version>3.2.9</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -23,7 +23,7 @@
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
         <easyexcel.version>4.0.2</easyexcel.version>
         <velocity.version>2.3</velocity.version>
-        <satoken.version>1.38.0</satoken.version>
+        <satoken.version>1.39.0</satoken.version>
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.31</hutool.version>
@@ -69,6 +69,8 @@
                 <!-- 环境标识，需要与配置文件的名称相对应 -->
                 <profiles.active>local</profiles.active>
                 <logging.level>info</logging.level>
+                <monitor.username>ruoyi</monitor.username>
+                <monitor.password>123456</monitor.password>
             </properties>
         </profile>
         <profile>
@@ -77,6 +79,8 @@
                 <!-- 环境标识，需要与配置文件的名称相对应 -->
                 <profiles.active>dev</profiles.active>
                 <logging.level>info</logging.level>
+                <monitor.username>ruoyi</monitor.username>
+                <monitor.password>123456</monitor.password>
             </properties>
             <activation>
                 <!-- 默认环境 -->
@@ -88,6 +92,8 @@
             <properties>
                 <profiles.active>prod</profiles.active>
                 <logging.level>warn</logging.level>
+                <monitor.username>ruoyi</monitor.username>
+                <monitor.password>123456</monitor.password>
             </properties>
         </profile>
     </profiles>
@@ -328,9 +334,9 @@
             </dependency>
 
             <dependency>
-                <artifactId>commons-compress</artifactId>
-                <groupId>org.apache.commons</groupId>
-                <version>1.26.2</version>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.15.0</version>
             </dependency>
 
             <dependency>

@@ -340,8 +340,8 @@ public class OssClient {
      * @return UploadResult 包含上传后的文件信息
      * @throws OssException 如果上传失败，抛出自定义异常
      */
-    public UploadResult uploadSuffix(byte[] data, String suffix) {
-        return upload(new ByteArrayInputStream(data), getPath(properties.getPrefix(), suffix), Long.valueOf(data.length), FileUtils.getMimeType(suffix));
+    public UploadResult uploadSuffix(byte[] data, String suffix, String contentType) {
+        return upload(new ByteArrayInputStream(data), getPath(properties.getPrefix(), suffix), Long.valueOf(data.length), contentType);
     }
 
     /**
@@ -353,8 +353,8 @@ public class OssClient {
      * @return UploadResult 包含上传后的文件信息
      * @throws OssException 如果上传失败，抛出自定义异常
      */
-    public UploadResult uploadSuffix(InputStream inputStream, String suffix, Long length) {
-        return upload(inputStream, getPath(properties.getPrefix(), suffix), length, FileUtils.getMimeType(suffix));
+    public UploadResult uploadSuffix(InputStream inputStream, String suffix, Long length, String contentType) {
+        return upload(inputStream, getPath(properties.getPrefix(), suffix), length, contentType);
     }
 
     /**

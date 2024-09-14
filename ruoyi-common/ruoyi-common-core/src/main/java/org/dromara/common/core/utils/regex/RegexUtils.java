@@ -21,7 +21,8 @@ public final class RegexUtils extends ReUtil {
      */
     public static String extractFromString(String input, String regex, String defaultInput) {
         try {
-            return ReUtil.get(regex, input, 1);
+            String str = ReUtil.get(regex, input, 1);
+            return str == null ? defaultInput : str;
         } catch (Exception e) {
             return defaultInput;
         }
