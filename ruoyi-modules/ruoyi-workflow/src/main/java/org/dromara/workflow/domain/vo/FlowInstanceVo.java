@@ -80,6 +80,11 @@ public class FlowInstanceVo {
     private Integer flowStatus;
 
     /**
+     * 流程状态
+     */
+    private String flowStatusName;
+
+    /**
      * 流程激活状态（0挂起 1激活）
      */
     private Integer activityStatus;

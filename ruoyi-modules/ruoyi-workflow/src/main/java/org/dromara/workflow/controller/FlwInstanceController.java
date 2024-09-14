@@ -7,6 +7,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
+import org.dromara.workflow.domain.bo.InstanceBo;
 import org.dromara.workflow.domain.vo.FlowInstanceVo;
 import org.dromara.workflow.service.IFlwInstanceService;
 import org.springframework.validation.annotation.Validated;
@@ -93,5 +94,17 @@ public class FlwInstanceController extends BaseController {
         } else {
             return R.ok(insService.active(id));
         }
+    }
+
+
+    /**
+     * 获取当前登陆人发起的流程实例
+     *
+     * @param instanceBo 参数
+     * @param pageQuery  分页
+     */
+    @GetMapping("/getPageByCurrent")
+    public TableDataInfo<FlowInstanceVo> getPageByCurrent(InstanceBo instanceBo, PageQuery pageQuery) {
+        return flwInstanceService.getPageByCurrent(instanceBo, pageQuery);
     }
 }

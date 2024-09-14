@@ -19,12 +19,12 @@ public class InstanceBo implements Serializable {
     /**
      * 流程名称
      */
-    private String name;
+    private String flowName;
 
     /**
-     * 流程key
+     * 流程编码
      */
-    private String key;
+    private String flowCode;
 
     /**
      * 任务发起人

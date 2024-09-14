@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.dromara.common.satoken.utils.LoginHelper;
 
 /**
- * 任务状态枚举
+ * warmFlow配置
  *
  * @author may
  */

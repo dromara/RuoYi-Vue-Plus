@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.warm.flow.core.FlowFactory;
 import com.warm.flow.core.constant.ExceptionCons;
@@ -18,14 +19,19 @@ import com.warm.flow.core.service.InsService;
 import com.warm.flow.core.service.NodeService;
 import com.warm.flow.core.service.TaskService;
 import com.warm.flow.core.utils.AssertUtil;
+import com.warm.flow.orm.entity.FlowDefinition;
 import com.warm.flow.orm.entity.FlowInstance;
+import com.warm.flow.orm.mapper.FlowDefinitionMapper;
 import com.warm.flow.orm.mapper.FlowInstanceMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.StreamUtils;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.workflow.domain.bo.FlowInstanceBo;
+import org.dromara.workflow.domain.bo.InstanceBo;
 import org.dromara.workflow.domain.vo.FlowInstanceVo;
 import org.dromara.workflow.mapper.FlwInstanceMapper;
 import org.dromara.workflow.service.IFlwInstanceService;
@@ -51,6 +57,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     private final TaskService taskService;
     private final FlowInstanceMapper flowInstanceMapper;
     private final FlwInstanceMapper flwInstanceMapper;
+    private final FlowDefinitionMapper flowDefinitionMapper;
 
     /**
      * 分页查询正在运行的流程实例
@@ -154,5 +161,45 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         List<Skip> skips = FlowFactory.skipService().list(FlowFactory.newSkip().setDefinitionId(startNode.getDefinitionId()).setNowNodeCode(startNode.getNodeCode()));
         Skip skip = skips.get(0);
         return FlowFactory.nodeService().getOne(FlowFactory.newNode().setDefinitionId(startNode.getDefinitionId()).setNodeCode(skip.getNextNodeCode()));
+    }
+
+    /**
+     * 获取当前登陆人发起的流程实例
+     *
+     * @param instanceBo 参数
+     * @param pageQuery  分页
+     */
+    @Override
+    public TableDataInfo<FlowInstanceVo> getPageByCurrent(InstanceBo instanceBo, PageQuery pageQuery) {
+        LambdaQueryWrapper<FlowInstance> wrapper = Wrappers.lambdaQuery();
+
+        if (StringUtils.isNotBlank(instanceBo.getFlowCode())) {
+            List<FlowDefinition> flowDefinitions = flowDefinitionMapper.selectList(
+                new LambdaQueryWrapper<FlowDefinition>().eq(FlowDefinition::getFlowCode, instanceBo.getFlowCode()));
+            if (CollUtil.isNotEmpty(flowDefinitions)) {
+                List<Long> defIdList = StreamUtils.toList(flowDefinitions, FlowDefinition::getId);
+                wrapper.in(FlowInstance::getDefinitionId, defIdList);
+            }
+        }
+        wrapper.eq(FlowInstance::getCreateBy, LoginHelper.getUserId());
+        Page<FlowInstance> page = flowInstanceMapper.selectPage(pageQuery.build(), wrapper);
+        TableDataInfo<FlowInstanceVo> build = TableDataInfo.build();
+        List<FlowInstanceVo> flowInstanceVos = BeanUtil.copyToList(page.getRecords(), FlowInstanceVo.class);
+        if (CollUtil.isNotEmpty(flowInstanceVos)) {
+            List<Long> definitionIds = StreamUtils.toList(flowInstanceVos, FlowInstanceVo::getDefinitionId);
+            List<FlowDefinition> flowDefinitions = flowDefinitionMapper.selectBatchIds(definitionIds);
+            for (FlowInstanceVo vo : flowInstanceVos) {
+                flowDefinitions.stream().filter(e -> e.getId().toString().equals(vo.getDefinitionId().toString())).findFirst().ifPresent(e -> {
+                    vo.setFlowName(e.getFlowName());
+                    vo.setFlowCode(e.getFlowCode());
+                    vo.setVersion(e.getVersion());
+                    vo.setFlowStatusName(FlowStatus.getValueByKey(vo.getFlowStatus()));
+                });
+            }
+
+        }
+        build.setRows(flowInstanceVos);
+        build.setTotal(page.getTotal());
+        return build;
     }
 }

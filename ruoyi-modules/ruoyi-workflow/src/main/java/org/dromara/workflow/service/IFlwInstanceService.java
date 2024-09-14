@@ -4,6 +4,7 @@ import com.warm.flow.core.entity.Instance;
 import com.warm.flow.orm.entity.FlowInstance;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.workflow.domain.bo.InstanceBo;
 import org.dromara.workflow.domain.vo.FlowInstanceVo;
 
 import java.util.List;
@@ -64,4 +65,13 @@ public interface IFlwInstanceService {
      * @return 结果
      */
     boolean cancelProcessApply(String businessId);
+
+    /**
+     * 获取当前登陆人发起的流程实例
+     *
+     * @param instanceBo 参数
+     * @param pageQuery  分页
+     * @return 结果
+     */
+    TableDataInfo<FlowInstanceVo> getPageByCurrent(InstanceBo instanceBo, PageQuery pageQuery);
 }
