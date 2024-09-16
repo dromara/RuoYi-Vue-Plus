@@ -67,54 +67,38 @@
          FROM flow_task AS t
          LEFT JOIN flow_user uu ON uu.associated = t.id
          LEFT JOIN flow_definition d on t.definition_id = d.id
-         LEFT JOIN flow_instance i on t.instance_id = i.id where t.node_type = 1 and i.flow_status = '1' and t.del_flag = '0') t
+         LEFT JOIN flow_instance i on t.instance_id = i.id where t.node_type = 1 and t.del_flag = '0') t
          ${ew.getCustomSqlSegment}
     </select>
 
     <select id="getTaskFinishByPage" resultMap="FlowHisTaskResult">
         select * from (
             select
-            t.id,
-            t.node_code,
-            t.node_name,
-            t.cooperate_type,
-            t.approver,
-            t.collaborator,
-            t.node_type,
-            t.target_node_code,
-            t.target_node_name,
-            t.definition_id,
-            t.instance_id,
-            i.flow_status,
-            t.message,
-            t.ext,
-            t.create_time,
-            t.update_time,
-            t.tenant_id,
-            i.business_id,
-            d.form_path fromPath,
-            d.flow_name,
-            d.flow_code
-            from ( SELECT MAX(id) as id
-            FROM flow_his_task
-            <where>
-                flow_status <![CDATA[<> '10']]> and node_type = 1
-                <if test="flowTaskBo.permissionList != null and flowTaskBo.permissionList.size > 0">
-                    AND approver in
-                    <foreach item="permission" collection="flowTaskBo.permissionList" open="(" separator="," close=")">
-                        #{permission}
-                    </foreach>
-                </if>
-                <if test="flowTaskBo.nodeName != null  and flowTaskBo.nodeName != ''">and node_name like concat('%',
-                    #{flowTaskBo.nodeName}, '%')
-                </if>
-                <if test="flowTaskBo.instanceId != null ">and instance_id = #{flowTaskBo.instanceId}</if>
-            </where>
-            GROUP BY instance_id ) tmp
-            LEFT JOIN flow_his_task t ON t.id = tmp.id
-            LEFT JOIN flow_definition d on t.definition_id = d.id
-            LEFT JOIN flow_instance i on t.instance_id = i.id
-            order by t.create_time desc ) t ${ew.getCustomSqlSegment}
+                a.id,
+                a.node_code,
+                a.node_name,
+                a.cooperate_type,
+                a.approver,
+                a.collaborator,
+                a.node_type,
+                a.target_node_code,
+                a.target_node_name,
+                a.definition_id,
+                a.instance_id,
+                a.flow_status,
+                a.message,
+                a.ext,
+                a.create_time,
+                a.update_time,
+                a.tenant_id,
+                b.business_id,
+                c.form_path fromPath,
+                c.flow_name,
+                c.flow_code
+            from flow_his_task a
+            LEFT JOIN flow_instance b on a.instance_id = b.id
+            LEFT JOIN flow_definition c on a.definition_id = c.id
+        ) t ${ew.getCustomSqlSegment}
     </select>
 
     <select id="getTaskCopyByPage" resultMap="FlowTaskResult">

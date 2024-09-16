@@ -96,6 +96,29 @@ public class FlwTaskController extends BaseController {
     }
 
     /**
+     * 查询待办任务
+     *
+     * @param flowTaskBo 参数
+     * @param pageQuery  分页
+     */
+    @GetMapping("/getPageByAllTaskWait")
+    public TableDataInfo<FlowTaskVo> getPageByAllTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
+        return flwTaskService.getPageByAllTaskWait(flowTaskBo, pageQuery);
+    }
+
+    /**
+     * 查询已办任务
+     *
+     * @param flowTaskBo 参数
+     * @param pageQuery  分页
+     */
+
+    @GetMapping("/getPageByAllTaskFinish")
+    public TableDataInfo<FlowHisTaskVo> getPageByAllTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
+        return flwTaskService.getPageByAllTaskFinish(flowTaskBo, pageQuery);
+    }
+
+    /**
      * 查询当前用户的抄送
      *
      * @param flowTaskBo 参数

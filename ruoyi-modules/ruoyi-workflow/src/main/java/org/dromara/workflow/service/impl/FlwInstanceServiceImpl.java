@@ -172,7 +172,6 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     public TableDataInfo<FlowInstanceVo> getPageByCurrent(InstanceBo instanceBo, PageQuery pageQuery) {
         LambdaQueryWrapper<FlowInstance> wrapper = Wrappers.lambdaQuery();
-
         if (StringUtils.isNotBlank(instanceBo.getFlowCode())) {
             List<FlowDefinition> flowDefinitions = flowDefinitionMapper.selectList(
                 new LambdaQueryWrapper<FlowDefinition>().eq(FlowDefinition::getFlowCode, instanceBo.getFlowCode()));

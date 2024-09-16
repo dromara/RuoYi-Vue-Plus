@@ -7,6 +7,8 @@ import com.warm.flow.core.dto.FlowParams;
 import com.warm.flow.core.entity.Instance;
 import com.warm.flow.core.entity.Task;
 import com.warm.flow.core.entity.User;
+import com.warm.flow.core.enums.FlowStatus;
+import com.warm.flow.core.enums.NodeType;
 import com.warm.flow.core.enums.SkipType;
 import com.warm.flow.core.service.InsService;
 import com.warm.flow.core.service.TaskService;
@@ -135,21 +137,10 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public TableDataInfo<FlowTaskVo> getPageByTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
-        QueryWrapper<FlowTaskBo> queryWrapper = getFlowTaskBoQueryWrapper(flowTaskBo);
+        QueryWrapper<FlowTaskBo> queryWrapper = new QueryWrapper<>();
         queryWrapper.in("t.processed_by", WorkflowUtils.permissionList());
-        Page<FlowTaskVo> page = flwTaskMapper.getTaskWaitByPage(pageQuery.build(), queryWrapper);
-        List<FlowTaskVo> records = page.getRecords();
-        if (CollUtil.isNotEmpty(records)) {
-            List<Long> taskIds = StreamUtils.toList(records, FlowTaskVo::getId);
-            List<User> userList = userService.getByAssociateds(taskIds);
-            for (FlowTaskVo record : records) {
-                if (CollUtil.isNotEmpty(userList)) {
-                    List<User> users = StreamUtils.filter(userList, e -> e.getAssociated().toString().equals(record.getId().toString()));
-                    record.setUserList(CollUtil.isEmpty(users) ? Collections.emptyList() : users);
-                    record.setUserDTOList(WorkflowUtils.getHandlerUser(users));
-                }
-            }
-        }
+        queryWrapper.in("t.flow_status", FlowStatus.APPROVAL.getKey());
+        Page<FlowTaskVo> page = buildTaskWaitingPage(pageQuery, queryWrapper, flowTaskBo);
         return TableDataInfo.build(page);
     }
 
@@ -161,10 +152,81 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public TableDataInfo<FlowHisTaskVo> getPageByTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
-        QueryWrapper<FlowTaskBo> queryWrapper = getFlowTaskBoQueryWrapper(flowTaskBo);
-        flowTaskBo.setPermissionList(WorkflowUtils.permissionList());
-        Page<FlowHisTaskVo> page = flwTaskMapper.getTaskFinishByPage(pageQuery.build(), queryWrapper, flowTaskBo);
+        QueryWrapper<FlowTaskBo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("t.approver", LoginHelper.getUserId());
+        Page<FlowHisTaskVo> page = buildTaskFinishPage(pageQuery, queryWrapper, flowTaskBo);
         return TableDataInfo.build(page);
+    }
+
+    /**
+     * 查询待办任务
+     *
+     * @param flowTaskBo 参数
+     * @param pageQuery  分页
+     */
+    @Override
+    public TableDataInfo<FlowTaskVo> getPageByAllTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
+        QueryWrapper<FlowTaskBo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("t.processed_by", WorkflowUtils.permissionList());
+        Page<FlowTaskVo> page = buildTaskWaitingPage(pageQuery, queryWrapper, flowTaskBo);
+        return TableDataInfo.build(page);
+    }
+
+    private Page<FlowTaskVo> buildTaskWaitingPage(PageQuery pageQuery, QueryWrapper<FlowTaskBo> queryWrapper, FlowTaskBo flowTaskBo) {
+        commonCondition(queryWrapper, flowTaskBo);
+        Page<FlowTaskVo> page = flwTaskMapper.getTaskWaitByPage(pageQuery.build(), queryWrapper);
+        List<FlowTaskVo> records = page.getRecords();
+        if (CollUtil.isNotEmpty(records)) {
+            List<Long> taskIds = StreamUtils.toList(records, FlowTaskVo::getId);
+            List<User> userList = userService.getByAssociateds(taskIds);
+            for (FlowTaskVo data : records) {
+                if (CollUtil.isNotEmpty(userList)) {
+                    List<User> users = StreamUtils.filter(userList, e -> e.getAssociated().toString().equals(data.getId().toString()));
+                    data.setUserList(CollUtil.isEmpty(users) ? Collections.emptyList() : users);
+                    data.setUserDTOList(WorkflowUtils.getHandlerUser(users));
+                }
+                data.setFlowStatusName(FlowStatus.getValueByKey(data.getFlowStatus()));
+            }
+        }
+        return page;
+    }
+
+    /**
+     * 通用条件
+     *
+     * @param queryWrapper 查询条件
+     * @param flowTaskBo   参数
+     */
+    private void commonCondition(QueryWrapper<FlowTaskBo> queryWrapper, FlowTaskBo flowTaskBo) {
+        queryWrapper.like(StringUtils.isNotBlank(flowTaskBo.getNodeName()), "t.node_name", flowTaskBo.getNodeName());
+        queryWrapper.like(StringUtils.isNotBlank(flowTaskBo.getFlowName()), "t.flow_name", flowTaskBo.getFlowName());
+        queryWrapper.eq(StringUtils.isNotBlank(flowTaskBo.getFlowCode()), "t.flow_code", flowTaskBo.getFlowCode());
+        queryWrapper.eq("t.node_type", NodeType.BETWEEN.getKey());
+    }
+
+    /**
+     * 查询已办任务
+     *
+     * @param flowTaskBo 参数
+     * @param pageQuery  分页
+     */
+    @Override
+    public TableDataInfo<FlowHisTaskVo> getPageByAllTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
+        QueryWrapper<FlowTaskBo> queryWrapper = new QueryWrapper<>();
+        Page<FlowHisTaskVo> page = buildTaskFinishPage(pageQuery, queryWrapper, flowTaskBo);
+        return TableDataInfo.build(page);
+    }
+
+    private Page<FlowHisTaskVo> buildTaskFinishPage(PageQuery pageQuery, QueryWrapper<FlowTaskBo> queryWrapper, FlowTaskBo flowTaskBo) {
+        commonCondition(queryWrapper, flowTaskBo);
+        Page<FlowHisTaskVo> page = flwTaskMapper.getTaskFinishByPage(pageQuery.build(), queryWrapper);
+        List<FlowHisTaskVo> records = page.getRecords();
+        if (CollUtil.isNotEmpty(records)) {
+            for (FlowHisTaskVo data : records) {
+                data.setFlowStatusName(FlowStatus.getValueByKey(data.getFlowStatus()));
+            }
+        }
+        return page;
     }
 
     /**
@@ -175,24 +237,12 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public TableDataInfo<FlowTaskVo> getPageByTaskCopy(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
-        QueryWrapper<FlowTaskBo> queryWrapper = getFlowTaskBoQueryWrapper(flowTaskBo);
-        flowTaskBo.setPermissionList(WorkflowUtils.permissionList());
-        Page<FlowTaskVo> page = flwTaskMapper.getTaskCopyByPage(pageQuery.build(), queryWrapper);
-        return TableDataInfo.build(page);
-    }
-
-
-    /**
-     * 查询参数
-     *
-     * @param flowTaskBo 参数
-     */
-    private QueryWrapper<FlowTaskBo> getFlowTaskBoQueryWrapper(FlowTaskBo flowTaskBo) {
         QueryWrapper<FlowTaskBo> queryWrapper = new QueryWrapper<>();
         queryWrapper.like(StringUtils.isNotBlank(flowTaskBo.getNodeName()), "t.node_name", flowTaskBo.getNodeName());
         queryWrapper.like(StringUtils.isNotBlank(flowTaskBo.getFlowName()), "t.flow_name", flowTaskBo.getFlowName());
         queryWrapper.eq(StringUtils.isNotBlank(flowTaskBo.getFlowCode()), "t.flow_code", flowTaskBo.getFlowCode());
-        return queryWrapper;
+        Page<FlowTaskVo> page = flwTaskMapper.getTaskCopyByPage(pageQuery.build(), queryWrapper);
+        return TableDataInfo.build(page);
     }
 
     /**

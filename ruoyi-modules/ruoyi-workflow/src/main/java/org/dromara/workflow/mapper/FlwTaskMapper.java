@@ -32,12 +32,10 @@ public interface FlwTaskMapper {
      *
      * @param page         分页
      * @param queryWrapper 条件
-     * @param flowTaskBo   条件
      * @return 结果
      */
     Page<FlowHisTaskVo> getTaskFinishByPage(@Param("page") Page<FlowTaskVo> page,
-                                            @Param(Constants.WRAPPER) Wrapper<FlowTaskBo> queryWrapper,
-                                            @Param("flowTaskBo") FlowTaskBo flowTaskBo);
+                                            @Param(Constants.WRAPPER) Wrapper<FlowTaskBo> queryWrapper);
 
     /**
      * 查询当前用户的抄送

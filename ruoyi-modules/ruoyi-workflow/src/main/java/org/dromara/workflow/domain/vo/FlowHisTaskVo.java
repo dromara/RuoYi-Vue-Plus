@@ -103,6 +103,12 @@ public class FlowHisTaskVo implements Serializable {
     private String approver;
 
     /**
+     * 审批者
+     */
+    @Translation(type = TransConstant.USER_ID_TO_NICKNAME, mapper = "approver")
+    private String approveName;
+
+    /**
      * 协作人(只有转办、会签、票签、委派)
      */
     private String collaborator;
@@ -121,6 +127,11 @@ public class FlowHisTaskVo implements Serializable {
      * 流程状态（1审批中 2 审批通过 9已退回 10失效）
      */
     private Integer flowStatus;
+
+    /**
+     * 流程状态
+     */
+    private String flowStatusName;
 
     /**
      * 审批意见
@@ -152,10 +163,4 @@ public class FlowHisTaskVo implements Serializable {
      * 流程定义编码
      */
     private String flowCode;
-
-    /**
-     * 审批者
-     */
-    @Translation(type = TransConstant.USER_ID_TO_NICKNAME, mapper = "approver")
-    private String approverName;
 }
