@@ -104,20 +104,20 @@
     <select id="getTaskCopyByPage" resultMap="FlowTaskResult">
        select * from (
          SELECT
+             b.id ,
              b.flow_status,
              b.business_id,
              a.create_time,
              b.node_name,
              b.node_code,
-             b.id ,
              d.flow_name,
-             d.flow_code,
+             d.flow_code
          FROM
              `flow_user` a
              LEFT JOIN flow_instance b ON a.associated = b.id
              LEFT JOIN flow_definition d on b.definition_id=d.id
          WHERE
-             a.type = 4 ORDER BY create_time DESC
+             a.type = 4
        ) t ${ew.getCustomSqlSegment}
     </select>
 </mapper>

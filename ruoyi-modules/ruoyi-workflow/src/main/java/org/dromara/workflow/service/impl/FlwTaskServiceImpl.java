@@ -202,6 +202,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         queryWrapper.like(StringUtils.isNotBlank(flowTaskBo.getFlowName()), "t.flow_name", flowTaskBo.getFlowName());
         queryWrapper.eq(StringUtils.isNotBlank(flowTaskBo.getFlowCode()), "t.flow_code", flowTaskBo.getFlowCode());
         queryWrapper.eq("t.node_type", NodeType.BETWEEN.getKey());
+        queryWrapper.orderByDesc("t.create_time");
     }
 
     /**
@@ -238,7 +239,6 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     @Override
     public TableDataInfo<FlowTaskVo> getPageByTaskCopy(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
         QueryWrapper<FlowTaskBo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotBlank(flowTaskBo.getNodeName()), "t.node_name", flowTaskBo.getNodeName());
         queryWrapper.like(StringUtils.isNotBlank(flowTaskBo.getFlowName()), "t.flow_name", flowTaskBo.getFlowName());
         queryWrapper.eq(StringUtils.isNotBlank(flowTaskBo.getFlowCode()), "t.flow_code", flowTaskBo.getFlowCode());
         Page<FlowTaskVo> page = flwTaskMapper.getTaskCopyByPage(pageQuery.build(), queryWrapper);
