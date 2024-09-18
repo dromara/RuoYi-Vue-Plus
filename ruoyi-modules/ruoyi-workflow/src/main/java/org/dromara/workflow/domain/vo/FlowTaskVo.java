@@ -110,7 +110,7 @@ public class FlowTaskVo implements Serializable {
     /**
      * 流程状态
      */
-    private Integer flowStatus;
+    private String flowStatus;
 
     /**
      * 流程状态

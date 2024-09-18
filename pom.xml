@@ -51,7 +51,7 @@
         <!-- 面向运行时的D-ORM依赖 -->
         <anyline.version>8.7.2-20240808</anyline.version>
         <!--工作流配置-->
-        <warm-flow>1.2.4</warm-flow>
+        <warm-flow.version>1.2.7</warm-flow.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
@@ -122,9 +122,14 @@
             <dependency>
                 <groupId>io.github.minliuhua</groupId>
                 <artifactId>warm-flow-mybatis-plus-sb-starter</artifactId>
-                <version>${warm-flow}</version>
+                <version>${warm-flow.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.github.minliuhua</groupId>
+                <artifactId>warm-flow-plugin-spel</artifactId>
+                <version>${warm-flow.version}</version>
+            </dependency>
 
             <!-- JustAuth 的依赖配置-->
             <dependency>

@@ -126,7 +126,7 @@ public class FlowHisTaskVo implements Serializable {
     /**
      * 流程状态（1审批中 2 审批通过 9已退回 10失效）
      */
-    private Integer flowStatus;
+    private String flowStatus;
 
     /**
      * 流程状态
