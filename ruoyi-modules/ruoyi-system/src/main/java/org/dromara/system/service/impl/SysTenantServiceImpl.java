@@ -268,7 +268,9 @@ public class SysTenantServiceImpl implements ISysTenantService {
     @CacheEvict(cacheNames = CacheNames.SYS_TENANT, key = "#bo.tenantId")
     @Override
     public int updateTenantStatus(SysTenantBo bo) {
-        SysTenant tenant = MapstructUtils.convert(bo, SysTenant.class);
+        SysTenant tenant = new SysTenant();
+        tenant.setId(bo.getId());
+        tenant.setStatus(bo.getStatus());
         return baseMapper.updateById(tenant);
     }
 

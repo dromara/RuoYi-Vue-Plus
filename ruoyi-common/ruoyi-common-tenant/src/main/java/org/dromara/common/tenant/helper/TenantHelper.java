@@ -1,6 +1,5 @@
 package org.dromara.common.tenant.helper;
 
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
@@ -130,7 +129,7 @@ public class TenantHelper {
         if (!isEnable()) {
             return;
         }
-        if (!isLogin() || !global) {
+        if (!LoginHelper.isLogin() || !global) {
             TEMP_DYNAMIC_TENANT.set(tenantId);
             return;
         }
@@ -147,7 +146,7 @@ public class TenantHelper {
         if (!isEnable()) {
             return null;
         }
-        if (!isLogin()) {
+        if (!LoginHelper.isLogin()) {
             return TEMP_DYNAMIC_TENANT.get();
         }
         // 如果线程内有值 优先返回
@@ -167,7 +166,7 @@ public class TenantHelper {
         if (!isEnable()) {
             return;
         }
-        if (!isLogin()) {
+        if (!LoginHelper.isLogin()) {
             TEMP_DYNAMIC_TENANT.remove();
             return;
         }
@@ -216,15 +215,6 @@ public class TenantHelper {
             tenantId = LoginHelper.getTenantId();
         }
         return tenantId;
-    }
-
-    private static boolean isLogin() {
-        try {
-            StpUtil.checkLogin();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
 }
