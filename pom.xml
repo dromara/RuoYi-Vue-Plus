@@ -21,14 +21,14 @@
         <mybatis.version>3.5.16</mybatis.version>
         <springdoc.version>2.6.0</springdoc.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
-        <easyexcel.version>4.0.2</easyexcel.version>
+        <easyexcel.version>4.0.3</easyexcel.version>
         <velocity.version>2.3</velocity.version>
         <satoken.version>1.39.0</satoken.version>
         <mybatis-plus.version>3.5.8</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.31</hutool.version>
         <spring-boot-admin.version>3.2.3</spring-boot-admin.version>
-        <redisson.version>3.34.1</redisson.version>
+        <redisson.version>3.36.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
         <snailjob.version>1.1.2</snailjob.version>
