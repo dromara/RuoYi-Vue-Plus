@@ -18,9 +18,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * 自定义 Mapper 接口, 实现 自定义扩展
@@ -69,9 +67,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 插入操作是否成功的布尔值
      */
     default boolean insertBatch(Collection<T> entityList) {
-        Db.saveBatch(entityList);
-        // 临时解决 新版本 mp 插入状态判断错误问题
-        return true;
+        return Db.saveBatch(entityList);
     }
 
     /**
@@ -81,9 +77,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 更新操作是否成功的布尔值
      */
     default boolean updateBatchById(Collection<T> entityList) {
-        Db.updateBatchById(entityList);
-        // 临时解决 新版本 mp 插入状态判断错误问题
-        return true;
+        return Db.updateBatchById(entityList);
     }
 
     /**
@@ -93,9 +87,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 插入或更新操作是否成功的布尔值
      */
     default boolean insertOrUpdateBatch(Collection<T> entityList) {
-        Db.saveOrUpdateBatch(entityList);
-        // 临时解决 新版本 mp 插入状态判断错误问题
-        return true;
+        return Db.saveOrUpdateBatch(entityList);
     }
 
     /**
@@ -106,9 +98,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 插入操作是否成功的布尔值
      */
     default boolean insertBatch(Collection<T> entityList, int batchSize) {
-        Db.saveBatch(entityList, batchSize);
-        // 临时解决 新版本 mp 插入状态判断错误问题
-        return true;
+        return Db.saveBatch(entityList, batchSize);
     }
 
     /**
@@ -119,9 +109,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 更新操作是否成功的布尔值
      */
     default boolean updateBatchById(Collection<T> entityList, int batchSize) {
-        Db.updateBatchById(entityList, batchSize);
-        // 临时解决 新版本 mp 插入状态判断错误问题
-        return true;
+        return Db.updateBatchById(entityList, batchSize);
     }
 
     /**
@@ -132,9 +120,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 插入或更新操作是否成功的布尔值
      */
     default boolean insertOrUpdateBatch(Collection<T> entityList, int batchSize) {
-        Db.saveOrUpdateBatch(entityList, batchSize);
-        // 临时解决 新版本 mp 插入状态判断错误问题
-        return true;
+        return Db.saveOrUpdateBatch(entityList, batchSize);
     }
 
     /**
