@@ -101,7 +101,7 @@ public class TestDemoServiceImpl implements ITestDemoService {
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         if (isValid) {
             // 做一些业务上的校验,判断是否需要校验
-            List<TestDemo> list = baseMapper.selectBatchIds(ids);
+            List<TestDemo> list = baseMapper.selectByIds(ids);
             if (list.size() != ids.size()) {
                 throw new ServiceException("您没有删除权限!");
             }

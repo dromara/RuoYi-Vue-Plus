@@ -155,8 +155,8 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @param idList 主键ID集合
      * @return 查询到的VO对象列表
      */
-    default List<V> selectVoBatchIds(Collection<? extends Serializable> idList) {
-        return selectVoBatchIds(idList, this.currentVoClass());
+    default List<V> selectVoByIds(Collection<? extends Serializable> idList) {
+        return selectVoByIds(idList, this.currentVoClass());
     }
 
     /**
@@ -167,8 +167,8 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @param <C>     VO类的类型
      * @return 查询到的VO对象列表，经过转换为指定的VO类后返回
      */
-    default <C> List<C> selectVoBatchIds(Collection<? extends Serializable> idList, Class<C> voClass) {
-        List<T> list = this.selectBatchIds(idList);
+    default <C> List<C> selectVoByIds(Collection<? extends Serializable> idList, Class<C> voClass) {
+        List<T> list = this.selectByIds(idList);
         if (CollUtil.isEmpty(list)) {
             return CollUtil.newArrayList();
         }

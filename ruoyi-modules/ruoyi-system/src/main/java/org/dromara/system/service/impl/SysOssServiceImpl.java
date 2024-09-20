@@ -244,7 +244,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         if (isValid) {
             // 做一些业务上的校验,判断是否需要校验
         }
-        List<SysOss> list = baseMapper.selectBatchIds(ids);
+        List<SysOss> list = baseMapper.selectByIds(ids);
         for (SysOss sysOss : list) {
             OssClient storage = OssFactory.instance(sysOss.getService());
             storage.delete(sysOss.getUrl());
