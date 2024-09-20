@@ -28,6 +28,7 @@ import org.dromara.workflow.utils.WorkflowUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -176,7 +177,7 @@ public class FlwTaskController extends BaseController {
             bo.getTaskId(),
             String.valueOf(LoginHelper.getUserId()),
             WorkflowUtils.permissionList(),
-            bo.getUserIds(),
+            Collections.singletonList(bo.getUserId()),
             bo.getMessage()));
     }
 
@@ -193,7 +194,7 @@ public class FlwTaskController extends BaseController {
             bo.getTaskId(),
             String.valueOf(LoginHelper.getUserId()),
             WorkflowUtils.permissionList(),
-            bo.getUserIds(),
+            Collections.singletonList(bo.getUserId()),
             bo.getMessage()));
     }
 

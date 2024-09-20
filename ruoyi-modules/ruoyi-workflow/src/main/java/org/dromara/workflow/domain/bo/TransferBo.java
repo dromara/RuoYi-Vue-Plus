@@ -23,7 +23,7 @@ public class TransferBo implements Serializable {
      * 转办人id
      */
     @NotNull(message = "转办人id不能为空", groups = {AddGroup.class})
-    private List<String> userIds;
+    private String userId;
 
     /**
      * 任务id

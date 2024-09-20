@@ -23,7 +23,7 @@ public class DelegateBo implements Serializable {
      * 委派人id
      */
     @NotNull(message = "委派人id不能为空", groups = {AddGroup.class})
-    private List<String> userIds;
+    private String userId;
 
     /**
      * 任务id
