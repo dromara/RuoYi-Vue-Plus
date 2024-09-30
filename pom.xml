@@ -17,7 +17,7 @@
         <spring-boot.version>3.2.10</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <mybatis.version>3.5.16</mybatis.version>
         <springdoc.version>2.6.0</springdoc.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
@@ -48,7 +48,7 @@
         <!-- 限制框架中的fastjson版本 -->
         <fastjson.version>1.2.83</fastjson.version>
         <!-- 面向运行时的D-ORM依赖 -->
-        <anyline.version>8.7.2-20240808</anyline.version>
+        <anyline.version>8.7.2-20240930</anyline.version>
         <!--工作流配置-->
         <flowable.version>7.0.1</flowable.version>
 
