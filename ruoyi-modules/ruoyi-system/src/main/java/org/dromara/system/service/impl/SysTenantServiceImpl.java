@@ -444,12 +444,14 @@ public class SysTenantServiceImpl implements ISysTenantService {
                 }
             }
         }
-        if (CollUtil.isNotEmpty(saveTypeList)) {
-            dictTypeMapper.insertBatch(saveTypeList);
-        }
-        if (CollUtil.isNotEmpty(saveDataList)) {
-            dictDataMapper.insertBatch(saveDataList);
-        }
+        TenantHelper.ignore(() -> {
+            if (CollUtil.isNotEmpty(saveTypeList)) {
+                dictTypeMapper.insertBatch(saveTypeList);
+            }
+            if (CollUtil.isNotEmpty(saveDataList)) {
+                dictDataMapper.insertBatch(saveDataList);
+            }
+        });
         for (String tenantId : set) {
             TenantHelper.dynamic(tenantId, () -> CacheUtils.clear(CacheNames.SYS_DICT));
         }
