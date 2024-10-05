@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.warm.flow.core.entity.Task;
 import com.warm.flow.core.entity.User;
+import com.warm.flow.orm.entity.FlowUser;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.domain.dto.RoleDTO;
@@ -111,12 +112,12 @@ public class WorkflowUtils {
             for (User user : userList) {
                 if (user.getProcessedBy().startsWith("user:")) {
                     userIds.add(Long.valueOf(StringUtils.substringAfter(user.getProcessedBy(), StrUtil.C_COLON)));
-                }
-                if (user.getProcessedBy().startsWith("role:")) {
+                } else if (user.getProcessedBy().startsWith("role:")) {
                     roleIds.add(Long.valueOf(StringUtils.substringAfter(user.getProcessedBy(), StrUtil.C_COLON)));
-                }
-                if (user.getProcessedBy().startsWith("dept:")) {
+                } else if (user.getProcessedBy().startsWith("dept:")) {
                     deptIds.add(Long.valueOf(StringUtils.substringAfter(user.getProcessedBy(), StrUtil.C_COLON)));
+                } else {
+                    userIds.add(Long.valueOf(user.getProcessedBy()));
                 }
             }
             List<UserDTO> users = userService.selectListByIds(userIds);
@@ -133,5 +134,51 @@ public class WorkflowUtils {
             }
         }
         return userDTOList;
+    }
+
+    /**
+     * 获取办理人
+     *
+     * @param userList 办理用户
+     * @return 用户
+     */
+    public static Set<User> getUser(List<User> userList) {
+        Set<User> list = new HashSet<>();
+        if (CollUtil.isNotEmpty(userList)) {
+            UserService userService = SpringUtils.getBean(UserService.class);
+            for (User user : userList) {
+                if (user.getProcessedBy().startsWith("user:")) {
+                    Long userId = Long.valueOf(StringUtils.substringAfter(user.getProcessedBy(), StrUtil.C_COLON));
+                    List<UserDTO> users = userService.selectListByIds(List.of(userId));
+                    if (CollUtil.isNotEmpty(users)) {
+                        FlowUser u = new FlowUser();
+                        u.setType(user.getType());
+                        u.setProcessedBy(String.valueOf(StreamUtils.toList(users, UserDTO::getUserId).get(0)));
+                        list.add(u);
+                    }
+                }
+                if (user.getProcessedBy().startsWith("role:")) {
+                    Long roleId = Long.valueOf(StringUtils.substringAfter(user.getProcessedBy(), StrUtil.C_COLON));
+                    List<UserDTO> roleUsers = userService.selectUsersByRoleIds(List.of(roleId));
+                    for (UserDTO roleUser : roleUsers) {
+                        FlowUser u = new FlowUser();
+                        u.setType(user.getType());
+                        u.setProcessedBy(String.valueOf(roleUser.getUserId()));
+                        list.add(u);
+                    }
+                }
+                if (user.getProcessedBy().startsWith("dept:")) {
+                    Long deptId = Long.valueOf(StringUtils.substringAfter(user.getProcessedBy(), StrUtil.C_COLON));
+                    List<UserDTO> deptUsers = userService.selectUsersByDeptIds(List.of(deptId));
+                    for (UserDTO deptUser : deptUsers) {
+                        FlowUser u = new FlowUser();
+                        u.setType(user.getType());
+                        u.setProcessedBy(String.valueOf(deptUser.getUserId()));
+                        list.add(u);
+                    }
+                }
+            }
+        }
+        return list;
     }
 }

@@ -1,6 +1,7 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.warm.flow.core.dto.FlowParams;
@@ -15,8 +16,10 @@ import com.warm.flow.core.service.TaskService;
 import com.warm.flow.core.service.UserService;
 import com.warm.flow.orm.entity.FlowInstance;
 import com.warm.flow.orm.entity.FlowTask;
+import com.warm.flow.orm.mapper.FlowTaskMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -53,6 +56,8 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     private final UserService userService;
     private final IWfDefinitionConfigService wfDefinitionConfigService;
     private final IFlwInstanceService iFlwInstanceService;
+
+    private final FlowTaskMapper flowTaskMapper;
 
     /**
      * 启动任务
@@ -121,11 +126,37 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             flowParams.message(completeTaskBo.getMessage());
             flowParams.handler(userId);
             flowParams.permissionFlag(WorkflowUtils.permissionList());
-            taskService.skip(taskId, flowParams);
+            Instance instance = taskService.skip(taskId, flowParams);
+            setHandler(instance);
             return true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 设置办理人
+     *
+     * @param instance 实例
+     */
+    private void setHandler(Instance instance) {
+        if (instance != null) {
+            List<FlowTask> flowTasks = flowTaskMapper.selectList(new LambdaQueryWrapper<>(FlowTask.class)
+                .eq(FlowTask::getInstanceId, instance.getId()));
+            for (FlowTask flowTask : flowTasks) {
+                List<User> userList = userService.getByAssociateds(Collections.singletonList(flowTask.getId()));
+                if (CollUtil.isNotEmpty(userList)) {
+                    Set<User> users = WorkflowUtils.getUser(userList);
+                    if (CollUtil.isNotEmpty(users)) {
+                        userService.deleteByTaskIds(Collections.singletonList(flowTask.getId()));
+                        for (User user : users) {
+                            user.setAssociated(flowTask.getId());
+                        }
+                        userService.saveBatch(new ArrayList<>(users));
+                    }
+                }
+            }
         }
     }
 

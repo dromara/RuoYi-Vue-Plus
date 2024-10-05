@@ -147,10 +147,10 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             AssertUtil.isNull(startNode, ExceptionCons.LOST_START_NODE);
 
             // 获取下一个节点，如果是网关节点，则重新获取后续节点
-            List<Node> nextNodes = FlowFactory.taskService().getNextByCheckGateWay(new FlowParams(), getFirstBetween(startNode));
-            Node node = nextNodes.get(0);
-            FlowParams flowParams = FlowParams.build().nodeCode(node.getNodeCode()).skipType(SkipType.PASS.getKey()).permissionFlag(WorkflowUtils.permissionList());
-            taskService.skip(list.get(0).getId(), flowParams);
+            //List<Node> nextNodes = FlowFactory.taskService().getNextByCheckGateWay(new FlowParams(), getFirstBetween(startNode));
+            //Node node = nextNodes.get(0);
+           // FlowParams flowParams = FlowParams.build().nodeCode(node.getNodeCode()).skipType(SkipType.PASS.getKey()).permissionFlag(WorkflowUtils.permissionList());
+           // taskService.skip(list.get(0).getId(), flowParams);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

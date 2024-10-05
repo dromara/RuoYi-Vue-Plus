@@ -121,4 +121,9 @@ public class FlowTaskVo implements Serializable {
      * 办理人
      */
     private List<UserDTO> userDTOList;
+
+    /**
+     * 办理人类型
+     */
+    private String type;
 }

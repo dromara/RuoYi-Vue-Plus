@@ -20,6 +20,7 @@
         <result property="formCustom" column="form_custom"/>
         <result property="formPath" column="form_path"/>
         <result property="delFlag" column="del_flag"/>
+        <result property="type" column="type"/>
     </resultMap>
     <resultMap type="org.dromara.workflow.domain.vo.FlowHisTaskVo" id="FlowHisTaskResult">
         <result property="id" column="id"/>
@@ -63,11 +64,12 @@
          d.flow_code,
          d.form_custom,
          d.form_path,
-         uu.processed_by
+         uu.processed_by,
+         uu.type
          FROM flow_task AS t
          LEFT JOIN flow_user uu ON uu.associated = t.id
          LEFT JOIN flow_definition d on t.definition_id = d.id
-         LEFT JOIN flow_instance i on t.instance_id = i.id where t.node_type = 1 and t.del_flag = '0') t
+         LEFT JOIN flow_instance i on t.instance_id = i.id where t.node_type = 1 and t.del_flag = '0' and uu.del_flag = '0') t
          ${ew.getCustomSqlSegment}
     </select>
 
@@ -117,7 +119,7 @@
              LEFT JOIN flow_instance b ON a.associated = b.id
              LEFT JOIN flow_definition d on b.definition_id=d.id
          WHERE
-             a.type = 4
+             a.type = 4 and a.del_flag = '0'
        ) t ${ew.getCustomSqlSegment}
     </select>
 </mapper>
