@@ -39,7 +39,7 @@ public class BackProcessBo implements Serializable {
      * 驳回的节点id(目前未使用，直接驳回到申请人)
      */
     @NotBlank(message = "驳回的节点不能为空", groups = AddGroup.class)
-    private String targetNodeCode;
+    private String nodeCode;
 
     /**
      * 办理意见

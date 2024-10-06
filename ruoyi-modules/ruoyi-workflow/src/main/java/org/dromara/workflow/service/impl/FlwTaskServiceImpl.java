@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.warm.flow.core.dto.FlowParams;
+import com.warm.flow.core.entity.HisTask;
 import com.warm.flow.core.entity.Instance;
 import com.warm.flow.core.entity.Task;
 import com.warm.flow.core.entity.User;
@@ -14,12 +15,15 @@ import com.warm.flow.core.enums.SkipType;
 import com.warm.flow.core.service.InsService;
 import com.warm.flow.core.service.TaskService;
 import com.warm.flow.core.service.UserService;
+import com.warm.flow.orm.entity.FlowHisTask;
 import com.warm.flow.orm.entity.FlowInstance;
+import com.warm.flow.orm.entity.FlowSkip;
 import com.warm.flow.orm.entity.FlowTask;
+import com.warm.flow.orm.mapper.FlowHisTaskMapper;
+import com.warm.flow.orm.mapper.FlowSkipMapper;
 import com.warm.flow.orm.mapper.FlowTaskMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -37,6 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.dromara.workflow.common.constant.FlowConstant.*;
 
@@ -56,8 +61,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     private final UserService userService;
     private final IWfDefinitionConfigService wfDefinitionConfigService;
     private final IFlwInstanceService iFlwInstanceService;
-
     private final FlowTaskMapper flowTaskMapper;
+    private final FlowHisTaskMapper flowHisTaskMapper;
+    private final FlowSkipMapper flowSkipMapper;
 
     /**
      * 启动任务
@@ -92,7 +98,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         FlowParams flowParams = new FlowParams();
         flowParams.flowCode(wfDefinitionConfigVo.getProcessKey());
         flowParams.variable(startProcessBo.getVariables());
-
+        flowParams.setHandler(String.valueOf(LoginHelper.getUserId()));
         Instance instance;
         try {
             instance = insService.start(startProcessBo.getBusinessKey(), flowParams);
@@ -286,17 +292,52 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         try {
             String userId = String.valueOf(LoginHelper.getUserId());
             Long taskId = bo.getTaskId();
+            List<FlowTask> flowTasks = flowTaskMapper.selectList(new LambdaQueryWrapper<>(FlowTask.class).eq(FlowTask::getId, taskId));
+            if (CollUtil.isEmpty(flowTasks)) {
+                throw new ServiceException("任务不存在！");
+            }
+            Long definitionId = flowTasks.get(0).getDefinitionId();
+            List<FlowSkip> flowSkips = flowSkipMapper.selectList(new LambdaQueryWrapper<>(FlowSkip.class).eq(FlowSkip::getDefinitionId, definitionId));
+            FlowSkip flowSkip = StreamUtils.findFirst(flowSkips, e -> NodeType.START.getKey().equals(e.getNowNodeType()));
+            //开始节点的下一节点
+            assert flowSkip != null;
+            String nextNodeCode = flowSkip.getNextNodeCode();
+
             FlowParams flowParams = new FlowParams();
             flowParams.variable(bo.getVariables());
-            flowParams.skipType(SkipType.REJECT.getKey());
+            if (nextNodeCode.equals(bo.getNodeCode())) {
+                flowParams.skipType(SkipType.REJECT.getKey());
+            } else {
+                flowParams.skipType(SkipType.PASS.getKey());
+            }
             flowParams.message(bo.getMessage());
             flowParams.handler(userId);
-            flowParams.nodeCode(bo.getTargetNodeCode());
-            taskService.skip(taskId, flowParams);
+            flowParams.nodeCode(bo.getNodeCode());
+            flowParams.setPermissionFlag(WorkflowUtils.permissionList());
+            Instance instance = taskService.skip(taskId, flowParams);
+            setHandler(instance);
             return true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
+    }
+
+    /**
+     * 获取可驳回节点
+     *
+     * @param instanceId 实例id
+     */
+    @Override
+    public List<HisTask> getBackTaskNode(String instanceId) {
+        LambdaQueryWrapper<FlowHisTask> lw = new LambdaQueryWrapper<>(FlowHisTask.class)
+            .eq(FlowHisTask::getInstanceId, instanceId)
+            .eq(FlowHisTask::getNodeType, 1)
+            .orderByDesc(FlowHisTask::getCreateTime);
+        List<FlowHisTask> flowHisTasks = flowHisTaskMapper.selectList(lw);
+        if (CollUtil.isNotEmpty(flowHisTasks)) {
+            return flowHisTasks.stream().distinct().collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 }

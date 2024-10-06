@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.warm.flow.core.dto.FlowParams;
 import com.warm.flow.core.dto.ModifyHandler;
+import com.warm.flow.core.entity.HisTask;
 import com.warm.flow.core.entity.Instance;
 import com.warm.flow.core.entity.Task;
 import com.warm.flow.core.enums.CooperateType;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -264,5 +266,16 @@ public class FlwTaskController extends BaseController {
     public R<Void> backProcess(@Validated({AddGroup.class}) @RequestBody BackProcessBo bo) {
         return toAjax(flwTaskService.backProcess(bo));
     }
+
+    /**
+     * 获取可驳回节点
+     *
+     * @param instanceId 实例id
+     */
+    @GetMapping("/getBackTaskNode/{instanceId}")
+    public R<List<HisTask>> getBackTaskNode(@PathVariable String instanceId) {
+        return R.ok(flwTaskService.getBackTaskNode(instanceId));
+    }
+
 
 }

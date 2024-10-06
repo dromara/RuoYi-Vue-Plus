@@ -1,11 +1,13 @@
 package org.dromara.workflow.service;
 
+import com.warm.flow.core.entity.HisTask;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.FlowHisTaskVo;
 import org.dromara.workflow.domain.vo.FlowTaskVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,7 +52,6 @@ public interface IFlwTaskService {
     TableDataInfo<FlowHisTaskVo> getPageByTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery);
 
 
-
     /**
      * 查询待办任务
      *
@@ -85,4 +86,12 @@ public interface IFlwTaskService {
      * @return 结果
      */
     boolean backProcess(BackProcessBo bo);
+
+    /**
+     * 获取可驳回节点
+     *
+     * @param instanceId 实例id
+     * @return 结果
+     */
+    List<HisTask> getBackTaskNode(String instanceId);
 }

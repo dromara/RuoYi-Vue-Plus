@@ -39,6 +39,7 @@ import org.dromara.workflow.utils.WorkflowUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -85,7 +86,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     public TableDataInfo<FlowInstanceVo> getPageByFinish(Instance instance, PageQuery pageQuery) {
         QueryWrapper<FlowInstanceBo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("t.flow_status", FlowStatus.FINISHED.getKey());
+        queryWrapper.in("t.flow_status", Arrays.asList(FlowStatus.FINISHED.getKey(), FlowStatus.AUTO_PASS.getKey()));
         Page<FlowInstanceVo> page = flwInstanceMapper.page(pageQuery.build(), queryWrapper);
         TableDataInfo<FlowInstanceVo> build = TableDataInfo.build();
         build.setRows(BeanUtil.copyToList(page.getRecords(), FlowInstanceVo.class));
@@ -149,8 +150,8 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             // 获取下一个节点，如果是网关节点，则重新获取后续节点
             //List<Node> nextNodes = FlowFactory.taskService().getNextByCheckGateWay(new FlowParams(), getFirstBetween(startNode));
             //Node node = nextNodes.get(0);
-           // FlowParams flowParams = FlowParams.build().nodeCode(node.getNodeCode()).skipType(SkipType.PASS.getKey()).permissionFlag(WorkflowUtils.permissionList());
-           // taskService.skip(list.get(0).getId(), flowParams);
+            // FlowParams flowParams = FlowParams.build().nodeCode(node.getNodeCode()).skipType(SkipType.PASS.getKey()).permissionFlag(WorkflowUtils.permissionList());
+            // taskService.skip(list.get(0).getId(), flowParams);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
