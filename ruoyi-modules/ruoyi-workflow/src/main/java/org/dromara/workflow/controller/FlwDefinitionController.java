@@ -168,7 +168,7 @@ public class FlwDefinitionController extends BaseController {
      */
     @GetMapping("/xmlString/{id}")
     public R<String> xmlString(@PathVariable Long id) {
-        return R.ok(defService.xmlString(id));
+        return R.ok("操作成功", defService.xmlString(id));
     }
 
     /**
@@ -179,7 +179,7 @@ public class FlwDefinitionController extends BaseController {
      */
     @GetMapping("/flowChart/{instanceId}")
     public R<String> flowChart(@PathVariable Long instanceId) throws IOException {
-        return R.ok(defService.flowChart(instanceId));
+        return R.ok("操作成功", defService.flowChart(instanceId));
     }
 
     /**
