@@ -15,12 +15,12 @@ import org.dromara.common.oss.properties.OssProperties;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.core.async.BlockingInputStreamAsyncRequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.crt.S3CrtHttpConfiguration;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.S3Exception;
@@ -95,6 +95,9 @@ public class OssClient {
                 .minimumPartSizeInBytes(10 * 1025 * 1024L)
                 .checksumValidationEnabled(false)
                 .forcePathStyle(isStyle)
+                .httpConfiguration(S3CrtHttpConfiguration.builder()
+                    .connectionTimeout(Duration.ofSeconds(60)) // 设置连接超时
+                    .build())
                 .build();
 
             //AWS基于 CRT 的 S3 AsyncClient 实例用作 S3 传输管理器的底层客户端
@@ -217,7 +220,10 @@ public class OssClient {
         }
         try {
             // 创建异步请求体（length如果为空会报错）
-            BlockingInputStreamAsyncRequestBody body = AsyncRequestBody.forBlockingInputStream(length);
+            BlockingInputStreamAsyncRequestBody body = BlockingInputStreamAsyncRequestBody.builder()
+                .contentLength(length)
+                .subscribeTimeout(Duration.ofSeconds(30))
+                .build();
 
             // 使用 transferManager 进行上传
             Upload upload = transferManager.upload(
