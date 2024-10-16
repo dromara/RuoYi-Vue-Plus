@@ -178,6 +178,9 @@ public class OssClient {
                             .key(key)
                             .contentMD5(StringUtils.isNotEmpty(md5Digest) ? md5Digest : null)
                             .contentType(contentType)
+                            // 用于设置对象的访问控制列表（ACL）。不同云厂商对ACL的支持和实现方式有所不同，
+                            // 因此根据具体的云服务提供商，你可能需要进行不同的配置（自行开启，阿里云有acl权限配置，腾讯云没有acl权限配置）
+                            //.acl(getAccessPolicy().getObjectCannedACL())
                             .build())
                     .addTransferListener(LoggingTransferListener.create())
                     .source(filePath).build());
@@ -223,6 +226,9 @@ public class OssClient {
                         y -> y.bucket(properties.getBucketName())
                             .key(key)
                             .contentType(contentType)
+                            // 用于设置对象的访问控制列表（ACL）。不同云厂商对ACL的支持和实现方式有所不同，
+                            // 因此根据具体的云服务提供商，你可能需要进行不同的配置（自行开启，阿里云有acl权限配置，腾讯云没有acl权限配置）
+                            //.acl(getAccessPolicy().getObjectCannedACL())
                             .build())
                     .build());
 
