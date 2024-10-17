@@ -25,6 +25,8 @@ snail-job:
   namespace: ${spring.profiles.active}
   # 随主应用端口飘逸
   port: 2${server.port}
+  # 客户端ip指定
+  host:
 
 --- # 数据源配置
 spring:

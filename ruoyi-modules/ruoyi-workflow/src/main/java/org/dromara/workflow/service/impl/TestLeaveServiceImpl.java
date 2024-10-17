@@ -142,11 +142,16 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      *
      * @param processTaskEvent 参数
      */
-    @EventListener(condition = "#processTaskEvent.key=='leave1' && #processTaskEvent.taskDefinitionKey=='Activity_14633hx'")
+    @EventListener(condition = "#processTaskEvent.key.startsWith('leave')")
     public void processTaskHandler(ProcessTaskEvent processTaskEvent) {
-        log.info("当前任务执行了{}", processTaskEvent.toString());
-        TestLeave testLeave = baseMapper.selectById(Long.valueOf(processTaskEvent.getBusinessKey()));
-        testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
-        baseMapper.updateById(testLeave);
+        // 所有demo案例的申请人节点id
+        String[] ids = {"Activity_14633hx", "Activity_19b1i4j", "Activity_0uscrk3",
+            "Activity_0uscrk3", "Activity_0x6b71j", "Activity_0zy3g6j", "Activity_06a55t0"};
+        if (StringUtils.equalsAny(processTaskEvent.getTaskDefinitionKey(), ids)) {
+            log.info("当前任务执行了{}", processTaskEvent.toString());
+            TestLeave testLeave = baseMapper.selectById(Long.valueOf(processTaskEvent.getBusinessKey()));
+            testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
+            baseMapper.updateById(testLeave);
+        }
     }
 }

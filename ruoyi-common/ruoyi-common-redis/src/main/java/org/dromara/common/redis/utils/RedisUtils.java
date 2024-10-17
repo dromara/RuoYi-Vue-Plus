@@ -517,7 +517,7 @@ public class RedisUtils {
     }
 
     /**
-     * 获得缓存的基本对象列表
+     * 获得缓存的基本对象列表(全局匹配忽略租户 自行拼接租户id)
      *
      * @param pattern 字符串前缀
      * @return 对象列表
@@ -528,7 +528,7 @@ public class RedisUtils {
     }
 
     /**
-     * 删除缓存的基本对象列表
+     * 删除缓存的基本对象列表(全局匹配忽略租户 自行拼接租户id)
      *
      * @param pattern 字符串前缀
      */

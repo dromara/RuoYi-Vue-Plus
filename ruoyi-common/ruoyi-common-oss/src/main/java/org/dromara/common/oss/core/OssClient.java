@@ -15,12 +15,12 @@ import org.dromara.common.oss.properties.OssProperties;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.core.async.BlockingInputStreamAsyncRequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.crt.S3CrtHttpConfiguration;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.S3Exception;
@@ -83,8 +83,8 @@ public class OssClient {
             StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
                 AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey()));
 
-            //MinIO 使用 HTTPS 限制使用域名访问，站点填域名。需要启用路径样式访问
-            boolean isStyle = !StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
+            //使用对象存储服务时要求明确配置访问样式（路径样式或虚拟托管样式）。需要启用路径样式访问
+            boolean isStyle = true;
 
             //创建AWS基于 CRT 的 S3 客户端
             this.client = S3AsyncClient.crtBuilder()
@@ -95,6 +95,9 @@ public class OssClient {
                 .minimumPartSizeInBytes(10 * 1025 * 1024L)
                 .checksumValidationEnabled(false)
                 .forcePathStyle(isStyle)
+                .httpConfiguration(S3CrtHttpConfiguration.builder()
+                    .connectionTimeout(Duration.ofSeconds(60)) // 设置连接超时
+                    .build())
                 .build();
 
             //AWS基于 CRT 的 S3 AsyncClient 实例用作 S3 传输管理器的底层客户端
@@ -178,7 +181,9 @@ public class OssClient {
                             .key(key)
                             .contentMD5(StringUtils.isNotEmpty(md5Digest) ? md5Digest : null)
                             .contentType(contentType)
-                            .acl(getAccessPolicy().getObjectCannedACL())
+                            // 用于设置对象的访问控制列表（ACL）。不同云厂商对ACL的支持和实现方式有所不同，
+                            // 因此根据具体的云服务提供商，你可能需要进行不同的配置（自行开启，阿里云有acl权限配置，腾讯云没有acl权限配置）
+                            //.acl(getAccessPolicy().getObjectCannedACL())
                             .build())
                     .addTransferListener(LoggingTransferListener.create())
                     .source(filePath).build());
@@ -215,7 +220,10 @@ public class OssClient {
         }
         try {
             // 创建异步请求体（length如果为空会报错）
-            BlockingInputStreamAsyncRequestBody body = AsyncRequestBody.forBlockingInputStream(length);
+            BlockingInputStreamAsyncRequestBody body = BlockingInputStreamAsyncRequestBody.builder()
+                .contentLength(length)
+                .subscribeTimeout(Duration.ofSeconds(30))
+                .build();
 
             // 使用 transferManager 进行上传
             Upload upload = transferManager.upload(
@@ -224,7 +232,9 @@ public class OssClient {
                         y -> y.bucket(properties.getBucketName())
                             .key(key)
                             .contentType(contentType)
-                            .acl(getAccessPolicy().getObjectCannedACL())
+                            // 用于设置对象的访问控制列表（ACL）。不同云厂商对ACL的支持和实现方式有所不同，
+                            // 因此根据具体的云服务提供商，你可能需要进行不同的配置（自行开启，阿里云有acl权限配置，腾讯云没有acl权限配置）
+                            //.acl(getAccessPolicy().getObjectCannedACL())
                             .build())
                     .build());
 

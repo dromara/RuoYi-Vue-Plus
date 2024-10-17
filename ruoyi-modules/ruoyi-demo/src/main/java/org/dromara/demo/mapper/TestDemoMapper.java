@@ -48,7 +48,7 @@ public interface TestDemoMapper extends BaseMapperPlus<TestDemo, TestDemoVo> {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "user_id")
     }, joinStr = "AND")
-    List<TestDemo> selectBatchIds(@Param(Constants.COLL) Collection<? extends Serializable> idList);
+    List<TestDemo> selectByIds(@Param(Constants.COLL) Collection<? extends Serializable> idList);
 
     @Override
     @DataPermission({

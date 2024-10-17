@@ -14,21 +14,21 @@
 
     <properties>
         <revision>5.2.2</revision>
-        <spring-boot.version>3.2.9</spring-boot.version>
+        <spring-boot.version>3.2.10</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
         <mybatis.version>3.5.16</mybatis.version>
         <springdoc.version>2.6.0</springdoc.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
-        <easyexcel.version>4.0.2</easyexcel.version>
+        <easyexcel.version>4.0.3</easyexcel.version>
         <velocity.version>2.3</velocity.version>
         <satoken.version>1.39.0</satoken.version>
-        <mybatis-plus.version>3.5.7</mybatis-plus.version>
+        <mybatis-plus.version>3.5.8</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.31</hutool.version>
         <spring-boot-admin.version>3.2.3</spring-boot-admin.version>
-        <redisson.version>3.34.1</redisson.version>
+        <redisson.version>3.36.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
         <snailjob.version>1.1.2</snailjob.version>
@@ -39,17 +39,16 @@
         <justauth.version>1.16.6</justauth.version>
         <!-- 离线IP地址定位库 -->
         <ip2region.version>2.7.0</ip2region.version>
-        <undertow.version>2.3.15.Final</undertow.version>
 
         <!-- OSS 配置 -->
-        <aws.sdk.version>2.25.15</aws.sdk.version>
-        <aws.crt.version>0.29.13</aws.crt.version>
+        <aws.sdk.version>2.28.22</aws.sdk.version>
+        <aws.crt.version>0.31.3</aws.crt.version>
         <!-- SMS 配置 -->
-        <sms4j.version>3.3.2</sms4j.version>
+        <sms4j.version>3.3.3</sms4j.version>
         <!-- 限制框架中的fastjson版本 -->
         <fastjson.version>1.2.83</fastjson.version>
         <!-- 面向运行时的D-ORM依赖 -->
-        <anyline.version>8.7.2-20240808</anyline.version>
+        <anyline.version>8.7.2-20240930</anyline.version>
         <!--工作流配置-->
         <warm-flow.version>1.2.10</warm-flow.version>
 
@@ -313,22 +312,6 @@
                 <groupId>org.lionsoul</groupId>
                 <artifactId>ip2region</artifactId>
                 <version>${ip2region.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.undertow</groupId>
-                <artifactId>undertow-core</artifactId>
-                <version>${undertow.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.undertow</groupId>
-                <artifactId>undertow-servlet</artifactId>
-                <version>${undertow.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.undertow</groupId>
-                <artifactId>undertow-websockets-jsr</artifactId>
-                <version>${undertow.version}</version>
             </dependency>
 
             <dependency>

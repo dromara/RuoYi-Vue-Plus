@@ -6,8 +6,8 @@ import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import org.apache.ibatis.io.Resources;
 import org.dromara.common.core.domain.dto.RoleDTO;
@@ -106,7 +106,7 @@ public class PlusDataPermissionHandler {
         try {
             Expression expression = CCJSqlParserUtil.parseExpression(dataFilterSql);
             // 数据权限使用单独的括号 防止与其他条件冲突
-            Parenthesis parenthesis = new Parenthesis(expression);
+            ParenthesedExpressionList<Expression> parenthesis = new ParenthesedExpressionList<>(expression);
             if (ObjectUtil.isNotNull(where)) {
                 return new AndExpression(where, parenthesis);
             } else {

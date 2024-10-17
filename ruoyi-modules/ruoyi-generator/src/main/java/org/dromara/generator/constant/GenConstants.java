@@ -56,13 +56,13 @@ public interface GenConstants {
      * 数据库时间类型
      */
     String[] COLUMNTYPE_TIME = {"datetime", "time", "date", "timestamp", "year", "interval",
-        "smalldatetime", "datetime2", "datetimeoffset"};
+        "smalldatetime", "datetime2", "datetimeoffset", "timestamptz"};
 
     /**
      * 数据库数字类型
      */
-    String[] COLUMNTYPE_NUMBER = {"tinyint", "smallint", "mediumint", "int", "number", "integer",
-        "bit", "bigint", "float", "double", "decimal", "numeric", "real", "double precision",
+    String[] COLUMNTYPE_NUMBER = {"tinyint", "smallint", "mediumint", "int", "int2", "int4", "int8", "number", "integer",
+        "bit", "bigint", "float", "float4", "float8", "double", "decimal", "numeric", "real", "double precision",
         "smallserial", "serial", "bigserial", "money", "smallmoney"};
 
     /**

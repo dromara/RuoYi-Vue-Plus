@@ -427,7 +427,7 @@ comment on column sys_menu.remark       is '备注';
 -- ----------------------------
 -- 一级菜单
 insert into sys_menu values('1', '系统管理', '0', '1', 'system',           null, '', '1', '0', 'M', '0', '0', '', 'system',   103, 1, now(), null, null, '系统管理目录');
-insert into sys_menu values('6', '系统管理', '0', '2', 'tenant',           null, '', '1', '0', 'M', '0', '0', '', 'chart',    103, 1, now(), null, null, '租户管理目录');
+insert into sys_menu values('6', '租户管理', '0', '2', 'tenant',           null, '', '1', '0', 'M', '0', '0', '', 'chart',    103, 1, now(), null, null, '租户管理目录');
 insert into sys_menu values('2', '系统监控', '0', '3', 'monitor',          null, '', '1', '0', 'M', '0', '0', '', 'monitor',  103, 1, now(), null, null, '系统监控目录');
 insert into sys_menu values('3', '系统工具', '0', '4', 'tool',             null, '', '1', '0', 'M', '0', '0', '', 'tool',     103, 1, now(), null, null, '系统工具目录');
 insert into sys_menu values('4', 'PLUS官网', '0', '5', 'https://gitee.com/dromara/RuoYi-Vue-Plus', null, '', '0', '0', 'M', '0', '0', '', 'guide',    103, 1, now(), null, null, 'RuoYi-Vue-Plus官网地址');

@@ -41,7 +41,7 @@ public class WfFormManageServiceImpl implements IWfFormManageService {
 
     @Override
     public List<WfFormManageVo> queryByIds(List<Long> ids) {
-        return baseMapper.selectVoBatchIds(ids);
+        return baseMapper.selectVoByIds(ids);
     }
 
     /**
