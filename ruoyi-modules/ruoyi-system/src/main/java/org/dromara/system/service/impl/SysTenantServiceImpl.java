@@ -1,6 +1,7 @@
 package org.dromara.system.service.impl;
 
 import cn.dev33.satoken.secure.BCrypt;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
@@ -413,33 +414,36 @@ public class SysTenantServiceImpl implements ISysTenantService {
                     Map<String, SysDictData> map = StreamUtils.toIdentityMap(dataListTenant, SysDictData::getDictValue);
                     for (SysDictData dictData : dataList) {
                         if (!map.containsKey(dictData.getDictValue())) {
+                            SysDictData data = BeanUtil.toBean(dictData, SysDictData.class);
                             // 设置字典编码为 null
-                            dictData.setDictCode(null);
-                            dictData.setTenantId(tenantId);
-                            dictData.setCreateTime(null);
-                            dictData.setUpdateTime(null);
+                            data.setDictCode(null);
+                            data.setTenantId(tenantId);
+                            data.setCreateTime(null);
+                            data.setUpdateTime(null);
                             set.add(tenantId);
-                            saveDataList.add(dictData);
+                            saveDataList.add(data);
                         }
                     }
                 } else {
-                    dictType.setDictId(null);
-                    dictType.setTenantId(tenantId);
-                    dictType.setCreateTime(null);
-                    dictType.setUpdateTime(null);
+                    SysDictType type = BeanUtil.toBean(dictType, SysDictType.class);
+                    type.setDictId(null);
+                    type.setTenantId(tenantId);
+                    type.setCreateTime(null);
+                    type.setUpdateTime(null);
                     set.add(tenantId);
-                    saveTypeList.add(dictType);
+                    saveTypeList.add(type);
                     if (CollUtil.isNotEmpty(dataList)) {
                         // 筛选出 dictType 对应的 data
                         for (SysDictData dictData : dataList) {
+                            SysDictData data = BeanUtil.toBean(dictData, SysDictData.class);
                             // 设置字典编码为 null
-                            dictData.setDictCode(null);
-                            dictData.setTenantId(tenantId);
-                            dictData.setCreateTime(null);
-                            dictData.setUpdateTime(null);
+                            data.setDictCode(null);
+                            data.setTenantId(tenantId);
+                            data.setCreateTime(null);
+                            data.setUpdateTime(null);
                             set.add(tenantId);
+                            saveDataList.add(data);
                         }
-                        saveDataList.addAll(dataList);
                     }
                 }
             }
