@@ -19,23 +19,21 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties(XssProperties.class)
 public class FilterConfig {
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Bean
     @ConditionalOnProperty(value = "xss.enabled", havingValue = "true")
-    public FilterRegistrationBean xssFilterRegistration(XssProperties xssProperties) {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
+    public FilterRegistrationBean<XssFilter> xssFilterRegistration() {
+        FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
         registration.setDispatcherTypes(DispatcherType.REQUEST);
         registration.setFilter(new XssFilter());
         registration.addUrlPatterns("/*");
         registration.setName("xssFilter");
-        registration.setOrder(FilterRegistrationBean.HIGHEST_PRECEDENCE);
+        registration.setOrder(FilterRegistrationBean.HIGHEST_PRECEDENCE + 1);
         return registration;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Bean
-    public FilterRegistrationBean someFilterRegistration() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
+    public FilterRegistrationBean<RepeatableFilter> someFilterRegistration() {
+        FilterRegistrationBean<RepeatableFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new RepeatableFilter());
         registration.addUrlPatterns("/*");
         registration.setName("repeatableFilter");
