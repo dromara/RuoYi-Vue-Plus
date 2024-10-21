@@ -96,7 +96,7 @@ public class WfDefinitionConfigServiceImpl implements IWfDefinitionConfigService
         baseMapper.delete(new LambdaQueryWrapper<WfDefinitionConfig>().eq(WfDefinitionConfig::getTableName, bo.getTableName()));
         add.setTableName(add.getTableName().toLowerCase());
         boolean flag = baseMapper.insertOrUpdate(add);
-        if (baseMapper.insertOrUpdate(add)) {
+        if (flag) {
             bo.setId(add.getId());
         }
         return flag;
