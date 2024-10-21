@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * XSS过滤处理
@@ -29,6 +30,33 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
+    public String getParameter(String name) {
+        String value = super.getParameter(name);
+        if (value != null) {
+            return HtmlUtil.cleanHtmlTag(value).trim();
+        }
+        return value;
+    }
+
+    @Override
+    public Map<String, String[]> getParameterMap() {
+        Map<String, String[]> valueMap = super.getParameterMap();
+        for (Map.Entry<String, String[]> entry : valueMap.entrySet()) {
+            String[] values = entry.getValue();
+            if (values != null) {
+                int length = values.length;
+                String[] escapseValues = new String[length];
+                for (int i = 0; i < length; i++) {
+                    // 防xss攻击和过滤前后空格
+                    escapseValues[i] = HtmlUtil.cleanHtmlTag(values[i]).trim();
+                }
+                valueMap.put(entry.getKey(), escapseValues);
+            }
+        }
+        return valueMap;
+    }
+
+    @Override
     public String[] getParameterValues(String name) {
         String[] values = super.getParameterValues(name);
         if (values != null) {
@@ -40,7 +68,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
             }
             return escapseValues;
         }
-        return super.getParameterValues(name);
+        return values;
     }
 
     @Override
