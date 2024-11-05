@@ -50,8 +50,8 @@ public class CryptoFilter implements Filter {
                 // 请求解密
                 requestWrapper = new DecryptRequestBodyWrapper(servletRequest, properties.getPrivateKey(), properties.getHeaderFlag());
             } else {
-                // 是否有注解，有就报错，没有放行
-                if (ObjectUtil.isNotNull(apiEncrypt)) {
+                // 不存在加密标头，有注解且返回加密为true是直接报错，没有放行
+                if (ObjectUtil.isNotNull(apiEncrypt) && apiEncrypt.response()) {
                     HandlerExceptionResolver exceptionResolver = SpringUtils.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
                     exceptionResolver.resolveException(
                         servletRequest, servletResponse, null,
