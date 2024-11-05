@@ -82,7 +82,7 @@ public class SysTenantController extends BaseController {
     /**
      * 新增租户
      */
-    @ApiEncrypt
+    @ApiEncrypt(response = true)
     @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenant:add")
     @Log(title = "租户", businessType = BusinessType.INSERT)

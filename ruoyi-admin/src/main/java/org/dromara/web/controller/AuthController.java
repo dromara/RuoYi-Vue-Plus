@@ -178,7 +178,7 @@ public class AuthController {
     /**
      * 用户注册
      */
-    @ApiEncrypt
+    @ApiEncrypt(response = true)
     @PostMapping("/register")
     public R<Void> register(@Validated @RequestBody RegisterBody user) {
         if (!configService.selectRegisterEnabled(user.getTenantId())) {
