@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.system.mapper.SysPostMapper">
+
+    <resultMap type="org.dromara.system.domain.vo.SysPostVo" id="SysPostResult">
+    </resultMap>
+
+    <select id="selectPagePostList" resultMap="SysPostResult">
+        select
+        <if test="ew.getSqlSelect != null">
+            ${ew.getSqlSelect}
+        </if>
+        <if test="ew.getSqlSelect == null">
+            *
+        </if>
+        from sys_post ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="selectPostsByUserId" parameterType="Long" resultMap="SysPostResult">
+        select p.post_id, p.dept_id, p.post_name, p.post_code, p.post_category
+        from sys_post p
+                 left join sys_user_post up on up.post_id = p.post_id
+                 left join sys_user u on u.user_id = up.user_id
+        where u.user_id = #{userId}
+    </select>
+
+</mapper>

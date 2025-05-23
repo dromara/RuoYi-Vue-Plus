@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    hikari:
+      connection-timeout: 30000
+      validation-timeout: 5000
+      minimum-idle: 10
+      maximum-pool-size: 20
+      idle-timeout: 600000
+      max-lifetime: 900000
+      keepaliveTime: 30000
+
+--- # snail-job 服务端配置
+snail-job:
+  # 拉取重试数据的每批次的大小
+  retry-pull-page-size: 1000
+  # 拉取重试数据的每批次的大小
+  job-pull-page-size: 1000
+  # 服务器端口
+  server-port: 17888
+  # 日志保存时间(单位: day)
+  log-storage: 7
+  rpc-type: grpc
+
+--- # 监控中心配置
+spring.boot.admin.client:
+  # 增加客户端开关
+  enabled: true
+  url: http://localhost:9090/admin
+  instance:
+    service-host-type: IP
+    metadata:
+      username: ${spring.boot.admin.client.username}
+      userpassword: ${spring.boot.admin.client.password}
+  username: @monitor.username@
+  password: @monitor.password@
