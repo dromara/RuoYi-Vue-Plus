@@ -1,0 +1,3 @@
+[submodule "ruoyi-plus-soybean"]
+	path = ruoyi-plus-soybean
+	url = https://gitee.com/xlsea/ruoyi-plus-soybean.git
