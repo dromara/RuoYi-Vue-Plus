@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 部门管理 服务实现
@@ -92,6 +93,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
     }
 
     private LambdaQueryWrapper<SysDept> buildQueryWrapper(SysDeptBo bo) {
+        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysDept> lqw = Wrappers.lambdaQuery();
         lqw.eq(SysDept::getDelFlag, SystemConstants.NORMAL);
         lqw.eq(ObjectUtil.isNotNull(bo.getDeptId()), SysDept::getDeptId, bo.getDeptId());
@@ -99,6 +101,8 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         lqw.like(StringUtils.isNotBlank(bo.getDeptName()), SysDept::getDeptName, bo.getDeptName());
         lqw.like(StringUtils.isNotBlank(bo.getDeptCategory()), SysDept::getDeptCategory, bo.getDeptCategory());
         lqw.eq(StringUtils.isNotBlank(bo.getStatus()), SysDept::getStatus, bo.getStatus());
+        lqw.between(params.get("beginTime") != null && params.get("endTime") != null,
+            SysDept::getCreateTime, params.get("beginTime"), params.get("endTime"));
         lqw.orderByAsc(SysDept::getAncestors);
         lqw.orderByAsc(SysDept::getParentId);
         lqw.orderByAsc(SysDept::getOrderNum);

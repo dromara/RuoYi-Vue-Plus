@@ -44,9 +44,24 @@ public class SseEmitterManager {
         emitters.put(token, emitter);
 
         // 当 emitter 完成、超时或发生错误时，从映射表中移除对应的 token
-        emitter.onCompletion(() -> emitters.remove(token));
-        emitter.onTimeout(() -> emitters.remove(token));
-        emitter.onError((e) -> emitters.remove(token));
+        emitter.onCompletion(() -> {
+            SseEmitter remove = emitters.remove(token);
+            if (remove != null) {
+                remove.complete();
+            }
+        });
+        emitter.onTimeout(() -> {
+            SseEmitter remove = emitters.remove(token);
+            if (remove != null) {
+                remove.complete();
+            }
+        });
+        emitter.onError((e) -> {
+            SseEmitter remove = emitters.remove(token);
+            if (remove != null) {
+                remove.complete();
+            }
+        });
 
         try {
             // 向客户端发送一条连接成功的事件
@@ -106,7 +121,10 @@ public class SseEmitterManager {
                         .name("message")
                         .data(message));
                 } catch (Exception e) {
-                    emitters.remove(entry.getKey());
+                    SseEmitter remove = emitters.remove(entry.getKey());
+                    if (remove != null) {
+                        remove.complete();
+                    }
                 }
             }
         } else {

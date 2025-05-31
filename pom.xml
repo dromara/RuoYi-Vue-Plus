@@ -13,29 +13,29 @@
     <description>Dromara RuoYi-Vue-Plus多租户管理系统</description>
 
     <properties>
-        <revision>5.3.1</revision>
-        <spring-boot.version>3.4.4</spring-boot.version>
+        <revision>5.4.0</revision>
+        <spring-boot.version>3.4.6</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
         <mybatis.version>3.5.16</mybatis.version>
-        <springdoc.version>2.8.5</springdoc.version>
+        <springdoc.version>2.8.8</springdoc.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
-        <easyexcel.version>4.0.3</easyexcel.version>
+        <fastexcel.version>1.2.0</fastexcel.version>
         <velocity.version>2.3</velocity.version>
-        <satoken.version>1.40.0</satoken.version>
-        <mybatis-plus.version>3.5.11</mybatis-plus.version>
+        <satoken.version>1.42.0</satoken.version>
+        <mybatis-plus.version>3.5.12</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.35</hutool.version>
-        <spring-boot-admin.version>3.4.5</spring-boot-admin.version>
+        <spring-boot-admin.version>3.4.7</spring-boot-admin.version>
         <redisson.version>3.45.1</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
-        <snailjob.version>1.4.0</snailjob.version>
-        <mapstruct-plus.version>1.4.6</mapstruct-plus.version>
+        <snailjob.version>1.5.0</snailjob.version>
+        <mapstruct-plus.version>1.4.8</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.36</lombok.version>
-        <bouncycastle.version>1.76</bouncycastle.version>
+        <bouncycastle.version>1.80</bouncycastle.version>
         <justauth.version>1.16.7</justauth.version>
         <!-- 离线IP地址定位库 -->
         <ip2region.version>2.7.0</ip2region.version>
@@ -48,8 +48,8 @@
         <fastjson.version>1.2.83</fastjson.version>
         <!-- 面向运行时的D-ORM依赖 -->
         <anyline.version>8.7.2-20250101</anyline.version>
-        <!--工作流配置-->
-        <warm-flow.version>1.6.8</warm-flow.version>
+        <!-- 工作流配置 -->
+        <warm-flow.version>1.7.3</warm-flow.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
@@ -166,9 +166,9 @@
             </dependency>
 
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>easyexcel</artifactId>
-                <version>${easyexcel.version}</version>
+                <groupId>cn.idev.excel</groupId>
+                <artifactId>fastexcel</artifactId>
+                <version>${fastexcel.version}</version>
             </dependency>
 
             <!-- velocity代码生成使用模板 -->
@@ -322,12 +322,6 @@
             </dependency>
 
             <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.15.0</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
@@ -361,13 +355,6 @@
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-workflow</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <!--  PMS民宿管理系统模块  -->
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>ruoyi-pms</artifactId>
                 <version>${revision}</version>
             </dependency>
 

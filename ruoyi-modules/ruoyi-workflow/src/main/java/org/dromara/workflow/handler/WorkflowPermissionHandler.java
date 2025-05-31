@@ -1,22 +1,17 @@
 package org.dromara.workflow.handler;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.collection.CollUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.domain.model.LoginUser;
-import org.dromara.workflow.common.ConditionalOnEnable;
-import org.dromara.workflow.common.enums.TaskAssigneeEnum;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.dto.FlowParams;
 import org.dromara.warm.flow.core.handler.PermissionHandler;
-import org.dromara.warm.flow.core.service.impl.TaskServiceImpl;
+import org.dromara.workflow.common.ConditionalOnEnable;
+import org.dromara.workflow.service.IFlwCommonService;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 办理人权限处理器
@@ -29,35 +24,16 @@ import java.util.stream.Stream;
 @Slf4j
 public class WorkflowPermissionHandler implements PermissionHandler {
 
+    private final IFlwCommonService flwCommonService;
+
     /**
-     * 审批前获取当前办理人，办理时会校验的该权限集合
-     * 后续在{@link TaskServiceImpl#checkAuth(Task, FlowParams)} 中调用
+     * 办理人权限标识，比如用户，角色，部门等，用于校验是否有权限办理任务
+     * 后续在{@link FlowParams#getPermissionFlag}  中获取
      * 返回当前用户权限集合
      */
     @Override
     public List<String> permissions() {
-        LoginUser loginUser = LoginHelper.getLoginUser();
-        if (ObjectUtil.isNull(loginUser)) {
-            return new ArrayList<>();
-        }
-        // 使用一个流来构建权限列表
-        return Stream.of(
-                // 角色权限前缀
-                loginUser.getRoles().stream()
-                    .map(role -> TaskAssigneeEnum.ROLE.getCode() + role.getRoleId()),
-
-                // 岗位权限前缀
-                Stream.ofNullable(loginUser.getPosts())
-                    .flatMap(Collection::stream)
-                    .map(post -> TaskAssigneeEnum.POST.getCode() + post.getPostId()),
-
-                // 用户和部门权限
-                Stream.of(String.valueOf(loginUser.getUserId()),
-                    TaskAssigneeEnum.DEPT.getCode() + loginUser.getDeptId()
-                )
-            )
-            .flatMap(stream -> stream)
-            .collect(Collectors.toList());
+        return Collections.singletonList(LoginHelper.getUserIdStr());
     }
 
     /**
@@ -70,4 +46,14 @@ public class WorkflowPermissionHandler implements PermissionHandler {
         return LoginHelper.getUserIdStr();
     }
 
+    /**
+     * 转换办理人，比如设计器中预设了能办理的人，如果其中包含角色或者部门id等，可以通过此接口进行转换成用户id
+     */
+    @Override
+    public List<String> convertPermissions(List<String> permissions) {
+        if (CollUtil.isNotEmpty(permissions)) {
+            permissions = flwCommonService.buildUser(permissions);
+        }
+        return permissions;
+    }
 }

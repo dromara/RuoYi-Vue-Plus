@@ -40,7 +40,7 @@ public class RedisCacheController {
      * <p>
      * cacheNames 命名规则 查看 {@link CacheNames} 注释 支持多参数
      */
-    @Cacheable(cacheNames = "demo:cache#60s#10m#20", key = "#key", condition = "#key != null")
+    @Cacheable(cacheNames = "demo:cache#60s#10m#20#1", key = "#key", condition = "#key != null")
     @GetMapping("/test1")
     public R<String> test1(String key, String value) {
         return R.ok("操作成功", value);

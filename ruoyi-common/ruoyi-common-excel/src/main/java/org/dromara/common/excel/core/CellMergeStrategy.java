@@ -3,11 +3,11 @@ package org.dromara.common.excel.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.metadata.Head;
-import com.alibaba.excel.write.handler.WorkbookWriteHandler;
-import com.alibaba.excel.write.handler.context.WorkbookWriteHandlerContext;
-import com.alibaba.excel.write.merge.AbstractMergeStrategy;
+import cn.idev.excel.annotation.ExcelProperty;
+import cn.idev.excel.metadata.Head;
+import cn.idev.excel.write.handler.WorkbookWriteHandler;
+import cn.idev.excel.write.handler.context.WorkbookWriteHandlerContext;
+import cn.idev.excel.write.merge.AbstractMergeStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -112,7 +112,13 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements Workbook
                         }
                         map.put(field, new RepeatCell(val, i));
                     } else if (i == list.size() - 1) {
-                        if (i > repeatCell.getCurrent() && isMerge(list, i, field)) {
+                        if (!isMerge(list, i, field)) {
+                            // 如果最后一行不能合并，检查之前的数据是否需要合并
+                            if (i - repeatCell.getCurrent() > 1) {
+                                cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex - 1, colNum, colNum));
+                            }
+                        } else if (i > repeatCell.getCurrent()) {
+                            // 如果最后一行可以合并，则直接合并到最后
                             cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
                         }
                     } else if (!isMerge(list, i, field)) {

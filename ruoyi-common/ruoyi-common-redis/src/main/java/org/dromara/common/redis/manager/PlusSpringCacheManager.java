@@ -145,18 +145,25 @@ public class PlusSpringCacheManager implements CacheManager {
         if (array.length > 3) {
             config.setMaxSize(Integer.parseInt(array[3]));
         }
-
-        if (config.getMaxIdleTime() == 0 && config.getTTL() == 0 && config.getMaxSize() == 0) {
-            return createMap(name, config);
+        int local = 1;
+        if (array.length > 4) {
+            local = Integer.parseInt(array[4]);
         }
 
-        return createMapCache(name, config);
+        if (config.getMaxIdleTime() == 0 && config.getTTL() == 0 && config.getMaxSize() == 0) {
+            return createMap(name, config, local);
+        }
+
+        return createMapCache(name, config, local);
     }
 
-    private Cache createMap(String name, CacheConfig config) {
+    private Cache createMap(String name, CacheConfig config, int local) {
         RMap<Object, Object> map = RedisUtils.getClient().getMap(name);
 
-        Cache cache = new CaffeineCacheDecorator(name, new RedissonCache(map, allowNullValues));
+        Cache cache = new RedissonCache(map, allowNullValues);
+        if (local == 1) {
+            cache = new CaffeineCacheDecorator(name, cache);
+        }
         if (transactionAware) {
             cache = new TransactionAwareCacheDecorator(cache);
         }
@@ -167,10 +174,13 @@ public class PlusSpringCacheManager implements CacheManager {
         return cache;
     }
 
-    private Cache createMapCache(String name, CacheConfig config) {
+    private Cache createMapCache(String name, CacheConfig config, int local) {
         RMapCache<Object, Object> map = RedisUtils.getClient().getMapCache(name);
 
-        Cache cache = new CaffeineCacheDecorator(name, new RedissonCache(map, config, allowNullValues));
+        Cache cache = new RedissonCache(map, config, allowNullValues);
+        if (local == 1) {
+            cache = new CaffeineCacheDecorator(name, cache);
+        }
         if (transactionAware) {
             cache = new TransactionAwareCacheDecorator(cache);
         }

@@ -50,7 +50,12 @@ public enum ButtonPermissionEnum implements NodeExtEnum {
     /**
      * 是否能终止
      */
-    TERMINATION("是否能终止", "termination", true);
+    TERMINATION("是否能终止", "termination", true),
+
+    /**
+     * 是否能上传附件
+     */
+    FILE("是否能上传附件", "file", true);
 
     private final String label;
     private final String value;

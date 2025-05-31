@@ -1,7 +1,7 @@
 package org.dromara.web.service.impl;
 
-import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -58,8 +58,8 @@ public class SmsAuthStrategy implements IAuthStrategy {
         });
         loginUser.setClientKey(client.getClientKey());
         loginUser.setDeviceType(client.getDeviceType());
-        SaLoginModel model = new SaLoginModel();
-        model.setDevice(client.getDeviceType());
+        SaLoginParameter model = new SaLoginParameter();
+        model.setDeviceType(client.getDeviceType());
         // 自定义分配 不同用户体系 不同 token 授权时间 不设置默认走全局 yml 配置
         // 例如: 后台用户30分钟过期 app用户1天过期
         model.setTimeout(client.getTimeout());

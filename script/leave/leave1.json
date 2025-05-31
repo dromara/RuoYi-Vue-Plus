@@ -52,7 +52,7 @@
     "nodeType" : 1,
     "nodeCode" : "a8abf15f-b83e-428a-86cc-033555ea9bbe",
     "nodeName" : "部门主管",
-    "permissionFlag" : "role:3,role:4",
+    "permissionFlag" : "role:3@@role:4",
     "nodeRatio" : 0.000,
     "coordinate" : "720,200|720,200",
     "formCustom" : "N",

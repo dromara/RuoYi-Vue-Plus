@@ -14,19 +14,9 @@ public interface FlowConstant {
     String INITIATOR = "initiator";
 
     /**
-     * 流程实例id
-     */
-    String PROCESS_INSTANCE_ID = "processInstanceId";
-
-    /**
      * 业务id
      */
     String BUSINESS_ID = "businessId";
-
-    /**
-     * 任务id
-     */
-    String TASK_ID = "taskId";
 
     /**
      * 委托
@@ -62,5 +52,25 @@ public interface FlowConstant {
      * 默认租户OA申请分类id
      */
     Long FLOW_CATEGORY_ID = 100L;
+
+    /**
+     * 是否为申请人提交常量
+     */
+    String SUBMIT = "submit";
+
+    /**
+     * 抄送常量
+     */
+    String FLOW_COPY_LIST = "flowCopyList";
+
+    /**
+     * 消息类型常量
+     */
+    String MESSAGE_TYPE = "messageType";
+
+    /**
+     * 消息通知常量
+     */
+    String MESSAGE_NOTICE = "messageNotice";
 
 }

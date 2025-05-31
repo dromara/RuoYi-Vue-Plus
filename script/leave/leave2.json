@@ -58,7 +58,7 @@
     "nodeType" : 1,
     "nodeCode" : "b3528155-dcb7-4445-bbdf-3d00e3499e86",
     "nodeName" : "组长",
-    "permissionFlag" : "3,4",
+    "permissionFlag" : "3@@4",
     "nodeRatio" : 0.000,
     "coordinate" : "720,320|720,320",
     "formCustom" : "N",

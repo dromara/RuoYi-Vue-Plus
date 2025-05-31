@@ -1,5 +1,6 @@
 package org.dromara.common.mybatis.core.page;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.Data;
@@ -86,6 +87,21 @@ public class TableDataInfo<T> implements Serializable {
         rspData.setCode(HttpStatus.HTTP_OK);
         rspData.setMsg("查询成功");
         return rspData;
+    }
+
+    /**
+     * 根据原始数据列表和分页参数，构建表格分页数据对象（用于假分页）
+     *
+     * @param list 原始数据列表（全部数据）
+     * @param page 分页参数对象（包含当前页码、每页大小等）
+     * @return 构造好的分页结果 TableDataInfo<T>
+     */
+    public static <T> TableDataInfo<T> build(List<T> list, IPage<T> page) {
+        if (CollUtil.isEmpty(list)) {
+            return TableDataInfo.build();
+        }
+        List<T> pageList = CollUtil.page((int) page.getCurrent() - 1, (int) page.getSize(), list);
+        return new TableDataInfo<>(pageList, list.size());
     }
 
 }

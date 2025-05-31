@@ -106,7 +106,7 @@
     "nodeType" : 1,
     "nodeCode" : "762cb975-37d8-4276-b6db-79a4c3606394",
     "nodeName" : "综合部",
-    "permissionFlag" : "role:3,role:4",
+    "permissionFlag" : "role:3@@role:4",
     "nodeRatio" : 0.000,
     "coordinate" : "800,300|800,300",
     "formCustom" : "N",

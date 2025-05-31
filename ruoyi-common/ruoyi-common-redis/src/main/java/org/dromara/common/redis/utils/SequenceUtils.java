@@ -2,10 +2,10 @@ package org.dromara.common.redis.utils;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.common.core.utils.StringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.core.utils.StringUtils;
 import org.redisson.api.RIdGenerator;
 import org.redisson.api.RedissonClient;
 
@@ -24,14 +24,17 @@ public class SequenceUtils {
      * 默认初始值
      */
     public static final Long DEFAULT_INIT_VALUE = 1L;
+
     /**
      * 默认步长
      */
     public static final Long DEFAULT_STEP_VALUE = 1L;
+
     /**
      * 默认过期时间-天
      */
     public static final Duration DEFAULT_EXPIRE_TIME_DAY = Duration.ofDays(1);
+
     /**
      * 默认过期时间-分钟
      */
@@ -112,6 +115,18 @@ public class SequenceUtils {
      */
     public static String nextIdStr(String key, Duration expireTime) {
         return String.valueOf(nextId(key, expireTime));
+    }
+
+    /**
+     * 获取指定业务key的唯一id字符串 (ID初始值=1,ID步长=1)，不足位数自动补零
+     *
+     * @param key        业务key
+     * @param expireTime 过期时间
+     * @param width      位数，不足左补0
+     * @return 补零后的唯一id字符串
+     */
+    public static String nextPaddedIdStr(String key, Duration expireTime, Integer width) {
+        return StringUtils.leftPad(nextIdStr(key, expireTime), width, '0');
     }
 
     /**

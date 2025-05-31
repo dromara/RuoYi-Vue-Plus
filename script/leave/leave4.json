@@ -52,7 +52,7 @@
     "nodeType" : 1,
     "nodeCode" : "2f9f2e21-9bcf-42a3-a07c-13037aad22d1",
     "nodeName" : "全部审批通过",
-    "permissionFlag" : "role:1,role:3",
+    "permissionFlag" : "role:1@@role:3",
     "nodeRatio" : 100.000,
     "coordinate" : "820,240|820,240",
     "formCustom" : "N",

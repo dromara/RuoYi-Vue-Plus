@@ -1,0 +1,408 @@
+---
+description:
+globs: *.java,*.xml,ruoyi-modules/*
+alwaysApply: false
+---
+## RuoYi-Vue-Plus 后端开发 Cursor Rules
+
+本规则用于指导 RuoYi-Vue-Plus 后端项目的高效二次开发。
+
+### 1. 分层职责
+| 层级       | 主要职责           | 典型注解/基类           |
+|------------|--------------------|-------------------------|
+| Controller | HTTP处理/参数校验  | @RestController, @Validated, @SaCheckPermission |
+| Service    | 业务逻辑/事务      | @Service, @Transactional |
+| Mapper     | 数据库交互         | BaseMapperPlus, @DataPermission |
+| Entity     | 数据结构/表映射    | @TableName, @TableId, @Version, @TableLogic |
+| BO         | 业务对象/校验      | @AutoMapper(target=Entity.class), JSR 303 |
+| VO         | 视图对象/翻译脱敏  | @AutoMapper(target=Entity.class), @Translation, @Sensitive |
+
+### 2. 命名规范与重复避免
+
+#### 2.1 类命名规范
+- **Entity**: `[模块前缀][业务名称]` (如: `PmsCustomerContacts`)
+- **BO**: `[模块前缀][业务名称]Bo` (如: `PmsCustomerContactsBo`)
+- **VO**: `[模块前缀][业务名称]Vo` (如: `PmsCustomerContactsVo`)
+- **Controller**: `[模块前缀][业务名称]Controller` (如: `PmsCustomerContactsController`)
+- **Service**: `I[模块前缀][业务名称]Service` / `[模块前缀][业务名称]ServiceImpl`
+- **Mapper**: `[模块前缀][业务名称]Mapper`
+
+#### 2.2 避免重复类的规则
+1. **一个业务实体只能有一个主VO类**：如 `PmsCustomerContactsVo`
+2. **如需简化VO，使用内部类或继承**：
+   ```java
+   // 推荐：使用内部静态类
+   public class PmsCustomerContactsVo {
+       // 完整字段
+
+       @Data
+       public static class Simple {
+           private Long contactId;
+           private String fullName;
+           // 简化字段
+       }
+   }
+
+   // 或者：使用继承
+   public class PmsCustomerContactsSimpleVo extends PmsCustomerContactsVo {
+       // 只包含需要的字段
+   }
+   ```
+3. **禁止创建功能相似的重复类**：如 `PmsContactTagVo` 和 `PmsContactTagsVo`
+4. **类型定义必须与后端数据库字典值保持一致**
+
+#### 2.3 数据库字典与前端类型一致性
+- 后端字典值：`guest_individual`, `guest_group_contact`, `corporate_contact`, `travel_agent_contact`, `company_profile`, `supplier_contact`, `employee_profile`, `other`
+- 前端TypeScript类型必须与后端字典值完全一致
+- 禁止在前端使用不同的枚举值
+
+### 3. 关键注解与用法
+- **分组校验**：
+  ```java
+  @Validated(AddGroup.class)
+  @Validated(EditGroup.class)
+  @Validated(QueryGroup.class)
+  ```
+- **MapStruct**：
+  ```java
+  // VO类：需要双向转换（Entity ↔ VO），用于查询结果展示和数据提交，不要添加`reverseConvertGenerate = false`
+  @AutoMapper(target = Entity.class)
+  // BO类：只需要单向转换（BO → Entity），用于接收前端数据，需要添加`reverseConvertGenerate = false`
+  @AutoMapper(target = Entity.class, reverseConvertGenerate = false)
+  ```
+- **VO/BO/Entity 注解**：
+  ```java
+  @Translation(type = TransConstant.USER_ID_TO_NAME, mapper = "createBy")
+  @Sensitive(strategy = SensitiveStrategy.PHONE)
+  @ExcelProperty(value = "用户名")
+  @ExcelDictFormat(dictType = "sys_user_sex")
+  @ExcelEnumFormat(enumClass = UserStatus.class, textField = "info")
+  ```
+- **批量操作**：
+  ```java
+  testDemoMapper.insertBatch(list);
+  testDemoMapper.insertOrUpdateBatch(list);
+  testDemoMapper.deleteWithValidByIds(ids, true);
+  ```
+- **国际化**：
+  ```java
+  MessageUtils.message("user.register.success");
+  @NotBlank(message = "{not.null}")
+  ```
+- **分布式锁/缓存/限流/脱敏/加密**：
+  ```java
+  @Lock4j(keys = {"#key"})
+  @Cacheable(cacheNames = "demo:cache#60s#10m#20", key = "#key")
+  @RateLimiter(count = 2, time = 10)
+  @Sensitive(strategy = SensitiveStrategy.ID_CARD)
+  @EncryptField(algorithm = AlgorithmType.AES, password = "xxx")
+  ```
+- **异常处理**：
+  ```java
+  throw new ServiceException("xxx错误");
+  return R.fail("操作失败");
+  return R.ok(data);
+  ```
+
+### 4. RESTful 设计与文档
+- Controller 方法使用 @GetMapping/@PostMapping/@PutMapping/@DeleteMapping
+- 权限注解 @SaCheckPermission("模块:资源:操作")
+- 日志注解 @Log(title = "xx", businessType = BusinessType.INSERT)
+- Swagger 注解 @ApiOperation/@ApiModel/@ApiModelProperty
+
+### 5. 常见错误与修正
+- MapStruct 转换异常：检查 @AutoMapper target 是否正确
+- 数据库连接异常：检查数据源配置与连接池
+- 分布式锁死锁：确保 finally 释放锁
+- JSR 303 校验不生效：Controller 层加 @Validated
+- 国际化 message 不生效：检查 messages_zh_CN.properties 配置
+- **重复类问题**：检查是否已存在相同功能的类，避免创建重复的VO/BO类
+
+### 6. 推荐代码片段
+- 批量操作、分组校验、国际化、脱敏、加密、缓存、限流、分布式锁等 demo 代码片段见 ruoyi-demo 模块
+
+---
+如需更多示例，请参考 ruoyi-demo 模块实际代码。
+
+### 7. 模块设计与创建
+
+- **Maven模块**: 新业务模块在 `[ruoyi-modules](mdc:ruoyi-modules)` 下创建
+    - 配置 `pom.xml`: 父模块为 `ruoyi-modules`，添加必要依赖
+    - 在根 `[pom.xml](mdc:pom.xml)` 和 `[ruoyi-modules/pom.xml](mdc:ruoyi-modules/pom.xml)` 注册新模块
+- **包结构**: `org.dromara.[模块名]` (如 `org.dromara.pms`)
+    - `controller`, `service`, `service.impl`, `mapper`, `domain` (含 `entity`, `bo`, `vo`)
+- **资源文件**: `src/main/resources/`
+    - `mapper/[模块名]/` (MyBatis XML)
+    - `i18n/messages_[语言].properties` (国际化)
+
+### 8. 代码生成提示模板
+
+**生成完整模块**:
+```
+为 [表名] 生成符合RuoYi-Vue-Plus规范的完整模块代码。
+包含: Controller, Service接口与实现, Mapper接口与XML, Entity, BO, VO
+要求:
+- Entity继承TenantEntity，主键使用@TableId(type = IdType.ASSIGN_ID)
+- BO包含校验注解(@NotBlank, @NotNull, @Size)
+- VO包含@Translation和@Sensitive注解
+- Service方法添加@Transactional注解
+- Controller方法添加@Log和@SaCheckPermission注解
+- 使用@AutoMapper进行对象转换
+- 避免创建重复的VO/BO类
+```
+
+**实现业务逻辑**:
+```
+在 [ServiceImpl] 中实现 [业务描述] 功能。
+包含: 数据校验、业务处理、状态更新、事务管理
+确保异常处理和数据一致性。
+```
+
+### 9. 核心功能规范
+
+- **权限控制**: `@SaCheckPermission("pms:module:action")`
+- **数据权限**: `@DataPermission`, `@DataScope`
+- **操作日志**: `@Log(title = "模块管理", businessType = BusinessType.INSERT)`
+- **参数校验**: JSR 303/380注解在BO对象上
+- **Excel导入/导出**: `ExcelUtil`, `@ExcelProperty`, `@ExcelDictFormat`
+- **多租户**: Entity继承 `TenantEntity`，特殊场景使用 `@TenantIgnore`
+- **事务管理**: `@Transactional(rollbackFor = Exception.class)`
+- **缓存**: Spring Cache注解配合 `CacheNames` 常量
+- **国际化**: `MessageUtils.message("key")`
+- **枚举处理**: Java枚举类，确保MyBatis TypeHandler正确配置
+- **对象转换**: 优先使用 MapStruct Plus (`@AutoMapper`)
+
+### 10. 字典数据管理
+
+**字典配置规范**:
+- 新增字典类型到 `sys_dict_type` 表
+- 字典数据添加到 `sys_dict_data` 表
+- 命名规范: `pms_[业务模块]_[字段名]` (如 `pms_contact_type`)
+- 支持多租户隔离，通过 `tenant_id` 区分
+
+**字典使用**:
+```java
+// VO中使用字典翻译
+@Translation(type = TransConstant.DICT_TYPE_TO_LABEL, mapper = "pms_contact_type")
+private String contactType;
+
+// Excel导出时字典转换
+@ExcelDictFormat(dictType = "pms_contact_type")
+private String contactType;
+```
+
+### 11. 数据权限与安全
+
+**数据权限配置**:
+```java
+@DataPermission({
+    @DataColumn(key = "deptName", value = "dept_id"),
+    @DataColumn(key = "userName", value = "create_by")
+})
+public List<Entity> selectList(Query query);
+```
+
+**敏感数据处理**:
+```java
+// 敏感字段脱敏
+@Sensitive(strategy = SensitiveStrategy.PHONE)
+private String phoneNumber;
+
+@Sensitive(strategy = SensitiveStrategy.ID_CARD)
+private String idNumber;
+```
+
+### 12. 缓存策略
+
+**缓存使用规范**:
+```java
+@Cacheable(cacheNames = CacheNames.SYS_DICT, key = "#dictType")
+public List<SysDictData> selectDictDataByType(String dictType);
+
+@CacheEvict(cacheNames = CacheNames.SYS_DICT, key = "#dictType")
+public void refreshDictCache(String dictType);
+```
+
+**缓存命名**: 使用 `CacheNames` 常量类统一管理缓存名称
+
+### 13. 数据库与MyBatis
+
+- **SQL脚本**: 存放在 `script/sql/[数据库类型]/`
+- **MyBatis Plus**: 充分利用便捷CRUD，复杂查询在XML中编写
+- **动态SQL**: 使用 `<if>`, `<choose>`, `<foreach>` 标签
+- **分页查询**: 使用 `PageQuery` 和 `TableDataInfo`
+- **批量操作**: 优先使用 `saveBatch()`, `updateBatchById()` 等批量方法
+
+### 14. 数据校验与业务规则
+
+**参数校验规范**:
+```java
+// BO对象中的校验注解
+@NotBlank(message = "联系人姓名不能为空", groups = {AddGroup.class, EditGroup.class})
+@Size(max = 255, message = "联系人姓名长度不能超过255个字符")
+private String fullName;
+
+@Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
+private String phoneNumber;
+
+@Email(message = "邮箱格式不正确")
+private String email;
+```
+
+**业务校验**:
+```java
+// Service层业务校验
+private void validEntityBeforeSave(PmsCustomerContacts entity) {
+    // 检查手机号唯一性
+    if (StringUtils.isNotBlank(entity.getPhoneNumber())) {
+        LambdaQueryWrapper<PmsCustomerContacts> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(PmsCustomerContacts::getPhoneNumber, entity.getPhoneNumber());
+        wrapper.ne(entity.getContactId() != null, PmsCustomerContacts::getContactId, entity.getContactId());
+        if (baseMapper.exists(wrapper)) {
+            throw new ServiceException("手机号已存在");
+        }
+    }
+}
+```
+
+### 15. API设计与文档
+
+**RESTful API规范**:
+```java
+// 标准CRUD接口设计
+@GetMapping("/list")           // 查询列表
+@GetMapping("/{id}")          // 查询详情
+@PostMapping                  // 新增
+@PutMapping                   // 修改
+@DeleteMapping("/{ids}")      // 删除
+
+// 批量操作
+@PostMapping("/batch")        // 批量新增
+@PutMapping("/batch")         // 批量修改
+@DeleteMapping("/batch/{ids}") // 批量删除
+```
+
+**Swagger文档注解**:
+```java
+@Api(tags = "客户联系人管理")
+@ApiOperation("查询客户联系人列表")
+@ApiParam(name = "contactId", value = "联系人ID", required = true)
+```
+
+### 16. 异常处理与日志
+
+**异常处理**:
+```java
+// Service层抛出业务异常
+throw new ServiceException("业务异常信息");
+
+// 全局异常处理器自动转换为R对象
+@ExceptionHandler(ServiceException.class)
+public R<Void> handleServiceException(ServiceException e);
+```
+
+**日志记录**:
+- 使用 `@Slf4j` 注解
+- 关键业务操作记录INFO日志
+- 异常情况记录ERROR日志
+- 避免在循环中打印日志
+
+### 17. 事务管理与性能优化
+
+**事务管理**:
+```java
+// Service方法事务注解
+@Transactional(rollbackFor = Exception.class)
+public Boolean insertByBo(PmsCustomerContactsBo bo) {
+    // 业务逻辑
+}
+
+// 只读事务优化查询性能
+@Transactional(readOnly = true)
+public List<PmsCustomerContactsVo> queryList(PmsCustomerContactsBo bo) {
+    // 查询逻辑
+}
+```
+
+**性能优化**:
+- 批量操作使用 `saveBatch()`, `updateBatchById()`
+- 大数据量查询使用分页
+- 合理使用索引和查询条件
+- 避免N+1查询问题
+
+### 18. 代码风格与质量
+
+- **命名**: 遵循Alibaba Java规范 (类名PascalCase, 方法/变量camelCase)
+- **注释**: Javadoc覆盖所有public类和方法
+- **代码检查**: 使用SonarLint等工具进行代码质量检查
+- **单元测试**: 核心业务逻辑编写单元测试
+
+### 19. 重要参考文件
+
+- **最佳实践**: `[RuoYi-Vue-Plus二次开发最佳实践.md](mdc:RuoYi-Vue-Plus二次开发最佳实践.md)`
+- **开发指南**: `[二开todolist.md](mdc:docs/二开todolist.md)`
+- **项目分析**: `[RuoYi-Vue-Plus项目分析报告.md](mdc:RuoYi-Vue-Plus项目分析报告.md)`
+
+### 20. MapStruct Plus @AutoMapper 用法
+```java
+// Entity
+@Data
+@TableName("sys_user")
+public class SysUser extends TenantEntity {
+    @TableId(type = IdType.ASSIGN_ID)
+    private Long userId;
+    ...
+}
+// BO
+@Data
+@AutoMapper(target = SysUser.class)
+public class SysUserBo {
+    @NotBlank(message = "用户名不能为空")
+    private String userName;
+    ...
+}
+// VO
+@Data
+@AutoMapper(target = SysUser.class)
+public class SysUserVo {
+    @Translation(type = TransConstant.DICT_TYPE_TO_LABEL, mapper = "sys_user_status")
+    private String statusLabel;
+    ...
+}
+```
+
+### 21. 注解与常用代码片段
+- 字典：`@Translation(type = TransConstant.DICT_TYPE_TO_LABEL, mapper = "dict_type")`
+- 脱敏：`@Sensitive(strategy = SensitiveStrategy.PHONE)`
+- 事务：`@Transactional(rollbackFor = Exception.class)`
+- 数据权限：`@DataPermission({@DataColumn(key = "deptName", value = "dept_id")})`
+
+### 22. RESTful API 设计与文档
+```java
+// Controller 示例
+@Api(tags = "用户管理")
+@RestController
+@RequestMapping("/system/user")
+public class SysUserController {
+    @GetMapping("/list")
+    public TableDataInfo<SysUserVo> list(SysUserBo bo, PageQuery pageQuery) {...}
+    @PostMapping
+    public R<Void> add(@Validated(AddGroup.class) @RequestBody SysUserBo bo) {...}
+    ...
+}
+```
+
+### 23. 其他规范
+- 命名、注释、代码风格遵循阿里巴巴 Java 规范
+- 统一异常处理，Service 层抛 ServiceException
+- 只用官方注解/工具，避免自造轮子
+
+---
+*务必使用官方注解/工具，确保类型安全与一致性。避免创建重复的类和不一致的类型定义。*
+
+**⚠️ 重要规则**：
+- **VO类必须使用默认配置**：`@AutoMapper(target = Entity.class)`，不要添加`reverseConvertGenerate = false`
+- **BO类必须禁用反向转换**：`@AutoMapper(target = Entity.class, reverseConvertGenerate = false)`
+- **错误配置会导致**：`cannot find converter from Entity to Vo` 异常，页面无法加载数据
+- **验证方法**：编译时检查`target/generated-sources/annotations/`目录下是否生成了对应的转换器
+

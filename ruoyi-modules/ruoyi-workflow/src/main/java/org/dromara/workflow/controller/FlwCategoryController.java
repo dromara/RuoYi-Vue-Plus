@@ -14,6 +14,7 @@ import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.workflow.common.ConditionalOnEnable;
+import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.bo.FlowCategoryBo;
 import org.dromara.workflow.domain.vo.FlowCategoryVo;
 import org.dromara.workflow.service.IFlwCategoryService;
@@ -110,6 +111,9 @@ public class FlwCategoryController extends BaseController {
     @Log(title = "流程分类", businessType = BusinessType.DELETE)
     @DeleteMapping("/{categoryId}")
     public R<Void> remove(@PathVariable Long categoryId) {
+        if (FlowConstant.FLOW_CATEGORY_ID.equals(categoryId)) {
+            return R.warn("默认流程分类,不允许删除");
+        }
         if (flwCategoryService.hasChildByCategoryId(categoryId)) {
             return R.warn("存在下级流程分类,不允许删除");
         }

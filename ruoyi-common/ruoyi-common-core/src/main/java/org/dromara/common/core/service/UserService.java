@@ -3,6 +3,7 @@ package org.dromara.common.core.service;
 import org.dromara.common.core.domain.dto.UserDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 通用 用户服务
@@ -90,5 +91,37 @@ public interface UserService {
      * @return 用户
      */
     List<UserDTO> selectUsersByPostIds(List<Long> postIds);
+
+    /**
+     * 根据用户 ID 列表查询用户名称映射关系
+     *
+     * @param userIds 用户 ID 列表
+     * @return Map，其中 key 为用户 ID，value 为对应的用户名称
+     */
+    Map<Long, String> selectUserNamesByIds(List<Long> userIds);
+
+    /**
+     * 根据角色 ID 列表查询角色名称映射关系
+     *
+     * @param roleIds 角色 ID 列表
+     * @return Map，其中 key 为角色 ID，value 为对应的角色名称
+     */
+    Map<Long, String> selectRoleNamesByIds(List<Long> roleIds);
+
+    /**
+     * 根据部门 ID 列表查询部门名称映射关系
+     *
+     * @param deptIds 部门 ID 列表
+     * @return Map，其中 key 为部门 ID，value 为对应的部门名称
+     */
+    Map<Long, String> selectDeptNamesByIds(List<Long> deptIds);
+
+    /**
+     * 根据岗位 ID 列表查询岗位名称映射关系
+     *
+     * @param postIds 岗位 ID 列表
+     * @return Map，其中 key 为岗位 ID，value 为对应的岗位名称
+     */
+    Map<Long, String> selectPostNamesByIds(List<Long> postIds);
 
 }

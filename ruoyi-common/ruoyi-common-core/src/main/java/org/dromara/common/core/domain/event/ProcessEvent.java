@@ -33,7 +33,22 @@ public class ProcessEvent implements Serializable {
     private String businessId;
 
     /**
-     * 状态
+     * 节点类型（0开始节点 1中间节点 2结束节点 3互斥网关 4并行网关）
+     */
+    private Integer nodeType;
+
+    /**
+     * 流程节点编码
+     */
+    private String nodeCode;
+
+    /**
+     * 流程节点名称
+     */
+    private String nodeName;
+
+    /**
+     * 流程状态
      */
     private String status;
 
@@ -45,6 +60,6 @@ public class ProcessEvent implements Serializable {
     /**
      * 当为true时为申请人节点办理
      */
-    private boolean submit;
+    private Boolean submit;
 
 }

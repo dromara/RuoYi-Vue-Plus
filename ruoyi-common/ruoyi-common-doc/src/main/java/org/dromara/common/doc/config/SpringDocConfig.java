@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Swagger 文档配置
+ * 接口文档配置
  *
  * @author Lion Li
  */

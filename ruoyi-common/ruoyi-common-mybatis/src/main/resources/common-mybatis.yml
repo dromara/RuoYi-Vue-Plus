@@ -2,8 +2,6 @@
 # MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:
-  # 多包名使用 例如 org.dromara.**.mapper,org.xxx.**.mapper
-  mapperPackage: org.dromara.**.mapper
   # 启动时是否检查 MyBatis XML 文件的存在，默认不检查
   checkConfigLocation: false
   configuration:
@@ -33,4 +31,3 @@ mybatis-plus:
       insertStrategy: NOT_NULL
       updateStrategy: NOT_NULL
       whereStrategy: NOT_NULL
-

@@ -1,7 +1,8 @@
 package org.dromara.workflow.domain.vo;
 
-import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import com.alibaba.excel.annotation.ExcelProperty;
+import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
+import cn.idev.excel.annotation.ExcelProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import org.dromara.workflow.domain.TestLeave;
@@ -41,12 +42,14 @@ public class TestLeaveVo implements Serializable {
      * 开始时间
      */
     @ExcelProperty(value = "开始时间")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
 
     /**
      * 结束时间
      */
     @ExcelProperty(value = "结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 
     /**

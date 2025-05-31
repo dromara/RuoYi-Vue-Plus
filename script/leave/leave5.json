@@ -55,7 +55,7 @@
     "nodeType" : 1,
     "nodeCode" : "c80f273e-1f17-4bd8-9ad1-04a4a94ea862",
     "nodeName" : "会签",
-    "permissionFlag" : "role:1,role:3",
+    "permissionFlag" : "role:1@@role:3",
     "nodeRatio" : 100.000,
     "coordinate" : "700,320|700,320",
     "formCustom" : "N",

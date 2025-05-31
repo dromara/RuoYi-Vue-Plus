@@ -191,7 +191,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
             List<FlowDefinition> flowDefinitions = flowDefinitionMapper.selectByIds(StreamUtils.toList(flowHisTasks, FlowHisTask::getDefinitionId));
             if (CollUtil.isNotEmpty(flowDefinitions)) {
                 String join = StreamUtils.join(flowDefinitions, FlowDefinition::getFlowCode);
-                log.error("流程定义【{}】已被使用不可被删除！", join);
+                log.info("流程定义【{}】已被使用不可被删除！", join);
                 throw new ServiceException("流程定义【" + join + "】已被使用不可被删除！");
             }
         }

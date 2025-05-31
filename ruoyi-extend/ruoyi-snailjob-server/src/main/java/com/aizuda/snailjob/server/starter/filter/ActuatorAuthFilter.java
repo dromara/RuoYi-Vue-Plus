@@ -44,7 +44,7 @@ public class ActuatorAuthFilter implements Filter {
             return;
         }
         // 验证用户名和密码
-        if (!username.equals(split[0]) && password.equals(split[1])) {
+        if (!username.equals(split[0]) || !password.equals(split[1])) {
             response.setHeader("WWW-Authenticate", "Basic realm=\"realm\"");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             return;

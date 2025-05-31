@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.0.33
+    image: mysql:8.0.42
     container_name: mysql
     environment:
       # 时区上海
@@ -48,7 +48,7 @@ services:
     network_mode: "host"
 
   redis:
-    image: redis:6.2.12
+    image: redis:7.2.8
     container_name: redis
     ports:
       - "6379:6379"
@@ -65,7 +65,8 @@ services:
     network_mode: "host"
 
   minio:
-    image: minio/minio:RELEASE.2023-04-13T03-08-07Z
+    # minio 最后一个未阉割版本 不能再进行升级 在往上的版本功能被阉割
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
     container_name: minio
     ports:
       # api 端口
@@ -98,12 +99,13 @@ services:
     network_mode: "host"
 
   ruoyi-server1:
-    image: ruoyi/ruoyi-server:5.3.1
+    image: ruoyi/ruoyi-server:5.4.0
     container_name: ruoyi-server1
     environment:
       # 时区上海
       TZ: Asia/Shanghai
       SERVER_PORT: 8080
+      SNAIL_PORT: 28080
     volumes:
       # 配置文件
       - /docker/server1/logs/:/ruoyi/server/logs/
@@ -113,12 +115,13 @@ services:
     network_mode: "host"
 
   ruoyi-server2:
-    image: ruoyi/ruoyi-server:5.3.1
+    image: ruoyi/ruoyi-server:5.4.0
     container_name: ruoyi-server2
     environment:
       # 时区上海
       TZ: Asia/Shanghai
       SERVER_PORT: 8081
+      SNAIL_PORT: 28081
     volumes:
       # 配置文件
       - /docker/server2/logs/:/ruoyi/server/logs/
@@ -128,7 +131,7 @@ services:
     network_mode: "host"
 
   ruoyi-monitor-admin:
-    image: ruoyi/ruoyi-monitor-admin:5.3.1
+    image: ruoyi/ruoyi-monitor-admin:5.4.0
     container_name: ruoyi-monitor-admin
     environment:
       # 时区上海
@@ -140,7 +143,7 @@ services:
     network_mode: "host"
 
   ruoyi-snailjob-server:
-    image: ruoyi/ruoyi-snailjob-server:5.3.1
+    image: ruoyi/ruoyi-snailjob-server:5.4.0
     container_name: ruoyi-snailjob-server
     environment:
       # 时区上海

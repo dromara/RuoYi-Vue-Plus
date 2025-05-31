@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 岗位信息 服务层处理
@@ -76,11 +77,14 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      * @return 构建好的查询包装器
      */
     private LambdaQueryWrapper<SysPost> buildQueryWrapper(SysPostBo bo) {
+        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysPost> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StringUtils.isNotBlank(bo.getPostCode()), SysPost::getPostCode, bo.getPostCode())
             .like(StringUtils.isNotBlank(bo.getPostCategory()), SysPost::getPostCategory, bo.getPostCategory())
             .like(StringUtils.isNotBlank(bo.getPostName()), SysPost::getPostName, bo.getPostName())
             .eq(StringUtils.isNotBlank(bo.getStatus()), SysPost::getStatus, bo.getStatus())
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                SysPost::getCreateTime, params.get("beginTime"), params.get("endTime"))
             .orderByAsc(SysPost::getPostSort);
         if (ObjectUtil.isNotNull(bo.getDeptId())) {
             //优先单部门搜索

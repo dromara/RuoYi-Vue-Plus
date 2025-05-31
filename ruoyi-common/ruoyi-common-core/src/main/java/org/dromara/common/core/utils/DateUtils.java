@@ -175,14 +175,27 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
-     * 计算两个日期之间的天数差（以毫秒为单位）
+     * 计算两个时间之间的时间差，并以指定单位返回（绝对值）
      *
-     * @param date1 第一个日期
-     * @param date2 第二个日期
-     * @return 两个日期之间的天数差的绝对值
+     * @param start 起始时间
+     * @param end   结束时间
+     * @param unit  所需返回的时间单位（DAYS、HOURS、MINUTES、SECONDS、MILLISECONDS、MICROSECONDS、NANOSECONDS）
+     * @return 时间差的绝对值，以指定单位表示
      */
-    public static int differentDaysByMillisecond(Date date1, Date date2) {
-        return Math.abs((int) ((date2.getTime() - date1.getTime()) / (1000 * 3600 * 24)));
+    public static long difference(Date start, Date end, TimeUnit unit) {
+        // 计算时间差，单位为毫秒，取绝对值避免负数
+        long diffInMillis = Math.abs(end.getTime() - start.getTime());
+
+        // 根据目标单位转换时间差
+        return switch (unit) {
+            case DAYS -> diffInMillis / TimeUnit.DAYS.toMillis(1);
+            case HOURS -> diffInMillis / TimeUnit.HOURS.toMillis(1);
+            case MINUTES -> diffInMillis / TimeUnit.MINUTES.toMillis(1);
+            case SECONDS -> diffInMillis / TimeUnit.SECONDS.toMillis(1);
+            case MILLISECONDS -> diffInMillis;
+            case MICROSECONDS -> TimeUnit.MILLISECONDS.toMicros(diffInMillis);
+            case NANOSECONDS -> TimeUnit.MILLISECONDS.toNanos(diffInMillis);
+        };
     }
 
     /**

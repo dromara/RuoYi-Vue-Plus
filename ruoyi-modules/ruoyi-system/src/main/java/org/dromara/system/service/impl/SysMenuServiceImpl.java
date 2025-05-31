@@ -28,6 +28,7 @@ import org.dromara.system.mapper.SysRoleMenuMapper;
 import org.dromara.system.mapper.SysTenantPackageMapper;
 import org.dromara.system.service.ISysMenuService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -71,6 +72,8 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 .like(StringUtils.isNotBlank(menu.getMenuName()), SysMenu::getMenuName, menu.getMenuName())
                 .eq(StringUtils.isNotBlank(menu.getVisible()), SysMenu::getVisible, menu.getVisible())
                 .eq(StringUtils.isNotBlank(menu.getStatus()), SysMenu::getStatus, menu.getStatus())
+                .eq(StringUtils.isNotBlank(menu.getMenuType()), SysMenu::getMenuType, menu.getMenuType())
+                .eq(ObjectUtil.isNotNull(menu.getParentId()), SysMenu::getParentId, menu.getParentId())
                 .orderByAsc(SysMenu::getParentId)
                 .orderByAsc(SysMenu::getOrderNum));
         } else {
@@ -79,6 +82,8 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 .like(StringUtils.isNotBlank(menu.getMenuName()), "m.menu_name", menu.getMenuName())
                 .eq(StringUtils.isNotBlank(menu.getVisible()), "m.visible", menu.getVisible())
                 .eq(StringUtils.isNotBlank(menu.getStatus()), "m.status", menu.getStatus())
+                .eq(StringUtils.isNotBlank(menu.getMenuType()), "m.menu_type", menu.getMenuType())
+                .eq(ObjectUtil.isNotNull(menu.getParentId()), "m.parent_id", menu.getParentId())
                 .orderByAsc("m.parent_id")
                 .orderByAsc("m.order_num");
             List<SysMenu> list = baseMapper.selectMenuListByUserId(wrapper);
@@ -169,11 +174,15 @@ public class SysMenuServiceImpl implements ISysMenuService {
         if (tenantPackage.getMenuCheckStrictly()) {
             parentIds = baseMapper.selectObjs(new LambdaQueryWrapper<SysMenu>()
                 .select(SysMenu::getParentId)
-                .in(SysMenu::getMenuId, menuIds), x -> {return Convert.toLong(x);});
+                .in(SysMenu::getMenuId, menuIds), x -> {
+                return Convert.toLong(x);
+            });
         }
         return baseMapper.selectObjs(new LambdaQueryWrapper<SysMenu>()
             .in(SysMenu::getMenuId, menuIds)
-            .notIn(CollUtil.isNotEmpty(parentIds), SysMenu::getMenuId, parentIds), x -> {return Convert.toLong(x);});
+            .notIn(CollUtil.isNotEmpty(parentIds), SysMenu::getMenuId, parentIds), x -> {
+            return Convert.toLong(x);
+        });
     }
 
     /**
@@ -275,6 +284,17 @@ public class SysMenuServiceImpl implements ISysMenuService {
     }
 
     /**
+     * 是否存在菜单子节点
+     *
+     * @param menuIds 菜单ID串
+     * @return 结果
+     */
+    @Override
+    public boolean hasChildByMenuId(List<Long> menuIds) {
+        return baseMapper.exists(new LambdaQueryWrapper<SysMenu>().in(SysMenu::getParentId, menuIds).notIn(SysMenu::getMenuId, menuIds));
+    }
+
+    /**
      * 查询菜单使用数量
      *
      * @param menuId 菜单ID
@@ -318,6 +338,19 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public int deleteMenuById(Long menuId) {
         return baseMapper.deleteById(menuId);
+    }
+
+    /**
+     * 批量删除菜单管理信息
+     *
+     * @param menuIds 菜单ID串
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteMenuById(List<Long> menuIds) {
+        baseMapper.deleteByIds(menuIds);
+        roleMenuMapper.deleteByMenuIds(menuIds);
     }
 
     /**

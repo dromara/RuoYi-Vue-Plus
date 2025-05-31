@@ -2,6 +2,7 @@ package org.dromara.common.web.handler;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
+import com.fasterxml.jackson.core.JsonParseException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -14,6 +15,7 @@ import org.dromara.common.core.exception.base.BaseException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -178,6 +180,26 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage());
         String message = StreamUtils.join(e.getBindingResult().getAllErrors(), DefaultMessageSourceResolvable::getDefaultMessage, ", ");
         return R.fail(message);
+    }
+
+    /**
+     * JSON 解析异常（Jackson 在处理 JSON 格式出错时抛出）
+     * 可能是请求体格式非法，也可能是服务端反序列化失败
+     */
+    @ExceptionHandler(JsonParseException.class)
+    public R<Void> handleJsonParseException(JsonParseException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}' 发生 JSON 解析异常: {}", requestURI, e.getMessage());
+        return R.fail(HttpStatus.HTTP_BAD_REQUEST, "请求数据格式错误（JSON 解析失败）：" + e.getMessage());
+    }
+
+    /**
+     * 请求体读取异常（通常是请求参数格式非法、字段类型不匹配等）
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public R<Void> handleHttpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletRequest request) {
+        log.error("请求地址'{}', 参数解析失败: {}", request.getRequestURI(), e.getMessage());
+        return R.fail(HttpStatus.HTTP_BAD_REQUEST, "请求参数格式错误：" + e.getMostSpecificCause().getMessage());
     }
 
 }

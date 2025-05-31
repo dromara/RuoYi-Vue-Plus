@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.util.AntPathMatcher;
 
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -337,6 +338,28 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * 将字符串从源字符集转换为目标字符集
+     *
+     * @param input       原始字符串
+     * @param fromCharset 源字符集
+     * @param toCharset   目标字符集
+     * @return 转换后的字符串
+     */
+    public static String convert(String input, Charset fromCharset, Charset toCharset) {
+        if (isBlank(input)) {
+            return input;
+        }
+        try {
+            // 从源字符集获取字节
+            byte[] bytes = input.getBytes(fromCharset);
+            // 使用目标字符集解码
+            return new String(bytes, toCharset);
+        } catch (Exception e) {
+            return input;
+        }
     }
 
 }

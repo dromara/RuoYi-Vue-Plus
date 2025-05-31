@@ -1,20 +1,16 @@
 package org.dromara.workflow.domain.vo;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.json.JSONUtil;
 import lombok.Data;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.translation.annotation.Translation;
 import org.dromara.common.translation.constant.TransConstant;
 import org.dromara.warm.flow.core.entity.User;
 import org.dromara.workflow.common.constant.FlowConstant;
-import org.dromara.workflow.common.enums.ButtonPermissionEnum;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 任务视图
@@ -181,35 +177,11 @@ public class FlowTaskVo implements Serializable {
     /**
      * 是否为申请人节点
      */
-    private boolean applyNode;
+    private Boolean applyNode;
 
     /**
      * 按钮权限
      */
-    private List<ButtonPermission> buttonList;
+    private List<ButtonPermissionVo> buttonList;
 
-    public List<ButtonPermission> getButtonList(String ext) {
-        List<ButtonPermission> buttonPermissions = Arrays.stream(ButtonPermissionEnum.values())
-            .map(value -> {
-                ButtonPermission buttonPermission = new ButtonPermission();
-                buttonPermission.setCode(value.getValue());
-                buttonPermission.setShow(false);
-                return buttonPermission;
-            })
-            .collect(Collectors.toList());
-        if (StringUtils.isNotBlank(ext)) {
-            List<ButtonPermission> buttonCodeList = JSONUtil.toList(JSONUtil.parseArray(ext), ButtonPermission.class);
-            if (CollUtil.isNotEmpty(buttonCodeList)) {
-                Optional<ButtonPermission> firstPermission = buttonCodeList.stream().findFirst();
-                firstPermission.ifPresent(permission -> {
-                    Set<String> codeSet = Arrays.stream(permission.getValue().split(","))
-                        .map(String::trim)
-                        .filter(code -> !code.isEmpty())
-                        .collect(Collectors.toSet());
-                    buttonPermissions.forEach(bp -> bp.setShow(codeSet.contains(bp.getCode())));
-                });
-            }
-        }
-        return buttonPermissions;
-    }
 }

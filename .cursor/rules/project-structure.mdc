@@ -1,0 +1,28 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+## RuoYi-Vue-Plus 项目结构概览
+
+本项目采用多模块 Maven 结构，后端基于 Spring Boot & Cloud & Alibaba，前端基于 Vue & Naive UI。
+
+主要目录和模块说明：
+
+- `[ruoyi-admin](mdc:ruoyi-admin)`: 后台管理核心模块，包含用户、角色、菜单、字典等基础功能，以及后台接口实现。
+- `[ruoyi-common](mdc:ruoyi-common)`: 通用模块，包含各种基础组件和工具类，如 `ruoyi-common-core` (核心工具)、`ruoyi-common-security` (安全认证)、`ruoyi-common-mybatis` (MyBatis Plus 扩展) 等。
+- `[ruoyi-extend](mdc:ruoyi-extend)`: 扩展模块，包含一些可选的功能扩展，如监控 (`ruoyi-monitor-admin`)、定时任务 (`ruoyi-snailjob-server`)。
+- `[ruoyi-modules](mdc:ruoyi-modules)`: 业务模块目录，新增的业务功能模块（如 `ruoyi-pms`, `ruoyi-demo`）应在此目录下创建。
+- `[ruoyi-plus-soybean](mdc:ruoyi-plus-soybean)`: 前端项目目录，基于 Soybean Admin Pro，包含 Vue 页面、组件、API 服务、Hooks 等。
+- `script`: 脚本目录，包含 Docker 配置、SQL 脚本等。
+- `docs`: 文档目录。
+- `pom.xml`: 项目根目录 Maven 父 POM 文件，管理依赖和子模块。
+- `README.md`: 项目说明文档。
+
+开发新功能时，请参考以下模块的示例：
+
+- 后端业务模块示例: `[ruoyi-modules/ruoyi-demo](mdc:ruoyi-modules/ruoyi-demo)`
+- 前端页面/组件示例: `[ruoyi-plus-soybean/src/views/demo](mdc:ruoyi-plus-soybean/src/views/demo)` 或 `[ruoyi-plus-soybean/src/views/pms](mdc:ruoyi-plus-soybean/src/views/pms)`
+
+更多详细的开发规范请参考 `.cursor/rules/backend-dev-rules.mdc` 和 `.cursor/rules/frontend-dev-rules.mdc`。
+

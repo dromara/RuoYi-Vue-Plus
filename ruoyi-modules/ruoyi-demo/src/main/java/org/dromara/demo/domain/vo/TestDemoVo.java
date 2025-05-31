@@ -1,7 +1,7 @@
 package org.dromara.demo.domain.vo;
 
-import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import com.alibaba.excel.annotation.ExcelProperty;
+import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
+import cn.idev.excel.annotation.ExcelProperty;
 import org.dromara.common.excel.annotation.ExcelNotation;
 import org.dromara.common.excel.annotation.ExcelRequired;
 import org.dromara.common.translation.annotation.Translation;

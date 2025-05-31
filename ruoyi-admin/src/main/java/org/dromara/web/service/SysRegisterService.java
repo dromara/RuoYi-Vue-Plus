@@ -1,6 +1,6 @@
 package org.dromara.web.service;
 
-import cn.dev33.satoken.secure.BCrypt;
+import cn.hutool.crypto.digest.BCrypt;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.Constants;

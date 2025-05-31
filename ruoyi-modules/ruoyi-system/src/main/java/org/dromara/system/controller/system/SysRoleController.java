@@ -1,6 +1,7 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.hutool.core.lang.tree.Tree;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
@@ -14,7 +15,6 @@ import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.bo.SysDeptBo;
 import org.dromara.system.domain.bo.SysRoleBo;
 import org.dromara.system.domain.bo.SysUserBo;
-import org.dromara.system.domain.vo.DeptTreeSelectVo;
 import org.dromara.system.domain.vo.SysRoleVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.service.ISysDeptService;
@@ -221,9 +221,12 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:list")
     @GetMapping(value = "/deptTree/{roleId}")
     public R<DeptTreeSelectVo> roleDeptTreeselect(@PathVariable("roleId") Long roleId) {
-        DeptTreeSelectVo selectVo = new DeptTreeSelectVo();
-        selectVo.setCheckedKeys(deptService.selectDeptListByRoleId(roleId));
-        selectVo.setDepts(deptService.selectDeptTreeList(new SysDeptBo()));
+        DeptTreeSelectVo selectVo = new DeptTreeSelectVo(
+            deptService.selectDeptListByRoleId(roleId),
+            deptService.selectDeptTreeList(new SysDeptBo()));
         return R.ok(selectVo);
     }
+
+    public record DeptTreeSelectVo(List<Long> checkedKeys, List<Tree<Long>> depts) {}
+
 }

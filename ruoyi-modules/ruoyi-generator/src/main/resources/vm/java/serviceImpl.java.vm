@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ${packageName}.domain.bo.${ClassName}Bo;
 import ${packageName}.domain.vo.${ClassName}Vo;
@@ -27,6 +28,7 @@ import java.util.Collection;
  * @author ${author}
  * @date ${datetime}
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ${ClassName}ServiceImpl implements I${ClassName}Service {

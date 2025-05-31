@@ -1,10 +1,9 @@
 package org.dromara.system.controller.monitor;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.system.domain.vo.CacheListInfoVo;
-import lombok.RequiredArgsConstructor;
 import org.redisson.spring.data.connection.RedissonConnectionFactory;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,11 +44,11 @@ public class CacheController {
             });
         }
 
-        CacheListInfoVo infoVo = new CacheListInfoVo();
-        infoVo.setInfo(connection.commands().info());
-        infoVo.setDbSize(connection.commands().dbSize());
-        infoVo.setCommandStats(pieList);
-        return R.ok(infoVo);
+        return R.ok(new CacheListInfoVo(
+            connection.commands().info(),
+            connection.commands().dbSize(), pieList));
     }
+
+    public record CacheListInfoVo(Properties info, Long dbSize, List<Map<String, String>> commandStats) {}
 
 }

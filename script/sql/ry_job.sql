@@ -84,7 +84,9 @@ CREATE TABLE `sj_retry_dead_letter`
     `id`            bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`  varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
     `group_name`    varchar(64)         NOT NULL COMMENT '组名称',
+    `group_id`      bigint(20)          NOT NULL COMMENT '组Id',
     `scene_name`    varchar(64)         NOT NULL COMMENT '场景名称',
+    `scene_id`      bigint(20)          NOT NULL COMMENT '场景ID',
     `idempotent_id` varchar(64)         NOT NULL COMMENT '幂等id',
     `biz_no`        varchar(64)         NOT NULL DEFAULT '' COMMENT '业务编号',
     `executor_name` varchar(512)        NOT NULL DEFAULT '' COMMENT '执行器名称',
@@ -105,7 +107,9 @@ CREATE TABLE `sj_retry`
     `id`              bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
     `namespace_id`    varchar(64)         NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' COMMENT '命名空间id',
     `group_name`      varchar(64)         NOT NULL COMMENT '组名称',
+    `group_id`        bigint(20)          NOT NULL COMMENT '组Id',
     `scene_name`      varchar(64)         NOT NULL COMMENT '场景名称',
+    `scene_id`        bigint(20)          NOT NULL COMMENT '场景ID',
     `idempotent_id`   varchar(64)         NOT NULL COMMENT '幂等id',
     `biz_no`          varchar(64)         NOT NULL DEFAULT '' COMMENT '业务编号',
     `executor_name`   varchar(512)        NOT NULL DEFAULT '' COMMENT '执行器名称',
@@ -121,13 +125,12 @@ CREATE TABLE `sj_retry`
     `create_dt`       datetime            NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_dt`       datetime            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     PRIMARY KEY (`id`),
-    KEY `idx_namespace_id_group_name_scene_name` (`namespace_id`, `group_name`, `scene_name`),
-    KEY `idx_namespace_id_group_name_retry_status` (`namespace_id`, `group_name`, `retry_status`),
-    KEY `idx_idempotent_id` (`idempotent_id`),
     KEY `idx_biz_no` (`biz_no`),
+    KEY `idx_idempotent_id` (`idempotent_id`),
+    KEY `idx_retry_status_bucket_index` (`retry_status`, `bucket_index`),
     KEY `idx_parent_id` (`parent_id`),
     KEY `idx_create_dt` (`create_dt`),
-    UNIQUE KEY `uk_name_task_type_idempotent_id_deleted` (`namespace_id`, `group_name`, `task_type`, `idempotent_id`, `deleted`)
+    UNIQUE KEY `uk_scene_tasktype_idempotentid_deleted` (`scene_id`, `task_type`, `idempotent_id`, `deleted`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 0
   DEFAULT CHARSET = utf8mb4 COMMENT ='重试信息表';

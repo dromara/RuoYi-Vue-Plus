@@ -108,7 +108,7 @@ public class EncryptUtils {
     }
 
     /**
-     * sm4加密
+     * SM4加密（Base64编码）
      *
      * @param data     待加密数据
      * @param password 秘钥字符串
@@ -127,11 +127,11 @@ public class EncryptUtils {
     }
 
     /**
-     * sm4加密
+     * SM4加密（Hex编码）
      *
      * @param data     待加密数据
      * @param password 秘钥字符串
-     * @return 加密后字符串, 采用Base64编码
+     * @return 加密后字符串, 采用Hex编码
      */
     public static String encryptBySm4Hex(String data, String password) {
         if (StrUtil.isBlank(password)) {
@@ -148,7 +148,7 @@ public class EncryptUtils {
     /**
      * sm4解密
      *
-     * @param data     待解密数据
+     * @param data     待解密数据（可以是Base64或Hex编码）
      * @param password 秘钥字符串
      * @return 解密后字符串
      */

@@ -80,6 +80,7 @@
         v-loading="loading"
         :data="${businessName}List"
         row-key="${treeCode}"
+        border
         :default-expand-all="isExpandAll"
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       >

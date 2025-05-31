@@ -5,7 +5,6 @@ import lombok.Getter;
 
 /**
  * 设备类型
- * 针对一套 用户体系
  *
  * @author Lion Li
  */
@@ -29,9 +28,12 @@ public enum DeviceType {
     XCX("xcx"),
 
     /**
-     * social第三方端
+     * 第三方社交登录平台
      */
     SOCIAL("social");
 
+    /**
+     * 设备标识
+     */
     private final String device;
 }

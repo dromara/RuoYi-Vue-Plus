@@ -1,12 +1,11 @@
 package org.dromara.common.core.enums;
 
-import org.dromara.common.core.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.dromara.common.core.utils.StringUtils;
 
 /**
- * 设备类型
- * 针对多套 用户体系
+ * 用户类型
  *
  * @author Lion Li
  */
@@ -15,15 +14,18 @@ import lombok.Getter;
 public enum UserType {
 
     /**
-     * pc端
+     * 后台系统用户
      */
     SYS_USER("sys_user"),
 
     /**
-     * app端
+     * 移动客户端用户
      */
     APP_USER("app_user");
 
+    /**
+     * 用户类型标识（用于 token、权限识别等）
+     */
     private final String userType;
 
     public static UserType getUserType(String str) {

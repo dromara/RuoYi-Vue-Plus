@@ -5,6 +5,7 @@ import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.warm.flow.core.entity.Node;
+import org.dromara.warm.flow.core.entity.Task;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
 import org.dromara.warm.flow.orm.entity.FlowNode;
 import org.dromara.warm.flow.orm.entity.FlowTask;
@@ -37,6 +38,14 @@ public interface IFlwTaskService {
      * @return 结果
      */
     boolean completeTask(CompleteTaskBo completeTaskBo);
+
+    /**
+     * 添加抄送人
+     *
+     * @param task         任务信息
+     * @param flowCopyList 抄送人
+     */
+    void setCopy(Task task, List<FlowCopyBo> flowCopyList);
 
     /**
      * 查询当前用户的待办任务

@@ -13,7 +13,7 @@ import org.dromara.common.core.utils.reflect.ReflectUtils;
  */
 public class EnumPatternValidator implements ConstraintValidator<EnumPattern, String> {
 
-    private EnumPattern annotation;;
+    private EnumPattern annotation;
 
     @Override
     public void initialize(EnumPattern annotation) {

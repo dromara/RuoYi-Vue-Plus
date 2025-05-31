@@ -3,7 +3,7 @@
 -- ----------------------------
 CREATE TABLE `flow_definition`
 (
-    `id`              bigint unsigned NOT NULL COMMENT '主键id',
+    `id`              bigint          NOT NULL COMMENT '主键id',
     `flow_code`       varchar(40)     NOT NULL COMMENT '流程编码',
     `flow_name`       varchar(100)    NOT NULL COMMENT '流程名称',
     `category`        varchar(100)             DEFAULT NULL COMMENT '流程类别',
@@ -50,7 +50,7 @@ CREATE TABLE `flow_node`
 
 CREATE TABLE `flow_skip`
 (
-    `id`             bigint unsigned NOT NULL COMMENT '主键id',
+    `id`             bigint       NOT NULL COMMENT '主键id',
     `definition_id`  bigint          NOT NULL COMMENT '流程定义id',
     `now_node_code`  varchar(100)    NOT NULL COMMENT '当前流程节点的编码',
     `now_node_type`  tinyint(1)   DEFAULT NULL COMMENT '当前节点类型（0开始节点 1中间节点 2结束节点 3互斥网关 4并行网关）',
@@ -76,7 +76,7 @@ CREATE TABLE `flow_instance`
     `node_code`       varchar(40) NOT NULL COMMENT '流程节点编码',
     `node_name`       varchar(100)         DEFAULT NULL COMMENT '流程节点名称',
     `variable`        text COMMENT '任务变量',
-    `flow_status`     varchar(20) NOT NULL COMMENT '流程状态（0待提交 1审批中 2 审批通过 3自动通过 4终止 5作废 6撤销 7取回  8已完成 9已退回 10失效）',
+    `flow_status`     varchar(20) NOT NULL COMMENT '流程状态（0待提交 1审批中 2审批通过 4终止 5作废 6撤销 8已完成 9已退回 10失效 11拿回）',
     `activity_status` tinyint(1)  NOT NULL DEFAULT '1' COMMENT '流程激活状态（0挂起 1激活）',
     `def_json`        text COMMENT '流程定义json',
     `create_by`       varchar(64)          DEFAULT '' COMMENT '创建者',
@@ -96,6 +96,7 @@ CREATE TABLE `flow_task`
     `node_code`     varchar(100) NOT NULL COMMENT '节点编码',
     `node_name`     varchar(100) DEFAULT NULL COMMENT '节点名称',
     `node_type`     tinyint(1)   NOT NULL COMMENT '节点类型（0开始节点 1中间节点 2结束节点 3互斥网关 4并行网关）',
+    `flow_status`   varchar(20)  NOT NULL COMMENT '流程状态（0待提交 1审批中 2审批通过 4终止 5作废 6撤销 8已完成 9已退回 10失效 11拿回）',
     `form_custom`   char(1)      DEFAULT 'N' COMMENT '审批表单是否自定义（Y是 N否）',
     `form_path`     varchar(100) DEFAULT NULL COMMENT '审批表单路径',
     `create_time`   datetime     DEFAULT NULL COMMENT '创建时间',
@@ -107,7 +108,7 @@ CREATE TABLE `flow_task`
 
 CREATE TABLE `flow_his_task`
 (
-    `id`               bigint(20) unsigned NOT NULL COMMENT '主键id',
+    `id`               bigint(20)          NOT NULL COMMENT '主键id',
     `definition_id`    bigint(20)          NOT NULL COMMENT '对应flow_definition表的id',
     `instance_id`      bigint(20)          NOT NULL COMMENT '对应flow_instance表的id',
     `task_id`          bigint(20)          NOT NULL COMMENT '对应flow_task表的id',
@@ -120,7 +121,7 @@ CREATE TABLE `flow_his_task`
     `cooperate_type`   tinyint(1)          NOT NULL DEFAULT '0' COMMENT '协作方式(1审批 2转办 3委派 4会签 5票签 6加签 7减签)',
     `collaborator`     varchar(40)                  DEFAULT NULL COMMENT '协作人',
     `skip_type`        varchar(10)         NOT NULL COMMENT '流转类型（PASS通过 REJECT退回 NONE无动作）',
-    `flow_status`      varchar(20)         NOT NULL COMMENT '流程状态（1审批中 2 审批通过 9已退回 10失效）',
+    `flow_status`      varchar(20)         NOT NULL COMMENT '流程状态（0待提交 1审批中 2审批通过 4终止 5作废 6撤销 8已完成 9已退回 10失效 11拿回）',
     `form_custom`      char(1)                      DEFAULT 'N' COMMENT '审批表单是否自定义（Y是 N否）',
     `form_path`        varchar(100)                 DEFAULT NULL COMMENT '审批表单路径',
     `message`          varchar(500)                 DEFAULT NULL COMMENT '审批意见',
@@ -136,7 +137,7 @@ CREATE TABLE `flow_his_task`
 
 CREATE TABLE `flow_user`
 (
-    `id`           bigint unsigned NOT NULL COMMENT '主键id',
+    `id`           bigint      NOT NULL COMMENT '主键id',
     `type`         char(1)         NOT NULL COMMENT '人员类型（1待办任务的审批人权限 2待办任务的转办人权限 3待办任务的委托人权限）',
     `processed_by` varchar(80) DEFAULT NULL COMMENT '权限人',
     `associated`   bigint          NOT NULL COMMENT '任务表id',
@@ -213,6 +214,8 @@ insert into sys_menu values ('11622', '流程分类', '11616', '1', 'category', 
 insert into sys_menu values ('11629', '我发起的', '11618', '1', 'myDocument', 'workflow/task/myDocument', '', '1', '1', 'C', '0', '0', '', 'guide', 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11630', '流程监控', '11616', '4', 'monitor', '', '', '1', '0', 'M', '0', '0', '', 'monitor', 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11631', '待办任务', '11630', '2', 'allTaskWaiting', 'workflow/task/allTaskWaiting', '', '1', '1', 'C', '0', '0', '', 'waiting', 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11700', '流程设计', '11616', '5', 'design/index',   'workflow/processDefinition/design', '', 1, 1, 'C', '1', '0', 'workflow:leave:edit', '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values ('11701', '请假申请', '11616', '6', 'leaveEdit/index', 'workflow/leave/leaveEdit', '', 1, 1, 'C', '1', '0', 'workflow:leave:edit', '#', 103, 1, sysdate(), null, null, '');
 -- 流程分类管理相关按钮
 insert into sys_menu values ('11623', '流程分类查询', '11622', '1', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:query', '#', 103, 1,sysdate(), null, null, '');
 insert into sys_menu values ('11624', '流程分类新增', '11622', '2', '#', '', '', 1, 0, 'F', '0', '0', 'workflow:category:add', '#', 103, 1,sysdate(), null, null, '');

@@ -21,8 +21,8 @@ server:
       worker: 256
 
 captcha:
+  # 是否启用验证码校验
   enable: true
-  # 页面 <参数设置> 可开启关闭 验证码校验
   # 验证码类型 math 数组计算 char 字符验证
   type: MATH
   # line 线段干扰 circle 圆圈干扰 shear 扭曲干扰
@@ -35,7 +35,7 @@ captcha:
 # 日志配置
 logging:
   level:
-    org.dromara: info
+    org.dromara: @logging.level@
     org.springframework: warn
     org.mybatis.spring.mapper: error
     org.apache.fury: warn
@@ -62,7 +62,7 @@ spring:
     # 国际化资源文件路径
     basename: i18n/messages
   profiles:
-    active: dev
+    active: @profiles.active@
   # 文件上传
   servlet:
     multipart:
@@ -110,7 +110,7 @@ security:
     - /error
     - /*/api-docs
     - /*/api-docs/**
-    - /warm-flow-ui/token-name
+    - /warm-flow-ui/config
 
 # 多租户配置
 tenant:
@@ -127,9 +127,6 @@ tenant:
     - sys_user_role
     - sys_client
     - sys_oss_config
-    # PMS供应商合作伙伴表 (支持全局共享，排除多租户拦截器)
-    - pms_suppliers           # 供应商信息  
-    - pms_partners           # 合作伙伴信息
 
 # MyBatisPlus配置
 # https://baomidou.com/config/
@@ -180,9 +177,6 @@ springdoc:
   api-docs:
     # 是否开启接口文档
     enabled: true
-#  swagger-ui:
-#    # 持久化认证数据
-#    persistAuthorization: true
   info:
     # 标题
     title: '标题：RuoYi-Vue-Plus多租户管理系统_接口文档'
@@ -214,8 +208,6 @@ springdoc:
       packages-to-scan: org.dromara.generator
     - group: 5.工作流模块
       packages-to-scan: org.dromara.workflow
-    - group: 6.PMS民宿管理模块
-      packages-to-scan: org.dromara.pms
 
 # 防止XSS攻击
 xss:
@@ -284,4 +276,3 @@ warm-flow:
     - 255,205,23
     ## 已办理
     - 157,255,0
-

@@ -49,8 +49,8 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
     public TaskAssigneeDTO selectRolesByTaskAssigneeList(TaskAssigneeBody taskQuery) {
         PageQuery pageQuery = new PageQuery(taskQuery.getPageSize(), taskQuery.getPageNum());
         SysRoleBo bo = new SysRoleBo();
-        bo.setRoleName(taskQuery.getHandlerCode());
-        bo.setRoleKey(taskQuery.getHandlerName());
+        bo.setRoleKey(taskQuery.getHandlerCode());
+        bo.setRoleName(taskQuery.getHandlerName());
         Map<String, Object> params = bo.getParams();
         params.put("beginTime", taskQuery.getBeginTime());
         params.put("endTime", taskQuery.getEndTime());

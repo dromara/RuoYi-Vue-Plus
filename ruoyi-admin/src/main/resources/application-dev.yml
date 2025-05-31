@@ -1,19 +1,19 @@
 --- # 监控中心配置
 spring.boot.admin.client:
   # 增加客户端开关
-  enabled: false
+  enabled: true
   url: http://localhost:9090/admin
   instance:
     service-host-type: IP
     metadata:
       username: ${spring.boot.admin.client.username}
       userpassword: ${spring.boot.admin.client.password}
-  username: ruoyi
-  password: 123456
+  username: @monitor.username@
+  password: @monitor.password@
 
 --- # snail-job 配置
 snail-job:
-  enabled: false
+  enabled: true
   # 需要在 SnailJob 后台组管理创建对应名称的组,然后创建任务的时候选择对应的组,才能正确分派任务
   group: "ruoyi_group"
   # SnailJob 接入验证令牌 详见 script/sql/ry_job.sql `sj_group_config` 表
@@ -49,9 +49,9 @@ spring:
           driverClassName: com.mysql.cj.jdbc.Driver
           # jdbc 所有参数配置参考 https://lionli.blog.csdn.net/article/details/122018562
           # rewriteBatchedStatements=true 批处理优化 大幅提升批量插入更新删除性能(对数据库有性能损耗 使用批量操作应考虑性能问题)
-          url: jdbc:mysql://111.229.149.206:3306/ruoyi?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
-          username: ruoyi
-          password: 4yHmmhKyRYNWeRWk
+          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+          username: root
+          password: root
 #        # 从库数据源
 #        slave:
 #          lazy: true
@@ -104,7 +104,7 @@ spring.data:
     # 数据库索引
     database: 0
     # redis 密码必须配置
-    # password: ''
+    password: ruoyi123
     # 连接超时时间
     timeout: 10s
     # 是否开启ssl
@@ -263,5 +263,10 @@ justauth:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
       redirect-uri: ${justauth.address}/social-callback?source=gitlab
-
-
+    gitea:
+      # 前端改动 https://gitee.com/JavaLionLi/plus-ui/pulls/204
+      # gitea 服务器地址
+      server-url: https://demo.gitea.com
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=gitea

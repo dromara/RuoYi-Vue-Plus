@@ -9,7 +9,6 @@ import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -168,12 +167,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 return gen;
             }).sorted(Comparator.comparing(GenTable::getCreateTime).reversed())
             .toList();
-
-        IPage<GenTable> page = pageQuery.build();
-        page.setTotal(tables.size());
-        // 手动分页 set数据
-        page.setRecords(CollUtil.page((int) page.getCurrent() - 1, (int) page.getSize(), tables));
-        return TableDataInfo.build(page);
+        return TableDataInfo.build(tables, pageQuery.build());
     }
 
     /**

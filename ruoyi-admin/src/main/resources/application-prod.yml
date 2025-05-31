@@ -11,8 +11,8 @@ spring.boot.admin.client:
     metadata:
       username: ${spring.boot.admin.client.username}
       userpassword: ${spring.boot.admin.client.password}
-  username: ruoyi
-  password: 123456
+  username: @monitor.username@
+  password: @monitor.password@
 
 --- # snail-job 配置
 snail-job:
@@ -265,4 +265,10 @@ justauth:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
       redirect-uri: ${justauth.address}/social-callback?source=gitlab
-
+    gitea:
+      # 前端改动 https://gitee.com/JavaLionLi/plus-ui/pulls/204
+      # gitea 服务器地址
+      server-url: https://demo.gitea.com
+      client-id: 10**********6
+      client-secret: 1f7d08**********5b7**********29e
+      redirect-uri: ${justauth.address}/social-callback?source=gitea

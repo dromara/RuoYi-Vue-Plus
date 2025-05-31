@@ -1,0 +1,209 @@
+---
+description:
+globs: *.ts,*.vue,ruoyi-plus-soybean/*
+alwaysApply: false
+---
+## RuoYi-Vue-Plus (Soybean Admin Pro) 前端开发 Cursor Rules
+
+本规则用于指导 RuoYi-Vue-Plus (Soybean Admin Pro) 前端项目的高效二次开发。
+
+### 1. 目录结构与组件规范
+- **技术栈**: Vue 3 Composition API + `<script setup>` + TypeScript
+- **UI组件库**: 直接使用 Naive UI 组件 (`n-button`, `n-input`, `n-data-table`, `n-form`,
+`n-select` 等)
+- 页面组件: `src/views/模块/`
+- API服务: `src/service/api/模块/`
+- 类型定义: `src/typings/api/模块/`
+- 专属组件: `src/components/模块/`
+- 路由配置: `src/router/routes/modules/模块.ts`
+
+### 2. hooks 使用规范
+- hooks 路径必须为 `@/hooks/common/xxx` 或 `@/hooks/business/xxx`，禁止 web/ 目录
+- 表格/表单 hooks 必须用官方 hooks（如 useTable、useNaiveForm、useFormRules）
+- 禁止自定义封装（如 TablePro、QueryBar）
+
+### 3. 表单校验与类型安全
+- 推荐使用 patternRules，常用校验片段：
+  ```ts
+  import { useFormRules } from '@/hooks/common/form';
+  const { createRequiredRule, patternRules } = useFormRules();
+  // 手机号
+  phoneNumber: [patternRules.phone, { max: 50, message: '长度不能超过50个字符' }]
+  // 邮箱
+  email: [patternRules.email, { max: 255, message: '长度不能超过255个字符' }]
+  ```
+- 所有表单、API、组件 props 必须有类型定义，禁止 any
+
+### 4. 权限控制
+- 只允许 `v-if="hasAuth('模块:资源:操作')"`，禁止 v-hasPermi
+- 示例：
+  ```vue
+  <n-button v-if="hasAuth('pms:contacts:add')">新增</n-button>
+  ```
+
+### 5. 国际化
+- 所有页面、组件、API 错误提示必须用 i18n，禁止硬编码中文
+- 示例：
+  ```ts
+  import { t } from '@/locales';
+  message.error(t('common.error'));
+  ```
+
+#### 5.1 国际化文件模块拆分规范
+- **拆分原则**: 当主国际化文件超过800行时，应按模块拆分
+- **重复定义清理**: 模块化后必须清理主文件中的重复定义，避免冗余
+- **目录结构**:
+  ```
+  src/locales/langs/
+  ├── modules/           # 模块化国际化文件
+  │   ├── pms.zh-cn.ts  # PMS模块中文国际化
+  │   ├── pms.en-us.ts  # PMS模块英文国际化
+  │   ├── system.zh-cn.ts # 系统模块中文国际化
+  │   ├── system.en-us.ts # 系统模块英文国际化
+  │   └── monitor.zh-cn.ts # 监控模块中文国际化
+  │   └── monitor.en-us.ts # 监控模块英文国际化
+  ├── zh-cn.ts          # 主中文文件（导入模块）
+  └── en-us.ts          # 主英文文件（导入模块）
+  ```
+- **模块文件命名**: 使用 `{模块名}.{语言}.ts` 格式，如 `pms.zh-cn.ts`, `pms.en-us.ts`
+- **导出规范**: 每个模块文件导出一个默认对象，包含route和page两个部分
+- **内容结构**:
+  ```ts
+  // pms.zh-cn.ts
+  const pmsZhCn = {
+    route: {}, // 路由标题
+    page: {}   // 页面内容
+  };
+  export default pmsZhCn;
+
+  // pms.en-us.ts
+  const pmsEnUs = {
+    route: {}, // 路由标题
+    page: {}   // 页面内容
+  };
+  export default pmsEnUs;
+  ```
+- **主文件集成**: 在主国际化文件中导入并合并模块
+  ```ts
+  // zh-cn.ts
+  import pms from './modules/pms.zh-cn';
+  // 在route中: ...pms.route
+  // 在page.system中: pms: pms.page
+
+  // en-us.ts
+  import pmsEnUs from './modules/pms.en-us';
+  // 在route中: ...pmsEnUs.route
+  // 在page.system中: pms: pmsEnUs.page
+  ```
+- **使用方式**: 保持原有的 `t('route.pms')` 调用方式不变
+
+### 6. 路由与菜单
+- 路由配置必须在 `src/router/routes/modules/模块.ts`
+- 菜单权限与后端一致，meta.perms 字段与后端 @SaCheckPermission 保持一致
+
+#### 6.1 路由命名规范 ⚠️重要
+
+##### 核心规则
+- **路由名称**: `{模块名}_{功能名}`，多词功能名用连字符 `-` 连接
+- **路由路径**: `/{模块名}/{功能名}`，与路由名称保持一致
+- **组件映射**: PascalCase 格式，多词功能名去掉连字符，如 `SystemTenantPackage`、`PmsRoomType`、`PmsRoomLock`
+- **文件目录**: 使用连字符分隔，如 `src/views/pms/room-type/index.vue`
+
+##### 示例对照
+```typescript
+// 路由配置 (src/router/elegant/routes.ts)
+{
+  name: 'pms_room-type',                    // 路由名称
+  path: '/pms/room-type',                   // 路由路径
+  component: 'view.pms_room-type',          // 组件引用
+  meta: {
+    title: 'pms_room-type',
+    i18nKey: 'route.pms_room-type'          // 国际化键
+  }
+}
+
+// 组件映射 (src/router/_generated/imports.ts)
+PmsRoomType: () => import("@/views/pms/room-type/index.vue"),
+
+// 文件目录
+src/views/pms/room-type/index.vue
+```
+
+##### 国际化规则
+- **路由国际化键**: 使用 `route.{路由名称}` 格式
+- **页面国际化键**: 使用 `page.{模块名}.{功能名}` 格式，功能名去掉连字符
+- **示例**:
+```typescript
+// 国际化文件 zh-cn.ts
+route: {
+  'pms_room-type': '房型管理',
+  'pms_room-lock': '房间锁定管理'
+},
+page: {
+  pms: {
+    roomType: {
+      title: '房型管理',
+      addRoomType: '新增房型',
+      editRoomType: '编辑房型'
+    },
+    roomLock: {
+      title: '房间锁定管理',
+      addRoomLock: '新增锁定',
+      editRoomLock: '编辑锁定'
+    }
+  }
+}
+```
+
+### 7. 类型安全与常见错误
+- 表单 rules 类型错误：rules 类型应为 `FormRules`，推荐用 useFormRules 工具
+- API 返回值类型错误：所有 API 必须有类型定义，禁止 any
+- hooks 路径错误：必须 '@/hooks/common/xxx'，禁止 web/ 目录
+- 权限指令错误：禁止 v-hasPermi，统一用 hasAuth
+
+### 8. 推荐代码片段
+- 表单 hooks：
+  ```ts
+  import { useNaiveForm, useFormRules } from '@/hooks/common/form';
+  const { formRef, validate } = useNaiveForm();
+  const { createRequiredRule, patternRules } = useFormRules();
+  ```
+- 字典 hooks：
+  ```ts
+  import { useDict } from '@/hooks/business/dict';
+  const { options: typeOptions } = useDict('pms_contact_type');
+  ```
+- 权限 hooks：
+  ```ts
+  import { hasAuth } from '@/hooks/business/auth';
+  ```
+
+### 9. 其他规范
+- 组件、API、类型、hooks 路径、国际化、权限、表单校验等必须符合上述规范
+- 代码风格遵循官方 ESLint/Prettier 规范
+
+### 10. 前端 API 开发规范
+
+1.  **API 文件位置**:
+    *   通用 API 文件（如认证、路由）可直接存放在 `src/service/api/` 目录下。
+    *   特定模块的 API 文件必须存放在 `src/service/api/[模块名]/` 目录下。
+2.  **API 文件命名**:
+    *   使用简洁、描述性的单数名词或名词短语作为文件名，例如 `user.ts`, `role.ts`, `contact.ts`, `tag.ts`。
+    *   避免在文件名中重复模块名或层级信息（如 `user-api.ts` 或 `api-user.ts`）。
+3.  **API 函数命名**:
+    *   统一使用以下前缀约定：
+        *   查询列表/获取资源集合: `fetchXxxList`
+        *   获取单个资源详情: `fetchXxxDetail`
+        *   新增资源: `addXxx`
+        *   修改资源: `updateXxx`
+        *   删除资源: `deleteXxx`
+        *   其他操作: 使用动词开头，清晰表达功能 (如 `saveContactTags`, `checkRelationExists`)
+    *   函数名应使用驼峰命名法 (camelCase)。
+4.  **模块导出**:
+    *   特定模块的 `src/service/api/[模块名]/` 目录下应包含一个 `index.ts` 文件，用于统一导出该模块的所有 API 函数。
+    *   主 `src/service/api/index.ts` 文件应导入并导出所有模块的 `index.ts` 以及根目录下的通用 API 文件。
+
+---
+如需更多示例，请参考 ruoyi-plus-soybean 模块实际代码。
+
+

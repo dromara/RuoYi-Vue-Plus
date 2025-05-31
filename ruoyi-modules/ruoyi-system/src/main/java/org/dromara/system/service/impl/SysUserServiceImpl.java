@@ -35,10 +35,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用户 业务层处理
@@ -81,6 +79,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
             .eq(ObjectUtil.isNotNull(user.getUserId()), "u.user_id", user.getUserId())
             .in(StringUtils.isNotBlank(user.getUserIds()), "u.user_id", StringUtils.splitTo(user.getUserIds(), Convert::toLong))
             .like(StringUtils.isNotBlank(user.getUserName()), "u.user_name", user.getUserName())
+            .like(StringUtils.isNotBlank(user.getNickName()), "u.nick_name", user.getNickName())
             .eq(StringUtils.isNotBlank(user.getStatus()), "u.status", user.getStatus())
             .like(StringUtils.isNotBlank(user.getPhonenumber()), "u.phonenumber", user.getPhonenumber())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
@@ -718,6 +717,82 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         Set<Long> userIds = StreamUtils.toSet(userPosts, SysUserPost::getUserId);
 
         return selectListByIds(new ArrayList<>(userIds));
+    }
+
+    /**
+     * 根据用户 ID 列表查询用户名称映射关系
+     *
+     * @param userIds 用户 ID 列表
+     * @return Map，其中 key 为用户 ID，value 为对应的用户名称
+     */
+    @Override
+    public Map<Long, String> selectUserNamesByIds(List<Long> userIds) {
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyMap();
+        }
+        return baseMapper.selectList(
+                new LambdaQueryWrapper<SysUser>()
+                    .select(SysUser::getUserId, SysUser::getNickName)
+                    .in(SysUser::getUserId, userIds)
+            ).stream()
+            .collect(Collectors.toMap(SysUser::getUserId, SysUser::getNickName));
+    }
+
+    /**
+     * 根据角色 ID 列表查询角色名称映射关系
+     *
+     * @param roleIds 角色 ID 列表
+     * @return Map，其中 key 为角色 ID，value 为对应的角色名称
+     */
+    @Override
+    public Map<Long, String> selectRoleNamesByIds(List<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return Collections.emptyMap();
+        }
+        return roleMapper.selectList(
+                new LambdaQueryWrapper<SysRole>()
+                    .select(SysRole::getRoleId, SysRole::getRoleName)
+                    .in(SysRole::getRoleId, roleIds)
+            ).stream()
+            .collect(Collectors.toMap(SysRole::getRoleId, SysRole::getRoleName));
+    }
+
+    /**
+     * 根据部门 ID 列表查询部门名称映射关系
+     *
+     * @param deptIds 部门 ID 列表
+     * @return Map，其中 key 为部门 ID，value 为对应的部门名称
+     */
+    @Override
+    public Map<Long, String> selectDeptNamesByIds(List<Long> deptIds) {
+        if (CollUtil.isEmpty(deptIds)) {
+            return Collections.emptyMap();
+        }
+        return deptMapper.selectList(
+                new LambdaQueryWrapper<SysDept>()
+                    .select(SysDept::getDeptId, SysDept::getDeptName)
+                    .in(SysDept::getDeptId, deptIds)
+            ).stream()
+            .collect(Collectors.toMap(SysDept::getDeptId, SysDept::getDeptName));
+    }
+
+    /**
+     * 根据岗位 ID 列表查询岗位名称映射关系
+     *
+     * @param postIds 岗位 ID 列表
+     * @return Map，其中 key 为岗位 ID，value 为对应的岗位名称
+     */
+    @Override
+    public Map<Long, String> selectPostNamesByIds(List<Long> postIds) {
+        if (CollUtil.isEmpty(postIds)) {
+            return Collections.emptyMap();
+        }
+        return postMapper.selectList(
+                new LambdaQueryWrapper<SysPost>()
+                    .select(SysPost::getPostId, SysPost::getPostName)
+                    .in(SysPost::getPostId, postIds)
+            ).stream()
+            .collect(Collectors.toMap(SysPost::getPostId, SysPost::getPostName));
     }
 
 }

@@ -78,9 +78,18 @@ public interface WorkflowService {
 
     /**
      * 办理任务
+     * 系统后台发起审批 无用户信息 需要忽略权限
+     * completeTask.getVariables().put("ignore", true);
      *
      * @param completeTask 参数
-     * @return 结果
      */
     boolean completeTask(CompleteTaskDTO completeTask);
+
+    /**
+     * 办理任务
+     *
+     * @param taskId  任务ID
+     * @param message 办理意见
+     */
+    boolean completeTask(Long taskId, String message);
 }
