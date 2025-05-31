@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.pms.mapper.PmsPricingCalculationMapper">
+
+    <resultMap type="org.dromara.pms.domain.PmsPricingCalculation" id="PmsPricingCalculationResult">
+        <result property="calculationId" column="calculation_id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="roomTypeId" column="room_type_id"/>
+        <result property="checkInDate" column="check_in_date"/>
+        <result property="checkOutDate" column="check_out_date"/>
+        <result property="numAdults" column="num_adults"/>
+        <result property="numChildren" column="num_children"/>
+        <result property="channelCode" column="channel_code"/>
+        <result property="memberLevel" column="member_level"/>
+        <result property="advanceBookingDays" column="advance_booking_days"/>
+        <result property="basePrice" column="base_price"/>
+        <result property="finalPrice" column="final_price"/>
+        <result property="totalDiscount" column="total_discount"/>
+        <result property="appliedRulesJson" column="applied_rules"/>
+        <result property="calculationContextJson" column="calculation_context"/>
+        <result property="calculationTime" column="calculation_time"/>
+        <result property="calculationSource" column="calculation_source"/>
+        <result property="orderId" column="order_id"/>
+        <result property="isFinalBooking" column="is_final_booking"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <sql id="selectPmsPricingCalculationVo">
+        select calculation_id, tenant_id, dept_id, room_type_id, check_in_date, check_out_date,
+               num_adults, num_children, channel_code, member_level, advance_booking_days,
+               base_price, final_price, total_discount, applied_rules, calculation_context,
+               calculation_time, calculation_source, order_id, is_final_booking,
+               create_by, create_time, update_by, update_time, del_flag
+        from pms_pricing_calculations
+    </sql>
+
+    <!-- 查询价格趋势数据 -->
+    <select id="selectPriceTrend" resultType="java.util.Map">
+        SELECT
+            DATE(check_in_date) as date,
+            AVG(final_price) as avg_price,
+            MIN(final_price) as min_price,
+            MAX(final_price) as max_price,
+            COUNT(*) as calculation_count
+        FROM pms_pricing_calculations
+        WHERE del_flag = '0'
+          AND tenant_id = #{tenantId}
+          AND dept_id = #{deptId}
+          AND room_type_id = #{roomTypeId}
+          AND check_in_date BETWEEN #{startDate} AND #{endDate}
+        GROUP BY DATE(check_in_date)
+        ORDER BY DATE(check_in_date)
+    </select>
+
+    <!-- 查询规则效果分析数据 -->
+    <select id="selectRuleEffectAnalysis" resultType="java.util.Map">
+        SELECT
+            DATE(calculation_time) as date,
+            COUNT(*) as usage_count,
+            AVG(total_discount) as avg_discount,
+            SUM(total_discount) as total_discount_amount,
+            AVG(final_price) as avg_final_price
+        FROM pms_pricing_calculations
+        WHERE del_flag = '0'
+          AND tenant_id = #{tenantId}
+          AND dept_id = #{deptId}
+          AND calculation_time BETWEEN #{startDate} AND #{endDate}
+          AND JSON_SEARCH(applied_rules, 'one', #{ruleId}, NULL, '$[*].ruleId') IS NOT NULL
+        GROUP BY DATE(calculation_time)
+        ORDER BY DATE(calculation_time)
+    </select>
+
+    <!-- 查询收益分析数据 -->
+    <select id="selectRevenueAnalysis" resultType="java.util.Map">
+        SELECT
+            DATE(check_in_date) as date,
+            SUM(final_price * DATEDIFF(check_out_date, check_in_date)) as total_revenue,
+            SUM(base_price * DATEDIFF(check_out_date, check_in_date)) as base_revenue,
+            SUM(total_discount * DATEDIFF(check_out_date, check_in_date)) as total_discount_amount,
+            COUNT(*) as booking_count,
+            AVG(final_price) as avg_price
+        FROM pms_pricing_calculations
+        WHERE del_flag = '0'
+          AND tenant_id = #{tenantId}
+          AND dept_id = #{deptId}
+          AND check_in_date BETWEEN #{startDate} AND #{endDate}
+          AND is_final_booking = 1
+        GROUP BY DATE(check_in_date)
+        ORDER BY DATE(check_in_date)
+    </select>
+
+    <!-- 查询平均价格 -->
+    <select id="selectAveragePrice" resultType="java.util.Map">
+        SELECT
+            AVG(final_price) as avg_final_price,
+            AVG(base_price) as avg_base_price,
+            AVG(total_discount) as avg_discount,
+            COUNT(*) as total_calculations,
+            MIN(final_price) as min_price,
+            MAX(final_price) as max_price
+        FROM pms_pricing_calculations
+        WHERE del_flag = '0'
+          AND tenant_id = #{tenantId}
+          AND dept_id = #{deptId}
+          AND room_type_id = #{roomTypeId}
+          AND check_in_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+    <!-- 查询价格分布统计 -->
+    <select id="selectPriceDistribution" resultType="java.util.Map">
+        SELECT
+            CASE
+                WHEN final_price &lt; 100 THEN '0-100'
+                WHEN final_price &lt; 200 THEN '100-200'
+                WHEN final_price &lt; 300 THEN '200-300'
+                WHEN final_price &lt; 500 THEN '300-500'
+                WHEN final_price &lt; 800 THEN '500-800'
+                ELSE '800+'
+            END as price_range,
+            COUNT(*) as count,
+            ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM pms_pricing_calculations
+                                      WHERE del_flag = '0'
+                                        AND tenant_id = #{tenantId}
+                                        AND dept_id = #{deptId}
+                                        AND room_type_id = #{roomTypeId}
+                                        AND check_in_date BETWEEN #{startDate} AND #{endDate}), 2) as percentage
+        FROM pms_pricing_calculations
+        WHERE del_flag = '0'
+          AND tenant_id = #{tenantId}
+          AND dept_id = #{deptId}
+          AND room_type_id = #{roomTypeId}
+          AND check_in_date BETWEEN #{startDate} AND #{endDate}
+        GROUP BY
+            CASE
+                WHEN final_price &lt; 100 THEN '0-100'
+                WHEN final_price &lt; 200 THEN '100-200'
+                WHEN final_price &lt; 300 THEN '200-300'
+                WHEN final_price &lt; 500 THEN '300-500'
+                WHEN final_price &lt; 800 THEN '500-800'
+                ELSE '800+'
+            END
+        ORDER BY MIN(final_price)
+    </select>
+
+    <!-- 查询渠道价格对比 -->
+    <select id="selectChannelPriceComparison" resultType="java.util.Map">
+        SELECT
+            channel_code,
+            COUNT(*) as booking_count,
+            AVG(final_price) as avg_price,
+            MIN(final_price) as min_price,
+            MAX(final_price) as max_price,
+            AVG(total_discount) as avg_discount,
+            SUM(final_price * DATEDIFF(check_out_date, check_in_date)) as total_revenue
+        FROM pms_pricing_calculations
+        WHERE del_flag = '0'
+          AND tenant_id = #{tenantId}
+          AND dept_id = #{deptId}
+          AND room_type_id = #{roomTypeId}
+          AND check_in_date BETWEEN #{startDate} AND #{endDate}
+          AND channel_code IS NOT NULL
+        GROUP BY channel_code
+        ORDER BY total_revenue DESC
+    </select>
+
+    <!-- 删除过期的计算记录 -->
+    <delete id="deleteExpiredRecords">
+        DELETE FROM pms_pricing_calculations
+        WHERE calculation_time &lt; #{beforeDate}
+          AND is_final_booking = 0
+    </delete>
+
+</mapper>

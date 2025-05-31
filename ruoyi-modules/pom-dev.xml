@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ruoyi-vue-plus</artifactId>
+        <groupId>org.dromara</groupId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 开发环境模块配置 - 只包含必要模块 -->
+    <modules>
+        <!-- 系统模块 - 核心必需 -->
+        <module>ruoyi-system</module>
+
+        <!-- PMS模块 - 主要开发模块 -->
+        <module>ruoyi-pms</module>
+
+        <!-- 以下模块在开发环境中暂时注释，提高编译和启动速度 -->
+
+        <!-- demo模块 - 开发时不需要 -->
+        <!-- <module>ruoyi-demo</module> -->
+
+        <!-- 代码生成模块 - 需要时可以取消注释 -->
+        <!-- <module>ruoyi-generator</module> -->
+
+        <!-- 任务调度模块 - 需要时可以取消注释 -->
+        <!-- <module>ruoyi-job</module> -->
+
+        <!-- 工作流模块 - 开发时暂时不需要 -->
+        <!-- <module>ruoyi-workflow</module> -->
+    </modules>
+
+    <artifactId>ruoyi-modules</artifactId>
+    <packaging>pom</packaging>
+
+    <description>
+        ruoyi-modules 业务模块 - 开发环境优化版本
+    </description>
+
+</project>

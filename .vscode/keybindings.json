@@ -1,0 +1,22 @@
+[
+  {
+    "key": "f5",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🧠 智能启动 (推荐)"
+  },
+  {
+    "key": "ctrl+f6",
+    "command": "workbench.action.tasks.runTask",
+    "args": "⚡ 零编译启动"
+  },
+  {
+    "key": "ctrl+alt+x",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🛑 停止后台编译"
+  },
+  {
+    "key": "ctrl+alt+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📦 PMS快速编译"
+  }
+]

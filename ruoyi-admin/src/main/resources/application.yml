@@ -35,7 +35,7 @@ captcha:
 # 日志配置
 logging:
   level:
-    org.dromara: @logging.level@
+    org.dromara: info
     org.springframework: warn
     org.mybatis.spring.mapper: error
     org.apache.fury: warn
@@ -62,7 +62,7 @@ spring:
     # 国际化资源文件路径
     basename: i18n/messages
   profiles:
-    active: @profiles.active@
+    active: dev
   # 文件上传
   servlet:
     multipart:
@@ -127,6 +127,9 @@ tenant:
     - sys_user_role
     - sys_client
     - sys_oss_config
+    # PMS供应商合作伙伴表 (支持全局共享，排除多租户拦截器)
+    - pms_suppliers           # 供应商信息  
+    - pms_partners           # 合作伙伴信息
 
 # MyBatisPlus配置
 # https://baomidou.com/config/
@@ -281,3 +284,4 @@ warm-flow:
     - 255,205,23
     ## 已办理
     - 157,255,0
+

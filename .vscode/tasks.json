@@ -1,0 +1,88 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🧠 智能启动 (推荐)",
+      "type": "shell",
+      "command": ".\\dev-start.ps1",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*启动应用.*",
+          "endsPattern": "^.*Started.*in.*seconds.*"
+        }
+      }
+    },
+    {
+      "label": "⚡ 零编译启动",
+      "type": "shell",
+      "command": ".\\quick-start.ps1",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*启动应用.*",
+          "endsPattern": "^.*Started.*in.*seconds.*"
+        }
+      }
+    },
+    {
+      "label": "🛑 停止后台编译",
+      "type": "shell",
+      "command": ".\\stop-background-compile.ps1",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "label": "📦 PMS快速编译",
+      "type": "shell",
+      "command": ".\\pms-compile.ps1",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [
+        "$maven-compiler-java"
+      ]
+    }
+  ]
+}

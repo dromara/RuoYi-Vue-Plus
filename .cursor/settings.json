@@ -1,0 +1,22 @@
+{
+  "cursor.cpp.intelliSenseEngine": "disabled",
+  "cursor.python.analysis.autoImportCompletions": false,
+  "cursor.java.completion.enabled": true,
+  "cursor.java.completion.maxResults": 50,
+  "cursor.indexing.excludePatterns": [
+    "**/target/**",
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/logs/**",
+    "**/temp/**",
+    "**/*.jar",
+    "**/.flattened-pom.xml",
+    "**/ruoyi-plus-soybean/node_modules/**",
+    "**/ruoyi-plus-soybean/dist/**",
+    "**/ruoyi-plus-soybean/.temp/**"
+  ],
+  "cursor.indexing.maxFileSize": "1MB",
+  "cursor.indexing.maxFiles": 10000,
+  "cursor.chat.maxTokens": 4000,
+  "cursor.general.enableLogging": false
+}

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.pms.mapper.PmsRoomPricingRuleMapper">
+
+    <resultMap type="org.dromara.pms.domain.PmsRoomPricingRule" id="PmsRoomPricingRuleResult">
+        <result property="ruleId" column="rule_id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="roomTypeId" column="room_type_id"/>
+        <result property="priceAdjustmentType" column="price_adjustment_type"/>
+        <result property="adjustmentValue" column="adjustment_value"/>
+        <result property="dateRangeStart" column="date_range_start"/>
+        <result property="dateRangeEnd" column="date_range_end"/>
+        <result property="weekdaysApplicable" column="weekdays_applicable"/>
+        <result property="channelCodes" column="channel_codes"/>
+        <result property="memberLevels" column="member_levels"/>
+        <result property="guestCountMin" column="guest_count_min"/>
+        <result property="guestCountMax" column="guest_count_max"/>
+        <result property="minLengthOfStay" column="min_length_of_stay"/>
+        <result property="maxLengthOfStay" column="max_length_of_stay"/>
+        <result property="advanceBookingDaysMin" column="advance_booking_days_min"/>
+        <result property="advanceBookingDaysMax" column="advance_booking_days_max"/>
+        <result property="minFinalPrice" column="min_final_price"/>
+        <result property="maxDiscountAmount" column="max_discount_amount"/>
+        <result property="maxDiscountPercentage" column="max_discount_percentage"/>
+        <result property="priority" column="priority"/>
+        <result property="isCombinable" column="is_combinable"/>
+        <result property="usageLimit" column="usage_limit"/>
+        <result property="usedCount" column="used_count"/>
+        <result property="effectiveStartDate" column="effective_start_date"/>
+        <result property="effectiveEndDate" column="effective_end_date"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <sql id="selectPmsRoomPricingRuleVo">
+        select rule_id, tenant_id, dept_id, name, description, room_type_id, price_adjustment_type, adjustment_value,
+               date_range_start, date_range_end, weekdays_applicable, channel_codes, member_levels,
+               guest_count_min, guest_count_max, min_length_of_stay, max_length_of_stay,
+               advance_booking_days_min, advance_booking_days_max, min_final_price, max_discount_amount,
+               max_discount_percentage, priority, is_combinable, usage_limit, used_count,
+               effective_start_date, effective_end_date, status, create_by, create_time, update_by, update_time, del_flag
+        from pms_room_pricing_rules
+    </sql>
+
+    <!-- 查询适用的价格规则 -->
+    <select id="selectApplicableRules" resultMap="PmsRoomPricingRuleResult">
+        <include refid="selectPmsRoomPricingRuleVo"/>
+        <where>
+            del_flag = '0'
+            AND status = 'active'
+            AND tenant_id = #{tenantId}
+            AND dept_id = #{deptId}
+            <!-- 房型匹配 -->
+            AND (room_type_id IS NULL OR room_type_id = #{roomTypeId})
+            <!-- 日期范围匹配 -->
+            AND (
+                (date_range_start IS NULL AND date_range_end IS NULL)
+                OR (date_range_start IS NULL AND #{checkInDate} &lt;= date_range_end)
+                OR (date_range_end IS NULL AND #{checkOutDate} >= date_range_start)
+                OR (#{checkInDate} &lt;= date_range_end AND #{checkOutDate} >= date_range_start)
+            )
+            <!-- 星期匹配 -->
+            AND (
+                weekdays_applicable IS NULL
+                OR weekdays_applicable = ''
+                OR FIND_IN_SET(DAYOFWEEK(#{checkInDate}), weekdays_applicable) > 0
+            )
+            <!-- 渠道匹配 -->
+            AND (
+                channel_codes IS NULL
+                OR channel_codes = ''
+                OR #{channelCode} IS NULL
+                OR FIND_IN_SET(#{channelCode}, channel_codes) > 0
+            )
+            <!-- 会员等级匹配 -->
+            AND (
+                member_levels IS NULL
+                OR member_levels = ''
+                OR #{memberLevel} IS NULL
+                OR FIND_IN_SET(#{memberLevel}, member_levels) > 0
+            )
+            <!-- 客人数量匹配 -->
+            AND (
+                (guest_count_min IS NULL OR #{guestCount} >= guest_count_min)
+                AND (guest_count_max IS NULL OR #{guestCount} &lt;= guest_count_max)
+            )
+            <!-- 入住天数匹配 -->
+            <if test="checkInDate != null and checkOutDate != null">
+                AND (
+                    (min_length_of_stay IS NULL OR DATEDIFF(#{checkOutDate}, #{checkInDate}) >= min_length_of_stay)
+                    AND (max_length_of_stay IS NULL OR DATEDIFF(#{checkOutDate}, #{checkInDate}) &lt;= max_length_of_stay)
+                )
+            </if>
+            <!-- 提前预订天数匹配 -->
+            AND (
+                (advance_booking_days_min IS NULL OR #{advanceBookingDays} >= advance_booking_days_min)
+                AND (advance_booking_days_max IS NULL OR #{advanceBookingDays} &lt;= advance_booking_days_max)
+            )
+            <!-- 使用次数限制 -->
+            AND (usage_limit IS NULL OR used_count &lt; usage_limit)
+            <!-- 生效日期范围 -->
+            AND (
+                (effective_start_date IS NULL OR CURDATE() >= effective_start_date)
+                AND (effective_end_date IS NULL OR CURDATE() &lt;= effective_end_date)
+            )
+        </where>
+        ORDER BY priority DESC, create_time ASC
+    </select>
+
+    <!-- 查询有效的价格规则 -->
+    <select id="selectActiveRules" resultMap="PmsRoomPricingRuleResult">
+        <include refid="selectPmsRoomPricingRuleVo"/>
+        <where>
+            del_flag = '0'
+            AND tenant_id = #{tenantId}
+            AND dept_id = #{deptId}
+            AND status = #{status}
+            AND (
+                (effective_start_date IS NULL OR CURDATE() >= effective_start_date)
+                AND (effective_end_date IS NULL OR CURDATE() &lt;= effective_end_date)
+            )
+        </where>
+        ORDER BY priority DESC, create_time ASC
+    </select>
+
+    <!-- 更新规则使用次数 -->
+    <update id="updateRuleUsageCount">
+        UPDATE pms_room_pricing_rules
+        SET used_count = used_count + #{count},
+            update_time = NOW()
+        WHERE rule_id = #{ruleId}
+          AND del_flag = '0'
+    </update>
+
+    <!-- 查询冲突的规则 -->
+    <select id="selectConflictingRules" resultMap="PmsRoomPricingRuleResult">
+        <include refid="selectPmsRoomPricingRuleVo"/>
+        <where>
+            del_flag = '0'
+            AND tenant_id = #{tenantId}
+            AND dept_id = #{deptId}
+            AND status = 'active'
+            <if test="ruleId != null">
+                AND rule_id != #{ruleId}
+            </if>
+            <!-- 房型匹配 -->
+            AND (room_type_id IS NULL OR room_type_id = #{roomTypeId})
+            <!-- 日期范围重叠 -->
+            AND (
+                (date_range_start IS NULL AND date_range_end IS NULL)
+                OR (date_range_start IS NULL AND #{dateRangeEnd} >= date_range_start)
+                OR (date_range_end IS NULL AND #{dateRangeStart} &lt;= date_range_end)
+                OR (#{dateRangeStart} &lt;= date_range_end AND #{dateRangeEnd} >= date_range_start)
+            )
+            <!-- 不可组合的规则 -->
+            AND is_combinable = 0
+        </where>
+    </select>
+
+    <!-- 批量更新规则状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE pms_room_pricing_rules
+        SET status = #{status},
+            update_time = NOW()
+        WHERE rule_id IN
+        <foreach collection="ruleIds" item="ruleId" open="(" separator="," close=")">
+            #{ruleId}
+        </foreach>
+        AND del_flag = '0'
+    </update>
+
+</mapper>

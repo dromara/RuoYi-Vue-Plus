@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.pms.mapper.PmsCustomerContactsMapper">
+
+    <!-- 查询联系人详情包含标签信息 -->
+    <select id="selectVoByIdWithTags" parameterType="Long" resultType="org.dromara.pms.domain.vo.PmsCustomerContactsVo">
+        SELECT
+            c.contact_id,
+            c.tenant_id,
+            c.contact_type,
+            c.full_name,
+            c.phone_number,
+            c.email,
+            c.wechat_openid,
+            c.wechat_unionid,
+            c.gender,
+            c.date_of_birth,
+            c.id_type,
+            c.id_number_encrypted,
+            c.nationality_country_code,
+            c.address_province,
+            c.address_city,
+            c.address_district,
+            c.address_detail,
+            c.postal_code,
+            c.contact_status,
+            c.member_level,
+            c.total_stays,
+            c.total_amount,
+            c.last_stay_date,
+            c.remarks,
+            c.create_dept,
+            c.create_by,
+            c.create_time,
+            c.update_by,
+            c.update_time
+        FROM pms_customer_contacts c
+        WHERE c.contact_id = #{contactId}
+        AND c.del_flag = '0'
+    </select>
+
+    <!-- 查询联系人的标签列表 -->
+    <select id="selectTagsByContactId" parameterType="Long" resultType="org.dromara.pms.domain.vo.PmsContactTagsVo">
+        SELECT
+            t.tag_id,
+            t.name,
+            t.color,
+            t.category,
+            t.description,
+            t.is_system,
+            t.sort_order
+        FROM pms_contact_tags t
+        INNER JOIN pms_contact_tag_relations r ON t.tag_id = r.tag_id
+        WHERE r.contact_id = #{contactId}
+        AND t.del_flag = '0'
+        ORDER BY t.sort_order ASC, t.tag_id ASC
+    </select>
+
+</mapper>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.pms.mapper.PmsRoomLockMapper">
+
+    <resultMap type="org.dromara.pms.domain.vo.PmsRoomLockVo" id="PmsRoomLockResult">
+        <result property="lockId"    column="lock_id"    />
+        <result property="tenantId"    column="tenant_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="roomId"    column="room_id"    />
+        <result property="roomNumber"    column="room_number"    />
+        <result property="lockType"    column="lock_type"    />
+        <result property="lockStartTime"    column="lock_start_time"    />
+        <result property="lockEndTime"    column="lock_end_time"    />
+        <result property="lockReason"    column="lock_reason"    />
+        <result property="lockStatus"    column="lock_status"    />
+        <result property="unlockTime"    column="unlock_time"    />
+        <result property="unlockBy"    column="unlock_by"    />
+        <result property="unlockByName"    column="unlock_by_name"    />
+        <result property="unlockReason"    column="unlock_reason"    />
+        <result property="createDept"    column="create_dept"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectPmsRoomLockVo">
+        SELECT
+            l.lock_id,
+            l.tenant_id,
+            l.dept_id,
+            l.room_id,
+            l.lock_type,
+            l.lock_start_time,
+            l.lock_end_time,
+            l.lock_reason,
+            l.lock_status,
+            l.unlock_time,
+            l.unlock_by,
+            l.unlock_reason,
+            l.create_dept,
+            l.create_by,
+            l.create_time,
+            l.update_by,
+            l.update_time,
+            d.dept_name,
+            r.room_number,
+            u.nick_name AS unlock_by_name
+        FROM pms_room_locks l
+        LEFT JOIN sys_dept d ON l.dept_id = d.dept_id
+        LEFT JOIN pms_room_rooms r ON l.room_id = r.room_id
+        LEFT JOIN sys_user u ON l.unlock_by = u.user_id
+        WHERE l.del_flag = '0'
+    </sql>
+
+    <!-- 根据锁定ID查询锁定详情（包含部门名称、房间号、操作人姓名） -->
+    <select id="selectVoByIdWithDetails" parameterType="Long" resultMap="PmsRoomLockResult">
+        <include refid="selectPmsRoomLockVo"/>
+        AND l.lock_id = #{lockId}
+    </select>
+
+    <!-- 查询锁定列表（包含部门名称、房间号、操作人姓名） -->
+    <select id="selectVoListWithDetails" parameterType="org.dromara.pms.domain.PmsRoomLock" resultMap="PmsRoomLockResult">
+        <include refid="selectPmsRoomLockVo"/>
+        <if test="deptId != null">
+            AND l.dept_id = #{deptId}
+        </if>
+        <if test="roomId != null">
+            AND l.room_id = #{roomId}
+        </if>
+        <if test="lockType != null and lockType != ''">
+            AND l.lock_type = #{lockType}
+        </if>
+        <if test="lockStatus != null and lockStatus != ''">
+            AND l.lock_status = #{lockStatus}
+        </if>
+        <if test="lockStartTime != null">
+            AND l.lock_start_time >= #{lockStartTime}
+        </if>
+        <if test="lockEndTime != null">
+            AND l.lock_end_time &lt;= #{lockEndTime}
+        </if>
+        ORDER BY l.lock_start_time DESC
+    </select>
+
+    <!-- 根据房间ID查询活跃的锁定记录 -->
+    <select id="selectActiveLocksByRoomId" parameterType="Long" resultMap="PmsRoomLockResult">
+        <include refid="selectPmsRoomLockVo"/>
+        AND l.room_id = #{roomId}
+        AND l.lock_status = 'active'
+        AND (l.lock_end_time IS NULL OR l.lock_end_time > NOW())
+        ORDER BY l.lock_start_time DESC
+    </select>
+
+    <!-- 根据部门ID查询锁定列表 -->
+    <select id="selectByDeptId" parameterType="Long" resultMap="PmsRoomLockResult">
+        <include refid="selectPmsRoomLockVo"/>
+        AND l.dept_id = #{deptId}
+        ORDER BY l.lock_start_time DESC
+    </select>
+
+    <!-- 根据锁定类型查询锁定列表 -->
+    <select id="selectByLockType" resultMap="PmsRoomLockResult">
+        <include refid="selectPmsRoomLockVo"/>
+        AND l.dept_id = #{deptId}
+        AND l.lock_type = #{lockType}
+        ORDER BY l.lock_start_time DESC
+    </select>
+
+    <!-- 查询指定时间范围内的锁定记录 -->
+    <select id="selectByTimeRange" resultMap="PmsRoomLockResult">
+        <include refid="selectPmsRoomLockVo"/>
+        AND l.dept_id = #{deptId}
+        AND l.lock_start_time >= #{startTime}
+        AND (l.lock_end_time IS NULL OR l.lock_end_time &lt;= #{endTime})
+        ORDER BY l.lock_start_time DESC
+    </select>
+
+    <!-- 检查房间在指定时间段是否有冲突的锁定 -->
+    <select id="checkTimeConflict" resultType="int">
+        SELECT COUNT(*)
+        FROM pms_room_locks
+        WHERE room_id = #{roomId}
+        AND lock_status = 'active'
+        AND del_flag = '0'
+        AND (
+            (lock_start_time &lt;= #{startTime} AND (lock_end_time IS NULL OR lock_end_time >= #{startTime}))
+            OR
+            (lock_start_time &lt;= #{endTime} AND (lock_end_time IS NULL OR lock_end_time >= #{endTime}))
+            OR
+            (lock_start_time >= #{startTime} AND lock_start_time &lt;= #{endTime})
+        )
+        <if test="excludeId != null">
+            AND lock_id != #{excludeId}
+        </if>
+    </select>
+
+</mapper>

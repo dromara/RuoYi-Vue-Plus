@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.pms.mapper.PmsContactTagRelationsMapper">
+
+    <!-- 根据联系人ID查询标签关联列表 -->
+    <select id="selectRelationsByContactId" parameterType="Long" resultType="org.dromara.pms.domain.vo.PmsContactTagRelationsVo">
+        SELECT
+            r.relation_id,
+            r.contact_id,
+            r.tag_id
+        FROM pms_contact_tag_relations r
+        WHERE r.contact_id = #{contactId}
+        AND r.del_flag = '0'
+        ORDER BY r.relation_id ASC
+    </select>
+
+    <!-- 根据标签ID查询关联的联系人列表 -->
+    <select id="selectRelationsByTagId" parameterType="Long" resultType="org.dromara.pms.domain.vo.PmsContactTagRelationsVo">
+        SELECT
+            r.relation_id,
+            r.contact_id,
+            r.tag_id
+        FROM pms_contact_tag_relations r
+        WHERE r.tag_id = #{tagId}
+        AND r.del_flag = '0'
+        ORDER BY r.relation_id ASC
+    </select>
+
+    <!-- 批量插入联系人标签关联 -->
+    <insert id="batchInsertRelations" parameterType="java.util.List">
+        INSERT INTO pms_contact_tag_relations (
+            tenant_id,
+            contact_id,
+            tag_id,
+            create_dept,
+            create_by,
+            create_time,
+            del_flag
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.tenantId},
+                #{item.contactId},
+                #{item.tagId},
+                #{item.createDept},
+                #{item.createBy},
+                #{item.createTime},
+                '0'
+            )
+        </foreach>
+    </insert>
+
+    <!-- 根据联系人ID删除所有标签关联 -->
+    <update id="deleteByContactId" parameterType="Long">
+        UPDATE pms_contact_tag_relations
+        SET del_flag = '1'
+        WHERE contact_id = #{contactId}
+        AND del_flag = '0'
+    </update>
+
+    <!-- 根据标签ID删除所有关联 -->
+    <update id="deleteByTagId" parameterType="Long">
+        UPDATE pms_contact_tag_relations
+        SET del_flag = '1'
+        WHERE tag_id = #{tagId}
+        AND del_flag = '0'
+    </update>
+
+    <!-- 检查联系人和标签的关联是否存在 -->
+    <select id="existsRelation" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM pms_contact_tag_relations
+        WHERE contact_id = #{contactId}
+        AND tag_id = #{tagId}
+        AND del_flag = '0'
+    </select>
+
+</mapper>

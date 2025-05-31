@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.pms.mapper.PmsSpecialDatePricingMapper">
+
+    <resultMap type="org.dromara.pms.domain.PmsSpecialDatePricing" id="PmsSpecialDatePricingResult">
+        <result property="specialDateId" column="special_date_id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="roomTypeId" column="room_type_id"/>
+        <result property="specialDate" column="special_date"/>
+        <result property="dateType" column="date_type"/>
+        <result property="dateName" column="date_name"/>
+        <result property="description" column="description"/>
+        <result property="priceAdjustmentType" column="price_adjustment_type"/>
+        <result property="adjustmentValue" column="adjustment_value"/>
+        <result property="priority" column="priority"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <sql id="selectPmsSpecialDatePricingVo">
+        select special_date_id, tenant_id, dept_id, room_type_id, special_date, date_type, date_name,
+               description, price_adjustment_type, adjustment_value, priority, status,
+               create_by, create_time, update_by, update_time, del_flag
+        from pms_special_date_pricing
+    </sql>
+
+    <!-- 查询指定日期范围内的特殊日期价格 -->
+    <select id="selectByDateRange" resultMap="PmsSpecialDatePricingResult">
+        <include refid="selectPmsSpecialDatePricingVo"/>
+        <where>
+            del_flag = '0'
+            AND tenant_id = #{tenantId}
+            AND dept_id = #{deptId}
+            <if test="roomTypeId != null">
+                AND (room_type_id IS NULL OR room_type_id = #{roomTypeId})
+            </if>
+            AND special_date BETWEEN #{startDate} AND #{endDate}
+        </where>
+        ORDER BY special_date ASC, priority DESC
+    </select>
+
+    <!-- 查询指定日期的特殊价格 -->
+    <select id="selectByDate" resultMap="PmsSpecialDatePricingResult">
+        <include refid="selectPmsSpecialDatePricingVo"/>
+        <where>
+            del_flag = '0'
+            AND tenant_id = #{tenantId}
+            AND dept_id = #{deptId}
+            AND room_type_id = #{roomTypeId}
+            AND special_date = #{specialDate}
+        </where>
+        ORDER BY priority DESC
+        LIMIT 1
+    </select>
+
+    <!-- 查询有效的特殊日期价格 -->
+    <select id="selectActiveSpecialDates" resultMap="PmsSpecialDatePricingResult">
+        <include refid="selectPmsSpecialDatePricingVo"/>
+        <where>
+            del_flag = '0'
+            AND tenant_id = #{tenantId}
+            AND dept_id = #{deptId}
+            AND status = #{status}
+            AND special_date >= CURDATE()
+        </where>
+        ORDER BY special_date ASC, priority DESC
+    </select>
+
+    <!-- 查询冲突的特殊日期价格 -->
+    <select id="selectConflictingDates" resultMap="PmsSpecialDatePricingResult">
+        <include refid="selectPmsSpecialDatePricingVo"/>
+        <where>
+            del_flag = '0'
+            AND tenant_id = #{tenantId}
+            AND dept_id = #{deptId}
+            AND room_type_id = #{roomTypeId}
+            AND special_date = #{specialDate}
+            <if test="excludeDateId != null">
+                AND special_date_id != #{excludeDateId}
+            </if>
+        </where>
+    </select>
+
+    <!-- 批量插入特殊日期价格 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO pms_special_date_pricing (
+            tenant_id, dept_id, room_type_id, special_date, date_type, date_name,
+            description, price_adjustment_type, adjustment_value, priority, status,
+            create_by, create_time, del_flag
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.tenantId}, #{item.deptId}, #{item.roomTypeId}, #{item.specialDate},
+                #{item.dateType}, #{item.dateName}, #{item.description}, #{item.priceAdjustmentType},
+                #{item.adjustmentValue}, #{item.priority}, #{item.status}, #{item.createBy},
+                #{item.createTime}, '0'
+            )
+        </foreach>
+    </insert>
+
+    <!-- 批量更新特殊日期价格状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE pms_special_date_pricing
+        SET status = #{status},
+            update_time = NOW()
+        WHERE special_date_id IN
+        <foreach collection="dateIds" item="dateId" open="(" separator="," close=")">
+            #{dateId}
+        </foreach>
+        AND del_flag = '0'
+    </update>
+
+    <!-- 查询按日期类型分组的统计信息 -->
+    <select id="selectStatsByDateType" resultType="java.util.Map">
+        SELECT
+            date_type,
+            COUNT(*) as count,
+            AVG(adjustment_value) as avg_adjustment,
+            MIN(special_date) as earliest_date,
+            MAX(special_date) as latest_date
+        FROM pms_special_date_pricing
+        WHERE del_flag = '0'
+          AND tenant_id = #{tenantId}
+          AND dept_id = #{deptId}
+          AND special_date BETWEEN #{startDate} AND #{endDate}
+        GROUP BY date_type
+        ORDER BY count DESC
+    </select>
+
+    <!-- 删除过期的特殊日期价格 -->
+    <delete id="deleteExpiredDates">
+        DELETE FROM pms_special_date_pricing
+        WHERE special_date &lt; #{beforeDate}
+          AND status = 'inactive'
+    </delete>
+
+</mapper>

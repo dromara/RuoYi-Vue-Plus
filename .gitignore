@@ -40,9 +40,44 @@ nbdist/
 *.log
 *.xml.versionsBackup
 *.swp
+*.md
+*.ps1
+*.mdc
 
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
 
 .flattened-pom.xml
+
+######################################################################
+# Cursor优化 - 排除索引文件
+*.jar
+*.war
+*.ear
+*.class
+*.pyc
+*.pyo
+__pycache__/
+.DS_Store
+Thumbs.db
+
+# 前端构建产物
+**/node_modules/
+**/dist/
+**/.temp/
+**/.nuxt/
+**/.next/
+**/.vuepress/dist/
+
+# 日志和临时文件
+logs/
+temp/
+*.tmp
+*.temp
+
+# 开发环境文件
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

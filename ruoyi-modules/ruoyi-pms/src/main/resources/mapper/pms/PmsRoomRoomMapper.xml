@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.pms.mapper.PmsRoomRoomMapper">
+
+    <resultMap type="org.dromara.pms.domain.vo.PmsRoomRoomVo" id="PmsRoomRoomResult">
+        <result property="roomId"    column="room_id"    />
+        <result property="tenantId"    column="tenant_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="roomTypeId"    column="room_type_id"    />
+        <result property="typeName"    column="type_name"    />
+        <result property="roomNumber"    column="room_number"    />
+        <result property="floor"    column="floor"    />
+        <result property="roomStatus"    column="room_status"    />
+        <result property="cleaningStatus"    column="cleaning_status"    />
+        <result property="description"    column="description"    />
+        <result property="specialAmenities"    column="special_amenities"    />
+        <result property="lastCleaningTime"    column="last_cleaning_time"    />
+        <result property="lastMaintenanceTime"    column="last_maintenance_time"    />
+        <result property="statusRemarks"    column="status_remarks"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="createDept"    column="create_dept"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectPmsRoomRoomVo">
+        SELECT
+            r.room_id,
+            r.tenant_id,
+            r.dept_id,
+            r.room_type_id,
+            r.room_number,
+            r.floor,
+            r.room_status,
+            r.cleaning_status,
+            r.description,
+            r.special_amenities,
+            r.last_cleaning_time,
+            r.last_maintenance_time,
+            r.status_remarks,
+            r.sort_order,
+            r.create_dept,
+            r.create_by,
+            r.create_time,
+            r.update_by,
+            r.update_time,
+            d.dept_name,
+            rt.type_name
+        FROM pms_room_rooms r
+        LEFT JOIN sys_dept d ON r.dept_id = d.dept_id
+        LEFT JOIN pms_room_types rt ON r.room_type_id = rt.room_type_id
+        WHERE r.del_flag = '0'
+    </sql>
+
+    <!-- 根据房间ID查询房间详情（包含部门名称和房型名称） -->
+    <select id="selectVoByIdWithDetails" parameterType="Long" resultMap="PmsRoomRoomResult">
+        <include refid="selectPmsRoomRoomVo"/>
+        AND r.room_id = #{roomId}
+    </select>
+
+    <!-- 查询房间列表（包含部门名称和房型名称） -->
+    <select id="selectVoListWithDetails" parameterType="org.dromara.pms.domain.PmsRoomRoom" resultMap="PmsRoomRoomResult">
+        <include refid="selectPmsRoomRoomVo"/>
+        <if test="deptId != null">
+            AND r.dept_id = #{deptId}
+        </if>
+        <if test="roomTypeId != null">
+            AND r.room_type_id = #{roomTypeId}
+        </if>
+        <if test="roomNumber != null and roomNumber != ''">
+            AND r.room_number LIKE CONCAT('%', #{roomNumber}, '%')
+        </if>
+        <if test="floor != null and floor != ''">
+            AND r.floor = #{floor}
+        </if>
+        <if test="roomStatus != null and roomStatus != ''">
+            AND r.room_status = #{roomStatus}
+        </if>
+        <if test="cleaningStatus != null and cleaningStatus != ''">
+            AND r.cleaning_status = #{cleaningStatus}
+        </if>
+        ORDER BY r.sort_order ASC, r.room_number ASC
+    </select>
+
+    <!-- 根据房间号查询房间（用于唯一性校验） -->
+    <select id="selectByRoomNumber" resultType="org.dromara.pms.domain.PmsRoomRoom">
+        SELECT * FROM pms_room_rooms
+        WHERE room_number = #{roomNumber}
+        AND dept_id = #{deptId}
+        AND del_flag = '0'
+        <if test="excludeId != null">
+            AND room_id != #{excludeId}
+        </if>
+        LIMIT 1
+    </select>
+
+    <!-- 根据房型ID查询房间列表 -->
+    <select id="selectByRoomTypeId" parameterType="Long" resultMap="PmsRoomRoomResult">
+        <include refid="selectPmsRoomRoomVo"/>
+        AND r.room_type_id = #{roomTypeId}
+        ORDER BY r.sort_order ASC, r.room_number ASC
+    </select>
+
+    <!-- 根据部门ID查询房间列表 -->
+    <select id="selectByDeptId" parameterType="Long" resultMap="PmsRoomRoomResult">
+        <include refid="selectPmsRoomRoomVo"/>
+        AND r.dept_id = #{deptId}
+        ORDER BY r.sort_order ASC, r.room_number ASC
+    </select>
+
+    <!-- 根据房间状态查询房间列表 -->
+    <select id="selectByStatus" resultMap="PmsRoomRoomResult">
+        <include refid="selectPmsRoomRoomVo"/>
+        AND r.dept_id = #{deptId}
+        <if test="roomStatus != null and roomStatus != ''">
+            AND r.room_status = #{roomStatus}
+        </if>
+        <if test="cleaningStatus != null and cleaningStatus != ''">
+            AND r.cleaning_status = #{cleaningStatus}
+        </if>
+        ORDER BY r.sort_order ASC, r.room_number ASC
+    </select>
+
+</mapper>

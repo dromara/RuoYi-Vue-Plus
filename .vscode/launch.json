@@ -1,0 +1,59 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "DromaraApplication",
+      "request": "launch",
+      "mainClass": "org.dromara.DromaraApplication",
+      "projectName": "ruoyi-admin"
+    },
+    {
+      "type": "java",
+      "name": "RuoYi Application",
+      "request": "launch",
+      "mainClass": "org.dromara.DromaraApplication",
+      "projectName": "ruoyi-admin",
+      "args": "",
+      "vmArgs": "-Xmx2g -Xms1g -XX:+UseG1GC -Dspring.profiles.active=dev -Dfile.encoding=UTF-8",
+      "env": {
+        "JAVA_TOOL_OPTIONS": "-Dfile.encoding=UTF-8 -Duser.timezone=Asia/Shanghai"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "java",
+      "name": "RuoYi Debug",
+      "request": "launch",
+      "mainClass": "org.dromara.DromaraApplication",
+      "projectName": "ruoyi-admin",
+      "args": "",
+      "vmArgs": "-Xmx2g -Xms1g -XX:+UseG1GC -Dspring.profiles.active=dev -Dfile.encoding=UTF-8 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005",
+      "env": {
+        "JAVA_TOOL_OPTIONS": "-Dfile.encoding=UTF-8 -Duser.timezone=Asia/Shanghai"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "java",
+      "name": "Remote Debug",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005,
+      "projectName": "ruoyi-admin"
+    },
+    {
+      "type": "java",
+      "name": "JUnit Tests",
+      "request": "launch",
+      "mainClass": "",
+      "projectName": "ruoyi-pms",
+      "args": "",
+      "vmArgs": "-Dspring.profiles.active=test",
+      "env": {},
+      "console": "integratedTerminal"
+    }
+  ]
+}

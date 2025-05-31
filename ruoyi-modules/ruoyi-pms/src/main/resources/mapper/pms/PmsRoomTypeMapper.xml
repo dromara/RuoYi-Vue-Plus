@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.pms.mapper.PmsRoomTypeMapper">
+
+    <!-- 根据房型ID查询房型详情（包含部门名称） -->
+    <select id="selectVoByIdWithDept" parameterType="Long" resultType="org.dromara.pms.domain.vo.PmsRoomTypeVo">
+        SELECT
+            rt.room_type_id,
+            rt.tenant_id,
+            rt.dept_id,
+            rt.type_name,
+            rt.type_code,
+            rt.description,
+            rt.standard_occupancy,
+            rt.max_occupancy,
+            rt.room_area,
+            rt.bed_configuration,
+            rt.amenities,
+            rt.default_price,
+            rt.status,
+            rt.sort_order,
+            rt.images,
+            rt.create_dept,
+            rt.create_by,
+            rt.create_time,
+            rt.update_by,
+            rt.update_time,
+            d.dept_name
+        FROM pms_room_types rt
+        LEFT JOIN sys_dept d ON rt.dept_id = d.dept_id
+        WHERE rt.room_type_id = #{roomTypeId}
+        AND rt.del_flag = '0'
+    </select>
+
+    <!-- 查询房型列表（包含部门名称和房间数量统计） -->
+    <select id="selectVoListWithStats" parameterType="org.dromara.pms.domain.PmsRoomType" resultType="org.dromara.pms.domain.vo.PmsRoomTypeVo">
+        SELECT
+            rt.room_type_id,
+            rt.tenant_id,
+            rt.dept_id,
+            rt.type_name,
+            rt.type_code,
+            rt.description,
+            rt.standard_occupancy,
+            rt.max_occupancy,
+            rt.room_area,
+            rt.bed_configuration,
+            rt.amenities,
+            rt.default_price,
+            rt.status,
+            rt.sort_order,
+            rt.images,
+            rt.create_dept,
+            rt.create_by,
+            rt.create_time,
+            rt.update_by,
+            rt.update_time,
+            d.dept_name,
+            COALESCE(r.room_count, 0) as room_count
+        FROM pms_room_types rt
+        LEFT JOIN sys_dept d ON rt.dept_id = d.dept_id
+        LEFT JOIN (
+            SELECT room_type_id, COUNT(*) as room_count
+            FROM pms_room_rooms
+            WHERE del_flag = '0'
+            GROUP BY room_type_id
+        ) r ON rt.room_type_id = r.room_type_id
+        WHERE rt.del_flag = '0'
+        <if test="deptId != null">
+            AND rt.dept_id = #{deptId}
+        </if>
+        <if test="typeName != null and typeName != ''">
+            AND rt.type_name LIKE CONCAT('%', #{typeName}, '%')
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            AND rt.type_code LIKE CONCAT('%', #{typeCode}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND rt.status = #{status}
+        </if>
+        ORDER BY rt.sort_order ASC, rt.room_type_id ASC
+    </select>
+
+    <!-- 根据房型代码查询房型（用于唯一性校验） -->
+    <select id="selectByTypeCode" resultType="org.dromara.pms.domain.PmsRoomType">
+        SELECT room_type_id, type_code, dept_id
+        FROM pms_room_types
+        WHERE type_code = #{typeCode}
+        AND dept_id = #{deptId}
+        AND del_flag = '0'
+        <if test="excludeId != null">
+            AND room_type_id != #{excludeId}
+        </if>
+        LIMIT 1
+    </select>
+
+    <!-- 根据部门ID查询房型列表 -->
+    <select id="selectByDeptId" parameterType="Long" resultType="org.dromara.pms.domain.vo.PmsRoomTypeVo">
+        SELECT
+            room_type_id,
+            type_name,
+            type_code,
+            status,
+            default_price,
+            standard_occupancy,
+            max_occupancy
+        FROM pms_room_types
+        WHERE dept_id = #{deptId}
+        AND status = 'active'
+        AND del_flag = '0'
+        ORDER BY sort_order ASC, room_type_id ASC
+    </select>
+
+</mapper>
