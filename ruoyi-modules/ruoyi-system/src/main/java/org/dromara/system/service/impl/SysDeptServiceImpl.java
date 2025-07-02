@@ -131,23 +131,17 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         if (CollUtil.isEmpty(depts)) {
             return CollUtil.newArrayList();
         }
-        // 获取当前列表中每一个节点的parentId，然后在列表中查找是否有id与其parentId对应，若无对应，则表明此时节点列表中，该节点在当前列表中属于顶级节点
-        List<Tree<Long>> treeList = CollUtil.newArrayList();
-        for (SysDeptVo d : depts) {
-            Long parentId = d.getParentId();
-            SysDeptVo sysDeptVo = StreamUtils.findFirst(depts, it -> it.getDeptId().longValue() == parentId);
-            if (ObjectUtil.isNull(sysDeptVo)) {
-                List<Tree<Long>> trees = TreeBuildUtils.build(depts, parentId, (dept, tree) ->
-                    tree.setId(dept.getDeptId())
-                        .setParentId(dept.getParentId())
-                        .setName(dept.getDeptName())
-                        .setWeight(dept.getOrderNum())
-                        .putExtra("disabled", SystemConstants.DISABLE.equals(dept.getStatus())));
-                Tree<Long> tree = StreamUtils.findFirst(trees, it -> it.getId().longValue() == d.getDeptId());
-                treeList.add(tree);
-            }
-        }
-        return treeList;
+        return TreeBuildUtils.buildMultiRoot(
+            depts,
+            SysDeptVo::getDeptId,
+            SysDeptVo::getParentId,
+            (node, treeNode) -> treeNode
+                .setId(node.getDeptId())
+                .setParentId(node.getParentId())
+                .setName(node.getDeptName())
+                .setWeight(node.getOrderNum())
+                .putExtra("disabled", SystemConstants.DISABLE.equals(node.getStatus()))
+        );
     }
 
     /**

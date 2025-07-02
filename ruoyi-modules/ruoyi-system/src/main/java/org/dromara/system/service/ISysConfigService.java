@@ -69,7 +69,7 @@ public interface ISysConfigService {
      *
      * @param configIds 需要删除的参数ID
      */
-    void deleteConfigByIds(Long[] configIds);
+    void deleteConfigByIds(List<Long> configIds);
 
     /**
      * 重置参数缓存数据

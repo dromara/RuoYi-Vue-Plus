@@ -73,4 +73,9 @@ public interface FlowConstant {
      */
     String MESSAGE_NOTICE = "messageNotice";
 
+    /**
+     * 任务状态
+     */
+    String WF_TASK_STATUS = "wf_task_status";
+
 }

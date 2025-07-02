@@ -47,7 +47,7 @@ CREATE TABLE flow_node
     definition_id   int8          NOT NULL,                             -- 流程定义id
     node_code       varchar(100)  NOT NULL,                             -- 流程节点编码
     node_name       varchar(100)  NULL,                                 -- 流程节点名称
-    permission_flag varchar(200)  NULL,                                 -- 权限标识（权限类型:权限标识，可以多个，用逗号隔开)
+    permission_flag varchar(200)  NULL,                                 -- 权限标识（权限类型:权限标识，可以多个，用@@隔开)
     node_ratio      numeric(6, 3) NULL,                                 -- 流程签署比例值
     coordinate      varchar(100)  NULL,                                 -- 坐标
     any_node_skip   varchar(100)  NULL,                                 -- 任意结点跳转
@@ -60,7 +60,7 @@ CREATE TABLE flow_node
     "version"       varchar(20)   NOT NULL,                             -- 版本
     create_time     timestamp     NULL,                                 -- 创建时间
     update_time     timestamp     NULL,                                 -- 更新时间
-    ext             varchar(500)  NULL,                                 -- 扩展属性
+    ext             text         NULL,                                  -- 扩展属性
     del_flag        bpchar(1)     NULL DEFAULT '0':: character varying, -- 删除标志
     tenant_id       varchar(40)   NULL,                                 -- 租户id
     CONSTRAINT flow_node_pkey PRIMARY KEY (id)
@@ -72,7 +72,7 @@ COMMENT ON COLUMN flow_node.node_type IS '节点类型（0开始节点 1中间�
 COMMENT ON COLUMN flow_node.definition_id IS '流程定义id';
 COMMENT ON COLUMN flow_node.node_code IS '流程节点编码';
 COMMENT ON COLUMN flow_node.node_name IS '流程节点名称';
-COMMENT ON COLUMN flow_node.permission_flag IS '权限标识（权限类型:权限标识，可以多个，用逗号隔开)';
+COMMENT ON COLUMN flow_node.permission_flag IS '权限标识（权限类型:权限标识，可以多个，用@@隔开)';
 COMMENT ON COLUMN flow_node.node_ratio IS '流程签署比例值';
 COMMENT ON COLUMN flow_node.coordinate IS '坐标';
 COMMENT ON COLUMN flow_node.any_node_skip IS '任意结点跳转';
@@ -85,7 +85,7 @@ COMMENT ON COLUMN flow_node.form_path IS '审批表单路径';
 COMMENT ON COLUMN flow_node."version" IS '版本';
 COMMENT ON COLUMN flow_node.create_time IS '创建时间';
 COMMENT ON COLUMN flow_node.update_time IS '更新时间';
-COMMENT ON COLUMN flow_node.ext IS '扩展属性';
+COMMENT ON COLUMN flow_node.ext IS '节点扩展属性';
 COMMENT ON COLUMN flow_node.del_flag IS '删除标志';
 COMMENT ON COLUMN flow_node.tenant_id IS '租户id';
 
@@ -172,7 +172,7 @@ CREATE TABLE flow_task
     node_code     varchar(100) NOT NULL,                             -- 节点编码
     node_name     varchar(100) NULL,                                 -- 节点名称
     node_type     int2         NOT NULL,                             -- 节点类型（0开始节点 1中间节点 2结束节点 3互斥网关 4并行网关）
-    flow_status      varchar(20)  NOT NULL,                                 -- 流程状态（0待提交 1审批中 2 审批通过 8已完成 9已退回 10失效）
+    flow_status   varchar(20)  NOT NULL,                             -- 流程状态（0待提交 1审批中 2 审批通过 8已完成 9已退回 10失效）
     form_custom   bpchar(1)    NULL DEFAULT 'N':: character varying, -- 审批表单是否自定义（Y是 N否）
     form_path     varchar(100) NULL,                                 -- 审批表单路径
     create_time   timestamp    NULL,                                 -- 创建时间
@@ -215,7 +215,7 @@ CREATE TABLE flow_his_task
     flow_status      varchar(20)  NOT NULL,                                 -- 流程状态（0待提交 1审批中 2 审批通过 8已完成 9已退回 10失效）
     form_custom      bpchar(1)    NULL     DEFAULT 'N':: character varying, -- 审批表单是否自定义（Y是 N否）
     form_path        varchar(100) NULL,                                     -- 审批表单路径
-    ext              varchar(500) NULL,                                     -- 扩展字段，预留给业务系统使用
+    ext              text         NULL,                                     -- 扩展字段，预留给业务系统使用
     message          varchar(500) NULL,                                     -- 审批意见
     variable         text         NULL,                                     -- 任务变量
     create_time      timestamp    NULL,                                     -- 创建时间
@@ -265,7 +265,6 @@ CREATE TABLE flow_user
 );
 CREATE INDEX user_processed_type ON flow_user USING btree (processed_by, type);
 CREATE INDEX user_associated_idx ON FLOW_USER USING btree (associated);
-
 COMMENT ON TABLE flow_user IS '流程用户表';
 
 COMMENT ON COLUMN flow_user.id IS '主键id';

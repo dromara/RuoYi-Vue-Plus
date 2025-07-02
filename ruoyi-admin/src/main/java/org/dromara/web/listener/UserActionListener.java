@@ -158,6 +158,6 @@ public class UserActionListener implements SaTokenListener {
      * 每次Token续期时触发
      */
     @Override
-    public void doRenewTimeout(String tokenValue, Object loginId, long timeout) {
+    public void doRenewTimeout(String loginType, Object loginId, String tokenValue, long timeout) {
     }
 }

@@ -78,10 +78,8 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
         LambdaQueryWrapper<FlowDefinition> wrapper = buildQueryWrapper(flowDefinition);
         wrapper.eq(FlowDefinition::getIsPublish, PublishStatus.PUBLISHED.getKey());
         Page<FlowDefinition> page = flowDefinitionMapper.selectPage(pageQuery.build(), wrapper);
-        TableDataInfo<FlowDefinitionVo> build = TableDataInfo.build();
-        build.setRows(BeanUtil.copyToList(page.getRecords(), FlowDefinitionVo.class));
-        build.setTotal(page.getTotal());
-        return build;
+        List<FlowDefinitionVo> list = BeanUtil.copyToList(page.getRecords(), FlowDefinitionVo.class);
+        return new TableDataInfo<>(list, page.getTotal());
     }
 
     /**
@@ -96,10 +94,8 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
         LambdaQueryWrapper<FlowDefinition> wrapper = buildQueryWrapper(flowDefinition);
         wrapper.in(FlowDefinition::getIsPublish, Arrays.asList(PublishStatus.UNPUBLISHED.getKey(), PublishStatus.EXPIRED.getKey()));
         Page<FlowDefinition> page = flowDefinitionMapper.selectPage(pageQuery.build(), wrapper);
-        TableDataInfo<FlowDefinitionVo> build = TableDataInfo.build();
-        build.setRows(BeanUtil.copyToList(page.getRecords(), FlowDefinitionVo.class));
-        build.setTotal(page.getTotal());
-        return build;
+        List<FlowDefinitionVo> list = BeanUtil.copyToList(page.getRecords(), FlowDefinitionVo.class);
+        return new TableDataInfo<>(list, page.getTotal());
     }
 
     private LambdaQueryWrapper<FlowDefinition> buildQueryWrapper(FlowDefinition flowDefinition) {

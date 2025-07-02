@@ -1,5 +1,6 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -43,10 +44,9 @@ public class SysClientServiceImpl implements ISysClientService {
     @Override
     public SysClientVo queryById(Long id) {
         SysClientVo vo = baseMapper.selectVoById(id);
-        vo.setGrantTypeList(List.of(vo.getGrantType().split(",")));
+        vo.setGrantTypeList(StringUtils.splitList(vo.getGrantType()));
         return vo;
     }
-
 
     /**
      * 查询客户端管理
@@ -64,7 +64,7 @@ public class SysClientServiceImpl implements ISysClientService {
     public TableDataInfo<SysClientVo> queryPageList(SysClientBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<SysClient> lqw = buildQueryWrapper(bo);
         Page<SysClientVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
-        result.getRecords().forEach(r -> r.setGrantTypeList(List.of(r.getGrantType().split(","))));
+        result.getRecords().forEach(r -> r.setGrantTypeList(StringUtils.splitList(r.getGrantType())));
         return TableDataInfo.build(result);
     }
 
@@ -93,8 +93,7 @@ public class SysClientServiceImpl implements ISysClientService {
     @Override
     public Boolean insertByBo(SysClientBo bo) {
         SysClient add = MapstructUtils.convert(bo, SysClient.class);
-        validEntityBeforeSave(add);
-        add.setGrantType(String.join(",", bo.getGrantTypeList()));
+        add.setGrantType(CollUtil.join(bo.getGrantTypeList(), StringUtils.SEPARATOR));
         // 生成clientid
         String clientKey = bo.getClientKey();
         String clientSecret = bo.getClientSecret();
@@ -113,7 +112,6 @@ public class SysClientServiceImpl implements ISysClientService {
     @Override
     public Boolean updateByBo(SysClientBo bo) {
         SysClient update = MapstructUtils.convert(bo, SysClient.class);
-        validEntityBeforeSave(update);
         update.setGrantType(String.join(",", bo.getGrantTypeList()));
         return baseMapper.updateById(update) > 0;
     }
@@ -131,21 +129,11 @@ public class SysClientServiceImpl implements ISysClientService {
     }
 
     /**
-     * 保存前的数据校验
-     */
-    private void validEntityBeforeSave(SysClient entity) {
-        //TODO 做一些数据校验,如唯一约束
-    }
-
-    /**
      * 批量删除客户端管理
      */
     @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, allEntries = true)
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if (isValid) {
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
     }
 }

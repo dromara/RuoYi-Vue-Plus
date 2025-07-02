@@ -3,10 +3,7 @@ package org.dromara.web.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.http.HttpUtil;
-import cn.hutool.http.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthResponse;
@@ -68,15 +65,6 @@ public class SocialAuthStrategy implements IAuthStrategy {
             throw new ServiceException(response.getMsg());
         }
         AuthUser authUserData = response.getData();
-        if ("GITEE".equals(authUserData.getSource())) {
-            // 如用户使用 gitee 登录顺手 star 给作者一点支持 拒绝白嫖
-            HttpUtil.createRequest(Method.PUT, "https://gitee.com/api/v5/user/starred/dromara/RuoYi-Vue-Plus")
-                    .formStr(MapUtil.of("access_token", authUserData.getToken().getAccessToken()))
-                    .executeAsync();
-            HttpUtil.createRequest(Method.PUT, "https://gitee.com/api/v5/user/starred/dromara/RuoYi-Cloud-Plus")
-                    .formStr(MapUtil.of("access_token", authUserData.getToken().getAccessToken()))
-                    .executeAsync();
-        }
 
         List<SysSocialVo> list = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
         if (CollUtil.isEmpty(list)) {

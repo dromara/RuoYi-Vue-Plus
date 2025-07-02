@@ -1,9 +1,7 @@
 package org.dromara.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
@@ -30,7 +28,9 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "create_by")
     })
-    Page<SysPostVo> selectPagePostList(@Param("page") Page<SysPostVo> page, @Param(Constants.WRAPPER) Wrapper<SysPost> queryWrapper);
+    default Page<SysPostVo> selectPagePostList(Page<SysPost> page, Wrapper<SysPost> queryWrapper) {
+        return this.selectVoPage(page, queryWrapper);
+    }
 
     /**
      * 查询用户所属岗位组

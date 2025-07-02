@@ -42,14 +42,12 @@ public class TestLeaveVo implements Serializable {
      * 开始时间
      */
     @ExcelProperty(value = "开始时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
 
     /**
      * 结束时间
      */
     @ExcelProperty(value = "结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 
     /**

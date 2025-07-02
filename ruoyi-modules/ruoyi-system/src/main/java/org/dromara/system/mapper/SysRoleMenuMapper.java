@@ -16,12 +16,11 @@ public interface SysRoleMenuMapper extends BaseMapperPlus<SysRoleMenu, SysRoleMe
     /**
      * 根据菜单ID串删除关联关系
      *
+     * @param menuIds 菜单ID串
      * @return 结果
      */
     default int deleteByMenuIds(List<Long> menuIds) {
-        LambdaUpdateWrapper<SysRoleMenu> lqw = new LambdaUpdateWrapper<SysRoleMenu>()
-            .in(SysRoleMenu::getMenuId, menuIds);
-        return this.delete(lqw);
+        return this.delete(new LambdaUpdateWrapper<SysRoleMenu>().in(SysRoleMenu::getMenuId, menuIds));
     }
 
 }

@@ -2,10 +2,10 @@ package org.dromara.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.exception.ServiceException;
@@ -23,12 +23,10 @@ import org.dromara.system.domain.bo.SysConfigBo;
 import org.dromara.system.domain.vo.SysConfigVo;
 import org.dromara.system.mapper.SysConfigMapper;
 import org.dromara.system.service.ISysConfigService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +55,6 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * @return 参数配置信息
      */
     @Override
-    @DS("master")
     public SysConfigVo selectConfigById(Long configId) {
         return baseMapper.selectVoById(configId);
     }
@@ -83,14 +80,10 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      */
     @Override
     public boolean selectRegisterEnabled(String tenantId) {
-        SysConfig retConfig = TenantHelper.dynamic(tenantId, () -> {
-            return baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>()
-                .eq(SysConfig::getConfigKey, "sys.account.registerUser"));
-        });
-        if (ObjectUtil.isNull(retConfig)) {
-            return false;
-        }
-        return Convert.toBool(retConfig.getConfigValue());
+        String configValue = TenantHelper.dynamic(tenantId, () ->
+            this.selectConfigByKey("sys.account.registerUser")
+        );
+        return Convert.toBool(configValue);
     }
 
     /**
@@ -168,15 +161,15 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * @param configIds 需要删除的参数ID
      */
     @Override
-    public void deleteConfigByIds(Long[] configIds) {
-        for (Long configId : configIds) {
-            SysConfig config = baseMapper.selectById(configId);
+    public void deleteConfigByIds(List<Long> configIds) {
+        List<SysConfig> list = baseMapper.selectByIds(configIds);
+        list.forEach(config -> {
             if (StringUtils.equals(SystemConstants.YES, config.getConfigType())) {
-                throw new ServiceException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
+                throw new ServiceException(String.format("内置参数【%s】不能删除", config.getConfigKey()));
             }
             CacheUtils.evict(CacheNames.SYS_CONFIG, config.getConfigKey());
-        }
-        baseMapper.deleteByIds(Arrays.asList(configIds));
+        });
+        baseMapper.deleteByIds(configIds);
     }
 
     /**
@@ -195,12 +188,10 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      */
     @Override
     public boolean checkConfigKeyUnique(SysConfigBo config) {
-        long configId = ObjectUtils.notNull(config.getConfigId(), -1L);
-        SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, config.getConfigKey()));
-        if (ObjectUtil.isNotNull(info) && info.getConfigId() != configId) {
-            return false;
-        }
-        return true;
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysConfig>()
+            .eq(SysConfig::getConfigKey, config.getConfigKey())
+            .ne(ObjectUtil.isNotNull(config.getConfigId()), SysConfig::getConfigId, config.getConfigId()));
+        return !exist;
     }
 
     /**

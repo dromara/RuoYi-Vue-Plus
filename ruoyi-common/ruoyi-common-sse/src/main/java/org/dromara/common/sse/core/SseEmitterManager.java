@@ -38,8 +38,8 @@ public class SseEmitterManager {
         // 每个用户可以有多个 SSE 连接，通过 token 进行区分
         Map<String, SseEmitter> emitters = USER_TOKEN_EMITTERS.computeIfAbsent(userId, k -> new ConcurrentHashMap<>());
 
-        // 创建一个新的 SseEmitter 实例，超时时间设置为 0 表示无限制
-        SseEmitter emitter = new SseEmitter(0L);
+        // 创建一个新的 SseEmitter 实例，超时时间设置为一天 避免连接之后直接关闭浏览器导致连接停滞
+        SseEmitter emitter = new SseEmitter(86400000L);
 
         emitters.put(token, emitter);
 

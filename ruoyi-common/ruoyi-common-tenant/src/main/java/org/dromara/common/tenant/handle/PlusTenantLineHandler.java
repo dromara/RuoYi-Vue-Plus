@@ -48,7 +48,7 @@ public class PlusTenantLineHandler implements TenantLineHandler {
                 "gen_table_column"
             );
             tables.addAll(excludes);
-            return StringUtils.containsAnyIgnoreCase(tableName, tables.toArray(new String[0]));
+            return StringUtils.equalsAnyIgnoreCase(tableName, tables.toArray(new String[0]));
         }
         return true;
     }

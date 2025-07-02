@@ -35,7 +35,6 @@ public interface IFlwDefinitionService {
      */
     TableDataInfo<FlowDefinitionVo> unPublishList(FlowDefinition flowDefinition, PageQuery pageQuery);
 
-
     /**
      * 发布流程定义
      *

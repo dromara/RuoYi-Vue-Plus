@@ -162,7 +162,7 @@ CREATE TABLE flow_node (
     version nvarchar(20) NOT NULL,
     create_time datetime2(7)  NULL,
     update_time datetime2(7)  NULL,
-    ext nvarchar(500) NULL,
+    ext nvarchar(max) NULL,
     del_flag nchar(1) DEFAULT('0') NULL,
     tenant_id nvarchar(40) NULL,
     CONSTRAINT PK__flow_nod__3213E83F372470DE PRIMARY KEY CLUSTERED (id)
@@ -208,7 +208,7 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'权限标识（权限类型:权限标识，可以多个，用逗号隔开)',
+'MS_Description', N'权限标识（权限类型:权限标识，可以多个，用@@隔开)',
 'SCHEMA', N'dbo',
 'TABLE', N'flow_node',
 'COLUMN', N'permission_flag'
@@ -299,11 +299,12 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'扩展属性',
+'MS_Description', N'节点扩展属性',
 'SCHEMA', N'dbo',
 'TABLE', N'flow_node',
 'COLUMN', N'ext'
 GO
+
 
 EXEC sp_addextendedproperty
 'MS_Description', N'删除标志',
@@ -731,7 +732,7 @@ CREATE TABLE flow_his_task (
     form_path nvarchar(100) NULL,
     message nvarchar(500) NULL,
     variable nvarchar(max) NULL,
-    ext nvarchar(500) NULL,
+    ext nvarchar(max) NULL,
     create_time datetime2(7)  NULL,
     update_time datetime2(7)  NULL,
     del_flag nchar(1) DEFAULT('0') NULL,

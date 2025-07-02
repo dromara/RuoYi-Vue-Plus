@@ -8,7 +8,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.exception.ServiceException;
-import org.dromara.common.core.utils.*;
+import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.ObjectUtils;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.TreeBuildUtils;
 import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.service.DefService;
@@ -48,14 +51,7 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService {
      */
     @Override
     public FlowCategoryVo queryById(Long categoryId) {
-        FlowCategoryVo category = baseMapper.selectVoById(categoryId);
-        if (ObjectUtil.isNull(category)) {
-            return null;
-        }
-        FlowCategoryVo parentCategory = baseMapper.selectVoOne(new LambdaQueryWrapper<FlowCategory>()
-            .select(FlowCategory::getCategoryName).eq(FlowCategory::getCategoryId, category.getParentId()));
-        category.setParentName(ObjectUtils.notNullGetter(parentCategory, FlowCategoryVo::getCategoryName));
-        return category;
+        return baseMapper.selectVoById(categoryId);
     }
 
     /**
@@ -95,27 +91,20 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService {
      */
     @Override
     public List<Tree<String>> selectCategoryTreeList(FlowCategoryBo category) {
-        LambdaQueryWrapper<FlowCategory> lqw = buildQueryWrapper(category);
-        List<FlowCategoryVo> categorys = baseMapper.selectVoList(lqw);
-        if (CollUtil.isEmpty(categorys)) {
+        List<FlowCategoryVo> categoryList = this.queryList(category);
+        if (CollUtil.isEmpty(categoryList)) {
             return CollUtil.newArrayList();
         }
-        // 获取当前列表中每一个节点的parentId，然后在列表中查找是否有id与其parentId对应，若无对应，则表明此时节点列表中，该节点在当前列表中属于顶级节点
-        List<Tree<String>> treeList = CollUtil.newArrayList();
-        for (FlowCategoryVo d : categorys) {
-            String parentId = d.getParentId().toString();
-            FlowCategoryVo categoryVo = StreamUtils.findFirst(categorys, it -> it.getCategoryId().toString().equals(parentId));
-            if (ObjectUtil.isNull(categoryVo)) {
-                List<Tree<String>> trees = TreeBuildUtils.build(categorys, parentId, (dept, tree) ->
-                    tree.setId(dept.getCategoryId().toString())
-                        .setParentId(dept.getParentId().toString())
-                        .setName(dept.getCategoryName())
-                        .setWeight(dept.getOrderNum()));
-                Tree<String> tree = StreamUtils.findFirst(trees, it -> it.getId().equals(d.getCategoryId().toString()));
-                treeList.add(tree);
-            }
-        }
-        return treeList;
+        return TreeBuildUtils.buildMultiRoot(
+            categoryList,
+            node -> String.valueOf(node.getCategoryId()),
+            node -> String.valueOf(node.getParentId()),
+            (node, treeNode) -> treeNode
+                .setId(String.valueOf(node.getCategoryId()))
+                .setParentId(String.valueOf(node.getParentId()))
+                .setName(node.getCategoryName())
+                .setWeight(node.getOrderNum())
+        );
     }
 
     /**

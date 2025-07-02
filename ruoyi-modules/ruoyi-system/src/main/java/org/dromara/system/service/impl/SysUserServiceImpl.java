@@ -69,15 +69,9 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public List<SysUserExportVo> selectUserExportList(SysUserBo user) {
-        return baseMapper.selectUserExportList(this.buildQueryWrapper(user));
-    }
-
-    private Wrapper<SysUser> buildQueryWrapper(SysUserBo user) {
         Map<String, Object> params = user.getParams();
         QueryWrapper<SysUser> wrapper = Wrappers.query();
         wrapper.eq("u.del_flag", SystemConstants.NORMAL)
-            .eq(ObjectUtil.isNotNull(user.getUserId()), "u.user_id", user.getUserId())
-            .in(StringUtils.isNotBlank(user.getUserIds()), "u.user_id", StringUtils.splitTo(user.getUserIds(), Convert::toLong))
             .like(StringUtils.isNotBlank(user.getUserName()), "u.user_name", user.getUserName())
             .like(StringUtils.isNotBlank(user.getNickName()), "u.nick_name", user.getNickName())
             .eq(StringUtils.isNotBlank(user.getStatus()), "u.status", user.getStatus())
@@ -90,8 +84,29 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
                 ids.add(user.getDeptId());
                 w.in("u.dept_id", ids);
             }).orderByAsc("u.user_id");
+        return baseMapper.selectUserExportList(wrapper);
+    }
+
+    private Wrapper<SysUser> buildQueryWrapper(SysUserBo user) {
+        Map<String, Object> params = user.getParams();
+        LambdaQueryWrapper<SysUser> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(SysUser::getDelFlag, SystemConstants.NORMAL)
+            .eq(ObjectUtil.isNotNull(user.getUserId()), SysUser::getUserId, user.getUserId())
+            .in(StringUtils.isNotBlank(user.getUserIds()), SysUser::getUserId, StringUtils.splitTo(user.getUserIds(), Convert::toLong))
+            .like(StringUtils.isNotBlank(user.getUserName()), SysUser::getUserName, user.getUserName())
+            .like(StringUtils.isNotBlank(user.getNickName()), SysUser::getNickName, user.getNickName())
+            .eq(StringUtils.isNotBlank(user.getStatus()), SysUser::getStatus, user.getStatus())
+            .like(StringUtils.isNotBlank(user.getPhonenumber()), SysUser::getPhonenumber, user.getPhonenumber())
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                SysUser::getCreateTime, params.get("beginTime"), params.get("endTime"))
+            .and(ObjectUtil.isNotNull(user.getDeptId()), w -> {
+                List<SysDept> deptList = deptMapper.selectListByParentId(user.getDeptId());
+                List<Long> ids = StreamUtils.toList(deptList, SysDept::getDeptId);
+                ids.add(user.getDeptId());
+                w.in(SysUser::getDeptId, ids);
+            }).orderByAsc(SysUser::getUserId);
         if (StringUtils.isNotBlank(user.getExcludeUserIds())) {
-            wrapper.notIn("u.user_id", StringUtils.splitTo(user.getExcludeUserIds(), Convert::toLong));
+            wrapper.notIn(SysUser::getUserId, StringUtils.splitList(user.getExcludeUserIds()));
         }
         return wrapper;
     }
@@ -635,7 +650,10 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
             return List.of();
         }
         List<SysUserVo> list = baseMapper.selectVoList(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName, SysUser::getEmail, SysUser::getPhonenumber)
+            .select(SysUser::getUserId, SysUser::getDeptId, SysUser::getUserName,
+                SysUser::getNickName, SysUser::getUserType, SysUser::getEmail,
+                SysUser::getPhonenumber, SysUser::getSex, SysUser::getStatus,
+                SysUser::getCreateTime)
             .eq(SysUser::getStatus, SystemConstants.NORMAL)
             .in(SysUser::getUserId, userIds));
         return BeanUtil.copyToList(list, UserDTO.class);
@@ -676,7 +694,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         // 获取用户ID列表
         Set<Long> userIds = StreamUtils.toSet(userRoles, SysUserRole::getUserId);
 
-        return selectListByIds(new ArrayList<>(userIds));
+        return this.selectListByIds(new ArrayList<>(userIds));
     }
 
     /**
@@ -716,7 +734,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         // 获取用户ID列表
         Set<Long> userIds = StreamUtils.toSet(userPosts, SysUserPost::getUserId);
 
-        return selectListByIds(new ArrayList<>(userIds));
+        return this.selectListByIds(new ArrayList<>(userIds));
     }
 
     /**

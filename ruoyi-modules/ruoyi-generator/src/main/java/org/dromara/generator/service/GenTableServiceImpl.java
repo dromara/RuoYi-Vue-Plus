@@ -297,13 +297,13 @@ public class GenTableServiceImpl implements IGenTableService {
         List<GenTableColumn> tableColumns = new ArrayList<>();
         columns.forEach((columnName, column) -> {
             GenTableColumn tableColumn = new GenTableColumn();
-            tableColumn.setIsPk(String.valueOf(column.isPrimaryKey()));
+            tableColumn.setIsPk(column.isPrimaryKey() ? "1" : "0");
             tableColumn.setColumnName(column.getName());
             tableColumn.setColumnComment(column.getComment());
             tableColumn.setColumnType(column.getOriginType().toLowerCase());
             tableColumn.setSort(column.getPosition());
-            tableColumn.setIsRequired(column.isNullable() == 0 ? "1" : "0");
-            tableColumn.setIsIncrement(column.isAutoIncrement() == -1 ? "0" : "1");
+            tableColumn.setIsRequired(column.isNullable() ? "1" : "0");
+            tableColumn.setIsIncrement(column.isAutoIncrement() ? "1" : "0");
             tableColumns.add(tableColumn);
         });
         return tableColumns;

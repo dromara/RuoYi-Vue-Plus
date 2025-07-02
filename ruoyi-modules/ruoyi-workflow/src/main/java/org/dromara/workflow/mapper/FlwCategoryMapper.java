@@ -29,7 +29,9 @@ public interface FlwCategoryMapper extends BaseMapperPlus<FlowCategory, FlowCate
     @DataPermission({
         @DataColumn(key = "deptName", value = "createDept")
     })
-    long countCategoryById(Long categoryId);
+    default long countCategoryById(Long categoryId) {
+        return this.selectCount(new LambdaQueryWrapper<FlowCategory>().eq(FlowCategory::getCategoryId, categoryId));
+    }
 
     /**
      * 根据父流程分类ID查询其所有子流程分类的列表

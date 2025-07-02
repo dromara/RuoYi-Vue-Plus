@@ -4,14 +4,13 @@ import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+import org.dromara.common.translation.annotation.Translation;
+import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.FlowCategory;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
 
 /**
  * 流程分类视图对象 wf_category
@@ -34,13 +33,14 @@ public class FlowCategoryVo implements Serializable {
     private Long categoryId;
 
     /**
-     * 父级id
+     * 父级分类id
      */
     private Long parentId;
 
     /**
-     * 父类别名称
+     * 父级分类名称
      */
+    @Translation(type = FlowConstant.CATEGORY_ID_TO_NAME, mapper = "parentId")
     private String parentName;
 
     /**
@@ -65,10 +65,5 @@ public class FlowCategoryVo implements Serializable {
      */
     @ExcelProperty(value = "创建时间")
     private Date createTime;
-
-    /**
-     * 子菜单
-     */
-    private List<FlowCategoryVo> children = new ArrayList<>();
 
 }

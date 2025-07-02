@@ -5,6 +5,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.plugin.*;
 import org.dromara.common.core.utils.StringUtils;
@@ -39,12 +40,23 @@ public class MybatisDecryptInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
+        // 开始进行参数解密
+        ResultSetHandler resultSetHandler = (ResultSetHandler) invocation.getTarget();
+        Field parameterHandlerField = resultSetHandler.getClass().getDeclaredField("parameterHandler");
+        parameterHandlerField.setAccessible(true);
+        Object target = parameterHandlerField.get(resultSetHandler);
+        if (target instanceof ParameterHandler parameterHandler) {
+            Object parameterObject = parameterHandler.getParameterObject();
+            if (ObjectUtil.isNotNull(parameterObject) && !(parameterObject instanceof String)) {
+                this.decryptHandler(parameterObject);
+            }
+        }
         // 获取执行mysql执行结果
         Object result = invocation.proceed();
         if (result == null) {
             return null;
         }
-        decryptHandler(result);
+        this.decryptHandler(result);
         return result;
     }
 

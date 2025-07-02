@@ -113,6 +113,9 @@ public class SysDeptController extends BaseController {
     @Log(title = "部门管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{deptId}")
     public R<Void> remove(@PathVariable Long deptId) {
+        if (SystemConstants.DEFAULT_DEPT_ID.equals(deptId)) {
+            return R.warn("默认部门,不允许删除");
+        }
         if (deptService.hasChildByDeptId(deptId)) {
             return R.warn("存在下级部门,不允许删除");
         }

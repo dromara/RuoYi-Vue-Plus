@@ -304,14 +304,14 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         }
         //历史任务
         LambdaQueryWrapper<FlowHisTask> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(FlowHisTask::getInstanceId, instanceId);
-        wrapper.eq(FlowHisTask::getNodeType, NodeType.BETWEEN.getKey());
-        wrapper.orderByDesc(FlowHisTask::getCreateTime).orderByDesc(FlowHisTask::getUpdateTime);
+        wrapper.eq(FlowHisTask::getInstanceId, instanceId)
+            .eq(FlowHisTask::getNodeType, NodeType.BETWEEN.getKey())
+            .orderByDesc(FlowHisTask::getCreateTime, FlowHisTask::getUpdateTime);
         List<FlowHisTask> flowHisTasks = flowHisTaskMapper.selectList(wrapper);
         if (CollUtil.isNotEmpty(flowHisTasks)) {
             list.addAll(BeanUtil.copyToList(flowHisTasks, FlowHisTaskVo.class));
         }
-        return Map.of("list", list,"instanceId",instanceId);
+        return Map.of("list", list, "instanceId", instanceId);
     }
 
     /**

@@ -61,7 +61,7 @@ create table FLOW_NODE
     VERSION         VARCHAR2(20),
     CREATE_TIME     DATE,
     UPDATE_TIME     DATE,
-    EXT             VARCHAR2(500),
+    EXT             CLOB,
     DEL_FLAG        VARCHAR2(1)   default '0',
     TENANT_ID       VARCHAR2(40),
     PERMISSION_FLAG VARCHAR2(200)
@@ -88,10 +88,10 @@ comment on column FLOW_NODE.FORM_PATH is '审批表单路径';
 comment on column FLOW_NODE.VERSION is '版本';
 comment on column FLOW_NODE.CREATE_TIME is '创建时间';
 comment on column FLOW_NODE.UPDATE_TIME is '更新时间';
-comment on column FLOW_NODE.EXT is '扩展属性';
+comment on column FLOW_NODE.EXT is '节点扩展属性';
 comment on column FLOW_NODE.DEL_FLAG is '删除标志';
 comment on column FLOW_NODE.TENANT_ID is '租户id';
-comment on column FLOW_NODE.PERMISSION_FLAG is '权限标识（权限类型:权限标识，可以多个，用逗号隔开)';
+comment on column FLOW_NODE.PERMISSION_FLAG is '权限标识（权限类型:权限标识，可以多个，用@@隔开)';
 
 create table FLOW_SKIP
 (
@@ -179,7 +179,7 @@ create table FLOW_TASK
     NODE_CODE     VARCHAR2(100),
     NODE_NAME     VARCHAR2(100),
     NODE_TYPE     NUMBER(1),
-    FLOW_STATUS      VARCHAR2(20),
+    FLOW_STATUS   VARCHAR2(20),
     FORM_CUSTOM   VARCHAR2(1) default 'N',
     FORM_PATH     VARCHAR2(100),
     CREATE_TIME   DATE,
@@ -226,7 +226,7 @@ create table FLOW_HIS_TASK
     FORM_PATH        VARCHAR2(100),
     MESSAGE          VARCHAR2(500),
     VARIABLE         CLOB,
-    EXT              VARCHAR2(500),
+    EXT              CLOB,
     CREATE_TIME      DATE,
     UPDATE_TIME      DATE,
     DEL_FLAG         VARCHAR2(1) default '0',

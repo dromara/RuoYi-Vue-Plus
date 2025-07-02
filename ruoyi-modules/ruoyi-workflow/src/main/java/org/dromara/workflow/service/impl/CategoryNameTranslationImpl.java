@@ -26,12 +26,6 @@ public class CategoryNameTranslationImpl implements TranslationInterface<String>
 
     @Override
     public String translation(Object key, String other) {
-        Long id = null;
-        if (key instanceof String categoryId) {
-            id = Convert.toLong(categoryId);
-        } else if (key instanceof Long categoryId) {
-            id = categoryId;
-        }
-        return flwCategoryService.selectCategoryNameById(id);
+        return flwCategoryService.selectCategoryNameById(Convert.toLong(key));
     }
 }

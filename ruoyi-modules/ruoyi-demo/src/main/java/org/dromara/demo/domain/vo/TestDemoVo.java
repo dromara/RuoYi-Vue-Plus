@@ -2,6 +2,7 @@ package org.dromara.demo.domain.vo;
 
 import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
+import cn.idev.excel.annotation.format.DateTimeFormat;
 import org.dromara.common.excel.annotation.ExcelNotation;
 import org.dromara.common.excel.annotation.ExcelRequired;
 import org.dromara.common.translation.annotation.Translation;
@@ -46,7 +47,7 @@ public class TestDemoVo implements Serializable {
      * 用户id
      */
     @ExcelRequired
-    @ExcelProperty(value = "用户id")
+    @ExcelProperty(value = "用户id", index = 5)
     private Long userId;
 
     /**
@@ -73,6 +74,8 @@ public class TestDemoVo implements Serializable {
     /**
      * 创建时间
      */
+    @ExcelRequired
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间")
     private Date createTime;
 
@@ -107,5 +110,10 @@ public class TestDemoVo implements Serializable {
     @Translation(type = TransConstant.USER_ID_TO_NAME, mapper = "updateBy")
     @ExcelProperty(value = "更新人账号")
     private String updateByName;
+
+    /**
+     * 版本
+     */
+    private Long version;
 
 }

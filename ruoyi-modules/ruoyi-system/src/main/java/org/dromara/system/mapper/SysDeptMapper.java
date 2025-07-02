@@ -2,7 +2,6 @@ package org.dromara.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.annotation.DataColumn;
@@ -30,18 +29,23 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo> {
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id")
     })
-    List<SysDeptVo> selectDeptList(@Param(Constants.WRAPPER) Wrapper<SysDept> queryWrapper);
+    default List<SysDeptVo> selectDeptList(Wrapper<SysDept> queryWrapper) {
+        return this.selectVoList(queryWrapper);
+    }
 
     /**
      * 分页查询部门管理数据
      *
+     * @param page         分页信息
      * @param queryWrapper 查询条件
      * @return 部门信息集合
      */
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id"),
     })
-    Page<SysDeptVo> selectPageDeptList(@Param("page") Page<SysDeptVo> page, @Param(Constants.WRAPPER) Wrapper<SysDept> queryWrapper);
+    default Page<SysDeptVo> selectPageDeptList(Page<SysDept> page, Wrapper<SysDept> queryWrapper) {
+        return this.selectVoPage(page, queryWrapper);
+    }
 
     /**
      * 统计指定部门ID的部门数量
@@ -52,7 +56,9 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo> {
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id")
     })
-    long countDeptById(Long deptId);
+    default long countDeptById(Long deptId) {
+        return this.selectCount(new LambdaQueryWrapper<SysDept>().eq(SysDept::getDeptId, deptId));
+    }
 
     /**
      * 根据父部门ID查询其所有子部门的列表

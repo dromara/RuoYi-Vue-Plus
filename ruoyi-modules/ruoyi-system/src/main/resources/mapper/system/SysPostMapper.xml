@@ -7,17 +7,6 @@
     <resultMap type="org.dromara.system.domain.vo.SysPostVo" id="SysPostResult">
     </resultMap>
 
-    <select id="selectPagePostList" resultMap="SysPostResult">
-        select
-        <if test="ew.getSqlSelect != null">
-            ${ew.getSqlSelect}
-        </if>
-        <if test="ew.getSqlSelect == null">
-            *
-        </if>
-        from sys_post ${ew.getCustomSqlSegment}
-    </select>
-
     <select id="selectPostsByUserId" parameterType="Long" resultMap="SysPostResult">
         select p.post_id, p.dept_id, p.post_name, p.post_code, p.post_category
         from sys_post p

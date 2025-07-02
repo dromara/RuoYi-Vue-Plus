@@ -6,17 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 批注
+ * 批注 此注解仅用于单表头 不支持多层级表头
  * @author guzhouyanyu
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExcelNotation {
 
-    /**
-     * col index
-     */
-    int index() default -1;
     /**
      * 批注内容
      */

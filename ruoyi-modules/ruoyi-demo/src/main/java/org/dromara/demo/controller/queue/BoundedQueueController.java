@@ -1,11 +1,9 @@
 package org.dromara.demo.controller.queue;
 
-import cn.dev33.satoken.annotation.SaIgnore;
-import org.dromara.common.core.domain.R;
-import org.dromara.common.redis.utils.QueueUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RBoundedBlockingQueue;
+import org.dromara.common.core.domain.R;
+import org.dromara.common.redis.utils.QueueUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Lion Li
  * @version 3.6.0
+ * @deprecated redisson 新版本已经将队列功能标记删除 一些技术问题无法解决 建议搭建MQ使用
  */
+@Deprecated
 @Slf4j
 @RequiredArgsConstructor
 @RestController

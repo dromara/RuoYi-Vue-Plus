@@ -2,6 +2,7 @@ package org.dromara.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.dto.TaskAssigneeDTO;
 import org.dromara.common.core.domain.model.TaskAssigneeBody;
 import org.dromara.common.core.service.TaskAssigneeService;
@@ -51,6 +52,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         SysRoleBo bo = new SysRoleBo();
         bo.setRoleKey(taskQuery.getHandlerCode());
         bo.setRoleName(taskQuery.getHandlerName());
+        bo.setStatus(SystemConstants.NORMAL);
         Map<String, Object> params = bo.getParams();
         params.put("beginTime", taskQuery.getBeginTime());
         params.put("endTime", taskQuery.getEndTime());
@@ -73,6 +75,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         SysPostBo bo = new SysPostBo();
         bo.setPostCategory(taskQuery.getHandlerCode());
         bo.setPostName(taskQuery.getHandlerName());
+        bo.setStatus(SystemConstants.NORMAL);
         Map<String, Object> params = bo.getParams();
         params.put("beginTime", taskQuery.getBeginTime());
         params.put("endTime", taskQuery.getEndTime());
@@ -96,6 +99,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         SysDeptBo bo = new SysDeptBo();
         bo.setDeptCategory(taskQuery.getHandlerCode());
         bo.setDeptName(taskQuery.getHandlerName());
+        bo.setStatus(SystemConstants.NORMAL);
         Map<String, Object> params = bo.getParams();
         params.put("beginTime", taskQuery.getBeginTime());
         params.put("endTime", taskQuery.getEndTime());
@@ -106,7 +110,6 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
             SysDeptVo::getDeptId, SysDeptVo::getDeptCategory, SysDeptVo::getDeptName, SysDeptVo::getParentId, SysDeptVo::getCreateTime);
         return new TaskAssigneeDTO(page.getTotal(), handlers);
     }
-
 
     /**
      * 查询用户并返回任务指派的列表，支持分页
@@ -120,6 +123,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         SysUserBo bo = new SysUserBo();
         bo.setUserName(taskQuery.getHandlerCode());
         bo.setNickName(taskQuery.getHandlerName());
+        bo.setStatus(SystemConstants.NORMAL);
         Map<String, Object> params = bo.getParams();
         params.put("beginTime", taskQuery.getBeginTime());
         params.put("endTime", taskQuery.getEndTime());

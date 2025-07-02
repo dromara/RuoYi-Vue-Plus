@@ -1,6 +1,8 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.common.log.annotation.Log;
@@ -11,11 +13,10 @@ import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysConfigBo;
 import org.dromara.system.domain.vo.SysConfigVo;
 import org.dromara.system.service.ISysConfigService;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -120,7 +121,7 @@ public class SysConfigController extends BaseController {
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
     public R<Void> remove(@PathVariable Long[] configIds) {
-        configService.deleteConfigByIds(configIds);
+        configService.deleteConfigByIds(Arrays.asList(configIds));
         return R.ok();
     }
 
