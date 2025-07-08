@@ -2,6 +2,7 @@ package org.dromara.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -32,9 +33,8 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "user_id")
     })
-    default Page<SysUserVo> selectPageUserList(Page<SysUser> page, Wrapper<SysUser> queryWrapper) {
-        return this.selectVoPage(page, queryWrapper);
-    }
+    Page<SysUserVo> selectPageUserList(@Param("page") Page<SysUserVo> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+
 
     /**
      * 查询用户列表，并进行数据权限控制

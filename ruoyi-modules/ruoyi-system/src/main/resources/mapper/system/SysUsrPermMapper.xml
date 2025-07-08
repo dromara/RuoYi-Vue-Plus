@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.system.mapper.SysUsrPermMapper">
+
+    <resultMap type="org.dromara.system.domain.vo.SysUsrPermVo" id="SysUsrPrmResult">
+        <id property="username" column="username"/>
+    </resultMap>
+
+    <select id="selectUsrPermList" resultMap="SysUsrPrmResult">
+        SELECT user_name ,tenant_id ,user_perm
+        FROM v_user_per_menus
+        ${ew.getCustomSqlSegment}
+    </select>
+
+
+</mapper>

@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jodd.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.CacheNames;
@@ -57,8 +58,12 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
 
     @Override
     public TableDataInfo<SysUserVo> selectPageUserList(SysUserBo user, PageQuery pageQuery) {
-        Page<SysUserVo> page = baseMapper.selectPageUserList(pageQuery.build(), this.buildQueryWrapper(user));
-        return TableDataInfo.build(page);
+        Wrapper<SysUser> wrapper =  this.buildQueryWrapper(user, pageQuery);
+
+        Page<SysUserVo> page = pageQuery.build();
+        Page<SysUserVo> resultPage = baseMapper.selectPageUserList(page, wrapper);
+
+        return TableDataInfo.build(resultPage);
     }
 
     /**
@@ -87,28 +92,45 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         return baseMapper.selectUserExportList(wrapper);
     }
 
-    private Wrapper<SysUser> buildQueryWrapper(SysUserBo user) {
+    private Wrapper<SysUser> buildQueryWrapper(SysUserBo user, PageQuery pageQuery) {
         Map<String, Object> params = user.getParams();
-        LambdaQueryWrapper<SysUser> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(SysUser::getDelFlag, SystemConstants.NORMAL)
-            .eq(ObjectUtil.isNotNull(user.getUserId()), SysUser::getUserId, user.getUserId())
-            .in(StringUtils.isNotBlank(user.getUserIds()), SysUser::getUserId, StringUtils.splitTo(user.getUserIds(), Convert::toLong))
-            .like(StringUtils.isNotBlank(user.getUserName()), SysUser::getUserName, user.getUserName())
-            .like(StringUtils.isNotBlank(user.getNickName()), SysUser::getNickName, user.getNickName())
-            .eq(StringUtils.isNotBlank(user.getStatus()), SysUser::getStatus, user.getStatus())
-            .like(StringUtils.isNotBlank(user.getPhonenumber()), SysUser::getPhonenumber, user.getPhonenumber())
+        QueryWrapper<SysUser> wrapper = Wrappers.query();
+
+        wrapper.eq("u.del_flag", SystemConstants.NORMAL)
+            .eq(ObjectUtil.isNotNull(user.getUserId()), "u.user_id", user.getUserId())
+            .like(StringUtils.isNotBlank(user.getUserName()), "u.user_name", user.getUserName())
+            .like(StringUtils.isNotBlank(user.getNickName()), "u.nick_name", user.getNickName())
+            .eq(StringUtils.isNotBlank(user.getStatus()), "u.status", user.getStatus())
+            .like(StringUtils.isNotBlank(user.getPhonenumber()), "u.phonenumber", user.getPhonenumber())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysUser::getCreateTime, params.get("beginTime"), params.get("endTime"))
+                "u.create_time", params.get("beginTime"), params.get("endTime"))
             .and(ObjectUtil.isNotNull(user.getDeptId()), w -> {
                 List<SysDept> deptList = deptMapper.selectListByParentId(user.getDeptId());
                 List<Long> ids = StreamUtils.toList(deptList, SysDept::getDeptId);
                 ids.add(user.getDeptId());
-                w.in(SysUser::getDeptId, ids);
-            }).orderByAsc(SysUser::getUserId);
+                w.in("u.dept_id", ids);
+            });
+
         if (StringUtils.isNotBlank(user.getExcludeUserIds())) {
-            wrapper.notIn(SysUser::getUserId, StringUtils.splitList(user.getExcludeUserIds()));
+            wrapper.notIn("u.user_id", StringUtils.splitList(user.getExcludeUserIds()));
+        }
+
+        if(StringUtils.isNotBlank(pageQuery.getOrderByColumn()))
+        {
+            String sortingDirection =  StringUtils.equals("asc",pageQuery.getIsAsc()) ? "ASC": "DESC";
+            String sortingFieldName  = getFieldWithTableName(pageQuery.getOrderByColumn());
+            wrapper.last("ORDER BY " + sortingFieldName + " " +  sortingDirection);
         }
         return wrapper;
+    }
+
+    private String getFieldWithTableName(String fieldName) {
+        String fieldTargetTableName = "u.";
+        if(StringUtil.equals(fieldName,"dept_name"))
+        {
+            fieldTargetTableName = "d.";
+        }
+        return fieldTargetTableName + fieldName;
     }
 
     /**
