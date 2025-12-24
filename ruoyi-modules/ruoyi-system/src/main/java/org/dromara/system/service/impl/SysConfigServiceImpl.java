@@ -1,6 +1,7 @@
 package org.dromara.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -14,6 +15,7 @@ import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.ObjectUtils;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.redis.utils.CacheUtils;
@@ -82,6 +84,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
 
     /**
      * 获取注册开关
+     *
      * @param tenantId 租户id
      * @return true开启，false关闭
      */
@@ -210,6 +213,56 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     @Override
     public String getConfigValue(String configKey) {
         return SpringUtils.getAopProxy(this).selectConfigByKey(configKey);
+    }
+
+    /**
+     * 根据参数 key 获取 Map 类型的配置
+     *
+     * @param configKey 参数 key
+     * @return Dict 对象，如果配置为空或无法解析，返回空 Dict
+     */
+    @Override
+    public Dict getConfigMap(String configKey) {
+        String configValue = getConfigValue(configKey);
+        return JsonUtils.parseMap(configValue);
+    }
+
+    /**
+     * 根据参数 key 获取 Map 类型的配置列表
+     *
+     * @param configKey 参数 key
+     * @return Dict 列表，如果配置为空或无法解析，返回空列表
+     */
+    @Override
+    public List<Dict> getConfigArrayMap(String configKey) {
+        String configValue = getConfigValue(configKey);
+        return JsonUtils.parseArrayMap(configValue);
+    }
+
+    /**
+     * 根据参数 key 获取指定类型的配置对象
+     *
+     * @param configKey 参数 key
+     * @param clazz     目标对象类型
+     * @return 对象实例，如果配置为空或无法解析，返回 null
+     */
+    @Override
+    public <T> T getConfigObject(String configKey, Class<T> clazz) {
+        String configValue = getConfigValue(configKey);
+        return JsonUtils.parseObject(configValue, clazz);
+    }
+
+    /**
+     * 根据参数 key 获取指定类型的配置列表=
+     *
+     * @param configKey 参数 key
+     * @param clazz     目标元素类型
+     * @return 指定类型列表，如果配置为空或无法解析，返回空列表
+     */
+    @Override
+    public <T> List<T> getConfigArray(String configKey, Class<T> clazz) {
+        String configValue = getConfigValue(configKey);
+        return JsonUtils.parseArray(configValue, clazz);
     }
 
 }

@@ -1,5 +1,7 @@
 package org.dromara.common.core.utils;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.dromara.common.core.enums.FormatsType;
 import org.dromara.common.core.exception.ServiceException;
@@ -295,6 +297,82 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         if (diff > maxValue) {
             throw new ServiceException("最大时间跨度为 {} {}", maxValue, unit.toString().toLowerCase());
         }
+    }
+
+    /**
+     * 根据指定日期时间获取时间段（凌晨 / 上午 / 中午 / 下午 / 晚上）
+     *
+     * @param date 日期时间
+     * @return 时间段描述
+     */
+    public static String getTodayHour(Date date) {
+        int hour = DateUtil.hour(date, true);
+        if (hour <= 6) {
+            return "凌晨";
+        } else if (hour < 12) {
+            return "上午";
+        } else if (hour == 12) {
+            return "中午";
+        } else if (hour <= 18) {
+            return "下午";
+        } else {
+            return "晚上";
+        }
+    }
+
+    /**
+     * 将日期格式化为仿微信的友好时间
+     * <p>
+     * 规则说明：
+     * 1. 未来时间：yyyy-MM-dd HH:mm
+     * 2. 今天：
+     * - 1 分钟内：刚刚
+     * - 1 小时内：X 分钟前
+     * - 超过 1 小时：凌晨/上午/中午/下午/晚上 HH:mm
+     * 3. 昨天：昨天 HH:mm
+     * 4. 本周：周X HH:mm
+     * 5. 今年内：MM-dd HH:mm
+     * 6. 非今年：yyyy-MM-dd HH:mm
+     *
+     * @param date 日期时间
+     * @return 格式化后的时间描述
+     */
+    public static String formatFriendlyTime(Date date) {
+        if (date == null) {
+            return "";
+        }
+        Date now = DateUtil.date();
+
+        // 未来时间或非今年
+        if (date.after(now) || DateUtil.year(date) != DateUtil.year(now)) {
+            return parseDateToStr(FormatsType.YYYY_MM_DD_HH_MM, date);
+        }
+
+        // 今天
+        if (DateUtil.isSameDay(date, now)) {
+            long minutes = DateUtil.between(date, now, DateUnit.MINUTE);
+            if (minutes < 1) {
+                return "刚刚";
+            }
+            if (minutes < 60) {
+                return minutes + "分钟前";
+            }
+            return getTodayHour(date) + " " + DateUtil.format(date, "HH:mm");
+        }
+
+        // 昨天
+        if (DateUtil.isSameDay(date, DateUtil.yesterday())) {
+            return "昨天 " + DateUtil.format(date, "HH:mm");
+        }
+
+        // 本周
+        if (DateUtil.isSameWeek(date, now, true)) {
+            return DateUtil.dayOfWeekEnum(date).toChinese("周")
+                + " " + DateUtil.format(date, "HH:mm");
+        }
+
+        // 今年内其它时间
+        return DateUtil.format(date, "MM-dd HH:mm");
     }
 
 }

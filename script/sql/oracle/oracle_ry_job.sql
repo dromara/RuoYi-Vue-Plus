@@ -738,7 +738,7 @@ CREATE TABLE sj_retry_summary
     id            number GENERATED ALWAYS AS IDENTITY,
     namespace_id  varchar2(64) DEFAULT '764d604ec6fc45f68cd92514c40e9e1a' NULL,
     group_name    varchar2(64) DEFAULT ''                                 NULL,
-    scene_name    varchar2(50) DEFAULT ''                                 NULL,
+    scene_name    varchar2(64) DEFAULT ''                                 NULL,
     trigger_at    date         DEFAULT CURRENT_TIMESTAMP                  NOT NULL,
     running_num   number       DEFAULT 0                                  NOT NULL,
     finish_num    number       DEFAULT 0                                  NOT NULL,

@@ -27,7 +27,10 @@
                 d.flow_code,
                 d.form_custom,
                 d.category,
-                COALESCE(t.form_path, d.form_path) as form_path,
+                COALESCE(
+                    NULLIF(TRIM(t.form_path), ''),
+                    NULLIF(TRIM(d.form_path), '')
+                ) AS form_path,
                 d.version,
                 uu.processed_by,
                 uu.type,

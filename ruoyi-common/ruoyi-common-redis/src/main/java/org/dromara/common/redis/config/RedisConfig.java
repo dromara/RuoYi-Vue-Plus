@@ -53,9 +53,10 @@ public class RedisConfig {
             om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
             // 指定序列化输入的类型，类必须是非final修饰的。序列化时将对象全类名一起保存下来
             om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
-//            LoggerFactory.useSlf4jLogging(true);
-//            FuryCodec furyCodec = new FuryCodec();
-//            CompositeCodec codec = new CompositeCodec(StringCodec.INSTANCE, furyCodec, furyCodec);
+            // org.apache.fory.logging.LoggerFactory 包别引入错了
+            // LoggerFactory.useSlf4jLogging(true);
+            // ForyCodec foryCodec = new ForyCodec();
+            // CompositeCodec codec = new CompositeCodec(StringCodec.INSTANCE, foryCodec, foryCodec);
             TypedJsonJacksonCodec jsonCodec = new TypedJsonJacksonCodec(Object.class, om);
             // 组合序列化 key 使用 String 内容使用通用 json 格式
             CompositeCodec codec = new CompositeCodec(StringCodec.INSTANCE, jsonCodec, jsonCodec);

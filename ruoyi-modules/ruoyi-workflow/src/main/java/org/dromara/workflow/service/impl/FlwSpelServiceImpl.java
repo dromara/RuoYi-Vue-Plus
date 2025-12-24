@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 流程spel达式定义Service业务层处理
+ * 流程spel表达式定义Service业务层处理
  *
  * @author Michelle.Chung
  * @date 2025-07-04
@@ -42,10 +42,10 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
     private final FlwSpelMapper baseMapper;
 
     /**
-     * 查询流程spel达式定义
+     * 查询流程spel表达式定义
      *
      * @param id 主键
-     * @return 流程spel达式定义
+     * @return 流程spel表达式定义
      */
     @Override
     public FlowSpelVo queryById(Long id){
@@ -53,11 +53,11 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
     }
 
     /**
-     * 分页查询流程spel达式定义列表
+     * 分页查询流程spel表达式定义列表
      *
      * @param bo        查询条件
      * @param pageQuery 分页参数
-     * @return 流程spel达式定义分页列表
+     * @return 流程spel表达式定义分页列表
      */
     @Override
     public TableDataInfo<FlowSpelVo> queryPageList(FlowSpelBo bo, PageQuery pageQuery) {
@@ -67,10 +67,10 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
     }
 
     /**
-     * 查询符合条件的流程spel达式定义列表
+     * 查询符合条件的流程spel表达式定义列表
      *
      * @param bo 查询条件
-     * @return 流程spel达式定义列表
+     * @return 流程spel表达式定义列表
      */
     @Override
     public List<FlowSpelVo> queryList(FlowSpelBo bo) {
@@ -92,9 +92,9 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
     }
 
     /**
-     * 新增流程spel达式定义
+     * 新增流程spel表达式定义
      *
-     * @param bo 流程spel达式定义
+     * @param bo 流程spel表达式定义
      * @return 是否新增成功
      */
     @Override
@@ -109,9 +109,9 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
     }
 
     /**
-     * 修改流程spel达式定义
+     * 修改流程spel表达式定义
      *
-     * @param bo 流程spel达式定义
+     * @param bo 流程spel表达式定义
      * @return 是否修改成功
      */
     @Override
@@ -129,7 +129,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
     }
 
     /**
-     * 校验并批量删除流程spel达式定义信息
+     * 校验并批量删除流程spel表达式定义信息
      *
      * @param ids     待删除的主键集合
      * @param isValid 是否进行有效性校验

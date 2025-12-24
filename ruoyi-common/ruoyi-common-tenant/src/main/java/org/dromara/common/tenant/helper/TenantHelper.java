@@ -55,7 +55,7 @@ public class TenantHelper {
     /**
      * 开启忽略租户(开启后需手动调用 {@link #disableIgnore()} 关闭)
      */
-    public static void enableIgnore() {
+    private static void enableIgnore() {
         IgnoreStrategy ignoreStrategy = getIgnoreStrategy();
         if (ObjectUtil.isNull(ignoreStrategy)) {
             InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
@@ -69,7 +69,7 @@ public class TenantHelper {
     /**
      * 关闭忽略租户
      */
-    public static void disableIgnore() {
+    private static void disableIgnore() {
         IgnoreStrategy ignoreStrategy = getIgnoreStrategy();
         if (ObjectUtil.isNotNull(ignoreStrategy)) {
             boolean noOtherIgnoreStrategy = !Boolean.TRUE.equals(ignoreStrategy.getDynamicTableName())

@@ -92,4 +92,20 @@ public interface FlowConstant {
      * 业务编码
      */
     String BUSINESS_CODE = "businessCode";
+
+    /**
+     * 忽略-办理权限校验（true：忽略，false：不忽略）
+     */
+    String VAR_IGNORE = "ignore";
+
+    /**
+     * 忽略-委派处理（true：忽略，false：不忽略）
+     */
+    String VAR_IGNORE_DEPUTE = "ignoreDepute";
+
+    /**
+     * 忽略-会签票签处理（true：忽略，false：不忽略）
+     */
+    String VAR_IGNORE_COOPERATE = "ignoreCooperate";
+
 }

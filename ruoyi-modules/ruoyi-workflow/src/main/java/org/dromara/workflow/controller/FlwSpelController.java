@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 流程spel达式定义
+ * 流程spel表达式定义
  *
  * @author Michelle.Chung
  * @date 2025-07-04
@@ -38,7 +38,7 @@ public class FlwSpelController extends BaseController {
     private final IFlwSpelService flwSpelService;
 
     /**
-     * 查询流程spel达式定义列表
+     * 查询流程spel表达式定义列表
      */
     @SaCheckPermission("workflow:spel:list")
     @GetMapping("/list")
@@ -47,7 +47,7 @@ public class FlwSpelController extends BaseController {
     }
 
     /**
-     * 获取流程spel达式定义详细信息
+     * 获取流程spel表达式定义详细信息
      *
      * @param id 主键
      */
@@ -58,10 +58,10 @@ public class FlwSpelController extends BaseController {
     }
 
     /**
-     * 新增流程spel达式定义
+     * 新增流程spel表达式定义
      */
     @SaCheckPermission("workflow:spel:add")
-    @Log(title = "流程spel达式定义", businessType = BusinessType.INSERT)
+    @Log(title = "流程spel表达式定义", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody FlowSpelBo bo) {
@@ -69,10 +69,10 @@ public class FlwSpelController extends BaseController {
     }
 
     /**
-     * 修改流程spel达式定义
+     * 修改流程spel表达式定义
      */
     @SaCheckPermission("workflow:spel:edit")
-    @Log(title = "流程spel达式定义", businessType = BusinessType.UPDATE)
+    @Log(title = "流程spel表达式定义", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody FlowSpelBo bo) {
@@ -80,12 +80,12 @@ public class FlwSpelController extends BaseController {
     }
 
     /**
-     * 删除流程spel达式定义
+     * 删除流程spel表达式定义
      *
      * @param ids 主键串
      */
     @SaCheckPermission("workflow:spel:remove")
-    @Log(title = "流程spel达式定义", businessType = BusinessType.DELETE)
+    @Log(title = "流程spel表达式定义", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空") @PathVariable Long[] ids) {
         return toAjax(flwSpelService.deleteWithValidByIds(List.of(ids), true));

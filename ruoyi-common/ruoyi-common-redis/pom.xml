@@ -43,16 +43,12 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
-<!--        &lt;!&ndash; redis序列化替代方案 比json快无数的跨语言二进制序列化 &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.fury</groupId>-->
-<!--            <artifactId>fury-core</artifactId>-->
-<!--            <version>0.9.0</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.slf4j</groupId>-->
-<!--            <artifactId>slf4j-api</artifactId>-->
-<!--        </dependency>-->
+        <!-- redis序列化替代方案 比json快无数的跨语言二进制序列化 -->
+        <dependency>
+            <groupId>org.apache.fory</groupId>
+            <artifactId>fory-core</artifactId>
+            <version>0.13.1</version>
+        </dependency>
 
     </dependencies>
 

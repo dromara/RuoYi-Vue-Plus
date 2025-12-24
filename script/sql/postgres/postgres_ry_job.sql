@@ -684,7 +684,7 @@ CREATE TABLE sj_retry_summary
     id            bigserial PRIMARY KEY,
     namespace_id  varchar(64) NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a',
     group_name    varchar(64) NOT NULL DEFAULT '',
-    scene_name    varchar(50) NOT NULL DEFAULT '',
+    scene_name    varchar(64) NOT NULL DEFAULT '',
     trigger_at    timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     running_num   int         NOT NULL DEFAULT 0,
     finish_num    int         NOT NULL DEFAULT 0,

@@ -28,9 +28,14 @@ public class SocialLoginConfigProperties {
     private String redirectUri;
 
     /**
-     * 是否获取unionId
+     * 是否需要申请unionid，目前只针对qq登录
      */
-    private boolean unionId;
+    private Boolean unionId;
+
+    /**
+     * Microsoft Entra ID（原微软 AAD）中的租户 ID
+     */
+    private String tenantId;
 
     /**
      * Coding 企业名称

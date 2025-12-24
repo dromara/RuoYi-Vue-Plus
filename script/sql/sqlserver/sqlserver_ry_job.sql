@@ -2248,7 +2248,7 @@ CREATE TABLE sj_retry_summary
     id            bigint       NOT NULL PRIMARY KEY IDENTITY,
     namespace_id  nvarchar(64) NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a',
     group_name    nvarchar(64) NOT NULL DEFAULT '',
-    scene_name    nvarchar(50) NOT NULL DEFAULT '',
+    scene_name    nvarchar(64) NOT NULL DEFAULT '',
     trigger_at    datetime2    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     running_num   int          NOT NULL DEFAULT 0,
     finish_num    int          NOT NULL DEFAULT 0,

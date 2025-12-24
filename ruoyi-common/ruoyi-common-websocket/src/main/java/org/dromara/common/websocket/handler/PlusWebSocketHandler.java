@@ -8,6 +8,7 @@ import org.dromara.common.websocket.holder.WebSocketSessionHolder;
 import org.dromara.common.websocket.utils.WebSocketUtils;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
+import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,7 +34,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
             log.info("[connect] invalid token received. sessionId: {}", session.getId());
             return;
         }
-        WebSocketSessionHolder.addSession(loginUser.getUserId(), session);
+        WebSocketSessionHolder.addSession(loginUser.getUserId(), new ConcurrentWebSocketSessionDecorator(session, 10 * 1000, 64000));
         log.info("[connect] sessionId: {},userId:{},userType:{}", session.getId(), loginUser.getUserId(), loginUser.getUserType());
     }
 

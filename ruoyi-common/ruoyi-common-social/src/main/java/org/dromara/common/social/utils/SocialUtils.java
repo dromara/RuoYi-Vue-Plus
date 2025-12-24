@@ -57,7 +57,7 @@ public class SocialUtils  {
             case "taobao" -> new AuthTaobaoRequest(builder.build(), STATE_CACHE);
             case "douyin" -> new AuthDouyinRequest(builder.build(), STATE_CACHE);
             case "linkedin" -> new AuthLinkedinRequest(builder.build(), STATE_CACHE);
-            case "microsoft" -> new AuthMicrosoftRequest(builder.build(), STATE_CACHE);
+            case "microsoft" -> new AuthMicrosoftRequest(builder.tenantId(obj.getTenantId()).build(), STATE_CACHE);
             case "renren" -> new AuthRenrenRequest(builder.build(), STATE_CACHE);
             case "stack_overflow" -> new AuthStackOverflowRequest(builder.stackOverflowKey(obj.getStackOverflowKey()).build(), STATE_CACHE);
             case "huawei" -> new AuthHuaweiV3Request(builder.build(), STATE_CACHE);

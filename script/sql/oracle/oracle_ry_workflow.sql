@@ -55,13 +55,12 @@ create table FLOW_NODE
     DEFINITION_ID   NUMBER(20)    not null,
     NODE_CODE       VARCHAR2(100) not null,
     NODE_NAME       VARCHAR2(100),
-    NODE_RATIO      NUMBER(6, 3),
+    PERMISSION_FLAG VARCHAR2(200),
+    NODE_RATIO      VARCHAR2(200),
     COORDINATE      VARCHAR2(100),
     ANY_NODE_SKIP   VARCHAR2(100),
     LISTENER_TYPE   VARCHAR2(100),
     LISTENER_PATH   VARCHAR2(500),
-    HANDLER_TYPE    VARCHAR2(100),
-    HANDLER_PATH    VARCHAR2(400),
     FORM_CUSTOM     VARCHAR2(1)   default 'N',
     FORM_PATH       VARCHAR2(100),
     VERSION         VARCHAR2(20),
@@ -71,8 +70,7 @@ create table FLOW_NODE
     UPDATE_BY       VARCHAR2(64) default '',
     EXT             CLOB,
     DEL_FLAG        VARCHAR2(1)   default '0',
-    TENANT_ID       VARCHAR2(40),
-    PERMISSION_FLAG VARCHAR2(200)
+    TENANT_ID       VARCHAR2(40)
 );
 
 alter table FLOW_NODE
@@ -89,8 +87,6 @@ comment on column FLOW_NODE.COORDINATE is '坐标';
 comment on column FLOW_NODE.ANY_NODE_SKIP is '任意结点跳转';
 comment on column FLOW_NODE.LISTENER_TYPE is '监听器类型';
 comment on column FLOW_NODE.LISTENER_PATH is '监听器路径';
-comment on column FLOW_NODE.HANDLER_TYPE is '处理器类型';
-comment on column FLOW_NODE.HANDLER_PATH is '处理器路径';
 comment on column FLOW_NODE.FORM_CUSTOM is '审批表单是否自定义 (Y是 N否)';
 comment on column FLOW_NODE.FORM_PATH is '审批表单路径';
 comment on column FLOW_NODE.VERSION is '版本';
@@ -493,11 +489,11 @@ INSERT INTO sys_menu VALUES ('11626', '流程分类删除', '11622', '4', '#', '
 INSERT INTO sys_menu VALUES ('11627', '流程分类导出', '11622', '5', '#', '', '', '1', '0', 'F', '0', '0', 'workflow:category:export', '#', 103, 1, SYSDATE, NULL, NULL, '');
 
 INSERT INTO sys_menu VALUES ('11801', '流程表达式', '11616', 2, 'spel', 'workflow/spel/index', '', 1, 0, 'C', '0', '0', 'workflow:spel:list', 'input', 103, 1, SYSDATE, 1, SYSDATE, '流程达式定义菜单');
-INSERT INTO sys_menu VALUES ('11802', '流程spel达式定义查询', '11801', 1, '#', '', NULL, 1, 0, 'F', '0', '0', 'workflow:spel:query', '#', 103, 1, SYSDATE, NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11803', '流程spel达式定义新增', '11801', 2, '#', '', NULL, 1, 0, 'F', '0', '0', 'workflow:spel:add', '#', 103, 1, SYSDATE, NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11804', '流程spel达式定义修改', '11801', 3, '#', '', NULL, 1, 0, 'F', '0', '0', 'workflow:spel:edit', '#', 103, 1, SYSDATE, NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11805', '流程spel达式定义删除', '11801', 4, '#', '', NULL, 1, 0, 'F', '0', '0', 'workflow:spel:remove', '#', 103, 1, SYSDATE, NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11806', '流程spel达式定义导出', '11801', 5, '#', '', NULL, 1, 0, 'F', '0', '0', 'workflow:spel:export', '#', 103, 1, SYSDATE, NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11802', '流程spel表达式定义查询', '11801', 1, '#', '', NULL, 1, 0, 'F', '0', '0', 'workflow:spel:query', '#', 103, 1, SYSDATE, NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11803', '流程spel表达式定义新增', '11801', 2, '#', '', NULL, 1, 0, 'F', '0', '0', 'workflow:spel:add', '#', 103, 1, SYSDATE, NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11804', '流程spel表达式定义修改', '11801', 3, '#', '', NULL, 1, 0, 'F', '0', '0', 'workflow:spel:edit', '#', 103, 1, SYSDATE, NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11805', '流程spel表达式定义删除', '11801', 4, '#', '', NULL, 1, 0, 'F', '0', '0', 'workflow:spel:remove', '#', 103, 1, SYSDATE, NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11806', '流程spel表达式定义导出', '11801', 5, '#', '', NULL, 1, 0, 'F', '0', '0', 'workflow:spel:export', '#', 103, 1, SYSDATE, NULL, NULL, '');
 
 INSERT INTO sys_menu VALUES ('11638', '请假申请', '5', '1', 'leave', 'workflow/leave/index', '', '1', '0', 'C', '0', '0', 'workflow:leave:list', '#', 103, 1, SYSDATE, NULL, NULL, '请假申请菜单');
 INSERT INTO sys_menu VALUES ('11639', '请假申请查询', '11638', '1', '#', '', '', '1', '0', 'F', '0', '0', 'workflow:leave:query', '#', 103, 1, SYSDATE, NULL, NULL, '');

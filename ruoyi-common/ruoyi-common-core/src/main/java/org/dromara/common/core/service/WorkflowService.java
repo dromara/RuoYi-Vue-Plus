@@ -20,7 +20,7 @@ public interface WorkflowService {
      * @param businessIds 业务id
      * @return 结果
      */
-    boolean deleteInstance(List<Long> businessIds);
+    boolean deleteInstance(List<String> businessIds);
 
     /**
      * 获取当前流程状态

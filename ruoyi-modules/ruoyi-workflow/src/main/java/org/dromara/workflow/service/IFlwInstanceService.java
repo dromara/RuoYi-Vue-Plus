@@ -75,7 +75,7 @@ public interface IFlwInstanceService {
      * @param businessIds 业务id
      * @return 结果
      */
-    boolean deleteByBusinessIds(List<Long> businessIds);
+    boolean deleteByBusinessIds(List<String> businessIds);
 
     /**
      * 按照实例id删除流程实例

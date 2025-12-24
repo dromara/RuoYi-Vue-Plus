@@ -42,7 +42,7 @@ public class DataBaseHelper {
             String databaseProductName = metaData.getDatabaseProductName();
             return DataBaseType.find(databaseProductName);
         } catch (SQLException e) {
-            throw new ServiceException(e.getMessage());
+            throw new RuntimeException("获取数据库类型失败", e);
         }
     }
 

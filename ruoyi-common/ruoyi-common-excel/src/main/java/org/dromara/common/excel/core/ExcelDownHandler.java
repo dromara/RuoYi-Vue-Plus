@@ -23,6 +23,7 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.excel.annotation.ExcelDictFormat;
+import org.dromara.common.excel.annotation.ExcelDynamicOptions;
 import org.dromara.common.excel.annotation.ExcelEnumFormat;
 
 import java.lang.reflect.Field;
@@ -117,6 +118,15 @@ public class ExcelDownHandler implements SheetWriteHandler {
                 ExcelEnumFormat format = field.getDeclaredAnnotation(ExcelEnumFormat.class);
                 List<Object> values = EnumUtil.getFieldValues(format.enumClass(), format.textField());
                 options = StreamUtils.toList(values, Convert::toStr);
+            } else if (field.isAnnotationPresent(ExcelDynamicOptions.class)) {
+                // 处理动态下拉选项
+                ExcelDynamicOptions dynamicOptions = field.getDeclaredAnnotation(ExcelDynamicOptions.class);
+                // 获取提供者实例
+                ExcelOptionsProvider provider = SpringUtils.getBean(dynamicOptions.providerClass());
+                Set<String> providerOptions = provider.getOptions();
+                if (CollUtil.isNotEmpty(providerOptions)) {
+                    options = new ArrayList<>(providerOptions);
+                }
             }
             if (ObjectUtil.isNotEmpty(options)) {
                 // 仅当下拉可选项不为空时执行

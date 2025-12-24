@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.dto.CompleteTaskDTO;
 import org.dromara.common.core.domain.dto.StartProcessDTO;
 import org.dromara.common.core.domain.dto.StartProcessReturnDTO;
-import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.WorkflowService;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
@@ -46,7 +45,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * @return 结果
      */
     @Override
-    public boolean deleteInstance(List<Long> businessIds) {
+    public boolean deleteInstance(List<String> businessIds) {
         return flwInstanceService.deleteByBusinessIds(businessIds);
     }
 
@@ -161,28 +160,19 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean startCompleteTask(StartProcessDTO startProcess) {
-        try {
-            StartProcessBo processBo = new StartProcessBo();
-            processBo.setBusinessId(startProcess.getBusinessId());
-            processBo.setFlowCode(startProcess.getFlowCode());
-            processBo.setVariables(startProcess.getVariables());
-            processBo.setHandler(startProcess.getHandler());
-            processBo.setBizExt(BeanUtil.toBean(startProcess.getBizExt(), FlowInstanceBizExt.class));
+        StartProcessBo processBo = new StartProcessBo();
+        processBo.setBusinessId(startProcess.getBusinessId());
+        processBo.setFlowCode(startProcess.getFlowCode());
+        processBo.setVariables(startProcess.getVariables());
+        processBo.setHandler(startProcess.getHandler());
+        processBo.setBizExt(BeanUtil.toBean(startProcess.getBizExt(), FlowInstanceBizExt.class));
 
-            StartProcessReturnDTO result = flwTaskService.startWorkFlow(processBo);
-            CompleteTaskBo taskBo = new CompleteTaskBo();
-            taskBo.setTaskId(result.getTaskId());
-            taskBo.setMessageType(Collections.singletonList(MessageTypeEnum.SYSTEM_MESSAGE.getCode()));
-            taskBo.setVariables(startProcess.getVariables());
-            taskBo.setHandler(startProcess.getHandler());
-
-            boolean flag = flwTaskService.completeTask(taskBo);
-            if (!flag) {
-                throw new ServiceException("流程发起异常");
-            }
-            return true;
-        } catch (Exception e) {
-            throw new ServiceException(e.getMessage());
-        }
+        StartProcessReturnDTO result = flwTaskService.startWorkFlow(processBo);
+        CompleteTaskBo taskBo = new CompleteTaskBo();
+        taskBo.setTaskId(result.getTaskId());
+        taskBo.setMessageType(Collections.singletonList(MessageTypeEnum.SYSTEM_MESSAGE.getCode()));
+        taskBo.setVariables(startProcess.getVariables());
+        taskBo.setHandler(startProcess.getHandler());
+        return flwTaskService.completeTask(taskBo);
     }
 }

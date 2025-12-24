@@ -253,4 +253,8 @@ public class FlowHisTaskVo implements Serializable {
         this.cooperateTypeName = CooperateType.getValueByKey(cooperateType);
     }
 
+    public String getCreateTime() {
+        return DateUtils.formatFriendlyTime(createTime);
+    }
+
 }

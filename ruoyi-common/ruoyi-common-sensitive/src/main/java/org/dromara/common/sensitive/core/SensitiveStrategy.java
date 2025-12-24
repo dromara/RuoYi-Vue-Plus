@@ -3,6 +3,7 @@ package org.dromara.common.sensitive.core;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.DesensitizedUtil;
 import lombok.AllArgsConstructor;
+import org.dromara.common.core.utils.DesensitizedUtils;
 
 import java.util.function.Function;
 
@@ -79,6 +80,18 @@ public enum SensitiveStrategy {
      * 只显示第一个字符
      */
     FIRST_MASK(DesensitizedUtil::firstMask),
+
+    /**
+     * 通用字符串脱敏
+     * 可配置前后可见长度和中间掩码长度
+     * 默认示例：前4位可见，后4位可见，中间固定4个*
+     */
+    STRING_MASK(s -> DesensitizedUtils.mask(s, 4, 4, 4)),
+
+    /**
+     * 高安全级别脱敏（Token / 私钥）：前2位可见，后2位可见，中间全部掩码
+     */
+    MASK_HIGH_SECURITY(s -> DesensitizedUtils.maskHighSecurity(s, 2, 2)),
 
     /**
      * 清空为""

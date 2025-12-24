@@ -174,13 +174,11 @@ CREATE TABLE flow_node (
     node_code nvarchar(100) NOT NULL,
     node_name nvarchar(100) NULL,
     permission_flag nvarchar(200) NULL,
-    node_ratio decimal(6,3)  NULL,
+    node_ratio nvarchar(200)  NULL,
     coordinate nvarchar(100) NULL,
     any_node_skip nvarchar(100) NULL,
     listener_type nvarchar(100) NULL,
     listener_path nvarchar(400) NULL,
-    handler_type nvarchar(100) NULL,
-    handler_path nvarchar(400) NULL,
     form_custom nchar(1) DEFAULT('N') NULL,
     form_path nvarchar(100) NULL,
     version nvarchar(20) NOT NULL,
@@ -273,20 +271,6 @@ EXEC sp_addextendedproperty
 'SCHEMA', N'dbo',
 'TABLE', N'flow_node',
 'COLUMN', N'listener_path'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'处理器类型',
-'SCHEMA', N'dbo',
-'TABLE', N'flow_node',
-'COLUMN', N'handler_type'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'处理器路径',
-'SCHEMA', N'dbo',
-'TABLE', N'flow_node',
-'COLUMN', N'handler_path'
 GO
 
 EXEC sp_addextendedproperty
@@ -1261,7 +1245,7 @@ EXEC sp_addextendedproperty
     'COLUMN', N'component_name'
 GO
 
--- method_name 字段注释
+EXEC sp_addextendedproperty
     'MS_Description', N'方法名',
     'SCHEMA', N'dbo',
     'TABLE', N'flow_spel',
@@ -1618,15 +1602,15 @@ GO
 
 INSERT sys_menu VALUES (11801, N'流程表达式', N'11616', 2, N'spel', N'workflow/spel/index', N'', 1, 0, N'C', N'0', N'0', N'workflow:spel:list', N'input', 103, 1, GETDATE(), 1, GETDATE(), N'流程达式定义菜单');
 GO
-INSERT sys_menu VALUES (11802, N'流程spel达式定义查询', N'11801', 1, N'#', N'', NULL, 1, 0, N'F', N'0', N'0', N'workflow:spel:query', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11802, N'流程spel表达式定义查询', N'11801', 1, N'#', N'', NULL, 1, 0, N'F', N'0', N'0', N'workflow:spel:query', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11803, N'流程spel达式定义新增', N'11801', 2, N'#', N'', NULL, 1, 0, N'F', N'0', N'0', N'workflow:spel:add', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11803, N'流程spel表达式定义新增', N'11801', 2, N'#', N'', NULL, 1, 0, N'F', N'0', N'0', N'workflow:spel:add', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11804, N'流程spel达式定义修改', N'11801', 3, N'#', N'', NULL, 1, 0, N'F', N'0', N'0', N'workflow:spel:edit', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11804, N'流程spel表达式定义修改', N'11801', 3, N'#', N'', NULL, 1, 0, N'F', N'0', N'0', N'workflow:spel:edit', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11805, N'流程spel达式定义删除', N'11801', 4, N'#', N'', NULL, 1, 0, N'F', N'0', N'0', N'workflow:spel:remove', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11805, N'流程spel表达式定义删除', N'11801', 4, N'#', N'', NULL, 1, 0, N'F', N'0', N'0', N'workflow:spel:remove', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11806, N'流程spel达式定义导出', N'11801', 5, N'#', N'', NULL, 1, 0, N'F', N'0', N'0', N'workflow:spel:export', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11806, N'流程spel表达式定义导出', N'11801', 5, N'#', N'', NULL, 1, 0, N'F', N'0', N'0', N'workflow:spel:export', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
 
 -- 请假测试相关按钮

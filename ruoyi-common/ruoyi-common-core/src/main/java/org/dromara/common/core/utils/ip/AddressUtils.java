@@ -20,51 +20,24 @@ public class AddressUtils {
     public static final String UNKNOWN_IP = "XX XX";
     // 内网地址
     public static final String LOCAL_ADDRESS = "内网IP";
-    // 未知地址
-    public static final String UNKNOWN_ADDRESS = "未知";
 
     public static String getRealAddressByIP(String ip) {
         // 处理空串并过滤HTML标签
         ip = HtmlUtil.cleanHtmlTag(StringUtils.blankToDefault(ip,""));
         // 判断是否为IPv4
-        if (NetUtils.isIPv4(ip)) {
-            return resolverIPv4Region(ip);
-        }
+        boolean isIPv4 = NetUtils.isIPv4(ip);
         // 判断是否为IPv6
-        if (NetUtils.isIPv6(ip)) {
-            return resolverIPv6Region(ip);
-        }
+        boolean isIPv6 = NetUtils.isIPv6(ip);
         // 如果不是IPv4或IPv6，则返回未知IP
-        return UNKNOWN_IP;
-    }
-
-    /**
-     * 根据IPv4地址查询IP归属行政区域
-     * @param ip ipv4地址
-     * @return 归属行政区域
-     */
-    private static String resolverIPv4Region(String ip){
+        if (!isIPv4 && !isIPv6) {
+            return UNKNOWN_IP;
+        }
         // 内网不查询
-        if (NetUtils.isInnerIP(ip)) {
+        if ((isIPv4 && NetUtils.isInnerIP(ip)) || (isIPv6 && NetUtils.isInnerIPv6(ip))) {
             return LOCAL_ADDRESS;
         }
-        return RegionUtils.getCityInfo(ip);
-    }
-
-    /**
-     * 根据IPv6地址查询IP归属行政区域
-     * @param ip ipv6地址
-     * @return 归属行政区域
-     */
-    private static String resolverIPv6Region(String ip){
-        // 内网不查询
-        if (NetUtils.isInnerIPv6(ip)) {
-            return LOCAL_ADDRESS;
-        }
-        log.warn("ip2region不支持IPV6地址解析：{}", ip);
-        // 不支持IPv6，不再进行没有必要的IP地址信息的解析，直接返回
-        // 如有需要，可自行实现IPv6地址信息解析逻辑，并在这里返回
-        return UNKNOWN_ADDRESS;
+        // Tips：Ip2Region 提供了精简的IPv6地址库，精简的IPv6地址库并不能完全支持IPv6地址的查询，且准确度上可能会存在问题，如需要准确的IPv6地址查询，建议自行实现
+        return RegionUtils.getRegion(ip);
     }
 
 }

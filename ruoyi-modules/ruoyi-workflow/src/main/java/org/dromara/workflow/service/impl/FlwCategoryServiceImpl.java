@@ -206,6 +206,9 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
         if (ObjectUtil.isNull(oldCategory)) {
             throw new ServiceException("流程分类不存在，无法修改");
         }
+        if (oldCategory.getParentId() == 0L && category.getParentId() != 0L) {
+            throw new ServiceException("不允许修改顶级分类的父级节点");
+        }
         if (!oldCategory.getParentId().equals(category.getParentId())) {
             FlowCategory newParentCategory = baseMapper.selectById(category.getParentId());
             if (ObjectUtil.isNotNull(newParentCategory)) {

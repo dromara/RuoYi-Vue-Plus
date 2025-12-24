@@ -1,5 +1,6 @@
 package org.dromara.common.translation.core.impl;
 
+import cn.hutool.core.convert.Convert;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.translation.annotation.TranslationType;
 import org.dromara.common.translation.constant.TransConstant;
@@ -19,9 +20,6 @@ public class UserNameTranslationImpl implements TranslationInterface<String> {
 
     @Override
     public String translation(Object key, String other) {
-        if (key instanceof Long id) {
-            return userService.selectUserNameById(id);
-        }
-        return null;
+        return userService.selectUserNameById(Convert.toLong(key));
     }
 }

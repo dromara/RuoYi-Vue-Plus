@@ -187,6 +187,7 @@ public class FlwDefinitionController extends BaseController {
     @RepeatSubmit()
     @PutMapping("/active/{id}")
     @Transactional(rollbackFor = Exception.class)
+    @Log(title = "流程定义", businessType = BusinessType.UPDATE)
     public R<Boolean> active(@PathVariable Long id, @RequestParam boolean active) {
         return R.ok(active ? defService.active(id) : defService.unActive(id));
     }

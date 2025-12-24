@@ -18,6 +18,7 @@ import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.WorkflowService;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -167,7 +168,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(List<Long> ids) {
-        workflowService.deleteInstance(ids);
+        workflowService.deleteInstance(StreamUtils.toList(ids, Convert::toStr));
         return baseMapper.deleteByIds(ids) > 0;
     }
 
@@ -199,7 +200,10 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
                 testLeave.setApplyCode(businessCode);
             }
             testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
+            log.info("申请人提交");
         }
+        String status = BusinessStatusEnum.findByStatus(processEvent.getStatus());
+        log.info("当前流程状态为{}", status);
         baseMapper.updateById(testLeave);
     }
 

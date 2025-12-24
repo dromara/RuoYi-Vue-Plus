@@ -10,7 +10,7 @@ import jakarta.validation.constraints.*;
 import org.dromara.workflow.domain.FlowSpel;
 
 /**
- * 流程spel达式定义业务对象 flow_spel
+ * 流程spel表达式定义业务对象 flow_spel
  *
  * @author Michelle.Chung
  * @date 2025-07-04

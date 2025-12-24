@@ -14,7 +14,9 @@ import org.dromara.common.core.exception.SseException;
 import org.dromara.common.core.exception.base.BaseException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.json.utils.JsonUtils;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.expression.ExpressionException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
@@ -43,7 +46,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public R<Void> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e,
-                                                                HttpServletRequest request) {
+                                                       HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',不支持'{}'请求", requestURI, e.getMethod());
         return R.fail(HttpStatus.HTTP_BAD_METHOD, e.getMessage());
@@ -191,6 +194,16 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 方法参数校验异常 用于处理 @Validated 注解
+     */
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public R<Void> handlerMethodValidationException(HandlerMethodValidationException e) {
+        log.error(e.getMessage());
+        String message = StreamUtils.join(e.getAllErrors(), MessageSourceResolvable::getDefaultMessage, ", ");
+        return R.fail(message);
+    }
+
+    /**
      * JSON 解析异常（Jackson 在处理 JSON 格式出错时抛出）
      * 可能是请求体格式非法，也可能是服务端反序列化失败
      */
@@ -208,6 +221,15 @@ public class GlobalExceptionHandler {
     public R<Void> handleHttpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletRequest request) {
         log.error("请求地址'{}', 参数解析失败: {}", request.getRequestURI(), e.getMessage());
         return R.fail(HttpStatus.HTTP_BAD_REQUEST, "请求参数格式错误：" + e.getMostSpecificCause().getMessage());
+    }
+
+    /**
+     * SpEL 表达式相关异常
+     */
+    @ExceptionHandler(ExpressionException.class)
+    public R<Void> handleSpelException(ExpressionException e, HttpServletRequest request) {
+        log.error("请求地址'{}'，SpEL解析异常: {}", request.getRequestURI(), e.getMessage());
+        return R.fail(HttpStatus.HTTP_INTERNAL_ERROR, "SpEL解析失败：" + e.getMessage());
     }
 
 }

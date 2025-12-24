@@ -5,6 +5,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.enums.BusinessStatusEnum;
@@ -73,6 +74,9 @@ public class WorkflowGlobalListener implements GlobalListener {
         String ext = listenerVariable.getNode().getExt();
         if (StringUtils.isNotBlank(ext)) {
             Map<String, Object> variable = listenerVariable.getVariable();
+            if (CollUtil.isEmpty(variable)) {
+                variable = new HashMap<>();
+            }
             NodeExtVo nodeExt = nodeExtService.parseNodeExt(ext, variable);
             Set<String> copyList = nodeExt.getCopySettings();
             if (CollUtil.isNotEmpty(copyList)) {
@@ -104,17 +108,58 @@ public class WorkflowGlobalListener implements GlobalListener {
         Definition definition = listenerVariable.getDefinition();
         Instance instance = listenerVariable.getInstance();
         String applyNodeCode = flwCommonService.applyNodeCode(definition.getId());
+        String hisStatus = flowParams != null ? flowParams.getHisStatus() : null;
+
         for (Task flowTask : nextTasks) {
-            // 如果办理或者退回并行存在需要指定办理人，则直接覆盖办理人
-            if (variable.containsKey(flowTask.getNodeCode()) && TaskStatusEnum.isPassOrBack(flowParams.getHisStatus())) {
-                String userIds = variable.get(flowTask.getNodeCode()).toString();
-                flowTask.setPermissionList(List.of(userIds.split(StringUtils.SEPARATOR)));
-                variable.remove(flowTask.getNodeCode());
+            String nodeCode = flowTask.getNodeCode();
+
+            // 处理办理或退回时指定办理人的情况
+            if (TaskStatusEnum.PASS.getStatus().equals(hisStatus)) {
+                processTaskPermission(variable, flowTask, hisStatus);
+            } else if (TaskStatusEnum.BACK.getStatus().equals(hisStatus)) {
+                processTaskPermission(variable, flowTask, hisStatus);
             }
+
             // 如果是申请节点，则把启动人添加到办理人
-            if (flowTask.getNodeCode().equals(applyNodeCode)) {
+            if (nodeCode.equals(applyNodeCode) && StringUtils.isNotBlank(instance.getCreateBy())) {
                 flowTask.setPermissionList(List.of(instance.getCreateBy()));
             }
+        }
+    }
+
+    /**
+     * 处理任务权限设置
+     *
+     * @param variable   变量集合
+     * @param flowTask   流程任务
+     * @param taskStatus 任务状态
+     */
+    private void processTaskPermission(Map<String, Object> variable, Task flowTask, String taskStatus) {
+        String nodeKey = taskStatus + StrUtil.COLON + flowTask.getNodeCode();
+
+        // 检查是否存在状态相关的变量
+        if (!variable.containsKey(nodeKey)) {
+            return;
+        }
+
+        // 获取用户ID字符串
+        Object userIdsObj = variable.get(nodeKey);
+        if (userIdsObj == null) {
+            return;
+        }
+
+        String userIds = userIdsObj.toString();
+        if (StringUtils.isBlank(userIds)) {
+            return;
+        }
+
+        // 分割用户ID并设置权限列表
+        String[] userIdArray = userIds.split(StringUtils.SEPARATOR);
+        if (userIdArray.length > 0) {
+            flowTask.setPermissionList(List.of(userIdArray));
+            // 移除已处理的状态变量
+            variable.remove(nodeKey);
+            FlowEngine.insService().removeVariables(flowTask.getInstanceId(),nodeKey);
         }
     }
 
@@ -144,7 +189,8 @@ public class WorkflowGlobalListener implements GlobalListener {
         //申请人提交事件
         Boolean submit = MapUtil.getBool(variable, FlowConstant.SUBMIT);
         if (submit != null && submit) {
-            flowProcessEventHandler.processHandler(definition.getFlowCode(), instance, instance.getFlowStatus(), variable, true);
+            String status = determineFlowStatus(instance);
+            flowProcessEventHandler.processHandler(definition.getFlowCode(), instance, status, variable, true);
         } else {
             // 判断流程状态（发布：撤销，退回，作废，终止，已完成事件）
             String status = determineFlowStatus(instance);
@@ -165,7 +211,7 @@ public class WorkflowGlobalListener implements GlobalListener {
         //发布任务事件
         if (CollUtil.isNotEmpty(nextTasks)) {
             for (Task nextTask : nextTasks) {
-                flowProcessEventHandler.processTaskHandler(definition.getFlowCode(), instance, nextTask.getId(), params);
+                flowProcessEventHandler.processTaskHandler(definition.getFlowCode(), instance, nextTask, params);
             }
         }
         if (ObjectUtil.isNull(flowParams)) {

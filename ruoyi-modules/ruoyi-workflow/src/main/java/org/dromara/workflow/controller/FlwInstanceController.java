@@ -1,7 +1,9 @@
 package org.dromara.workflow.controller;
 
+import cn.hutool.core.convert.Convert;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
@@ -75,8 +77,9 @@ public class FlwInstanceController extends BaseController {
      * @param businessIds 业务id
      */
     @DeleteMapping("/deleteByBusinessIds/{businessIds}")
+    @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
     public R<Void> deleteByBusinessIds(@PathVariable List<Long> businessIds) {
-        return toAjax(flwInstanceService.deleteByBusinessIds(businessIds));
+        return toAjax(flwInstanceService.deleteByBusinessIds(StreamUtils.toList(businessIds, Convert::toStr)));
     }
 
     /**
@@ -85,6 +88,7 @@ public class FlwInstanceController extends BaseController {
      * @param instanceIds 实例id
      */
     @DeleteMapping("/deleteByInstanceIds/{instanceIds}")
+    @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
     public R<Void> deleteByInstanceIds(@PathVariable List<Long> instanceIds) {
         return toAjax(flwInstanceService.deleteByInstanceIds(instanceIds));
     }
@@ -95,6 +99,7 @@ public class FlwInstanceController extends BaseController {
      * @param instanceIds 实例id
      */
     @DeleteMapping("/deleteHisByInstanceIds/{instanceIds}")
+    @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
     public R<Void> deleteHisByInstanceIds(@PathVariable List<Long> instanceIds) {
         return toAjax(flwInstanceService.deleteHisByInstanceIds(instanceIds));
     }
@@ -106,6 +111,7 @@ public class FlwInstanceController extends BaseController {
      */
     @RepeatSubmit()
     @PutMapping("/cancelProcessApply")
+    @Log(title = "流程实例管理", businessType = BusinessType.UPDATE)
     public R<Void> cancelProcessApply(@RequestBody FlowCancelBo bo) {
         return toAjax(flwInstanceService.cancelProcessApply(bo));
     }
@@ -118,6 +124,7 @@ public class FlwInstanceController extends BaseController {
      */
     @RepeatSubmit()
     @PutMapping("/active/{id}")
+    @Log(title = "流程实例管理", businessType = BusinessType.UPDATE)
     public R<Boolean> active(@PathVariable Long id, @RequestParam boolean active) {
         return R.ok(active ? insService.active(id) : insService.unActive(id));
     }
@@ -160,6 +167,7 @@ public class FlwInstanceController extends BaseController {
      */
     @RepeatSubmit()
     @PutMapping("/updateVariable")
+    @Log(title = "流程实例管理", businessType = BusinessType.UPDATE)
     public R<Void> updateVariable(@Validated @RequestBody FlowVariableBo bo) {
         return toAjax(flwInstanceService.updateVariable(bo));
     }

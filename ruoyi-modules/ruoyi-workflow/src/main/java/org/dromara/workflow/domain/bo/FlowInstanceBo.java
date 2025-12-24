@@ -50,6 +50,6 @@ public class FlowInstanceBo implements Serializable {
     /**
      * 申请人Ids
      */
-    private List<Long> createByIds;
+    private List<String> createByIds;
 
 }

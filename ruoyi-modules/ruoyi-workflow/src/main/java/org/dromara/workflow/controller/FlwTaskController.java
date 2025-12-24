@@ -216,6 +216,7 @@ public class FlwTaskController extends BaseController {
      * @return 结果
      */
     @PostMapping("/urgeTask")
+    @Log(title = "任务管理", businessType = BusinessType.INSERT)
     public R<Void> urgeTask(@RequestBody FlowUrgeTaskBo bo) {
         return toAjax(flwTaskService.urgeTask(bo));
     }
