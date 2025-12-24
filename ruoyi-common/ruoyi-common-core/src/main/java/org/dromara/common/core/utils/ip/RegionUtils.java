@@ -1,6 +1,5 @@
 package org.dromara.common.core.utils.ip;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
@@ -9,7 +8,6 @@ import org.lionsoul.ip2region.service.Config;
 import org.lionsoul.ip2region.service.Ip2Region;
 import org.lionsoul.ip2region.xdb.Util;
 
-import java.io.File;
 import java.io.InputStream;
 import java.time.Duration;
 
@@ -31,6 +29,11 @@ public class RegionUtils {
     // 下载地址：https://gitee.com/lionsoul/ip2region/blob/master/data/ip2region_v6.xdb
     public static final String DEFAULT_IPV6_XDB_PATH = "ip2region_v6.xdb";
 
+    // 默认缓存切片大小为15MB（仅针对BufferCache全量读取有效，如果你的xdb数据库很大，合理设置该值可以有效提升BufferCache模式下的查询效率，具体可以查看Ip2Region的README）
+    // 注意：设置过大的值可能会申请内存时，因内存不足而导致OOM，请合理设置该值。
+    // README：https://gitee.com/lionsoul/ip2region/tree/master/binding/java
+    public static final int DEFAULT_CACHE_SLICE_BYTES = 1024 * 1024 * 15;
+
     // 未知地址
     public static final String UNKNOWN_ADDRESS = "未知";
 
@@ -43,20 +46,18 @@ public class RegionUtils {
             // 注意：Ip2Region 的xdb文件加载策略 CachePolicy 有三种，分别是：BufferCache（全量读取xdb到内存中）、VIndexCache（默认策略，按需读取并缓存）、NoCache（实时读取）
             // 本项目工具使用的 CachePolicy 为 BufferCache，BufferCache会加载整个xdb文件到内存中，setXdbInputStream 仅支持 BufferCache 策略。
             // 因为加载整个xdb文件会耗费非常大的内存，如果你不希望加载整个xdb到内存中，更推荐使用 VIndexCache 或 NoCache（即实时读取文件）策略和 setXdbPath/setXdbFile 加载方法（需要注意的一点，setXdbPath 和 setXdbFile 不支持读取ClassPath（即源码和resource目录）中的文件）。
-            // 一般而言，更建议把xdb数据库放到一个指定的文件目录中（即不打包进jar包中），然后使用 NoCache + 配合SearcherPool的并发池读取数据，更方便随时更新xdb数据库
+            // 一般而言，更建议把xdb数据库放到一个指定的文件目录中（即不打包进jar包中），然后使用 VIndexCache + 配合SearcherPool的并发池读取数据，更方便随时更新xdb数据库
 
-            // TODO 2025年12月23日 Ip2Region封装的 InputStream 读取函数 Searcher.loadContentFromInputStream 在Linux环境下会申请过大的byte[]空间而导致OOM，这里先用临时文件的方案解决，等后续 Ip2Region 更新解决方案
-            // 创建临时文件
-            File v4TempXdb = FileUtil.writeFromStream(ResourceUtil.getStream(DEFAULT_IPV4_XDB_PATH), FileUtil.createTempFile());
+            InputStream v4InputStream = ResourceUtil.getStream(DEFAULT_IPV4_XDB_PATH);
 
             // IPv4配置
             Config v4Config = Config.custom()
                 .setCachePolicy(Config.BufferCache)
-                .setXdbFile(v4TempXdb)
-//                .setXdbInputStream(ResourceUtil.getStream(DEFAULT_IPV4_XDB_PATH))
+                //.setXdbFile(v4TempXdb)
+                .setXdbInputStream(v4InputStream)
+                //
+                .setCacheSliceBytes(DEFAULT_CACHE_SLICE_BYTES)
                 .asV4();
-            // 删除临时文件
-            v4TempXdb.delete();
 
             // IPv6配置
             Config v6Config = null;
@@ -64,17 +65,12 @@ public class RegionUtils {
             if (v6XdbInputStream == null) {
                 log.warn("未加载 IPv6 地址库：未在类路径下找到文件 {}。当前仅启用 IPv4 查询。如需启用 IPv6，请将 ip2region_v6.xdb 放置到 resources 目录", DEFAULT_IPV6_XDB_PATH);
             } else {
-                // 创建临时文件
-                File v6TempXdb = FileUtil.writeFromStream(ResourceUtil.getStream(DEFAULT_IPV4_XDB_PATH), FileUtil.createTempFile());
-
                 v6Config = Config.custom()
                     .setCachePolicy(Config.BufferCache)
-                    .setXdbFile(v6TempXdb)
-//                    .setXdbInputStream(v6XdbInputStream)
+                    //.setXdbFile(v6TempXdb)
+                    .setXdbInputStream(v6XdbInputStream)
+                    .setCacheSliceBytes(DEFAULT_CACHE_SLICE_BYTES)
                     .asV6();
-
-                // 删除临时文件
-                v6TempXdb.delete();
             }
 
             // 初始化Ip2Region实例
