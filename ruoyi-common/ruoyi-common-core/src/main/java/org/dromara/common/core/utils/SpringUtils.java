@@ -2,7 +2,7 @@ package org.dromara.common.core.utils;
 
 import cn.hutool.extra.spring.SpringUtil;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.boot.autoconfigure.thread.Threading;
+import org.springframework.boot.thread.Threading;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;

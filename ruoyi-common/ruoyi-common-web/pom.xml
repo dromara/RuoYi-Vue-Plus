@@ -35,7 +35,7 @@
         <!-- web 容器使用 undertow 性能更强 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-undertow</artifactId>
+            <artifactId>spring-boot-starter-jetty</artifactId>
         </dependency>
 
         <dependency>

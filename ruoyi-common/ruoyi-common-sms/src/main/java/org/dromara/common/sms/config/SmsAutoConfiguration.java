@@ -4,7 +4,7 @@ import org.dromara.common.sms.core.dao.PlusSmsDao;
 import org.dromara.common.sms.handler.SmsExceptionHandler;
 import org.dromara.sms4j.api.dao.SmsDao;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Primary;
  *
  * @author Feng
  */
-@AutoConfiguration(after = {RedisAutoConfiguration.class})
+@AutoConfiguration(after = {DataRedisAutoConfiguration.class})
 public class SmsAutoConfiguration {
 
     @Primary

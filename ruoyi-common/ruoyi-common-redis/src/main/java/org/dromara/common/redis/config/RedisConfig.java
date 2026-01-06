@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -47,7 +48,7 @@ public class RedisConfig {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
             javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
-            ObjectMapper om = new ObjectMapper();
+            JsonMapper om = new JsonMapper();
             om.registerModule(javaTimeModule);
             om.setTimeZone(TimeZone.getDefault());
             om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
@@ -64,6 +65,8 @@ public class RedisConfig {
                 .setNettyThreads(redissonProperties.getNettyThreads())
                 // 缓存 Lua 脚本 减少网络传输(redisson 大部分的功能都是基于 Lua 脚本实现)
                 .setUseScriptCache(true)
+                //设置redis key前缀
+                .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()))
                 .setCodec(codec);
             if (SpringUtils.isVirtual()) {
                 config.setNettyExecutor(new VirtualThreadTaskExecutor("redisson-"));
@@ -72,8 +75,6 @@ public class RedisConfig {
             if (ObjectUtil.isNotNull(singleServerConfig)) {
                 // 使用单机模式
                 config.useSingleServer()
-                    //设置redis key前缀
-                    .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()))
                     .setTimeout(singleServerConfig.getTimeout())
                     .setClientName(singleServerConfig.getClientName())
                     .setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
@@ -85,8 +86,6 @@ public class RedisConfig {
             RedissonProperties.ClusterServersConfig clusterServersConfig = redissonProperties.getClusterServersConfig();
             if (ObjectUtil.isNotNull(clusterServersConfig)) {
                 config.useClusterServers()
-                    //设置redis key前缀
-                    .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()))
                     .setTimeout(clusterServersConfig.getTimeout())
                     .setClientName(clusterServersConfig.getClientName())
                     .setIdleConnectionTimeout(clusterServersConfig.getIdleConnectionTimeout())

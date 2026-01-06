@@ -1,7 +1,7 @@
 package org.dromara.common.redis.handler;
 
 import org.dromara.common.core.utils.StringUtils;
-import org.redisson.api.NameMapper;
+import org.redisson.config.NameMapper;
 
 /**
  * redis缓存key前缀处理

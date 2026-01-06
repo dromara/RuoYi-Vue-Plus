@@ -2,7 +2,6 @@ package org.dromara.common.web.handler;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
-import com.fasterxml.jackson.core.JsonParseException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -14,6 +13,7 @@ import org.dromara.common.core.exception.SseException;
 import org.dromara.common.core.exception.base.BaseException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.json.utils.JsonUtils;
+import org.springframework.boot.json.JsonParseException;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.expression.ExpressionException;

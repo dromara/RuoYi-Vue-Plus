@@ -1,9 +1,7 @@
 package org.dromara.common.tenant.config;
 
 import cn.dev33.satoken.dao.SaTokenDao;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
-import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.redis.config.RedisConfig;
 import org.dromara.common.redis.config.properties.RedissonProperties;
 import org.dromara.common.tenant.core.TenantSaTokenDao;
@@ -11,8 +9,6 @@ import org.dromara.common.tenant.handle.PlusTenantLineHandler;
 import org.dromara.common.tenant.handle.TenantKeyPrefixHandler;
 import org.dromara.common.tenant.manager.TenantSpringCacheManager;
 import org.dromara.common.tenant.properties.TenantProperties;
-import org.redisson.config.ClusterServersConfig;
-import org.redisson.config.SingleServerConfig;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -49,19 +45,8 @@ public class TenantConfig {
     @Bean
     public RedissonAutoConfigurationCustomizer tenantRedissonCustomizer(RedissonProperties redissonProperties) {
         return config -> {
-            TenantKeyPrefixHandler nameMapper = new TenantKeyPrefixHandler(redissonProperties.getKeyPrefix());
-            SingleServerConfig singleServerConfig = ReflectUtils.invokeGetter(config, "singleServerConfig");
-            if (ObjectUtil.isNotNull(singleServerConfig)) {
-                // 使用单机模式
-                // 设置多租户 redis key前缀
-                singleServerConfig.setNameMapper(nameMapper);
-            }
-            ClusterServersConfig clusterServersConfig = ReflectUtils.invokeGetter(config, "clusterServersConfig");
-            // 集群配置方式 参考下方注释
-            if (ObjectUtil.isNotNull(clusterServersConfig)) {
-                // 设置多租户 redis key前缀
-                clusterServersConfig.setNameMapper(nameMapper);
-            }
+            // 设置多租户 redis key前缀
+            config.setNameMapper(new TenantKeyPrefixHandler(redissonProperties.getKeyPrefix()));
         };
     }
 

@@ -1,9 +1,9 @@
 package org.dromara.common.translation.core.handler;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.SerializationConfig;
+import tools.jackson.databind.ser.BeanPropertyWriter;
+import tools.jackson.databind.ser.ValueSerializerModifier;
 
 import java.util.List;
 
@@ -12,10 +12,10 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public class TranslationBeanSerializerModifier extends BeanSerializerModifier {
+public class TranslationBeanSerializerModifier extends ValueSerializerModifier {
 
     @Override
-    public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDesc,
+    public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription.Supplier beanDesc,
                                                      List<BeanPropertyWriter> beanProperties) {
         for (BeanPropertyWriter writer : beanProperties) {
             // 如果序列化器为 TranslationHandler 的话 将 Null 值也交给他处理
@@ -23,7 +23,7 @@ public class TranslationBeanSerializerModifier extends BeanSerializerModifier {
                 writer.assignNullSerializer(serializer);
             }
         }
-        return beanProperties;
+        return super.changeProperties(config, beanDesc, beanProperties);
     }
 
 }

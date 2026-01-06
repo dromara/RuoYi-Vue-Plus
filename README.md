@@ -35,7 +35,6 @@ MaxKey 业界领先单点登录产品 - https://gitee.com/dromara/MaxKey <br>
 CCFlow 驰聘低代码-流程-表单 - https://gitee.com/opencc/RuoYi-JFlow <br>
 数舵科技 软件定制开发APP小程序等 - http://www.shuduokeji.com/ <br>
 引迈信息 软件开发平台 - https://www.jnpfsoft.com/index.html?from=plus-doc <br>
-<font color="red">**启山商城系统 多租户商城源码可免费商用可二次开发 - https://www.73app.cn/** </font><br>
 Mall4J 高质量Java商城系统 - https://www.mall4j.com/cn/?statId=11 <br>
 aizuda flowlong 工作流 - https://gitee.com/aizuda/flowlong <br>
 Ruoyi-Plus-Uniapp - https://ruoyi.plus <br>

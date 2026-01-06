@@ -18,6 +18,7 @@ package org.dromara.common.redis.manager;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.redisson.api.RMap;
 import org.redisson.api.RMapCache;
+import org.redisson.api.map.event.MapEntryListener;
 import org.redisson.spring.cache.CacheConfig;
 import org.redisson.spring.cache.RedissonCache;
 import org.springframework.boot.convert.DurationStyle;
@@ -189,6 +190,9 @@ public class PlusSpringCacheManager implements CacheManager {
             cache = oldCache;
         } else {
             map.setMaxSize(config.getMaxSize());
+            for (MapEntryListener listener : config.getListeners()) {
+                map.addListener(listener);
+            }
         }
         return cache;
     }
