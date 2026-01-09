@@ -130,11 +130,11 @@ public class SysMenu extends BaseEntity {
     public String getRouterPath() {
         String routerPath = this.path;
         // 内链打开外网方式
-        if (getParentId() != 0L && isInnerLink()) {
+        if (!Constants.TOP_PARENT_ID.equals(getParentId()) && isInnerLink()) {
             routerPath = innerLinkReplaceEach(routerPath);
         }
         // 非外链并且是一级目录（类型为目录）
-        if (0L == getParentId() && SystemConstants.TYPE_DIR.equals(getMenuType())
+        if (Constants.TOP_PARENT_ID.equals(getParentId()) && SystemConstants.TYPE_DIR.equals(getMenuType())
             && SystemConstants.NO_FRAME.equals(getIsFrame())) {
             routerPath = "/" + this.path;
         }
@@ -152,7 +152,7 @@ public class SysMenu extends BaseEntity {
         String component = SystemConstants.LAYOUT;
         if (StringUtils.isNotEmpty(this.component) && !isMenuFrame()) {
             component = this.component;
-        } else if (StringUtils.isEmpty(this.component) && getParentId() != 0L && isInnerLink()) {
+        } else if (StringUtils.isEmpty(this.component) && !Constants.TOP_PARENT_ID.equals(getParentId()) && isInnerLink()) {
             component = SystemConstants.INNER_LINK;
         } else if (StringUtils.isEmpty(this.component) && isParentView()) {
             component = SystemConstants.PARENT_VIEW;
@@ -164,7 +164,7 @@ public class SysMenu extends BaseEntity {
      * 是否为菜单内部跳转
      */
     public boolean isMenuFrame() {
-        return getParentId() == 0L && SystemConstants.TYPE_MENU.equals(menuType) && isFrame.equals(SystemConstants.NO_FRAME);
+        return Constants.TOP_PARENT_ID.equals(getParentId()) && SystemConstants.TYPE_MENU.equals(menuType) && isFrame.equals(SystemConstants.NO_FRAME);
     }
 
     /**
@@ -178,7 +178,7 @@ public class SysMenu extends BaseEntity {
      * 是否为parent_view组件
      */
     public boolean isParentView() {
-        return getParentId() != 0L && SystemConstants.TYPE_DIR.equals(menuType);
+        return !Constants.TOP_PARENT_ID.equals(getParentId()) && SystemConstants.TYPE_DIR.equals(menuType);
     }
 
     /**
