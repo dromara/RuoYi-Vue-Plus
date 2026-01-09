@@ -374,10 +374,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         List<SysMenu> sysMenuList = baseMapper.selectList(
             new LambdaQueryWrapper<SysMenu>()
                 .in(SysMenu::getMenuType, SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
-                .and(w ->
-                    w.eq(SysMenu::getPath, path)
-                        .or().eq(SysMenu::getRouteName, path)
-                        .or().eq(SysMenu::getRouteName, routeName)));
+                .eq(SysMenu::getPath, path));
         for (SysMenu sysMenu : sysMenuList) {
             if (sysMenu.getMenuId() != menuId) {
                 Long dbParentId = sysMenu.getParentId();
