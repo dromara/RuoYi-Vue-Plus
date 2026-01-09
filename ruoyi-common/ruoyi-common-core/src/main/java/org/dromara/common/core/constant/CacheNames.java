@@ -47,7 +47,7 @@ public interface CacheNames {
     String SYS_CLIENT = GlobalConstants.GLOBAL_REDIS_KEY + "sys_client#30d";
 
     /**
-     * 用户账户
+     * 用户帐户
      */
     String SYS_USER_NAME = "sys_user_name#30d";
 

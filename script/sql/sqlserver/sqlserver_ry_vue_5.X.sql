@@ -1801,7 +1801,7 @@ INSERT sys_menu VALUES (1044, N'登录删除', 501, 2, N'#', N'', N'', 1, 0, N'F
 GO
 INSERT sys_menu VALUES (1045, N'日志导出', 501, 3, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:logininfor:export', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_menu VALUES (1050, N'账户解锁', 501, 4, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:logininfor:unlock',  N'#', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_menu VALUES (1050, N'帐户解锁', 501, 4, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:logininfor:unlock',  N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
 INSERT sys_menu VALUES (1046, N'在线查询', 109, 1, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:online:query', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
