@@ -134,7 +134,7 @@ public class SysMenuController extends BaseController {
         } else if (menu.getMenuId().equals(menu.getParentId())) {
             return R.fail("修改菜单'" + menu.getMenuName() + "'失败，上级菜单不能选择自己");
         } else if (!menuService.checkRouteConfigUnique(menu)) {
-            return R.fail("新增菜单'" + menu.getMenuName() + "'失败，路由名称或地址已存在");
+            return R.fail("修改菜单'" + menu.getMenuName() + "'失败，路由名称或地址已存在");
         }
         return toAjax(menuService.updateMenu(menu));
     }
