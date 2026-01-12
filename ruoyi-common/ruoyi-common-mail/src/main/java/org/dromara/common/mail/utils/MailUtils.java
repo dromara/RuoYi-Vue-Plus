@@ -51,7 +51,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送文本邮件，发送给单个或多个收件人<br>
+     * 使用配置文件中设置的账户发送文本邮件，发送给单个或多个收件人<br>
      * 多个收件人可以使用逗号“,”分隔，也可以通过分号“;”分隔
      *
      * @param to      收件人
@@ -66,7 +66,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送HTML邮件，发送给单个或多个收件人<br>
+     * 使用配置文件中设置的账户发送HTML邮件，发送给单个或多个收件人<br>
      * 多个收件人可以使用逗号“,”分隔，也可以通过分号“;”分隔
      *
      * @param to      收件人
@@ -81,7 +81,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送邮件，发送单个或多个收件人<br>
+     * 使用配置文件中设置的账户发送邮件，发送单个或多个收件人<br>
      * 多个收件人可以使用逗号“,”分隔，也可以通过分号“;”分隔
      *
      * @param to      收件人
@@ -96,7 +96,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送邮件，发送单个或多个收件人<br>
+     * 使用配置文件中设置的账户发送邮件，发送单个或多个收件人<br>
      * 多个收件人、抄送人、密送人可以使用逗号“,”分隔，也可以通过分号“;”分隔
      *
      * @param to      收件人，可以使用逗号“,”分隔，也可以通过分号“;”分隔
@@ -114,7 +114,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送文本邮件，发送给多人
+     * 使用配置文件中设置的账户发送文本邮件，发送给多人
      *
      * @param tos     收件人列表
      * @param subject 标题
@@ -127,7 +127,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送HTML邮件，发送给多人
+     * 使用配置文件中设置的账户发送HTML邮件，发送给多人
      *
      * @param tos     收件人列表
      * @param subject 标题
@@ -141,7 +141,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送邮件，发送给多人
+     * 使用配置文件中设置的账户发送邮件，发送给多人
      *
      * @param tos     收件人列表
      * @param subject 标题
@@ -155,7 +155,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送邮件，发送给多人
+     * 使用配置文件中设置的账户发送邮件，发送给多人
      *
      * @param tos     收件人列表
      * @param ccs     抄送人列表，可以为null或空
@@ -192,7 +192,7 @@ public class MailUtils {
     /**
      * 发送邮件给多人
      *
-     * @param mailAccount 邮件帐户信息
+     * @param mailAccount 邮件账户信息
      * @param tos         收件人列表
      * @param subject     标题
      * @param content     正文
@@ -207,7 +207,7 @@ public class MailUtils {
     /**
      * 发送邮件给多人
      *
-     * @param mailAccount 邮件帐户信息
+     * @param mailAccount 邮件账户信息
      * @param tos         收件人列表
      * @param ccs         抄送人列表，可以为null或空
      * @param bccs        密送人列表，可以为null或空
@@ -223,7 +223,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送HTML邮件，发送给单个或多个收件人<br>
+     * 使用配置文件中设置的账户发送HTML邮件，发送给单个或多个收件人<br>
      * 多个收件人可以使用逗号“,”分隔，也可以通过分号“;”分隔
      *
      * @param to       收件人
@@ -239,7 +239,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送邮件，发送单个或多个收件人<br>
+     * 使用配置文件中设置的账户发送邮件，发送单个或多个收件人<br>
      * 多个收件人可以使用逗号“,”分隔，也可以通过分号“;”分隔
      *
      * @param to       收件人
@@ -255,7 +255,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送邮件，发送单个或多个收件人<br>
+     * 使用配置文件中设置的账户发送邮件，发送单个或多个收件人<br>
      * 多个收件人、抄送人、密送人可以使用逗号“,”分隔，也可以通过分号“;”分隔
      *
      * @param to       收件人，可以使用逗号“,”分隔，也可以通过分号“;”分隔
@@ -274,7 +274,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送HTML邮件，发送给多人
+     * 使用配置文件中设置的账户发送HTML邮件，发送给多人
      *
      * @param tos      收件人列表
      * @param subject  标题
@@ -289,7 +289,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送邮件，发送给多人
+     * 使用配置文件中设置的账户发送邮件，发送给多人
      *
      * @param tos      收件人列表
      * @param subject  标题
@@ -304,7 +304,7 @@ public class MailUtils {
     }
 
     /**
-     * 使用配置文件中设置的帐户发送邮件，发送给多人
+     * 使用配置文件中设置的账户发送邮件，发送给多人
      *
      * @param tos      收件人列表
      * @param ccs      抄送人列表，可以为null或空
@@ -343,7 +343,7 @@ public class MailUtils {
     /**
      * 发送邮件给多人
      *
-     * @param mailAccount 邮件帐户信息
+     * @param mailAccount 邮件账户信息
      * @param tos         收件人列表
      * @param subject     标题
      * @param content     正文
@@ -360,7 +360,7 @@ public class MailUtils {
     /**
      * 发送邮件给多人
      *
-     * @param mailAccount 邮件帐户信息
+     * @param mailAccount 邮件账户信息
      * @param tos         收件人列表
      * @param ccs         抄送人列表，可以为null或空
      * @param bccs        密送人列表，可以为null或空
@@ -380,7 +380,7 @@ public class MailUtils {
     /**
      * 根据配置文件，获取邮件客户端会话
      *
-     * @param mailAccount 邮件帐户配置
+     * @param mailAccount 邮件账户配置
      * @param isSingleton 是否单例（全局共享会话）
      * @return {@link Session}
      * @since 5.5.7
@@ -400,7 +400,7 @@ public class MailUtils {
     /**
      * 发送邮件给多人
      *
-     * @param mailAccount      邮件帐户信息
+     * @param mailAccount      邮件账户信息
      * @param useGlobalSession 是否全局共享Session
      * @param tos              收件人列表
      * @param ccs              抄送人列表，可以为null或空

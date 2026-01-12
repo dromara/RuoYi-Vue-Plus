@@ -79,7 +79,7 @@ public class SysLogininforController extends BaseController {
     }
 
     @SaCheckPermission("monitor:logininfor:unlock")
-    @Log(title = "帐户解锁", businessType = BusinessType.OTHER)
+    @Log(title = "账户解锁", businessType = BusinessType.OTHER)
     @RepeatSubmit()
     @GetMapping("/unlock/{userName}")
     public R<Void> unlock(@PathVariable("userName") String userName) {

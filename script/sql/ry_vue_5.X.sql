@@ -148,7 +148,7 @@ create table sys_user (
     sex               char(1)         default '0'                comment '用户性别（0男 1女 2未知）',
     avatar            bigint(20)                                 comment '头像地址',
     password          varchar(100)    default ''                 comment '密码',
-    status            char(1)         default '0'                comment '帐号状态（0正常 1停用）',
+    status            char(1)         default '0'                comment '账号状态（0正常 1停用）',
     del_flag          char(1)         default '0'                comment '删除标志（0代表存在 1代表删除）',
     login_ip          varchar(128)    default ''                 comment '最后登录IP',
     login_date        datetime                                   comment '最后登录时间',
@@ -353,7 +353,7 @@ insert into sys_menu values('1042', '日志导出', '500', '4', '#', '', '', 1, 
 insert into sys_menu values('1043', '登录查询', '501', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:query',   '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values('1044', '登录删除', '501', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:remove',  '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values('1045', '日志导出', '501', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:export',  '#', 103, 1, sysdate(), null, null, '');
-insert into sys_menu values('1050', '帐户解锁', '501', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:unlock',  '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1050', '账户解锁', '501', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:unlock',  '#', 103, 1, sysdate(), null, null, '');
 -- 在线用户按钮
 insert into sys_menu values('1046', '在线查询', '109', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:query',       '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values('1047', '批量强退', '109', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:batchLogout', '#', 103, 1, sysdate(), null, null, '');
