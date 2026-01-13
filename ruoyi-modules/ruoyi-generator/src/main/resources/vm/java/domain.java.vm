@@ -1,15 +1,6 @@
 package ${packageName}.domain;
 
-#foreach ($column in $columns)
-#if($column.javaField=='tenantId')
-#set($IsTenant=1)
-#end
-#end
-#if($IsTenant==1)
-import org.dromara.common.tenant.core.TenantEntity;
-#else
 import org.dromara.common.mybatis.core.domain.BaseEntity;
-#end
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,11 +16,7 @@ import java.io.Serial;
  * @author ${author}
  * @date ${datetime}
  */
-#if($IsTenant==1)
-#set($Entity="TenantEntity")
-#else
 #set($Entity="BaseEntity")
-#end
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("${tableName}")

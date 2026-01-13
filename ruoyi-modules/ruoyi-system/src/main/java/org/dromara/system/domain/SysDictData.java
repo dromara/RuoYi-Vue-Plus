@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dromara.common.core.constant.SystemConstants;
-import org.dromara.common.tenant.core.TenantEntity;
+import org.dromara.common.mybatis.core.domain.BaseEntity;
 
 /**
  * 字典数据表 sys_dict_data
@@ -16,7 +16,7 @@ import org.dromara.common.tenant.core.TenantEntity;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_dict_data")
-public class SysDictData extends TenantEntity {
+public class SysDictData extends BaseEntity {
 
     /**
      * 字典编码

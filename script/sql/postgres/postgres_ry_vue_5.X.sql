@@ -5,7 +5,6 @@ create table sys_social
 (
     id                 int8             not null,
     user_id            int8             not null,
-    tenant_id          varchar(20)      default '000000'::varchar,
     auth_id            varchar(255)     not null,
     source             varchar(255)     not null,
     open_id            varchar(255)     default null::varchar,
@@ -38,7 +37,6 @@ create table sys_social
 comment on table   sys_social                   is '社会化关系表';
 comment on column  sys_social.id                is '主键';
 comment on column  sys_social.user_id           is '用户ID';
-comment on column  sys_social.tenant_id         is '租户id';
 comment on column  sys_social.auth_id           is '平台+平台唯一id';
 comment on column  sys_social.source            is '用户来源';
 comment on column  sys_social.open_id           is '平台编号唯一id';
@@ -67,105 +65,11 @@ comment on column  sys_social.update_time       is '更新时间';
 comment on column  sys_social.del_flag          is '删除标志（0代表存在 1代表删除）';
 
 -- ----------------------------
--- 租户表
--- ----------------------------
-create table if not exists sys_tenant
-(
-    id                int8,
-    tenant_id         varchar(20)   not null,
-    contact_user_name varchar(20)   default null::varchar,
-    contact_phone     varchar(20)   default null::varchar,
-    company_name      varchar(30)   default null::varchar,
-    license_number    varchar(30)   default null::varchar,
-    address           varchar(200)  default null::varchar,
-    intro             varchar(200)  default null::varchar,
-    domain            varchar(200)  default null::varchar,
-    remark            varchar(200)  default null::varchar,
-    package_id        int8,
-    expire_time       timestamp,
-    account_count     int4          default -1,
-    status            char          default '0'::bpchar,
-    del_flag          char          default '0'::bpchar,
-    create_dept       int8,
-    create_by         int8,
-    create_time       timestamp,
-    update_by         int8,
-    update_time       timestamp,
-    constraint "pk_sys_tenant" primary key (id)
-);
-
-
-comment on table   sys_tenant                    is '租户表';
-comment on column  sys_tenant.tenant_id          is '租户编号';
-comment on column  sys_tenant.contact_phone      is '联系电话';
-comment on column  sys_tenant.company_name       is '企业名称';
-comment on column  sys_tenant.company_name       is '联系人';
-comment on column  sys_tenant.license_number     is '统一社会信用代码';
-comment on column  sys_tenant.address            is '地址';
-comment on column  sys_tenant.intro              is '企业简介';
-comment on column  sys_tenant.domain             is '域名';
-comment on column  sys_tenant.remark             is '备注';
-comment on column  sys_tenant.package_id         is '租户套餐编号';
-comment on column  sys_tenant.expire_time        is '过期时间';
-comment on column  sys_tenant.account_count      is '用户数量（-1不限制）';
-comment on column  sys_tenant.status             is '租户状态（0正常 1停用）';
-comment on column  sys_tenant.del_flag           is '删除标志（0代表存在 1代表删除）';
-comment on column  sys_tenant.create_dept        is '创建部门';
-comment on column  sys_tenant.create_by          is '创建者';
-comment on column  sys_tenant.create_time        is '创建时间';
-comment on column  sys_tenant.update_by          is '更新者';
-comment on column  sys_tenant.update_time        is '更新时间';
-
-
--- ----------------------------
--- 初始化-租户表数据
--- ----------------------------
-
-insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有限公司', null, null, '多租户通用后台管理管理系统', null, null, null, null, -1, '0', '0', 103, 1, now(), null, null);
-
-
--- ----------------------------
--- 租户套餐表
--- ----------------------------
-create table if not exists sys_tenant_package
-(
-    package_id          int8,
-    package_name        varchar(20)     default ''::varchar,
-    menu_ids            varchar(3000)   default ''::varchar,
-    remark              varchar(200)    default ''::varchar,
-    menu_check_strictly bool            default true,
-    status              char            default '0'::bpchar,
-    del_flag            char            default '0'::bpchar,
-    create_dept         int8,
-    create_by           int8,
-    create_time         timestamp,
-    update_by           int8,
-    update_time         timestamp,
-    constraint "pk_sys_tenant_package" primary key (package_id)
-);
-
-
-comment on table   sys_tenant_package                    is '租户套餐表';
-comment on column  sys_tenant_package.package_id         is '租户套餐id';
-comment on column  sys_tenant_package.package_name       is '套餐名称';
-comment on column  sys_tenant_package.menu_ids           is '关联菜单id';
-comment on column  sys_tenant_package.remark             is '备注';
-comment on column  sys_tenant_package.status             is '状态（0正常 1停用）';
-comment on column  sys_tenant_package.del_flag           is '删除标志（0代表存在 1代表删除）';
-comment on column  sys_tenant_package.create_dept        is '创建部门';
-comment on column  sys_tenant_package.create_by          is '创建者';
-comment on column  sys_tenant_package.create_time        is '创建时间';
-comment on column  sys_tenant_package.update_by          is '更新者';
-comment on column  sys_tenant_package.update_time        is '更新时间';
-
-
--- ----------------------------
 -- 1、部门表
 -- ----------------------------
 create table if not exists sys_dept
 (
     dept_id     int8,
-    tenant_id   varchar(20) default '000000'::varchar,
     parent_id   int8        default 0,
     ancestors   varchar(500)default ''::varchar,
     dept_name   varchar(30) default ''::varchar,
@@ -186,7 +90,6 @@ create table if not exists sys_dept
 
 comment on table sys_dept               is '部门表';
 comment on column sys_dept.dept_id      is '部门ID';
-comment on column sys_dept.tenant_id    is '租户编号';
 comment on column sys_dept.parent_id    is '父部门ID';
 comment on column sys_dept.ancestors    is '祖级列表';
 comment on column sys_dept.dept_name    is '部门名称';
@@ -206,16 +109,16 @@ comment on column sys_dept.update_time  is '更新时间';
 -- ----------------------------
 -- 初始化-部门表数据
 -- ----------------------------
-insert into sys_dept values(100, '000000', 0,   '0',          'XXX科技',   null,0, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
-insert into sys_dept values(101, '000000', 100, '0,100',      '深圳总公司', null,1, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
-insert into sys_dept values(102, '000000', 100, '0,100',      '长沙分公司', null,2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
-insert into sys_dept values(103, '000000', 101, '0,100,101',  '研发部门',   null,1, 1, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
-insert into sys_dept values(104, '000000', 101, '0,100,101',  '市场部门',   null,2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
-insert into sys_dept values(105, '000000', 101, '0,100,101',  '测试部门',   null,3, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
-insert into sys_dept values(106, '000000', 101, '0,100,101',  '财务部门',   null,4, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
-insert into sys_dept values(107, '000000', 101, '0,100,101',  '运维部门',   null,5, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
-insert into sys_dept values(108, '000000', 102, '0,100,102',  '市场部门',   null,1, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
-insert into sys_dept values(109, '000000', 102, '0,100,102',  '财务部门',   null,2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
+insert into sys_dept values(100, 0,   '0',          'XXX科技',   null,0, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
+insert into sys_dept values(101, 100, '0,100',      '深圳总公司', null,1, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
+insert into sys_dept values(102, 100, '0,100',      '长沙分公司', null,2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
+insert into sys_dept values(103, 101, '0,100,101',  '研发部门',   null,1, 1, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
+insert into sys_dept values(104, 101, '0,100,101',  '市场部门',   null,2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
+insert into sys_dept values(105, 101, '0,100,101',  '测试部门',   null,3, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
+insert into sys_dept values(106, 101, '0,100,101',  '财务部门',   null,4, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
+insert into sys_dept values(107, 101, '0,100,101',  '运维部门',   null,5, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
+insert into sys_dept values(108, 102, '0,100,102',  '市场部门',   null,1, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
+insert into sys_dept values(109, 102, '0,100,102',  '财务部门',   null,2, null, '15888888888', 'xxx@qq.com', '0', '0', 103, 1, now(), null, null);
 
 -- ----------------------------
 -- 2、用户信息表
@@ -223,7 +126,6 @@ insert into sys_dept values(109, '000000', 102, '0,100,102',  '财务部门',   
 create table if not exists sys_user
 (
     user_id     int8,
-    tenant_id   varchar(20)  default '000000'::varchar,
     dept_id     int8,
     user_name   varchar(30)  not null,
     nick_name   varchar(30)  not null,
@@ -248,7 +150,6 @@ create table if not exists sys_user
 
 comment on table sys_user               is '用户信息表';
 comment on column sys_user.user_id      is '用户ID';
-comment on column sys_user.tenant_id    is '租户编号';
 comment on column sys_user.dept_id      is '部门ID';
 comment on column sys_user.user_name    is '用户账号';
 comment on column sys_user.nick_name    is '用户昵称';
@@ -273,9 +174,9 @@ comment on column sys_user.remark       is '备注';
 
 -- 初始化-用户信息表数据
 -- ----------------------------
-insert into sys_user values(1, '000000', 103, 'admin', '疯狂的狮子Li', 'sys_user', 'crazyLionLi@163.com', '15888888888', '1', null, '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', now(), 103, 1, now(), null, null, '管理员');
-insert into sys_user VALUES(3, '000000', 108, 'test', '本部门及以下 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', now(), 103, 1, now(), 3, now(), NULL);
-insert into sys_user VALUES(4, '000000', 102, 'test1', '仅本人 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', now(), 103, 1, now(), 4, now(), NULL);
+insert into sys_user values(1, 103, 'admin', '疯狂的狮子Li', 'sys_user', 'crazyLionLi@163.com', '15888888888', '1', null, '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', now(), 103, 1, now(), null, null, '管理员');
+insert into sys_user VALUES(3, 108, 'test', '本部门及以下 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', now(), 103, 1, now(), 3, now(), NULL);
+insert into sys_user VALUES(4, 102, 'test1', '仅本人 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', now(), 103, 1, now(), 4, now(), NULL);
 
 -- ----------------------------
 -- 3、岗位信息表
@@ -283,7 +184,6 @@ insert into sys_user VALUES(4, '000000', 102, 'test1', '仅本人 密码666666',
 create table if not exists sys_post
 (
     post_id     int8,
-    tenant_id   varchar(20) default '000000'::varchar,
     dept_id     int8,
     post_code   varchar(64) not null,
     post_category   varchar(100) default null,
@@ -301,7 +201,6 @@ create table if not exists sys_post
 
 comment on table sys_post               is '岗位信息表';
 comment on column sys_post.post_id      is '岗位ID';
-comment on column sys_post.tenant_id    is '租户编号';
 comment on column sys_post.dept_id      is '部门id';
 comment on column sys_post.post_code    is '岗位编码';
 comment on column sys_post.post_category is '岗位类别编码';
@@ -318,10 +217,10 @@ comment on column sys_post.remark       is '备注';
 -- ----------------------------
 -- 初始化-岗位信息表数据
 -- ----------------------------
-insert into sys_post values(1, '000000', 103, 'ceo',  null, '董事长',    1, '0', 103, 1, now(), null, null, '');
-insert into sys_post values(2, '000000', 100, 'se',   null, '项目经理',  2, '0', 103, 1, now(), null, null, '');
-insert into sys_post values(3, '000000', 100, 'hr',   null, '人力资源',  3, '0', 103, 1, now(), null, null, '');
-insert into sys_post values(4, '000000', 100, 'user', null, '普通员工',  4, '0', 103, 1, now(), null, null, '');
+insert into sys_post values(1, 103, 'ceo',  null, '董事长',    1, '0', 103, 1, now(), null, null, '');
+insert into sys_post values(2, 100, 'se',   null, '项目经理',  2, '0', 103, 1, now(), null, null, '');
+insert into sys_post values(3, 100, 'hr',   null, '人力资源',  3, '0', 103, 1, now(), null, null, '');
+insert into sys_post values(4, 100, 'user', null, '普通员工',  4, '0', 103, 1, now(), null, null, '');
 
 -- ----------------------------
 -- 4、角色信息表
@@ -329,7 +228,6 @@ insert into sys_post values(4, '000000', 100, 'user', null, '普通员工',  4, 
 create table if not exists sys_role
 (
     role_id             int8,
-    tenant_id           varchar(20)  default '000000'::varchar,
     role_name           varchar(30)  not null,
     role_key            varchar(100) not null,
     role_sort           int4         not null,
@@ -349,7 +247,6 @@ create table if not exists sys_role
 
 comment on table sys_role                       is '角色信息表';
 comment on column sys_role.role_id              is '角色ID';
-comment on column sys_role.tenant_id            is '租户编号';
 comment on column sys_role.role_name            is '角色名称';
 comment on column sys_role.role_key             is '角色权限字符串';
 comment on column sys_role.role_sort            is '显示顺序';
@@ -368,9 +265,9 @@ comment on column sys_role.remark               is '备注';
 -- ----------------------------
 -- 初始化-角色信息表数据
 -- ----------------------------
-insert into sys_role values('1', '000000', '超级管理员',  'superadmin',  1, '1', 't', 't', '0', '0', 103, 1, now(), null, null, '超级管理员');
-insert into sys_role values('3', '000000', '本部门及以下', 'test1', 3, '4', 't', 't', '0', '0', 103, 1, now(), NULL, NULL, '');
-insert into sys_role values('4', '000000', '仅本人', 'test2', 4, '5', 't', 't', '0', '0', 103, 1, now(), NULL, NULL, '');
+insert into sys_role values('1', '超级管理员',  'superadmin',  1, '1', 't', 't', '0', '0', 103, 1, now(), null, null, '超级管理员');
+insert into sys_role values('3', '本部门及以下', 'test1', 3, '4', 't', 't', '0', '0', 103, 1, now(), NULL, NULL, '');
+insert into sys_role values('4', '仅本人', 'test2', 4, '5', 't', 't', '0', '0', 103, 1, now(), NULL, NULL, '');
 
 -- ----------------------------
 -- 5、菜单权限表
@@ -427,7 +324,6 @@ comment on column sys_menu.remark       is '备注';
 -- ----------------------------
 -- 一级菜单
 insert into sys_menu values('1', '系统管理', '0', '1', 'system',           null, '', '1', '0', 'M', '0', '0', '', 'system',   103, 1, now(), null, null, '系统管理目录');
-insert into sys_menu values('6', '租户管理', '0', '2', 'tenant',           null, '', '1', '0', 'M', '0', '0', '', 'chart',    103, 1, now(), null, null, '租户管理目录');
 insert into sys_menu values('2', '系统监控', '0', '3', 'monitor',          null, '', '1', '0', 'M', '0', '0', '', 'monitor',  103, 1, now(), null, null, '系统监控目录');
 insert into sys_menu values('3', '系统工具', '0', '4', 'tool',             null, '', '1', '0', 'M', '0', '0', '', 'tool',     103, 1, now(), null, null, '系统工具目录');
 insert into sys_menu values('4', 'PLUS官网', '0', '5', 'https://gitee.com/dromara/RuoYi-Vue-Plus', null, '', '0', '0', 'M', '0', '0', '', 'guide',    103, 1, now(), null, null, 'RuoYi-Vue-Plus官网地址');
@@ -445,8 +341,6 @@ insert into sys_menu values('108',  '日志管理',     '1',   '9', 'log',      
 insert into sys_menu values('109',  '在线用户',     '2',   '1', 'online',           'monitor/online/index',         '', '1', '0', 'C', '0', '0', 'monitor:online:list',         'online',        103, 1, now(), null, null, '在线用户菜单');
 insert into sys_menu values('113',  '缓存监控',     '2',   '5', 'cache',            'monitor/cache/index',          '', '1', '0', 'C', '0', '0', 'monitor:cache:list',          'redis',         103, 1, now(), null, null, '缓存监控菜单');
 insert into sys_menu values('115',  '代码生成',     '3',   '2', 'gen',              'tool/gen/index',               '', '1', '0', 'C', '0', '0', 'tool:gen:list',               'code',          103, 1, now(), null, null, '代码生成菜单');
-insert into sys_menu values('121',  '租户管理',     '6',   '1', 'tenant',           'system/tenant/index',          '', '1', '0', 'C', '0', '0', 'system:tenant:list',          'list',          103, 1, now(), null, null, '租户管理菜单');
-insert into sys_menu values('122',  '租户套餐管理', '6',   '2', 'tenantPackage',    'system/tenantPackage/index',   '', '1', '0', 'C', '0', '0', 'system:tenantPackage:list',   'form',          103, 1, now(), null, null, '租户套餐管理菜单');
 insert into sys_menu values('123',  '客户端管理',   '1',   '11', 'client',           'system/client/index',          '', '1', '0', 'C', '0', '0', 'system:client:list',          'international', 103, 1, now(), null, null, '客户端管理菜单');
 insert into sys_menu values('116', '修改生成配置',  '3',   '2', 'gen-edit/index/:tableId', 'tool/gen/editTable', '', '1', '1', 'C', '1', '0', 'tool:gen:edit',           '#',               103, 1, now(), null, null, '/tool/gen');
 insert into sys_menu values('130', '分配用户',     '1',   '2', 'role-auth/user/:roleId', 'system/role/authUser', '', '1', '1', 'C', '1', '0', 'system:role:edit',      '#',               103, 1, now(), null, null, '/system/role');
@@ -540,18 +434,6 @@ insert into sys_menu values('1620', '配置列表', '118', '5', '#', '', '', '1'
 insert into sys_menu values('1621', '配置添加', '118', '6', '#', '', '', '1', '0', 'F', '0', '0', 'system:ossConfig:add',    '#', 103, 1, now(), null, null, '');
 insert into sys_menu values('1622', '配置编辑', '118', '6', '#', '', '', '1', '0', 'F', '0', '0', 'system:ossConfig:edit',   '#', 103, 1, now(), null, null, '');
 insert into sys_menu values('1623', '配置删除', '118', '6', '#', '', '', '1', '0', 'F', '0', '0', 'system:ossConfig:remove', '#', 103, 1, now(), null, null, '');
--- 租户管理相关按钮
-insert into sys_menu values('1606', '租户查询', '121', '1', '#', '', '', '1', '0', 'F', '0', '0', 'system:tenant:query',   '#', 103, 1, now(), null, null, '');
-insert into sys_menu values('1607', '租户新增', '121', '2', '#', '', '', '1', '0', 'F', '0', '0', 'system:tenant:add',     '#', 103, 1, now(), null, null, '');
-insert into sys_menu values('1608', '租户修改', '121', '3', '#', '', '', '1', '0', 'F', '0', '0', 'system:tenant:edit',    '#', 103, 1, now(), null, null, '');
-insert into sys_menu values('1609', '租户删除', '121', '4', '#', '', '', '1', '0', 'F', '0', '0', 'system:tenant:remove',  '#', 103, 1, now(), null, null, '');
-insert into sys_menu values('1610', '租户导出', '121', '5', '#', '', '', '1', '0', 'F', '0', '0', 'system:tenant:export',  '#', 103, 1, now(), null, null, '');
--- 租户套餐管理相关按钮
-insert into sys_menu values('1611', '租户套餐查询', '122', '1', '#', '', '', '1', '0', 'F', '0', '0', 'system:tenantPackage:query',   '#', 103, 1, now(), null, null, '');
-insert into sys_menu values('1612', '租户套餐新增', '122', '2', '#', '', '', '1', '0', 'F', '0', '0', 'system:tenantPackage:add',     '#', 103, 1, now(), null, null, '');
-insert into sys_menu values('1613', '租户套餐修改', '122', '3', '#', '', '', '1', '0', 'F', '0', '0', 'system:tenantPackage:edit',    '#', 103, 1, now(), null, null, '');
-insert into sys_menu values('1614', '租户套餐删除', '122', '4', '#', '', '', '1', '0', 'F', '0', '0', 'system:tenantPackage:remove',  '#', 103, 1, now(), null, null, '');
-insert into sys_menu values('1615', '租户套餐导出', '122', '5', '#', '', '', '1', '0', 'F', '0', '0', 'system:tenantPackage:export',  '#', 103, 1, now(), null, null, '');
 -- 客户端管理按钮
 insert into sys_menu values('1061', '客户端管理查询', '123', '1',  '#', '', '', '1', '0', 'F', '0', '0', 'system:client:query',        '#', 103, 1, now(), null, null, '');
 insert into sys_menu values('1062', '客户端管理新增', '123', '2',  '#', '', '', '1', '0', 'F', '0', '0', 'system:client:add',          '#', 103, 1, now(), null, null, '');
@@ -770,7 +652,6 @@ insert into sys_user_post values ('1', '1');
 create table if not exists sys_oper_log
 (
     oper_id        int8,
-    tenant_id      varchar(20)   default '000000'::varchar,
     title          varchar(50)   default ''::varchar,
     business_type  int4          default 0,
     method         varchar(100)  default ''::varchar,
@@ -796,7 +677,6 @@ create index idx_sys_oper_log_ot ON sys_oper_log (oper_time);
 
 comment on table sys_oper_log                   is '操作日志记录';
 comment on column sys_oper_log.oper_id          is '日志主键';
-comment on column sys_oper_log.tenant_id        is '租户编号';
 comment on column sys_oper_log.title            is '模块标题';
 comment on column sys_oper_log.business_type    is '业务类型（0其它 1新增 2修改 3删除）';
 comment on column sys_oper_log.method           is '方法名称';
@@ -820,7 +700,6 @@ comment on column sys_oper_log.cost_time        is '消耗时间';
 create table if not exists sys_dict_type
 (
     dict_id     int8,
-    tenant_id   varchar(20)  default '000000'::varchar,
     dict_name   varchar(100) default ''::varchar,
     dict_type   varchar(100) default ''::varchar,
     create_dept int8,
@@ -836,7 +715,6 @@ create unique index sys_dict_type_index1 ON sys_dict_type (tenant_id, dict_type)
 
 comment on table sys_dict_type                  is '字典类型表';
 comment on column sys_dict_type.dict_id         is '字典主键';
-comment on column sys_dict_type.tenant_id       is '租户编号';
 comment on column sys_dict_type.dict_name       is '字典名称';
 comment on column sys_dict_type.dict_type       is '字典类型';
 comment on column sys_dict_type.create_dept     is '创建部门';
@@ -846,16 +724,16 @@ comment on column sys_dict_type.update_by       is '更新者';
 comment on column sys_dict_type.update_time     is '更新时间';
 comment on column sys_dict_type.remark          is '备注';
 
-insert into sys_dict_type values(1, '000000', '用户性别', 'sys_user_sex',        103, 1, now(), null, null, '用户性别列表');
-insert into sys_dict_type values(2, '000000', '菜单状态', 'sys_show_hide',       103, 1, now(), null, null, '菜单状态列表');
-insert into sys_dict_type values(3, '000000', '系统开关', 'sys_normal_disable',  103, 1, now(), null, null, '系统开关列表');
-insert into sys_dict_type values(6, '000000', '系统是否', 'sys_yes_no',          103, 1, now(), null, null, '系统是否列表');
-insert into sys_dict_type values(7, '000000', '通知类型', 'sys_notice_type',     103, 1, now(), null, null, '通知类型列表');
-insert into sys_dict_type values(8, '000000', '通知状态', 'sys_notice_status',   103, 1, now(), null, null, '通知状态列表');
-insert into sys_dict_type values(9, '000000', '操作类型', 'sys_oper_type',       103, 1, now(), null, null, '操作类型列表');
-insert into sys_dict_type values(10, '000000', '系统状态', 'sys_common_status',  103, 1, now(), null, null, '登录状态列表');
-insert into sys_dict_type values(11, '000000', '授权类型', 'sys_grant_type',     103, 1, now(), null, null, '认证授权类型');
-insert into sys_dict_type values(12, '000000', '设备类型', 'sys_device_type',    103, 1, now(), null, null, '客户端设备类型');
+insert into sys_dict_type values(1, '用户性别', 'sys_user_sex',        103, 1, now(), null, null, '用户性别列表');
+insert into sys_dict_type values(2, '菜单状态', 'sys_show_hide',       103, 1, now(), null, null, '菜单状态列表');
+insert into sys_dict_type values(3, '系统开关', 'sys_normal_disable',  103, 1, now(), null, null, '系统开关列表');
+insert into sys_dict_type values(6, '系统是否', 'sys_yes_no',          103, 1, now(), null, null, '系统是否列表');
+insert into sys_dict_type values(7, '通知类型', 'sys_notice_type',     103, 1, now(), null, null, '通知类型列表');
+insert into sys_dict_type values(8, '通知状态', 'sys_notice_status',   103, 1, now(), null, null, '通知状态列表');
+insert into sys_dict_type values(9, '操作类型', 'sys_oper_type',       103, 1, now(), null, null, '操作类型列表');
+insert into sys_dict_type values(10, '系统状态', 'sys_common_status',  103, 1, now(), null, null, '登录状态列表');
+insert into sys_dict_type values(11, '授权类型', 'sys_grant_type',     103, 1, now(), null, null, '认证授权类型');
+insert into sys_dict_type values(12, '设备类型', 'sys_device_type',    103, 1, now(), null, null, '客户端设备类型');
 
 -- ----------------------------
 -- 12、字典数据表
@@ -863,7 +741,6 @@ insert into sys_dict_type values(12, '000000', '设备类型', 'sys_device_type'
 create table if not exists sys_dict_data
 (
     dict_code   int8,
-    tenant_id   varchar(20)  default '000000'::varchar,
     dict_sort   int4         default 0,
     dict_label  varchar(100) default ''::varchar,
     dict_value  varchar(100) default ''::varchar,
@@ -882,7 +759,6 @@ create table if not exists sys_dict_data
 
 comment on table sys_dict_data                  is '字典数据表';
 comment on column sys_dict_data.dict_code       is '字典编码';
-comment on column sys_dict_type.tenant_id       is '租户编号';
 comment on column sys_dict_data.dict_sort       is '字典排序';
 comment on column sys_dict_data.dict_label      is '字典标签';
 comment on column sys_dict_data.dict_value      is '字典键值';
@@ -897,40 +773,40 @@ comment on column sys_dict_data.update_by       is '更新者';
 comment on column sys_dict_data.update_time     is '更新时间';
 comment on column sys_dict_data.remark          is '备注';
 
-insert into sys_dict_data values(1, '000000', 1,  '男',       '0',       'sys_user_sex',        '',   '',        'Y', 103, 1, now(), null, null, '性别男');
-insert into sys_dict_data values(2, '000000', 2,  '女',       '1',       'sys_user_sex',        '',   '',        'N', 103, 1, now(), null, null, '性别女');
-insert into sys_dict_data values(3, '000000', 3,  '未知',     '2',       'sys_user_sex',        '',   '',        'N', 103, 1, now(), null, null, '性别未知');
-insert into sys_dict_data values(4, '000000', 1,  '显示',     '0',       'sys_show_hide',       '',   'primary', 'Y', 103, 1, now(), null, null, '显示菜单');
-insert into sys_dict_data values(5, '000000', 2,  '隐藏',     '1',       'sys_show_hide',       '',   'danger',  'N', 103, 1, now(), null, null, '隐藏菜单');
-insert into sys_dict_data values(6, '000000', 1,  '正常',     '0',       'sys_normal_disable',  '',   'primary', 'Y', 103, 1, now(), null, null, '正常状态');
-insert into sys_dict_data values(7, '000000', 2,  '停用',     '1',       'sys_normal_disable',  '',   'danger',  'N', 103, 1, now(), null, null, '停用状态');
-insert into sys_dict_data values(12, '000000', 1,  '是',       'Y',       'sys_yes_no',          '',   'primary', 'Y', 103, 1, now(), null, null, '系统默认是');
-insert into sys_dict_data values(13, '000000', 2,  '否',       'N',       'sys_yes_no',          '',   'danger',  'N', 103, 1, now(), null, null, '系统默认否');
-insert into sys_dict_data values(14, '000000', 1,  '通知',     '1',       'sys_notice_type',     '',   'warning', 'Y', 103, 1, now(), null, null, '通知');
-insert into sys_dict_data values(15, '000000', 2,  '公告',     '2',       'sys_notice_type',     '',   'success', 'N', 103, 1, now(), null, null, '公告');
-insert into sys_dict_data values(16, '000000', 1,  '正常',     '0',       'sys_notice_status',   '',   'primary', 'Y', 103, 1, now(), null, null, '正常状态');
-insert into sys_dict_data values(17, '000000', 2,  '关闭',     '1',       'sys_notice_status',   '',   'danger',  'N', 103, 1, now(), null, null, '关闭状态');
-insert into sys_dict_data values(29, '000000', 99, '其他',     '0',       'sys_oper_type',       '',   'info',    'N', 103, 1, now(), null, null, '其他操作');
-insert into sys_dict_data values(18, '000000', 1,  '新增',     '1',       'sys_oper_type',       '',   'info',    'N', 103, 1, now(), null, null, '新增操作');
-insert into sys_dict_data values(19, '000000', 2,  '修改',     '2',       'sys_oper_type',       '',   'info',    'N', 103, 1, now(), null, null, '修改操作');
-insert into sys_dict_data values(20, '000000', 3,  '删除',     '3',       'sys_oper_type',       '',   'danger',  'N', 103, 1, now(), null, null, '删除操作');
-insert into sys_dict_data values(21, '000000', 4,  '授权',     '4',       'sys_oper_type',       '',   'primary', 'N', 103, 1, now(), null, null, '授权操作');
-insert into sys_dict_data values(22, '000000', 5,  '导出',     '5',       'sys_oper_type',       '',   'warning', 'N', 103, 1, now(), null, null, '导出操作');
-insert into sys_dict_data values(23, '000000', 6,  '导入',     '6',       'sys_oper_type',       '',   'warning', 'N', 103, 1, now(), null, null, '导入操作');
-insert into sys_dict_data values(24, '000000', 7,  '强退',     '7',       'sys_oper_type',       '',   'danger',  'N', 103, 1, now(), null, null, '强退操作');
-insert into sys_dict_data values(25, '000000', 8,  '生成代码', '8',       'sys_oper_type',       '',   'warning', 'N', 103, 1, now(), null, null, '生成操作');
-insert into sys_dict_data values(26, '000000', 9,  '清空数据', '9',       'sys_oper_type',       '',   'danger',  'N', 103, 1, now(), null, null, '清空操作');
-insert into sys_dict_data values(27, '000000', 1,  '成功',     '0',       'sys_common_status',   '',   'primary', 'N', 103, 1, now(), null, null, '正常状态');
-insert into sys_dict_data values(28, '000000', 2,  '失败',     '1',       'sys_common_status',   '',   'danger',  'N', 103, 1, now(), null, null, '停用状态');
-insert into sys_dict_data values(30, '000000', 0,  '密码认证', 'password',   'sys_grant_type',   '',   'default', 'N', 103, 1, now(), null, null, '密码认证');
-insert into sys_dict_data values(31, '000000', 0,  '短信认证', 'sms',        'sys_grant_type',   '',   'default', 'N', 103, 1, now(), null, null, '短信认证');
-insert into sys_dict_data values(32, '000000', 0,  '邮件认证', 'email',      'sys_grant_type',   '',   'default', 'N', 103, 1, now(), null, null, '邮件认证');
-insert into sys_dict_data values(33, '000000', 0,  '小程序认证', 'xcx',      'sys_grant_type',   '',   'default', 'N', 103, 1, now(), null, null, '小程序认证');
-insert into sys_dict_data values(34, '000000', 0,  '三方登录认证', 'social', 'sys_grant_type',   '',   'default', 'N', 103, 1, now(), null, null, '三方登录认证');
-insert into sys_dict_data values(35, '000000', 0,  'PC', 'pc',              'sys_device_type',   '',   'default', 'N', 103, 1, now(), null, null, 'PC');
-insert into sys_dict_data values(36, '000000', 0,  '安卓', 'android',       'sys_device_type',   '',   'default', 'N', 103, 1, now(), null, null, '安卓');
-insert into sys_dict_data values(37, '000000', 0,  'iOS', 'ios',            'sys_device_type',   '',   'default', 'N', 103, 1, now(), null, null, 'iOS');
-insert into sys_dict_data values(38, '000000', 0,  '小程序', 'xcx',         'sys_device_type',   '',   'default', 'N', 103, 1, now(), null, null, '小程序');
+insert into sys_dict_data values(1, 1,  '男',       '0',       'sys_user_sex',        '',   '',        'Y', 103, 1, now(), null, null, '性别男');
+insert into sys_dict_data values(2, 2,  '女',       '1',       'sys_user_sex',        '',   '',        'N', 103, 1, now(), null, null, '性别女');
+insert into sys_dict_data values(3, 3,  '未知',     '2',       'sys_user_sex',        '',   '',        'N', 103, 1, now(), null, null, '性别未知');
+insert into sys_dict_data values(4, 1,  '显示',     '0',       'sys_show_hide',       '',   'primary', 'Y', 103, 1, now(), null, null, '显示菜单');
+insert into sys_dict_data values(5, 2,  '隐藏',     '1',       'sys_show_hide',       '',   'danger',  'N', 103, 1, now(), null, null, '隐藏菜单');
+insert into sys_dict_data values(6, 1,  '正常',     '0',       'sys_normal_disable',  '',   'primary', 'Y', 103, 1, now(), null, null, '正常状态');
+insert into sys_dict_data values(7, 2,  '停用',     '1',       'sys_normal_disable',  '',   'danger',  'N', 103, 1, now(), null, null, '停用状态');
+insert into sys_dict_data values(12, 1,  '是',       'Y',       'sys_yes_no',          '',   'primary', 'Y', 103, 1, now(), null, null, '系统默认是');
+insert into sys_dict_data values(13, 2,  '否',       'N',       'sys_yes_no',          '',   'danger',  'N', 103, 1, now(), null, null, '系统默认否');
+insert into sys_dict_data values(14, 1,  '通知',     '1',       'sys_notice_type',     '',   'warning', 'Y', 103, 1, now(), null, null, '通知');
+insert into sys_dict_data values(15, 2,  '公告',     '2',       'sys_notice_type',     '',   'success', 'N', 103, 1, now(), null, null, '公告');
+insert into sys_dict_data values(16, 1,  '正常',     '0',       'sys_notice_status',   '',   'primary', 'Y', 103, 1, now(), null, null, '正常状态');
+insert into sys_dict_data values(17, 2,  '关闭',     '1',       'sys_notice_status',   '',   'danger',  'N', 103, 1, now(), null, null, '关闭状态');
+insert into sys_dict_data values(29, 99, '其他',     '0',       'sys_oper_type',       '',   'info',    'N', 103, 1, now(), null, null, '其他操作');
+insert into sys_dict_data values(18, 1,  '新增',     '1',       'sys_oper_type',       '',   'info',    'N', 103, 1, now(), null, null, '新增操作');
+insert into sys_dict_data values(19, 2,  '修改',     '2',       'sys_oper_type',       '',   'info',    'N', 103, 1, now(), null, null, '修改操作');
+insert into sys_dict_data values(20, 3,  '删除',     '3',       'sys_oper_type',       '',   'danger',  'N', 103, 1, now(), null, null, '删除操作');
+insert into sys_dict_data values(21, 4,  '授权',     '4',       'sys_oper_type',       '',   'primary', 'N', 103, 1, now(), null, null, '授权操作');
+insert into sys_dict_data values(22, 5,  '导出',     '5',       'sys_oper_type',       '',   'warning', 'N', 103, 1, now(), null, null, '导出操作');
+insert into sys_dict_data values(23, 6,  '导入',     '6',       'sys_oper_type',       '',   'warning', 'N', 103, 1, now(), null, null, '导入操作');
+insert into sys_dict_data values(24, 7,  '强退',     '7',       'sys_oper_type',       '',   'danger',  'N', 103, 1, now(), null, null, '强退操作');
+insert into sys_dict_data values(25, 8,  '生成代码', '8',       'sys_oper_type',       '',   'warning', 'N', 103, 1, now(), null, null, '生成操作');
+insert into sys_dict_data values(26, 9,  '清空数据', '9',       'sys_oper_type',       '',   'danger',  'N', 103, 1, now(), null, null, '清空操作');
+insert into sys_dict_data values(27, 1,  '成功',     '0',       'sys_common_status',   '',   'primary', 'N', 103, 1, now(), null, null, '正常状态');
+insert into sys_dict_data values(28, 2,  '失败',     '1',       'sys_common_status',   '',   'danger',  'N', 103, 1, now(), null, null, '停用状态');
+insert into sys_dict_data values(30, 0,  '密码认证', 'password',   'sys_grant_type',   '',   'default', 'N', 103, 1, now(), null, null, '密码认证');
+insert into sys_dict_data values(31, 0,  '短信认证', 'sms',        'sys_grant_type',   '',   'default', 'N', 103, 1, now(), null, null, '短信认证');
+insert into sys_dict_data values(32, 0,  '邮件认证', 'email',      'sys_grant_type',   '',   'default', 'N', 103, 1, now(), null, null, '邮件认证');
+insert into sys_dict_data values(33, 0,  '小程序认证', 'xcx',      'sys_grant_type',   '',   'default', 'N', 103, 1, now(), null, null, '小程序认证');
+insert into sys_dict_data values(34, 0,  '三方登录认证', 'social', 'sys_grant_type',   '',   'default', 'N', 103, 1, now(), null, null, '三方登录认证');
+insert into sys_dict_data values(35, 0,  'PC', 'pc',              'sys_device_type',   '',   'default', 'N', 103, 1, now(), null, null, 'PC');
+insert into sys_dict_data values(36, 0,  '安卓', 'android',       'sys_device_type',   '',   'default', 'N', 103, 1, now(), null, null, '安卓');
+insert into sys_dict_data values(37, 0,  'iOS', 'ios',            'sys_device_type',   '',   'default', 'N', 103, 1, now(), null, null, 'iOS');
+insert into sys_dict_data values(38, 0,  '小程序', 'xcx',         'sys_device_type',   '',   'default', 'N', 103, 1, now(), null, null, '小程序');
 
 
 -- ----------------------------
@@ -939,7 +815,6 @@ insert into sys_dict_data values(38, '000000', 0,  '小程序', 'xcx',         '
 create table if not exists sys_config
 (
     config_id    int8,
-    tenant_id    varchar(20)  default '000000'::varchar,
     config_name  varchar(100) default ''::varchar,
     config_key   varchar(100) default ''::varchar,
     config_value varchar(500) default ''::varchar,
@@ -955,7 +830,6 @@ create table if not exists sys_config
 
 comment on table sys_config                 is '参数配置表';
 comment on column sys_config.config_id      is '参数主键';
-comment on column sys_config.tenant_id      is '租户编号';
 comment on column sys_config.config_name    is '参数名称';
 comment on column sys_config.config_key     is '参数键名';
 comment on column sys_config.config_value   is '参数键值';
@@ -967,11 +841,11 @@ comment on column sys_config.update_by      is '更新者';
 comment on column sys_config.update_time    is '更新时间';
 comment on column sys_config.remark         is '备注';
 
-insert into sys_config values(1, '000000', '主框架页-默认皮肤样式名称',     'sys.index.skinName',            'skin-blue',     'Y', 103, 1, now(), null, null, '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow' );
-insert into sys_config values(2, '000000', '用户管理-账号初始密码',         'sys.user.initPassword',         '123456',        'Y', 103, 1, now(), null, null, '初始化密码 123456' );
-insert into sys_config values(3, '000000', '主框架页-侧边栏主题',           'sys.index.sideTheme',           'theme-dark',    'Y', 103, 1, now(), null, null, '深色主题theme-dark，浅色主题theme-light' );
-insert into sys_config values(5, '000000', '账号自助-是否开启用户注册功能',   'sys.account.registerUser',      'false',         'Y', 103, 1, now(), null, null, '是否开启注册用户功能（true开启，false关闭）');
-insert into sys_config values(11, '000000', 'OSS预览列表资源开关',          'sys.oss.previewListResource',   'true',          'Y', 103, 1, now(), null, null, 'true:开启, false:关闭');
+insert into sys_config values(1, '主框架页-默认皮肤样式名称',     'sys.index.skinName',            'skin-blue',     'Y', 103, 1, now(), null, null, '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow' );
+insert into sys_config values(2, '用户管理-账号初始密码',         'sys.user.initPassword',         '123456',        'Y', 103, 1, now(), null, null, '初始化密码 123456' );
+insert into sys_config values(3, '主框架页-侧边栏主题',           'sys.index.sideTheme',           'theme-dark',    'Y', 103, 1, now(), null, null, '深色主题theme-dark，浅色主题theme-light' );
+insert into sys_config values(5, '账号自助-是否开启用户注册功能',   'sys.account.registerUser',      'false',         'Y', 103, 1, now(), null, null, '是否开启注册用户功能（true开启，false关闭）');
+insert into sys_config values(11, 'OSS预览列表资源开关',          'sys.oss.previewListResource',   'true',          'Y', 103, 1, now(), null, null, 'true:开启, false:关闭');
 
 
 -- ----------------------------
@@ -980,7 +854,6 @@ insert into sys_config values(11, '000000', 'OSS预览列表资源开关',      
 create table if not exists sys_logininfor
 (
     info_id        int8,
-    tenant_id      varchar(20)  default '000000'::varchar,
     user_name      varchar(50)  default ''::varchar,
     client_key     varchar(32)  default ''::varchar,
     device_type    varchar(32)  default ''::varchar,
@@ -999,7 +872,6 @@ create index idx_sys_logininfor_lt ON sys_logininfor (login_time);
 
 comment on table sys_logininfor                 is '系统访问记录';
 comment on column sys_logininfor.info_id        is '访问ID';
-comment on column sys_logininfor.tenant_id      is '租户编号';
 comment on column sys_logininfor.user_name      is '用户账号';
 comment on column sys_logininfor.client_key     is '客户端';
 comment on column sys_logininfor.device_type    is '设备类型';
@@ -1017,7 +889,6 @@ comment on column sys_logininfor.login_time     is '访问时间';
 create table if not exists sys_notice
 (
     notice_id      int8,
-    tenant_id      varchar(20)  default '000000'::varchar,
     notice_title   varchar(50)  not null,
     notice_type    char         not null,
     notice_content text,
@@ -1033,7 +904,6 @@ create table if not exists sys_notice
 
 comment on table sys_notice                 is '通知公告表';
 comment on column sys_notice.notice_id      is '公告ID';
-comment on column sys_notice.tenant_id      is '租户编号';
 comment on column sys_notice.notice_title   is '公告标题';
 comment on column sys_notice.notice_type    is '公告类型（1通知 2公告）';
 comment on column sys_notice.notice_content is '公告内容';
@@ -1048,8 +918,8 @@ comment on column sys_notice.remark         is '备注';
 -- ----------------------------
 -- 初始化-公告信息表数据
 -- ----------------------------
-insert into sys_notice values('1', '000000', '温馨提醒：2018-07-01 新版本发布啦', '2', '新版本内容', '0', 103, 1, now(), null, null, '管理员');
-insert into sys_notice values('2', '000000', '维护通知：2018-07-01 系统凌晨维护', '1', '维护内容',   '0', 103, 1, now(), null, null, '管理员');
+insert into sys_notice values('1', '温馨提醒：2018-07-01 新版本发布啦', '2', '新版本内容', '0', 103, 1, now(), null, null, '管理员');
+insert into sys_notice values('2', '维护通知：2018-07-01 系统凌晨维护', '1', '维护内容',   '0', 103, 1, now(), null, null, '管理员');
 
 
 -- ----------------------------
@@ -1168,7 +1038,6 @@ comment on column gen_table_column.update_time is '更新时间';
 create table if not exists sys_oss
 (
     oss_id        int8,
-    tenant_id     varchar(20)  default '000000'::varchar,
     file_name     varchar(255) default ''::varchar not null,
     original_name varchar(255) default ''::varchar not null,
     file_suffix   varchar(10)  default ''::varchar not null,
@@ -1185,7 +1054,6 @@ create table if not exists sys_oss
 
 comment on table sys_oss                    is 'OSS对象存储表';
 comment on column sys_oss.oss_id            is '对象存储主键';
-comment on column sys_oss.tenant_id         is '租户编码';
 comment on column sys_oss.file_name         is '文件名';
 comment on column sys_oss.original_name     is '原名';
 comment on column sys_oss.file_suffix       is '文件后缀名';
@@ -1204,7 +1072,6 @@ comment on column sys_oss.service           is '服务商';
 create table if not exists sys_oss_config
 (
     oss_config_id int8,
-    tenant_id     varchar(20)  default '000000'::varchar,
     config_key    varchar(20)  default ''::varchar not null,
     access_key    varchar(255) default ''::varchar,
     secret_key    varchar(255) default ''::varchar,
@@ -1228,7 +1095,6 @@ create table if not exists sys_oss_config
 
 comment on table sys_oss_config                 is '对象存储配置表';
 comment on column sys_oss_config.oss_config_id  is '主键';
-comment on column sys_oss_config.tenant_id      is '租户编码';
 comment on column sys_oss_config.config_key     is '配置key';
 comment on column sys_oss_config.access_key     is 'accessKey';
 comment on column sys_oss_config.secret_key     is '秘钥';
@@ -1248,11 +1114,11 @@ comment on column sys_oss_config.update_by      is '更新者';
 comment on column sys_oss_config.update_time    is '更新时间';
 comment on column sys_oss_config.remark         is '备注';
 
-insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                      '','N', '',            '1', '0', '', 103, 1, now(), 1, now(), null);
-insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',           '','N', '',            '1', '1', '', 103, 1, now(), 1, now(), null);
-insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',         '','N', '',            '1', '1', '', 103, 1, now(), 1, now(), null);
-insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1240000000',  '', 'cos.ap-beijing.myqcloud.com',         '','N', 'ap-beijing',  '1', '1', '', 103, 1, now(), 1, now(), null);
-insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',                 '','N', '',            '1', '1', '', 103, 1, now(), 1, now(), NULL);
+insert into sys_oss_config values (1, 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                      '','N', '',            '1', '0', '', 103, 1, now(), 1, now(), null);
+insert into sys_oss_config values (2, 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',           '','N', '',            '1', '1', '', 103, 1, now(), 1, now(), null);
+insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',         '','N', '',            '1', '1', '', 103, 1, now(), 1, now(), null);
+insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1240000000',  '', 'cos.ap-beijing.myqcloud.com',         '','N', 'ap-beijing',  '1', '1', '', 103, 1, now(), 1, now(), null);
+insert into sys_oss_config values (5, 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',                 '','N', '',            '1', '1', '', 103, 1, now(), 1, now(), NULL);
 
 -- ----------------------------
 -- 系统授权表
@@ -1299,7 +1165,6 @@ insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'ap
 create table if not exists test_demo
 (
     id          int8,
-    tenant_id   varchar(20)     default '000000',
     dept_id     int8,
     user_id     int8,
     order_num   int4            default 0,
@@ -1316,7 +1181,6 @@ create table if not exists test_demo
 
 comment on table test_demo is '测试单表';
 comment on column test_demo.id is '主键';
-comment on column test_demo.tenant_id is '租户编号';
 comment on column test_demo.dept_id is '部门id';
 comment on column test_demo.user_id is '用户id';
 comment on column test_demo.order_num is '排序号';
@@ -1333,7 +1197,6 @@ comment on column test_demo.del_flag is '删除标志';
 create table if not exists test_tree
 (
     id          int8,
-    tenant_id   varchar(20)     default '000000',
     parent_id   int8            default 0,
     dept_id     int8,
     user_id     int8,
@@ -1349,7 +1212,6 @@ create table if not exists test_tree
 
 comment on table test_tree is '测试树表';
 comment on column test_tree.id is '主键';
-comment on column test_tree.tenant_id is '租户编号';
 comment on column test_tree.parent_id is '父id';
 comment on column test_tree.dept_id is '部门id';
 comment on column test_tree.user_id is '用户id';
@@ -1362,33 +1224,33 @@ comment on column test_tree.update_time is '更新时间';
 comment on column test_tree.update_by is '更新人';
 comment on column test_tree.del_flag is '删除标志';
 
-INSERT INTO test_demo VALUES (1, '000000', 102, 4, 1, '测试数据权限', '测试', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (2, '000000', 102, 3, 2, '子节点1', '111', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (3, '000000', 102, 3, 3, '子节点2', '222', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (4, '000000', 108, 4, 4, '测试数据', 'demo', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (5, '000000', 108, 3, 13, '子节点11', '1111', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (6, '000000', 108, 3, 12, '子节点22', '2222', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (7, '000000', 108, 3, 11, '子节点33', '3333', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (8, '000000', 108, 3, 10, '子节点44', '4444', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (9, '000000', 108, 3, 9, '子节点55', '5555', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (10, '000000', 108, 3, 8, '子节点66', '6666', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (11, '000000', 108, 3, 7, '子节点77', '7777', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (12, '000000', 108, 3, 6, '子节点88', '8888', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_demo VALUES (13, '000000', 108, 3, 5, '子节点99', '9999', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (1, 102, 4, 1, '测试数据权限', '测试', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (2, 102, 3, 2, '子节点1', '111', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (3, 102, 3, 3, '子节点2', '222', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (4, 108, 4, 4, '测试数据', 'demo', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (5, 108, 3, 13, '子节点11', '1111', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (6, 108, 3, 12, '子节点22', '2222', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (7, 108, 3, 11, '子节点33', '3333', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (8, 108, 3, 10, '子节点44', '4444', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (9, 108, 3, 9, '子节点55', '5555', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (10, 108, 3, 8, '子节点66', '6666', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (11, 108, 3, 7, '子节点77', '7777', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (12, 108, 3, 6, '子节点88', '8888', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_demo VALUES (13, 108, 3, 5, '子节点99', '9999', 0, 103, now(), 1, NULL, NULL, 0);
 
-INSERT INTO test_tree VALUES (1, '000000', 0, 102, 4, '测试数据权限', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (2, '000000', 1, 102, 3, '子节点1', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (3, '000000', 2, 102, 3, '子节点2', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (4, '000000', 0, 108, 4, '测试树1', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (5, '000000', 4, 108, 3, '子节点11', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (6, '000000', 4, 108, 3, '子节点22', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (7, '000000', 4, 108, 3, '子节点33', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (8, '000000', 5, 108, 3, '子节点44', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (9, '000000', 6, 108, 3, '子节点55', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (10, '000000', 7, 108, 3, '子节点66', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (11, '000000', 7, 108, 3, '子节点77', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (12, '000000', 10, 108, 3, '子节点88', 0, 103, now(), 1, NULL, NULL, 0);
-INSERT INTO test_tree VALUES (13, '000000', 10, 108, 3, '子节点99', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (1, 0, 102, 4, '测试数据权限', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (2, 1, 102, 3, '子节点1', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (3, 2, 102, 3, '子节点2', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (4, 0, 108, 4, '测试树1', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (5, 4, 108, 3, '子节点11', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (6, 4, 108, 3, '子节点22', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (7, 4, 108, 3, '子节点33', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (8, 5, 108, 3, '子节点44', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (9, 6, 108, 3, '子节点55', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (10, 7, 108, 3, '子节点66', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (11, 7, 108, 3, '子节点77', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (12, 10, 108, 3, '子节点88', 0, 103, now(), 1, NULL, NULL, 0);
+INSERT INTO test_tree VALUES (13, 10, 108, 3, '子节点99', 0, 103, now(), 1, NULL, NULL, 0);
 
 -- 字符串自动转时间 避免框架时间查询报错问题
 create or replace function cast_varchar_to_timestamp(varchar) returns timestamptz as $$

@@ -1,10 +1,7 @@
 package org.dromara.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
-import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +15,10 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.RegisterBody;
 import org.dromara.common.core.domain.model.SocialLoginBody;
-import org.dromara.common.core.utils.*;
+import org.dromara.common.core.utils.DateUtils;
+import org.dromara.common.core.utils.MessageUtils;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.ratelimiter.annotation.RateLimiter;
@@ -29,29 +29,20 @@ import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.sse.dto.SseMessageDto;
 import org.dromara.common.sse.utils.SseMessageUtils;
-import org.dromara.common.tenant.helper.TenantHelper;
-import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysClientVo;
-import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.service.ISysClientService;
 import org.dromara.system.service.ISysConfigService;
 import org.dromara.system.service.ISysSocialService;
-import org.dromara.system.service.ISysTenantService;
 import org.dromara.web.domain.vo.LoginTenantVo;
 import org.dromara.web.domain.vo.LoginVo;
-import org.dromara.web.domain.vo.TenantListVo;
 import org.dromara.web.service.IAuthStrategy;
 import org.dromara.web.service.SysLoginService;
 import org.dromara.web.service.SysRegisterService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -71,7 +62,6 @@ public class AuthController {
     private final SysLoginService loginService;
     private final SysRegisterService registerService;
     private final ISysConfigService configService;
-    private final ISysTenantService tenantService;
     private final ISysSocialService socialUserService;
     private final ISysClientService clientService;
     private final ScheduledExecutorService scheduledExecutorService;
@@ -99,8 +89,6 @@ public class AuthController {
         } else if (!SystemConstants.NORMAL.equals(client.getStatus())) {
             return R.fail(MessageUtils.message("auth.grant.type.blocked"));
         }
-        // 校验租户
-        loginService.checkTenant(loginBody.getTenantId());
         // 登录
         LoginVo loginVo = IAuthStrategy.login(body, client, grantType);
 
@@ -121,18 +109,13 @@ public class AuthController {
      * @return 结果
      */
     @GetMapping("/binding/{source}")
-    public R<String> authBinding(@PathVariable("source") String source,
-                                 @RequestParam String tenantId, @RequestParam String domain) {
+    public R<String> authBinding(@PathVariable("source") String source) {
         SocialLoginConfigProperties obj = socialProperties.getType().get(source);
         if (ObjectUtil.isNull(obj)) {
             return R.fail(source + "平台账号暂不支持");
         }
         AuthRequest authRequest = SocialUtils.getAuthRequest(source, socialProperties);
-        Map<String, String> map = new HashMap<>();
-        map.put("tenantId", tenantId);
-        map.put("domain", domain);
-        map.put("state", AuthStateUtils.createState());
-        String authorizeUrl = authRequest.authorize(Base64.encode(JsonUtils.toJsonString(map), StandardCharsets.UTF_8));
+        String authorizeUrl = authRequest.authorize(AuthStateUtils.createState());
         return R.ok("操作成功", authorizeUrl);
     }
 
@@ -189,7 +172,7 @@ public class AuthController {
     @ApiEncrypt
     @PostMapping("/register")
     public R<Void> register(@Validated @RequestBody RegisterBody user) {
-        if (!configService.selectRegisterEnabled(user.getTenantId())) {
+        if (!configService.selectRegisterEnabled()) {
             return R.fail("当前系统没有开启注册功能！");
         }
         registerService.register(user);
@@ -204,39 +187,9 @@ public class AuthController {
     @RateLimiter(time = 60, count = 20, limitType = LimitType.IP)
     @GetMapping("/tenant/list")
     public R<LoginTenantVo> tenantList(HttpServletRequest request) throws Exception {
-        // 返回对象
+        // 暂时预留给前端使用 后续删除
         LoginTenantVo result = new LoginTenantVo();
-        boolean enable = TenantHelper.isEnable();
-        result.setTenantEnabled(enable);
-        // 如果未开启租户这直接返回
-        if (!enable) {
-            return R.ok(result);
-        }
-
-        List<SysTenantVo> tenantList = tenantService.queryList(new SysTenantBo());
-        List<TenantListVo> voList = MapstructUtils.convert(tenantList, TenantListVo.class);
-        try {
-            // 如果只超管返回所有租户
-            if (LoginHelper.isSuperAdmin()) {
-                result.setVoList(voList);
-                return R.ok(result);
-            }
-        } catch (NotLoginException ignored) {
-        }
-
-        // 获取域名
-        String host;
-        String referer = request.getHeader("referer");
-        if (StringUtils.isNotBlank(referer)) {
-            // 这里从referer中取值是为了本地使用hosts添加虚拟域名，方便本地环境调试
-            host = referer.split("//")[1].split("/")[0];
-        } else {
-            host = new URL(request.getRequestURL().toString()).getHost();
-        }
-        // 根据域名进行筛选
-        List<TenantListVo> list = StreamUtils.filter(voList, vo ->
-            StringUtils.equalsIgnoreCase(vo.getDomain(), host));
-        result.setVoList(CollUtil.isNotEmpty(list) ? list : voList);
+        result.setTenantEnabled(false);
         return R.ok(result);
     }
 

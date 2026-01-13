@@ -28,11 +28,6 @@ public class SysLogininfor implements Serializable {
     private Long infoId;
 
     /**
-     * 租户编号
-     */
-    private String tenantId;
-
-    /**
      * 用户账号
      */
     private String userName;

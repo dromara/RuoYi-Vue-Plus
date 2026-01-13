@@ -105,16 +105,6 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     /**
-     * 新增租户流程定义
-     *
-     * @param tenantId 租户id
-     */
-    @Override
-    public void syncDef(String tenantId) {
-        flwDefinitionService.syncDef(tenantId);
-    }
-
-    /**
      * 启动流程
      *
      * @param startProcess 参数

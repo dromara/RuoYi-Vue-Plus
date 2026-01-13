@@ -158,13 +158,6 @@
                 <version>${revision}</version>
             </dependency>
 
-            <!-- 租户模块 -->
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>ruoyi-common-tenant</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
             <!-- WebSocket模块 -->
             <dependency>
                 <groupId>org.dromara</groupId>

@@ -1184,25 +1184,25 @@ EXEC sp_addextendedproperty
 'TABLE', N'flow_category'
 GO
 
-INSERT flow_category VALUES (100, N'000000', 0, N'0', N'OA审批', 0, N'0', 103, 1, getdate(), NULL, NULL);
+INSERT flow_category VALUES (100, 0, N'0', N'OA审批', 0, N'0', 103, 1, getdate(), NULL, NULL);
 GO
-INSERT flow_category VALUES (101, N'000000', 100, N'0,100', N'假勤管理', 0, N'0', 103, 1, getdate(), NULL, NULL);
+INSERT flow_category VALUES (101, 100, N'0,100', N'假勤管理', 0, N'0', 103, 1, getdate(), NULL, NULL);
 GO
-INSERT flow_category VALUES (102, N'000000', 100, N'0,100', N'人事管理', 1, N'0', 103, 1, getdate(), NULL, NULL);
+INSERT flow_category VALUES (102, 100, N'0,100', N'人事管理', 1, N'0', 103, 1, getdate(), NULL, NULL);
 GO
-INSERT flow_category VALUES (103, N'000000', 101, N'0,100,101', N'请假', 0, N'0', 103, 1, getdate(), NULL, NULL);
+INSERT flow_category VALUES (103, 101, N'0,100,101', N'请假', 0, N'0', 103, 1, getdate(), NULL, NULL);
 GO
-INSERT flow_category VALUES (104, N'000000', 101, N'0,100,101', N'出差', 1, N'0', 103, 1, getdate(), NULL, NULL);
+INSERT flow_category VALUES (104, 101, N'0,100,101', N'出差', 1, N'0', 103, 1, getdate(), NULL, NULL);
 GO
-INSERT flow_category VALUES (105, N'000000', 101, N'0,100,101', N'加班', 2, N'0', 103, 1, getdate(), NULL, NULL);
+INSERT flow_category VALUES (105, 101, N'0,100,101', N'加班', 2, N'0', 103, 1, getdate(), NULL, NULL);
 GO
-INSERT flow_category VALUES (106, N'000000', 101, N'0,100,101', N'换班', 3, N'0', 103, 1, getdate(), NULL, NULL);
+INSERT flow_category VALUES (106, 101, N'0,100,101', N'换班', 3, N'0', 103, 1, getdate(), NULL, NULL);
 GO
-INSERT flow_category VALUES (107, N'000000', 101, N'0,100,101', N'外出', 4, N'0', 103, 1, getdate(), NULL, NULL);
+INSERT flow_category VALUES (107, 101, N'0,100,101', N'外出', 4, N'0', 103, 1, getdate(), NULL, NULL);
 GO
-INSERT flow_category VALUES (108, N'000000', 102, N'0,100,102', N'转正', 1, N'0', 103, 1, getdate(), NULL, NULL);
+INSERT flow_category VALUES (108, 102, N'0,100,102', N'转正', 1, N'0', 103, 1, getdate(), NULL, NULL);
 GO
-INSERT flow_category VALUES (109, N'000000', 102, N'0,100,102', N'离职', 2, N'0', 103, 1, getdate(), NULL, NULL);
+INSERT flow_category VALUES (109, 102, N'0,100,102', N'离职', 2, N'0', 103, 1, getdate(), NULL, NULL);
 GO
 
 CREATE TABLE flow_spel (
@@ -1626,52 +1626,52 @@ INSERT sys_menu VALUES (11642, N'请假申请删除', 11638, 4, N'#', N'', N'', 
 GO
 INSERT sys_menu VALUES (11643, N'请假申请导出', 11638, 5, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'workflow:leave:export', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
 
-INSERT sys_dict_type VALUES (13, N'000000', N'业务状态', N'wf_business_status', 103, 1, GETDATE(), NULL, NULL, N'业务状态列表');
+INSERT sys_dict_type VALUES (13, N'业务状态', N'wf_business_status', 103, 1, GETDATE(), NULL, NULL, N'业务状态列表');
 GO
-INSERT sys_dict_type VALUES (14, N'000000', N'表单类型', N'wf_form_type', 103, 1, GETDATE(), NULL, NULL, N'表单类型列表');
+INSERT sys_dict_type VALUES (14, N'表单类型', N'wf_form_type', 103, 1, GETDATE(), NULL, NULL, N'表单类型列表');
 GO
-INSERT sys_dict_type VALUES (15, N'000000', N'任务状态', N'wf_task_status', 103, 1, GETDATE(), NULL, NULL, N'任务状态');
+INSERT sys_dict_type VALUES (15, N'任务状态', N'wf_task_status', 103, 1, GETDATE(), NULL, NULL, N'任务状态');
 GO
 
-INSERT sys_dict_data VALUES (39, N'000000', 1, N'已撤销', N'cancel', N'wf_business_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'已撤销');
+INSERT sys_dict_data VALUES (39, 1, N'已撤销', N'cancel', N'wf_business_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'已撤销');
 GO
-INSERT sys_dict_data VALUES (40, N'000000', 2, N'草稿', N'draft', N'wf_business_status', N'', N'info', N'N', 103, 1, GETDATE(), NULL, NULL, N'草稿');
+INSERT sys_dict_data VALUES (40, 2, N'草稿', N'draft', N'wf_business_status', N'', N'info', N'N', 103, 1, GETDATE(), NULL, NULL, N'草稿');
 GO
-INSERT sys_dict_data VALUES (41, N'000000', 3, N'待审核', N'waiting', N'wf_business_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'待审核');
+INSERT sys_dict_data VALUES (41, 3, N'待审核', N'waiting', N'wf_business_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'待审核');
 GO
-INSERT sys_dict_data VALUES (42, N'000000', 4, N'已完成', N'finish', N'wf_business_status', N'', N'success', N'N', 103, 1, GETDATE(), NULL, NULL, N'已完成');
+INSERT sys_dict_data VALUES (42, 4, N'已完成', N'finish', N'wf_business_status', N'', N'success', N'N', 103, 1, GETDATE(), NULL, NULL, N'已完成');
 GO
-INSERT sys_dict_data VALUES (43, N'000000', 5, N'已作废', N'invalid', N'wf_business_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'已作废');
+INSERT sys_dict_data VALUES (43, 5, N'已作废', N'invalid', N'wf_business_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'已作废');
 GO
-INSERT sys_dict_data VALUES (44, N'000000', 6, N'已退回', N'back', N'wf_business_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'已退回');
+INSERT sys_dict_data VALUES (44, 6, N'已退回', N'back', N'wf_business_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'已退回');
 GO
-INSERT sys_dict_data VALUES (45, N'000000', 7, N'已终止', N'termination', N'wf_business_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'已终止');
+INSERT sys_dict_data VALUES (45, 7, N'已终止', N'termination', N'wf_business_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'已终止');
 GO
-INSERT sys_dict_data VALUES (46, N'000000', 1, N'自定义表单', N'static', N'wf_form_type', N'', N'success', N'N', 103, 1, GETDATE(), NULL, NULL, N'自定义表单');
+INSERT sys_dict_data VALUES (46, 1, N'自定义表单', N'static', N'wf_form_type', N'', N'success', N'N', 103, 1, GETDATE(), NULL, NULL, N'自定义表单');
 GO
-INSERT sys_dict_data VALUES (47, N'000000', 2, N'动态表单', N'dynamic', N'wf_form_type', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'动态表单');
+INSERT sys_dict_data VALUES (47, 2, N'动态表单', N'dynamic', N'wf_form_type', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'动态表单');
 GO
-INSERT sys_dict_data VALUES (48, N'000000', 1, N'撤销', N'cancel', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'撤销');
+INSERT sys_dict_data VALUES (48, 1, N'撤销', N'cancel', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'撤销');
 GO
-INSERT sys_dict_data VALUES (49, N'000000', 2, N'通过', N'pass', N'wf_task_status', N'', N'success', N'N', 103, 1, GETDATE(), NULL, NULL, N'通过');
+INSERT sys_dict_data VALUES (49, 2, N'通过', N'pass', N'wf_task_status', N'', N'success', N'N', 103, 1, GETDATE(), NULL, NULL, N'通过');
 GO
-INSERT sys_dict_data VALUES (50, N'000000', 3, N'待审核', N'waiting', N'wf_task_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'待审核');
+INSERT sys_dict_data VALUES (50, 3, N'待审核', N'waiting', N'wf_task_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'待审核');
 GO
-INSERT sys_dict_data VALUES (51, N'000000', 4, N'作废', N'invalid', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'作废');
+INSERT sys_dict_data VALUES (51, 4, N'作废', N'invalid', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'作废');
 GO
-INSERT sys_dict_data VALUES (52, N'000000', 5, N'退回', N'back', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'退回');
+INSERT sys_dict_data VALUES (52, 5, N'退回', N'back', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'退回');
 GO
-INSERT sys_dict_data VALUES (53, N'000000', 6, N'终止', N'termination', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'终止');
+INSERT sys_dict_data VALUES (53, 6, N'终止', N'termination', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'终止');
 GO
-INSERT sys_dict_data VALUES (54, N'000000', 7, N'转办', N'transfer', N'wf_task_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'转办');
+INSERT sys_dict_data VALUES (54, 7, N'转办', N'transfer', N'wf_task_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'转办');
 GO
-INSERT sys_dict_data VALUES (55, N'000000', 8, N'委托', N'depute', N'wf_task_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'委托');
+INSERT sys_dict_data VALUES (55, 8, N'委托', N'depute', N'wf_task_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'委托');
 GO
-INSERT sys_dict_data VALUES (56, N'000000', 9, N'抄送', N'copy', N'wf_task_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'抄送');
+INSERT sys_dict_data VALUES (56, 9, N'抄送', N'copy', N'wf_task_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'抄送');
 GO
-INSERT sys_dict_data VALUES (57, N'000000', 10, N'加签', N'sign', N'wf_task_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'加签');
+INSERT sys_dict_data VALUES (57, 10, N'加签', N'sign', N'wf_task_status', N'', N'primary', N'N', 103, 1, GETDATE(), NULL, NULL, N'加签');
 GO
-INSERT sys_dict_data VALUES (58, N'000000', 11, N'减签', N'sign_off', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'减签');
+INSERT sys_dict_data VALUES (58, 11, N'减签', N'sign_off', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'减签');
 GO
-INSERT sys_dict_data VALUES (59, N'000000', 11, N'超时', N'timeout', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'超时');
+INSERT sys_dict_data VALUES (59, 11, N'超时', N'timeout', N'wf_task_status', N'', N'danger', N'N', 103, 1, GETDATE(), NULL, NULL, N'超时');
 GO

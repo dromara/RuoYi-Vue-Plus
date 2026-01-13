@@ -2,7 +2,6 @@ create table sys_social
 (
     id                 bigint            NOT NULL,
     user_id            bigint            NOT NULL,
-    tenant_id          nvarchar(20)      DEFAULT ('000000') NULL,
     auth_id            nvarchar(255)     NOT NULL,
     source             nvarchar(255)     NOT NULL,
     open_id            nvarchar(255)     NULL,
@@ -47,12 +46,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_social',
     'COLUMN', N'user_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户id' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_social',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'平台+平台唯一id' ,
@@ -214,258 +207,6 @@ EXEC sp_addextendedproperty
     'MS_Description', N'社会化关系表',
     'SCHEMA', N'dbo',
     'TABLE', N'sys_social'
-GO
-
-CREATE TABLE sys_tenant
-(
-    id                    bigint                          NOT NULL,
-    tenant_id             nvarchar(20)                    NOT NULL,
-    contact_user_name     nvarchar(20)                    NULL,
-    contact_phone         nvarchar(20)                    NULL,
-    company_name          nvarchar(30)                    NULL,
-    license_number        nvarchar(30)                    NULL,
-    address               nvarchar(200)                   NULL,
-    intro                 nvarchar(200)                   NULL,
-    domain                nvarchar(200)                   NULL,
-    remark                nvarchar(200)                   NULL,
-    package_id            bigint                          NULL,
-    expire_time           datetime2(7)                    NULL,
-    account_count         int             DEFAULT ((-1))  NULL,
-    status                nchar(1)        DEFAULT ('0')   NULL,
-    del_flag              nchar(1)        DEFAULT ('0')   NULL,
-    create_dept           bigint                          NULL,
-    create_by             bigint                          NULL,
-    create_time           datetime2(7)                    NULL,
-    update_by             bigint                          NULL,
-    update_time           datetime2(7)                    NULL,
-    CONSTRAINT PK__sys_tenant__B21E8F2427725F8A PRIMARY KEY CLUSTERED (id)
-        WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
-        ON [PRIMARY]
-)
-ON [PRIMARY]
-GO
-
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'id' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户编号' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'tenant_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'联系人' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'contact_user_name'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'联系电话' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'contact_phone'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'企业名称' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'company_name'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'统一社会信用代码' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'license_number'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'地址' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'address'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'企业简介' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'intro'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'域名' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'domain'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'备注' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'remark'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户套餐编号' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'package_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'过期时间' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'expire_time'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'用户数量（-1不限制）' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'account_count'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户状态（0正常 1停用）' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'status'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'删除标志（0代表存在 1代表删除）' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'del_flag'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'创建部门' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'create_dept'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'创建者' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'create_by'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'创建时间' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'create_time'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'更新者' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'update_by'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'更新时间' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant',
-    'COLUMN', N'update_time'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户表' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant'
-GO
-
-INSERT sys_tenant VALUES (1, N'000000', N'管理组', N'15888888888', N'XXX有限公司', NULL, NULL, N'多租户通用后台管理管理系统', NULL, NULL, NULL, NULL, -1, N'0', N'0', 103, 1, getdate(), NULL, NULL)
-GO
-
-
-CREATE TABLE sys_tenant_package
-(
-    package_id            bigint                          NOT NULL,
-    package_name          nvarchar(20)                    NOT NULL,
-    menu_ids              nvarchar(3000)                  NULL,
-    remark                nvarchar(200)                   NULL,
-    menu_check_strictly   tinyint         DEFAULT ((1))   NULL,
-    status                nchar(1)        DEFAULT ('0')   NULL,
-    del_flag              nchar(1)        DEFAULT ('0')   NULL,
-    create_dept           bigint                          NULL,
-    create_by             bigint                          NULL,
-    create_time           datetime2(7)                    NULL,
-    update_by             bigint                          NULL,
-    update_time           datetime2(7)                    NULL,
-    CONSTRAINT PK__sys_tenant_package__B21E8F2427725F8A PRIMARY KEY CLUSTERED (package_id)
-        WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
-        ON [PRIMARY]
-)
-ON [PRIMARY]
-GO
-
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户套餐id' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package',
-    'COLUMN', N'package_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'套餐名称' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package',
-    'COLUMN', N'package_name'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'关联菜单id' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package',
-    'COLUMN', N'menu_ids'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'备注' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package',
-    'COLUMN', N'remark'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户状态（0正常 1停用）' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package',
-    'COLUMN', N'status'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'删除标志（0代表存在 1代表删除）' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package',
-    'COLUMN', N'del_flag'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'创建部门' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package',
-    'COLUMN', N'create_dept'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'创建者' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package',
-    'COLUMN', N'create_by'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'创建时间' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package',
-    'COLUMN', N'create_time'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'更新者' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package',
-    'COLUMN', N'update_by'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'更新时间' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package',
-    'COLUMN', N'update_time'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户套餐表' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_tenant_package'
 GO
 
 
@@ -817,7 +558,6 @@ GO
 CREATE TABLE sys_config
 (
     config_id    bigint                      NOT NULL,
-    tenant_id    nvarchar(20)  DEFAULT '000000'  NULL,
     config_name  nvarchar(100) DEFAULT ''    NULL,
     config_key   nvarchar(100) DEFAULT ''    NULL,
     config_value nvarchar(500) DEFAULT ''    NULL,
@@ -840,12 +580,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_config',
     'COLUMN', N'config_id'
-GO
-EXEC sys.sp_addextendedproperty
-     'MS_Description', N'租户编号' ,
-     'SCHEMA', N'dbo',
-     'TABLE', N'sys_config',
-     'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'参数名称' ,
@@ -913,21 +647,20 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_config'
 GO
 
-INSERT sys_config VALUES (1, N'000000', N'主框架页-默认皮肤样式名称', N'sys.index.skinName', N'skin-blue', N'Y', 103, 1, getdate(), NULL, NULL, N'蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow')
+INSERT sys_config VALUES (1, N'主框架页-默认皮肤样式名称', N'sys.index.skinName', N'skin-blue', N'Y', 103, 1, getdate(), NULL, NULL, N'蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow')
 GO
-INSERT sys_config VALUES (2, N'000000', N'用户管理-账号初始密码', N'sys.user.initPassword', N'123456', N'Y', 103, 1, getdate(), NULL, NULL, N'初始化密码 123456')
+INSERT sys_config VALUES (2, N'用户管理-账号初始密码', N'sys.user.initPassword', N'123456', N'Y', 103, 1, getdate(), NULL, NULL, N'初始化密码 123456')
 GO
-INSERT sys_config VALUES (3, N'000000', N'主框架页-侧边栏主题', N'sys.index.sideTheme', N'theme-dark', N'Y', 103, 1, getdate(), NULL, NULL, N'深色主题theme-dark，浅色主题theme-light')
+INSERT sys_config VALUES (3, N'主框架页-侧边栏主题', N'sys.index.sideTheme', N'theme-dark', N'Y', 103, 1, getdate(), NULL, NULL, N'深色主题theme-dark，浅色主题theme-light')
 GO
-INSERT sys_config VALUES (5, N'000000', N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
+INSERT sys_config VALUES (5, N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
 GO
-INSERT sys_config VALUES (11, N'000000', N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 103, 1, getdate(), NULL, NULL, N'true:开启, false:关闭');
+INSERT sys_config VALUES (11, N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 103, 1, getdate(), NULL, NULL, N'true:开启, false:关闭');
 GO
 
 CREATE TABLE sys_dept
 (
     dept_id     bigint                     NOT NULL,
-    tenant_id   nvarchar(20) DEFAULT ('000000') NULL,
     parent_id   bigint       DEFAULT ((0)) NULL,
     ancestors   nvarchar(500)DEFAULT ''    NULL,
     dept_name   nvarchar(30)               NULL,
@@ -955,12 +688,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_dept',
     'COLUMN', N'dept_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户编号' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_dept',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'父部门id' ,
@@ -1058,31 +785,30 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dept'
 GO
 
-INSERT sys_dept VALUES (100, N'000000', 0, N'0', N'XXX科技', NULL, 0, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (100, 0, N'0', N'XXX科技', NULL, 0, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (101, N'000000', 100, N'0,100', N'深圳总公司', NULL, 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (101, 100, N'0,100', N'深圳总公司', NULL, 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (102, N'000000', 100, N'0,100', N'长沙分公司', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (102, 100, N'0,100', N'长沙分公司', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (103, N'000000', 101, N'0,100,101', N'研发部门', NULL, 1, 1, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (103, 101, N'0,100,101', N'研发部门', NULL, 1, 1, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (104, N'000000', 101, N'0,100,101', N'市场部门', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (104, 101, N'0,100,101', N'市场部门', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (105, N'000000', 101, N'0,100,101', N'测试部门', NULL, 3, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (105, 101, N'0,100,101', N'测试部门', NULL, 3, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (106, N'000000', 101, N'0,100,101', N'财务部门', NULL, 4, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (106, 101, N'0,100,101', N'财务部门', NULL, 4, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (107, N'000000', 101, N'0,100,101', N'运维部门', NULL, 5, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (107, 101, N'0,100,101', N'运维部门', NULL, 5, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (108, N'000000', 102, N'0,100,102', N'市场部门', NULL, 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (108, 102, N'0,100,102', N'市场部门', NULL, 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (109, N'000000', 102, N'0,100,102', N'财务部门', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (109, 102, N'0,100,102', N'财务部门', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
 
 CREATE TABLE sys_dict_data
 (
     dict_code   bigint                      NOT NULL,
-    tenant_id   nvarchar(20)  DEFAULT ('000000') NULL,
     dict_sort   int           DEFAULT ((0)) NULL,
     dict_label  nvarchar(100) DEFAULT ''    NULL,
     dict_value  nvarchar(100) DEFAULT ''    NULL,
@@ -1108,12 +834,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_dict_data',
     'COLUMN', N'dict_code'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'字典编码' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_dict_data',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'字典排序' ,
@@ -1199,87 +919,86 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dict_data'
 GO
 
-INSERT sys_dict_data VALUES (1, N'000000', 1, N'男', N'0', N'sys_user_sex', N'', N'', N'Y', 103, 1, getdate(), NULL, NULL, N'性别男')
+INSERT sys_dict_data VALUES (1, 1, N'男', N'0', N'sys_user_sex', N'', N'', N'Y', 103, 1, getdate(), NULL, NULL, N'性别男')
 GO
-INSERT sys_dict_data VALUES (2, N'000000', 2, N'女', N'1', N'sys_user_sex', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'性别女')
+INSERT sys_dict_data VALUES (2, 2, N'女', N'1', N'sys_user_sex', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'性别女')
 GO
-INSERT sys_dict_data VALUES (3, N'000000', 3, N'未知', N'2', N'sys_user_sex', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'性别未知')
+INSERT sys_dict_data VALUES (3, 3, N'未知', N'2', N'sys_user_sex', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'性别未知')
 GO
-INSERT sys_dict_data VALUES (4, N'000000', 1, N'显示', N'0', N'sys_show_hide', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'显示菜单')
+INSERT sys_dict_data VALUES (4, 1, N'显示', N'0', N'sys_show_hide', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'显示菜单')
 GO
-INSERT sys_dict_data VALUES (5, N'000000', 2, N'隐藏', N'1', N'sys_show_hide', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'隐藏菜单')
+INSERT sys_dict_data VALUES (5, 2, N'隐藏', N'1', N'sys_show_hide', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'隐藏菜单')
 GO
-INSERT sys_dict_data VALUES (6, N'000000', 1, N'正常', N'0', N'sys_normal_disable', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (6, 1, N'正常', N'0', N'sys_normal_disable', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (7, N'000000', 2, N'停用', N'1', N'sys_normal_disable', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
+INSERT sys_dict_data VALUES (7, 2, N'停用', N'1', N'sys_normal_disable', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
 GO
-INSERT sys_dict_data VALUES (8, N'000000', 1, N'正常', N'0', N'sys_job_status', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (8, 1, N'正常', N'0', N'sys_job_status', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (9, N'000000', 2, N'暂停', N'1', N'sys_job_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
+INSERT sys_dict_data VALUES (9, 2, N'暂停', N'1', N'sys_job_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
 GO
-INSERT sys_dict_data VALUES (10, N'000000', 1, N'默认', N'DEFAULT', N'sys_job_group', N'', N'', N'Y', 103, 1, getdate(), NULL, NULL, N'默认分组')
+INSERT sys_dict_data VALUES (10, 1, N'默认', N'DEFAULT', N'sys_job_group', N'', N'', N'Y', 103, 1, getdate(), NULL, NULL, N'默认分组')
 GO
-INSERT sys_dict_data VALUES (11, N'000000', 2, N'系统', N'SYSTEM', N'sys_job_group', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'系统分组')
+INSERT sys_dict_data VALUES (11, 2, N'系统', N'SYSTEM', N'sys_job_group', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'系统分组')
 GO
-INSERT sys_dict_data VALUES (12, N'000000', 1, N'是', N'Y', N'sys_yes_no', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'系统默认是')
+INSERT sys_dict_data VALUES (12, 1, N'是', N'Y', N'sys_yes_no', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'系统默认是')
 GO
-INSERT sys_dict_data VALUES (13, N'000000', 2, N'否', N'N', N'sys_yes_no', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'系统默认否')
+INSERT sys_dict_data VALUES (13, 2, N'否', N'N', N'sys_yes_no', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'系统默认否')
 GO
-INSERT sys_dict_data VALUES (14, N'000000', 1, N'通知', N'1', N'sys_notice_type', N'', N'warning', N'Y', 103, 1, getdate(), NULL, NULL, N'通知')
+INSERT sys_dict_data VALUES (14, 1, N'通知', N'1', N'sys_notice_type', N'', N'warning', N'Y', 103, 1, getdate(), NULL, NULL, N'通知')
 GO
-INSERT sys_dict_data VALUES (15, N'000000', 2, N'公告', N'2', N'sys_notice_type', N'', N'success', N'N', 103, 1, getdate(), NULL, NULL, N'公告')
+INSERT sys_dict_data VALUES (15, 2, N'公告', N'2', N'sys_notice_type', N'', N'success', N'N', 103, 1, getdate(), NULL, NULL, N'公告')
 GO
-INSERT sys_dict_data VALUES (16, N'000000', 1, N'正常', N'0', N'sys_notice_status', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (16, 1, N'正常', N'0', N'sys_notice_status', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (17, N'000000', 2, N'关闭', N'1', N'sys_notice_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'关闭状态')
+INSERT sys_dict_data VALUES (17, 2, N'关闭', N'1', N'sys_notice_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'关闭状态')
 GO
-INSERT sys_dict_data VALUES (29, N'000000', 99, N'其他', N'0', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'其他操作');
+INSERT sys_dict_data VALUES (29, 99, N'其他', N'0', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'其他操作');
 GO
-INSERT sys_dict_data VALUES (18, N'000000', 1, N'新增', N'1', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'新增操作')
+INSERT sys_dict_data VALUES (18, 1, N'新增', N'1', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'新增操作')
 GO
-INSERT sys_dict_data VALUES (19, N'000000', 2, N'修改', N'2', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'修改操作')
+INSERT sys_dict_data VALUES (19, 2, N'修改', N'2', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'修改操作')
 GO
-INSERT sys_dict_data VALUES (20, N'000000', 3, N'删除', N'3', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'删除操作')
+INSERT sys_dict_data VALUES (20, 3, N'删除', N'3', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'删除操作')
 GO
-INSERT sys_dict_data VALUES (21, N'000000', 4, N'授权', N'4', N'sys_oper_type', N'', N'primary', N'N', 103, 1, getdate(), NULL, NULL, N'授权操作')
+INSERT sys_dict_data VALUES (21, 4, N'授权', N'4', N'sys_oper_type', N'', N'primary', N'N', 103, 1, getdate(), NULL, NULL, N'授权操作')
 GO
-INSERT sys_dict_data VALUES (22, N'000000', 5, N'导出', N'5', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'导出操作')
+INSERT sys_dict_data VALUES (22, 5, N'导出', N'5', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'导出操作')
 GO
-INSERT sys_dict_data VALUES (23, N'000000', 6, N'导入', N'6', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'导入操作')
+INSERT sys_dict_data VALUES (23, 6, N'导入', N'6', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'导入操作')
 GO
-INSERT sys_dict_data VALUES (24, N'000000', 7, N'强退', N'7', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'强退操作')
+INSERT sys_dict_data VALUES (24, 7, N'强退', N'7', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'强退操作')
 GO
-INSERT sys_dict_data VALUES (25, N'000000', 8, N'生成代码', N'8', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'生成操作')
+INSERT sys_dict_data VALUES (25, 8, N'生成代码', N'8', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'生成操作')
 GO
-INSERT sys_dict_data VALUES (26, N'000000', 9, N'清空数据', N'9', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'清空操作')
+INSERT sys_dict_data VALUES (26, 9, N'清空数据', N'9', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'清空操作')
 GO
-INSERT sys_dict_data VALUES (27, N'000000', 1, N'成功', N'0', N'sys_common_status', N'', N'primary', N'N', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (27, 1, N'成功', N'0', N'sys_common_status', N'', N'primary', N'N', 103, 1, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (28, N'000000', 2, N'失败', N'1', N'sys_common_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
+INSERT sys_dict_data VALUES (28, 2, N'失败', N'1', N'sys_common_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
 GO
-INSERT sys_dict_data VALUES (30, N'000000', 0, N'密码认证', N'password', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'密码认证')
+INSERT sys_dict_data VALUES (30, 0, N'密码认证', N'password', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'密码认证')
 GO
-INSERT sys_dict_data VALUES (31, N'000000', 0, N'短信认证', N'sms', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'短信认证')
+INSERT sys_dict_data VALUES (31, 0, N'短信认证', N'sms', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'短信认证')
 GO
-INSERT sys_dict_data VALUES (32, N'000000', 0, N'邮件认证', N'email', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'邮件认证')
+INSERT sys_dict_data VALUES (32, 0, N'邮件认证', N'email', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'邮件认证')
 GO
-INSERT sys_dict_data VALUES (33, N'000000', 0, N'小程序认证', N'xcx', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'小程序认证')
+INSERT sys_dict_data VALUES (33, 0, N'小程序认证', N'xcx', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'小程序认证')
 GO
-INSERT sys_dict_data VALUES (34, N'000000', 0, N'三方登录认证', N'social', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'三方登录认证')
+INSERT sys_dict_data VALUES (34, 0, N'三方登录认证', N'social', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'三方登录认证')
 GO
-INSERT sys_dict_data VALUES (35, N'000000', 0, N'PC', N'pc', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'PC')
+INSERT sys_dict_data VALUES (35, 0, N'PC', N'pc', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'PC')
 GO
-INSERT sys_dict_data VALUES (36, N'000000', 0, N'安卓', N'android', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'安卓')
+INSERT sys_dict_data VALUES (36, 0, N'安卓', N'android', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'安卓')
 GO
-INSERT sys_dict_data VALUES (37, N'000000', 0, N'iOS', N'ios', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'iOS')
+INSERT sys_dict_data VALUES (37, 0, N'iOS', N'ios', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'iOS')
 GO
-INSERT sys_dict_data VALUES (38, N'000000', 0, N'小程序', N'xcx', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'小程序')
+INSERT sys_dict_data VALUES (38, 0, N'小程序', N'xcx', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'小程序')
 GO
 
 CREATE TABLE sys_dict_type
 (
     dict_id     bigint                      NOT NULL,
-    tenant_id   nvarchar(20)  DEFAULT ('000000') NULL,
     dict_name   nvarchar(100) DEFAULT ''    NULL,
     dict_type   nvarchar(100) DEFAULT ''    NULL,
     create_dept bigint                      NULL,
@@ -1303,12 +1022,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_dict_type',
     'COLUMN', N'dict_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'字典主键' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_dict_type',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'字典名称' ,
@@ -1364,35 +1077,34 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dict_type'
 GO
 
-INSERT sys_dict_type VALUES (1, N'000000', N'用户性别', N'sys_user_sex', 103, 1, getdate(), NULL, NULL, N'用户性别列表')
+INSERT sys_dict_type VALUES (1, N'用户性别', N'sys_user_sex', 103, 1, getdate(), NULL, NULL, N'用户性别列表')
 GO
-INSERT sys_dict_type VALUES (2, N'000000', N'菜单状态', N'sys_show_hide', 103, 1, getdate(), NULL, NULL, N'菜单状态列表')
+INSERT sys_dict_type VALUES (2, N'菜单状态', N'sys_show_hide', 103, 1, getdate(), NULL, NULL, N'菜单状态列表')
 GO
-INSERT sys_dict_type VALUES (3, N'000000', N'系统开关', N'sys_normal_disable', 103, 1, getdate(), NULL, NULL, N'系统开关列表')
+INSERT sys_dict_type VALUES (3, N'系统开关', N'sys_normal_disable', 103, 1, getdate(), NULL, NULL, N'系统开关列表')
 GO
-INSERT sys_dict_type VALUES (4, N'000000', N'任务状态', N'sys_job_status', 103, 1, getdate(), NULL, NULL, N'任务状态列表')
+INSERT sys_dict_type VALUES (4, N'任务状态', N'sys_job_status', 103, 1, getdate(), NULL, NULL, N'任务状态列表')
 GO
-INSERT sys_dict_type VALUES (5, N'000000', N'任务分组', N'sys_job_group', 103, 1, getdate(), NULL, NULL, N'任务分组列表')
+INSERT sys_dict_type VALUES (5, N'任务分组', N'sys_job_group', 103, 1, getdate(), NULL, NULL, N'任务分组列表')
 GO
-INSERT sys_dict_type VALUES (6, N'000000', N'系统是否', N'sys_yes_no', 103, 1, getdate(), NULL, NULL, N'系统是否列表')
+INSERT sys_dict_type VALUES (6, N'系统是否', N'sys_yes_no', 103, 1, getdate(), NULL, NULL, N'系统是否列表')
 GO
-INSERT sys_dict_type VALUES (7, N'000000', N'通知类型', N'sys_notice_type', 103, 1, getdate(), NULL, NULL, N'通知类型列表')
+INSERT sys_dict_type VALUES (7, N'通知类型', N'sys_notice_type', 103, 1, getdate(), NULL, NULL, N'通知类型列表')
 GO
-INSERT sys_dict_type VALUES (8, N'000000', N'通知状态', N'sys_notice_status', 103, 1, getdate(), NULL, NULL, N'通知状态列表')
+INSERT sys_dict_type VALUES (8, N'通知状态', N'sys_notice_status', 103, 1, getdate(), NULL, NULL, N'通知状态列表')
 GO
-INSERT sys_dict_type VALUES (9, N'000000', N'操作类型', N'sys_oper_type', 103, 1, getdate(), NULL, NULL, N'操作类型列表')
+INSERT sys_dict_type VALUES (9, N'操作类型', N'sys_oper_type', 103, 1, getdate(), NULL, NULL, N'操作类型列表')
 GO
-INSERT sys_dict_type VALUES (10, N'000000', N'系统状态', N'sys_common_status', 103, 1, getdate(), NULL, NULL, N'登录状态列表')
+INSERT sys_dict_type VALUES (10, N'系统状态', N'sys_common_status', 103, 1, getdate(), NULL, NULL, N'登录状态列表')
 GO
-INSERT sys_dict_type VALUES (11, N'000000', N'授权类型', N'sys_grant_type', 103, 1, getdate(), NULL, NULL, N'认证授权类型')
+INSERT sys_dict_type VALUES (11, N'授权类型', N'sys_grant_type', 103, 1, getdate(), NULL, NULL, N'认证授权类型')
 GO
-INSERT sys_dict_type VALUES (12, N'000000', N'设备类型', N'sys_device_type', 103, 1, getdate(), NULL, NULL, N'客户端设备类型')
+INSERT sys_dict_type VALUES (12, N'设备类型', N'sys_device_type', 103, 1, getdate(), NULL, NULL, N'客户端设备类型')
 GO
 
 CREATE TABLE sys_logininfor
 (
     info_id        bigint                      NOT NULL,
-    tenant_id      nvarchar(20)  DEFAULT ('000000') NULL,
     user_name      nvarchar(50)  DEFAULT ''    NULL,
     client_key     nvarchar(32)  DEFAULT ''    NULL,
     device_type    nvarchar(32)  DEFAULT ''    NULL,
@@ -1420,12 +1132,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_logininfor',
     'COLUMN', N'info_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户编号' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'用户账号' ,
@@ -1650,8 +1356,6 @@ GO
 
 INSERT sys_menu VALUES (1, N'系统管理', 0, 1, N'system', NULL, N'', 1, 0, N'M', N'0', N'0', N'', N'system', 103, 1, getdate(), NULL, NULL, N'系统管理目录')
 GO
-INSERT sys_menu VALUES (6, N'租户管理', 0, 2, N'tenant', NULL, N'', 1, 0, N'M', N'0', N'0', N'', N'chart', 103, 1, getdate(), NULL, NULL, N'租户管理目录')
-GO
 INSERT sys_menu VALUES (2, N'系统监控', 0, 3, N'monitor', NULL, N'', 1, 0, N'M', N'0', N'0', N'', N'monitor', 103, 1, getdate(), NULL, NULL, N'系统监控目录')
 GO
 INSERT sys_menu VALUES (3, N'系统工具', 0, 4, N'tool', NULL, N'', 1, 0, N'M', N'0', N'0', N'', N'tool', 103, 1, getdate(), NULL, NULL, N'系统工具目录')
@@ -1683,10 +1387,6 @@ GO
 INSERT sys_menu VALUES (113, N'缓存监控', 2, 5, N'cache', N'monitor/cache/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:cache:list', N'redis', 103, 1, getdate(), NULL, NULL, N'缓存监控菜单')
 GO
 INSERT sys_menu VALUES (115, N'代码生成', 3, 2, N'gen', N'tool/gen/index', N'', 1, 0, N'C', N'0', N'0', N'tool:gen:list', N'code', 103, 1, getdate(), NULL, NULL, N'代码生成菜单')
-GO
-INSERT sys_menu VALUES (121, N'租户管理', 6, 1, N'tenant', N'system/tenant/index', N'', 1, 0, N'C', N'0', N'0', N'system:tenant:list', N'code', 103, 1, getdate(), NULL, NULL, N'租户管理菜单')
-GO
-INSERT sys_menu VALUES (122, N'租户套餐管理', 6, 2, N'tenantPackage', N'system/tenantPackage/index', N'', 1, 0, N'C', N'0', N'0', N'system:tenantPackage:list', N'code', 103, 1, getdate(), NULL, NULL, N'租户套餐管理菜单')
 GO
 INSERT sys_menu VALUES (123, N'客户端管理', 1, 11, N'client', N'system/client/index', N'', 1, 0, N'C', N'0', N'0', N'system:client:list', N'international', 103, 1, getdate(), NULL, NULL, N'客户端管理菜单')
 GO
@@ -1838,28 +1538,6 @@ INSERT sys_menu VALUES (1622, N'配置编辑', 118, 6, N'#', N'', N'', 1, 0, N'F
 GO
 INSERT sys_menu VALUES (1623, N'配置删除', 118, 6, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:ossConfig:remove', N'#', 103, 1, getdate(), NULL, NULL, N'');
 GO
--- 租户管理相关按钮
-INSERT sys_menu VALUES (1606, N'租户查询', 121, 1, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenant:query', N'#', 103, 1, getdate(), NULL, NULL, N'');
-GO
-INSERT sys_menu VALUES (1607, N'租户新增', 121, 2, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenant:add', N'#', 103, 1, getdate(), NULL, NULL, N'');
-GO
-INSERT sys_menu VALUES (1608, N'租户修改', 121, 3, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenant:edit', N'#', 103, 1, getdate(), NULL, NULL, N'');
-GO
-INSERT sys_menu VALUES (1609, N'租户删除', 121, 4, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenant:remove', N'#', 103, 1, getdate(), NULL, NULL, N'');
-GO
-INSERT sys_menu VALUES (1610, N'租户导出', 121, 5, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenant:export', N'#', 103, 1, getdate(), NULL, NULL, N'');
-GO
--- 租户套餐管理相关按钮
-INSERT sys_menu VALUES (1611, N'租户套餐查询', 122, 1, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:query', N'#', 103, 1, getdate(), NULL, NULL, N'');
-GO
-INSERT sys_menu VALUES (1612, N'租户套餐新增', 122, 2, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:add', N'#', 103, 1, getdate(), NULL, NULL, N'');
-GO
-INSERT sys_menu VALUES (1613, N'租户套餐修改', 122, 3, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:edit', N'#', 103, 1, getdate(), NULL, NULL, N'');
-GO
-INSERT sys_menu VALUES (1614, N'租户套餐删除', 122, 4, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:remove', N'#', 103, 1, getdate(), NULL, NULL, N'');
-GO
-INSERT sys_menu VALUES (1615, N'租户套餐导出', 122, 5, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:export', N'#', 103, 1, getdate(), NULL, NULL, N'');
-GO
 -- 客户端管理按钮
 INSERT sys_menu VALUES (1061, N'客户端管理查询', 123, 1, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:client:query', N'#', 103, 1, getdate(), NULL, NULL, N'');
 GO
@@ -1901,7 +1579,6 @@ GO
 CREATE TABLE sys_notice
 (
     notice_id      bigint                     NOT NULL,
-    tenant_id      nvarchar(20) DEFAULT ('000000') NULL,
     notice_title   nvarchar(50)               NOT NULL,
     notice_type    nchar(1)                   NOT NULL,
     notice_content nvarchar(max)              NULL,
@@ -1925,12 +1602,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_notice',
     'COLUMN', N'notice_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户编号' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_notice',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'公告标题' ,
@@ -1998,15 +1669,14 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_notice'
 GO
 
-INSERT sys_notice VALUES (1, N'000000', N'温馨提醒：2018-07-01 若依新版本发布啦', N'2', N'新版本内容', N'0', 103, 1, getdate(), NULL, NULL, N'管理员')
+INSERT sys_notice VALUES (1, N'温馨提醒：2018-07-01 若依新版本发布啦', N'2', N'新版本内容', N'0', 103, 1, getdate(), NULL, NULL, N'管理员')
 GO
-INSERT sys_notice VALUES (2, N'000000', N'维护通知：2018-07-01 若依系统凌晨维护', N'1', N'维护内容', N'0', 103, 1, getdate(), NULL, NULL, N'管理员')
+INSERT sys_notice VALUES (2, N'维护通知：2018-07-01 若依系统凌晨维护', N'1', N'维护内容', N'0', 103, 1, getdate(), NULL, NULL, N'管理员')
 GO
 
 CREATE TABLE sys_oper_log
 (
     oper_id        bigint                       NOT NULL,
-    tenant_id      nvarchar(20)   DEFAULT ('000000') NULL,
     title          nvarchar(50)   DEFAULT ''    NULL,
     business_type  int            DEFAULT ((0)) NULL,
     method         nvarchar(100)  DEFAULT ''    NULL,
@@ -2042,12 +1712,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oper_log',
     'COLUMN', N'oper_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户编号' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_oper_log',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'模块标题' ,
@@ -2154,7 +1818,6 @@ GO
 CREATE TABLE sys_post
 (
     post_id     bigint                          NOT NULL,
-    tenant_id   nvarchar(20) DEFAULT ('000000') NULL,
     dept_id     bigint                          NOT NULL,
     post_code   nvarchar(64)                    NOT NULL,
     post_category nvarchar(100)                 NULL,
@@ -2179,12 +1842,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_post',
     'COLUMN', N'post_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户编号' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_post',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'部门id' ,
@@ -2264,19 +1921,18 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_post'
 GO
 
-INSERT sys_post VALUES (1, N'000000', 103, N'ceo', NULL,  N'董事长', 1, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (1, 103, N'ceo', NULL,  N'董事长', 1, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (2, N'000000', 100, N'se', NULL,  N'项目经理', 2, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (2, 100, N'se', NULL,  N'项目经理', 2, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (3, N'000000', 100, N'hr', NULL,  N'人力资源', 3, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (3, 100, N'hr', NULL,  N'人力资源', 3, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (4, N'000000', 100, N'user', NULL,  N'普通员工', 4, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (4, 100, N'user', NULL,  N'普通员工', 4, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
 
 CREATE TABLE sys_role
 (
     role_id             bigint                     NOT NULL,
-    tenant_id           nvarchar(20) DEFAULT ('000000') NULL,
     role_name           nvarchar(30)               NOT NULL,
     role_key            nvarchar(100)              NOT NULL,
     role_sort           int                        NOT NULL,
@@ -2303,12 +1959,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_role',
     'COLUMN', N'role_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户编号' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_role',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'角色名称' ,
@@ -2400,11 +2050,11 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_role'
 GO
 
-INSERT sys_role VALUES (1, N'000000', N'超级管理员', N'superadmin', 1, N'1', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'超级管理员')
+INSERT sys_role VALUES (1, N'超级管理员', N'superadmin', 1, N'1', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'超级管理员')
 GO
-INSERT sys_role VALUES (3, N'000000', N'本部门及以下', N'test1', 3, N'4', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'');
+INSERT sys_role VALUES (3, N'本部门及以下', N'test1', 3, N'4', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'');
 GO
-INSERT sys_role VALUES (4, N'000000', N'仅本人', N'test2', 4, N'5', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'');
+INSERT sys_role VALUES (4, N'仅本人', N'test2', 4, N'5', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'');
 GO
 
 CREATE TABLE sys_role_dept
@@ -2708,7 +2358,6 @@ GO
 CREATE TABLE sys_user
 (
     user_id     bigint                             NOT NULL,
-    tenant_id   nvarchar(20)  DEFAULT ('000000')   NULL,
     dept_id     bigint                             NULL,
     user_name   nvarchar(30)                       NOT NULL,
     nick_name   nvarchar(30)                       NOT NULL,
@@ -2740,12 +2389,6 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_user',
     'COLUMN', N'user_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户编号' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_user',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'部门ID' ,
@@ -2867,11 +2510,11 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_user'
 GO
 
-INSERT sys_user VALUES (1, N'000000', 103,  N'admin', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@163.com', N'15888888888', N'1', NULL, N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), NULL, NULL, N'管理员')
+INSERT sys_user VALUES (1, 103, N'admin', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@163.com', N'15888888888', N'1', NULL, N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), NULL, NULL, N'管理员')
 GO
-INSERT sys_user VALUES (3, N'000000', 108, N'test', N'本部门及以下 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), 3, getdate(), NULL);
+INSERT sys_user VALUES (3, 108, N'test', N'本部门及以下 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), 3, getdate(), NULL);
 GO
-INSERT sys_user VALUES (4, N'000000', 102, N'test1', N'仅本人 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), 4, getdate(), NULL);
+INSERT sys_user VALUES (4, 102, N'test1', N'仅本人 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), 4, getdate(), NULL);
 GO
 
 CREATE TABLE sys_user_post
@@ -2945,7 +2588,6 @@ GO
 CREATE TABLE sys_oss
 (
     oss_id        bigint                          NOT NULL,
-    tenant_id     nvarchar(20)  DEFAULT ('000000') NULL,
     file_name     nvarchar(255) DEFAULT ''        NOT NULL,
     original_name nvarchar(255) DEFAULT ''        NOT NULL,
     file_suffix   nvarchar(10)  DEFAULT ''        NOT NULL,
@@ -2969,12 +2611,6 @@ EXEC sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oss',
     'COLUMN', N'oss_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户编号' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_oss',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sp_addextendedproperty
     'MS_Description', N'文件名',
@@ -3051,7 +2687,6 @@ GO
 CREATE TABLE sys_oss_config
 (
     oss_config_id bigint                      NOT NULL,
-    tenant_id     nvarchar(20)  DEFAULT ('000000') NULL,
     config_key    nvarchar(20)  DEFAULT ''    NOT NULL,
     access_key    nvarchar(255) DEFAULT ''    NULL,
     secret_key    nvarchar(255) DEFAULT ''    NULL,
@@ -3082,12 +2717,6 @@ EXEC sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oss_config',
     'COLUMN', N'oss_config_id'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'租户编号' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'sys_oss_config',
-    'COLUMN', N'tenant_id'
 GO
 EXEC sp_addextendedproperty
     'MS_Description', N'配置key',
@@ -3203,15 +2832,15 @@ EXEC sp_addextendedproperty
     'TABLE', N'sys_oss_config'
 GO
 
-INSERT INTO sys_oss_config VALUES (N'1', N'000000', N'minio', N'ruoyi',            N'ruoyi123',        N'ruoyi',            N'', N'127.0.0.1:9000',                    N'',N'N', N'',           N'1', N'0', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO sys_oss_config VALUES (N'1', N'minio', N'ruoyi',            N'ruoyi123',        N'ruoyi',            N'', N'127.0.0.1:9000',                    N'',N'N', N'',           N'1', N'0', N'', 103, 1, getdate(), 1, getdate(), NULL)
 GO
-INSERT INTO sys_oss_config VALUES (N'2', N'000000', N'qiniu', N'XXXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N's3-cn-north-1.qiniucs.com',         N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO sys_oss_config VALUES (N'2', N'qiniu', N'XXXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N's3-cn-north-1.qiniucs.com',         N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
 GO
-INSERT INTO sys_oss_config VALUES (N'3', N'000000', N'aliyun', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N'oss-cn-beijing.aliyuncs.com',       N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO sys_oss_config VALUES (N'3', N'aliyun', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N'oss-cn-beijing.aliyuncs.com',       N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
 GO
-INSERT INTO sys_oss_config VALUES (N'4', N'000000', N'qcloud', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi-1250000000', N'', N'cos.ap-beijing.myqcloud.com',       N'',N'N', N'ap-beijing', N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO sys_oss_config VALUES (N'4', N'qcloud', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi-1250000000', N'', N'cos.ap-beijing.myqcloud.com',       N'',N'N', N'ap-beijing', N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
 GO
-INSERT INTO sys_oss_config VALUES (N'5', N'000000', N'image',  N'ruoyi',           N'ruoyi123',        N'ruoyi',            N'image', N'127.0.0.1:9000',               N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO sys_oss_config VALUES (N'5', N'image',  N'ruoyi',           N'ruoyi123',        N'ruoyi',            N'image', N'127.0.0.1:9000',               N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
 GO
 
 
@@ -3343,7 +2972,6 @@ GO
 CREATE TABLE test_demo
 (
     id          bigint            NOT NULL,
-    tenant_id   nvarchar(20)      DEFAULT ('000000') NULL,
     dept_id     bigint            NULL,
     user_id     bigint            NULL,
     order_num   int DEFAULT ((0)) NULL,
@@ -3368,13 +2996,6 @@ EXEC sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'test_demo',
     'COLUMN', N'id'
-GO
-
-EXEC sp_addextendedproperty
-    'MS_Description', N'租户id',
-    'SCHEMA', N'dbo',
-    'TABLE', N'test_demo',
-    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
@@ -3470,7 +3091,6 @@ GO
 CREATE TABLE test_tree
 (
     id          bigint               NOT NULL,
-    tenant_id   nvarchar(20)         DEFAULT ('000000') NULL,
     parent_id   bigint DEFAULT ((0)) NULL,
     dept_id     bigint               NULL,
     user_id     bigint               NULL,
@@ -3494,13 +3114,6 @@ EXEC sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'test_tree',
     'COLUMN', N'id'
-GO
-
-EXEC sp_addextendedproperty
-    'MS_Description', N'租户id',
-    'SCHEMA', N'dbo',
-    'TABLE', N'test_tree',
-    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
@@ -3586,56 +3199,56 @@ EXEC sp_addextendedproperty
     'TABLE', N'test_tree'
 GO
 
-INSERT test_demo VALUES (1, N'000000', 102, 4, 1, N'测试数据权限', N'测试', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1, 102, 4, 1, N'测试数据权限', N'测试', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (2, N'000000', 102, 3, 2, N'子节点1', N'111', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (2, 102, 3, 2, N'子节点1', N'111', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (3, N'000000', 102, 3, 3, N'子节点2', N'222', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (3, 102, 3, 3, N'子节点2', N'222', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (4, N'000000', 108, 4, 4, N'测试数据', N'demo', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (4, 108, 4, 4, N'测试数据', N'demo', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (5, N'000000', 108, 3, 13, N'子节点11', N'1111', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (5, 108, 3, 13, N'子节点11', N'1111', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (6, N'000000', 108, 3, 12, N'子节点22', N'2222', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (6, 108, 3, 12, N'子节点22', N'2222', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (7, N'000000', 108, 3, 11, N'子节点33', N'3333', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (7, 108, 3, 11, N'子节点33', N'3333', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (8, N'000000', 108, 3, 10, N'子节点44', N'4444', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (8, 108, 3, 10, N'子节点44', N'4444', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (9, N'000000', 108, 3, 9, N'子节点55', N'5555', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (9, 108, 3, 9, N'子节点55', N'5555', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (10, N'000000', 108, 3, 8, N'子节点66', N'6666', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (10, 108, 3, 8, N'子节点66', N'6666', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (11, N'000000', 108, 3, 7, N'子节点77', N'7777', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (11, 108, 3, 7, N'子节点77', N'7777', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (12, N'000000', 108, 3, 6, N'子节点88', N'8888', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (12, 108, 3, 6, N'子节点88', N'8888', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (13, N'000000', 108, 3, 5, N'子节点99', N'9999', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (13, 108, 3, 5, N'子节点99', N'9999', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
 
-INSERT test_tree VALUES (1, N'000000', 0, 102, 4, N'测试数据权限', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1, 0, 102, 4, N'测试数据权限', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (2, N'000000', 1, 102, 3, N'子节点1', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (2, 1, 102, 3, N'子节点1', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (3, N'000000', 2, 102, 3, N'子节点2', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (3, 2, 102, 3, N'子节点2', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (4, N'000000', 0, 108, 4, N'测试树1', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (4, 0, 108, 4, N'测试树1', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (5, N'000000', 4, 108, 3, N'子节点11', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (5, 4, 108, 3, N'子节点11', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (6, N'000000', 4, 108, 3, N'子节点22', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (6, 4, 108, 3, N'子节点22', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (7, N'000000', 4, 108, 3, N'子节点33', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (7, 4, 108, 3, N'子节点33', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (8, N'000000', 5, 108, 3, N'子节点44', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (8, 5, 108, 3, N'子节点44', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (9, N'000000', 6, 108, 3, N'子节点55', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (9, 6, 108, 3, N'子节点55', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (10, N'000000', 7, 108, 3, N'子节点66', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (10, 7, 108, 3, N'子节点66', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (11, N'000000', 7, 108, 3, N'子节点77', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (11, 7, 108, 3, N'子节点77', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (12, N'000000', 10, 108, 3, N'子节点88', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (12, 10, 108, 3, N'子节点88', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (13, N'000000', 10, 108, 3, N'子节点99', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (13, 10, 108, 3, N'子节点99', 0, 103, getdate(), 1, NULL, NULL, 0);
 GO

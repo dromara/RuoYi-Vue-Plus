@@ -3,17 +3,13 @@ package org.dromara.common.satoken.utils;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
-import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.UserType;
-
-import java.util.Set;
 
 
 /**
@@ -32,7 +28,6 @@ import java.util.Set;
 public class LoginHelper {
 
     public static final String LOGIN_USER_KEY = "loginUser";
-    public static final String TENANT_KEY = "tenantId";
     public static final String USER_KEY = "userId";
     public static final String USER_NAME_KEY = "userName";
     public static final String DEPT_KEY = "deptId";
@@ -50,8 +45,7 @@ public class LoginHelper {
     public static void login(LoginUser loginUser, SaLoginParameter model) {
         model = ObjectUtil.defaultIfNull(model, new SaLoginParameter());
         StpUtil.login(loginUser.getLoginId(),
-            model.setExtra(TENANT_KEY, loginUser.getTenantId())
-                .setExtra(USER_KEY, loginUser.getUserId())
+            model.setExtra(USER_KEY, loginUser.getUserId())
                 .setExtra(USER_NAME_KEY, loginUser.getUsername())
                 .setExtra(DEPT_KEY, loginUser.getDeptId())
                 .setExtra(DEPT_NAME_KEY, loginUser.getDeptName())
@@ -103,13 +97,6 @@ public class LoginHelper {
      */
     public static String getUsername() {
         return Convert.toStr(getExtra(USER_NAME_KEY));
-    }
-
-    /**
-     * 获取租户ID
-     */
-    public static String getTenantId() {
-        return Convert.toStr(getExtra(TENANT_KEY));
     }
 
     /**
@@ -172,32 +159,6 @@ public class LoginHelper {
      */
     public static boolean isSuperAdmin() {
         return isSuperAdmin(getUserId());
-    }
-
-    /**
-     * 是否为租户管理员
-     *
-     * @param rolePermission 角色权限标识组
-     * @return 结果
-     */
-    public static boolean isTenantAdmin(Set<String> rolePermission) {
-        if (CollUtil.isEmpty(rolePermission)) {
-            return false;
-        }
-        return rolePermission.contains(TenantConstants.TENANT_ADMIN_ROLE_KEY);
-    }
-
-    /**
-     * 是否为租户管理员
-     *
-     * @return 结果
-     */
-    public static boolean isTenantAdmin() {
-        LoginUser loginUser = getLoginUser();
-        if (loginUser == null) {
-            return false;
-        }
-        return Convert.toBool(isTenantAdmin(loginUser.getRolePermission()));
     }
 
     /**

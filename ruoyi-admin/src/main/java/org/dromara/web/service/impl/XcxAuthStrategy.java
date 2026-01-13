@@ -67,7 +67,6 @@ public class XcxAuthStrategy implements IAuthStrategy {
         SysUserVo user = loadUserByOpenid(openid);
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         XcxLoginUser loginUser = new XcxLoginUser();
-        loginUser.setTenantId(user.getTenantId());
         loginUser.setUserId(user.getUserId());
         loginUser.setUsername(user.getUserName());
         loginUser.setNickname(user.getNickName());

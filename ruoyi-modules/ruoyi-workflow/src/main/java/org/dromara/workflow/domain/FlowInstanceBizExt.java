@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.tenant.core.TenantEntity;
+import org.dromara.common.mybatis.core.domain.BaseEntity;
 
 import java.io.Serial;
 
@@ -18,7 +18,7 @@ import java.io.Serial;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("flow_instance_biz_ext")
-public class FlowInstanceBizExt extends TenantEntity {
+public class FlowInstanceBizExt extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;

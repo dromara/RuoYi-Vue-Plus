@@ -1,9 +1,9 @@
 package org.dromara.demo.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-import org.dromara.common.tenant.core.TenantEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dromara.common.mybatis.core.domain.BaseEntity;
 
 import java.io.Serial;
 
@@ -16,7 +16,7 @@ import java.io.Serial;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("test_demo")
-public class TestDemo extends TenantEntity {
+public class TestDemo extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;

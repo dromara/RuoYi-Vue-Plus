@@ -23,14 +23,11 @@ import org.dromara.warm.flow.core.service.DefService;
 import org.dromara.warm.flow.orm.entity.FlowDefinition;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
 import org.dromara.warm.flow.orm.entity.FlowNode;
-import org.dromara.warm.flow.orm.entity.FlowSkip;
 import org.dromara.warm.flow.orm.mapper.FlowDefinitionMapper;
 import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
 import org.dromara.warm.flow.orm.mapper.FlowNodeMapper;
 import org.dromara.warm.flow.orm.mapper.FlowSkipMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
-import org.dromara.workflow.common.constant.FlowConstant;
-import org.dromara.workflow.domain.FlowCategory;
 import org.dromara.workflow.domain.vo.FlowDefinitionVo;
 import org.dromara.workflow.mapper.FlwCategoryMapper;
 import org.dromara.workflow.service.IFlwCommonService;
@@ -44,8 +41,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.dromara.common.core.constant.TenantConstants.DEFAULT_TENANT_ID;
 
 /**
  * 流程定义 服务层实现
@@ -200,71 +195,4 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
         return true;
     }
 
-    /**
-     * 新增租户流程定义
-     *
-     * @param tenantId 租户id
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void syncDef(String tenantId) {
-        FlowCategory flowCategory = flwCategoryMapper.selectOne(new LambdaQueryWrapper<FlowCategory>()
-            .eq(FlowCategory::getTenantId, DEFAULT_TENANT_ID)
-            .eq(FlowCategory::getCategoryId, FlowConstant.FLOW_CATEGORY_ID));
-        flowCategory.setCategoryId(null);
-        flowCategory.setTenantId(tenantId);
-        flowCategory.setCreateDept(null);
-        flowCategory.setCreateBy(null);
-        flowCategory.setCreateTime(null);
-        flowCategory.setUpdateBy(null);
-        flowCategory.setUpdateTime(null);
-        flwCategoryMapper.insert(flowCategory);
-
-        List<FlowDefinition> flowDefinitions = flowDefinitionMapper.selectList(new LambdaQueryWrapper<FlowDefinition>().eq(FlowDefinition::getTenantId, DEFAULT_TENANT_ID));
-        if (CollUtil.isEmpty(flowDefinitions)) {
-            return;
-        }
-        List<Long> defIds = StreamUtils.toList(flowDefinitions, FlowDefinition::getId);
-        List<FlowNode> flowNodes = flowNodeMapper.selectList(new LambdaQueryWrapper<FlowNode>().in(FlowNode::getDefinitionId, defIds));
-        List<FlowSkip> flowSkips = flowSkipMapper.selectList(new LambdaQueryWrapper<FlowSkip>().in(FlowSkip::getDefinitionId, defIds));
-        for (FlowDefinition definition : flowDefinitions) {
-            FlowDefinition flowDefinition = BeanUtil.toBean(definition, FlowDefinition.class);
-            flowDefinition.setId(null);
-            flowDefinition.setTenantId(tenantId);
-            flowDefinition.setIsPublish(0);
-            flowDefinition.setCategory(Convert.toStr(flowCategory.getCategoryId()));
-            int insert = flowDefinitionMapper.insert(flowDefinition);
-            if (insert <= 0) {
-                log.info("同步流程定义【{}】失败！", definition.getFlowCode());
-                continue;
-            }
-            log.info("同步流程定义【{}】成功！", definition.getFlowCode());
-            Long definitionId = flowDefinition.getId();
-            if (CollUtil.isNotEmpty(flowNodes)) {
-                List<FlowNode> nodes = StreamUtils.filter(flowNodes, node -> node.getDefinitionId().equals(definition.getId()));
-                if (CollUtil.isNotEmpty(nodes)) {
-                    List<FlowNode> flowNodeList = BeanUtil.copyToList(nodes, FlowNode.class);
-                    flowNodeList.forEach(e -> {
-                        e.setId(null);
-                        e.setDefinitionId(definitionId);
-                        e.setTenantId(tenantId);
-                        e.setPermissionFlag(null);
-                    });
-                    flowNodeMapper.insertOrUpdate(flowNodeList);
-                }
-            }
-            if (CollUtil.isNotEmpty(flowSkips)) {
-                List<FlowSkip> skips = StreamUtils.filter(flowSkips, skip -> skip.getDefinitionId().equals(definition.getId()));
-                if (CollUtil.isNotEmpty(skips)) {
-                    List<FlowSkip> flowSkipList = BeanUtil.copyToList(skips, FlowSkip.class);
-                    flowSkipList.forEach(e -> {
-                        e.setId(null);
-                        e.setDefinitionId(definitionId);
-                        e.setTenantId(tenantId);
-                    });
-                    flowSkipMapper.insertOrUpdate(flowSkipList);
-                }
-            }
-        }
-    }
 }

@@ -32,11 +32,6 @@ public class FlowDefinitionVo implements Serializable {
     private Date updateTime;
 
     /**
-     * 租户ID
-     */
-    private String tenantId;
-
-    /**
      * 删除标记
      */
     private String delFlag;
