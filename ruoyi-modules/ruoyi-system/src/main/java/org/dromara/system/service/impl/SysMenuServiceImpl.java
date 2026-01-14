@@ -350,7 +350,9 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 if (StringUtils.equalsAnyIgnoreCase(path, dbPath) && parentId.longValue() == dbParentId.longValue()) {
                     log.warn("[同级路由冲突] 同级下已存在相同路由路径 '{}'，冲突菜单：{}", dbPath, sysMenu.getMenuName());
                     return false;
-                } else if (StringUtils.equalsAnyIgnoreCase(path, dbPath) && parentId.longValue() == Constants.TOP_PARENT_ID) {
+                } else if (StringUtils.equalsAnyIgnoreCase(path, dbPath)
+                    && parentId.longValue() == Constants.TOP_PARENT_ID
+                    && dbParentId.longValue() == Constants.TOP_PARENT_ID) {
                     log.warn("[根目录路由冲突] 根目录下路由 '{}' 必须唯一，已被菜单 '{}' 占用", path, sysMenu.getMenuName());
                     return false;
                 } else if (StringUtils.equalsAnyIgnoreCase(routeName, dbRouteName)) {
