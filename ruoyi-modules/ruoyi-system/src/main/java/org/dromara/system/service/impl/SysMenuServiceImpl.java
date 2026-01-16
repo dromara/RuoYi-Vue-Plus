@@ -334,6 +334,9 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public boolean checkRouteConfigUnique(SysMenuBo menuBo) {
         SysMenu menu = MapstructUtils.convert(menuBo, SysMenu.class);
+        if (SystemConstants.TYPE_BUTTON.equals(menu.getMenuType())) {
+            return true;
+        }
         long menuId = ObjectUtil.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
         Long parentId = menu.getParentId();
         String path = menu.getPath();
