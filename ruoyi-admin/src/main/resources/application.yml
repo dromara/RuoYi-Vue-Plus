@@ -244,7 +244,7 @@ warm-flow:
 
 --- # mqtt 配置
 # 具体配置还需查看文档
-# https://gitee.com/dromara/mica-mqtt
+# https://mica-mqtt.dreamlu.net/guide/spring/client.html
 mqtt.client:
   # 是否开启客户端，默认：true
   enabled: false

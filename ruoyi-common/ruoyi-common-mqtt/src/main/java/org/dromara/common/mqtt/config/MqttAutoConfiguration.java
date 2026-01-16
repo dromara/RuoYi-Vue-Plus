@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Bean;
 /**
  * mqtt客户端配置初始化
  * <p>
- * 用法文档 <a href="https://gitee.com/dromara/mica-mqtt/blob/master/starter/mica-mqtt-client-spring-boot-starter/README.md">...</a>
+ * 用法文档 <a href="https://mica-mqtt.dreamlu.net/guide/spring/client.html">...</a>
  * 测试server搭建:
  * 可执行下载其他mqtt服务端搭建
- * 也可使用 mica自带的server搭建 <a href="https://gitee.com/dromara/mica-mqtt/blob/master/starter/mica-mqtt-server-spring-boot-starter/README.md">...</a>
+ * 也可使用 mica自带的server搭建 <a href="https://mica-mqtt.dreamlu.net/guide/spring/server.html">...</a>
  *
  * @author Lion Li
  */
