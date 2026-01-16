@@ -241,3 +241,43 @@ warm-flow:
   node-tooltip: true
   # 默认Authorization，如果有多个token，用逗号分隔
   token-name: ${sa-token.token-name},clientid
+
+--- # mqtt 配置
+# 具体配置还需查看文档
+# https://gitee.com/dromara/mica-mqtt
+mqtt.client:
+  # 是否开启客户端，默认：true
+  enabled: false
+  # 连接的服务端 ip ，默认：127.0.0.1
+  ip: 127.0.0.1
+  # 端口：默认：1883
+  port: 1883
+  # 客户端名称
+  name: Mqtt-Client
+  # 客户端Id（非常重要，一般为设备 sn，不可重复）
+  client-id: 000001
+  username: ruoyi
+  password: 123456
+  # 超时时间，单位：秒，默认：5秒
+  timeout: 5
+  # 重连时间，默认 5000 毫秒
+  re-interval: 5000
+  # mqtt 协议版本，可选 MQTT_3_1、mqtt_3_1_1、mqtt_5，默认：mqtt_3_1_1
+  version: mqtt_3_1_1
+  # 接收数据的 buffer size，默认：8k
+  read-buffer-size: 8KB
+  # 消息解析最大 bytes 长度，默认：10M
+  max-bytes-in-message: 10MB
+  # keep-alive 时间，单位：秒
+  keep-alive-secs: 60
+  # 开启保留 session 时，session 的有效期
+  session-expiry-interval-secs: 0
+  # 工作线程数，如果消息量比较大，例如做 emqx 的转发消息处理，可以调大此参数
+  biz-thread-pool-size: 2
+  # 是否开启 ssl
+  ssl:
+    enabled: false
+    keystore-path:
+    keystore-pass:
+    truststore-path:
+    truststore-pass:
