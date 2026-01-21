@@ -344,21 +344,24 @@ public class SysMenuServiceImpl implements ISysMenuService {
         List<SysMenu> sysMenuList = baseMapper.selectList(
             new LambdaQueryWrapper<SysMenu>()
                 .in(SysMenu::getMenuType, SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
-                .eq(SysMenu::getPath, path).or().eq(SysMenu::getPath, routeName));
+                .and(w ->
+                    w.eq(SysMenu::getPath, path).or().eq(SysMenu::getPath, routeName)
+                ));
         for (SysMenu sysMenu : sysMenuList) {
-            if (sysMenu.getMenuId() != menuId) {
+            if (!sysMenu.getMenuId().equals(menuId)) {
                 Long dbParentId = sysMenu.getParentId();
                 String dbPath = sysMenu.getPath();
                 String dbRouteName = StringUtils.isEmpty(sysMenu.getRouteName()) ? dbPath : sysMenu.getRouteName();
-                if (StringUtils.equalsAnyIgnoreCase(path, dbPath) && parentId.longValue() == dbParentId.longValue()) {
+                if (StringUtils.equalsAnyIgnoreCase(path, dbPath) && parentId.equals(dbParentId)) {
                     log.warn("[同级路由冲突] 同级下已存在相同路由路径 '{}'，冲突菜单：{}", dbPath, sysMenu.getMenuName());
                     return false;
                 } else if (StringUtils.equalsAnyIgnoreCase(path, dbPath)
-                    && parentId.longValue() == Constants.TOP_PARENT_ID
-                    && dbParentId.longValue() == Constants.TOP_PARENT_ID) {
+                    && Constants.TOP_PARENT_ID.equals(parentId)
+                    && Constants.TOP_PARENT_ID.equals(dbParentId)) {
                     log.warn("[根目录路由冲突] 根目录下路由 '{}' 必须唯一，已被菜单 '{}' 占用", path, sysMenu.getMenuName());
                     return false;
-                } else if (StringUtils.equalsAnyIgnoreCase(routeName, dbRouteName)) {
+                } else if (StringUtils.equalsAnyIgnoreCase(routeName, dbRouteName)
+                    && sysMenu.getMenuType().equals(menu.getMenuType())) {
                     log.warn("[路由名称冲突] 路由名称 '{}' 需全局唯一，已被菜单 '{}' 使用", routeName, sysMenu.getMenuName());
                     return false;
                 }
