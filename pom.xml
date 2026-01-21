@@ -226,13 +226,13 @@
                 <artifactId>s3</artifactId>
                 <version>${aws.sdk.version}</version>
             </dependency>
-            <!-- 基于 AWS CRT 的 S3 客户端的性能增强的 S3 传输管理器 -->
+            <!-- 客户端的性能增强传输管理器 -->
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>s3-transfer-manager</artifactId>
                 <version>${aws.sdk.version}</version>
             </dependency>
-            <!-- 将基于 Netty 的 HTTP 客户端从类路径中移除 -->
+            <!-- 适用于 Netty 的客户端 -->
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>netty-nio-client</artifactId>
