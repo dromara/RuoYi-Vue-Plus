@@ -33,6 +33,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
 /**
@@ -144,17 +146,27 @@ public class SysLoginService {
         loginUser.setUsername(user.getUserName());
         loginUser.setNickname(user.getNickName());
         loginUser.setUserType(user.getUserType());
-        loginUser.setMenuPermission(permissionService.getMenuPermission(userId));
-        loginUser.setRolePermission(permissionService.getRolePermission(userId));
         if (ObjectUtil.isNotNull(user.getDeptId())) {
             Opt<SysDeptVo> deptOpt = Opt.of(user.getDeptId()).map(deptService::selectDeptById);
             loginUser.setDeptName(deptOpt.map(SysDeptVo::getDeptName).orElse(StringUtils.EMPTY));
             loginUser.setDeptCategory(deptOpt.map(SysDeptVo::getDeptCategory).orElse(StringUtils.EMPTY));
         }
-        List<SysRoleVo> roles = roleService.selectRolesByUserId(userId);
-        List<SysPostVo> posts = postService.selectPostsByUserId(userId);
-        loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
-        loginUser.setPosts(BeanUtil.copyToList(posts, PostDTO.class));
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            executor.execute(() -> {
+                loginUser.setMenuPermission(permissionService.getMenuPermission(userId));
+            });
+            executor.execute(() -> {
+                loginUser.setRolePermission(permissionService.getRolePermission(userId));
+            });
+            executor.execute(() -> {
+                List<SysRoleVo> roles = roleService.selectRolesByUserId(userId);
+                loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
+            });
+            executor.execute(() -> {
+                List<SysPostVo> posts = postService.selectPostsByUserId(userId);
+                loginUser.setPosts(BeanUtil.copyToList(posts, PostDTO.class));
+            });
+        }
         return loginUser;
     }
 
