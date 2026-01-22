@@ -4,6 +4,7 @@ import org.dromara.common.mqtt.listener.MqttClientConnectListener;
 import org.dromara.common.mqtt.listener.MqttClientGlobalMessageListener;
 import org.dromara.mica.mqtt.core.client.MqttClientCreator;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Bean;
  * @author Lion Li
  */
 @AutoConfiguration
+@ConditionalOnProperty(value = "mqtt.client.enabled", havingValue = "true")
 public class MqttAutoConfiguration {
 
     @Bean

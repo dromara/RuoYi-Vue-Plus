@@ -8,6 +8,8 @@ import org.dromara.mica.mqtt.codec.message.MqttPublishMessage;
 import org.dromara.mica.mqtt.core.annotation.MqttClientSubscribe;
 import org.dromara.mica.mqtt.core.deserialize.MqttJsonDeserializer;
 import org.dromara.mica.mqtt.spring.client.MqttClientTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +32,9 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class MqttController {
 
-    private final MqttClientTemplate client;
+    @Lazy
+    @Autowired
+    private MqttClientTemplate client;
 
     @GetMapping("/send")
     public boolean send() {
