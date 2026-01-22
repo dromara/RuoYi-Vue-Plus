@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.Strings;
 import org.springframework.util.AntPathMatcher;
 
 import java.nio.charset.Charset;
@@ -379,6 +380,50 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      */
     public static String joinComma(Object[] array) {
         return StringUtils.join(array, SEPARATOR);
+    }
+
+    /**
+     * 判断两个字符串是否相等
+     *
+     * @param cs1 字符串1
+     * @param cs2 字符串2
+     * @return 是否相等
+     */
+    public static boolean equals(final CharSequence cs1, final CharSequence cs2) {
+        return Strings.CS.equals(cs1, cs2);
+    }
+
+    /**
+     * 判断字符串是否在指定的字符串列表中
+     *
+     * @param string       字符串
+     * @param searchStrings 字符串列表
+     * @return 是否在列表中
+     */
+    public static boolean equalsAny(final CharSequence string, final CharSequence... searchStrings) {
+        return Strings.CS.equalsAny(string, searchStrings);
+    }
+
+    /**
+     * 忽略大小写判断字符串是否在指定的字符串列表中
+     *
+     * @param string       字符串
+     * @param searchStrings 字符串列表
+     * @return 是否在列表中
+     */
+    public static boolean equalsAnyIgnoreCase(final CharSequence string, final CharSequence... searchStrings) {
+        return Strings.CI.equalsAny(string, searchStrings);
+    }
+
+    /**
+     * 忽略大小写判断两个字符串是否相等
+     *
+     * @param cs1 字符串1
+     * @param cs2 字符串2
+     * @return 是否相等
+     */
+    public static boolean equalsIgnoreCase(final CharSequence cs1, final CharSequence cs2) {
+        return Strings.CI.equals(cs1, cs2);
     }
 
 }
