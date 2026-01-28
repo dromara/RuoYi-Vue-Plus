@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.system.mapper.SysVisitorRegistrationMapper">
+
+    <sql id="selectVisitorRegistrationVo">
+        select vr.id, vr.visitor_name, vr.visitor_phone, vr.visit_purpose, vr.dept_id,
+               vr.appointment_time, vr.status, vr.check_in_time, vr.check_out_time,
+               vr.remark, vr.create_by, vr.create_time, vr.update_by, vr.update_time,
+               sd.dept_name
+        from sys_visitor_registration vr
+        left join sys_dept sd on sd.dept_id = vr.dept_id and sd.del_flag = '0'
+        where vr.del_flag = '0'
+    </sql>
+
+    <select id="selectVisitorRegistrationList" resultType="org.dromara.system.domain.vo.SysVisitorRegistrationVo">
+        <include refid="selectVisitorRegistrationVo"/>
+        <where>
+            <if test="bo.visitorName != null and bo.visitorName != ''">
+                and vr.visitor_name like concat('%', #{bo.visitorName}, '%')
+            </if>
+            <if test="bo.visitorNameKeyword != null and bo.visitorNameKeyword != ''">
+                and vr.visitor_name like concat('%', #{bo.visitorNameKeyword}, '%')
+            </if>
+            <if test="bo.visitorPhone != null and bo.visitorPhone != ''">
+                and vr.visitor_phone = #{bo.visitorPhone}
+            </if>
+            <if test="bo.visitPurpose != null and bo.visitPurpose != ''">
+                and vr.visit_purpose like concat('%', #{bo.visitPurpose}, '%')
+            </if>
+            <if test="bo.deptId != null">
+                and vr.dept_id = #{bo.deptId}
+            </if>
+            <if test="bo.status != null and bo.status != ''">
+                and vr.status = #{bo.status}
+            </if>
+            <if test="bo.statusList != null and bo.statusList.length > 0">
+                and vr.status in
+                <foreach collection="bo.statusList" item="status" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+            <if test="bo.appointmentTime != null">
+                and date(vr.appointment_time) = date(#{bo.appointmentTime})
+            </if>
+            <if test="bo.appointmentTimeStart != null">
+                and vr.appointment_time >= #{bo.appointmentTimeStart}
+            </if>
+            <if test="bo.appointmentTimeEnd != null">
+                and vr.appointment_time &lt;= #{bo.appointmentTimeEnd}
+            </if>
+            <if test="bo.checkInTime != null">
+                and date(vr.check_in_time) = date(#{bo.checkInTime})
+            </if>
+            <if test="bo.checkOutTime != null">
+                and date(vr.check_out_time) = date(#{bo.checkOutTime})
+            </if>
+            <if test="bo.params.beginTime != null and bo.params.beginTime != ''"><!-- 开始时间检索 -->
+                and date(vr.create_time) &gt;= date(#{bo.params.beginTime})
+            </if>
+            <if test="bo.params.endTime != null and bo.params.endTime != ''"><!-- 结束时间检索 -->
+                and date(vr.create_time) &lt;= date(#{bo.params.endTime})
+            </if>
+        </where>
+        order by vr.create_time desc
+    </select>
+
+    <select id="selectVisitorRegistrationPage" resultType="org.dromara.system.domain.vo.SysVisitorRegistrationVo">
+        <include refid="selectVisitorRegistrationVo"/>
+        <where>
+            <if test="bo.visitorName != null and bo.visitorName != ''">
+                and vr.visitor_name like concat('%', #{bo.visitorName}, '%')
+            </if>
+            <if test="bo.visitorNameKeyword != null and bo.visitorNameKeyword != ''">
+                and vr.visitor_name like concat('%', #{bo.visitorNameKeyword}, '%')
+            </if>
+            <if test="bo.visitorPhone != null and bo.visitorPhone != ''">
+                and vr.visitor_phone = #{bo.visitorPhone}
+            </if>
+            <if test="bo.visitPurpose != null and bo.visitPurpose != ''">
+                and vr.visit_purpose like concat('%', #{bo.visitPurpose}, '%')
+            </if>
+            <if test="bo.deptId != null">
+                and vr.dept_id = #{bo.deptId}
+            </if>
+            <if test="bo.status != null and bo.status != ''">
+                and vr.status = #{bo.status}
+            </if>
+            <if test="bo.statusList != null and bo.statusList.length > 0">
+                and vr.status in
+                <foreach collection="bo.statusList" item="status" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+            <if test="bo.appointmentTime != null">
+                and date(vr.appointment_time) = date(#{bo.appointmentTime})
+            </if>
+            <if test="bo.appointmentTimeStart != null">
+                and vr.appointment_time >= #{bo.appointmentTimeStart}
+            </if>
+            <if test="bo.appointmentTimeEnd != null">
+                and vr.appointment_time &lt;= #{bo.appointmentTimeEnd}
+            </if>
+            <if test="bo.checkInTime != null">
+                and date(vr.check_in_time) = date(#{bo.checkInTime})
+            </if>
+            <if test="bo.checkOutTime != null">
+                and date(vr.check_out_time) = date(#{bo.checkOutTime})
+            </if>
+            <if test="bo.params.beginTime != null and bo.params.beginTime != ''"><!-- 开始时间检索 -->
+                and date(vr.create_time) &gt;= date(#{bo.params.beginTime})
+            </if>
+            <if test="bo.params.endTime != null and bo.params.endTime != ''"><!-- 结束时间检索 -->
+                and date(vr.create_time) &lt;= date(#{bo.params.endTime})
+            </if>
+        </where>
+        order by vr.create_time desc
+    </select>
+
+</mapper>
