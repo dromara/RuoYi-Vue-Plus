@@ -21,7 +21,7 @@ import tools.jackson.databind.DefaultTyping;
 import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
 import tools.jackson.databind.ext.javatime.ser.LocalDateTimeSerializer;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import tools.jackson.databind.module.SimpleModule;
 
 import java.time.LocalDateTime;
@@ -53,8 +53,10 @@ public class RedisConfig {
                 .defaultTimeZone(TimeZone.getDefault())
                 .changeDefaultVisibility(visibilityChecker -> visibilityChecker.withVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY))
                 // 指定序列化输入的类型，类必须是非final修饰的。序列化时将对象全类名一起保存下来
-                // LaissezFaireSubTypeValidator 在 Jackson 3.X 中被禁止外部引用，此处使用 DefaultBaseTypeLimitingValidator 替代，两者在行为上可能会有所差异，但一般情况下无影响
-                .activateDefaultTyping(new DefaultBaseTypeLimitingValidator(), DefaultTyping.NON_FINAL)
+                // 因为安全策略，LaissezFaireSubTypeValidator 在 Jackson 3.X 中被禁止外部引用，在反序列化的数据来源不可信时，需要配置反序列化验证器来防止反序列化漏洞攻击，使用者需要自行执行哪些包或类是可以放行的
+                // 此处使用 BasicPolymorphicTypeValidator + 自定义类型匹配起替代，默认放行所有类型，此行为配置与 Jackson 2.X 中 LaissezFaireSubTypeValidator 的行为基本一致
+                // 一般而言，更加建议使用包名白名单的方式去进行匹配，以确保放行通过安全认可的类，如：BasicPolymorphicTypeValidator.builder().allowIfBaseType("org.dromara").allowIfSubType("org.dromara").build()
+                .activateDefaultTyping(BasicPolymorphicTypeValidator.builder().allowIfSubType((ctxt, clazz) -> true).build(), DefaultTyping.NON_FINAL)
                 .build();
             // org.apache.fory.logging.LoggerFactory 包别引入错了
             // LoggerFactory.useSlf4jLogging(true);
