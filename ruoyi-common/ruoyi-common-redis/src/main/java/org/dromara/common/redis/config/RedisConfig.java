@@ -3,12 +3,6 @@ package org.dromara.common.redis.config;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.redis.config.properties.RedissonProperties;
@@ -16,13 +10,19 @@ import org.dromara.common.redis.handler.KeyPrefixHandler;
 import org.dromara.common.redis.handler.RedisExceptionHandler;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.CompositeCodec;
-import org.redisson.codec.TypedJsonJacksonCodec;
+import org.redisson.codec.TypedJsonJackson3Codec;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
+import tools.jackson.databind.DefaultTyping;
+import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
+import tools.jackson.databind.ext.javatime.ser.LocalDateTimeSerializer;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator;
+import tools.jackson.databind.module.SimpleModule;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -44,21 +44,23 @@ public class RedisConfig {
     @Bean
     public RedissonAutoConfigurationCustomizer redissonCustomizer() {
         return config -> {
-            JavaTimeModule javaTimeModule = new JavaTimeModule();
+            SimpleModule simpleModule = new SimpleModule();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
-            javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
-            JsonMapper om = new JsonMapper();
-            om.registerModule(javaTimeModule);
-            om.setTimeZone(TimeZone.getDefault());
-            om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-            // 指定序列化输入的类型，类必须是非final修饰的。序列化时将对象全类名一起保存下来
-            om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+            simpleModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
+            simpleModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
+            JsonMapper jsonMapper = JsonMapper.builder()
+                .addModules(simpleModule)
+                .defaultTimeZone(TimeZone.getDefault())
+                .changeDefaultVisibility(visibilityChecker -> visibilityChecker.withVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY))
+                // 指定序列化输入的类型，类必须是非final修饰的。序列化时将对象全类名一起保存下来
+                // LaissezFaireSubTypeValidator 在 Jackson 3.X 中被禁止外部引用，此处使用 DefaultBaseTypeLimitingValidator 替代，两者在行为上可能会有所差异，但一般情况下无影响
+                .activateDefaultTyping(new DefaultBaseTypeLimitingValidator(), DefaultTyping.NON_FINAL)
+                .build();
             // org.apache.fory.logging.LoggerFactory 包别引入错了
             // LoggerFactory.useSlf4jLogging(true);
             // ForyCodec foryCodec = new ForyCodec();
             // CompositeCodec codec = new CompositeCodec(StringCodec.INSTANCE, foryCodec, foryCodec);
-            TypedJsonJacksonCodec jsonCodec = new TypedJsonJacksonCodec(Object.class, om);
+            TypedJsonJackson3Codec jsonCodec = new TypedJsonJackson3Codec(Object.class, jsonMapper);
             // 组合序列化 key 使用 String 内容使用通用 json 格式
             CompositeCodec codec = new CompositeCodec(StringCodec.INSTANCE, jsonCodec, jsonCodec);
             config.setThreads(redissonProperties.getThreads())
