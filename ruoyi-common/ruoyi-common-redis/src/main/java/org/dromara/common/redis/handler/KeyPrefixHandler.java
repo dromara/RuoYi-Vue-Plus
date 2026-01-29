@@ -1,6 +1,5 @@
 package org.dromara.common.redis.handler;
 
-import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.utils.StringUtils;
 import org.redisson.config.NameMapper;
 
@@ -25,7 +24,10 @@ public class KeyPrefixHandler implements NameMapper {
      */
     @Override
     public String map(String name) {
-        if (StringUtils.isNoneBlank(name,keyPrefix) && !Strings.CS.startsWith(name, keyPrefix)) {
+        if (StringUtils.isBlank(name)) {
+            return null;
+        }
+        if (StringUtils.isNotBlank(keyPrefix) && !name.startsWith(keyPrefix)) {
             return keyPrefix + name;
         }
         return name;
@@ -36,7 +38,10 @@ public class KeyPrefixHandler implements NameMapper {
      */
     @Override
     public String unmap(String name) {
-        if (StringUtils.isNoneBlank(name,keyPrefix) && Strings.CS.startsWith(name, keyPrefix)) {
+        if (StringUtils.isBlank(name)) {
+            return null;
+        }
+        if (StringUtils.isNotBlank(keyPrefix) && name.startsWith(keyPrefix)) {
             return name.substring(keyPrefix.length());
         }
         return name;
