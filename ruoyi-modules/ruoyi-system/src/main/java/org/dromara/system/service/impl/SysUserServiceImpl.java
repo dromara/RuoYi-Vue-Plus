@@ -375,7 +375,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * 修改用户状态
      *
      * @param userId 用户ID
-     * @param status 帐号状态
+     * @param status 账号状态
      * @return 结果
      */
     @Override

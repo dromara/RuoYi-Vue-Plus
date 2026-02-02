@@ -1,8 +1,9 @@
 package org.dromara.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
-import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
+import cn.hutool.captcha.generator.MathGenerator;
+import cn.hutool.captcha.generator.RandomGenerator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import jakarta.validation.constraints.NotBlank;
@@ -14,14 +15,13 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mail.config.properties.MailProperties;
 import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.common.ratelimiter.annotation.RateLimiter;
 import org.dromara.common.ratelimiter.enums.LimitType;
 import org.dromara.common.redis.utils.RedisUtils;
+import org.dromara.common.web.core.WaveAndCircleCaptcha;
 import org.dromara.common.web.config.properties.CaptchaProperties;
-import org.dromara.common.web.enums.CaptchaType;
 import org.dromara.sms4j.api.SmsBlend;
 import org.dromara.sms4j.api.entity.SmsResponse;
 import org.dromara.sms4j.core.factory.SmsFactory;
@@ -33,6 +33,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.awt.*;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 
@@ -130,19 +131,21 @@ public class CaptchaController {
         String uuid = IdUtil.simpleUUID();
         String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + uuid;
         // 生成验证码
-        CaptchaType captchaType = captchaProperties.getType();
+        String captchaType = captchaProperties.getType();
         CodeGenerator codeGenerator;
-        if (CaptchaType.MATH == captchaType) {
-            codeGenerator = ReflectUtils.newInstance(captchaType.getClazz(), captchaProperties.getNumberLength(), false);
+        if ("math".equals(captchaType)) {
+            codeGenerator = new MathGenerator(captchaProperties.getNumberLength(), false);
         } else {
-            codeGenerator = ReflectUtils.newInstance(captchaType.getClazz(), captchaProperties.getCharLength());
+            codeGenerator = new RandomGenerator(captchaProperties.getCharLength());
         }
-        AbstractCaptcha captcha = SpringUtils.getBean(captchaProperties.getCategory().getClazz());
+        WaveAndCircleCaptcha captcha = new WaveAndCircleCaptcha(160, 60);
+        // captcha.setBackground(Color.WHITE); // 不设置就是透明底
+        captcha.setFont(new Font("Arial", Font.BOLD, 45));
         captcha.setGenerator(codeGenerator);
         captcha.createCode();
         // 如果是数学验证码，使用SpEL表达式处理验证码结果
         String code = captcha.getCode();
-        if (CaptchaType.MATH == captchaType) {
+        if ("math".equals(captchaType)) {
             ExpressionParser parser = new SpelExpressionParser();
             Expression exp = parser.parseExpression(StringUtils.remove(code, "="));
             code = exp.getValue(String.class);

@@ -24,9 +24,7 @@ captcha:
   # 是否启用验证码校验
   enable: false
   # 验证码类型 math 数组计算 char 字符验证
-  type: MATH
-  # line 线段干扰 circle 圆圈干扰 shear 扭曲干扰
-  category: CIRCLE
+  type: math
   # 数字验证码位数
   numberLength: 1
   # 字符验证码长度

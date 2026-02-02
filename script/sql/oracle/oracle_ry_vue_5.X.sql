@@ -257,7 +257,7 @@ comment on column sys_user.phonenumber  is '手机号码';
 comment on column sys_user.sex          is '用户性别（0男 1女 2未知）';
 comment on column sys_user.avatar       is '头像路径';
 comment on column sys_user.password     is '密码';
-comment on column sys_user.status       is '帐号状态（0正常 1停用）';
+comment on column sys_user.status       is '账号状态（0正常 1停用）';
 comment on column sys_user.del_flag     is '删除标志（0代表存在 1代表删除）';
 comment on column sys_user.login_ip     is '最后登录IP';
 comment on column sys_user.login_date   is '最后登录时间';

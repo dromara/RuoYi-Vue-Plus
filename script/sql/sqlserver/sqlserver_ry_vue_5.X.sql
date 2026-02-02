@@ -2802,7 +2802,7 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'password'
 GO
 EXEC sys.sp_addextendedproperty
-    'MS_Description', N'帐号状态（0正常 1停用）' ,
+    'MS_Description', N'账号状态（0正常 1停用）' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_user',
     'COLUMN', N'status'

@@ -31,7 +31,7 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
             <exclusions>
-                <!-- 将基于 CRT 的 HTTP 客户端从类路径中移除 -->
+                <!-- 东西 30M 特别大的 jar 包 性能跟 Netty 差不多 有需要可以自行替换使用 -->
                 <exclusion>
                     <groupId>software.amazon.awssdk</groupId>
                     <artifactId>aws-crt-client</artifactId>
@@ -49,13 +49,13 @@
             </exclusions>
         </dependency>
 
-        <!-- 将基于 Netty 的 HTTP 客户端从类路径中移除 -->
+        <!-- 适用于 Netty 的客户端 -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>netty-nio-client</artifactId>
         </dependency>
 
-        <!-- 基于 AWS CRT 的 S3 客户端的性能增强的 S3 传输管理器 -->
+        <!-- 客户端的性能增强传输管理器 -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3-transfer-manager</artifactId>

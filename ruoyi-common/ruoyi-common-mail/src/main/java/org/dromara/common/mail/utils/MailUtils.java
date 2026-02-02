@@ -192,7 +192,7 @@ public class MailUtils {
     /**
      * 发送邮件给多人
      *
-     * @param mailAccount 邮件帐户信息
+     * @param mailAccount 邮件账户信息
      * @param tos         收件人列表
      * @param subject     标题
      * @param content     正文
@@ -207,7 +207,7 @@ public class MailUtils {
     /**
      * 发送邮件给多人
      *
-     * @param mailAccount 邮件帐户信息
+     * @param mailAccount 邮件账户信息
      * @param tos         收件人列表
      * @param ccs         抄送人列表，可以为null或空
      * @param bccs        密送人列表，可以为null或空
@@ -343,7 +343,7 @@ public class MailUtils {
     /**
      * 发送邮件给多人
      *
-     * @param mailAccount 邮件帐户信息
+     * @param mailAccount 邮件账户信息
      * @param tos         收件人列表
      * @param subject     标题
      * @param content     正文
@@ -360,7 +360,7 @@ public class MailUtils {
     /**
      * 发送邮件给多人
      *
-     * @param mailAccount 邮件帐户信息
+     * @param mailAccount 邮件账户信息
      * @param tos         收件人列表
      * @param ccs         抄送人列表，可以为null或空
      * @param bccs        密送人列表，可以为null或空
@@ -400,7 +400,7 @@ public class MailUtils {
     /**
      * 发送邮件给多人
      *
-     * @param mailAccount      邮件帐户信息
+     * @param mailAccount      邮件账户信息
      * @param useGlobalSession 是否全局共享Session
      * @param tos              收件人列表
      * @param ccs              抄送人列表，可以为null或空
