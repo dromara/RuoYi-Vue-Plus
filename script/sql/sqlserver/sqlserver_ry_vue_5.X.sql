@@ -1014,7 +1014,7 @@ CREATE TABLE sys_dict_type
 ON [PRIMARY]
 GO
 
-CREATE NONCLUSTERED INDEX sys_dict_type_index1 ON sys_dict_type (tenant_id, dict_type)
+CREATE NONCLUSTERED INDEX sys_dict_type_index1 ON sys_dict_type (dict_type)
 GO
 
 EXEC sys.sp_addextendedproperty

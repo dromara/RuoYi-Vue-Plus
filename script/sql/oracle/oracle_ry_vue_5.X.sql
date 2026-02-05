@@ -713,7 +713,7 @@ create table sys_dict_type (
 );
 
 alter table sys_dict_type add constraint pk_sys_dict_type primary key (dict_id);
-create unique index sys_dict_type_index1 on sys_dict_type (tenant_id, dict_type);
+create unique index sys_dict_type_index1 on sys_dict_type (dict_type);
 
 comment on table  sys_dict_type               is '字典类型表';
 comment on column sys_dict_type.dict_id       is '字典主键';

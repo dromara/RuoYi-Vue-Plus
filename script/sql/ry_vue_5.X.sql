@@ -535,7 +535,6 @@ create table sys_oper_log (
 create table sys_dict_type
 (
     dict_id          bigint(20)      not null                   comment '字典主键',
-    tenant_id        varchar(20)     default '000000'           comment '租户编号',
     dict_name        varchar(100)    default ''                 comment '字典名称',
     dict_type        varchar(100)    default ''                 comment '字典类型',
     create_dept      bigint(20)      default null               comment '创建部门',
@@ -545,7 +544,7 @@ create table sys_dict_type
     update_time      datetime                                   comment '更新时间',
     remark           varchar(500)    default null               comment '备注',
     primary key (dict_id),
-    unique (tenant_id, dict_type)
+    unique (dict_type)
 ) engine=innodb comment = '字典类型表';
 
 insert into sys_dict_type values(1, '用户性别', 'sys_user_sex',        103, 1, sysdate(), null, null, '用户性别列表');
