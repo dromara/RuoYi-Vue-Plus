@@ -50,7 +50,7 @@
         <!-- 工作流配置 -->
         <warm-flow.version>1.8.4</warm-flow.version>
         <!-- mqtt客户端 -->
-        <mica-mqtt.version>2.5.11</mica-mqtt.version>
+        <mica-mqtt.version>2.5.12</mica-mqtt.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
