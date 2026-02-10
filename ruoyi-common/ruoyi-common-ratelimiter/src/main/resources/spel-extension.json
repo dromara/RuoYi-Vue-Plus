@@ -1,7 +1,0 @@
-{
-  "org.dromara.common.ratelimiter.annotation.RateLimiter@key": {
-    "method": {
-      "parameters": true
-    }
-  }
-}

@@ -8,7 +8,7 @@ import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.core.validate.QueryGroup;
 import org.dromara.common.web.core.BaseController;
-import org.dromara.common.idempotent.annotation.RepeatSubmit;
+import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.excel.core.ExcelResult;

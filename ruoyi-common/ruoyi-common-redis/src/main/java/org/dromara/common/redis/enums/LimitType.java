@@ -1,4 +1,4 @@
-package org.dromara.common.ratelimiter.enums;
+package org.dromara.common.redis.enums;
 
 /**
  * 限流类型

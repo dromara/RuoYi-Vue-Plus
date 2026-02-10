@@ -1,6 +1,6 @@
-package org.dromara.common.idempotent.config;
+package org.dromara.common.redis.config;
 
-import org.dromara.common.idempotent.aspectj.RepeatSubmitAspect;
+import org.dromara.common.redis.aspectj.RepeatSubmitAspect;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConfiguration;

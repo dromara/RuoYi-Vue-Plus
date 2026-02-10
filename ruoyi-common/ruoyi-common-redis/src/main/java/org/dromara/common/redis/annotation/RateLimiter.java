@@ -1,6 +1,6 @@
-package org.dromara.common.ratelimiter.annotation;
+package org.dromara.common.redis.annotation;
 
-import org.dromara.common.ratelimiter.enums.LimitType;
+import org.dromara.common.redis.enums.LimitType;
 
 import java.lang.annotation.*;
 

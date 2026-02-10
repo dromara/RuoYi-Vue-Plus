@@ -1,4 +1,4 @@
-package org.dromara.common.ratelimiter.aspectj;
+package org.dromara.common.redis.aspectj;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -11,8 +11,8 @@ import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.ratelimiter.annotation.RateLimiter;
-import org.dromara.common.ratelimiter.enums.LimitType;
+import org.dromara.common.redis.annotation.RateLimiter;
+import org.dromara.common.redis.enums.LimitType;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.redisson.api.RateType;
 import org.springframework.context.expression.BeanFactoryResolver;

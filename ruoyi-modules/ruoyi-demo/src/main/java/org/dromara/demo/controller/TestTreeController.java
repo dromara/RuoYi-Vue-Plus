@@ -7,7 +7,7 @@ import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.core.validate.QueryGroup;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.common.excel.utils.ExcelUtil;
-import org.dromara.common.idempotent.annotation.RepeatSubmit;
+import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.demo.domain.bo.TestTreeBo;

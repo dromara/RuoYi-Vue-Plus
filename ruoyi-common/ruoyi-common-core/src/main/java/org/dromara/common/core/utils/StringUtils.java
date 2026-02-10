@@ -334,7 +334,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     public static boolean startWithAnyIgnoreCase(CharSequence str, CharSequence... prefixs) {
         // 判断是否是以指定字符串开头
         for (CharSequence prefix : prefixs) {
-            if (StringUtils.startsWithIgnoreCase(str, prefix)) {
+            if (Strings.CI.startsWith(str, prefix)) {
                 return true;
             }
         }
@@ -425,5 +425,28 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     public static boolean equalsIgnoreCase(final CharSequence cs1, final CharSequence cs2) {
         return Strings.CI.equals(cs1, cs2);
     }
+
+    /**
+     * 检查指定的字符序列中是否包含另一个字符序列。
+     *
+     * @param seq       要检查的字符序列，不能为null
+     * @param searchSeq 要搜索的字符序列，不能为null
+     * @return 如果seq中包含searchSeq，则返回true；否则返回false
+     */
+    public static boolean contains(final CharSequence seq, final CharSequence searchSeq) {
+        return Strings.CS.contains(seq, searchSeq);
+    }
+
+    /**
+     * 移除字符串中的指定字符序列。
+     *
+     * @param str       要处理的字符串，不能为null
+     * @param remove    要移除的字符序列，不能为null
+     * @return 处理后的字符串
+     */
+    public static String remove(final String str, final String remove) {
+        return Strings.CS.remove(str, remove);
+    }
+
 
 }

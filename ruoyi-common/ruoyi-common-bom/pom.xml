@@ -40,13 +40,6 @@
                 <version>${revision}</version>
             </dependency>
 
-            <!-- 幂等 -->
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>ruoyi-common-idempotent</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
             <!-- 调度模块 -->
             <dependency>
                 <groupId>org.dromara</groupId>
@@ -79,13 +72,6 @@
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-common-oss</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <!-- 限流 -->
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>ruoyi-common-ratelimiter</artifactId>
                 <version>${revision}</version>
             </dependency>
 
