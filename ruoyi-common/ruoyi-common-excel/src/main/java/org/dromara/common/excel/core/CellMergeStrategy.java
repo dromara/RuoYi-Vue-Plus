@@ -1,12 +1,12 @@
 package org.dromara.common.excel.core;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.idev.excel.metadata.Head;
-import cn.idev.excel.write.handler.SheetWriteHandler;
-import cn.idev.excel.write.merge.AbstractMergeStrategy;
-import cn.idev.excel.write.metadata.holder.WriteSheetHolder;
-import cn.idev.excel.write.metadata.holder.WriteWorkbookHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.fesod.sheet.metadata.Head;
+import org.apache.fesod.sheet.write.handler.SheetWriteHandler;
+import org.apache.fesod.sheet.write.merge.AbstractMergeStrategy;
+import org.apache.fesod.sheet.write.metadata.holder.WriteSheetHolder;
+import org.apache.fesod.sheet.write.metadata.holder.WriteWorkbookHolder;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;

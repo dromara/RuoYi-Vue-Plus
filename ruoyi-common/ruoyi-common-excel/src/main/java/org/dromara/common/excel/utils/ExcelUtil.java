@@ -3,13 +3,13 @@ package org.dromara.common.excel.utils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.IdUtil;
-import cn.idev.excel.FastExcel;
-import cn.idev.excel.ExcelWriter;
-import cn.idev.excel.write.builder.ExcelWriterSheetBuilder;
-import cn.idev.excel.write.metadata.WriteSheet;
-import cn.idev.excel.write.metadata.fill.FillConfig;
-import cn.idev.excel.write.metadata.fill.FillWrapper;
-import cn.idev.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
+import org.apache.fesod.sheet.FesodSheet;
+import org.apache.fesod.sheet.ExcelWriter;
+import org.apache.fesod.sheet.write.builder.ExcelWriterSheetBuilder;
+import org.apache.fesod.sheet.write.metadata.WriteSheet;
+import org.apache.fesod.sheet.write.metadata.fill.FillConfig;
+import org.apache.fesod.sheet.write.metadata.fill.FillWrapper;
+import org.apache.fesod.sheet.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -44,7 +44,7 @@ public class ExcelUtil {
      * @return 转换后集合
      */
     public static <T> List<T> importExcel(InputStream is, Class<T> clazz) {
-        return FastExcel.read(is).head(clazz).autoCloseStream(false).sheet().doReadSync();
+        return FesodSheet.read(is).head(clazz).autoCloseStream(false).sheet().doReadSync();
     }
 
 
@@ -58,7 +58,7 @@ public class ExcelUtil {
      */
     public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, boolean isValidate) {
         DefaultExcelListener<T> listener = new DefaultExcelListener<>(isValidate);
-        FastExcel.read(is, clazz, listener).sheet().doRead();
+        FesodSheet.read(is, clazz, listener).sheet().doRead();
         return listener.getExcelResult();
     }
 
@@ -71,7 +71,7 @@ public class ExcelUtil {
      * @return 转换后集合
      */
     public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, ExcelListener<T> listener) {
-        FastExcel.read(is, clazz, listener).sheet().doRead();
+        FesodSheet.read(is, clazz, listener).sheet().doRead();
         return listener.getExcelResult();
     }
 
@@ -187,7 +187,7 @@ public class ExcelUtil {
      */
     public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge,
                                        OutputStream os, List<DropDownOptions> options) {
-        ExcelWriterSheetBuilder builder = FastExcel.write(os, clazz)
+        ExcelWriterSheetBuilder builder = FesodSheet.write(os, clazz)
             .autoCloseStream(false)
             // 自动适配
             .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
@@ -213,7 +213,7 @@ public class ExcelUtil {
      * @param consumer 导出助手消费函数
      */
     public static <T> void exportExcel(Class<T> headType, OutputStream os, List<DropDownOptions> options, Consumer<ExcelWriterWrapper<T>> consumer) {
-        try (ExcelWriter writer = FastExcel.write(os, headType)
+        try (ExcelWriter writer = FesodSheet.write(os, headType)
             .autoCloseStream(false)
             // 自动适配
             .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
@@ -276,14 +276,14 @@ public class ExcelUtil {
      */
     public static <T> void exportTemplate(List<T> data, String templatePath, OutputStream os) {
         ClassPathResource templateResource = new ClassPathResource(templatePath);
-        ExcelWriter excelWriter = FastExcel.write(os)
+        ExcelWriter excelWriter = FesodSheet.write(os)
             .withTemplate(templateResource.getStream())
             .autoCloseStream(false)
             // 大数值自动转换 防止失真
             .registerConverter(new ExcelBigNumberConvert())
-            .registerWriteHandler(new DataWriteHandler(data.get(0).getClass()))
+            .registerWriteHandler(new DataWriteHandler(data.getFirst().getClass()))
             .build();
-        WriteSheet writeSheet = FastExcel.writerSheet().build();
+        WriteSheet writeSheet = FesodSheet.writerSheet().build();
         FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
         // 单表多数据导出 模板格式为 {.属性}
         for (T d : data) {
@@ -349,13 +349,13 @@ public class ExcelUtil {
      */
     public static void exportTemplateMultiList(Map<String, Object> data, String templatePath, OutputStream os) {
         ClassPathResource templateResource = new ClassPathResource(templatePath);
-        ExcelWriter excelWriter = FastExcel.write(os)
+        ExcelWriter excelWriter = FesodSheet.write(os)
             .withTemplate(templateResource.getStream())
             .autoCloseStream(false)
             // 大数值自动转换 防止失真
             .registerConverter(new ExcelBigNumberConvert())
             .build();
-        WriteSheet writeSheet = FastExcel.writerSheet().build();
+        WriteSheet writeSheet = FesodSheet.writerSheet().build();
         for (Map.Entry<String, Object> map : data.entrySet()) {
             // 设置列表后续还有数据
             FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
@@ -380,14 +380,14 @@ public class ExcelUtil {
      */
     public static void exportTemplateMultiSheet(List<Map<String, Object>> data, String templatePath, OutputStream os) {
         ClassPathResource templateResource = new ClassPathResource(templatePath);
-        ExcelWriter excelWriter = FastExcel.write(os)
+        ExcelWriter excelWriter = FesodSheet.write(os)
             .withTemplate(templateResource.getStream())
             .autoCloseStream(false)
             // 大数值自动转换 防止失真
             .registerConverter(new ExcelBigNumberConvert())
             .build();
         for (int i = 0; i < data.size(); i++) {
-            WriteSheet writeSheet = FastExcel.writerSheet(i).build();
+            WriteSheet writeSheet = FesodSheet.writerSheet(i).build();
             for (Map.Entry<String, Object> map : data.get(i).entrySet()) {
                 // 设置列表后续还有数据
                 FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
@@ -427,7 +427,7 @@ public class ExcelUtil {
             if (StringUtils.containsAny(propertyValue, separator)) {
                 for (String value : propertyValue.split(separator)) {
                     if (itemArray[0].equals(value)) {
-                        propertyString.append(itemArray[1] + separator);
+                        propertyString.append(itemArray[1]).append(separator);
                         break;
                     }
                 }
@@ -456,7 +456,7 @@ public class ExcelUtil {
             if (StringUtils.containsAny(propertyValue, separator)) {
                 for (String value : propertyValue.split(separator)) {
                     if (itemArray[1].equals(value)) {
-                        propertyString.append(itemArray[0] + separator);
+                        propertyString.append(itemArray[0]).append(separator);
                         break;
                     }
                 }
