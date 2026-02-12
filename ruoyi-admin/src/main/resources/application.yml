@@ -271,7 +271,7 @@ mqtt.client:
   # 开启保留 session 时，session 的有效期
   session-expiry-interval-secs: 0
   # 工作线程数，如果消息量比较大，例如做 emqx 的转发消息处理，可以调大此参数
-  biz-thread-pool-size: 2
+  mqtt-executor-size: 2
   # 是否开启 ssl
   ssl:
     enabled: false
