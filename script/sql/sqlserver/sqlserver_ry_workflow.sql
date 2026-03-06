@@ -1579,7 +1579,7 @@ INSERT sys_menu VALUES (11622, N'流程分类', 11616, 1, N'category', N'workflo
 GO
 INSERT sys_menu VALUES (11629, N'我发起的', 11618, 1, N'myDocument', N'workflow/task/myDocument', N'', 1, 1, N'C', N'0', N'0', N'', N'guide', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11630, N'流程监控', 11616, 4, N'monitor', NULL, N'', 1, 0, N'M', N'0', N'0', N'', N'monitor', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11630, N'流程监控', 11616, 4, N'processMonitor', NULL, N'', 1, 0, N'M', N'0', N'0', N'', N'monitor', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
 INSERT sys_menu VALUES (11631, N'待办任务', 11630, 2, N'allTaskWaiting', N'workflow/task/allTaskWaiting', N'', 1, 1, N'C', N'0', N'0', N'', N'waiting', 103, 1, GETDATE(), NULL, NULL, N'');
 GO

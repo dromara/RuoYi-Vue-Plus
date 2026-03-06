@@ -57,7 +57,7 @@ public class LoginHelper {
     /**
      * 获取用户(多级缓存)
      */
-    @SuppressWarnings("unchecked cast")
+    @SuppressWarnings("unchecked")
     public static <T extends LoginUser> T getLoginUser() {
         SaSession session = StpUtil.getTokenSession();
         if (ObjectUtil.isNull(session)) {
@@ -69,7 +69,7 @@ public class LoginHelper {
     /**
      * 获取用户基于token
      */
-    @SuppressWarnings("unchecked cast")
+    @SuppressWarnings("unchecked")
     public static <T extends LoginUser> T getLoginUser(String token) {
         SaSession session = StpUtil.getTokenSessionByToken(token);
         if (ObjectUtil.isNull(session)) {
