@@ -24,16 +24,32 @@
             <artifactId>ruoyi-common-redis</artifactId>
         </dependency>
 
+        <!-- spring-webmvc 依赖 -->
+        <!--
+            Sa-Token 1.45.0 的pom依赖项发生了变动，此处需要自行引入所需的依赖项。
+            本着最小依赖的原则，此处仅引入 spring-webmvc 的依赖，如果还是无法启动，请更改为 spring-boot-starter-web (Sa-Token 1.44.0版本中的依赖项)
+        -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
         <!-- Sa-Token 权限认证, 在线文档：http://sa-token.dev33.cn/ -->
         <dependency>
             <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-spring-boot3-starter</artifactId>
+            <artifactId>sa-token-spring-boot4-starter</artifactId>
         </dependency>
 
         <!-- Sa-Token 整合 jwt -->
         <dependency>
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-jwt</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>cn.hutool</groupId>
+                    <artifactId>hutool-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

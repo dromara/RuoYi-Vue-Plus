@@ -19,16 +19,16 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
         <mybatis.version>3.5.19</mybatis.version>
-        <springdoc.version>3.0.1</springdoc.version>
+        <springdoc.version>3.0.2</springdoc.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
         <fesod.version>2.0.1-incubating</fesod.version>
         <velocity.version>2.3</velocity.version>
-        <satoken.version>1.44.0</satoken.version>
+        <satoken.version>1.45.0</satoken.version>
         <mybatis-plus.version>3.5.16</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.43</hutool.version>
-        <spring-boot-admin.version>4.0.1</spring-boot-admin.version>
-        <redisson.version>4.2.0</redisson.version>
+        <spring-boot-admin.version>4.0.2</spring-boot-admin.version>
+        <redisson.version>4.3.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.5.0</dynamic-ds.version>
         <snailjob.version>1.9.0</snailjob.version>
@@ -38,15 +38,15 @@
         <bouncycastle.version>1.83</bouncycastle.version>
         <justauth.version>1.16.7</justauth.version>
         <!-- 离线IP地址定位库 -->
-        <ip2region.version>3.3.4</ip2region.version>
+        <ip2region.version>3.3.6</ip2region.version>
         <!-- OSS 配置 -->
-        <aws.sdk.version>2.41.34</aws.sdk.version>
+        <aws.sdk.version>2.42.9</aws.sdk.version>
         <!-- SMS 配置 -->
         <sms4j.version>3.3.5</sms4j.version>
         <!-- 限制框架中的fastjson版本 -->
         <fastjson.version>1.2.83</fastjson.version>
         <!-- 面向运行时的D-ORM依赖 -->
-        <anyline.version>8.7.3-20260202</anyline.version>
+        <anyline.version>8.7.3-20260306</anyline.version>
         <!-- 工作流配置 -->
         <warm-flow.version>1.8.4</warm-flow.version>
         <!-- mqtt客户端 -->
@@ -56,7 +56,7 @@
         <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
         <maven-war-plugin.version>3.5.1</maven-war-plugin.version>
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
         <!-- 统一版本号管理：Maven3.X需要，Maven4.0之后已原生支持 -->
         <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
         <!-- 打包默认跳过测试 -->
@@ -121,6 +121,16 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- sa-token-bom 依赖 -->
+            <!-- Sa-Token 权限认证, 在线文档：http://sa-token.dev33.cn/ -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-bom</artifactId>
+                <version>${satoken.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- common 的依赖配置-->
             <dependency>
                 <groupId>org.dromara</groupId>
@@ -160,30 +170,6 @@
                 <groupId>org.apache.velocity</groupId>
                 <artifactId>velocity-engine-core</artifactId>
                 <version>${velocity.version}</version>
-            </dependency>
-
-            <!-- Sa-Token 权限认证, 在线文档：http://sa-token.dev33.cn/ -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-boot3-starter</artifactId>
-                <version>${satoken.version}</version>
-            </dependency>
-            <!-- Sa-Token 整合 jwt -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-jwt</artifactId>
-                <version>${satoken.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>cn.hutool</groupId>
-                        <artifactId>hutool-all</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-core</artifactId>
-                <version>${satoken.version}</version>
             </dependency>
 
             <!-- dynamic-datasource 多数据源-->
