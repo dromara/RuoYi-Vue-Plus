@@ -22,6 +22,7 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
+import org.dromara.common.mybatis.core.domain.DataPermissionAccess;
 import org.dromara.common.mybatis.enums.DataScopeType;
 import org.dromara.common.mybatis.helper.DataPermissionHelper;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -110,7 +111,7 @@ public class PlusDataPermissionHandler {
         context.setBeanResolver(beanResolver);
         DataPermissionHelper.getContext().forEach(context::setVariable);
         Set<String> conditions = new HashSet<>();
-        RequestAccess access = currentAccess();
+        DataPermissionAccess access = currentAccess();
         List<RoleDTO> scopeRoles = scopeRoles(user, access);
         if (CollUtil.isEmpty(scopeRoles)) {
             if (access.constrained()) {
@@ -182,29 +183,17 @@ public class PlusDataPermissionHandler {
         return currentUser;
     }
 
-    private RequestAccess currentAccess() {
-        HttpServletRequest request = ServletUtils.getRequest();
-        if (request == null) {
-            return RequestAccess.EMPTY;
+    private DataPermissionAccess currentAccess() {
+        DataPermissionAccess access = DataPermissionHelper.getAccess();
+        if (access != null) {
+            return access;
         }
-        Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
-        if (!(handler instanceof HandlerMethod handlerMethod)) {
-            return RequestAccess.EMPTY;
-        }
-        SaCheckPermission saCheckPermission = findAnnotation(handlerMethod, SaCheckPermission.class);
-        SaCheckRole saCheckRole = findAnnotation(handlerMethod, SaCheckRole.class);
-        Set<String> perms = saCheckPermission == null ? Set.of() : toSet(saCheckPermission.value());
-        Set<String> roleKeys = new LinkedHashSet<>();
-        if (saCheckPermission != null) {
-            roleKeys.addAll(toSet(saCheckPermission.orRole()));
-        }
-        if (saCheckRole != null) {
-            roleKeys.addAll(toSet(saCheckRole.value()));
-        }
-        return new RequestAccess(perms, roleKeys);
+        DataPermissionAccess resolvedAccess = resolveAccess();
+        DataPermissionHelper.setAccess(resolvedAccess);
+        return resolvedAccess;
     }
 
-    private List<RoleDTO> scopeRoles(LoginUser user, RequestAccess access) {
+    private List<RoleDTO> scopeRoles(LoginUser user, DataPermissionAccess access) {
         List<RoleDTO> roles = user.getRoles();
         if (!access.constrained()) {
             return roles;
@@ -212,20 +201,46 @@ public class PlusDataPermissionHandler {
         Map<Long, RoleDTO> roleMap = new LinkedHashMap<>();
         Map<String, List<RoleDTO>> dataScopeRoleMap = user.getDataScopeRoleMap();
         if (CollUtil.isNotEmpty(dataScopeRoleMap)) {
-            access.perms.forEach(perm -> {
+            access.perms().forEach(perm -> {
                 List<RoleDTO> roleList = dataScopeRoleMap.get(perm);
                 if (CollUtil.isNotEmpty(roleList)) {
                     roleList.forEach(role -> roleMap.putIfAbsent(role.getRoleId(), role));
                 }
             });
         }
-        if (CollUtil.isNotEmpty(roles) && CollUtil.isNotEmpty(access.roleKeys)) {
+        if (CollUtil.isNotEmpty(roles) && CollUtil.isNotEmpty(access.roleKeys())) {
             roles.stream()
                 .filter(role -> StringUtils.isNotBlank(role.getRoleKey()))
-                .filter(role -> StringUtils.splitList(role.getRoleKey()).stream().anyMatch(access.roleKeys::contains))
+                .filter(role -> StringUtils.splitList(role.getRoleKey()).stream().anyMatch(access.roleKeys()::contains))
                 .forEach(role -> roleMap.putIfAbsent(role.getRoleId(), role));
         }
         return new ArrayList<>(roleMap.values());
+    }
+
+    private DataPermissionAccess resolveAccess() {
+        HttpServletRequest request = ServletUtils.getRequest();
+        if (request == null) {
+            return DataPermissionAccess.EMPTY;
+        }
+        Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
+        if (!(handler instanceof HandlerMethod handlerMethod)) {
+            return DataPermissionAccess.EMPTY;
+        }
+        Set<String> perms = new LinkedHashSet<>();
+        Set<String> roleKeys = new LinkedHashSet<>();
+        SaCheckPermission saCheckPermission = findAnnotation(handlerMethod, SaCheckPermission.class);
+        if (saCheckPermission != null) {
+            perms.addAll(toSet(saCheckPermission.value()));
+            roleKeys.addAll(toSet(saCheckPermission.orRole()));
+        }
+        SaCheckRole saCheckRole = findAnnotation(handlerMethod, SaCheckRole.class);
+        if (saCheckRole != null) {
+            roleKeys.addAll(toSet(saCheckRole.value()));
+        }
+        if (perms.isEmpty() && roleKeys.isEmpty()) {
+            return DataPermissionAccess.EMPTY;
+        }
+        return new DataPermissionAccess(Set.copyOf(perms), Set.copyOf(roleKeys));
     }
 
     private <A extends Annotation> A findAnnotation(HandlerMethod handlerMethod, Class<A> annotationType) {
@@ -320,15 +335,6 @@ public class PlusDataPermissionHandler {
         @Override
         public void write(EvaluationContext context, Object target, String name, Object newValue) throws AccessException {
             delegate.write(context, target, name, newValue);
-        }
-    }
-
-    private record RequestAccess(Set<String> perms, Set<String> roleKeys) {
-
-        private static final RequestAccess EMPTY = new RequestAccess(Set.of(), Set.of());
-
-        private boolean constrained() {
-            return CollUtil.isNotEmpty(perms) || CollUtil.isNotEmpty(roleKeys);
         }
     }
 
