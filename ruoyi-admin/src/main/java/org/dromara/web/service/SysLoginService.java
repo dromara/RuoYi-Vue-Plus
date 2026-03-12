@@ -157,7 +157,9 @@ public class SysLoginService {
             loginUser.setRolePermission(permissionService.getRolePermission(userId));
         }, () -> {
             List<SysRoleVo> roles = roleService.selectRolesByUserId(userId);
-            loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
+            List<RoleDTO> roleDtos = BeanUtil.copyToList(roles, RoleDTO.class);
+            loginUser.setRoles(roleDtos);
+            loginUser.setDataScopeRoleMap(permissionService.getDataScopeRoleMap(roleDtos));
         }, () -> {
             List<SysPostVo> posts = postService.selectPostsByUserId(userId);
             loginUser.setPosts(BeanUtil.copyToList(posts, PostDTO.class));

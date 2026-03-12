@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -103,6 +104,17 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public Set<String> selectMenuPermsByRoleId(Long roleId) {
         return baseMapper.selectMenuPermsByRoleId(roleId);
+    }
+
+    /**
+     * 根据角色ID列表批量查询权限
+     *
+     * @param roleIds 角色ID列表
+     * @return 角色权限映射
+     */
+    @Override
+    public Map<Long, Set<String>> selectMenuPermsByRoleIds(List<Long> roleIds) {
+        return baseMapper.selectMenuPermsByRoleIds(roleIds);
     }
 
     /**

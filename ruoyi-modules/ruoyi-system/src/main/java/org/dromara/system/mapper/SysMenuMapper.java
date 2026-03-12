@@ -1,5 +1,6 @@
 package org.dromara.system.mapper;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.StreamUtils;
@@ -8,9 +9,7 @@ import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.SysMenu;
 import org.dromara.system.domain.vo.SysMenuVo;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 菜单表 数据层
@@ -109,6 +108,21 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
                 .isNotNull(SysMenu::getPerms)
         );
         return new HashSet<>(StreamUtils.filter(list, StringUtils::isNotBlank));
+    }
+
+    /**
+     * 根据角色ID列表批量查询权限
+     *
+     * @param roleIds 角色ID列表
+     * @return 角色权限映射
+     */
+    default Map<Long, Set<String>> selectMenuPermsByRoleIds(List<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return Map.of();
+        }
+        Map<Long, Set<String>> result = new LinkedHashMap<>();
+        roleIds.forEach(roleId -> result.put(roleId, this.selectMenuPermsByRoleId(roleId)));
+        return result;
     }
 
     /**

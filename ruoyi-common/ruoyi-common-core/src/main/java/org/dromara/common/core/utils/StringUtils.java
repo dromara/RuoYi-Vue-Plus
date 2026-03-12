@@ -449,4 +449,15 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
 
+    /**
+     * 检查字符串是否包含任意一个指定的字符序列
+     *
+     * @param cs                  要检查的字符串
+     * @param searchCharSequences 需要查找的字符序列数组
+     * @return 如果包含任意一个字符序列返回 true，否则返回 false
+     */
+    public static boolean containsAny(final CharSequence cs, final CharSequence... searchCharSequences) {
+        return Strings.CS.containsAny(cs, searchCharSequences);
+    }
+
 }

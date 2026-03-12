@@ -124,7 +124,11 @@ public class SysRoleController extends BaseController {
     public R<Void> dataScope(@RequestBody SysRoleBo role) {
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
-        return toAjax(roleService.authDataScope(role));
+        if (roleService.authDataScope(role) > 0) {
+            roleService.cleanOnlineUserByRole(role.getRoleId());
+            return R.ok();
+        }
+        return R.fail("修改角色'" + role.getRoleName() + "'数据权限失败，请联系管理员");
     }
 
     /**
@@ -137,7 +141,11 @@ public class SysRoleController extends BaseController {
     public R<Void> changeStatus(@RequestBody SysRoleBo role) {
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
-        return toAjax(roleService.updateRoleStatus(role.getRoleId(), role.getStatus()));
+        if (roleService.updateRoleStatus(role.getRoleId(), role.getStatus()) > 0) {
+            roleService.cleanOnlineUserByRole(role.getRoleId());
+            return R.ok();
+        }
+        return R.fail("修改角色'" + role.getRoleName() + "'状态失败，请联系管理员");
     }
 
     /**

@@ -6,6 +6,7 @@ import org.dromara.system.domain.bo.SysMenuBo;
 import org.dromara.system.domain.vo.RouterVo;
 import org.dromara.system.domain.vo.SysMenuVo;
 
+import java.util.Map;
 import java.util.List;
 import java.util.Set;
 
@@ -48,6 +49,14 @@ public interface ISysMenuService {
      * @return 权限列表
      */
     Set<String> selectMenuPermsByRoleId(Long roleId);
+
+    /**
+     * 根据角色ID列表批量查询权限
+     *
+     * @param roleIds 角色ID列表
+     * @return 角色权限映射
+     */
+    Map<Long, Set<String>> selectMenuPermsByRoleIds(List<Long> roleIds);
 
     /**
      * 根据用户ID查询菜单树信息

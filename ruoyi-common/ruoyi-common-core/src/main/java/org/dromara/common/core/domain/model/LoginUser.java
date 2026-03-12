@@ -8,6 +8,7 @@ import org.dromara.common.core.domain.dto.RoleDTO;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -106,6 +107,11 @@ public class LoginUser implements Serializable {
      * 角色对象
      */
     private List<RoleDTO> roles;
+
+    /**
+     * 数据权限角色映射 key 为权限码 value 为可参与数据权限计算的角色
+     */
+    private Map<String, List<RoleDTO>> dataScopeRoleMap;
 
     /**
      * 岗位对象
