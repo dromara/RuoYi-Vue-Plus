@@ -29,7 +29,18 @@ public class TranslationHandler extends ValueSerializer<Object> {
      */
     public static final Map<String, TranslationInterface<?>> TRANSLATION_MAPPER = new ConcurrentHashMap<>();
 
-    private Translation translation;
+    private final Translation translation;
+
+    /**
+     * 提供给 jackson 创建上下文序列化器时使用 不然会报错
+     */
+    public TranslationHandler() {
+        this.translation = null;
+    }
+
+    public TranslationHandler(Translation translation) {
+        this.translation = translation;
+    }
 
     @Override
     public void serialize(Object value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
@@ -61,8 +72,7 @@ public class TranslationHandler extends ValueSerializer<Object> {
     public ValueSerializer<?> createContextual(SerializationContext ctxt, BeanProperty property) {
         Translation translation = property.getAnnotation(Translation.class);
         if (Objects.nonNull(translation)) {
-            this.translation = translation;
-            return this;
+            return new TranslationHandler(translation);
         }
         return super.createContextual(ctxt, property);
     }

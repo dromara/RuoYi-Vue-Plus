@@ -13,7 +13,7 @@ public interface TransConstant {
     String USER_ID_TO_NAME = "user_id_to_name";
 
     /**
-     * 用户id转用户名称
+     * 用户id转用户昵称
      */
     String USER_ID_TO_NICKNAME = "user_id_to_nickname";
 

@@ -229,6 +229,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public String getDictLabel(String dictType, String dictValue, String separator) {
         List<SysDictDataVo> datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+        if (CollUtil.isEmpty(datas)) {
+            return StringUtils.EMPTY;
+        }
         Map<String, String> map = StreamUtils.toMap(datas, SysDictDataVo::getDictValue, SysDictDataVo::getDictLabel);
         if (StringUtils.containsAny(dictValue, separator)) {
             return Arrays.stream(dictValue.split(separator))
@@ -250,6 +253,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public String getDictValue(String dictType, String dictLabel, String separator) {
         List<SysDictDataVo> datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+        if (CollUtil.isEmpty(datas)) {
+            return StringUtils.EMPTY;
+        }
         Map<String, String> map = StreamUtils.toMap(datas, SysDictDataVo::getDictLabel, SysDictDataVo::getDictValue);
         if (StringUtils.containsAny(dictLabel, separator)) {
             return Arrays.stream(dictLabel.split(separator))
@@ -269,6 +275,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public Map<String, String> getAllDictByDictType(String dictType) {
         List<SysDictDataVo> list = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+        if (CollUtil.isEmpty(list)) {
+            return new HashMap<>();
+        }
         // 保证顺序
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         for (SysDictDataVo vo : list) {
@@ -286,6 +295,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public DictTypeDTO getDictType(String dictType) {
         SysDictTypeVo vo = SpringUtils.getAopProxy(this).selectDictTypeByType(dictType);
+        if (ObjectUtil.isNull(vo)) {
+            return null;
+        }
         return BeanUtil.toBean(vo, DictTypeDTO.class);
     }
 
@@ -298,6 +310,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public List<DictDataDTO> getDictData(String dictType) {
         List<SysDictDataVo> list = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+        if (CollUtil.isEmpty(list)) {
+            return new ArrayList<>();
+        }
         return BeanUtil.copyToList(list, DictDataDTO.class);
     }
 

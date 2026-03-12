@@ -111,8 +111,14 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     public FlowInstanceVo queryByBusinessId(Long businessId) {
         FlowInstance instance = this.selectInstByBusinessId(Convert.toStr(businessId));
+        if (ObjectUtil.isNull(instance)) {
+            throw new ServiceException(ExceptionCons.NOT_FOUNT_INSTANCE);
+        }
         FlowInstanceVo instanceVo = BeanUtil.toBean(instance, FlowInstanceVo.class);
         Definition definition = defService.getById(instanceVo.getDefinitionId());
+        if (ObjectUtil.isNull(definition)) {
+            throw new ServiceException(ExceptionCons.NOT_FOUNT_DEF);
+        }
         instanceVo.setFlowName(definition.getFlowName());
         instanceVo.setFlowCode(definition.getFlowCode());
         instanceVo.setVersion(definition.getVersion());
@@ -383,6 +389,9 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     public Map<String, Object> instanceVariable(Long instanceId) {
         FlowInstance flowInstance = flowInstanceMapper.selectById(instanceId);
+        if (ObjectUtil.isNull(flowInstance)) {
+            throw new ServiceException(ExceptionCons.NOT_FOUNT_INSTANCE);
+        }
         Map<String, Object> variableMap = Optional.ofNullable(flowInstance.getVariableMap()).orElse(Collections.emptyMap());
         List<Map<String, Object>> variableList = variableMap.entrySet().stream()
             .map(entry -> Map.of("key", entry.getKey(), "value", entry.getValue()))

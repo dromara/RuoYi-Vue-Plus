@@ -6,10 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
-import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Intercepts;
-import org.apache.ibatis.plugin.Invocation;
-import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.plugin.*;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.encrypt.annotation.EncryptField;
 import org.dromara.common.encrypt.core.EncryptContext;
@@ -42,19 +39,19 @@ public class MybatisEncryptInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        return invocation;
-    }
-
-    @Override
-    public Object plugin(Object target) {
+        Object target = invocation.getTarget();
         if (target instanceof ParameterHandler parameterHandler) {
-            // 进行加密操作
             Object parameterObject = parameterHandler.getParameterObject();
             if (ObjectUtil.isNotNull(parameterObject) && !(parameterObject instanceof String)) {
                 this.encryptHandler(parameterObject);
             }
         }
-        return target;
+        return invocation.proceed();
+    }
+
+    @Override
+    public Object plugin(Object target) {
+        return Plugin.wrap(target, this);
     }
 
     /**

@@ -21,7 +21,7 @@ public class SysUserOnline {
     private String deptName;
 
     /**
-     * 用户名称
+     * 用户账号
      */
     private String userName;
 

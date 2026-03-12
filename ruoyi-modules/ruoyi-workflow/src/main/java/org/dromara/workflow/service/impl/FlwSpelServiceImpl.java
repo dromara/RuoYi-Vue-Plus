@@ -1,6 +1,7 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.dto.TaskAssigneeDTO;
 import org.dromara.common.core.domain.model.TaskAssigneeBody;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -125,7 +127,14 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(FlowSpel entity){
-        //TODO 做一些数据校验,如唯一约束
+        if (StringUtils.isNotBlank(entity.getViewSpel())) {
+            boolean exists = baseMapper.exists(new LambdaQueryWrapper<FlowSpel>()
+                .eq(FlowSpel::getViewSpel, entity.getViewSpel())
+                .ne(ObjectUtil.isNotNull(entity.getId()), FlowSpel::getId, entity.getId()));
+            if (exists) {
+                throw new ServiceException("SpEL表达式已存在，请勿重复添加");
+            }
+        }
     }
 
     /**
@@ -137,7 +146,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
+        if (isValid){
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return baseMapper.deleteByIds(ids) > 0;

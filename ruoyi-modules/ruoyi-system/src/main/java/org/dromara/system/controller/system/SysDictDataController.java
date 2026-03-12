@@ -83,7 +83,7 @@ public class SysDictDataController extends BaseController {
     }
 
     /**
-     * 新增字典类型
+     * 新增字典数据
      */
     @SaCheckPermission("system:dict:add")
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
@@ -98,7 +98,7 @@ public class SysDictDataController extends BaseController {
     }
 
     /**
-     * 修改保存字典类型
+     * 修改保存字典数据
      */
     @SaCheckPermission("system:dict:edit")
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
@@ -113,12 +113,12 @@ public class SysDictDataController extends BaseController {
     }
 
     /**
-     * 删除字典类型
+     * 删除字典数据
      *
      * @param dictCodes 字典code串
      */
     @SaCheckPermission("system:dict:remove")
-    @Log(title = "字典类型", businessType = BusinessType.DELETE)
+    @Log(title = "字典数据", businessType = BusinessType.DELETE)
     @DeleteMapping("/{dictCodes}")
     public R<Void> remove(@PathVariable Long[] dictCodes) {
         dictDataService.deleteDictDataByIds(Arrays.asList(dictCodes));
