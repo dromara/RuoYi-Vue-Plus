@@ -119,6 +119,12 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         return StringUtils.joinComma(list);
     }
 
+    /**
+     * 根据逗号分隔的文件主键列表查询文件传输对象集合。
+     *
+     * @param ossIds 逗号分隔的文件主键字符串
+     * @return 文件传输对象列表
+     */
     @Override
     public List<OssDTO> selectByIds(String ossIds) {
         List<OssDTO> list = new ArrayList<>();
@@ -137,6 +143,12 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         return list;
     }
 
+    /**
+     * 构造 OSS 文件列表查询条件。
+     *
+     * @param bo 文件筛选条件
+     * @return 包含文件名、后缀、归属服务和创建时间区间的查询包装器
+     */
     private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysOss> lqw = Wrappers.lambdaQuery();
@@ -233,6 +245,16 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         return buildResultEntity(originalfileName, suffix, storage.getConfigKey(), uploadResult, ext1);
     }
 
+    /**
+     * 组装上传结果并持久化文件元数据。
+     *
+     * @param originalfileName 原始文件名
+     * @param suffix           文件后缀
+     * @param configKey        存储配置标识
+     * @param uploadResult     上传结果
+     * @param ext1             扩展属性对象
+     * @return 持久化后的文件信息视图
+     */
     @NotNull
     private SysOssVo buildResultEntity(String originalfileName, String suffix, String configKey, UploadResult uploadResult, SysOssExt ext1) {
         SysOss oss = new SysOss();

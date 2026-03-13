@@ -10,6 +10,12 @@ import java.io.IOException;
 @FunctionalInterface
 public interface WriteOutSubscriber<T> {
 
+    /**
+     * 将订阅到的数据写出到目标对象。
+     *
+     * @param out 写出目标
+     * @throws IOException 写出异常
+     */
     void writeTo(T out) throws IOException;
 
 }

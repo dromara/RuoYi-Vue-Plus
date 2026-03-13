@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 流程spel表达式定义
+ * 流程 SpEL 表达式定义控制器，负责表达式规则的增删改查。
  *
  * @author Michelle.Chung
  * @date 2025-07-04
@@ -38,7 +38,11 @@ public class FlwSpelController extends BaseController {
     private final IFlwSpelService flwSpelService;
 
     /**
-     * 查询流程spel表达式定义列表
+     * 分页查询流程 SpEL 表达式定义列表。
+     *
+     * @param bo 查询条件
+     * @param pageQuery 分页参数
+     * @return 表达式分页数据
      */
     @SaCheckPermission("workflow:spel:list")
     @GetMapping("/list")
@@ -47,9 +51,10 @@ public class FlwSpelController extends BaseController {
     }
 
     /**
-     * 获取流程spel表达式定义详细信息
+     * 获取流程 SpEL 表达式定义详情。
      *
      * @param id 主键
+     * @return 表达式详情
      */
     @SaCheckPermission("workflow:spel:query")
     @GetMapping("/{id}")
@@ -58,7 +63,11 @@ public class FlwSpelController extends BaseController {
     }
 
     /**
-     * 新增流程spel表达式定义
+    /**
+     * 新增流程 SpEL 表达式定义。
+     *
+     * @param bo 表达式信息
+     * @return 操作结果
      */
     @SaCheckPermission("workflow:spel:add")
     @Log(title = "流程spel表达式定义", businessType = BusinessType.INSERT)
@@ -69,7 +78,10 @@ public class FlwSpelController extends BaseController {
     }
 
     /**
-     * 修改流程spel表达式定义
+     * 修改流程 SpEL 表达式定义。
+     *
+     * @param bo 表达式信息
+     * @return 操作结果
      */
     @SaCheckPermission("workflow:spel:edit")
     @Log(title = "流程spel表达式定义", businessType = BusinessType.UPDATE)
@@ -80,9 +92,10 @@ public class FlwSpelController extends BaseController {
     }
 
     /**
-     * 删除流程spel表达式定义
+     * 批量删除流程 SpEL 表达式定义。
      *
      * @param ids 主键串
+     * @return 操作结果
      */
     @SaCheckPermission("workflow:spel:remove")
     @Log(title = "流程spel表达式定义", businessType = BusinessType.DELETE)

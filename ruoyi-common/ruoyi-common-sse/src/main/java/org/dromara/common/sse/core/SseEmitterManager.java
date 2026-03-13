@@ -116,7 +116,7 @@ public class SseEmitterManager {
     }
 
     /**
-     * SSE 心跳检测，关闭无效连接
+     * 执行 SSE 心跳检测并清理失效连接。
      */
     public void sseMonitor() {
         final SseEmitter.SseEventBuilder heartbeat = SseEmitter.event().comment("heartbeat");
@@ -154,7 +154,7 @@ public class SseEmitterManager {
     }
 
     /**
-     * 订阅SSE消息主题，并提供一个消费者函数来处理接收到的消息
+     * 订阅 SSE 广播主题消息。
      *
      * @param consumer 处理SSE消息的消费者函数
      */
@@ -163,7 +163,7 @@ public class SseEmitterManager {
     }
 
     /**
-     * 向指定的用户会话发送消息
+     * 向指定用户的全部本地 SSE 会话发送消息。
      *
      * @param userId  要发送消息的用户id
      * @param message 要发送的消息内容
@@ -189,7 +189,7 @@ public class SseEmitterManager {
     }
 
     /**
-     * 本机全用户会话发送消息
+     * 向当前节点所有 SSE 会话发送消息。
      *
      * @param message 要发送的消息内容
      */
@@ -200,7 +200,7 @@ public class SseEmitterManager {
     }
 
     /**
-     * 发布SSE订阅消息
+     * 发布 SSE 订阅消息。
      *
      * @param sseMessageDTO 要发布的SSE消息对象
      */
@@ -215,7 +215,7 @@ public class SseEmitterManager {
     }
 
     /**
-     * 向所有的用户发布订阅的消息(群发)
+     * 发布 SSE 广播消息。
      *
      * @param message 要发布的消息内容
      */

@@ -38,7 +38,11 @@ public class SysOssConfigController extends BaseController {
     private final ISysOssConfigService ossConfigService;
 
     /**
-     * 查询对象存储配置列表
+     * 分页查询对象存储配置列表。
+     *
+     * @param bo 查询条件
+     * @param pageQuery 分页参数
+     * @return 配置分页数据
      */
     @SaCheckPermission("system:ossConfig:list")
     @GetMapping("/list")
@@ -47,9 +51,10 @@ public class SysOssConfigController extends BaseController {
     }
 
     /**
-     * 获取对象存储配置详细信息
+     * 获取单个对象存储配置详情。
      *
      * @param ossConfigId OSS配置ID
+     * @return 配置详情
      */
     @SaCheckPermission("system:ossConfig:list")
     @GetMapping("/{ossConfigId}")
@@ -59,7 +64,10 @@ public class SysOssConfigController extends BaseController {
     }
 
     /**
-     * 新增对象存储配置
+     * 新增对象存储配置。
+     *
+     * @param bo 配置信息
+     * @return 操作结果
      */
     @SaCheckPermission("system:ossConfig:add")
     @Log(title = "对象存储配置", businessType = BusinessType.INSERT)
@@ -70,7 +78,10 @@ public class SysOssConfigController extends BaseController {
     }
 
     /**
-     * 修改对象存储配置
+     * 修改对象存储配置。
+     *
+     * @param bo 配置信息
+     * @return 操作结果
      */
     @SaCheckPermission("system:ossConfig:edit")
     @Log(title = "对象存储配置", businessType = BusinessType.UPDATE)
@@ -81,9 +92,10 @@ public class SysOssConfigController extends BaseController {
     }
 
     /**
-     * 删除对象存储配置
+     * 批量删除对象存储配置。
      *
      * @param ossConfigIds OSS配置ID串
+     * @return 操作结果
      */
     @SaCheckPermission("system:ossConfig:remove")
     @Log(title = "对象存储配置", businessType = BusinessType.DELETE)
@@ -94,7 +106,10 @@ public class SysOssConfigController extends BaseController {
     }
 
     /**
-     * 状态修改
+     * 切换对象存储配置启用状态，并同步更新当前生效配置。
+     *
+     * @param bo 状态变更信息
+     * @return 操作结果
      */
     @SaCheckPermission("system:ossConfig:edit")
     @Log(title = "对象存储状态修改", businessType = BusinessType.UPDATE)

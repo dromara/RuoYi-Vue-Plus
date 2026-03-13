@@ -8,7 +8,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 撤销任务请求对象
+ * 撤销流程请求对象。
  *
  * @author may
  */

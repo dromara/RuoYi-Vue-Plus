@@ -8,7 +8,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 抄送对象
+ * 流程抄送视图对象。
  *
  * @author AprilWind
  */
@@ -29,6 +29,11 @@ public class FlowCopyVo implements Serializable {
     @Translation(type = TransConstant.USER_ID_TO_NICKNAME, mapper = "userId")
     private String nickName;
 
+    /**
+     * 使用用户 ID 构造抄送对象。
+     *
+     * @param userId 用户ID
+     */
     public FlowCopyVo(Long userId) {
         this.userId = userId;
     }

@@ -26,7 +26,9 @@ public class SseController implements DisposableBean {
     private final SseEmitterManager sseEmitterManager;
 
     /**
-     * 建立 SSE 连接
+     * 建立当前登录用户的 SSE 连接。
+     *
+     * @return SSE 发射器
      */
     @GetMapping(value = "${sse.path}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter connect() {
@@ -39,7 +41,9 @@ public class SseController implements DisposableBean {
     }
 
     /**
-     * 关闭 SSE 连接
+     * 关闭当前登录用户的 SSE 连接。
+     *
+     * @return 操作结果
      */
     @SaIgnore
     @GetMapping(value = "${sse.path}/close")
@@ -78,7 +82,9 @@ public class SseController implements DisposableBean {
 //    }
 
     /**
-     * 清理资源。此方法目前不执行任何操作，但避免因未实现而导致错误
+     * 容器销毁时释放资源占位实现。
+     *
+     * @throws Exception 销毁异常
      */
     @Override
     public void destroy() throws Exception {

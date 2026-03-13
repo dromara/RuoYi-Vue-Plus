@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 
 /**
- * 抄送
+ * 流程抄送请求对象。
  *
  * @author may
  */

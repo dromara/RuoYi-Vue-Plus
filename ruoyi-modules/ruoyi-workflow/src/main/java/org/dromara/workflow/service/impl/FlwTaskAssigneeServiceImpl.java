@@ -119,7 +119,11 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
     }
 
     /**
-     * 根据任务办理类型查询对应的数据
+     * 根据办理人类型查询右侧候选数据。
+     *
+     * @param type 办理人类型
+     * @param taskQuery 查询条件
+     * @return 办理人数据
      */
     private TaskAssigneeDTO fetchTaskAssigneeData(TaskAssigneeEnum type, TaskAssigneeBody taskQuery) {
         return switch (type) {
@@ -132,7 +136,10 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
     }
 
     /**
-     * 根据任务办理类型获取部门数据
+     * 根据办理人类型获取部门树数据源。
+     *
+     * @param type 办理人类型
+     * @return 部门列表
      */
     private List<DeptDTO> fetchDeptData(TaskAssigneeEnum type) {
         if (type.needsDeptService()) {
@@ -159,7 +166,10 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
     }
 
     /**
-     * 构建部门树状结构
+     * 构建设计器左侧部门树。
+     *
+     * @param depts 部门列表
+     * @return 部门树构建器
      */
     private TreeFunDto<DeptDTO> buildDeptTree(List<DeptDTO> depts) {
         return new TreeFunDto<>(depts)
@@ -169,7 +179,11 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
     }
 
     /**
-     * 构建任务办理人数据
+     * 构建设计器右侧办理人列表数据。
+     *
+     * @param dto 办理人数据
+     * @param type 办理人类型
+     * @return 办理人列表构建器
      */
     private HandlerFunDto<TaskAssigneeDTO.TaskHandler> buildHandlerData(TaskAssigneeDTO dto, TaskAssigneeEnum type) {
         return new HandlerFunDto<>(dto.getList(), dto.getTotal())

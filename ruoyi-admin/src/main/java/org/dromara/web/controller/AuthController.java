@@ -47,7 +47,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 认证
+ * 认证控制器，提供登录、注册、社交绑定和退出能力。
  *
  * @author Lion Li
  */
@@ -103,10 +103,10 @@ public class AuthController {
     }
 
     /**
-     * 获取跳转URL
+     * 获取第三方绑定跳转地址。
      *
      * @param source 登录来源
-     * @return 结果
+     * @return 跳转地址
      */
     @GetMapping("/binding/{source}")
     public R<String> authBinding(@PathVariable("source") String source) {
@@ -120,10 +120,10 @@ public class AuthController {
     }
 
     /**
-     * 前端回调绑定授权(需要token)
+     * 处理前端回调后的社交账号绑定。
      *
      * @param loginBody 请求体
-     * @return 结果
+     * @return 操作结果
      */
     @PostMapping("/social/callback")
     public R<Void> socialCallback(@RequestBody SocialLoginBody loginBody) {
@@ -144,9 +144,10 @@ public class AuthController {
 
 
     /**
-     * 取消授权(需要token)
+     * 取消当前用户的社交账号授权。
      *
      * @param socialId socialId
+     * @return 操作结果
      */
     @DeleteMapping(value = "/unlock/{socialId}")
     public R<Void> unlockSocial(@PathVariable Long socialId) {
@@ -167,7 +168,10 @@ public class AuthController {
     }
 
     /**
-     * 用户注册
+     * 用户注册。
+     *
+     * @param user 注册信息
+     * @return 操作结果
      */
     @ApiEncrypt
     @PostMapping("/register")
@@ -180,9 +184,11 @@ public class AuthController {
     }
 
     /**
-     * 登录页面租户下拉框
+     * 获取登录页租户下拉框数据，当前仅预留返回结构。
      *
+     * @param request 当前请求
      * @return 租户列表
+     * @throws Exception 异常
      */
     @RateLimiter(time = 60, count = 20, limitType = LimitType.IP)
     @GetMapping("/tenant/list")

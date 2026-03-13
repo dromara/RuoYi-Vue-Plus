@@ -45,7 +45,9 @@ public class SysProfileController extends BaseController {
     private final ISysOssService ossService;
 
     /**
-     * 个人信息
+     * 获取当前登录用户的个人中心信息。
+     *
+     * @return 用户信息、角色组和岗位组
      */
     @GetMapping
     public R<ProfileVo> profile() {
@@ -59,7 +61,10 @@ public class SysProfileController extends BaseController {
     }
 
     /**
-     * 修改用户信息
+     * 修改当前登录用户的个人资料。
+     *
+     * @param profile 个人资料参数
+     * @return 操作结果
      */
     @RepeatSubmit
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
@@ -85,6 +90,7 @@ public class SysProfileController extends BaseController {
      * 重置密码
      *
      * @param bo 新旧密码
+     * @return 操作结果
      */
     @RepeatSubmit
     @ApiEncrypt
@@ -110,6 +116,7 @@ public class SysProfileController extends BaseController {
      * 头像上传
      *
      * @param avatarfile 用户头像
+     * @return 头像上传结果
      */
     @RepeatSubmit
     @Log(title = "用户头像", businessType = BusinessType.UPDATE)

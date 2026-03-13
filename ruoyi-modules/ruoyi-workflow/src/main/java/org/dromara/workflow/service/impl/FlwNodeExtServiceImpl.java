@@ -275,6 +275,9 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
 
     /**
      * 按逗号分割字符串，但保留 #{...} 表达式和字符串常量中的逗号
+     *
+     * @param str 原始配置字符串
+     * @return 智能分割后的片段列表
      */
     private static List<String> spelSmartSplit(String str) {
         List<String> result = new ArrayList<>();
@@ -347,6 +350,14 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
         return result;
     }
 
+    /**
+     * 判断指定位置的下一个字符是否匹配预期字符。
+     *
+     * @param str      原始字符串
+     * @param index    当前索引
+     * @param expected 期望匹配的字符
+     * @return 匹配成功返回 {@code true}
+     */
     private static boolean checkNext(String str, int index, char expected) {
         return index + 1 < str.length() && str.charAt(index + 1) == expected;
     }

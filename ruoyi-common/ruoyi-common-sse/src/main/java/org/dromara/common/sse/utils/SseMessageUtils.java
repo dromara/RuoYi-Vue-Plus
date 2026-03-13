@@ -26,7 +26,7 @@ public class SseMessageUtils {
     }
 
     /**
-     * 向指定的SSE会话发送消息
+     * 向指定用户的 SSE 会话发送消息。
      *
      * @param userId  要发送消息的用户id
      * @param message 要发送的消息内容
@@ -39,7 +39,7 @@ public class SseMessageUtils {
     }
 
     /**
-     * 本机全用户会话发送消息
+     * 向当前节点上的所有 SSE 会话发送消息。
      *
      * @param message 要发送的消息内容
      */
@@ -51,7 +51,7 @@ public class SseMessageUtils {
     }
 
     /**
-     * 发布SSE订阅消息
+     * 发布 SSE 订阅消息。
      *
      * @param sseMessageDTO 要发布的SSE消息对象
      */
@@ -63,7 +63,7 @@ public class SseMessageUtils {
     }
 
     /**
-     * 向所有的用户发布订阅的消息(群发)
+     * 向所有用户发布 SSE 广播消息。
      *
      * @param message 要发布的消息内容
      */
@@ -75,7 +75,9 @@ public class SseMessageUtils {
     }
 
     /**
-     * 是否开启
+     * 判断 SSE 功能是否启用。
+     *
+     * @return 是否启用
      */
     public static Boolean isEnable() {
         return SSE_ENABLE;

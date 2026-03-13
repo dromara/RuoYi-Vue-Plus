@@ -7,7 +7,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * OSS对象
+ * OSS 文件简要信息对象。
  *
  * @author Lion Li
  */

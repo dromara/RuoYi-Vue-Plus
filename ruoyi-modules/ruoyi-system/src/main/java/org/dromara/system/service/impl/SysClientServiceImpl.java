@@ -41,6 +41,9 @@ public class SysClientServiceImpl implements ISysClientService {
 
     /**
      * 查询客户端管理
+     *
+     * @param id 主键
+     * @return 客户端详情
      */
     @Override
     public SysClientVo queryById(Long id) {
@@ -51,6 +54,9 @@ public class SysClientServiceImpl implements ISysClientService {
 
     /**
      * 查询客户端管理
+     *
+     * @param clientId 客户端标识
+     * @return 客户端详情
      */
     @Cacheable(cacheNames = CacheNames.SYS_CLIENT, key = "#clientId")
     @Override
@@ -60,6 +66,10 @@ public class SysClientServiceImpl implements ISysClientService {
 
     /**
      * 查询客户端管理列表
+     *
+     * @param bo        查询条件
+     * @param pageQuery 分页参数
+     * @return 客户端分页列表
      */
     @Override
     public TableDataInfo<SysClientVo> queryPageList(SysClientBo bo, PageQuery pageQuery) {
@@ -71,6 +81,9 @@ public class SysClientServiceImpl implements ISysClientService {
 
     /**
      * 查询客户端管理列表
+     *
+     * @param bo 查询条件
+     * @return 客户端列表
      */
     @Override
     public List<SysClientVo> queryList(SysClientBo bo) {
@@ -78,6 +91,12 @@ public class SysClientServiceImpl implements ISysClientService {
         return baseMapper.selectVoList(lqw);
     }
 
+    /**
+     * 构造客户端列表查询条件。
+     *
+     * @param bo 客户端筛选条件
+     * @return 包含 clientId、clientKey、状态等条件的查询包装器
+     */
     private LambdaQueryWrapper<SysClient> buildQueryWrapper(SysClientBo bo) {
         LambdaQueryWrapper<SysClient> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getClientId()), SysClient::getClientId, bo.getClientId());
@@ -90,6 +109,9 @@ public class SysClientServiceImpl implements ISysClientService {
 
     /**
      * 新增客户端管理
+     *
+     * @param bo 客户端业务对象
+     * @return 新增成功返回 {@code true}
      */
     @Override
     public Boolean insertByBo(SysClientBo bo) {
@@ -108,6 +130,9 @@ public class SysClientServiceImpl implements ISysClientService {
 
     /**
      * 修改客户端管理
+     *
+     * @param bo 客户端业务对象
+     * @return 修改成功返回 {@code true}
      */
     @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, key = "#bo.clientId")
     @Override
@@ -119,6 +144,10 @@ public class SysClientServiceImpl implements ISysClientService {
 
     /**
      * 修改状态
+     *
+     * @param clientId 客户端标识
+     * @param status   状态值
+     * @return 更新条数
      */
     @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, key = "#clientId")
     @Override
@@ -131,6 +160,10 @@ public class SysClientServiceImpl implements ISysClientService {
 
     /**
      * 批量删除客户端管理
+     *
+     * @param ids     主键集合
+     * @param isValid 是否执行业务校验
+     * @return 删除成功返回 {@code true}
      */
     @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, allEntries = true)
     @Override

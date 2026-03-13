@@ -15,6 +15,9 @@ public class CaptchaVo {
      */
     private Boolean captchaEnabled = true;
 
+    /**
+     * 验证码唯一标识。
+     */
     private String uuid;
 
     /**

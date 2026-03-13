@@ -46,6 +46,13 @@ public class PasswordAuthStrategy implements IAuthStrategy {
     private final SysLoginService loginService;
     private final SysUserMapper userMapper;
 
+    /**
+     * 执行账号密码登录，并按客户端配置生成访问令牌。
+     *
+     * @param body   登录请求体
+     * @param client 当前客户端配置
+     * @return 登录结果
+     */
     @Override
     public LoginVo login(String body, SysClientVo client) {
         PasswordLoginBody loginBody = JsonUtils.parseObject(body, PasswordLoginBody.class);
@@ -84,11 +91,11 @@ public class PasswordAuthStrategy implements IAuthStrategy {
     }
 
     /**
-     * 校验验证码
+     * 校验图形验证码是否有效且匹配。
      *
      * @param username 用户名
-     * @param code     验证码
-     * @param uuid     唯一标识
+     * @param code     用户输入的验证码
+     * @param uuid     验证码缓存标识
      */
     private void validateCaptcha(String username, String code, String uuid) {
         String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.blankToDefault(uuid, "");
@@ -104,6 +111,12 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         }
     }
 
+    /**
+     * 按用户名加载可登录用户，并校验是否存在或被停用。
+     *
+     * @param username 用户名
+     * @return 用户信息
+     */
     private SysUserVo loadUserByUsername(String username) {
         SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, username));
         if (ObjectUtil.isNull(user)) {

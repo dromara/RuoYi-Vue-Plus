@@ -39,7 +39,7 @@ public interface IFlwDefinitionService {
      * 发布流程定义
      *
      * @param id 流程定义id
-     * @return 结果
+     * @return 是否发布成功
      */
     boolean publish(Long id);
 
@@ -57,7 +57,7 @@ public interface IFlwDefinitionService {
      *
      * @param file     文件
      * @param category 分类
-     * @return 结果
+     * @return 是否导入成功
      */
     boolean importJson(MultipartFile file, String category);
 
@@ -65,7 +65,7 @@ public interface IFlwDefinitionService {
      * 删除流程定义
      *
      * @param ids 流程定义id
-     * @return 结果
+     * @return 是否删除成功
      */
     boolean removeDef(List<Long> ids);
 

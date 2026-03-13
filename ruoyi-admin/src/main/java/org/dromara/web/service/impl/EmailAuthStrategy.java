@@ -42,6 +42,13 @@ public class EmailAuthStrategy implements IAuthStrategy {
     private final SysLoginService loginService;
     private final SysUserMapper userMapper;
 
+    /**
+     * 执行邮箱验证码登录，并按客户端配置生成访问令牌。
+     *
+     * @param body   登录请求体
+     * @param client 当前客户端配置
+     * @return 登录结果
+     */
     @Override
     public LoginVo login(String body, SysClientVo client) {
         EmailLoginBody loginBody = JsonUtils.parseObject(body, EmailLoginBody.class);
@@ -72,7 +79,11 @@ public class EmailAuthStrategy implements IAuthStrategy {
     }
 
     /**
-     * 校验邮箱验证码
+     * 校验邮箱验证码是否存在且匹配。
+     *
+     * @param email     邮箱地址
+     * @param emailCode 用户输入的邮箱验证码
+     * @return 是否校验通过
      */
     private boolean validateEmailCode(String email, String emailCode) {
         String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + email);
@@ -83,6 +94,12 @@ public class EmailAuthStrategy implements IAuthStrategy {
         return code.equals(emailCode);
     }
 
+    /**
+     * 按邮箱加载可登录用户，并校验是否存在或被停用。
+     *
+     * @param email 邮箱地址
+     * @return 用户信息
+     */
     private SysUserVo loadUserByEmail(String email) {
         SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getEmail, email));
         if (ObjectUtil.isNull(user)) {

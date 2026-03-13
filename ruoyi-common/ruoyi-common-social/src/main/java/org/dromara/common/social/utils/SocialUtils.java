@@ -23,6 +23,16 @@ public class SocialUtils  {
 
     private static final AuthRedisStateCache STATE_CACHE = SpringUtils.getBean(AuthRedisStateCache.class);
 
+    /**
+     * 执行第三方登录授权回调。
+     *
+     * @param source 社交平台类型
+     * @param code 授权码
+     * @param state 状态值
+     * @param socialProperties 社交平台配置
+     * @return 授权响应
+     * @throws AuthException 授权异常
+     */
     @SuppressWarnings("unchecked")
     public static AuthResponse<AuthUser> loginAuth(String source, String code, String state, SocialProperties socialProperties) throws AuthException {
         AuthRequest authRequest = getAuthRequest(source, socialProperties);
@@ -32,6 +42,14 @@ public class SocialUtils  {
         return authRequest.login(callback);
     }
 
+    /**
+     * 根据平台类型构建授权请求实例。
+     *
+     * @param source 社交平台类型
+     * @param socialProperties 社交平台配置
+     * @return 授权请求
+     * @throws AuthException 授权异常
+     */
     public static AuthRequest getAuthRequest(String source, SocialProperties socialProperties) throws AuthException {
         SocialLoginConfigProperties obj = socialProperties.getType().get(source);
          if (ObjectUtil.isNull(obj)) {

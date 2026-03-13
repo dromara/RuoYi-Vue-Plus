@@ -180,7 +180,7 @@ public interface GenConstants {
     String QUERY_EQ = "EQ";
 
     /**
-     * 需要
+     * 必填标识，对应前端表单规则中的必填字段配置。
      */
     String REQUIRE = "1";
 }

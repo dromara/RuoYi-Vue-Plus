@@ -1,7 +1,7 @@
 package org.dromara.common.core.constant;
 
 /**
- * 缓存的key 常量
+ * Redis 缓存键前缀常量。
  *
  * @author Lion Li
  */

@@ -35,7 +35,7 @@ public interface ISysPostService {
      * 查询用户所属岗位组
      *
      * @param userId 用户ID
-     * @return 岗位ID
+     * @return 岗位列表
      */
     List<SysPostVo> selectPostsByUserId(Long userId);
 
@@ -50,7 +50,7 @@ public interface ISysPostService {
      * 通过岗位ID查询岗位信息
      *
      * @param postId 岗位ID
-     * @return 角色对象信息
+     * @return 岗位信息
      */
     SysPostVo selectPostById(Long postId);
 
@@ -74,7 +74,7 @@ public interface ISysPostService {
      * 校验岗位名称
      *
      * @param post 岗位信息
-     * @return 结果
+     * @return 是否唯一
      */
     boolean checkPostNameUnique(SysPostBo post);
 
@@ -82,7 +82,7 @@ public interface ISysPostService {
      * 校验岗位编码
      *
      * @param post 岗位信息
-     * @return 结果
+     * @return 是否唯一
      */
     boolean checkPostCodeUnique(SysPostBo post);
 
@@ -90,7 +90,7 @@ public interface ISysPostService {
      * 通过岗位ID查询岗位使用数量
      *
      * @param postId 岗位ID
-     * @return 结果
+     * @return 绑定用户数量
      */
     long countUserPostById(Long postId);
 
@@ -98,7 +98,7 @@ public interface ISysPostService {
      * 通过部门ID查询岗位使用数量
      *
      * @param deptId 部门id
-     * @return 结果
+     * @return 岗位数量
      */
     long countPostByDeptId(Long deptId);
 
@@ -106,7 +106,7 @@ public interface ISysPostService {
      * 删除岗位信息
      *
      * @param postId 岗位ID
-     * @return 结果
+     * @return 影响行数
      */
     int deletePostById(Long postId);
 
@@ -114,7 +114,7 @@ public interface ISysPostService {
      * 批量删除岗位信息
      *
      * @param postIds 需要删除的岗位ID
-     * @return 结果
+     * @return 影响行数
      */
     int deletePostByIds(List<Long> postIds);
 
@@ -122,7 +122,7 @@ public interface ISysPostService {
      * 新增保存岗位信息
      *
      * @param bo 岗位信息
-     * @return 结果
+     * @return 影响行数
      */
     int insertPost(SysPostBo bo);
 
@@ -130,7 +130,7 @@ public interface ISysPostService {
      * 修改保存岗位信息
      *
      * @param bo 岗位信息
-     * @return 结果
+     * @return 影响行数
      */
     int updatePost(SysPostBo bo);
 }

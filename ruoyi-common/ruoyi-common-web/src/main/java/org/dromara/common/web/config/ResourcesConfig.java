@@ -25,12 +25,22 @@ import java.util.Date;
 @AutoConfiguration
 public class ResourcesConfig implements WebMvcConfigurer {
 
+    /**
+     * 注册全局拦截器。
+     *
+     * @param registry 拦截器注册表
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 全局访问性能拦截
         registry.addInterceptor(new PlusWebInvokeTimeInterceptor());
     }
 
+    /**
+     * 注册全局格式转换器。
+     *
+     * @param registry 格式化器注册表
+     */
     @Override
     public void addFormatters(FormatterRegistry registry) {
         // 全局日期格式转换配置
@@ -43,12 +53,19 @@ public class ResourcesConfig implements WebMvcConfigurer {
         });
     }
 
+    /**
+     * 注册静态资源处理器。
+     *
+     * @param registry 资源处理器注册表
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
     }
 
     /**
      * 跨域配置
+     *
+     * @return 全局 Cors 过滤器
      */
     @Bean
     public CorsFilter corsFilter() {
@@ -71,6 +88,8 @@ public class ResourcesConfig implements WebMvcConfigurer {
 
     /**
      * 全局异常处理器
+     *
+     * @return 全局异常处理器实例
      */
     @Bean
     public GlobalExceptionHandler globalExceptionHandler() {

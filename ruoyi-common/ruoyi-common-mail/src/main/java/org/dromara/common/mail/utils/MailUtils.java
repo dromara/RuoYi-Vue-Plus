@@ -31,7 +31,9 @@ public class MailUtils {
     private static final MailAccount ACCOUNT = SpringUtils.getBean(MailAccount.class);
 
     /**
-     * 获取邮件发送实例
+     * 获取默认邮件账户配置。
+     *
+     * @return 邮件账户配置
      */
     public static MailAccount getMailAccount() {
         return ACCOUNT;
@@ -40,8 +42,10 @@ public class MailUtils {
     /**
      * 获取邮件发送实例 (自定义发送人以及授权码)
      *
+     * @param from 发送人
      * @param user 发送人
      * @param pass 授权码
+     * @return 邮件账户配置
      */
     public static MailAccount getMailAccount(String from, String user, String pass) {
         ACCOUNT.setFrom(StringUtils.blankToDefault(from, ACCOUNT.getFrom()));

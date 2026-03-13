@@ -97,6 +97,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * 启动任务
      *
      * @param startProcessBo 启动流程参数
+     * @return 启动后的流程实例标识与首个任务标识
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -171,6 +172,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
 
     /**
      * 生成业务编号，如果已有则直接返回已有值
+     *
+     * @param bizExt 流程业务扩展信息
+     * @return 可用于流程实例展示的业务编号
      */
     private String generateBusinessCode(FlowInstanceBizExt bizExt) {
         if (StringUtils.isBlank(bizExt.getBusinessCode())) {
@@ -198,6 +202,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * 办理任务
      *
      * @param completeTaskBo 办理任务参数
+     * @return 办理成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -294,6 +299,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      *
      * @param assigneeMap  处理人
      * @param variablesMap 变量
+     * @return 追加流程状态前缀后的处理人变量映射
      */
     private Map<String, Object> setPopAssigneeMap(Map<String, Object> assigneeMap, Map<String, Object> variablesMap) {
         Map<String, Object> map = new HashMap<>();
@@ -367,6 +373,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
+     * @return 当前登录人的待办任务分页结果
      */
     @Override
     public TableDataInfo<FlowTaskVo> pageByTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
@@ -380,6 +387,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
+     * @return 当前登录人的已办任务分页结果
      */
     @Override
     public TableDataInfo<FlowHisTaskVo> pageByTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
@@ -392,6 +400,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
+     * @return 全部待办任务分页结果
      */
     @Override
     public TableDataInfo<FlowTaskVo> pageByAllTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
@@ -423,6 +432,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
+     * @return 全部已办任务分页结果
      */
     @Override
     public TableDataInfo<FlowHisTaskVo> pageByAllTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
@@ -435,6 +445,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
+     * @return 当前登录人收到的抄送分页结果
      */
     @Override
     public TableDataInfo<FlowTaskVo> pageByTaskCopy(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
@@ -442,6 +453,12 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         return TableDataInfo.build(page);
     }
 
+    /**
+     * 解析查询条件中的分类及其子分类编码集合。
+     *
+     * @param flowTaskBo 任务筛选条件
+     * @return 分类 id 字符串集合，未指定分类时返回 {@code null}
+     */
     private List<String> categoryIds(FlowTaskBo flowTaskBo) {
         if (StringUtils.isNotBlank(flowTaskBo.getCategory())) {
             List<Long> categoryIds = flwCategoryMapper.selectCategoryIdsByParentId(Convert.toLong(flowTaskBo.getCategory()));
@@ -454,6 +471,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * 驳回任务
      *
      * @param bo 参数
+     * @return 驳回成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -497,6 +515,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      *
      * @param taskId      任务id
      * @param nowNodeCode 当前节点
+     * @return 当前任务允许驳回的节点列表
      */
     @Override
     public List<Node> getBackTaskNode(Long taskId, String nowNodeCode) {
@@ -544,6 +563,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * 终止任务
      *
      * @param bo 参数
+     * @return 终止成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -569,6 +589,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * 按照任务id查询任务
      *
      * @param taskIdList 任务id
+     * @return 任务列表
      */
     @Override
     public List<FlowTask> selectByIdList(List<Long> taskIdList) {
@@ -579,6 +600,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * 按照任务id查询任务
      *
      * @param taskId 任务id
+     * @return 任务详情视图，不存在时返回 {@code null}
      */
     @Override
     public FlowTaskVo selectById(Long taskId) {
@@ -631,6 +653,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * 获取下一节点信息
      *
      * @param bo 参数
+     * @return 当前任务在给定变量下可流转到的下一审批节点列表
      */
     @Override
     public List<FlowNode> getNextNodeList(FlowNextNodeBo bo) {
@@ -691,6 +714,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * 按照实例id查询任务
      *
      * @param instanceId 流程实例id
+     * @return 运行中的任务列表
      */
     @Override
     public List<FlowTask> selectByInstId(Long instanceId) {
@@ -701,6 +725,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * 按照实例id查询任务
      *
      * @param instanceIds 流程实例id
+     * @return 运行中的任务列表
      */
     @Override
     public List<FlowTask> selectByInstIds(List<Long> instanceIds) {
@@ -724,6 +749,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      *
      * @param bo            参数
      * @param taskOperation 操作类型，委派 delegateTask、转办 transferTask、加签 addSignature、减签 reductionSignature
+     * @return 操作成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

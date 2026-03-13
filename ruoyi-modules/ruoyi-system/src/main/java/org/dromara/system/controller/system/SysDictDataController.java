@@ -38,7 +38,11 @@ public class SysDictDataController extends BaseController {
     private final ISysDictTypeService dictTypeService;
 
     /**
-     * 查询字典数据列表
+     * 分页查询字典数据列表。
+     *
+     * @param dictData 查询条件
+     * @param pageQuery 分页参数
+     * @return 字典数据分页结果
      */
     @SaCheckPermission("system:dict:list")
     @GetMapping("/list")
@@ -47,7 +51,10 @@ public class SysDictDataController extends BaseController {
     }
 
     /**
-     * 导出字典数据列表
+     * 导出字典数据列表。
+     *
+     * @param dictData 查询条件
+     * @param response HTTP 响应
      */
     @Log(title = "字典数据", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:dict:export")
@@ -61,6 +68,7 @@ public class SysDictDataController extends BaseController {
      * 查询字典数据详细
      *
      * @param dictCode 字典code
+     * @return 字典数据详情
      */
     @SaCheckPermission("system:dict:query")
     @GetMapping(value = "/{dictCode}")
@@ -72,6 +80,7 @@ public class SysDictDataController extends BaseController {
      * 根据字典类型查询字典数据信息
      *
      * @param dictType 字典类型
+     * @return 字典数据列表
      */
     @GetMapping(value = "/type/{dictType}")
     public R<List<SysDictDataVo>> dictType(@PathVariable String dictType) {
@@ -83,7 +92,10 @@ public class SysDictDataController extends BaseController {
     }
 
     /**
-     * 新增字典数据
+     * 新增字典数据。
+     *
+     * @param dict 字典数据参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:dict:add")
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
@@ -98,7 +110,10 @@ public class SysDictDataController extends BaseController {
     }
 
     /**
-     * 修改保存字典数据
+     * 修改字典数据。
+     *
+     * @param dict 字典数据参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:dict:edit")
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
@@ -116,6 +131,7 @@ public class SysDictDataController extends BaseController {
      * 删除字典数据
      *
      * @param dictCodes 字典code串
+     * @return 操作结果
      */
     @SaCheckPermission("system:dict:remove")
     @Log(title = "字典数据", businessType = BusinessType.DELETE)

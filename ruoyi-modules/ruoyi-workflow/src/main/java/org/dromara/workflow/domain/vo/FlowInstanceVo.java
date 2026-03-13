@@ -8,13 +8,16 @@ import org.dromara.workflow.common.constant.FlowConstant;
 import java.util.Date;
 
 /**
- * 流程实例视图
+ * 流程实例视图对象。
  *
  * @author may
  */
 @Data
 public class FlowInstanceVo {
 
+    /**
+     * 流程实例ID。
+     */
     private Long id;
 
     /**

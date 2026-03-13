@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 任务视图
+ * 流程任务视图对象。
  *
  * @author may
  */
@@ -24,6 +24,9 @@ public class FlowTaskVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 任务ID。
+     */
     private Long id;
 
     /**
@@ -207,6 +210,11 @@ public class FlowTaskVo implements Serializable {
     private String businessTitle;
     //业务扩展信息结束
 
+    /**
+     * 获取友好格式的创建时间。
+     *
+     * @return 格式化后的创建时间
+     */
     public String getCreateTime() {
         return DateUtils.formatFriendlyTime(createTime);
     }

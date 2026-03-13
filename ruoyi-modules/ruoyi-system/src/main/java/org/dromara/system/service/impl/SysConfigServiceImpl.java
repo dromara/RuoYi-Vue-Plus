@@ -103,6 +103,12 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
         return baseMapper.selectVoList(lqw);
     }
 
+    /**
+     * 构造参数配置列表查询条件。
+     *
+     * @param bo 参数配置筛选条件
+     * @return 包含名称、键名、类型与时间区间的查询包装器
+     */
     private LambdaQueryWrapper<SysConfig> buildQueryWrapper(SysConfigBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysConfig> lqw = Wrappers.lambdaQuery();
@@ -214,7 +220,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * 根据参数 key 获取 Map 类型的配置
      *
      * @param configKey 参数 key
-     * @return Dict 对象，如果配置为空或无法解析，返回空 Dict
+     * @return Dict 对象，如果配置为空或无法解析则返回空 Dict
      */
     @Override
     public Dict getConfigMap(String configKey) {
@@ -226,7 +232,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * 根据参数 key 获取 Map 类型的配置列表
      *
      * @param configKey 参数 key
-     * @return Dict 列表，如果配置为空或无法解析，返回空列表
+     * @return Dict 列表，如果配置为空或无法解析则返回空列表
      */
     @Override
     public List<Dict> getConfigArrayMap(String configKey) {

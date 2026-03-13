@@ -7,11 +7,10 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 用户登录对象
+ * 通用登录请求对象，封装客户端、授权类型和验证码信息。
  *
  * @author Lion Li
  */
-
 @Data
 public class LoginBody implements Serializable {
 
@@ -36,7 +35,7 @@ public class LoginBody implements Serializable {
     private String code;
 
     /**
-     * 唯一标识
+     * 验证码唯一标识。
      */
     private String uuid;
 

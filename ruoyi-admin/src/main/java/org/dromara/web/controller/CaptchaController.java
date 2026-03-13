@@ -53,9 +53,10 @@ public class CaptchaController {
     private final MailProperties mailProperties;
 
     /**
-     * 短信验证码
+     * 发送短信验证码。
      *
      * @param phonenumber 用户手机号
+     * @return 操作结果
      */
     @RateLimiter(key = "#phonenumber", time = 60, count = 1)
     @GetMapping("/resource/sms/code")
@@ -77,9 +78,10 @@ public class CaptchaController {
     }
 
     /**
-     * 邮箱验证码
+     * 发送邮箱验证码。
      *
      * @param email 邮箱
+     * @return 操作结果
      */
     @GetMapping("/resource/email/code")
     public R<Void> emailCode(@NotBlank(message = "{user.email.not.blank}") String email) {
@@ -91,8 +93,9 @@ public class CaptchaController {
     }
 
     /**
-     * 邮箱验证码
-     * 独立方法避免验证码关闭之后仍然走限流
+     * 发送邮箱验证码的实际执行方法，拆分出来避免开关关闭时仍触发限流。
+     *
+     * @param email 邮箱
      */
     @RateLimiter(key = "#email", time = 60, count = 1)
     public void emailCodeImpl(String email) {
@@ -108,7 +111,9 @@ public class CaptchaController {
     }
 
     /**
-     * 生成验证码
+     * 获取图片验证码。
+     *
+     * @return 验证码信息
      */
     @GetMapping("/auth/code")
     public R<CaptchaVo> getCode() {
@@ -122,8 +127,9 @@ public class CaptchaController {
     }
 
     /**
-     * 生成验证码
-     * 独立方法避免验证码关闭之后仍然走限流
+     * 实际生成图片验证码并缓存结果。
+     *
+     * @return 验证码信息
      */
     @RateLimiter(time = 60, count = 10, limitType = LimitType.IP)
     public CaptchaVo getCodeImpl() {

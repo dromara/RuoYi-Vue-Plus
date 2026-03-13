@@ -80,6 +80,12 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
         return baseMapper.selectVoList(lqw);
     }
 
+    /**
+     * 组装 SpEL 表达式列表查询条件。
+     *
+     * @param bo 页面筛选参数
+     * @return 包含排序和筛选条件的查询包装器
+     */
     private LambdaQueryWrapper<FlowSpel> buildQueryWrapper(FlowSpelBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<FlowSpel> lqw = Wrappers.lambdaQuery();
@@ -125,6 +131,8 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
 
     /**
      * 保存前的数据校验
+     *
+     * @param entity 待保存的 SpEL 表达式实体
      */
     private void validEntityBeforeSave(FlowSpel entity){
         if (StringUtils.isNotBlank(entity.getViewSpel())) {

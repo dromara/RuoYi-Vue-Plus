@@ -46,10 +46,11 @@ public class SocialAuthStrategy implements IAuthStrategy {
     private final SysLoginService loginService;
 
     /**
-     * 登录-第三方授权登录
+     * 执行第三方授权登录，并校验授权账号与系统账号的绑定关系。
      *
      * @param body     登录信息
      * @param client   客户端信息
+     * @return 登录结果
      */
     @Override
     public LoginVo login(String body, SysClientVo client) {
@@ -89,6 +90,12 @@ public class SocialAuthStrategy implements IAuthStrategy {
         return loginVo;
     }
 
+    /**
+     * 根据用户ID加载用户，并校验账号状态是否允许登录。
+     *
+     * @param userId 用户ID
+     * @return 用户信息
+     */
     private SysUserVo loadUser(Long userId) {
         SysUserVo user = userMapper.selectVoById(userId);
         if (ObjectUtil.isNull(user)) {

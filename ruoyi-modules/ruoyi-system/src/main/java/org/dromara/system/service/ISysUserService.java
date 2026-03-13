@@ -20,8 +20,8 @@ public interface ISysUserService {
      * 根据条件分页查询用户列表
      *
      * @param user      用户信息
-     * @param pageQuery 发呢也
-     * @return 用户信息
+     * @param pageQuery 分页参数
+     * @return 用户分页信息
      */
     TableDataInfo<SysUserVo> selectPageUserList(SysUserBo user, PageQuery pageQuery);
 
@@ -29,7 +29,7 @@ public interface ISysUserService {
      * 导出用户列表
      *
      * @param user 用户信息
-     * @return 用户信息集合信息
+     * @return 用户导出列表
      */
     List<SysUserExportVo> selectUserExportList(SysUserBo user);
 
@@ -37,8 +37,8 @@ public interface ISysUserService {
      * 根据条件分页查询已分配用户角色列表
      *
      * @param user      用户信息
-     * @param pageQuery 分页
-     * @return 用户信息集合信息
+      * @param pageQuery 分页
+     * @return 已分配角色的用户分页信息
      */
     TableDataInfo<SysUserVo> selectAllocatedList(SysUserBo user, PageQuery pageQuery);
 
@@ -47,7 +47,7 @@ public interface ISysUserService {
      *
      * @param user      用户信息
      * @param pageQuery 分页
-     * @return 用户信息集合信息
+     * @return 未分配角色的用户分页信息
      */
     TableDataInfo<SysUserVo> selectUnallocatedList(SysUserBo user, PageQuery pageQuery);
 
@@ -150,7 +150,7 @@ public interface ISysUserService {
      * 注册用户信息
      *
      * @param user 用户信息
-     * @return 结果
+     * @return 是否注册成功
      */
     boolean registerUser(SysUserBo user);
 
@@ -192,7 +192,7 @@ public interface ISysUserService {
      *
      * @param userId 用户ID
      * @param avatar 头像地址
-     * @return 结果
+     * @return 是否修改成功
      */
     boolean updateUserAvatar(Long userId, Long avatar);
 

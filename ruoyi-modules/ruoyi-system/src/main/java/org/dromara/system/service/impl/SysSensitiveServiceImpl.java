@@ -19,6 +19,10 @@ public class SysSensitiveServiceImpl implements SensitiveService {
 
     /**
      * 是否脱敏
+     *
+     * @param roleKey 允许查看原文的角色标识列表
+     * @param perms   允许查看原文的权限标识列表
+     * @return 需要脱敏返回 {@code true}
      */
     @Override
     public boolean isSensitive(String[] roleKey, String[] perms) {

@@ -260,7 +260,7 @@ public class FlwChartExtServiceImpl implements ChartExtService {
      * 根据流程实例ID获取历史任务列表
      *
      * @param instanceId 流程实例ID
-     * @return 历史任务列表
+     * @return 按更新时间倒序排列的审批历史任务列表
      */
     public List<FlowHisTask> getHisTaskGroupedByNode(Long instanceId) {
         LambdaQueryWrapper<FlowHisTask> wrapper = Wrappers.lambdaQuery();

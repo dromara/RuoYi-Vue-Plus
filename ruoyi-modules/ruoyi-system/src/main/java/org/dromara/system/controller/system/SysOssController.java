@@ -39,7 +39,11 @@ public class SysOssController extends BaseController {
     private final ISysOssService ossService;
 
     /**
-     * 查询OSS对象存储列表
+     * 分页查询 OSS 对象存储列表。
+     *
+     * @param bo 查询条件
+     * @param pageQuery 分页参数
+     * @return OSS 分页结果
      */
     @SaCheckPermission("system:oss:list")
     @GetMapping("/list")
@@ -51,6 +55,7 @@ public class SysOssController extends BaseController {
      * 查询OSS对象基于id串
      *
      * @param ossIds OSS对象ID串
+     * @return OSS 对象列表
      */
     @SaCheckPermission("system:oss:query")
     @GetMapping("/listByIds/{ossIds}")
@@ -64,6 +69,7 @@ public class SysOssController extends BaseController {
      * 上传OSS对象存储
      *
      * @param file 文件
+     * @return 上传结果
      */
     @SaCheckPermission("system:oss:upload")
     @Log(title = "OSS对象存储", businessType = BusinessType.INSERT)
@@ -81,6 +87,8 @@ public class SysOssController extends BaseController {
      * 下载OSS对象
      *
      * @param ossId OSS对象ID
+     * @param response HTTP 响应
+     * @throws IOException IO 异常
      */
     @SaCheckPermission("system:oss:download")
     @GetMapping("/download/{ossId}")
@@ -92,6 +100,7 @@ public class SysOssController extends BaseController {
      * 删除OSS对象存储
      *
      * @param ossIds OSS对象ID串
+     * @return 操作结果
      */
     @SaCheckPermission("system:oss:remove")
     @Log(title = "OSS对象存储", businessType = BusinessType.DELETE)

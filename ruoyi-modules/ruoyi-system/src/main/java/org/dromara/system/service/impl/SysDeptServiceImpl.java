@@ -89,6 +89,12 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         return buildDeptTreeSelect(depts);
     }
 
+    /**
+     * 构造部门列表查询条件。
+     *
+     * @param bo 部门筛选条件
+     * @return 包含树级过滤、状态、分类和时间区间的查询包装器
+     */
     private LambdaQueryWrapper<SysDept> buildQueryWrapper(SysDeptBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysDept> lqw = Wrappers.lambdaQuery();
@@ -169,6 +175,12 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         return dept;
     }
 
+    /**
+     * 按部门主键集合查询部门基础信息。
+     *
+     * @param deptIds 部门主键集合
+     * @return 部门基础信息列表
+     */
     @Override
     public List<SysDeptVo> selectDeptByIds(List<Long> deptIds) {
         return baseMapper.selectDeptList(new LambdaQueryWrapper<SysDept>()

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 
 /**
- * 基础异常
+ * 基础国际化异常，支持按错误码解析最终提示信息。
  *
  * @author ruoyi
  */
@@ -43,18 +43,42 @@ public class BaseException extends RuntimeException {
      */
     private String defaultMessage;
 
+    /**
+     * 使用模块、错误码和参数构造异常。
+     *
+     * @param module 所属模块
+     * @param code 错误码
+     * @param args 参数
+     */
     public BaseException(String module, String code, Object[] args) {
         this(module, code, args, null);
     }
 
+    /**
+     * 使用模块和默认消息构造异常。
+     *
+     * @param module 所属模块
+     * @param defaultMessage 默认消息
+     */
     public BaseException(String module, String defaultMessage) {
         this(module, null, null, defaultMessage);
     }
 
+    /**
+     * 使用错误码和参数构造异常。
+     *
+     * @param code 错误码
+     * @param args 参数
+     */
     public BaseException(String code, Object[] args) {
         this(null, code, args, null);
     }
 
+    /**
+     * 使用默认消息构造异常。
+     *
+     * @param defaultMessage 默认消息
+     */
     public BaseException(String defaultMessage) {
         this(null, null, null, defaultMessage);
     }

@@ -18,7 +18,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class RedisExceptionHandler {
 
     /**
-     * 分布式锁Lock4j异常
+     * 处理 Lock4j 分布式锁获取失败异常。
+     *
+     * @param e 异常信息
+     * @param request 当前请求
+     * @return 统一失败响应
      */
     @ExceptionHandler(LockFailureException.class)
     public R<Void> handleLockFailureException(LockFailureException e, HttpServletRequest request) {

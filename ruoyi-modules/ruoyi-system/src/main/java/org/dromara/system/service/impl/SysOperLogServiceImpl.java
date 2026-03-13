@@ -66,6 +66,12 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
         return TableDataInfo.build(page);
     }
 
+    /**
+     * 构造操作日志查询条件。
+     *
+     * @param operLog 操作日志筛选条件
+     * @return 包含业务类型、状态、操作人和时间区间的查询包装器
+     */
     private LambdaQueryWrapper<SysOperLog> buildQueryWrapper(SysOperLogBo operLog) {
         Map<String, Object> params = operLog.getParams();
         return new LambdaQueryWrapper<SysOperLog>()

@@ -547,6 +547,9 @@ public class OssClient {
 
     /**
      * 检查配置是否相同
+     *
+     * @param properties OSS 配置
+     * @return 是否与当前客户端配置一致
      */
     public boolean checkPropertiesSame(OssProperties properties) {
         return this.properties.equals(properties);

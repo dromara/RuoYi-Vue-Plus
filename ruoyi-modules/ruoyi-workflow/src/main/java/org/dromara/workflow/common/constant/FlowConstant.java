@@ -24,52 +24,52 @@ public interface FlowConstant {
     String INITIATOR_DEPT_ID = "initiatorDeptId";
 
     /**
-     * 流程分类Id转名称
+     * 流程分类 ID 转名称的翻译标识。
      */
     String CATEGORY_ID_TO_NAME = "category_id_to_name";
 
     /**
-     * 流程分类名称
+     * 流程分类名称缓存键。
      */
     String FLOW_CATEGORY_NAME = "flow_category_name#30d";
 
     /**
-     * 默认租户OA申请分类id
+     * 默认租户 OA 申请分类 ID。
      */
     Long FLOW_CATEGORY_ID = 100L;
 
     /**
-     * 是否为申请人提交常量
+     * 申请人提交动作标识。
      */
     String SUBMIT = "submit";
 
     /**
-     * 抄送常量
+     * 抄送列表流程变量名。
      */
     String FLOW_COPY_LIST = "flowCopyList";
 
     /**
-     * 消息类型常量
+     * 消息类型流程变量名。
      */
     String MESSAGE_TYPE = "messageType";
 
     /**
-     * 消息通知常量
+     * 消息通知内容流程变量名。
      */
     String MESSAGE_NOTICE = "messageNotice";
 
     /**
-     * 任务状态
+     * 任务状态字典类型编码。
      */
     String WF_TASK_STATUS = "wf_task_status";
 
     /**
-     * 自动通过
+     * 自动通过变量标识。
      */
     String AUTO_PASS = "autoPass";
 
     /**
-     * 业务编码
+     * 业务编码流程变量名。
      */
     String BUSINESS_CODE = "businessCode";
 

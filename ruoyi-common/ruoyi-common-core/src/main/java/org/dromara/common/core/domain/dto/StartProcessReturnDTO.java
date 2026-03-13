@@ -7,7 +7,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 启动流程返回对象
+ * 启动流程后的返回结果对象。
  *
  * @author Lion Li
  */

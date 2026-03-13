@@ -56,6 +56,13 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     private final SysUserRoleMapper userRoleMapper;
     private final SysUserPostMapper userPostMapper;
 
+    /**
+     * 分页查询用户列表。
+     *
+     * @param user      用户筛选条件
+     * @param pageQuery 分页参数
+     * @return 用户分页结果
+     */
     @Override
     public TableDataInfo<SysUserVo> selectPageUserList(SysUserBo user, PageQuery pageQuery) {
         Page<SysUserVo> page = baseMapper.selectPageUserList(pageQuery.build(), this.buildQueryWrapper(user));
@@ -74,6 +81,12 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         return baseMapper.selectUserExportList(user, deptIds);
     }
 
+    /**
+     * 构造用户列表查询条件。
+     *
+     * @param user 用户筛选条件
+     * @return 叠加部门、状态、时间区间等条件的查询包装器
+     */
     private Wrapper<SysUser> buildQueryWrapper(SysUserBo user) {
         Map<String, Object> params = user.getParams();
         LambdaQueryWrapper<SysUser> wrapper = Wrappers.lambdaQuery();

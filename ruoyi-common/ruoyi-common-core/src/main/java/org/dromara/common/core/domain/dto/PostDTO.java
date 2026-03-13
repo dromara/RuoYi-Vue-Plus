@@ -7,7 +7,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 岗位
+ * 岗位简要信息对象。
  *
  * @author AprilWind
  */

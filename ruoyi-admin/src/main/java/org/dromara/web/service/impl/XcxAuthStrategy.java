@@ -38,6 +38,13 @@ public class XcxAuthStrategy implements IAuthStrategy {
 
     private final SysLoginService loginService;
 
+    /**
+     * 执行微信小程序登录，并根据 openid 构建小程序用户登录态。
+     *
+     * @param body   登录请求体
+     * @param client 当前客户端配置
+     * @return 登录结果
+     */
     @Override
     public LoginVo login(String body, SysClientVo client) {
         XcxLoginBody loginBody = JsonUtils.parseObject(body, XcxLoginBody.class);
@@ -93,6 +100,12 @@ public class XcxAuthStrategy implements IAuthStrategy {
         return loginVo;
     }
 
+    /**
+     * 按 openid 查询小程序绑定用户。
+     *
+     * @param openid 小程序用户唯一标识
+     * @return 绑定的系统用户信息
+     */
     private SysUserVo loadUserByOpenid(String openid) {
         // 使用 openid 查询绑定用户 如未绑定用户 则根据业务自行处理 例如 创建默认用户
         // todo 自行实现 userService.selectUserByOpenid(openid);

@@ -27,6 +27,13 @@ public class SecurityConfig {
         this.adminContextPath = adminServerProperties.getContextPath();
     }
 
+    /**
+     * 配置监控后台的安全过滤链。
+     *
+     * @param httpSecurity Spring Security 配置对象
+     * @return 安全过滤链
+     * @throws Exception 构建过滤链异常
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();

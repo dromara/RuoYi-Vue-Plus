@@ -25,6 +25,9 @@ import java.util.Map;
 @Component
 public class MyBatisDataSourceMonitor implements DataSourceMonitor {
 
+    /**
+     * 初始化 anyline 与动态数据源联动所需的元数据解析策略。
+     */
     public MyBatisDataSourceMonitor() {
         // 调整执行模式为自定义
         ConfigTable.KEEP_ADAPTER = 2;
@@ -72,6 +75,8 @@ public class MyBatisDataSourceMonitor implements DataSourceMonitor {
 
     /**
      * 数据源唯一标识 如果不实现则默认feature
+     *
+     * @param runtime    数据运行时上下文
      * @param datasource 数据源
      * @return String 返回null由上层自动提取
      */
@@ -90,6 +95,7 @@ public class MyBatisDataSourceMonitor implements DataSourceMonitor {
      * ConfigTable.KEEP_ADAPTER=2 : 根据当前接口判断是否保持同一个数据源绑定同一个adapter<br/>
      * DynamicRoutingDataSource类型的返回false,因为同一个DynamicRoutingDataSource可能对应多类数据库, 如果项目中只有一种数据库 应该直接返回true
      *
+     * @param runtime    数据运行时上下文
      * @param datasource 数据源
      * @return boolean
      */

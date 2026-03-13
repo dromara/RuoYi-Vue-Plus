@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexController {
 
     /**
-     * 访问首页，提示语
+     * 访问首页时返回引导提示。
+     *
+     * @return 首页提示语
      */
     @GetMapping("/")
     public String index() {

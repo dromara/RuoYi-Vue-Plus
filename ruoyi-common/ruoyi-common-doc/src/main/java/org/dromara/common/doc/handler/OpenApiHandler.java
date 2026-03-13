@@ -124,6 +124,7 @@ public class OpenApiHandler extends OpenAPIService {
      * @param openApiBuilderCustomizers the open api builder customisers
      * @param serverBaseUrlCustomizers  the server base url customizers
      * @param javadocProvider           the javadoc provider
+     * @param javadocResolvers          Javadoc 解析器列表
      */
     public OpenApiHandler(Optional<OpenAPI> openAPI, SecurityService securityParser,
                           SpringDocConfigProperties springDocConfigProperties, PropertyResolverUtils propertyResolverUtils,
@@ -152,6 +153,15 @@ public class OpenApiHandler extends OpenAPIService {
             TypeNameResolver.std.setUseFqn(true);
     }
 
+    /**
+     * 构建接口标签、权限描述与方法摘要。
+     *
+     * @param handlerMethod Handler 方法
+     * @param operation OpenAPI 操作对象
+     * @param openAPI OpenAPI 文档对象
+     * @param locale 当前语言环境
+     * @return 处理后的操作对象
+     */
     @Override
     public Operation buildTags(HandlerMethod handlerMethod, Operation operation, OpenAPI openAPI, Locale locale) {
 
@@ -247,6 +257,14 @@ public class OpenApiHandler extends OpenAPIService {
         return operation;
     }
 
+    /**
+     * 从方法注解中提取标签信息。
+     *
+     * @param method 方法对象
+     * @param tags 标签集合
+     * @param tagsStr 标签名称集合
+     * @param locale 当前语言环境
+     */
     private void buildTagsFromMethod(Method method, Set<io.swagger.v3.oas.models.tags.Tag> tags, Set<String> tagsStr, Locale locale) {
         // method tags
         Set<Tags> tagsSet = AnnotatedElementUtils
@@ -261,6 +279,13 @@ public class OpenApiHandler extends OpenAPIService {
         }
     }
 
+    /**
+     * 将注解标签转换并合并到 OpenAPI 标签集合。
+     *
+     * @param sourceTags 注解标签列表
+     * @param tags OpenAPI 标签集合
+     * @param locale 当前语言环境
+     */
     private void addTags(List<io.swagger.v3.oas.annotations.tags.Tag> sourceTags, Set<io.swagger.v3.oas.models.tags.Tag> tags, Locale locale) {
         Optional<Set<io.swagger.v3.oas.models.tags.Tag>> optionalTagSet = AnnotationsUtils
             .getTags(sourceTags.toArray(new io.swagger.v3.oas.annotations.tags.Tag[0]), true);

@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 登录用户身份权限
+ * 登录用户上下文对象，保存当前会话的身份、权限和终端信息。
  *
  * @author Lion Li
  */
@@ -134,7 +134,9 @@ public class LoginUser implements Serializable {
     private String deviceType;
 
     /**
-     * 获取登录id
+     * 获取 Sa-Token 使用的登录标识。
+     *
+     * @return 登录标识
      */
     public String getLoginId() {
         if (userType == null) {

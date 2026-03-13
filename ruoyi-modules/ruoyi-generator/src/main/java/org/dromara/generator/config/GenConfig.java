@@ -39,6 +39,11 @@ public class GenConfig {
         return author;
     }
 
+    /**
+     * 注入代码生成作者配置。
+     *
+     * @param author 作者名称
+     */
     @Value("${author}")
     public void setAuthor(String author) {
         GenConfig.author = author;
@@ -48,6 +53,11 @@ public class GenConfig {
         return packageName;
     }
 
+    /**
+     * 注入代码生成基础包名配置。
+     *
+     * @param packageName 基础包名
+     */
     @Value("${packageName}")
     public void setPackageName(String packageName) {
         GenConfig.packageName = packageName;
@@ -57,6 +67,11 @@ public class GenConfig {
         return autoRemovePre;
     }
 
+    /**
+     * 注入是否自动移除表前缀配置。
+     *
+     * @param autoRemovePre 是否自动移除表前缀
+     */
     @Value("${autoRemovePre}")
     public void setAutoRemovePre(boolean autoRemovePre) {
         GenConfig.autoRemovePre = autoRemovePre;
@@ -66,6 +81,11 @@ public class GenConfig {
         return tablePrefix;
     }
 
+    /**
+     * 注入代码生成表前缀配置。
+     *
+     * @param tablePrefix 表前缀字符串
+     */
     @Value("${tablePrefix}")
     public void setTablePrefix(String tablePrefix) {
         GenConfig.tablePrefix = tablePrefix;

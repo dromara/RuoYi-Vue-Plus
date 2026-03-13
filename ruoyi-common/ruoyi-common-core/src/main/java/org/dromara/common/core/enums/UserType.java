@@ -28,6 +28,12 @@ public enum UserType {
      */
     private final String userType;
 
+    /**
+     * 根据字符串内容匹配用户类型。
+     *
+     * @param str 待匹配字符串
+     * @return 用户类型
+     */
     public static UserType getUserType(String str) {
         for (UserType value : values()) {
             if (StringUtils.contains(str, value.getUserType())) {

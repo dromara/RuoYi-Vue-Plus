@@ -5,11 +5,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 三方登录对象
+ * 第三方平台登录绑定请求对象。
  *
  * @author Lion Li
  */
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SocialLoginBody extends LoginBody {

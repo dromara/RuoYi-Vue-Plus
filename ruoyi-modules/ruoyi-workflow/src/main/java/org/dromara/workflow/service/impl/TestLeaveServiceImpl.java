@@ -67,6 +67,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
 
     /**
      * 查询请假
+     *
+     * @param id 主键
+     * @return 请假详情
      */
     @Override
     public TestLeaveVo queryById(Long id) {
@@ -75,6 +78,10 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
 
     /**
      * 查询请假列表
+     *
+     * @param bo        查询条件
+     * @param pageQuery 分页参数
+     * @return 请假分页列表
      */
     @Override
     public TableDataInfo<TestLeaveVo> queryPageList(TestLeaveBo bo, PageQuery pageQuery) {
@@ -85,6 +92,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
 
     /**
      * 查询请假列表
+     *
+     * @param bo 查询条件
+     * @return 请假列表
      */
     @Override
     public List<TestLeaveVo> queryList(TestLeaveBo bo) {
@@ -92,6 +102,12 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         return baseMapper.selectVoList(lqw);
     }
 
+    /**
+     * 构造请假列表查询条件。
+     *
+     * @param bo 查询参数
+     * @return 包含请假类型、天数区间和排序条件的查询包装器
+     */
     private LambdaQueryWrapper<TestLeave> buildQueryWrapper(TestLeaveBo bo) {
         LambdaQueryWrapper<TestLeave> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getLeaveType()), TestLeave::getLeaveType, bo.getLeaveType());
@@ -103,6 +119,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
 
     /**
      * 新增请假
+     *
+     * @param bo 请假业务对象
+     * @return 新增后的请假详情
      */
     @Override
     public TestLeaveVo insertByBo(TestLeaveBo bo) {
@@ -121,6 +140,12 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         return MapstructUtils.convert(add, TestLeaveVo.class);
     }
 
+    /**
+     * 提交请假并同步发起审批流程。
+     *
+     * @param bo 请假业务对象
+     * @return 已落库并完成流程提交的请假详情
+     */
     @Transactional(rollbackFor = Exception.class)
     @Override
     public TestLeaveVo submitAndFlowStart(TestLeaveBo bo) {
@@ -154,6 +179,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
 
     /**
      * 修改请假
+     *
+     * @param bo 请假业务对象
+     * @return 更新后的请假详情
      */
     @Override
     public TestLeaveVo updateByBo(TestLeaveBo bo) {
@@ -164,6 +192,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
 
     /**
      * 批量删除请假
+     *
+     * @param ids 主键集合
+     * @return 删除成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

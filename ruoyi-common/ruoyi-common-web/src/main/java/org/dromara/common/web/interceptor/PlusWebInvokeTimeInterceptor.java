@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * web的调用时间统计拦截器
+ * Web 调用时间统计拦截器，同时记录请求参数并对敏感字段做脱敏处理。
  *
  * @author Lion Li
  * @since 3.3.0
@@ -36,6 +36,15 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
 
     private final static ThreadLocal<StopWatch> KEY_CACHE = new ThreadLocal<>();
 
+    /**
+     * 请求进入控制器前记录入参并启动耗时统计。
+     *
+     * @param request 当前请求
+     * @param response 当前响应
+     * @param handler 目标处理器
+     * @return 始终返回 true，继续后续处理流程
+     * @throws Exception 读取请求体或解析 JSON 失败时抛出
+     */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String url = request.getMethod() + " " + request.getRequestURI();
@@ -71,6 +80,12 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
         return true;
     }
 
+    /**
+     * 递归移除 JSON 节点中的敏感字段，避免在日志中输出密码等敏感信息。
+     *
+     * @param node 当前 JSON 节点
+     * @param excludeProperties 需要排除的字段名集合
+     */
     private void removeSensitiveFields(JsonNode node, String[] excludeProperties) {
         if (node == null) {
             return;
@@ -100,6 +115,15 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
 
     }
 
+    /**
+     * 请求完成后输出最终耗时，并清理线程内缓存的计时器。
+     *
+     * @param request 当前请求
+     * @param response 当前响应
+     * @param handler 目标处理器
+     * @param ex 请求处理过程中的异常
+     * @throws Exception 拦截器链路抛出的异常
+     */
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         StopWatch stopWatch = KEY_CACHE.get();

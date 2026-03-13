@@ -14,7 +14,7 @@ import java.io.Serial;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * 带干扰线、波浪、圆的验证码
+ * 带干扰线、波浪和圆形干扰元素的验证码实现，用于增强验证码识别难度。
  *
  * @author Lion Li
  */
@@ -23,27 +23,70 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    // 构造方法（略，与之前一致）
+    /**
+     * 构造默认长度为 4 的验证码。
+     *
+     * @param width 图片宽度
+     * @param height 图片高度
+     */
     public WaveAndCircleCaptcha(int width, int height) {
         this(width, height, 4);
     }
 
+    /**
+     * 构造指定验证码长度的验证码对象。
+     *
+     * @param width 图片宽度
+     * @param height 图片高度
+     * @param codeCount 验证码字符数
+     */
     public WaveAndCircleCaptcha(int width, int height, int codeCount) {
         this(width, height, codeCount, 6);
     }
 
+    /**
+     * 构造指定字符数与干扰数的验证码对象。
+     *
+     * @param width 图片宽度
+     * @param height 图片高度
+     * @param codeCount 验证码字符数
+     * @param interfereCount 干扰元素数量
+     */
     public WaveAndCircleCaptcha(int width, int height, int codeCount, int interfereCount) {
         this(width, height, new RandomGenerator(codeCount), interfereCount);
     }
 
+    /**
+     * 使用指定验证码生成器构造验证码对象。
+     *
+     * @param width 图片宽度
+     * @param height 图片高度
+     * @param generator 验证码生成器
+     * @param interfereCount 干扰元素数量
+     */
     public WaveAndCircleCaptcha(int width, int height, CodeGenerator generator, int interfereCount) {
         super(width, height, generator, interfereCount);
     }
 
+    /**
+     * 构造带字体缩放比例的验证码对象。
+     *
+     * @param width 图片宽度
+     * @param height 图片高度
+     * @param codeCount 验证码字符数
+     * @param interfereCount 干扰元素数量
+     * @param size 字体相对尺寸
+     */
     public WaveAndCircleCaptcha(int width, int height, int codeCount, int interfereCount, float size) {
         super(width, height, new RandomGenerator(codeCount), interfereCount, size);
     }
 
+    /**
+     * 生成验证码图片并绘制文字、扭曲效果及干扰图形。
+     *
+     * @param code 验证码文本
+     * @return 生成后的验证码图片
+     */
     @Override
     public Image createImage(String code) {
         final BufferedImage image = new BufferedImage(
@@ -65,6 +108,12 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
         return image;
     }
 
+    /**
+     * 绘制验证码文本并开启文字抗锯齿。
+     *
+     * @param g 图形上下文
+     * @param code 验证码文本
+     */
     private void drawString(Graphics2D g, String code) {
         // 设置抗锯齿（让字体渲染更清晰）
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -77,6 +126,11 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
         GraphicsUtil.drawStringColourful(g, code, this.font, this.width, this.height);
     }
 
+    /**
+     * 绘制圆形与波浪线干扰元素。
+     *
+     * @param g 图形上下文
+     */
     protected void drawInterfere(Graphics2D g) {
         ThreadLocalRandom random = RandomUtil.getRandom();
         int circleCount = Math.max(0, this.interfereCount - 1);
@@ -98,6 +152,12 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
         }
     }
 
+    /**
+     * 绘制平滑波浪线干扰轨迹。
+     *
+     * @param g 图形上下文
+     * @param random 随机数生成器
+     */
     private void drawSmoothWave(Graphics2D g, ThreadLocalRandom random) {
         int amplitude = random.nextInt(8) + 5;        // 波动幅度
         int wavelength = random.nextInt(40) + 30;     // 波长
@@ -122,6 +182,14 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
         g.drawPolyline(xPoints, yPoints, width);
     }
 
+    /**
+     * 生成指定 RGB 范围内的随机颜色。
+     *
+     * @param min 最小颜色值
+     * @param max 最大颜色值
+     * @param random 随机数生成器
+     * @return 随机颜色
+     */
     private Color getRandomColor(int min, int max, ThreadLocalRandom random) {
         int range = max - min;
         return new Color(

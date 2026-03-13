@@ -59,6 +59,12 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
         return baseMapper.selectVoList(lqw);
     }
 
+    /**
+     * 构造字典数据列表查询条件。
+     *
+     * @param bo 字典数据筛选条件
+     * @return 包含排序号、标签和字典类型条件的查询包装器
+     */
     private LambdaQueryWrapper<SysDictData> buildQueryWrapper(SysDictDataBo bo) {
         LambdaQueryWrapper<SysDictData> lqw = Wrappers.lambdaQuery();
         lqw.eq(bo.getDictSort() != null, SysDictData::getDictSort, bo.getDictSort());

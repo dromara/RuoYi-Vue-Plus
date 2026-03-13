@@ -28,7 +28,9 @@ public class SysSocialController extends BaseController {
     private final ISysSocialService socialUserService;
 
     /**
-     * 查询社会化关系列表
+     * 查询当前登录用户的社会化账号绑定列表。
+     *
+     * @return 绑定关系列表
      */
     @GetMapping("/list")
     public R<List<SysSocialVo>> list() {

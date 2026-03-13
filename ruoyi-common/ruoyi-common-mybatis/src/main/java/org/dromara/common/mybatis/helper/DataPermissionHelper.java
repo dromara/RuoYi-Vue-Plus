@@ -46,7 +46,7 @@ public class DataPermissionHelper {
     /**
      * 设置当前执行mapper权限注解
      *
-     * @param dataPermission   数据权限注解
+     * @param dataPermission 数据权限注解
      */
     public static void setPermission(DataPermission dataPermission) {
         PERMISSION_CACHE.set(dataPermission);
@@ -82,10 +82,20 @@ public class DataPermissionHelper {
         context.put(key, value);
     }
 
+    /**
+     * 获取当前数据权限访问控制对象。
+     *
+     * @return 访问控制对象
+     */
     public static DataPermissionAccess getAccess() {
         return getVariable(ACCESS_KEY);
     }
 
+    /**
+     * 设置当前数据权限访问控制对象。
+     *
+     * @param access 访问控制对象
+     */
     public static void setAccess(DataPermissionAccess access) {
         setVariable(ACCESS_KEY, access);
     }
@@ -109,6 +119,11 @@ public class DataPermissionHelper {
         throw new NullPointerException("data permission context type exception");
     }
 
+    /**
+     * 获取当前忽略策略。
+     *
+     * @return 忽略策略
+     */
     private static IgnoreStrategy getIgnoreStrategy() {
         Object ignoreStrategyLocal = ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
         if (ignoreStrategyLocal instanceof ThreadLocal<?> IGNORE_STRATEGY_LOCAL) {
@@ -173,6 +188,7 @@ public class DataPermissionHelper {
      * 在忽略数据权限中执行
      *
      * @param handle 处理执行方法
+     * @return 执行结果
      */
     public static <T> T ignore(Supplier<T> handle) {
         enableIgnore();

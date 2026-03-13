@@ -56,7 +56,8 @@ public class SysMenuServiceImpl implements ISysMenuService {
     /**
      * 查询系统菜单列表
      *
-     * @param menu 菜单信息
+     * @param menu   菜单筛选条件
+     * @param userId 当前查询的用户主键
      * @return 菜单列表
      */
     @Override
@@ -113,7 +114,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * 根据用户ID查询菜单
      *
      * @param userId 用户ID
-     * @return 菜单列表
+     * @return 按树结构组织的菜单列表
      */
     @Override
     public List<SysMenu> selectMenuTreeByUserId(Long userId) {
@@ -309,7 +310,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * 批量删除菜单管理信息
      *
      * @param menuIds 菜单ID串
-     * @return 结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

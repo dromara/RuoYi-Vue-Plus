@@ -36,10 +36,11 @@ import java.util.stream.Collectors;
 public class SysUserOnlineController extends BaseController {
 
     /**
-     * 获取在线用户监控列表
+     * 获取在线用户监控列表，并按 IP 或用户名条件过滤当前有效会话。
      *
      * @param ipaddr   IP地址
      * @param userName 用户名
+     * @return 在线用户分页数据
      */
     @SaCheckPermission("monitor:online:list")
     @GetMapping("/list")
@@ -76,9 +77,10 @@ public class SysUserOnlineController extends BaseController {
     }
 
     /**
-     * 强退用户
+     * 按 token 强制用户下线，适用于管理员踢除异常会话。
      *
      * @param tokenId token值
+     * @return 操作结果
      */
     @SaCheckPermission("monitor:online:forceLogout")
     @Log(title = "在线用户", businessType = BusinessType.FORCE)
@@ -93,7 +95,9 @@ public class SysUserOnlineController extends BaseController {
     }
 
     /**
-     * 获取当前用户登录在线设备
+     * 获取当前登录用户的在线设备列表，仅返回当前账号仍有效的 token 会话。
+     *
+     * @return 当前用户在线设备列表
      */
     @GetMapping()
     public TableDataInfo<SysUserOnline> getInfo() {
@@ -111,9 +115,10 @@ public class SysUserOnlineController extends BaseController {
     }
 
     /**
-     * 强退当前在线设备
+     * 强退当前账号下指定在线设备，避免误踢其他账号的会话。
      *
      * @param tokenId token值
+     * @return 操作结果
      */
     @Log(title = "在线设备", businessType = BusinessType.FORCE)
     @RepeatSubmit()

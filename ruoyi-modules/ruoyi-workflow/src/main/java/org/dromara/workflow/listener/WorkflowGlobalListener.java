@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 全局任务办理监听
+ * 工作流全局监听器，处理任务流转中的扩展变量、消息和事件发布。
  *
  * @author may
  */
@@ -55,7 +55,7 @@ public class WorkflowGlobalListener implements GlobalListener {
     private final UserService userService;
 
     /**
-     * 创建监听器，任务创建时执行
+     * 任务创建回调，当前预留扩展。
      *
      * @param listenerVariable 监听器变量
      */
@@ -65,7 +65,7 @@ public class WorkflowGlobalListener implements GlobalListener {
     }
 
     /**
-     * 开始监听器，任务开始办理时执行
+     * 任务开始办理时解析节点扩展配置。
      *
      * @param listenerVariable 监听器变量
      */
@@ -98,7 +98,7 @@ public class WorkflowGlobalListener implements GlobalListener {
     }
 
     /**
-     * 分派监听器，动态修改代办任务信息
+     * 任务分派时动态调整办理权限。
      *
      * @param listenerVariable 监听器变量
      */
@@ -166,7 +166,7 @@ public class WorkflowGlobalListener implements GlobalListener {
     }
 
     /**
-     * 完成监听器，当前任务完成后执行
+     * 任务完成后发布流程事件并处理抄送和通知。
      *
      * @param listenerVariable 监听器变量
      */

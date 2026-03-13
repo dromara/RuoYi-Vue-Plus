@@ -93,6 +93,12 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
         return new TableDataInfo<>(list, page.getTotal());
     }
 
+    /**
+     * 构造流程定义分页查询条件。
+     *
+     * @param flowDefinition 页面传入的流程定义筛选条件
+     * @return 叠加流程编码、名称、分类以及排序条件后的查询包装器
+     */
     private LambdaQueryWrapper<FlowDefinition> buildQueryWrapper(FlowDefinition flowDefinition) {
         LambdaQueryWrapper<FlowDefinition> wrapper = Wrappers.lambdaQuery();
         wrapper.like(StringUtils.isNotBlank(flowDefinition.getFlowCode()), FlowDefinition::getFlowCode, flowDefinition.getFlowCode());
@@ -109,6 +115,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
      * 发布流程定义
      *
      * @param id 流程定义id
+     * @return 发布成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -132,7 +139,9 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
     /**
      * 导入流程定义
      *
-     * @param file 文件
+     * @param file     流程定义 Json 文件
+     * @param category 导入后绑定的流程分类
+     * @return 导入成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -152,7 +161,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
      * 导出流程定义
      *
      * @param id       流程定义id
-     * @param response 响应
+     * @param response HTTP 响应对象，用于输出定义 Json 内容
      * @throws IOException 异常
      */
     @Override
@@ -171,6 +180,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
      * 删除流程定义
      *
      * @param ids 流程定义id
+     * @return 删除成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

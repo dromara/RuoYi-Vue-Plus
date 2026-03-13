@@ -80,6 +80,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      *
      * @param flowInstanceBo 流程实例
      * @param pageQuery      分页
+     * @return 当前符合条件的运行中流程实例分页结果
      */
     @Override
     public TableDataInfo<FlowInstanceVo> selectRunningInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery) {
@@ -94,6 +95,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      *
      * @param flowInstanceBo 流程实例
      * @param pageQuery      分页
+     * @return 当前符合条件的已结束流程实例分页结果
      */
     @Override
     public TableDataInfo<FlowInstanceVo> selectFinishInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery) {
@@ -179,6 +181,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 根据业务id查询流程实例
      *
      * @param businessId 业务id
+     * @return 对应的流程实例，不存在时返回 {@code null}
      */
     @Override
     public FlowInstance selectInstByBusinessId(String businessId) {
@@ -189,6 +192,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 按照实例id查询流程实例
      *
      * @param instanceId 实例id
+     * @return 实例详情，不存在时返回 {@code null}
      */
     @Override
     public FlowInstance selectInstById(Long instanceId) {
@@ -199,6 +203,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 按照实例id查询流程实例
      *
      * @param instanceIds 实例id
+     * @return 实例列表
      */
     @Override
     public List<FlowInstance> selectInstListByIdList(List<Long> instanceIds) {
@@ -209,6 +214,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 按照业务id删除流程实例
      *
      * @param businessIds 业务id
+     * @return 删除成功返回 {@code true}，未找到实例时返回 {@code false}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -225,6 +231,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 按照实例id删除流程实例
      *
      * @param instanceIds 实例id
+     * @return 删除成功返回 {@code true}，未找到实例时返回 {@code false}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -259,6 +266,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 按照实例id删除已完成的流程实例
      *
      * @param instanceIds 实例id
+     * @return 删除成功返回 {@code true}，未找到实例时返回 {@code false}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -298,6 +306,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 撤销流程
      *
      * @param bo 参数
+     * @return 撤销成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -328,6 +337,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      *
      * @param instanceBo 流程实例
      * @param pageQuery  分页
+     * @return 当前登录人发起的流程实例分页结果
      */
     @Override
     public TableDataInfo<FlowInstanceVo> selectCurrentInstanceList(FlowInstanceBo instanceBo, PageQuery pageQuery) {
@@ -341,6 +351,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 获取流程图,流程记录
      *
      * @param businessId 业务id
+     * @return 包含流程记录列表和实例 id 的结果集
      */
     @Override
     public Map<String, Object> flowHisTaskList(String businessId) {
@@ -410,6 +421,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 获取流程变量
      *
      * @param instanceId 实例id
+     * @return 变量明细列表及原始变量字符串
      */
     @Override
     public Map<String, Object> instanceVariable(Long instanceId) {
@@ -428,6 +440,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 设置流程变量
      *
      * @param bo 参数
+     * @return 更新成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -465,6 +478,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 按任务id查询实例
      *
      * @param taskId 任务id
+     * @return 任务关联的流程实例，运行中任务不存在时回退查询历史任务
      */
     @Override
     public FlowInstance selectByTaskId(Long taskId) {
@@ -484,6 +498,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * 作废流程
      *
      * @param bo 参数
+     * @return 作废成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

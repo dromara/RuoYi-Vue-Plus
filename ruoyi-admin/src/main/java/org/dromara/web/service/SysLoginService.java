@@ -136,7 +136,10 @@ public class SysLoginService {
     }
 
     /**
-     * 构建登录用户
+     * 根据用户视图对象组装登录态上下文。
+     *
+     * @param user 用户基础信息
+     * @return 包含部门、角色、岗位与权限数据的登录用户
      */
     public LoginUser buildLoginUser(SysUserVo user) {
         LoginUser loginUser = new LoginUser();
@@ -168,9 +171,10 @@ public class SysLoginService {
     }
 
     /**
-     * 记录登录信息
+     * 更新用户最近一次登录IP与登录时间。
      *
      * @param userId 用户ID
+     * @param ip     登录IP
      */
     public void recordLoginInfo(Long userId, String ip) {
         SysUser sysUser = new SysUser();
@@ -182,7 +186,11 @@ public class SysLoginService {
     }
 
     /**
-     * 登录校验
+     * 执行登录失败次数校验，并在成功后清空失败计数。
+     *
+     * @param loginType 登录类型
+     * @param username  登录标识
+     * @param supplier  返回 {@code true} 表示本次认证失败
      */
     public void checkLogin(LoginType loginType, String username, Supplier<Boolean> supplier) {
         String errorKey = CacheConstants.PWD_ERR_CNT_KEY + username;

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 
 /**
- * 用户行为 侦听器的实现
+ * 用户行为监听器，用于同步在线状态和登录日志。
  *
  * @author Lion Li
  */
@@ -34,7 +34,7 @@ public class UserActionListener implements SaTokenListener {
     private final SysLoginService loginService;
 
     /**
-     * 每次登录时触发
+     * 登录成功后记录在线信息并写入登录日志。
      */
     @Override
     public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginParameter loginParameter) {
@@ -71,7 +71,7 @@ public class UserActionListener implements SaTokenListener {
     }
 
     /**
-     * 每次注销时触发
+     * 注销时清理在线缓存。
      */
     @Override
     public void doLogout(String loginType, Object loginId, String tokenValue) {
@@ -80,7 +80,7 @@ public class UserActionListener implements SaTokenListener {
     }
 
     /**
-     * 每次被踢下线时触发
+     * 被踢下线时清理在线缓存。
      */
     @Override
     public void doKickout(String loginType, Object loginId, String tokenValue) {
@@ -89,7 +89,7 @@ public class UserActionListener implements SaTokenListener {
     }
 
     /**
-     * 每次被顶下线时触发
+     * 被顶下线时清理在线缓存。
      */
     @Override
     public void doReplaced(String loginType, Object loginId, String tokenValue) {

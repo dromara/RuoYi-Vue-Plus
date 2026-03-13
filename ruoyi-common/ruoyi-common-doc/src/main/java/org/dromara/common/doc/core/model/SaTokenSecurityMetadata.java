@@ -162,6 +162,7 @@ public class SaTokenSecurityMetadata {
 
         /**
          * 重写mode的获取方法，返回符号而非文字
+         *
          * @return AND→&，OR→|，默认→&
          */
         public String getModeSymbol() {

@@ -57,8 +57,19 @@ public enum ButtonPermissionEnum implements NodeExtEnum {
      */
     FILE("是否能上传附件", "file", true);
 
+    /**
+     * 按钮展示名称。
+     */
     private final String label;
+
+    /**
+     * 按钮权限值。
+     */
     private final String value;
+
+    /**
+     * 是否默认开启。
+     */
     private final boolean selected;
 
 }

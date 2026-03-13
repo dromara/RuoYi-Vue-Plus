@@ -161,6 +161,12 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
             .eq(FlowCategory::getParentId, categoryId));
     }
 
+    /**
+     * 构建流程分类查询条件。
+     *
+     * @param bo 查询条件
+     * @return 查询条件包装器
+     */
     private LambdaQueryWrapper<FlowCategory> buildQueryWrapper(FlowCategoryBo bo) {
         LambdaQueryWrapper<FlowCategory> lqw = Wrappers.lambdaQuery();
         lqw.eq(FlowCategory::getDelFlag, SystemConstants.NORMAL);

@@ -89,12 +89,25 @@ public class GenTableServiceImpl implements IGenTableService {
         return genTable;
     }
 
+    /**
+     * 分页查询已导入的代码生成业务表。
+     *
+     * @param genTable  业务表筛选条件
+     * @param pageQuery 分页参数
+     * @return 业务表分页结果
+     */
     @Override
     public TableDataInfo<GenTable> selectPageGenTableList(GenTable genTable, PageQuery pageQuery) {
         Page<GenTable> page = baseMapper.selectPage(pageQuery.build(), this.buildGenTableQueryWrapper(genTable));
         return TableDataInfo.build(page);
     }
 
+    /**
+     * 构造代码生成业务表查询条件。
+     *
+     * @param genTable 业务表筛选条件
+     * @return 包含数据源、表名、表注释和时间区间的查询包装器
+     */
     private QueryWrapper<GenTable> buildGenTableQueryWrapper(GenTable genTable) {
         Map<String, Object> params = genTable.getParams();
         QueryWrapper<GenTable> wrapper = Wrappers.query();
@@ -462,6 +475,9 @@ public class GenTableServiceImpl implements IGenTableService {
 
     /**
      * 查询表信息并生成代码
+     *
+     * @param tableId 业务表主键
+     * @param zip     代码压缩输出流
      */
     private void generatorCode(Long tableId, ZipOutputStream zip) {
         // 查询表信息
@@ -518,6 +534,12 @@ public class GenTableServiceImpl implements IGenTableService {
         }
     }
 
+    /**
+     * 查询业务表并补齐其列信息。
+     *
+     * @param tableId 业务表主键
+     * @return 包含字段集合的业务表实体
+     */
     private GenTable getGenTable(Long tableId) {
         GenTable table = baseMapper.selectById(tableId);
         if (ObjectUtil.isNull(table)) {
@@ -527,6 +549,12 @@ public class GenTableServiceImpl implements IGenTableService {
         return table;
     }
 
+    /**
+     * 批量填充业务表对应的字段列表。
+     *
+     * @param tables 业务表集合
+     * @return 已填充字段信息的业务表集合
+     */
     private List<GenTable> fillTableColumns(List<GenTable> tables) {
         if (CollUtil.isEmpty(tables)) {
             return tables;

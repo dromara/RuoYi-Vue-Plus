@@ -74,6 +74,12 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
         return baseMapper.selectVoList(lqw);
     }
 
+    /**
+     * 构造字典类型列表查询条件。
+     *
+     * @param bo 字典类型筛选条件
+     * @return 包含名称、类型与创建时间区间的查询包装器
+     */
     private LambdaQueryWrapper<SysDictType> buildQueryWrapper(SysDictTypeBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysDictType> lqw = Wrappers.lambdaQuery();
@@ -224,7 +230,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @param dictType  字典类型
      * @param dictValue 字典值
      * @param separator 分隔符
-     * @return 字典标签
+     * @return 转换后的字典标签，支持按分隔符批量转换
      */
     @Override
     public String getDictLabel(String dictType, String dictValue, String separator) {
@@ -248,7 +254,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @param dictType  字典类型
      * @param dictLabel 字典标签
      * @param separator 分隔符
-     * @return 字典值
+     * @return 转换后的字典值，支持按分隔符批量转换
      */
     @Override
     public String getDictValue(String dictType, String dictLabel, String separator) {

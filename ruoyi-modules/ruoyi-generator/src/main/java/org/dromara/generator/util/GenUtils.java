@@ -21,6 +21,8 @@ public class GenUtils {
 
     /**
      * 初始化表信息
+     *
+     * @param genTable 待初始化的业务表对象
      */
     public static void initTable(GenTable genTable) {
         genTable.setClassName(convertClassName(genTable.getTableName()));
@@ -35,6 +37,9 @@ public class GenUtils {
 
     /**
      * 初始化列属性字段
+     *
+     * @param column 待初始化的列对象
+     * @param table  所属业务表对象
      */
     public static void initColumnField(GenTableColumn column, GenTable table) {
         String dataType = getDbType(column.getColumnType());
@@ -166,6 +171,7 @@ public class GenUtils {
      *
      * @param replacementm 替换值
      * @param searchList   替换列表
+     * @return 去除命中前缀后的字符串
      */
     public static String replaceFirst(String replacementm, String[] searchList) {
         String text = replacementm;
@@ -206,7 +212,7 @@ public class GenUtils {
      * 获取字段长度
      *
      * @param columnType 列类型
-     * @return 截取后的列类型
+     * @return 字段长度，未声明长度时返回 0
      */
     public static Integer getColumnLength(String columnType) {
         if (StringUtils.indexOf(columnType, "(") > 0) {

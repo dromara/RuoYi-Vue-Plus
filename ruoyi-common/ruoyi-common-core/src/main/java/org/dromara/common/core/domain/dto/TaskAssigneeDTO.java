@@ -29,7 +29,7 @@ public class TaskAssigneeDTO implements Serializable {
     private Long total = 0L;
 
     /**
-     *
+     * 受让人列表。
      */
     private List<TaskHandler> list;
 
@@ -67,6 +67,9 @@ public class TaskAssigneeDTO implements Serializable {
             )).collect(Collectors.toList());
     }
 
+    /**
+     * 任务受让人明细对象。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

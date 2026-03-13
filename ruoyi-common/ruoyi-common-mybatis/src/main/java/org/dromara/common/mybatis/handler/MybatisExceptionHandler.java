@@ -21,7 +21,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class MybatisExceptionHandler {
 
     /**
-     * 主键或UNIQUE索引，数据重复异常
+     * 处理主键或唯一索引冲突异常。
+     *
+     * @param e 异常信息
+     * @param request 当前请求
+     * @return 统一失败响应
      */
     @ExceptionHandler(DuplicateKeyException.class)
     public R<Void> handleDuplicateKeyException(DuplicateKeyException e, HttpServletRequest request) {
@@ -31,7 +35,11 @@ public class MybatisExceptionHandler {
     }
 
     /**
-     * Mybatis系统异常 通用处理
+     * 处理 MyBatis 系统异常。
+     *
+     * @param e 异常信息
+     * @param request 当前请求
+     * @return 统一失败响应
      */
     @ExceptionHandler(MyBatisSystemException.class)
     public R<Void> handleCannotFindDataSourceException(MyBatisSystemException e, HttpServletRequest request) {

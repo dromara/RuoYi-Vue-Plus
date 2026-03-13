@@ -21,6 +21,7 @@ import java.util.List;
  * <p>
  * 注意: 此Service内不允许调用标注`数据权限`注解的方法
  * 例如: deptMapper.selectList 此 selectList 方法标注了`数据权限`注解 会出现循环解析的问题
+ * 当前实现仅负责返回角色自定义部门范围以及部门树展开后的 id 串，供数据权限插件拼装 SQL 时使用。
  *
  * @author Lion Li
  */
@@ -35,7 +36,7 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
      * 获取角色自定义权限
      *
      * @param roleId 角色Id
-     * @return 部门Id组
+     * @return 逗号分隔的部门 id 字符串，未配置时返回 `-1`
      */
     @Cacheable(cacheNames = CacheNames.SYS_ROLE_CUSTOM, key = "#roleId", condition = "#roleId != null")
     @Override
@@ -57,7 +58,7 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
      * 获取部门及以下权限
      *
      * @param deptId 部门Id
-     * @return 部门Id组
+     * @return 当前部门及其子部门的逗号分隔 id 字符串，未查询到时返回 `-1`
      */
     @Cacheable(cacheNames = CacheNames.SYS_DEPT_AND_CHILD, key = "#deptId", condition = "#deptId != null")
     @Override

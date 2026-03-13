@@ -28,6 +28,8 @@ public class ThreadPoolConfig {
 
     /**
      * 执行周期性或定时任务
+     *
+     * @return 全局定时任务线程池
      */
     @Bean(name = "scheduledExecutorService")
     protected ScheduledExecutorService scheduledExecutorService() {
@@ -85,6 +87,9 @@ public class ThreadPoolConfig {
 
     /**
      * 打印线程异常信息
+     *
+     * @param r 已执行的任务
+     * @param t 任务执行过程中抛出的异常
      */
     public static void printException(Runnable r, Throwable t) {
         if (t == null && r instanceof Future<?>) {

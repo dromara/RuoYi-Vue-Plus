@@ -23,6 +23,9 @@ public class AllUrlHandler implements InitializingBean {
 
     private List<String> urls = new ArrayList<>();
 
+    /**
+     * 初始化并收集系统中的全部请求路径。
+     */
     @Override
     public void afterPropertiesSet() {
         Set<String> set = new HashSet<>();

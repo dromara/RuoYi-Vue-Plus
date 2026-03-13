@@ -17,6 +17,13 @@ public class DeptNameTranslationImpl implements TranslationInterface<String> {
 
     private final DeptService deptService;
 
+    /**
+     * 将部门 ID 或 ID 集合翻译为部门名称。
+     *
+     * @param key 部门 ID 或逗号分隔的 ID 字符串
+     * @param other 额外参数
+     * @return 部门名称
+     */
     @Override
     public String translation(Object key, String other) {
         if (key instanceof String ids) {

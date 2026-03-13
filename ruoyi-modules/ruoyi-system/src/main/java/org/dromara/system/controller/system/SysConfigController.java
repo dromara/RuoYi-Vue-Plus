@@ -34,7 +34,11 @@ public class SysConfigController extends BaseController {
     private final ISysConfigService configService;
 
     /**
-     * 获取参数配置列表
+     * 分页查询参数配置列表。
+     *
+     * @param config 查询条件
+     * @param pageQuery 分页参数
+     * @return 参数配置分页结果
      */
     @SaCheckPermission("system:config:list")
     @GetMapping("/list")
@@ -43,7 +47,10 @@ public class SysConfigController extends BaseController {
     }
 
     /**
-     * 导出参数配置列表
+     * 导出参数配置列表。
+     *
+     * @param config 查询条件
+     * @param response HTTP 响应
      */
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:config:export")
@@ -57,6 +64,7 @@ public class SysConfigController extends BaseController {
      * 根据参数编号获取详细信息
      *
      * @param configId 参数ID
+     * @return 参数配置详情
      */
     @SaCheckPermission("system:config:query")
     @GetMapping(value = "/{configId}")
@@ -68,6 +76,7 @@ public class SysConfigController extends BaseController {
      * 根据参数键名查询参数值
      *
      * @param configKey 参数Key
+     * @return 参数值
      */
     @GetMapping(value = "/configKey/{configKey}")
     public R<String> getConfigKey(@PathVariable String configKey) {
@@ -75,7 +84,10 @@ public class SysConfigController extends BaseController {
     }
 
     /**
-     * 新增参数配置
+     * 新增参数配置。
+     *
+     * @param config 参数配置
+     * @return 操作结果
      */
     @SaCheckPermission("system:config:add")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
@@ -90,7 +102,10 @@ public class SysConfigController extends BaseController {
     }
 
     /**
-     * 修改参数配置
+     * 修改参数配置。
+     *
+     * @param config 参数配置
+     * @return 操作结果
      */
     @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
@@ -105,7 +120,10 @@ public class SysConfigController extends BaseController {
     }
 
     /**
-     * 根据参数键名修改参数配置
+     * 根据参数键名修改参数配置。
+     *
+     * @param config 参数配置
+     * @return 操作结果
      */
     @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
@@ -120,6 +138,7 @@ public class SysConfigController extends BaseController {
      * 删除参数配置
      *
      * @param configIds 参数ID串
+     * @return 操作结果
      */
     @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
@@ -130,7 +149,9 @@ public class SysConfigController extends BaseController {
     }
 
     /**
-     * 刷新参数缓存
+     * 刷新参数缓存。
+     *
+     * @return 操作结果
      */
     @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.CLEAN)

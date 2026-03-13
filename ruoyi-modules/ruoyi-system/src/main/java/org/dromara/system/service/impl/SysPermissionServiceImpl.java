@@ -62,6 +62,12 @@ public class SysPermissionServiceImpl implements ISysPermissionService, Permissi
         return perms;
     }
 
+    /**
+     * 按权限标识汇总具备数据权限的角色集合。
+     *
+     * @param roles 角色传输对象列表
+     * @return key 为权限标识、value 为拥有该权限的角色主键列表
+     */
     @Override
     public Map<String, List<Long>> getDataScopeRoleMap(List<RoleDTO> roles) {
         if (CollUtil.isEmpty(roles)) {

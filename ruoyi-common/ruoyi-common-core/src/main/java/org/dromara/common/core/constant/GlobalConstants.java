@@ -1,7 +1,7 @@
 package org.dromara.common.core.constant;
 
 /**
- * 全局的key常量 (业务无关的key)
+ * 全局通用键常量，主要用于业务无关的 Redis Key 前缀定义。
  *
  * @author Lion Li
  */

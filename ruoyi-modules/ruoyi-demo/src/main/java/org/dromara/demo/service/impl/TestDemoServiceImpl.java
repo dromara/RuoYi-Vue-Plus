@@ -32,11 +32,24 @@ public class TestDemoServiceImpl implements ITestDemoService {
 
     private final TestDemoMapper baseMapper;
 
+    /**
+     * 根据主键查询测试单表详情。
+     *
+     * @param id 主键
+     * @return 测试单表视图对象
+     */
     @Override
     public TestDemoVo queryById(Long id) {
         return baseMapper.selectVoById(id);
     }
 
+    /**
+     * 分页查询测试单表列表。
+     *
+     * @param bo 查询条件
+     * @param pageQuery 分页参数
+     * @return 分页结果
+     */
     @Override
     public TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
@@ -45,7 +58,11 @@ public class TestDemoServiceImpl implements ITestDemoService {
     }
 
     /**
-     * 自定义分页查询
+     * 通过自定义 SQL 分页查询测试单表列表。
+     *
+     * @param bo 查询条件
+     * @param pageQuery 分页参数
+     * @return 分页结果
      */
     @Override
     public TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery) {
@@ -54,11 +71,23 @@ public class TestDemoServiceImpl implements ITestDemoService {
         return TableDataInfo.build(result);
     }
 
+    /**
+     * 查询符合条件的测试单表列表。
+     *
+     * @param bo 查询条件
+     * @return 结果列表
+     */
     @Override
     public List<TestDemoVo> queryList(TestDemoBo bo) {
         return baseMapper.selectVoList(buildQueryWrapper(bo));
     }
 
+    /**
+     * 构建测试单表动态查询条件。
+     *
+     * @param bo 查询条件
+     * @return 查询条件包装器
+     */
     private LambdaQueryWrapper<TestDemo> buildQueryWrapper(TestDemoBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<TestDemo> lqw = Wrappers.lambdaQuery();
@@ -72,6 +101,12 @@ public class TestDemoServiceImpl implements ITestDemoService {
         return lqw;
     }
 
+    /**
+     * 新增测试单表数据。
+     *
+     * @param bo 新增业务对象
+     * @return 是否新增成功
+     */
     @Override
     public Boolean insertByBo(TestDemoBo bo) {
         TestDemo add = MapstructUtils.convert(bo, TestDemo.class);
@@ -83,6 +118,12 @@ public class TestDemoServiceImpl implements ITestDemoService {
         return flag;
     }
 
+    /**
+     * 更新测试单表数据。
+     *
+     * @param bo 编辑业务对象
+     * @return 是否更新成功
+     */
     @Override
     public Boolean updateByBo(TestDemoBo bo) {
         TestDemo update = MapstructUtils.convert(bo, TestDemo.class);
@@ -99,6 +140,13 @@ public class TestDemoServiceImpl implements ITestDemoService {
         //TODO 做一些数据校验,如唯一约束
     }
 
+    /**
+     * 按主键集合删除测试单表数据，并按需执行删除前校验。
+     *
+     * @param ids 主键集合
+     * @param isValid 是否执行删除校验
+     * @return 是否删除成功
+     */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         if (isValid) {
@@ -111,6 +159,12 @@ public class TestDemoServiceImpl implements ITestDemoService {
         return baseMapper.deleteByIds(ids) > 0;
     }
 
+    /**
+     * 批量保存测试单表数据。
+     *
+     * @param list 待保存实体列表
+     * @return 是否保存成功
+     */
     @Override
     public Boolean saveBatch(List<TestDemo> list) {
         return baseMapper.insertBatch(list);

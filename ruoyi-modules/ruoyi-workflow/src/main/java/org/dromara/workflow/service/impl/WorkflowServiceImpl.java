@@ -53,6 +53,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * 获取当前流程状态
      *
      * @param taskId 任务id
+     * @return 任务关联流程实例的业务状态，未查询到时返回空字符串
      */
     @Override
     public String getBusinessStatusByTaskId(Long taskId) {
@@ -64,6 +65,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * 获取当前流程状态
      *
      * @param businessId 业务id
+     * @return 业务单据对应的流程状态，未查询到时返回空字符串
      */
     @Override
     public String getBusinessStatus(String businessId) {
@@ -86,6 +88,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * 获取流程变量
      *
      * @param instanceId 流程实例id
+     * @return 实例变量信息
      */
     @Override
     public Map<String, Object> instanceVariable(Long instanceId) {
@@ -108,6 +111,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * 启动流程
      *
      * @param startProcess 参数
+     * @return 启动后的流程实例和首个任务信息
      */
     @Override
     public StartProcessReturnDTO startWorkFlow(StartProcessDTO startProcess) {
@@ -120,6 +124,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * completeTask.getVariables().put("ignore", true);
      *
      * @param completeTask 参数
+     * @return 办理成功返回 {@code true}
      */
     @Override
     public boolean completeTask(CompleteTaskDTO completeTask) {
@@ -131,6 +136,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      *
      * @param taskId  任务ID
      * @param message 办理意见
+     * @return 办理成功返回 {@code true}
      */
     @Override
     public boolean completeTask(Long taskId, String message) {
@@ -146,6 +152,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * 启动流程并办理第一个任务
      *
      * @param startProcess 参数
+     * @return 首节点办理成功返回 {@code true}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

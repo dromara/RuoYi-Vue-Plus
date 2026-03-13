@@ -36,7 +36,11 @@ public class SysLoginInfoController extends BaseController {
     private final ISysLoginInfoService loginInfoService;
 
     /**
-     * 获取系统访问记录列表
+     * 分页查询系统访问记录。
+     *
+     * @param loginInfo 查询条件
+     * @param pageQuery 分页参数
+     * @return 登录日志分页结果
      */
     @SaCheckPermission("monitor:logininfo:list")
     @GetMapping("/list")
@@ -45,7 +49,10 @@ public class SysLoginInfoController extends BaseController {
     }
 
     /**
-     * 导出系统访问记录列表
+     * 导出系统访问记录列表。
+     *
+     * @param loginInfo 查询条件
+     * @param response HTTP 响应
      */
     @Log(title = "登录日志", businessType = BusinessType.EXPORT)
     @SaCheckPermission("monitor:logininfo:export")
@@ -57,7 +64,9 @@ public class SysLoginInfoController extends BaseController {
 
     /**
      * 批量删除登录日志
+     *
      * @param infoIds 日志ids
+     * @return 操作结果
      */
     @SaCheckPermission("monitor:logininfo:remove")
     @Log(title = "登录日志", businessType = BusinessType.DELETE)
@@ -67,7 +76,9 @@ public class SysLoginInfoController extends BaseController {
     }
 
     /**
-     * 清理系统访问记录
+     * 清空系统访问记录。
+     *
+     * @return 操作结果
      */
     @SaCheckPermission("monitor:logininfo:remove")
     @Log(title = "登录日志", businessType = BusinessType.CLEAN)
@@ -78,6 +89,12 @@ public class SysLoginInfoController extends BaseController {
         return R.ok();
     }
 
+    /**
+     * 清除指定用户的登录失败锁定状态。
+     *
+     * @param userName 用户名
+     * @return 操作结果
+     */
     @SaCheckPermission("monitor:logininfo:unlock")
     @Log(title = "账户解锁", businessType = BusinessType.OTHER)
     @RepeatSubmit()

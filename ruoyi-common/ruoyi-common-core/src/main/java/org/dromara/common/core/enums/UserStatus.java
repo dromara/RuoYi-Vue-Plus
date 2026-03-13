@@ -24,7 +24,14 @@ public enum UserStatus {
      */
     DELETED("2", "删除");
 
+    /**
+     * 状态编码。
+     */
     private final String code;
+
+    /**
+     * 状态说明。
+     */
     private final String info;
 
 }

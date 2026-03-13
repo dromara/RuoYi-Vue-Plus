@@ -42,7 +42,11 @@ public class SysRoleController extends BaseController {
     private final ISysDeptService deptService;
 
     /**
-     * 获取角色信息列表
+     * 分页查询角色列表。
+     *
+     * @param role 查询条件
+     * @param pageQuery 分页参数
+     * @return 角色分页结果
      */
     @SaCheckPermission("system:role:list")
     @GetMapping("/list")
@@ -51,7 +55,10 @@ public class SysRoleController extends BaseController {
     }
 
     /**
-     * 导出角色信息列表
+     * 导出角色信息列表。
+     *
+     * @param role 查询条件
+     * @param response HTTP 响应
      */
     @Log(title = "角色管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:role:export")
@@ -65,6 +72,7 @@ public class SysRoleController extends BaseController {
      * 根据角色编号获取详细信息
      *
      * @param roleId 角色ID
+     * @return 角色详情
      */
     @SaCheckPermission("system:role:query")
     @GetMapping(value = "/{roleId}")
@@ -74,7 +82,10 @@ public class SysRoleController extends BaseController {
     }
 
     /**
-     * 新增角色
+     * 新增角色。
+     *
+     * @param role 角色参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:role:add")
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
@@ -92,7 +103,10 @@ public class SysRoleController extends BaseController {
     }
 
     /**
-     * 修改保存角色
+     * 修改角色。
+     *
+     * @param role 角色参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
@@ -115,7 +129,10 @@ public class SysRoleController extends BaseController {
     }
 
     /**
-     * 修改保存数据权限
+     * 修改角色数据权限。
+     *
+     * @param role 角色参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
@@ -132,7 +149,10 @@ public class SysRoleController extends BaseController {
     }
 
     /**
-     * 状态修改
+     * 修改角色状态。
+     *
+     * @param role 角色参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
@@ -152,6 +172,7 @@ public class SysRoleController extends BaseController {
      * 删除角色
      *
      * @param roleIds 角色ID串
+     * @return 操作结果
      */
     @SaCheckPermission("system:role:remove")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
@@ -164,6 +185,7 @@ public class SysRoleController extends BaseController {
      * 获取角色选择框列表
      *
      * @param roleIds 角色ID串
+     * @return 角色列表
      */
     @SaCheckPermission("system:role:query")
     @GetMapping("/optionselect")
@@ -172,7 +194,11 @@ public class SysRoleController extends BaseController {
     }
 
     /**
-     * 查询已分配用户角色列表
+     * 查询已分配用户角色列表。
+     *
+     * @param user 查询条件
+     * @param pageQuery 分页参数
+     * @return 用户分页结果
      */
     @SaCheckPermission("system:role:list")
     @GetMapping("/authUser/allocatedList")
@@ -181,7 +207,11 @@ public class SysRoleController extends BaseController {
     }
 
     /**
-     * 查询未分配用户角色列表
+     * 查询未分配用户角色列表。
+     *
+     * @param user 查询条件
+     * @param pageQuery 分页参数
+     * @return 用户分页结果
      */
     @SaCheckPermission("system:role:list")
     @GetMapping("/authUser/unallocatedList")
@@ -190,7 +220,10 @@ public class SysRoleController extends BaseController {
     }
 
     /**
-     * 取消授权用户
+     * 取消授权用户。
+     *
+     * @param userRole 用户角色关系
+     * @return 操作结果
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
@@ -205,6 +238,7 @@ public class SysRoleController extends BaseController {
      *
      * @param roleId  角色ID
      * @param userIds 用户ID串
+     * @return 操作结果
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
@@ -219,6 +253,7 @@ public class SysRoleController extends BaseController {
      *
      * @param roleId  角色ID
      * @param userIds 用户ID串
+     * @return 操作结果
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
@@ -233,6 +268,7 @@ public class SysRoleController extends BaseController {
      * 获取对应角色部门树列表
      *
      * @param roleId 角色ID
+     * @return 角色部门树信息
      */
     @SaCheckPermission("system:role:list")
     @GetMapping(value = "/deptTree/{roleId}")

@@ -16,6 +16,4 @@ public class SecurityProperties {
      * 排除路径
      */
     private String[] excludes;
-
-
 }

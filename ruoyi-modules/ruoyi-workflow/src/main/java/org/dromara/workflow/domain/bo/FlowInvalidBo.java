@@ -8,7 +8,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 作废请求对象
+ * 作废流程请求对象。
  *
  * @author may
  */

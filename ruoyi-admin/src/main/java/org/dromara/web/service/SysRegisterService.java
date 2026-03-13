@@ -38,6 +38,8 @@ public class SysRegisterService {
 
     /**
      * 注册
+     *
+     * @param registerBody 注册请求参数
      */
     public void register(RegisterBody registerBody) {
         String username = registerBody.getUsername();
@@ -95,7 +97,6 @@ public class SysRegisterService {
      * @param username 用户名
      * @param status   状态
      * @param message  消息内容
-     * @return
      */
     private void recordLoginInfo(String username, String status, String message) {
         LoginInfoEvent loginInfoEvent = new LoginInfoEvent();

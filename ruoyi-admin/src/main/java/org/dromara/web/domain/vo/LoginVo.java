@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
- * 登录验证信息
+ * 登录成功后的令牌信息返回对象。
  *
  * @author Michelle.Chung
  */

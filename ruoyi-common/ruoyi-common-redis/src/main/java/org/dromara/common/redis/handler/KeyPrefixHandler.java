@@ -14,13 +14,21 @@ public class KeyPrefixHandler implements NameMapper {
 
     private final String keyPrefix;
 
+    /**
+     * 创建 Redis Key 前缀处理器。
+     *
+     * @param keyPrefix Key 前缀
+     */
     public KeyPrefixHandler(String keyPrefix) {
         //前缀为空 则返回空前缀
         this.keyPrefix = StringUtils.isBlank(keyPrefix) ? "" : keyPrefix + ":";
     }
 
     /**
-     * 增加前缀
+     * 为原始 Key 增加前缀。
+     *
+     * @param name 原始 Key
+     * @return 带前缀的 Key
      */
     @Override
     public String map(String name) {
@@ -34,7 +42,10 @@ public class KeyPrefixHandler implements NameMapper {
     }
 
     /**
-     * 去除前缀
+     * 去除 Key 前缀。
+     *
+     * @param name 带前缀的 Key
+     * @return 原始 Key
      */
     @Override
     public String unmap(String name) {

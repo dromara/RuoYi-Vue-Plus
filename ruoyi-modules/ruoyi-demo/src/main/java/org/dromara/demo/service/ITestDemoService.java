@@ -20,22 +20,34 @@ public interface ITestDemoService {
     /**
      * 查询单个
      *
-     * @return
+     * @param id 主键
+     * @return 测试单表视图对象
      */
     TestDemoVo queryById(Long id);
 
     /**
-     * 查询列表
+     * 分页查询测试单表列表。
+     *
+     * @param bo 查询条件
+     * @param pageQuery 分页参数
+     * @return 分页结果
      */
     TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery);
 
     /**
-     * 自定义分页查询
+     * 按自定义 SQL 分页查询测试单表列表。
+     *
+     * @param bo 查询条件
+     * @param pageQuery 分页参数
+     * @return 分页结果
      */
     TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery);
 
     /**
-     * 查询列表
+     * 查询符合条件的测试单表列表。
+     *
+     * @param bo 查询条件
+     * @return 结果列表
      */
     List<TestDemoVo> queryList(TestDemoBo bo);
 
@@ -43,7 +55,7 @@ public interface ITestDemoService {
      * 根据新增业务对象插入测试单表
      *
      * @param bo 测试单表新增业务对象
-     * @return
+     * @return 是否新增成功
      */
     Boolean insertByBo(TestDemoBo bo);
 
@@ -51,7 +63,7 @@ public interface ITestDemoService {
      * 根据编辑业务对象修改测试单表
      *
      * @param bo 测试单表编辑业务对象
-     * @return
+     * @return 是否修改成功
      */
     Boolean updateByBo(TestDemoBo bo);
 
@@ -60,12 +72,15 @@ public interface ITestDemoService {
      *
      * @param ids     主键集合
      * @param isValid 是否校验,true-删除前校验,false-不校验
-     * @return
+     * @return 是否删除成功
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
 
     /**
-     * 批量保存
+     * 批量保存测试单表数据。
+     *
+     * @param list 待保存数据
+     * @return 是否保存成功
      */
     Boolean saveBatch(List<TestDemo> list);
 }

@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 消息类型枚举
+ * 消息类型枚举，定义流程通知支持的消息通道。
  *
  * @author may
  */
@@ -32,15 +32,21 @@ public enum MessageTypeEnum {
      */
     SMS_MESSAGE("3", "短信");
 
+    /**
+     * 消息类型编码。
+     */
     private final String code;
 
+    /**
+     * 消息类型描述。
+     */
     private final String desc;
 
     private static final Map<String, MessageTypeEnum> MESSAGE_TYPE_ENUM_MAP = Arrays.stream(values())
         .collect(Collectors.toConcurrentMap(MessageTypeEnum::getCode, Function.identity()));
 
     /**
-     * 根据消息类型 code 获取 MessageTypeEnum
+     * 根据消息类型编码获取枚举实例。
      *
      * @param code 消息类型code
      * @return MessageTypeEnum

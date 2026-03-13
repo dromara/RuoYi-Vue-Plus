@@ -17,6 +17,8 @@ public class VelocityInitializer {
 
     /**
      * 初始化vm方法
+     *
+     * @throws RuntimeException 初始化 Velocity 引擎失败时抛出
      */
     public static void initVelocity() {
         Properties p = new Properties();

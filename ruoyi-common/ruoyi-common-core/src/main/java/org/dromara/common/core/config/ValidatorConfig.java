@@ -20,6 +20,9 @@ public class ValidatorConfig {
 
     /**
      * 配置校验框架 快速失败模式
+     *
+     * @param messageSource 国际化消息源
+     * @return 启用快速失败模式的校验器
      */
     @Bean
     public Validator validator(MessageSource messageSource) {

@@ -39,7 +39,11 @@ public class GenController extends BaseController {
     private final IGenTableService genTableService;
 
     /**
-     * 查询代码生成列表
+     * 分页查询代码生成业务列表。
+     *
+     * @param genTable 查询条件
+     * @param pageQuery 分页参数
+     * @return 代码生成列表
      */
     @SaCheckPermission("tool:gen:list")
     @GetMapping("/list")
@@ -51,6 +55,7 @@ public class GenController extends BaseController {
      * 修改代码生成业务
      *
      * @param tableId 表ID
+     * @return 表、字段与可选业务表信息
      */
     @RepeatSubmit()
     @SaCheckPermission("tool:gen:query")
@@ -67,7 +72,11 @@ public class GenController extends BaseController {
     }
 
     /**
-     * 查询数据库列表
+     * 分页查询数据库表列表。
+     *
+     * @param genTable 查询条件
+     * @param pageQuery 分页参数
+     * @return 数据库表列表
      */
     @SaCheckPermission("tool:gen:list")
     @GetMapping("/db/list")
@@ -79,6 +88,7 @@ public class GenController extends BaseController {
      * 查询数据表字段列表
      *
      * @param tableId 表ID
+     * @return 字段列表
      */
     @SaCheckPermission("tool:gen:list")
     @GetMapping(value = "/column/{tableId}")
@@ -92,6 +102,7 @@ public class GenController extends BaseController {
      *
      * @param tables   表名串
      * @param dataName 数据源名称
+     * @return 操作结果
      */
     @SaCheckPermission("tool:gen:import")
     @Log(title = "代码生成", businessType = BusinessType.IMPORT)
@@ -107,7 +118,10 @@ public class GenController extends BaseController {
     }
 
     /**
-     * 修改保存代码生成业务
+     * 保存代码生成业务配置。
+     *
+     * @param genTable 业务配置
+     * @return 操作结果
      */
     @SaCheckPermission("tool:gen:edit")
     @Log(title = "代码生成", businessType = BusinessType.UPDATE)
@@ -123,6 +137,7 @@ public class GenController extends BaseController {
      * 删除代码生成
      *
      * @param tableIds 表ID串
+     * @return 操作结果
      */
     @SaCheckPermission("tool:gen:remove")
     @Log(title = "代码生成", businessType = BusinessType.DELETE)
@@ -136,6 +151,7 @@ public class GenController extends BaseController {
      * 预览代码
      *
      * @param tableId 表ID
+     * @return 模板路径与生成代码内容映射
      */
     @SaCheckPermission("tool:gen:preview")
     @GetMapping("/preview/{tableId}")
@@ -147,6 +163,7 @@ public class GenController extends BaseController {
     /**
      * 生成代码（下载方式）
      *
+     * @param response HTTP 响应
      * @param tableId 表ID
      */
     @SaCheckPermission("tool:gen:code")
@@ -161,6 +178,7 @@ public class GenController extends BaseController {
      * 生成代码（自定义路径）
      *
      * @param tableId 表ID
+     * @return 操作结果
      */
     @SaCheckPermission("tool:gen:code")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
@@ -174,6 +192,7 @@ public class GenController extends BaseController {
      * 同步数据库
      *
      * @param tableId 表ID
+     * @return 操作结果
      */
     @SaCheckPermission("tool:gen:edit")
     @Log(title = "代码生成", businessType = BusinessType.UPDATE)
@@ -187,6 +206,7 @@ public class GenController extends BaseController {
     /**
      * 批量生成代码
      *
+     * @param response HTTP 响应
      * @param tableIdStr 表ID串
      */
     @SaCheckPermission("tool:gen:code")
@@ -199,7 +219,10 @@ public class GenController extends BaseController {
     }
 
     /**
-     * 生成zip文件
+     * 将生成结果写出为 zip 文件流。
+     *
+     * @param response HTTP 响应
+     * @param data zip 二进制数据
      */
     private void genCode(HttpServletResponse response, byte[] data) throws IOException {
         response.reset();
@@ -212,7 +235,9 @@ public class GenController extends BaseController {
     }
 
     /**
-     * 查询数据源名称列表
+     * 查询当前可用数据源名称列表。
+     *
+     * @return 数据源名称集合
      */
     @SaCheckPermission("tool:gen:list")
     @GetMapping(value = "/getDataNames")

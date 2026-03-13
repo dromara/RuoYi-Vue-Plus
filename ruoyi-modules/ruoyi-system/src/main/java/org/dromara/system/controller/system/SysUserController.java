@@ -59,7 +59,11 @@ public class SysUserController extends BaseController {
     private final ISysDeptService deptService;
 
     /**
-     * 获取用户列表
+     * 分页查询用户列表。
+     *
+     * @param user 用户查询条件
+     * @param pageQuery 分页参数
+     * @return 用户分页列表
      */
     @SaCheckPermission("system:user:list")
     @GetMapping("/list")
@@ -68,7 +72,10 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 导出用户列表
+     * 导出符合条件的用户列表。
+     *
+     * @param user 用户查询条件
+     * @param response HTTP 响应
      */
     @Log(title = "用户管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:user:export")
@@ -93,7 +100,9 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 获取导入模板
+     * 导出用户导入模板。
+     *
+     * @param response HTTP 响应
      */
     @PostMapping("/importTemplate")
     public void importTemplate(HttpServletResponse response) {
@@ -103,7 +112,7 @@ public class SysUserController extends BaseController {
     /**
      * 获取用户信息
      *
-     * @return 用户信息
+     * @return 当前登录用户信息、角色与权限集合
      */
     @GetMapping("/getInfo")
     public R<UserInfoVo> getInfo() {
@@ -124,6 +133,7 @@ public class SysUserController extends BaseController {
      * 根据用户编号获取详细信息
      *
      * @param userId 用户ID
+     * @return 用户详情、角色与岗位信息
      */
     @SaCheckPermission("system:user:query")
     @GetMapping(value = {"/", "/{userId}"})
@@ -150,7 +160,10 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 新增用户
+     * 新增用户。
+     *
+     * @param user 用户新增参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:user:add")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
@@ -170,7 +183,10 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 修改用户
+     * 修改用户。
+     *
+     * @param user 用户编辑参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
@@ -193,7 +209,8 @@ public class SysUserController extends BaseController {
     /**
      * 删除用户
      *
-     * @param userIds 角色ID串
+     * @param userIds 用户ID数组
+     * @return 操作结果
      */
     @SaCheckPermission("system:user:remove")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
@@ -210,6 +227,7 @@ public class SysUserController extends BaseController {
      *
      * @param userIds 用户ID串
      * @param deptId  部门ID
+     * @return 用户基础信息列表
      */
     @SaCheckPermission("system:user:query")
     @GetMapping("/optionselect")
@@ -219,7 +237,10 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 重置密码
+     * 重置指定用户密码。
+     *
+     * @param user 用户参数
+     * @return 操作结果
      */
     @ApiEncrypt
     @SaCheckPermission("system:user:resetPwd")
@@ -234,7 +255,10 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 状态修改
+     * 修改用户状态。
+     *
+     * @param user 用户参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
@@ -250,6 +274,7 @@ public class SysUserController extends BaseController {
      * 根据用户编号获取授权角色
      *
      * @param userId 用户ID
+     * @return 用户及其可授权角色信息
      */
     @SaCheckPermission("system:user:query")
     @GetMapping("/authRole/{userId}")
@@ -268,6 +293,7 @@ public class SysUserController extends BaseController {
      *
      * @param userId  用户Id
      * @param roleIds 角色ID串
+     * @return 操作结果
      */
     @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.GRANT)
@@ -280,7 +306,10 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 获取部门树列表
+     * 获取用户筛选用的部门树。
+     *
+     * @param dept 部门查询条件
+     * @return 部门树列表
      */
     @SaCheckPermission("system:user:list")
     @GetMapping("/deptTree")
@@ -289,7 +318,10 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 获取部门下的所有用户信息
+     * 获取指定部门下的全部用户信息。
+     *
+     * @param deptId 部门ID
+     * @return 用户列表
      */
     @SaCheckPermission("system:user:list")
     @GetMapping("/list/dept/{deptId}")

@@ -38,7 +38,11 @@ public class SysClientController extends BaseController {
     private final ISysClientService sysClientService;
 
     /**
-     * 查询客户端管理列表
+     * 分页查询客户端管理列表。
+     *
+     * @param bo 查询条件
+     * @param pageQuery 分页参数
+     * @return 客户端分页数据
      */
     @SaCheckPermission("system:client:list")
     @GetMapping("/list")
@@ -47,7 +51,10 @@ public class SysClientController extends BaseController {
     }
 
     /**
-     * 导出客户端管理列表
+     * 导出客户端管理列表，便于离线审计与配置核查。
+     *
+     * @param bo 查询条件
+     * @param response 响应流
      */
     @SaCheckPermission("system:client:export")
     @Log(title = "客户端管理", businessType = BusinessType.EXPORT)
@@ -58,9 +65,10 @@ public class SysClientController extends BaseController {
     }
 
     /**
-     * 获取客户端管理详细信息
+     * 获取单个客户端的详细配置信息。
      *
      * @param id 主键
+     * @return 客户端详情
      */
     @SaCheckPermission("system:client:query")
     @GetMapping("/{id}")
@@ -70,7 +78,10 @@ public class SysClientController extends BaseController {
     }
 
     /**
-     * 新增客户端管理
+     * 新增客户端配置，入库前先校验客户端 key 是否唯一。
+     *
+     * @param bo 客户端信息
+     * @return 操作结果
      */
     @SaCheckPermission("system:client:add")
     @Log(title = "客户端管理", businessType = BusinessType.INSERT)
@@ -84,7 +95,10 @@ public class SysClientController extends BaseController {
     }
 
     /**
-     * 修改客户端管理
+     * 修改客户端配置，避免重复占用同一个客户端 key。
+     *
+     * @param bo 客户端信息
+     * @return 操作结果
      */
     @SaCheckPermission("system:client:edit")
     @Log(title = "客户端管理", businessType = BusinessType.UPDATE)
@@ -98,7 +112,10 @@ public class SysClientController extends BaseController {
     }
 
     /**
-     * 状态修改
+     * 修改客户端启停状态。
+     *
+     * @param bo 客户端状态信息
+     * @return 操作结果
      */
     @SaCheckPermission("system:client:edit")
     @Log(title = "客户端管理", businessType = BusinessType.UPDATE)
@@ -108,9 +125,10 @@ public class SysClientController extends BaseController {
     }
 
     /**
-     * 删除客户端管理
+     * 批量删除客户端配置。
      *
      * @param ids 主键串
+     * @return 操作结果
      */
     @SaCheckPermission("system:client:remove")
     @Log(title = "客户端管理", businessType = BusinessType.DELETE)

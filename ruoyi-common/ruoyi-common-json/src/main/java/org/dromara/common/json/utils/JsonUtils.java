@@ -24,6 +24,11 @@ public class JsonUtils {
 
     private static final JsonMapper JSON_MAPPER = SpringUtils.getBean(JsonMapper.class);
 
+    /**
+     * 获取全局 JsonMapper 实例。
+     *
+     * @return JsonMapper
+     */
     public static JsonMapper getJsonMapper() {
         return JSON_MAPPER;
     }

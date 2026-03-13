@@ -1,7 +1,7 @@
 package org.dromara.common.core.constant;
 
 /**
- * 缓存组名称常量
+ * 缓存组名称常量，统一约定缓存名和缓存策略配置格式。
  * <p>
  * key 格式为 cacheNames#ttl#maxIdleTime#maxSize#local
  * <p>

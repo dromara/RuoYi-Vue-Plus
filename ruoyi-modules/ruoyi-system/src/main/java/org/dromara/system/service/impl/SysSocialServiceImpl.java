@@ -29,6 +29,9 @@ public class SysSocialServiceImpl implements ISysSocialService {
 
     /**
      * 查询社会化关系
+     *
+     * @param id 主键
+     * @return 社会化绑定详情
      */
     @Override
     public SysSocialVo queryById(String id) {
@@ -37,6 +40,9 @@ public class SysSocialServiceImpl implements ISysSocialService {
 
     /**
      * 授权列表
+     *
+     * @param bo 查询条件
+     * @return 社会化授权关系列表
      */
     @Override
     public List<SysSocialVo> queryList(SysSocialBo bo) {
@@ -47,6 +53,12 @@ public class SysSocialServiceImpl implements ISysSocialService {
         return baseMapper.selectVoList(lqw);
     }
 
+    /**
+     * 按用户主键查询其绑定的社会化授权列表。
+     *
+     * @param userId 用户主键
+     * @return 用户已绑定的社会化授权列表
+     */
     @Override
     public List<SysSocialVo> queryListByUserId(Long userId) {
         return baseMapper.selectVoList(new LambdaQueryWrapper<SysSocial>().eq(SysSocial::getUserId, userId));
@@ -55,6 +67,9 @@ public class SysSocialServiceImpl implements ISysSocialService {
 
     /**
      * 新增社会化关系
+     *
+     * @param bo 业务对象
+     * @return 新增成功返回 {@code true}
      */
     @Override
     public Boolean insertByBo(SysSocialBo bo) {
@@ -73,6 +88,9 @@ public class SysSocialServiceImpl implements ISysSocialService {
 
     /**
      * 更新社会化关系
+     *
+     * @param bo 业务对象
+     * @return 更新成功返回 {@code true}
      */
     @Override
     public Boolean updateByBo(SysSocialBo bo) {
@@ -83,6 +101,8 @@ public class SysSocialServiceImpl implements ISysSocialService {
 
     /**
      * 保存前的数据校验
+     *
+     * @param entity 待保存的社会化关系实体
      */
     private void validEntityBeforeSave(SysSocial entity) {
         //TODO 做一些数据校验,如唯一约束
@@ -91,6 +111,9 @@ public class SysSocialServiceImpl implements ISysSocialService {
 
     /**
      * 删除社会化关系
+     *
+     * @param id 主键
+     * @return 删除成功返回 {@code true}
      */
     @Override
     public Boolean deleteWithValidById(Long id) {

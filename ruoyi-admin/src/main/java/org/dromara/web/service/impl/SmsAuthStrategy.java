@@ -42,6 +42,13 @@ public class SmsAuthStrategy implements IAuthStrategy {
     private final SysLoginService loginService;
     private final SysUserMapper userMapper;
 
+    /**
+     * 执行短信验证码登录，并按客户端配置生成访问令牌。
+     *
+     * @param body   登录请求体
+     * @param client 当前客户端配置
+     * @return 登录结果
+     */
     @Override
     public LoginVo login(String body, SysClientVo client) {
         SmsLoginBody loginBody = JsonUtils.parseObject(body, SmsLoginBody.class);
@@ -72,7 +79,11 @@ public class SmsAuthStrategy implements IAuthStrategy {
     }
 
     /**
-     * 校验短信验证码
+     * 校验短信验证码是否存在且匹配。
+     *
+     * @param phonenumber 手机号
+     * @param smsCode     用户输入的短信验证码
+     * @return 是否校验通过
      */
     private boolean validateSmsCode(String phonenumber, String smsCode) {
         String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + phonenumber);
@@ -83,6 +94,12 @@ public class SmsAuthStrategy implements IAuthStrategy {
         return code.equals(smsCode);
     }
 
+    /**
+     * 按手机号加载可登录用户，并校验是否存在或被停用。
+     *
+     * @param phonenumber 手机号
+     * @return 用户信息
+     */
     private SysUserVo loadUserByPhonenumber(String phonenumber) {
         SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhonenumber, phonenumber));
         if (ObjectUtil.isNull(user)) {

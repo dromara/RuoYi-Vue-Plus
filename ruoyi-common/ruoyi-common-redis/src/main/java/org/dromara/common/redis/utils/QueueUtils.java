@@ -25,7 +25,9 @@ public class QueueUtils {
 
 
     /**
-     * 获取客户端实例
+     * 获取 Redisson 客户端实例。
+     *
+     * @return Redisson 客户端
      */
     public static RedissonClient getClient() {
         return CLIENT;
@@ -36,6 +38,7 @@ public class QueueUtils {
      *
      * @param queueName 队列名
      * @param data      数据
+     * @return 是否添加成功
      */
     public static <T> boolean addQueueObject(String queueName, T data) {
         RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
@@ -46,6 +49,7 @@ public class QueueUtils {
      * 通用获取一个队列数据 没有数据返回 null(不支持延迟队列)
      *
      * @param queueName 队列名
+     * @return 队列数据
      */
     public static <T> T getQueueObject(String queueName) {
         RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
@@ -53,7 +57,11 @@ public class QueueUtils {
     }
 
     /**
-     * 通用删除队列数据(不支持延迟队列)
+     * 删除普通队列中的指定数据。
+     *
+     * @param queueName 队列名
+     * @param data      数据
+     * @return 是否删除成功
      */
     public static <T> boolean removeQueueObject(String queueName, T data) {
         RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
@@ -61,7 +69,10 @@ public class QueueUtils {
     }
 
     /**
-     * 通用销毁队列 所有阻塞监听 报错(不支持延迟队列)
+     * 销毁普通队列。
+     *
+     * @param queueName 队列名
+     * @return 是否销毁成功
      */
     public static <T> boolean destroyQueue(String queueName) {
         RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
@@ -73,6 +84,7 @@ public class QueueUtils {
      *
      * @param queueName 队列名
      * @param data      数据
+     * @return 是否添加成功
      */
     public static <T> boolean addPriorityQueueObject(String queueName, T data) {
         RPriorityBlockingQueue<T> priorityBlockingQueue = CLIENT.getPriorityBlockingQueue(queueName);
@@ -83,6 +95,7 @@ public class QueueUtils {
      * 优先队列获取一个队列数据 没有数据返回 null(不支持延迟队列)
      *
      * @param queueName 队列名
+     * @return 队列数据
      */
     public static <T> T getPriorityQueueObject(String queueName) {
         RPriorityBlockingQueue<T> queue = CLIENT.getPriorityBlockingQueue(queueName);
@@ -90,7 +103,11 @@ public class QueueUtils {
     }
 
     /**
-     * 优先队列删除队列数据(不支持延迟队列)
+     * 删除优先队列中的指定数据。
+     *
+     * @param queueName 队列名
+     * @param data      数据
+     * @return 是否删除成功
      */
     public static <T> boolean removePriorityQueueObject(String queueName, T data) {
         RPriorityBlockingQueue<T> queue = CLIENT.getPriorityBlockingQueue(queueName);
@@ -98,7 +115,10 @@ public class QueueUtils {
     }
 
     /**
-     * 优先队列销毁队列 所有阻塞监听 报错(不支持延迟队列)
+     * 销毁优先队列。
+     *
+     * @param queueName 队列名
+     * @return 是否销毁成功
      */
     public static <T> boolean destroyPriorityQueue(String queueName) {
         RPriorityBlockingQueue<T> queue = CLIENT.getPriorityBlockingQueue(queueName);
@@ -106,7 +126,10 @@ public class QueueUtils {
     }
 
     /**
-     * 订阅阻塞队列(可订阅所有实现类)
+     * 订阅阻塞队列元素。
+     *
+     * @param queueName 队列名
+     * @param consumer  消费逻辑
      */
     public static <T> void subscribeBlockingQueue(String queueName, Function<T, CompletionStage<Void>> consumer) {
         RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);

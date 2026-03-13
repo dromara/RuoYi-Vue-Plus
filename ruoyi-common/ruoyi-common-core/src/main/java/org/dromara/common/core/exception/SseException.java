@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 
 /**
- * sse 特制异常
+ * SSE 场景专用异常。
  *
  * @author LionLi
  */
@@ -36,10 +36,21 @@ public final class SseException extends RuntimeException {
      */
     private String detailMessage;
 
+    /**
+     * 使用错误消息构造 SSE 异常。
+     *
+     * @param message 错误消息
+     */
     public SseException(String message) {
         this.message = message;
     }
 
+    /**
+     * 使用错误消息和错误码构造 SSE 异常。
+     *
+     * @param message 错误消息
+     * @param code 错误码
+     */
     public SseException(String message, Integer code) {
         this.message = message;
         this.code = code;
@@ -50,11 +61,23 @@ public final class SseException extends RuntimeException {
         return message;
     }
 
+    /**
+     * 设置错误消息并返回当前异常对象。
+     *
+     * @param message 错误消息
+     * @return 当前异常对象
+     */
     public SseException setMessage(String message) {
         this.message = message;
         return this;
     }
 
+    /**
+     * 设置错误明细并返回当前异常对象。
+     *
+     * @param detailMessage 错误明细
+     * @return 当前异常对象
+     */
     public SseException setDetailMessage(String detailMessage) {
         this.detailMessage = detailMessage;
         return this;

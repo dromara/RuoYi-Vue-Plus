@@ -77,6 +77,12 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
         return baseMapper.selectRoleList(this.buildQueryWrapper(role));
     }
 
+    /**
+     * 构造角色列表查询条件。
+     *
+     * @param bo 角色筛选条件
+     * @return 包含名称、权限字符、状态和创建时间区间的查询包装器
+     */
     private Wrapper<SysRole> buildQueryWrapper(SysRoleBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysRole> wrapper = Wrappers.lambdaQuery();

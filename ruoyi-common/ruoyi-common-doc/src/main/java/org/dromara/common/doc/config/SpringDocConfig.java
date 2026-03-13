@@ -44,6 +44,12 @@ public class SpringDocConfig {
 
     private final ServerProperties serverProperties;
 
+    /**
+     * 构建基础 OpenAPI 文档对象。
+     *
+     * @param properties SpringDoc 配置
+     * @return OpenAPI 对象
+     */
     @Bean
     @ConditionalOnMissingBean(OpenAPI.class)
     public OpenAPI openApi(SpringDocProperties properties) {
@@ -68,6 +74,12 @@ public class SpringDocConfig {
         return openApi;
     }
 
+    /**
+     * 将自定义文档信息配置转换为 OpenAPI Info。
+     *
+     * @param infoProperties 文档信息配置
+     * @return Info 对象
+     */
     private Info convertInfo(SpringDocProperties.InfoProperties infoProperties) {
         Info info = new Info();
         info.setTitle(infoProperties.getTitle());

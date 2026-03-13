@@ -25,7 +25,10 @@ public class SpelRuleComponent {
     private final DeptService deptService;
 
     /**
-     * 通过发起人部门id获取部门负责人
+     * 通过发起人部门 ID 获取部门负责人。
+     *
+     * @param initiatorDeptId 发起人部门 ID
+     * @return 部门负责人用户 ID
      */
     public Long selectDeptLeaderById(Long initiatorDeptId) {
         Long leaderId = deptService.selectDeptLeaderById(initiatorDeptId);

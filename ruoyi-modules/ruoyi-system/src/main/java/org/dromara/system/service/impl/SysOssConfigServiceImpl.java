@@ -60,11 +60,24 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         }
     }
 
+    /**
+     * 查询对象存储配置详情。
+     *
+     * @param ossConfigId 配置主键
+     * @return 对象存储配置详情
+     */
     @Override
     public SysOssConfigVo queryById(Long ossConfigId) {
         return baseMapper.selectVoById(ossConfigId);
     }
 
+    /**
+     * 分页查询对象存储配置列表。
+     *
+     * @param bo        配置筛选条件
+     * @param pageQuery 分页参数
+     * @return 配置分页结果
+     */
     @Override
     public TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<SysOssConfig> lqw = buildQueryWrapper(bo);
@@ -73,6 +86,12 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
     }
 
 
+    /**
+     * 构造对象存储配置列表查询条件。
+     *
+     * @param bo 配置筛选条件
+     * @return 包含配置标识、桶名称和状态条件的查询包装器
+     */
     private LambdaQueryWrapper<SysOssConfig> buildQueryWrapper(SysOssConfigBo bo) {
         LambdaQueryWrapper<SysOssConfig> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getConfigKey()), SysOssConfig::getConfigKey, bo.getConfigKey());
@@ -82,6 +101,12 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         return lqw;
     }
 
+    /**
+     * 新增对象存储配置并刷新缓存。
+     *
+     * @param bo 配置业务对象
+     * @return 新增成功返回 {@code true}
+     */
     @Override
     public Boolean insertByBo(SysOssConfigBo bo) {
         SysOssConfig config = MapstructUtils.convert(bo, SysOssConfig.class);
@@ -95,6 +120,12 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         return flag;
     }
 
+    /**
+     * 更新对象存储配置并刷新缓存。
+     *
+     * @param bo 配置业务对象
+     * @return 更新成功返回 {@code true}
+     */
     @Override
     public Boolean updateByBo(SysOssConfigBo bo) {
         SysOssConfig config = MapstructUtils.convert(bo, SysOssConfig.class);
@@ -116,6 +147,8 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
 
     /**
      * 保存前的数据校验
+     *
+     * @param entity 待保存的对象存储配置实体
      */
     private void validEntityBeforeSave(SysOssConfig entity) {
         if (StringUtils.isNotEmpty(entity.getConfigKey())
@@ -124,6 +157,13 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         }
     }
 
+    /**
+     * 删除对象存储配置并同步清理缓存。
+     *
+     * @param ids     主键集合
+     * @param isValid 是否执行业务校验
+     * @return 删除成功返回 {@code true}
+     */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         if (isValid) {
@@ -146,6 +186,9 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
 
     /**
      * 判断configKey是否唯一
+     *
+     * @param sysOssConfig 对象存储配置实体
+     * @return 唯一返回 {@code true}
      */
     private boolean checkConfigKeyUnique(SysOssConfig sysOssConfig) {
         long ossConfigId = ObjectUtils.notNull(sysOssConfig.getOssConfigId(), -1L);
@@ -160,6 +203,9 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
 
     /**
      * 启用禁用状态
+     *
+     * @param bo 配置业务对象
+     * @return 更新条数
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

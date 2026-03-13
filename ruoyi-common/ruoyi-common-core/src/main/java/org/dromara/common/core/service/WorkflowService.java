@@ -50,6 +50,7 @@ public interface WorkflowService {
      * 获取流程变量
      *
      * @param instanceId 流程实例id
+     * @return 流程变量详情
      */
     Map<String, Object> instanceVariable(Long instanceId);
 
@@ -65,7 +66,7 @@ public interface WorkflowService {
      * 启动流程
      *
      * @param startProcess 参数
-     * @return 结果
+     * @return 启动后的流程实例与首任务信息
      */
     StartProcessReturnDTO startWorkFlow(StartProcessDTO startProcess);
 
@@ -75,7 +76,7 @@ public interface WorkflowService {
      * completeTask.getVariables().put("ignore", true);
      *
      * @param completeTask 参数
-     * @return 结果
+     * @return 办理成功返回 {@code true}
      */
     boolean completeTask(CompleteTaskDTO completeTask);
 
@@ -84,7 +85,7 @@ public interface WorkflowService {
      *
      * @param taskId  任务ID
      * @param message 办理意见
-     * @return 结果
+     * @return 办理成功返回 {@code true}
      */
     boolean completeTask(Long taskId, String message);
 
@@ -92,7 +93,7 @@ public interface WorkflowService {
      * 启动流程并办理第一个任务
      *
      * @param startProcess 参数
-     * @return 结果
+     * @return 首节点办理成功返回 {@code true}
      */
     boolean startCompleteTask(StartProcessDTO startProcess);
 }

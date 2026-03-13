@@ -56,7 +56,7 @@ public class PlusSpringCacheManager implements CacheManager {
     ConcurrentMap<String, Cache> instanceMap = new ConcurrentHashMap<>();
 
     /**
-     * Creates CacheManager supplied by Redisson instance
+     * 创建基于 Redisson 的缓存管理器。
      */
     public PlusSpringCacheManager() {
     }
@@ -113,10 +113,21 @@ public class PlusSpringCacheManager implements CacheManager {
         this.configMap = (Map<String, CacheConfig>) config;
     }
 
+    /**
+     * 创建默认缓存配置。
+     *
+     * @return 默认缓存配置
+     */
     protected CacheConfig createDefaultConfig() {
         return new CacheConfig();
     }
 
+    /**
+     * 按缓存名称获取缓存实例，并支持通过扩展参数动态设置 TTL、最大空闲时间和容量。
+     *
+     * @param name 缓存名称，支持 `cacheName#ttl#maxIdle#maxSize#local` 格式
+     * @return 缓存实例
+     */
     @Override
     public Cache getCache(String name) {
         // 重写 cacheName 支持多参数
@@ -158,6 +169,14 @@ public class PlusSpringCacheManager implements CacheManager {
         return createMapCache(name, config, local);
     }
 
+    /**
+     * 创建普通 Map 类型缓存。
+     *
+     * @param name 缓存名称
+     * @param config 缓存配置
+     * @param local 是否启用本地一级缓存
+     * @return 缓存实例
+     */
     private Cache createMap(String name, CacheConfig config, int local) {
         RMap<Object, Object> map = RedisUtils.getClient().getMap(name);
 
@@ -175,6 +194,14 @@ public class PlusSpringCacheManager implements CacheManager {
         return cache;
     }
 
+    /**
+     * 创建带过期策略的 MapCache 类型缓存。
+     *
+     * @param name 缓存名称
+     * @param config 缓存配置
+     * @param local 是否启用本地一级缓存
+     * @return 缓存实例
+     */
     private Cache createMapCache(String name, CacheConfig config, int local) {
         RMapCache<Object, Object> map = RedisUtils.getClient().getMapCache(name);
 
@@ -197,6 +224,11 @@ public class PlusSpringCacheManager implements CacheManager {
         return cache;
     }
 
+    /**
+     * 获取当前缓存名称集合。
+     *
+     * @return 缓存名称集合
+     */
     @Override
     public Collection<String> getCacheNames() {
         return Collections.unmodifiableSet(configMap.keySet());

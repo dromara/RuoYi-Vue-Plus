@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 流程spel表达式定义Service接口
+ * 流程 SpEL 表达式定义服务接口，负责表达式规则管理与动态指派解析。
  *
  * @author Michelle.Chung
  * @date 2025-07-04
@@ -20,7 +20,7 @@ import java.util.Map;
 public interface IFlwSpelService {
 
     /**
-     * 查询流程spel表达式定义
+     * 根据主键查询流程 SpEL 表达式定义。
      *
      * @param id 主键
      * @return 流程spel表达式定义
@@ -37,7 +37,7 @@ public interface IFlwSpelService {
     TableDataInfo<FlowSpelVo> queryPageList(FlowSpelBo bo, PageQuery pageQuery);
 
     /**
-     * 查询符合条件的流程spel表达式定义列表
+     * 查询符合条件的流程 SpEL 表达式定义列表。
      *
      * @param bo 查询条件
      * @return 流程spel表达式定义列表
@@ -45,7 +45,7 @@ public interface IFlwSpelService {
     List<FlowSpelVo> queryList(FlowSpelBo bo);
 
     /**
-     * 新增流程spel表达式定义
+     * 新增流程 SpEL 表达式定义。
      *
      * @param bo 流程spel表达式定义
      * @return 是否新增成功
@@ -53,7 +53,7 @@ public interface IFlwSpelService {
     Boolean insertByBo(FlowSpelBo bo);
 
     /**
-     * 修改流程spel表达式定义
+     * 修改流程 SpEL 表达式定义。
      *
      * @param bo 流程spel表达式定义
      * @return 是否修改成功
@@ -70,7 +70,7 @@ public interface IFlwSpelService {
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
 
     /**
-     * 查询spel并返回任务指派的列表，支持分页
+     * 按任务指派条件解析 SpEL，并返回可用办理人列表。
      *
      * @param taskQuery 查询条件
      * @return 办理人

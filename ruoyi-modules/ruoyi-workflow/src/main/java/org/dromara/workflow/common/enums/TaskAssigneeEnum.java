@@ -43,7 +43,14 @@ public enum TaskAssigneeEnum {
      */
     SPEL("SpEL表达式", "");
 
+    /**
+     * 类型描述。
+     */
     private final String desc;
+
+    /**
+     * 类型编码前缀。
+     */
     private final String code;
 
     /**
@@ -85,10 +92,7 @@ public enum TaskAssigneeEnum {
     }
 
     /**
-     * 获取所有办理人类型的描述列表
-     * <p>
-     * 获取当前枚举类所有项的描述字段列表，通常用于展示选择项。
-     * </p>
+     * 获取所有办理人类型的描述列表，通常用于前端展示选择项。
      *
      * @return List<String> 返回所有办理人类型的描述列表
      */
@@ -99,10 +103,8 @@ public enum TaskAssigneeEnum {
     }
 
     /**
-     * 获取所有办理人类型的代码列表
-     * <p>
-     * 获取当前枚举类所有项的代码字段列表，通常用于程序内部逻辑的判断。
-     * </p>
+    /**
+     * 获取所有办理人类型的代码列表，通常用于程序内部逻辑判断。
      *
      * @return List<String> 返回所有办理人类型的代码列表
      */
@@ -113,7 +115,7 @@ public enum TaskAssigneeEnum {
     }
 
     /**
-     * 判断当前办理人类型是否需要调用部门服务（deptService）
+     * 判断当前办理人类型是否需要调用部门服务。
      *
      * @return 如果类型是 USER、DEPT 或 POST，则返回 true；否则返回 false
      */

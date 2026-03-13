@@ -43,7 +43,9 @@ public class SecurityConfig implements WebMvcConfigurer {
     private String ssePath;
 
     /**
-     * 注册sa-token的拦截器
+     * 注册 Sa-Token 路由拦截器并配置鉴权规则。
+     *
+     * @param registry 拦截器注册器
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -87,7 +89,9 @@ public class SecurityConfig implements WebMvcConfigurer {
     }
 
     /**
-     * 对 actuator 健康检查接口 做账号密码鉴权
+     * 为 actuator 健康检查接口配置 Basic Auth 鉴权过滤器。
+     *
+     * @return Sa-Token Servlet 过滤器
      */
     @Bean
     public SaServletFilter getSaServletFilter() {

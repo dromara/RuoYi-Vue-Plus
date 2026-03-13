@@ -32,7 +32,11 @@ public class SysNoticeController extends BaseController {
     private final DictService dictService;
 
     /**
-     * 获取通知公告列表
+     * 分页查询通知公告列表。
+     *
+     * @param notice 查询条件
+     * @param pageQuery 分页参数
+     * @return 公告分页结果
      */
     @SaCheckPermission("system:notice:list")
     @GetMapping("/list")
@@ -44,6 +48,7 @@ public class SysNoticeController extends BaseController {
      * 根据通知公告编号获取详细信息
      *
      * @param noticeId 公告ID
+     * @return 公告详情
      */
     @SaCheckPermission("system:notice:query")
     @GetMapping(value = "/{noticeId}")
@@ -52,7 +57,10 @@ public class SysNoticeController extends BaseController {
     }
 
     /**
-     * 新增通知公告
+     * 新增通知公告，并向在线用户广播公告摘要。
+     *
+     * @param notice 公告参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:notice:add")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
@@ -69,7 +77,10 @@ public class SysNoticeController extends BaseController {
     }
 
     /**
-     * 修改通知公告
+     * 修改通知公告。
+     *
+     * @param notice 公告参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:notice:edit")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
@@ -83,6 +94,7 @@ public class SysNoticeController extends BaseController {
      * 删除通知公告
      *
      * @param noticeIds 公告ID串
+     * @return 操作结果
      */
     @SaCheckPermission("system:notice:remove")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)

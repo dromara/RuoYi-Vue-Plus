@@ -34,7 +34,10 @@ public class SysDeptController extends BaseController {
     private final ISysPostService postService;
 
     /**
-     * 获取部门列表
+     * 查询部门列表。
+     *
+     * @param dept 查询条件
+     * @return 部门列表
      */
     @SaCheckPermission("system:dept:list")
     @GetMapping("/list")
@@ -47,6 +50,7 @@ public class SysDeptController extends BaseController {
      * 查询部门列表（排除节点）
      *
      * @param deptId 部门ID
+     * @return 过滤后的部门列表
      */
     @SaCheckPermission("system:dept:list")
     @GetMapping("/list/exclude/{deptId}")
@@ -61,6 +65,7 @@ public class SysDeptController extends BaseController {
      * 根据部门编号获取详细信息
      *
      * @param deptId 部门ID
+     * @return 部门详情
      */
     @SaCheckPermission("system:dept:query")
     @GetMapping(value = "/{deptId}")
@@ -70,7 +75,10 @@ public class SysDeptController extends BaseController {
     }
 
     /**
-     * 新增部门
+     * 新增部门。
+     *
+     * @param dept 部门参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:dept:add")
     @Log(title = "部门管理", businessType = BusinessType.INSERT)
@@ -84,7 +92,10 @@ public class SysDeptController extends BaseController {
     }
 
     /**
-     * 修改部门
+     * 修改部门。
+     *
+     * @param dept 部门参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:dept:edit")
     @Log(title = "部门管理", businessType = BusinessType.UPDATE)
@@ -111,6 +122,7 @@ public class SysDeptController extends BaseController {
      * 删除部门
      *
      * @param deptId 部门ID
+     * @return 操作结果
      */
     @SaCheckPermission("system:dept:remove")
     @Log(title = "部门管理", businessType = BusinessType.DELETE)
@@ -136,6 +148,7 @@ public class SysDeptController extends BaseController {
      * 获取部门选择框列表
      *
      * @param deptIds 部门ID串
+     * @return 部门列表
      */
     @SaCheckPermission("system:dept:query")
     @GetMapping("/optionselect")

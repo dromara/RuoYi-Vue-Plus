@@ -100,6 +100,12 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
         insertLoginInfo(loginInfo);
     }
 
+    /**
+     * 将日志片段包装为统一的方括号格式。
+     *
+     * @param msg 日志片段内容
+     * @return 包装后的日志片段字符串
+     */
     private String getBlock(Object msg) {
         if (msg == null) {
             msg = "";

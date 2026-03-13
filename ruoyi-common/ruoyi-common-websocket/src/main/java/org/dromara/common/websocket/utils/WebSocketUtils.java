@@ -29,7 +29,7 @@ import static org.dromara.common.websocket.constant.WebSocketConstants.WEB_SOCKE
 public class WebSocketUtils {
 
     /**
-     * 向指定的WebSocket会话发送消息
+     * 向指定会话标识发送文本消息。
      *
      * @param sessionKey 要发送消息的用户id
      * @param message    要发送的消息内容
@@ -40,7 +40,7 @@ public class WebSocketUtils {
     }
 
     /**
-     * 订阅WebSocket消息主题，并提供一个消费者函数来处理接收到的消息
+     * 订阅 WebSocket 广播主题消息。
      *
      * @param consumer 处理WebSocket消息的消费者函数
      */
@@ -49,7 +49,7 @@ public class WebSocketUtils {
     }
 
     /**
-     * 发布WebSocket订阅消息
+     * 按会话标识发布 WebSocket 消息。
      *
      * @param webSocketMessage 要发布的WebSocket消息对象
      */
@@ -76,7 +76,7 @@ public class WebSocketUtils {
     }
 
     /**
-     * 向所有的WebSocket会话发布订阅的消息(群发)
+     * 向所有 WebSocket 会话发布广播消息。
      *
      * @param message 要发布的消息内容
      */
@@ -89,7 +89,7 @@ public class WebSocketUtils {
     }
 
     /**
-     * 向指定的WebSocket会话发送Pong消息
+     * 向指定会话发送 Pong 心跳消息。
      *
      * @param session 要发送Pong消息的WebSocket会话
      */
@@ -98,7 +98,7 @@ public class WebSocketUtils {
     }
 
     /**
-     * 向指定的WebSocket会话发送文本消息
+     * 向指定 WebSocket 会话发送文本消息。
      *
      * @param session WebSocket会话
      * @param message 要发送的文本消息内容
@@ -108,7 +108,7 @@ public class WebSocketUtils {
     }
 
     /**
-     * 向指定的WebSocket会话发送WebSocket消息对象
+     * 向指定 WebSocket 会话发送原始消息对象。
      *
      * @param session WebSocket会话
      * @param message 要发送的WebSocket消息对象

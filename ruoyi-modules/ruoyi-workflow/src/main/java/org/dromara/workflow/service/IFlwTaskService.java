@@ -51,7 +51,7 @@ public interface IFlwTaskService {
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
-     * @return 结果
+     * @return 当前用户待办任务分页结果
      */
     TableDataInfo<FlowTaskVo> pageByTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery);
 
@@ -60,7 +60,7 @@ public interface IFlwTaskService {
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
-     * @return 结果
+     * @return 当前用户已办任务分页结果
      */
     TableDataInfo<FlowHisTaskVo> pageByTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery);
 
@@ -69,7 +69,7 @@ public interface IFlwTaskService {
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
-     * @return 结果
+     * @return 当前租户待办任务分页结果
      */
     TableDataInfo<FlowTaskVo> pageByAllTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery);
 
@@ -78,7 +78,7 @@ public interface IFlwTaskService {
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
-     * @return 结果
+     * @return 当前租户已办任务分页结果
      */
     TableDataInfo<FlowHisTaskVo> pageByAllTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery);
 
@@ -87,7 +87,7 @@ public interface IFlwTaskService {
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
-     * @return 结果
+     * @return 当前用户抄送分页结果
      */
     TableDataInfo<FlowTaskVo> pageByTaskCopy(FlowTaskBo flowTaskBo, PageQuery pageQuery);
 
@@ -129,7 +129,7 @@ public interface IFlwTaskService {
      * 按照任务id查询任务
      *
      * @param taskIdList 任务id
-     * @return 结果
+     * @return 任务列表
      */
     List<FlowTask> selectByIdList(List<Long> taskIdList);
 
@@ -137,7 +137,7 @@ public interface IFlwTaskService {
      * 按照任务id查询任务
      *
      * @param taskId 任务id
-     * @return 结果
+     * @return 任务详情
      */
     FlowTaskVo selectById(Long taskId);
 
@@ -145,7 +145,7 @@ public interface IFlwTaskService {
      * 获取下一节点信息
      *
      * @param bo 参数
-     * @return 结果
+     * @return 下一节点列表
      */
     List<FlowNode> getNextNodeList(FlowNextNodeBo bo);
 
@@ -153,7 +153,7 @@ public interface IFlwTaskService {
      * 按照任务id查询任务
      *
      * @param taskId 任务id
-     * @return 结果
+     * @return 历史任务详情
      */
     FlowHisTask selectHisTaskById(Long taskId);
 
@@ -161,7 +161,7 @@ public interface IFlwTaskService {
      * 按照实例id查询任务
      *
      * @param instanceId 流程实例id
-     * @return 结果
+     * @return 任务列表
      */
     List<FlowTask> selectByInstId(Long instanceId);
 
@@ -169,7 +169,7 @@ public interface IFlwTaskService {
      * 按照实例id查询任务
      *
      * @param instanceIds 列表
-     * @return 结果
+     * @return 任务列表
      */
     List<FlowTask> selectByInstIds(List<Long> instanceIds);
 
@@ -194,7 +194,7 @@ public interface IFlwTaskService {
      * 获取当前任务的所有办理人
      *
      * @param taskIds 任务id
-     * @return 结果
+     * @return 办理人列表
      */
     List<UserDTO> currentTaskAllUser(List<Long> taskIds);
 
@@ -211,7 +211,7 @@ public interface IFlwTaskService {
      * 催办任务
      *
      * @param bo 参数
-     * @return 结果
+     * @return 是否催办成功
      */
     boolean urgeTask(FlowUrgeTaskBo bo);
 }

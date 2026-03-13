@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 
 /**
- * 业务异常（支持占位符 {} ）
+ * 通用业务异常，支持使用占位符拼接错误信息。
  *
  * @author ruoyi
  */
@@ -37,15 +37,32 @@ public final class ServiceException extends RuntimeException {
      */
     private String detailMessage;
 
+    /**
+     * 使用错误消息构造业务异常。
+     *
+     * @param message 错误消息
+     */
     public ServiceException(String message) {
         this.message = message;
     }
 
+    /**
+     * 使用错误消息和错误码构造业务异常。
+     *
+     * @param message 错误消息
+     * @param code 错误码
+     */
     public ServiceException(String message, Integer code) {
         this.message = message;
         this.code = code;
     }
 
+    /**
+     * 使用占位符参数格式化错误消息。
+     *
+     * @param message 模板消息
+     * @param args 参数
+     */
     public ServiceException(String message, Object... args) {
         this.message = StrFormatter.format(message, args);
     }
@@ -55,11 +72,23 @@ public final class ServiceException extends RuntimeException {
         return message;
     }
 
+    /**
+     * 设置错误消息并返回当前异常对象。
+     *
+     * @param message 错误消息
+     * @return 当前异常对象
+     */
     public ServiceException setMessage(String message) {
         this.message = message;
         return this;
     }
 
+    /**
+     * 设置错误明细并返回当前异常对象。
+     *
+     * @param detailMessage 错误明细
+     * @return 当前异常对象
+     */
     public ServiceException setDetailMessage(String detailMessage) {
         this.detailMessage = detailMessage;
         return this;

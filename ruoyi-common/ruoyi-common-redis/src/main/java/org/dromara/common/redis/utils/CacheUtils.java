@@ -22,6 +22,7 @@ public class CacheUtils {
      *
      * @param cacheNames 缓存组名称
      * @param key        缓存key
+     * @return 缓存值
      */
     public static <T> T get(String cacheNames, Object key) {
         Cache.ValueWrapper wrapper = CACHE_MANAGER.getCache(cacheNames).get(key);

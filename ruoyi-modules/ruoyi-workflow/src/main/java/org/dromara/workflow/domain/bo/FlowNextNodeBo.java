@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 下一节点信息
+ * 查询下一节点信息的请求对象。
  *
  * @author may
  */
@@ -28,6 +28,11 @@ public class FlowNextNodeBo implements Serializable {
      */
     private Map<String, Object> variables;
 
+    /**
+     * 获取流程变量并自动剔除空值。
+     *
+     * @return 流程变量
+     */
     public Map<String, Object> getVariables() {
         if (variables == null) {
             variables = new HashMap<>(16);

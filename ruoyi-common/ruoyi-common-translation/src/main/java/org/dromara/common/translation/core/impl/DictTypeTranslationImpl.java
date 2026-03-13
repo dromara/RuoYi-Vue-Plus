@@ -18,6 +18,13 @@ public class DictTypeTranslationImpl implements TranslationInterface<String> {
 
     private final DictService dictService;
 
+    /**
+     * 根据字典类型和字典值翻译显示标签。
+     *
+     * @param key 字典值
+     * @param other 字典类型
+     * @return 字典标签
+     */
     @Override
     public String translation(Object key, String other) {
         if (key instanceof String dictValue && StringUtils.isNotBlank(other)) {

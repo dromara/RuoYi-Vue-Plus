@@ -12,6 +12,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "captcha")
 public class CaptchaProperties {
 
+    /**
+     * 是否启用验证码校验。
+     */
     private Boolean enable;
 
     /**

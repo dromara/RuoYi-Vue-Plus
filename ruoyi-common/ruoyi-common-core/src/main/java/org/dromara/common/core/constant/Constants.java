@@ -1,7 +1,7 @@
 package org.dromara.common.core.constant;
 
 /**
- * 通用常量信息
+ * 通用基础常量定义。
  *
  * @author ruoyi
  */

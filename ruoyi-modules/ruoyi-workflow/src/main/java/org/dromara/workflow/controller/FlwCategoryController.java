@@ -38,7 +38,10 @@ public class FlwCategoryController extends BaseController {
     private final IFlwCategoryService flwCategoryService;
 
     /**
-     * 查询流程分类列表
+     * 查询流程分类列表。
+     *
+     * @param bo 查询条件
+     * @return 流程分类列表
      */
     @SaCheckPermission("workflow:category:list")
     @GetMapping("/list")
@@ -48,7 +51,10 @@ public class FlwCategoryController extends BaseController {
     }
 
     /**
-     * 导出流程分类列表
+     * 导出流程分类列表。
+     *
+     * @param bo 查询条件
+     * @param response 响应流
      */
     @SaCheckPermission("workflow:category:export")
     @Log(title = "流程分类", businessType = BusinessType.EXPORT)
@@ -59,9 +65,10 @@ public class FlwCategoryController extends BaseController {
     }
 
     /**
-     * 获取流程分类详细信息
+     * 获取单个流程分类详情。
      *
      * @param categoryId 主键
+     * @return 流程分类详情
      */
     @SaCheckPermission("workflow:category:query")
     @GetMapping("/{categoryId}")
@@ -70,7 +77,10 @@ public class FlwCategoryController extends BaseController {
     }
 
     /**
-     * 新增流程分类
+     * 新增流程分类，并校验分类名称唯一性。
+     *
+     * @param category 分类信息
+     * @return 操作结果
      */
     @SaCheckPermission("workflow:category:add")
     @Log(title = "流程分类", businessType = BusinessType.INSERT)
@@ -84,7 +94,10 @@ public class FlwCategoryController extends BaseController {
     }
 
     /**
-     * 修改流程分类
+     * 修改流程分类，并校验名称唯一及父子关系合法性。
+     *
+     * @param category 分类信息
+     * @return 操作结果
      */
     @SaCheckPermission("workflow:category:edit")
     @Log(title = "流程分类", businessType = BusinessType.UPDATE)
@@ -101,9 +114,10 @@ public class FlwCategoryController extends BaseController {
     }
 
     /**
-     * 删除流程分类
+     * 删除流程分类，删除前校验默认分类、子节点和绑定流程定义。
      *
      * @param categoryId 主键
+     * @return 操作结果
      */
     @SaCheckPermission("workflow:category:remove")
     @Log(title = "流程分类", businessType = BusinessType.DELETE)
@@ -122,9 +136,10 @@ public class FlwCategoryController extends BaseController {
     }
 
     /**
-     * 获取流程分类树列表
+     * 获取流程分类树列表，用于流程定义选择分类节点。
      *
      * @param categoryBo 流程分类
+     * @return 流程分类树
      */
     @GetMapping("/categoryTree")
     public R<List<Tree<String>>> categoryTree(FlowCategoryBo categoryBo) {

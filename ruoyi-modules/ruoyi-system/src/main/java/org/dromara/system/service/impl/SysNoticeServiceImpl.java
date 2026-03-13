@@ -71,6 +71,12 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
         return baseMapper.selectVoList(lqw);
     }
 
+    /**
+     * 构造公告列表查询条件。
+     *
+     * @param bo 公告筛选条件
+     * @return 包含标题、类型、创建人和排序条件的查询包装器
+     */
     private LambdaQueryWrapper<SysNotice> buildQueryWrapper(SysNoticeBo bo) {
         LambdaQueryWrapper<SysNotice> lqw = Wrappers.lambdaQuery();
         lqw.like(StringUtils.isNotBlank(bo.getNoticeTitle()), SysNotice::getNoticeTitle, bo.getNoticeTitle());

@@ -38,7 +38,7 @@ public interface IFlwInstanceService {
     TableDataInfo<FlowInstanceVo> selectFinishInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery);
 
     /**
-     * 根据业务id查询流程实例详细信息
+     * 根据业务 id 查询流程实例详情，返回业务侧展示所需信息。
      *
      * @param businessId 业务id
      * @return 结果
@@ -46,7 +46,7 @@ public interface IFlwInstanceService {
     FlowInstanceVo queryByBusinessId(Long businessId);
 
     /**
-     * 按照业务id查询流程实例
+     * 按业务 id 查询底层流程实例实体。
      *
      * @param businessId 业务id
      * @return 结果
@@ -54,7 +54,7 @@ public interface IFlwInstanceService {
     FlowInstance selectInstByBusinessId(String businessId);
 
     /**
-     * 按照实例id查询流程实例
+     * 按实例 id 查询单个流程实例实体。
      *
      * @param instanceId 实例id
      * @return 结果
@@ -62,7 +62,7 @@ public interface IFlwInstanceService {
     FlowInstance selectInstById(Long instanceId);
 
     /**
-     * 按照实例id查询流程实例
+     * 按实例 id 集合批量查询流程实例。
      *
      * @param instanceIds 实例id
      * @return 结果
@@ -111,7 +111,7 @@ public interface IFlwInstanceService {
     TableDataInfo<FlowInstanceVo> selectCurrentInstanceList(FlowInstanceBo instanceBo, PageQuery pageQuery);
 
     /**
-     * 获取流程图,流程记录
+     * 获取流程图及历史办理记录，供前端展示流转轨迹。
      *
      * @param businessId 业务id
      * @return 结果
@@ -127,7 +127,7 @@ public interface IFlwInstanceService {
     void updateStatus(Long instanceId, String status);
 
     /**
-     * 获取流程变量
+     * 获取指定实例当前持有的流程变量。
      *
      * @param instanceId 实例id
      * @return 结果
@@ -135,7 +135,7 @@ public interface IFlwInstanceService {
     Map<String, Object> instanceVariable(Long instanceId);
 
     /**
-     * 更新流程变量
+     * 更新流程变量，支持在运行中修正流程上下文数据。
      *
      * @param bo 参数
      * @return 结果
@@ -143,7 +143,7 @@ public interface IFlwInstanceService {
     boolean updateVariable(FlowVariableBo bo);
 
     /**
-     * 设置流程变量
+     * 为指定流程实例设置变量集合。
      *
      * @param instanceId 实例id
      * @param variable   流程变量
@@ -151,7 +151,7 @@ public interface IFlwInstanceService {
     void setVariable(Long instanceId, Map<String, Object> variable);
 
     /**
-     * 按任务id查询实例
+     * 按任务 id 反查所属流程实例。
      *
      * @param taskId 任务id
      * @return 结果

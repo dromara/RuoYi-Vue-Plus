@@ -39,10 +39,11 @@ public class FlwDefinitionController extends BaseController {
     private final IFlwDefinitionService flwDefinitionService;
 
     /**
-     * 查询流程定义列表
+     * 分页查询流程定义列表。
      *
-     * @param flowDefinition 参数
-     * @param pageQuery      分页
+     * @param flowDefinition 查询条件
+     * @param pageQuery      分页参数
+     * @return 流程定义分页数据
      */
     @GetMapping("/list")
     public TableDataInfo<FlowDefinitionVo> list(FlowDefinition flowDefinition, PageQuery pageQuery) {
@@ -50,10 +51,11 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 查询未发布的流程定义列表
+     * 分页查询未发布的流程定义列表。
      *
-     * @param flowDefinition 参数
-     * @param pageQuery      分页
+     * @param flowDefinition 查询条件
+     * @param pageQuery      分页参数
+     * @return 未发布流程定义分页数据
      */
     @GetMapping("/unPublishList")
     public TableDataInfo<FlowDefinitionVo> unPublishList(FlowDefinition flowDefinition, PageQuery pageQuery) {
@@ -61,9 +63,10 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 获取流程定义详细信息
+     * 获取流程定义详细信息。
      *
      * @param id 流程定义id
+     * @return 流程定义详情
      */
     @GetMapping(value = "/{id}")
     public R<Definition> getInfo(@PathVariable Long id) {
@@ -71,9 +74,10 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 新增流程定义
+     * 新增流程定义并执行格式校验。
      *
-     * @param flowDefinition 参数
+     * @param flowDefinition 流程定义信息
+     * @return 操作结果
      */
     @Log(title = "流程定义", businessType = BusinessType.INSERT)
     @PostMapping
@@ -84,9 +88,10 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 修改流程定义
+     * 修改流程定义。
      *
-     * @param flowDefinition 参数
+     * @param flowDefinition 流程定义信息
+     * @return 操作结果
      */
     @Log(title = "流程定义", businessType = BusinessType.UPDATE)
     @PutMapping
@@ -97,9 +102,10 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 发布流程定义
+     * 发布流程定义，使其进入可用状态。
      *
      * @param id 流程定义id
+     * @return 发布结果
      */
     @Log(title = "流程定义", businessType = BusinessType.INSERT)
     @PutMapping("/publish/{id}")
@@ -109,9 +115,10 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 取消发布流程定义
+     * 取消发布流程定义。
      *
      * @param id 流程定义id
+     * @return 操作结果
      */
     @Log(title = "流程定义", businessType = BusinessType.INSERT)
     @PutMapping("/unPublish/{id}")
@@ -122,7 +129,10 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 删除流程定义
+     * 批量删除流程定义。
+     *
+     * @param ids 流程定义ID集合
+     * @return 操作结果
      */
     @Log(title = "流程定义", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
@@ -131,9 +141,10 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 复制流程定义
+     * 复制一份流程定义，便于快速创建相似流程。
      *
      * @param id 流程定义id
+     * @return 复制结果
      */
     @Log(title = "流程定义", businessType = BusinessType.INSERT)
     @PostMapping("/copy/{id}")
@@ -144,10 +155,11 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 导入流程定义
+     * 通过文件导入流程定义。
      *
      * @param file     文件
      * @param category 分类
+     * @return 导入结果
      */
     @Log(title = "流程定义", businessType = BusinessType.IMPORT)
     @PostMapping("/importDef")
@@ -156,7 +168,7 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 导出流程定义
+     * 导出流程定义文件。
      *
      * @param id       流程定义id
      * @param response 响应
@@ -169,9 +181,10 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 获取流程定义JSON字符串
+     * 获取流程定义 JSON 字符串。
      *
      * @param id 流程定义id
+     * @return 流程定义 JSON
      */
     @GetMapping("/xmlString/{id}")
     public R<String> xmlString(@PathVariable Long id) {
@@ -179,10 +192,12 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 激活/挂起流程定义
+    /**
+     * 激活或挂起流程定义。
      *
      * @param id     流程定义id
      * @param active 激活/挂起
+     * @return 处理结果
      */
     @RepeatSubmit()
     @PutMapping("/active/{id}")

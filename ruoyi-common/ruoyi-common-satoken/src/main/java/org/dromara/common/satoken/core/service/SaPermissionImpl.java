@@ -22,7 +22,11 @@ import java.util.List;
 public class SaPermissionImpl implements StpInterface {
 
     /**
-     * 获取菜单权限列表
+     * 获取指定登录对象的菜单权限列表。
+     *
+     * @param loginId 登录ID
+     * @param loginType 登录类型
+     * @return 菜单权限列表
      */
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
@@ -49,7 +53,11 @@ public class SaPermissionImpl implements StpInterface {
     }
 
     /**
-     * 获取角色权限列表
+     * 获取指定登录对象的角色权限列表。
+     *
+     * @param loginId 登录ID
+     * @param loginType 登录类型
+     * @return 角色权限列表
      */
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
@@ -75,6 +83,11 @@ public class SaPermissionImpl implements StpInterface {
         }
     }
 
+    /**
+     * 获取权限服务实现。
+     *
+     * @return 权限服务
+     */
     private PermissionService getPermissionService() {
         try {
             return SpringUtils.getBean(PermissionService.class);

@@ -34,6 +34,8 @@ public class WorkflowPermissionHandler implements PermissionHandler {
      * 办理人权限标识，比如用户，角色，部门等，用于校验是否有权限办理任务
      * 后续在{@link FlowParams#getPermissionFlag}  中获取
      * 返回当前用户权限集合
+     *
+     * @return 当前用户权限集合
      */
     @Override
     public List<String> permissions() {
@@ -51,7 +53,10 @@ public class WorkflowPermissionHandler implements PermissionHandler {
     }
 
     /**
-     * 转换办理人，比如设计器中预设了能办理的人，如果其中包含角色或者部门id等，可以通过此接口进行转换成用户id
+     * 将预设办理人转换为实际用户 ID 列表。
+     *
+     * @param permissions 预设权限标识列表
+     * @return 用户 ID 列表
      */
     @Override
     public List<String> convertPermissions(List<String> permissions) {

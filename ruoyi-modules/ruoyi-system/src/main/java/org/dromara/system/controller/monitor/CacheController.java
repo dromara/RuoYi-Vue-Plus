@@ -26,7 +26,9 @@ public class CacheController {
     private final RedissonConnectionFactory connectionFactory;
 
     /**
-     * 获取缓存监控列表
+     * 获取 Redis 缓存监控信息。
+     *
+     * @return Redis 信息、库大小与命令统计
      */
     @SaCheckPermission("monitor:cache:list")
     @GetMapping()

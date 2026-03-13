@@ -39,7 +39,7 @@ public interface IAuthStrategy {
      *
      * @param body   登录对象
      * @param client 授权管理视图对象
-     * @return 登录验证信息
+     * @return 当前策略完成认证后的登录结果
      */
     LoginVo login(String body, SysClientVo client);
 

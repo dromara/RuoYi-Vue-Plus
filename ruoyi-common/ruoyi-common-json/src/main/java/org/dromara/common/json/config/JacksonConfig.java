@@ -28,6 +28,11 @@ import java.util.TimeZone;
 @AutoConfiguration(before = JacksonAutoConfiguration.class)
 public class JacksonConfig {
 
+    /**
+     * 注册 Jackson 序列化与反序列化模块。
+     *
+     * @return Jackson 模块
+     */
     @Bean
     public SimpleModule registerJavaTimeModule() {
         // 全局配置序列化返回 JSON 处理
@@ -43,6 +48,11 @@ public class JacksonConfig {
         return module;
     }
 
+    /**
+     * 初始化 Jackson 构建器默认配置。
+     *
+     * @return Jackson 构建器自定义器
+     */
     @Bean
     public JsonMapperBuilderCustomizer jsonInitCustomizer() {
         return builder -> {

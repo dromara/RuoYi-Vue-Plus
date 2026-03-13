@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 流程实例请求对象
+ * 流程实例查询条件对象。
  *
  * @author may
  */

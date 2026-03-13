@@ -65,6 +65,11 @@ public class CompleteTaskDTO implements Serializable {
      */
     private String ext;
 
+    /**
+     * 获取流程变量并自动剔除空值。
+     *
+     * @return 流程变量
+     */
     public Map<String, Object> getVariables() {
         if (variables == null) {
             variables = new HashMap<>(16);

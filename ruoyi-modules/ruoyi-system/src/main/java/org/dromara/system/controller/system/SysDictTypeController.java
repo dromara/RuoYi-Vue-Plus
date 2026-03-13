@@ -35,7 +35,11 @@ public class SysDictTypeController extends BaseController {
     private final ISysDictTypeService dictTypeService;
 
     /**
-     * 查询字典类型列表
+     * 分页查询字典类型列表。
+     *
+     * @param dictType 查询条件
+     * @param pageQuery 分页参数
+     * @return 字典类型分页结果
      */
     @SaCheckPermission("system:dict:list")
     @GetMapping("/list")
@@ -44,7 +48,10 @@ public class SysDictTypeController extends BaseController {
     }
 
     /**
-     * 导出字典类型列表
+     * 导出字典类型列表。
+     *
+     * @param dictType 查询条件
+     * @param response HTTP 响应
      */
     @Log(title = "字典类型", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:dict:export")
@@ -58,6 +65,7 @@ public class SysDictTypeController extends BaseController {
      * 查询字典类型详细
      *
      * @param dictId 字典ID
+     * @return 字典类型详情
      */
     @SaCheckPermission("system:dict:query")
     @GetMapping(value = "/{dictId}")
@@ -66,7 +74,10 @@ public class SysDictTypeController extends BaseController {
     }
 
     /**
-     * 新增字典类型
+     * 新增字典类型。
+     *
+     * @param dict 字典类型参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:dict:add")
     @Log(title = "字典类型", businessType = BusinessType.INSERT)
@@ -81,7 +92,10 @@ public class SysDictTypeController extends BaseController {
     }
 
     /**
-     * 修改字典类型
+     * 修改字典类型。
+     *
+     * @param dict 字典类型参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:dict:edit")
     @Log(title = "字典类型", businessType = BusinessType.UPDATE)
@@ -99,6 +113,7 @@ public class SysDictTypeController extends BaseController {
      * 删除字典类型
      *
      * @param dictIds 字典ID串
+     * @return 操作结果
      */
     @SaCheckPermission("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
@@ -109,7 +124,9 @@ public class SysDictTypeController extends BaseController {
     }
 
     /**
-     * 刷新字典缓存
+     * 刷新字典缓存。
+     *
+     * @return 操作结果
      */
     @SaCheckPermission("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.CLEAN)
@@ -121,7 +138,9 @@ public class SysDictTypeController extends BaseController {
     }
 
     /**
-     * 获取字典选择框列表
+     * 获取字典类型下拉选择列表。
+     *
+     * @return 字典类型列表
      */
     @GetMapping("/optionselect")
     public R<List<SysDictTypeVo>> optionselect() {

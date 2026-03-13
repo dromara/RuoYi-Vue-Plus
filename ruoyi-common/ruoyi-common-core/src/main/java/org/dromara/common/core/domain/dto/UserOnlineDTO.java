@@ -7,11 +7,10 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 当前在线会话
+ * 当前在线会话信息对象。
  *
  * @author ruoyi
  */
-
 @Data
 @NoArgsConstructor
 public class UserOnlineDTO implements Serializable {

@@ -10,11 +10,11 @@ import org.dromara.common.translation.annotation.TranslationType;
 public interface TranslationInterface<T> {
 
     /**
-     * 翻译
+     * 按翻译键执行转换。
      *
      * @param key   需要被翻译的键(不为空)
      * @param other 其他参数
-     * @return 返回键对应的值
+     * @return 返回键对应的翻译值
      */
     T translation(Object key, String other);
 }

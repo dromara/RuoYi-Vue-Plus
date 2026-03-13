@@ -14,6 +14,14 @@ import java.util.List;
  */
 public class TranslationBeanSerializerModifier extends ValueSerializerModifier {
 
+    /**
+     * 为翻译字段补充空值序列化器，确保字段值为 {@code null} 时仍能走翻译处理链。
+     *
+     * @param config         当前序列化配置
+     * @param beanDesc       Bean 描述提供者
+     * @param beanProperties 当前 Bean 的属性写入器列表
+     * @return 调整后的属性写入器列表
+     */
     @Override
     public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription.Supplier beanDesc,
                                                      List<BeanPropertyWriter> beanProperties) {

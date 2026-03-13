@@ -55,7 +55,9 @@ public class LoginHelper {
     }
 
     /**
-     * 获取用户(多级缓存)
+     * 获取当前 Token 对应的登录用户信息。
+     *
+     * @return 登录用户
      */
     @SuppressWarnings("unchecked")
     public static <T extends LoginUser> T getLoginUser() {
@@ -67,7 +69,10 @@ public class LoginHelper {
     }
 
     /**
-     * 获取用户基于token
+     * 根据指定 Token 获取登录用户信息。
+     *
+     * @param token Token
+     * @return 登录用户
      */
     @SuppressWarnings("unchecked")
     public static <T extends LoginUser> T getLoginUser(String token) {
@@ -79,42 +84,54 @@ public class LoginHelper {
     }
 
     /**
-     * 获取用户id
+     * 获取当前登录用户 ID。
+     *
+     * @return 用户 ID
      */
     public static Long getUserId() {
         return Convert.toLong(getExtra(USER_KEY));
     }
 
     /**
-     * 获取用户id
+     * 获取当前登录用户 ID 字符串。
+     *
+     * @return 用户 ID 字符串
      */
     public static String getUserIdStr() {
         return Convert.toStr(getExtra(USER_KEY));
     }
 
     /**
-     * 获取用户账户
+     * 获取当前登录用户名。
+     *
+     * @return 用户名
      */
     public static String getUsername() {
         return Convert.toStr(getExtra(USER_NAME_KEY));
     }
 
     /**
-     * 获取部门ID
+     * 获取当前登录用户部门 ID。
+     *
+     * @return 部门 ID
      */
     public static Long getDeptId() {
         return Convert.toLong(getExtra(DEPT_KEY));
     }
 
     /**
-     * 获取部门名
+     * 获取当前登录用户部门名称。
+     *
+     * @return 部门名称
      */
     public static String getDeptName() {
         return Convert.toStr(getExtra(DEPT_NAME_KEY));
     }
 
     /**
-     * 获取部门类别编码
+     * 获取当前登录用户部门类别编码。
+     *
+     * @return 部门类别编码
      */
     public static String getDeptCategory() {
         return Convert.toStr(getExtra(DEPT_CATEGORY_KEY));
@@ -135,7 +152,9 @@ public class LoginHelper {
     }
 
     /**
-     * 获取用户类型
+     * 获取当前登录用户类型。
+     *
+     * @return 用户类型
      */
     public static UserType getUserType() {
         String loginType = StpUtil.getLoginIdAsString();
@@ -146,7 +165,7 @@ public class LoginHelper {
      * 是否为超级管理员
      *
      * @param userId 用户ID
-     * @return 结果
+     * @return 是否为超级管理员
      */
     public static boolean isSuperAdmin(Long userId) {
         return SystemConstants.SUPER_ADMIN_ID.equals(userId);
@@ -155,7 +174,7 @@ public class LoginHelper {
     /**
      * 是否为超级管理员
      *
-     * @return 结果
+     * @return 是否为超级管理员
      */
     public static boolean isSuperAdmin() {
         return isSuperAdmin(getUserId());
@@ -164,7 +183,7 @@ public class LoginHelper {
     /**
      * 检查当前用户是否已登录
      *
-     * @return 结果
+     * @return 是否已登录
      */
     public static boolean isLogin() {
         try {

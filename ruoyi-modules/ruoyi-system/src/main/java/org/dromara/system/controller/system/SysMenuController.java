@@ -39,7 +39,7 @@ public class SysMenuController extends BaseController {
     /**
      * 获取路由信息
      *
-     * @return 路由信息
+     * @return 当前用户可访问的路由信息
      */
     @GetMapping("/getRouters")
     public R<List<RouterVo>> getRouters() {
@@ -48,7 +48,10 @@ public class SysMenuController extends BaseController {
     }
 
     /**
-     * 获取菜单列表
+     * 查询菜单列表。
+     *
+     * @param menu 查询条件
+     * @return 菜单列表
      */
     @SaCheckRole(value = {
         SystemConstants.SUPER_ADMIN_ROLE_KEY,
@@ -64,6 +67,7 @@ public class SysMenuController extends BaseController {
      * 根据菜单编号获取详细信息
      *
      * @param menuId 菜单ID
+     * @return 菜单详情
      */
     @SaCheckRole(value = {
         SystemConstants.SUPER_ADMIN_ROLE_KEY,
@@ -75,7 +79,10 @@ public class SysMenuController extends BaseController {
     }
 
     /**
-     * 获取菜单下拉树列表
+     * 获取菜单下拉树列表。
+     *
+     * @param menu 查询条件
+     * @return 菜单树
      */
     @SaCheckPermission("system:menu:query")
     @GetMapping("/treeselect")
@@ -88,6 +95,7 @@ public class SysMenuController extends BaseController {
      * 加载对应角色菜单列表树
      *
      * @param roleId 角色ID
+     * @return 角色菜单树及选中节点
      */
     @SaCheckPermission("system:menu:query")
     @GetMapping(value = "/roleMenuTreeselect/{roleId}")
@@ -100,7 +108,10 @@ public class SysMenuController extends BaseController {
     }
 
     /**
-     * 新增菜单
+     * 新增菜单。
+     *
+     * @param menu 菜单参数
+     * @return 操作结果
      */
     @SaCheckRole(SystemConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:menu:add")
@@ -119,7 +130,10 @@ public class SysMenuController extends BaseController {
     }
 
     /**
-     * 修改菜单
+     * 修改菜单。
+     *
+     * @param menu 菜单参数
+     * @return 操作结果
      */
     @SaCheckRole(SystemConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:menu:edit")
@@ -143,6 +157,7 @@ public class SysMenuController extends BaseController {
      * 删除菜单
      *
      * @param menuId 菜单ID
+     * @return 操作结果
      */
     @SaCheckRole(SystemConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:menu:remove")
@@ -171,6 +186,7 @@ public class SysMenuController extends BaseController {
      * 批量级联删除菜单
      *
      * @param menuIds 菜单ID串
+     * @return 操作结果
      */
     @SaCheckRole(SystemConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:menu:remove")

@@ -17,6 +17,13 @@ public class OssUrlTranslationImpl implements TranslationInterface<String> {
 
     private final OssService ossService;
 
+    /**
+     * 将 OSS ID 或 ID 集合翻译为访问地址。
+     *
+     * @param key OSS ID 或逗号分隔的 ID 字符串
+     * @param other 额外参数
+     * @return 访问地址
+     */
     @Override
     public String translation(Object key, String other) {
         if (key instanceof String ids) {

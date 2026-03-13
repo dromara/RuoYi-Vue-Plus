@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 启动流程对象
+ * 启动流程请求对象。
  *
  * @author may
  */
@@ -46,6 +46,11 @@ public class StartProcessDTO implements Serializable {
      */
     private FlowInstanceBizExtDTO bizExt;
 
+    /**
+     * 获取流程变量并自动剔除空值。
+     *
+     * @return 流程变量
+     */
     public Map<String, Object> getVariables() {
         if (variables == null) {
             variables = new HashMap<>(16);
@@ -55,6 +60,11 @@ public class StartProcessDTO implements Serializable {
         return variables;
     }
 
+    /**
+     * 获取流程业务扩展信息，为空时返回默认对象。
+     *
+     * @return 业务扩展信息
+     */
     public FlowInstanceBizExtDTO getBizExt() {
         if (ObjectUtil.isNull(bizExt)) {
             bizExt = new FlowInstanceBizExtDTO();

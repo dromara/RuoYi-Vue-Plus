@@ -24,6 +24,13 @@ public class CategoryNameTranslationImpl implements TranslationInterface<String>
 
     private final IFlwCategoryService flwCategoryService;
 
+    /**
+     * 将流程分类 ID 翻译为分类名称。
+     *
+     * @param key 分类 ID
+     * @param other 额外参数
+     * @return 分类名称
+     */
     @Override
     public String translation(Object key, String other) {
         return flwCategoryService.selectCategoryNameById(Convert.toLong(key));

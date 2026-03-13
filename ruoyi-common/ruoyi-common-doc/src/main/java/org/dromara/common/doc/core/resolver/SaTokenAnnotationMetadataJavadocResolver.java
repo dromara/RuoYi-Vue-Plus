@@ -54,23 +54,53 @@ public class SaTokenAnnotationMetadataJavadocResolver extends AbstractMetadataJa
         this(DEFAULT_METADATA_PROVIDER);
     }
 
+    /**
+     * 使用自定义元数据提供者创建解析器。
+     *
+     * @param metadataProvider 元数据提供者
+     */
     public SaTokenAnnotationMetadataJavadocResolver(Supplier<SaTokenSecurityMetadata> metadataProvider) {
         super(metadataProvider);
     }
 
+    /**
+     * 使用指定顺序创建解析器。
+     *
+     * @param order 顺序值
+     */
     public SaTokenAnnotationMetadataJavadocResolver(int order) {
         this(DEFAULT_METADATA_PROVIDER,order);
     }
 
+    /**
+     * 使用自定义元数据提供者和顺序创建解析器。
+     *
+     * @param metadataProvider 元数据提供者
+     * @param order 顺序值
+     */
     public SaTokenAnnotationMetadataJavadocResolver(Supplier<SaTokenSecurityMetadata> metadataProvider, int order) {
         super(metadataProvider,order);
     }
 
+    /**
+     * 判断当前方法是否需要由该解析器处理。
+     *
+     * @param handlerMethod Handler 方法
+     * @return 是否支持
+     */
     @Override
     public boolean supports(HandlerMethod handlerMethod) {
         return hasAnnotation(handlerMethod, SA_CHECK_ROLE_CLASS) || hasAnnotation(handlerMethod, SA_CHECK_PERMISSION_CLASS) || hasAnnotation(handlerMethod, SA_IGNORE_CLASS);
     }
 
+    /**
+     * 解析 Sa-Token 注解并转换为文档说明。
+     *
+     * @param handlerMethod Handler 方法
+     * @param operation OpenAPI 操作对象
+     * @param metadata 权限元数据
+     * @return Markdown 描述
+     */
     @Override
     public String resolve(HandlerMethod handlerMethod, Operation operation, SaTokenSecurityMetadata metadata) {
         // 检查是否忽略校验

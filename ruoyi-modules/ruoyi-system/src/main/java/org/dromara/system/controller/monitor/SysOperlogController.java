@@ -33,7 +33,11 @@ public class SysOperlogController extends BaseController {
     private final ISysOperLogService operLogService;
 
     /**
-     * 获取操作日志记录列表
+     * 分页查询操作日志记录。
+     *
+     * @param operLog 查询条件
+     * @param pageQuery 分页参数
+     * @return 操作日志分页结果
      */
     @SaCheckPermission("monitor:operlog:list")
     @GetMapping("/list")
@@ -42,7 +46,10 @@ public class SysOperlogController extends BaseController {
     }
 
     /**
-     * 导出操作日志记录列表
+     * 导出操作日志记录列表。
+     *
+     * @param operLog 查询条件
+     * @param response HTTP 响应
      */
     @Log(title = "操作日志", businessType = BusinessType.EXPORT)
     @SaCheckPermission("monitor:operlog:export")
@@ -54,7 +61,9 @@ public class SysOperlogController extends BaseController {
 
     /**
      * 批量删除操作日志记录
+     *
      * @param operIds 日志ids
+     * @return 操作结果
      */
     @Log(title = "操作日志", businessType = BusinessType.DELETE)
     @SaCheckPermission("monitor:operlog:remove")
@@ -64,7 +73,9 @@ public class SysOperlogController extends BaseController {
     }
 
     /**
-     * 清理操作日志记录
+     * 清空操作日志记录。
+     *
+     * @return 操作结果
      */
     @Log(title = "操作日志", businessType = BusinessType.CLEAN)
     @SaCheckPermission("monitor:operlog:remove")

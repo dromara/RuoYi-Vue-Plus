@@ -27,7 +27,9 @@ public class OssFactory {
     private static final ReentrantLock LOCK = new ReentrantLock();
 
     /**
-     * 获取默认实例
+     * 获取默认 OSS 客户端实例。
+     *
+     * @return 默认 OSS 客户端
      */
     public static OssClient instance() {
         // 获取redis 默认类型
@@ -39,7 +41,10 @@ public class OssFactory {
     }
 
     /**
-     * 根据类型获取实例
+     * 根据配置键获取 OSS 客户端实例。
+     *
+     * @param configKey 配置键
+     * @return OSS 客户端
      */
     public static OssClient instance(String configKey) {
         String json = CacheUtils.get(CacheNames.SYS_OSS_CONFIG, configKey);

@@ -41,7 +41,11 @@ public class SysPostController extends BaseController {
     private final ISysDeptService deptService;
 
     /**
-     * 获取岗位列表
+     * 分页查询岗位列表。
+     *
+     * @param post 查询条件
+     * @param pageQuery 分页参数
+     * @return 岗位分页结果
      */
     @SaCheckPermission("system:post:list")
     @GetMapping("/list")
@@ -50,7 +54,10 @@ public class SysPostController extends BaseController {
     }
 
     /**
-     * 导出岗位列表
+     * 导出岗位列表。
+     *
+     * @param post 查询条件
+     * @param response HTTP 响应
      */
     @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:post:export")
@@ -64,6 +71,7 @@ public class SysPostController extends BaseController {
      * 根据岗位编号获取详细信息
      *
      * @param postId 岗位ID
+     * @return 岗位详情
      */
     @SaCheckPermission("system:post:query")
     @GetMapping(value = "/{postId}")
@@ -72,7 +80,10 @@ public class SysPostController extends BaseController {
     }
 
     /**
-     * 新增岗位
+     * 新增岗位。
+     *
+     * @param post 岗位参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:post:add")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
@@ -88,7 +99,10 @@ public class SysPostController extends BaseController {
     }
 
     /**
-     * 修改岗位
+     * 修改岗位。
+     *
+     * @param post 岗位参数
+     * @return 操作结果
      */
     @SaCheckPermission("system:post:edit")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
@@ -110,6 +124,7 @@ public class SysPostController extends BaseController {
      * 删除岗位
      *
      * @param postIds 岗位ID串
+     * @return 操作结果
      */
     @SaCheckPermission("system:post:remove")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)
@@ -123,6 +138,7 @@ public class SysPostController extends BaseController {
      *
      * @param postIds 岗位ID串
      * @param deptId  部门id
+     * @return 岗位列表
      */
     @SaCheckPermission("system:post:query")
     @GetMapping("/optionselect")
@@ -139,7 +155,10 @@ public class SysPostController extends BaseController {
     }
 
     /**
-     * 获取部门树列表
+     * 获取岗位筛选用的部门树。
+     *
+     * @param dept 部门查询条件
+     * @return 部门树列表
      */
     @SaCheckPermission("system:post:list")
     @GetMapping("/deptTree")

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 设备类型
+ * 登录设备类型枚举。
  *
  * @author Lion Li
  */

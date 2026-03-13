@@ -32,6 +32,9 @@ public class BaseController {
 
     /**
      * 页面跳转
+     *
+     * @param url 目标跳转地址
+     * @return Spring MVC 重定向路径表达式
      */
     public String redirect(String url) {
         return StringUtils.format("redirect:{}", url);

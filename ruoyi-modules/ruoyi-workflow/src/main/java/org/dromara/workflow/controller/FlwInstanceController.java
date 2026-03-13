@@ -40,10 +40,11 @@ public class FlwInstanceController extends BaseController {
     private final IFlwInstanceService flwInstanceService;
 
     /**
-     * 查询正在运行的流程实例列表
+     * 分页查询正在运行的流程实例。
      *
      * @param flowInstanceBo 流程实例
      * @param pageQuery      分页
+     * @return 正在运行的流程实例分页数据
      */
     @GetMapping("/pageByRunning")
     public TableDataInfo<FlowInstanceVo> selectRunningInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery) {
@@ -51,10 +52,11 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 查询已结束的流程实例列表
+     * 分页查询已结束的流程实例。
      *
      * @param flowInstanceBo 流程实例
      * @param pageQuery      分页
+     * @return 已结束的流程实例分页数据
      */
     @GetMapping("/pageByFinish")
     public TableDataInfo<FlowInstanceVo> selectFinishInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery) {
@@ -62,9 +64,10 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 根据业务id查询流程实例详细信息
+     * 根据业务 id 查询流程实例详细信息。
      *
      * @param businessId 业务id
+     * @return 流程实例详情
      */
     @GetMapping("/getInfo/{businessId}")
     public R<FlowInstanceVo> getInfo(@PathVariable Long businessId) {
@@ -72,9 +75,10 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 按照业务id删除流程实例
+     * 按业务 id 批量删除流程实例。
      *
      * @param businessIds 业务id
+     * @return 操作结果
      */
     @DeleteMapping("/deleteByBusinessIds/{businessIds}")
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
@@ -83,9 +87,10 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 按照实例id删除流程实例
+     * 按实例 id 批量删除流程实例。
      *
      * @param instanceIds 实例id
+     * @return 操作结果
      */
     @DeleteMapping("/deleteByInstanceIds/{instanceIds}")
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
@@ -94,9 +99,10 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 按照实例id删除已完成得流程实例
+     * 按实例 id 批量删除已完成的流程实例。
      *
      * @param instanceIds 实例id
+     * @return 操作结果
      */
     @DeleteMapping("/deleteHisByInstanceIds/{instanceIds}")
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
@@ -105,9 +111,10 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 撤销流程
+     * 撤销当前申请人发起的流程。
      *
      * @param bo 参数
+     * @return 操作结果
      */
     @RepeatSubmit()
     @PutMapping("/cancelProcessApply")
@@ -117,10 +124,11 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 激活/挂起流程实例
+     * 激活或挂起流程实例。
      *
      * @param id     流程实例id
      * @param active 激活/挂起
+     * @return 处理结果
      */
     @RepeatSubmit()
     @PutMapping("/active/{id}")
@@ -130,10 +138,11 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 获取当前登陆人发起的流程实例
+     * 获取当前登录人发起的流程实例列表。
      *
      * @param flowInstanceBo 参数
      * @param pageQuery      分页
+     * @return 当前用户发起的流程实例分页数据
      */
     @GetMapping("/pageByCurrent")
     public TableDataInfo<FlowInstanceVo> selectCurrentInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery) {
@@ -141,9 +150,10 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 获取流程图，流程记录
+     * 获取流程图和流程记录，用于展示实例流转轨迹。
      *
      * @param businessId 业务id
+     * @return 流程图与历史节点信息
      */
     @GetMapping("/flowHisTaskList/{businessId}")
     public R<Map<String, Object>> flowHisTaskList(@PathVariable String businessId) {
@@ -151,9 +161,10 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 获取流程变量
+     * 获取流程变量。
      *
      * @param instanceId 流程实例id
+     * @return 流程变量
      */
     @GetMapping("/instanceVariable/{instanceId}")
     public R<Map<String, Object>> instanceVariable(@PathVariable Long instanceId) {
@@ -161,9 +172,10 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 修改流程变量
+     * 修改流程变量。
      *
      * @param bo 参数
+     * @return 操作结果
      */
     @RepeatSubmit()
     @PutMapping("/updateVariable")
@@ -173,9 +185,10 @@ public class FlwInstanceController extends BaseController {
     }
 
     /**
-     * 作废流程
+     * 作废流程实例。
      *
      * @param bo 参数
+     * @return 处理结果
      */
     @Log(title = "流程实例管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()

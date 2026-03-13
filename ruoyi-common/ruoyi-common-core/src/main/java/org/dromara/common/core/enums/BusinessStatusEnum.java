@@ -13,7 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 业务状态枚举
+ * 流程业务状态枚举，统一定义单据在审批流转中的状态。
  *
  * @author may
  */

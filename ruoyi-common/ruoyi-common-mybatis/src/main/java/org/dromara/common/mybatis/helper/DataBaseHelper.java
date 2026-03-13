@@ -74,7 +74,9 @@ public class DataBaseHelper {
     }
 
     /**
-     * 获取当前加载的数据库名
+     * 获取当前注册的数据源名称列表。
+     *
+     * @return 数据源名称列表
      */
     public static List<String> getDataSourceNameList() {
         return new ArrayList<>(DS.getDataSources().keySet());

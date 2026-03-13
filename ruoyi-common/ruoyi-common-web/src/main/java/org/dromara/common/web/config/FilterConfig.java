@@ -20,6 +20,11 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties(XssProperties.class)
 public class FilterConfig {
 
+    /**
+     * 注册 XSS 过滤器。
+     *
+     * @return XSS 请求过滤器实例
+     */
     @Bean
     @ConditionalOnProperty(value = "xss.enabled", havingValue = "true")
     @FilterRegistration(
@@ -32,6 +37,11 @@ public class FilterConfig {
         return new XssFilter();
     }
 
+    /**
+     * 注册可重复读取请求体过滤器。
+     *
+     * @return 请求包装过滤器实例
+     */
     @Bean
     @FilterRegistration(name = "repeatableFilter", urlPatterns = "/*")
     public RepeatableFilter repeatableFilter() {

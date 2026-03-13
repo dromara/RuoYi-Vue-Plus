@@ -18,6 +18,13 @@ public class UserNameTranslationImpl implements TranslationInterface<String> {
 
     private final UserService userService;
 
+    /**
+     * 将用户 ID 翻译为用户名。
+     *
+     * @param key 用户 ID
+     * @param other 额外参数
+     * @return 用户名
+     */
     @Override
     public String translation(Object key, String other) {
         return userService.selectUserNameById(Convert.toLong(key));

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 请假
+ * 请假示例控制器，演示业务单据与流程引擎联动的典型用法。
  *
  * @author may
  * @date 2023-07-21
@@ -40,7 +40,11 @@ public class TestLeaveController extends BaseController {
     private final ITestLeaveService testLeaveService;
 
     /**
-     * 查询请假列表
+     * 分页查询请假列表。
+     *
+     * @param bo 查询条件
+     * @param pageQuery 分页参数
+     * @return 请假分页数据
      */
     @SaCheckPermission("workflow:leave:list")
     @GetMapping("/list")
@@ -49,7 +53,11 @@ public class TestLeaveController extends BaseController {
     }
 
     /**
-     * 导出请假列表
+    /**
+     * 导出请假列表。
+     *
+     * @param bo 查询条件
+     * @param response 响应流
      */
     @SaCheckPermission("workflow:leave:export")
     @Log(title = "请假", businessType = BusinessType.EXPORT)
@@ -60,9 +68,10 @@ public class TestLeaveController extends BaseController {
     }
 
     /**
-     * 获取请假详细信息
+     * 获取请假单详情。
      *
      * @param id 主键
+     * @return 请假详情
      */
     @SaCheckPermission("workflow:leave:query")
     @GetMapping("/{id}")
@@ -72,7 +81,10 @@ public class TestLeaveController extends BaseController {
     }
 
     /**
-     * 新增请假
+     * 新增请假单。
+     *
+     * @param bo 请假信息
+     * @return 新增后的请假单
      */
     @SaCheckPermission("workflow:leave:add")
     @Log(title = "请假", businessType = BusinessType.INSERT)
@@ -83,7 +95,10 @@ public class TestLeaveController extends BaseController {
     }
 
     /**
-     * 提交请假并提交流程
+     * 提交请假单并同步发起流程。
+     *
+     * @param bo 请假信息
+     * @return 提交后的请假单
      */
     @SaCheckPermission("workflow:leave:add")
     @Log(title = "请假", businessType = BusinessType.INSERT)
@@ -94,7 +109,10 @@ public class TestLeaveController extends BaseController {
     }
 
     /**
-     * 修改请假
+     * 修改请假单。
+     *
+     * @param bo 请假信息
+     * @return 修改后的请假单
      */
     @SaCheckPermission("workflow:leave:edit")
     @Log(title = "请假", businessType = BusinessType.UPDATE)
@@ -105,9 +123,10 @@ public class TestLeaveController extends BaseController {
     }
 
     /**
-     * 删除请假
+     * 批量删除请假单。
      *
      * @param ids 主键串
+     * @return 操作结果
      */
     @SaCheckPermission("workflow:leave:remove")
     @Log(title = "请假", businessType = BusinessType.DELETE)

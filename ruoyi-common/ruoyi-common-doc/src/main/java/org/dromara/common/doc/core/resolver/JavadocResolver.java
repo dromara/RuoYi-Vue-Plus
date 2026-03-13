@@ -15,6 +15,7 @@ public interface JavadocResolver extends Comparable<JavadocResolver>, Ordered {
 
     /**
      * 检查解析器是否支持解析 HandlerMethod
+     *
      * @param handlerMethod 处理器方法
      * @return 是否支持解析
      */
@@ -22,6 +23,7 @@ public interface JavadocResolver extends Comparable<JavadocResolver>, Ordered {
 
     /**
      * 执行解析并返回解析到的 Javadoc 内容
+     *
      * @param handlerMethod 处理器方法
      * @param operation Swagger Operation实例
      * @return 解析到的 Javadoc 内容
@@ -29,7 +31,9 @@ public interface JavadocResolver extends Comparable<JavadocResolver>, Ordered {
     String resolve(HandlerMethod handlerMethod, Operation operation);
 
     /**
-     * 获取解析器优先级
+     * 获取解析器优先级。
+     *
+     * @return 优先级
      */
     default int getOrder() {
         return Ordered.LOWEST_PRECEDENCE;
@@ -44,6 +48,12 @@ public interface JavadocResolver extends Comparable<JavadocResolver>, Ordered {
         return this.getClass().getSimpleName();
     }
 
+    /**
+     * 比较解析器执行顺序。
+     *
+     * @param o 其他解析器
+     * @return 比较结果
+     */
     @Override
     default int compareTo(@NotNull JavadocResolver o) {
         return Integer.compare(getOrder(), o.getOrder());

@@ -83,7 +83,7 @@ public enum TaskStatusEnum {
     private final String status;
 
     /**
-     * 描述
+     * 状态描述。
      */
     private final String desc;
 
@@ -91,9 +91,10 @@ public enum TaskStatusEnum {
         .collect(Collectors.toConcurrentMap(TaskStatusEnum::getStatus, TaskStatusEnum::getDesc));
 
     /**
-     * 任务业务状态
+     * 根据状态编码获取任务业务状态描述。
      *
      * @param status 状态
+     * @return 状态描述
      */
     public static String findByStatus(String status) {
         // 从缓存中直接获取描述

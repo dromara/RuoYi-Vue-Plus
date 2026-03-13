@@ -46,7 +46,10 @@ public class LogAspect {
     private static final ThreadLocal<StopWatch> KEY_CACHE = new ThreadLocal<>();
 
     /**
-     * 处理请求前执行
+     * 在目标方法执行前启动耗时统计。
+     *
+     * @param joinPoint 切点
+     * @param controllerLog 日志注解
      */
     @Before(value = "@annotation(controllerLog)")
     public void doBefore(JoinPoint joinPoint, Log controllerLog) {
@@ -56,9 +59,11 @@ public class LogAspect {
     }
 
     /**
-     * 处理完请求后执行
+     * 在目标方法正常返回后记录操作日志。
      *
      * @param joinPoint 切点
+     * @param controllerLog 日志注解
+     * @param jsonResult 返回结果
      */
     @AfterReturning(pointcut = "@annotation(controllerLog)", returning = "jsonResult")
     public void doAfterReturning(JoinPoint joinPoint, Log controllerLog, Object jsonResult) {
@@ -66,9 +71,10 @@ public class LogAspect {
     }
 
     /**
-     * 拦截异常操作
+     * 在目标方法抛出异常后记录操作日志。
      *
      * @param joinPoint 切点
+     * @param controllerLog 日志注解
      * @param e         异常
      */
     @AfterThrowing(value = "@annotation(controllerLog)", throwing = "e")
@@ -76,6 +82,14 @@ public class LogAspect {
         handleLog(joinPoint, controllerLog, e, null);
     }
 
+    /**
+     * 组装并发布操作日志事件。
+     *
+     * @param joinPoint 切点
+     * @param controllerLog 日志注解
+     * @param e 异常信息
+     * @param jsonResult 返回结果
+     */
     protected void handleLog(final JoinPoint joinPoint, Log controllerLog, final Exception e, Object jsonResult) {
         try {
 
@@ -119,9 +133,11 @@ public class LogAspect {
     /**
      * 获取注解中对方法的描述信息 用于Controller层注解
      *
+     * @param joinPoint 切点
      * @param log     日志
      * @param operLog 操作日志
-     * @throws Exception
+     * @param jsonResult 返回结果
+     * @throws Exception 异常
      */
     public void getControllerMethodDescription(JoinPoint joinPoint, Log log, OperLogEvent operLog, Object jsonResult) throws Exception {
         // 设置action动作
@@ -144,7 +160,9 @@ public class LogAspect {
     /**
      * 获取请求的参数，放到log中
      *
+     * @param joinPoint 切点
      * @param operLog 操作日志
+     * @param excludeParamNames 排除参数名
      * @throws Exception 异常
      */
     private void setRequestValue(JoinPoint joinPoint, OperLogEvent operLog, String[] excludeParamNames) throws Exception {
@@ -161,7 +179,11 @@ public class LogAspect {
     }
 
     /**
-     * 参数拼装
+     * 将方法参数序列化为日志字符串。
+     *
+     * @param paramsArray 参数数组
+     * @param excludeParamNames 排除字段名
+     * @return 参数字符串
      */
     private String argsArrayToString(Object[] paramsArray, String[] excludeParamNames) {
         StringJoiner params = new StringJoiner(" ");
