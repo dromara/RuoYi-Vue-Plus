@@ -9,14 +9,14 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 系统访问记录表 sys_logininfor
+ * 系统访问记录表 sys_login_info
  *
  * @author Lion Li
  */
 
 @Data
-@TableName("sys_logininfor")
-public class SysLogininfor implements Serializable {
+@TableName("sys_login_info")
+public class SysLoginInfo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

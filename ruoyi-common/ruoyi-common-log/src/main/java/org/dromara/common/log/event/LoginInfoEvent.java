@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 
 @Data
-public class LogininforEvent implements Serializable {
+public class LoginInfoEvent implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

@@ -232,7 +232,7 @@ insert into sys_menu values('120',  '任务调度中心',  '2',   '6',  'snailjo
 
 -- 三级菜单
 insert into sys_menu values('500',  '操作日志', '108', '1', 'operlog',    'monitor/operlog/index',    '', 1, 0, 'C', '0', '0', 'monitor:operlog:list',    'form',          103, 1, sysdate(), null, null, '操作日志菜单');
-insert into sys_menu values('501',  '登录日志', '108', '2', 'logininfor', 'monitor/logininfor/index', '', 1, 0, 'C', '0', '0', 'monitor:logininfor:list', 'logininfor',    103, 1, sysdate(), null, null, '登录日志菜单');
+insert into sys_menu values('501',  '登录日志', '108', '2', 'loginInfo', 'monitor/loginInfo/index', '', 1, 0, 'C', '0', '0', 'monitor:loginInfo:list', 'loginInfo',    103, 1, sysdate(), null, null, '登录日志菜单');
 -- 用户管理按钮
 insert into sys_menu values('1001', '用户查询', '100', '1',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:query',          '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values('1002', '用户新增', '100', '2',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:add',            '#', 103, 1, sysdate(), null, null, '');
@@ -285,10 +285,10 @@ insert into sys_menu values('1040', '操作查询', '500', '1', '#', '', '', 1, 
 insert into sys_menu values('1041', '操作删除', '500', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:operlog:remove',     '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values('1042', '日志导出', '500', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:operlog:export',     '#', 103, 1, sysdate(), null, null, '');
 -- 登录日志按钮
-insert into sys_menu values('1043', '登录查询', '501', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:query',   '#', 103, 1, sysdate(), null, null, '');
-insert into sys_menu values('1044', '登录删除', '501', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:remove',  '#', 103, 1, sysdate(), null, null, '');
-insert into sys_menu values('1045', '日志导出', '501', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:export',  '#', 103, 1, sysdate(), null, null, '');
-insert into sys_menu values('1050', '账户解锁', '501', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:unlock',  '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1043', '登录查询', '501', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:loginInfo:query',   '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1044', '登录删除', '501', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:loginInfo:remove',  '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1045', '日志导出', '501', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:loginInfo:export',  '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1050', '账户解锁', '501', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:loginInfo:unlock',  '#', 103, 1, sysdate(), null, null, '');
 -- 在线用户按钮
 insert into sys_menu values('1046', '在线查询', '109', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:query',       '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values('1047', '批量强退', '109', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:batchLogout', '#', 103, 1, sysdate(), null, null, '');
@@ -645,7 +645,7 @@ insert into sys_config values(11, 'OSS预览列表资源开关',         'sys.os
 -- ----------------------------
 -- 14、系统访问记录
 -- ----------------------------
-create table sys_logininfor (
+create table sys_login_info (
     info_id        bigint(20)     not null                  comment '访问ID',
     user_name      varchar(50)    default ''                comment '用户账号',
     client_key     varchar(32)    default ''                comment '客户端',
@@ -658,8 +658,8 @@ create table sys_logininfor (
     msg            varchar(255)   default ''                comment '提示消息',
     login_time     datetime                                 comment '访问时间',
     primary key (info_id),
-    key idx_sys_logininfor_s  (status),
-    key idx_sys_logininfor_lt (login_time)
+    key idx_sys_login_info_s  (status),
+    key idx_sys_login_info_lt (login_time)
 ) engine=innodb comment = '系统访问记录';
 
 

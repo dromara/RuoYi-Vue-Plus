@@ -14,7 +14,7 @@ import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.log.event.LogininforEvent;
+import org.dromara.common.log.event.LoginInfoEvent;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.web.config.properties.CaptchaProperties;
 import org.dromara.system.domain.SysUser;
@@ -65,7 +65,7 @@ public class SysRegisterService {
         if (!regFlag) {
             throw new UserException("user.register.error");
         }
-        recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.register.success"));
+        recordLoginInfo(username, Constants.REGISTER, MessageUtils.message("user.register.success"));
     }
 
     /**
@@ -80,11 +80,11 @@ public class SysRegisterService {
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
-            recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            recordLoginInfo(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         if (!StringUtils.equalsIgnoreCase(code, captcha)) {
-            recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
+            recordLoginInfo(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
             throw new CaptchaException();
         }
     }
@@ -97,13 +97,13 @@ public class SysRegisterService {
      * @param message  消息内容
      * @return
      */
-    private void recordLogininfor(String username, String status, String message) {
-        LogininforEvent logininforEvent = new LogininforEvent();
-        logininforEvent.setUsername(username);
-        logininforEvent.setStatus(status);
-        logininforEvent.setMessage(message);
-        logininforEvent.setRequest(ServletUtils.getRequest());
-        SpringUtils.context().publishEvent(logininforEvent);
+    private void recordLoginInfo(String username, String status, String message) {
+        LoginInfoEvent loginInfoEvent = new LoginInfoEvent();
+        loginInfoEvent.setUsername(username);
+        loginInfoEvent.setStatus(status);
+        loginInfoEvent.setMessage(message);
+        loginInfoEvent.setRequest(ServletUtils.getRequest());
+        SpringUtils.context().publishEvent(loginInfoEvent);
     }
 
 }

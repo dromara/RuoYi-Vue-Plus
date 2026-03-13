@@ -360,7 +360,7 @@ insert into sys_menu values('120',  '任务调度中心',  '2',    '5', 'snailjo
 
 -- 三级菜单
 insert into sys_menu values('500',  '操作日志', '108', '1', 'operlog',    'monitor/operlog/index',    '', 1, 0, 'C', '0', '0', 'monitor:operlog:list',    'form',          103, 1, sysdate, null, null, '操作日志菜单');
-insert into sys_menu values('501',  '登录日志', '108', '2', 'logininfor', 'monitor/logininfor/index', '', 1, 0, 'C', '0', '0', 'monitor:logininfor:list', 'logininfor',    103, 1, sysdate, null, null, '登录日志菜单');
+insert into sys_menu values('501',  '登录日志', '108', '2', 'loginInfo', 'monitor/logininfo/index', '', 1, 0, 'C', '0', '0', 'monitor:loginInfo:list', 'loginInfo',    103, 1, sysdate, null, null, '登录日志菜单');
 -- 用户管理按钮
 insert into sys_menu values('1001', '用户查询', '100', '1',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:query',          '#', 103, 1, sysdate, null, null, '');
 insert into sys_menu values('1002', '用户新增', '100', '2',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:add',            '#', 103, 1, sysdate, null, null, '');
@@ -413,10 +413,10 @@ insert into sys_menu values('1040', '操作查询', '500', '1', '#', '', '', 1, 
 insert into sys_menu values('1041', '操作删除', '500', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:operlog:remove',     '#', 103, 1, sysdate, null, null, '');
 insert into sys_menu values('1042', '日志导出', '500', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:operlog:export',     '#', 103, 1, sysdate, null, null, '');
 -- 登录日志按钮
-insert into sys_menu values('1043', '登录查询', '501', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:query',   '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1044', '登录删除', '501', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:remove',  '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1045', '日志导出', '501', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:export',  '#', 103, 1, sysdate, null, null, '');
-insert into sys_menu values('1050', '账户解锁', '501', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:unlock',  '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1043', '登录查询', '501', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfo:query',   '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1044', '登录删除', '501', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfo:remove',  '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1045', '日志导出', '501', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfo:export',  '#', 103, 1, sysdate, null, null, '');
+insert into sys_menu values('1050', '账户解锁', '501', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfo:unlock',  '#', 103, 1, sysdate, null, null, '');
 -- 在线用户按钮
 insert into sys_menu values('1046', '在线查询', '109', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:query',       '#', 103, 1, sysdate, null, null, '');
 insert into sys_menu values('1047', '批量强退', '109', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:batchLogout', '#', 103, 1, sysdate, null, null, '');
@@ -853,7 +853,7 @@ insert into sys_config values(11, 'OSS预览列表资源开关',          'sys.o
 -- ----------------------------
 -- 14、系统访问记录
 -- ----------------------------
-create table sys_logininfor (
+create table sys_login_info (
   info_id         number(20)     not null,
   user_name       varchar2(50)   default '',
   client_key      varchar2(32)   default '',
@@ -867,22 +867,22 @@ create table sys_logininfor (
   login_time      date
 );
 
-alter table sys_logininfor add constraint pk_sys_logininfor primary key (info_id);
-create index idx_sys_logininfor_s on sys_logininfor (status);
-create index idx_sys_logininfor_lt on sys_logininfor (login_time);
+alter table sys_login_info add constraint pk_sys_login_info primary key (info_id);
+create index idx_sys_login_info_s on sys_login_info (status);
+create index idx_sys_login_info_lt on sys_login_info (login_time);
 
-comment on table  sys_logininfor                is '系统访问记录';
-comment on column sys_logininfor.info_id        is '访问ID';
-comment on column sys_logininfor.user_name      is '登录账号';
-comment on column sys_logininfor.client_key     is '客户端';
-comment on column sys_logininfor.device_type    is '设备类型';
-comment on column sys_logininfor.ipaddr         is '登录IP地址';
-comment on column sys_logininfor.login_location is '登录地点';
-comment on column sys_logininfor.browser        is '浏览器类型';
-comment on column sys_logininfor.os             is '操作系统';
-comment on column sys_logininfor.status         is '登录状态（0成功 1失败）';
-comment on column sys_logininfor.msg            is '提示消息';
-comment on column sys_logininfor.login_time     is '访问时间';
+comment on table  sys_login_info               is '系统访问记录';
+comment on column sys_login_info.info_id       is '访问ID';
+comment on column sys_login_info.user_name     is '登录账号';
+comment on column sys_login_info.client_key    is '客户端';
+comment on column sys_login_info.device_type   is '设备类型';
+comment on column sys_login_info.ipaddr        is '登录IP地址';
+comment on column sys_login_info.login_location is '登录地点';
+comment on column sys_login_info.browser       is '浏览器类型';
+comment on column sys_login_info.os            is '操作系统';
+comment on column sys_login_info.status        is '登录状态（0成功 1失败）';
+comment on column sys_login_info.msg           is '提示消息';
+comment on column sys_login_info.login_time    is '访问时间';
 
 
 -- ----------------------------

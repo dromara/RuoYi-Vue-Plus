@@ -14,9 +14,9 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.web.core.BaseController;
-import org.dromara.system.domain.bo.SysLogininforBo;
-import org.dromara.system.domain.vo.SysLogininforVo;
-import org.dromara.system.service.ISysLogininforService;
+import org.dromara.system.domain.bo.SysLoginInfoBo;
+import org.dromara.system.domain.vo.SysLoginInfoVo;
+import org.dromara.system.service.ISysLoginInfoService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,55 +30,55 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/monitor/logininfor")
-public class SysLogininforController extends BaseController {
+@RequestMapping("/monitor/loginInfo")
+public class SysLoginInfoController extends BaseController {
 
-    private final ISysLogininforService logininforService;
+    private final ISysLoginInfoService loginInfoService;
 
     /**
      * 获取系统访问记录列表
      */
-    @SaCheckPermission("monitor:logininfor:list")
+    @SaCheckPermission("monitor:logininfo:list")
     @GetMapping("/list")
-    public TableDataInfo<SysLogininforVo> list(SysLogininforBo logininfor, PageQuery pageQuery) {
-        return logininforService.selectPageLogininforList(logininfor, pageQuery);
+    public TableDataInfo<SysLoginInfoVo> list(SysLoginInfoBo loginInfo, PageQuery pageQuery) {
+        return loginInfoService.selectPageLoginInfoList(loginInfo, pageQuery);
     }
 
     /**
      * 导出系统访问记录列表
      */
     @Log(title = "登录日志", businessType = BusinessType.EXPORT)
-    @SaCheckPermission("monitor:logininfor:export")
+    @SaCheckPermission("monitor:logininfo:export")
     @PostMapping("/export")
-    public void export(SysLogininforBo logininfor, HttpServletResponse response) {
-        List<SysLogininforVo> list = logininforService.selectLogininforList(logininfor);
-        ExcelUtil.exportExcel(list, "登录日志", SysLogininforVo.class, response);
+    public void export(SysLoginInfoBo loginInfo, HttpServletResponse response) {
+        List<SysLoginInfoVo> list = loginInfoService.selectLoginInfoList(loginInfo);
+        ExcelUtil.exportExcel(list, "登录日志", SysLoginInfoVo.class, response);
     }
 
     /**
      * 批量删除登录日志
      * @param infoIds 日志ids
      */
-    @SaCheckPermission("monitor:logininfor:remove")
+    @SaCheckPermission("monitor:logininfo:remove")
     @Log(title = "登录日志", businessType = BusinessType.DELETE)
     @DeleteMapping("/{infoIds}")
     public R<Void> remove(@PathVariable Long[] infoIds) {
-        return toAjax(logininforService.deleteLogininforByIds(infoIds));
+        return toAjax(loginInfoService.deleteLoginInfoByIds(infoIds));
     }
 
     /**
      * 清理系统访问记录
      */
-    @SaCheckPermission("monitor:logininfor:remove")
+    @SaCheckPermission("monitor:logininfo:remove")
     @Log(title = "登录日志", businessType = BusinessType.CLEAN)
     @Lock4j
     @DeleteMapping("/clean")
     public R<Void> clean() {
-        logininforService.cleanLogininfor();
+        loginInfoService.cleanLoginInfo();
         return R.ok();
     }
 
-    @SaCheckPermission("monitor:logininfor:unlock")
+    @SaCheckPermission("monitor:logininfo:unlock")
     @Log(title = "账户解锁", businessType = BusinessType.OTHER)
     @RepeatSubmit()
     @GetMapping("/unlock/{userName}")

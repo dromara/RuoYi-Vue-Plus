@@ -1102,7 +1102,7 @@ GO
 INSERT sys_dict_type VALUES (12, N'设备类型', N'sys_device_type', 103, 1, getdate(), NULL, NULL, N'客户端设备类型')
 GO
 
-CREATE TABLE sys_logininfor
+CREATE TABLE sys_login_info
 (
     info_id        bigint                      NOT NULL,
     user_name      nvarchar(50)  DEFAULT ''    NULL,
@@ -1122,81 +1122,81 @@ CREATE TABLE sys_logininfor
 ON [PRIMARY]
 GO
 
-CREATE NONCLUSTERED INDEX idx_sys_logininfor_s ON sys_logininfor (status)
+CREATE NONCLUSTERED INDEX idx_sys_login_info_s ON sys_login_info (status)
 GO
-CREATE NONCLUSTERED INDEX idx_sys_logininfor_lt ON sys_logininfor (login_time)
+CREATE NONCLUSTERED INDEX idx_sys_login_info_lt ON sys_login_info (login_time)
 GO
 
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'访问ID' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
+    'TABLE', N'sys_login_info',
     'COLUMN', N'info_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'用户账号' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
+    'TABLE', N'sys_login_info',
     'COLUMN', N'user_name'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'客户端' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
+    'TABLE', N'sys_login_info',
     'COLUMN', N'client_key'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'设备类型' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
+    'TABLE', N'sys_login_info',
     'COLUMN', N'device_type'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'登录IP地址' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
+    'TABLE', N'sys_login_info',
     'COLUMN', N'ipaddr'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'登录地点' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
+    'TABLE', N'sys_login_info',
     'COLUMN', N'login_location'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'浏览器类型' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
+    'TABLE', N'sys_login_info',
     'COLUMN', N'browser'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'操作系统' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
+    'TABLE', N'sys_login_info',
     'COLUMN', N'os'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'登录状态（0成功 1失败）' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
+    'TABLE', N'sys_login_info',
     'COLUMN', N'status'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'提示消息' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
+    'TABLE', N'sys_login_info',
     'COLUMN', N'msg'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'访问时间' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor',
+    'TABLE', N'sys_login_info',
     'COLUMN', N'login_time'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'系统访问记录' ,
     'SCHEMA', N'dbo',
-    'TABLE', N'sys_logininfor'
+    'TABLE', N'sys_login_info'
 GO
 
 CREATE TABLE sys_menu
@@ -1409,7 +1409,7 @@ INSERT sys_menu VALUES (120, N'任务调度中心', 2, 5, N'snailjob', N'monitor
 GO
 INSERT sys_menu VALUES (500, N'操作日志', 108, 1, N'operlog', N'monitor/operlog/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:operlog:list', N'form', 103, 1, getdate(), NULL, NULL, N'操作日志菜单')
 GO
-INSERT sys_menu VALUES (501, N'登录日志', 108, 2, N'logininfor', N'monitor/logininfor/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:logininfor:list', N'logininfor', 103, 1, getdate(), NULL, NULL, N'登录日志菜单')
+INSERT sys_menu VALUES (501, N'登录日志', 108, 2, N'loginInfo', N'monitor/loginInfo/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:loginInfo:list', N'loginInfo', 103, 1, getdate(), NULL, NULL, N'登录日志菜单')
 GO
 INSERT sys_menu VALUES (1001, N'用户查询', 100, 1, N'', N'', N'', 1, 0, N'F', N'0', N'0', N'system:user:query', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
@@ -1495,13 +1495,13 @@ INSERT sys_menu VALUES (1041, N'操作删除', 500, 2, N'#', N'', N'', 1, 0, N'F
 GO
 INSERT sys_menu VALUES (1042, N'日志导出', 500, 4, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:operlog:export', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_menu VALUES (1043, N'登录查询', 501, 1, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:logininfor:query', N'#', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_menu VALUES (1043, N'登录查询', 501, 1, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:loginInfo:query', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_menu VALUES (1044, N'登录删除', 501, 2, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:logininfor:remove', N'#', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_menu VALUES (1044, N'登录删除', 501, 2, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:loginInfo:remove', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_menu VALUES (1045, N'日志导出', 501, 3, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:logininfor:export', N'#', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_menu VALUES (1045, N'日志导出', 501, 3, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:loginInfo:export', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_menu VALUES (1050, N'账户解锁', 501, 4, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:logininfor:unlock',  N'#', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_menu VALUES (1050, N'账户解锁', 501, 4, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:loginInfo:unlock',  N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
 INSERT sys_menu VALUES (1046, N'在线查询', 109, 1, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'monitor:online:query', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO

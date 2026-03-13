@@ -19,7 +19,7 @@ import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.*;
-import org.dromara.common.log.event.LogininforEvent;
+import org.dromara.common.log.event.LoginInfoEvent;
 import org.dromara.common.mybatis.helper.DataPermissionHelper;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -109,7 +109,7 @@ public class SysLoginService {
             if (ObjectUtil.isNull(loginUser)) {
                 return;
             }
-            recordLogininfor(loginUser.getUsername(), Constants.LOGOUT, MessageUtils.message("user.logout.success"));
+            recordLoginInfo(loginUser.getUsername(), Constants.LOGOUT, MessageUtils.message("user.logout.success"));
         } catch (NotLoginException ignored) {
         } finally {
             try {
@@ -126,13 +126,13 @@ public class SysLoginService {
      * @param status   状态
      * @param message  消息内容
      */
-    public void recordLogininfor(String username, String status, String message) {
-        LogininforEvent logininforEvent = new LogininforEvent();
-        logininforEvent.setUsername(username);
-        logininforEvent.setStatus(status);
-        logininforEvent.setMessage(message);
-        logininforEvent.setRequest(ServletUtils.getRequest());
-        SpringUtils.context().publishEvent(logininforEvent);
+    public void recordLoginInfo(String username, String status, String message) {
+        LoginInfoEvent loginInfoEvent = new LoginInfoEvent();
+        loginInfoEvent.setUsername(username);
+        loginInfoEvent.setStatus(status);
+        loginInfoEvent.setMessage(message);
+        loginInfoEvent.setRequest(ServletUtils.getRequest());
+        SpringUtils.context().publishEvent(loginInfoEvent);
     }
 
     /**
@@ -192,7 +192,7 @@ public class SysLoginService {
         int errorNumber = ObjectUtil.defaultIfNull(RedisUtils.getCacheObject(errorKey), 0);
         // 锁定时间内登录 则踢出
         if (errorNumber >= maxRetryCount) {
-            recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime));
+            recordLoginInfo(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime));
             throw new UserException(loginType.getRetryLimitExceed(), maxRetryCount, lockTime);
         }
 
@@ -202,11 +202,11 @@ public class SysLoginService {
             RedisUtils.setCacheObject(errorKey, errorNumber, Duration.ofMinutes(lockTime));
             // 达到规定错误次数 则锁定登录
             if (errorNumber >= maxRetryCount) {
-                recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime));
+                recordLoginInfo(username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime));
                 throw new UserException(loginType.getRetryLimitExceed(), maxRetryCount, lockTime);
             } else {
                 // 未达到规定错误次数
-                recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitCount(), errorNumber));
+                recordLoginInfo(username, loginFail, MessageUtils.message(loginType.getRetryLimitCount(), errorNumber));
                 throw new UserException(loginType.getRetryLimitCount(), errorNumber);
             }
         }

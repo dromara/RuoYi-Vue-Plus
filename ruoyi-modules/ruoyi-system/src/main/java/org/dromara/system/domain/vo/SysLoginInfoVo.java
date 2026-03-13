@@ -5,7 +5,7 @@ import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
 import org.apache.fesod.sheet.annotation.ExcelProperty;
 import org.dromara.common.excel.annotation.ExcelDictFormat;
 import org.dromara.common.excel.convert.ExcelDictConvert;
-import org.dromara.system.domain.SysLogininfor;
+import org.dromara.system.domain.SysLoginInfo;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
@@ -15,15 +15,15 @@ import java.io.Serializable;
 
 
 /**
- * 系统访问记录视图对象 sys_logininfor
+ * 系统访问记录视图对象 sys_login_info
  *
  * @author Michelle.Chung
  * @date 2023-02-07
  */
 @Data
 @ExcelIgnoreUnannotated
-@AutoMapper(target = SysLogininfor.class)
-public class SysLogininforVo implements Serializable {
+@AutoMapper(target = SysLoginInfo.class)
+public class SysLoginInfoVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

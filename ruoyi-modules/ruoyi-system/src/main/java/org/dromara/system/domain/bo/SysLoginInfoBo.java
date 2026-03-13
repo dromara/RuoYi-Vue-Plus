@@ -1,6 +1,6 @@
 package org.dromara.system.domain.bo;
 
-import org.dromara.system.domain.SysLogininfor;
+import org.dromara.system.domain.SysLoginInfo;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
@@ -9,14 +9,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 系统访问记录业务对象 sys_logininfor
+ * 系统访问记录业务对象 sys_login_info
  *
  * @author Michelle.Chung
  */
 
 @Data
-@AutoMapper(target = SysLogininfor.class, reverseConvertGenerate = false)
-public class SysLogininforBo {
+@AutoMapper(target = SysLoginInfo.class, reverseConvertGenerate = false)
+public class SysLoginInfoBo {
 
     /**
      * 访问ID

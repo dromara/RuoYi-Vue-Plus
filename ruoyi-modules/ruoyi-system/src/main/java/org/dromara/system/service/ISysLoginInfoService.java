@@ -2,8 +2,8 @@ package org.dromara.system.service;
 
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.system.domain.bo.SysLogininforBo;
-import org.dromara.system.domain.vo.SysLogininforVo;
+import org.dromara.system.domain.bo.SysLoginInfoBo;
+import org.dromara.system.domain.vo.SysLoginInfoVo;
 
 import java.util.List;
 
@@ -12,31 +12,31 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface ISysLogininforService {
+public interface ISysLoginInfoService {
 
     /**
      * 分页查询登录日志列表
      *
-     * @param logininfor 查询条件
+     * @param loginInfo 查询条件
      * @param pageQuery  分页参数
      * @return 登录日志分页列表
      */
-    TableDataInfo<SysLogininforVo> selectPageLogininforList(SysLogininforBo logininfor, PageQuery pageQuery);
+    TableDataInfo<SysLoginInfoVo> selectPageLoginInfoList(SysLoginInfoBo loginInfo, PageQuery pageQuery);
 
     /**
      * 新增系统登录日志
      *
      * @param bo 访问日志对象
      */
-    void insertLogininfor(SysLogininforBo bo);
+    void insertLoginInfo(SysLoginInfoBo bo);
 
     /**
      * 查询系统登录日志集合
      *
-     * @param logininfor 访问日志对象
+     * @param loginInfo 访问日志对象
      * @return 登录记录集合
      */
-    List<SysLogininforVo> selectLogininforList(SysLogininforBo logininfor);
+    List<SysLoginInfoVo> selectLoginInfoList(SysLoginInfoBo loginInfo);
 
     /**
      * 批量删除系统登录日志
@@ -44,10 +44,10 @@ public interface ISysLogininforService {
      * @param infoIds 需要删除的登录日志ID
      * @return 结果
      */
-    int deleteLogininforByIds(Long[] infoIds);
+    int deleteLoginInfoByIds(Long[] infoIds);
 
     /**
      * 清空系统登录日志
      */
-    void cleanLogininfor();
+    void cleanLoginInfo();
 }
