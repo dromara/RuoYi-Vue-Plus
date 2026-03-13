@@ -33,8 +33,8 @@ public interface ISysPermissionService {
      * 根据角色列表构建数据权限角色映射
      *
      * @param roles 角色列表
-     * @return key 为权限码 value 为命中的角色列表
+     * @return key 为权限码 value 为命中的角色ID列表
      */
-    Map<String, List<RoleDTO>> getDataScopeRoleMap(List<RoleDTO> roles);
+    Map<String, List<Long>> getDataScopeRoleMap(List<RoleDTO> roles);
 
 }

@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.yulichang.toolkit.JoinWrappers;
 import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.SysRole;
+import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.vo.SysRoleVo;
 
 import java.util.List;
@@ -19,18 +21,6 @@ import java.util.List;
  * @author Lion Li
  */
 public interface SysRoleMapper extends BaseMapperPlus<SysRole, SysRoleVo> {
-
-    /**
-     * 构建根据用户ID查询角色ID的SQL子查询
-     *
-     * @param userId 用户ID
-     * @return 查询用户对应角色ID的SQL语句字符串
-     */
-    default String buildRoleByUserSql(Long userId) {
-        return """
-                select role_id from sys_user_role where user_id = %d
-            """.formatted(userId);
-    }
 
     /**
      * 分页查询角色列表
@@ -96,10 +86,11 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRole, SysRoleVo> {
      * @return 角色列表
      */
     default List<SysRoleVo> selectRolesByUserId(Long userId) {
-        return this.selectVoList(new LambdaQueryWrapper<SysRole>()
+        return this.selectJoinList(SysRoleVo.class, JoinWrappers.lambda("r", SysRole.class)
             .select(SysRole::getRoleId, SysRole::getRoleName, SysRole::getRoleKey,
                 SysRole::getRoleSort, SysRole::getDataScope, SysRole::getStatus)
-            .inSql(SysRole::getRoleId, this.buildRoleByUserSql(userId)));
+            .leftJoin(SysUserRole.class, "sur", SysUserRole::getRoleId, SysRole::getRoleId)
+            .eq("sur", SysUserRole::getUserId, userId));
     }
 
 }

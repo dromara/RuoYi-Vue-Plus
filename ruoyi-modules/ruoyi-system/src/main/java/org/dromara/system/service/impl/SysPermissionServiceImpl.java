@@ -63,17 +63,16 @@ public class SysPermissionServiceImpl implements ISysPermissionService, Permissi
     }
 
     @Override
-    public Map<String, List<RoleDTO>> getDataScopeRoleMap(List<RoleDTO> roles) {
+    public Map<String, List<Long>> getDataScopeRoleMap(List<RoleDTO> roles) {
         if (CollUtil.isEmpty(roles)) {
             return Map.of();
         }
-        Map<Long, RoleDTO> roleMap = StreamUtils.toIdentityMap(roles, RoleDTO::getRoleId);
         List<Long> roleIds = StreamUtils.toList(roles, RoleDTO::getRoleId);
         Map<Long, Set<String>> permsRoleIds = menuService.selectMenuPermsByRoleIds(roleIds);
-        Map<String, List<RoleDTO>> rolePermsMap = new LinkedHashMap<>();
+        Map<String, List<Long>> rolePermsMap = new LinkedHashMap<>();
         permsRoleIds.forEach((roleId, perms) ->  {
             perms.forEach(perm -> {
-                rolePermsMap.computeIfAbsent(perm, k -> new ArrayList<>()).add(roleMap.get(roleId));
+                rolePermsMap.computeIfAbsent(perm, key -> new ArrayList<>()).add(roleId);
             });
         });
         return rolePermsMap;

@@ -61,22 +61,19 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public List<SysMenuVo> selectMenuList(SysMenuBo menu, Long userId) {
-        List<SysMenuVo> menuList;
-        LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
         // 管理员显示所有菜单信息 不是管理员 按用户id过滤菜单
-        if (!LoginHelper.isSuperAdmin(userId)) {
-            // 通过用户id获取角色id 通过角色id获取菜单id 然后in菜单
-            wrapper.inSql(SysMenu::getMenuId, baseMapper.buildMenuByUserSql(userId));
+        if (LoginHelper.isSuperAdmin(userId)) {
+            return baseMapper.selectVoList(
+                new LambdaQueryWrapper<SysMenu>()
+                    .like(StringUtils.isNotBlank(menu.getMenuName()), SysMenu::getMenuName, menu.getMenuName())
+                    .eq(StringUtils.isNotBlank(menu.getVisible()), SysMenu::getVisible, menu.getVisible())
+                    .eq(StringUtils.isNotBlank(menu.getStatus()), SysMenu::getStatus, menu.getStatus())
+                    .eq(StringUtils.isNotBlank(menu.getMenuType()), SysMenu::getMenuType, menu.getMenuType())
+                    .eq(ObjectUtil.isNotNull(menu.getParentId()), SysMenu::getParentId, menu.getParentId())
+                    .orderByAsc(SysMenu::getParentId)
+                    .orderByAsc(SysMenu::getOrderNum));
         }
-        menuList = baseMapper.selectVoList(
-            wrapper.like(StringUtils.isNotBlank(menu.getMenuName()), SysMenu::getMenuName, menu.getMenuName())
-                .eq(StringUtils.isNotBlank(menu.getVisible()), SysMenu::getVisible, menu.getVisible())
-                .eq(StringUtils.isNotBlank(menu.getStatus()), SysMenu::getStatus, menu.getStatus())
-                .eq(StringUtils.isNotBlank(menu.getMenuType()), SysMenu::getMenuType, menu.getMenuType())
-                .eq(ObjectUtil.isNotNull(menu.getParentId()), SysMenu::getParentId, menu.getParentId())
-                .orderByAsc(SysMenu::getParentId)
-                .orderByAsc(SysMenu::getOrderNum));
-        return menuList;
+        return baseMapper.selectMenuListByUserId(menu, userId);
     }
 
     /**
@@ -124,13 +121,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         if (LoginHelper.isSuperAdmin(userId)) {
             menus = baseMapper.selectMenuTreeAll();
         } else {
-            LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
-            menus = baseMapper.selectList(
-                wrapper.in(SysMenu::getMenuType, SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
-                    .eq(SysMenu::getStatus, SystemConstants.NORMAL)
-                    .inSql(SysMenu::getMenuId, baseMapper.buildMenuByUserSql(userId))
-                    .orderByAsc(SysMenu::getParentId)
-                    .orderByAsc(SysMenu::getOrderNum));
+            menus = baseMapper.selectMenuTreeByUserId(userId);
         }
 
         return TreeBuildUtils.build(menus, Constants.TOP_PARENT_ID, SysMenu::getParentId, (menu, nodeTreeMaps) -> {

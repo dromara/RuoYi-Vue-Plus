@@ -8,8 +8,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.lock.annotation.Lock4j;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -372,11 +370,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public TableDataInfo<FlowTaskVo> pageByTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
-        QueryWrapper<FlowTaskBo> queryWrapper = buildQueryWrapper(flowTaskBo);
-        queryWrapper.eq("t.node_type", NodeType.BETWEEN.getKey());
-        queryWrapper.in("t.processed_by", LoginHelper.getUserIdStr());
-        queryWrapper.in("t.flow_status", BusinessStatusEnum.WAITING.getStatus());
-        Page<FlowTaskVo> page = flwTaskMapper.getListRunTask(pageQuery.build(), queryWrapper);
+        Page<FlowTaskVo> page = flwTaskMapper.getListRunTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), LoginHelper.getUserIdStr());
         this.wrapAssigneeInfo(page.getRecords());
         return TableDataInfo.build(page);
     }
@@ -389,10 +383,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public TableDataInfo<FlowHisTaskVo> pageByTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
-        QueryWrapper<FlowTaskBo> queryWrapper = buildQueryWrapper(flowTaskBo);
-        queryWrapper.eq("t.node_type", NodeType.BETWEEN.getKey());
-        queryWrapper.in("t.approver", LoginHelper.getUserIdStr());
-        Page<FlowHisTaskVo> page = flwTaskMapper.getListFinishTask(pageQuery.build(), queryWrapper);
+        Page<FlowHisTaskVo> page = flwTaskMapper.getListFinishTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), LoginHelper.getUserIdStr());
         return TableDataInfo.build(page);
     }
 
@@ -404,9 +395,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public TableDataInfo<FlowTaskVo> pageByAllTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
-        QueryWrapper<FlowTaskBo> queryWrapper = buildQueryWrapper(flowTaskBo);
-        queryWrapper.eq("t.node_type", NodeType.BETWEEN.getKey());
-        Page<FlowTaskVo> page = flwTaskMapper.getListRunTask(pageQuery.build(), queryWrapper);
+        Page<FlowTaskVo> page = flwTaskMapper.getListRunTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), null);
         this.wrapAssigneeInfo(page.getRecords());
         return TableDataInfo.build(page);
     }
@@ -437,8 +426,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public TableDataInfo<FlowHisTaskVo> pageByAllTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
-        QueryWrapper<FlowTaskBo> queryWrapper = buildQueryWrapper(flowTaskBo);
-        Page<FlowHisTaskVo> page = flwTaskMapper.getListFinishTask(pageQuery.build(), queryWrapper);
+        Page<FlowHisTaskVo> page = flwTaskMapper.getListFinishTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), null);
         return TableDataInfo.build(page);
     }
 
@@ -450,28 +438,16 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public TableDataInfo<FlowTaskVo> pageByTaskCopy(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
-        QueryWrapper<FlowTaskBo> queryWrapper = buildQueryWrapper(flowTaskBo);
-        queryWrapper.in("t.processed_by", LoginHelper.getUserIdStr());
-        Page<FlowTaskVo> page = flwTaskMapper.getTaskCopyByPage(pageQuery.build(), queryWrapper);
+        Page<FlowTaskVo> page = flwTaskMapper.getTaskCopyByPage(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), LoginHelper.getUserIdStr());
         return TableDataInfo.build(page);
     }
 
-    private QueryWrapper<FlowTaskBo> buildQueryWrapper(FlowTaskBo flowTaskBo) {
-        Map<String, Object> params = flowTaskBo.getParams();
-        QueryWrapper<FlowTaskBo> wrapper = Wrappers.query();
-        wrapper.like(StringUtils.isNotBlank(flowTaskBo.getNodeName()), "t.node_name", flowTaskBo.getNodeName());
-        wrapper.like(StringUtils.isNotBlank(flowTaskBo.getFlowName()), "t.flow_name", flowTaskBo.getFlowName());
-        wrapper.like(StringUtils.isNotBlank(flowTaskBo.getFlowCode()), "t.flow_code", flowTaskBo.getFlowCode());
-        wrapper.like(StringUtils.isNotBlank(flowTaskBo.getFlowStatus()), "t.flow_status", flowTaskBo.getFlowStatus());
-        wrapper.in(CollUtil.isNotEmpty(flowTaskBo.getCreateByIds()), "t.create_by", flowTaskBo.getCreateByIds());
+    private List<String> categoryIds(FlowTaskBo flowTaskBo) {
         if (StringUtils.isNotBlank(flowTaskBo.getCategory())) {
             List<Long> categoryIds = flwCategoryMapper.selectCategoryIdsByParentId(Convert.toLong(flowTaskBo.getCategory()));
-            wrapper.in("t.category", StreamUtils.toList(categoryIds, Convert::toStr));
+            return StreamUtils.toList(categoryIds, Convert::toStr);
         }
-        wrapper.between(params.get("beginTime") != null && params.get("endTime") != null,
-            "t.create_time", params.get("beginTime"), params.get("endTime"));
-        wrapper.orderByDesc("t.create_time").orderByDesc("t.update_time");
-        return wrapper;
+        return null;
     }
 
     /**

@@ -42,6 +42,11 @@
             <artifactId>mybatis-plus-jsqlparser</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-boot-starter</artifactId>
+        </dependency>
+
         <!-- sql性能分析插件 -->
         <dependency>
             <groupId>p6spy</groupId>

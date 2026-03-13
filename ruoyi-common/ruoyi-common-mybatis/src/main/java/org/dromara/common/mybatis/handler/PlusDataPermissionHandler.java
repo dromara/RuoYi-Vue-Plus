@@ -198,13 +198,22 @@ public class PlusDataPermissionHandler {
         if (!access.constrained()) {
             return roles;
         }
+        Map<Long, RoleDTO> allRoleMap = new LinkedHashMap<>();
+        if (CollUtil.isNotEmpty(roles)) {
+            roles.forEach(role -> allRoleMap.put(role.getRoleId(), role));
+        }
         Map<Long, RoleDTO> roleMap = new LinkedHashMap<>();
-        Map<String, List<RoleDTO>> dataScopeRoleMap = user.getDataScopeRoleMap();
+        Map<String, List<Long>> dataScopeRoleMap = user.getDataScopeRoleMap();
         if (CollUtil.isNotEmpty(dataScopeRoleMap)) {
             access.perms().forEach(perm -> {
-                List<RoleDTO> roleList = dataScopeRoleMap.get(perm);
-                if (CollUtil.isNotEmpty(roleList)) {
-                    roleList.forEach(role -> roleMap.putIfAbsent(role.getRoleId(), role));
+                List<Long> roleIds = dataScopeRoleMap.get(perm);
+                if (CollUtil.isNotEmpty(roleIds)) {
+                    roleIds.forEach(roleId -> {
+                        RoleDTO role = allRoleMap.get(roleId);
+                        if (role != null) {
+                            roleMap.putIfAbsent(role.getRoleId(), role);
+                        }
+                    });
                 }
             });
         }

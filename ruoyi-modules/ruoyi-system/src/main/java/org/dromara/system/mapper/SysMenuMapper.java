@@ -2,11 +2,17 @@ package org.dromara.system.mapper;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.yulichang.toolkit.JoinWrappers;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.SysMenu;
+import org.dromara.system.domain.SysRole;
+import org.dromara.system.domain.SysRoleMenu;
+import org.dromara.system.domain.SysUserRole;
+import org.dromara.system.domain.bo.SysMenuBo;
+import org.dromara.system.domain.vo.SysRoleMenuPermVo;
 import org.dromara.system.domain.vo.SysMenuVo;
 
 import java.util.*;
@@ -19,79 +25,22 @@ import java.util.*;
 public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
 
     /**
-     * 构建用户权限菜单 SQL
-     *
-     * <p>
-     * 查询用户所属角色所拥有的菜单权限，用于权限判断、菜单加载等场景
-     * </p>
-     *
-     * @param userId 用户ID
-     * @return SQL 字符串，用于 inSql 条件
-     */
-    default String buildMenuByUserSql(Long userId) {
-        return """
-                select menu_id from sys_role_menu where role_id in (
-                    select sur.role_id from sys_user_role sur
-                        left join sys_role sr on sr.role_id = sur.role_id
-                        where sur.user_id = %d and sr.status = '0'
-                )
-            """.formatted(userId);
-    }
-
-    /**
-     * 构建角色对应的菜单ID SQL 子查询
-     *
-     * <p>
-     * 用于根据角色ID查询其所拥有的菜单权限（用于权限标识、菜单显示等场景）
-     * 通常配合 inSql 使用
-     * </p>
-     *
-     * @param roleId 角色ID
-     * @return 查询菜单ID的 SQL 子查询字符串
-     */
-    default String buildMenuByRoleSql(Long roleId) {
-        return """
-                select srm.menu_id from sys_role_menu srm
-                    left join sys_role sr on sr.role_id = srm.role_id
-                    where srm.role_id = %d and sr.status = '0'
-            """.formatted(roleId);
-    }
-
-    /**
-     * 构建角色所关联菜单的父菜单ID查询 SQL
-     *
-     * <p>
-     * 用于配合菜单勾选树结构的 {@code menuCheckStrictly} 模式，过滤掉非叶子节点（父菜单），
-     * 只返回角色实际勾选的末级菜单
-     * </p>
-     *
-     * @param roleId 角色ID
-     * @return SQL 语句字符串（查询菜单的父菜单ID）
-     */
-    default String buildParentMenuByRoleSql(Long roleId) {
-        return """
-                select parent_id from sys_menu where menu_id in (
-                    select srm.menu_id from sys_role_menu srm
-                        left join sys_role sr on sr.role_id = srm.role_id
-                        where srm.role_id = %d and sr.status = '0'
-                )
-            """.formatted(roleId);
-    }
-
-    /**
      * 根据用户ID查询权限
      *
      * @param userId 用户ID
      * @return 权限列表
      */
     default Set<String> selectMenuPermsByUserId(Long userId) {
-        List<String> list = this.selectObjs(
-            new LambdaQueryWrapper<SysMenu>()
-                .select(SysMenu::getPerms)
-                .inSql(SysMenu::getMenuId, this.buildMenuByUserSql(userId))
-                .isNotNull(SysMenu::getPerms)
-        );
-        return new HashSet<>(StreamUtils.filter(list, StringUtils::isNotBlank));
+        List<SysMenu> list = this.selectJoinList(SysMenu.class, JoinWrappers.lambda("m", SysMenu.class)
+            .distinct()
+            .select(SysMenu::getPerms)
+            .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
+            .leftJoin(SysUserRole.class, "sur", SysUserRole::getRoleId, SysRoleMenu::getRoleId)
+            .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleMenu::getRoleId)
+            .eq("sur", SysUserRole::getUserId, userId)
+            .eq("sr", SysRole::getStatus, SystemConstants.NORMAL)
+            .isNotNull("m", SysMenu::getPerms));
+        return new HashSet<>(StreamUtils.filter(StreamUtils.toList(list, SysMenu::getPerms), StringUtils::isNotBlank));
     }
 
     /**
@@ -101,13 +50,15 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
      * @return 权限列表
      */
     default Set<String> selectMenuPermsByRoleId(Long roleId) {
-        List<String> list = this.selectObjs(
-            new LambdaQueryWrapper<SysMenu>()
-                .select(SysMenu::getPerms)
-                .inSql(SysMenu::getMenuId, this.buildMenuByRoleSql(roleId))
-                .isNotNull(SysMenu::getPerms)
-        );
-        return new HashSet<>(StreamUtils.filter(list, StringUtils::isNotBlank));
+        List<SysMenu> list = this.selectJoinList(SysMenu.class, JoinWrappers.lambda("m", SysMenu.class)
+            .distinct()
+            .select(SysMenu::getPerms)
+            .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
+            .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleMenu::getRoleId)
+            .eq("srm", SysRoleMenu::getRoleId, roleId)
+            .eq("sr", SysRole::getStatus, SystemConstants.NORMAL)
+            .isNotNull("m", SysMenu::getPerms));
+        return new HashSet<>(StreamUtils.filter(StreamUtils.toList(list, SysMenu::getPerms), StringUtils::isNotBlank));
     }
 
     /**
@@ -120,8 +71,22 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
         if (CollUtil.isEmpty(roleIds)) {
             return Map.of();
         }
+        List<SysRoleMenuPermVo> list = this.selectJoinList(SysRoleMenuPermVo.class, JoinWrappers.lambda("m", SysMenu.class)
+            .distinct()
+            .selectAs("srm", SysRoleMenu::getRoleId, SysRoleMenuPermVo::getRoleId)
+            .selectAs(SysMenu::getPerms, SysRoleMenuPermVo::getPerms)
+            .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
+            .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleMenu::getRoleId)
+            .in("srm", SysRoleMenu::getRoleId, roleIds)
+            .eq("sr", SysRole::getStatus, SystemConstants.NORMAL)
+            .isNotNull("m", SysMenu::getPerms));
         Map<Long, Set<String>> result = new LinkedHashMap<>();
-        roleIds.forEach(roleId -> result.put(roleId, this.selectMenuPermsByRoleId(roleId)));
+        for (SysRoleMenuPermVo item : list) {
+            if (StringUtils.isBlank(item.getPerms())) {
+                continue;
+            }
+            result.computeIfAbsent(item.getRoleId(), key -> new LinkedHashSet<>()).add(item.getPerms());
+        }
         return result;
     }
 
@@ -147,15 +112,53 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
      * @return 选中菜单列表
      */
     default List<Long> selectMenuListByRoleId(Long roleId, boolean menuCheckStrictly) {
-        LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(SysMenu::getMenuId)
-            .inSql(SysMenu::getMenuId, buildMenuByRoleSql(roleId))
-            .orderByAsc(SysMenu::getParentId)
-            .orderByAsc(SysMenu::getOrderNum);
-        if (menuCheckStrictly) {
-            wrapper.notInSql(SysMenu::getMenuId, this.buildParentMenuByRoleSql(roleId));
-        }
-        return this.selectObjs(wrapper);
+        List<SysMenu> menus = this.selectJoinList(SysMenu.class, JoinWrappers.lambda("m", SysMenu.class)
+            .distinct()
+            .select(SysMenu::getMenuId, SysMenu::getParentId)
+            .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
+            .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleMenu::getRoleId)
+            .eq("srm", SysRoleMenu::getRoleId, roleId)
+            .eq("sr", SysRole::getStatus, SystemConstants.NORMAL)
+            .orderByAsc("m", SysMenu::getParentId)
+            .orderByAsc("m", SysMenu::getOrderNum));
+        Set<Long> parentIds = menuCheckStrictly ? new HashSet<>(StreamUtils.toList(menus, SysMenu::getParentId)) : Collections.emptySet();
+        return menus.stream()
+            .map(SysMenu::getMenuId)
+            .filter(menuId -> !parentIds.contains(menuId))
+            .toList();
+    }
+
+    default List<SysMenuVo> selectMenuListByUserId(SysMenuBo menu, Long userId) {
+        return this.selectJoinList(SysMenuVo.class, JoinWrappers.lambda("m", SysMenu.class)
+            .distinct()
+            .selectAll(SysMenu.class)
+            .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
+            .leftJoin(SysUserRole.class, "sur", SysUserRole::getRoleId, SysRoleMenu::getRoleId)
+            .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleMenu::getRoleId)
+            .eq("sur", SysUserRole::getUserId, userId)
+            .eq("sr", SysRole::getStatus, SystemConstants.NORMAL)
+            .like(StringUtils.isNotBlank(menu.getMenuName()), "m", SysMenu::getMenuName, menu.getMenuName())
+            .eq(StringUtils.isNotBlank(menu.getVisible()), "m", SysMenu::getVisible, menu.getVisible())
+            .eq(StringUtils.isNotBlank(menu.getStatus()), "m", SysMenu::getStatus, menu.getStatus())
+            .eq(StringUtils.isNotBlank(menu.getMenuType()), "m", SysMenu::getMenuType, menu.getMenuType())
+            .eq(Objects.nonNull(menu.getParentId()), "m", SysMenu::getParentId, menu.getParentId())
+            .orderByAsc("m", SysMenu::getParentId)
+            .orderByAsc("m", SysMenu::getOrderNum));
+    }
+
+    default List<SysMenu> selectMenuTreeByUserId(Long userId) {
+        return this.selectJoinList(SysMenu.class, JoinWrappers.lambda("m", SysMenu.class)
+            .distinct()
+            .selectAll(SysMenu.class)
+            .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
+            .leftJoin(SysUserRole.class, "sur", SysUserRole::getRoleId, SysRoleMenu::getRoleId)
+            .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleMenu::getRoleId)
+            .eq("sur", SysUserRole::getUserId, userId)
+            .eq("sr", SysRole::getStatus, SystemConstants.NORMAL)
+            .in("m", SysMenu::getMenuType, SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
+            .eq("m", SysMenu::getStatus, SystemConstants.NORMAL)
+            .orderByAsc("m", SysMenu::getParentId)
+            .orderByAsc("m", SysMenu::getOrderNum));
     }
 
 }

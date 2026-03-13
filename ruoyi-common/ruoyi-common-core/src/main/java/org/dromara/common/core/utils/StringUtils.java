@@ -438,6 +438,64 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     /**
+     * 忽略大小写检查指定字符序列中是否包含另一个字符序列。
+     *
+     * @param seq       要检查的字符序列
+     * @param searchSeq 要搜索的字符序列
+     * @return 如果包含则返回 true，否则返回 false
+     */
+    public static boolean containsIgnoreCase(final CharSequence seq, final CharSequence searchSeq) {
+        return Strings.CI.contains(seq, searchSeq);
+    }
+
+    /**
+     * 检查 CharSequence 是否以指定前缀开头。
+     *
+     * @param str    要检查的字符序列
+     * @param prefix 要查找的前缀
+     * @return 如果以指定前缀开头则返回 true，否则返回 false
+     */
+    public static boolean startsWith(final CharSequence str, final CharSequence prefix) {
+        return Strings.CS.startsWith(str, prefix);
+    }
+
+    /**
+     * 忽略大小写检查 CharSequence 是否以指定前缀开头。
+     *
+     * @param str    要检查的字符序列
+     * @param prefix 要查找的前缀
+     * @return 如果以指定前缀开头则返回 true，否则返回 false
+     */
+    public static boolean startsWithIgnoreCase(final CharSequence str, final CharSequence prefix) {
+        return Strings.CI.startsWith(str, prefix);
+    }
+
+    /**
+     * 忽略大小写检查 CharSequence 是否以指定后缀结尾。
+     *
+     * @param str    要检查的字符序列
+     * @param suffix 要查找的后缀
+     * @return 如果以指定后缀结尾则返回 true，否则返回 false
+     */
+    public static boolean endsWithIgnoreCase(final CharSequence str, final CharSequence suffix) {
+        return Strings.CI.endsWith(str, suffix);
+    }
+
+    /**
+     * 返回指定字符序列首次出现的位置。
+     *
+     * @param seq       源字符序列
+     * @param searchSeq 待查找字符序列
+     * @return 首次出现的位置，不存在时返回 -1
+     */
+    public static int indexOf(final CharSequence seq, final CharSequence searchSeq) {
+        if (seq == null || searchSeq == null) {
+            return -1;
+        }
+        return seq.toString().indexOf(searchSeq.toString());
+    }
+
+    /**
      * 移除字符串中的指定字符序列。
      *
      * @param str       要处理的字符串，不能为null
@@ -446,6 +504,35 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      */
     public static String remove(final String str, final String remove) {
         return Strings.CS.remove(str, remove);
+    }
+
+    /**
+     * 如果字符串以指定前缀开头，则移除该前缀。
+     *
+     * @param str    要处理的字符串
+     * @param remove 要移除的前缀
+     * @return 处理后的字符串
+     */
+    public static String removeStart(final String str, final String remove) {
+        if (isEmpty(str) || isEmpty(remove)) {
+            return str;
+        }
+        return startsWith(str, remove) ? str.substring(remove.length()) : str;
+    }
+
+    /**
+     * 替换字符串中的目标子串。
+     *
+     * @param text         原始字符串
+     * @param searchString 需要替换的子串
+     * @param replacement  替换后的子串
+     * @return 替换后的字符串
+     */
+    public static String replace(final String text, final String searchString, final String replacement) {
+        if (text == null || isEmpty(searchString) || replacement == null) {
+            return text;
+        }
+        return text.replace(searchString, replacement);
     }
 
 

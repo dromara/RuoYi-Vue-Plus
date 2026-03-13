@@ -84,7 +84,7 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     @Override
     public GenTable selectGenTableById(Long id) {
-        GenTable genTable = baseMapper.selectGenTableById(id);
+        GenTable genTable = getGenTable(id);
         setTableFromOptions(genTable);
         return genTable;
     }
@@ -211,7 +211,8 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     @Override
     public List<GenTable> selectGenTableAll() {
-        return baseMapper.selectGenTableAll();
+        return fillTableColumns(baseMapper.selectList(new LambdaQueryWrapper<GenTable>()
+            .orderByAsc(GenTable::getTableId)));
     }
 
     /**
@@ -318,7 +319,7 @@ public class GenTableServiceImpl implements IGenTableService {
     public Map<String, String> previewCode(Long tableId) {
         Map<String, String> dataMap = new LinkedHashMap<>();
         // 查询表信息
-        GenTable table = baseMapper.selectGenTableById(tableId);
+        GenTable table = getGenTable(tableId);
         List<Long> menuIds = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             menuIds.add(IdGeneratorUtil.nextLongId());
@@ -365,7 +366,7 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public void generatorCode(Long tableId) {
         // 查询表信息
-        GenTable table = baseMapper.selectGenTableById(tableId);
+        GenTable table = getGenTable(tableId);
         // 设置主键列信息
         setPkColumn(table);
 
@@ -399,7 +400,7 @@ public class GenTableServiceImpl implements IGenTableService {
     @DSTransactional
     @Override
     public void synchDb(Long tableId) {
-        GenTable table = baseMapper.selectGenTableById(tableId);
+        GenTable table = getGenTable(tableId);
         List<GenTableColumn> tableColumns = table.getColumns();
         Map<String, GenTableColumn> tableColumnMap = StreamUtils.toIdentityMap(tableColumns, GenTableColumn::getColumnName);
 
@@ -464,7 +465,7 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     private void generatorCode(Long tableId, ZipOutputStream zip) {
         // 查询表信息
-        GenTable table = baseMapper.selectGenTableById(tableId);
+        GenTable table = getGenTable(tableId);
         List<Long> menuIds = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             menuIds.add(IdGeneratorUtil.nextLongId());
@@ -515,6 +516,29 @@ public class GenTableServiceImpl implements IGenTableService {
                 throw new ServiceException("树名称字段不能为空");
             }
         }
+    }
+
+    private GenTable getGenTable(Long tableId) {
+        GenTable table = baseMapper.selectById(tableId);
+        if (ObjectUtil.isNull(table)) {
+            throw new ServiceException("业务表不存在");
+        }
+        fillTableColumns(Collections.singletonList(table));
+        return table;
+    }
+
+    private List<GenTable> fillTableColumns(List<GenTable> tables) {
+        if (CollUtil.isEmpty(tables)) {
+            return tables;
+        }
+        List<Long> tableIds = StreamUtils.toList(tables, GenTable::getTableId);
+        List<GenTableColumn> columns = genTableColumnMapper.selectList(new LambdaQueryWrapper<GenTableColumn>()
+            .in(GenTableColumn::getTableId, tableIds)
+            .orderByAsc(GenTableColumn::getTableId)
+            .orderByAsc(GenTableColumn::getSort));
+        Map<Long, List<GenTableColumn>> columnMap = StreamUtils.groupByKey(columns, GenTableColumn::getTableId);
+        tables.forEach(table -> table.setColumns(columnMap.getOrDefault(table.getTableId(), new ArrayList<>())));
+        return tables;
     }
 
     /**

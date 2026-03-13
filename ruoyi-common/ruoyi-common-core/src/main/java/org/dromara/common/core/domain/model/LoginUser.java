@@ -109,9 +109,9 @@ public class LoginUser implements Serializable {
     private List<RoleDTO> roles;
 
     /**
-     * 数据权限角色映射 key 为权限码 value 为可参与数据权限计算的角色
+     * 数据权限角色映射 key 为权限码 value 为可参与数据权限计算的角色ID列表
      */
-    private Map<String, List<RoleDTO>> dataScopeRoleMap;
+    private Map<String, List<Long>> dataScopeRoleMap;
 
     /**
      * 岗位对象
