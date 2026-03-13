@@ -2,7 +2,7 @@ package org.dromara.demo.domain;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import org.dromara.common.encrypt.annotation.EncryptField;
-import org.dromara.common.encrypt.enumd.AlgorithmType;
+import org.dromara.common.encrypt.enums.AlgorithmType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

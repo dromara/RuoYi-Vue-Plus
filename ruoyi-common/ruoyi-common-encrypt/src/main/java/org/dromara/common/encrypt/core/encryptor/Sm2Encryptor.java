@@ -2,8 +2,8 @@ package org.dromara.common.encrypt.core.encryptor;
 
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.encrypt.core.EncryptContext;
-import org.dromara.common.encrypt.enumd.AlgorithmType;
-import org.dromara.common.encrypt.enumd.EncodeType;
+import org.dromara.common.encrypt.enums.AlgorithmType;
+import org.dromara.common.encrypt.enums.EncodeType;
 import org.dromara.common.encrypt.utils.EncryptUtils;
 
 /**

@@ -1,7 +1,7 @@
 package org.dromara.common.encrypt.core;
 
-import org.dromara.common.encrypt.enumd.AlgorithmType;
-import org.dromara.common.encrypt.enumd.EncodeType;
+import org.dromara.common.encrypt.enums.AlgorithmType;
+import org.dromara.common.encrypt.enums.EncodeType;
 
 /**
  * 加解者
