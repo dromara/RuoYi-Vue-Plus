@@ -7,7 +7,7 @@ import com.aizuda.snailjob.client.job.core.dto.JobArgs;
 import com.aizuda.snailjob.common.log.SnailJobLog;
 import com.aizuda.snailjob.model.dto.ExecuteResult;
 import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.job.entity.BillDto;
+import org.dromara.job.entity.BillDTO;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -23,21 +23,21 @@ import java.math.BigDecimal;
 public class WechatBillTask {
 
     public ExecuteResult jobExecute(JobArgs jobArgs) throws InterruptedException {
-        BillDto billDto = new BillDto();
-        billDto.setBillId(123456789L);
-        billDto.setBillChannel("wechat");
+        BillDTO billDTO = new BillDTO();
+        billDTO.setBillId(123456789L);
+        billDTO.setBillChannel("wechat");
         // 从上下文中获得清算日期并设置，如果上下文中清算日期
         // 是sysdate设置为当前日期；否则取管理页面设置的值
         String settlementDate = (String) jobArgs.getWfContext().get("settlementDate");
         if (StrUtil.equals(settlementDate, "sysdate")) {
             settlementDate = DateUtil.today();
         }
-        billDto.setBillDate(settlementDate);
-        billDto.setBillAmount(new BigDecimal("1234.56"));
-        // 把billDto对象放入上下文进行传递
-        jobArgs.appendContext("wechat", JsonUtils.toJsonString(billDto));
+        billDTO.setBillDate(settlementDate);
+        billDTO.setBillAmount(new BigDecimal("1234.56"));
+        // 把billDTO对象放入上下文进行传递
+        jobArgs.appendContext("wechat", JsonUtils.toJsonString(billDTO));
         SnailJobLog.REMOTE.info("上下文: {}", jobArgs.getWfContext());
-        return ExecuteResult.success(billDto);
+        return ExecuteResult.success(billDTO);
     }
 
 }

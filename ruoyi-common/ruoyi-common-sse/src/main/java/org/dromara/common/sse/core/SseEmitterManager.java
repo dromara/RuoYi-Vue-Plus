@@ -5,12 +5,11 @@ import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.redis.utils.RedisUtils;
-import org.dromara.common.sse.dto.SseMessageDto;
+import org.dromara.common.sse.dto.SseMessageDTO;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -159,8 +158,8 @@ public class SseEmitterManager {
      *
      * @param consumer 处理SSE消息的消费者函数
      */
-    public void subscribeMessage(Consumer<SseMessageDto> consumer) {
-        RedisUtils.subscribe(SSE_TOPIC, SseMessageDto.class, consumer);
+    public void subscribeMessage(Consumer<SseMessageDTO> consumer) {
+        RedisUtils.subscribe(SSE_TOPIC, SseMessageDTO.class, consumer);
     }
 
     /**
@@ -203,15 +202,15 @@ public class SseEmitterManager {
     /**
      * 发布SSE订阅消息
      *
-     * @param sseMessageDto 要发布的SSE消息对象
+     * @param sseMessageDTO 要发布的SSE消息对象
      */
-    public void publishMessage(SseMessageDto sseMessageDto) {
-        SseMessageDto broadcastMessage = new SseMessageDto();
-        broadcastMessage.setMessage(sseMessageDto.getMessage());
-        broadcastMessage.setUserIds(sseMessageDto.getUserIds());
+    public void publishMessage(SseMessageDTO sseMessageDTO) {
+        SseMessageDTO broadcastMessage = new SseMessageDTO();
+        broadcastMessage.setMessage(sseMessageDTO.getMessage());
+        broadcastMessage.setUserIds(sseMessageDTO.getUserIds());
         RedisUtils.publish(SSE_TOPIC, broadcastMessage, consumer -> {
             log.info("SSE发送主题订阅消息topic:{} session keys:{} message:{}",
-                SSE_TOPIC, sseMessageDto.getUserIds(), sseMessageDto.getMessage());
+                SSE_TOPIC, sseMessageDTO.getUserIds(), sseMessageDTO.getMessage());
         });
     }
 
@@ -221,7 +220,7 @@ public class SseEmitterManager {
      * @param message 要发布的消息内容
      */
     public void publishAll(String message) {
-        SseMessageDto broadcastMessage = new SseMessageDto();
+        SseMessageDTO broadcastMessage = new SseMessageDTO();
         broadcastMessage.setMessage(message);
         RedisUtils.publish(SSE_TOPIC, broadcastMessage, consumer -> {
             log.info("SSE发送主题订阅消息topic:{} message:{}", SSE_TOPIC, message);

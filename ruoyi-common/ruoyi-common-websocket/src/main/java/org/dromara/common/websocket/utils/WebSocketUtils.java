@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.redis.utils.RedisUtils;
-import org.dromara.common.websocket.dto.WebSocketMessageDto;
+import org.dromara.common.websocket.dto.WebSocketMessageDTO;
 import org.dromara.common.websocket.holder.WebSocketSessionHolder;
 import org.springframework.web.socket.PongMessage;
 import org.springframework.web.socket.TextMessage;
@@ -44,8 +44,8 @@ public class WebSocketUtils {
      *
      * @param consumer 处理WebSocket消息的消费者函数
      */
-    public static void subscribeMessage(Consumer<WebSocketMessageDto> consumer) {
-        RedisUtils.subscribe(WEB_SOCKET_TOPIC, WebSocketMessageDto.class, consumer);
+    public static void subscribeMessage(Consumer<WebSocketMessageDTO> consumer) {
+        RedisUtils.subscribe(WEB_SOCKET_TOPIC, WebSocketMessageDTO.class, consumer);
     }
 
     /**
@@ -53,7 +53,7 @@ public class WebSocketUtils {
      *
      * @param webSocketMessage 要发布的WebSocket消息对象
      */
-    public static void publishMessage(WebSocketMessageDto webSocketMessage) {
+    public static void publishMessage(WebSocketMessageDTO webSocketMessage) {
         List<Long> unsentSessionKeys = new ArrayList<>();
         // 当前服务内session,直接发送消息
         for (Long sessionKey : webSocketMessage.getSessionKeys()) {
@@ -65,7 +65,7 @@ public class WebSocketUtils {
         }
         // 不在当前服务内session,发布订阅消息
         if (CollUtil.isNotEmpty(unsentSessionKeys)) {
-            WebSocketMessageDto broadcastMessage = new WebSocketMessageDto();
+            WebSocketMessageDTO broadcastMessage = new WebSocketMessageDTO();
             broadcastMessage.setMessage(webSocketMessage.getMessage());
             broadcastMessage.setSessionKeys(unsentSessionKeys);
             RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage, consumer -> {
@@ -81,7 +81,7 @@ public class WebSocketUtils {
      * @param message 要发布的消息内容
      */
     public static void publishAll(String message) {
-        WebSocketMessageDto broadcastMessage = new WebSocketMessageDto();
+        WebSocketMessageDTO broadcastMessage = new WebSocketMessageDTO();
         broadcastMessage.setMessage(message);
         RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage, consumer -> {
             log.info("WebSocket发送主题订阅消息topic:{} message:{}", WEB_SOCKET_TOPIC, message);

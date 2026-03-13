@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.sse.core.SseEmitterManager;
-import org.dromara.common.sse.dto.SseMessageDto;
+import org.dromara.common.sse.dto.SseMessageDTO;
 
 /**
  * SSE工具类
@@ -53,13 +53,13 @@ public class SseMessageUtils {
     /**
      * 发布SSE订阅消息
      *
-     * @param sseMessageDto 要发布的SSE消息对象
+     * @param sseMessageDTO 要发布的SSE消息对象
      */
-    public static void publishMessage(SseMessageDto sseMessageDto) {
+    public static void publishMessage(SseMessageDTO sseMessageDTO) {
         if (!isEnable()) {
             return;
         }
-        MANAGER.publishMessage(sseMessageDto);
+        MANAGER.publishMessage(sseMessageDTO);
     }
 
     /**

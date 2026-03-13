@@ -1,7 +1,7 @@
 package org.dromara.demo.controller;
 
 import org.dromara.common.core.domain.R;
-import org.dromara.common.websocket.dto.WebSocketMessageDto;
+import org.dromara.common.websocket.dto.WebSocketMessageDTO;
 import org.dromara.common.websocket.utils.WebSocketUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class WebSocketController {
      * @param dto 发送内容
      */
     @GetMapping("/send")
-    public R<Void> send(WebSocketMessageDto dto) throws InterruptedException {
+    public R<Void> send(WebSocketMessageDTO dto) throws InterruptedException {
         WebSocketUtils.publishMessage(dto);
         return R.ok("操作成功");
     }

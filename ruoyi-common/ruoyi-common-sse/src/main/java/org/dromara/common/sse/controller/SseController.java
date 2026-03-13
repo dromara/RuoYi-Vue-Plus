@@ -59,7 +59,7 @@ public class SseController implements DisposableBean {
 //     */
 //    @GetMapping(value = "${sse.path}/send")
 //    public R<Void> send(Long userId, String msg) {
-//        SseMessageDto dto = new SseMessageDto();
+//        SseMessageDTO dto = new SseMessageDTO();
 //        dto.setUserIds(List.of(userId));
 //        dto.setMessage(msg);
 //        sseEmitterManager.publishMessage(dto);

@@ -6,7 +6,7 @@ import com.aizuda.snailjob.client.job.core.dto.JobArgs;
 import com.aizuda.snailjob.common.log.SnailJobLog;
 import com.aizuda.snailjob.model.dto.ExecuteResult;
 import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.job.entity.BillDto;
+import org.dromara.job.entity.BillDTO;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -26,15 +26,15 @@ public class SummaryBillTask {
         BigDecimal wechatAmount = BigDecimal.valueOf(0);
         String wechat = (String) jobArgs.getWfContext("wechat");
         if (StrUtil.isNotBlank(wechat)) {
-            BillDto wechatBillDto = JsonUtils.parseObject(wechat, BillDto.class);
-            wechatAmount = wechatBillDto.getBillAmount();
+            BillDTO wechatBillDTO = JsonUtils.parseObject(wechat, BillDTO.class);
+            wechatAmount = wechatBillDTO.getBillAmount();
         }
         // 获得支付宝账单
         BigDecimal alipayAmount = BigDecimal.valueOf(0);
         String alipay = (String) jobArgs.getWfContext("alipay");
         if (StrUtil.isNotBlank(alipay)) {
-            BillDto alipayBillDto = JsonUtils.parseObject(alipay, BillDto.class);
-            alipayAmount = alipayBillDto.getBillAmount();
+            BillDTO alipayBillDTO = JsonUtils.parseObject(alipay, BillDTO.class);
+            alipayAmount = alipayBillDTO.getBillAmount();
         }
         // 汇总账单
         BigDecimal totalAmount = wechatAmount.add(alipayAmount);

@@ -27,7 +27,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
-import org.dromara.common.sse.dto.SseMessageDto;
+import org.dromara.common.sse.dto.SseMessageDTO;
 import org.dromara.common.sse.utils.SseMessageUtils;
 import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.service.ISysClientService;
@@ -94,7 +94,7 @@ public class AuthController {
 
         Long userId = LoginHelper.getUserId();
         scheduledExecutorService.schedule(() -> {
-            SseMessageDto dto = new SseMessageDto();
+            SseMessageDTO dto = new SseMessageDTO();
             dto.setMessage(DateUtils.getTodayHour(new Date()) + "好，欢迎登录 RuoYi-Vue-Plus 后台管理系统");
             dto.setUserIds(List.of(userId));
             SseMessageUtils.publishMessage(dto);

@@ -7,7 +7,7 @@ import com.aizuda.snailjob.client.job.core.dto.JobArgs;
 import com.aizuda.snailjob.common.log.SnailJobLog;
 import com.aizuda.snailjob.model.dto.ExecuteResult;
 import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.job.entity.BillDto;
+import org.dromara.job.entity.BillDTO;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -23,20 +23,20 @@ import java.math.BigDecimal;
 public class AlipayBillTask {
 
     public ExecuteResult jobExecute(JobArgs jobArgs) throws InterruptedException {
-        BillDto billDto = new BillDto();
-        billDto.setBillId(23456789L);
-        billDto.setBillChannel("alipay");
+        BillDTO billDTO = new BillDTO();
+        billDTO.setBillId(23456789L);
+        billDTO.setBillChannel("alipay");
         // 设置清算日期
         String settlementDate = (String) jobArgs.getWfContext().get("settlementDate");
         if (StrUtil.equals(settlementDate, "sysdate")) {
             settlementDate = DateUtil.today();
         }
-        billDto.setBillDate(settlementDate);
-        billDto.setBillAmount(new BigDecimal("2345.67"));
-        // 把billDto对象放入上下文进行传递
-        jobArgs.appendContext("alipay", JsonUtils.toJsonString(billDto));
+        billDTO.setBillDate(settlementDate);
+        billDTO.setBillAmount(new BigDecimal("2345.67"));
+        // 把billDTO对象放入上下文进行传递
+        jobArgs.appendContext("alipay", JsonUtils.toJsonString(billDTO));
         SnailJobLog.REMOTE.info("上下文: {}", jobArgs.getWfContext());
-        return ExecuteResult.success(billDto);
+        return ExecuteResult.success(billDTO);
     }
 
 }

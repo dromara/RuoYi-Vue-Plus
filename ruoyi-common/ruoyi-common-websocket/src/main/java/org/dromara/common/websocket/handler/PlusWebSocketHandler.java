@@ -3,7 +3,7 @@ package org.dromara.common.websocket.handler;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.model.LoginUser;
-import org.dromara.common.websocket.dto.WebSocketMessageDto;
+import org.dromara.common.websocket.dto.WebSocketMessageDTO;
 import org.dromara.common.websocket.holder.WebSocketSessionHolder;
 import org.dromara.common.websocket.utils.WebSocketUtils;
 import org.springframework.web.socket.*;
@@ -51,10 +51,10 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
 
         // 创建WebSocket消息DTO对象
-        WebSocketMessageDto webSocketMessageDto = new WebSocketMessageDto();
-        webSocketMessageDto.setSessionKeys(List.of(loginUser.getUserId()));
-        webSocketMessageDto.setMessage(message.getPayload());
-        WebSocketUtils.publishMessage(webSocketMessageDto);
+        WebSocketMessageDTO messageDTO = new WebSocketMessageDTO();
+        messageDTO.setSessionKeys(List.of(loginUser.getUserId()));
+        messageDTO.setMessage(message.getPayload());
+        WebSocketUtils.publishMessage(messageDTO);
     }
 
     /**

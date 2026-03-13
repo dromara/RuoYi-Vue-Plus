@@ -7,12 +7,12 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 消息的dto
+ * 消息的DTO
  *
  * @author zendwang
  */
 @Data
-public class SseMessageDto implements Serializable {
+public class SseMessageDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
