@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,6 +29,25 @@ public class TreeBuildUtils extends TreeUtil {
      * 根据前端定制差异化字段
      */
     public static final TreeNodeConfig DEFAULT_CONFIG = TreeNodeConfig.DEFAULT_CONFIG.setNameKey("label");
+
+    /**
+     * 使用动态规划构建树形结构
+     *
+     * @param items      节点列表项
+     * @param parentId   父节点ID
+     * @param classifier 动态规划表分类函数
+     * @param action     回溯动作
+     * @param <K>        节点ID的类型
+     * @param <T>        输入节点的类型
+     * @return 构建好的树形结构列表
+     */
+    public static <K, T> List<T> build(List<T> items, K parentId, Function<T, K> classifier, BiConsumer<T,Map<K, List<T>>> action) {
+        // 构建动态规划表 (依据父ID分组)
+        Map<K, List<T>> nodeTreeMaps = items.stream().collect(Collectors.groupingBy(classifier));
+        // 回溯构建各级节点关系
+        items.forEach(item -> action.accept(item, nodeTreeMaps));
+        return nodeTreeMaps.get(parentId);
+    }
 
     /**
      * 构建树形结构
