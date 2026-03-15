@@ -6,7 +6,6 @@ import org.dromara.common.oss.s3.util.BucketUrlUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.lang.StringBuilder;
 import java.util.Optional;
 
 /**
@@ -15,7 +14,7 @@ import java.util.Optional;
  * @author 秋辞未寒
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public enum MinioBucketUrlBuilder implements StringBuilder<S3StorageClientConfig> {
+public enum MinioBucketUrlBuilder implements StrBuilder<S3StorageClientConfig> {
 
     INSTANCE;
 

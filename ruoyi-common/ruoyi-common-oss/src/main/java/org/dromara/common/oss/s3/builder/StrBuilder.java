@@ -6,6 +6,6 @@ package org.dromara.common.oss.s3.builder;
  * @param <T> 参数类型
  * @author 秋辞未寒
  */
-public interface StringBuilder<T> extends Builder<T,String> {
+public interface StrBuilder<T> extends Builder<T,String> {
 
 }
