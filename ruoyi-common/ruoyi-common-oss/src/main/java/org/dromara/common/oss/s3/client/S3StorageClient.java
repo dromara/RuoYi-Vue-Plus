@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * S3 存储客户端接口。
@@ -381,12 +382,23 @@ public interface S3StorageClient extends AutoCloseable {
      */
     String presignPutUrl(String key, Duration expiredTime, Map<String, String> metadata);
 
-
     /**
-     * 校验客户端配置与传入的配置是否一致
+     * 校验客户端配置
      *
-     * @param config 配置
+     * <p>注意：该方法不会修改任何既有的配置和状态，你看可以理解为这仅仅是一个配置展示的方法，以供调用者根据当前的配置，自行决定是否需要重新构建客户端。</p>
+     *
+     * @param verifyConfigAction 校验配置动作函数
      * @return 是否一致
      */
-    boolean verifyConfig(S3StorageClientConfig config);
+    boolean verifyConfig(Function<S3StorageClientConfig,Boolean> verifyConfigAction);
+
+    /**
+     * 校验客户端配置与传入的待校验配置是否一致
+     *
+     * <p>注意：该方法不会修改任何既有的配置和状态，你看可以理解为这仅仅是一个配置展示的方法，以供调用者根据当前的配置，自行决定是否需要重新构建客户端。</p>
+     *
+     * @param verifyConfig 待校验的配置
+     * @return 是否一致
+     */
+    boolean verifyConfig(S3StorageClientConfig verifyConfig);
 }

@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * S3 存储客户端实现类。
@@ -396,8 +397,14 @@ public class S3StorageClientImpl implements S3StorageClient {
     }
 
     @Override
-    public boolean verifyConfig(S3StorageClientConfig config) {
-        return Objects.equals(this.config,config);
+    public boolean verifyConfig(Function<S3StorageClientConfig,Boolean> verifyConfigAction) {
+        S3StorageClientConfig copy = S3StorageClientConfig.copy(config);
+        return Boolean.TRUE.equals(verifyConfigAction.apply(copy));
+    }
+
+    @Override
+    public boolean verifyConfig(S3StorageClientConfig verifyConfig) {
+        return verifyConfig(config -> Objects.equals(config,verifyConfig));
     }
 
     @Override
