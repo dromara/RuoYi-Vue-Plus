@@ -64,8 +64,10 @@ public class CellMergeHandler {
                 // 当前行数据字段值
                 Object currentRowObjFieldVal = ReflectUtils.invokeGetter(currentRowObj, field.getName());
 
-                // 空值跳过不处理
-                if (currentRowObjFieldVal == null || "".equals(currentRowObjFieldVal)) {
+                // 空值视为合并中断，需要先收口上一段合并区间
+                if (isBlankCell(currentRowObjFieldVal)) {
+                    appendMergeResult(result, rowRepeatCellMap.get(field), i - 1, colNum);
+                    rowRepeatCellMap.remove(field);
                     continue;
                 }
 
@@ -78,7 +80,6 @@ public class CellMergeHandler {
                 // 获取 单元格合并Map 中字段值
                 RepeatCell repeatCell = rowRepeatCellMap.get(field);
                 Object cellValue = repeatCell.value();
-                int current = repeatCell.current();
 
                 // 检查是否满足合并条件
                 // currentRowObj 当前行数据
@@ -86,33 +87,14 @@ public class CellMergeHandler {
                 // cellMerge 当前行字段合并注解
                 boolean merge = isMerge(currentRowObj, rows.get(i - 1), cellMerge);
 
-                // 是否添加到结果集
-                boolean isAddResult = false;
-                // 最新行
-                int lastRow = i + rowIndex - 1;
-
                 // 如果当前行字段值和缓存中的字段值不相等，或不满足合并条件，则替换
                 if (!currentRowObjFieldVal.equals(cellValue) || !merge) {
+                    appendMergeResult(result, repeatCell, i - 1, colNum);
                     rowRepeatCellMap.put(field, RepeatCell.of(currentRowObjFieldVal, i));
-                    isAddResult = true;
-                }
-
-                // 如果最后一行不能合并，检查之前的数据是否需要合并；如果最后一行可以合并，则直接合并到最后
-                if (i == rows.size() - 1) {
-                    isAddResult = true;
-                    if (i > current) {
-                        lastRow = i + rowIndex;
-                    }
-                }
-
-                if (isAddResult && i > current) {
-                    //如果是同一行，则跳过合并
-                    if (current + rowIndex == lastRow) {
-                        continue;
-                    }
-                    result.add(new CellRangeAddress(current + rowIndex, lastRow, colNum, colNum));
                 }
             }
+            appendMergeResult(result, rowRepeatCellMap.get(field), rows.size() - 1, colNum);
+            rowRepeatCellMap.remove(field);
         }
         return result;
     }
@@ -165,6 +147,17 @@ public class CellMergeHandler {
             }
         }
         return true;
+    }
+
+    private boolean isBlankCell(Object value) {
+        return value == null || StrUtil.isBlankIfStr(value);
+    }
+
+    private void appendMergeResult(List<CellRangeAddress> result, RepeatCell repeatCell, int endIndex, int colNum) {
+        if (repeatCell == null || endIndex <= repeatCell.current()) {
+            return;
+        }
+        result.add(new CellRangeAddress(repeatCell.current() + rowIndex, endIndex + rowIndex, colNum, colNum));
     }
 
     /**
