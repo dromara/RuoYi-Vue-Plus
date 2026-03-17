@@ -4,19 +4,19 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.BCrypt;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.MimeTypeUtils;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
-import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.helper.DataPermissionHelper;
+import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysUserBo;
-import org.dromara.system.domain.bo.SysUserPasswordBo;
 import org.dromara.system.domain.bo.SysUserProfileBo;
 import org.dromara.system.domain.vo.ProfileUserVo;
 import org.dromara.system.domain.vo.SysOssVo;
@@ -99,13 +99,13 @@ public class SysProfileController extends BaseController {
     public R<Void> updatePwd(@Validated @RequestBody SysUserPasswordBo bo) {
         SysUserVo user = userService.selectUserById(LoginHelper.getUserId());
         String password = user.getPassword();
-        if (!BCrypt.checkpw(bo.getOldPassword(), password)) {
+        if (!BCrypt.checkpw(bo.oldPassword(), password)) {
             return R.fail("修改密码失败，旧密码错误");
         }
-        if (BCrypt.checkpw(bo.getNewPassword(), password)) {
+        if (BCrypt.checkpw(bo.newPassword(), password)) {
             return R.fail("新密码不能与旧密码相同");
         }
-        int rows = DataPermissionHelper.ignore(() -> userService.resetUserPwd(user.getUserId(), BCrypt.hashpw(bo.getNewPassword())));
+        int rows = DataPermissionHelper.ignore(() -> userService.resetUserPwd(user.getUserId(), BCrypt.hashpw(bo.newPassword())));
         if (rows > 0) {
             return R.ok();
         }
@@ -152,5 +152,16 @@ public class SysProfileController extends BaseController {
      * @param postGroup 用户所属岗位组
      */
     public record ProfileVo(ProfileUserVo user, String roleGroup, String postGroup) {}
+
+    /**
+     * 用户密码修改
+     *
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     */
+    public record SysUserPasswordBo(
+        @NotBlank(message = "旧密码不能为空") String oldPassword,
+        @NotBlank(message = "新密码不能为空") String newPassword) {
+    }
 
 }

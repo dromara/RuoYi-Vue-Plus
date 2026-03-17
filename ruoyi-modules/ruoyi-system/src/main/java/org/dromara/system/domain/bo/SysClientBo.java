@@ -1,14 +1,15 @@
 package org.dromara.system.domain.bo;
 
-import org.dromara.system.domain.SysClient;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
+import io.github.linpeilie.annotations.AutoMapper;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
-import io.github.linpeilie.annotations.AutoMapper;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import jakarta.validation.constraints.*;
+import org.dromara.system.domain.SysClient;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -18,9 +19,11 @@ import java.util.List;
  * @date 2023-05-15
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = SysClient.class, reverseConvertGenerate = false)
-public class SysClientBo extends BaseEntity {
+public class SysClientBo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * id

@@ -1,9 +1,11 @@
 package org.dromara.system.domain.bo;
 
-import org.dromara.system.domain.SysLoginInfo;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+import org.dromara.system.domain.SysLoginInfo;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,10 @@ import java.util.Map;
 
 @Data
 @AutoMapper(target = SysLoginInfo.class, reverseConvertGenerate = false)
-public class SysLoginInfoBo {
+public class SysLoginInfoBo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 访问ID

@@ -1,12 +1,12 @@
 package ${packageName}.domain.bo;
 
 import ${packageName}.domain.${ClassName};
-import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 #foreach ($import in $importList)
 import ${import};
@@ -19,9 +19,11 @@ import ${import};
  * @date ${datetime}
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = ${ClassName}.class, reverseConvertGenerate = false)
-public class ${ClassName}Bo extends BaseEntity {
+public class ${ClassName}Bo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
 #foreach ($column in $columns)
 #if(!$table.isSuperColumn($column.javaField) && ($column.query || $column.insert || $column.edit))

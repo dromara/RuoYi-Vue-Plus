@@ -1,13 +1,14 @@
 package org.dromara.workflow.domain.bo;
 
-import org.dromara.common.mybatis.core.domain.BaseEntity;
+import io.github.linpeilie.annotations.AutoMapper;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
-import io.github.linpeilie.annotations.AutoMapper;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import jakarta.validation.constraints.*;
 import org.dromara.workflow.domain.FlowSpel;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 流程spel表达式定义业务对象 flow_spel
@@ -16,9 +17,11 @@ import org.dromara.workflow.domain.FlowSpel;
  * @date 2025-07-04
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = FlowSpel.class, reverseConvertGenerate = false)
-public class FlowSpelBo extends BaseEntity {
+public class FlowSpelBo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 主键id

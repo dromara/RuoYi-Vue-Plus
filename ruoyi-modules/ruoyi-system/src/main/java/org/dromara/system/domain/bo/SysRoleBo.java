@@ -5,11 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.system.domain.SysRole;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 角色信息业务对象 sys_role
@@ -19,9 +22,11 @@ import org.dromara.system.domain.SysRole;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = SysRole.class, reverseConvertGenerate = false)
-public class SysRoleBo extends BaseEntity {
+public class SysRoleBo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 角色ID
@@ -90,5 +95,10 @@ public class SysRoleBo extends BaseEntity {
     public boolean isSuperAdmin() {
         return SystemConstants.SUPER_ADMIN_ID.equals(this.roleId);
     }
+
+    /**
+     * 请求参数
+     */
+    private Map<String, Object> params = new HashMap<>();
 
 }

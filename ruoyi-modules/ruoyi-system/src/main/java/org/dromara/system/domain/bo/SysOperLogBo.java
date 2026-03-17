@@ -1,11 +1,13 @@
 package org.dromara.system.domain.bo;
 
-import org.dromara.common.log.event.OperLogEvent;
-import org.dromara.system.domain.SysOperLog;
 import io.github.linpeilie.annotations.AutoMapper;
 import io.github.linpeilie.annotations.AutoMappers;
 import lombok.Data;
+import org.dromara.common.log.event.OperLogEvent;
+import org.dromara.system.domain.SysOperLog;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +24,10 @@ import java.util.Map;
     @AutoMapper(target = SysOperLog.class, reverseConvertGenerate = false),
     @AutoMapper(target = OperLogEvent.class)
 })
-public class SysOperLogBo {
+public class SysOperLogBo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 日志主键

@@ -2,12 +2,12 @@ package org.dromara.system.domain.bo;
 
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.system.domain.SysDictData;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 字典数据业务对象 sys_dict_data
@@ -16,9 +16,11 @@ import org.dromara.system.domain.SysDictData;
  */
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = SysDictData.class, reverseConvertGenerate = false)
-public class SysDictDataBo extends BaseEntity {
+public class SysDictDataBo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 字典编码
