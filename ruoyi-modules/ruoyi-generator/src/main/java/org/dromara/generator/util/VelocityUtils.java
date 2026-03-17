@@ -237,6 +237,9 @@ public class VelocityUtils {
             } else if (!column.isSuperColumn() && "imageUpload".equals(column.getHtmlType())) {
                 importList.add("org.dromara.common.translation.annotation.Translation");
                 importList.add("org.dromara.common.translation.constant.TransConstant");
+            } else if (!column.isSuperColumn() && GenConstants.QUERY_BETWEEN.equals(column.getQueryType())) {
+                importList.add("java.util.HashMap");
+                importList.add("java.util.Map");
             }
         }
         return importList;

@@ -25,6 +25,7 @@ public class ${ClassName}Bo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+#set($hasBetween = false)
 #foreach ($column in $columns)
 #if(!$table.isSuperColumn($column.javaField) && ($column.query || $column.insert || $column.edit))
     /**
@@ -47,6 +48,15 @@ public class ${ClassName}Bo implements Serializable {
     private $column.javaType $column.javaField;
 
 #end
+#if($column.query && $column.queryType == 'BETWEEN')
+#set($hasBetween = true)
+#end
+#end
+#if($hasBetween)
+    /**
+     * 查询参数
+     */
+    private Map<String, Object> params = new HashMap<>();
 #end
 
 }
