@@ -9,7 +9,7 @@ import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysConfigBo;
 import org.dromara.system.domain.vo.SysConfigVo;
@@ -42,8 +42,8 @@ public class SysConfigController extends BaseController {
      */
     @SaCheckPermission("system:config:list")
     @GetMapping("/list")
-    public TableDataInfo<SysConfigVo> list(SysConfigBo config, PageQuery pageQuery) {
-        return configService.selectPageConfigList(config, pageQuery);
+    public R<PageResult<SysConfigVo>> list(SysConfigBo config, PageQuery pageQuery) {
+        return R.ok(configService.selectPageConfigList(config, pageQuery));
     }
 
     /**

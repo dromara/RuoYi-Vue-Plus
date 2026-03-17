@@ -1,7 +1,7 @@
 package org.dromara.system.service;
 
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.system.domain.bo.SysLoginInfoBo;
 import org.dromara.system.domain.vo.SysLoginInfoVo;
 
@@ -21,7 +21,7 @@ public interface ISysLoginInfoService {
      * @param pageQuery  分页参数
      * @return 登录日志分页列表
      */
-    TableDataInfo<SysLoginInfoVo> selectPageLoginInfoList(SysLoginInfoBo loginInfo, PageQuery pageQuery);
+    PageResult<SysLoginInfoVo> selectPageLoginInfoList(SysLoginInfoBo loginInfo, PageQuery pageQuery);
 
     /**
      * 新增系统登录日志

@@ -23,7 +23,7 @@ import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.utils.IdGeneratorUtil;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.FlowEngine;
@@ -378,10 +378,10 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * @return 当前登录人的待办任务分页结果
      */
     @Override
-    public TableDataInfo<FlowTaskVo> pageByTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
+    public PageResult<FlowTaskVo> pageByTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
         Page<FlowTaskVo> page = flwTaskMapper.getListRunTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), LoginHelper.getUserIdStr());
         this.wrapAssigneeInfo(page.getRecords());
-        return TableDataInfo.build(page);
+        return PageResult.build(page.getRecords(), page.getTotal());
     }
 
     /**
@@ -392,9 +392,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * @return 当前登录人的已办任务分页结果
      */
     @Override
-    public TableDataInfo<FlowHisTaskVo> pageByTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
+    public PageResult<FlowHisTaskVo> pageByTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
         Page<FlowHisTaskVo> page = flwHisTaskMapper.getListFinishTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), LoginHelper.getUserIdStr());
-        return TableDataInfo.build(page);
+        return PageResult.build(page.getRecords(), page.getTotal());
     }
 
     /**
@@ -405,10 +405,10 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * @return 全部待办任务分页结果
      */
     @Override
-    public TableDataInfo<FlowTaskVo> pageByAllTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
+    public PageResult<FlowTaskVo> pageByAllTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
         Page<FlowTaskVo> page = flwTaskMapper.getListRunTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), null);
         this.wrapAssigneeInfo(page.getRecords());
-        return TableDataInfo.build(page);
+        return PageResult.build(page.getRecords(), page.getTotal());
     }
 
     /**
@@ -437,9 +437,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * @return 全部已办任务分页结果
      */
     @Override
-    public TableDataInfo<FlowHisTaskVo> pageByAllTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
+    public PageResult<FlowHisTaskVo> pageByAllTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
         Page<FlowHisTaskVo> page = flwHisTaskMapper.getListFinishTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), null);
-        return TableDataInfo.build(page);
+        return PageResult.build(page.getRecords(), page.getTotal());
     }
 
     /**
@@ -450,9 +450,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * @return 当前登录人收到的抄送分页结果
      */
     @Override
-    public TableDataInfo<FlowTaskVo> pageByTaskCopy(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
+    public PageResult<FlowTaskVo> pageByTaskCopy(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
         Page<FlowTaskVo> page = flwTaskMapper.getTaskCopyByPage(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), LoginHelper.getUserIdStr());
-        return TableDataInfo.build(page);
+        return PageResult.build(page.getRecords(), page.getTotal());
     }
 
     /**

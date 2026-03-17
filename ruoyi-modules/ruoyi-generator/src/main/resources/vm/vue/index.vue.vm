@@ -351,8 +351,8 @@ const getList = async () => {
 #end
 #end
   const res = await list${BusinessName}(queryParams.value);
-  ${businessName}List.value = res.rows;
-  total.value = res.total;
+  ${businessName}List.value = res.data?.rows;
+  total.value = res.data?.total;
   loading.value = false;
 }
 

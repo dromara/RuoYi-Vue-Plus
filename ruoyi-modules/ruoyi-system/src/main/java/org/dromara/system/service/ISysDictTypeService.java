@@ -1,7 +1,7 @@
 package org.dromara.system.service;
 
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.system.domain.bo.SysDictTypeBo;
 import org.dromara.system.domain.vo.SysDictDataVo;
 import org.dromara.system.domain.vo.SysDictTypeVo;
@@ -22,7 +22,7 @@ public interface ISysDictTypeService {
      * @param pageQuery 分页参数
      * @return 字典类型分页列表
      */
-    TableDataInfo<SysDictTypeVo> selectPageDictTypeList(SysDictTypeBo dictType, PageQuery pageQuery);
+    PageResult<SysDictTypeVo> selectPageDictTypeList(SysDictTypeBo dictType, PageQuery pageQuery);
 
     /**
      * 根据条件分页查询字典类型

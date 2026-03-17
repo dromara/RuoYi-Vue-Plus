@@ -8,7 +8,7 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.demo.domain.TestDemo;
 import org.dromara.demo.domain.bo.TestDemoBo;
 import org.dromara.demo.domain.vo.TestDemoVo;
@@ -51,10 +51,10 @@ public class TestDemoServiceImpl implements ITestDemoService {
      * @return 分页结果
      */
     @Override
-    public TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery) {
+    public PageResult<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
         Page<TestDemoVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
-        return TableDataInfo.build(result);
+        return PageResult.build(result.getRecords(), result.getTotal());
     }
 
     /**
@@ -65,10 +65,10 @@ public class TestDemoServiceImpl implements ITestDemoService {
      * @return 分页结果
      */
     @Override
-    public TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery) {
+    public PageResult<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
         Page<TestDemoVo> result = baseMapper.customPageList(pageQuery.build(), lqw);
-        return TableDataInfo.build(result);
+        return PageResult.build(result.getRecords(), result.getTotal());
     }
 
     /**

@@ -1,7 +1,7 @@
 package org.dromara.workflow.service;
 
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.workflow.domain.bo.TestLeaveBo;
 import org.dromara.workflow.domain.vo.TestLeaveVo;
 
@@ -30,7 +30,7 @@ public interface ITestLeaveService {
      * @param pageQuery 分页参数
      * @return 请假分页数据
      */
-    TableDataInfo<TestLeaveVo> queryPageList(TestLeaveBo bo, PageQuery pageQuery);
+    PageResult<TestLeaveVo> queryPageList(TestLeaveBo bo, PageQuery pageQuery);
 
     /**
      * 查询符合条件的请假列表。

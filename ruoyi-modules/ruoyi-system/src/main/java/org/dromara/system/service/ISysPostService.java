@@ -1,7 +1,7 @@
 package org.dromara.system.service;
 
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.system.domain.bo.SysPostBo;
 import org.dromara.system.domain.vo.SysPostVo;
 
@@ -21,7 +21,7 @@ public interface ISysPostService {
      * @param pageQuery 分页参数
      * @return 岗位分页列表
      */
-    TableDataInfo<SysPostVo> selectPagePostList(SysPostBo post, PageQuery pageQuery);
+    PageResult<SysPostVo> selectPagePostList(SysPostBo post, PageQuery pageQuery);
 
     /**
      * 查询岗位信息集合

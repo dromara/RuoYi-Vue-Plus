@@ -12,7 +12,7 @@ import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysDeptBo;
 import org.dromara.system.domain.bo.SysPostBo;
@@ -49,8 +49,8 @@ public class SysPostController extends BaseController {
      */
     @SaCheckPermission("system:post:list")
     @GetMapping("/list")
-    public TableDataInfo<SysPostVo> list(SysPostBo post, PageQuery pageQuery) {
-        return postService.selectPagePostList(post, pageQuery);
+    public R<PageResult<SysPostVo>> list(SysPostBo post, PageQuery pageQuery) {
+        return R.ok(postService.selectPagePostList(post, pageQuery));
     }
 
     /**

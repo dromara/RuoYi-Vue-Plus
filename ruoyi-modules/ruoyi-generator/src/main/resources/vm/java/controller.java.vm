@@ -21,7 +21,7 @@ import ${packageName}.domain.vo.${ClassName}Vo;
 import ${packageName}.domain.bo.${ClassName}Bo;
 import ${packageName}.service.I${ClassName}Service;
 #if($table.crud)
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 #elseif($table.tree)
 #end
 
@@ -45,8 +45,8 @@ public class ${ClassName}Controller extends BaseController {
     @SaCheckPermission("${permissionPrefix}:list")
     @GetMapping("/list")
 #if($table.crud)
-    public TableDataInfo<${ClassName}Vo> list(${ClassName}Bo bo, PageQuery pageQuery) {
-        return ${className}Service.queryPageList(bo, pageQuery);
+    public R<PageResult<${ClassName}Vo>> list(${ClassName}Bo bo, PageQuery pageQuery) {
+        return R.ok(${className}Service.queryPageList(bo, pageQuery));
     }
 #elseif($table.tree)
     public R<List<${ClassName}Vo>> list(${ClassName}Bo bo) {

@@ -11,7 +11,7 @@ import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysLoginInfoBo;
@@ -44,8 +44,8 @@ public class SysLoginInfoController extends BaseController {
      */
     @SaCheckPermission("monitor:logininfo:list")
     @GetMapping("/list")
-    public TableDataInfo<SysLoginInfoVo> list(SysLoginInfoBo loginInfo, PageQuery pageQuery) {
-        return loginInfoService.selectPageLoginInfoList(loginInfo, pageQuery);
+    public R<PageResult<SysLoginInfoVo>> list(SysLoginInfoBo loginInfo, PageQuery pageQuery) {
+        return R.ok(loginInfoService.selectPageLoginInfoList(loginInfo, pageQuery));
     }
 
     /**

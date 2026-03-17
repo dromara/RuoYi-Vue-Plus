@@ -2,7 +2,7 @@ package org.dromara.system.service;
 
 import cn.hutool.core.lang.tree.Tree;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.system.domain.bo.SysDeptBo;
 import org.dromara.system.domain.vo.SysDeptVo;
 
@@ -22,7 +22,7 @@ public interface ISysDeptService {
      * @param pageQuery 分页对象
      * @return 部门信息集合
      */
-    TableDataInfo<SysDeptVo> selectPageDeptList(SysDeptBo dept, PageQuery pageQuery);
+    PageResult<SysDeptVo> selectPageDeptList(SysDeptBo dept, PageQuery pageQuery);
 
     /**
      * 查询部门管理数据

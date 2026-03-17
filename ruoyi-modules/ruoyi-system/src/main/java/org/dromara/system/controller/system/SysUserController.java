@@ -20,7 +20,7 @@ import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.helper.DataPermissionHelper;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
@@ -67,8 +67,8 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:list")
     @GetMapping("/list")
-    public TableDataInfo<SysUserVo> list(SysUserBo user, PageQuery pageQuery) {
-        return userService.selectPageUserList(user, pageQuery);
+    public R<PageResult<SysUserVo>> list(SysUserBo user, PageQuery pageQuery) {
+        return R.ok(userService.selectPageUserList(user, pageQuery));
     }
 
     /**

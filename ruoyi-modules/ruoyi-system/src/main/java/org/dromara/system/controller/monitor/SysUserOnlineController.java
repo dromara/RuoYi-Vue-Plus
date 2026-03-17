@@ -13,7 +13,7 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.SysUserOnline;
@@ -44,7 +44,7 @@ public class SysUserOnlineController extends BaseController {
      */
     @SaCheckPermission("monitor:online:list")
     @GetMapping("/list")
-    public TableDataInfo<SysUserOnline> list(String ipaddr, String userName) {
+    public R<PageResult<SysUserOnline>> list(String ipaddr, String userName) {
         // 获取所有未过期的 token
         Collection<String> keys = RedisUtils.keys(CacheConstants.ONLINE_TOKEN_KEY + "*");
         List<UserOnlineDTO> userOnlineDTOList = new ArrayList<>();
@@ -73,7 +73,7 @@ public class SysUserOnlineController extends BaseController {
         Collections.reverse(userOnlineDTOList);
         userOnlineDTOList.removeAll(Collections.singleton(null));
         List<SysUserOnline> userOnlineList = BeanUtil.copyToList(userOnlineDTOList, SysUserOnline.class);
-        return TableDataInfo.build(userOnlineList);
+        return R.ok(PageResult.build(userOnlineList));
     }
 
     /**
@@ -100,7 +100,7 @@ public class SysUserOnlineController extends BaseController {
      * @return 当前用户在线设备列表
      */
     @GetMapping()
-    public TableDataInfo<SysUserOnline> getInfo() {
+    public R<PageResult<SysUserOnline>> getInfo() {
         // 获取指定账号 id 的 token 集合
         List<String> tokenIds = StpUtil.getTokenValueListByLoginId(StpUtil.getLoginIdAsString());
         List<UserOnlineDTO> userOnlineDTOList = tokenIds.stream()
@@ -111,7 +111,7 @@ public class SysUserOnlineController extends BaseController {
         Collections.reverse(userOnlineDTOList);
         userOnlineDTOList.removeAll(Collections.singleton(null));
         List<SysUserOnline> userOnlineList = BeanUtil.copyToList(userOnlineDTOList, SysUserOnline.class);
-        return TableDataInfo.build(userOnlineList);
+        return R.ok(PageResult.build(userOnlineList));
     }
 
     /**

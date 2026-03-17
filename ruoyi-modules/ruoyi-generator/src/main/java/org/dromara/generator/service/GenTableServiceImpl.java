@@ -26,7 +26,7 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.utils.IdGeneratorUtil;
 import org.dromara.generator.constant.GenConstants;
 import org.dromara.generator.domain.GenTable;
@@ -97,9 +97,9 @@ public class GenTableServiceImpl implements IGenTableService {
      * @return 业务表分页结果
      */
     @Override
-    public TableDataInfo<GenTable> selectPageGenTableList(GenTable genTable, PageQuery pageQuery) {
+    public PageResult<GenTable> selectPageGenTableList(GenTable genTable, PageQuery pageQuery) {
         Page<GenTable> page = baseMapper.selectPage(pageQuery.build(), this.buildGenTableQueryWrapper(genTable));
-        return TableDataInfo.build(page);
+        return PageResult.build(page.getRecords(), page.getTotal());
     }
 
     /**
@@ -130,14 +130,14 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     @DS("#genTable.dataName")
     @Override
-    public TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable, PageQuery pageQuery) {
+    public PageResult<GenTable> selectPageDbTableList(GenTable genTable, PageQuery pageQuery) {
         // 获取查询条件
         String tableName = genTable.getTableName();
         String tableComment = genTable.getTableComment();
 
         LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.metadata().tables();
         if (CollUtil.isEmpty(tablesMap)) {
-            return TableDataInfo.build();
+            return PageResult.build();
         }
         List<String> tableNames = baseMapper.selectTableNameList(genTable.getDataName());
         String[] tableArrays;
@@ -179,7 +179,13 @@ public class GenTableServiceImpl implements IGenTableService {
                 return gen;
             }).sorted(Comparator.comparing(GenTable::getCreateTime).reversed())
             .toList();
-        return TableDataInfo.build(tables, pageQuery.build());
+        // 根据原始数据列表和分页参数，构建表格分页数据对象（用于假分页）
+        if (CollUtil.isEmpty(tables)) {
+            return PageResult.build();
+        }
+        Page<Object> page = pageQuery.build();
+        List<GenTable> pageList = CollUtil.page((int) page.getCurrent() - 1, (int) page.getSize(), tables);
+        return PageResult.build(pageList, tables.size());
     }
 
     /**

@@ -3,7 +3,7 @@ package ${packageName}.service;
 import ${packageName}.domain.vo.${ClassName}Vo;
 import ${packageName}.domain.bo.${ClassName}Bo;
 #if($table.crud)
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.core.page.PageQuery;
 #end
 
@@ -34,7 +34,7 @@ public interface I${ClassName}Service {
      * @param pageQuery 分页参数
      * @return ${functionName}分页列表
      */
-    TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery);
+    PageResult<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery);
 #end
 
     /**

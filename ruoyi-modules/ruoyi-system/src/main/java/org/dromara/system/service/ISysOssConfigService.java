@@ -1,7 +1,7 @@
 package org.dromara.system.service;
 
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.system.domain.bo.SysOssConfigBo;
 import org.dromara.system.domain.vo.SysOssConfigVo;
 
@@ -29,7 +29,7 @@ public interface ISysOssConfigService {
     /**
      * 查询列表
      */
-    TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo, PageQuery pageQuery);
+    PageResult<SysOssConfigVo> queryPageList(SysOssConfigBo bo, PageQuery pageQuery);
 
     /**
      * 根据新增业务对象插入对象存储配置

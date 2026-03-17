@@ -1,7 +1,7 @@
 package org.dromara.system.service;
 
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.system.domain.bo.SysClientBo;
 import org.dromara.system.domain.vo.SysClientVo;
 
@@ -29,7 +29,7 @@ public interface ISysClientService {
     /**
      * 查询客户端管理列表
      */
-    TableDataInfo<SysClientVo> queryPageList(SysClientBo bo, PageQuery pageQuery);
+    PageResult<SysClientVo> queryPageList(SysClientBo bo, PageQuery pageQuery);
 
     /**
      * 查询客户端管理列表

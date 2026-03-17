@@ -1,7 +1,7 @@
 package org.dromara.system.service;
 
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.system.domain.bo.SysOssBo;
 import org.dromara.system.domain.vo.SysOssVo;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,7 +26,7 @@ public interface ISysOssService {
      * @param pageQuery 分页查询实体类
      * @return 结果
      */
-    TableDataInfo<SysOssVo> queryPageList(SysOssBo sysOss, PageQuery pageQuery);
+    PageResult<SysOssVo> queryPageList(SysOssBo sysOss, PageQuery pageQuery);
 
     /**
      * 根据一组 ossIds 获取对应的 SysOssVo 列表

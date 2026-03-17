@@ -22,7 +22,7 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.TestLeave;
@@ -84,10 +84,10 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      * @return 请假分页列表
      */
     @Override
-    public TableDataInfo<TestLeaveVo> queryPageList(TestLeaveBo bo, PageQuery pageQuery) {
+    public PageResult<TestLeaveVo> queryPageList(TestLeaveBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestLeave> lqw = buildQueryWrapper(bo);
         Page<TestLeaveVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
-        return TableDataInfo.build(result);
+        return PageResult.build(result.getRecords(), result.getTotal());
     }
 
     /**

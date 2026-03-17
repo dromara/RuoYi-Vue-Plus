@@ -7,7 +7,7 @@ import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.warm.flow.core.entity.Definition;
 import org.dromara.warm.flow.core.service.DefService;
@@ -46,8 +46,8 @@ public class FlwDefinitionController extends BaseController {
      * @return 流程定义分页数据
      */
     @GetMapping("/list")
-    public TableDataInfo<FlowDefinitionVo> list(FlowDefinition flowDefinition, PageQuery pageQuery) {
-        return flwDefinitionService.queryList(flowDefinition, pageQuery);
+    public R<PageResult<FlowDefinitionVo>> list(FlowDefinition flowDefinition, PageQuery pageQuery) {
+        return R.ok(flwDefinitionService.queryList(flowDefinition, pageQuery));
     }
 
     /**
@@ -58,8 +58,8 @@ public class FlwDefinitionController extends BaseController {
      * @return 未发布流程定义分页数据
      */
     @GetMapping("/unPublishList")
-    public TableDataInfo<FlowDefinitionVo> unPublishList(FlowDefinition flowDefinition, PageQuery pageQuery) {
-        return flwDefinitionService.unPublishList(flowDefinition, pageQuery);
+    public R<PageResult<FlowDefinitionVo>> unPublishList(FlowDefinition flowDefinition, PageQuery pageQuery) {
+        return R.ok(flwDefinitionService.unPublishList(flowDefinition, pageQuery));
     }
 
     /**

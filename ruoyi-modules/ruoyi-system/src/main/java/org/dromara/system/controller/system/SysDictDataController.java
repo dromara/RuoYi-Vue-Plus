@@ -10,7 +10,7 @@ import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysDictDataBo;
 import org.dromara.system.domain.vo.SysDictDataVo;
@@ -46,8 +46,8 @@ public class SysDictDataController extends BaseController {
      */
     @SaCheckPermission("system:dict:list")
     @GetMapping("/list")
-    public TableDataInfo<SysDictDataVo> list(SysDictDataBo dictData, PageQuery pageQuery) {
-        return dictDataService.selectPageDictDataList(dictData, pageQuery);
+    public R<PageResult<SysDictDataVo>> list(SysDictDataBo dictData, PageQuery pageQuery) {
+        return R.ok(dictDataService.selectPageDictDataList(dictData, pageQuery));
     }
 
     /**

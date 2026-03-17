@@ -11,7 +11,7 @@ import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.generator.domain.GenTable;
@@ -47,8 +47,8 @@ public class GenController extends BaseController {
      */
     @SaCheckPermission("tool:gen:list")
     @GetMapping("/list")
-    public TableDataInfo<GenTable> genList(GenTable genTable, PageQuery pageQuery) {
-        return genTableService.selectPageGenTableList(genTable, pageQuery);
+    public R<PageResult<GenTable>> genList(GenTable genTable, PageQuery pageQuery) {
+        return R.ok(genTableService.selectPageGenTableList(genTable, pageQuery));
     }
 
     /**
@@ -80,8 +80,8 @@ public class GenController extends BaseController {
      */
     @SaCheckPermission("tool:gen:list")
     @GetMapping("/db/list")
-    public TableDataInfo<GenTable> dataList(GenTable genTable, PageQuery pageQuery) {
-        return genTableService.selectPageDbTableList(genTable, pageQuery);
+    public R<PageResult<GenTable>> dataList(GenTable genTable, PageQuery pageQuery) {
+        return R.ok(genTableService.selectPageDbTableList(genTable, pageQuery));
     }
 
     /**
@@ -92,9 +92,9 @@ public class GenController extends BaseController {
      */
     @SaCheckPermission("tool:gen:list")
     @GetMapping(value = "/column/{tableId}")
-    public TableDataInfo<GenTableColumn> columnList(@PathVariable("tableId") Long tableId) {
+    public R<PageResult<GenTableColumn>> columnList(@PathVariable("tableId") Long tableId) {
         List<GenTableColumn> list = genTableService.selectGenTableColumnListByTableId(tableId);
-        return TableDataInfo.build(list);
+        return R.ok(PageResult.build(list));
     }
 
     /**

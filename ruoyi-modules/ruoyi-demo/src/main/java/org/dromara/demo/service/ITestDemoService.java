@@ -1,7 +1,7 @@
 package org.dromara.demo.service;
 
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.demo.domain.TestDemo;
 import org.dromara.demo.domain.bo.TestDemoBo;
 import org.dromara.demo.domain.vo.TestDemoVo;
@@ -32,7 +32,7 @@ public interface ITestDemoService {
      * @param pageQuery 分页参数
      * @return 分页结果
      */
-    TableDataInfo<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery);
+    PageResult<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery);
 
     /**
      * 按自定义 SQL 分页查询测试单表列表。
@@ -41,7 +41,7 @@ public interface ITestDemoService {
      * @param pageQuery 分页参数
      * @return 分页结果
      */
-    TableDataInfo<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery);
+    PageResult<TestDemoVo> customPageList(TestDemoBo bo, PageQuery pageQuery);
 
     /**
      * 查询符合条件的测试单表列表。

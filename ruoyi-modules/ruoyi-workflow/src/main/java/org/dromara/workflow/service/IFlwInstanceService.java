@@ -1,7 +1,7 @@
 package org.dromara.workflow.service;
 
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
 import org.dromara.workflow.domain.bo.FlowCancelBo;
 import org.dromara.workflow.domain.bo.FlowInstanceBo;
@@ -26,7 +26,7 @@ public interface IFlwInstanceService {
      * @param pageQuery      分页
      * @return 结果
      */
-    TableDataInfo<FlowInstanceVo> selectRunningInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery);
+    PageResult<FlowInstanceVo> selectRunningInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery);
 
     /**
      * 分页查询已结束的流程实例
@@ -35,7 +35,7 @@ public interface IFlwInstanceService {
      * @param pageQuery      分页
      * @return 结果
      */
-    TableDataInfo<FlowInstanceVo> selectFinishInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery);
+    PageResult<FlowInstanceVo> selectFinishInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery);
 
     /**
      * 根据业务 id 查询流程实例详情，返回业务侧展示所需信息。
@@ -108,7 +108,7 @@ public interface IFlwInstanceService {
      * @param pageQuery  分页
      * @return 结果
      */
-    TableDataInfo<FlowInstanceVo> selectCurrentInstanceList(FlowInstanceBo instanceBo, PageQuery pageQuery);
+    PageResult<FlowInstanceVo> selectCurrentInstanceList(FlowInstanceBo instanceBo, PageQuery pageQuery);
 
     /**
      * 获取流程图及历史办理记录，供前端展示流转轨迹。

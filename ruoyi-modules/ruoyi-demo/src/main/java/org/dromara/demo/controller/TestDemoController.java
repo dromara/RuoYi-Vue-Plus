@@ -10,7 +10,7 @@ import org.dromara.common.core.validate.QueryGroup;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.excel.core.ExcelResult;
 import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.common.log.annotation.Log;
@@ -52,8 +52,8 @@ public class TestDemoController extends BaseController {
      */
     @SaCheckPermission("demo:demo:list")
     @GetMapping("/list")
-    public TableDataInfo<TestDemoVo> list(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
-        return testDemoService.queryPageList(bo, pageQuery);
+    public R<PageResult<TestDemoVo>> list(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
+        return R.ok(testDemoService.queryPageList(bo, pageQuery));
     }
 
     /**
@@ -61,8 +61,8 @@ public class TestDemoController extends BaseController {
      */
     @SaCheckPermission("demo:demo:list")
     @GetMapping("/page")
-    public TableDataInfo<TestDemoVo> page(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
-        return testDemoService.customPageList(bo, pageQuery);
+    public R<PageResult<TestDemoVo>> page(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
+        return R.ok(testDemoService.customPageList(bo, pageQuery));
     }
 
     /**

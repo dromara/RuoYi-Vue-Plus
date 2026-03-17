@@ -2,7 +2,7 @@ package org.dromara.workflow.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.warm.flow.orm.entity.FlowDefinition;
 import org.dromara.workflow.domain.vo.FlowDefinitionVo;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +24,7 @@ public interface IFlwDefinitionService {
      * @param pageQuery      分页
      * @return 返回分页列表
      */
-    TableDataInfo<FlowDefinitionVo> queryList(FlowDefinition flowDefinition, PageQuery pageQuery);
+    PageResult<FlowDefinitionVo> queryList(FlowDefinition flowDefinition, PageQuery pageQuery);
 
     /**
      * 查询未发布的流程定义列表
@@ -33,7 +33,7 @@ public interface IFlwDefinitionService {
      * @param pageQuery      分页
      * @return 返回分页列表
      */
-    TableDataInfo<FlowDefinitionVo> unPublishList(FlowDefinition flowDefinition, PageQuery pageQuery);
+    PageResult<FlowDefinitionVo> unPublishList(FlowDefinition flowDefinition, PageQuery pageQuery);
 
     /**
      * 发布流程定义

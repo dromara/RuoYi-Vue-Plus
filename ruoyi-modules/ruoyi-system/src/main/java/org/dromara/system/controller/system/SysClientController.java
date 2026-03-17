@@ -13,7 +13,7 @@ import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysClientBo;
 import org.dromara.system.domain.vo.SysClientVo;
@@ -46,8 +46,8 @@ public class SysClientController extends BaseController {
      */
     @SaCheckPermission("system:client:list")
     @GetMapping("/list")
-    public TableDataInfo<SysClientVo> list(SysClientBo bo, PageQuery pageQuery) {
-        return sysClientService.queryPageList(bo, pageQuery);
+    public R<PageResult<SysClientVo>> list(SysClientBo bo, PageQuery pageQuery) {
+        return R.ok(sysClientService.queryPageList(bo, pageQuery));
     }
 
     /**

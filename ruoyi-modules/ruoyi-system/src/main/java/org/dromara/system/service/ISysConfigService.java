@@ -1,7 +1,7 @@
 package org.dromara.system.service;
 
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.system.domain.bo.SysConfigBo;
 import org.dromara.system.domain.vo.SysConfigVo;
 
@@ -21,7 +21,7 @@ public interface ISysConfigService {
      * @param pageQuery 分页参数
      * @return 参数配置分页列表
      */
-    TableDataInfo<SysConfigVo> selectPageConfigList(SysConfigBo config, PageQuery pageQuery);
+    PageResult<SysConfigVo> selectPageConfigList(SysConfigBo config, PageQuery pageQuery);
 
     /**
      * 查询参数配置信息

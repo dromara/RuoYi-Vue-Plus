@@ -13,7 +13,7 @@ import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.bo.SysClientBo;
 import org.dromara.system.domain.vo.SysClientVo;
@@ -72,11 +72,11 @@ public class SysClientServiceImpl implements ISysClientService {
      * @return 客户端分页列表
      */
     @Override
-    public TableDataInfo<SysClientVo> queryPageList(SysClientBo bo, PageQuery pageQuery) {
+    public PageResult<SysClientVo> queryPageList(SysClientBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<SysClient> lqw = buildQueryWrapper(bo);
         Page<SysClientVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         result.getRecords().forEach(r -> r.setGrantTypeList(StringUtils.splitList(r.getGrantType())));
-        return TableDataInfo.build(result);
+        return PageResult.build(result.getRecords(), result.getTotal());
     }
 
     /**
