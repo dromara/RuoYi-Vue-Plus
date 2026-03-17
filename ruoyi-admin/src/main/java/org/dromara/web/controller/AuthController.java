@@ -93,10 +93,9 @@ public class AuthController {
 
         Long userId = LoginHelper.getUserId();
         scheduledExecutorService.schedule(() -> {
-            SseMessageDTO dto = new SseMessageDTO(
-                List.of(userId),
-                DateUtils.getTodayHour(new Date()) + "好，欢迎登录 RuoYi-Vue-Plus 后台管理系统"
-            );
+            SseMessageDTO dto = new SseMessageDTO();
+            dto.setUserIds(List.of(userId));
+            dto.setMessage(DateUtils.getTodayHour(new Date()) + "好，欢迎登录 RuoYi-Vue-Plus 后台管理系统");
             SseMessageUtils.publishMessage(dto);
         }, 5, TimeUnit.SECONDS);
         return R.ok(loginVo);

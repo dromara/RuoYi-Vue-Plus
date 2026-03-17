@@ -56,19 +56,21 @@ public class WebSocketUtils {
     public static void publishMessage(WebSocketMessageDTO webSocketMessage) {
         List<Long> unsentSessionKeys = new ArrayList<>();
         // 当前服务内session,直接发送消息
-        for (Long sessionKey : webSocketMessage.sessionKeys()) {
+        for (Long sessionKey : webSocketMessage.getSessionKeys()) {
             if (WebSocketSessionHolder.existSession(sessionKey)) {
-                WebSocketUtils.sendMessage(sessionKey, webSocketMessage.message());
+                WebSocketUtils.sendMessage(sessionKey, webSocketMessage.getMessage());
                 continue;
             }
             unsentSessionKeys.add(sessionKey);
         }
         // 不在当前服务内session,发布订阅消息
         if (CollUtil.isNotEmpty(unsentSessionKeys)) {
-            WebSocketMessageDTO broadcastMessage = new WebSocketMessageDTO(unsentSessionKeys, webSocketMessage.message());
+            WebSocketMessageDTO broadcastMessage = new WebSocketMessageDTO();
+            broadcastMessage.setSessionKeys(unsentSessionKeys);
+            broadcastMessage.setMessage(webSocketMessage.getMessage());
             RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage, consumer -> {
                 log.info(" WebSocket发送主题订阅消息topic:{} session keys:{} message:{}",
-                    WEB_SOCKET_TOPIC, unsentSessionKeys, webSocketMessage.message());
+                    WEB_SOCKET_TOPIC, unsentSessionKeys, webSocketMessage.getMessage());
             });
         }
     }
@@ -79,7 +81,8 @@ public class WebSocketUtils {
      * @param message 要发布的消息内容
      */
     public static void publishAll(String message) {
-        WebSocketMessageDTO broadcastMessage = new WebSocketMessageDTO(null, message);
+        WebSocketMessageDTO broadcastMessage = new WebSocketMessageDTO();
+        broadcastMessage.setMessage(message);
         RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage, consumer -> {
             log.info("WebSocket发送主题订阅消息topic:{} message:{}", WEB_SOCKET_TOPIC, message);
         });

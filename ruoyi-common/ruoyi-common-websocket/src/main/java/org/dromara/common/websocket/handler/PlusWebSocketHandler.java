@@ -51,7 +51,9 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
 
         // 创建WebSocket消息DTO对象
-        WebSocketMessageDTO messageDTO = new WebSocketMessageDTO(List.of(loginUser.getUserId()), message.getPayload());
+        WebSocketMessageDTO messageDTO = new WebSocketMessageDTO();
+        messageDTO.setSessionKeys(List.of(loginUser.getUserId()));
+        messageDTO.setMessage(message.getPayload());
         WebSocketUtils.publishMessage(messageDTO);
     }
 
