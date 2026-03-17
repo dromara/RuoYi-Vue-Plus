@@ -20,7 +20,7 @@ import java.util.List;
  * @author may
  * @date 2024-03-02
  */
-public interface FlwTaskMapper extends BaseMapperPlus<FlowTask, FlowTaskVo> {
+public interface FlwUserMapper extends BaseMapperPlus<FlowUser, FlowUser> {
 
     default Page<FlowTaskVo> getListRunTask(Page<FlowTaskVo> page,
                                             FlowTaskBo bo,

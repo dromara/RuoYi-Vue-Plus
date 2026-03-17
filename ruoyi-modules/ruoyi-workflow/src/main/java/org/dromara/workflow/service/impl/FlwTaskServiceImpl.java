@@ -52,6 +52,7 @@ import org.dromara.workflow.domain.vo.FlowHisTaskVo;
 import org.dromara.workflow.domain.vo.FlowTaskVo;
 import org.dromara.workflow.domain.vo.NodeExtVo;
 import org.dromara.workflow.mapper.FlwCategoryMapper;
+import org.dromara.workflow.mapper.FlwHisTaskMapper;
 import org.dromara.workflow.mapper.FlwInstanceBizExtMapper;
 import org.dromara.workflow.mapper.FlwTaskMapper;
 import org.dromara.workflow.service.IFlwCommonService;
@@ -86,6 +87,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     private final FlowHisTaskMapper flowHisTaskMapper;
     private final UserService userService;
     private final FlwTaskMapper flwTaskMapper;
+    private final FlwHisTaskMapper flwHisTaskMapper;
     private final FlwCategoryMapper flwCategoryMapper;
     private final FlowNodeMapper flowNodeMapper;
     private final IFlwTaskAssigneeService flwTaskAssigneeService;
@@ -391,7 +393,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public TableDataInfo<FlowHisTaskVo> pageByTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
-        Page<FlowHisTaskVo> page = flwTaskMapper.getListFinishTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), LoginHelper.getUserIdStr());
+        Page<FlowHisTaskVo> page = flwHisTaskMapper.getListFinishTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), LoginHelper.getUserIdStr());
         return TableDataInfo.build(page);
     }
 
@@ -436,7 +438,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public TableDataInfo<FlowHisTaskVo> pageByAllTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery) {
-        Page<FlowHisTaskVo> page = flwTaskMapper.getListFinishTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), null);
+        Page<FlowHisTaskVo> page = flwHisTaskMapper.getListFinishTask(pageQuery.build(), flowTaskBo, categoryIds(flowTaskBo), null);
         return TableDataInfo.build(page);
     }
 
