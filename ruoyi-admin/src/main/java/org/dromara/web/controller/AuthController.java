@@ -33,7 +33,6 @@ import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.service.ISysClientService;
 import org.dromara.system.service.ISysConfigService;
 import org.dromara.system.service.ISysSocialService;
-import org.dromara.web.domain.vo.LoginTenantVo;
 import org.dromara.web.domain.vo.LoginVo;
 import org.dromara.web.service.IAuthStrategy;
 import org.dromara.web.service.SysLoginService;
@@ -94,9 +93,10 @@ public class AuthController {
 
         Long userId = LoginHelper.getUserId();
         scheduledExecutorService.schedule(() -> {
-            SseMessageDTO dto = new SseMessageDTO();
-            dto.setMessage(DateUtils.getTodayHour(new Date()) + "好，欢迎登录 RuoYi-Vue-Plus 后台管理系统");
-            dto.setUserIds(List.of(userId));
+            SseMessageDTO dto = new SseMessageDTO(
+                List.of(userId),
+                DateUtils.getTodayHour(new Date()) + "好，欢迎登录 RuoYi-Vue-Plus 后台管理系统"
+            );
             SseMessageUtils.publishMessage(dto);
         }, 5, TimeUnit.SECONDS);
         return R.ok(loginVo);
@@ -194,9 +194,14 @@ public class AuthController {
     @GetMapping("/tenant/list")
     public R<LoginTenantVo> tenantList(HttpServletRequest request) throws Exception {
         // 暂时预留给前端使用 后续删除
-        LoginTenantVo result = new LoginTenantVo();
-        result.setTenantEnabled(false);
-        return R.ok(result);
+        return R.ok(new LoginTenantVo(false));
     }
 
+    /**
+     * 登录租户列表响应对象。
+     *
+     * @param tenantEnabled 是否启用租户
+     */
+    public record LoginTenantVo(Boolean tenantEnabled) {
+    }
 }

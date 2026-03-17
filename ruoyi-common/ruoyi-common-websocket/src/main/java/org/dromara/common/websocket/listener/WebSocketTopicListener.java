@@ -26,17 +26,17 @@ public class WebSocketTopicListener implements ApplicationRunner, Ordered {
     public void run(ApplicationArguments args) throws Exception {
         // 订阅WebSocket消息
         WebSocketUtils.subscribeMessage((message) -> {
-            log.info("WebSocket主题订阅收到消息session keys={} message={}", message.getSessionKeys(), message.getMessage());
+            log.info("WebSocket主题订阅收到消息session keys={} message={}", message.sessionKeys(), message.message());
             // 如果key不为空就按照key发消息 如果为空就群发
-            if (CollUtil.isNotEmpty(message.getSessionKeys())) {
-                message.getSessionKeys().forEach(key -> {
+            if (CollUtil.isNotEmpty(message.sessionKeys())) {
+                message.sessionKeys().forEach(key -> {
                     if (WebSocketSessionHolder.existSession(key)) {
-                        WebSocketUtils.sendMessage(key, message.getMessage());
+                        WebSocketUtils.sendMessage(key, message.message());
                     }
                 });
             } else {
                 WebSocketSessionHolder.getSessionsAll().forEach(key -> {
-                    WebSocketUtils.sendMessage(key, message.getMessage());
+                    WebSocketUtils.sendMessage(key, message.message());
                 });
             }
         });

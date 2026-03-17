@@ -23,16 +23,12 @@ import java.math.BigDecimal;
 public class AlipayBillTask {
 
     public ExecuteResult jobExecute(JobArgs jobArgs) throws InterruptedException {
-        BillDTO billDTO = new BillDTO();
-        billDTO.setBillId(23456789L);
-        billDTO.setBillChannel("alipay");
         // 设置清算日期
         String settlementDate = (String) jobArgs.getWfContext().get("settlementDate");
         if (StrUtil.equals(settlementDate, "sysdate")) {
             settlementDate = DateUtil.today();
         }
-        billDTO.setBillDate(settlementDate);
-        billDTO.setBillAmount(new BigDecimal("2345.67"));
+        BillDTO billDTO = new BillDTO(23456789L, "alipay", settlementDate, new BigDecimal("2345.67"));
         // 把billDTO对象放入上下文进行传递
         jobArgs.appendContext("alipay", JsonUtils.toJsonString(billDTO));
         SnailJobLog.REMOTE.info("上下文: {}", jobArgs.getWfContext());

@@ -92,9 +92,7 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
             try {
                 switch (messageTypeEnum) {
                     case SYSTEM_MESSAGE -> {
-                        SseMessageDTO dto = new SseMessageDTO();
-                        dto.setUserIds(userIds);
-                        dto.setMessage(message);
+                        SseMessageDTO dto = new SseMessageDTO(userIds, message);
                         SseMessageUtils.publishMessage(dto);
                     }
                     case EMAIL_MESSAGE -> MailUtils.sendText(emails, subject, message);

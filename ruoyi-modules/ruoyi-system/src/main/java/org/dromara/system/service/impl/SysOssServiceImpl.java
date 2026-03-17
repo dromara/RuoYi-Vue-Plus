@@ -258,9 +258,9 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     @NotNull
     private SysOssVo buildResultEntity(String originalfileName, String suffix, String configKey, UploadResult uploadResult, SysOssExt ext1) {
         SysOss oss = new SysOss();
-        oss.setUrl(uploadResult.getUrl());
+        oss.setUrl(uploadResult.url());
         oss.setFileSuffix(suffix);
-        oss.setFileName(uploadResult.getFilename());
+        oss.setFileName(uploadResult.filename());
         oss.setOriginalName(originalfileName);
         oss.setService(configKey);
         oss.setExt1(JsonUtils.toJsonString(ext1));

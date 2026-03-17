@@ -1,30 +1,19 @@
 package org.dromara.job.entity;
 
-import lombok.Data;
-
 import java.math.BigDecimal;
 
-@Data
-public class BillDTO {
-
-    /**
-     * 账单ID
-     */
-    private Long billId;
-
-    /**
-     * 账单渠道
-     */
-    private String billChannel;
-
-    /**
-     * 账单日期
-     */
-    private String billDate;
-
-    /**
-     * 账单金额
-     */
-    private BigDecimal billAmount;
-
+/**
+ * 账单数据传输对象。
+ *
+ * @param billId      账单 ID
+ * @param billChannel 账单渠道
+ * @param billDate    账单日期
+ * @param billAmount  账单金额
+ */
+public record BillDTO(
+    Long billId,
+    String billChannel,
+    String billDate,
+    BigDecimal billAmount
+) {
 }

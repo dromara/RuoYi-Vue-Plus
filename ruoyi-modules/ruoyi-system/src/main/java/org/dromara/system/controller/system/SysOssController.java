@@ -13,7 +13,6 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysOssBo;
-import org.dromara.system.domain.vo.SysOssUploadVo;
 import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.service.ISysOssService;
 import org.springframework.http.MediaType;
@@ -76,10 +75,7 @@ public class SysOssController extends BaseController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<SysOssUploadVo> upload(@RequestPart("file") MultipartFile file) {
         SysOssVo oss = ossService.upload(file);
-        SysOssUploadVo uploadVo = new SysOssUploadVo();
-        uploadVo.setUrl(oss.getUrl());
-        uploadVo.setFileName(oss.getOriginalName());
-        uploadVo.setOssId(oss.getOssId().toString());
+        SysOssUploadVo uploadVo = new SysOssUploadVo(oss.getUrl(), oss.getOriginalName(), oss.getOssId().toString());
         return R.ok(uploadVo);
     }
 
@@ -110,4 +106,13 @@ public class SysOssController extends BaseController {
         return toAjax(ossService.deleteWithValidByIds(List.of(ossIds), true));
     }
 
+    /**
+     * OSS 上传响应对象。
+     *
+     * @param url 文件访问地址
+     * @param fileName 原始文件名
+     * @param ossId OSS 对象 ID
+     */
+    public record SysOssUploadVo(String url, String fileName, String ossId) {
+    }
 }

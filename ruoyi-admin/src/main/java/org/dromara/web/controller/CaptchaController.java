@@ -25,7 +25,6 @@ import org.dromara.common.web.config.properties.CaptchaProperties;
 import org.dromara.sms4j.api.SmsBlend;
 import org.dromara.sms4j.api.entity.SmsResponse;
 import org.dromara.sms4j.core.factory.SmsFactory;
-import org.dromara.web.domain.vo.CaptchaVo;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -119,9 +118,7 @@ public class CaptchaController {
     public R<CaptchaVo> getCode() {
         boolean captchaEnabled = captchaProperties.getEnable();
         if (!captchaEnabled) {
-            CaptchaVo captchaVo = new CaptchaVo();
-            captchaVo.setCaptchaEnabled(false);
-            return R.ok(captchaVo);
+            return R.ok(new CaptchaVo(false, null, null));
         }
         return R.ok(SpringUtils.getAopProxy(this).getCodeImpl());
     }
@@ -157,10 +154,17 @@ public class CaptchaController {
             code = exp.getValue(String.class);
         }
         RedisUtils.setCacheObject(verifyKey, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
-        CaptchaVo captchaVo = new CaptchaVo();
-        captchaVo.setUuid(uuid);
-        captchaVo.setImg(captcha.getImageBase64());
-        return captchaVo;
+        return new CaptchaVo(true, uuid, captcha.getImageBase64());
+    }
+
+    /**
+     * 图片验证码响应对象。
+     *
+     * @param captchaEnabled 是否启用验证码
+     * @param uuid 验证码标识
+     * @param img Base64 图片数据
+     */
+    public record CaptchaVo(Boolean captchaEnabled, String uuid, String img) {
     }
 
 }

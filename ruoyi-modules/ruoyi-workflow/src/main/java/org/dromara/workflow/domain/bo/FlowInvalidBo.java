@@ -1,31 +1,18 @@
 package org.dromara.workflow.domain.bo;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import org.dromara.common.core.validate.AddGroup;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * 作废流程请求对象。
  *
+ * @param id      流程实例 ID
+ * @param comment 作废意见
  * @author may
  */
-@Data
-public class FlowInvalidBo implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * 流程实例id
-     */
+public record FlowInvalidBo(
     @NotNull(message = "流程实例id为空", groups = AddGroup.class)
-    private Long id;
-
-    /**
-     * 审批意见
-     */
-    private String comment;
+    Long id,
+    String comment
+) {
 }

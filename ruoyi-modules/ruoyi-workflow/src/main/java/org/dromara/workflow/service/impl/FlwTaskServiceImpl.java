@@ -133,9 +133,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             }
             taskService.mergeVariable(flowInstance, variables);
             insService.updateById(flowInstance);
-            StartProcessReturnDTO dto = new StartProcessReturnDTO();
-            dto.setProcessInstanceId(taskList.get(0).getInstanceId());
-            dto.setTaskId(taskList.get(0).getId());
+            StartProcessReturnDTO dto = new StartProcessReturnDTO(taskList.get(0).getInstanceId(), taskList.get(0).getId());
             // 保存流程实例业务信息
             this.buildFlowInstanceBizExt(flowInstance, bizExt);
             return dto;
@@ -166,10 +164,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (taskList.size() > 1) {
             throw new ServiceException("请检查流程第一个环节是否为申请人！");
         }
-        StartProcessReturnDTO dto = new StartProcessReturnDTO();
-        dto.setProcessInstanceId(instance.getId());
-        dto.setTaskId(taskList.get(0).getId());
-        return dto;
+        return new StartProcessReturnDTO(instance.getId(), taskList.get(0).getId());
     }
 
     /**
@@ -570,7 +565,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean terminationTask(FlowTerminationBo bo) {
-        Long taskId = bo.getTaskId();
+        Long taskId = bo.taskId();
         Task task = taskService.getById(taskId);
         if (task == null) {
             throw new ServiceException("任务不存在！");
@@ -580,7 +575,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             BusinessStatusEnum.checkInvalidStatus(instance.getFlowStatus());
         }
         FlowParams flowParams = FlowParams.build()
-            .message(bo.getComment())
+            .message(bo.comment())
             .flowStatus(BusinessStatusEnum.TERMINATION.getStatus())
             .hisStatus(TaskStatusEnum.TERMINATION.getStatus());
         taskService.termination(taskId, flowParams);

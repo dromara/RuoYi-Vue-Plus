@@ -1,30 +1,14 @@
 package org.dromara.common.core.domain.dto;
 
-import lombok.Data;
-
-import java.io.Serial;
-import java.io.Serializable;
-
-
 /**
  * 抄送
  *
+ * @param userId   抄送用户 ID
+ * @param nickName 抄送用户昵称
  * @author may
  */
-@Data
-public class FlowCopyDTO implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * 用户id
-     */
-    private Long userId;
-
-    /**
-     * 用户昵称
-     */
-    private String nickName;
-
+public record FlowCopyDTO(
+    Long userId,
+    String nickName
+) {
 }

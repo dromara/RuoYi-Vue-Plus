@@ -1,31 +1,18 @@
 package org.dromara.workflow.domain.bo;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 import org.dromara.common.core.validate.AddGroup;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * 撤销流程请求对象。
  *
+ * @param businessId 业务 ID
+ * @param message    撤销说明
  * @author may
  */
-@Data
-public class FlowCancelBo implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * 任务ID
-     */
+public record FlowCancelBo(
     @NotBlank(message = "业务ID不能为空", groups = AddGroup.class)
-    private String businessId;
-
-    /**
-     * 办理意见
-     */
-    private String message;
+    String businessId,
+    String message
+) {
 }

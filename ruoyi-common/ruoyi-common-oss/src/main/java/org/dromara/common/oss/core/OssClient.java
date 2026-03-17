@@ -162,7 +162,7 @@ public class OssClient {
             String eTag = uploadResult.response().eTag();
 
             // 提取上传结果中的 ETag，并构建一个自定义的 UploadResult 对象
-            return UploadResult.builder().url(getUrl() + StringUtils.SLASH + key).filename(key).eTag(eTag).build();
+            return new UploadResult(getUrl() + StringUtils.SLASH + key, key, eTag);
         } catch (Exception e) {
             // 捕获异常并抛出自定义异常
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
@@ -220,7 +220,7 @@ public class OssClient {
             String eTag = uploadResult.response().eTag();
 
             // 提取上传结果中的 ETag，并构建一个自定义的 UploadResult 对象
-            return UploadResult.builder().url(getUrl() + StringUtils.SLASH + key).filename(key).eTag(eTag).build();
+            return new UploadResult(getUrl() + StringUtils.SLASH + key, key, eTag);
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }

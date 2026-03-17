@@ -1,30 +1,16 @@
 package org.dromara.common.oss.entity;
 
-import lombok.Builder;
-import lombok.Data;
-
 /**
  * 上传返回体
  *
+ * @param url       文件访问地址
+ * @param filename  文件名
+ * @param eTag      存储服务返回的 ETag
  * @author Lion Li
  */
-@Data
-@Builder
-public class UploadResult {
-
-    /**
-     * 文件路径
-     */
-    private String url;
-
-    /**
-     * 文件名
-     */
-    private String filename;
-
-    /**
-     * 已上传对象的实体标记（用来校验文件）
-     */
-    private String eTag;
-
+public record UploadResult(
+    String url,
+    String filename,
+    String eTag
+) {
 }

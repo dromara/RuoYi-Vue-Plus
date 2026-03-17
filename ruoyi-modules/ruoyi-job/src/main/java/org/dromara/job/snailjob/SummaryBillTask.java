@@ -27,14 +27,14 @@ public class SummaryBillTask {
         String wechat = (String) jobArgs.getWfContext("wechat");
         if (StrUtil.isNotBlank(wechat)) {
             BillDTO wechatBillDTO = JsonUtils.parseObject(wechat, BillDTO.class);
-            wechatAmount = wechatBillDTO.getBillAmount();
+            wechatAmount = wechatBillDTO.billAmount();
         }
         // 获得支付宝账单
         BigDecimal alipayAmount = BigDecimal.valueOf(0);
         String alipay = (String) jobArgs.getWfContext("alipay");
         if (StrUtil.isNotBlank(alipay)) {
             BillDTO alipayBillDTO = JsonUtils.parseObject(alipay, BillDTO.class);
-            alipayAmount = alipayBillDTO.getBillAmount();
+            alipayAmount = alipayBillDTO.billAmount();
         }
         // 汇总账单
         BigDecimal totalAmount = wechatAmount.add(alipayAmount);

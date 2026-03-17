@@ -166,7 +166,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         StartProcessReturnDTO result = flwTaskService.startWorkFlow(processBo);
         CompleteTaskBo taskBo = new CompleteTaskBo();
-        taskBo.setTaskId(result.getTaskId());
+        taskBo.setTaskId(result.taskId());
         taskBo.setMessageType(Collections.singletonList(MessageTypeEnum.SYSTEM_MESSAGE.getCode()));
         taskBo.setVariables(startProcess.getVariables());
         taskBo.setHandler(startProcess.getHandler());

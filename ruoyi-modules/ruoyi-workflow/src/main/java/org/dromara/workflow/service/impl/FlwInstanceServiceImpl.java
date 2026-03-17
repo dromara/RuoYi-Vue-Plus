@@ -311,7 +311,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean cancelProcessApply(FlowCancelBo bo) {
-        Instance instance = selectInstByBusinessId(bo.getBusinessId());
+        Instance instance = selectInstByBusinessId(bo.businessId());
         if (instance == null) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_INSTANCE);
         }
@@ -319,7 +319,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         if (definition == null) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_DEF);
         }
-        String message = bo.getMessage();
+        String message = bo.message();
         String userIdStr = LoginHelper.getUserIdStr();
         BusinessStatusEnum.checkCancelStatus(instance.getFlowStatus());
         FlowParams flowParams = FlowParams.build()
@@ -445,16 +445,16 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateVariable(FlowVariableBo bo) {
-        FlowInstance flowInstance = flowInstanceMapper.selectById(bo.getInstanceId());
+        FlowInstance flowInstance = flowInstanceMapper.selectById(bo.instanceId());
         if (flowInstance == null) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_INSTANCE);
         }
         Map<String, Object> variableMap = new HashMap<>(Optional.ofNullable(flowInstance.getVariableMap()).orElse(Collections.emptyMap()));
-        if (!variableMap.containsKey(bo.getKey())) {
-            log.error("变量不存在: {}", bo.getKey());
+        if (!variableMap.containsKey(bo.key())) {
+            log.error("变量不存在: {}", bo.key());
             return false;
         }
-        variableMap.put(bo.getKey(), bo.getValue());
+        variableMap.put(bo.key(), bo.value());
         flowInstance.setVariable(FlowEngine.jsonConvert.objToStr(variableMap));
         return flowInstanceMapper.updateById(flowInstance) > 0;
     }
@@ -503,16 +503,16 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean processInvalid(FlowInvalidBo bo) {
-        Instance instance = insService.getById(bo.getId());
+        Instance instance = insService.getById(bo.id());
         if (instance != null) {
             BusinessStatusEnum.checkInvalidStatus(instance.getFlowStatus());
         }
         FlowParams flowParams = FlowParams.build()
-            .message(bo.getComment())
+            .message(bo.comment())
             .flowStatus(BusinessStatusEnum.INVALID.getStatus())
             .hisStatus(TaskStatusEnum.INVALID.getStatus())
             .ignore(true);
-        taskService.terminationByInsId(bo.getId(), flowParams);
+        taskService.terminationByInsId(bo.id(), flowParams);
         return true;
     }
 }
