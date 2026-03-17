@@ -118,6 +118,21 @@ public class SysUserBo implements Serializable {
      */
     private String excludeUserIds;
 
+    /**
+     * 创建者
+     */
+    private Long createBy;
+
+    /**
+     * 更新者
+     */
+    private Long updateBy;
+
+    /**
+     * 请求参数
+     */
+    private Map<String, Object> params = new HashMap<>();
+
     public SysUserBo(Long userId) {
         this.userId = userId;
     }
@@ -125,10 +140,5 @@ public class SysUserBo implements Serializable {
     public boolean isSuperAdmin() {
         return SystemConstants.SUPER_ADMIN_ID.equals(this.userId);
     }
-
-    /**
-     * 请求参数
-     */
-    private Map<String, Object> params = new HashMap<>();
 
 }

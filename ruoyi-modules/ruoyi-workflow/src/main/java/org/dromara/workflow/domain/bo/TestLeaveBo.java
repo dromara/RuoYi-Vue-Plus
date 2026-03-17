@@ -13,6 +13,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 请假业务对象 test_leave
@@ -90,5 +92,9 @@ public class TestLeaveBo implements Serializable {
      */
     private String status;
 
+    /**
+     * 请求参数
+     */
+    private Map<String, Object> params = new HashMap<>();
 
 }

@@ -12,7 +12,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 业务表 gen_table
@@ -169,6 +171,12 @@ public class GenTable extends BaseEntity {
      */
     @TableField(exist = false)
     private String parentMenuName;
+
+    /**
+     * 请求参数
+     */
+    @TableField(exist = false)
+    private Map<String, Object> params = new HashMap<>();
 
     /**
      * 判断当前业务表是否采用树表模板。

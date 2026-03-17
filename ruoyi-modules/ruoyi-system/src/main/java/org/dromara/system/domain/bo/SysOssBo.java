@@ -57,6 +57,11 @@ public class SysOssBo implements Serializable {
     private String service;
 
     /**
+     * 创建者
+     */
+    private Long createBy;
+
+    /**
      * 请求参数
      */
     private Map<String, Object> params = new HashMap<>();

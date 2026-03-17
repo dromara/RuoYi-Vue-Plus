@@ -81,12 +81,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @return 包含名称、类型与创建时间区间的查询包装器
      */
     private LambdaQueryWrapper<SysDictType> buildQueryWrapper(SysDictTypeBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysDictType> lqw = Wrappers.lambdaQuery();
         lqw.like(StringUtils.isNotBlank(bo.getDictName()), SysDictType::getDictName, bo.getDictName());
         lqw.like(StringUtils.isNotBlank(bo.getDictType()), SysDictType::getDictType, bo.getDictType());
-        lqw.between(params.get("beginTime") != null && params.get("endTime") != null,
-            SysDictType::getCreateTime, params.get("beginTime"), params.get("endTime"));
         lqw.orderByAsc(SysDictType::getDictId);
         return lqw;
     }

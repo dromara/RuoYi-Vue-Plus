@@ -9,6 +9,8 @@ import org.dromara.workflow.domain.FlowSpel;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 流程spel表达式定义业务对象 flow_spel
@@ -59,5 +61,10 @@ public class FlowSpelBo implements Serializable {
      * 备注
      */
     private String remark;
+
+    /**
+     * 请求参数
+     */
+    private Map<String, Object> params = new HashMap<>();
 
 }

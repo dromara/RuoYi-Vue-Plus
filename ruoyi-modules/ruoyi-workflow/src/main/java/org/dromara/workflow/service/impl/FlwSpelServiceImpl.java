@@ -87,7 +87,6 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
      * @return 包含排序和筛选条件的查询包装器
      */
     private LambdaQueryWrapper<FlowSpel> buildQueryWrapper(FlowSpelBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<FlowSpel> lqw = Wrappers.lambdaQuery();
         lqw.orderByAsc(FlowSpel::getId);
         lqw.like(StringUtils.isNotBlank(bo.getComponentName()), FlowSpel::getComponentName, bo.getComponentName());

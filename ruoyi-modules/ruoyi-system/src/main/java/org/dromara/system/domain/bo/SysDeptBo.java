@@ -10,6 +10,8 @@ import org.dromara.system.domain.SysDept;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 部门业务对象 sys_dept
@@ -80,5 +82,10 @@ public class SysDeptBo implements Serializable {
      * 归属部门id（部门树）
      */
     private Long belongDeptId;
+
+    /**
+     * 请求参数
+     */
+    private Map<String, Object> params = new HashMap<>();
 
 }

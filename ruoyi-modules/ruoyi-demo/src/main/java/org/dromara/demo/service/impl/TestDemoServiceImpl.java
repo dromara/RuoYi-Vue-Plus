@@ -4,11 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.demo.domain.TestDemo;
 import org.dromara.demo.domain.bo.TestDemoBo;
 import org.dromara.demo.domain.vo.TestDemoVo;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 测试单表Service业务层处理
@@ -89,14 +88,11 @@ public class TestDemoServiceImpl implements ITestDemoService {
      * @return 查询条件包装器
      */
     private LambdaQueryWrapper<TestDemo> buildQueryWrapper(TestDemoBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<TestDemo> lqw = Wrappers.lambdaQuery();
         lqw.eq(bo.getDeptId() != null, TestDemo::getDeptId, bo.getDeptId());
         lqw.eq(bo.getUserId() != null, TestDemo::getUserId, bo.getUserId());
         lqw.like(StringUtils.isNotBlank(bo.getTestKey()), TestDemo::getTestKey, bo.getTestKey());
         lqw.eq(StringUtils.isNotBlank(bo.getValue()), TestDemo::getValue, bo.getValue());
-        lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
-            TestDemo::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
         lqw.orderByAsc(TestDemo::getId);
         return lqw;
     }

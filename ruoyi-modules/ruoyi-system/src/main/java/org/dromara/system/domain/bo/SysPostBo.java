@@ -9,6 +9,8 @@ import org.dromara.system.domain.SysPost;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 岗位信息业务对象 sys_post
@@ -74,5 +76,10 @@ public class SysPostBo implements Serializable {
      * 备注
      */
     private String remark;
+
+    /**
+     * 请求参数
+     */
+    private Map<String, Object> params = new HashMap<>();
 
 }
