@@ -484,7 +484,7 @@ const submitForm = () => {
       }
       proxy?.#[[$modal]]#.msgSuccess("操作成功");
       dialog.visible = false;
-      getList();
+      await getList();
     }
   });
 }
