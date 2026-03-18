@@ -8,7 +8,9 @@ import cn.hutool.crypto.digest.BCrypt;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.constant.CacheConstants;
 import org.dromara.common.core.constant.SystemConstants;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.utils.StreamUtils;
@@ -16,12 +18,12 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.excel.core.ExcelResult;
 import org.dromara.common.excel.utils.ExcelUtil;
-import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.helper.DataPermissionHelper;
+import org.dromara.common.redis.annotation.RepeatSubmit;
+import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysDeptBo;
@@ -61,7 +63,7 @@ public class SysUserController extends BaseController {
     /**
      * 分页查询用户列表。
      *
-     * @param user 用户查询条件
+     * @param user      用户查询条件
      * @param pageQuery 分页参数
      * @return 用户分页列表
      */
@@ -74,7 +76,7 @@ public class SysUserController extends BaseController {
     /**
      * 导出符合条件的用户列表。
      *
-     * @param user 用户查询条件
+     * @param user     用户查询条件
      * @param response HTTP 响应
      */
     @Log(title = "用户管理", businessType = BusinessType.EXPORT)
@@ -268,6 +270,28 @@ public class SysUserController extends BaseController {
         userService.checkUserAllowed(user.getUserId());
         userService.checkUserDataScope(user.getUserId());
         return toAjax(userService.updateUserStatus(user.getUserId(), user.getStatus()));
+    }
+
+    /**
+     * 解锁用户
+     *
+     * @param userId 用户ID
+     * @return 操作结果
+     */
+    @SaCheckPermission("system:user:unlock")
+    @Log(title = "用户解锁", businessType = BusinessType.OTHER)
+    @RepeatSubmit()
+    @GetMapping("/unlock/{userId}")
+    public R<Void> unlock(@PathVariable Long userId) {
+        SysUserVo user = userService.selectUserById(userId);
+        if (ObjectUtil.isNull(user)) {
+            return R.fail("用户不存在");
+        }
+        String loginName = CacheConstants.PWD_ERR_CNT_KEY + user.getUserName();
+        if (RedisUtils.hasKey(loginName)) {
+            RedisUtils.deleteObject(loginName);
+        }
+        return R.ok();
     }
 
     /**
