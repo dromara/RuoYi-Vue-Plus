@@ -1,15 +1,16 @@
 package org.dromara.demo.domain.vo;
 
+import io.github.linpeilie.annotations.AutoMapper;
+import lombok.Data;
 import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
 import org.apache.fesod.sheet.annotation.ExcelProperty;
 import org.apache.fesod.sheet.annotation.format.DateTimeFormat;
 import org.dromara.common.excel.annotation.ExcelNotation;
 import org.dromara.common.excel.annotation.ExcelRequired;
 import org.dromara.common.translation.annotation.Translation;
+import org.dromara.common.translation.collection.TranslationCollection;
 import org.dromara.common.translation.constant.TransConstant;
 import org.dromara.demo.domain.TestDemo;
-import io.github.linpeilie.annotations.AutoMapper;
-import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -22,6 +23,7 @@ import java.util.Date;
  * @author Lion Li
  * @date 2021-07-26
  */
+@TranslationCollection(type = "test")
 @Data
 @ExcelIgnoreUnannotated
 @AutoMapper(target = TestDemo.class)
