@@ -224,6 +224,13 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             log.warn("未找到对应的流程实例信息，无法执行删除操作。");
             return false;
         }
+        String userId = LoginHelper.getUserIdStr();
+        for (FlowInstance instance : flowInstances) {
+            if (LoginHelper.isSuperAdmin() || instance.getCreateBy().equals(userId)) {
+                continue;
+            }
+            throw new ServiceException("权限不足，无法删除流程实例信息!");
+        }
         return insService.remove(StreamUtils.toList(flowInstances, FlowInstance::getId));
     }
 
@@ -241,6 +248,13 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         if (CollUtil.isEmpty(instances)) {
             log.warn("未找到对应的流程实例信息，无法执行删除操作。");
             return false;
+        }
+        String userId = LoginHelper.getUserIdStr();
+        for (Instance instance : instances) {
+            if (LoginHelper.isSuperAdmin() || instance.getCreateBy().equals(userId)) {
+                continue;
+            }
+            throw new ServiceException("权限不足，无法删除流程实例信息!");
         }
         // 获取定义信息
         Map<Long, Definition> definitionMap = StreamUtils.toMap(
@@ -276,6 +290,13 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         if (CollUtil.isEmpty(instances)) {
             log.warn("未找到对应的流程实例信息，无法执行删除操作。");
             return false;
+        }
+        String userId = LoginHelper.getUserIdStr();
+        for (Instance instance : instances) {
+            if (LoginHelper.isSuperAdmin() || instance.getCreateBy().equals(userId)) {
+                continue;
+            }
+            throw new ServiceException("权限不足，无法删除流程实例信息!");
         }
         // 获取定义信息
         Map<Long, Definition> definitionMap = StreamUtils.toMap(
