@@ -5,15 +5,15 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import lombok.RequiredArgsConstructor;
-import org.dromara.common.core.constant.CacheConstants;
+import org.dromara.common.core.constant.CacheNames;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.dto.UserOnlineDTO;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
-import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.SysUserOnline;
@@ -46,7 +46,7 @@ public class SysUserOnlineController extends BaseController {
     @GetMapping("/list")
     public R<PageResult<SysUserOnline>> list(String ipaddr, String userName) {
         // 获取所有未过期的 token
-        Collection<String> keys = RedisUtils.keys(CacheConstants.ONLINE_TOKEN_KEY + "*");
+        Collection<String> keys = RedisUtils.keys(CacheNames.ONLINE_TOKEN_KEY + "*");
         List<UserOnlineDTO> userOnlineDTOList = new ArrayList<>();
         for (String key : keys) {
             String token = StringUtils.substringAfterLast(key, ":");
@@ -54,7 +54,7 @@ public class SysUserOnlineController extends BaseController {
             if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
                 continue;
             }
-            userOnlineDTOList.add(RedisUtils.getCacheObject(CacheConstants.ONLINE_TOKEN_KEY + token));
+            userOnlineDTOList.add(RedisUtils.getCacheObject(CacheNames.ONLINE_TOKEN_KEY + token));
         }
         if (StringUtils.isNotEmpty(ipaddr) && StringUtils.isNotEmpty(userName)) {
             userOnlineDTOList = StreamUtils.filter(userOnlineDTOList, userOnline ->
@@ -105,7 +105,7 @@ public class SysUserOnlineController extends BaseController {
         List<String> tokenIds = StpUtil.getTokenValueListByLoginId(StpUtil.getLoginIdAsString());
         List<UserOnlineDTO> userOnlineDTOList = tokenIds.stream()
             .filter(token -> StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) >= -1)
-            .map(token -> (UserOnlineDTO) RedisUtils.getCacheObject(CacheConstants.ONLINE_TOKEN_KEY + token))
+            .map(token -> (UserOnlineDTO) RedisUtils.getCacheObject(CacheNames.ONLINE_TOKEN_KEY + token))
             .collect(Collectors.toList());
         //复制和处理 SysUserOnline 对象列表
         Collections.reverse(userOnlineDTOList);

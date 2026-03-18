@@ -39,7 +39,7 @@ public interface CacheNames {
     /**
      * 客户端
      */
-    String SYS_CLIENT = GlobalConstants.GLOBAL_REDIS_KEY + "sys_client#30d";
+    String SYS_CLIENT = "sys_client#30d";
 
     /**
      * 用户账户
@@ -74,11 +74,16 @@ public interface CacheNames {
     /**
      * OSS配置
      */
-    String SYS_OSS_CONFIG = GlobalConstants.GLOBAL_REDIS_KEY + "sys_oss_config";
+    String SYS_OSS_CONFIG = "sys_oss_config";
 
     /**
      * 在线用户
      */
-    String ONLINE_TOKEN = "online_tokens";
+    String ONLINE_TOKEN_KEY = "online_tokens:";
+
+    /**
+     * 登录账户密码错误次数 redis key
+     */
+    String PWD_ERR_CNT_KEY = "pwd_err_cnt:";
 
 }

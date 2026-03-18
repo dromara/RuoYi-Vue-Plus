@@ -10,7 +10,7 @@ import com.baomidou.lock.annotation.Lock4j;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthUser;
-import org.dromara.common.core.constant.CacheConstants;
+import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.domain.dto.PostDTO;
 import org.dromara.common.core.domain.dto.RoleDTO;
@@ -33,8 +33,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
 /**
@@ -193,7 +191,7 @@ public class SysLoginService {
      * @param supplier  返回 {@code true} 表示本次认证失败
      */
     public void checkLogin(LoginType loginType, String username, Supplier<Boolean> supplier) {
-        String errorKey = CacheConstants.PWD_ERR_CNT_KEY + username;
+        String errorKey = CacheNames.PWD_ERR_CNT_KEY + username;
         String loginFail = Constants.LOGIN_FAIL;
 
         // 获取用户登录错误次数，默认为0 (可自定义限制策略 例如: key + username + ip)

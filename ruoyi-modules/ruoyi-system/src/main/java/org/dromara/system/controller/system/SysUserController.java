@@ -8,7 +8,7 @@ import cn.hutool.crypto.digest.BCrypt;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.dromara.common.core.constant.CacheConstants;
+import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
@@ -287,7 +287,7 @@ public class SysUserController extends BaseController {
         if (ObjectUtil.isNull(user)) {
             return R.fail("用户不存在");
         }
-        String loginName = CacheConstants.PWD_ERR_CNT_KEY + user.getUserName();
+        String loginName = CacheNames.PWD_ERR_CNT_KEY + user.getUserName();
         if (RedisUtils.hasKey(loginName)) {
             RedisUtils.deleteObject(loginName);
         }
