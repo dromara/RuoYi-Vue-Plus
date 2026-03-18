@@ -278,7 +278,7 @@ public class SysUserController extends BaseController {
      * @param userId 用户ID
      * @return 操作结果
      */
-    @SaCheckPermission("system:user:unlock")
+    @SaCheckPermission("system:user:edit")
     @Log(title = "用户解锁", businessType = BusinessType.OTHER)
     @RepeatSubmit()
     @GetMapping("/unlock/{userId}")
