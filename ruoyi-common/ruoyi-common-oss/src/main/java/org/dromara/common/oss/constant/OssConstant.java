@@ -32,9 +32,4 @@ public interface OssConstant {
      */
     String[] CLOUD_SERVICE = new String[] {"aliyun", "qcloud", "qiniu", "obs"};
 
-    /**
-     * https 状态
-     */
-    String IS_HTTPS = "Y";
-
 }

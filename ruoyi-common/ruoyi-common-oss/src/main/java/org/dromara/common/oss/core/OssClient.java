@@ -4,6 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
@@ -542,7 +543,7 @@ public class OssClient {
      * @return 协议头部，根据是否使用 HTTPS 返回 "https://" 或 "http://"
      */
     public String getIsHttps() {
-        return OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? Constants.HTTPS : Constants.HTTP;
+        return SystemConstants.YES.equals(properties.getIsHttps()) ? Constants.HTTPS : Constants.HTTP;
     }
 
     /**

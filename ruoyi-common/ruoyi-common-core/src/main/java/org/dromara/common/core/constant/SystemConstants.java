@@ -18,24 +18,14 @@ public interface SystemConstants {
     String DISABLE = "1";
 
     /**
-     * 是否为系统默认（是）
+     * 是
      */
     String YES = "Y";
 
     /**
-     * 是否为系统默认（否）
+     * 否
      */
     String NO = "N";
-
-    /**
-     * 是否菜单外链（是）
-     */
-    String YES_FRAME = "Y";
-
-    /**
-     * 是否菜单外链（否）
-     */
-    String NO_FRAME = "N";
 
     /**
      * 菜单类型（目录）

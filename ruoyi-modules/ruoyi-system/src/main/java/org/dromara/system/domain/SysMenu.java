@@ -135,7 +135,7 @@ public class SysMenu extends BaseEntity {
         }
         // 非外链并且是一级目录（类型为目录）
         if (Constants.TOP_PARENT_ID.equals(getParentId()) && SystemConstants.TYPE_DIR.equals(getMenuType())
-            && SystemConstants.NO_FRAME.equals(getIsFrame())) {
+            && SystemConstants.NO.equals(getIsFrame())) {
             routerPath = "/" + this.path;
         }
         // 非外链并且是一级目录（类型为菜单）
@@ -164,14 +164,14 @@ public class SysMenu extends BaseEntity {
      * 是否为菜单内部跳转
      */
     public boolean isMenuFrame() {
-        return Constants.TOP_PARENT_ID.equals(getParentId()) && SystemConstants.TYPE_MENU.equals(menuType) && isFrame.equals(SystemConstants.NO_FRAME);
+        return Constants.TOP_PARENT_ID.equals(getParentId()) && SystemConstants.TYPE_MENU.equals(menuType) && isFrame.equals(SystemConstants.NO);
     }
 
     /**
      * 是否为内链组件
      */
     public boolean isInnerLink() {
-        return isFrame.equals(SystemConstants.NO_FRAME) && StringUtils.ishttp(path);
+        return isFrame.equals(SystemConstants.NO) && StringUtils.ishttp(path);
     }
 
     /**

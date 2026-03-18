@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.CacheNames;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.ObjectUtils;
@@ -212,7 +213,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
     public int updateOssConfigStatus(SysOssConfigBo bo) {
         SysOssConfig sysOssConfig = MapstructUtils.convert(bo, SysOssConfig.class);
         int row = baseMapper.update(null, new LambdaUpdateWrapper<SysOssConfig>()
-            .set(SysOssConfig::getStatus, "Y"));
+            .set(SysOssConfig::getStatus, SystemConstants.YES));
         row += baseMapper.updateById(sysOssConfig);
         if (row > 0) {
             RedisUtils.setCacheObject(OssConstant.DEFAULT_CONFIG_KEY, sysOssConfig.getConfigKey());
