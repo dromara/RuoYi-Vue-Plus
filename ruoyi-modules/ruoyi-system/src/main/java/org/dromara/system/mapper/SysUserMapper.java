@@ -61,7 +61,8 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     /**
      * 根据条件分页查询用户列表
      *
-     * @param queryWrapper 查询条件
+     * @param user      查询条件
+     * @param deptIds   部门ID集合
      * @return 用户信息集合信息
      */
     @DataPermission({
@@ -79,7 +80,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
             .like(StringUtils.isNotBlank(user.getUserName()), "u", SysUser::getUserName, user.getUserName())
             .like(StringUtils.isNotBlank(user.getNickName()), "u", SysUser::getNickName, user.getNickName())
             .eq(StringUtils.isNotBlank(user.getStatus()), "u", SysUser::getStatus, user.getStatus())
-            .like(StringUtils.isNotBlank(user.getPhonenumber()), "u", SysUser::getPhonenumber, user.getPhonenumber())
+            .like(StringUtils.isNotBlank(user.getPhoneNumber()), "u", SysUser::getPhoneNumber, user.getPhoneNumber())
             .between(user.getParams().get("beginTime") != null && user.getParams().get("endTime") != null,
                 "u", SysUser::getCreateTime, user.getParams().get("beginTime"), user.getParams().get("endTime"))
             .in(deptIds != null && !deptIds.isEmpty(), "u", SysUser::getDeptId, deptIds)
@@ -91,7 +92,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
      * 根据条件分页查询已配用户角色列表
      *
      * @param page         分页信息
-     * @param queryWrapper 查询条件
+     * @param user         查询条件
      * @return 用户信息集合信息
      */
     @DataPermission({
@@ -108,7 +109,9 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     /**
      * 根据条件分页查询未分配用户角色列表
      *
-     * @param queryWrapper 查询条件
+     * @param page    分页信息
+     * @param user    查询条件
+     * @param userIds 未分配用户角色的用户ID列表
      * @return 用户信息集合信息
      */
     @DataPermission({
@@ -163,7 +166,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     })
     int updateById(@Param(Constants.ENTITY) SysUser user);
 
-    private MPJLambdaWrapper<SysUser> buildUserRoleJoinWrapper(SysUserBo user) {
+    default MPJLambdaWrapper<SysUser> buildUserRoleJoinWrapper(SysUserBo user) {
         return JoinWrappers.lambda("u", SysUser.class)
             .distinct()
             .selectAll(SysUser.class)
@@ -173,7 +176,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
             .eq("u", SysUser::getDelFlag, SystemConstants.NORMAL)
             .like(StringUtils.isNotBlank(user.getUserName()), "u", SysUser::getUserName, user.getUserName())
             .eq(StringUtils.isNotBlank(user.getStatus()), "u", SysUser::getStatus, user.getStatus())
-            .like(StringUtils.isNotBlank(user.getPhonenumber()), "u", SysUser::getPhonenumber, user.getPhonenumber());
+            .like(StringUtils.isNotBlank(user.getPhoneNumber()), "u", SysUser::getPhoneNumber, user.getPhoneNumber());
     }
 
 }

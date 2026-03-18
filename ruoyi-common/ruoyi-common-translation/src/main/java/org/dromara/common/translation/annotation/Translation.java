@@ -30,7 +30,7 @@ public @interface Translation {
     String mapper() default "";
 
     /**
-     * 其他条件 例如: 字典type(sys_user_sex)
+     * 其他条件 例如: 字典type(sys_user_gender)
      */
     String other() default "";
 

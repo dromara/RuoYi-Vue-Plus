@@ -15,7 +15,7 @@ import java.lang.annotation.*;
 public @interface ExcelDictFormat {
 
     /**
-     * 如果是字典类型，请设置字典的type值 (如: sys_user_sex)
+     * 如果是字典类型，请设置字典的type值 (如: sys_user_gender)
      */
     String dictType() default "";
 

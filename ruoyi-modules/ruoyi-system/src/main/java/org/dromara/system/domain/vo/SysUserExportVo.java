@@ -57,7 +57,7 @@ public class SysUserExportVo implements Serializable {
      * 用户性别
      */
     @ExcelProperty(value = "用户性别", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(dictType = "sys_user_sex")
+    @ExcelDictFormat(dictType = "sys_user_gender")
     private String sex;
 
     /**

@@ -55,12 +55,12 @@ public class SysUser extends BaseEntity {
     /**
      * 手机号码
      */
-    private String phonenumber;
+    private String phoneNumber;
 
     /**
      * 用户性别
      */
-    private String sex;
+    private String gender;
 
     /**
      * 用户头像

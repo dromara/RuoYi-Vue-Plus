@@ -18,7 +18,7 @@ public class OssProperties {
     /**
      * 自定义域名
      */
-    private String domain;
+    private String domainUrl;
 
     /**
      * 前缀

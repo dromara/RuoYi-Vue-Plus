@@ -30,12 +30,12 @@ public interface SystemConstants {
     /**
      * 是否菜单外链（是）
      */
-    String YES_FRAME = "0";
+    String YES_FRAME = "Y";
 
     /**
      * 是否菜单外链（否）
      */
-    String NO_FRAME = "1";
+    String NO_FRAME = "N";
 
     /**
      * 菜单类型（目录）

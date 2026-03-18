@@ -76,7 +76,7 @@ public class SysOssConfigBo implements Serializable {
     /**
      * 自定义域名
      */
-    private String domain;
+    private String domainUrl;
 
     /**
      * 是否https（Y=是,N=否）
@@ -84,7 +84,7 @@ public class SysOssConfigBo implements Serializable {
     private String isHttps;
 
     /**
-     * 是否默认（0=是,1=否）
+     * 是否默认（Y=是,N=否）
      */
     private String status;
 

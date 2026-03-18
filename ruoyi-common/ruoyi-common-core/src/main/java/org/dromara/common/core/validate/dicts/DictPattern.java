@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 public @interface DictPattern {
 
     /**
-     * 字典类型，如 "sys_user_sex"
+     * 字典类型，如 "sys_user_gender"
      */
     String dictType();
 

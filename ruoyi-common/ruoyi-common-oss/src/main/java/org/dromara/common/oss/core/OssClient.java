@@ -447,7 +447,7 @@ public class OssClient {
      */
     public String getDomain() {
         // 从配置中获取域名、终端点、是否使用 HTTPS 等信息
-        String domain = properties.getDomain();
+        String domain = properties.getDomainUrl();
         String endpoint = properties.getEndpoint();
         String header = getIsHttps();
 
@@ -485,7 +485,7 @@ public class OssClient {
      * @return 文件路径
      */
     public String getUrl() {
-        String domain = properties.getDomain();
+        String domain = properties.getDomainUrl();
         String endpoint = properties.getEndpoint();
         String header = getIsHttps();
         // 云服务商直接返回

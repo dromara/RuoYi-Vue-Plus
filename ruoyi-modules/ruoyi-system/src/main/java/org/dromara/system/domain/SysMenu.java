@@ -61,12 +61,12 @@ public class SysMenu extends BaseEntity {
     private String queryParam;
 
     /**
-     * 是否为外链（0是 1否）
+     * 是否为外链（Y是 N否）
      */
     private String isFrame;
 
     /**
-     * 是否缓存（0缓存 1不缓存）
+     * 是否缓存（Y缓存 N不缓存）
      */
     private String isCache;
 
