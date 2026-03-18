@@ -30,17 +30,6 @@ public class PageResult<T> implements Serializable {
     private List<T> rows;
 
     /**
-     * 分页
-     *
-     * @param list  列表数据
-     * @param total 总记录数
-     */
-    public PageResult(List<T> list, long total) {
-        this.rows = list;
-        this.total = total;
-    }
-
-    /**
      * 根据分页对象构建表格分页数据对象
      */
     public static <T> PageResult<T> build(List<T> list, long total) {
