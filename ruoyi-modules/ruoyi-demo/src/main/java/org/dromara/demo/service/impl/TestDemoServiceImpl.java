@@ -9,7 +9,6 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.translation.collection.TranslationCollectionWrapper;
 import org.dromara.demo.domain.TestDemo;
 import org.dromara.demo.domain.bo.TestDemoBo;
 import org.dromara.demo.domain.vo.TestDemoVo;
@@ -54,7 +53,7 @@ public class TestDemoServiceImpl implements ITestDemoService {
     public PageResult<TestDemoVo> queryPageList(TestDemoBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestDemo> lqw = buildQueryWrapper(bo);
         Page<TestDemoVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
-        return PageResult.build(TranslationCollectionWrapper.form(result.getRecords()), result.getTotal());
+        return PageResult.build(result.getRecords(), result.getTotal());
     }
 
     /**
