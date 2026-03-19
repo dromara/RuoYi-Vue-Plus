@@ -1078,7 +1078,7 @@ create table if not exists sys_oss_config
     bucket_name   varchar(255) default ''::varchar,
     prefix        varchar(255) default ''::varchar,
     endpoint      varchar(255) default ''::varchar,
-    domainUrl     varchar(255) default ''::varchar,
+    domain_url    varchar(255) default ''::varchar,
     is_https      char         default 'N'::bpchar,
     region        varchar(255) default ''::varchar,
     access_policy char(1)      default '1'::bpchar not null,
@@ -1101,7 +1101,7 @@ comment on column sys_oss_config.secret_key     is '秘钥';
 comment on column sys_oss_config.bucket_name    is '桶名称';
 comment on column sys_oss_config.prefix         is '前缀';
 comment on column sys_oss_config.endpoint       is '访问站点';
-comment on column sys_oss_config.domain         is '自定义域名';
+comment on column sys_oss_config.domain_url     is '自定义域名';
 comment on column sys_oss_config.is_https       is '是否https（Y=是,N=否）';
 comment on column sys_oss_config.region         is '域';
 comment on column sys_oss_config.access_policy  is '桶权限类型(0=private 1=public 2=custom)';

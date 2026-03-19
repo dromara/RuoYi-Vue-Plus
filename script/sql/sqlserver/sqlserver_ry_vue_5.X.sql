@@ -2424,7 +2424,7 @@ EXEC sys.sp_addextendedproperty
     'MS_Description', N'手机号码' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_user',
-    'COLUMN', N'phoneNumber'
+    'COLUMN', N'phone_number'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'用户性别（0男 1女 2未知）' ,
@@ -2693,7 +2693,7 @@ CREATE TABLE sys_oss_config
     bucket_name   nvarchar(255) DEFAULT ''    NULL,
     prefix        nvarchar(255) DEFAULT ''    NULL,
     endpoint      nvarchar(255) DEFAULT ''    NULL,
-    domainUrl     nvarchar(255) DEFAULT ''    NULL,
+    domain_url    nvarchar(255) DEFAULT ''    NULL,
     is_https      nchar(1)      DEFAULT ('N') NULL,
     region        nvarchar(255) DEFAULT ''    NULL,
     access_policy nchar(1)      DEFAULT ('1') NOT NULL,
@@ -2758,7 +2758,7 @@ EXEC sp_addextendedproperty
      'MS_Description', N'自定义域名',
      'SCHEMA', N'dbo',
      'TABLE', N'sys_oss_config',
-     'COLUMN', N'domain'
+     'COLUMN', N'domain_url'
 GO
 EXEC sp_addextendedproperty
     'MS_Description', N'是否https（Y=是,N=否）',
