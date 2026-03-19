@@ -1571,7 +1571,7 @@ INSERT sys_menu VALUES (11632, N'我的已办', 11618, 3, N'taskFinish', N'workf
 GO
 INSERT sys_menu VALUES (11633, N'我的抄送', 11618, 4, N'taskCopyList', N'workflow/task/taskCopyList', N'', N'N', N'N', N'C', N'0', N'0', N'', N'my-copy', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11620, N'流程定义', 11616, 3, N'processDefinition', N'workflow/processDefinition/index', N'', N'N', N'N', N'C', N'0', N'0', N'', N'process-definition', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11620, N'流程定义', 11616, 3, N'processDefinition', N'workflow/processDefinition/index', N'', N'N', N'N', N'C', N'0', N'0', N'workflow:definition:list', N'process-definition', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
 INSERT sys_menu VALUES (11621, N'流程实例', 11630, 1, N'processInstance', N'workflow/processInstance/index', N'', N'N', N'N', N'C', N'0', N'0', N'workflow:instance:list', N'tree-table', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
