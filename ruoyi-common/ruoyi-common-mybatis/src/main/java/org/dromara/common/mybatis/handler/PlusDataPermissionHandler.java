@@ -174,7 +174,13 @@ public class PlusDataPermissionHandler {
         return StringUtils.EMPTY;
     }
 
+    /**
+     * 获取当前登录用户信息
+     *
+     * @return 当前登录用户的LoginUser对象，可能为null（如未登录场景）
+     */
     private LoginUser currentUser() {
+        // 从数据权限助手缓存中获取当前登录用户
         LoginUser currentUser = DataPermissionHelper.getVariable("user");
         if (ObjectUtil.isNull(currentUser)) {
             currentUser = LoginHelper.getLoginUser();

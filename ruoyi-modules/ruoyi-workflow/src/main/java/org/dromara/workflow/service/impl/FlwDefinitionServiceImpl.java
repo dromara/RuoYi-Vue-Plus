@@ -10,12 +10,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.warm.flow.core.dto.DefJson;
 import org.dromara.warm.flow.core.enums.NodeType;
 import org.dromara.warm.flow.core.enums.PublishStatus;
@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -184,7 +185,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean removeDef(List<Long> ids) {
+    public boolean removeDef(Collection<Long> ids) {
         LambdaQueryWrapper<FlowHisTask> wrapper = Wrappers.lambdaQuery();
         wrapper.in(FlowHisTask::getDefinitionId, ids);
         List<FlowHisTask> flowHisTasks = flowHisTaskMapper.selectList(wrapper);
@@ -197,7 +198,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
             }
         }
         try {
-            defService.removeDef(ids);
+            defService.removeDef((List<Long>) ids);
         } catch (Exception e) {
             log.error("Error removing flow definitions: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to remove flow definitions", e);

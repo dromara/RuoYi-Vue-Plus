@@ -1,9 +1,9 @@
 package org.dromara.system.domain.vo;
 
-import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
-import org.dromara.system.domain.SysOssConfig;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
+import org.dromara.system.domain.SysOssConfig;
 
 import java.io.Serial;
 import java.io.Serializable;

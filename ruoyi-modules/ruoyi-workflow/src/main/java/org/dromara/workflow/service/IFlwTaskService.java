@@ -1,9 +1,9 @@
 package org.dromara.workflow.service;
 
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.dto.StartProcessReturnDTO;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.warm.flow.core.entity.Node;
 import org.dromara.warm.flow.core.entity.Task;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
@@ -13,6 +13,7 @@ import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.FlowHisTaskVo;
 import org.dromara.workflow.domain.vo.FlowTaskVo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -98,7 +99,7 @@ public interface IFlwTaskService {
      * @param userId     用户id
      * @return 结果
      */
-    boolean updateAssignee(List<Long> taskIdList, String userId);
+    boolean updateAssignee(Collection<Long> taskIdList, String userId);
 
     /**
      * 驳回审批
@@ -111,8 +112,8 @@ public interface IFlwTaskService {
     /**
      * 获取可驳回的前置节点
      *
-     * @param taskId       任务id
-     * @param nowNodeCode  当前节点
+     * @param taskId      任务id
+     * @param nowNodeCode 当前节点
      * @return 结果
      */
     List<Node> getBackTaskNode(Long taskId, String nowNodeCode);
@@ -131,7 +132,7 @@ public interface IFlwTaskService {
      * @param taskIdList 任务id
      * @return 任务列表
      */
-    List<FlowTask> selectByIdList(List<Long> taskIdList);
+    List<FlowTask> selectByIdList(Collection<Long> taskIdList);
 
     /**
      * 按照任务id查询任务
@@ -171,7 +172,7 @@ public interface IFlwTaskService {
      * @param instanceIds 列表
      * @return 任务列表
      */
-    List<FlowTask> selectByInstIds(List<Long> instanceIds);
+    List<FlowTask> selectByInstIds(Collection<Long> instanceIds);
 
     /**
      * 判断流程是否已结束（即该流程实例下是否还有未完成的任务）

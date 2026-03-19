@@ -106,7 +106,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return 角色权限映射
      */
     @Override
-    public Map<Long, Set<String>> selectMenuPermsByRoleIds(List<Long> roleIds) {
+    public Map<Long, Set<String>> selectMenuPermsByRoleIds(Collection<Long> roleIds) {
         return baseMapper.selectMenuPermsByRoleIds(roleIds);
     }
 
@@ -256,7 +256,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return 结果
      */
     @Override
-    public boolean hasChildByMenuId(List<Long> menuIds) {
+    public boolean hasChildByMenuId(Collection<Long> menuIds) {
         return baseMapper.exists(new LambdaQueryWrapper<SysMenu>().in(SysMenu::getParentId, menuIds).notIn(SysMenu::getMenuId, menuIds));
     }
 
@@ -313,7 +313,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteMenuById(List<Long> menuIds) {
+    public void deleteMenuById(Collection<Long> menuIds) {
         baseMapper.deleteByIds(menuIds);
         roleMenuMapper.deleteByMenuIds(menuIds);
     }

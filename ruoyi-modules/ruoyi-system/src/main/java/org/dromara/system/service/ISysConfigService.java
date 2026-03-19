@@ -1,10 +1,11 @@
 package org.dromara.system.service;
 
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.system.domain.bo.SysConfigBo;
 import org.dromara.system.domain.vo.SysConfigVo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -75,7 +76,7 @@ public interface ISysConfigService {
      *
      * @param configIds 需要删除的参数ID
      */
-    void deleteConfigByIds(List<Long> configIds);
+    void deleteConfigByIds(Collection<Long> configIds);
 
     /**
      * 重置参数缓存数据

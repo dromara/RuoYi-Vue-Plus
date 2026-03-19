@@ -1,14 +1,14 @@
 package org.dromara.workflow.service;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.warm.flow.orm.entity.FlowDefinition;
 import org.dromara.workflow.domain.vo.FlowDefinitionVo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * 流程定义 服务层
@@ -67,6 +67,6 @@ public interface IFlwDefinitionService {
      * @param ids 流程定义id
      * @return 是否删除成功
      */
-    boolean removeDef(List<Long> ids);
+    boolean removeDef(Collection<Long> ids);
 
 }

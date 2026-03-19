@@ -1,8 +1,8 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.core.utils.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.utils.StringUtils;
 
 /**
  * 缓存信息

@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
-import org.dromara.workflow.domain.bo.FlowInstanceBo;
 import org.dromara.workflow.domain.vo.FlowInstanceVo;
 
 /**

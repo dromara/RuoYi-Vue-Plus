@@ -14,12 +14,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.SystemConstants;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.*;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.SysUserPost;
@@ -179,7 +179,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @return 用户列表信息
      */
     @Override
-    public List<SysUserVo> selectUserByIds(List<Long> userIds, Long deptId) {
+    public List<SysUserVo> selectUserByIds(Collection<Long> userIds, Long deptId) {
         return baseMapper.selectUserList(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName)
             .eq(SysUser::getStatus, SystemConstants.NORMAL)
@@ -648,7 +648,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @return 用户列表
      */
     @Override
-    public List<UserDTO> selectListByIds(List<Long> userIds) {
+    public List<UserDTO> selectListByIds(Collection<Long> userIds) {
         if (CollUtil.isEmpty(userIds)) {
             return List.of();
         }
@@ -669,7 +669,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @return 用户ids
      */
     @Override
-    public List<Long> selectUserIdsByRoleIds(List<Long> roleIds) {
+    public List<Long> selectUserIdsByRoleIds(Collection<Long> roleIds) {
         if (CollUtil.isEmpty(roleIds)) {
             return List.of();
         }
@@ -685,7 +685,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @return 用户
      */
     @Override
-    public List<UserDTO> selectUsersByRoleIds(List<Long> roleIds) {
+    public List<UserDTO> selectUsersByRoleIds(Collection<Long> roleIds) {
         if (CollUtil.isEmpty(roleIds)) {
             return List.of();
         }
@@ -707,7 +707,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @return 用户
      */
     @Override
-    public List<UserDTO> selectUsersByDeptIds(List<Long> deptIds) {
+    public List<UserDTO> selectUsersByDeptIds(Collection<Long> deptIds) {
         if (CollUtil.isEmpty(deptIds)) {
             return List.of();
         }
@@ -725,7 +725,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @return 用户
      */
     @Override
-    public List<UserDTO> selectUsersByPostIds(List<Long> postIds) {
+    public List<UserDTO> selectUsersByPostIds(Collection<Long> postIds) {
         if (CollUtil.isEmpty(postIds)) {
             return List.of();
         }
@@ -747,7 +747,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @return Map，其中 key 为用户 ID，value 为对应的用户昵称
      */
     @Override
-    public Map<Long, String> selectUserNicksByIds(List<Long> userIds) {
+    public Map<Long, String> selectUserNicksByIds(Collection<Long> userIds) {
         if (CollUtil.isEmpty(userIds)) {
             return Collections.emptyMap();
         }

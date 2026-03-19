@@ -2,6 +2,7 @@ package org.dromara.common.core.service;
 
 import org.dromara.common.core.domain.dto.UserDTO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +59,7 @@ public interface UserService {
      * @param userIds 用户ids
      * @return 用户列表
      */
-    List<UserDTO> selectListByIds(List<Long> userIds);
+    List<UserDTO> selectListByIds(Collection<Long> userIds);
 
     /**
      * 通过角色ID查询用户ID
@@ -66,7 +67,7 @@ public interface UserService {
      * @param roleIds 角色ids
      * @return 用户ids
      */
-    List<Long> selectUserIdsByRoleIds(List<Long> roleIds);
+    List<Long> selectUserIdsByRoleIds(Collection<Long> roleIds);
 
     /**
      * 通过角色ID查询用户
@@ -74,7 +75,7 @@ public interface UserService {
      * @param roleIds 角色ids
      * @return 用户
      */
-    List<UserDTO> selectUsersByRoleIds(List<Long> roleIds);
+    List<UserDTO> selectUsersByRoleIds(Collection<Long> roleIds);
 
     /**
      * 通过部门ID查询用户
@@ -82,7 +83,7 @@ public interface UserService {
      * @param deptIds 部门ids
      * @return 用户
      */
-    List<UserDTO> selectUsersByDeptIds(List<Long> deptIds);
+    List<UserDTO> selectUsersByDeptIds(Collection<Long> deptIds);
 
     /**
      * 通过岗位ID查询用户
@@ -90,7 +91,7 @@ public interface UserService {
      * @param postIds 岗位ids
      * @return 用户
      */
-    List<UserDTO> selectUsersByPostIds(List<Long> postIds);
+    List<UserDTO> selectUsersByPostIds(Collection<Long> postIds);
 
     /**
      * 根据用户 ID 列表查询用户昵称映射关系
@@ -98,6 +99,6 @@ public interface UserService {
      * @param userIds 用户 ID 列表
      * @return Map，其中 key 为用户 ID，value 为对应的用户昵称
      */
-    Map<Long, String> selectUserNicksByIds(List<Long> userIds);
+    Map<Long, String> selectUserNicksByIds(Collection<Long> userIds);
 
 }

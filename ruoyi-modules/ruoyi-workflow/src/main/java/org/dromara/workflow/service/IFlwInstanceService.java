@@ -1,7 +1,7 @@
 package org.dromara.workflow.service;
 
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
 import org.dromara.workflow.domain.bo.FlowCancelBo;
 import org.dromara.workflow.domain.bo.FlowInstanceBo;
@@ -9,6 +9,7 @@ import org.dromara.workflow.domain.bo.FlowInvalidBo;
 import org.dromara.workflow.domain.bo.FlowVariableBo;
 import org.dromara.workflow.domain.vo.FlowInstanceVo;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +68,7 @@ public interface IFlwInstanceService {
      * @param instanceIds 实例id
      * @return 结果
      */
-    List<FlowInstance> selectInstListByIdList(List<Long> instanceIds);
+    List<FlowInstance> selectInstListByIdList(Collection<Long> instanceIds);
 
     /**
      * 按照业务id删除流程实例
@@ -83,7 +84,7 @@ public interface IFlwInstanceService {
      * @param instanceIds 实例id
      * @return 结果
      */
-    boolean deleteByInstanceIds(List<Long> instanceIds);
+    boolean deleteByInstanceIds(Collection<Long> instanceIds);
 
     /**
      * 按照实例id删除已完成得流程实例
@@ -91,7 +92,7 @@ public interface IFlwInstanceService {
      * @param instanceIds 删除的实例id
      * @return 删除结果
      */
-    boolean deleteHisByInstanceIds(List<Long> instanceIds);
+    boolean deleteHisByInstanceIds(Collection<Long> instanceIds);
 
     /**
      * 撤销流程

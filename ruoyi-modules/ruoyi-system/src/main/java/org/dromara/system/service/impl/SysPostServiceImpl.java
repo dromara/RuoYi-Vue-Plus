@@ -7,13 +7,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.PostService;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.system.domain.SysPost;
 import org.dromara.system.domain.SysUserPost;
 import org.dromara.system.domain.bo.SysPostBo;
@@ -24,6 +24,7 @@ import org.dromara.system.mapper.SysUserPostMapper;
 import org.dromara.system.service.ISysPostService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +146,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      * @return 岗位列表信息
      */
     @Override
-    public List<SysPostVo> selectPostByIds(List<Long> postIds) {
+    public List<SysPostVo> selectPostByIds(Collection<Long> postIds) {
         return baseMapper.selectVoList(new LambdaQueryWrapper<SysPost>()
             .select(SysPost::getPostId, SysPost::getPostName, SysPost::getPostCode)
             .eq(SysPost::getStatus, SystemConstants.NORMAL)
@@ -221,7 +222,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      * @return 结果
      */
     @Override
-    public int deletePostByIds(List<Long> postIds) {
+    public int deletePostByIds(Collection<Long> postIds) {
         List<SysPost> list = baseMapper.selectByIds(postIds);
         for (SysPost post : list) {
             if (this.countUserPostById(post.getPostId()) > 0) {
@@ -262,7 +263,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      * @return Map，其中 key 为岗位 ID，value 为对应的岗位名称
      */
     @Override
-    public Map<Long, String> selectPostNamesByIds(List<Long> postIds) {
+    public Map<Long, String> selectPostNamesByIds(Collection<Long> postIds) {
         if (CollUtil.isEmpty(postIds)) {
             return Collections.emptyMap();
         }

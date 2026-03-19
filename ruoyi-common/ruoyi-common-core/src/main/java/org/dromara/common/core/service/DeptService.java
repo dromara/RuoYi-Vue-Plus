@@ -2,6 +2,7 @@ package org.dromara.common.core.service;
 
 import org.dromara.common.core.domain.dto.DeptDTO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,6 @@ public interface DeptService {
      * @param deptIds 部门 ID 列表
      * @return Map，其中 key 为部门 ID，value 为对应的部门名称
      */
-    Map<Long, String> selectDeptNamesByIds(List<Long> deptIds);
+    Map<Long, String> selectDeptNamesByIds(Collection<Long> deptIds);
 
 }

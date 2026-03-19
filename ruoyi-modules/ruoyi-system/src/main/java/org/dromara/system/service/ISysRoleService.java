@@ -1,11 +1,12 @@
 package org.dromara.system.service;
 
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.bo.SysRoleBo;
 import org.dromara.system.domain.vo.SysRoleVo;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -86,7 +87,7 @@ public interface ISysRoleService {
      * @param roleIds 角色ID串
      * @return 角色列表信息
      */
-    List<SysRoleVo> selectRoleByIds(List<Long> roleIds);
+    List<SysRoleVo> selectRoleByIds(Collection<Long> roleIds);
 
     /**
      * 校验角色名称是否唯一
@@ -123,7 +124,7 @@ public interface ISysRoleService {
      *
      * @param roleIds 角色ID列表（支持传单个ID）
      */
-    void checkRoleDataScope(List<Long> roleIds);
+    void checkRoleDataScope(Collection<Long> roleIds);
 
     /**
      * 通过角色ID查询角色使用数量
@@ -180,7 +181,7 @@ public interface ISysRoleService {
      * @param roleIds 需要删除的角色ID
      * @return 影响行数
      */
-    int deleteRoleByIds(List<Long> roleIds);
+    int deleteRoleByIds(Collection<Long> roleIds);
 
     /**
      * 取消授权用户角色
@@ -197,7 +198,7 @@ public interface ISysRoleService {
      * @param userIds 需要取消授权的用户数据ID
      * @return 影响行数
      */
-    int deleteAuthUsers(Long roleId, Long[] userIds);
+    int deleteAuthUsers(Long roleId, Collection<Long> userIds);
 
     /**
      * 批量选择授权用户角色
@@ -206,7 +207,7 @@ public interface ISysRoleService {
      * @param userIds 需要删除的用户数据ID
      * @return 影响行数
      */
-    int insertAuthUsers(Long roleId, Long[] userIds);
+    int insertAuthUsers(Long roleId, Collection<Long> userIds);
 
     /**
      * 根据角色ID清除该角色关联的所有在线用户的登录状态（踢出在线用户）
@@ -231,6 +232,6 @@ public interface ISysRoleService {
      *
      * @param userIds 需要清除的用户ID列表
      */
-    void cleanOnlineUser(List<Long> userIds);
+    void cleanOnlineUser(Collection<Long> userIds);
 
 }

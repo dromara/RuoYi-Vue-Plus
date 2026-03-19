@@ -11,6 +11,7 @@ import org.dromara.system.domain.SysPost;
 import org.dromara.system.domain.SysUserPost;
 import org.dromara.system.domain.vo.SysPostVo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -59,7 +60,7 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "create_by")
     })
-    default long selectPostCount(List<Long> postIds) {
+    default long selectPostCount(Collection<Long> postIds) {
         return this.selectCount(new LambdaQueryWrapper<SysPost>().in(SysPost::getPostId, postIds));
     }
 

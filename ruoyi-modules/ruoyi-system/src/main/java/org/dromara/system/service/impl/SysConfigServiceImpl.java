@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.SystemConstants;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.ConfigService;
 import org.dromara.common.core.utils.MapstructUtils;
@@ -17,7 +18,6 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.system.domain.SysConfig;
 import org.dromara.system.domain.bo.SysConfigBo;
@@ -28,6 +28,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -172,7 +173,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * @param configIds 需要删除的参数ID
      */
     @Override
-    public void deleteConfigByIds(List<Long> configIds) {
+    public void deleteConfigByIds(Collection<Long> configIds) {
         List<SysConfig> list = baseMapper.selectByIds(configIds);
         list.forEach(config -> {
             if (StringUtils.equals(SystemConstants.YES, config.getConfigType())) {

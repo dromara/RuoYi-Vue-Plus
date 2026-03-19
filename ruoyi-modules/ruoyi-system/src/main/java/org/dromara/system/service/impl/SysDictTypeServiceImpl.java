@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.dto.DictDataDTO;
 import org.dromara.common.core.domain.dto.DictTypeDTO;
 import org.dromara.common.core.exception.ServiceException;
@@ -18,7 +19,6 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.system.domain.SysDictData;
 import org.dromara.system.domain.SysDictType;
@@ -140,7 +140,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @param dictIds 需要删除的字典ID
      */
     @Override
-    public void deleteDictTypeByIds(List<Long> dictIds) {
+    public void deleteDictTypeByIds(Collection<Long> dictIds) {
         List<SysDictType> list = baseMapper.selectByIds(dictIds);
         list.forEach(x -> {
             boolean assigned = dictDataMapper.exists(new LambdaQueryWrapper<SysDictData>()
