@@ -323,8 +323,11 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         if (definition == null) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_DEF);
         }
-        String message = bo.message();
         String userIdStr = LoginHelper.getUserIdStr();
+        if (!LoginHelper.isSuperAdmin() && !instance.getCreateBy().equals(userIdStr)) {
+            throw new ServiceException("权限不足，无法撤销流程!");
+        }
+        String message = bo.message();
         BusinessStatusEnum.checkCancelStatus(instance.getFlowStatus());
         FlowParams flowParams = FlowParams.build()
             .message(message)
