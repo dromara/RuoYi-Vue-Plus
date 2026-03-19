@@ -1616,6 +1616,26 @@ GO
 INSERT sys_menu VALUES (11659, N'流程实例撤销', 11621, 7, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:cancel', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
 
+-- 流程定义管理相关按钮
+INSERT sys_menu VALUES (11644, N'流程定义查询', 11620, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:query', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (11645, N'流程定义新增', 11620, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:add', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (11646, N'流程定义修改', 11620, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:edit', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (11647, N'流程定义删除', 11620, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:remove', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (11648, N'流程定义导出', 11620, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:export', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (11649, N'流程定义导入', 11620, 6, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:import', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (11650, N'流程定义发布/取消发布', 11620, 7, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:publish', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (11651, N'流程定义复制', 11620, 8, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:copy', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (11652, N'流程定义激活/挂起', 11620, 9, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:active', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+GO
+
 INSERT sys_menu VALUES (11801, N'流程表达式', N'11616', 2, N'spel', N'workflow/spel/index', N'', N'N', N'Y', N'C', N'0', N'0', N'workflow:spel:list', N'input', 103, 1, GETDATE(), 1, GETDATE(), N'流程达式定义菜单');
 GO
 INSERT sys_menu VALUES (11802, N'流程spel表达式定义查询', N'11801', 1, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:query', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
