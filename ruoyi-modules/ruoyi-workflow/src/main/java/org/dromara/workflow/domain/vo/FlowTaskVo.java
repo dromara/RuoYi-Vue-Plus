@@ -210,13 +210,4 @@ public class FlowTaskVo implements Serializable {
     private String businessTitle;
     //业务扩展信息结束
 
-    /**
-     * 获取友好格式的创建时间。
-     *
-     * @return 格式化后的创建时间
-     */
-    public String getCreateTime() {
-        return DateUtils.formatFriendlyTime(createTime);
-    }
-
 }

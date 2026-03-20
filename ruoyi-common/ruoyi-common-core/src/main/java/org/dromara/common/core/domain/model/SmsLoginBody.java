@@ -17,7 +17,7 @@ public class SmsLoginBody extends LoginBody {
      * 手机号
      */
     @NotBlank(message = "{user.phonenumber.not.blank}")
-    private String phonenumber;
+    private String phoneNumber;
 
     /**
      * 短信code

@@ -63,10 +63,10 @@ public interface ISysUserService {
     /**
      * 通过手机号查询用户
      *
-     * @param phonenumber 手机号
+     * @param phoneNumber 手机号
      * @return 用户对象信息
      */
-    SysUserVo selectUserByPhonenumber(String phonenumber);
+    SysUserVo selectUserByPhoneNumber(String phoneNumber);
 
     /**
      * 通过用户ID查询用户

@@ -57,7 +57,7 @@ public class SysUserImportVo implements Serializable {
      * 手机号码
      */
     @ExcelProperty(value = "手机号码")
-    private String phonenumber;
+    private String phoneNumber;
 
     /**
      * 用户性别
