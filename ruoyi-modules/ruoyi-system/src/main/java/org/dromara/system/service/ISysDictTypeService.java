@@ -1,11 +1,12 @@
 package org.dromara.system.service;
 
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.system.domain.bo.SysDictTypeBo;
 import org.dromara.system.domain.vo.SysDictDataVo;
 import org.dromara.system.domain.vo.SysDictTypeVo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -68,7 +69,7 @@ public interface ISysDictTypeService {
      *
      * @param dictIds 需要删除的字典ID
      */
-    void deleteDictTypeByIds(List<Long> dictIds);
+    void deleteDictTypeByIds(Collection<Long> dictIds);
 
     /**
      * 重置字典缓存数据

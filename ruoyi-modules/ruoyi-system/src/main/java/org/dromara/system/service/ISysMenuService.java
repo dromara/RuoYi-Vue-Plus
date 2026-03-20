@@ -6,8 +6,9 @@ import org.dromara.system.domain.bo.SysMenuBo;
 import org.dromara.system.domain.vo.RouterVo;
 import org.dromara.system.domain.vo.SysMenuVo;
 
-import java.util.Map;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -56,7 +57,7 @@ public interface ISysMenuService {
      * @param roleIds 角色ID列表
      * @return 角色权限映射
      */
-    Map<Long, Set<String>> selectMenuPermsByRoleIds(List<Long> roleIds);
+    Map<Long, Set<String>> selectMenuPermsByRoleIds(Collection<Long> roleIds);
 
     /**
      * 根据用户ID查询菜单树信息
@@ -112,7 +113,7 @@ public interface ISysMenuService {
      * @param menuIds 菜单ID串
      * @return 结果 true 存在 false 不存在
      */
-    boolean hasChildByMenuId(List<Long> menuIds);
+    boolean hasChildByMenuId(Collection<Long> menuIds);
 
     /**
      * 查询菜单是否存在角色
@@ -152,7 +153,7 @@ public interface ISysMenuService {
      * @param menuIds 菜单ID串
      * @return 结果
      */
-    void deleteMenuById(List<Long> menuIds);
+    void deleteMenuById(Collection<Long> menuIds);
 
     /**
      * 校验菜单名称是否唯一

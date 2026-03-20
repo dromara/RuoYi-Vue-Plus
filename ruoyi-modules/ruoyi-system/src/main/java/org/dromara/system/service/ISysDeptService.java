@@ -1,11 +1,12 @@
 package org.dromara.system.service;
 
 import cn.hutool.core.lang.tree.Tree;
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.system.domain.bo.SysDeptBo;
 import org.dromara.system.domain.vo.SysDeptVo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -70,7 +71,7 @@ public interface ISysDeptService {
      * @param deptIds 部门id串
      * @return 部门列表信息
      */
-    List<SysDeptVo> selectDeptByIds(List<Long> deptIds);
+    List<SysDeptVo> selectDeptByIds(Collection<Long> deptIds);
 
     /**
      * 根据ID查询所有子部门数（正常状态）

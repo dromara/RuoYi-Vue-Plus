@@ -1,10 +1,11 @@
 package org.dromara.system.service;
 
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.system.domain.bo.SysPostBo;
 import org.dromara.system.domain.vo.SysPostVo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -68,7 +69,7 @@ public interface ISysPostService {
      * @param postIds 岗位id串
      * @return 岗位列表信息
      */
-    List<SysPostVo> selectPostByIds(List<Long> postIds);
+    List<SysPostVo> selectPostByIds(Collection<Long> postIds);
 
     /**
      * 校验岗位名称
@@ -116,7 +117,7 @@ public interface ISysPostService {
      * @param postIds 需要删除的岗位ID
      * @return 影响行数
      */
-    int deletePostByIds(List<Long> postIds);
+    int deletePostByIds(Collection<Long> postIds);
 
     /**
      * 新增保存岗位信息

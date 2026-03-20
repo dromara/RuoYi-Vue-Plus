@@ -4,13 +4,13 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.lang.tree.Tree;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.excel.utils.ExcelUtil;
-import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.bo.SysDeptBo;
@@ -24,6 +24,7 @@ import org.dromara.system.service.ISysUserService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ public class SysRoleController extends BaseController {
     /**
      * 分页查询角色列表。
      *
-     * @param role 查询条件
+     * @param role      查询条件
      * @param pageQuery 分页参数
      * @return 角色分页结果
      */
@@ -57,7 +58,7 @@ public class SysRoleController extends BaseController {
     /**
      * 导出角色信息列表。
      *
-     * @param role 查询条件
+     * @param role     查询条件
      * @param response HTTP 响应
      */
     @Log(title = "角色管理", businessType = BusinessType.EXPORT)
@@ -196,7 +197,7 @@ public class SysRoleController extends BaseController {
     /**
      * 查询已分配用户角色列表。
      *
-     * @param user 查询条件
+     * @param user      查询条件
      * @param pageQuery 分页参数
      * @return 用户分页结果
      */
@@ -209,7 +210,7 @@ public class SysRoleController extends BaseController {
     /**
      * 查询未分配用户角色列表。
      *
-     * @param user 查询条件
+     * @param user      查询条件
      * @param pageQuery 分页参数
      * @return 用户分页结果
      */
@@ -245,7 +246,7 @@ public class SysRoleController extends BaseController {
     @RepeatSubmit()
     @PutMapping("/authUser/cancelAll")
     public R<Void> cancelAuthUserAll(Long roleId, Long[] userIds) {
-        return toAjax(roleService.deleteAuthUsers(roleId, userIds));
+        return toAjax(roleService.deleteAuthUsers(roleId, List.of(userIds)));
     }
 
     /**
@@ -261,7 +262,7 @@ public class SysRoleController extends BaseController {
     @PutMapping("/authUser/selectAll")
     public R<Void> selectAuthUserAll(Long roleId, Long[] userIds) {
         roleService.checkRoleDataScope(roleId);
-        return toAjax(roleService.insertAuthUsers(roleId, userIds));
+        return toAjax(roleService.insertAuthUsers(roleId, List.of(userIds)));
     }
 
     /**
@@ -285,6 +286,7 @@ public class SysRoleController extends BaseController {
      * @param checkedKeys 选中部门列表
      * @param depts       下拉树结构列表
      */
-    public record DeptTreeSelectVo(List<Long> checkedKeys, List<Tree<Long>> depts) {}
+    public record DeptTreeSelectVo(Collection<Long> checkedKeys, List<Tree<Long>> depts) {
+    }
 
 }

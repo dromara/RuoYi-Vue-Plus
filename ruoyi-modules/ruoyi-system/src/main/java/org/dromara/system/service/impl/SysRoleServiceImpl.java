@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.SystemConstants;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.RoleService;
@@ -20,7 +21,6 @@ import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.SysRole;
 import org.dromara.system.domain.SysRoleDept;
@@ -185,7 +185,7 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
      * @return 角色列表信息
      */
     @Override
-    public List<SysRoleVo> selectRoleByIds(List<Long> roleIds) {
+    public List<SysRoleVo> selectRoleByIds(Collection<Long> roleIds) {
         return baseMapper.selectRoleList(new LambdaQueryWrapper<SysRole>()
             .eq(SysRole::getStatus, SystemConstants.NORMAL)
             .in(CollUtil.isNotEmpty(roleIds), SysRole::getRoleId, roleIds));
@@ -268,7 +268,7 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
      * @param roleIds 角色ID列表（支持传单个ID）
      */
     @Override
-    public void checkRoleDataScope(List<Long> roleIds) {
+    public void checkRoleDataScope(Collection<Long> roleIds) {
         if (CollUtil.isEmpty(roleIds) || LoginHelper.isSuperAdmin()) {
             return;
         }
@@ -431,7 +431,7 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
     @CacheEvict(cacheNames = CacheNames.SYS_ROLE_CUSTOM, allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteRoleByIds(List<Long> roleIds) {
+    public int deleteRoleByIds(Collection<Long> roleIds) {
         this.checkRoleDataScope(roleIds);
         List<SysRole> roles = baseMapper.selectByIds(roleIds);
         for (SysRole role : roles) {
@@ -475,16 +475,15 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
      * @return 结果
      */
     @Override
-    public int deleteAuthUsers(Long roleId, Long[] userIds) {
-        List<Long> ids = List.of(userIds);
-        if (ids.contains(LoginHelper.getUserId())) {
+    public int deleteAuthUsers(Long roleId, Collection<Long> userIds) {
+        if (userIds.contains(LoginHelper.getUserId())) {
             throw new ServiceException("不允许修改当前用户角色!");
         }
         int rows = userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
             .eq(SysUserRole::getRoleId, roleId)
-            .in(SysUserRole::getUserId, ids));
+            .in(SysUserRole::getUserId, userIds));
         if (rows > 0) {
-            cleanOnlineUser(ids);
+            cleanOnlineUser(userIds);
         }
         return rows;
     }
@@ -497,14 +496,13 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
      * @return 结果
      */
     @Override
-    public int insertAuthUsers(Long roleId, Long[] userIds) {
+    public int insertAuthUsers(Long roleId, Collection<Long> userIds) {
         // 新增用户与角色管理
         int rows = 1;
-        List<Long> ids = List.of(userIds);
-        if (ids.contains(LoginHelper.getUserId())) {
+        if (userIds.contains(LoginHelper.getUserId())) {
             throw new ServiceException("不允许修改当前用户角色!");
         }
-        List<SysUserRole> list = StreamUtils.toList(ids, userId -> {
+        List<SysUserRole> list = StreamUtils.toList(userIds, userId -> {
             SysUserRole ur = new SysUserRole();
             ur.setUserId(userId);
             ur.setRoleId(roleId);
@@ -514,7 +512,7 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
             rows = userRoleMapper.insertBatch(list) ? list.size() : 0;
         }
         if (rows > 0) {
-            cleanOnlineUser(ids);
+            cleanOnlineUser(userIds);
         }
         return rows;
     }
@@ -572,7 +570,7 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
      * @param userIds 需要清除的用户ID列表
      */
     @Override
-    public void cleanOnlineUser(List<Long> userIds) {
+    public void cleanOnlineUser(Collection<Long> userIds) {
         List<String> keys = StpUtil.searchTokenValue("", 0, -1, false);
         if (CollUtil.isEmpty(keys)) {
             return;
@@ -604,7 +602,7 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
      * @return Map，其中 key 为角色 ID，value 为对应的角色名称
      */
     @Override
-    public Map<Long, String> selectRoleNamesByIds(List<Long> roleIds) {
+    public Map<Long, String> selectRoleNamesByIds(Collection<Long> roleIds) {
         if (CollUtil.isEmpty(roleIds)) {
             return Collections.emptyMap();
         }

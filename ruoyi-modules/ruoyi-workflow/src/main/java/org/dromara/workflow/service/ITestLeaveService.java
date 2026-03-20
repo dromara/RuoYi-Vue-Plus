@@ -1,10 +1,11 @@
 package org.dromara.workflow.service;
 
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.workflow.domain.bo.TestLeaveBo;
 import org.dromara.workflow.domain.vo.TestLeaveVo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -70,5 +71,5 @@ public interface ITestLeaveService {
      * @param ids 主键集合
      * @return 删除结果
      */
-    Boolean deleteWithValidByIds(List<Long> ids);
+    Boolean deleteWithValidByIds(Collection<Long> ids);
 }

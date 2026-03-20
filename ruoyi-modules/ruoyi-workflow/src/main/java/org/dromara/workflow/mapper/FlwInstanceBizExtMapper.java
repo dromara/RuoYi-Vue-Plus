@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * 流程实例业务扩展Mapper接口
@@ -53,7 +53,7 @@ public interface FlwInstanceBizExtMapper extends BaseMapperPlus<FlowInstanceBizE
      * @param instanceIds 流程实例ID列表
      * @return 删除的行数
      */
-    default int deleteByInstIds(List<Long> instanceIds) {
+    default int deleteByInstIds(Collection<Long> instanceIds) {
         return this.delete(new LambdaQueryWrapper<FlowInstanceBizExt>()
             .in(FlowInstanceBizExt::getInstanceId, instanceIds));
     }

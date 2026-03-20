@@ -13,6 +13,7 @@ import org.dromara.system.domain.SysRole;
 import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.vo.SysRoleVo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -61,7 +62,7 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRole, SysRoleVo> {
         @DataColumn(key = "deptName", value = "create_dept"),
         @DataColumn(key = "userName", value = "create_by")
     })
-    default long selectRoleCount(List<Long> roleIds) {
+    default long selectRoleCount(Collection<Long> roleIds) {
         return this.selectCount(new LambdaQueryWrapper<SysRole>().in(SysRole::getRoleId, roleIds));
     }
 

@@ -11,12 +11,12 @@ import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.constant.ExceptionCons;
@@ -206,7 +206,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * @return 实例列表
      */
     @Override
-    public List<FlowInstance> selectInstListByIdList(List<Long> instanceIds) {
+    public List<FlowInstance> selectInstListByIdList(Collection<Long> instanceIds) {
         return flowInstanceMapper.selectByIds(instanceIds);
     }
 
@@ -237,7 +237,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteByInstanceIds(List<Long> instanceIds) {
+    public boolean deleteByInstanceIds(Collection<Long> instanceIds) {
         // 获取实例信息
         List<FlowInstance> flowInstances = flowInstanceMapper.selectByIds(instanceIds);
         if (CollUtil.isEmpty(flowInstances)) {
@@ -247,7 +247,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         // 发送事件
         processDeleteHandler(flowInstances);
         // 删除实例
-        return insService.remove(instanceIds);
+        return insService.remove((List<Long>) instanceIds);
     }
 
     /**
@@ -258,7 +258,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteHisByInstanceIds(List<Long> instanceIds) {
+    public boolean deleteHisByInstanceIds(Collection<Long> instanceIds) {
         // 获取实例信息
         List<FlowInstance> flowInstances = flowInstanceMapper.selectByIds(instanceIds);
         if (CollUtil.isEmpty(flowInstances)) {
@@ -271,8 +271,8 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         if (CollUtil.isNotEmpty(flowTaskList)) {
             FlowEngine.userService().deleteByTaskIds(StreamUtils.toList(flowTaskList, FlowTask::getId));
         }
-        FlowEngine.taskService().deleteByInsIds(instanceIds);
-        FlowEngine.hisTaskService().deleteByInsIds(instanceIds);
+        FlowEngine.taskService().deleteByInsIds((List<Long>) instanceIds);
+        FlowEngine.hisTaskService().deleteByInsIds((List<Long>) instanceIds);
         FlowEngine.insService().removeByIds(instanceIds);
         return true;
     }
@@ -323,8 +323,11 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         if (definition == null) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_DEF);
         }
-        String message = bo.message();
         String userIdStr = LoginHelper.getUserIdStr();
+        if (!LoginHelper.isSuperAdmin() && !instance.getCreateBy().equals(userIdStr)) {
+            throw new ServiceException("权限不足，无法撤销流程!");
+        }
+        String message = bo.message();
         BusinessStatusEnum.checkCancelStatus(instance.getFlowStatus());
         FlowParams flowParams = FlowParams.build()
             .message(message)

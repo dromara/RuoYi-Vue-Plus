@@ -1,11 +1,12 @@
 package org.dromara.system.service;
 
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.system.domain.bo.SysUserBo;
 import org.dromara.system.domain.vo.SysUserExportVo;
 import org.dromara.system.domain.vo.SysUserVo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -82,7 +83,7 @@ public interface ISysUserService {
      * @param deptId  部门id
      * @return 用户列表信息
      */
-    List<SysUserVo> selectUserByIds(List<Long> userIds, Long deptId);
+    List<SysUserVo> selectUserByIds(Collection<Long> userIds, Long deptId);
 
     /**
      * 根据用户ID查询用户所属角色组

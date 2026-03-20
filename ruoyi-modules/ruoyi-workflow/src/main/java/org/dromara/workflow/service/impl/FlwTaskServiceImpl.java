@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.dto.StartProcessReturnDTO;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.enums.BusinessStatusEnum;
@@ -23,7 +24,6 @@ import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.utils.IdGeneratorUtil;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.FlowEngine;
@@ -589,7 +589,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * @return 任务列表
      */
     @Override
-    public List<FlowTask> selectByIdList(List<Long> taskIdList) {
+    public List<FlowTask> selectByIdList(Collection<Long> taskIdList) {
         return flowTaskMapper.selectList(new LambdaQueryWrapper<>(FlowTask.class).in(FlowTask::getId, taskIdList));
     }
 
@@ -725,7 +725,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * @return 运行中的任务列表
      */
     @Override
-    public List<FlowTask> selectByInstIds(List<Long> instanceIds) {
+    public List<FlowTask> selectByInstIds(Collection<Long> instanceIds) {
         return flowTaskMapper.selectList(new LambdaQueryWrapper<>(FlowTask.class).in(FlowTask::getInstanceId, instanceIds));
     }
 
@@ -843,7 +843,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateAssignee(List<Long> taskIdList, String userId) {
+    public boolean updateAssignee(Collection<Long> taskIdList, String userId) {
         if (CollUtil.isEmpty(taskIdList)) {
             return false;
         }

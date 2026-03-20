@@ -1,14 +1,15 @@
 package org.dromara.workflow.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.convert.Convert;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StreamUtils;
-import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.warm.flow.core.service.InsService;
 import org.dromara.workflow.common.ConditionalOnEnable;
@@ -47,6 +48,7 @@ public class FlwInstanceController extends BaseController {
      * @return 正在运行的流程实例分页数据
      */
     @GetMapping("/pageByRunning")
+    @SaCheckPermission("workflow:instance:list")
     public R<PageResult<FlowInstanceVo>> selectRunningInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery) {
         return R.ok(flwInstanceService.selectRunningInstanceList(flowInstanceBo, pageQuery));
     }
@@ -59,6 +61,7 @@ public class FlwInstanceController extends BaseController {
      * @return 已结束的流程实例分页数据
      */
     @GetMapping("/pageByFinish")
+    @SaCheckPermission("workflow:instance:list")
     public R<PageResult<FlowInstanceVo>> selectFinishInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery) {
         return R.ok(flwInstanceService.selectFinishInstanceList(flowInstanceBo, pageQuery));
     }
@@ -70,6 +73,7 @@ public class FlwInstanceController extends BaseController {
      * @return 流程实例详情
      */
     @GetMapping("/getInfo/{businessId}")
+    @SaCheckPermission("workflow:instance:query")
     public R<FlowInstanceVo> getInfo(@PathVariable Long businessId) {
         return R.ok(flwInstanceService.queryByBusinessId(businessId));
     }
@@ -82,6 +86,7 @@ public class FlwInstanceController extends BaseController {
      */
     @DeleteMapping("/deleteByBusinessIds/{businessIds}")
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @SaCheckPermission("workflow:instance:remove")
     public R<Void> deleteByBusinessIds(@PathVariable List<Long> businessIds) {
         return toAjax(flwInstanceService.deleteByBusinessIds(StreamUtils.toList(businessIds, Convert::toStr)));
     }
@@ -94,6 +99,7 @@ public class FlwInstanceController extends BaseController {
      */
     @DeleteMapping("/deleteByInstanceIds/{instanceIds}")
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @SaCheckPermission("workflow:instance:remove")
     public R<Void> deleteByInstanceIds(@PathVariable List<Long> instanceIds) {
         return toAjax(flwInstanceService.deleteByInstanceIds(instanceIds));
     }
@@ -106,6 +112,7 @@ public class FlwInstanceController extends BaseController {
      */
     @DeleteMapping("/deleteHisByInstanceIds/{instanceIds}")
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @SaCheckPermission("workflow:instance:remove")
     public R<Void> deleteHisByInstanceIds(@PathVariable List<Long> instanceIds) {
         return toAjax(flwInstanceService.deleteHisByInstanceIds(instanceIds));
     }
@@ -119,6 +126,7 @@ public class FlwInstanceController extends BaseController {
     @RepeatSubmit()
     @PutMapping("/cancelProcessApply")
     @Log(title = "流程实例管理", businessType = BusinessType.UPDATE)
+    @SaCheckPermission("workflow:instance:cancel")
     public R<Void> cancelProcessApply(@RequestBody FlowCancelBo bo) {
         return toAjax(flwInstanceService.cancelProcessApply(bo));
     }
@@ -133,6 +141,7 @@ public class FlwInstanceController extends BaseController {
     @RepeatSubmit()
     @PutMapping("/active/{id}")
     @Log(title = "流程实例管理", businessType = BusinessType.UPDATE)
+    @SaCheckPermission("workflow:instance:active")
     public R<Boolean> active(@PathVariable Long id, @RequestParam boolean active) {
         return R.ok(active ? insService.active(id) : insService.unActive(id));
     }
@@ -145,6 +154,7 @@ public class FlwInstanceController extends BaseController {
      * @return 当前用户发起的流程实例分页数据
      */
     @GetMapping("/pageByCurrent")
+    @SaCheckPermission("workflow:instance:currentList")
     public R<PageResult<FlowInstanceVo>> selectCurrentInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery) {
         return R.ok(flwInstanceService.selectCurrentInstanceList(flowInstanceBo, pageQuery));
     }
@@ -156,6 +166,7 @@ public class FlwInstanceController extends BaseController {
      * @return 流程图与历史节点信息
      */
     @GetMapping("/flowHisTaskList/{businessId}")
+    @SaCheckPermission("workflow:instance:query")
     public R<Map<String, Object>> flowHisTaskList(@PathVariable String businessId) {
         return R.ok(flwInstanceService.flowHisTaskList(businessId));
     }
@@ -167,6 +178,7 @@ public class FlwInstanceController extends BaseController {
      * @return 流程变量
      */
     @GetMapping("/instanceVariable/{instanceId}")
+    @SaCheckPermission("workflow:instance:variableQuery")
     public R<Map<String, Object>> instanceVariable(@PathVariable Long instanceId) {
         return R.ok(flwInstanceService.instanceVariable(instanceId));
     }
@@ -180,6 +192,7 @@ public class FlwInstanceController extends BaseController {
     @RepeatSubmit()
     @PutMapping("/updateVariable")
     @Log(title = "流程实例管理", businessType = BusinessType.UPDATE)
+    @SaCheckPermission("workflow:instance:variable")
     public R<Void> updateVariable(@Validated @RequestBody FlowVariableBo bo) {
         return toAjax(flwInstanceService.updateVariable(bo));
     }
@@ -193,6 +206,7 @@ public class FlwInstanceController extends BaseController {
     @Log(title = "流程实例管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping("/invalid")
+    @SaCheckPermission("workflow:instance:invalid")
     public R<Boolean> invalid(@Validated @RequestBody FlowInvalidBo bo) {
         return R.ok(flwInstanceService.processInvalid(bo));
     }

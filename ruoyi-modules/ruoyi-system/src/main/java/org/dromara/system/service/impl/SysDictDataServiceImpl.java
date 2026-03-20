@@ -6,11 +6,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.system.domain.SysDictData;
 import org.dromara.system.domain.bo.SysDictDataBo;
@@ -20,6 +20,7 @@ import org.dromara.system.service.ISysDictDataService;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -107,7 +108,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      * @param dictCodes 需要删除的字典数据ID
      */
     @Override
-    public void deleteDictDataByIds(List<Long> dictCodes) {
+    public void deleteDictDataByIds(Collection<Long> dictCodes) {
         List<SysDictData> list = baseMapper.selectByIds(dictCodes);
         baseMapper.deleteByIds(dictCodes);
         list.forEach(x -> CacheUtils.evict(CacheNames.SYS_DICT, x.getDictType()));

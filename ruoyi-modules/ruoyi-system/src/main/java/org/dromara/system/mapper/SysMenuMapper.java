@@ -12,8 +12,8 @@ import org.dromara.system.domain.SysRole;
 import org.dromara.system.domain.SysRoleMenu;
 import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.bo.SysMenuBo;
-import org.dromara.system.domain.vo.SysRoleMenuPermVo;
 import org.dromara.system.domain.vo.SysMenuVo;
+import org.dromara.system.domain.vo.SysRoleMenuPermVo;
 
 import java.util.*;
 
@@ -67,7 +67,7 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
      * @param roleIds 角色ID列表
      * @return 角色权限映射
      */
-    default Map<Long, Set<String>> selectMenuPermsByRoleIds(List<Long> roleIds) {
+    default Map<Long, Set<String>> selectMenuPermsByRoleIds(Collection<Long> roleIds) {
         if (CollUtil.isEmpty(roleIds)) {
             return Map.of();
         }

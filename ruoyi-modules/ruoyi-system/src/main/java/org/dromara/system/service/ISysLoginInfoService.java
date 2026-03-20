@@ -1,7 +1,7 @@
 package org.dromara.system.service;
 
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.system.domain.bo.SysLoginInfoBo;
 import org.dromara.system.domain.vo.SysLoginInfoVo;
 

@@ -12,12 +12,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.SystemConstants;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.dto.DeptDTO;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.DeptService;
 import org.dromara.common.core.utils.*;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -182,7 +182,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
      * @return 部门基础信息列表
      */
     @Override
-    public List<SysDeptVo> selectDeptByIds(List<Long> deptIds) {
+    public List<SysDeptVo> selectDeptByIds(Collection<Long> deptIds) {
         return baseMapper.selectDeptList(new LambdaQueryWrapper<SysDept>()
             .select(SysDept::getDeptId, SysDept::getDeptName, SysDept::getLeader)
             .eq(SysDept::getStatus, SystemConstants.NORMAL)
@@ -423,7 +423,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
      * @return Map，其中 key 为部门 ID，value 为对应的部门名称
      */
     @Override
-    public Map<Long, String> selectDeptNamesByIds(List<Long> deptIds) {
+    public Map<Long, String> selectDeptNamesByIds(Collection<Long> deptIds) {
         if (CollUtil.isEmpty(deptIds)) {
             return Collections.emptyMap();
         }

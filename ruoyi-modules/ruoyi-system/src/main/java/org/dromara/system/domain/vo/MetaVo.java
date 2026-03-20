@@ -1,7 +1,7 @@
 package org.dromara.system.domain.vo;
 
-import org.dromara.common.core.utils.StringUtils;
 import lombok.Data;
+import org.dromara.common.core.utils.StringUtils;
 
 /**
  * 路由显示信息
