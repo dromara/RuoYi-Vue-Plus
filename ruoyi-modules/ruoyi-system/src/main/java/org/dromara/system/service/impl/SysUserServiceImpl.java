@@ -147,12 +147,12 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     /**
      * 通过手机号查询用户
      *
-     * @param phonenumber 手机号
+     * @param phoneNumber 手机号
      * @return 用户对象信息
      */
     @Override
-    public SysUserVo selectUserByPhonenumber(String phonenumber) {
-        return baseMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhoneNumber, phonenumber));
+    public SysUserVo selectUserByPhoneNumber(String phoneNumber) {
+        return baseMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhoneNumber, phoneNumber));
     }
 
     /**

@@ -53,10 +53,10 @@ public class SmsAuthStrategy implements IAuthStrategy {
     public LoginVo login(String body, SysClientVo client) {
         SmsLoginBody loginBody = JsonUtils.parseObject(body, SmsLoginBody.class);
         ValidatorUtils.validate(loginBody);
-        String phonenumber = loginBody.getPhonenumber();
+        String phoneNumber = loginBody.getPhoneNumber();
         String smsCode = loginBody.getSmsCode();
-        SysUserVo user = loadUserByPhonenumber(phonenumber);
-        loginService.checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode));
+        SysUserVo user = loadUserByPhoneNumber(phoneNumber);
+        loginService.checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phoneNumber, smsCode));
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         LoginUser loginUser = loginService.buildLoginUser(user);
         loginUser.setClientKey(client.getClientKey());
@@ -81,14 +81,14 @@ public class SmsAuthStrategy implements IAuthStrategy {
     /**
      * 校验短信验证码是否存在且匹配。
      *
-     * @param phonenumber 手机号
+     * @param phoneNumber 手机号
      * @param smsCode     用户输入的短信验证码
      * @return 是否校验通过
      */
-    private boolean validateSmsCode(String phonenumber, String smsCode) {
-        String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + phonenumber);
+    private boolean validateSmsCode(String phoneNumber, String smsCode) {
+        String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + phoneNumber);
         if (StringUtils.isBlank(code)) {
-            loginService.recordLoginInfo(phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            loginService.recordLoginInfo(phoneNumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         return code.equals(smsCode);
@@ -97,17 +97,17 @@ public class SmsAuthStrategy implements IAuthStrategy {
     /**
      * 按手机号加载可登录用户，并校验是否存在或被停用。
      *
-     * @param phonenumber 手机号
+     * @param phoneNumber 手机号
      * @return 用户信息
      */
-    private SysUserVo loadUserByPhonenumber(String phonenumber) {
-        SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhoneNumber, phonenumber));
+    private SysUserVo loadUserByPhoneNumber(String phoneNumber) {
+        SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhoneNumber, phoneNumber));
         if (ObjectUtil.isNull(user)) {
-            log.info("登录用户：{} 不存在.", phonenumber);
-            throw new UserException("user.not.exists", phonenumber);
+            log.info("登录用户：{} 不存在.", phoneNumber);
+            throw new UserException("user.not.exists", phoneNumber);
         } else if (SystemConstants.DISABLE.equals(user.getStatus())) {
-            log.info("登录用户：{} 已被停用.", phonenumber);
-            throw new UserException("user.blocked", phonenumber);
+            log.info("登录用户：{} 已被停用.", phoneNumber);
+            throw new UserException("user.blocked", phoneNumber);
         }
         return user;
     }
