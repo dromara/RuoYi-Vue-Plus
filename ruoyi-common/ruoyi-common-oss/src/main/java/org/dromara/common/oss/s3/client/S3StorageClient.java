@@ -1,5 +1,6 @@
 package org.dromara.common.oss.s3.client;
 
+import cn.hutool.core.util.IdUtil;
 import org.dromara.common.oss.s3.config.S3StorageClientConfig;
 import org.dromara.common.oss.s3.domain.GetObjectResult;
 import org.dromara.common.oss.s3.domain.HandleAsyncResult;
@@ -39,6 +40,27 @@ import java.util.function.Function;
  * @author 秋辞未寒
  */
 public interface S3StorageClient extends AutoCloseable {
+
+    /**
+     * S3 存储客户端ID
+     *
+     * 用于标识客户端，初始化后不允许更改
+     *
+     * @return S3 存储客户端ID
+     */
+    default String clientId(){
+        return IdUtil.fastSimpleUUID();
+    }
+
+    /**
+     * 获取客户端配置copy副本
+     */
+    S3StorageClientConfig config();
+
+    /**
+     * 是否已经初始化
+     */
+    boolean isInitialized();
 
     /**
      * 初始化客户端

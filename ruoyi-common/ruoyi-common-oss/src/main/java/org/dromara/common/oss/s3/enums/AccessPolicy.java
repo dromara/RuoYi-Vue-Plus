@@ -2,8 +2,11 @@ package org.dromara.common.oss.s3.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.dromara.common.oss.s3.exception.S3StorageException;
 import software.amazon.awssdk.services.s3.model.BucketCannedACL;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+
+import java.util.Arrays;
 
 /**
  * 访问策略
@@ -17,17 +20,22 @@ public enum AccessPolicy {
     /**
      * 私有
      */
-    PRIVATE(BucketCannedACL.PRIVATE, ObjectCannedACL.PRIVATE),
+    PRIVATE(0,BucketCannedACL.PRIVATE, ObjectCannedACL.PRIVATE),
 
     /**
      * 公有读写
      */
-    PUBLIC_READ_WRITE(BucketCannedACL.PUBLIC_READ_WRITE, ObjectCannedACL.PUBLIC_READ_WRITE),
+    PUBLIC_READ_WRITE(1,BucketCannedACL.PUBLIC_READ_WRITE, ObjectCannedACL.PUBLIC_READ_WRITE),
 
     /**
      * 公有只读
      */
-    PUBLIC_READ(BucketCannedACL.PUBLIC_READ, ObjectCannedACL.PUBLIC_READ);
+    PUBLIC_READ(2,BucketCannedACL.PUBLIC_READ, ObjectCannedACL.PUBLIC_READ);
+
+    /**
+     * 访问策略类型
+     */
+    private final Integer type;
 
     /**
      * 桶权限
@@ -39,4 +47,10 @@ public enum AccessPolicy {
      */
     private final ObjectCannedACL objectCannedACL;
 
+    public static AccessPolicy formType(String type) {
+        return Arrays.stream(values())
+            .filter(policy -> policy.getType().toString().equals(type))
+            .findFirst()
+            .orElseThrow(() -> S3StorageException.form("'type' not found By " + type));
+    }
 }

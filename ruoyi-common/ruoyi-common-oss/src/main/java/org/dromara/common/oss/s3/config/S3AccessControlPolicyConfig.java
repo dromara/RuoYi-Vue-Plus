@@ -1,6 +1,6 @@
 package org.dromara.common.oss.s3.config;
 
-import lombok.*;
+import lombok.Builder;
 import org.dromara.common.oss.s3.enums.AccessPolicy;
 import org.jspecify.annotations.NonNull;
 
@@ -11,35 +11,31 @@ import java.util.Optional;
 /**
  * S3 ACL访问策略配置
  *
+ * @param enabled      是否启用ACL
+ * @param accessPolicy 访问策略
  * @author 秋辞未寒
  */
-@Data
 @Builder
-@EqualsAndHashCode
-public class S3AccessControlPolicyConfig implements Config<S3AccessControlPolicyConfig,S3AccessControlPolicyConfig.S3AccessControlPolicyConfigBuilder>,Serializable {
+public record S3AccessControlPolicyConfig(
+    boolean enabled
+    , AccessPolicy accessPolicy
+) implements Config<S3AccessControlPolicyConfig, S3AccessControlPolicyConfig.S3AccessControlPolicyConfigBuilder>, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public static final S3AccessControlPolicyConfig DEFAULT = S3AccessControlPolicyConfig.builder().build();
-
     /**
-     * 是否启用ACL
+     * 默认访问策略配置
      */
-    private boolean enabled;
+    public static final S3AccessControlPolicyConfig DEFAULT = S3AccessControlPolicyConfig.builder()
+        .enabled(false)
+        .accessPolicy(AccessPolicy.PUBLIC_READ_WRITE)
+        .build();
 
-    /**
-     * 访问策略
-     */
-    private AccessPolicy accessPolicy;
-
-    public boolean enabled() {
-        return enabled;
-    }
-
+    @Override
     public @NonNull AccessPolicy accessPolicy() {
         return Optional.ofNullable(accessPolicy)
-            .orElse(AccessPolicy.PRIVATE);
+            .orElse(AccessPolicy.PUBLIC_READ_WRITE);
     }
 
     @Override

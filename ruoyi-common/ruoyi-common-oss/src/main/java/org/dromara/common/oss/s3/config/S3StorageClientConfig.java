@@ -4,6 +4,10 @@ import cn.hutool.http.HttpUtil;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.constant.SystemConstants;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.oss.constant.OssConstant;
+import org.dromara.common.oss.properties.OssProperties;
 import org.dromara.common.oss.s3.exception.S3StorageException;
 import org.dromara.common.oss.s3.util.BucketUrlUtil;
 import org.jspecify.annotations.NonNull;
@@ -235,5 +239,42 @@ public class S3StorageClientConfig implements Config<S3StorageClientConfig, S3St
             .prefix(prefix)
             .accessControlPolicyConfig(accessControlPolicyConfig().copy())
             .asyncExecutorConfig(asyncExecutorConfig().copy());
+    }
+
+    public static S3StorageClientConfig formProperties(OssProperties properties){
+        return formPropertiesBuilder(properties).build();
+    }
+
+    public static S3StorageClientConfigBuilder formPropertiesBuilder(OssProperties properties){
+        String regionString = properties.getRegion();
+        Region region = Region.US_EAST_1;
+        if (StringUtils.isNotBlank(regionString)) {
+            region = Region.of(regionString);
+        }
+
+        // 是否使用路径风格应当由使用者明确去配置，此处的配置只是为了适配旧的配置项
+        // MinIO 使用 HTTPS 限制使用域名访问，站点填域名。需要启用路径样式访问
+        boolean usePathStyleAccess = !StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
+
+//        // 目前自定义实现的 Client 中并没有实际使用到ACL相关配置，只是作为一个扩展点保留，有需要ACL的自行实现调用逻辑
+//        String accessPolicyString = properties.getAccessPolicy();
+//        // 绝大多数的云厂商都是不允许操作ACL的，所以此处的默认配置也是禁用ACL的
+//        S3AccessControlPolicyConfig accessControlPolicyConfig = S3AccessControlPolicyConfig.DEFAULT;
+//        if (StringUtils.isNotBlank(accessPolicyString)) {
+//            accessControlPolicyConfig = S3AccessControlPolicyConfig.builder()
+//                .enabled(true)
+//                .accessPolicy(AccessPolicy.formType(accessPolicyString))
+//                .build();
+//        }
+        return builder()
+            .endpoint(properties.getEndpoint())
+            .domain(properties.getDomainUrl())
+            .accessKey(properties.getAccessKey())
+            .secretKey(properties.getSecretKey())
+            .bucket(properties.getBucketName())
+            .region(region)
+            .useHttps(SystemConstants.YES.equals(properties.getIsHttps()))
+            .usePathStyleAccess(usePathStyleAccess);
+//            .accessControlPolicyConfig(accessControlPolicyConfig);
     }
 }

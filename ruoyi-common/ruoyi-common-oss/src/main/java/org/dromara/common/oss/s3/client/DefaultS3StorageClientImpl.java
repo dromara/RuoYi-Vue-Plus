@@ -23,8 +23,8 @@ import java.util.concurrent.Executors;
  */
 public class DefaultS3StorageClientImpl extends AbstractS3StorageClientImpl {
 
-    public DefaultS3StorageClientImpl(S3StorageClientConfig config) {
-        super(config);
+    public DefaultS3StorageClientImpl(String clientId, S3StorageClientConfig config) {
+        super(clientId, config);
     }
 
     @Override

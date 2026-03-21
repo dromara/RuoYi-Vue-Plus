@@ -1,5 +1,8 @@
 package org.dromara.common.oss.s3.client;
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.oss.s3.config.S3StorageClientConfig;
 import org.dromara.common.oss.s3.domain.GetObjectResult;
 import org.dromara.common.oss.s3.domain.HandleAsyncResult;
@@ -46,6 +49,13 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
     private final AtomicBoolean initialized = new AtomicBoolean(false);
 
     /**
+     * S3 存储客户端ID
+     *
+     * 用于标识客户端，初始化后不允许更改
+     */
+    protected final String clientId;
+
+    /**
      * S3 存储客户端配置。
      */
     protected S3StorageClientConfig config;
@@ -70,15 +80,34 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
      */
     protected ExecutorService asyncExecutor;
 
-    public AbstractS3StorageClientImpl(S3StorageClientConfig config) {
+    public AbstractS3StorageClientImpl(String clientId, S3StorageClientConfig config) {
+        Assert.notNull(config, () -> S3StorageException.form("S3StorageClientConfig must not be null"));
+        // 如果没有设置存储客户端ID，则随机生成一个
+        this.clientId = StringUtils.isBlank(clientId)? IdUtil.fastSimpleUUID() : clientId;
         this.config = config;
         this.initialize();
     }
 
     @Override
+    public String clientId() {
+        return this.clientId;
+    }
+
+    @Override
+    public S3StorageClientConfig config() {
+        // 仅返回copy副本，防篡改
+        return this.config.copy();
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return initialized.get();
+    }
+
+    @Override
     public void initialize() {
         // 如果已经是初始化状态，则直接返回
-        if (initialized.get()) {
+        if (isInitialized()) {
             return;
         }
         try {
@@ -118,12 +147,13 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
 
     @Override
     public boolean verifyConfig(Function<S3StorageClientConfig, Boolean> verifyConfigAction) {
-        return Boolean.TRUE.equals(verifyConfigAction.apply(config.copy()));
+        S3StorageClientConfig config = config();
+        return Boolean.TRUE.equals(verifyConfigAction.apply(config));
     }
 
     @Override
     public boolean verifyConfig(S3StorageClientConfig verifyConfig) {
-        return verifyConfig(config -> Objects.equals(config, verifyConfig));
+        return verifyConfig((config) -> Objects.equals(config, verifyConfig));
     }
 
     @Override
@@ -456,5 +486,7 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
         if (asyncExecutor != null) {
             asyncExecutor.close();
         }
+        // 重置初始化状态为 false
+        initialized.compareAndSet(true, false);
     }
 }

@@ -5,6 +5,7 @@ import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.oss.constant.OssConstant;
+import org.dromara.common.oss.properties.OssProperties;
 import org.dromara.common.oss.s3.client.DefaultS3StorageClientImpl;
 import org.dromara.common.oss.s3.client.S3StorageClient;
 import org.dromara.common.oss.s3.config.S3StorageClientConfig;
@@ -14,6 +15,7 @@ import org.dromara.common.redis.utils.RedisUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * S3存储客户端工厂
@@ -24,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class S3StorageClientFactory {
 
     private static final Map<String, S3StorageClient> CLIENT_CACHE = new ConcurrentHashMap<>();
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
     /**
      * 获取默认实例
@@ -41,20 +44,30 @@ public class S3StorageClientFactory {
      * 根据类型获取实例
      */
     public static S3StorageClient instance(String configKey) {
-        // 使用租户标识避免多个租户相同key实例覆盖
-        return CLIENT_CACHE.computeIfAbsent(configKey, S3StorageClientFactory::instanceCache);
-    }
-
-    /**
-     * 使用缓存实例化
-     */
-    private static S3StorageClient instanceCache(String configKey) {
         String json = CacheUtils.get(CacheNames.SYS_OSS_CONFIG, configKey);
         if (json == null) {
             throw S3StorageException.form("系统异常, '" + configKey + "'配置信息不存在!");
         }
-        S3StorageClientConfig config = JsonUtils.parseObject(json, S3StorageClientConfig.class);
-        return new DefaultS3StorageClientImpl(config);
+        OssProperties properties = JsonUtils.parseObject(json, OssProperties.class);
+        S3StorageClientConfig config = S3StorageClientConfig.formProperties(properties);
+        LOCK.lock();
+        try {
+            // 如果已经存在，则校验配置一致性
+            if (CLIENT_CACHE.containsKey(configKey)) {
+                S3StorageClient client = CLIENT_CACHE.get(configKey);
+                if (!client.verifyConfig(config)) {
+                    // 配置不一致，刷新配置
+                    client.refresh(config);
+                    CLIENT_CACHE.put(configKey, client);
+                }
+                return client;
+            }
+            DefaultS3StorageClientImpl client = new DefaultS3StorageClientImpl(configKey,config);
+            CLIENT_CACHE.put(configKey, client);
+            return client;
+        } finally {
+            LOCK.lock();
+        }
     }
 
     /**
@@ -68,7 +81,7 @@ public class S3StorageClientFactory {
         try {
             client.close();
         } catch (Exception e) {
-            log.warn("S3存储客户端关闭异常，错误信息: {}",e.getMessage(),e);
+            log.warn("S3存储客户端关闭异常，错误信息: {}", e.getMessage(), e);
         }
         return true;
     }
