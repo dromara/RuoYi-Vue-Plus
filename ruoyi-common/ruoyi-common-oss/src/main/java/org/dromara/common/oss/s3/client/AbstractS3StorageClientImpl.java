@@ -31,71 +31,117 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * S3 存储客户端实现类。
+ * 抽象S3存储客户端实现类。
  *
  * @author 秋辞未寒
  */
-public class S3StorageClientImpl implements S3StorageClient {
+public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
+
+    private final AtomicBoolean initialized = new AtomicBoolean(false);
 
     /**
      * S3 存储客户端配置。
      */
-    private final S3StorageClientConfig config;
+    protected S3StorageClientConfig config;
 
     /**
      * Amazon S3 异步客户端。
      */
-    private final S3AsyncClient s3AsyncClient;
+    protected S3AsyncClient s3AsyncClient;
 
     /**
      * 用于管理 S3 数据传输的高级工具。
      */
-    private final S3TransferManager s3TransferManager;
+    protected S3TransferManager s3TransferManager;
 
     /**
      * AWS S3 预签名 URL 生成器。
      */
-    private final S3Presigner s3Presigner;
+    protected S3Presigner s3Presigner;
 
     /**
      * 异步调度线程池。
      */
-    private final ExecutorService executorService;
+    protected ExecutorService asyncExecutor;
 
-    public S3StorageClientImpl(S3StorageClientConfig config, S3AsyncClient s3AsyncClient, S3TransferManager s3TransferManager, S3Presigner s3Presigner) {
-        this(config,s3AsyncClient,s3TransferManager,s3Presigner, Executors.newSingleThreadExecutor());
+    public AbstractS3StorageClientImpl(S3StorageClientConfig config) {
+        this.config = config;
+        this.initialize();
     }
 
-    public S3StorageClientImpl(S3StorageClientConfig config, S3AsyncClient s3AsyncClient, S3TransferManager s3TransferManager, S3Presigner s3Presigner, ExecutorService executorService) {
-        this.config = config;
-        this.s3AsyncClient = s3AsyncClient;
-        this.s3TransferManager = s3TransferManager;
-        this.s3Presigner = s3Presigner;
-        this.executorService = executorService;
+    @Override
+    public void initialize() {
+        // 如果已经是初始化状态，则直接返回
+        if (initialized.get()) {
+            return;
+        }
+        try {
+            doInitialize();
+            // 将状态转为已初始化
+            initialized.compareAndSet(false, true);
+        } catch (Exception e) {
+            if (e instanceof S3StorageException) {
+                throw e;
+            }
+            throw S3StorageException.form(e);
+        }
+    }
+
+    abstract void doInitialize();
+
+    @Override
+    public void refresh(S3StorageClientConfig config) {
+        if (Objects.equals(this.config, config)) {
+            return;
+        }
+        // 如果状态本来就是未初始化，直接则调用初始化
+        if (!initialized.get()) {
+            this.initialize();
+        }
+        // 将状态转为未初始化
+        if (initialized.compareAndSet(false, true)) {
+            try {
+                this.close();
+            } catch (Exception e) {
+                // 异常不影响刷新逻辑，此处屏蔽异常
+            }
+            // 状态交换成功才进行刷新
+            this.initialize();
+        }
+    }
+
+    @Override
+    public boolean verifyConfig(Function<S3StorageClientConfig, Boolean> verifyConfigAction) {
+        return Boolean.TRUE.equals(verifyConfigAction.apply(config.copy()));
+    }
+
+    @Override
+    public boolean verifyConfig(S3StorageClientConfig verifyConfig) {
+        return verifyConfig(config -> Objects.equals(config, verifyConfig));
     }
 
     @Override
     public <T> T doCustomUpload(AsyncRequestBody body, Consumer<PutObjectRequest.Builder> putObjectRequestBuilderConsumer, Collection<TransferListener> transferListeners, BiFunction<CompletedUpload, Throwable, T> handleAsyncAction) {
         try {
             return s3TransferManager.upload(uploadRequestBuilder -> {
-                        uploadRequestBuilder.requestBody(body)
-                                .putObjectRequest(putObjectRequestBuilderConsumer)
-                                .transferListeners(transferListeners);
-                    })
-                    .completionFuture()
-                    .handleAsync(handleAsyncAction)
-                    .join();
+                    uploadRequestBuilder.requestBody(body)
+                        .putObjectRequest(putObjectRequestBuilderConsumer)
+                        .transferListeners(transferListeners);
+                })
+                .completionFuture()
+                .handleAsync(handleAsyncAction)
+                .join();
         } catch (Exception e) {
             if (e instanceof S3StorageException ex) {
                 throw ex;
             }
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 
@@ -134,7 +180,7 @@ public class S3StorageClientImpl implements S3StorageClient {
             if (e instanceof S3StorageException ex) {
                 throw ex;
             }
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 
@@ -150,15 +196,15 @@ public class S3StorageClientImpl implements S3StorageClient {
             if (e instanceof S3StorageException ex) {
                 throw ex;
             }
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 
     @Override
     public PutObjectResult bucketUpload(String bucket, String key, InputStream in, long contentLength) {
         AsyncRequestBody body = AsyncRequestBody.fromInputStream(builder -> builder.inputStream(in)
-                .contentLength(contentLength)
-                .executor(executorService));
+            .contentLength(contentLength)
+            .executor(asyncExecutor));
         return bucketUpload(bucket, key, body);
     }
 
@@ -170,7 +216,7 @@ public class S3StorageClientImpl implements S3StorageClient {
             if (e instanceof S3StorageException ex) {
                 throw ex;
             }
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 
@@ -178,33 +224,33 @@ public class S3StorageClientImpl implements S3StorageClient {
     private PutObjectResult bucketUpload(String bucket, String key, AsyncRequestBody body) {
         HandleAsyncResult<PutObjectResponse> result = doCustomUpload(body, builder -> builder.bucket(bucket).key(key));
         if (result.isFailure()) {
-            throw S3StorageException.of(result.error());
+            throw S3StorageException.form(result.error());
         }
         Optional<PutObjectResponse> opt = result.getResult();
         if (opt.isEmpty()) {
-            throw S3StorageException.of("response is empty.");
+            throw S3StorageException.form("response is empty.");
         }
         PutObjectResponse response = opt.get();
-        return PutObjectResult.of(null, key, response.eTag(), response.size());
+        return PutObjectResult.form(null, key, response.eTag(), response.size());
     }
 
     @Override
     public <T> T doCustomDownload(Consumer<GetObjectRequest.Builder> getObjectRequestBuilderConsumer, AsyncResponseTransformer<GetObjectResponse, T> responseTransformer, Collection<TransferListener> transferListeners) {
         try {
             DownloadRequest<T> downloadRequest = DownloadRequest.builder()
-                    .responseTransformer(responseTransformer)
-                    .getObjectRequest(getObjectRequestBuilderConsumer)
-                    .transferListeners(transferListeners)
-                    .build();
+                .responseTransformer(responseTransformer)
+                .getObjectRequest(getObjectRequestBuilderConsumer)
+                .transferListeners(transferListeners)
+                .build();
             return s3TransferManager.download(downloadRequest)
-                    .completionFuture()
-                    .join()
-                    .result();
+                .completionFuture()
+                .join()
+                .result();
         } catch (Exception e) {
             if (e instanceof S3StorageException ex) {
                 throw ex;
             }
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 
@@ -219,7 +265,7 @@ public class S3StorageClientImpl implements S3StorageClient {
             if (e instanceof S3StorageException ex) {
                 throw ex;
             }
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 
@@ -231,7 +277,7 @@ public class S3StorageClientImpl implements S3StorageClient {
             if (e instanceof S3StorageException ex) {
                 throw ex;
             }
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 
@@ -243,7 +289,7 @@ public class S3StorageClientImpl implements S3StorageClient {
             if (e instanceof S3StorageException ex) {
                 throw ex;
             }
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 
@@ -263,17 +309,17 @@ public class S3StorageClientImpl implements S3StorageClient {
     }
 
     private GetObjectResult buildGetObjectResult(String key, GetObjectResponse response) {
-        return GetObjectResult.of(
-                key,
-                response.eTag(),
-                LocalDateTime.from(response.lastModified()),
-                response.contentLength(),
-                response.contentType(),
-                response.contentDisposition(),
-                response.contentRange(),
-                response.contentEncoding(),
-                response.contentLanguage(),
-                response.metadata()
+        return GetObjectResult.form(
+            key,
+            response.eTag(),
+            LocalDateTime.from(response.lastModified()),
+            response.contentLength(),
+            response.contentType(),
+            response.contentDisposition(),
+            response.contentRange(),
+            response.contentEncoding(),
+            response.contentLanguage(),
+            response.metadata()
         );
     }
 
@@ -283,7 +329,7 @@ public class S3StorageClientImpl implements S3StorageClient {
             DeleteObjectResponse response = s3AsyncClient.deleteObject(builder -> builder.bucket(bucket).key(key)).join();
             return Boolean.TRUE.equals(response.deleteMarker());
         } catch (Exception e) {
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 
@@ -291,13 +337,13 @@ public class S3StorageClientImpl implements S3StorageClient {
     public String bucketPresignGetUrl(String bucket, String key, Duration expiredTime) {
         try {
             return s3Presigner.presignGetObject(getObjectPresignRequestBuilder -> {
-                        getObjectPresignRequestBuilder.signatureDuration(expiredTime)
-                                .getObjectRequest(getObjectRequestBuilder -> getObjectRequestBuilder.bucket(bucket).key(key));
-                    })
-                    .url()
-                    .toExternalForm();
+                    getObjectPresignRequestBuilder.signatureDuration(expiredTime)
+                        .getObjectRequest(getObjectRequestBuilder -> getObjectRequestBuilder.bucket(bucket).key(key));
+                })
+                .url()
+                .toExternalForm();
         } catch (Exception e) {
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 
@@ -305,13 +351,13 @@ public class S3StorageClientImpl implements S3StorageClient {
     public String bucketPresignPutUrl(String bucket, String key, Duration expiredTime, Map<String, String> metadata) {
         try {
             return s3Presigner.presignPutObject(putObjectPresignRequestBuilder -> {
-                        putObjectPresignRequestBuilder.signatureDuration(expiredTime)
-                                .putObjectRequest(putObjectRequestBuilder -> putObjectRequestBuilder.bucket(bucket).key(key).metadata(metadata));
-                    })
-                    .url()
-                    .toExternalForm();
+                    putObjectPresignRequestBuilder.signatureDuration(expiredTime)
+                        .putObjectRequest(putObjectRequestBuilder -> putObjectRequestBuilder.bucket(bucket).key(key).metadata(metadata));
+                })
+                .url()
+                .toExternalForm();
         } catch (Exception e) {
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 
@@ -392,26 +438,23 @@ public class S3StorageClientImpl implements S3StorageClient {
 
     private String defaultBucket() {
         return config.bucket()
-                .filter(bucket -> !bucket.isBlank())
-                .orElseThrow(() -> S3StorageException.of("bucket is not configured."));
-    }
-
-    @Override
-    public boolean verifyConfig(Function<S3StorageClientConfig,Boolean> verifyConfigAction) {
-        S3StorageClientConfig copy = S3StorageClientConfig.copy(config);
-        return Boolean.TRUE.equals(verifyConfigAction.apply(copy));
-    }
-
-    @Override
-    public boolean verifyConfig(S3StorageClientConfig verifyConfig) {
-        return verifyConfig(config -> Objects.equals(config,verifyConfig));
+            .filter(bucket -> !bucket.isBlank())
+            .orElseThrow(() -> S3StorageException.form("bucket is not configured."));
     }
 
     @Override
     public void close() throws Exception {
-        s3TransferManager.close();
-        s3AsyncClient.close();
-        s3Presigner.close();
-        executorService.close();
+        if (s3TransferManager != null) {
+            s3TransferManager.close();
+        }
+        if (s3AsyncClient != null) {
+            s3AsyncClient.close();
+        }
+        if (s3Presigner != null) {
+            s3Presigner.close();
+        }
+        if (asyncExecutor != null) {
+            asyncExecutor.close();
+        }
     }
 }

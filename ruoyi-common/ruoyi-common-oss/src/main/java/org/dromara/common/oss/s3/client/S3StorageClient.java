@@ -41,6 +41,38 @@ import java.util.function.Function;
 public interface S3StorageClient extends AutoCloseable {
 
     /**
+     * 初始化客户端
+     */
+    void initialize();
+
+    /**
+     * 刷新客户端配置
+     *
+     * @param config 配置项
+     */
+    void refresh(S3StorageClientConfig config);
+
+    /**
+     * 校验客户端配置
+     *
+     * <p>注意：该方法不会修改任何既有的配置和状态，你看可以理解为这仅仅是一个配置展示的方法，以供调用者根据当前的配置，自行决定是否需要重新构建客户端。</p>
+     *
+     * @param verifyConfigAction 校验配置动作函数
+     * @return 是否一致
+     */
+    boolean verifyConfig(Function<S3StorageClientConfig,Boolean> verifyConfigAction);
+
+    /**
+     * 校验客户端配置与传入的待校验配置是否一致
+     *
+     * <p>注意：该方法不会修改任何既有的配置和状态，你看可以理解为这仅仅是一个配置展示的方法，以供调用者根据当前的配置，自行决定是否需要重新构建客户端。</p>
+     *
+     * @param verifyConfig 待校验的配置
+     * @return 是否一致
+     */
+    boolean verifyConfig(S3StorageClientConfig verifyConfig);
+
+    /**
      * 执行自定义上传请求。
      *
      * @param body                            上传请求体
@@ -381,24 +413,4 @@ public interface S3StorageClient extends AutoCloseable {
      * @return 预签名上传 URL
      */
     String presignPutUrl(String key, Duration expiredTime, Map<String, String> metadata);
-
-    /**
-     * 校验客户端配置
-     *
-     * <p>注意：该方法不会修改任何既有的配置和状态，你看可以理解为这仅仅是一个配置展示的方法，以供调用者根据当前的配置，自行决定是否需要重新构建客户端。</p>
-     *
-     * @param verifyConfigAction 校验配置动作函数
-     * @return 是否一致
-     */
-    boolean verifyConfig(Function<S3StorageClientConfig,Boolean> verifyConfigAction);
-
-    /**
-     * 校验客户端配置与传入的待校验配置是否一致
-     *
-     * <p>注意：该方法不会修改任何既有的配置和状态，你看可以理解为这仅仅是一个配置展示的方法，以供调用者根据当前的配置，自行决定是否需要重新构建客户端。</p>
-     *
-     * @param verifyConfig 待校验的配置
-     * @return 是否一致
-     */
-    boolean verifyConfig(S3StorageClientConfig verifyConfig);
 }

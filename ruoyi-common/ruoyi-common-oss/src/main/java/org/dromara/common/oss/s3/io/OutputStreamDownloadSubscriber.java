@@ -40,7 +40,7 @@ public class OutputStreamDownloadSubscriber implements Consumer<ByteBuffer>, Aut
                 channel.write(byteBuffer);
             }
         } catch (IOException e) {
-            throw S3StorageException.of(e);
+            throw S3StorageException.form(e);
         }
     }
 

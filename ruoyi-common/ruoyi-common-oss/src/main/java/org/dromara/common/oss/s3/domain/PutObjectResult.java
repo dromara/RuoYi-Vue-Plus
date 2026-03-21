@@ -16,7 +16,7 @@ public record PutObjectResult(
         long size
 ) {
 
-    public static PutObjectResult of(String url, String key, String eTag, long size) {
+    public static PutObjectResult form(String url, String key, String eTag, long size) {
         return new PutObjectResult(url, key, eTag, size);
     }
 

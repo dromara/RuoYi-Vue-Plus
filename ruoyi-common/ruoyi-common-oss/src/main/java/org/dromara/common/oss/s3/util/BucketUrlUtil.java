@@ -2,6 +2,7 @@ package org.dromara.common.oss.s3.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.utils.StringUtils;
 
 /**
  * 桶链接工具类
@@ -25,13 +26,13 @@ public class BucketUrlUtil {
     private static final String SITE_STYLE_HTTPS_FORMATE = "https://%s.%s";
 
     /**
-     * 获取域名地址 例：https://s3examples.com
+     * 重建链接协议头（将IP、域名、站点的协议头改成HTTP或者HTTPS）
      *
-     * @param isHttps    是否为HTTP
-     * @param base       基础地址（可以是IP、站点或者域名）
+     * @param isHttps 是否为HTTP
+     * @param base    基础地址（可以是IP、站点或者域名）
      * @return 域名地址
      */
-    public static String getDomainUrl(boolean isHttps, String base) {
+    public static String rebuildUrlHeader(boolean isHttps, String base) {
         String baseUrl = removeHttpProtocolHeader(base);
         if (isHttps) {
             return HTTPS_PROTOCOL_HEADER + baseUrl;
@@ -78,11 +79,10 @@ public class BucketUrlUtil {
      * @return 移除HTTP/HTTPS协议头后的地址
      */
     public static String removeHttpProtocolHeader(String url) {
-        String s = url.toLowerCase();
-        if (s.startsWith(HTTP_PROTOCOL_HEADER) || s.startsWith(HTTPS_PROTOCOL_HEADER)) {
-            return s.replace(HTTP_PROTOCOL_HEADER, EMPTY_STRING)
-                    .replace(HTTPS_PROTOCOL_HEADER, EMPTY_STRING);
+        if (StringUtils.startsWithIgnoreCase(url, HTTP_PROTOCOL_HEADER) || StringUtils.startsWithIgnoreCase(url, HTTPS_PROTOCOL_HEADER)) {
+            return url.replace(HTTP_PROTOCOL_HEADER, EMPTY_STRING)
+                .replace(HTTPS_PROTOCOL_HEADER, EMPTY_STRING);
         }
-        return s;
+        return url;
     }
 }

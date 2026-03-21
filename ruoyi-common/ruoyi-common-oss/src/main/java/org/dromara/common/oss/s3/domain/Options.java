@@ -76,19 +76,4 @@ public class Options {
     public static Options builder() {
         return new Options();
     }
-
-    /**
-     * 复制一个新的可选项对象
-     *
-     * @param options 可选项对象
-     * @return 新的可选项对象
-     */
-    public static Options copy(Options options) {
-        return builder()
-                .setLength(options.getLength())
-                .setMd5Digest(options.getMd5Digest())
-                .setContentType(options.getContentType())
-                .setMetadata(options.getMetadata())
-                .setTransferListeners(options.getTransferListeners());
-    }
 }

@@ -28,19 +28,19 @@ public class S3StorageException extends RuntimeException {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public static S3StorageException of(String message) {
+    public static S3StorageException form(String message) {
         return new S3StorageException(message);
     }
 
-    public static S3StorageException of(String message, Throwable cause) {
+    public static S3StorageException form(String message, Throwable cause) {
         return new S3StorageException(message, cause);
     }
 
-    public static S3StorageException of(Throwable cause) {
+    public static S3StorageException form(Throwable cause) {
         return new S3StorageException(cause);
     }
 
-    public static S3StorageException of(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public static S3StorageException form(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         return new S3StorageException(message, cause, enableSuppression, writableStackTrace);
     }
 

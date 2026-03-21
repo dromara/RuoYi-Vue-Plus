@@ -5,12 +5,12 @@ import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.oss.constant.OssConstant;
-import org.dromara.common.redis.utils.CacheUtils;
-import org.dromara.common.redis.utils.RedisUtils;
-import org.dromara.common.oss.s3.builder.DefaultS3StorageClientBuilder;
+import org.dromara.common.oss.s3.client.DefaultS3StorageClientImpl;
 import org.dromara.common.oss.s3.client.S3StorageClient;
 import org.dromara.common.oss.s3.config.S3StorageClientConfig;
 import org.dromara.common.oss.s3.exception.S3StorageException;
+import org.dromara.common.redis.utils.CacheUtils;
+import org.dromara.common.redis.utils.RedisUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +32,7 @@ public class S3StorageClientFactory {
         // 获取redis 默认类型
         String configKey = RedisUtils.getCacheObject(OssConstant.DEFAULT_CONFIG_KEY);
         if (StringUtils.isEmpty(configKey)) {
-            throw S3StorageException.of("文件存储服务类型无法找到!");
+            throw S3StorageException.form("文件存储服务类型无法找到!");
         }
         return instance(configKey);
     }
@@ -51,10 +51,10 @@ public class S3StorageClientFactory {
     private static S3StorageClient instanceCache(String configKey) {
         String json = CacheUtils.get(CacheNames.SYS_OSS_CONFIG, configKey);
         if (json == null) {
-            throw S3StorageException.of("系统异常, '" + configKey + "'配置信息不存在!");
+            throw S3StorageException.form("系统异常, '" + configKey + "'配置信息不存在!");
         }
         S3StorageClientConfig config = JsonUtils.parseObject(json, S3StorageClientConfig.class);
-        return DefaultS3StorageClientBuilder.INSTANCE.build(config);
+        return new DefaultS3StorageClientImpl(config);
     }
 
     /**

@@ -1,12 +1,12 @@
 package org.dromara.common.oss.s3.config;
 
-import org.dromara.common.oss.s3.builder.CloudServiceBucketUrlBuilder;
-import org.dromara.common.oss.s3.builder.MinioBucketUrlBuilder;
-import org.dromara.common.oss.s3.exception.S3StorageException;
-import org.dromara.common.oss.s3.util.BucketUrlUtil;
+import cn.hutool.http.HttpUtil;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.oss.s3.exception.S3StorageException;
+import org.dromara.common.oss.s3.util.BucketUrlUtil;
+import org.jspecify.annotations.NonNull;
 import software.amazon.awssdk.regions.Region;
 
 import java.io.Serial;
@@ -21,7 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class S3StorageClientConfig implements Serializable {
+public class S3StorageClientConfig implements Config<S3StorageClientConfig, S3StorageClientConfig.S3StorageClientConfigBuilder>, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -74,7 +74,12 @@ public class S3StorageClientConfig implements Serializable {
     /**
      * ACL访问策略配置
      */
-    private final S3AclConfig aclConfig;
+    private final S3AccessControlPolicyConfig accessControlPolicyConfig;
+
+    /**
+     * 异步调度池配置
+     */
+    private final S3AsyncExecutorConfig asyncExecutorConfig;
 
     /**
      * 访问端点
@@ -89,6 +94,7 @@ public class S3StorageClientConfig implements Serializable {
     public Optional<String> domain() {
         return Optional.ofNullable(domain);
     }
+
     /**
      * 是否使用HTTPS协议
      */
@@ -141,8 +147,17 @@ public class S3StorageClientConfig implements Serializable {
     /**
      * ACL访问策略配置
      */
-    public Optional<S3AclConfig> aclConfig() {
-        return Optional.ofNullable(aclConfig);
+    public @NonNull S3AccessControlPolicyConfig accessControlPolicyConfig() {
+        return Optional.ofNullable(accessControlPolicyConfig)
+            .orElse(S3AccessControlPolicyConfig.DEFAULT);
+    }
+
+    /**
+     * ACL访问策略配置
+     */
+    public @NonNull S3AsyncExecutorConfig asyncExecutorConfig() {
+        return Optional.ofNullable(asyncExecutorConfig)
+            .orElse(S3AsyncExecutorConfig.DEFAULT);
     }
 
     /**
@@ -150,11 +165,11 @@ public class S3StorageClientConfig implements Serializable {
      *
      * @return 访问站点URL地址
      */
-    public String getEndpointUrl(){
+    public String getEndpointUrl() {
         String endpoint = endpoint()
-                .filter(s -> !s.isBlank())
-                .orElseThrow(() -> S3StorageException.of("endpoint is not configured."));
-        return BucketUrlUtil.getDomainUrl(useHttps, endpoint);
+            .filter(s -> !s.isBlank())
+            .orElseThrow(() -> S3StorageException.form("endpoint is not configured."));
+        return BucketUrlUtil.rebuildUrlHeader(useHttps, endpoint);
     }
 
     /**
@@ -162,52 +177,63 @@ public class S3StorageClientConfig implements Serializable {
      *
      * @return 域名URL地址
      */
-    public String getDomainUrl(){
+    public String getDomainUrl() {
         return domain()
-                .filter(s -> !s.isBlank())
-                // 如果已经配置了自定义域名，则优先使用域名
-                .map(s -> BucketUrlUtil.getDomainUrl(useHttps, s))
-                // 否则使用站点
-                .orElseGet(this::getEndpointUrl);
+            // 如果已经配置了自定义域名，则优先使用域名
+            // 检查携带协议头
+            .filter(s -> HttpUtil.isHttp(s) || HttpUtil.isHttps(s))
+            // 否则使用站点
+            .orElseGet(this::getEndpointUrl);
     }
 
     /**
      * 获取桶URL地址
      *
-     * @param isCloudService 是否是云服务商
      * @return 桶URL地址
      */
-    public String getBucketUrl(boolean isCloudService){
-        // 如果是云服务商，则优先使用云服务商的
-        if (isCloudService) {
-            return CloudServiceBucketUrlBuilder.INSTANCE.build(this);
-        }
-        // 否则默认使用MinIO的
-        return MinioBucketUrlBuilder.INSTANCE.build(this);
+    public String getBucketUrl() {
+        // 如果未配置桶，则抛异常
+        String bucket = bucket()
+            .filter(s -> !s.isBlank())
+            .orElseThrow(() -> S3StorageException.form("bucket is not configured."));
+        // 如果已经配置了自定义域名，则优先使用域名
+        String url = domain()
+            // 检查携带协议头
+            .filter(s -> HttpUtil.isHttp(s) || HttpUtil.isHttps(s))
+            // 否则使用站点
+            .orElseGet(() ->
+                endpoint()
+                    .filter(s -> !s.isBlank())
+                    .orElseThrow(() -> S3StorageException.form("endpoint is not configured."))
+            );
+        // 根据是否使用路径风格配置项决定存储桶的URL风格
+        return usePathStyleAccess ? BucketUrlUtil.getPathStyleBucketUrl(useHttps, url, bucket) : BucketUrlUtil.getSiteStyleBucketUrl(useHttps, url, bucket);
     }
 
     /**
      * 复制S3存储客户端配置对象
      */
-    public static S3StorageClientConfig copy(S3StorageClientConfig config) {
-        return toBuilder(config).build();
+    @Override
+    public S3StorageClientConfig copy() {
+        return toBuilder().build();
     }
 
     /**
      * 转为S3存储客户端配置构建器对象
      */
-    public static S3StorageClientConfigBuilder toBuilder(S3StorageClientConfig config) {
-        S3StorageClientConfigBuilder builder = builder()
-                .endpoint(config.endpoint().orElse(null))
-                .domain(config.domain().orElse(null))
-                .useHttps(config.useHttps())
-                .usePathStyleAccess(config.usePathStyleAccess())
-                .accessKey(config.accessKey().orElse(null))
-                .secretKey(config.secretKey().orElse(null))
-                .bucket(config.bucket().orElse(null))
-                .region(config.region().orElse(null))
-                .prefix(config.prefix().orElse(null));
-        config.aclConfig().ifPresent(s3AclConfig -> builder.aclConfig(S3AclConfig.copy(s3AclConfig)));
-        return builder;
+    @Override
+    public S3StorageClientConfigBuilder toBuilder() {
+        return builder()
+            .endpoint(endpoint)
+            .domain(domain)
+            .useHttps(useHttps)
+            .usePathStyleAccess(usePathStyleAccess)
+            .accessKey(accessKey)
+            .secretKey(secretKey)
+            .bucket(bucket)
+            .region(region)
+            .prefix(prefix)
+            .accessControlPolicyConfig(accessControlPolicyConfig().copy())
+            .asyncExecutorConfig(asyncExecutorConfig().copy());
     }
 }
