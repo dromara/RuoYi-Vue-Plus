@@ -1,93 +1,45 @@
 package org.dromara.generator.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import cn.hutool.extra.template.TemplateConfig;
+import org.dromara.common.core.factory.YmlPropertySourceFactory;
+import org.dromara.generator.config.properties.GenProperties;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
 
 /**
  * 读取代码生成相关配置
  *
  * @author ruoyi
  */
-@Component
-@ConfigurationProperties(prefix = "gen")
-@PropertySource(value = {"classpath:generator.yml"}, encoding = "UTF-8")
+@AutoConfiguration
+@EnableConfigurationProperties(GenProperties.class)
+@PropertySource(value = "classpath:generator.yml", factory = YmlPropertySourceFactory.class)
 public class GenConfig {
 
-    /**
-     * 作者
-     */
-    public static String author;
+    private static GenProperties genProperties;
 
-    /**
-     * 生成包路径
-     */
-    public static String packageName;
-
-    /**
-     * 自动去除表前缀，默认是false
-     */
-    public static boolean autoRemovePre;
-
-    /**
-     * 表前缀(类名不会包含表前缀)
-     */
-    public static String tablePrefix;
-
-    public static String getAuthor() {
-        return author;
+    public GenConfig(GenProperties genProperties) {
+        GenConfig.genProperties = genProperties;
     }
 
-    /**
-     * 注入代码生成作者配置。
-     *
-     * @param author 作者名称
-     */
-    @Value("${author}")
-    public void setAuthor(String author) {
-        GenConfig.author = author;
+    public static String getAuthor() {
+        return genProperties.getAuthor();
     }
 
     public static String getPackageName() {
-        return packageName;
-    }
-
-    /**
-     * 注入代码生成基础包名配置。
-     *
-     * @param packageName 基础包名
-     */
-    @Value("${packageName}")
-    public void setPackageName(String packageName) {
-        GenConfig.packageName = packageName;
+        return genProperties.getPackageName();
     }
 
     public static boolean getAutoRemovePre() {
-        return autoRemovePre;
-    }
-
-    /**
-     * 注入是否自动移除表前缀配置。
-     *
-     * @param autoRemovePre 是否自动移除表前缀
-     */
-    @Value("${autoRemovePre}")
-    public void setAutoRemovePre(boolean autoRemovePre) {
-        GenConfig.autoRemovePre = autoRemovePre;
+        return genProperties.isAutoRemovePre();
     }
 
     public static String getTablePrefix() {
-        return tablePrefix;
+        return genProperties.getTablePrefix();
     }
 
-    /**
-     * 注入代码生成表前缀配置。
-     *
-     * @param tablePrefix 表前缀字符串
-     */
-    @Value("${tablePrefix}")
-    public void setTablePrefix(String tablePrefix) {
-        GenConfig.tablePrefix = tablePrefix;
+    public static TemplateConfig getTemplateConfig() {
+        return genProperties.getTemplateConfig();
     }
 }

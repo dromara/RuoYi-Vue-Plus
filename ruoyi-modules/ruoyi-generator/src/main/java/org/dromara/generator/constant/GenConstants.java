@@ -1,5 +1,9 @@
 package org.dromara.generator.constant;
 
+import cn.hutool.core.collection.CollUtil;
+
+import java.util.Set;
+
 /**
  * 代码生成通用常量
  *
@@ -187,4 +191,48 @@ public interface GenConstants {
      * 必填标识，对应前端表单规则中的必填字段配置。
      */
     String REQUIRE = "1";
+
+    // 后端源码模板
+    String JAVA_DOMAIN_TEMPLATE_PATH = "vm/java/domain.java.vm";
+    String JAVA_VO_TEMPLATE_PATH = "vm/java/vo.java.vm";
+    String JAVA_BO_TEMPLATE_PATH = "vm/java/bo.java.vm";
+    String JAVA_MAPPER_TEMPLATE_PATH = "vm/java/mapper.java.vm";
+    String JAVA_SERVICE_TEMPLATE_PATH = "vm/java/service.java.vm";
+    String JAVA_SERVICE_IMPL_TEMPLATE_PATH = "vm/java/serviceImpl.java.vm";
+    String JAVA_CONTROLLER_TEMPLATE_PATH = "vm/java/controller.java.vm";
+    // MyBatis MapperXML 模板
+    String XML_MAPPER_TEMPLATE_PATH = "vm/xml/mapper.xml.vm";
+    // 前端接口源码模板
+    String TS_API_TEMPLATE_PATH = "vm/ts/api.ts.vm";
+    String TS_TYPES_TEMPLATE_PATH = "vm/ts/types.ts.vm";
+    // 前端页面源码模板
+    String VUE_INDEX_TEMPLATE_PATH = "vm/vue/index.vue.vm";
+    String VUE_INDEX_TREE_TEMPLATE_PATH = "vm/vue/index-tree.vue.vm";
+    // 数据库SQL模板
+    String SQL_ORACLE_TEMPLATE_PATH = "vm/sql/oracle.sql.vm";
+    String SQL_POSTGRES_TEMPLATE_PATH = "vm/sql/postgres.sql.vm";
+    String SQL_SQLSERVER_TEMPLATE_PATH = "vm/sql/sqlserver.sql.vm";
+    String SQL_MYSQL_TEMPLATE_PATH = "vm/sql/mysql.sql.vm";
+
+    /**
+     * 所有模板路径集合
+     */
+    Set<String> TEMPLATE_PATHS = CollUtil.newHashSet(
+        JAVA_DOMAIN_TEMPLATE_PATH
+        , JAVA_VO_TEMPLATE_PATH
+        , JAVA_BO_TEMPLATE_PATH
+        , JAVA_MAPPER_TEMPLATE_PATH
+        , JAVA_SERVICE_TEMPLATE_PATH
+        , JAVA_SERVICE_IMPL_TEMPLATE_PATH
+        , JAVA_CONTROLLER_TEMPLATE_PATH
+        , XML_MAPPER_TEMPLATE_PATH
+        , TS_API_TEMPLATE_PATH
+        , TS_TYPES_TEMPLATE_PATH
+        , VUE_INDEX_TEMPLATE_PATH
+        , VUE_INDEX_TREE_TEMPLATE_PATH
+        , SQL_ORACLE_TEMPLATE_PATH
+        , SQL_POSTGRES_TEMPLATE_PATH
+        , SQL_SQLSERVER_TEMPLATE_PATH
+        , SQL_MYSQL_TEMPLATE_PATH
+    );
 }

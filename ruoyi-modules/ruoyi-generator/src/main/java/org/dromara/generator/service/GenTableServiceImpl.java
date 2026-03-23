@@ -15,10 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.anyline.metadata.Column;
 import org.anyline.metadata.Table;
 import org.anyline.proxy.ServiceProxy;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.dromara.common.core.constant.Constants;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
@@ -26,7 +23,6 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.utils.IdGeneratorUtil;
 import org.dromara.generator.constant.GenConstants;
 import org.dromara.generator.domain.GenTable;
@@ -34,15 +30,14 @@ import org.dromara.generator.domain.GenTableColumn;
 import org.dromara.generator.mapper.GenTableColumnMapper;
 import org.dromara.generator.mapper.GenTableMapper;
 import org.dromara.generator.util.GenUtils;
-import org.dromara.generator.util.VelocityInitializer;
-import org.dromara.generator.util.VelocityUtils;
+import org.dromara.generator.util.TemplateEngineUtils;
+import org.dromara.generator.util.template.PathNamedTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -346,18 +341,14 @@ public class GenTableServiceImpl implements IGenTableService {
         table.setMenuIds(menuIds);
         // 设置主键列信息
         setPkColumn(table);
-        VelocityInitializer.initVelocity();
 
-        VelocityContext context = VelocityUtils.prepareContext(table);
-
+        Dict context = TemplateEngineUtils.buildContext(table);
         // 获取模板列表
-        List<String> templates = VelocityUtils.getTemplateList(table.getTplCategory());
-        for (String template : templates) {
+        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory());
+        for (PathNamedTemplate template : templates) {
             // 渲染模板
-            StringWriter sw = new StringWriter();
-            Template tpl = Velocity.getTemplate(template, Constants.UTF8);
-            tpl.merge(context, sw);
-            dataMap.put(template, sw.toString());
+            String render = template.render(context);
+            dataMap.put(template.getPathName(), render);
         }
         return dataMap;
     }
@@ -389,21 +380,18 @@ public class GenTableServiceImpl implements IGenTableService {
         // 设置主键列信息
         setPkColumn(table);
 
-        VelocityInitializer.initVelocity();
-
-        VelocityContext context = VelocityUtils.prepareContext(table);
-
+        Dict context = TemplateEngineUtils.buildContext(table);
         // 获取模板列表
-        List<String> templates = VelocityUtils.getTemplateList(table.getTplCategory());
-        for (String template : templates) {
-            if (!StringUtils.containsAny(template, "sql.vm", "api.ts.vm", "types.ts.vm", "index.vue.vm", "index-tree.vue.vm")) {
+        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory());
+        for (PathNamedTemplate template : templates) {
+            String pathName = template.getPathName();
+            // 渲染模板
+            if (!StringUtils.containsAny(pathName, "sql.vm", "api.ts.vm", "types.ts.vm", "index.vue.vm", "index-tree.vue.vm")) {
                 // 渲染模板
-                StringWriter sw = new StringWriter();
-                Template tpl = Velocity.getTemplate(template, Constants.UTF8);
-                tpl.merge(context, sw);
                 try {
-                    String path = getGenPath(table, template);
-                    FileUtils.writeUtf8String(sw.toString(), path);
+                    String render = template.render(context);
+                    String path = getGenPath(table, pathName);
+                    FileUtils.writeUtf8String(render, path);
                 } catch (Exception e) {
                     throw new ServiceException("渲染模板失败，表名：" + table.getTableName());
                 }
@@ -496,22 +484,17 @@ public class GenTableServiceImpl implements IGenTableService {
         // 设置主键列信息
         setPkColumn(table);
 
-        VelocityInitializer.initVelocity();
-
-        VelocityContext context = VelocityUtils.prepareContext(table);
-
+        Dict context = TemplateEngineUtils.buildContext(table);
         // 获取模板列表
-        List<String> templates = VelocityUtils.getTemplateList(table.getTplCategory());
-        for (String template : templates) {
+        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory());
+        for (PathNamedTemplate template : templates) {
+            String pathName = template.getPathName();
             // 渲染模板
-            StringWriter sw = new StringWriter();
-            Template tpl = Velocity.getTemplate(template, Constants.UTF8);
-            tpl.merge(context, sw);
             try {
+                String render = template.render(context);
                 // 添加到zip
-                zip.putNextEntry(new ZipEntry(VelocityUtils.getFileName(template, table)));
-                IoUtil.write(zip, StandardCharsets.UTF_8, false, sw.toString());
-                IoUtil.close(sw);
+                zip.putNextEntry(new ZipEntry(TemplateEngineUtils.getFileName(pathName, table)));
+                IoUtil.write(zip, StandardCharsets.UTF_8, false, render);
                 zip.flush();
                 zip.closeEntry();
             } catch (IOException e) {
@@ -628,9 +611,9 @@ public class GenTableServiceImpl implements IGenTableService {
     public static String getGenPath(GenTable table, String template) {
         String genPath = table.getGenPath();
         if (StringUtils.equals(genPath, "/")) {
-            return System.getProperty("user.dir") + File.separator + "src" + File.separator + VelocityUtils.getFileName(template, table);
+            return System.getProperty("user.dir") + File.separator + "src" + File.separator + TemplateEngineUtils.getFileName(template, table);
         }
-        return genPath + File.separator + VelocityUtils.getFileName(template, table);
+        return genPath + File.separator + TemplateEngineUtils.getFileName(template, table);
     }
 }
 

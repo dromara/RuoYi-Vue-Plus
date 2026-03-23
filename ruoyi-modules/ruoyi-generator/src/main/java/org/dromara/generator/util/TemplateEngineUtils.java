@@ -3,27 +3,33 @@ package org.dromara.generator.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
-import org.dromara.common.mybatis.enums.DataBaseType;
-import org.dromara.generator.constant.GenConstants;
+import cn.hutool.extra.template.TemplateEngine;
+import cn.hutool.extra.template.TemplateUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.common.mybatis.enums.DataBaseType;
 import org.dromara.common.mybatis.helper.DataBaseHelper;
+import org.dromara.generator.config.GenConfig;
+import org.dromara.generator.constant.GenConstants;
 import org.dromara.generator.domain.GenTable;
 import org.dromara.generator.domain.GenTableColumn;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import org.apache.velocity.VelocityContext;
+import org.dromara.generator.util.template.PathNamedTemplate;
 
 import java.util.*;
+import java.util.function.Consumer;
+
+import static org.dromara.generator.constant.GenConstants.TS_TYPES_TEMPLATE_PATH;
 
 /**
- * 模板处理工具类
- *
- * @author ruoyi
+ * 模板引擎工具
  */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VelocityUtils {
+public class TemplateEngineUtils {
 
     /**
      * 项目空间路径
@@ -40,56 +46,73 @@ public class VelocityUtils {
      */
     private static final String DEFAULT_PARENT_MENU_ID = "3";
 
+    // 模板引擎
+    private static final TemplateEngine TEMPLATE_ENGINE;
+    private static final Map<String, PathNamedTemplate> TEMPLATE_MAPPER;
+
+    static {
+        // 模板引擎初始化
+        TEMPLATE_ENGINE = TemplateUtil.createEngine(GenConfig.getTemplateConfig());
+        TEMPLATE_MAPPER = PathNamedTemplate.form(TEMPLATE_ENGINE, GenConstants.TEMPLATE_PATHS);
+    }
+
     /**
-     * 设置模板变量信息
+     * 构建模板上下文
+     *
+     * @param contextInit 模板上下文初始化函数
+     * @return 模板上下文
+     */
+    public static Dict buildContext(Consumer<Dict> contextInit) {
+        Dict context = new Dict();
+        contextInit.accept(context);
+        return context;
+    }
+
+    /**
+     * 构建模板上下文
      *
      * @param genTable 代码生成业务表对象
-     * @return 初始化后的 Velocity 上下文
+     * @return 模板上下文
      */
-    public static VelocityContext prepareContext(GenTable genTable) {
+    public static Dict buildContext(GenTable genTable) {
+        // 构建上下文
+        Dict context = new Dict();
         String moduleName = genTable.getModuleName();
         String businessName = genTable.getBusinessName();
         String packageName = genTable.getPackageName();
         String tplCategory = genTable.getTplCategory();
         String functionName = genTable.getFunctionName();
 
-        VelocityContext velocityContext = new VelocityContext();
-        velocityContext.put("tplCategory", genTable.getTplCategory());
-        velocityContext.put("tableName", genTable.getTableName());
-        velocityContext.put("functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
-        velocityContext.put("ClassName", genTable.getClassName());
-        velocityContext.put("className", StringUtils.uncapitalize(genTable.getClassName()));
-        velocityContext.put("moduleName", genTable.getModuleName());
-        velocityContext.put("BusinessName", StringUtils.capitalize(genTable.getBusinessName()));
-        velocityContext.put("businessName", genTable.getBusinessName());
-        velocityContext.put("basePackage", getPackagePrefix(packageName));
-        velocityContext.put("packageName", packageName);
-        velocityContext.put("author", genTable.getFunctionAuthor());
-        velocityContext.put("datetime", DateUtils.getDate());
-        velocityContext.put("pkColumn", genTable.getPkColumn());
-        velocityContext.put("importList", getImportList(genTable));
-        velocityContext.put("permissionPrefix", getPermissionPrefix(moduleName, businessName));
-        velocityContext.put("columns", genTable.getColumns());
-        velocityContext.put("table", genTable);
-        velocityContext.put("dicts", getDicts(genTable));
-        setMenuVelocityContext(velocityContext, genTable);
-        if (GenConstants.TPL_TREE.equals(tplCategory)) {
-            setTreeVelocityContext(velocityContext, genTable);
-        }
-        return velocityContext;
-    }
-
-    /**
-     * 向模板上下文写入菜单相关变量。
-     *
-     * @param context  模板上下文
-     * @param genTable 代码生成业务表对象
-     */
-    public static void setMenuVelocityContext(VelocityContext context, GenTable genTable) {
+        context.put("tplCategory", genTable.getTplCategory());
+        context.put("tableName", genTable.getTableName());
+        context.put("functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
+        context.put("ClassName", genTable.getClassName());
+        context.put("className", StringUtils.uncapitalize(genTable.getClassName()));
+        context.put("moduleName", moduleName);
+        context.put("BusinessName", StringUtils.capitalize(businessName));
+        context.put("businessName", businessName);
+        context.put("basePackage", getPackagePrefix(packageName));
+        context.put("packageName", packageName);
+        context.put("author", genTable.getFunctionAuthor());
+        context.put("datetime", DateUtils.getDate());
+        context.put("pkColumn", genTable.getPkColumn());
+        context.put("importList", getImportList(genTable));
+        context.put("permissionPrefix", getPermissionPrefix(moduleName, businessName));
+        context.put("columns", genTable.getColumns());
+        context.put("table", genTable);
+        context.put("dicts", getDicts(genTable));
+        // 向模板上下文写入菜单相关变量
         String options = genTable.getOptions();
         Dict paramsObj = JsonUtils.parseMap(options);
         String parentMenuId = getParentMenuId(paramsObj);
         context.put("parentMenuId", parentMenuId);
+
+        // 向树形模板上下文写入树字段相关变量
+        if (GenConstants.TPL_TREE.equals(tplCategory)) {
+            setTreeContext(context, genTable);
+        }
+
+        return context;
     }
 
     /**
@@ -98,10 +121,10 @@ public class VelocityUtils {
      * @param context  模板上下文
      * @param genTable 代码生成业务表对象
      */
-    public static void setTreeVelocityContext(VelocityContext context, GenTable genTable) {
+    public static void setTreeContext(Dict context, GenTable genTable) {
         String options = genTable.getOptions();
         Dict paramsObj = JsonUtils.parseMap(options);
-        String treeCode = getTreecode(paramsObj);
+        String treeCode = getTreeCode(paramsObj);
         String treeParentCode = getTreeParentCode(paramsObj);
         String treeName = getTreeName(paramsObj);
 
@@ -122,32 +145,38 @@ public class VelocityUtils {
      *
      * @return 模板列表
      */
-    public static List<String> getTemplateList(String tplCategory) {
-        List<String> templates = new ArrayList<>();
-        templates.add("vm/java/domain.java.vm");
-        templates.add("vm/java/vo.java.vm");
-        templates.add("vm/java/bo.java.vm");
-        templates.add("vm/java/mapper.java.vm");
-        templates.add("vm/java/service.java.vm");
-        templates.add("vm/java/serviceImpl.java.vm");
-        templates.add("vm/java/controller.java.vm");
-        templates.add("vm/xml/mapper.xml.vm");
+    public static List<PathNamedTemplate> getTemplateList(String tplCategory) {
+        List<PathNamedTemplate> templates = new ArrayList<>();
+        // 后端源码模板
+        templates.add(TEMPLATE_MAPPER.get(GenConstants.JAVA_DOMAIN_TEMPLATE_PATH));
+        templates.add(TEMPLATE_MAPPER.get(GenConstants.JAVA_VO_TEMPLATE_PATH));
+        templates.add(TEMPLATE_MAPPER.get(GenConstants.JAVA_BO_TEMPLATE_PATH));
+        templates.add(TEMPLATE_MAPPER.get(GenConstants.JAVA_MAPPER_TEMPLATE_PATH));
+        templates.add(TEMPLATE_MAPPER.get(GenConstants.JAVA_SERVICE_TEMPLATE_PATH));
+        templates.add(TEMPLATE_MAPPER.get(GenConstants.JAVA_SERVICE_IMPL_TEMPLATE_PATH));
+        templates.add(TEMPLATE_MAPPER.get(GenConstants.JAVA_CONTROLLER_TEMPLATE_PATH));
+        // MyBatis MapperXML 模板
+        templates.add(TEMPLATE_MAPPER.get(GenConstants.XML_MAPPER_TEMPLATE_PATH));
+        // 前端接口源码模板
+        templates.add(TEMPLATE_MAPPER.get(GenConstants.TS_API_TEMPLATE_PATH));
+        templates.add(TEMPLATE_MAPPER.get(TS_TYPES_TEMPLATE_PATH));
+        // 数据库模板
         DataBaseType dataBaseType = DataBaseHelper.getDataBaseType();
         if (dataBaseType.isOracle()) {
-            templates.add("vm/sql/oracle/sql.vm");
+            templates.add(TEMPLATE_MAPPER.get(GenConstants.SQL_ORACLE_TEMPLATE_PATH));
         } else if (dataBaseType.isPostgreSql()) {
-            templates.add("vm/sql/postgres/sql.vm");
+            templates.add(TEMPLATE_MAPPER.get(GenConstants.SQL_POSTGRES_TEMPLATE_PATH));
         } else if (dataBaseType.isSqlServer()) {
-            templates.add("vm/sql/sqlserver/sql.vm");
+            templates.add(TEMPLATE_MAPPER.get(GenConstants.SQL_SQLSERVER_TEMPLATE_PATH));
         } else {
-            templates.add("vm/sql/sql.vm");
+            // 默认使用MySQL模板
+            templates.add(TEMPLATE_MAPPER.get(GenConstants.SQL_MYSQL_TEMPLATE_PATH));
         }
-        templates.add("vm/ts/api.ts.vm");
-        templates.add("vm/ts/types.ts.vm");
+        // 前端页面源码模板
         if (GenConstants.TPL_CRUD.equals(tplCategory)) {
-            templates.add("vm/vue/index.vue.vm");
+            templates.add(TEMPLATE_MAPPER.get(GenConstants.VUE_INDEX_TEMPLATE_PATH));
         } else if (GenConstants.TPL_TREE.equals(tplCategory)) {
-            templates.add("vm/vue/index-tree.vue.vm");
+            templates.add(TEMPLATE_MAPPER.get(GenConstants.VUE_INDEX_TREE_TEMPLATE_PATH));
         }
         return templates;
     }
@@ -174,7 +203,8 @@ public class VelocityUtils {
         String javaPath = PROJECT_PATH + "/" + StringUtils.replace(packageName, ".", "/");
         String mybatisPath = MYBATIS_PATH + "/" + moduleName;
         String vuePath = "vue";
-
+        // templatePath
+        // genFilePathFormat
         if (template.contains("domain.java.vm")) {
             fileName = StringUtils.format("{}/domain/{}.java", javaPath, className);
         }
@@ -306,7 +336,7 @@ public class VelocityUtils {
      * @param paramsObj 生成其他选项
      * @return 树编码
      */
-    public static String getTreecode(Map<String, Object> paramsObj) {
+    public static String getTreeCode(Map<String, Object> paramsObj) {
         if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_CODE)) {
             return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_CODE)));
         }
