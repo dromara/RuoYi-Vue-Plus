@@ -9,11 +9,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.DateUtils;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.enums.DataBaseType;
 import org.dromara.common.mybatis.helper.DataBaseHelper;
-import org.dromara.generator.config.GenConfig;
+import org.dromara.generator.config.properties.GenProperties;
 import org.dromara.generator.constant.GenConstants;
 import org.dromara.generator.domain.GenTable;
 import org.dromara.generator.domain.GenTableColumn;
@@ -52,7 +53,8 @@ public class TemplateEngineUtils {
 
     static {
         // 模板引擎初始化
-        TEMPLATE_ENGINE = TemplateUtil.createEngine(GenConfig.getTemplateConfig());
+        GenProperties properties = SpringUtils.getBean(GenProperties.class);
+        TEMPLATE_ENGINE = TemplateUtil.createEngine(properties.getTemplateConfig());
         TEMPLATE_MAPPER = PathNamedTemplate.form(TEMPLATE_ENGINE, GenConstants.TEMPLATE_PATHS);
     }
 

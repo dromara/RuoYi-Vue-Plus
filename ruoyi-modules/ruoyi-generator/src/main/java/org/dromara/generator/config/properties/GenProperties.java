@@ -2,7 +2,10 @@ package org.dromara.generator.config.properties;
 
 import cn.hutool.extra.template.TemplateConfig;
 import lombok.Data;
+import org.dromara.common.core.factory.YmlPropertySourceFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 
@@ -12,7 +15,9 @@ import java.nio.charset.StandardCharsets;
  * @author 秋辞未寒
  */
 @Data
+@Component
 @ConfigurationProperties(prefix = "gen")
+@PropertySource(value = "classpath:generator.yml", factory = YmlPropertySourceFactory.class)
 public class GenProperties {
 
     /**

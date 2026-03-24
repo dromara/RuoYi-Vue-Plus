@@ -3,8 +3,9 @@ package org.dromara.generator.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.RegExUtils;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.generator.config.GenConfig;
+import org.dromara.generator.config.properties.GenProperties;
 import org.dromara.generator.constant.GenConstants;
 import org.dromara.generator.domain.GenTable;
 import org.dromara.generator.domain.GenTableColumn;
@@ -19,6 +20,8 @@ import java.util.Arrays;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class GenUtils {
 
+    private final static GenProperties PROPERTIES = SpringUtils.getBean(GenProperties.class);
+
     /**
      * 初始化表信息
      *
@@ -26,11 +29,11 @@ public class GenUtils {
      */
     public static void initTable(GenTable genTable) {
         genTable.setClassName(convertClassName(genTable.getTableName()));
-        genTable.setPackageName(GenConfig.getPackageName());
-        genTable.setModuleName(getModuleName(GenConfig.getPackageName()));
+        genTable.setPackageName(PROPERTIES.getPackageName());
+        genTable.setModuleName(getModuleName(PROPERTIES.getPackageName()));
         genTable.setBusinessName(getBusinessName(genTable.getTableName()));
         genTable.setFunctionName(replaceText(genTable.getTableComment()));
-        genTable.setFunctionAuthor(GenConfig.getAuthor());
+        genTable.setFunctionAuthor(PROPERTIES.getAuthor());
         genTable.setCreateTime(null);
         genTable.setUpdateTime(null);
     }
@@ -157,8 +160,8 @@ public class GenUtils {
      * @return 类名
      */
     public static String convertClassName(String tableName) {
-        boolean autoRemovePre = GenConfig.getAutoRemovePre();
-        String tablePrefix = GenConfig.getTablePrefix();
+        boolean autoRemovePre = PROPERTIES.isAutoRemovePre();
+        String tablePrefix = PROPERTIES.getTablePrefix();
         if (autoRemovePre && StringUtils.isNotEmpty(tablePrefix)) {
             String[] searchList = StringUtils.split(tablePrefix, StringUtils.SEPARATOR);
             tableName = replaceFirst(tableName, searchList);
