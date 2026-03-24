@@ -1,8 +1,8 @@
-package org.dromara.common.oss.s3.client;
+package org.dromara.common.oss.client;
 
-import org.dromara.common.oss.s3.config.S3AsyncExecutorConfig;
-import org.dromara.common.oss.s3.config.S3StorageClientConfig;
-import org.dromara.common.oss.s3.exception.S3StorageException;
+import org.dromara.common.oss.config.S3AsyncExecutorConfig;
+import org.dromara.common.oss.config.S3StorageClientConfig;
+import org.dromara.common.oss.exception.S3StorageException;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;

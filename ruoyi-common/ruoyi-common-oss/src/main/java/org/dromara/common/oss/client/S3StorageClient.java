@@ -1,11 +1,11 @@
-package org.dromara.common.oss.s3.client;
+package org.dromara.common.oss.client;
 
 import cn.hutool.core.util.IdUtil;
-import org.dromara.common.oss.s3.config.S3StorageClientConfig;
-import org.dromara.common.oss.s3.domain.GetObjectResult;
-import org.dromara.common.oss.s3.domain.HandleAsyncResult;
-import org.dromara.common.oss.s3.domain.PutObjectResult;
-import org.dromara.common.oss.s3.io.OutputStreamDownloadSubscriber;
+import org.dromara.common.oss.config.S3StorageClientConfig;
+import org.dromara.common.oss.model.GetObjectResult;
+import org.dromara.common.oss.model.HandleAsyncResult;
+import org.dromara.common.oss.model.PutObjectResult;
+import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;

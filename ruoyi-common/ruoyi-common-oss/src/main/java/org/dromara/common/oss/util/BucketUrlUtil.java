@@ -1,4 +1,4 @@
-package org.dromara.common.oss.s3.util;
+package org.dromara.common.oss.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

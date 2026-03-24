@@ -1,14 +1,15 @@
-package org.dromara.common.oss.s3.client;
+package org.dromara.common.oss.client;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.oss.s3.config.S3StorageClientConfig;
-import org.dromara.common.oss.s3.domain.GetObjectResult;
-import org.dromara.common.oss.s3.domain.HandleAsyncResult;
-import org.dromara.common.oss.s3.domain.PutObjectResult;
-import org.dromara.common.oss.s3.exception.S3StorageException;
-import org.dromara.common.oss.s3.io.OutputStreamDownloadSubscriber;
+import org.dromara.common.oss.config.S3StorageClientConfig;
+import org.dromara.common.oss.model.GetObjectResult;
+import org.dromara.common.oss.model.HandleAsyncResult;
+import org.dromara.common.oss.model.PutObjectResult;
+import org.dromara.common.oss.exception.S3StorageException;
+import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.core.async.ResponsePublisher;
@@ -44,6 +45,7 @@ import java.util.function.Function;
  *
  * @author 秋辞未寒
  */
+@Slf4j
 public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
 
     private final AtomicBoolean initialized = new AtomicBoolean(false);
@@ -182,12 +184,22 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
 
     @Override
     public HandleAsyncResult<PutObjectResponse> doCustomUpload(AsyncRequestBody body, Consumer<PutObjectRequest.Builder> putObjectRequestBuilderConsumer, Collection<TransferListener> transferListeners) {
-        return doCustomUpload(body, putObjectRequestBuilderConsumer, transferListeners, (completedUpload, throwable) -> HandleAsyncResult.of(completedUpload.response(), throwable));
+        return doCustomUpload(body, putObjectRequestBuilderConsumer, transferListeners, (completedUpload, throwable) -> {
+            if (completedUpload == null) {
+                return HandleAsyncResult.of(null, throwable);
+            }
+            return HandleAsyncResult.of(completedUpload.response(), throwable);
+        });
     }
 
     @Override
     public HandleAsyncResult<PutObjectResponse> doCustomUpload(AsyncRequestBody body, Consumer<PutObjectRequest.Builder> putObjectRequestBuilderConsumer) {
-        return doCustomUpload(body, putObjectRequestBuilderConsumer, null, (completedUpload, throwable) -> HandleAsyncResult.of(completedUpload.response(), throwable));
+        return doCustomUpload(body, putObjectRequestBuilderConsumer, null, (completedUpload, throwable) -> {
+            if (completedUpload == null) {
+                return HandleAsyncResult.of(null, throwable);
+            }
+            return HandleAsyncResult.of(completedUpload.response(), throwable);
+        });
     }
 
     @Override
@@ -232,9 +244,7 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
 
     @Override
     public PutObjectResult bucketUpload(String bucket, String key, InputStream in, long contentLength) {
-        AsyncRequestBody body = AsyncRequestBody.fromInputStream(builder -> builder.inputStream(in)
-            .contentLength(contentLength)
-            .executor(asyncExecutor));
+        AsyncRequestBody body = AsyncRequestBody.fromInputStream(in,contentLength,asyncExecutor);
         return bucketUpload(bucket, key, body);
     }
 
@@ -252,7 +262,13 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
 
 
     private PutObjectResult bucketUpload(String bucket, String key, AsyncRequestBody body) {
-        HandleAsyncResult<PutObjectResponse> result = doCustomUpload(body, builder -> builder.bucket(bucket).key(key));
+        Long contentLength = body.contentLength().orElse(null);
+        HandleAsyncResult<PutObjectResponse> result = doCustomUpload(body, builder -> {
+            builder.bucket(bucket)
+                .key(key)
+                .contentLength(contentLength)
+            ;
+        });
         if (result.isFailure()) {
             throw S3StorageException.form(result.error());
         }
@@ -261,7 +277,12 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
             throw S3StorageException.form("response is empty.");
         }
         PutObjectResponse response = opt.get();
-        return PutObjectResult.form(null, key, response.eTag(), response.size());
+        String bucketUrl = config.getBucketUrl(bucket);
+        // 不知道什么原因导致 response.size() 返回了一个 null size ，此处做一个适配...
+        Long size = response.size();
+        size = size == null ? contentLength : size;
+        log.info("response size:{}", size);
+        return PutObjectResult.form("%s/%s".formatted(bucketUrl,key), key, response.eTag(), size == null?0:size);
     }
 
     @Override

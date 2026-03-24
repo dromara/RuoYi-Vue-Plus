@@ -1,7 +1,7 @@
-package org.dromara.common.oss.s3.config;
+package org.dromara.common.oss.config;
 
 import lombok.Builder;
-import org.dromara.common.oss.s3.enums.AccessPolicy;
+import org.dromara.common.oss.enums.AccessPolicy;
 import org.jspecify.annotations.NonNull;
 
 import java.io.Serial;

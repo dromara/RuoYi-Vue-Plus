@@ -1,4 +1,4 @@
-package org.dromara.common.oss.s3.config;
+package org.dromara.common.oss.config;
 
 /**
  * 配置对象接口

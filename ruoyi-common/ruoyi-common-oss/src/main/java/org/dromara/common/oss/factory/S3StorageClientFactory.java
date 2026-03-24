@@ -1,4 +1,4 @@
-package org.dromara.common.oss.s3.factory;
+package org.dromara.common.oss.factory;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.CacheNames;
@@ -6,10 +6,10 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.oss.constant.OssConstant;
 import org.dromara.common.oss.properties.OssProperties;
-import org.dromara.common.oss.s3.client.DefaultS3StorageClientImpl;
-import org.dromara.common.oss.s3.client.S3StorageClient;
-import org.dromara.common.oss.s3.config.S3StorageClientConfig;
-import org.dromara.common.oss.s3.exception.S3StorageException;
+import org.dromara.common.oss.client.DefaultS3StorageClientImpl;
+import org.dromara.common.oss.client.S3StorageClient;
+import org.dromara.common.oss.config.S3StorageClientConfig;
+import org.dromara.common.oss.exception.S3StorageException;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 

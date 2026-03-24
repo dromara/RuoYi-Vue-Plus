@@ -1,4 +1,4 @@
-package org.dromara.common.oss.s3.domain;
+package org.dromara.common.oss.model;
 
 import java.time.LocalDateTime;
 import java.util.Map;
