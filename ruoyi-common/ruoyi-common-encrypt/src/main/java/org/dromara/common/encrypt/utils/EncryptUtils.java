@@ -223,6 +223,50 @@ public class EncryptUtils {
     }
 
     /**
+     * SM2公钥验签（Base64编码）
+     *
+     * @param data      原文数据
+     * @param sign      签名值
+     * @param publicKey 公钥
+     * @return true-验签成功，false-验签失败
+     */
+    public static boolean verifySm2Sign(String data, String sign, String publicKey) {
+        if (StrUtil.isBlank(data)) {
+            throw new IllegalArgumentException("SM2验签需要传入原文数据");
+        }
+        if (StrUtil.isBlank(sign)) {
+            throw new IllegalArgumentException("SM2验签需要传入签名值");
+        }
+        if (StrUtil.isBlank(publicKey)) {
+            throw new IllegalArgumentException("SM2验签需要传入公钥");
+        }
+        SM2 sm2 = SmUtil.sm2(null, publicKey);
+        return sm2.verify(data.getBytes(StandardCharsets.UTF_8), sign.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * SM2公钥验签（Hex编码）
+     *
+     * @param dataHex    原文数据（Hex编码）
+     * @param signHex    签名值（Hex编码）
+     * @param publicKey  公钥
+     * @return true-验签成功，false-验签失败
+     */
+    public static boolean verifySm2SignHex(String dataHex, String signHex, String publicKey) {
+        if (StrUtil.isBlank(dataHex)) {
+            throw new IllegalArgumentException("SM2验签需要传入Hex格式的原文数据");
+        }
+        if (StrUtil.isBlank(signHex)) {
+            throw new IllegalArgumentException("SM2验签需要传入Hex格式的签名值");
+        }
+        if (StrUtil.isBlank(publicKey)) {
+            throw new IllegalArgumentException("SM2验签需要传入公钥");
+        }
+        SM2 sm2 = SmUtil.sm2(null, publicKey);
+        return sm2.verifyHex(dataHex, signHex);
+    }
+
+    /**
      * 产生RSA加解密需要的公钥和私钥
      *
      * @return 公私钥Map
