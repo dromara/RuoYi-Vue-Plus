@@ -52,7 +52,7 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
 
     /**
      * S3 存储客户端ID
-     *
+     * <p>
      * 用于标识客户端，初始化后不允许更改
      */
     protected final String clientId;
@@ -85,7 +85,7 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
     public AbstractS3StorageClientImpl(String clientId, S3StorageClientConfig config) {
         Assert.notNull(config, () -> S3StorageException.form("S3StorageClientConfig must not be null"));
         // 如果没有设置存储客户端ID，则随机生成一个
-        this.clientId = StringUtils.isBlank(clientId)? IdUtil.fastSimpleUUID() : clientId;
+        this.clientId = StringUtils.isBlank(clientId) ? IdUtil.fastSimpleUUID() : clientId;
         this.config = config;
         this.initialize();
     }
@@ -244,7 +244,7 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
 
     @Override
     public PutObjectResult bucketUpload(String bucket, String key, InputStream in, long contentLength) {
-        AsyncRequestBody body = AsyncRequestBody.fromInputStream(in,contentLength,asyncExecutor);
+        AsyncRequestBody body = AsyncRequestBody.fromInputStream(in, contentLength, asyncExecutor);
         return bucketUpload(bucket, key, body);
     }
 
@@ -281,8 +281,7 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
         // 不知道什么原因导致 response.size() 返回了一个 null size ，此处做一个适配...
         Long size = response.size();
         size = size == null ? contentLength : size;
-        log.info("response size:{}", size);
-        return PutObjectResult.form("%s/%s".formatted(bucketUrl,key), key, response.eTag(), size == null?0:size);
+        return PutObjectResult.form("%s/%s".formatted(bucketUrl, key), key, response.eTag(), size == null ? 0 : size);
     }
 
     @Override
