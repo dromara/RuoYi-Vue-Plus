@@ -21,8 +21,8 @@ import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.common.redis.annotation.RateLimiter;
 import org.dromara.common.redis.enums.LimitType;
 import org.dromara.common.redis.utils.RedisUtils;
-import org.dromara.common.web.core.WaveAndCircleCaptcha;
 import org.dromara.common.web.config.properties.CaptchaProperties;
+import org.dromara.common.web.core.WaveAndCircleCaptcha;
 import org.dromara.sms4j.api.SmsBlend;
 import org.dromara.sms4j.api.entity.SmsResponse;
 import org.dromara.sms4j.core.factory.SmsFactory;
@@ -61,7 +61,7 @@ public class CaptchaController {
     @RateLimiter(key = "#phonenumber", time = 60, count = 1)
     @GetMapping("/resource/sms/code")
     public R<Void> smsCode(@NotBlank(message = "{user.phonenumber.not.blank}") String phoneNumber) {
-        if (RegexValidator.isMobile(phoneNumber)) {
+        if (!RegexValidator.isMobile(phoneNumber)) {
             return R.fail("请输入正确的手机号！");
         }
         String key = GlobalConstants.CAPTCHA_CODE_KEY + phoneNumber;
@@ -91,7 +91,7 @@ public class CaptchaController {
         if (!mailProperties.getEnabled()) {
             return R.fail("当前系统没有开启邮箱功能！");
         }
-        if (RegexValidator.isEmail(email)) {
+        if (!RegexValidator.isEmail(email)) {
             return R.fail("请输入正确的邮箱地址！");
         }
         SpringUtils.getAopProxy(this).emailCodeImpl(email);
@@ -168,8 +168,8 @@ public class CaptchaController {
      * 图片验证码响应对象。
      *
      * @param captchaEnabled 是否启用验证码
-     * @param uuid 验证码标识
-     * @param img Base64 图片数据
+     * @param uuid           验证码标识
+     * @param img            Base64 图片数据
      */
     public record CaptchaVo(Boolean captchaEnabled, String uuid, String img) {
     }
