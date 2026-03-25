@@ -4,12 +4,12 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.oss.config.S3StorageClientConfig;
+import org.dromara.common.oss.config.OssClientConfig;
+import org.dromara.common.oss.exception.S3StorageException;
+import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
 import org.dromara.common.oss.model.GetObjectResult;
 import org.dromara.common.oss.model.HandleAsyncResult;
 import org.dromara.common.oss.model.PutObjectResult;
-import org.dromara.common.oss.exception.S3StorageException;
-import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.core.async.ResponsePublisher;
@@ -46,7 +46,7 @@ import java.util.function.Function;
  * @author 秋辞未寒
  */
 @Slf4j
-public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
+public abstract class AbstractOssClientImpl implements OssClient {
 
     private final AtomicBoolean initialized = new AtomicBoolean(false);
 
@@ -60,7 +60,7 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
     /**
      * S3 存储客户端配置。
      */
-    protected S3StorageClientConfig config;
+    protected OssClientConfig config;
 
     /**
      * Amazon S3 异步客户端。
@@ -82,7 +82,7 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
      */
     protected ExecutorService asyncExecutor;
 
-    public AbstractS3StorageClientImpl(String clientId, S3StorageClientConfig config) {
+    public AbstractOssClientImpl(String clientId, OssClientConfig config) {
         Assert.notNull(config, () -> S3StorageException.form("S3StorageClientConfig must not be null"));
         // 如果没有设置存储客户端ID，则随机生成一个
         this.clientId = StringUtils.isBlank(clientId) ? IdUtil.fastSimpleUUID() : clientId;
@@ -96,7 +96,7 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
     }
 
     @Override
-    public S3StorageClientConfig config() {
+    public OssClientConfig config() {
         // 仅返回copy副本，防篡改
         return this.config.copy();
     }
@@ -127,7 +127,7 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
     abstract void doInitialize();
 
     @Override
-    public void refresh(S3StorageClientConfig config) {
+    public void refresh(OssClientConfig config) {
         if (Objects.equals(this.config, config)) {
             return;
         }
@@ -148,13 +148,13 @@ public abstract class AbstractS3StorageClientImpl implements S3StorageClient {
     }
 
     @Override
-    public boolean verifyConfig(Function<S3StorageClientConfig, Boolean> verifyConfigAction) {
-        S3StorageClientConfig config = config();
+    public boolean verifyConfig(Function<OssClientConfig, Boolean> verifyConfigAction) {
+        OssClientConfig config = config();
         return Boolean.TRUE.equals(verifyConfigAction.apply(config));
     }
 
     @Override
-    public boolean verifyConfig(S3StorageClientConfig verifyConfig) {
+    public boolean verifyConfig(OssClientConfig verifyConfig) {
         return verifyConfig((config) -> Objects.equals(config, verifyConfig));
     }
 

@@ -1,11 +1,11 @@
 package org.dromara.common.oss.client;
 
 import cn.hutool.core.util.IdUtil;
-import org.dromara.common.oss.config.S3StorageClientConfig;
+import org.dromara.common.oss.config.OssClientConfig;
+import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
 import org.dromara.common.oss.model.GetObjectResult;
 import org.dromara.common.oss.model.HandleAsyncResult;
 import org.dromara.common.oss.model.PutObjectResult;
-import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -39,7 +39,7 @@ import java.util.function.Function;
  *
  * @author 秋辞未寒
  */
-public interface S3StorageClient extends AutoCloseable {
+public interface OssClient extends AutoCloseable {
 
     /**
      * S3 存储客户端ID
@@ -55,7 +55,7 @@ public interface S3StorageClient extends AutoCloseable {
     /**
      * 获取客户端配置copy副本
      */
-    S3StorageClientConfig config();
+    OssClientConfig config();
 
     /**
      * 是否已经初始化
@@ -72,7 +72,7 @@ public interface S3StorageClient extends AutoCloseable {
      *
      * @param config 配置项
      */
-    void refresh(S3StorageClientConfig config);
+    void refresh(OssClientConfig config);
 
     /**
      * 校验客户端配置
@@ -82,7 +82,7 @@ public interface S3StorageClient extends AutoCloseable {
      * @param verifyConfigAction 校验配置动作函数
      * @return 是否一致
      */
-    boolean verifyConfig(Function<S3StorageClientConfig,Boolean> verifyConfigAction);
+    boolean verifyConfig(Function<OssClientConfig, Boolean> verifyConfigAction);
 
     /**
      * 校验客户端配置与传入的待校验配置是否一致
@@ -92,7 +92,7 @@ public interface S3StorageClient extends AutoCloseable {
      * @param verifyConfig 待校验的配置
      * @return 是否一致
      */
-    boolean verifyConfig(S3StorageClientConfig verifyConfig);
+    boolean verifyConfig(OssClientConfig verifyConfig);
 
     /**
      * 执行自定义上传请求。

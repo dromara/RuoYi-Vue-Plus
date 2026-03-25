@@ -26,7 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class S3StorageClientConfig implements Config<S3StorageClientConfig, S3StorageClientConfig.S3StorageClientConfigBuilder>, Serializable {
+public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.OssClientConfigBuilder>, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -79,12 +79,12 @@ public class S3StorageClientConfig implements Config<S3StorageClientConfig, S3St
     /**
      * ACL访问策略配置
      */
-    private final S3AccessControlPolicyConfig accessControlPolicyConfig;
+    private final AccessControlPolicyConfig accessControlPolicyConfig;
 
     /**
      * 异步调度池配置
      */
-    private final S3AsyncExecutorConfig asyncExecutorConfig;
+    private final OssAsyncExecutorConfig asyncExecutorConfig;
 
     /**
      * 访问端点
@@ -149,20 +149,42 @@ public class S3StorageClientConfig implements Config<S3StorageClientConfig, S3St
         return Optional.ofNullable(prefix);
     }
 
-    /**
-     * ACL访问策略配置
-     */
-    public @NonNull S3AccessControlPolicyConfig accessControlPolicyConfig() {
-        return Optional.ofNullable(accessControlPolicyConfig)
-            .orElse(S3AccessControlPolicyConfig.DEFAULT);
+    public static OssClientConfig formProperties(OssProperties properties) {
+        return formPropertiesBuilder(properties).build();
     }
 
-    /**
-     * ACL访问策略配置
-     */
-    public @NonNull S3AsyncExecutorConfig asyncExecutorConfig() {
-        return Optional.ofNullable(asyncExecutorConfig)
-            .orElse(S3AsyncExecutorConfig.DEFAULT);
+    public static OssClientConfigBuilder formPropertiesBuilder(OssProperties properties) {
+        String regionString = properties.getRegion();
+        Region region = Region.US_EAST_1;
+        if (StringUtils.isNotBlank(regionString)) {
+            region = Region.of(regionString);
+        }
+
+        // 是否使用路径风格应当由使用者明确去配置，此处的配置只是为了适配旧的配置项
+        // MinIO 使用 HTTPS 限制使用域名访问，站点填域名。需要启用路径样式访问
+        boolean usePathStyleAccess = !StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
+
+        // 绝大多数的云厂商都是不允许操作ACL的，所以此处的默认配置也是禁用ACL的
+        AccessControlPolicyConfig accessControlPolicyConfig = AccessControlPolicyConfig.DEFAULT;
+        // 目前自定义实现的 Client 上传/下载/删除中并没有实际使用到ACL相关配置
+        // 仅有业务中的链接预签名使用到（SysOssServiceImpl#matchingUrl），更多只是作为一个扩展点保留，如有需要ACL的自行实现调用逻辑
+        String accessPolicyString = properties.getAccessPolicy();
+        if (StringUtils.isNotBlank(accessPolicyString)) {
+            accessControlPolicyConfig = AccessControlPolicyConfig.builder()
+                .enabled(true)
+                .accessPolicy(AccessPolicy.formType(accessPolicyString))
+                .build();
+        }
+        return builder()
+            .endpoint(properties.getEndpoint())
+            .domain(properties.getDomainUrl())
+            .accessKey(properties.getAccessKey())
+            .secretKey(properties.getSecretKey())
+            .bucket(properties.getBucketName())
+            .region(region)
+            .useHttps(SystemConstants.YES.equals(properties.getIsHttps()))
+            .usePathStyleAccess(usePathStyleAccess)
+            .accessControlPolicyConfig(accessControlPolicyConfig);
     }
 
     /**
@@ -225,10 +247,26 @@ public class S3StorageClientConfig implements Config<S3StorageClientConfig, S3St
     }
 
     /**
+     * ACL访问策略配置
+     */
+    public @NonNull AccessControlPolicyConfig accessControlPolicyConfig() {
+        return Optional.ofNullable(accessControlPolicyConfig)
+            .orElse(AccessControlPolicyConfig.DEFAULT);
+    }
+
+    /**
+     * ACL访问策略配置
+     */
+    public @NonNull OssAsyncExecutorConfig asyncExecutorConfig() {
+        return Optional.ofNullable(asyncExecutorConfig)
+            .orElse(OssAsyncExecutorConfig.DEFAULT);
+    }
+
+    /**
      * 复制S3存储客户端配置对象
      */
     @Override
-    public S3StorageClientConfig copy() {
+    public OssClientConfig copy() {
         return toBuilder().build();
     }
 
@@ -236,7 +274,7 @@ public class S3StorageClientConfig implements Config<S3StorageClientConfig, S3St
      * 转为S3存储客户端配置构建器对象
      */
     @Override
-    public S3StorageClientConfigBuilder toBuilder() {
+    public OssClientConfigBuilder toBuilder() {
         return builder()
             .endpoint(endpoint)
             .domain(domain)
@@ -249,43 +287,5 @@ public class S3StorageClientConfig implements Config<S3StorageClientConfig, S3St
             .prefix(prefix)
             .accessControlPolicyConfig(accessControlPolicyConfig().copy())
             .asyncExecutorConfig(asyncExecutorConfig().copy());
-    }
-
-    public static S3StorageClientConfig formProperties(OssProperties properties){
-        return formPropertiesBuilder(properties).build();
-    }
-
-    public static S3StorageClientConfigBuilder formPropertiesBuilder(OssProperties properties){
-        String regionString = properties.getRegion();
-        Region region = Region.US_EAST_1;
-        if (StringUtils.isNotBlank(regionString)) {
-            region = Region.of(regionString);
-        }
-
-        // 是否使用路径风格应当由使用者明确去配置，此处的配置只是为了适配旧的配置项
-        // MinIO 使用 HTTPS 限制使用域名访问，站点填域名。需要启用路径样式访问
-        boolean usePathStyleAccess = !StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
-
-        // 绝大多数的云厂商都是不允许操作ACL的，所以此处的默认配置也是禁用ACL的
-        S3AccessControlPolicyConfig accessControlPolicyConfig = S3AccessControlPolicyConfig.DEFAULT;
-        // 目前自定义实现的 Client 上传/下载/删除中并没有实际使用到ACL相关配置
-        // 仅有业务中的链接预签名使用到（SysOssServiceImpl#matchingUrl），更多只是作为一个扩展点保留，如有需要ACL的自行实现调用逻辑
-        String accessPolicyString = properties.getAccessPolicy();
-        if (StringUtils.isNotBlank(accessPolicyString)) {
-            accessControlPolicyConfig = S3AccessControlPolicyConfig.builder()
-                .enabled(true)
-                .accessPolicy(AccessPolicy.formType(accessPolicyString))
-                .build();
-        }
-        return builder()
-            .endpoint(properties.getEndpoint())
-            .domain(properties.getDomainUrl())
-            .accessKey(properties.getAccessKey())
-            .secretKey(properties.getSecretKey())
-            .bucket(properties.getBucketName())
-            .region(region)
-            .useHttps(SystemConstants.YES.equals(properties.getIsHttps()))
-            .usePathStyleAccess(usePathStyleAccess)
-            .accessControlPolicyConfig(accessControlPolicyConfig);
     }
 }

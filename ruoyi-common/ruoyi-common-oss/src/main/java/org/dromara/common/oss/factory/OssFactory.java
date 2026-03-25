@@ -4,12 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.common.oss.client.DefaultOssClientImpl;
+import org.dromara.common.oss.client.OssClient;
+import org.dromara.common.oss.config.OssClientConfig;
 import org.dromara.common.oss.constant.OssConstant;
-import org.dromara.common.oss.properties.OssProperties;
-import org.dromara.common.oss.client.DefaultS3StorageClientImpl;
-import org.dromara.common.oss.client.S3StorageClient;
-import org.dromara.common.oss.config.S3StorageClientConfig;
 import org.dromara.common.oss.exception.S3StorageException;
+import org.dromara.common.oss.properties.OssProperties;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 
@@ -23,15 +23,15 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author 秋辞未寒
  */
 @Slf4j
-public class S3StorageClientFactory {
+public class OssFactory {
 
-    private static final Map<String, S3StorageClient> CLIENT_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, OssClient> CLIENT_CACHE = new ConcurrentHashMap<>();
     private static final ReentrantLock LOCK = new ReentrantLock();
 
     /**
      * 获取默认实例
      */
-    public static S3StorageClient instance() {
+    public static OssClient instance() {
         // 获取redis 默认类型
         String configKey = RedisUtils.getCacheObject(OssConstant.DEFAULT_CONFIG_KEY);
         if (StringUtils.isEmpty(configKey)) {
@@ -43,18 +43,18 @@ public class S3StorageClientFactory {
     /**
      * 根据类型获取实例
      */
-    public static S3StorageClient instance(String configKey) {
+    public static OssClient instance(String configKey) {
         String json = CacheUtils.get(CacheNames.SYS_OSS_CONFIG, configKey);
         if (json == null) {
             throw S3StorageException.form("系统异常, '" + configKey + "'配置信息不存在!");
         }
         OssProperties properties = JsonUtils.parseObject(json, OssProperties.class);
-        S3StorageClientConfig config = S3StorageClientConfig.formProperties(properties);
+        OssClientConfig config = OssClientConfig.formProperties(properties);
         LOCK.lock();
         try {
             // 如果已经存在，则校验配置一致性
             if (CLIENT_CACHE.containsKey(configKey)) {
-                S3StorageClient client = CLIENT_CACHE.get(configKey);
+                OssClient client = CLIENT_CACHE.get(configKey);
                 if (!client.verifyConfig(config)) {
                     // 配置不一致，刷新配置
                     client.refresh(config);
@@ -62,7 +62,7 @@ public class S3StorageClientFactory {
                 }
                 return client;
             }
-            DefaultS3StorageClientImpl client = new DefaultS3StorageClientImpl(configKey,config);
+            DefaultOssClientImpl client = new DefaultOssClientImpl(configKey, config);
             CLIENT_CACHE.put(configKey, client);
             return client;
         } finally {
@@ -74,7 +74,7 @@ public class S3StorageClientFactory {
      * 移除实例
      */
     public static boolean remove(String configKey) {
-        S3StorageClient client = CLIENT_CACHE.remove(configKey);
+        OssClient client = CLIENT_CACHE.remove(configKey);
         if (client == null) {
             return false;
         }

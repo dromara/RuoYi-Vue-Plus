@@ -16,10 +16,10 @@ import java.util.Optional;
  * @author 秋辞未寒
  */
 @Builder
-public record S3AccessControlPolicyConfig(
+public record AccessControlPolicyConfig(
     boolean enabled
     , AccessPolicy accessPolicy
-) implements Config<S3AccessControlPolicyConfig, S3AccessControlPolicyConfig.S3AccessControlPolicyConfigBuilder>, Serializable {
+) implements Config<AccessControlPolicyConfig, AccessControlPolicyConfig.AccessControlPolicyConfigBuilder>, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -27,7 +27,7 @@ public record S3AccessControlPolicyConfig(
     /**
      * 默认访问策略配置
      */
-    public static final S3AccessControlPolicyConfig DEFAULT = S3AccessControlPolicyConfig.builder()
+    public static final AccessControlPolicyConfig DEFAULT = AccessControlPolicyConfig.builder()
         .enabled(false)
         .accessPolicy(AccessPolicy.PUBLIC_READ_WRITE)
         .build();
@@ -39,12 +39,12 @@ public record S3AccessControlPolicyConfig(
     }
 
     @Override
-    public S3AccessControlPolicyConfig copy() {
+    public AccessControlPolicyConfig copy() {
         return toBuilder().build();
     }
 
     @Override
-    public S3AccessControlPolicyConfigBuilder toBuilder() {
+    public AccessControlPolicyConfigBuilder toBuilder() {
         return builder()
             .enabled(enabled)
             .accessPolicy(accessPolicy);

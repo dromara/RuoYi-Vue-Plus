@@ -15,10 +15,10 @@ import java.io.Serializable;
  * @author 秋辞未寒
  */
 @Builder
-public record S3AsyncExecutorConfig(
+public record OssAsyncExecutorConfig(
     boolean enabledVirtualThread
     , int corePoolSize
-) implements Config<S3AsyncExecutorConfig, S3AsyncExecutorConfig.S3AsyncExecutorConfigBuilder>, Serializable {
+) implements Config<OssAsyncExecutorConfig, OssAsyncExecutorConfig.OssAsyncExecutorConfigBuilder>, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -31,7 +31,7 @@ public record S3AsyncExecutorConfig(
     /**
      * 默认异步执行器配置
      */
-    public static final S3AsyncExecutorConfig DEFAULT = S3AsyncExecutorConfig.builder()
+    public static final OssAsyncExecutorConfig DEFAULT = OssAsyncExecutorConfig.builder()
         .enabledVirtualThread(false)
         .corePoolSize(DEFAULT_CORE_POOL_SIZE)
         .build();
@@ -53,12 +53,12 @@ public record S3AsyncExecutorConfig(
     }
 
     @Override
-    public S3AsyncExecutorConfig copy() {
+    public OssAsyncExecutorConfig copy() {
         return toBuilder().build();
     }
 
     @Override
-    public S3AsyncExecutorConfigBuilder toBuilder() {
+    public OssAsyncExecutorConfigBuilder toBuilder() {
         return builder()
             .enabledVirtualThread(enabledVirtualThread)
             .corePoolSize(corePoolSize);

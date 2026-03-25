@@ -21,6 +21,7 @@ import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.oss.client.S3StorageClient;
+import org.dromara.common.oss.factory.OssFactory;
 import org.dromara.common.oss.model.GetObjectResult;
 import org.dromara.common.oss.model.PutObjectResult;
 import org.dromara.common.oss.enums.AccessPolicy;
@@ -212,7 +213,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         }
         String originalfileName = file.getOriginalFilename();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
-        S3StorageClient instance = S3StorageClientFactory.instance();
+        S3StorageClient instance = OssFactory.instance();
         try {
             String pathKey = S3ObjectUtil.buildPathKey(originalfileName);
             PutObjectResult result = instance.upload(pathKey, file.getInputStream(), file.getSize());

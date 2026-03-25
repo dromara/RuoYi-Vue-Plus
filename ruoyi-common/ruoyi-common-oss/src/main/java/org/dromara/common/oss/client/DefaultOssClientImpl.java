@@ -1,7 +1,7 @@
 package org.dromara.common.oss.client;
 
-import org.dromara.common.oss.config.S3AsyncExecutorConfig;
-import org.dromara.common.oss.config.S3StorageClientConfig;
+import org.dromara.common.oss.config.OssAsyncExecutorConfig;
+import org.dromara.common.oss.config.OssClientConfig;
 import org.dromara.common.oss.exception.S3StorageException;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -21,9 +21,9 @@ import java.util.concurrent.Executors;
  *
  * @author 秋辞未寒
  */
-public class DefaultS3StorageClientImpl extends AbstractS3StorageClientImpl {
+public class DefaultOssClientImpl extends AbstractOssClientImpl {
 
-    public DefaultS3StorageClientImpl(String clientId, S3StorageClientConfig config) {
+    public DefaultOssClientImpl(String clientId, OssClientConfig config) {
         super(clientId, config);
     }
 
@@ -79,7 +79,7 @@ public class DefaultS3StorageClientImpl extends AbstractS3StorageClientImpl {
             .build();
 
         // 创建异步调度器对象
-        S3AsyncExecutorConfig asyncExecutorConfig = config.asyncExecutorConfig();
+        OssAsyncExecutorConfig asyncExecutorConfig = config.asyncExecutorConfig();
         // 是否使用虚拟线程
         if (asyncExecutorConfig.enabledVirtualThread()) {
             this.asyncExecutor = Executors.newVirtualThreadPerTaskExecutor();
