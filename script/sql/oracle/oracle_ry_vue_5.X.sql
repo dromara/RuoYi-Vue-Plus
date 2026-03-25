@@ -360,7 +360,7 @@ insert into sys_menu values('120',  '任务调度中心',  '2',    '5', 'snailjo
 
 -- 三级菜单
 insert into sys_menu values('500',  '操作日志', '108', '1', 'operlog',    'monitor/operlog/index',    '', 'N', 'Y', 'C', '0', '0', 'monitor:operlog:list',    'form',          103, 1, sysdate, null, null, '操作日志菜单');
-insert into sys_menu values('501',  '登录日志', '108', '2', 'loginInfo', 'monitor/logininfo/index', '', 'N', 'Y', 'C', '0', '0', 'monitor:loginInfo:list', 'loginInfo',    103, 1, sysdate, null, null, '登录日志菜单');
+insert into sys_menu values('501',  '登录日志', '108', '2', 'logininfo', 'monitor/logininfo/index', '', 'N', 'Y', 'C', '0', '0', 'monitor:logininfo:list', 'logininfo',    103, 1, sysdate, null, null, '登录日志菜单');
 -- 用户管理按钮
 insert into sys_menu values('1001', '用户查询', '100', '1',  '', '', '', 'N', 'Y', 'F', '0', '0', 'system:user:query',          '#', 103, 1, sysdate, null, null, '');
 insert into sys_menu values('1002', '用户新增', '100', '2',  '', '', '', 'N', 'Y', 'F', '0', '0', 'system:user:add',            '#', 103, 1, sysdate, null, null, '');

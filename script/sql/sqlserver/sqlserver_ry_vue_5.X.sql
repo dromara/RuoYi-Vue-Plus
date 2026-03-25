@@ -1409,7 +1409,7 @@ INSERT sys_menu VALUES (120, N'任务调度中心', 2, 5, N'snailjob', N'monitor
 GO
 INSERT sys_menu VALUES (500, N'操作日志', 108, 1, N'operlog', N'monitor/operlog/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:operlog:list', N'form', 103, 1, getdate(), NULL, NULL, N'操作日志菜单')
 GO
-INSERT sys_menu VALUES (501, N'登录日志', 108, 2, N'loginInfo', N'monitor/loginInfo/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:loginInfo:list', N'loginInfo', 103, 1, getdate(), NULL, NULL, N'登录日志菜单')
+INSERT sys_menu VALUES (501, N'登录日志', 108, 2, N'logininfo', N'monitor/logininfo/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:logininfo:list', N'logininfo', 103, 1, getdate(), NULL, NULL, N'登录日志菜单')
 GO
 INSERT sys_menu VALUES (1001, N'用户查询', 100, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:query', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
