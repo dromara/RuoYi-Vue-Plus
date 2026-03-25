@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.dto.UserDTO;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -98,7 +99,14 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
                     }
                     case EMAIL_MESSAGE -> MailUtils.sendText(emails, subject, message);
                     case SMS_MESSAGE -> {
-                        // TODO: 补充短信发送逻辑
+//                        LinkedHashMap<String, String> map = new LinkedHashMap<>(1);
+//                        // 根据具体短信服务商参数用法传参
+//                        map.put("code", "1234");
+//                        // 自动获取一个短信服务商
+//                        SmsBlend smsBlend = SmsFactory.getSmsBlend();
+//                        // 指定获取一个短信服务商 configKey
+//                        SmsBlend smsBlend = SmsFactory.getSmsBlend("config1");
+//                        SmsResponse smsResponse = smsBlend.sendMessage(phones, templateId, map);
                         log.info("【短信发送 - TODO】用户数量={} 内容={}", userList.size(), message);
                     }
                     default -> log.warn("【消息发送】未处理的消息类型：{}", messageTypeEnum);
@@ -119,6 +127,9 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
     @Override
     public String applyNodeCode(Long definitionId) {
         List<Node> firstBetweenNode = FlowEngine.nodeService().getFirstBetweenNode(definitionId, new HashMap<>());
+        if (CollUtil.isEmpty(firstBetweenNode)) {
+            throw new ServiceException("流程定义缺少申请人节点，请检查流程定义配置");
+        }
         return firstBetweenNode.get(0).getNodeCode();
     }
 }

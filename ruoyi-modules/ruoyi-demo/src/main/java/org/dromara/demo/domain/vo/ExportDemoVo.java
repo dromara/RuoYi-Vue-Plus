@@ -35,8 +35,8 @@ public class ExportDemoVo implements Serializable {
     /**
      * 用户昵称
      */
-    @ExcelProperty(value = "用户名", index = 0)
-    @NotEmpty(message = "用户名不能为空", groups = AddGroup.class)
+    @ExcelProperty(value = "用户昵称", index = 0)
+    @NotEmpty(message = "用户昵称不能为空", groups = AddGroup.class)
     private String nickName;
 
     /**

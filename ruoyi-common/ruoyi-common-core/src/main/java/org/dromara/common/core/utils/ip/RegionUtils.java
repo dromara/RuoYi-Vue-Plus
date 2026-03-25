@@ -90,9 +90,9 @@ public class RegionUtils {
         try {
             String region = ip2Region.search(ipString);
             if (StringUtils.isBlank(region)) {
-                region = UNKNOWN_ADDRESS;
+                return UNKNOWN_ADDRESS;
             }
-            return region;
+            return StringUtils.replace(region, "0", UNKNOWN_ADDRESS);
         } catch (Exception e) {
             log.error("IP地址离线获取城市异常 {}", ipString);
             return UNKNOWN_ADDRESS;
@@ -109,9 +109,9 @@ public class RegionUtils {
         try {
             String region = ip2Region.search(ipBytes);
             if (StringUtils.isBlank(region)) {
-                region = UNKNOWN_ADDRESS;
+                return UNKNOWN_ADDRESS;
             }
-            return region;
+            return StringUtils.replace(region, "0", UNKNOWN_ADDRESS);
         } catch (Exception e) {
             log.error("IP地址离线获取城市异常 {}", Util.ipToString(ipBytes));
             return UNKNOWN_ADDRESS;

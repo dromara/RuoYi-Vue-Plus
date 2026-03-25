@@ -232,7 +232,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     }
 
     /**
-     * 校验用户名称是否唯一
+     * 校验用户账号是否唯一
      *
      * @param user 用户信息
      * @return 结果
@@ -497,6 +497,11 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
             roleList.remove(SystemConstants.SUPER_ADMIN_ID);
         }
 
+        // 移除超管角色后若无剩余角色，说明仅选了超管角色且不允许分配，显式报错
+        if (roleList.isEmpty()) {
+            throw new ServiceException("不允许为普通用户分配超级管理员角色，请至少选择一个其他角色");
+        }
+
         // 校验是否有权限访问这些角色（含数据权限控制）
         if (roleMapper.selectRoleCount(roleList) != roleList.size()) {
             throw new ServiceException("没有权限访问角色的数据");
@@ -594,10 +599,10 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     }
 
     /**
-     * 通过用户ID查询用户账户
+     * 通过用户ID查询用户昵称
      *
      * @param userId 用户ID
-     * @return 用户账户
+     * @return 用户昵称
      */
     @Override
     @Cacheable(cacheNames = CacheNames.SYS_NICKNAME, key = "#userId")
@@ -608,10 +613,10 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     }
 
     /**
-     * 通过用户ID查询用户账户
+     * 通过用户ID查询用户昵称
      *
      * @param userIds 用户ID 多个用逗号隔开
-     * @return 用户账户
+     * @return 用户昵称
      */
     @Override
     public String selectNicknameByIds(String userIds) {
@@ -751,13 +756,13 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     }
 
     /**
-     * 根据用户 ID 列表查询用户名称映射关系
+     * 根据用户 ID 列表查询用户昵称映射关系
      *
      * @param userIds 用户 ID 列表
-     * @return Map，其中 key 为用户 ID，value 为对应的用户名称
+     * @return Map，其中 key 为用户 ID，value 为对应的用户昵称
      */
     @Override
-    public Map<Long, String> selectUserNamesByIds(List<Long> userIds) {
+    public Map<Long, String> selectUserNicksByIds(List<Long> userIds) {
         if (CollUtil.isEmpty(userIds)) {
             return Collections.emptyMap();
         }

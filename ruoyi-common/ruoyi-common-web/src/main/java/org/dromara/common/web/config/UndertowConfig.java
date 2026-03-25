@@ -1,11 +1,14 @@
 package org.dromara.common.web.config;
 
+import io.undertow.UndertowOptions;
 import io.undertow.server.DefaultByteBufferPool;
 import io.undertow.server.handlers.DisallowedMethodsHandler;
 import io.undertow.util.HttpString;
 import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 import org.dromara.common.core.utils.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
@@ -17,6 +20,9 @@ import org.springframework.core.task.VirtualThreadTaskExecutor;
  */
 @AutoConfiguration
 public class UndertowConfig implements WebServerFactoryCustomizer<UndertowServletWebServerFactory> {
+
+    @Autowired
+    private ServerProperties serverProperties;
 
     /**
      * 自定义 Undertow 配置
@@ -31,6 +37,11 @@ public class UndertowConfig implements WebServerFactoryCustomizer<UndertowServle
      */
     @Override
     public void customize(UndertowServletWebServerFactory factory) {
+        long bytes = serverProperties.getUndertow().getMaxHttpPostSize().toBytes();
+        factory.addBuilderCustomizers(builder -> {
+            builder.setServerOption(UndertowOptions.MULTIPART_MAX_ENTITY_SIZE, bytes);
+        });
+
         factory.addDeploymentInfoCustomizers(deploymentInfo -> {
             // 配置 WebSocket 部署信息，设置 WebSocket 使用的缓冲区池
             WebSocketDeploymentInfo webSocketDeploymentInfo = new WebSocketDeploymentInfo();

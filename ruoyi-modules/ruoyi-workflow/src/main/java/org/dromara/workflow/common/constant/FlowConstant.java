@@ -24,26 +24,6 @@ public interface FlowConstant {
     String INITIATOR_DEPT_ID = "initiatorDeptId";
 
     /**
-     * 委托
-     */
-    String DELEGATE_TASK = "delegateTask";
-
-    /**
-     * 转办
-     */
-    String TRANSFER_TASK = "transferTask";
-
-    /**
-     * 加签
-     */
-    String ADD_SIGNATURE = "addSignature";
-
-    /**
-     * 减签
-     */
-    String REDUCTION_SIGNATURE = "reductionSignature";
-
-    /**
      * 流程分类Id转名称
      */
     String CATEGORY_ID_TO_NAME = "category_id_to_name";

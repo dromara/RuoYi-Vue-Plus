@@ -52,7 +52,7 @@ public interface CacheNames {
     String SYS_USER_NAME = "sys_user_name#30d";
 
     /**
-     * 用户名称
+     * 用户昵称
      */
     String SYS_NICKNAME = "sys_nickname#30d";
 

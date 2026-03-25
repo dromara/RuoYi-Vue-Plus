@@ -30,7 +30,7 @@ public class UserOnlineDTO implements Serializable {
     private String deptName;
 
     /**
-     * 用户名称
+     * 用户账号
      */
     private String userName;
 

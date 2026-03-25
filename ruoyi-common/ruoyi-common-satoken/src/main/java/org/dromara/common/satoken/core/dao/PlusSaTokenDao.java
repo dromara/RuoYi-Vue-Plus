@@ -113,7 +113,7 @@ public class PlusSaTokenDao implements SaTokenDaoBySessionFollowObject {
      * @param key 键名称
      * @return object
      */
-    @SuppressWarnings("unchecked cast")
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getObject(String key, Class<T> classType) {
         Object o = CAFFEINE.get(key, k -> RedisUtils.getCacheObject(key));

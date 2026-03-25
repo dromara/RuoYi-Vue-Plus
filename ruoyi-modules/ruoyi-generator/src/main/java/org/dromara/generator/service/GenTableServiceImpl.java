@@ -523,6 +523,9 @@ public class GenTableServiceImpl implements IGenTableService {
      * @param table 业务表信息
      */
     public void setPkColumn(GenTable table) {
+        if (CollUtil.isEmpty(table.getColumns())) {
+            throw new ServiceException("表【" + table.getTableName() + "】字段为空，请检查表结构");
+        }
         for (GenTableColumn column : table.getColumns()) {
             if (column.isPk()) {
                 table.setPkColumn(column);

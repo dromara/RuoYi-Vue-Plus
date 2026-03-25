@@ -21,6 +21,7 @@ import java.util.stream.IntStream;
  *
  * @author 老马
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 @Component
 @JobExecutor(name = "testMapJobAnnotation")
 public class TestMapJobAnnotation {

@@ -1,5 +1,6 @@
 package org.dromara.workflow.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
@@ -45,6 +46,7 @@ public class FlwDefinitionController extends BaseController {
      * @param pageQuery      分页
      */
     @GetMapping("/list")
+    @SaCheckPermission("workflow:definition:list")
     public TableDataInfo<FlowDefinitionVo> list(FlowDefinition flowDefinition, PageQuery pageQuery) {
         return flwDefinitionService.queryList(flowDefinition, pageQuery);
     }
@@ -56,6 +58,7 @@ public class FlwDefinitionController extends BaseController {
      * @param pageQuery      分页
      */
     @GetMapping("/unPublishList")
+    @SaCheckPermission("workflow:definition:list")
     public TableDataInfo<FlowDefinitionVo> unPublishList(FlowDefinition flowDefinition, PageQuery pageQuery) {
         return flwDefinitionService.unPublishList(flowDefinition, pageQuery);
     }
@@ -66,6 +69,7 @@ public class FlwDefinitionController extends BaseController {
      * @param id 流程定义id
      */
     @GetMapping(value = "/{id}")
+    @SaCheckPermission("workflow:definition:query")
     public R<Definition> getInfo(@PathVariable Long id) {
         return R.ok(defService.getById(id));
     }
@@ -79,6 +83,7 @@ public class FlwDefinitionController extends BaseController {
     @PostMapping
     @RepeatSubmit()
     @Transactional(rollbackFor = Exception.class)
+    @SaCheckPermission("workflow:definition:add")
     public R<Boolean> add(@RequestBody FlowDefinition flowDefinition) {
         return R.ok(defService.checkAndSave(flowDefinition));
     }
@@ -92,6 +97,7 @@ public class FlwDefinitionController extends BaseController {
     @PutMapping
     @RepeatSubmit()
     @Transactional(rollbackFor = Exception.class)
+    @SaCheckPermission("workflow:definition:edit")
     public R<Boolean> edit(@RequestBody FlowDefinition flowDefinition) {
         return R.ok(defService.updateById(flowDefinition));
     }
@@ -104,6 +110,7 @@ public class FlwDefinitionController extends BaseController {
     @Log(title = "流程定义", businessType = BusinessType.INSERT)
     @PutMapping("/publish/{id}")
     @RepeatSubmit()
+    @SaCheckPermission("workflow:definition:publish")
     public R<Boolean> publish(@PathVariable Long id) {
         return R.ok(flwDefinitionService.publish(id));
     }
@@ -117,6 +124,7 @@ public class FlwDefinitionController extends BaseController {
     @PutMapping("/unPublish/{id}")
     @RepeatSubmit()
     @Transactional(rollbackFor = Exception.class)
+    @SaCheckPermission("workflow:definition:publish")
     public R<Boolean> unPublish(@PathVariable Long id) {
         return R.ok(defService.unPublish(id));
     }
@@ -126,6 +134,7 @@ public class FlwDefinitionController extends BaseController {
      */
     @Log(title = "流程定义", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
+    @SaCheckPermission("workflow:definition:remove")
     public R<Void> remove(@PathVariable List<Long> ids) {
         return toAjax(flwDefinitionService.removeDef(ids));
     }
@@ -139,6 +148,7 @@ public class FlwDefinitionController extends BaseController {
     @PostMapping("/copy/{id}")
     @RepeatSubmit()
     @Transactional(rollbackFor = Exception.class)
+    @SaCheckPermission("workflow:definition:copy")
     public R<Boolean> copy(@PathVariable Long id) {
         return R.ok(defService.copyDef(id));
     }
@@ -151,6 +161,7 @@ public class FlwDefinitionController extends BaseController {
      */
     @Log(title = "流程定义", businessType = BusinessType.IMPORT)
     @PostMapping("/importDef")
+    @SaCheckPermission("workflow:definition:import")
     public R<Boolean> importDef(MultipartFile file, String category) {
         return R.ok(flwDefinitionService.importJson(file, category));
     }
@@ -164,6 +175,7 @@ public class FlwDefinitionController extends BaseController {
      */
     @Log(title = "流程定义", businessType = BusinessType.EXPORT)
     @PostMapping("/exportDef/{id}")
+    @SaCheckPermission("workflow:definition:export")
     public void exportDef(@PathVariable Long id, HttpServletResponse response) throws IOException {
         flwDefinitionService.exportDef(id, response);
     }
@@ -174,6 +186,7 @@ public class FlwDefinitionController extends BaseController {
      * @param id 流程定义id
      */
     @GetMapping("/xmlString/{id}")
+    @SaCheckPermission("workflow:definition:query")
     public R<String> xmlString(@PathVariable Long id) {
         return R.ok("操作成功", defService.exportJson(id));
     }
@@ -188,6 +201,7 @@ public class FlwDefinitionController extends BaseController {
     @PutMapping("/active/{id}")
     @Transactional(rollbackFor = Exception.class)
     @Log(title = "流程定义", businessType = BusinessType.UPDATE)
+    @SaCheckPermission("workflow:definition:active")
     public R<Boolean> active(@PathVariable Long id, @RequestParam boolean active) {
         return R.ok(active ? defService.active(id) : defService.unActive(id));
     }

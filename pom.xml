@@ -13,8 +13,8 @@
     <description>Dromara RuoYi-Vue-Plus多租户管理系统</description>
 
     <properties>
-        <revision>5.5.3</revision>
-        <spring-boot.version>3.5.9</spring-boot.version>
+        <revision>5.6.0</revision>
+        <spring-boot.version>3.5.12</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
@@ -35,10 +35,10 @@
         <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.42</lombok.version>
-        <bouncycastle.version>1.80</bouncycastle.version>
+        <bouncycastle.version>1.83</bouncycastle.version>
         <justauth.version>1.16.7</justauth.version>
         <!-- 离线IP地址定位库 -->
-        <ip2region.version>3.3.2</ip2region.version>
+        <ip2region.version>3.3.4</ip2region.version>
         <!-- OSS 配置 -->
         <aws.sdk.version>2.28.22</aws.sdk.version>
         <!-- SMS 配置 -->
@@ -284,7 +284,7 @@
             <!-- 加密包引入 -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15to18</artifactId>
+                <artifactId>bcpkix-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
 
@@ -375,8 +375,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <annotationProcessorPaths>
                         <path>

@@ -1,5 +1,6 @@
 package org.dromara.workflow.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.convert.Convert;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
@@ -46,6 +47,7 @@ public class FlwInstanceController extends BaseController {
      * @param pageQuery      分页
      */
     @GetMapping("/pageByRunning")
+    @SaCheckPermission("workflow:instance:list")
     public TableDataInfo<FlowInstanceVo> selectRunningInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery) {
         return flwInstanceService.selectRunningInstanceList(flowInstanceBo, pageQuery);
     }
@@ -57,6 +59,7 @@ public class FlwInstanceController extends BaseController {
      * @param pageQuery      分页
      */
     @GetMapping("/pageByFinish")
+    @SaCheckPermission("workflow:instance:list")
     public TableDataInfo<FlowInstanceVo> selectFinishInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery) {
         return flwInstanceService.selectFinishInstanceList(flowInstanceBo, pageQuery);
     }
@@ -67,6 +70,7 @@ public class FlwInstanceController extends BaseController {
      * @param businessId 业务id
      */
     @GetMapping("/getInfo/{businessId}")
+    @SaCheckPermission("workflow:instance:query")
     public R<FlowInstanceVo> getInfo(@PathVariable Long businessId) {
         return R.ok(flwInstanceService.queryByBusinessId(businessId));
     }
@@ -78,6 +82,7 @@ public class FlwInstanceController extends BaseController {
      */
     @DeleteMapping("/deleteByBusinessIds/{businessIds}")
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @SaCheckPermission("workflow:instance:remove")
     public R<Void> deleteByBusinessIds(@PathVariable List<Long> businessIds) {
         return toAjax(flwInstanceService.deleteByBusinessIds(StreamUtils.toList(businessIds, Convert::toStr)));
     }
@@ -89,6 +94,7 @@ public class FlwInstanceController extends BaseController {
      */
     @DeleteMapping("/deleteByInstanceIds/{instanceIds}")
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @SaCheckPermission("workflow:instance:remove")
     public R<Void> deleteByInstanceIds(@PathVariable List<Long> instanceIds) {
         return toAjax(flwInstanceService.deleteByInstanceIds(instanceIds));
     }
@@ -100,6 +106,7 @@ public class FlwInstanceController extends BaseController {
      */
     @DeleteMapping("/deleteHisByInstanceIds/{instanceIds}")
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @SaCheckPermission("workflow:instance:remove")
     public R<Void> deleteHisByInstanceIds(@PathVariable List<Long> instanceIds) {
         return toAjax(flwInstanceService.deleteHisByInstanceIds(instanceIds));
     }
@@ -112,6 +119,7 @@ public class FlwInstanceController extends BaseController {
     @RepeatSubmit()
     @PutMapping("/cancelProcessApply")
     @Log(title = "流程实例管理", businessType = BusinessType.UPDATE)
+    @SaCheckPermission("workflow:instance:cancel")
     public R<Void> cancelProcessApply(@RequestBody FlowCancelBo bo) {
         return toAjax(flwInstanceService.cancelProcessApply(bo));
     }
@@ -125,6 +133,7 @@ public class FlwInstanceController extends BaseController {
     @RepeatSubmit()
     @PutMapping("/active/{id}")
     @Log(title = "流程实例管理", businessType = BusinessType.UPDATE)
+    @SaCheckPermission("workflow:instance:active")
     public R<Boolean> active(@PathVariable Long id, @RequestParam boolean active) {
         return R.ok(active ? insService.active(id) : insService.unActive(id));
     }
@@ -136,6 +145,7 @@ public class FlwInstanceController extends BaseController {
      * @param pageQuery      分页
      */
     @GetMapping("/pageByCurrent")
+    @SaCheckPermission("workflow:instance:currentList")
     public TableDataInfo<FlowInstanceVo> selectCurrentInstanceList(FlowInstanceBo flowInstanceBo, PageQuery pageQuery) {
         return flwInstanceService.selectCurrentInstanceList(flowInstanceBo, pageQuery);
     }
@@ -146,6 +156,7 @@ public class FlwInstanceController extends BaseController {
      * @param businessId 业务id
      */
     @GetMapping("/flowHisTaskList/{businessId}")
+    @SaCheckPermission("workflow:instance:query")
     public R<Map<String, Object>> flowHisTaskList(@PathVariable String businessId) {
         return R.ok(flwInstanceService.flowHisTaskList(businessId));
     }
@@ -156,6 +167,7 @@ public class FlwInstanceController extends BaseController {
      * @param instanceId 流程实例id
      */
     @GetMapping("/instanceVariable/{instanceId}")
+    @SaCheckPermission("workflow:instance:variableQuery")
     public R<Map<String, Object>> instanceVariable(@PathVariable Long instanceId) {
         return R.ok(flwInstanceService.instanceVariable(instanceId));
     }
@@ -168,6 +180,7 @@ public class FlwInstanceController extends BaseController {
     @RepeatSubmit()
     @PutMapping("/updateVariable")
     @Log(title = "流程实例管理", businessType = BusinessType.UPDATE)
+    @SaCheckPermission("workflow:instance:variable")
     public R<Void> updateVariable(@Validated @RequestBody FlowVariableBo bo) {
         return toAjax(flwInstanceService.updateVariable(bo));
     }
@@ -180,6 +193,7 @@ public class FlwInstanceController extends BaseController {
     @Log(title = "流程实例管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping("/invalid")
+    @SaCheckPermission("workflow:instance:invalid")
     public R<Boolean> invalid(@Validated @RequestBody FlowInvalidBo bo) {
         return R.ok(flwInstanceService.processInvalid(bo));
     }

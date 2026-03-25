@@ -17,7 +17,7 @@ import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.demo.domain.TestDemo;
 import org.dromara.demo.domain.bo.TestDemoBo;
-import org.dromara.demo.domain.bo.TestDemoImportVo;
+import org.dromara.demo.domain.vo.TestDemoImportVo;
 import org.dromara.demo.domain.vo.TestDemoVo;
 import org.dromara.demo.service.ITestDemoService;
 import lombok.RequiredArgsConstructor;

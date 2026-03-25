@@ -24,10 +24,10 @@ public class FlowCopyVo implements Serializable {
     private Long userId;
 
     /**
-     * 用户名称
+     * 用户昵称
      */
     @Translation(type = TransConstant.USER_ID_TO_NICKNAME, mapper = "userId")
-    private String userName;
+    private String nickName;
 
     public FlowCopyVo(Long userId) {
         this.userId = userId;

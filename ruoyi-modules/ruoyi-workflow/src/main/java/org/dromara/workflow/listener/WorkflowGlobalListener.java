@@ -80,11 +80,13 @@ public class WorkflowGlobalListener implements GlobalListener {
             NodeExtVo nodeExt = nodeExtService.parseNodeExt(ext, variable);
             Set<String> copyList = nodeExt.getCopySettings();
             if (CollUtil.isNotEmpty(copyList)) {
+                List<Long> userIds = StreamUtils.toList(copyList, Convert::toLong);
+                Map<Long, String> nickNameMap = userService.selectUserNicksByIds(userIds);
                 List<FlowCopyBo> list = StreamUtils.toList(copyList, x -> {
                     FlowCopyBo bo = new FlowCopyBo();
                     Long id = Convert.toLong(x);
                     bo.setUserId(id);
-                    bo.setUserName(userService.selectUserNameById(id));
+                    bo.setNickName(nickNameMap.getOrDefault(id, StringUtils.EMPTY));
                     return bo;
                 });
                 variable.put(FlowConstant.FLOW_COPY_LIST, list);
@@ -159,7 +161,7 @@ public class WorkflowGlobalListener implements GlobalListener {
             flowTask.setPermissionList(List.of(userIdArray));
             // 移除已处理的状态变量
             variable.remove(nodeKey);
-            FlowEngine.insService().removeVariables(flowTask.getInstanceId(),nodeKey);
+            FlowEngine.insService().removeVariables(flowTask.getInstanceId(), nodeKey);
         }
     }
 

@@ -41,6 +41,11 @@ public class TaskOperationBo implements Serializable {
     private Long taskId;
 
     /**
+     * 消息类型
+     */
+    private List<String> messageType;
+
+    /**
      * 意见或备注信息（可选）
      */
     private String message;

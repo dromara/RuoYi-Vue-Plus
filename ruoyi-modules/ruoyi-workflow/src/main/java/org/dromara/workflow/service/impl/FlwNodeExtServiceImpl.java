@@ -102,7 +102,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
      * @param sources 数据来源（枚举类或字典类型）
      * @return 构建的 `NodeExt` 对象
      */
-    @SuppressWarnings("unchecked cast")
+    @SuppressWarnings("unchecked")
     private NodeExt buildNodeExt(String code, String name, int type, List<Object> sources) {
         NodeExt nodeExt = new NodeExt();
         nodeExt.setCode(code);

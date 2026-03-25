@@ -25,9 +25,24 @@ import java.util.Objects;
 @Slf4j
 public class SensitiveHandler extends JsonSerializer<String> implements ContextualSerializer {
 
-    private SensitiveStrategy strategy;
-    private String[] roleKey;
-    private String[] perms;
+    private final SensitiveStrategy strategy;
+    private final String[] roleKey;
+    private final String[] perms;
+
+    /**
+     * 提供给 jackson 创建上下文序列化器时使用 不然会报错
+     */
+    public SensitiveHandler() {
+        this.strategy = null;
+        this.roleKey = null;
+        this.perms = null;
+    }
+
+    public SensitiveHandler(SensitiveStrategy strategy, String[] strings, String[] perms) {
+        this.strategy = strategy;
+        this.roleKey = strings;
+        this.perms = perms;
+    }
 
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
@@ -48,10 +63,7 @@ public class SensitiveHandler extends JsonSerializer<String> implements Contextu
     public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property) throws JsonMappingException {
         Sensitive annotation = property.getAnnotation(Sensitive.class);
         if (Objects.nonNull(annotation) && Objects.equals(String.class, property.getType().getRawClass())) {
-            this.strategy = annotation.strategy();
-            this.roleKey = annotation.roleKey();
-            this.perms = annotation.perms();
-            return this;
+            return new SensitiveHandler(annotation.strategy(), annotation.roleKey(), annotation.perms());
         }
         return prov.findValueSerializer(property.getType(), property);
     }

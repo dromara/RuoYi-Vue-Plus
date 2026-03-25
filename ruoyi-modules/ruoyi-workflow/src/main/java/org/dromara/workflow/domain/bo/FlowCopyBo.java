@@ -23,8 +23,8 @@ public class FlowCopyBo implements Serializable {
     private Long userId;
 
     /**
-     * 用户名称
+     * 用户昵称
      */
-    private String userName;
+    private String nickName;
 
 }

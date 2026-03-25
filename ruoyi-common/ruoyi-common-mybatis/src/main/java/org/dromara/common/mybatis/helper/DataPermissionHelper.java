@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  * @version 3.5.0
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@SuppressWarnings("unchecked cast")
+@SuppressWarnings("unchecked")
 public class DataPermissionHelper {
 
     private static final String DATA_PERMISSION_KEY = "data:permission";
