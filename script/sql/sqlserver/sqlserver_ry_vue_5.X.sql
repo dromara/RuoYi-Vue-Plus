@@ -1495,13 +1495,13 @@ INSERT sys_menu VALUES (1041, N'操作删除', 500, 2, N'#', N'', N'', N'N', N'Y
 GO
 INSERT sys_menu VALUES (1042, N'日志导出', 500, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:operlog:export', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_menu VALUES (1043, N'登录查询', 501, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:loginInfo:query', N'#', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_menu VALUES (1043, N'登录查询', 501, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:query', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_menu VALUES (1044, N'登录删除', 501, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:loginInfo:remove', N'#', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_menu VALUES (1044, N'登录删除', 501, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:remove', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_menu VALUES (1045, N'日志导出', 501, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:loginInfo:export', N'#', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_menu VALUES (1045, N'日志导出', 501, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:export', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_menu VALUES (1050, N'账户解锁', 501, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:loginInfo:unlock',  N'#', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_menu VALUES (1050, N'账户解锁', 501, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:unlock',  N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO
 INSERT sys_menu VALUES (1046, N'在线查询', 109, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:online:query', N'#', 103, 1, getdate(), NULL, NULL, N'')
 GO

@@ -410,10 +410,10 @@ insert into sys_menu values('1040', '操作查询', '500', '1', '#', '', '', 'N'
 insert into sys_menu values('1041', '操作删除', '500', '2', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:operlog:remove',     '#', 103, 1, now(), null, null, '');
 insert into sys_menu values('1042', '日志导出', '500', '4', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:operlog:export',     '#', 103, 1, now(), null, null, '');
 -- 登录日志按钮
-insert into sys_menu values('1043', '登录查询', '501', '1', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:loginInfo:query',   '#', 103, 1, now(), null, null, '');
-insert into sys_menu values('1044', '登录删除', '501', '2', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:loginInfo:remove',  '#', 103, 1, now(), null, null, '');
-insert into sys_menu values('1045', '日志导出', '501', '3', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:loginInfo:export',  '#', 103, 1, now(), null, null, '');
-insert into sys_menu values('1050', '账户解锁', '501', '4', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:loginInfo:unlock',  '#', 103, 1, now(), null, null, '');
+insert into sys_menu values('1043', '登录查询', '501', '1', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:logininfo:query',   '#', 103, 1, now(), null, null, '');
+insert into sys_menu values('1044', '登录删除', '501', '2', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:logininfo:remove',  '#', 103, 1, now(), null, null, '');
+insert into sys_menu values('1045', '日志导出', '501', '3', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:logininfo:export',  '#', 103, 1, now(), null, null, '');
+insert into sys_menu values('1050', '账户解锁', '501', '4', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:logininfo:unlock',  '#', 103, 1, now(), null, null, '');
 -- 在线用户按钮
 insert into sys_menu values('1046', '在线查询', '109', '1', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:online:query',       '#', 103, 1, now(), null, null, '');
 insert into sys_menu values('1047', '批量强退', '109', '2', '#', '', '', 'N', 'Y', 'F', '0', '0', 'monitor:online:batchLogout', '#', 103, 1, now(), null, null, '');
