@@ -2,11 +2,11 @@ package org.dromara.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.domain.PageResult;
@@ -21,10 +21,9 @@ import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.oss.client.OssClient;
-import org.dromara.common.oss.factory.OssFactory;
-import org.dromara.common.oss.model.GetObjectResult;
-import org.dromara.common.oss.model.PutObjectResult;
 import org.dromara.common.oss.enums.AccessPolicy;
+import org.dromara.common.oss.factory.OssFactory;
+import org.dromara.common.oss.model.PutObjectResult;
 import org.dromara.common.oss.util.S3ObjectUtil;
 import org.dromara.system.domain.SysOss;
 import org.dromara.system.domain.SysOssExt;
@@ -35,6 +34,7 @@ import org.dromara.system.service.ISysOssService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -182,20 +182,28 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     /**
      * 文件下载方法，支持一次性下载完整文件
      *
-     * @param ossId    OSS对象ID
-     * @param response HttpServletResponse对象，用于设置响应头和向客户端发送文件内容
+     * @param ossId OSS对象ID
      */
     @Override
-    public void download(Long ossId, HttpServletResponse response) throws IOException {
+    public ResponseEntity<byte[]> download(Long ossId) {
         SysOssVo sysOss = SpringUtils.getAopProxy(this).getById(ossId);
         if (ObjectUtil.isNull(sysOss)) {
             throw new ServiceException("文件数据不存在!");
         }
-        FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
-        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
-        OssClient instance = OssFactory.instance(sysOss.getService());
-        GetObjectResult result = instance.download(sysOss.getFileName(), response.getOutputStream());
-        response.setContentLengthLong(result.size());
+        String percentEncodedFileName = FileUtils.percentEncode(sysOss.getOriginalName());
+        String contentDispositionValue = "attachment; filename=%s;filename*=utf-8''%s".formatted(percentEncodedFileName, percentEncodedFileName);
+        return OssFactory.instance(sysOss.getService())
+            .download(sysOss.getFileName(), (result, inputStream) -> {
+                // 构建响应实体
+                return ResponseEntity.ok()
+                    .header("Access-Control-Expose-Headers", "Content-Disposition,download-filename")
+                    .header("Content-disposition", contentDispositionValue)
+                    .header("download-filename", percentEncodedFileName)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentLength(result.size())
+                    .body(IoUtil.readBytes(inputStream));
+            });
+
     }
 
     /**

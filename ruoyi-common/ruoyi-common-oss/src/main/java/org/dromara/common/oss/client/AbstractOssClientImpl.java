@@ -10,6 +10,7 @@ import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
 import org.dromara.common.oss.model.GetObjectResult;
 import org.dromara.common.oss.model.HandleAsyncResult;
 import org.dromara.common.oss.model.PutObjectResult;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.core.async.ResponsePublisher;
@@ -29,7 +30,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -309,8 +310,23 @@ public abstract class AbstractOssClientImpl implements OssClient {
         try {
             ResponsePublisher<GetObjectResponse> publisher = doCustomDownload(builder -> builder.bucket(bucket).key(key), AsyncResponseTransformer.toPublisher(), null);
             GetObjectResult getObjectResult = buildGetObjectResult(key, publisher.response());
-            publisher.subscribe(downloadSubscriber);
+            publisher.subscribe(downloadSubscriber).join();
             return getObjectResult;
+        } catch (Exception e) {
+            if (e instanceof S3StorageException ex) {
+                throw ex;
+            }
+            throw S3StorageException.form(e);
+        }
+    }
+
+    @Override
+    public <T> T bucketDownload(String bucket, String key, BiFunction<GetObjectResult, InputStream, T> downloadTransformer) {
+        try {
+            ResponseInputStream<GetObjectResponse> responseInputStream = doCustomDownload(builder -> builder.bucket(bucket).key(key), AsyncResponseTransformer.toBlockingInputStream(), null);
+            GetObjectResponse response = responseInputStream.response();
+            GetObjectResult getObjectResult = buildGetObjectResult(key, response);
+            return downloadTransformer.apply(getObjectResult, responseInputStream);
         } catch (Exception e) {
             if (e instanceof S3StorageException ex) {
                 throw ex;
@@ -362,7 +378,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
         return GetObjectResult.form(
             key,
             response.eTag(),
-            LocalDateTime.from(response.lastModified()),
+            response.lastModified().atOffset(ZoneOffset.UTC).toLocalDateTime(),
             response.contentLength(),
             response.contentType(),
             response.contentDisposition(),
@@ -444,6 +460,11 @@ public abstract class AbstractOssClientImpl implements OssClient {
     @Override
     public GetObjectResult download(String key, OutputStreamDownloadSubscriber downloadSubscriber) {
         return bucketDownload(defaultBucket(), key, downloadSubscriber);
+    }
+
+    @Override
+    public <T> T download(String key, BiFunction<GetObjectResult, InputStream, T> downloadTransformer) {
+        return bucketDownload(defaultBucket(), key, downloadTransformer);
     }
 
     @Override

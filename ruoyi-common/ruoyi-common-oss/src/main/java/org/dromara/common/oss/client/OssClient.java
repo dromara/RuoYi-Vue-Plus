@@ -43,12 +43,12 @@ public interface OssClient extends AutoCloseable {
 
     /**
      * S3 存储客户端ID
-     *
+     * <p>
      * 用于标识客户端，初始化后不允许更改
      *
      * @return S3 存储客户端ID
      */
-    default String clientId(){
+    default String clientId() {
         return IdUtil.fastSimpleUUID();
     }
 
@@ -220,6 +220,16 @@ public interface OssClient extends AutoCloseable {
     GetObjectResult bucketDownload(String bucket, String key, OutputStreamDownloadSubscriber downloadSubscriber);
 
     /**
+     * 将指定存储桶中的对象下载到转换器中，由使用者决定返回值。
+     *
+     * @param bucket              存储桶名称
+     * @param key                 对象键
+     * @param downloadTransformer 下载转换器
+     * @return 下载结果
+     */
+    <T> T bucketDownload(String bucket, String key, BiFunction<GetObjectResult, InputStream, T> downloadTransformer);
+
+    /**
      * 将指定存储桶中的对象下载到本地路径。
      *
      * @param bucket 存储桶名称
@@ -363,6 +373,15 @@ public interface OssClient extends AutoCloseable {
      * @return 下载结果
      */
     GetObjectResult download(String key, OutputStreamDownloadSubscriber downloadSubscriber);
+
+    /**
+     * 将指定存储桶中的对象下载到转换器中，由使用者决定返回值。
+     *
+     * @param key                 对象键
+     * @param downloadTransformer 下载转换器
+     * @return 下载结果
+     */
+    <T> T download(String key, BiFunction<GetObjectResult, InputStream, T> downloadTransformer);
 
     /**
      * 将默认存储桶中的对象下载到本地路径。

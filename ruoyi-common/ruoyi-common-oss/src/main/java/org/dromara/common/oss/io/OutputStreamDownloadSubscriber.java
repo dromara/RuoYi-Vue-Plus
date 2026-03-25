@@ -3,7 +3,6 @@ package org.dromara.common.oss.io;
 import org.dromara.common.oss.exception.S3StorageException;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -19,11 +18,15 @@ public class OutputStreamDownloadSubscriber implements Consumer<ByteBuffer>, Aut
 
     private final WritableByteChannel channel;
 
-    private OutputStreamDownloadSubscriber(WritableByteChannel channel) {
+    private final boolean allowAutoClose;
+
+    private OutputStreamDownloadSubscriber(WritableByteChannel channel, boolean allowAutoClose) {
         this.channel = channel;
+        this.allowAutoClose = allowAutoClose;
     }
 
-    private OutputStreamDownloadSubscriber(OutputStream out) {
+    private OutputStreamDownloadSubscriber(OutputStream out, boolean allowAutoClose) {
+        this.allowAutoClose = allowAutoClose;
         // 创建可写入的字节通道
         if (out instanceof FileOutputStream outputStream) {
             // 如果是文件输入流，直接获取文件输出流的 Channel
@@ -35,18 +38,18 @@ public class OutputStreamDownloadSubscriber implements Consumer<ByteBuffer>, Aut
 
     @Override
     public void accept(ByteBuffer byteBuffer) {
-        try (channel) {
+        try {
             while (byteBuffer.hasRemaining()) {
                 channel.write(byteBuffer);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw S3StorageException.form(e);
         }
     }
 
     @Override
     public void close() throws Exception {
-        if (channel.isOpen()) {
+        if (channel.isOpen() && allowAutoClose) {
             channel.close();
         }
     }
@@ -58,7 +61,18 @@ public class OutputStreamDownloadSubscriber implements Consumer<ByteBuffer>, Aut
      * @return 输出流下载订阅器
      */
     public static OutputStreamDownloadSubscriber create(OutputStream out) {
-        return new OutputStreamDownloadSubscriber(out);
+        return create(out, false);
+    }
+
+    /**
+     * 创建一个输出流下载订阅器
+     *
+     * @param out            输出流
+     * @param allowAutoClose 是否允许自动关闭流
+     * @return 输出流下载订阅器
+     */
+    public static OutputStreamDownloadSubscriber create(OutputStream out, boolean allowAutoClose) {
+        return new OutputStreamDownloadSubscriber(out, allowAutoClose);
     }
 
     /**
@@ -68,7 +82,18 @@ public class OutputStreamDownloadSubscriber implements Consumer<ByteBuffer>, Aut
      * @return 输出流下载订阅器
      */
     public static OutputStreamDownloadSubscriber create(WritableByteChannel channel) {
-        return new OutputStreamDownloadSubscriber(channel);
+        return create(channel, false);
+    }
+
+    /**
+     * 创建一个输出流下载订阅器
+     *
+     * @param channel        可写字节通道
+     * @param allowAutoClose 是否允许自动关闭流
+     * @return 输出流下载订阅器
+     */
+    public static OutputStreamDownloadSubscriber create(WritableByteChannel channel, boolean allowAutoClose) {
+        return new OutputStreamDownloadSubscriber(channel, allowAutoClose);
     }
 
 }

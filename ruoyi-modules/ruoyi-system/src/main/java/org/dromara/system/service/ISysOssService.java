@@ -1,14 +1,13 @@
 package org.dromara.system.service;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.system.domain.bo.SysOssBo;
 import org.dromara.system.domain.vo.SysOssVo;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -64,9 +63,8 @@ public interface ISysOssService {
      * 文件下载方法，支持一次性下载完整文件
      *
      * @param ossId    OSS对象ID
-     * @param response HttpServletResponse对象，用于设置响应头和向客户端发送文件内容
      */
-    void download(Long ossId, HttpServletResponse response) throws IOException;
+    ResponseEntity<byte[]> download(Long ossId);
 
     /**
      * 删除OSS对象存储

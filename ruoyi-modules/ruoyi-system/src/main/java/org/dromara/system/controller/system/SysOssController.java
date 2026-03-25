@@ -2,7 +2,6 @@ package org.dromara.system.controller.system;
 
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
@@ -16,6 +15,7 @@ import org.dromara.system.domain.bo.SysOssBo;
 import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.service.ISysOssService;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -83,13 +83,12 @@ public class SysOssController extends BaseController {
      * 下载OSS对象
      *
      * @param ossId OSS对象ID
-     * @param response HTTP 响应
      * @throws IOException IO 异常
      */
     @SaCheckPermission("system:oss:download")
     @GetMapping("/download/{ossId}")
-    public void download(@PathVariable Long ossId, HttpServletResponse response) throws IOException {
-        ossService.download(ossId, response);
+    public ResponseEntity<byte[]> download(@PathVariable Long ossId) throws IOException {
+        return ossService.download(ossId);
     }
 
     /**
