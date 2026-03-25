@@ -15,6 +15,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.regex.RegexValidator;
 import org.dromara.common.mail.config.properties.MailProperties;
 import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.common.redis.annotation.RateLimiter;
@@ -60,6 +61,9 @@ public class CaptchaController {
     @RateLimiter(key = "#phonenumber", time = 60, count = 1)
     @GetMapping("/resource/sms/code")
     public R<Void> smsCode(@NotBlank(message = "{user.phonenumber.not.blank}") String phoneNumber) {
+        if (RegexValidator.isMobile(phoneNumber)) {
+            return R.fail("请输入正确的手机号！");
+        }
         String key = GlobalConstants.CAPTCHA_CODE_KEY + phoneNumber;
         String code = RandomUtil.randomNumbers(4);
         RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
@@ -77,7 +81,7 @@ public class CaptchaController {
     }
 
     /**
-     * 发送邮箱验证码。
+     * 发送邮箱验证码
      *
      * @param email 邮箱
      * @return 操作结果
@@ -86,6 +90,9 @@ public class CaptchaController {
     public R<Void> emailCode(@NotBlank(message = "{user.email.not.blank}") String email) {
         if (!mailProperties.getEnabled()) {
             return R.fail("当前系统没有开启邮箱功能！");
+        }
+        if (RegexValidator.isEmail(email)) {
+            return R.fail("请输入正确的邮箱地址！");
         }
         SpringUtils.getAopProxy(this).emailCodeImpl(email);
         return R.ok();
