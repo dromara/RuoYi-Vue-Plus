@@ -49,8 +49,9 @@ public class XcxAuthStrategy implements IAuthStrategy {
 
         // 校验 appid + appsrcret + xcxCode 调用登录凭证校验接口 获取 session_key 与 openid
         AuthRequest authRequest = new AuthWechatMiniProgramRequest(AuthConfig.builder()
-            .clientId(appid).clientSecret("自行填写密钥 可根据不同appid填入不同密钥")
-            .ignoreCheckRedirectUri(true).ignoreCheckState(true).build());
+            .clientId(appid).clientSecret("dd57506ed3c2a57e95c6e2f5818d943e")
+            .ignoreCheckRedirectUri(true).ignoreCheckState(true)
+            .build());
         AuthCallback authCallback = new AuthCallback();
         authCallback.setCode(xcxCode);
         AuthResponse<AuthUser> resp = authRequest.login(authCallback);
