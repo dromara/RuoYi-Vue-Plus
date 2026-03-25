@@ -20,12 +20,11 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.oss.client.S3StorageClient;
+import org.dromara.common.oss.client.OssClient;
 import org.dromara.common.oss.factory.OssFactory;
 import org.dromara.common.oss.model.GetObjectResult;
 import org.dromara.common.oss.model.PutObjectResult;
 import org.dromara.common.oss.enums.AccessPolicy;
-import org.dromara.common.oss.factory.S3StorageClientFactory;
 import org.dromara.common.oss.util.S3ObjectUtil;
 import org.dromara.system.domain.SysOss;
 import org.dromara.system.domain.SysOssExt;
@@ -194,7 +193,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         }
         FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
-        S3StorageClient instance = S3StorageClientFactory.instance(sysOss.getService());
+        OssClient instance = OssFactory.instance(sysOss.getService());
         GetObjectResult result = instance.download(sysOss.getFileName(), response.getOutputStream());
         response.setContentLengthLong(result.size());
     }
@@ -213,7 +212,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         }
         String originalfileName = file.getOriginalFilename();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
-        S3StorageClient instance = OssFactory.instance();
+        OssClient instance = OssFactory.instance();
         try {
             String pathKey = S3ObjectUtil.buildPathKey(originalfileName);
             PutObjectResult result = instance.upload(pathKey, file.getInputStream(), file.getSize());
@@ -240,7 +239,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         }
         String originalfileName = file.getName();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
-        S3StorageClient instance = S3StorageClientFactory.instance();
+        OssClient instance = OssFactory.instance();
         String pathKey = S3ObjectUtil.buildPathKey(originalfileName);
         PutObjectResult result = instance.upload(pathKey, file);
         SysOssExt ext1 = new SysOssExt();
@@ -255,7 +254,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      * @param originalfileName 原始文件名
      * @param suffix           文件后缀
      * @param configKey        存储配置标识
-     * @param uploadResult     上传结果
+     * @param result           上传结果
      * @param ext1             扩展属性对象
      * @return 持久化后的文件信息视图
      */
@@ -287,7 +286,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         }
         List<SysOss> list = baseMapper.selectByIds(ids);
         for (SysOss sysOss : list) {
-            S3StorageClientFactory.instance(sysOss.getService()).delete(sysOss.getFileName());
+            OssFactory.instance(sysOss.getService()).delete(sysOss.getFileName());
         }
         return baseMapper.deleteByIds(ids) > 0;
     }
@@ -299,7 +298,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      * @return oss 匹配Url的OSS对象
      */
     private SysOssVo matchingUrl(SysOssVo oss) {
-        S3StorageClient instance = S3StorageClientFactory.instance(oss.getService());
+        OssClient instance = OssFactory.instance(oss.getService());
         // 仅修改桶类型为 private 的URL，临时URL时长为120s
         if (instance.verifyConfig(config -> AccessPolicy.PRIVATE.equals(config.accessControlPolicyConfig().accessPolicy()))) {
             oss.setUrl(instance.presignGetUrl(oss.getFileName(), Duration.ofSeconds(120)));
