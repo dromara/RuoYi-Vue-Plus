@@ -1,0 +1,3 @@
+org.dromara.common.push.config.MessageAutoConfiguration
+org.dromara.common.push.config.MessageSseConfiguration
+org.dromara.common.push.config.MessageWebSocketConfiguration

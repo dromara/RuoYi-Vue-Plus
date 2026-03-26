@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.dto.PushPayload;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.enums.PushSourceEnum;
 import org.dromara.common.core.enums.PushTypeEnum;
@@ -12,8 +13,7 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mail.utils.MailUtils;
-import org.dromara.common.sse.dto.SseMessageDTO;
-import org.dromara.common.sse.utils.SseMessageUtils;
+import org.dromara.common.push.helper.PushHelper;
 import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.entity.Node;
 import org.dromara.warm.flow.orm.entity.FlowTask;
@@ -94,12 +94,12 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
             try {
                 switch (messageTypeEnum) {
                     case SYSTEM_MESSAGE -> {
-                        SseMessageDTO dto = new SseMessageDTO();
-                        dto.setUserIds(userIds);
-                        dto.setMessage(message);
-                        dto.setMessageType(PushTypeEnum.MESSAGE.getType());
-                        dto.setMessageSource(PushSourceEnum.WORKFLOW.getSource());
-                        SseMessageUtils.publishMessage(dto);
+                        PushHelper.publishMessage(userIds, PushPayload.of(
+                            PushTypeEnum.MESSAGE,
+                            PushSourceEnum.WORKFLOW,
+                            message,
+                            null
+                        ));
                     }
                     case EMAIL_MESSAGE -> MailUtils.sendText(emails, subject, message);
                     case SMS_MESSAGE -> {

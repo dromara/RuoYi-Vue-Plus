@@ -4,15 +4,15 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.domain.dto.PushPayload;
 import org.dromara.common.core.enums.PushSourceEnum;
 import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.service.DictService;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.push.helper.PushHelper;
 import org.dromara.common.redis.annotation.RepeatSubmit;
-import org.dromara.common.sse.dto.SseMessageDTO;
-import org.dromara.common.sse.utils.SseMessageUtils;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysNoticeBo;
 import org.dromara.system.domain.vo.SysNoticeVo;
@@ -82,13 +82,14 @@ public class SysNoticeController extends BaseController {
         data.put("noticeType", notice.getNoticeType());
         data.put("noticeTypeLabel", type);
         data.put("noticeTitle", notice.getNoticeTitle());
-        SseMessageDTO dto = new SseMessageDTO();
-        dto.setMessage("[" + type + "] " + notice.getNoticeTitle());
-        dto.setMessageType(PushTypeEnum.NOTICE.getType());
-        dto.setMessageSource(PushSourceEnum.NOTICE.getSource());
-        dto.setData(data);
-        dto.setPath("/system/notice");
-        SseMessageUtils.publishMessage(dto);
+        PushHelper.publishAll(PushPayload.of(
+            PushTypeEnum.NOTICE,
+            PushSourceEnum.NOTICE,
+            "[" + type + "] " + notice.getNoticeTitle(),
+            data,
+            "/system/notice",
+            null
+        ));
         return R.ok();
     }
 

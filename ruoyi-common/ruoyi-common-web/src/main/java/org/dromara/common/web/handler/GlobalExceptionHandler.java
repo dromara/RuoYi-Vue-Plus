@@ -11,6 +11,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.exception.SseException;
 import org.dromara.common.core.exception.base.BaseException;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.springframework.boot.json.JsonParseException;
@@ -129,7 +130,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IOException.class)
     public void handleIoException(IOException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        if (requestURI.contains("sse")) {
+        String path = SpringUtils.getProperty("message.path");
+        if (requestURI.contains(path)) {
             // sse 经常性连接中断 例如关闭浏览器 直接屏蔽
             return;
         }

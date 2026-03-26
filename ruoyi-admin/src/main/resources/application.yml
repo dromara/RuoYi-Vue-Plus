@@ -213,18 +213,14 @@ management:
     logfile:
       external-file: ./logs/sys-console.log
 
---- # 默认/推荐使用sse推送
-sse:
+--- # 统一消息推送配置
+message:
   enabled: true
-  path: /resource/sse
-
---- # websocket
-websocket:
-  # 如果关闭 需要和前端开关一起关闭
-  enabled: false
-  # 路径
-  path: /resource/websocket
-  # 设置访问源地址
+  # sse / websocket
+  transport: sse
+  # 统一访问路径
+  path: /resource/message
+  # websocket 允许的跨域来源
   allowedOrigins: '*'
 
 --- # warm-flow工作流配置

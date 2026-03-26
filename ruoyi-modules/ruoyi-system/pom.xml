@@ -82,12 +82,7 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-websocket</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-sse</artifactId>
+            <artifactId>ruoyi-common-push</artifactId>
         </dependency>
 
     </dependencies>
