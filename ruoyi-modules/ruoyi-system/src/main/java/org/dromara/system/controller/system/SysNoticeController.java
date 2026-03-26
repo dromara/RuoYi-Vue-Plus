@@ -82,13 +82,13 @@ public class SysNoticeController extends BaseController {
         data.put("noticeType", notice.getNoticeType());
         data.put("noticeTypeLabel", type);
         data.put("noticeTitle", notice.getNoticeTitle());
+        data.put("noticeId", notice.getNoticeId());
         PushHelper.publishAll(PushPayload.of(
             PushTypeEnum.NOTICE,
             PushSourceEnum.NOTICE,
             "[" + type + "] " + notice.getNoticeTitle(),
             data,
-            "/system/notice",
-            null
+            "/system/notice?noticeId=" + notice.getNoticeId()
         ));
         return R.ok();
     }

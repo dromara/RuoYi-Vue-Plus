@@ -7,7 +7,6 @@ import org.dromara.common.core.utils.StringUtils;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * 推送给前端的统一消息体
@@ -46,11 +45,6 @@ public class PushPayload implements Serializable {
     private String path;
 
     /**
-     * 前端跳转参数
-     */
-    private Map<String, Object> query;
-
-    /**
      * 时间戳
      */
     private Long timestamp;
@@ -74,10 +68,9 @@ public class PushPayload implements Serializable {
         );
     }
 
-    public static PushPayload of(PushTypeEnum type, PushSourceEnum source, String message, Object data, String path, Map<String, Object> query) {
+    public static PushPayload of(PushTypeEnum type, PushSourceEnum source, String message, Object data, String path) {
         PushPayload payload = of(type, source, message, data);
         payload.setPath(path);
-        payload.setQuery(query);
         return payload;
     }
 }

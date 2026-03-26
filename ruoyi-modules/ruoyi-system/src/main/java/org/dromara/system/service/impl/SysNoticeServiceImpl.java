@@ -98,7 +98,9 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
     @Override
     public int insertNotice(SysNoticeBo bo) {
         SysNotice notice = MapstructUtils.convert(bo, SysNotice.class);
-        return baseMapper.insert(notice);
+        int rows = baseMapper.insert(notice);
+        bo.setNoticeId(notice.getNoticeId());
+        return rows;
     }
 
     /**
