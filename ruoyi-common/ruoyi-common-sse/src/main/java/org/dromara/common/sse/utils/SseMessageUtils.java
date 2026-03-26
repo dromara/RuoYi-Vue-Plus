@@ -3,9 +3,14 @@ package org.dromara.common.sse.utils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.dto.PushPayload;
+import org.dromara.common.core.enums.PushSourceEnum;
+import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.sse.core.SseEmitterManager;
 import org.dromara.common.sse.dto.SseMessageDTO;
+
+import java.util.List;
 
 /**
  * SSE工具类
@@ -35,7 +40,7 @@ public class SseMessageUtils {
         if (!isEnable()) {
             return;
         }
-        MANAGER.sendMessage(userId, message);
+        MANAGER.sendMessage(userId, buildMessage(message));
     }
 
     /**
@@ -47,7 +52,32 @@ public class SseMessageUtils {
         if (!isEnable()) {
             return;
         }
-        MANAGER.sendMessage(message);
+        MANAGER.sendMessage(buildMessage(message));
+    }
+
+    /**
+     * 向指定用户的 SSE 会话发送统一 JSON 消息。
+     *
+     * @param userId  要发送消息的用户id
+     * @param payload 要发送的消息体
+     */
+    public static void sendMessage(Long userId, PushPayload payload) {
+        if (!isEnable()) {
+            return;
+        }
+        MANAGER.sendMessage(userId, payload);
+    }
+
+    /**
+     * 向当前节点上的所有 SSE 会话发送统一 JSON 消息。
+     *
+     * @param payload 要发送的消息体
+     */
+    public static void sendMessage(PushPayload payload) {
+        if (!isEnable()) {
+            return;
+        }
+        MANAGER.sendMessage(payload);
     }
 
     /**
@@ -71,7 +101,40 @@ public class SseMessageUtils {
         if (!isEnable()) {
             return;
         }
-        MANAGER.publishAll(message);
+        MANAGER.publishAll(buildMessage(message));
+    }
+
+    /**
+     * 向指定用户发布统一 JSON 消息。
+     *
+     * @param userIds  目标用户
+     * @param payload  消息体
+     */
+    public static void publishMessage(List<Long> userIds, PushPayload payload) {
+        if (!isEnable()) {
+            return;
+        }
+        SseMessageDTO dto = new SseMessageDTO();
+        dto.setUserIds(userIds);
+        dto.setMessage(payload.getMessage());
+        dto.setMessageType(payload.getType());
+        dto.setMessageSource(payload.getSource());
+        dto.setData(payload.getData());
+        dto.setPath(payload.getPath());
+        dto.setQuery(payload.getQuery());
+        MANAGER.publishMessage(dto);
+    }
+
+    /**
+     * 向所有用户发布统一 JSON 消息。
+     *
+     * @param payload 消息体
+     */
+    public static void publishAll(PushPayload payload) {
+        if (!isEnable()) {
+            return;
+        }
+        MANAGER.publishAll(payload);
     }
 
     /**
@@ -81,6 +144,10 @@ public class SseMessageUtils {
      */
     public static Boolean isEnable() {
         return SSE_ENABLE;
+    }
+
+    private static PushPayload buildMessage(String message) {
+        return PushPayload.of(PushTypeEnum.MESSAGE, PushSourceEnum.BACKEND, message, null);
     }
 
 }

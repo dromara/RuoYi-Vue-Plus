@@ -3,7 +3,9 @@ package org.dromara.common.sse.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.dto.PushPayload;
 import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.sse.dto.SseMessageDTO;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -189,6 +191,26 @@ public class SseEmitterManager {
     }
 
     /**
+     * 向指定用户的全部本地 SSE 会话发送统一 JSON 消息。
+     *
+     * @param userId  要发送消息的用户id
+     * @param payload 要发送的消息体
+     */
+    public void sendMessage(Long userId, PushPayload payload) {
+        sendMessage(userId, JsonUtils.toJsonString(payload));
+    }
+
+    /**
+     * 向指定用户的全部本地 SSE 会话发送统一 JSON 消息。
+     *
+     * @param userId        要发送消息的用户id
+     * @param sseMessageDTO 要发送的消息内容
+     */
+    public void sendMessage(Long userId, SseMessageDTO sseMessageDTO) {
+        sendMessage(userId, buildPayload(sseMessageDTO));
+    }
+
+    /**
      * 向当前节点所有 SSE 会话发送消息。
      *
      * @param message 要发送的消息内容
@@ -197,6 +219,15 @@ public class SseEmitterManager {
         for (Long userId : USER_TOKEN_EMITTERS.keySet()) {
             sendMessage(userId, message);
         }
+    }
+
+    /**
+     * 向当前节点所有 SSE 会话发送统一 JSON 消息。
+     *
+     * @param payload 要发送的消息体
+     */
+    public void sendMessage(PushPayload payload) {
+        sendMessage(JsonUtils.toJsonString(payload));
     }
 
     /**
@@ -225,5 +256,36 @@ public class SseEmitterManager {
         RedisUtils.publish(SSE_TOPIC, broadcastMessage, consumer -> {
             log.info("SSE发送主题订阅消息topic:{} message:{}", SSE_TOPIC, message);
         });
+    }
+
+    /**
+     * 发布 SSE 广播 JSON 消息。
+     *
+     * @param payload 要发布的消息体
+     */
+    public void publishAll(PushPayload payload) {
+        SseMessageDTO broadcastMessage = new SseMessageDTO();
+        broadcastMessage.setMessage(payload.getMessage());
+        broadcastMessage.setMessageType(payload.getType());
+        broadcastMessage.setMessageSource(payload.getSource());
+        broadcastMessage.setData(payload.getData());
+        broadcastMessage.setPath(payload.getPath());
+        broadcastMessage.setQuery(payload.getQuery());
+        RedisUtils.publish(SSE_TOPIC, broadcastMessage, consumer -> {
+            log.info("SSE发送主题订阅消息topic:{} type:{} source:{} message:{}",
+                SSE_TOPIC, payload.getType(), payload.getSource(), payload.getMessage());
+        });
+    }
+
+    private String buildPayload(SseMessageDTO sseMessageDTO) {
+        PushPayload payload = PushPayload.of(
+            sseMessageDTO.getMessageType(),
+            sseMessageDTO.getMessageSource(),
+            sseMessageDTO.getMessage(),
+            sseMessageDTO.getData()
+        );
+        payload.setPath(sseMessageDTO.getPath());
+        payload.setQuery(sseMessageDTO.getQuery());
+        return JsonUtils.toJsonString(payload);
     }
 }

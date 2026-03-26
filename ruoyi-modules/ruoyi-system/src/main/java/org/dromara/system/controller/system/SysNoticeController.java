@@ -4,11 +4,14 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.enums.PushSourceEnum;
+import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.service.DictService;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.redis.annotation.RepeatSubmit;
+import org.dromara.common.sse.dto.SseMessageDTO;
 import org.dromara.common.sse.utils.SseMessageUtils;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysNoticeBo;
@@ -16,6 +19,9 @@ import org.dromara.system.domain.vo.SysNoticeVo;
 import org.dromara.system.service.ISysNoticeService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 公告 信息操作处理
@@ -72,7 +78,17 @@ public class SysNoticeController extends BaseController {
             return R.fail();
         }
         String type = dictService.getDictLabel("sys_notice_type", notice.getNoticeType());
-        SseMessageUtils.publishAll("[" + type + "] " + notice.getNoticeTitle());
+        Map<String, Object> data = new HashMap<>(4);
+        data.put("noticeType", notice.getNoticeType());
+        data.put("noticeTypeLabel", type);
+        data.put("noticeTitle", notice.getNoticeTitle());
+        SseMessageDTO dto = new SseMessageDTO();
+        dto.setMessage("[" + type + "] " + notice.getNoticeTitle());
+        dto.setMessageType(PushTypeEnum.NOTICE.getType());
+        dto.setMessageSource(PushSourceEnum.NOTICE.getSource());
+        dto.setData(data);
+        dto.setPath("/system/notice");
+        SseMessageUtils.publishMessage(dto);
         return R.ok();
     }
 

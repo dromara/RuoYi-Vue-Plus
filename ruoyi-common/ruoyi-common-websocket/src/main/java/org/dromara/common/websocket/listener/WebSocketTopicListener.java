@@ -31,12 +31,12 @@ public class WebSocketTopicListener implements ApplicationRunner, Ordered {
             if (CollUtil.isNotEmpty(message.getSessionKeys())) {
                 message.getSessionKeys().forEach(key -> {
                     if (WebSocketSessionHolder.existSession(key)) {
-                        WebSocketUtils.sendMessage(key, message.getMessage());
+                        WebSocketUtils.sendMessage(key, message);
                     }
                 });
             } else {
                 WebSocketSessionHolder.getSessionsAll().forEach(key -> {
-                    WebSocketUtils.sendMessage(key, message.getMessage());
+                    WebSocketUtils.sendMessage(key, message);
                 });
             }
         });

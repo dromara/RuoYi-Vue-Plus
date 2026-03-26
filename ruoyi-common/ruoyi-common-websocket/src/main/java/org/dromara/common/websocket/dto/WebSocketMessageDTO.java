@@ -5,6 +5,7 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 消息的dto
@@ -26,4 +27,29 @@ public class WebSocketMessageDTO implements Serializable {
      * 需要发送的消息
      */
     private String message;
+
+    /**
+     * 消息类型
+     */
+    private String messageType;
+
+    /**
+     * 消息来源
+     */
+    private String messageSource;
+
+    /**
+     * 扩展数据
+     */
+    private Object data;
+
+    /**
+     * 前端跳转路径
+     */
+    private String path;
+
+    /**
+     * 前端跳转参数
+     */
+    private Map<String, Object> query;
 }

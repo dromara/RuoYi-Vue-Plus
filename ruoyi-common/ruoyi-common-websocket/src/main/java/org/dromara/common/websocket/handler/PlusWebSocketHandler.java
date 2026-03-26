@@ -2,6 +2,8 @@ package org.dromara.common.websocket.handler;
 
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.enums.PushSourceEnum;
+import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.websocket.dto.WebSocketMessageDTO;
 import org.dromara.common.websocket.holder.WebSocketSessionHolder;
@@ -54,6 +56,8 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         WebSocketMessageDTO messageDTO = new WebSocketMessageDTO();
         messageDTO.setSessionKeys(List.of(loginUser.getUserId()));
         messageDTO.setMessage(message.getPayload());
+        messageDTO.setMessageType(PushTypeEnum.CUSTOM.getType());
+        messageDTO.setMessageSource(PushSourceEnum.CLIENT.getSource());
         WebSocketUtils.publishMessage(messageDTO);
     }
 

@@ -5,6 +5,8 @@ import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.dto.UserDTO;
+import org.dromara.common.core.enums.PushSourceEnum;
+import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
@@ -95,6 +97,8 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
                         SseMessageDTO dto = new SseMessageDTO();
                         dto.setUserIds(userIds);
                         dto.setMessage(message);
+                        dto.setMessageType(PushTypeEnum.MESSAGE.getType());
+                        dto.setMessageSource(PushSourceEnum.WORKFLOW.getSource());
                         SseMessageUtils.publishMessage(dto);
                     }
                     case EMAIL_MESSAGE -> MailUtils.sendText(emails, subject, message);

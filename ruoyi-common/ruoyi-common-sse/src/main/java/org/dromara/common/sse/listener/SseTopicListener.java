@@ -32,10 +32,17 @@ public class SseTopicListener implements ApplicationRunner, Ordered {
             // 如果key不为空就按照key发消息 如果为空就群发
             if (CollUtil.isNotEmpty(message.getUserIds())) {
                 message.getUserIds().forEach(key -> {
-                    sseEmitterManager.sendMessage(key, message.getMessage());
+                    sseEmitterManager.sendMessage(key, message);
                 });
             } else {
-                sseEmitterManager.sendMessage(message.getMessage());
+                sseEmitterManager.sendMessage(
+                    org.dromara.common.core.domain.dto.PushPayload.of(
+                        message.getMessageType(),
+                        message.getMessageSource(),
+                        message.getMessage(),
+                        message.getData()
+                    )
+                );
             }
         });
         log.info("初始化SSE主题订阅监听器成功");
