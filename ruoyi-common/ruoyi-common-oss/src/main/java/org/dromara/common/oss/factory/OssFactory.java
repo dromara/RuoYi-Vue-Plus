@@ -66,7 +66,7 @@ public class OssFactory {
             CLIENT_CACHE.put(configKey, client);
             return client;
         } finally {
-            LOCK.lock();
+            LOCK.unlock();
         }
     }
 

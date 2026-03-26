@@ -5,6 +5,7 @@ import org.dromara.common.oss.config.OssClientConfig;
 import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
 import org.dromara.common.oss.model.GetObjectResult;
 import org.dromara.common.oss.model.HandleAsyncResult;
+import org.dromara.common.oss.model.Options;
 import org.dromara.common.oss.model.PutObjectResult;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
@@ -142,6 +143,17 @@ public interface OssClient extends AutoCloseable {
      * @param bucket 存储桶名称
      * @param key    对象键
      * @param path   文件路径
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult bucketUpload(String bucket, String key, Path path, Options options);
+
+    /**
+     * 将本地路径对应的文件上传到指定存储桶。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     * @param path   文件路径
      * @return 上传结果
      */
     PutObjectResult bucketUpload(String bucket, String key, Path path);
@@ -152,9 +164,31 @@ public interface OssClient extends AutoCloseable {
      * @param bucket 存储桶名称
      * @param key    对象键
      * @param file   文件对象
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult bucketUpload(String bucket, String key, File file, Options options);
+
+    /**
+     * 将文件上传到指定存储桶。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     * @param file   文件对象
      * @return 上传结果
      */
     PutObjectResult bucketUpload(String bucket, String key, File file);
+
+    /**
+     * 将随机访问文件上传到指定存储桶。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     * @param file   随机访问文件
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult bucketUpload(String bucket, String key, RandomAccessFile file, Options options);
 
     /**
      * 将随机访问文件上传到指定存储桶。
@@ -173,9 +207,33 @@ public interface OssClient extends AutoCloseable {
      * @param key           对象键
      * @param channel       数据通道
      * @param contentLength 内容长度
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult bucketUpload(String bucket, String key, ReadableByteChannel channel, long contentLength, Options options);
+
+    /**
+     * 将可读通道中的数据上传到指定存储桶。
+     *
+     * @param bucket        存储桶名称
+     * @param key           对象键
+     * @param channel       数据通道
+     * @param contentLength 内容长度
      * @return 上传结果
      */
     PutObjectResult bucketUpload(String bucket, String key, ReadableByteChannel channel, long contentLength);
+
+    /**
+     * 将可读通道中的数据上传到指定存储桶。
+     *
+     * @param bucket        存储桶名称
+     * @param key           对象键
+     * @param in            输入流
+     * @param contentLength 内容长度
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult bucketUpload(String bucket, String key, InputStream in, long contentLength, Options options);
 
     /**
      * 将输入流中的数据上传到指定存储桶。
@@ -187,6 +245,17 @@ public interface OssClient extends AutoCloseable {
      * @return 上传结果
      */
     PutObjectResult bucketUpload(String bucket, String key, InputStream in, long contentLength);
+
+    /**
+     * 将字节数组上传到指定存储桶。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     * @param data   字节数组
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult bucketUpload(String bucket, String key, byte[] data, Options options);
 
     /**
      * 将字节数组上传到指定存储桶。
@@ -314,9 +383,29 @@ public interface OssClient extends AutoCloseable {
      *
      * @param key  对象键
      * @param path 文件路径
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult upload(String key, Path path, Options options);
+
+    /**
+     * 将本地路径对应的文件上传到默认存储桶。
+     *
+     * @param key  对象键
+     * @param path 文件路径
      * @return 上传结果
      */
     PutObjectResult upload(String key, Path path);
+
+    /**
+     * 将文件上传到默认存储桶。
+     *
+     * @param key  对象键
+     * @param file 文件对象
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult upload(String key, File file, Options options);
 
     /**
      * 将文件上传到默认存储桶。
@@ -332,9 +421,30 @@ public interface OssClient extends AutoCloseable {
      *
      * @param key  对象键
      * @param file 随机访问文件
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult upload(String key, RandomAccessFile file, Options options);
+
+    /**
+     * 将随机访问文件上传到默认存储桶。
+     *
+     * @param key  对象键
+     * @param file 随机访问文件
      * @return 上传结果
      */
     PutObjectResult upload(String key, RandomAccessFile file);
+
+    /**
+     * 将可读通道中的数据上传到默认存储桶。
+     *
+     * @param key    对象键
+     * @param channel            数据通道
+     * @param contentLength 内容长度
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult upload(String key, ReadableByteChannel channel, long contentLength, Options options);
 
     /**
      * 将可读通道中的数据上传到默认存储桶。
@@ -349,12 +459,33 @@ public interface OssClient extends AutoCloseable {
     /**
      * 将输入流中的数据上传到默认存储桶。
      *
+     * @param key    对象键
+     * @param in            输入流
+     * @param contentLength 内容长度
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult upload(String key, InputStream in, long contentLength, Options options);
+
+    /**
+     * 将输入流中的数据上传到默认存储桶。
+     *
      * @param key           对象键
      * @param in            输入流
      * @param contentLength 内容长度
      * @return 上传结果
      */
     PutObjectResult upload(String key, InputStream in, long contentLength);
+
+    /**
+     * 将字节数组上传到默认存储桶。
+     *
+     * @param key    对象键
+     * @param data   字节数组
+     * @param options 可选项
+     * @return 上传结果
+     */
+    PutObjectResult upload(String key, byte[] data, Options options);
 
     /**
      * 将字节数组上传到默认存储桶。
