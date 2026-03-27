@@ -2,6 +2,7 @@ package org.dromara.common.oss.client;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.oss.config.OssClientConfig;
 import org.dromara.common.oss.exception.S3StorageException;
@@ -128,27 +129,6 @@ public abstract class AbstractOssClientImpl implements OssClient {
     abstract void doInitialize();
 
     @Override
-    public void refresh(OssClientConfig config) {
-        if (Objects.equals(this.config, config)) {
-            return;
-        }
-        // 如果状态本来就是未初始化，直接则调用初始化
-        if (!initialized.get()) {
-            this.initialize();
-        }
-        // 将状态转为未初始化
-        if (initialized.compareAndSet(false, true)) {
-            try {
-                this.close();
-            } catch (Exception e) {
-                // 异常不影响刷新逻辑，此处屏蔽异常
-            }
-            // 状态交换成功才进行刷新
-            this.initialize();
-        }
-    }
-
-    @Override
     public boolean verifyConfig(Function<OssClientConfig, Boolean> verifyConfigAction) {
         OssClientConfig config = config();
         return Boolean.TRUE.equals(verifyConfigAction.apply(config));
@@ -157,6 +137,23 @@ public abstract class AbstractOssClientImpl implements OssClient {
     @Override
     public boolean verifyConfig(OssClientConfig verifyConfig) {
         return verifyConfig((config) -> Objects.equals(config, verifyConfig));
+    }
+
+    @Override
+    public String buildPathKey(String fileName) {
+        return buildPathKey(null, fileName);
+    }
+
+    @Override
+    public String buildPathKey(String businessPrefix, String fileName) {
+        String defaultPrefix = config.prefix()
+            .orElse("");
+        String mergedPrefix = mergePrefix(defaultPrefix, businessPrefix);
+        String suffix = suffix(fileName);
+        String datePath = DateUtils.datePath();
+        String uuid = IdUtil.fastSimpleUUID();
+        String path = mergedPrefix.isEmpty() ? datePath + StringUtils.SLASH + uuid : mergedPrefix + StringUtils.SLASH + datePath + StringUtils.SLASH + uuid;
+        return path + suffix;
     }
 
     @Override
@@ -230,7 +227,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
         try {
             // 以文件的大小为准
             options.setLength(file.length());
-            return bucketUpload(bucket, key, file.getChannel(), -1L);
+            return bucketUpload(bucket, key, file.getChannel(), -1L, options);
         } catch (Exception e) {
             if (e instanceof S3StorageException ex) {
                 throw ex;
@@ -438,8 +435,8 @@ public abstract class AbstractOssClientImpl implements OssClient {
     @Override
     public boolean bucketDelete(String bucket, String key) {
         try {
-            DeleteObjectResponse response = s3AsyncClient.deleteObject(builder -> builder.bucket(bucket).key(key)).join();
-            return Boolean.TRUE.equals(response.deleteMarker());
+            s3AsyncClient.deleteObject(builder -> builder.bucket(bucket).key(key)).join();
+            return true;
         } catch (Exception e) {
             throw S3StorageException.form(e);
         }
@@ -587,6 +584,43 @@ public abstract class AbstractOssClientImpl implements OssClient {
         return config.bucket()
             .filter(bucket -> !bucket.isBlank())
             .orElseThrow(() -> S3StorageException.form("bucket is not configured."));
+    }
+
+    private String mergePrefix(String defaultPrefix, String businessPrefix) {
+        String left = normalizePrefix(defaultPrefix);
+        String right = normalizePrefix(businessPrefix);
+        if (left.isEmpty()) {
+            return right;
+        }
+        if (right.isEmpty()) {
+            return left;
+        }
+        return left + StringUtils.SLASH + right;
+    }
+
+    private String normalizePrefix(String prefix) {
+        if (prefix == null) {
+            return "";
+        }
+        String normalized = prefix.trim();
+        while (normalized.startsWith(StringUtils.SLASH)) {
+            normalized = normalized.substring(1);
+        }
+        while (normalized.endsWith(StringUtils.SLASH)) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+        return normalized;
+    }
+
+    private String suffix(String fileName) {
+        if (fileName == null) {
+            return "";
+        }
+        int index = fileName.lastIndexOf('.');
+        if (index < 0) {
+            return "";
+        }
+        return fileName.substring(index);
     }
 
     @Override

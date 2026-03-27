@@ -182,6 +182,7 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
             .secretKey(properties.getSecretKey())
             .bucket(properties.getBucketName())
             .region(region)
+            .prefix(properties.getPrefix())
             .useHttps(SystemConstants.YES.equals(properties.getIsHttps()))
             .usePathStyleAccess(usePathStyleAccess)
             .accessControlPolicyConfig(accessControlPolicyConfig);

@@ -26,7 +26,6 @@ import org.dromara.common.oss.enums.AccessPolicy;
 import org.dromara.common.oss.factory.OssFactory;
 import org.dromara.common.oss.model.Options;
 import org.dromara.common.oss.model.PutObjectResult;
-import org.dromara.common.oss.util.S3ObjectUtil;
 import org.dromara.system.domain.SysOss;
 import org.dromara.system.domain.SysOssExt;
 import org.dromara.system.domain.bo.SysOssBo;
@@ -232,11 +231,9 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         String originalfileName = file.getOriginalFilename();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
         OssClient instance = OssFactory.instance();
-        try {
-            String pathKey = S3ObjectUtil.buildPathKey(originalfileName);
-            InputStream inputStream = file.getInputStream();
+        String pathKey = instance.buildPathKey(originalfileName);
+        try (InputStream inputStream = file.getInputStream()) {
             PutObjectResult result = instance.upload(pathKey, inputStream, file.getSize(), Options.builder().setContentType(file.getContentType()));
-            IoUtil.close(inputStream);
             SysOssExt ext1 = new SysOssExt();
             ext1.setFileSize(file.getSize());
             ext1.setContentType(file.getContentType());
@@ -261,7 +258,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         String originalfileName = file.getName();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
         OssClient instance = OssFactory.instance();
-        String pathKey = S3ObjectUtil.buildPathKey(originalfileName);
+        String pathKey = instance.buildPathKey(originalfileName);
         PutObjectResult result = instance.upload(pathKey, file, Options.builder().setContentType(FileUtils.getMimeType(file.toPath())));
         SysOssExt ext1 = new SysOssExt();
         ext1.setFileSize(result.size());

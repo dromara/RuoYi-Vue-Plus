@@ -69,13 +69,6 @@ public interface OssClient extends AutoCloseable {
     void initialize();
 
     /**
-     * 刷新客户端配置
-     *
-     * @param config 配置项
-     */
-    void refresh(OssClientConfig config);
-
-    /**
      * 校验客户端配置
      *
      * <p>注意：该方法不会修改任何既有的配置和状态，你看可以理解为这仅仅是一个配置展示的方法，以供调用者根据当前的配置，自行决定是否需要重新构建客户端。</p>
@@ -585,4 +578,21 @@ public interface OssClient extends AutoCloseable {
      * @return 预签名上传 URL
      */
     String presignPutUrl(String key, Duration expiredTime, Map<String, String> metadata);
+
+    /**
+     * 根据客户端配置生成默认对象Key。
+     *
+     * @param fileName 原始文件名
+     * @return 对象Key
+     */
+    String buildPathKey(String fileName);
+
+    /**
+     * 根据业务前缀和客户端默认前缀生成对象Key。
+     *
+     * @param businessPrefix 业务前缀
+     * @param fileName       原始文件名
+     * @return 对象Key
+     */
+    String buildPathKey(String businessPrefix, String fileName);
 }

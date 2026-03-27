@@ -52,19 +52,16 @@ public class OssFactory {
         OssClientConfig config = OssClientConfig.formProperties(properties);
         LOCK.lock();
         try {
-            // 如果已经存在，则校验配置一致性
-            if (CLIENT_CACHE.containsKey(configKey)) {
-                OssClient client = CLIENT_CACHE.get(configKey);
-                if (!client.verifyConfig(config)) {
-                    // 配置不一致，刷新配置
-                    client.refresh(config);
-                    CLIENT_CACHE.put(configKey, client);
+            OssClient client = CLIENT_CACHE.get(configKey);
+            if (client != null) {
+                if (client.verifyConfig(config)) {
+                    return client;
                 }
-                return client;
+                closeClient(configKey, client);
             }
-            DefaultOssClientImpl client = new DefaultOssClientImpl(configKey, config);
-            CLIENT_CACHE.put(configKey, client);
-            return client;
+            OssClient newClient = new DefaultOssClientImpl(configKey, config);
+            CLIENT_CACHE.put(configKey, newClient);
+            return newClient;
         } finally {
             LOCK.unlock();
         }
@@ -78,12 +75,16 @@ public class OssFactory {
         if (client == null) {
             return false;
         }
+        closeClient(configKey, client);
+        return true;
+    }
+
+    private static void closeClient(String configKey, OssClient client) {
         try {
             client.close();
         } catch (Exception e) {
-            log.warn("S3存储客户端关闭异常，错误信息: {}", e.getMessage(), e);
+            log.warn("S3存储客户端 [{}] 关闭异常，错误信息: {}", configKey, e.getMessage(), e);
         }
-        return true;
     }
 
 }
