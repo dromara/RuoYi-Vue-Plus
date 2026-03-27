@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/system/message")
+@RequestMapping("/resource/message")
 public class SysMessageController extends BaseController {
 
     private final ISysMessageService messageService;
