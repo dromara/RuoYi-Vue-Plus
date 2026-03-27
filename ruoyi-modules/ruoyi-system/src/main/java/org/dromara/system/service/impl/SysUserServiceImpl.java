@@ -642,6 +642,24 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     }
 
     /**
+     * 通过用户ID查询用户
+     *
+     * @param userId 用户id
+     * @return 用户列表
+     */
+    @Override
+    public UserDTO selectById(Long userId) {
+        SysUserVo vo = baseMapper.selectVoOne(new LambdaQueryWrapper<SysUser>()
+            .select(SysUser::getUserId, SysUser::getDeptId, SysUser::getUserName,
+                SysUser::getNickName, SysUser::getUserType, SysUser::getEmail,
+                SysUser::getPhoneNumber, SysUser::getGender, SysUser::getStatus,
+                SysUser::getCreateTime)
+            .eq(SysUser::getStatus, SystemConstants.NORMAL)
+            .eq(SysUser::getUserId, userId));
+        return BeanUtil.copyProperties(vo, UserDTO.class);
+    }
+
+    /**
      * 通过用户ID查询用户列表
      *
      * @param userIds 用户ids

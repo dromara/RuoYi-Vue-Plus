@@ -8,6 +8,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.StreamUtils;
@@ -21,6 +22,7 @@ import org.dromara.warm.flow.core.listener.GlobalListener;
 import org.dromara.warm.flow.core.listener.ListenerVariable;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.constant.FlowConstant;
+import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.FlowCopyBo;
 import org.dromara.workflow.domain.vo.NodeExtVo;
@@ -31,10 +33,7 @@ import org.dromara.workflow.service.IFlwNodeExtService;
 import org.dromara.workflow.service.IFlwTaskService;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 工作流全局监听器，处理任务流转中的扩展变量、消息和事件发布。
@@ -198,12 +197,14 @@ public class WorkflowGlobalListener implements GlobalListener {
             String status = determineFlowStatus(instance);
             if (StringUtils.isNotBlank(status)) {
                 flowProcessEventHandler.processHandler(definition.getFlowCode(), instance, status, params, false);
+                notifyInitiatorIfNeeded(definition, instance, status, variable);
             }
             if (!BusinessStatusEnum.initialState(instance.getFlowStatus())) {
                 if (task != null && CollUtil.isNotEmpty(nextTasks) && nextTasks.size() == 1
                     && flwCommonService.applyNodeCode(definition.getId()).equals(nextTasks.get(0).getNodeCode())) {
                     // 如果为画线指定驳回 线条指定为驳回 驳回得节点为申请人节点 则修改流程状态为退回
                     flowProcessEventHandler.processHandler(definition.getFlowCode(), instance, BusinessStatusEnum.BACK.getStatus(), params, false);
+                    notifyInitiatorIfNeeded(definition, instance, BusinessStatusEnum.BACK.getStatus(), variable);
                     // 修改流程实例状态
                     instance.setFlowStatus(BusinessStatusEnum.BACK.getStatus());
                     FlowEngine.insService().updateById(instance);
@@ -237,7 +238,10 @@ public class WorkflowGlobalListener implements GlobalListener {
             List<String> messageType = MapUtil.get(variable, FlowConstant.MESSAGE_TYPE, new TypeReference<>() {
             });
             String notice = MapUtil.getStr(variable, FlowConstant.MESSAGE_NOTICE);
-            flwCommonService.sendMessage(definition.getFlowName(), instance.getId(), messageType, notice);
+            // 退回到申请人时只保留“已退回”结果消息，避免再追加一条“新的待办”形成重复提醒。
+            if (shouldSendTaskMessage(flowParams, definition, nextTasks)) {
+                flwCommonService.sendMessage(definition.getFlowName(), instance.getId(), messageType, notice);
+            }
         }
         FlowEngine.insService().removeVariables(instance.getId(),
             FlowConstant.FLOW_COPY_LIST,
@@ -245,6 +249,46 @@ public class WorkflowGlobalListener implements GlobalListener {
             FlowConstant.MESSAGE_NOTICE,
             FlowConstant.SUBMIT
         );
+    }
+
+    private boolean shouldSendTaskMessage(FlowParams flowParams, Definition definition, List<Task> nextTasks) {
+        if (flowParams == null || !TaskStatusEnum.BACK.getStatus().equals(flowParams.getHisStatus())) {
+            return true;
+        }
+        if (CollUtil.isEmpty(nextTasks) || nextTasks.size() != 1) {
+            return true;
+        }
+        // 只有“退回到申请人”场景需要拦截待办提醒，其余退回/流转仍然保留待办消息。
+        String applyNodeCode = flwCommonService.applyNodeCode(definition.getId());
+        return !StringUtils.equals(applyNodeCode, nextTasks.get(0).getNodeCode());
+    }
+
+    private void notifyInitiatorIfNeeded(Definition definition, Instance instance, String status, Map<String, Object> variable) {
+        if (!StringUtils.equalsAny(status, BusinessStatusEnum.FINISH.getStatus(), BusinessStatusEnum.BACK.getStatus())) {
+            return;
+        }
+        if (StringUtils.isBlank(instance.getCreateBy())) {
+            return;
+        }
+        BusinessStatusEnum statusEnum = BusinessStatusEnum.getByStatus(status);
+        if (statusEnum == null) {
+            return;
+        }
+        Long createBy = Convert.toLong(instance.getCreateBy(), null);
+        if (createBy == null) {
+            return;
+        }
+        UserDTO initiator = userService.selectById(createBy);
+        if (initiator == null || initiator.getUserId() == null) {
+            return;
+        }
+        // 已完成、已退回这类结果消息只发给发起人，不再混入处理人待办消息。
+        List<String> messageType = Collections.singletonList(MessageTypeEnum.SYSTEM_MESSAGE.getCode());
+        if (MapUtil.isNotEmpty(variable) && variable.containsKey(FlowConstant.MESSAGE_TYPE)) {
+            messageType = MapUtil.get(variable, FlowConstant.MESSAGE_TYPE, new TypeReference<>() {
+            });
+        }
+        flwCommonService.sendResultMessage(definition.getFlowName(), statusEnum, messageType, Collections.singletonList(initiator));
     }
 
     /**

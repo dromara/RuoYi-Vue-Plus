@@ -363,6 +363,14 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
                 .setAssociated(taskId));
         // 批量保存抄送人员
         FlowEngine.userService().saveBatch(userList);
+        // 抄送消息进入“我的抄送”，不和待办列表混用。
+        flwCommonService.sendMessage(
+            List.of(org.dromara.workflow.common.enums.MessageTypeEnum.SYSTEM_MESSAGE.getCode()),
+            "您收到一条新的流程抄送，请及时查看。",
+            "单据抄送提醒",
+            userService.selectListByIds(StreamUtils.toList(flowCopyList, FlowCopyBo::getUserId)),
+            PATH_TASK_COPY
+        );
     }
 
     /**
@@ -824,11 +832,13 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
                 userIdList.addAll(StreamUtils.toList(bo.getUserIds(), Convert::toLong));
             }
             if (CollUtil.isNotEmpty(userIdList)) {
+                // 转办、委托、加减签等运行时操作，消息接收人统一从“我的待办”进入处理。
                 flwCommonService.sendMessage(
                     bo.getMessageType(),
                     StringUtils.isNotBlank(bo.getMessage()) ? bo.getMessage() : "单据「" + op.getDesc() + "」通知",
                     "单据「" + op.getDesc() + "」提醒",
-                    userService.selectListByIds(userIdList)
+                    userService.selectListByIds(userIdList),
+                    PATH_TASK_WAITING
                 );
             }
         }
@@ -907,7 +917,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         }
         List<String> messageType = bo.getMessageType();
         String message = bo.getMessage();
-        flwCommonService.sendMessage(messageType, message, "单据审批提醒", userList);
+        flwCommonService.sendMessage(messageType, message, "单据审批提醒", userList, PATH_TASK_WAITING);
         return true;
     }
 }

@@ -59,6 +59,26 @@ public interface FlowConstant {
     String MESSAGE_NOTICE = "messageNotice";
 
     /**
+     * 我的发起页面路径。
+     */
+    String PATH_MY_DOCUMENT = "/task/myDocument";
+
+    /**
+     * 我的待办页面路径。
+     */
+    String PATH_TASK_WAITING = "/task/taskWaiting";
+
+    /**
+     * 我的已办页面路径。
+     */
+    String PATH_TASK_FINISH = "/task/taskFinish";
+
+    /**
+     * 我的抄送页面路径。
+     */
+    String PATH_TASK_COPY = "/task/taskCopyList";
+
+    /**
      * 任务状态字典类型编码。
      */
     String WF_TASK_STATUS = "wf_task_status";

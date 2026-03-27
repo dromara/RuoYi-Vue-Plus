@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.core.domain.dto.UserDTO;
+import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.enums.PushSourceEnum;
 import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.exception.ServiceException;
@@ -28,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import static org.dromara.workflow.common.constant.FlowConstant.PATH_MY_DOCUMENT;
+import static org.dromara.workflow.common.constant.FlowConstant.PATH_TASK_WAITING;
 
 /**
  * 工作流工具
@@ -68,7 +71,8 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
         if (CollUtil.isEmpty(userList)) {
             return;
         }
-        sendMessage(messageType, message, DEFAULT_SUBJECT, userList);
+        // 发给当前处理人的工作流消息统一进入“我的待办”。
+        sendMessage(messageType, message, DEFAULT_SUBJECT, userList, PATH_TASK_WAITING);
     }
 
     /**
@@ -81,11 +85,27 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
      */
     @Override
     public void sendMessage(List<String> messageType, String message, String subject, List<UserDTO> userList) {
+        sendMessage(messageType, message, subject, userList, null);
+    }
+
+    @Override
+    public void sendResultMessage(String flowName, BusinessStatusEnum status, List<String> messageType, List<UserDTO> userList) {
+        if (status == null || CollUtil.isEmpty(messageType) || CollUtil.isEmpty(userList)) {
+            return;
+        }
+        // 审批结果类消息面向发起人查看，统一跳转到“我发起的”。
+        String message = "您发起的【" + flowName + "】单据审批已" + status.getDesc() + "。";
+        sendMessage(messageType, message, DEFAULT_SUBJECT, userList, PATH_MY_DOCUMENT);
+    }
+
+    @Override
+    public void sendMessage(List<String> messageType, String message, String subject, List<UserDTO> userList, String path) {
         if (CollUtil.isEmpty(messageType) || CollUtil.isEmpty(userList)) {
             return;
         }
         List<Long> userIds = new ArrayList<>(StreamUtils.toSet(userList, UserDTO::getUserId));
         Set<String> emails = StreamUtils.toSet(userList, UserDTO::getEmail);
+        emails.removeIf(StringUtils::isBlank);
 
         for (String code : messageType) {
             MessageTypeEnum messageTypeEnum = MessageTypeEnum.getByCode(code);
@@ -95,11 +115,11 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
             try {
                 switch (messageTypeEnum) {
                     case SYSTEM_MESSAGE -> {
+                        // 站内消息直接携带前端路由，消息盒子点击后可按路径分流。
                         messageService.publishMessage(userIds, PushPayloadDTO.of(
                             PushTypeEnum.MESSAGE,
                             PushSourceEnum.WORKFLOW,
-                            message,
-                            null
+                            message, null, path
                         ));
                     }
                     case EMAIL_MESSAGE -> MailUtils.sendText(emails, subject, message);
