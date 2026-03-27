@@ -1,10 +1,10 @@
 package org.dromara.demo.controller;
 
 import org.dromara.common.core.domain.R;
-import org.dromara.common.core.domain.dto.PushPayload;
+import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.core.enums.PushSourceEnum;
 import org.dromara.common.core.enums.PushTypeEnum;
-import org.dromara.common.push.helper.PushHelper;
+import org.dromara.common.core.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +24,8 @@ import java.util.List;
 @Slf4j
 public class WebSocketController {
 
+    private final MessageService messageService;
+
     /**
      * 发布消息
      *
@@ -32,16 +34,16 @@ public class WebSocketController {
      */
     @GetMapping("/send")
     public R<Void> send(Long userId, String message) {
-        PushPayload payload = PushPayload.of(
+        PushPayloadDTO payload = PushPayloadDTO.of(
             PushTypeEnum.MESSAGE,
             PushSourceEnum.BACKEND,
             message,
             null
         );
         if (userId == null) {
-            PushHelper.publishAll(payload);
+            messageService.publishAll(payload);
         } else {
-            PushHelper.publishMessage(List.of(userId), payload);
+            messageService.publishMessage(List.of(userId), payload);
         }
         return R.ok("操作成功");
     }

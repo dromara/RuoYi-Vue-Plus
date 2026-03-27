@@ -3,7 +3,7 @@ package org.dromara.common.push.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.domain.dto.PushPayload;
+import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.push.constant.MessageConstants;
 import org.dromara.common.push.dto.PushDTO;
 import org.dromara.common.core.utils.SpringUtils;
@@ -194,7 +194,7 @@ public class SseEmitterSessionManager implements PushSessionManager {
      * @param payload 要发送的消息体
      */
     @Override
-    public void sendMessage(Long userId, PushPayload payload) {
+    public void sendMessage(Long userId, PushPayloadDTO payload) {
         sendMessage(userId, JsonUtils.toJsonString(payload));
     }
 
@@ -228,7 +228,7 @@ public class SseEmitterSessionManager implements PushSessionManager {
      * @param payload 要发送的消息体
      */
     @Override
-    public void sendMessage(PushPayload payload) {
+    public void sendMessage(PushPayloadDTO payload) {
         sendMessage(JsonUtils.toJsonString(payload));
     }
 
@@ -253,7 +253,7 @@ public class SseEmitterSessionManager implements PushSessionManager {
      * @param message 要发布的消息内容
      */
     public void publishAll(String message) {
-        publishAll(PushPayload.of("message", "backend", message, null));
+        publishAll(PushPayloadDTO.of("message", "backend", message, null));
     }
 
     /**
@@ -262,7 +262,7 @@ public class SseEmitterSessionManager implements PushSessionManager {
      * @param payload 要发布的消息体
      */
     @Override
-    public void publishAll(PushPayload payload) {
+    public void publishAll(PushPayloadDTO payload) {
         PushDTO dto = new PushDTO();
         dto.setPayload(payload);
         RedisUtils.publish(MessageConstants.MESSAGE_TOPIC, dto, consumer -> {

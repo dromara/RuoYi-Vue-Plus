@@ -3,7 +3,7 @@ package org.dromara.common.push.handler;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.domain.dto.PushPayload;
+import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.PushSourceEnum;
 import org.dromara.common.core.enums.PushTypeEnum;
@@ -61,7 +61,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         }
         PushDTO dto = new PushDTO();
         dto.setUserIds(List.of(loginUser.getUserId()));
-        dto.setPayload(PushPayload.of(
+        dto.setPayload(PushPayloadDTO.of(
             PushTypeEnum.CUSTOM,
             PushSourceEnum.CLIENT,
             message.getPayload(),

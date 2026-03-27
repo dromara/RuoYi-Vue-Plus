@@ -1,7 +1,7 @@
 package org.dromara.common.push.dto;
 
 import lombok.Data;
-import org.dromara.common.core.domain.dto.PushPayload;
+import org.dromara.common.core.domain.dto.PushPayloadDTO;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -26,5 +26,5 @@ public class PushDTO implements Serializable {
     /**
      * 推送消息体。
      */
-    private PushPayload payload;
+    private PushPayloadDTO payload;
 }

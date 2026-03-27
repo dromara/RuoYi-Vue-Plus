@@ -3,7 +3,7 @@ package org.dromara.common.push.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.domain.dto.PushPayload;
+import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.push.dto.PushDTO;
@@ -90,7 +90,7 @@ public class WebSocketSessionManager implements PushSessionManager {
     }
 
     @Override
-    public void sendMessage(Long userId, PushPayload payload) {
+    public void sendMessage(Long userId, PushPayloadDTO payload) {
         if (payload == null) {
             return;
         }
@@ -113,7 +113,7 @@ public class WebSocketSessionManager implements PushSessionManager {
     }
 
     @Override
-    public void sendMessage(PushPayload payload) {
+    public void sendMessage(PushPayloadDTO payload) {
         USER_TOKEN_SESSIONS.keySet().forEach(userId -> sendMessage(userId, payload));
     }
 
@@ -128,7 +128,7 @@ public class WebSocketSessionManager implements PushSessionManager {
     }
 
     @Override
-    public void publishAll(PushPayload payload) {
+    public void publishAll(PushPayloadDTO payload) {
         PushDTO dto = new PushDTO();
         dto.setPayload(payload);
         publishMessage(dto);

@@ -1674,6 +1674,130 @@ GO
 INSERT sys_notice VALUES (2, N'维护通知：2018-07-01 若依系统凌晨维护', N'1', N'维护内容', N'0', 103, 1, getdate(), NULL, NULL, N'管理员')
 GO
 
+CREATE TABLE sys_message
+(
+    message_id    bigint                        NOT NULL,
+    category      nvarchar(20)                  NOT NULL,
+    type          nvarchar(20)                  NOT NULL,
+    source        nvarchar(20)                  NOT NULL,
+    title         nvarchar(100)   DEFAULT ('')  NULL,
+    message       nvarchar(500)   DEFAULT ('')  NULL,
+    content       nvarchar(max)                 NULL,
+    data_json     nvarchar(max)                 NULL,
+    path          nvarchar(500)                 NULL,
+    send_user_ids nvarchar(2000)  DEFAULT ('0') NOT NULL,
+    create_dept   bigint                        NULL,
+    create_by     bigint                        NULL,
+    create_time   datetime2(7)                  NULL,
+    update_by     bigint                        NULL,
+    update_time   datetime2(7)                  NULL,
+    CONSTRAINT PK__sys_mess__0BBF6EE69F35486A PRIMARY KEY CLUSTERED (message_id)
+        WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+        ON [PRIMARY]
+)
+ON [PRIMARY]
+TEXTIMAGE_ON [PRIMARY]
+GO
+
+CREATE NONCLUSTERED INDEX idx_sys_message_category_time ON sys_message(category, create_time)
+GO
+
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'消息ID' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'message_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'消息分组(system/notice/workflow)' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'category'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'消息类型' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'type'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'消息来源' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'source'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'标题' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'title'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'摘要消息' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'message'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'详细内容' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'content'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'扩展数据JSON' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'data_json'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'前端跳转路径' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'path'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'目标用户ID串，0表示全局' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'send_user_ids'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'创建部门' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'create_dept'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'创建者' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'create_by'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'创建时间' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'create_time'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'更新者' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'update_by'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'更新时间' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message',
+    'COLUMN', N'update_time'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'消息记录表' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_message'
+GO
+
 CREATE TABLE sys_oper_log
 (
     oper_id        bigint                       NOT NULL,

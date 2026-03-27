@@ -1,6 +1,6 @@
 package org.dromara.common.push.core;
 
-import org.dromara.common.core.domain.dto.PushPayload;
+import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.push.dto.PushDTO;
 
 import java.util.function.Consumer;
@@ -14,11 +14,11 @@ public interface PushSessionManager {
 
     void subscribeMessage(Consumer<PushDTO> consumer);
 
-    void sendMessage(Long userId, PushPayload payload);
+    void sendMessage(Long userId, PushPayloadDTO payload);
 
-    void sendMessage(PushPayload payload);
+    void sendMessage(PushPayloadDTO payload);
 
     void publishMessage(PushDTO pushDTO);
 
-    void publishAll(PushPayload payload);
+    void publishAll(PushPayloadDTO payload);
 }

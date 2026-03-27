@@ -2,7 +2,7 @@ package org.dromara.common.push.helper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.dromara.common.core.domain.dto.PushPayload;
+import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.core.enums.PushSourceEnum;
 import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.utils.SpringUtils;
@@ -27,21 +27,21 @@ public class PushHelper {
         sendMessage(buildMessage(message));
     }
 
-    public static void sendMessage(Long userId, PushPayload payload) {
+    public static void sendMessage(Long userId, PushPayloadDTO payload) {
         if (!isEnabled()) {
             return;
         }
         getSessionManager().sendMessage(userId, payload);
     }
 
-    public static void sendMessage(PushPayload payload) {
+    public static void sendMessage(PushPayloadDTO payload) {
         if (!isEnabled()) {
             return;
         }
         getSessionManager().sendMessage(payload);
     }
 
-    public static void publishMessage(List<Long> userIds, PushPayload payload) {
+    public static void publishMessage(List<Long> userIds, PushPayloadDTO payload) {
         PushDTO dto = new PushDTO();
         dto.setUserIds(userIds);
         dto.setPayload(payload);
@@ -59,7 +59,7 @@ public class PushHelper {
         publishAll(buildMessage(message));
     }
 
-    public static void publishAll(PushPayload payload) {
+    public static void publishAll(PushPayloadDTO payload) {
         if (!isEnabled()) {
             return;
         }
@@ -74,7 +74,7 @@ public class PushHelper {
         return SpringUtils.getBean(PushSessionManager.class);
     }
 
-    private static PushPayload buildMessage(String message) {
-        return PushPayload.of(PushTypeEnum.MESSAGE, PushSourceEnum.BACKEND, message, null);
+    private static PushPayloadDTO buildMessage(String message) {
+        return PushPayloadDTO.of(PushTypeEnum.MESSAGE, PushSourceEnum.BACKEND, message, null);
     }
 }

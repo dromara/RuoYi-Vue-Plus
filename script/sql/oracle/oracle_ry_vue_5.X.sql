@@ -925,7 +925,50 @@ insert into sys_notice values('2', '维护通知：2018-07-01 系统凌晨维护
 
 
 -- ----------------------------
--- 18、代码生成业务表
+-- 18、消息记录表
+-- ----------------------------
+create table sys_message (
+  message_id       number(20)      not null,
+  category         varchar2(20)    not null,
+  type             varchar2(20)    not null,
+  source           varchar2(20)    not null,
+  title            varchar2(100)   default '',
+  message          varchar2(500)   default '',
+  content          clob            default null,
+  data_json        clob            default null,
+  path             varchar2(500)   default null,
+  send_user_ids    varchar2(2000)  default '0' not null,
+  create_dept      number(20)      default null,
+  create_by        number(20)      default null,
+  create_time      date,
+  update_by        number(20)      default null,
+  update_time      date
+);
+
+alter table sys_message add constraint pk_sys_message primary key (message_id);
+
+create index idx_sys_message_category_time on sys_message(category, create_time);
+
+comment on table  sys_message                  is '消息记录表';
+comment on column sys_message.message_id       is '消息ID';
+comment on column sys_message.category         is '消息分组(system/notice/workflow)';
+comment on column sys_message.type             is '消息类型';
+comment on column sys_message.source           is '消息来源';
+comment on column sys_message.title            is '标题';
+comment on column sys_message.message          is '摘要消息';
+comment on column sys_message.content          is '详细内容';
+comment on column sys_message.data_json        is '扩展数据JSON';
+comment on column sys_message.path             is '前端跳转路径';
+comment on column sys_message.send_user_ids    is '目标用户ID串，0表示全局';
+comment on column sys_message.create_dept      is '创建部门';
+comment on column sys_message.create_by        is '创建者';
+comment on column sys_message.create_time      is '创建时间';
+comment on column sys_message.update_by        is '更新者';
+comment on column sys_message.update_time      is '更新时间';
+
+
+-- ----------------------------
+-- 19、代码生成业务表
 -- ----------------------------
 create table gen_table (
   table_id          number(20)       not null,
@@ -980,7 +1023,7 @@ comment on column gen_table.remark            is '备注';
 
 
 -- ----------------------------
--- 19、代码生成业务表字段
+-- 20、代码生成业务表字段
 -- ----------------------------
 create table gen_table_column (
   column_id         number(20)      not null,

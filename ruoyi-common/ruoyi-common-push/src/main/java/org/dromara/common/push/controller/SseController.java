@@ -63,7 +63,7 @@ public class SseController implements DisposableBean {
 //    public R<Void> send(Long userId, String msg) {
 //        PushDTO dto = new PushDTO();
 //        dto.setUserIds(List.of(userId));
-//        dto.setPayload(PushPayload.of("message", "backend", msg, null));
+//        dto.setPayload(PushPayloadDTO.of("message", "backend", msg, null));
 //        sessionManager.publishMessage(dto);
 //        return R.ok();
 //    }

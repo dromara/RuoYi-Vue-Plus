@@ -4,14 +4,14 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
-import org.dromara.common.core.domain.dto.PushPayload;
+import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.core.enums.PushSourceEnum;
 import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.service.DictService;
+import org.dromara.common.core.service.MessageService;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.push.helper.PushHelper;
 import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysNoticeBo;
@@ -36,6 +36,7 @@ public class SysNoticeController extends BaseController {
 
     private final ISysNoticeService noticeService;
     private final DictService dictService;
+    private final MessageService messageService;
 
     /**
      * 分页查询通知公告列表。
@@ -83,7 +84,9 @@ public class SysNoticeController extends BaseController {
         data.put("noticeTypeLabel", type);
         data.put("noticeTitle", notice.getNoticeTitle());
         data.put("noticeId", notice.getNoticeId());
-        PushHelper.publishAll(PushPayload.of(
+        data.put("noticeContent", notice.getNoticeContent());
+        data.put("status", notice.getStatus());
+        messageService.publishAll(PushPayloadDTO.of(
             PushTypeEnum.NOTICE,
             PushSourceEnum.NOTICE,
             "[" + type + "] " + notice.getNoticeTitle(),

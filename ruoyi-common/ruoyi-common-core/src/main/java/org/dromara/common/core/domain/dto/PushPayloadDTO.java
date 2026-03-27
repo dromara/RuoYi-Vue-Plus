@@ -14,10 +14,15 @@ import java.io.Serializable;
  * @author Lion Li
  */
 @Data
-public class PushPayload implements Serializable {
+public class PushPayloadDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 消息记录ID
+     */
+    private Long messageId;
 
     /**
      * 消息类型
@@ -49,8 +54,8 @@ public class PushPayload implements Serializable {
      */
     private Long timestamp;
 
-    public static PushPayload of(String type, String source, String message, Object data) {
-        PushPayload payload = new PushPayload();
+    public static PushPayloadDTO of(String type, String source, String message, Object data) {
+        PushPayloadDTO payload = new PushPayloadDTO();
         payload.setType(StringUtils.defaultIfBlank(type, PushTypeEnum.MESSAGE.getType()));
         payload.setSource(StringUtils.defaultIfBlank(source, PushSourceEnum.BACKEND.getSource()));
         payload.setMessage(message);
@@ -59,7 +64,7 @@ public class PushPayload implements Serializable {
         return payload;
     }
 
-    public static PushPayload of(PushTypeEnum type, PushSourceEnum source, String message, Object data) {
+    public static PushPayloadDTO of(PushTypeEnum type, PushSourceEnum source, String message, Object data) {
         return of(
             type == null ? null : type.getType(),
             source == null ? null : source.getSource(),
@@ -68,8 +73,8 @@ public class PushPayload implements Serializable {
         );
     }
 
-    public static PushPayload of(PushTypeEnum type, PushSourceEnum source, String message, Object data, String path) {
-        PushPayload payload = of(type, source, message, data);
+    public static PushPayloadDTO of(PushTypeEnum type, PushSourceEnum source, String message, Object data, String path) {
+        PushPayloadDTO payload = of(type, source, message, data);
         payload.setPath(path);
         return payload;
     }

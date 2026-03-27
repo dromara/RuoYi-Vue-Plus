@@ -4,16 +4,16 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.domain.dto.PushPayload;
+import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.enums.PushSourceEnum;
 import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.service.MessageService;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mail.utils.MailUtils;
-import org.dromara.common.push.helper.PushHelper;
 import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.entity.Node;
 import org.dromara.warm.flow.orm.entity.FlowTask;
@@ -41,6 +41,7 @@ import java.util.Set;
 public class FlwCommonServiceImpl implements IFlwCommonService {
 
     private static final String DEFAULT_SUBJECT = "单据审批提醒";
+    private final MessageService messageService;
 
     /**
      * 根据流程实例发送消息给当前处理人
@@ -94,7 +95,7 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
             try {
                 switch (messageTypeEnum) {
                     case SYSTEM_MESSAGE -> {
-                        PushHelper.publishMessage(userIds, PushPayload.of(
+                        messageService.publishMessage(userIds, PushPayloadDTO.of(
                             PushTypeEnum.MESSAGE,
                             PushSourceEnum.WORKFLOW,
                             message,
