@@ -1,11 +1,17 @@
 package org.dromara.common.translation.core.impl;
 
+import lombok.AllArgsConstructor;
 import org.dromara.common.core.service.DictService;
+import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.translation.annotation.TranslationType;
 import org.dromara.common.translation.constant.TransConstant;
 import org.dromara.common.translation.core.TranslationInterface;
-import lombok.AllArgsConstructor;
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 字典翻译实现
@@ -31,5 +37,23 @@ public class DictTypeTranslationImpl implements TranslationInterface<String> {
             return dictService.getDictLabel(other, dictValue);
         }
         return null;
+    }
+
+    @Override
+    public Map<Object, String> translationBatch(Set<Object> keys, String other) {
+        if (keys.isEmpty() || StringUtils.isBlank(other)) {
+            return Map.of();
+        }
+        Map<String, String> dictMap = dictService.getAllDictByDictType(other);
+        Map<Object, String> result = new LinkedHashMap<>(keys.size());
+        for (Object key : keys) {
+            if (key instanceof String dictValue) {
+                result.put(key, StreamUtils.join(
+                    StreamUtils.filter(Arrays.asList(dictValue.split(",")), StringUtils::isNotBlank),
+                    value -> dictMap.get(value.trim())
+                ));
+            }
+        }
+        return result;
     }
 }

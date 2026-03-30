@@ -1,10 +1,10 @@
 package org.dromara.common.translation.annotation;
 
-import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
-import org.dromara.common.translation.core.handler.TranslationHandler;
-import tools.jackson.databind.annotation.JsonSerialize;
-
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 通用翻译注解
@@ -13,8 +13,7 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
-@JacksonAnnotationsInside
-@JsonSerialize(using = TranslationHandler.class)
+@Documented
 public @interface Translation {
 
     /**

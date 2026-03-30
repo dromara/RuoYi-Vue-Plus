@@ -1,0 +1,133 @@
+package org.dromara.common.translation.core.handler;
+
+import cn.hutool.core.util.ObjectUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.reflect.ReflectUtils;
+import org.dromara.common.json.enhance.JsonEnhancementContext;
+import org.dromara.common.json.enhance.JsonFieldContext;
+import org.dromara.common.json.enhance.JsonFieldProcessor;
+import org.dromara.common.translation.annotation.Translation;
+import org.dromara.common.translation.annotation.TranslationType;
+import org.dromara.common.translation.core.TranslationInterface;
+import org.springframework.core.annotation.Order;
+
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+/**
+ * 翻译响应处理器。
+ */
+@Slf4j
+@Order(0)
+@RequiredArgsConstructor
+public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
+
+    private static final String ATTR_BATCHES = TranslationJsonFieldProcessor.class.getName() + ".batches";
+
+    private static final String ATTR_RESULTS = TranslationJsonFieldProcessor.class.getName() + ".results";
+
+    private final List<TranslationInterface<?>> translations;
+
+    @Override
+    public void collect(JsonFieldContext fieldContext, JsonEnhancementContext context) {
+        Translation translation = fieldContext.getAnnotation(Translation.class);
+        if (translation == null) {
+            return;
+        }
+        Object sourceValue = resolveSourceValue(fieldContext, translation);
+        if (sourceValue == null) {
+            return;
+        }
+        Map<TranslationBatchKey, Set<Object>> batches = getOrCreateBatches(context);
+        batches.computeIfAbsent(new TranslationBatchKey(translation.type(), translation.other()), key -> new LinkedHashSet<>())
+            .add(sourceValue);
+    }
+
+    @Override
+    public void prepare(JsonEnhancementContext context) {
+        Map<TranslationBatchKey, Set<Object>> batches = context.getAttribute(ATTR_BATCHES);
+        if (batches == null || batches.isEmpty()) {
+            return;
+        }
+        Map<TranslationBatchKey, Map<Object, Object>> results = new LinkedHashMap<>(batches.size());
+        for (Map.Entry<TranslationBatchKey, Set<Object>> entry : batches.entrySet()) {
+            TranslationInterface<?> translation = getTranslation(entry.getKey().type());
+            if (translation == null) {
+                continue;
+            }
+            try {
+                Map<Object, ?> translated = translation.translationBatch(entry.getValue(), entry.getKey().other());
+                results.put(entry.getKey(), new LinkedHashMap<>(translated));
+            } catch (Exception e) {
+                log.error("批量翻译处理异常，type: {}, other: {}", entry.getKey().type(), entry.getKey().other(), e);
+            }
+        }
+        context.setAttribute(ATTR_RESULTS, results);
+    }
+
+    @Override
+    public Object process(JsonFieldContext fieldContext, Object value, JsonEnhancementContext context) {
+        Translation translation = fieldContext.getAnnotation(Translation.class);
+        if (translation == null) {
+            return value;
+        }
+        Object sourceValue = resolveSourceValue(fieldContext, translation);
+        if (sourceValue == null) {
+            return null;
+        }
+        TranslationBatchKey batchKey = new TranslationBatchKey(translation.type(), translation.other());
+        Map<TranslationBatchKey, Map<Object, Object>> results = context.getAttribute(ATTR_RESULTS);
+        if (results != null) {
+            Map<Object, Object> translatedMap = results.get(batchKey);
+            if (translatedMap != null && translatedMap.containsKey(sourceValue)) {
+                return translatedMap.get(sourceValue);
+            }
+        }
+        TranslationInterface<?> trans = getTranslation(translation.type());
+        if (ObjectUtil.isNull(trans)) {
+            return value;
+        }
+        try {
+            return trans.translation(sourceValue, translation.other());
+        } catch (Exception e) {
+            log.error("翻译处理异常，type: {}, value: {}", translation.type(), sourceValue, e);
+            return value;
+        }
+    }
+
+    private Map<TranslationBatchKey, Set<Object>> getOrCreateBatches(JsonEnhancementContext context) {
+        Map<TranslationBatchKey, Set<Object>> batches = context.getAttribute(ATTR_BATCHES);
+        if (batches == null) {
+            batches = new LinkedHashMap<>();
+            context.setAttribute(ATTR_BATCHES, batches);
+        }
+        return batches;
+    }
+
+    private Object resolveSourceValue(JsonFieldContext fieldContext, Translation translation) {
+        if (StringUtils.isNotBlank(translation.mapper())) {
+            return ReflectUtils.invokeGetter(fieldContext.owner(), translation.mapper());
+        }
+        return fieldContext.value();
+    }
+
+    private TranslationInterface<?> getTranslation(String type) {
+        for (TranslationInterface<?> translation : translations) {
+            TranslationType translationType = translation.getClass().getAnnotation(TranslationType.class);
+            if (translationType != null && Objects.equals(type, translationType.type())) {
+                return translation;
+            }
+        }
+        return null;
+    }
+
+    private record TranslationBatchKey(String type, String other) {
+    }
+
+}
