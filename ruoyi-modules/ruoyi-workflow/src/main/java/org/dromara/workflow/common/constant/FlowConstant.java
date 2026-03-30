@@ -108,4 +108,13 @@ public interface FlowConstant {
      */
     String VAR_IGNORE_COOPERATE = "ignoreCooperate";
 
+    /**
+     * 未删除（正常数据）
+     */
+    Integer NOT_DELETED = 0;
+
+    /**
+     * 已删除（逻辑删除）
+     */
+    Integer DELETED = 1;
 }

@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.dromara.common.core.constant.SystemConstants.NORMAL;
+
 /**
  * 部门管理 数据层
  *
@@ -105,7 +107,7 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo> {
             .leftJoin(SysRoleDept.class, "srd", SysRoleDept::getDeptId, SysDept::getDeptId)
             .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleDept::getRoleId)
             .eq("srd", SysRoleDept::getRoleId, roleId)
-            .eq("sr", SysRole::getStatus, "0")
+            .eq("sr", SysRole::getStatus, NORMAL)
             .orderByAsc("d", SysDept::getParentId)
             .orderByAsc("d", SysDept::getOrderNum));
         Set<Long> parentIds = deptCheckStrictly ? new HashSet<>(StreamUtils.toList(depts, SysDept::getParentId)) : Collections.emptySet();
