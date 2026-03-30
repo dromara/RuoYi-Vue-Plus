@@ -22,7 +22,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * WebSocket Handler。
+ * WebSocket 请求处理器
+ * 处理WebSocket连接建立、消息接收、异常、断开等全生命周期事件
  *
  * @author Lion Li
  */
@@ -30,17 +31,31 @@ import java.util.List;
 @Slf4j
 public class PlusWebSocketHandler extends AbstractWebSocketHandler {
 
+    /**
+     * WebSocket 会话管理器
+     */
     private final WebSocketSessionManager webSocketSessionManager;
 
+    /**
+     * 建立WebSocket连接后触发
+     * 校验用户登录信息，注册会话
+     *
+     * @param session WebSocket会话
+     */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws IOException {
+        // 从会话属性中获取登录用户信息和Token
         LoginUser loginUser = (LoginUser) session.getAttributes().get(MessageConstants.LOGIN_USER_KEY);
         String token = (String) session.getAttributes().get(MessageConstants.LOGIN_TOKEN_KEY);
+
+        // 校验用户信息是否为空，无效则直接关闭连接
         if (ObjectUtil.hasNull(loginUser, token)) {
             session.close(CloseStatus.BAD_DATA);
             log.info("[connect] invalid token received. sessionId: {}", session.getId());
             return;
         }
+
+        // 并发安全包装会话，并注册到会话管理器
         webSocketSessionManager.connect(
             loginUser.getUserId(),
             token,
@@ -49,16 +64,27 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         log.info("[connect] sessionId: {}, userId:{}, token:{}", session.getId(), loginUser.getUserId(), token);
     }
 
+    /**
+     * 处理客户端发送的文本消息
+     * 支持心跳ping/pong，以及自定义消息转发
+     *
+     * @param session WebSocket会话
+     * @param message 文本消息
+     */
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(MessageConstants.LOGIN_USER_KEY);
         if (ObjectUtil.isNull(loginUser)) {
             return;
         }
+
+        // 心跳处理：客户端发送ping，服务端回复pong
         if (MessageConstants.PING.equalsIgnoreCase(message.getPayload())) {
             webSocketSessionManager.sendMessage(session, MessageConstants.PONG);
             return;
         }
+
+        // 构建客户端自定义消息并发布
         PushDTO dto = new PushDTO();
         dto.setUserIds(List.of(loginUser.getUserId()));
         dto.setPayload(PushPayloadDTO.of(
@@ -70,33 +96,55 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         webSocketSessionManager.publishMessage(dto);
     }
 
+    /**
+     * 处理二进制消息（默认实现）
+     */
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
         super.handleBinaryMessage(session, message);
     }
 
+    /**
+     * 处理Pong心跳响应
+     * 维持长连接存活
+     */
     @Override
     protected void handlePongMessage(WebSocketSession session, PongMessage message) {
         webSocketSessionManager.sendPongMessage(session);
     }
 
+    /**
+     * 传输异常处理
+     * 记录异常日志
+     */
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
         log.error("[transport error] sessionId: {}, exception:{}", session.getId(), exception.getMessage());
     }
 
+    /**
+     * 连接关闭后触发
+     * 注销用户会话
+     */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(MessageConstants.LOGIN_USER_KEY);
         String token = (String) session.getAttributes().get(MessageConstants.LOGIN_TOKEN_KEY);
+
         if (ObjectUtil.hasNull(loginUser, token)) {
             log.info("[disconnect] invalid token received. sessionId: {}", session.getId());
             return;
         }
+
+        // 从会话管理器中移除连接
         webSocketSessionManager.disconnect(loginUser.getUserId(), token);
         log.info("[disconnect] sessionId: {}, userId:{}, token:{}", session.getId(), loginUser.getUserId(), token);
     }
 
+    /**
+     * 是否支持分片消息
+     * 关闭：不支持分片传输
+     */
     @Override
     public boolean supportsPartialMessages() {
         return false;

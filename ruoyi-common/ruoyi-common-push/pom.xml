@@ -12,7 +12,7 @@
     <artifactId>ruoyi-common-push</artifactId>
 
     <description>
-        ruoyi-common-push 模块
+        ruoyi-common-push 消息推送模块
     </description>
 
     <dependencies>

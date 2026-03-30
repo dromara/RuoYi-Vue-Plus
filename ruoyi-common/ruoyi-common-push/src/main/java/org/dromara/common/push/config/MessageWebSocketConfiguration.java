@@ -23,6 +23,10 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 @ConditionalOnProperty(prefix = "message", name = "transport", havingValue = "websocket")
 public class MessageWebSocketConfiguration {
 
+    /**
+     * WebSocket 配置注册
+     * 配置连接路径、拦截器、跨域
+     */
     @Bean
     public WebSocketConfigurer webSocketConfigurer(HandshakeInterceptor handshakeInterceptor,
                                                    WebSocketHandler webSocketHandler,
@@ -33,21 +37,37 @@ public class MessageWebSocketConfiguration {
             .setAllowedOrigins(messageProperties.getAllowedOrigins());
     }
 
+    /**
+     * WebSocket 会话管理器
+     * 负责连接管理、消息发送、定时清理失效会话
+     */
     @Bean
     public WebSocketSessionManager webSocketSessionManager() {
         return new WebSocketSessionManager();
     }
 
+    /**
+     * WebSocket 握手拦截器
+     * 建立连接前做登录校验、客户端ID校验
+     */
     @Bean
     public HandshakeInterceptor handshakeInterceptor() {
         return new PlusWebSocketInterceptor();
     }
 
+    /**
+     * WebSocket 消息处理器
+     * 处理连接、消息、心跳、断开、异常等事件
+     */
     @Bean
     public WebSocketHandler webSocketHandler(WebSocketSessionManager webSocketSessionManager) {
         return new PlusWebSocketHandler(webSocketSessionManager);
     }
 
+    /**
+     * 消息主题监听器
+     * 订阅 Redis 消息，实现集群环境下的消息分发
+     */
     @Bean
     public MessageTopicListener messageTopicListener(WebSocketSessionManager webSocketSessionManager) {
         return new MessageTopicListener(webSocketSessionManager);
