@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.apache.fesod.sheet.annotation.ExcelProperty;
 import org.dromara.common.excel.annotation.ExcelDictFormat;
 import org.dromara.common.excel.convert.ExcelDictConvert;
+import org.dromara.system.listener.DeptExcelConverter;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -15,7 +16,6 @@ import java.util.Date;
  *
  * @author Lion Li
  */
-
 @Data
 @NoArgsConstructor
 public class SysUserExportVo implements Serializable {
@@ -34,6 +34,12 @@ public class SysUserExportVo implements Serializable {
      */
     @ExcelProperty(value = "用户账号")
     private String userName;
+
+    /**
+     * 部门ID
+     */
+    @ExcelProperty(value = "部门名称", converter = DeptExcelConverter.class)
+    private Long deptId;
 
     /**
      * 用户昵称

@@ -5,10 +5,12 @@ import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.lang.tree.parser.NodeParser;
+import cn.hutool.core.util.StrUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +43,7 @@ public class TreeBuildUtils extends TreeUtil {
      * @param <T>        输入节点的类型
      * @return 构建好的树形结构列表
      */
-    public static <K, T> List<T> build(List<T> items, K parentId, Function<T, K> classifier, BiConsumer<T,Map<K, List<T>>> action) {
+    public static <K, T> List<T> build(List<T> items, K parentId, Function<T, K> classifier, BiConsumer<T, Map<K, List<T>>> action) {
         // 构建动态规划表 (依据父ID分组)
         Map<K, List<T>> nodeTreeMaps = items.stream().collect(Collectors.groupingBy(classifier));
         // 回溯构建各级节点关系
@@ -125,6 +127,20 @@ public class TreeBuildUtils extends TreeUtil {
     }
 
     /**
+     * 构建树节点路径 Map：路径为 key，节点为 value
+     *
+     * @param trees       树结构
+     * @param joiner      拼接符 / - _
+     * @param fieldGetter 路径拼接字段（Tree::getName / Tree::getId）
+     * @return Map<拼接路径, 原始Tree节点>
+     */
+    public static <K> Map<String, Tree<K>> buildTreeNodeMap(List<Tree<K>> trees, String joiner, Function<Tree<K>, CharSequence> fieldGetter) {
+        Map<String, Tree<K>> nodeMap = new LinkedHashMap<>();
+        doBuildTreeNodeMap(trees, "", joiner, fieldGetter, nodeMap);
+        return nodeMap;
+    }
+
+    /**
      * 获取指定节点下的所有叶子节点
      *
      * @param <K>  节点ID的类型
@@ -138,6 +154,35 @@ public class TreeBuildUtils extends TreeUtil {
             // 递归调用，获取所有子节点的叶子节点
             return node.getChildren().stream()
                 .flatMap(TreeBuildUtils::extractLeafNodes);
+        }
+    }
+
+    /**
+     * 递归构建【路径为key，节点为value】的Map
+     * <p>深度优先遍历树结构，将拼接好的路径作为key，原始Tree节点作为value</p>
+     *
+     * @param trees       当前层级的节点列表
+     * @param parentPath  父节点已拼接好的路径
+     * @param joiner      路径拼接符，如 "/"、"-"、"_"
+     * @param fieldGetter 用于拼接路径的节点字段获取器
+     * @param nodeMap     存放最终结果的有序Map（路径->Tree节点）
+     * @param <K>         树节点ID的类型
+     */
+    private static <K> void doBuildTreeNodeMap(List<Tree<K>> trees, String parentPath, String joiner, Function<Tree<K>, CharSequence> fieldGetter, Map<String, Tree<K>> nodeMap) {
+        if (CollUtil.isEmpty(trees)) {
+            return;
+        }
+        for (Tree<K> tree : trees) {
+            CharSequence field = fieldGetter.apply(tree);
+            if (StrUtil.isEmpty(field)) {
+                continue;
+            }
+            // 拼接路径作为 KEY
+            String currentPath = StrUtil.isEmpty(parentPath) ? field.toString() : parentPath + joiner + field;
+            // 路径 = key，节点 = value
+            nodeMap.put(currentPath, tree);
+            // 递归子节点
+            doBuildTreeNodeMap(tree.getChildren(), currentPath, joiner, fieldGetter, nodeMap);
         }
     }
 

@@ -103,6 +103,7 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- 授权认证 -->
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-common-social</artifactId>
@@ -151,6 +152,7 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- mqtt模块 -->
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-common-mqtt</artifactId>
