@@ -115,7 +115,7 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
     default List<Long> selectMenuListByRoleId(Long roleId, boolean menuCheckStrictly) {
         List<SysMenu> menus = this.selectJoinList(SysMenu.class, JoinWrappers.lambda("m", SysMenu.class)
             .distinct()
-            .select(SysMenu::getMenuId, SysMenu::getParentId)
+            .select(SysMenu::getMenuId, SysMenu::getParentId, SysMenu::getOrderNum)
             .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
             .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleMenu::getRoleId)
             .eq("srm", SysRoleMenu::getRoleId, roleId)

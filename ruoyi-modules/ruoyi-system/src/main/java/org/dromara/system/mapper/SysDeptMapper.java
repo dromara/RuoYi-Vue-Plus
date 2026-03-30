@@ -104,7 +104,7 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo>, MPJBa
     default List<Long> selectDeptListByRoleId(Long roleId, boolean deptCheckStrictly) {
         List<SysDept> depts = this.selectJoinList(SysDept.class, JoinWrappers.lambda("d", SysDept.class)
             .distinct()
-            .select(SysDept::getDeptId, SysDept::getParentId)
+            .select(SysDept::getDeptId, SysDept::getParentId, SysDept::getOrderNum)
             .leftJoin(SysRoleDept.class, "srd", SysRoleDept::getDeptId, SysDept::getDeptId)
             .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleDept::getRoleId)
             .eq("srd", SysRoleDept::getRoleId, roleId)
