@@ -2,6 +2,7 @@ package org.dromara.system.mapper;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.toolkit.JoinWrappers;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.StreamUtils;
@@ -22,7 +23,7 @@ import java.util.*;
  *
  * @author Lion Li
  */
-public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
+public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBaseMapper<SysMenu> {
 
     /**
      * 根据用户ID查询权限

@@ -3,6 +3,7 @@ package org.dromara.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.toolkit.JoinWrappers;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.mybatis.annotation.DataColumn;
@@ -26,7 +27,7 @@ import static org.dromara.common.core.constant.SystemConstants.NORMAL;
  *
  * @author Lion Li
  */
-public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo> {
+public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo>, MPJBaseMapper<SysDept> {
 
     /**
      * 查询部门管理数据

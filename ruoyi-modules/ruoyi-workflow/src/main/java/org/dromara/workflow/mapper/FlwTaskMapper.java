@@ -2,6 +2,7 @@ package org.dromara.workflow.mapper;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.dromara.common.core.enums.BusinessStatusEnum;
@@ -24,7 +25,7 @@ import static org.dromara.workflow.common.constant.FlowConstant.NOT_DELETED;
  * @author may
  * @date 2024-03-02
  */
-public interface FlwTaskMapper extends BaseMapperPlus<FlowTask, FlowTaskVo> {
+public interface FlwTaskMapper extends BaseMapperPlus<FlowTask, FlowTaskVo>, MPJBaseMapper<FlowTask> {
 
     default Page<FlowTaskVo> getListRunTask(Page<FlowTaskVo> page, FlowTaskBo bo, List<String> categoryIds, String userId) {
         Map<String, Object> params = bo.getParams();

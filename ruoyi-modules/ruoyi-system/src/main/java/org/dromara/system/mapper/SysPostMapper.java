@@ -3,6 +3,7 @@ package org.dromara.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.toolkit.JoinWrappers;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
@@ -19,7 +20,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
+public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo>, MPJBaseMapper<SysPost> {
 
     /**
      * 分页查询岗位列表
