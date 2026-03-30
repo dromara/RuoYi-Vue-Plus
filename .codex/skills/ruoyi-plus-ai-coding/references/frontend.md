@@ -2,8 +2,8 @@
 
 ## 优先参考的代码来源
 
-- `ruoyi-modules/ruoyi-generator/src/main/resources/vm/ts/*.vm`
-- `ruoyi-modules/ruoyi-generator/src/main/resources/vm/vue/*.vm`
+- `ruoyi-modules/ruoyi-gen/src/main/resources/vm/ts/*.vm`
+- `ruoyi-modules/ruoyi-gen/src/main/resources/vm/vue/*.vm`
 - 前端工程中与目标模块最接近的现有页面
 
 如果任务涉及前端，先看仓库里实际使用的前端目录和同类页面，不要直接套通用 Vue 习惯。

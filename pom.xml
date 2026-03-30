@@ -343,7 +343,7 @@
 
             <dependency>
                 <groupId>org.dromara</groupId>
-                <artifactId>ruoyi-generator</artifactId>
+                <artifactId>ruoyi-gen</artifactId>
                 <version>${revision}</version>
             </dependency>
 

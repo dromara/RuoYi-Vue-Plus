@@ -29,7 +29,7 @@ description: 在仓库内按代码生成器模板和项目既有约定生成或�
 ## 执行流程
 
 1. 先确认目标模块，优先复用同模块中最近似功能的写法。
-2. 新增标准 CRUD 代码前，先读取 `ruoyi-modules/ruoyi-generator/src/main/resources/vm/` 下的模板。
+2. 新增标准 CRUD 代码前，先读取 `ruoyi-modules/ruoyi-gen/src/main/resources/vm/` 下的模板。
 3. 命名和分层保持与仓库一致：
    `domain` entity、`domain.bo`、`domain.vo`、`mapper`、`service`、`service.impl`、`controller`。
 4. 优先在生成器结构上扩展，不要自行发明新的分层。
