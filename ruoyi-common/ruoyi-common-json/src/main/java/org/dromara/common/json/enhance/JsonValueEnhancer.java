@@ -129,7 +129,7 @@ public class JsonValueEnhancer {
             return jsonMapper.valueToTree(value);
         }
         try {
-            ObjectNode objectNode = asObjectNode(jsonMapper.valueToTree(value));
+            ObjectNode objectNode = jsonMapper.createObjectNode();
             for (PropertyMetadata metadata : getProperties(value.getClass())) {
                 Object originalValue = metadata.getValue(value);
                 JsonFieldContext fieldContext = new JsonFieldContext(value, metadata.propertyName(), metadata.member(), originalValue);
@@ -156,13 +156,6 @@ public class JsonValueEnhancer {
             return renderValue(value, context, visited);
         }
         return enhanceTree(value);
-    }
-
-    private ObjectNode asObjectNode(JsonNode node) {
-        if (node instanceof ObjectNode objectNode) {
-            return objectNode;
-        }
-        return jsonMapper.createObjectNode();
     }
 
     private List<PropertyMetadata> getProperties(Class<?> type) {

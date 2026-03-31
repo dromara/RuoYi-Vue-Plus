@@ -1,7 +1,6 @@
 package org.dromara.common.translation.core.handler;
 
 import cn.hutool.core.util.ObjectUtil;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
@@ -13,11 +12,11 @@ import org.dromara.common.translation.annotation.TranslationType;
 import org.dromara.common.translation.core.TranslationInterface;
 import org.springframework.core.annotation.Order;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -25,14 +24,24 @@ import java.util.Set;
  */
 @Slf4j
 @Order(0)
-@RequiredArgsConstructor
 public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
 
     private static final String ATTR_BATCHES = TranslationJsonFieldProcessor.class.getName() + ".batches";
 
     private static final String ATTR_RESULTS = TranslationJsonFieldProcessor.class.getName() + ".results";
 
-    private final List<TranslationInterface<?>> translations;
+    private final Map<String, TranslationInterface<?>> translationMap;
+
+    public TranslationJsonFieldProcessor(List<TranslationInterface<?>> translations) {
+        Map<String, TranslationInterface<?>> map = new LinkedHashMap<>(translations.size());
+        for (TranslationInterface<?> t : translations) {
+            TranslationType annotation = t.getClass().getAnnotation(TranslationType.class);
+            if (annotation != null) {
+                map.put(annotation.type(), t);
+            }
+        }
+        this.translationMap = Collections.unmodifiableMap(map);
+    }
 
     @Override
     public void collect(JsonFieldContext fieldContext, JsonEnhancementContext context) {
@@ -118,13 +127,7 @@ public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
     }
 
     private TranslationInterface<?> getTranslation(String type) {
-        for (TranslationInterface<?> translation : translations) {
-            TranslationType translationType = translation.getClass().getAnnotation(TranslationType.class);
-            if (translationType != null && Objects.equals(type, translationType.type())) {
-                return translation;
-            }
-        }
-        return null;
+        return translationMap.get(type);
     }
 
     private record TranslationBatchKey(String type, String other) {
