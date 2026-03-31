@@ -133,7 +133,7 @@ public class PlusDataPermissionHandler {
         }
 
         for (RoleDTO role : scopeRoles) {
-            user.setRoleId(role.getRoleId());
+            context.setVariable("roleId", role.getRoleId());
             // 获取角色权限泛型
             DataScopeType type = DataScopeType.findCode(role.getDataScope());
             if (ObjectUtil.isNull(type)) {

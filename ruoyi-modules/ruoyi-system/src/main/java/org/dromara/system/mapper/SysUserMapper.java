@@ -73,7 +73,6 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo>, MPJBa
     default List<SysUserExportVo> selectUserExportList(SysUserBo user, List<Long> deptIds) {
         MPJLambdaWrapper<SysUser> wrapper = JoinWrappers.lambda("u", SysUser.class)
             .selectAll(SysUser.class)
-            .selectAs(SysDept::getDeptName, SysUserExportVo::getDeptName)
             .selectAs("u1", SysUser::getUserName, SysUserExportVo::getLeaderName)
             .leftJoin(SysDept.class, "d", SysDept::getDeptId, SysUser::getDeptId)
             .leftJoin(SysUser.class, "u1", SysUser::getUserId, SysDept::getLeader)

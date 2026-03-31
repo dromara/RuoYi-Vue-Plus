@@ -241,9 +241,7 @@ public class GenTableServiceImpl implements IGenTableService {
         genTable.setOptions(options);
         int row = baseMapper.updateById(genTable);
         if (row > 0) {
-            for (GenTableColumn cenTableColumn : genTable.getColumns()) {
-                genTableColumnMapper.updateById(cenTableColumn);
-            }
+            genTableColumnMapper.updateBatchById(genTable.getColumns());
         }
     }
 
@@ -289,6 +287,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 }
             }
         } catch (Exception e) {
+            log.error("导入失败", e);
             throw new ServiceException("导入失败：" + e.getMessage());
         }
     }
@@ -471,7 +470,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 zip.flush();
                 zip.closeEntry();
             } catch (IOException e) {
-                log.error("渲染模板失败，表名：" + table.getTableName(), e);
+                log.error("渲染模板失败，表名：{}", table.getTableName(), e);
             }
         }
     }

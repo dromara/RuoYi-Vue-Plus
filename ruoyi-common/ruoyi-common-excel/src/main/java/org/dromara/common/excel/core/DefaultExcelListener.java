@@ -73,6 +73,10 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
                 log.error(errMsg);
             }
         }
+        if (errMsg == null) {
+            errMsg = StrUtil.format("第{}行数据异常: {}", context.readRowHolder().getRowIndex() + 1, exception.getMessage());
+            log.error(errMsg, exception);
+        }
         excelResult.getErrorList().add(errMsg);
         throw new ExcelAnalysisException(errMsg);
     }

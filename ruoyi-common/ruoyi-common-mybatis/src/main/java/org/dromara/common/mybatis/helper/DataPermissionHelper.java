@@ -12,9 +12,10 @@ import org.dromara.common.mybatis.core.domain.DataPermissionAccess;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mybatis.annotation.DataPermission;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 import java.util.function.Supplier;
 
 /**
@@ -30,7 +31,7 @@ public class DataPermissionHelper {
     private static final String DATA_PERMISSION_KEY = "data:permission";
     private static final String ACCESS_KEY = "data:permission:access";
 
-    private static final ThreadLocal<Stack<Integer>> REENTRANT_IGNORE = ThreadLocal.withInitial(Stack::new);
+    private static final ThreadLocal<Deque<Integer>> REENTRANT_IGNORE = ThreadLocal.withInitial(ArrayDeque::new);
 
     private static final ThreadLocal<DataPermission> PERMISSION_CACHE = new ThreadLocal<>();
 
@@ -116,7 +117,7 @@ public class DataPermissionHelper {
         if (attribute instanceof Map map) {
             return map;
         }
-        throw new NullPointerException("data permission context type exception");
+        throw new IllegalStateException("data permission context type exception");
     }
 
     /**
@@ -144,7 +145,7 @@ public class DataPermissionHelper {
         } else {
             ignoreStrategy.setDataPermission(true);
         }
-        Stack<Integer> reentrantStack = REENTRANT_IGNORE.get();
+        Deque<Integer> reentrantStack = REENTRANT_IGNORE.get();
         reentrantStack.push(reentrantStack.size() + 1);
     }
 
@@ -159,7 +160,7 @@ public class DataPermissionHelper {
                 && !Boolean.TRUE.equals(ignoreStrategy.getIllegalSql())
                 && !Boolean.TRUE.equals(ignoreStrategy.getTenantLine())
                 && CollectionUtil.isEmpty(ignoreStrategy.getOthers());
-            Stack<Integer> reentrantStack = REENTRANT_IGNORE.get();
+            Deque<Integer> reentrantStack = REENTRANT_IGNORE.get();
             boolean empty = reentrantStack.isEmpty() || reentrantStack.pop() == 1;
             if (noOtherIgnoreStrategy && empty) {
                 InterceptorIgnoreHelper.clearIgnoreStrategy();

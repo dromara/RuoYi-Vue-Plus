@@ -33,7 +33,7 @@ public enum DataScopeType {
     /**
      * 自定数据权限
      */
-    CUSTOM("2", " #{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} ) ", " 1 = 0 "),
+    CUSTOM("2", " #{#deptName} IN ( #{@sdss.getRoleCustom( #roleId )} ) ", " 1 = 0 "),
 
     /**
      * 部门数据权限

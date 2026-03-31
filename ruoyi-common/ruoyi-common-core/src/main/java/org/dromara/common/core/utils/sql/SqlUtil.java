@@ -1,5 +1,6 @@
 package org.dromara.common.core.utils.sql;
 
+import cn.hutool.core.exceptions.UtilException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.StringUtils;
@@ -15,7 +16,7 @@ public class SqlUtil {
     /**
      * 定义常用的 sql关键字
      */
-    public static String SQL_REGEX = "\u000B|and |extractvalue|updatexml|sleep|exec |insert |select |delete |update |drop |count |chr |mid |master |truncate |char |declare |or |union |like |+|/*|user()";
+    public static final String SQL_REGEX = "\u000B|%0A|and |extractvalue|updatexml|sleep|information_schema|exec |insert |select |delete |update |drop |count |chr |mid |master |truncate |char |declare |or |union |like |+|/*|user()";
 
     /**
      * 仅支持字母、数字、下划线、空格、逗号、小数点（支持多个字段排序）
@@ -46,10 +47,11 @@ public class SqlUtil {
         if (StringUtils.isEmpty(value)) {
             return;
         }
+        String normalizedValue = value.replaceAll("\\p{Z}|\\s", "");
         String[] sqlKeywords = StringUtils.split(SQL_REGEX, "\\|");
         for (String sqlKeyword : sqlKeywords) {
-            if (StringUtils.indexOfIgnoreCase(value, sqlKeyword) > -1) {
-                throw new IllegalArgumentException("参数存在SQL注入风险");
+            if (StringUtils.indexOf(normalizedValue, sqlKeyword) > -1) {
+                throw new UtilException("请求参数包含敏感关键词'" + sqlKeyword + "'，可能存在安全风险");
             }
         }
     }

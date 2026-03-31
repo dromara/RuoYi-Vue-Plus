@@ -216,7 +216,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
     @Override
     public Long selectDeptLeaderById(Long deptId) {
         SysDeptVo vo = SpringUtils.getAopProxy(this).selectDeptById(deptId);
-        return vo.getLeader();
+        return ObjectUtil.isNull(vo) ? null : vo.getLeader();
     }
 
     /**
@@ -312,7 +312,10 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
     @Override
     public int insertDept(SysDeptBo bo) {
         SysDept info = baseMapper.selectById(bo.getParentId());
-        // 如果父节点不为正常状态,则不允许新增子节点
+        // 如果父节点不存在或不为正常状态,则不允许新增子节点
+        if (ObjectUtil.isNull(info)) {
+            throw new ServiceException("父部门不存在");
+        }
         if (!SystemConstants.NORMAL.equals(info.getStatus())) {
             throw new ServiceException("部门停用，不允许新增");
         }
@@ -390,7 +393,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         for (SysDept child : children) {
             SysDept dept = new SysDept();
             dept.setDeptId(child.getDeptId());
-            dept.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
+            dept.setAncestors(StringUtils.replaceOnce(child.getAncestors(), oldAncestors, newAncestors));
             list.add(dept);
         }
         if (CollUtil.isNotEmpty(list)) {
@@ -408,7 +411,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
      */
     @Caching(evict = {
         @CacheEvict(cacheNames = CacheNames.SYS_DEPT, key = "#deptId"),
-        @CacheEvict(cacheNames = CacheNames.SYS_DEPT_AND_CHILD, key = "#deptId")
+        @CacheEvict(cacheNames = CacheNames.SYS_DEPT_AND_CHILD, allEntries = true)
     })
     @Override
     public int deleteDeptById(Long deptId) {

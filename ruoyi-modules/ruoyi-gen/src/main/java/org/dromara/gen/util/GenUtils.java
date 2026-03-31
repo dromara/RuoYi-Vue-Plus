@@ -180,7 +180,7 @@ public class GenUtils {
         String text = replacementm;
         for (String searchString : searchList) {
             if (replacementm.startsWith(searchString)) {
-                text = replacementm.replaceFirst(searchString, StringUtils.EMPTY);
+                text = StringUtils.removeStart(replacementm, searchString);
                 break;
             }
         }
@@ -220,6 +220,10 @@ public class GenUtils {
     public static Integer getColumnLength(String columnType) {
         if (StringUtils.indexOf(columnType, "(") > 0) {
             String length = StringUtils.substringBetween(columnType, "(", ")");
+            // 处理 decimal(10,2) 这类带精度的类型，只取长度部分
+            if (length.contains(",")) {
+                length = StringUtils.substringBefore(length, ",");
+            }
             return Integer.valueOf(length);
         } else {
             return 0;

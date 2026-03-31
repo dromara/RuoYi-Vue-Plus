@@ -152,7 +152,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
         SysConfig config = MapstructUtils.convert(bo, SysConfig.class);
         if (config.getConfigId() != null) {
             SysConfig temp = baseMapper.selectById(config.getConfigId());
-            if (!StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
+            if (ObjectUtil.isNotNull(temp) && !StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
                 CacheUtils.evict(CacheNames.SYS_CONFIG, temp.getConfigKey());
             }
             row = baseMapper.updateById(config);

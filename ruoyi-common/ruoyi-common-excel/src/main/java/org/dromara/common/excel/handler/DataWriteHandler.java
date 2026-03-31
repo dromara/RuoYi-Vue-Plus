@@ -99,6 +99,9 @@ public class DataWriteHandler implements SheetWriteHandler, CellWriteHandler {
             }
             ExcelRequired excelRequired = field.getAnnotation(ExcelRequired.class);
             ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
+            if (excelProperty == null || excelProperty.value().length == 0) {
+                continue;
+            }
             requiredMap.put(excelProperty.value()[0], excelRequired.fontColor().getIndex());
         }
         return requiredMap;
@@ -116,6 +119,9 @@ public class DataWriteHandler implements SheetWriteHandler, CellWriteHandler {
             }
             ExcelNotation excelNotation = field.getAnnotation(ExcelNotation.class);
             ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
+            if (excelProperty == null || excelProperty.value().length == 0) {
+                continue;
+            }
             notationMap.put(excelProperty.value()[0], excelNotation.value());
         }
         return notationMap;

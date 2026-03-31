@@ -23,6 +23,8 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
     public static final String SLASH = "/";
 
+    private static final AntPathMatcher ANT_PATH_MATCHER = new AntPathMatcher();
+
     @Deprecated
     private StringUtils() {
     }
@@ -233,8 +235,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @param url     需要匹配的url
      */
     public static boolean isMatch(String pattern, String url) {
-        AntPathMatcher matcher = new AntPathMatcher();
-        return matcher.match(pattern, url);
+        return ANT_PATH_MATCHER.match(pattern, url);
     }
 
     /**

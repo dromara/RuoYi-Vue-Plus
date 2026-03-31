@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 枚举格式化转换处理
@@ -24,6 +25,9 @@ import java.util.Map;
  */
 @Slf4j
 public class ExcelEnumConvert implements Converter<Object> {
+
+    private static final Map<Field, Map<Object, String>> ENUM_MAP_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Field, Map<Object, Object>> ENUM_REVERSE_MAP_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public Class<Object> supportJavaTypeKey() {
@@ -50,10 +54,15 @@ public class ExcelEnumConvert implements Converter<Object> {
             return null;
         }
         Map<Object, String> enumCodeToTextMap = beforeConvert(contentProperty);
-        // 从Java输出至Excel是code转text
-        // 因此从Excel转Java应该将text与code对调
-        Map<Object, Object> enumTextToCodeMap = new HashMap<>();
-        enumCodeToTextMap.forEach((key, value) -> enumTextToCodeMap.put(value, key));
+        // 从Java输出至Excel是code转text，从Excel转Java应将text与code对调
+        Map<Object, Object> enumTextToCodeMap = ENUM_REVERSE_MAP_CACHE.computeIfAbsent(
+            contentProperty.getField(),
+            f -> {
+                Map<Object, Object> reverseMap = new HashMap<>();
+                enumCodeToTextMap.forEach((key, value) -> reverseMap.put(value, key));
+                return reverseMap;
+            }
+        );
         // 应该从text -> code中查找
         Object codeValue = enumTextToCodeMap.get(textValue);
         return Convert.convert(contentProperty.getField().getType(), codeValue);
@@ -70,15 +79,17 @@ public class ExcelEnumConvert implements Converter<Object> {
     }
 
     private Map<Object, String> beforeConvert(ExcelContentProperty contentProperty) {
-        ExcelEnumFormat anno = getAnnotation(contentProperty.getField());
-        Map<Object, String> enumValueMap = new HashMap<>();
-        Enum<?>[] enumConstants = anno.enumClass().getEnumConstants();
-        for (Enum<?> enumConstant : enumConstants) {
-            Object codeValue = ReflectUtils.invokeGetter(enumConstant, anno.codeField());
-            String textValue = ReflectUtils.invokeGetter(enumConstant, anno.textField());
-            enumValueMap.put(codeValue, textValue);
-        }
-        return enumValueMap;
+        return ENUM_MAP_CACHE.computeIfAbsent(contentProperty.getField(), field -> {
+            ExcelEnumFormat anno = getAnnotation(field);
+            Map<Object, String> enumValueMap = new HashMap<>();
+            Enum<?>[] enumConstants = anno.enumClass().getEnumConstants();
+            for (Enum<?> enumConstant : enumConstants) {
+                Object codeValue = ReflectUtils.invokeGetter(enumConstant, anno.codeField());
+                String textValue = ReflectUtils.invokeGetter(enumConstant, anno.textField());
+                enumValueMap.put(codeValue, textValue);
+            }
+            return enumValueMap;
+        });
     }
 
     private ExcelEnumFormat getAnnotation(Field field) {

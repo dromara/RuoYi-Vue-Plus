@@ -108,7 +108,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public List<SysDictDataVo> selectDictDataByType(String dictType) {
         List<SysDictDataVo> dictDatas = dictDataMapper.selectDictDataByType(dictType);
-        return CollUtil.isNotEmpty(dictDatas) ? dictDatas : null;
+        return CollUtil.isNotEmpty(dictDatas) ? dictDatas : Collections.emptyList();
     }
 
     /**
