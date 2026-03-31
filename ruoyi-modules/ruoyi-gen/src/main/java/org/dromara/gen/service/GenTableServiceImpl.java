@@ -332,23 +332,9 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public Map<String, String> previewCode(Long tableId) {
         Map<String, String> dataMap = new LinkedHashMap<>();
-        // 查询表信息
-        GenTable table = getGenTable(tableId);
-        List<Long> menuIds = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            menuIds.add(IdGeneratorUtil.nextLongId());
-        }
-        table.setMenuIds(menuIds);
-        // 设置主键列信息
-        setPkColumn(table);
-
-        Dict context = TemplateEngineUtils.buildContext(table);
-        // 获取模板列表
-        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory());
-        for (PathNamedTemplate template : templates) {
-            // 渲染模板
-            String render = template.render(context);
-            dataMap.put(template.getPathName(), render);
+        RenderContext rc = buildRenderContext(tableId);
+        for (PathNamedTemplate template : rc.templates()) {
+            dataMap.put(template.getPathName(), template.render(rc.context()));
         }
         return dataMap;
     }
@@ -474,25 +460,12 @@ public class GenTableServiceImpl implements IGenTableService {
      * @param zip     代码压缩输出流
      */
     private void generatorCode(Long tableId, ZipOutputStream zip) {
-        // 查询表信息
-        GenTable table = getGenTable(tableId);
-        List<Long> menuIds = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            menuIds.add(IdGeneratorUtil.nextLongId());
-        }
-        table.setMenuIds(menuIds);
-        // 设置主键列信息
-        setPkColumn(table);
-
-        Dict context = TemplateEngineUtils.buildContext(table);
-        // 获取模板列表
-        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory());
-        for (PathNamedTemplate template : templates) {
+        RenderContext rc = buildRenderContext(tableId);
+        GenTable table = rc.table();
+        for (PathNamedTemplate template : rc.templates()) {
             String pathName = template.getPathName();
-            // 渲染模板
             try {
-                String render = template.render(context);
-                // 添加到zip
+                String render = template.render(rc.context());
                 zip.putNextEntry(new ZipEntry(TemplateEngineUtils.getFileName(pathName, table)));
                 IoUtil.write(zip, StandardCharsets.UTF_8, false, render);
                 zip.flush();
@@ -501,6 +474,28 @@ public class GenTableServiceImpl implements IGenTableService {
                 log.error("渲染模板失败，表名：" + table.getTableName(), e);
             }
         }
+    }
+
+    /**
+     * 构建代码渲染上下文（含表信息、菜单ID、主键列、模板列表）
+     *
+     * @param tableId 业务表主键
+     * @return 渲染上下文
+     */
+    private RenderContext buildRenderContext(Long tableId) {
+        GenTable table = getGenTable(tableId);
+        List<Long> menuIds = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            menuIds.add(IdGeneratorUtil.nextLongId());
+        }
+        table.setMenuIds(menuIds);
+        setPkColumn(table);
+        Dict context = TemplateEngineUtils.buildContext(table);
+        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory());
+        return new RenderContext(table, context, templates);
+    }
+
+    private record RenderContext(GenTable table, Dict context, List<PathNamedTemplate> templates) {
     }
 
     /**

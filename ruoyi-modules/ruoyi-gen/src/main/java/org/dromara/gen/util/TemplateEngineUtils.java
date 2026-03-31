@@ -111,7 +111,7 @@ public class TemplateEngineUtils {
 
         // 向树形模板上下文写入树字段相关变量
         if (GenConstants.TPL_TREE.equals(tplCategory)) {
-            setTreeContext(context, genTable);
+            setTreeContext(context, genTable, paramsObj);
         }
 
         return context;
@@ -120,12 +120,11 @@ public class TemplateEngineUtils {
     /**
      * 向树形模板上下文写入树字段相关变量。
      *
-     * @param context  模板上下文
-     * @param genTable 代码生成业务表对象
+     * @param context    模板上下文
+     * @param genTable   代码生成业务表对象
+     * @param paramsObj  已解析的 options 参数（避免重复解析）
      */
-    public static void setTreeContext(Dict context, GenTable genTable) {
-        String options = genTable.getOptions();
-        Dict paramsObj = JsonUtils.parseMap(options);
+    public static void setTreeContext(Dict context, GenTable genTable, Dict paramsObj) {
         String treeCode = getTreeCode(paramsObj);
         String treeParentCode = getTreeParentCode(paramsObj);
         String treeName = getTreeName(paramsObj);
@@ -133,7 +132,17 @@ public class TemplateEngineUtils {
         context.put("treeCode", treeCode);
         context.put("treeParentCode", treeParentCode);
         context.put("treeName", treeName);
-        context.put("expandColumn", getExpandColumn(genTable));
+        String expandTreeName = paramsObj.getStr(GenConstants.TREE_NAME);
+        int expandColumn = 0;
+        for (GenTableColumn column : genTable.getColumns()) {
+            if (column.isList()) {
+                expandColumn++;
+                if (column.getColumnName().equals(expandTreeName)) {
+                    break;
+                }
+            }
+        }
+        context.put("expandColumn", expandColumn);
         if (paramsObj.containsKey(GenConstants.TREE_PARENT_CODE)) {
             context.put("tree_parent_code", paramsObj.get(GenConstants.TREE_PARENT_CODE));
         }
@@ -209,14 +218,11 @@ public class TemplateEngineUtils {
         // genFilePathFormat
         if (template.contains("domain.java.vm")) {
             fileName = StringUtils.format("{}/domain/{}.java", javaPath, className);
-        }
-        if (template.contains("vo.java.vm")) {
+        } else if (template.contains("vo.java.vm")) {
             fileName = StringUtils.format("{}/domain/vo/{}Vo.java", javaPath, className);
-        }
-        if (template.contains("bo.java.vm")) {
+        } else if (template.contains("bo.java.vm")) {
             fileName = StringUtils.format("{}/domain/bo/{}Bo.java", javaPath, className);
-        }
-        if (template.contains("mapper.java.vm")) {
+        } else if (template.contains("mapper.java.vm")) {
             fileName = StringUtils.format("{}/mapper/{}Mapper.java", javaPath, className);
         } else if (template.contains("service.java.vm")) {
             fileName = StringUtils.format("{}/service/I{}Service.java", javaPath, className);
@@ -369,28 +375,5 @@ public class TemplateEngineUtils {
             return StringUtils.toCamelCase(paramsObj.getStr(GenConstants.TREE_NAME));
         }
         return StringUtils.EMPTY;
-    }
-
-    /**
-     * 获取需要在哪一列上面显示展开按钮
-     *
-     * @param genTable 业务表对象
-     * @return 展开按钮列序号
-     */
-    public static int getExpandColumn(GenTable genTable) {
-        String options = genTable.getOptions();
-        Dict paramsObj = JsonUtils.parseMap(options);
-        String treeName = paramsObj.getStr(GenConstants.TREE_NAME);
-        int num = 0;
-        for (GenTableColumn column : genTable.getColumns()) {
-            if (column.isList()) {
-                num++;
-                String columnName = column.getColumnName();
-                if (columnName.equals(treeName)) {
-                    break;
-                }
-            }
-        }
-        return num;
     }
 }
