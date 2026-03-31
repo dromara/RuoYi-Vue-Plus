@@ -1,15 +1,10 @@
 package org.dromara.system.listener;
 
-import cn.hutool.core.lang.tree.Tree;
 import lombok.RequiredArgsConstructor;
-import org.dromara.common.core.utils.TreeBuildUtils;
 import org.dromara.common.excel.core.ExcelOptionsProvider;
-import org.dromara.system.domain.bo.SysDeptBo;
 import org.dromara.system.service.ISysDeptService;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,9 +25,7 @@ public class DeptExcelOptions implements ExcelOptionsProvider {
      */
     @Override
     public Set<String> getOptions() {
-        List<Tree<Long>> trees = deptService.selectDeptTreeList(new SysDeptBo());
-        Map<String, Tree<Long>> treeMap = TreeBuildUtils.buildTreeNodeMap(trees, "/", Tree::getName);
-        return treeMap.keySet();
+        return DeptExcelConverter.buildDeptPathMap(deptService).keySet();
     }
 
 }

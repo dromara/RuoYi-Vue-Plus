@@ -1,7 +1,8 @@
 package org.dromara.system.listener;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.tree.Tree;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.RequiredArgsConstructor;
 import org.apache.fesod.sheet.converters.Converter;
 import org.apache.fesod.sheet.enums.CellDataTypeEnum;
@@ -9,7 +10,6 @@ import org.apache.fesod.sheet.metadata.GlobalConfiguration;
 import org.apache.fesod.sheet.metadata.data.ReadCellData;
 import org.apache.fesod.sheet.metadata.data.WriteCellData;
 import org.apache.fesod.sheet.metadata.property.ExcelContentProperty;
-import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.TreeBuildUtils;
 import org.dromara.system.domain.bo.SysDeptBo;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Excel 部门转换处理
@@ -28,44 +29,40 @@ import java.util.Map;
 @Component
 public class DeptExcelConverter implements Converter<Long> {
 
-    /**
-     * 线程内缓存：ID → 名称
-     */
-    private static final ThreadLocal<Map<Long, String>> TL_ID_TO_NAME = new ThreadLocal<>();
+    private static final String CACHE_KEY = "dept:excel";
 
     /**
-     * 线程内缓存：名称 → ID
+     * Caffeine 缓存：key=CACHE_KEY，value=[idToName, nameToId]，5分钟过期
      */
-    private static final ThreadLocal<Map<String, Long>> TL_NAME_TO_ID = new ThreadLocal<>();
+    private static final Cache<String, DeptMaps> DEPT_CACHE = Caffeine.newBuilder()
+        .expireAfterWrite(30, TimeUnit.SECONDS)
+        .build();
+
+    private final ISysDeptService deptService;
+
+    private DeptMaps getDeptMaps() {
+        return DEPT_CACHE.get(CACHE_KEY, k -> {
+            Map<String, Tree<Long>> deptPathToTreeMap = buildDeptPathMap(deptService);
+            Map<Long, String> idToName = new HashMap<>();
+            Map<String, Long> nameToId = new HashMap<>();
+            deptPathToTreeMap.forEach((name, treeNode) -> {
+                Long deptId = treeNode.getId();
+                idToName.put(deptId, name);
+                nameToId.put(name, deptId);
+            });
+            return new DeptMaps(idToName, nameToId);
+        });
+    }
 
     /**
-     * 初始化当前线程的部门缓存（一次导出/导入只执行1次）
+     * 构建部门路径 → 树节点映射，供 Converter 和 Options 共用
      */
-    private void initThreadCache() {
-        Map<Long, String> idMap = TL_ID_TO_NAME.get();
-        if (CollUtil.isNotEmpty(idMap)) {
-            // 当前线程已加载，直接返回
-            return;
-        }
-
-        Map<String, Tree<Long>> deptPathToTreeMap = TreeBuildUtils.buildTreeNodeMap(
-            SpringUtils.getBean(ISysDeptService.class).selectDeptTreeList(new SysDeptBo()),
+    static Map<String, Tree<Long>> buildDeptPathMap(ISysDeptService deptService) {
+        return TreeBuildUtils.buildTreeNodeMap(
+            deptService.selectDeptTreeList(new SysDeptBo()),
             "/",
             Tree::getName
         );
-
-        // 构建互转映射
-        Map<Long, String> idToName = new HashMap<>();
-        Map<String, Long> nameToId = new HashMap<>();
-        deptPathToTreeMap.forEach((name, treeNode) -> {
-            Long deptId = treeNode.getId();
-            idToName.put(deptId, name);
-            nameToId.put(name, deptId);
-        });
-
-        // 设置到当前线程
-        TL_ID_TO_NAME.set(idToName);
-        TL_NAME_TO_ID.set(nameToId);
     }
 
     /**
@@ -93,12 +90,7 @@ public class DeptExcelConverter implements Converter<Long> {
         if (StringUtils.isBlank(deptName)) {
             return null;
         }
-
-        // 初始化线程缓存（只执行一次）
-        initThreadCache();
-
-        // 从线程缓存中直接获取，不查库
-        return TL_NAME_TO_ID.get().get(deptName);
+        return getDeptMaps().nameToId().get(deptName);
     }
 
     /**
@@ -109,13 +101,11 @@ public class DeptExcelConverter implements Converter<Long> {
         if (value == null) {
             return new WriteCellData<>("");
         }
-
-        // 初始化线程缓存（只执行一次）
-        initThreadCache();
-
-        // 从线程缓存中直接获取，不查库
-        String deptName = TL_ID_TO_NAME.get().getOrDefault(value, "");
+        String deptName = getDeptMaps().idToName().getOrDefault(value, "");
         return new WriteCellData<>(deptName);
+    }
+
+    private record DeptMaps(Map<Long, String> idToName, Map<String, Long> nameToId) {
     }
 
 }
