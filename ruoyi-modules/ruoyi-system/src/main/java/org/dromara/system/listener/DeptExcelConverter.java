@@ -10,11 +10,11 @@ import org.apache.fesod.sheet.metadata.GlobalConfiguration;
 import org.apache.fesod.sheet.metadata.data.ReadCellData;
 import org.apache.fesod.sheet.metadata.data.WriteCellData;
 import org.apache.fesod.sheet.metadata.property.ExcelContentProperty;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.TreeBuildUtils;
 import org.dromara.system.domain.bo.SysDeptBo;
 import org.dromara.system.service.ISysDeptService;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
  * @author AprilWind
  */
 @RequiredArgsConstructor
-@Component
 public class DeptExcelConverter implements Converter<Long> {
 
     private static final String CACHE_KEY = "dept:excel";
@@ -38,9 +37,8 @@ public class DeptExcelConverter implements Converter<Long> {
         .expireAfterWrite(30, TimeUnit.SECONDS)
         .build();
 
-    private final ISysDeptService deptService;
-
     private DeptMaps getDeptMaps() {
+        ISysDeptService deptService = SpringUtils.getBean(ISysDeptService.class);
         return DEPT_CACHE.get(CACHE_KEY, k -> {
             Map<String, Tree<Long>> deptPathToTreeMap = buildDeptPathMap(deptService);
             Map<Long, String> idToName = new HashMap<>();

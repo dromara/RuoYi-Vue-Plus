@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 数据库助手
@@ -26,7 +27,7 @@ import java.util.Map;
 public class DataBaseHelper {
 
     private static final DynamicRoutingDataSource DS = SpringUtils.getBean(DynamicRoutingDataSource.class);
-    private static final Map<String, DataBaseType> DB_TYPE_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Map<String, DataBaseType> DB_TYPE_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 获取当前数据源对应的数据库类型

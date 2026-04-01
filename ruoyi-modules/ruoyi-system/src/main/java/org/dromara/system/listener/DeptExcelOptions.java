@@ -1,9 +1,9 @@
 package org.dromara.system.listener;
 
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.excel.core.ExcelOptionsProvider;
 import org.dromara.system.service.ISysDeptService;
-import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
@@ -13,10 +13,7 @@ import java.util.Set;
  * @author AprilWind
  */
 @RequiredArgsConstructor
-@Component
 public class DeptExcelOptions implements ExcelOptionsProvider {
-
-    private final ISysDeptService deptService;
 
     /**
      * 获取下拉选项数据
@@ -25,6 +22,7 @@ public class DeptExcelOptions implements ExcelOptionsProvider {
      */
     @Override
     public Set<String> getOptions() {
+        ISysDeptService deptService = SpringUtils.getBean(ISysDeptService.class);
         return DeptExcelConverter.buildDeptPathMap(deptService).keySet();
     }
 

@@ -548,4 +548,11 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return Strings.CS.containsAny(cs, searchCharSequences);
     }
 
+    /**
+     * 将一个字符串替换为较大字符串内的另一个字符串，一次
+     */
+    public static String replaceOnce(final String text, final String searchString, final String replacement) {
+        return Strings.CS.replaceOnce(text, searchString, replacement);
+    }
+
 }

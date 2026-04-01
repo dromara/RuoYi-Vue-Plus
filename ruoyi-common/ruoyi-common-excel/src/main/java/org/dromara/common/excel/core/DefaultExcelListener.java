@@ -62,7 +62,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
             errMsg = StrUtil.format("第{}行-第{}列-表头{}: 解析异常<br/>",
                 rowIndex + 1, columnIndex + 1, headMap.get(columnIndex));
             if (log.isDebugEnabled()) {
-                log.error(errMsg);
+                log.warn(errMsg);
             }
         }
         if (exception instanceof ConstraintViolationException constraintViolationException) {
@@ -70,12 +70,12 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
             String constraintViolationsMsg = StreamUtils.join(constraintViolations, ConstraintViolation::getMessage, ", ");
             errMsg = StrUtil.format("第{}行数据校验异常: {}", context.readRowHolder().getRowIndex() + 1, constraintViolationsMsg);
             if (log.isDebugEnabled()) {
-                log.error(errMsg);
+                log.warn(errMsg);
             }
         }
         if (errMsg == null) {
             errMsg = StrUtil.format("第{}行数据异常: {}", context.readRowHolder().getRowIndex() + 1, exception.getMessage());
-            log.error(errMsg, exception);
+            log.warn(errMsg, exception);
         }
         excelResult.getErrorList().add(errMsg);
         throw new ExcelAnalysisException(errMsg);
