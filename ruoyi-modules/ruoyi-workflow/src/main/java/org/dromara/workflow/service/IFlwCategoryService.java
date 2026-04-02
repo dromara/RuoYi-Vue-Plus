@@ -5,6 +5,8 @@ import org.dromara.workflow.domain.bo.FlowCategoryBo;
 import org.dromara.workflow.domain.vo.FlowCategoryVo;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 流程分类Service接口
@@ -28,6 +30,14 @@ public interface IFlwCategoryService {
      * @return 流程分类名称
      */
     String selectCategoryNameById(Long categoryId);
+
+    /**
+     * 根据流程分类ID查询流程分类名称
+     *
+     * @param categoryIds 流程分类ID
+     * @return 流程分类名称
+     */
+    Map<Long, String> selectCategoryNameByIds(Set<Long> categoryIds);
 
     /**
      * 查询符合条件的流程分类列表
