@@ -81,7 +81,8 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
             return Collections.emptyMap();
         }
         List<FlowCategory> list = baseMapper.selectList(new LambdaQueryWrapper<FlowCategory>()
-            .select(FlowCategory::getCategoryName).in(FlowCategory::getCategoryId, categoryIds));
+            .select(FlowCategory::getCategoryId, FlowCategory::getCategoryName)
+            .in(FlowCategory::getCategoryId, categoryIds));
         return StreamUtils.toMap(list, FlowCategory::getCategoryId, FlowCategory::getCategoryName);
     }
 
