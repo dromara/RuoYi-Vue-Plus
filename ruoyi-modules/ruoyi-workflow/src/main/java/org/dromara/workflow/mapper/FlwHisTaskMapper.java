@@ -11,6 +11,7 @@ import org.dromara.warm.flow.core.enums.NodeType;
 import org.dromara.warm.flow.orm.entity.FlowDefinition;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
+import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
 import org.dromara.workflow.domain.bo.FlowTaskBo;
 import org.dromara.workflow.domain.vo.FlowHisTaskVo;
@@ -64,7 +65,8 @@ public interface FlwHisTaskMapper extends BaseMapperPlus<FlowHisTask, FlowHisTas
             .eq("a", FlowHisTask::getDelFlag, NOT_DELETED)
             .eq("b", FlowInstance::getDelFlag, NOT_DELETED)
             .eq("c", FlowDefinition::getDelFlag, NOT_DELETED)
-            .in("a", FlowHisTask::getNodeType, List.of("1", "3"))
+            .in("a", FlowHisTask::getNodeType, List.of("1", "3", "4"))
+            .ne("a", FlowHisTask::getFlowStatus, TaskStatusEnum.COPY.getStatus())
             .like(StringUtils.isNotBlank(bo.getNodeName()), "a", FlowHisTask::getNodeName, bo.getNodeName())
             .like(StringUtils.isNotBlank(bo.getFlowName()), "c", FlowDefinition::getFlowName, bo.getFlowName())
             .like(StringUtils.isNotBlank(bo.getFlowCode()), "c", FlowDefinition::getFlowCode, bo.getFlowCode())
