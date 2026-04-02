@@ -64,7 +64,7 @@ public interface FlwHisTaskMapper extends BaseMapperPlus<FlowHisTask, FlowHisTas
             .eq("a", FlowHisTask::getDelFlag, NOT_DELETED)
             .eq("b", FlowInstance::getDelFlag, NOT_DELETED)
             .eq("c", FlowDefinition::getDelFlag, NOT_DELETED)
-            .in("a", FlowHisTask::getNodeType, List.of("1", "3", "4"))
+            .in("a", FlowHisTask::getNodeType, List.of("1", "3"))
             .like(StringUtils.isNotBlank(bo.getNodeName()), "a", FlowHisTask::getNodeName, bo.getNodeName())
             .like(StringUtils.isNotBlank(bo.getFlowName()), "c", FlowDefinition::getFlowName, bo.getFlowName())
             .like(StringUtils.isNotBlank(bo.getFlowCode()), "c", FlowDefinition::getFlowCode, bo.getFlowCode())
