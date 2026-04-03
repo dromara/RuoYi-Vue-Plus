@@ -76,8 +76,6 @@ spring:
     format:
       date-time: yyyy-MM-dd HH:mm:ss
   jackson:
-    # 日期格式化
-    date-format: yyyy-MM-dd HH:mm:ss
     serialization:
       # 格式化输出
       indent_output: false

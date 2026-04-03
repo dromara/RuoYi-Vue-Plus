@@ -25,7 +25,7 @@ public class CustomDateDeserializer extends ValueDeserializer<Date> {
      */
     @Override
     public Date deserialize(JsonParser p, DeserializationContext ctxt) {
-        DateTime parse = DateUtil.parse(p.getText());
+        DateTime parse = DateUtil.parse(p.getString());
         if (ObjectUtils.isNull(parse)) {
             return null;
         }
