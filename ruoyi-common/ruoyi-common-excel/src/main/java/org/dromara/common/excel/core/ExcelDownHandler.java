@@ -130,8 +130,9 @@ public class ExcelDownHandler implements SheetWriteHandler {
             }
             if (ObjectUtil.isNotEmpty(options)) {
                 // 仅当下拉可选项不为空时执行
-                if (options.size() > 20) {
-                    // 这里限制如果可选项大于20，则使用额外表形式
+                int totalCharacter = options.stream().mapToInt(String::length).sum() + options.size();
+                if (options.size() > 20 || totalCharacter > 255) {
+                    // 这里限制如果可选项大于20 或 总字符数超过255，则使用额外表形式
                     dropDownWithSheet(helper, workbook, sheet, index, options);
                 } else {
                     // 否则使用固定值形式
