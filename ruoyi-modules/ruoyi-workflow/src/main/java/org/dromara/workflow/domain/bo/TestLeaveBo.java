@@ -12,7 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +57,7 @@ public class TestLeaveBo implements Serializable {
     @NotNull(message = "开始时间不能为空", groups = {AddGroup.class, EditGroup.class})
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date startDate;
+    private LocalDateTime startDate;
 
     /**
      * 结束时间
@@ -65,7 +65,7 @@ public class TestLeaveBo implements Serializable {
     @NotNull(message = "结束时间不能为空", groups = {AddGroup.class, EditGroup.class})
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date endDate;
+    private LocalDateTime endDate;
 
     /**
      * 请假天数

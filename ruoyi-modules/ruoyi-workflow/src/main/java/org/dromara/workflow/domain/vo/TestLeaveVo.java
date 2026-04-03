@@ -8,7 +8,7 @@ import org.dromara.workflow.domain.TestLeave;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 /**
@@ -47,13 +47,13 @@ public class TestLeaveVo implements Serializable {
      * 开始时间
      */
     @ExcelProperty(value = "开始时间")
-    private Date startDate;
+    private LocalDateTime startDate;
 
     /**
      * 结束时间
      */
     @ExcelProperty(value = "结束时间")
-    private Date endDate;
+    private LocalDateTime endDate;
 
     /**
      * 请假天数

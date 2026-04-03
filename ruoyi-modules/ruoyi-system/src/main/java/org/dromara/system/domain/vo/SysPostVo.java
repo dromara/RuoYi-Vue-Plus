@@ -12,7 +12,7 @@ import org.dromara.system.domain.SysPost;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 岗位信息视图对象 sys_post
@@ -80,7 +80,7 @@ public class SysPostVo implements Serializable {
      * 创建时间
      */
     @ExcelProperty(value = "创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 部门名

@@ -8,7 +8,7 @@ import org.dromara.system.domain.SysOperLog;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,7 +112,7 @@ public class SysOperLogBo implements Serializable {
     /**
      * 操作时间
      */
-    private Date operTime;
+    private LocalDateTime operTime;
 
     /**
      * 消耗时间

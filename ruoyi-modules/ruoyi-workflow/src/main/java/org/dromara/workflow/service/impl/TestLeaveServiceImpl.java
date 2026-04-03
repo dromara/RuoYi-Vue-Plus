@@ -1,7 +1,7 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.date.DateUtil;
+import java.time.temporal.ChronoUnit;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -126,7 +126,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      */
     @Override
     public TestLeaveVo insertByBo(TestLeaveBo bo) {
-        long day = DateUtil.betweenDay(bo.getStartDate(), bo.getEndDate(), true);
+        long day = ChronoUnit.DAYS.between(bo.getStartDate(), bo.getEndDate());
         // 截止日期也算一天
         bo.setLeaveDays((int) day + 1);
         bo.setApplyCode(System.currentTimeMillis() + StrUtil.EMPTY);
@@ -150,7 +150,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public TestLeaveVo submitAndFlowStart(TestLeaveBo bo) {
-        long day = DateUtil.betweenDay(bo.getStartDate(), bo.getEndDate(), true);
+        long day = ChronoUnit.DAYS.between(bo.getStartDate(), bo.getEndDate());
         // 截止日期也算一天
         bo.setLeaveDays((int) day + 1);
         if (ObjectUtil.isNull(bo.getId())) {

@@ -1,6 +1,7 @@
 package org.dromara.gen.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
@@ -169,8 +170,9 @@ public class GenTableServiceImpl implements IGenTableService {
                 gen.setTableName(x.getName());
                 gen.setTableComment(x.getComment());
                 // postgresql的表元数据没有创建时间这个东西(好奇葩) 只能new Date代替
-                gen.setCreateTime(ObjectUtil.defaultIfNull(x.getCreateTime(), new Date()));
-                gen.setUpdateTime(x.getUpdateTime());
+                Date createDate = ObjectUtil.defaultIfNull(x.getCreateTime(), new Date());
+                gen.setCreateTime(LocalDateTimeUtil.of(createDate));
+                gen.setUpdateTime(x.getUpdateTime() != null ? LocalDateTimeUtil.of(x.getUpdateTime()) : null);
                 return gen;
             }).sorted(Comparator.comparing(GenTable::getCreateTime).reversed())
             .toList();
@@ -212,8 +214,8 @@ public class GenTableServiceImpl implements IGenTableService {
             gen.setDataName(dataName);
             gen.setTableName(x.getName());
             gen.setTableComment(x.getComment());
-            gen.setCreateTime(x.getCreateTime());
-            gen.setUpdateTime(x.getUpdateTime());
+            gen.setCreateTime(LocalDateTimeUtil.of(x.getCreateTime()));
+            gen.setUpdateTime(LocalDateTimeUtil.of(x.getUpdateTime()));
             return gen;
         }).toList();
     }

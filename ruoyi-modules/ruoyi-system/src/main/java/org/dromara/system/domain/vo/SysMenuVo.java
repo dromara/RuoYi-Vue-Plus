@@ -7,7 +7,7 @@ import org.dromara.system.domain.SysMenu;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -106,7 +106,7 @@ public class SysMenuVo implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 子菜单

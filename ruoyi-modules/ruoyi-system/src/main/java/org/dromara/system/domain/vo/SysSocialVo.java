@@ -6,7 +6,7 @@ import org.dromara.system.domain.SysSocial;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 /**
@@ -135,5 +135,5 @@ public class SysSocialVo implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private LocalDateTime createTime;
 }

@@ -6,7 +6,7 @@ import org.dromara.system.domain.SysMessage;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 消息记录视图对象 sys_message
@@ -68,5 +68,5 @@ public class SysMessageVo implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private LocalDateTime createTime;
 }

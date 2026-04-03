@@ -10,7 +10,7 @@ import org.dromara.system.domain.SysLoginInfo;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 
@@ -95,7 +95,7 @@ public class SysLoginInfoVo implements Serializable {
      * 访问时间
      */
     @ExcelProperty(value = "访问时间")
-    private Date loginTime;
+    private LocalDateTime loginTime;
 
 
 }

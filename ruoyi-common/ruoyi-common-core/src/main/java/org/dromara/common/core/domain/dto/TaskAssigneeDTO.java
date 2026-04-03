@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -57,7 +57,7 @@ public class TaskAssigneeDTO implements Serializable {
         Function<T, String> handlerCode,
         Function<T, String> handlerName,
         Function<T, String> groupName,
-        Function<T, Date> createTimeMapper) {
+        Function<T, LocalDateTime> createTimeMapper) {
         return sourceCollection.stream()
             .map(item -> new TaskHandler(
                 storageId.apply(item),
@@ -99,7 +99,7 @@ public class TaskAssigneeDTO implements Serializable {
         /**
          * 创建时间
          */
-        private Date createTime;
+        private LocalDateTime createTime;
     }
 
 }

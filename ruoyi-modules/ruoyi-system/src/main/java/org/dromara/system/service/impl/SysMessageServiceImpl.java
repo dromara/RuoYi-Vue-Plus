@@ -23,10 +23,9 @@ import org.dromara.system.mapper.SysMessageMapper;
 import org.dromara.system.service.ISysMessageService;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 消息记录服务实现
@@ -212,7 +211,7 @@ public class SysMessageServiceImpl implements ISysMessageService, MessageService
         // 分类匹配
         lqw.eq(SysMessage::getCategory, category);
         // 仅查询30天内消息
-        lqw.ge(SysMessage::getCreateTime, new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(BOX_DAYS)));
+        lqw.ge(SysMessage::getCreateTime, LocalDateTime.now().minusDays(BOX_DAYS));
         // 全局消息 或 当前用户在接收人范围内
         lqw.and(wrapper -> wrapper.eq(SysMessage::getSendUserIds, GLOBAL_USER_IDS)
             .or()

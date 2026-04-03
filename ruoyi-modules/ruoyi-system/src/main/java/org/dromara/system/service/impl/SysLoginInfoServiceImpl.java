@@ -28,8 +28,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -56,8 +56,8 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
     @EventListener
     public void recordLoginInfo(LoginInfoEvent loginInfoEvent) {
         HttpServletRequest request = loginInfoEvent.getRequest();
-        final UserAgent userAgent = UserAgentUtil.parse(request.getHeader("User-Agent"));
-        final String ip = ServletUtils.getClientIP(request);
+        UserAgent userAgent = UserAgentUtil.parse(request.getHeader("User-Agent"));
+        String ip = ServletUtils.getClientIP(request);
         // 客户端信息
         String clientId = request.getHeader(LoginHelper.CLIENT_KEY);
         SysClientVo client = null;
@@ -144,7 +144,7 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
     @Override
     public void insertLoginInfo(SysLoginInfoBo bo) {
         SysLoginInfo loginInfo = MapstructUtils.convert(bo, SysLoginInfo.class);
-        loginInfo.setLoginTime(new Date());
+        loginInfo.setLoginTime(LocalDateTime.now());
         baseMapper.insert(loginInfo);
     }
 

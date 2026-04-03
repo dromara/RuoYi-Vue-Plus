@@ -10,6 +10,7 @@ import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -120,6 +121,16 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      */
     public static String formatDateTime(final Date date) {
         return parseDateToStr(FormatsType.YYYY_MM_DD_HH_MM_SS, date);
+    }
+
+    /**
+     * 将 LocalDateTime 格式化为 YYYY-MM-DD HH:MM:SS 格式的字符串
+     *
+     * @param dateTime 要格式化的 LocalDateTime 对象
+     * @return 格式化后的日期时间字符串
+     */
+    public static String formatDateTime(final LocalDateTime dateTime) {
+        return dateTime.format(DateTimeFormatter.ofPattern(FormatsType.YYYY_MM_DD_HH_MM_SS.getTimeFormat()));
     }
 
     /**
@@ -242,7 +253,36 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         if (sec > 0) {
             result.append(String.format("%d秒", sec));
         }
-        return result.length() > 0 ? result.toString().trim() : "0秒";
+        return !result.isEmpty() ? result.toString().trim() : "0秒";
+    }
+
+    /**
+     * 计算两个 LocalDateTime 时间点的差值（天、小时、分钟、秒），当值为0时不显示该单位
+     *
+     * @param endDate 结束时间
+     * @param nowDate 当前时间
+     * @return 时间差字符串，格式为 "x天 x小时 x分钟 x秒"，若为 0 则不显示
+     */
+    public static String getTimeDifference(LocalDateTime endDate, LocalDateTime nowDate) {
+        long diffInMillis = java.time.Duration.between(nowDate, endDate).toMillis();
+        long day = TimeUnit.MILLISECONDS.toDays(diffInMillis);
+        long hour = TimeUnit.MILLISECONDS.toHours(diffInMillis) % 24;
+        long min = TimeUnit.MILLISECONDS.toMinutes(diffInMillis) % 60;
+        long sec = TimeUnit.MILLISECONDS.toSeconds(diffInMillis) % 60;
+        StringBuilder result = new StringBuilder();
+        if (day > 0) {
+            result.append(String.format("%d天 ", day));
+        }
+        if (hour > 0) {
+            result.append(String.format("%d小时 ", hour));
+        }
+        if (min > 0) {
+            result.append(String.format("%d分钟 ", min));
+        }
+        if (sec > 0) {
+            result.append(String.format("%d秒", sec));
+        }
+        return !result.isEmpty() ? result.toString().trim() : "0秒";
     }
 
     /**
