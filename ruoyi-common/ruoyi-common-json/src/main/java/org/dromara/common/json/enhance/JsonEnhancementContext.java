@@ -3,8 +3,8 @@ package org.dromara.common.json.enhance;
 import lombok.Getter;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 单次响应增强上下文。
@@ -14,7 +14,7 @@ public class JsonEnhancementContext {
 
     private final JsonMapper jsonMapper;
 
-    private final Map<String, Object> attributes = new ConcurrentHashMap<>();
+    private final Map<String, Object> attributes = new LinkedHashMap<>();
 
     public JsonEnhancementContext(JsonMapper jsonMapper) {
         this.jsonMapper = jsonMapper;

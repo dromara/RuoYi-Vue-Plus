@@ -88,7 +88,7 @@ public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
         }
         Object sourceValue = resolveSourceValue(fieldContext, translation);
         if (sourceValue == null) {
-            return null;
+            return value;
         }
         TranslationBatchKey batchKey = new TranslationBatchKey(translation.type(), translation.other());
         Map<TranslationBatchKey, Map<Object, Object>> results = context.getAttribute(ATTR_RESULTS);

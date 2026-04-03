@@ -4,6 +4,8 @@ import cn.hutool.core.convert.Convert;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.translation.annotation.TranslationType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,6 +22,8 @@ import java.util.function.Function;
  * @author Lion Li
  */
 public interface TranslationInterface<T> {
+
+    Logger log = LoggerFactory.getLogger(TranslationInterface.class);
 
     /**
      * 按翻译键执行转换。
@@ -38,6 +42,9 @@ public interface TranslationInterface<T> {
      * @return 翻译结果映射
      */
     default Map<Object, T> translationBatch(Set<Object> keys, String other) {
+        TranslationType annotation = this.getClass().getAnnotation(TranslationType.class);
+        String type = annotation != null ? annotation.type() : this.getClass().getSimpleName();
+        log.warn("翻译类型 [{}] 未覆盖 translationBatch 方法，已退化为逐条查询，建议实现批量查询以提升性能", type);
         Map<Object, T> result = new LinkedHashMap<>(keys.size());
         for (Object key : keys) {
             result.put(key, translation(key, other));
