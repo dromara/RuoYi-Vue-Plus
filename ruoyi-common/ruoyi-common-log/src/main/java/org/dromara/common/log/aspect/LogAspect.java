@@ -4,8 +4,6 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.http.useragent.UserAgent;
-import cn.hutool.http.useragent.UserAgentUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +48,7 @@ public class LogAspect {
     /**
      * 在目标方法执行前启动耗时统计。
      *
-     * @param joinPoint     切点
+     * @param joinPoint 切点
      * @param controllerLog 日志注解
      */
     @Before(value = "@annotation(controllerLog)")
@@ -63,9 +61,9 @@ public class LogAspect {
     /**
      * 在目标方法正常返回后记录操作日志。
      *
-     * @param joinPoint     切点
+     * @param joinPoint 切点
      * @param controllerLog 日志注解
-     * @param jsonResult    返回结果
+     * @param jsonResult 返回结果
      */
     @AfterReturning(pointcut = "@annotation(controllerLog)", returning = "jsonResult")
     public void doAfterReturning(JoinPoint joinPoint, Log controllerLog, Object jsonResult) {
@@ -75,9 +73,9 @@ public class LogAspect {
     /**
      * 在目标方法抛出异常后记录操作日志。
      *
-     * @param joinPoint     切点
+     * @param joinPoint 切点
      * @param controllerLog 日志注解
-     * @param e             异常
+     * @param e         异常
      */
     @AfterThrowing(value = "@annotation(controllerLog)", throwing = "e")
     public void doAfterThrowing(JoinPoint joinPoint, Log controllerLog, Exception e) {
@@ -87,42 +85,35 @@ public class LogAspect {
     /**
      * 组装并发布操作日志事件。
      *
-     * @param joinPoint     切点
+     * @param joinPoint 切点
      * @param controllerLog 日志注解
-     * @param e             异常信息
-     * @param jsonResult    返回结果
+     * @param e 异常信息
+     * @param jsonResult 返回结果
      */
     protected void handleLog(final JoinPoint joinPoint, Log controllerLog, final Exception e, Object jsonResult) {
         try {
+
             // *========数据库日志=========*//
             OperLogEvent operLog = new OperLogEvent();
-
+            operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
+            // 请求的地址
+            String ip = ServletUtils.getClientIP();
+            operLog.setOperIp(ip);
+            operLog.setOperUrl(StringUtils.substring(ServletUtils.getRequest().getRequestURI(), 0, 255));
             LoginUser loginUser = LoginHelper.getLoginUser();
-            operLog.setUsername(loginUser.getUsername());
+            operLog.setOperName(loginUser.getUsername());
             operLog.setDeptName(loginUser.getDeptName());
-            operLog.setUserType(loginUser.getUserType());
-            operLog.setDeviceType(loginUser.getDeviceType());
-
-            operLog.setOperIp(ServletUtils.getClientIP());
-            HttpServletRequest request = ServletUtils.getRequest();
-            operLog.setOperUrl(StringUtils.substring(request.getRequestURI(), 0, 255));
-            UserAgent userAgent = UserAgentUtil.parse(request.getHeader("User-Agent"));
-            operLog.setBrowser(userAgent.getBrowser().getName());
-            operLog.setOs(userAgent.getOs().getName());
 
             if (e != null) {
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());
                 operLog.setErrorMsg(StringUtils.substring(e.getMessage(), 0, 3800));
-            } else {
-                operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
             }
-
             // 设置方法名称
             String className = joinPoint.getTarget().getClass().getName();
             String methodName = joinPoint.getSignature().getName();
             operLog.setMethod(className + "." + methodName + "()");
             // 设置请求方式
-            operLog.setRequestMethod(request.getMethod());
+            operLog.setRequestMethod(ServletUtils.getRequest().getMethod());
             // 处理设置注解上的参数
             getControllerMethodDescription(joinPoint, controllerLog, operLog, jsonResult);
             // 设置消耗时间
@@ -142,19 +133,19 @@ public class LogAspect {
     /**
      * 获取注解中对方法的描述信息 用于Controller层注解
      *
-     * @param joinPoint  切点
-     * @param log        日志
-     * @param operLog    操作日志
+     * @param joinPoint 切点
+     * @param log     日志
+     * @param operLog 操作日志
      * @param jsonResult 返回结果
      * @throws Exception 异常
      */
     public void getControllerMethodDescription(JoinPoint joinPoint, Log log, OperLogEvent operLog, Object jsonResult) throws Exception {
-        operLog.setModule(StringUtils.isBlank(log.title()) ? log.module() : log.title());
-        operLog.setName(log.name());
-        operLog.setRemark(log.remark());
-        operLog.setTags(JsonUtils.toJsonString(log.tags()));
-        operLog.setBusinessType(log.businessType().getCode());
-        operLog.setChannel(log.channel().getCode());
+        // 设置action动作
+        operLog.setBusinessType(log.businessType().ordinal());
+        // 设置标题
+        operLog.setTitle(log.title());
+        // 设置操作人类别
+        operLog.setOperatorType(log.operatorType().ordinal());
         // 是否需要保存request，参数和值
         if (log.isSaveRequestData()) {
             // 获取参数的信息，传入到数据库中。
@@ -169,8 +160,8 @@ public class LogAspect {
     /**
      * 获取请求的参数，放到log中
      *
-     * @param joinPoint         切点
-     * @param operLog           操作日志
+     * @param joinPoint 切点
+     * @param operLog 操作日志
      * @param excludeParamNames 排除参数名
      * @throws Exception 异常
      */
@@ -190,7 +181,7 @@ public class LogAspect {
     /**
      * 将方法参数序列化为日志字符串。
      *
-     * @param paramsArray       参数数组
+     * @param paramsArray 参数数组
      * @param excludeParamNames 排除字段名
      * @return 参数字符串
      */
@@ -251,6 +242,6 @@ public class LogAspect {
             }
         }
         return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse
-            || o instanceof BindingResult;
+               || o instanceof BindingResult;
     }
 }

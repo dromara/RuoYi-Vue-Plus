@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
  *
  * @author Lion Li
  */
+
 @Data
 public class OperLogEvent implements Serializable {
 
@@ -18,34 +19,24 @@ public class OperLogEvent implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 业务模块名称
+     * 日志主键
      */
-    private String module;
+    private Long operId;
 
     /**
-     * 操作功能名称
+     * 操作模块
      */
-    private String name;
+    private String title;
 
     /**
-     * 操作描述（备注）
-     */
-    private String remark;
-
-    /**
-     * 标签（用于检索/分类）
-     */
-    private String tags;
-
-    /**
-     * 业务类型
+     * 业务类型（0其它 1新增 2修改 3删除）
      */
     private Integer businessType;
 
     /**
-     * 操作渠道
+     * 业务类型数组
      */
-    private Integer channel;
+    private Integer[] businessTypes;
 
     /**
      * 请求方法
@@ -58,19 +49,19 @@ public class OperLogEvent implements Serializable {
     private String requestMethod;
 
     /**
-     * 用户名
+     * 操作类别（0其它 1后台用户 2手机端用户）
      */
-    private String username;
+    private Integer operatorType;
+
+    /**
+     * 操作人员
+     */
+    private String operName;
 
     /**
      * 部门名称
      */
     private String deptName;
-
-    /**
-     * 用户类型
-     */
-    private String userType;
 
     /**
      * 请求url
@@ -83,19 +74,9 @@ public class OperLogEvent implements Serializable {
     private String operIp;
 
     /**
-     * 设备类型
+     * 操作地点
      */
-    private String deviceType;
-
-    /**
-     * 浏览器类型
-     */
-    private String browser;
-
-    /**
-     * 操作系统
-     */
-    private String os;
+    private String operLocation;
 
     /**
      * 请求参数
