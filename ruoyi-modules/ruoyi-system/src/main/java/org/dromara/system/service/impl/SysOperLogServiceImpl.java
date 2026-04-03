@@ -1,5 +1,6 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -43,10 +44,11 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     @Async
     @EventListener
     public void recordOper(OperLogEvent operLogEvent) {
-        SysOperLogBo operLog = MapstructUtils.convert(operLogEvent, SysOperLogBo.class);
+        SysOperLog operLog = BeanUtil.copyProperties(operLogEvent, SysOperLog.class);
         // 远程查询操作地点
         operLog.setOperLocation(AddressUtils.getRealAddressByIP(operLog.getOperIp()));
-        insertOperlog(operLog);
+        operLog.setOperTime(LocalDateTime.now());
+        baseMapper.insert(operLog);
     }
 
     /**
@@ -76,7 +78,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
         Map<String, Object> params = operLog.getParams();
         return new LambdaQueryWrapper<SysOperLog>()
             .like(StringUtils.isNotBlank(operLog.getOperIp()), SysOperLog::getOperIp, operLog.getOperIp())
-            .like(StringUtils.isNotBlank(operLog.getTitle()), SysOperLog::getTitle, operLog.getTitle())
+            .like(StringUtils.isNotBlank(operLog.getModule()), SysOperLog::getModule, operLog.getModule())
             .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
                 SysOperLog::getBusinessType, operLog.getBusinessType())
             .func(f -> {
@@ -86,7 +88,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
             })
             .eq(operLog.getStatus() != null,
                 SysOperLog::getStatus, operLog.getStatus())
-            .like(StringUtils.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
+            .like(StringUtils.isNotBlank(operLog.getUsername()), SysOperLog::getUsername, operLog.getUsername())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysOperLog::getOperTime, params.get("beginTime"), params.get("endTime"));
     }

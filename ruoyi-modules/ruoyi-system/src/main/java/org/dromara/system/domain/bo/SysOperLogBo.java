@@ -35,14 +35,34 @@ public class SysOperLogBo implements Serializable {
     private Long operId;
 
     /**
-     * 模块标题
+     * 业务模块名称
      */
-    private String title;
+    private String module;
 
     /**
-     * 业务类型（0其它 1新增 2修改 3删除）
+     * 操作功能名称
+     */
+    private String name;
+
+    /**
+     * 操作描述（备注）
+     */
+    private String remark;
+
+    /**
+     * 标签（用于检索/分类）
+     */
+    private String tags;
+
+    /**
+     * 业务类型
      */
     private Integer businessType;
+
+    /**
+     * 操作渠道
+     */
+    private Integer channel;
 
     /**
      * 业务类型数组
@@ -50,7 +70,7 @@ public class SysOperLogBo implements Serializable {
     private Integer[] businessTypes;
 
     /**
-     * 方法名称
+     * 请求方法
      */
     private String method;
 
@@ -65,9 +85,9 @@ public class SysOperLogBo implements Serializable {
     private Integer operatorType;
 
     /**
-     * 操作人员
+     * 用户名
      */
-    private String operName;
+    private String username;
 
     /**
      * 部门名称
@@ -75,19 +95,39 @@ public class SysOperLogBo implements Serializable {
     private String deptName;
 
     /**
-     * 请求URL
+     * 用户类型
+     */
+    private String userType;
+
+    /**
+     * 请求url
      */
     private String operUrl;
 
     /**
-     * 主机地址
+     * 操作地址
      */
     private String operIp;
+
+    /**
+     * 设备类型
+     */
+    private String deviceType;
 
     /**
      * 操作地点
      */
     private String operLocation;
+
+    /**
+     * 浏览器类型
+     */
+    private String browser;
+
+    /**
+     * 操作系统
+     */
+    private String os;
 
     /**
      * 请求参数
