@@ -104,6 +104,6 @@ public class SysDeptVo implements Serializable {
     /**
      * 子部门
      */
-    private List<SysDept> children = new ArrayList<>();
+    private List<SysDeptVo> children = new ArrayList<>();
 
 }
