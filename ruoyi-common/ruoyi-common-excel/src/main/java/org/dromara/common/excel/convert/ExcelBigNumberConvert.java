@@ -33,7 +33,7 @@ public class ExcelBigNumberConvert implements Converter<Long> {
 
     @Override
     public Long convertToJavaData(ReadCellData<?> cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-        return Convert.toLong(cellData.getData());
+        return Convert.toLong(cellData.getStringValue());
     }
 
     @Override
