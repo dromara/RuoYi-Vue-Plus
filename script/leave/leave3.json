@@ -202,7 +202,7 @@
   "flowCode": "leave3",
   "flowName": "请假申请-并行网关",
   "modelValue": "CLASSICS",
-  "category": "103",
+  "category": "1762300000000000103",
   "version": "1",
   "formCustom": "N",
   "formPath": "/workflow/leaveEdit/index",

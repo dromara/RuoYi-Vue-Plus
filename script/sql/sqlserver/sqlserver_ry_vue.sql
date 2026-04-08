@@ -647,15 +647,15 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_config'
 GO
 
-INSERT sys_config VALUES (1, N'主框架页-默认皮肤样式名称', N'sys.index.skinName', N'skin-blue', N'Y', 103, 1, getdate(), NULL, NULL, N'蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow')
+INSERT sys_config VALUES (1761700000000000001, N'主框架页-默认皮肤样式名称', N'sys.index.skinName', N'skin-blue', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow')
 GO
-INSERT sys_config VALUES (2, N'用户管理-账号初始密码', N'sys.user.initPassword', N'123456', N'Y', 103, 1, getdate(), NULL, NULL, N'初始化密码 123456')
+INSERT sys_config VALUES (1761700000000000002, N'用户管理-账号初始密码', N'sys.user.initPassword', N'123456', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'初始化密码 123456')
 GO
-INSERT sys_config VALUES (3, N'主框架页-侧边栏主题', N'sys.index.sideTheme', N'theme-dark', N'Y', 103, 1, getdate(), NULL, NULL, N'深色主题theme-dark，浅色主题theme-light')
+INSERT sys_config VALUES (1761700000000000003, N'主框架页-侧边栏主题', N'sys.index.sideTheme', N'theme-dark', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'深色主题theme-dark，浅色主题theme-light')
 GO
-INSERT sys_config VALUES (5, N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
+INSERT sys_config VALUES (1761700000000000005, N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
 GO
-INSERT sys_config VALUES (11, N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 103, 1, getdate(), NULL, NULL, N'true:开启, false:关闭');
+INSERT sys_config VALUES (1761700000000000011, N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'true:开启, false:关闭');
 GO
 
 CREATE TABLE sys_dept
@@ -785,25 +785,25 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dept'
 GO
 
-INSERT sys_dept VALUES (100, 0, N'0', N'XXX科技', NULL, 0, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (1761000000000000100, 0, N'0', N'XXX科技', NULL, 0, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (101, 100, N'0,100', N'深圳总公司', NULL, 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (1761000000000000101, 1761000000000000100, N'0,1761000000000000100', N'深圳总公司', NULL, 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (102, 100, N'0,100', N'长沙分公司', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (1761000000000000102, 1761000000000000100, N'0,1761000000000000100', N'长沙分公司', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (103, 101, N'0,100,101', N'研发部门', NULL, 1, 1, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (1761000000000000103, 1761000000000000101, N'0,1761000000000000100,1761000000000000101', N'研发部门', NULL, 1, 1761100000000000001, N'15888888888', N'xxx@qq.com', N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (104, 101, N'0,100,101', N'市场部门', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (1761000000000000104, 1761000000000000101, N'0,1761000000000000100,1761000000000000101', N'市场部门', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (105, 101, N'0,100,101', N'测试部门', NULL, 3, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (1761000000000000105, 1761000000000000101, N'0,1761000000000000100,1761000000000000101', N'测试部门', NULL, 3, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (106, 101, N'0,100,101', N'财务部门', NULL, 4, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (1761000000000000106, 1761000000000000101, N'0,1761000000000000100,1761000000000000101', N'财务部门', NULL, 4, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (107, 101, N'0,100,101', N'运维部门', NULL, 5, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (1761000000000000107, 1761000000000000101, N'0,1761000000000000100,1761000000000000101', N'运维部门', NULL, 5, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (108, 102, N'0,100,102', N'市场部门', NULL, 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (1761000000000000108, 1761000000000000102, N'0,1761000000000000100,1761000000000000102', N'市场部门', NULL, 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (109, 102, N'0,100,102', N'财务部门', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (1761000000000000109, 1761000000000000102, N'0,1761000000000000100,1761000000000000102', N'财务部门', NULL, 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL)
 GO
 
 CREATE TABLE sys_dict_data
@@ -919,81 +919,81 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dict_data'
 GO
 
-INSERT sys_dict_data VALUES (1, 1, N'男', N'0', N'sys_user_gender', N'', N'', N'Y', 103, 1, getdate(), NULL, NULL, N'性别男')
+INSERT sys_dict_data VALUES (1761600000000000001, 1, N'男', N'0', N'sys_user_gender', N'', N'', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'性别男')
 GO
-INSERT sys_dict_data VALUES (2, 2, N'女', N'1', N'sys_user_gender', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'性别女')
+INSERT sys_dict_data VALUES (1761600000000000002, 2, N'女', N'1', N'sys_user_gender', N'', N'', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'性别女')
 GO
-INSERT sys_dict_data VALUES (3, 3, N'未知', N'2', N'sys_user_gender', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'性别未知')
+INSERT sys_dict_data VALUES (1761600000000000003, 3, N'未知', N'2', N'sys_user_gender', N'', N'', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'性别未知')
 GO
-INSERT sys_dict_data VALUES (4, 1, N'显示', N'0', N'sys_show_hide', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'显示菜单')
+INSERT sys_dict_data VALUES (1761600000000000004, 1, N'显示', N'0', N'sys_show_hide', N'', N'primary', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'显示菜单')
 GO
-INSERT sys_dict_data VALUES (5, 2, N'隐藏', N'1', N'sys_show_hide', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'隐藏菜单')
+INSERT sys_dict_data VALUES (1761600000000000005, 2, N'隐藏', N'1', N'sys_show_hide', N'', N'danger', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'隐藏菜单')
 GO
-INSERT sys_dict_data VALUES (6, 1, N'正常', N'0', N'sys_normal_disable', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (1761600000000000006, 1, N'正常', N'0', N'sys_normal_disable', N'', N'primary', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (7, 2, N'停用', N'1', N'sys_normal_disable', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
+INSERT sys_dict_data VALUES (1761600000000000007, 2, N'停用', N'1', N'sys_normal_disable', N'', N'danger', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'停用状态')
 GO
-INSERT sys_dict_data VALUES (8, 1, N'正常', N'0', N'sys_job_status', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (1761600000000000008, 1, N'正常', N'0', N'sys_job_status', N'', N'primary', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (9, 2, N'暂停', N'1', N'sys_job_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
+INSERT sys_dict_data VALUES (1761600000000000009, 2, N'暂停', N'1', N'sys_job_status', N'', N'danger', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'停用状态')
 GO
-INSERT sys_dict_data VALUES (10, 1, N'默认', N'DEFAULT', N'sys_job_group', N'', N'', N'Y', 103, 1, getdate(), NULL, NULL, N'默认分组')
+INSERT sys_dict_data VALUES (1761600000000000010, 1, N'默认', N'DEFAULT', N'sys_job_group', N'', N'', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'默认分组')
 GO
-INSERT sys_dict_data VALUES (11, 2, N'系统', N'SYSTEM', N'sys_job_group', N'', N'', N'N', 103, 1, getdate(), NULL, NULL, N'系统分组')
+INSERT sys_dict_data VALUES (1761600000000000011, 2, N'系统', N'SYSTEM', N'sys_job_group', N'', N'', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'系统分组')
 GO
-INSERT sys_dict_data VALUES (12, 1, N'是', N'Y', N'sys_yes_no', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'系统默认是')
+INSERT sys_dict_data VALUES (1761600000000000012, 1, N'是', N'Y', N'sys_yes_no', N'', N'primary', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'系统默认是')
 GO
-INSERT sys_dict_data VALUES (13, 2, N'否', N'N', N'sys_yes_no', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'系统默认否')
+INSERT sys_dict_data VALUES (1761600000000000013, 2, N'否', N'N', N'sys_yes_no', N'', N'danger', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'系统默认否')
 GO
-INSERT sys_dict_data VALUES (14, 1, N'通知', N'1', N'sys_notice_type', N'', N'warning', N'Y', 103, 1, getdate(), NULL, NULL, N'通知')
+INSERT sys_dict_data VALUES (1761600000000000014, 1, N'通知', N'1', N'sys_notice_type', N'', N'warning', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'通知')
 GO
-INSERT sys_dict_data VALUES (15, 2, N'公告', N'2', N'sys_notice_type', N'', N'success', N'N', 103, 1, getdate(), NULL, NULL, N'公告')
+INSERT sys_dict_data VALUES (1761600000000000015, 2, N'公告', N'2', N'sys_notice_type', N'', N'success', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'公告')
 GO
-INSERT sys_dict_data VALUES (16, 1, N'正常', N'0', N'sys_notice_status', N'', N'primary', N'Y', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (1761600000000000016, 1, N'正常', N'0', N'sys_notice_status', N'', N'primary', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (17, 2, N'关闭', N'1', N'sys_notice_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'关闭状态')
+INSERT sys_dict_data VALUES (1761600000000000017, 2, N'关闭', N'1', N'sys_notice_status', N'', N'danger', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'关闭状态')
 GO
-INSERT sys_dict_data VALUES (29, 99, N'其他', N'0', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'其他操作');
+INSERT sys_dict_data VALUES (1761600000000000029, 99, N'其他', N'0', N'sys_oper_type', N'', N'info', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'其他操作');
 GO
-INSERT sys_dict_data VALUES (18, 1, N'新增', N'1', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'新增操作')
+INSERT sys_dict_data VALUES (1761600000000000018, 1, N'新增', N'1', N'sys_oper_type', N'', N'info', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'新增操作')
 GO
-INSERT sys_dict_data VALUES (19, 2, N'修改', N'2', N'sys_oper_type', N'', N'info', N'N', 103, 1, getdate(), NULL, NULL, N'修改操作')
+INSERT sys_dict_data VALUES (1761600000000000019, 2, N'修改', N'2', N'sys_oper_type', N'', N'info', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'修改操作')
 GO
-INSERT sys_dict_data VALUES (20, 3, N'删除', N'3', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'删除操作')
+INSERT sys_dict_data VALUES (1761600000000000020, 3, N'删除', N'3', N'sys_oper_type', N'', N'danger', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'删除操作')
 GO
-INSERT sys_dict_data VALUES (21, 4, N'授权', N'4', N'sys_oper_type', N'', N'primary', N'N', 103, 1, getdate(), NULL, NULL, N'授权操作')
+INSERT sys_dict_data VALUES (1761600000000000021, 4, N'授权', N'4', N'sys_oper_type', N'', N'primary', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'授权操作')
 GO
-INSERT sys_dict_data VALUES (22, 5, N'导出', N'5', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'导出操作')
+INSERT sys_dict_data VALUES (1761600000000000022, 5, N'导出', N'5', N'sys_oper_type', N'', N'warning', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'导出操作')
 GO
-INSERT sys_dict_data VALUES (23, 6, N'导入', N'6', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'导入操作')
+INSERT sys_dict_data VALUES (1761600000000000023, 6, N'导入', N'6', N'sys_oper_type', N'', N'warning', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'导入操作')
 GO
-INSERT sys_dict_data VALUES (24, 7, N'强退', N'7', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'强退操作')
+INSERT sys_dict_data VALUES (1761600000000000024, 7, N'强退', N'7', N'sys_oper_type', N'', N'danger', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'强退操作')
 GO
-INSERT sys_dict_data VALUES (25, 8, N'生成代码', N'8', N'sys_oper_type', N'', N'warning', N'N', 103, 1, getdate(), NULL, NULL, N'生成操作')
+INSERT sys_dict_data VALUES (1761600000000000025, 8, N'生成代码', N'8', N'sys_oper_type', N'', N'warning', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'生成操作')
 GO
-INSERT sys_dict_data VALUES (26, 9, N'清空数据', N'9', N'sys_oper_type', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'清空操作')
+INSERT sys_dict_data VALUES (1761600000000000026, 9, N'清空数据', N'9', N'sys_oper_type', N'', N'danger', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'清空操作')
 GO
-INSERT sys_dict_data VALUES (27, 1, N'成功', N'0', N'sys_common_status', N'', N'primary', N'N', 103, 1, getdate(), NULL, NULL, N'正常状态')
+INSERT sys_dict_data VALUES (1761600000000000027, 1, N'成功', N'0', N'sys_common_status', N'', N'primary', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'正常状态')
 GO
-INSERT sys_dict_data VALUES (28, 2, N'失败', N'1', N'sys_common_status', N'', N'danger', N'N', 103, 1, getdate(), NULL, NULL, N'停用状态')
+INSERT sys_dict_data VALUES (1761600000000000028, 2, N'失败', N'1', N'sys_common_status', N'', N'danger', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'停用状态')
 GO
-INSERT sys_dict_data VALUES (30, 0, N'密码认证', N'password', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'密码认证')
+INSERT sys_dict_data VALUES (1761600000000000030, 0, N'密码认证', N'password', N'sys_grant_type', N'', N'default', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'密码认证')
 GO
-INSERT sys_dict_data VALUES (31, 0, N'短信认证', N'sms', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'短信认证')
+INSERT sys_dict_data VALUES (1761600000000000031, 0, N'短信认证', N'sms', N'sys_grant_type', N'', N'default', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'短信认证')
 GO
-INSERT sys_dict_data VALUES (32, 0, N'邮件认证', N'email', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'邮件认证')
+INSERT sys_dict_data VALUES (1761600000000000032, 0, N'邮件认证', N'email', N'sys_grant_type', N'', N'default', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'邮件认证')
 GO
-INSERT sys_dict_data VALUES (33, 0, N'小程序认证', N'xcx', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'小程序认证')
+INSERT sys_dict_data VALUES (1761600000000000033, 0, N'小程序认证', N'xcx', N'sys_grant_type', N'', N'default', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'小程序认证')
 GO
-INSERT sys_dict_data VALUES (34, 0, N'三方登录认证', N'social', N'sys_grant_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'三方登录认证')
+INSERT sys_dict_data VALUES (1761600000000000034, 0, N'三方登录认证', N'social', N'sys_grant_type', N'', N'default', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'三方登录认证')
 GO
-INSERT sys_dict_data VALUES (35, 0, N'PC', N'pc', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'PC')
+INSERT sys_dict_data VALUES (1761600000000000035, 0, N'PC', N'pc', N'sys_device_type', N'', N'default', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'PC')
 GO
-INSERT sys_dict_data VALUES (36, 0, N'安卓', N'android', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'安卓')
+INSERT sys_dict_data VALUES (1761600000000000036, 0, N'安卓', N'android', N'sys_device_type', N'', N'default', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'安卓')
 GO
-INSERT sys_dict_data VALUES (37, 0, N'iOS', N'ios', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'iOS')
+INSERT sys_dict_data VALUES (1761600000000000037, 0, N'iOS', N'ios', N'sys_device_type', N'', N'default', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'iOS')
 GO
-INSERT sys_dict_data VALUES (38, 0, N'小程序', N'xcx', N'sys_device_type', N'', N'default', N'N', 103, 1, getdate(), NULL, NULL, N'小程序')
+INSERT sys_dict_data VALUES (1761600000000000038, 0, N'小程序', N'xcx', N'sys_device_type', N'', N'default', N'N', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'小程序')
 GO
 
 CREATE TABLE sys_dict_type
@@ -1077,29 +1077,29 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dict_type'
 GO
 
-INSERT sys_dict_type VALUES (1, N'用户性别', N'sys_user_gender', 103, 1, getdate(), NULL, NULL, N'用户性别列表')
+INSERT sys_dict_type VALUES (1761500000000000001, N'用户性别', N'sys_user_gender', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'用户性别列表')
 GO
-INSERT sys_dict_type VALUES (2, N'菜单状态', N'sys_show_hide', 103, 1, getdate(), NULL, NULL, N'菜单状态列表')
+INSERT sys_dict_type VALUES (1761500000000000002, N'菜单状态', N'sys_show_hide', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'菜单状态列表')
 GO
-INSERT sys_dict_type VALUES (3, N'系统开关', N'sys_normal_disable', 103, 1, getdate(), NULL, NULL, N'系统开关列表')
+INSERT sys_dict_type VALUES (1761500000000000003, N'系统开关', N'sys_normal_disable', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'系统开关列表')
 GO
-INSERT sys_dict_type VALUES (4, N'任务状态', N'sys_job_status', 103, 1, getdate(), NULL, NULL, N'任务状态列表')
+INSERT sys_dict_type VALUES (1761500000000000004, N'任务状态', N'sys_job_status', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'任务状态列表')
 GO
-INSERT sys_dict_type VALUES (5, N'任务分组', N'sys_job_group', 103, 1, getdate(), NULL, NULL, N'任务分组列表')
+INSERT sys_dict_type VALUES (1761500000000000005, N'任务分组', N'sys_job_group', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'任务分组列表')
 GO
-INSERT sys_dict_type VALUES (6, N'系统是否', N'sys_yes_no', 103, 1, getdate(), NULL, NULL, N'系统是否列表')
+INSERT sys_dict_type VALUES (1761500000000000006, N'系统是否', N'sys_yes_no', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'系统是否列表')
 GO
-INSERT sys_dict_type VALUES (7, N'通知类型', N'sys_notice_type', 103, 1, getdate(), NULL, NULL, N'通知类型列表')
+INSERT sys_dict_type VALUES (1761500000000000007, N'通知类型', N'sys_notice_type', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'通知类型列表')
 GO
-INSERT sys_dict_type VALUES (8, N'通知状态', N'sys_notice_status', 103, 1, getdate(), NULL, NULL, N'通知状态列表')
+INSERT sys_dict_type VALUES (1761500000000000008, N'通知状态', N'sys_notice_status', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'通知状态列表')
 GO
-INSERT sys_dict_type VALUES (9, N'操作类型', N'sys_oper_type', 103, 1, getdate(), NULL, NULL, N'操作类型列表')
+INSERT sys_dict_type VALUES (1761500000000000009, N'操作类型', N'sys_oper_type', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'操作类型列表')
 GO
-INSERT sys_dict_type VALUES (10, N'系统状态', N'sys_common_status', 103, 1, getdate(), NULL, NULL, N'登录状态列表')
+INSERT sys_dict_type VALUES (1761500000000000010, N'系统状态', N'sys_common_status', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'登录状态列表')
 GO
-INSERT sys_dict_type VALUES (11, N'授权类型', N'sys_grant_type', 103, 1, getdate(), NULL, NULL, N'认证授权类型')
+INSERT sys_dict_type VALUES (1761500000000000011, N'授权类型', N'sys_grant_type', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'认证授权类型')
 GO
-INSERT sys_dict_type VALUES (12, N'设备类型', N'sys_device_type', 103, 1, getdate(), NULL, NULL, N'客户端设备类型')
+INSERT sys_dict_type VALUES (1761500000000000012, N'设备类型', N'sys_device_type', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'客户端设备类型')
 GO
 
 CREATE TABLE sys_login_info
@@ -1368,226 +1368,226 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_menu'
 GO
 
-insert into sys_menu values(1, N'系统管理', 0, 1, N'system', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'system', N'', N'', 103, 1, getdate(), NULL, NULL, N'系统管理目录')
+insert into sys_menu values(1761400000000000001, N'系统管理', 0, 1, N'system', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'system', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'系统管理目录');
 GO
-insert into sys_menu values(2, N'系统监控', 0, 3, N'monitor', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'monitor', N'', N'', 103, 1, getdate(), NULL, NULL, N'系统监控目录')
+insert into sys_menu values(1761400000000000002, N'系统监控', 0, 3, N'monitor', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'monitor', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'系统监控目录');
 GO
-insert into sys_menu values(3, N'系统工具', 0, 4, N'tool', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'tool', N'', N'', 103, 1, getdate(), NULL, NULL, N'系统工具目录')
+insert into sys_menu values(1761400000000000003, N'系统工具', 0, 4, N'tool', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'tool', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'系统工具目录');
 GO
-insert into sys_menu values(5, N'测试菜单', 0, 5, N'demo', NULL, N'', N'N', N'Y', N'M', N'0', N'0', NULL, N'star', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000000005, N'测试菜单', 0, 5, N'demo', NULL, N'', N'N', N'Y', N'M', N'0', N'0', NULL, N'star', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(4, N'PLUS官网', 0, 9, N'https://gitee.com/dromara/RuoYi-Vue-Plus', null, N'', N'Y', N'Y', N'M', N'0', N'0', N'', N'guide', N'', N'', 103, 1, getdate(), null, null, N'RuoYi-Vue-Plus官网地址');
+insert into sys_menu values(1761400000000000004, N'PLUS官网', 0, 9, N'https://gitee.com/dromara/RuoYi-Vue-Plus', null, N'', N'Y', N'Y', N'M', N'0', N'0', N'', N'guide', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), null, null, N'RuoYi-Vue-Plus官网地址');
 GO
-insert into sys_menu values(100, N'用户管理', 1, 1, N'user', N'system/user/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:user:list', N'user', N'', N'', 103, 1, getdate(), NULL, NULL, N'用户管理菜单')
+insert into sys_menu values(1761400000000000100, N'用户管理', 1761400000000000001, 1, N'user', N'system/user/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:user:list', N'user', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'用户管理菜单');
 GO
-insert into sys_menu values(101, N'角色管理', 1, 2, N'role', N'system/role/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:role:list', N'peoples', N'', N'', 103, 1, getdate(), NULL, NULL, N'角色管理菜单')
+insert into sys_menu values(1761400000000000101, N'角色管理', 1761400000000000001, 2, N'role', N'system/role/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:role:list', N'peoples', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'角色管理菜单');
 GO
-insert into sys_menu values(102, N'菜单管理', 1, 3, N'menu', N'system/menu/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:menu:list', N'tree-table', N'', N'', 103, 1, getdate(), NULL, NULL, N'菜单管理菜单')
+insert into sys_menu values(1761400000000000102, N'菜单管理', 1761400000000000001, 3, N'menu', N'system/menu/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:menu:list', N'tree-table', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'菜单管理菜单');
 GO
-insert into sys_menu values(103, N'部门管理', 1, 4, N'dept', N'system/dept/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:dept:list', N'tree', N'', N'', 103, 1, getdate(), NULL, NULL, N'部门管理菜单')
+insert into sys_menu values(1761400000000000103, N'部门管理', 1761400000000000001, 4, N'dept', N'system/dept/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:dept:list', N'tree', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'部门管理菜单');
 GO
-insert into sys_menu values(104, N'岗位管理', 1, 5, N'post', N'system/post/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:post:list', N'post', N'', N'', 103, 1, getdate(), NULL, NULL, N'岗位管理菜单')
+insert into sys_menu values(1761400000000000104, N'岗位管理', 1761400000000000001, 5, N'post', N'system/post/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:post:list', N'post', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'岗位管理菜单');
 GO
-insert into sys_menu values(105, N'字典管理', 1, 6, N'dict', N'system/dict/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:dict:list', N'dict', N'', N'', 103, 1, getdate(), NULL, NULL, N'字典管理菜单')
+insert into sys_menu values(1761400000000000105, N'字典管理', 1761400000000000001, 6, N'dict', N'system/dict/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:dict:list', N'dict', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'字典管理菜单');
 GO
-insert into sys_menu values(106, N'参数设置', 1, 7, N'config', N'system/config/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:config:list', N'edit', N'', N'', 103, 1, getdate(), NULL, NULL, N'参数设置菜单')
+insert into sys_menu values(1761400000000000106, N'参数设置', 1761400000000000001, 7, N'config', N'system/config/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:config:list', N'edit', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'参数设置菜单');
 GO
-insert into sys_menu values(107, N'通知公告', 1, 8, N'notice', N'system/notice/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:notice:list', N'message', N'', N'', 103, 1, getdate(), NULL, NULL, N'通知公告菜单')
+insert into sys_menu values(1761400000000000107, N'通知公告', 1761400000000000001, 8, N'notice', N'system/notice/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:notice:list', N'message', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'通知公告菜单');
 GO
-insert into sys_menu values(108, N'日志管理', 1, 9, N'log', N'', N'', N'N', N'Y', N'M', N'0', N'0', N'', N'log', N'', N'', 103, 1, getdate(), NULL, NULL, N'日志管理菜单')
+insert into sys_menu values(1761400000000000108, N'日志管理', 1761400000000000001, 9, N'log', N'', N'', N'N', N'Y', N'M', N'0', N'0', N'', N'log', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'日志管理菜单');
 GO
-insert into sys_menu values(109, N'在线用户', 2, 1, N'online', N'monitor/online/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:online:list', N'online', N'', N'', 103, 1, getdate(), NULL, NULL, N'在线用户菜单')
+insert into sys_menu values(1761400000000000109, N'在线用户', 1761400000000000002, 1, N'online', N'monitor/online/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:online:list', N'online', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'在线用户菜单');
 GO
-insert into sys_menu values(113, N'缓存监控', 2, 5, N'cache', N'monitor/cache/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:cache:list', N'redis', N'', N'', 103, 1, getdate(), NULL, NULL, N'缓存监控菜单')
+insert into sys_menu values(1761400000000000113, N'缓存监控', 1761400000000000002, 5, N'cache', N'monitor/cache/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:cache:list', N'redis', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'缓存监控菜单');
 GO
-insert into sys_menu values(115, N'代码生成', 3, 2, N'gen', N'tool/gen/index', N'', N'N', N'Y', N'C', N'0', N'0', N'tool:gen:list', N'code', N'', N'', 103, 1, getdate(), NULL, NULL, N'代码生成菜单')
+insert into sys_menu values(1761400000000000115, N'代码生成', 1761400000000000003, 2, N'gen', N'tool/gen/index', N'', N'N', N'Y', N'C', N'0', N'0', N'tool:gen:list', N'code', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'代码生成菜单');
 GO
-insert into sys_menu values(123, N'客户端管理', 1, 11, N'client', N'system/client/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:client:list', N'international', N'', N'', 103, 1, getdate(), NULL, NULL, N'客户端管理菜单')
+insert into sys_menu values(1761400000000000123, N'客户端管理', 1761400000000000001, 11, N'client', N'system/client/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:client:list', N'international', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'客户端管理菜单');
 GO
-insert into sys_menu values(116, N'修改生成配置', 3, 2, N'gen-edit/index/:tableId', N'tool/gen/editTable', N'', N'N', N'N', N'C', N'1', N'0', N'tool:gen:edit', N'#', N'/tool/gen', N'', 103, 1, getdate(), null, null, N'');
+insert into sys_menu values(1761400000000000116, N'修改生成配置', 1761400000000000003, 2, N'gen-edit/index/:tableId', N'tool/gen/editTable', N'', N'N', N'N', N'C', N'1', N'0', N'tool:gen:edit', N'#', N'/tool/gen', N'', 1761000000000000103, 1761100000000000001, getdate(), null, null, N'');
 GO
-insert into sys_menu values(130, N'分配用户', 1, 2, N'role-auth/user/:roleId', N'system/role/authUser', N'', N'N', N'N', N'C', N'1', N'0', N'system:role:edit', N'#', N'/system/role', N'', 103, 1, getdate(), null, null, N'');
+insert into sys_menu values(1761400000000000130, N'分配用户', 1761400000000000001, 2, N'role-auth/user/:roleId', N'system/role/authUser', N'', N'N', N'N', N'C', N'1', N'0', N'system:role:edit', N'#', N'/system/role', N'', 1761000000000000103, 1761100000000000001, getdate(), null, null, N'');
 GO
-insert into sys_menu values(131, N'分配角色', 1, 1, N'user-auth/role/:userId', N'system/user/authRole', N'', N'N', N'N', N'C', N'1', N'0', N'system:user:edit', N'#', N'/system/user', N'', 103, 1, getdate(), null, null, N'');
+insert into sys_menu values(1761400000000000131, N'分配角色', 1761400000000000001, 1, N'user-auth/role/:userId', N'system/user/authRole', N'', N'N', N'N', N'C', N'1', N'0', N'system:user:edit', N'#', N'/system/user', N'', 1761000000000000103, 1761100000000000001, getdate(), null, null, N'');
 GO
-insert into sys_menu values(132, N'字典数据', 1, 6, N'dict-data/index/:dictId', N'system/dict/data', N'', N'N', N'N', N'C', N'1', N'0', N'system:dict:list', N'#', N'/system/dict', N'', 103, 1, getdate(), null, null, N'');
+insert into sys_menu values(1761400000000000132, N'字典数据', 1761400000000000001, 6, N'dict-data/index/:dictId', N'system/dict/data', N'', N'N', N'N', N'C', N'1', N'0', N'system:dict:list', N'#', N'/system/dict', N'', 1761000000000000103, 1761100000000000001, getdate(), null, null, N'');
 GO
-insert into sys_menu values(133, N'文件配置管理', 1, 10, N'oss-config/index', N'system/oss/config', N'', N'N', N'N', N'C', N'1', N'0', N'system:ossConfig:list', N'#', N'/system/oss', N'', 103, 1, getdate(), null, null, N'');
+insert into sys_menu values(1761400000000000133, N'文件配置管理', 1761400000000000001, 10, N'oss-config/index', N'system/oss/config', N'', N'N', N'N', N'C', N'1', N'0', N'system:ossConfig:list', N'#', N'/system/oss', N'', 1761000000000000103, 1761100000000000001, getdate(), null, null, N'');
 GO
 
-insert into sys_menu values(117, N'Admin监控', 2, 5, N'Admin', N'monitor/admin/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:admin:list', N'dashboard', N'', N'', 103, 1, getdate(), NULL, NULL, N'Admin监控菜单');
+insert into sys_menu values(1761400000000000117, N'Admin监控', 1761400000000000002, 5, N'Admin', N'monitor/admin/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:admin:list', N'dashboard', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'Admin监控菜单');
 GO
-insert into sys_menu values(118, N'文件管理', 1, 10, N'oss', N'system/oss/index', N'', N'N', N'Y', N'C', '0', N'0', N'system:oss:list', N'upload', N'', N'', 103, 1, getdate(), NULL, NULL, N'文件管理菜单');
+insert into sys_menu values(1761400000000000118, N'文件管理', 1761400000000000001, 10, N'oss', N'system/oss/index', N'', N'N', N'Y', N'C', '0', N'0', N'system:oss:list', N'upload', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'文件管理菜单');
 GO
-insert into sys_menu values(120, N'任务调度中心', 2, 5, N'snailjob', N'monitor/snailjob/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:snailjob:list', N'job', N'', N'', 103, 1, getdate(), NULL, NULL, N'SnailJob控制台菜单');
+insert into sys_menu values(1761400000000000120, N'任务调度中心', 1761400000000000002, 5, N'snailjob', N'monitor/snailjob/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:snailjob:list', N'job', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'SnailJob控制台菜单');
 GO
-insert into sys_menu values(500, N'操作日志', 108, 1, N'operlog', N'monitor/operlog/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:operlog:list', N'form', N'', N'', 103, 1, getdate(), NULL, NULL, N'操作日志菜单')
+insert into sys_menu values(1761400000000000500, N'操作日志', 1761400000000000108, 1, N'operlog', N'monitor/operlog/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:operlog:list', N'form', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'操作日志菜单');
 GO
-insert into sys_menu values(501, N'登录日志', 108, 2, N'logininfo', N'monitor/logininfo/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:logininfo:list', N'logininfo', N'', N'', 103, 1, getdate(), NULL, NULL, N'登录日志菜单')
+insert into sys_menu values(1761400000000000501, N'登录日志', 1761400000000000108, 2, N'logininfo', N'monitor/logininfo/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:logininfo:list', N'logininfo', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'登录日志菜单');
 GO
-insert into sys_menu values(1001, N'用户查询', 100, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001001, N'用户查询', 1761400000000000100, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1002, N'用户新增', 100, 2, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001002, N'用户新增', 1761400000000000100, 2, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1003, N'用户修改', 100, 3, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001003, N'用户修改', 1761400000000000100, 3, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1004, N'用户删除', 100, 4, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001004, N'用户删除', 1761400000000000100, 4, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1005, N'用户导出', 100, 5, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:export', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001005, N'用户导出', 1761400000000000100, 5, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:export', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1006, N'用户导入', 100, 6, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:import', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001006, N'用户导入', 1761400000000000100, 6, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:import', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1007, N'重置密码', 100, 7, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:resetPwd', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001007, N'重置密码', 1761400000000000100, 7, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:user:resetPwd', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1008, N'角色查询', 101, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:role:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001008, N'角色查询', 1761400000000000101, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:role:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1009, N'角色新增', 101, 2, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:role:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001009, N'角色新增', 1761400000000000101, 2, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:role:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1010, N'角色修改', 101, 3, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:role:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001010, N'角色修改', 1761400000000000101, 3, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:role:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1011, N'角色删除', 101, 4, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:role:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001011, N'角色删除', 1761400000000000101, 4, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:role:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1012, N'角色导出', 101, 5, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:role:export', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001012, N'角色导出', 1761400000000000101, 5, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:role:export', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1013, N'菜单查询', 102, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:menu:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001013, N'菜单查询', 1761400000000000102, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:menu:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1014, N'菜单新增', 102, 2, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:menu:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001014, N'菜单新增', 1761400000000000102, 2, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:menu:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1015, N'菜单修改', 102, 3, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:menu:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001015, N'菜单修改', 1761400000000000102, 3, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:menu:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1016, N'菜单删除', 102, 4, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:menu:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001016, N'菜单删除', 1761400000000000102, 4, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:menu:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1017, N'部门查询', 103, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dept:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001017, N'部门查询', 1761400000000000103, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dept:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1018, N'部门新增', 103, 2, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dept:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001018, N'部门新增', 1761400000000000103, 2, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dept:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1019, N'部门修改', 103, 3, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dept:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001019, N'部门修改', 1761400000000000103, 3, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dept:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1020, N'部门删除', 103, 4, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dept:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001020, N'部门删除', 1761400000000000103, 4, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dept:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1021, N'岗位查询', 104, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:post:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001021, N'岗位查询', 1761400000000000104, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:post:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1022, N'岗位新增', 104, 2, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:post:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001022, N'岗位新增', 1761400000000000104, 2, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:post:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1023, N'岗位修改', 104, 3, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:post:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001023, N'岗位修改', 1761400000000000104, 3, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:post:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1024, N'岗位删除', 104, 4, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:post:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001024, N'岗位删除', 1761400000000000104, 4, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:post:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1025, N'岗位导出', 104, 5, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:post:export', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001025, N'岗位导出', 1761400000000000104, 5, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:post:export', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1026, N'字典查询', 105, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dict:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001026, N'字典查询', 1761400000000000105, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dict:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1027, N'字典新增', 105, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dict:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001027, N'字典新增', 1761400000000000105, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dict:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1028, N'字典修改', 105, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dict:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001028, N'字典修改', 1761400000000000105, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dict:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1029, N'字典删除', 105, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dict:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001029, N'字典删除', 1761400000000000105, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dict:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1030, N'字典导出', 105, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dict:export', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001030, N'字典导出', 1761400000000000105, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dict:export', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1031, N'参数查询', 106, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:config:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001031, N'参数查询', 1761400000000000106, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:config:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1032, N'参数新增', 106, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:config:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001032, N'参数新增', 1761400000000000106, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:config:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1033, N'参数修改', 106, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:config:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001033, N'参数修改', 1761400000000000106, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:config:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1034, N'参数删除', 106, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:config:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001034, N'参数删除', 1761400000000000106, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:config:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1035, N'参数导出', 106, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:config:export', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001035, N'参数导出', 1761400000000000106, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:config:export', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1036, N'公告查询', 107, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:notice:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001036, N'公告查询', 1761400000000000107, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:notice:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1037, N'公告新增', 107, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:notice:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001037, N'公告新增', 1761400000000000107, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:notice:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1038, N'公告修改', 107, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:notice:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001038, N'公告修改', 1761400000000000107, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:notice:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1039, N'公告删除', 107, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:notice:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001039, N'公告删除', 1761400000000000107, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:notice:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1040, N'操作查询', 500, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:operlog:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001040, N'操作查询', 1761400000000000500, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:operlog:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1041, N'操作删除', 500, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:operlog:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001041, N'操作删除', 1761400000000000500, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:operlog:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1042, N'日志导出', 500, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:operlog:export', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001042, N'日志导出', 1761400000000000500, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:operlog:export', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1043, N'登录查询', 501, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001043, N'登录查询', 1761400000000000501, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1044, N'登录删除', 501, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001044, N'登录删除', 1761400000000000501, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1045, N'日志导出', 501, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:export', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001045, N'日志导出', 1761400000000000501, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:export', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1050, N'账户解锁', 501, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:unlock', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001050, N'账户解锁', 1761400000000000501, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:logininfo:unlock', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1046, N'在线查询', 109, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:online:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001046, N'在线查询', 1761400000000000109, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:online:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1047, N'批量强退', 109, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:online:batchLogout', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001047, N'批量强退', 1761400000000000109, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:online:batchLogout', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1048, N'单条强退', 109, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:online:forceLogout', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001048, N'单条强退', 1761400000000000109, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'monitor:online:forceLogout', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1055, N'生成查询', 115, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001055, N'生成查询', 1761400000000000115, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1056, N'生成修改', 115, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001056, N'生成修改', 1761400000000000115, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1057, N'生成删除', 115, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001057, N'生成删除', 1761400000000000115, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1058, N'导入代码', 115, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:import', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001058, N'导入代码', 1761400000000000115, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:import', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1059, N'预览代码', 115, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:preview', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001059, N'预览代码', 1761400000000000115, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:preview', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1060, N'生成代码', 115, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:code', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'')
+insert into sys_menu values(1761400000000001060, N'生成代码', 1761400000000000115, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'tool:gen:code', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
 -- oss相关按钮
-insert into sys_menu values(1600, N'文件查询', 118, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:oss:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001600, N'文件查询', 1761400000000000118, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:oss:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1601, N'文件上传', 118, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:oss:upload', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001601, N'文件上传', 1761400000000000118, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:oss:upload', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1602, N'文件下载', 118, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:oss:download', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001602, N'文件下载', 1761400000000000118, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:oss:download', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1603, N'文件删除', 118, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:oss:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001603, N'文件删除', 1761400000000000118, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:oss:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1620, N'配置列表', 118, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:ossConfig:list', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001620, N'配置列表', 1761400000000000118, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:ossConfig:list', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1621, N'配置添加', 118, 6, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:ossConfig:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001621, N'配置添加', 1761400000000000118, 6, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:ossConfig:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1622, N'配置编辑', 118, 6, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:ossConfig:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001622, N'配置编辑', 1761400000000000118, 6, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:ossConfig:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1623, N'配置删除', 118, 6, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:ossConfig:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001623, N'配置删除', 1761400000000000118, 6, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:ossConfig:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
 -- 客户端管理按钮
-insert into sys_menu values(1061, N'客户端管理查询', 123, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:client:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001061, N'客户端管理查询', 1761400000000000123, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:client:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1062, N'客户端管理新增', 123, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:client:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001062, N'客户端管理新增', 1761400000000000123, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:client:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1063, N'客户端管理修改', 123, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:client:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001063, N'客户端管理修改', 1761400000000000123, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:client:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1064, N'客户端管理删除', 123, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:client:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001064, N'客户端管理删除', 1761400000000000123, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:client:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1065, N'客户端管理导出', 123, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:client:export', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001065, N'客户端管理导出', 1761400000000000123, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:client:export', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
 -- 测试菜单
-insert into sys_menu values(1500, N'测试单表', 5, 1, N'demo', N'demo/demo/index', N'', N'N', N'Y', N'C', N'0', N'0', N'demo:demo:list', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'测试单表菜单');
+insert into sys_menu values(1761400000000001500, N'测试单表', 1761400000000000005, 1, N'demo', N'demo/demo/index', N'', N'N', N'Y', N'C', N'0', N'0', N'demo:demo:list', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'测试单表菜单');
 GO
-insert into sys_menu values(1501, N'测试单表查询', 1500, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:demo:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001501, N'测试单表查询', 1761400000000001500, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:demo:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1502, N'测试单表新增', 1500, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:demo:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001502, N'测试单表新增', 1761400000000001500, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:demo:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1503, N'测试单表修改', 1500, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:demo:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001503, N'测试单表修改', 1761400000000001500, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:demo:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1504, N'测试单表删除', 1500, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:demo:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001504, N'测试单表删除', 1761400000000001500, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:demo:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1505, N'测试单表导出', 1500, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:demo:export', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001505, N'测试单表导出', 1761400000000001500, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:demo:export', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
 
-insert into sys_menu values(1506, N'测试树表', 5, 1, N'tree', N'demo/tree/index', N'', N'N', N'Y', N'C', N'0', N'0', N'demo:tree:list', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'测试树表菜单');
+insert into sys_menu values(1761400000000001506, N'测试树表', 1761400000000000005, 1, N'tree', N'demo/tree/index', N'', N'N', N'Y', N'C', N'0', N'0', N'demo:tree:list', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'测试树表菜单');
 GO
-insert into sys_menu values(1507, N'测试树表查询', 1506, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:tree:query', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001507, N'测试树表查询', 1761400000000001506, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:tree:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1508, N'测试树表新增', 1506, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:tree:add', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001508, N'测试树表新增', 1761400000000001506, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:tree:add', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1509, N'测试树表修改', 1506, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:tree:edit', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001509, N'测试树表修改', 1761400000000001506, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:tree:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1510, N'测试树表删除', 1506, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:tree:remove', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001510, N'测试树表删除', 1761400000000001506, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:tree:remove', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-insert into sys_menu values(1511, N'测试树表导出', 1506, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:tree:export', N'#', N'', N'', 103, 1, getdate(), NULL, NULL, N'');
+insert into sys_menu values(1761400000000001511, N'测试树表导出', 1761400000000001506, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'demo:tree:export', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
 
 CREATE TABLE sys_notice
@@ -1683,9 +1683,9 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_notice'
 GO
 
-INSERT sys_notice VALUES (1, N'温馨提醒：2018-07-01 若依新版本发布啦', N'2', N'新版本内容', N'0', 103, 1, getdate(), NULL, NULL, N'管理员')
+INSERT sys_notice VALUES (1761800000000000001, N'温馨提醒：2018-07-01 若依新版本发布啦', N'2', N'新版本内容', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'管理员')
 GO
-INSERT sys_notice VALUES (2, N'维护通知：2018-07-01 若依系统凌晨维护', N'1', N'维护内容', N'0', 103, 1, getdate(), NULL, NULL, N'管理员')
+INSERT sys_notice VALUES (1761800000000000002, N'维护通知：2018-07-01 若依系统凌晨维护', N'1', N'维护内容', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'管理员')
 GO
 
 CREATE TABLE sys_message
@@ -2103,13 +2103,13 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_post'
 GO
 
-INSERT sys_post VALUES (1, 103, N'ceo', NULL,  N'董事长', 1, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (1761200000000000001, 1761000000000000103, N'ceo', NULL, N'董事长', 1, N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (2, 100, N'se', NULL,  N'项目经理', 2, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (1761200000000000002, 1761000000000000100, N'se', NULL, N'项目经理', 2, N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (3, 100, N'hr', NULL,  N'人力资源', 3, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (1761200000000000003, 1761000000000000100, N'hr', NULL, N'人力资源', 3, N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'')
 GO
-INSERT sys_post VALUES (4, 100, N'user', NULL,  N'普通员工', 4, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT sys_post VALUES (1761200000000000004, 1761000000000000100, N'user', NULL, N'普通员工', 4, N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'')
 GO
 
 CREATE TABLE sys_role
@@ -2232,11 +2232,11 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_role'
 GO
 
-INSERT sys_role VALUES (1, N'超级管理员', N'superadmin', 1, N'1', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'超级管理员')
+INSERT sys_role VALUES (1761300000000000001, N'超级管理员', N'superadmin', 1, N'1', 1, 1, N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'超级管理员')
 GO
-INSERT sys_role VALUES (3, N'本部门及以下', N'test1', 3, N'4', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'');
+INSERT sys_role VALUES (1761300000000000003, N'本部门及以下', N'test1', 3, N'4', 1, 1, N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
-INSERT sys_role VALUES (4, N'仅本人', N'test2', 4, N'5', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'');
+INSERT sys_role VALUES (1761300000000000004, N'仅本人', N'test2', 4, N'5', 1, 1, N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
 
 CREATE TABLE sys_role_dept
@@ -2300,241 +2300,241 @@ GO
 -- ----------------------------
 -- 初始化-角色和菜单关联表数据
 -- ----------------------------
-INSERT sys_role_menu VALUES (3, 1);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000001);
 GO
-INSERT sys_role_menu VALUES (3, 5);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000005);
 GO
-INSERT sys_role_menu VALUES (3, 100);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000100);
 GO
-INSERT sys_role_menu VALUES (3, 101);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000101);
 GO
-INSERT sys_role_menu VALUES (3, 102);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000102);
 GO
-INSERT sys_role_menu VALUES (3, 103);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000103);
 GO
-INSERT sys_role_menu VALUES (3, 104);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000104);
 GO
-INSERT sys_role_menu VALUES (3, 105);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000105);
 GO
-INSERT sys_role_menu VALUES (3, 106);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000106);
 GO
-INSERT sys_role_menu VALUES (3, 107);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000107);
 GO
-INSERT sys_role_menu VALUES (3, 108);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000108);
 GO
-INSERT sys_role_menu VALUES (3, 118);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000118);
 GO
-INSERT sys_role_menu VALUES (3, 123);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000123);
 GO
-INSERT sys_role_menu VALUES (3, 130);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000130);
 GO
-INSERT sys_role_menu VALUES (3, 131);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000131);
 GO
-INSERT sys_role_menu VALUES (3, 132);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000132);
 GO
-INSERT sys_role_menu VALUES (3, 133);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000133);
 GO
-INSERT sys_role_menu VALUES (3, 500);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000500);
 GO
-INSERT sys_role_menu VALUES (3, 501);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000501);
 GO
-INSERT sys_role_menu VALUES (3, 1001);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001001);
 GO
-INSERT sys_role_menu VALUES (3, 1002);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001002);
 GO
-INSERT sys_role_menu VALUES (3, 1003);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001003);
 GO
-INSERT sys_role_menu VALUES (3, 1004);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001004);
 GO
-INSERT sys_role_menu VALUES (3, 1005);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001005);
 GO
-INSERT sys_role_menu VALUES (3, 1006);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001006);
 GO
-INSERT sys_role_menu VALUES (3, 1007);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001007);
 GO
-INSERT sys_role_menu VALUES (3, 1008);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001008);
 GO
-INSERT sys_role_menu VALUES (3, 1009);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001009);
 GO
-INSERT sys_role_menu VALUES (3, 1010);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001010);
 GO
-INSERT sys_role_menu VALUES (3, 1011);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001011);
 GO
-INSERT sys_role_menu VALUES (3, 1012);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001012);
 GO
-INSERT sys_role_menu VALUES (3, 1013);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001013);
 GO
-INSERT sys_role_menu VALUES (3, 1014);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001014);
 GO
-INSERT sys_role_menu VALUES (3, 1015);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001015);
 GO
-INSERT sys_role_menu VALUES (3, 1016);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001016);
 GO
-INSERT sys_role_menu VALUES (3, 1017);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001017);
 GO
-INSERT sys_role_menu VALUES (3, 1018);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001018);
 GO
-INSERT sys_role_menu VALUES (3, 1019);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001019);
 GO
-INSERT sys_role_menu VALUES (3, 1020);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001020);
 GO
-INSERT sys_role_menu VALUES (3, 1021);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001021);
 GO
-INSERT sys_role_menu VALUES (3, 1022);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001022);
 GO
-INSERT sys_role_menu VALUES (3, 1023);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001023);
 GO
-INSERT sys_role_menu VALUES (3, 1024);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001024);
 GO
-INSERT sys_role_menu VALUES (3, 1025);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001025);
 GO
-INSERT sys_role_menu VALUES (3, 1026);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001026);
 GO
-INSERT sys_role_menu VALUES (3, 1027);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001027);
 GO
-INSERT sys_role_menu VALUES (3, 1028);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001028);
 GO
-INSERT sys_role_menu VALUES (3, 1029);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001029);
 GO
-INSERT sys_role_menu VALUES (3, 1030);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001030);
 GO
-INSERT sys_role_menu VALUES (3, 1031);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001031);
 GO
-INSERT sys_role_menu VALUES (3, 1032);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001032);
 GO
-INSERT sys_role_menu VALUES (3, 1033);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001033);
 GO
-INSERT sys_role_menu VALUES (3, 1034);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001034);
 GO
-INSERT sys_role_menu VALUES (3, 1035);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001035);
 GO
-INSERT sys_role_menu VALUES (3, 1036);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001036);
 GO
-INSERT sys_role_menu VALUES (3, 1037);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001037);
 GO
-INSERT sys_role_menu VALUES (3, 1038);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001038);
 GO
-INSERT sys_role_menu VALUES (3, 1039);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001039);
 GO
-INSERT sys_role_menu VALUES (3, 1040);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001040);
 GO
-INSERT sys_role_menu VALUES (3, 1041);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001041);
 GO
-INSERT sys_role_menu VALUES (3, 1042);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001042);
 GO
-INSERT sys_role_menu VALUES (3, 1043);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001043);
 GO
-INSERT sys_role_menu VALUES (3, 1044);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001044);
 GO
-INSERT sys_role_menu VALUES (3, 1045);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001045);
 GO
-INSERT sys_role_menu VALUES (3, 1050);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001050);
 GO
-INSERT sys_role_menu VALUES (3, 1061);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001061);
 GO
-INSERT sys_role_menu VALUES (3, 1062);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001062);
 GO
-INSERT sys_role_menu VALUES (3, 1063);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001063);
 GO
-INSERT sys_role_menu VALUES (3, 1064);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001064);
 GO
-INSERT sys_role_menu VALUES (3, 1065);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001065);
 GO
-INSERT sys_role_menu VALUES (3, 1500);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001500);
 GO
-INSERT sys_role_menu VALUES (3, 1501);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001501);
 GO
-INSERT sys_role_menu VALUES (3, 1502);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001502);
 GO
-INSERT sys_role_menu VALUES (3, 1503);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001503);
 GO
-INSERT sys_role_menu VALUES (3, 1504);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001504);
 GO
-INSERT sys_role_menu VALUES (3, 1505);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001505);
 GO
-INSERT sys_role_menu VALUES (3, 1506);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001506);
 GO
-INSERT sys_role_menu VALUES (3, 1507);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001507);
 GO
-INSERT sys_role_menu VALUES (3, 1508);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001508);
 GO
-INSERT sys_role_menu VALUES (3, 1509);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001509);
 GO
-INSERT sys_role_menu VALUES (3, 1510);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001510);
 GO
-INSERT sys_role_menu VALUES (3, 1511);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001511);
 GO
-INSERT sys_role_menu VALUES (3, 1600);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001600);
 GO
-INSERT sys_role_menu VALUES (3, 1601);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001601);
 GO
-INSERT sys_role_menu VALUES (3, 1602);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001602);
 GO
-INSERT sys_role_menu VALUES (3, 1603);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001603);
 GO
-INSERT sys_role_menu VALUES (3, 1620);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001620);
 GO
-INSERT sys_role_menu VALUES (3, 1621);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001621);
 GO
-INSERT sys_role_menu VALUES (3, 1622);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001622);
 GO
-INSERT sys_role_menu VALUES (3, 1623);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000001623);
 GO
-INSERT sys_role_menu VALUES (3, 11616);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011616);
 GO
-INSERT sys_role_menu VALUES (3, 11618);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011618);
 GO
-INSERT sys_role_menu VALUES (3, 11619);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011619);
 GO
-INSERT sys_role_menu VALUES (3, 11622);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011622);
 GO
-INSERT sys_role_menu VALUES (3, 11623);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011623);
 GO
-INSERT sys_role_menu VALUES (3, 11629);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011629);
 GO
-INSERT sys_role_menu VALUES (3, 11632);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011632);
 GO
-INSERT sys_role_menu VALUES (3, 11633);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011633);
 GO
-INSERT sys_role_menu VALUES (3, 11638);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011638);
 GO
-INSERT sys_role_menu VALUES (3, 11639);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011639);
 GO
-INSERT sys_role_menu VALUES (3, 11640);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011640);
 GO
-INSERT sys_role_menu VALUES (3, 11641);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011641);
 GO
-INSERT sys_role_menu VALUES (3, 11642);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011642);
 GO
-INSERT sys_role_menu VALUES (3, 11643);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011643);
 GO
-INSERT sys_role_menu VALUES (3, 11701);
+INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000011701);
 GO
-INSERT sys_role_menu VALUES (4, 5);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000000005);
 GO
-INSERT sys_role_menu VALUES (4, 1500);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001500);
 GO
-INSERT sys_role_menu VALUES (4, 1501);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001501);
 GO
-INSERT sys_role_menu VALUES (4, 1502);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001502);
 GO
-INSERT sys_role_menu VALUES (4, 1503);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001503);
 GO
-INSERT sys_role_menu VALUES (4, 1504);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001504);
 GO
-INSERT sys_role_menu VALUES (4, 1505);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001505);
 GO
-INSERT sys_role_menu VALUES (4, 1506);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001506);
 GO
-INSERT sys_role_menu VALUES (4, 1507);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001507);
 GO
-INSERT sys_role_menu VALUES (4, 1508);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001508);
 GO
-INSERT sys_role_menu VALUES (4, 1509);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001509);
 GO
-INSERT sys_role_menu VALUES (4, 1510);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001510);
 GO
-INSERT sys_role_menu VALUES (4, 1511);
+INSERT sys_role_menu VALUES (1761300000000000004, 1761400000000001511);
 GO
 
 CREATE TABLE sys_user
@@ -2692,11 +2692,11 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_user'
 GO
 
-INSERT sys_user VALUES (1, 103, N'admin', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@163.com', N'15888888888', N'1', NULL, N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), NULL, NULL, N'管理员')
+INSERT sys_user VALUES (1761100000000000001, 1761000000000000103, N'admin', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@163.com', N'15888888888', N'1', NULL, N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'管理员')
 GO
-INSERT sys_user VALUES (3, 108, N'test', N'本部门及以下 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), 3, getdate(), NULL);
+INSERT sys_user VALUES (1761100000000000003, 1761000000000000108, N'test', N'本部门及以下 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000003, getdate(), NULL);
 GO
-INSERT sys_user VALUES (4, 102, N'test1', N'仅本人 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), 4, getdate(), NULL);
+INSERT sys_user VALUES (1761100000000000004, 1761000000000000102, N'test1', N'仅本人 密码666666', N'sys_user', N'', N'', N'0', NULL, N'$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', N'0', N'0', N'127.0.0.1', getdate(), 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000004, getdate(), NULL);
 GO
 
 CREATE TABLE sys_user_post
@@ -2728,7 +2728,7 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_user_post'
 GO
 
-INSERT sys_user_post VALUES (1, 1)
+INSERT sys_user_post VALUES (1761100000000000001, 1761200000000000001)
 GO
 
 CREATE TABLE sys_user_role
@@ -2760,11 +2760,11 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_user_role'
 GO
 
-INSERT sys_user_role VALUES (1, 1)
+INSERT sys_user_role VALUES (1761100000000000001, 1761300000000000001)
 GO
-INSERT sys_user_role VALUES (3, 3);
+INSERT sys_user_role VALUES (1761100000000000003, 1761300000000000003);
 GO
-INSERT sys_user_role VALUES (4, 4);
+INSERT sys_user_role VALUES (1761100000000000004, 1761300000000000004);
 GO
 
 CREATE TABLE sys_oss
@@ -3014,15 +3014,15 @@ EXEC sp_addextendedproperty
     'TABLE', N'sys_oss_config'
 GO
 
-INSERT INTO sys_oss_config VALUES (N'1', N'minio', N'ruoyi',            N'ruoyi123',        N'ruoyi',            N'', N'127.0.0.1:9000',                    N'',N'N', N'',           N'1', N'Y', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO sys_oss_config VALUES (1761900000000000001, N'minio', N'ruoyi', N'ruoyi123', N'ruoyi', N'', N'127.0.0.1:9000', N'', N'N', N'', N'1', N'Y', N'', 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000001, getdate(), NULL);
 GO
-INSERT INTO sys_oss_config VALUES (N'2', N'qiniu', N'XXXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N's3-cn-north-1.qiniucs.com',         N'',N'N', N'',           N'1', N'N', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO sys_oss_config VALUES (1761900000000000002, N'qiniu', N'XXXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi', N'', N's3-cn-north-1.qiniucs.com', N'', N'N', N'', N'1', N'N', N'', 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000001, getdate(), NULL);
 GO
-INSERT INTO sys_oss_config VALUES (N'3', N'aliyun', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N'oss-cn-beijing.aliyuncs.com',       N'',N'N', N'',           N'1', N'N', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO sys_oss_config VALUES (1761900000000000003, N'aliyun', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi', N'', N'oss-cn-beijing.aliyuncs.com', N'', N'N', N'', N'1', N'N', N'', 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000001, getdate(), NULL);
 GO
-INSERT INTO sys_oss_config VALUES (N'4', N'qcloud', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi-1250000000', N'', N'cos.ap-beijing.myqcloud.com',       N'',N'N', N'ap-beijing', N'1', N'N', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO sys_oss_config VALUES (1761900000000000004, N'qcloud', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi-1250000000', N'', N'cos.ap-beijing.myqcloud.com', N'', N'N', N'ap-beijing', N'1', N'N', N'', 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000001, getdate(), NULL);
 GO
-INSERT INTO sys_oss_config VALUES (N'5', N'image',  N'ruoyi',           N'ruoyi123',        N'ruoyi',            N'image', N'127.0.0.1:9000',               N'',N'N', N'',           N'1', N'N', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO sys_oss_config VALUES (1761900000000000005, N'image', N'ruoyi', N'ruoyi123', N'ruoyi', N'image', N'127.0.0.1:9000', N'', N'N', N'', N'1', N'N', N'', 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000001, getdate(), NULL);
 GO
 
 
@@ -3146,9 +3146,9 @@ EXEC sp_addextendedproperty
     'TABLE', N'sys_client'
 GO
 
-INSERT INTO sys_client VALUES (N'1', N'e5cd7e4891bf95d1d19206ce24a7b32e', N'pc', N'pc123', N'password,social', N'pc', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
+INSERT INTO sys_client VALUES (1762000000000000001, N'e5cd7e4891bf95d1d19206ce24a7b32e', N'pc', N'pc123', N'password,social', N'pc', 1800, 604800, N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000001, getdate());
 GO
-INSERT INTO sys_client VALUES (N'2', N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms,social', N'android', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
+INSERT INTO sys_client VALUES (1762000000000000002, N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms,social', N'android', 1800, 604800, N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000001, getdate());
 GO
 
 CREATE TABLE test_demo
@@ -3381,57 +3381,57 @@ EXEC sp_addextendedproperty
     'TABLE', N'test_tree'
 GO
 
-INSERT test_demo VALUES (1, 102, 4, 1, N'测试数据权限', N'测试', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000001, 1761000000000000102, 1761100000000000004, 1, N'测试数据权限', N'测试', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (2, 102, 3, 2, N'子节点1', N'111', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000002, 1761000000000000102, 1761100000000000003, 2, N'子节点1', N'111', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (3, 102, 3, 3, N'子节点2', N'222', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000003, 1761000000000000102, 1761100000000000003, 3, N'子节点2', N'222', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (4, 108, 4, 4, N'测试数据', N'demo', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000004, 1761000000000000108, 1761100000000000004, 4, N'测试数据', N'demo', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (5, 108, 3, 13, N'子节点11', N'1111', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000005, 1761000000000000108, 1761100000000000003, 13, N'子节点11', N'1111', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (6, 108, 3, 12, N'子节点22', N'2222', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000006, 1761000000000000108, 1761100000000000003, 12, N'子节点22', N'2222', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (7, 108, 3, 11, N'子节点33', N'3333', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000007, 1761000000000000108, 1761100000000000003, 11, N'子节点33', N'3333', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (8, 108, 3, 10, N'子节点44', N'4444', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000008, 1761000000000000108, 1761100000000000003, 10, N'子节点44', N'4444', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (9, 108, 3, 9, N'子节点55', N'5555', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000009, 1761000000000000108, 1761100000000000003, 9, N'子节点55', N'5555', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (10, 108, 3, 8, N'子节点66', N'6666', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000010, 1761000000000000108, 1761100000000000003, 8, N'子节点66', N'6666', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (11, 108, 3, 7, N'子节点77', N'7777', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000011, 1761000000000000108, 1761100000000000003, 7, N'子节点77', N'7777', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (12, 108, 3, 6, N'子节点88', N'8888', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000012, 1761000000000000108, 1761100000000000003, 6, N'子节点88', N'8888', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_demo VALUES (13, 108, 3, 5, N'子节点99', N'9999', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_demo VALUES (1762100000000000013, 1761000000000000108, 1761100000000000003, 5, N'子节点99', N'9999', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
 
-INSERT test_tree VALUES (1, 0, 102, 4, N'测试数据权限', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000001, NULL, 1761000000000000102, 1761100000000000004, N'测试数据权限', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (2, 1, 102, 3, N'子节点1', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000002, 1762200000000000001, 1761000000000000102, 1761100000000000003, N'子节点1', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (3, 2, 102, 3, N'子节点2', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000003, 1762200000000000002, 1761000000000000102, 1761100000000000003, N'子节点2', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (4, 0, 108, 4, N'测试树1', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000004, NULL, 1761000000000000108, 1761100000000000004, N'测试树1', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (5, 4, 108, 3, N'子节点11', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000005, 1762200000000000004, 1761000000000000108, 1761100000000000003, N'子节点11', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (6, 4, 108, 3, N'子节点22', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000006, 1762200000000000004, 1761000000000000108, 1761100000000000003, N'子节点22', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (7, 4, 108, 3, N'子节点33', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000007, 1762200000000000004, 1761000000000000108, 1761100000000000003, N'子节点33', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (8, 5, 108, 3, N'子节点44', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000008, 1762200000000000005, 1761000000000000108, 1761100000000000003, N'子节点44', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (9, 6, 108, 3, N'子节点55', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000009, 1762200000000000006, 1761000000000000108, 1761100000000000003, N'子节点55', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (10, 7, 108, 3, N'子节点66', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000010, 1762200000000000007, 1761000000000000108, 1761100000000000003, N'子节点66', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (11, 7, 108, 3, N'子节点77', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000011, 1762200000000000007, 1761000000000000108, 1761100000000000003, N'子节点77', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (12, 10, 108, 3, N'子节点88', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000012, 1762200000000000010, 1761000000000000108, 1761100000000000003, N'子节点88', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
-INSERT test_tree VALUES (13, 10, 108, 3, N'子节点99', 0, 103, getdate(), 1, NULL, NULL, 0);
+INSERT test_tree VALUES (1762200000000000013, 1762200000000000010, 1761000000000000108, 1761100000000000003, N'子节点99', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
 

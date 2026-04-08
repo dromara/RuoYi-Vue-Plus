@@ -479,7 +479,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
 
         // 非超级管理员，禁止包含超级管理员角色
         if (!LoginHelper.isSuperAdmin(userId)) {
-            roleList.remove(SystemConstants.SUPER_ADMIN_ID);
+            roleList.remove(SystemConstants.SUPER_ADMIN_ROLE_ID);
         }
 
         // 移除超管角色后若无剩余角色，说明仅选了超管角色且不允许分配，显式报错

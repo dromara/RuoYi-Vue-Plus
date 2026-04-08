@@ -58,9 +58,14 @@ public interface SystemConstants {
     String INNER_LINK = "InnerLink";
 
     /**
-     * 超级管理员ID
+     * 超级管理员用户ID
      */
-    Long SUPER_ADMIN_ID = 1L;
+    Long SUPER_ADMIN_USER_ID = 1761100000000000001L;
+
+    /**
+     * 超级管理员角色ID
+     */
+    Long SUPER_ADMIN_ROLE_ID = 1761300000000000001L;
 
     /**
      * 超级管理员角色 roleKey
@@ -75,7 +80,7 @@ public interface SystemConstants {
     /**
      * 默认部门 ID
      */
-    Long DEFAULT_DEPT_ID = 100L;
+    Long DEFAULT_DEPT_ID = 1761000000000000100L;
 
     /**
      * 排除敏感属性字段

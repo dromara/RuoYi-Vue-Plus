@@ -226,7 +226,7 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
      */
     @Override
     public void checkRoleAllowed(SysRoleBo role) {
-        if (ObjectUtil.isNotNull(role.getRoleId()) && LoginHelper.isSuperAdmin(role.getRoleId())) {
+        if (ObjectUtil.isNotNull(role.getRoleId()) && SystemConstants.SUPER_ADMIN_ROLE_ID.equals(role.getRoleId())) {
             throw new ServiceException("不允许操作超级管理员角色");
         }
         String[] keys = new String[]{SystemConstants.SUPER_ADMIN_ROLE_KEY};

@@ -94,7 +94,7 @@ public class SysRoleVo implements Serializable {
     private boolean flag = false;
 
     public boolean isSuperAdmin() {
-        return SystemConstants.SUPER_ADMIN_ID.equals(this.roleId);
+        return SystemConstants.SUPER_ADMIN_ROLE_ID.equals(this.roleId);
     }
 
 }

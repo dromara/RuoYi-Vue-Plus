@@ -145,7 +145,7 @@
   "flowCode": "leave4",
   "flowName": "请假申请-会签",
   "modelValue": "CLASSICS",
-  "category": "103",
+  "category": "1762300000000000103",
   "version": "1",
   "formCustom": "N",
   "formPath": "/workflow/leaveEdit/index",

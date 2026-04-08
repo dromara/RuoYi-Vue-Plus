@@ -109,7 +109,7 @@ public class SysUser extends BaseEntity {
     }
 
     public boolean isSuperAdmin() {
-        return SystemConstants.SUPER_ADMIN_ID.equals(this.userId);
+        return SystemConstants.SUPER_ADMIN_USER_ID.equals(this.userId);
     }
 
 }
