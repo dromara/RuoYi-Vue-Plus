@@ -1821,7 +1821,13 @@ CREATE TABLE sys_oper_log
     request_method nvarchar(10)   DEFAULT ''    NULL,
     operator_type  int            DEFAULT ((0)) NULL,
     oper_name      nvarchar(50)   DEFAULT ''    NULL,
+    user_id        bigint                       NULL,
+    dept_id        bigint                       NULL,
     dept_name      nvarchar(50)   DEFAULT ''    NULL,
+    client_key     nvarchar(32)   DEFAULT ''    NULL,
+    device_type    nvarchar(32)   DEFAULT ''    NULL,
+    browser        nvarchar(50)   DEFAULT ''    NULL,
+    os             nvarchar(50)   DEFAULT ''    NULL,
     oper_url       nvarchar(255)  DEFAULT ''    NULL,
     oper_ip        nvarchar(128)  DEFAULT ''    NULL,
     oper_location  nvarchar(255)  DEFAULT ''    NULL,
@@ -1839,6 +1845,8 @@ ON [PRIMARY]
 GO
 
 CREATE NONCLUSTERED INDEX idx_sys_oper_log_bt ON sys_oper_log (business_type)
+GO
+CREATE NONCLUSTERED INDEX idx_sys_oper_log_uid ON sys_oper_log (user_id)
 GO
 CREATE NONCLUSTERED INDEX idx_sys_oper_log_s ON sys_oper_log (status)
 GO
@@ -1888,10 +1896,46 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'oper_name'
 GO
 EXEC sys.sp_addextendedproperty
+    'MS_Description', N'操作用户ID' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_oper_log',
+    'COLUMN', N'user_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'操作部门ID' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_oper_log',
+    'COLUMN', N'dept_id'
+GO
+EXEC sys.sp_addextendedproperty
     'MS_Description', N'部门名称' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oper_log',
     'COLUMN', N'dept_name'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'客户端' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_oper_log',
+    'COLUMN', N'client_key'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'设备类型' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_oper_log',
+    'COLUMN', N'device_type'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'浏览器类型' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_oper_log',
+    'COLUMN', N'browser'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'操作系统' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_oper_log',
+    'COLUMN', N'os'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'请求URL' ,

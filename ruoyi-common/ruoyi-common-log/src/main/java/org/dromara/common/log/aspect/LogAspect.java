@@ -96,13 +96,25 @@ public class LogAspect {
             // *========数据库日志=========*//
             OperLogEvent operLog = new OperLogEvent();
             operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
+            HttpServletRequest request = ServletUtils.getRequest();
             // 请求的地址
             String ip = ServletUtils.getClientIP();
             operLog.setOperIp(ip);
-            operLog.setOperUrl(StringUtils.substring(ServletUtils.getRequest().getRequestURI(), 0, 255));
+            operLog.setOperUrl(StringUtils.substring(request.getRequestURI(), 0, 255));
+            operLog.setClientKey(StringUtils.substring(request.getHeader(LoginHelper.CLIENT_KEY), 0, 32));
             LoginUser loginUser = LoginHelper.getLoginUser();
-            operLog.setOperName(loginUser.getUsername());
-            operLog.setDeptName(loginUser.getDeptName());
+            if (ObjectUtil.isNotNull(loginUser)) {
+                operLog.setOperName(loginUser.getUsername());
+                operLog.setUserId(loginUser.getUserId());
+                operLog.setDeptId(loginUser.getDeptId());
+                operLog.setDeptName(loginUser.getDeptName());
+                operLog.setDeviceType(loginUser.getDeviceType());
+                operLog.setBrowser(loginUser.getBrowser());
+                operLog.setOs(loginUser.getOs());
+                if (StringUtils.isBlank(operLog.getClientKey())) {
+                    operLog.setClientKey(loginUser.getClientKey());
+                }
+            }
 
             if (e != null) {
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());
@@ -113,7 +125,7 @@ public class LogAspect {
             String methodName = joinPoint.getSignature().getName();
             operLog.setMethod(className + "." + methodName + "()");
             // 设置请求方式
-            operLog.setRequestMethod(ServletUtils.getRequest().getMethod());
+            operLog.setRequestMethod(request.getMethod());
             // 处理设置注解上的参数
             getControllerMethodDescription(joinPoint, controllerLog, operLog, jsonResult);
             // 设置消耗时间

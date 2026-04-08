@@ -514,7 +514,13 @@ create table sys_oper_log (
     request_method    varchar(10)     default ''                 comment '请求方式',
     operator_type     int(1)          default 0                  comment '操作类别（0其它 1后台用户 2手机端用户）',
     oper_name         varchar(50)     default ''                 comment '操作人员',
+    user_id           bigint(20)      default null               comment '操作用户ID',
+    dept_id           bigint(20)      default null               comment '操作部门ID',
     dept_name         varchar(50)     default ''                 comment '部门名称',
+    client_key        varchar(32)     default ''                 comment '客户端',
+    device_type       varchar(32)     default ''                 comment '设备类型',
+    browser           varchar(50)     default ''                 comment '浏览器类型',
+    os                varchar(50)     default ''                 comment '操作系统',
     oper_url          varchar(255)    default ''                 comment '请求URL',
     oper_ip           varchar(128)    default ''                 comment '主机地址',
     oper_location     varchar(255)    default ''                 comment '操作地点',
@@ -526,6 +532,7 @@ create table sys_oper_log (
     cost_time         bigint(20)      default 0                  comment '消耗时间',
     primary key (oper_id),
     key idx_sys_oper_log_bt (business_type),
+    key idx_sys_oper_log_uid (user_id),
     key idx_sys_oper_log_s  (status),
     key idx_sys_oper_log_ot (oper_time)
 ) engine=innodb comment = '操作日志记录';

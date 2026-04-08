@@ -664,7 +664,13 @@ create table sys_oper_log (
   request_method    varchar2(10)     default '',
   operator_type     number(1)       default 0,
   oper_name         varchar2(50)    default '',
+  user_id           number(20)      default null,
+  dept_id           number(20)      default null,
   dept_name         varchar2(50)    default '',
+  client_key        varchar2(32)    default '',
+  device_type       varchar2(32)    default '',
+  browser           varchar2(50)    default '',
+  os                varchar2(50)    default '',
   oper_url          varchar2(255)   default '',
   oper_ip           varchar2(128)   default '',
   oper_location     varchar2(255)   default '',
@@ -678,6 +684,7 @@ create table sys_oper_log (
 
 alter table sys_oper_log add constraint pk_sys_oper_log primary key (oper_id);
 create index idx_sys_oper_log_bt on sys_oper_log (business_type);
+create index idx_sys_oper_log_uid on sys_oper_log (user_id);
 create index idx_sys_oper_log_s on sys_oper_log (status);
 create index idx_sys_oper_log_ot on sys_oper_log (oper_time);
 
@@ -689,7 +696,13 @@ comment on column sys_oper_log.method         is '方法名称';
 comment on column sys_oper_log.request_method is '请求方式';
 comment on column sys_oper_log.operator_type  is '操作类别（0其它 1后台用户 2手机端用户）';
 comment on column sys_oper_log.oper_name      is '操作人员';
+comment on column sys_oper_log.user_id        is '操作用户ID';
+comment on column sys_oper_log.dept_id        is '操作部门ID';
 comment on column sys_oper_log.dept_name      is '部门名称';
+comment on column sys_oper_log.client_key     is '客户端';
+comment on column sys_oper_log.device_type    is '设备类型';
+comment on column sys_oper_log.browser        is '浏览器类型';
+comment on column sys_oper_log.os             is '操作系统';
 comment on column sys_oper_log.oper_url       is '请求URL';
 comment on column sys_oper_log.oper_ip        is '主机地址';
 comment on column sys_oper_log.oper_location  is '操作地点';

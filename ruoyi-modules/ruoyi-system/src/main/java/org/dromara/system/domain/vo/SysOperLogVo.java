@@ -77,10 +77,47 @@ public class SysOperLogVo implements Serializable {
     private String operName;
 
     /**
+     * 操作用户ID
+     */
+    @ExcelProperty(value = "操作用户ID")
+    private Long userId;
+
+    /**
+     * 操作部门ID
+     */
+    @ExcelProperty(value = "操作部门ID")
+    private Long deptId;
+
+    /**
      * 部门名称
      */
     @ExcelProperty(value = "部门名称")
     private String deptName;
+
+    /**
+     * 客户端
+     */
+    @ExcelProperty(value = "客户端")
+    private String clientKey;
+
+    /**
+     * 设备类型
+     */
+    @ExcelProperty(value = "设备类型", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "sys_device_type")
+    private String deviceType;
+
+    /**
+     * 浏览器类型
+     */
+    @ExcelProperty(value = "浏览器")
+    private String browser;
+
+    /**
+     * 操作系统
+     */
+    @ExcelProperty(value = "操作系统")
+    private String os;
 
     /**
      * 请求URL
