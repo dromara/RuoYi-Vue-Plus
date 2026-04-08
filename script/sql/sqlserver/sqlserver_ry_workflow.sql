@@ -1561,106 +1561,106 @@ EXEC sp_addextendedproperty
 'TABLE', N'test_leave'
 GO
 
-INSERT sys_menu VALUES (11616, N'工作流', 0, 6, N'workflow', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'workflow', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11616, N'工作流', 0, 6, N'workflow', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'workflow', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11618, N'我的任务', 0, 7, N'task', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'my-task', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11618, N'我的任务', 0, 7, N'task', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'my-task', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11619, N'我的待办', 11618, 2, N'taskWaiting', N'workflow/task/taskWaiting', N'', N'N', N'N', N'C', N'0', N'0', N'', N'waiting', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11619, N'我的待办', 11618, 2, N'taskWaiting', N'workflow/task/taskWaiting', N'', N'N', N'N', N'C', N'0', N'0', N'', N'waiting', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11632, N'我的已办', 11618, 3, N'taskFinish', N'workflow/task/taskFinish', N'', N'N', N'N', N'C', N'0', N'0', N'', N'finish', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11632, N'我的已办', 11618, 3, N'taskFinish', N'workflow/task/taskFinish', N'', N'N', N'N', N'C', N'0', N'0', N'', N'finish', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11633, N'我的抄送', 11618, 4, N'taskCopyList', N'workflow/task/taskCopyList', N'', N'N', N'N', N'C', N'0', N'0', N'', N'my-copy', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11633, N'我的抄送', 11618, 4, N'taskCopyList', N'workflow/task/taskCopyList', N'', N'N', N'N', N'C', N'0', N'0', N'', N'my-copy', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11620, N'流程定义', 11616, 3, N'processDefinition', N'workflow/processDefinition/index', N'', N'N', N'N', N'C', N'0', N'0', N'workflow:definition:list', N'process-definition', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11620, N'流程定义', 11616, 3, N'processDefinition', N'workflow/processDefinition/index', N'', N'N', N'N', N'C', N'0', N'0', N'workflow:definition:list', N'process-definition', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11621, N'流程实例', 11630, 1, N'processInstance', N'workflow/processInstance/index', N'', N'N', N'N', N'C', N'0', N'0', N'workflow:instance:list', N'tree-table', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11621, N'流程实例', 11630, 1, N'processInstance', N'workflow/processInstance/index', N'', N'N', N'N', N'C', N'0', N'0', N'workflow:instance:list', N'tree-table', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11622, N'流程分类', 11616, 1, N'category', N'workflow/category/index', N'', N'N', N'Y', N'C', N'0', N'0', N'workflow:category:list', N'category', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11622, N'流程分类', 11616, 1, N'category', N'workflow/category/index', N'', N'N', N'Y', N'C', N'0', N'0', N'workflow:category:list', N'category', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11629, N'我发起的', 11618, 1, N'myDocument', N'workflow/task/myDocument', N'', N'N', N'N', N'C', N'0', N'0', N'workflow:instance:currentList', N'guide', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11629, N'我发起的', 11618, 1, N'myDocument', N'workflow/task/myDocument', N'', N'N', N'N', N'C', N'0', N'0', N'workflow:instance:currentList', N'guide', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11630, N'流程监控', 11616, 4, N'processMonitor', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'monitor', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11630, N'流程监控', 11616, 4, N'processMonitor', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'monitor', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11631, N'待办任务', 11630, 2, N'allTaskWaiting', N'workflow/task/allTaskWaiting', N'', N'N', N'N', N'C', N'0', N'0', N'', N'waiting', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11631, N'待办任务', 11630, 2, N'allTaskWaiting', N'workflow/task/allTaskWaiting', N'', N'N', N'N', N'C', N'0', N'0', N'', N'waiting', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11700, N'流程设计', 11616, 5, N'design/index',   N'workflow/processDefinition/design', N'', N'N', N'N', N'C', N'1', N'0', N'workflow:leave:edit', N'#', 103, 1, GETDATE(), NULL, NULL, N'/workflow/processDefinition');
+INSERT sys_menu VALUES (11700, N'流程设计', 11616, 5, N'design/index', N'workflow/processDefinition/design', N'', N'N', N'N', N'C', N'1', N'0', N'workflow:leave:edit', N'#', N'/workflow/processDefinition', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11701, N'请假申请', 11616, 6, N'leaveEdit/index', N'workflow/leave/leaveEdit', N'', N'N', N'N', N'C', N'1', N'0', N'workflow:leave:edit', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11701, N'请假申请', 11616, 6, N'leaveEdit/index', N'workflow/leave/leaveEdit', N'', N'N', N'N', N'C', N'1', N'0', N'workflow:leave:edit', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
 
 -- 流程分类管理相关按钮
-INSERT sys_menu VALUES (11623, N'流程分类查询', 11622, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:category:query', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11623, N'流程分类查询', 11622, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:category:query', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11624, N'流程分类新增', 11622, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:category:add', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11624, N'流程分类新增', 11622, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:category:add', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11625, N'流程分类修改', 11622, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:category:edit', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11625, N'流程分类修改', 11622, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:category:edit', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11626, N'流程分类删除', 11622, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:category:remove', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11626, N'流程分类删除', 11622, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:category:remove', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11627, N'流程分类导出', 11622, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:category:export', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11627, N'流程分类导出', 11622, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:category:export', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
 
 -- 流程实例管理相关按钮
-INSERT sys_menu VALUES (11653, N'流程实例查询', 11621, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:query', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11653, N'流程实例查询', 11621, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:query', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11654, N'流程变量查询', 11621, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:variableQuery', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11654, N'流程变量查询', 11621, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:variableQuery', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11655, N'流程变量修改', 11621, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:variable', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11655, N'流程变量修改', 11621, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:variable', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11656, N'流程实例激活/挂起', 11621, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:active', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11656, N'流程实例激活/挂起', 11621, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:active', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11657, N'流程实例删除', 11621, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:remove', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11657, N'流程实例删除', 11621, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:remove', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11658, N'流程实例作废', 11621, 6, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:invalid', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11658, N'流程实例作废', 11621, 6, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:invalid', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11659, N'流程实例撤销', 11621, 7, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:cancel', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11659, N'流程实例撤销', 11621, 7, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:instance:cancel', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
 
 -- 流程定义管理相关按钮
-INSERT sys_menu VALUES (11644, N'流程定义查询', 11620, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:query', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11644, N'流程定义查询', 11620, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:query', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11645, N'流程定义新增', 11620, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:add', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11645, N'流程定义新增', 11620, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:add', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11646, N'流程定义修改', 11620, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:edit', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11646, N'流程定义修改', 11620, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:edit', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11647, N'流程定义删除', 11620, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:remove', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11647, N'流程定义删除', 11620, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:remove', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11648, N'流程定义导出', 11620, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:export', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11648, N'流程定义导出', 11620, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:export', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11649, N'流程定义导入', 11620, 6, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:import', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11649, N'流程定义导入', 11620, 6, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:import', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11650, N'流程定义发布/取消发布', 11620, 7, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:publish', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11650, N'流程定义发布/取消发布', 11620, 7, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:publish', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11651, N'流程定义复制', 11620, 8, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:copy', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11651, N'流程定义复制', 11620, 8, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:copy', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11652, N'流程定义激活/挂起', 11620, 9, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:active', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11652, N'流程定义激活/挂起', 11620, 9, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:definition:active', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
 
-INSERT sys_menu VALUES (11801, N'流程表达式', N'11616', 2, N'spel', N'workflow/spel/index', N'', N'N', N'Y', N'C', N'0', N'0', N'workflow:spel:list', N'input', 103, 1, GETDATE(), 1, GETDATE(), N'流程达式定义菜单');
+INSERT sys_menu VALUES (11801, N'流程表达式', N'11616', 2, N'spel', N'workflow/spel/index', N'', N'N', N'Y', N'C', N'0', N'0', N'workflow:spel:list', N'input', N'', N'', 103, 1, GETDATE(), 1, GETDATE(), N'流程达式定义菜单');
 GO
-INSERT sys_menu VALUES (11802, N'流程spel表达式定义查询', N'11801', 1, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:query', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11802, N'流程spel表达式定义查询', N'11801', 1, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:query', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11803, N'流程spel表达式定义新增', N'11801', 2, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:add', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11803, N'流程spel表达式定义新增', N'11801', 2, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:add', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11804, N'流程spel表达式定义修改', N'11801', 3, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:edit', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11804, N'流程spel表达式定义修改', N'11801', 3, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:edit', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11805, N'流程spel表达式定义删除', N'11801', 4, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:remove', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11805, N'流程spel表达式定义删除', N'11801', 4, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:remove', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11806, N'流程spel表达式定义导出', N'11801', 5, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:export', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11806, N'流程spel表达式定义导出', N'11801', 5, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:export', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
 
 -- 请假测试相关按钮
-INSERT sys_menu VALUES (11638, N'请假申请', 5, 1, N'leave', N'workflow/leave/index', N'', N'N', N'Y', N'C', N'0', N'0', N'workflow:leave:list', N'#', 103, 1, GETDATE(), NULL, NULL, N'请假申请菜单');
+INSERT sys_menu VALUES (11638, N'请假申请', 5, 1, N'leave', N'workflow/leave/index', N'', N'N', N'Y', N'C', N'0', N'0', N'workflow:leave:list', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'请假申请菜单');
 GO
-INSERT sys_menu VALUES (11639, N'请假申请查询', 11638, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:leave:query', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11639, N'请假申请查询', 11638, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:leave:query', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11640, N'请假申请新增', 11638, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:leave:add', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11640, N'请假申请新增', 11638, 2, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:leave:add', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11641, N'请假申请修改', 11638, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:leave:edit', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11641, N'请假申请修改', 11638, 3, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:leave:edit', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11642, N'请假申请删除', 11638, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:leave:remove', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11642, N'请假申请删除', 11638, 4, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:leave:remove', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (11643, N'请假申请导出', 11638, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:leave:export', N'#', 103, 1, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (11643, N'请假申请导出', 11638, 5, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:leave:export', N'#', N'', N'', 103, 1, GETDATE(), NULL, NULL, N'');
 
 INSERT sys_dict_type VALUES (13, N'业务状态', N'wf_business_status', 103, 1, GETDATE(), NULL, NULL, N'业务状态列表');
 GO

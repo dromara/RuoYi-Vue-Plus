@@ -96,6 +96,16 @@ public class SysMenu extends BaseEntity {
     private String icon;
 
     /**
+     * 激活菜单路径
+     */
+    private String activeMenu;
+
+    /**
+     * 扩展字段
+     */
+    private String ext;
+
+    /**
      * 备注
      */
     private String remark;

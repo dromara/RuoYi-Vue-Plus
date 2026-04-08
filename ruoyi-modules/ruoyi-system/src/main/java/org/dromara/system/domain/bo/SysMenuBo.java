@@ -109,6 +109,18 @@ public class SysMenuBo implements Serializable {
     private String icon;
 
     /**
+     * 激活菜单路径
+     */
+    @Size(min = 0, max = 255, message = "激活菜单路径长度不能超过{max}个字符")
+    private String activeMenu;
+
+    /**
+     * 扩展字段
+     */
+    @Size(min = 0, max = 2000, message = "扩展字段长度不能超过{max}个字符")
+    private String ext;
+
+    /**
      * 备注
      */
     private String remark;
