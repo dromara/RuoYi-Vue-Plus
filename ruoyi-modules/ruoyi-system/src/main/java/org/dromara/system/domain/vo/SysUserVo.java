@@ -109,6 +109,11 @@ public class SysUserVo implements Serializable {
     private LocalDateTime createTime;
 
     /**
+     * 更新时间
+     */
+    private LocalDateTime updateTime;
+
+    /**
      * 部门名
      */
     @Translation(type = TransConstant.DEPT_ID_TO_NAME, mapper = "deptId")
