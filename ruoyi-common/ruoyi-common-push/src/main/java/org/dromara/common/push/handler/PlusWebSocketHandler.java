@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.core.domain.model.LoginUser;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.enums.PushSourceEnum;
 import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.push.constant.MessageConstants;
@@ -61,7 +62,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
             token,
             new ConcurrentWebSocketSessionDecorator(session, 10 * 1000, 64_000)
         );
-        log.info("[connect] sessionId: {}, userId:{}, token:{}", session.getId(), loginUser.getUserId(), token);
+        log.info("[connect] sessionId: {}, userId:{}, token:***{}", session.getId(), loginUser.getUserId(), StringUtils.right(token, 8));
     }
 
     /**
@@ -138,7 +139,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
 
         // 从会话管理器中移除连接
         webSocketSessionManager.disconnect(loginUser.getUserId(), token);
-        log.info("[disconnect] sessionId: {}, userId:{}, token:{}", session.getId(), loginUser.getUserId(), token);
+        log.info("[disconnect] sessionId: {}, userId:{}, token:***{}", session.getId(), loginUser.getUserId(), StringUtils.right(token, 8));
     }
 
     /**
