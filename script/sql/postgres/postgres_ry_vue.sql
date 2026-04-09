@@ -88,6 +88,8 @@ create table if not exists sys_dept
     constraint "sys_dept_pk" primary key (dept_id)
 );
 
+create index idx_sys_dept_parent_id ON sys_dept (parent_id);
+
 comment on table sys_dept               is '部门表';
 comment on column sys_dept.dept_id      is '部门ID';
 comment on column sys_dept.parent_id    is '父部门ID';
@@ -148,6 +150,11 @@ create table if not exists sys_user
     constraint "sys_user_pk" primary key (user_id)
 );
 
+create index idx_sys_user_dept_id ON sys_user (dept_id);
+create index idx_sys_user_create_by ON sys_user (create_by);
+create index idx_sys_user_user_name ON sys_user (user_name);
+create index idx_sys_user_phone ON sys_user (phone_number);
+
 comment on table sys_user               is '用户信息表';
 comment on column sys_user.user_id      is '用户ID';
 comment on column sys_user.dept_id      is '部门ID';
@@ -199,6 +206,8 @@ create table if not exists sys_post
     constraint "sys_post_pk" primary key (post_id)
 );
 
+create index idx_sys_post_dept_id ON sys_post (dept_id);
+
 comment on table sys_post               is '岗位信息表';
 comment on column sys_post.post_id      is '岗位ID';
 comment on column sys_post.dept_id      is '部门id';
@@ -244,6 +253,9 @@ create table if not exists sys_role
     remark              varchar(500) default null::varchar,
     constraint "sys_role_pk" primary key (role_id)
 );
+
+create index idx_sys_role_create_dept ON sys_role (create_dept);
+create index idx_sys_role_create_by ON sys_role (create_by);
 
 comment on table sys_role                       is '角色信息表';
 comment on column sys_role.role_id              is '角色ID';
@@ -468,6 +480,8 @@ create table if not exists sys_user_role
     role_id int8 not null,
     constraint sys_user_role_pk primary key (user_id, role_id)
 );
+
+create index idx_sys_user_role_rid ON sys_user_role (role_id);
 
 comment on table sys_user_role              is '用户和角色关联表';
 comment on column sys_user_role.user_id     is '用户ID';
@@ -773,6 +787,8 @@ create table if not exists sys_dict_data
     remark      varchar(500) default null::varchar,
     constraint sys_dict_data_pk primary key (dict_code)
 );
+
+create index idx_sys_dict_data_type ON sys_dict_data (dict_type);
 
 comment on table sys_dict_data                  is '字典数据表';
 comment on column sys_dict_data.dict_code       is '字典编码';

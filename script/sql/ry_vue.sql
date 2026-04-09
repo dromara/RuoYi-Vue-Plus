@@ -54,7 +54,8 @@ create table sys_dept (
     create_time       datetime                                   comment '创建时间',
     update_by         bigint(20)      default null               comment '更新者',
     update_time       datetime                                   comment '更新时间',
-    primary key (dept_id)
+    primary key (dept_id),
+    key idx_sys_dept_parent_id (parent_id)
 ) engine=innodb comment = '部门表';
 
 -- ----------------------------
@@ -98,7 +99,11 @@ create table sys_user (
     update_by         bigint(20)      default null               comment '更新者',
     update_time       datetime                                   comment '更新时间',
     remark            varchar(500)    default null               comment '备注',
-    primary key (user_id)
+    primary key (user_id),
+    key idx_sys_user_dept_id   (dept_id),
+    key idx_sys_user_create_by (create_by),
+    key idx_sys_user_user_name (user_name),
+    key idx_sys_user_phone     (phone_number)
 ) engine=innodb comment = '用户信息表';
 
 -- ----------------------------
@@ -126,7 +131,8 @@ create table sys_post
     update_by     bigint(20)      default null               comment '更新者',
     update_time   datetime                                   comment '更新时间',
     remark        varchar(500)    default null               comment '备注',
-    primary key (post_id)
+    primary key (post_id),
+    key idx_sys_post_dept_id (dept_id)
 ) engine=innodb comment = '岗位信息表';
 
 -- ----------------------------
@@ -157,7 +163,9 @@ create table sys_role (
     update_by            bigint(20)      default null               comment '更新者',
     update_time          datetime                                   comment '更新时间',
     remark               varchar(500)    default null               comment '备注',
-    primary key (role_id)
+    primary key (role_id),
+    key idx_sys_role_create_dept (create_dept),
+    key idx_sys_role_create_by   (create_by)
 ) engine=innodb comment = '角色信息表';
 
 -- ----------------------------
@@ -338,7 +346,8 @@ insert into sys_menu values(1761400000000001511, '测试树表导出', 176140000
 create table sys_user_role (
     user_id   bigint(20) not null comment '用户ID',
     role_id   bigint(20) not null comment '角色ID',
-    primary key(user_id, role_id)
+    primary key(user_id, role_id),
+    key idx_sys_user_role_rid (role_id)
 ) engine=innodb comment = '用户和角色关联表';
 
 -- ----------------------------
@@ -587,7 +596,8 @@ create table sys_dict_data
     update_by        bigint(20)      default null               comment '更新者',
     update_time      datetime                                   comment '更新时间',
     remark           varchar(500)    default null               comment '备注',
-    primary key (dict_code)
+    primary key (dict_code),
+    key idx_sys_dict_data_type (dict_type)
 ) engine=innodb comment = '字典数据表';
 
 insert into sys_dict_data values(1761600000000000001, 1, '男', '0', 'sys_user_gender', '', '', 'Y', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '性别男');

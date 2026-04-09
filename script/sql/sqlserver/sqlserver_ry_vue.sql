@@ -683,6 +683,9 @@ CREATE TABLE sys_dept
 ON [PRIMARY]
 GO
 
+CREATE NONCLUSTERED INDEX idx_sys_dept_parent_id ON sys_dept (parent_id)
+GO
+
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'部门id' ,
     'SCHEMA', N'dbo',
@@ -827,6 +830,9 @@ CREATE TABLE sys_dict_data
         ON [PRIMARY]
 )
 ON [PRIMARY]
+GO
+
+CREATE NONCLUSTERED INDEX idx_sys_dict_data_type ON sys_dict_data (dict_type)
 GO
 
 EXEC sys.sp_addextendedproperty
@@ -2019,6 +2025,9 @@ CREATE TABLE sys_post
 ON [PRIMARY]
 GO
 
+CREATE NONCLUSTERED INDEX idx_sys_post_dept_id ON sys_post (dept_id)
+GO
+
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'岗位ID' ,
     'SCHEMA', N'dbo',
@@ -2134,6 +2143,11 @@ CREATE TABLE sys_role
         ON [PRIMARY]
 )
 ON [PRIMARY]
+GO
+
+CREATE NONCLUSTERED INDEX idx_sys_role_create_dept ON sys_role (create_dept)
+GO
+CREATE NONCLUSTERED INDEX idx_sys_role_create_by ON sys_role (create_by)
 GO
 
 EXEC sys.sp_addextendedproperty
@@ -2566,6 +2580,15 @@ CREATE TABLE sys_user
 ON [PRIMARY]
 GO
 
+CREATE NONCLUSTERED INDEX idx_sys_user_dept_id ON sys_user (dept_id)
+GO
+CREATE NONCLUSTERED INDEX idx_sys_user_create_by ON sys_user (create_by)
+GO
+CREATE NONCLUSTERED INDEX idx_sys_user_user_name ON sys_user (user_name)
+GO
+CREATE NONCLUSTERED INDEX idx_sys_user_phone ON sys_user (phone_number)
+GO
+
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'用户ID' ,
     'SCHEMA', N'dbo',
@@ -2740,6 +2763,9 @@ CREATE TABLE sys_user_role
         ON [PRIMARY]
 )
 ON [PRIMARY]
+GO
+
+CREATE NONCLUSTERED INDEX idx_sys_user_role_rid ON sys_user_role (role_id)
 GO
 
 EXEC sys.sp_addextendedproperty

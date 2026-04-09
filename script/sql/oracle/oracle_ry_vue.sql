@@ -89,6 +89,8 @@ create table sys_dept (
 
 alter table sys_dept add constraint pk_sys_dept primary key (dept_id);
 
+create index idx_sys_dept_parent_id on sys_dept (parent_id);
+
 comment on table  sys_dept              is '部门表';
 comment on column sys_dept.dept_id      is '部门id';
 comment on column sys_dept.parent_id    is '父部门id';
@@ -151,6 +153,11 @@ create table sys_user (
 
 alter table sys_user add constraint pk_sys_user primary key (user_id);
 
+create index idx_sys_user_dept_id on sys_user (dept_id);
+create index idx_sys_user_create_by on sys_user (create_by);
+create index idx_sys_user_user_name on sys_user (user_name);
+create index idx_sys_user_phone on sys_user (phone_number);
+
 comment on table  sys_user              is '用户信息表';
 comment on column sys_user.user_id      is '用户ID';
 comment on column sys_user.dept_id      is '部门ID';
@@ -201,6 +208,8 @@ create table sys_post (
 
 alter table sys_post add constraint pk_sys_post primary key (post_id);
 
+create index idx_sys_post_dept_id on sys_post (dept_id);
+
 comment on table  sys_post              is '岗位信息表';
 comment on column sys_post.post_id      is '岗位ID';
 comment on column sys_post.dept_id      is '部门id';
@@ -247,6 +256,9 @@ create table sys_role (
 );
 
 alter table sys_role add constraint pk_sys_role primary key (role_id);
+
+create index idx_sys_role_create_dept on sys_role (create_dept);
+create index idx_sys_role_create_by on sys_role (create_by);
 
 comment on table  sys_role                       is '角色信息表';
 comment on column sys_role.role_id               is '角色ID';
@@ -471,6 +483,8 @@ create table sys_user_role (
 );
 
 alter table sys_user_role add constraint pk_sys_user_role primary key (user_id, role_id);
+
+create index idx_sys_user_role_rid on sys_user_role (role_id);
 
 comment on table  sys_user_role              is '用户和角色关联表';
 comment on column sys_user_role.user_id      is '用户ID';
@@ -776,6 +790,8 @@ create table sys_dict_data (
 );
 
 alter table sys_dict_data add constraint pk_sys_dict_data primary key (dict_code);
+
+create index idx_sys_dict_data_type on sys_dict_data (dict_type);
 
 comment on table  sys_dict_data               is '字典数据表';
 comment on column sys_dict_data.dict_code     is '字典主键';
