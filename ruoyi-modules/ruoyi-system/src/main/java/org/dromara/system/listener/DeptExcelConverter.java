@@ -55,7 +55,7 @@ public class DeptExcelConverter implements Converter<Long> {
     /**
      * 构建部门路径 → 树节点映射，供 Converter 和 Options 共用
      */
-    static Map<String, Tree<Long>> buildDeptPathMap(ISysDeptService deptService) {
+    private Map<String, Tree<Long>> buildDeptPathMap(ISysDeptService deptService) {
         return TreeBuildUtils.buildTreeNodeMap(
             deptService.selectDeptTreeList(new SysDeptBo()),
             "/",
