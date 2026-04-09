@@ -77,16 +77,16 @@ public class RepeatSubmitAspect {
      */
     @AfterReturning(pointcut = "@annotation(repeatSubmit)", returning = "jsonResult")
     public void doAfterReturning(JoinPoint joinPoint, RepeatSubmit repeatSubmit, Object jsonResult) {
-        if (jsonResult instanceof R<?> r) {
-            try {
+        try {
+            if (jsonResult instanceof R<?> r) {
                 // 成功则不删除redis数据 保证在有效时间内无法重复提交
                 if (r.getCode() == HttpStatus.SUCCESS) {
                     return;
                 }
                 RedisUtils.deleteObject(KEY_CACHE.get());
-            } finally {
-                KEY_CACHE.remove();
             }
+        } finally {
+            KEY_CACHE.remove();
         }
     }
 
