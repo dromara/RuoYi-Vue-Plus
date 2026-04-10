@@ -70,11 +70,6 @@
             <artifactId>ruoyi-job</artifactId>
         </dependency>
 
-        <!-- 代码生成-->
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-gen</artifactId>
-        </dependency>
 
         <!--  demo模块  -->
         <dependency>
@@ -112,6 +107,21 @@
 <!--        </dependency>-->
 
     </dependencies>
+
+
+    <profiles>
+        <!-- 仅在激活 'gen' profile 时，才引入代码生成模块 -->
+        <profile>
+            <id>gen</id>
+            <dependencies>
+                <!-- 代码生成-->
+                <dependency>
+                    <groupId>org.dromara</groupId>
+                    <artifactId>ruoyi-gen</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <build>
         <finalName>${project.artifactId}</finalName>
