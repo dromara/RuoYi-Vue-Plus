@@ -55,6 +55,26 @@ public class DataBaseHelper {
     }
 
     /**
+     * 获取指定数据源对应的数据库类型
+     *
+     * @param dsName 数据源名称
+     * @return 指定数据库对应的 DataBaseType 枚举，找不到时默认返回 MY_SQL
+     * @throws ServiceException 当获取数据库连接或元数据出现异常时抛出业务异常
+     */
+    public static DataBaseType getDataBaseType(String dsName) {
+        DataSource dataSource = DS.getDataSource(dsName);
+        return DB_TYPE_CACHE.computeIfAbsent(dsName, k -> {
+            try (Connection conn = dataSource.getConnection()) {
+                DatabaseMetaData metaData = conn.getMetaData();
+                String databaseProductName = metaData.getDatabaseProductName();
+                return DataBaseType.find(databaseProductName);
+            } catch (SQLException e) {
+                throw new RuntimeException("获取数据库类型失败", e);
+            }
+        });
+    }
+
+    /**
      * 根据当前数据库类型，生成兼容的 FIND_IN_SET 语句片段
      * <p>
      * 用于判断指定值是否存在于逗号分隔的字符串列中，SQL写法根据不同数据库方言自动切换：

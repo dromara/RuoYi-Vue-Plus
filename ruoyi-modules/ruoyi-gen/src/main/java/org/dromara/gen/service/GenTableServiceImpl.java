@@ -369,7 +369,7 @@ public class GenTableServiceImpl implements IGenTableService {
 
         Dict context = TemplateEngineUtils.buildContext(table);
         // 获取模板列表
-        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory());
+        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory(), table.getDataName());
         for (PathNamedTemplate template : templates) {
             String pathName = template.getPathName();
             // 渲染模板
@@ -492,7 +492,7 @@ public class GenTableServiceImpl implements IGenTableService {
         table.setMenuIds(menuIds);
         setPkColumn(table);
         Dict context = TemplateEngineUtils.buildContext(table);
-        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory());
+        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory(), table.getDataName());
         return new RenderContext(table, context, templates);
     }
 

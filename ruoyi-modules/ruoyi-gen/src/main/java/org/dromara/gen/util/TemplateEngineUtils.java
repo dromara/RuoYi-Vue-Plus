@@ -156,7 +156,7 @@ public class TemplateEngineUtils {
      *
      * @return 模板列表
      */
-    public static List<PathNamedTemplate> getTemplateList(String tplCategory) {
+    public static List<PathNamedTemplate> getTemplateList(String tplCategory, String dsName) {
         List<PathNamedTemplate> templates = new ArrayList<>();
         // 后端源码模板
         templates.add(TEMPLATE_MAPPER.get(GenConstants.JAVA_DOMAIN_TEMPLATE_PATH));
@@ -172,7 +172,7 @@ public class TemplateEngineUtils {
         templates.add(TEMPLATE_MAPPER.get(GenConstants.TS_API_TEMPLATE_PATH));
         templates.add(TEMPLATE_MAPPER.get(TS_TYPES_TEMPLATE_PATH));
         // 数据库模板
-        DataBaseType dataBaseType = DataBaseHelper.getDataBaseType();
+        DataBaseType dataBaseType = DataBaseHelper.getDataBaseType(dsName);
         if (dataBaseType.isOracle()) {
             templates.add(TEMPLATE_MAPPER.get(GenConstants.SQL_ORACLE_TEMPLATE_PATH));
         } else if (dataBaseType.isPostgreSql()) {
