@@ -1,7 +1,7 @@
+import type { ${BusinessName}Form, ${BusinessName}Query, ${BusinessName}VO } from '@/api/${moduleName}/${businessName}/types';
+import type { PageResult } from '@/api/types';
+import type { AxiosPromise } from '@/utils/api-types';
 import request from '@/utils/request';
-import { AxiosPromise } from 'axios';
-import { ${BusinessName}VO, ${BusinessName}Form, ${BusinessName}Query } from '@/api/${moduleName}/${businessName}/types';
-import { PageResult } from '@/api/types';
 
 /**
  * 查询${functionName}列表

@@ -248,14 +248,27 @@
   </div>
 </template>
 
+#set($needAddDateRange = false)
+#foreach ($column in $columns)
+#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#set($needAddDateRange = true)
+#end
+#end
 <script setup name="${BusinessName}" lang="ts">
-import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${BusinessName}, update${BusinessName} } from '@/api/${moduleName}/${businessName}';
-import { ${BusinessName}VO, ${BusinessName}Query, ${BusinessName}Form } from '@/api/${moduleName}/${businessName}/types';
+import { add${BusinessName}, del${BusinessName}, get${BusinessName}, list${BusinessName}, update${BusinessName} } from '@/api/${moduleName}/${businessName}';
+import { ${BusinessName}Form, ${BusinessName}Query, ${BusinessName}VO } from '@/api/${moduleName}/${businessName}/types';
+#if(${dicts} != '')
+import { useDict } from '@/utils/dict';
+#end
+#if($needAddDateRange)
+import { addDateRange } from '@/utils/ruoyi';
+#end
+import modal from '@/plugins/modal';
+import { download as requestDownload } from '@/utils/request';
 
-const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 #if(${dicts} != '')
 #set($dictsNoSymbol=$dicts.replace("'", ""))
-const { ${dictsNoSymbol} } = toRefs<any>(proxy?.useDict(${dicts}));
+const { ${dictsNoSymbol} } = toRefs<any>(useDict(${dicts}));
 #end
 
 const ${businessName}List = ref<${BusinessName}VO[]>([]);
@@ -293,7 +306,7 @@ const initFormData: ${BusinessName}Form = {
 #end
 }
 const data = reactive<PageData<${BusinessName}Form, ${BusinessName}Query>>({
-  form: {...initFormData},
+  form: { ...initFormData },
   queryParams: {
     pageNum: 1,
     pageSize: 10,
@@ -347,32 +360,32 @@ const getList = async () => {
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-  proxy?.addDateRange(queryParams.value, dateRange${AttrName}.value, '${AttrName}');
+  addDateRange(queryParams.value, dateRange${AttrName}.value, '${AttrName}');
 #end
 #end
   const res = await list${BusinessName}(queryParams.value);
   ${businessName}List.value = res.data?.rows;
   total.value = res.data?.total;
   loading.value = false;
-}
+};
 
 /** 取消按钮 */
 const cancel = () => {
   reset();
   dialog.visible = false;
-}
+};
 
 /** 表单重置 */
 const reset = () => {
-  form.value = {...initFormData};
+  form.value = { ...initFormData };
   ${businessName}FormRef.value?.resetFields();
-}
+};
 
 /** 搜索按钮操作 */
 const handleQuery = () => {
   queryParams.value.pageNum = 1;
   getList();
-}
+};
 
 /** 重置按钮操作 */
 const resetQuery = () => {
@@ -384,26 +397,26 @@ const resetQuery = () => {
 #end
   queryFormRef.value?.resetFields();
   handleQuery();
-}
+};
 
 /** 多选框选中数据 */
 const handleSelectionChange = (selection: ${BusinessName}VO[]) => {
   ids.value = selection.map(item => item.${pkColumn.javaField});
   single.value = selection.length != 1;
   multiple.value = !selection.length;
-}
+};
 
 /** 新增按钮操作 */
 const handleAdd = () => {
   reset();
   dialog.visible = true;
-  dialog.title = "添加${functionName}";
-}
+  dialog.title = '添加${functionName}';
+};
 
 /** 修改按钮操作 */
 const handleUpdate = async (row?: ${BusinessName}VO) => {
   reset();
-  const _${pkColumn.javaField} = row?.${pkColumn.javaField} || ids.value[0]
+  const _${pkColumn.javaField} = row?.${pkColumn.javaField} || ids.value[0];
   const res = await get${BusinessName}(_${pkColumn.javaField});
   Object.assign(form.value, res.data);
 #foreach ($column in $columns)
@@ -412,8 +425,8 @@ const handleUpdate = async (row?: ${BusinessName}VO) => {
   #end
 #end
   dialog.visible = true;
-  dialog.title = "修改${functionName}";
-}
+  dialog.title = '修改${functionName}';
+};
 
 /** 提交按钮 */
 const submitForm = () => {
@@ -426,32 +439,36 @@ const submitForm = () => {
         #end
       #end
       if (form.value.${pkColumn.javaField}) {
-        await update${BusinessName}(form.value).finally(() =>  buttonLoading.value = false);
+        await update${BusinessName}(form.value).finally(() => (buttonLoading.value = false));
       } else {
-        await add${BusinessName}(form.value).finally(() =>  buttonLoading.value = false);
+        await add${BusinessName}(form.value).finally(() => (buttonLoading.value = false));
       }
-      proxy?.#[[$modal]]#.msgSuccess("操作成功");
+      modal.msgSuccess('操作成功');
       dialog.visible = false;
       await getList();
     }
   });
-}
+};
 
 /** 删除按钮操作 */
 const handleDelete = async (row?: ${BusinessName}VO) => {
   const _${pkColumn.javaField}s = row?.${pkColumn.javaField} || ids.value;
-  await proxy?.#[[$modal]]#.confirm('是否确认删除${functionName}编号为"' + _${pkColumn.javaField}s + '"的数据项？').finally(() => loading.value = false);
+  await modal.confirm('是否确认删除${functionName}编号为"' + _${pkColumn.javaField}s + '"的数据项？').finally(() => (loading.value = false));
   await del${BusinessName}(_${pkColumn.javaField}s);
-  proxy?.#[[$modal]]#.msgSuccess("删除成功");
+  modal.msgSuccess('删除成功');
   await getList();
-}
+};
 
 /** 导出按钮操作 */
 const handleExport = () => {
-  proxy?.download('${moduleName}/${businessName}/export', {
-    ...queryParams.value
-  }, `${businessName}_#[[${new Date().getTime()}]]#.xlsx`)
-}
+  requestDownload(
+    '${moduleName}/${businessName}/export',
+    {
+      ...queryParams.value
+    },
+    `${businessName}_#[[${new Date().getTime()}]]#.xlsx`
+  );
+};
 
 onMounted(() => {
   getList();

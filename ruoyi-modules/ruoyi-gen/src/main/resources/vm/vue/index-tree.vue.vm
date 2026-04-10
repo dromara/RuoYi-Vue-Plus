@@ -268,22 +268,31 @@
   </div>
 </template>
 
+#set($needAddDateRange = false)
+#foreach ($column in $columns)
+#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#set($needAddDateRange = true)
+#end
+#end
 <script setup name="${BusinessName}" lang="ts">
-import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${BusinessName}, update${BusinessName} } from "@/api/${moduleName}/${businessName}";
-import { ${BusinessName}VO, ${BusinessName}Query, ${BusinessName}Form } from '@/api/${moduleName}/${businessName}/types';
+import { add${BusinessName}, del${BusinessName}, get${BusinessName}, list${BusinessName}, update${BusinessName} } from '@/api/${moduleName}/${businessName}';
+import { ${BusinessName}Form, ${BusinessName}Query, ${BusinessName}VO } from '@/api/${moduleName}/${businessName}/types';
+#if(${dicts} != '')
+import { useDict } from '@/utils/dict';
+#end
+import modal from '@/plugins/modal';
+import { handleTree#if($needAddDateRange), addDateRange#end } from '@/utils/ruoyi';
+
+#if(${dicts} != '')
+#set($dictsNoSymbol=$dicts.replace("'", ""))
+const { ${dictsNoSymbol} } = toRefs<any>(useDict(${dicts}));
+#end
 
 type ${BusinessName}Option = {
   ${treeCode}: number;
   ${treeName}: string;
   children?: ${BusinessName}Option[];
-}
-
-const { proxy } = getCurrentInstance() as ComponentInternalInstance;;
-
-#if(${dicts} != '')
-#set($dictsNoSymbol=$dicts.replace("'", ""))
-const { ${dictsNoSymbol} } = toRefs<any>(proxy?.useDict(${dicts}));
-#end
+};
 
 const ${businessName}List = ref<${BusinessName}VO[]>([]);
 const ${businessName}Options = ref<${BusinessName}Option[]>([]);
@@ -294,11 +303,11 @@ const loading = ref(false);
 
 const queryFormRef = ref<ElFormInstance>();
 const ${businessName}FormRef = ref<ElFormInstance>();
-const ${businessName}TableRef = ref<ElTableInstance>()
+const ${businessName}TableRef = ref<ElTableInstance>();
 
 const dialog = reactive<DialogOption>({
-    visible: false,
-    title: ''
+  visible: false,
+  title: ''
 });
 
 #foreach ($column in $columns)
@@ -373,42 +382,42 @@ const getList = async () => {
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-  proxy?.addDateRange(queryParams.value, dateRange${AttrName}.value, '${AttrName}');
+  addDateRange(queryParams.value, dateRange${AttrName}.value, '${AttrName}');
 #end
 #end
   const res = await list${BusinessName}(queryParams.value);
-  const data = proxy?.handleTree<${BusinessName}VO>(res.data, "${treeCode}", "${treeParentCode}");
+  const data = handleTree<${BusinessName}VO>(res.data, '${treeCode}', '${treeParentCode}');
   if (data) {
     ${businessName}List.value = data;
     loading.value = false;
   }
-}
+};
 
 /** 查询${functionName}下拉树结构 */
 const getTreeselect = async () => {
   const res = await list${BusinessName}();
   ${businessName}Options.value = [];
   const data: ${BusinessName}Option = { ${treeCode}: 0, ${treeName}: '顶级节点', children: [] };
-  data.children = proxy?.handleTree<${BusinessName}Option>(res.data, "${treeCode}", "${treeParentCode}");
+  data.children = handleTree<${BusinessName}Option>(res.data, '${treeCode}', '${treeParentCode}');
   ${businessName}Options.value.push(data);
-}
+};
 
-// 取消按钮
+/** 取消按钮 */
 const cancel = () => {
   reset();
   dialog.visible = false;
-}
+};
 
-// 表单重置
+/** 表单重置 */
 const reset = () => {
-  form.value = {...initFormData}
+  form.value = { ...initFormData };
   ${businessName}FormRef.value?.resetFields();
-}
+};
 
 /** 搜索按钮操作 */
 const handleQuery = () => {
   getList();
-}
+};
 
 /** 重置按钮操作 */
 const resetQuery = () => {
@@ -420,7 +429,7 @@ const resetQuery = () => {
 #end
   queryFormRef.value?.resetFields();
   handleQuery();
-}
+};
 
 /** 新增按钮操作 */
 const handleAdd = (row?: ${BusinessName}VO) => {
@@ -432,22 +441,22 @@ const handleAdd = (row?: ${BusinessName}VO) => {
     form.value.${treeParentCode} = 0;
   }
   dialog.visible = true;
-  dialog.title = "添加${functionName}";
-}
+  dialog.title = '添加${functionName}';
+};
 
 /** 展开/折叠操作 */
 const handleToggleExpandAll = () => {
   isExpandAll.value = !isExpandAll.value;
-  toggleExpandAll(${businessName}List.value, isExpandAll.value)
-}
+  toggleExpandAll(${businessName}List.value, isExpandAll.value);
+};
 
 /** 展开/折叠操作 */
 const toggleExpandAll = (data: ${BusinessName}VO[], status: boolean) => {
-  data.forEach((item) => {
-    ${businessName}TableRef.value?.toggleRowExpansion(item, status)
-    if (item.children && item.children.length > 0) toggleExpandAll(item.children, status)
-  })
-}
+  data.forEach(item => {
+    ${businessName}TableRef.value?.toggleRowExpansion(item, status);
+    if (item.children && item.children.length > 0) toggleExpandAll(item.children, status);
+  });
+};
 
 /** 修改按钮操作 */
 const handleUpdate = async (row: ${BusinessName}VO) => {
@@ -464,8 +473,8 @@ const handleUpdate = async (row: ${BusinessName}VO) => {
   #end
 #end
   dialog.visible = true;
-  dialog.title = "修改${functionName}";
-}
+  dialog.title = '修改${functionName}';
+};
 
 /** 提交按钮 */
 const submitForm = () => {
@@ -478,25 +487,25 @@ const submitForm = () => {
 #end
 #end
       if (form.value.${pkColumn.javaField}) {
-        await update${BusinessName}(form.value).finally(() => buttonLoading.value = false);
+        await update${BusinessName}(form.value).finally(() => (buttonLoading.value = false));
       } else {
-        await add${BusinessName}(form.value).finally(() => buttonLoading.value = false);
+        await add${BusinessName}(form.value).finally(() => (buttonLoading.value = false));
       }
-      proxy?.#[[$modal]]#.msgSuccess("操作成功");
+      modal.msgSuccess('操作成功');
       dialog.visible = false;
       await getList();
     }
   });
-}
+};
 
 /** 删除按钮操作 */
 const handleDelete = async (row: ${BusinessName}VO) => {
-  await proxy?.#[[$modal]]#.confirm('是否确认删除${functionName}编号为"' + row.${pkColumn.javaField} + '"的数据项？');
+  await modal.confirm('是否确认删除${functionName}编号为"' + row.${pkColumn.javaField} + '"的数据项？');
   loading.value = true;
-  await del${BusinessName}(row.${pkColumn.javaField}).finally(() => loading.value = false);
+  await del${BusinessName}(row.${pkColumn.javaField}).finally(() => (loading.value = false));
   await getList();
-  proxy?.#[[$modal]]#.msgSuccess("删除成功");
-}
+  modal.msgSuccess('删除成功');
+};
 
 onMounted(() => {
   getList();
