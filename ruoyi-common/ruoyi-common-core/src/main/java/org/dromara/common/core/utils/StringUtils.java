@@ -555,4 +555,11 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return Strings.CS.replaceOnce(text, searchString, replacement);
     }
 
+    /**
+     * 测试 CharSequence 是否以所提供的任何后缀结尾。
+     */
+    public static boolean endsWithAny(final CharSequence sequence, final CharSequence... searchStrings) {
+        return Strings.CS.endsWithAny(sequence, searchStrings);
+    }
+
 }
