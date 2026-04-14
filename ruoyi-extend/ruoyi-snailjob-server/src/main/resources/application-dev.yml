@@ -2,9 +2,9 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://120.76.251.160:3366/ruoyi-vue-plus?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
-    password: root
+    password: 35aeae44a5f40a18
     hikari:
       connection-timeout: 30000
       validation-timeout: 5000
