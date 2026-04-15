@@ -112,8 +112,8 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
-    @PutMapping("/baseInfo")
-    public R<Void> editBaseInfo(@Validated @RequestBody SysRoleBo role) {
+    @PutMapping
+    public R<Void> edit(@Validated @RequestBody SysRoleBo role) {
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
         if (!roleService.checkRoleNameUnique(role)) {
