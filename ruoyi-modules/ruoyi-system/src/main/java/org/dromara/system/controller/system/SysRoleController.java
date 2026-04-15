@@ -104,7 +104,7 @@ public class SysRoleController extends BaseController {
     }
 
     /**
-     * 修改角色。
+     * 修改角色基础信息（不包含菜单权限、数据权限）。
      *
      * @param role 角色参数
      * @return 操作结果
@@ -112,8 +112,8 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
-    @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysRoleBo role) {
+    @PutMapping("/baseInfo")
+    public R<Void> editBaseInfo(@Validated @RequestBody SysRoleBo role) {
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
         if (!roleService.checkRoleNameUnique(role)) {
@@ -122,7 +122,7 @@ public class SysRoleController extends BaseController {
             return R.fail("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
         }
 
-        if (roleService.updateRole(role) > 0) {
+        if (roleService.updateRoleBaseInfo(role) > 0) {
             roleService.cleanOnlineUserByRole(role.getRoleId());
             return R.ok();
         }
@@ -130,7 +130,7 @@ public class SysRoleController extends BaseController {
     }
 
     /**
-     * 修改角色数据权限。
+     * 修改角色权限信息（菜单权限 + 数据权限）。
      *
      * @param role 角色参数
      * @return 操作结果
@@ -138,15 +138,15 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
-    @PutMapping("/dataScope")
-    public R<Void> dataScope(@RequestBody SysRoleBo role) {
+    @PutMapping("/permission")
+    public R<Void> editPermission(@RequestBody SysRoleBo role) {
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
-        if (roleService.authDataScope(role) > 0) {
+        if (roleService.updateRolePermission(role) > 0) {
             roleService.cleanOnlineUserByRole(role.getRoleId());
             return R.ok();
         }
-        return R.fail("修改角色'" + role.getRoleName() + "'数据权限失败，请联系管理员");
+        return R.fail("修改角色'" + role.getRoleName() + "'权限失败，请联系管理员");
     }
 
     /**

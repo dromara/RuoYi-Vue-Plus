@@ -143,12 +143,20 @@ public interface ISysRoleService {
     int insertRole(SysRoleBo bo);
 
     /**
-     * 修改保存角色信息
+     * 修改角色基础信息（不包含菜单/数据权限）。
      *
      * @param bo 角色信息
      * @return 影响行数
      */
-    int updateRole(SysRoleBo bo);
+    int updateRoleBaseInfo(SysRoleBo bo);
+
+    /**
+     * 修改角色权限信息（菜单权限 + 数据权限）。
+     *
+     * @param bo 角色权限参数
+     * @return 影响行数
+     */
+    int updateRolePermission(SysRoleBo bo);
 
     /**
      * 修改角色状态
@@ -159,13 +167,6 @@ public interface ISysRoleService {
      */
     int updateRoleStatus(Long roleId, String status);
 
-    /**
-     * 修改数据权限信息
-     *
-     * @param bo 角色信息
-     * @return 影响行数
-     */
-    int authDataScope(SysRoleBo bo);
 
     /**
      * 通过角色ID删除角色

@@ -306,24 +306,42 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
     }
 
     /**
-     * 修改保存角色信息
+     * 修改角色基础信息（不更新菜单与数据权限）。
      *
      * @param bo 角色信息
      * @return 结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateRole(SysRoleBo bo) {
+    public int updateRoleBaseInfo(SysRoleBo bo) {
         SysRole role = MapstructUtils.convert(bo, SysRole.class);
 
         if (SystemConstants.DISABLE.equals(role.getStatus()) && this.countUserRoleByRoleId(role.getRoleId()) > 0) {
             throw new ServiceException("角色已分配，不能禁用!");
         }
-        // 修改角色信息
+        // 仅更新角色基础字段，避免影响权限分配。
+        return baseMapper.updateById(role);
+    }
+
+    /**
+     * 修改角色权限信息（菜单权限 + 数据权限）。
+     *
+     * @param bo 角色权限参数
+     * @return 结果
+     */
+    @CacheEvict(cacheNames = CacheNames.SYS_ROLE_CUSTOM, key = "#bo.roleId")
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int updateRolePermission(SysRoleBo bo) {
+        SysRole role = MapstructUtils.convert(bo, SysRole.class);
+        // 更新权限相关配置字段（数据范围、树联动）。
         baseMapper.updateById(role);
-        // 删除角色与菜单关联
+        // 先清理旧菜单权限，再重建。
         roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, role.getRoleId()));
-        return insertRoleMenu(bo);
+        insertRoleMenu(bo);
+        // 先清理旧数据权限，再按当前配置重建。
+        roleDeptMapper.delete(new LambdaQueryWrapper<SysRoleDept>().eq(SysRoleDept::getRoleId, role.getRoleId()));
+        return insertRoleDept(bo);
     }
 
     /**
@@ -344,24 +362,7 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
                 .eq(SysRole::getRoleId, roleId));
     }
 
-    /**
-     * 修改数据权限信息
-     *
-     * @param bo 角色信息
-     * @return 结果
-     */
-    @CacheEvict(cacheNames = CacheNames.SYS_ROLE_CUSTOM, key = "#bo.roleId")
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int authDataScope(SysRoleBo bo) {
-        SysRole role = MapstructUtils.convert(bo, SysRole.class);
-        // 修改角色信息
-        baseMapper.updateById(role);
-        // 删除角色与部门关联
-        roleDeptMapper.delete(new LambdaQueryWrapper<SysRoleDept>().eq(SysRoleDept::getRoleId, role.getRoleId()));
-        // 新增角色和部门信息（数据权限）
-        return insertRoleDept(bo);
-    }
+
 
     /**
      * 新增角色菜单信息
