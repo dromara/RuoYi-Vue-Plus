@@ -1,6 +1,6 @@
 package org.dromara.system.service;
 
-import org.dromara.common.core.domain.dto.RoleDTO;
+import org.dromara.system.api.domain.RoleDTO;
 
 import java.util.List;
 import java.util.Map;

@@ -360,6 +360,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!--  api模块  -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -368,6 +375,7 @@
         <module>ruoyi-common</module>
         <module>ruoyi-extend</module>
         <module>ruoyi-modules</module>
+        <module>ruoyi-api</module>
     </modules>
     <packaging>pom</packaging>
 

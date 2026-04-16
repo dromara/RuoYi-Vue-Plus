@@ -2,12 +2,12 @@ package org.dromara.common.push.helper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.core.enums.PushSourceEnum;
 import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.push.core.PushSessionManager;
 import org.dromara.common.push.dto.PushDTO;
+import org.dromara.system.api.domain.PushPayloadDTO;
 
 import java.util.List;
 

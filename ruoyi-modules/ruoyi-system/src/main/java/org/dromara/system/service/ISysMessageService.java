@@ -1,6 +1,6 @@
 package org.dromara.system.service;
 
-import org.dromara.common.core.domain.dto.PushPayloadDTO;
+import org.dromara.system.api.domain.PushPayloadDTO;
 import org.dromara.system.domain.vo.SysMessageBoxVo;
 
 import java.util.List;

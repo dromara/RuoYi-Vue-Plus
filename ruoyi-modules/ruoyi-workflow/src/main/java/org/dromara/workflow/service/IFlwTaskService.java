@@ -1,14 +1,14 @@
 package org.dromara.workflow.service;
 
 import org.dromara.common.core.domain.PageResult;
-import org.dromara.common.core.domain.dto.StartProcessReturnDTO;
-import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.system.api.domain.UserDTO;
 import org.dromara.warm.flow.core.entity.Node;
 import org.dromara.warm.flow.core.entity.Task;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
 import org.dromara.warm.flow.orm.entity.FlowNode;
 import org.dromara.warm.flow.orm.entity.FlowTask;
+import org.dromara.workflow.api.domain.StartProcessReturnDTO;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.FlowHisTaskVo;
 import org.dromara.workflow.domain.vo.FlowTaskVo;

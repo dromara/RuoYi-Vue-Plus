@@ -1,12 +1,12 @@
 package org.dromara.demo.controller;
 
-import org.dromara.common.core.domain.R;
-import org.dromara.common.core.domain.dto.PushPayloadDTO;
-import org.dromara.common.core.enums.PushSourceEnum;
-import org.dromara.common.core.enums.PushTypeEnum;
-import org.dromara.common.core.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.R;
+import org.dromara.common.core.enums.PushSourceEnum;
+import org.dromara.common.core.enums.PushTypeEnum;
+import org.dromara.system.api.MessageService;
+import org.dromara.system.api.domain.PushPayloadDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

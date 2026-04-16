@@ -3,12 +3,12 @@ package org.dromara.common.push.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.domain.dto.PushPayloadDTO;
-import org.dromara.common.push.constant.MessageConstants;
-import org.dromara.common.push.dto.PushDTO;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.common.push.constant.MessageConstants;
+import org.dromara.common.push.dto.PushDTO;
 import org.dromara.common.redis.utils.RedisUtils;
+import org.dromara.system.api.domain.PushPayloadDTO;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;

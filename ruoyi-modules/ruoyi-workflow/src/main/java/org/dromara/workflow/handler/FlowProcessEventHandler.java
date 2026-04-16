@@ -1,12 +1,12 @@
 package org.dromara.workflow.handler;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.domain.event.ProcessDeleteEvent;
-import org.dromara.common.core.domain.event.ProcessEvent;
-import org.dromara.common.core.domain.event.ProcessTaskEvent;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.entity.Task;
+import org.dromara.workflow.api.event.ProcessDeleteEvent;
+import org.dromara.workflow.api.event.ProcessEvent;
+import org.dromara.workflow.api.event.ProcessTaskEvent;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.springframework.stereotype.Component;
 

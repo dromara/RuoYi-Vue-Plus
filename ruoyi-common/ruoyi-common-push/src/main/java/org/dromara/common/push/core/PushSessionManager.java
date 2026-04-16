@@ -1,7 +1,7 @@
 package org.dromara.common.push.core;
 
-import org.dromara.common.core.domain.dto.PushPayloadDTO;
 import org.dromara.common.push.dto.PushDTO;
+import org.dromara.system.api.domain.PushPayloadDTO;
 
 import java.util.function.Consumer;
 

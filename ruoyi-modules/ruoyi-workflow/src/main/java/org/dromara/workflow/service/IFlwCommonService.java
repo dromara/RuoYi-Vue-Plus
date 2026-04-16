@@ -1,7 +1,7 @@
 package org.dromara.workflow.service;
 
 import org.dromara.common.core.enums.BusinessStatusEnum;
-import org.dromara.common.core.domain.dto.UserDTO;
+import org.dromara.system.api.domain.UserDTO;
 
 import java.util.List;
 

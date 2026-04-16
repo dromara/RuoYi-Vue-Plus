@@ -2,12 +2,12 @@ package org.dromara.common.translation.core.impl;
 
 import cn.hutool.core.convert.Convert;
 import lombok.AllArgsConstructor;
-import org.dromara.common.core.domain.dto.UserDTO;
-import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.translation.annotation.TranslationType;
 import org.dromara.common.translation.constant.TransConstant;
 import org.dromara.common.translation.core.TranslationInterface;
+import org.dromara.system.api.UserService;
+import org.dromara.system.api.domain.UserDTO;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

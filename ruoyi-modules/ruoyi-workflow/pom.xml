@@ -63,6 +63,10 @@
             <artifactId>ruoyi-common-security</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.dromara.warm</groupId>
             <artifactId>warm-flow-mybatis-plus-sb3-starter</artifactId>
         </dependency>

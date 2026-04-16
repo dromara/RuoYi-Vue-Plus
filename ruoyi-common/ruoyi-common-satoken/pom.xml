@@ -24,11 +24,12 @@
             <artifactId>ruoyi-common-redis</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-api</artifactId>
+        </dependency>
+
         <!-- spring-webmvc 依赖 -->
-        <!--
-            Sa-Token 1.45.0 的pom依赖项发生了变动，此处需要自行引入所需的依赖项。
-            本着最小依赖的原则，此处仅引入 spring-webmvc 的依赖，如果还是无法启动，请更改为 spring-boot-starter-web (Sa-Token 1.44.0版本中的依赖项)
-        -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>

@@ -1,7 +1,7 @@
 package org.dromara.common.push.dto;
 
 import lombok.Data;
-import org.dromara.common.core.domain.dto.PushPayloadDTO;
+import org.dromara.system.api.domain.PushPayloadDTO;
 
 import java.io.Serial;
 import java.io.Serializable;
