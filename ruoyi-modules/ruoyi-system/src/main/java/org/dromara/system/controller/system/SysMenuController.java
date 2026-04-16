@@ -22,6 +22,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 菜单信息
@@ -101,8 +103,12 @@ public class SysMenuController extends BaseController {
     @GetMapping(value = "/roleMenuTreeselect/{roleId}")
     public R<MenuTreeSelectVo> roleMenuTreeselect(@PathVariable("roleId") Long roleId) {
         List<SysMenuVo> menus = menuService.selectMenuList(LoginHelper.getUserId());
+        // 按钮权限单独分组返回，前端用于在对应菜单节点侧展示按钮行。
+        Map<Long, List<SysMenuVo>> buttonMenus = menus.stream().filter(m -> SystemConstants.TYPE_BUTTON.equals(m.getMenuType())).collect(Collectors.groupingBy(SysMenuVo::getParentId));
+        // 菜单树返回完整节点（包含按钮），前端可隐藏按钮节点并复用树组件级联勾选能力。
         MenuTreeSelectVo selectVo = new MenuTreeSelectVo(
             menuService.selectMenuListByRoleId(roleId),
+            buttonMenus,
             menuService.buildMenuTreeSelect(menus));
         return R.ok(selectVo);
     }
@@ -179,7 +185,7 @@ public class SysMenuController extends BaseController {
      * @param checkedKeys 选中菜单列表
      * @param menus       菜单下拉树结构列表
      */
-    public record MenuTreeSelectVo(List<Long> checkedKeys, List<Tree<Long>> menus) {
+    public record MenuTreeSelectVo(List<Long> checkedKeys, Map<Long, List<SysMenuVo>> buttonsMap, List<Tree<Long>> menus) {
     }
 
     /**
