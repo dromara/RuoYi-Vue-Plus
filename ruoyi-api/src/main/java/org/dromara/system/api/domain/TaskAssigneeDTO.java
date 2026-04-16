@@ -3,14 +3,14 @@ package org.dromara.system.api.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.utils.StreamUtils;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Collection;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * 任务受让人
@@ -58,14 +58,15 @@ public class TaskAssigneeDTO implements Serializable {
         Function<T, String> handlerName,
         Function<T, String> groupName,
         Function<T, LocalDateTime> createTimeMapper) {
-        return sourceCollection.stream()
-            .map(item -> new TaskHandler(
+        return StreamUtils.toList(sourceCollection, item ->
+            new TaskHandler(
                 storageId.apply(item),
                 handlerCode.apply(item),
                 handlerName.apply(item),
                 groupName.apply(item),
                 createTimeMapper.apply(item)
-            )).collect(Collectors.toList());
+            )
+        );
     }
 
     /**
