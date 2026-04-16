@@ -1,11 +1,15 @@
 package org.dromara.web.service;
 
 
+import cn.dev33.satoken.stp.parameter.SaLoginParameter;
+import cn.hutool.core.util.ObjectUtil;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.system.domain.SysClient;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.web.domain.vo.LoginVo;
+
+import java.util.function.Consumer;
 
 /**
  * 授权策略
@@ -32,6 +36,37 @@ public interface IAuthStrategy {
         }
         IAuthStrategy instance = SpringUtils.getBean(beanName);
         return instance.login(body, client);
+    }
+
+    /**
+     * 按客户端配置构建统一登录参数。
+     *
+     * @param client 客户端配置
+     * @return Sa-Token 登录参数
+     */
+    static SaLoginParameter buildLoginParameter(SysClientVo client) {
+        return buildLoginParameter(client, null);
+    }
+
+    /**
+     * 按客户端配置构建统一登录参数，并预留自定义扩展入口。
+     *
+     * @param client 客户端配置
+     * @param customizer 自定义扩展逻辑
+     * @return Sa-Token 登录参数
+     */
+    static SaLoginParameter buildLoginParameter(SysClientVo client, Consumer<SaLoginParameter> customizer) {
+        SaLoginParameter model = new SaLoginParameter();
+        model.setDeviceType(client.getDeviceType());
+        model.setTimeout(client.getTimeout());
+        model.setActiveTimeout(client.getActiveTimeout());
+        model.setExtra(LoginHelper.CLIENT_KEY, client.getClientId());
+        model.setExtra(LoginHelper.CLIENT_ACCESS_PATH_KEY, client.getAccessPath());
+        model.setExtra(LoginHelper.CLIENT_IP_WHITELIST_KEY, client.getIpWhitelist());
+        if (ObjectUtil.isNotNull(customizer)) {
+            customizer.accept(model);
+        }
+        return model;
     }
 
     /**

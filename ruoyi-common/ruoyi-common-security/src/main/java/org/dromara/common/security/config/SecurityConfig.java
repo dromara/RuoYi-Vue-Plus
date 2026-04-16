@@ -1,6 +1,7 @@
 package org.dromara.common.security.config;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.filter.SaServletFilter;
 import cn.dev33.satoken.httpauth.basic.SaHttpBasicUtil;
 import cn.dev33.satoken.interceptor.SaInterceptor;
@@ -13,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.HttpStatus;
+import org.dromara.common.core.utils.NetUtils;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -26,6 +28,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.List;
+
 /**
  * 权限安全配置
  *
@@ -37,6 +41,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableConfigurationProperties(SecurityProperties.class)
 @RequiredArgsConstructor
 public class SecurityConfig implements WebMvcConfigurer {
+
+    private static final String CLIENT_RULE_SEPARATOR_REGEX = "[,;\\r\\n]+";
 
     private final SecurityProperties securityProperties;
     @Value("${message.path:/resource/message}")
@@ -74,6 +80,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                                 "-100", "客户端ID与Token不匹配",
                                 StpUtil.getTokenValue());
                         }
+                        validateClientAccessRules(request);
 
                         // 有效率影响 用于临时测试
                         // if (log.isDebugEnabled()) {
@@ -107,6 +114,43 @@ public class SecurityConfig implements WebMvcConfigurer {
                 response.setContentType(SaTokenConsts.CONTENT_TYPE_APPLICATION_JSON);
                 return SaResult.error(e.getMessage()).setCode(HttpStatus.UNAUTHORIZED);
             });
+    }
+
+    /**
+     * 按客户端配置校验接口访问路径与来源 IP。
+     *
+     * @param request 当前请求
+     */
+    private void validateClientAccessRules(HttpServletRequest request) {
+        String requestPath = StringUtils.blankToDefault(request.getServletPath(), request.getRequestURI());
+        String accessPath = getTokenExtra(LoginHelper.CLIENT_ACCESS_PATH_KEY);
+        if (StringUtils.isNotBlank(accessPath)) {
+            List<String> accessPathList = StringUtils.str2List(accessPath, CLIENT_RULE_SEPARATOR_REGEX, true, true);
+            if (!StringUtils.matches(requestPath, accessPathList)) {
+                throw new NotPermissionException("当前客户端未授权访问该接口路径");
+            }
+        }
+
+        String ipWhitelist = getTokenExtra(LoginHelper.CLIENT_IP_WHITELIST_KEY);
+        if (StringUtils.isNotBlank(ipWhitelist)) {
+            String clientIp = ServletUtils.getClientIP(request);
+            List<String> ipWhitelistList = StringUtils.str2List(ipWhitelist, CLIENT_RULE_SEPARATOR_REGEX, true, true);
+            boolean matched = ipWhitelistList.stream().anyMatch(rule -> NetUtils.isMatchIpRule(rule, clientIp));
+            if (!matched) {
+                throw new NotPermissionException("当前客户端IP不在白名单内");
+            }
+        }
+    }
+
+    /**
+     * 读取 token 扩展信息，兼容空值场景。
+     *
+     * @param key 扩展字段
+     * @return 扩展值
+     */
+    private String getTokenExtra(String key) {
+        Object extra = StpUtil.getExtra(key);
+        return extra == null ? null : extra.toString();
     }
 
 }

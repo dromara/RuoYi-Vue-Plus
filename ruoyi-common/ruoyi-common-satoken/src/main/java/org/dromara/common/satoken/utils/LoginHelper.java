@@ -40,6 +40,8 @@ public class LoginHelper {
     public static final String DEPT_NAME_KEY = "deptName";
     public static final String DEPT_CATEGORY_KEY = "deptCategory";
     public static final String CLIENT_KEY = "clientid";
+    public static final String CLIENT_ACCESS_PATH_KEY = "clientAccessPath";
+    public static final String CLIENT_IP_WHITELIST_KEY = "clientIpWhitelist";
 
     /**
      * 登录系统 基于 设备类型

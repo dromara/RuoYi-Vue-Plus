@@ -1211,6 +1211,8 @@ create table sys_client (
     client_secret       varchar2(255)  default null,
     grant_type          varchar2(255)  default null,
     device_type         varchar2(32)   default null,
+    access_path         varchar2(2000) default null,
+    ip_whitelist        varchar2(1000) default null,
     active_timeout      number(11)     default 1800,
     timeout             number(11)     default 604800,
     status              char(1)        default '0',
@@ -1231,6 +1233,8 @@ comment on column sys_client.client_key             is '客户端key';
 comment on column sys_client.client_secret          is '客户端秘钥';
 comment on column sys_client.grant_type             is '授权类型';
 comment on column sys_client.device_type            is '设备类型';
+comment on column sys_client.access_path            is '允许访问路径';
+comment on column sys_client.ip_whitelist           is 'IP白名单';
 comment on column sys_client.active_timeout         is 'token活跃超时时间';
 comment on column sys_client.timeout                is 'token固定超时';
 comment on column sys_client.status                 is '状态（0正常 1停用）';
@@ -1241,8 +1245,8 @@ comment on column sys_client.create_time            is '创建时间';
 comment on column sys_client.update_by              is '更新者';
 comment on column sys_client.update_time            is '更新时间';
 
-insert into sys_client values (1762000000000000001, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password,social', 'pc', 1800, 604800, 0, 0, 1761000000000000103, 1761100000000000001, sysdate, 1761100000000000001, sysdate);
-insert into sys_client values (1762000000000000002, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms,social', 'android', 1800, 604800, 0, 0, 1761000000000000103, 1761100000000000001, sysdate, 1761100000000000001, sysdate);
+insert into sys_client values (1762000000000000001, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password,social', 'pc', null, null, 1800, 604800, 0, 0, 1761000000000000103, 1761100000000000001, sysdate, 1761100000000000001, sysdate);
+insert into sys_client values (1762000000000000002, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms,social', 'android', '/app/**', null, 1800, 604800, 0, 0, 1761000000000000103, 1761100000000000001, sysdate, 1761100000000000001, sysdate);
 
 create table test_demo (
     id          number(20)      not null,

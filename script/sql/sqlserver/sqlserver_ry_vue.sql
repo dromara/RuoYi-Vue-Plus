@@ -3060,6 +3060,8 @@ CREATE TABLE sys_client
     client_secret       nvarchar(255) DEFAULT ''            NULL,
     grant_type          nvarchar(255) DEFAULT ''            NULL,
     device_type         nvarchar(32) DEFAULT ''            NULL,
+    access_path         nvarchar(2000) DEFAULT ''           NULL,
+    ip_whitelist        nvarchar(1000) DEFAULT ''           NULL,
     active_timeout      int           DEFAULT ((1800))      NULL,
     timeout             int           DEFAULT ((604800))    NULL,
     status              nchar(1)      DEFAULT ('0')         NULL,
@@ -3111,6 +3113,18 @@ EXEC sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_client',
     'COLUMN', N'device_type'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'允许访问路径',
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_client',
+    'COLUMN', N'access_path'
+GO
+EXEC sp_addextendedproperty
+    'MS_Description', N'IP白名单',
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_client',
+    'COLUMN', N'ip_whitelist'
 GO
 EXEC sp_addextendedproperty
     'MS_Description', N'token活跃超时时间',
@@ -3172,9 +3186,9 @@ EXEC sp_addextendedproperty
     'TABLE', N'sys_client'
 GO
 
-INSERT INTO sys_client VALUES (1762000000000000001, N'e5cd7e4891bf95d1d19206ce24a7b32e', N'pc', N'pc123', N'password,social', N'pc', 1800, 604800, N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000001, getdate());
+INSERT INTO sys_client VALUES (1762000000000000001, N'e5cd7e4891bf95d1d19206ce24a7b32e', N'pc', N'pc123', N'password,social', N'pc', N'', N'', 1800, 604800, N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000001, getdate());
 GO
-INSERT INTO sys_client VALUES (1762000000000000002, N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms,social', N'android', 1800, 604800, N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000001, getdate());
+INSERT INTO sys_client VALUES (1762000000000000002, N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms,social', N'android', N'/app/**', N'', 1800, 604800, N'0', N'0', 1761000000000000103, 1761100000000000001, getdate(), 1761100000000000001, getdate());
 GO
 
 CREATE TABLE test_demo
