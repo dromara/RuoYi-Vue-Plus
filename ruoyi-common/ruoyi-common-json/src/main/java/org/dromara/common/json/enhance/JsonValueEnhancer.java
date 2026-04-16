@@ -1,6 +1,7 @@
 package org.dromara.common.json.enhance;
 
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import tools.jackson.databind.JavaType;
@@ -46,6 +47,7 @@ public class JsonValueEnhancer {
 
     public boolean supports(Class<?> converterType) {
         return !processors.isEmpty()
+            && !ByteArrayHttpMessageConverter.class.isAssignableFrom(converterType)
             && !StringHttpMessageConverter.class.isAssignableFrom(converterType)
             && !ResourceHttpMessageConverter.class.isAssignableFrom(converterType);
     }
