@@ -647,15 +647,11 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_config'
 GO
 
-INSERT sys_config VALUES (1761700000000000001, N'主框架页-默认皮肤样式名称', N'sys.index.skinName', N'skin-blue', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow')
+INSERT sys_config VALUES (1761700000000000001, N'用户管理-账号初始密码', N'sys.user.initPassword', N'123456', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'初始化密码 123456')
 GO
-INSERT sys_config VALUES (1761700000000000002, N'用户管理-账号初始密码', N'sys.user.initPassword', N'123456', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'初始化密码 123456')
+INSERT sys_config VALUES (1761700000000000002, N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
 GO
-INSERT sys_config VALUES (1761700000000000003, N'主框架页-侧边栏主题', N'sys.index.sideTheme', N'theme-dark', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'深色主题theme-dark，浅色主题theme-light')
-GO
-INSERT sys_config VALUES (1761700000000000005, N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
-GO
-INSERT sys_config VALUES (1761700000000000011, N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'true:开启, false:关闭');
+INSERT sys_config VALUES (1761700000000000003, N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'true:开启, false:关闭');
 GO
 
 CREATE TABLE sys_dept
