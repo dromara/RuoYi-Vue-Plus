@@ -257,6 +257,11 @@
 <script setup name="${BusinessName}" lang="ts">
 import { add${BusinessName}, del${BusinessName}, get${BusinessName}, list${BusinessName}, update${BusinessName} } from '@/api/${moduleName}/${businessName}';
 import { ${BusinessName}Form, ${BusinessName}Query, ${BusinessName}VO } from '@/api/${moduleName}/${businessName}/types';
+import { useLoading } from '@/hooks/async/useLoading';
+import { useFormDialog } from '@/hooks/dialog/useFormDialog';
+import { useSearchReset } from '@/hooks/form/useSearchReset';
+import { useSearchToggle } from '@/hooks/form/useSearchToggle';
+import { useTableSelection } from '@/hooks/table/useTableSelection';
 #if(${dicts} != '')
 import { useDict } from '@/utils/dict';
 #end
@@ -273,11 +278,8 @@ const { ${dictsNoSymbol} } = toRefs<any>(useDict(${dicts}));
 
 const ${businessName}List = ref<${BusinessName}VO[]>([]);
 const buttonLoading = ref(false);
-const loading = ref(true);
-const showSearch = ref(true);
-const ids = ref<Array<string | number>>([]);
-const single = ref(true);
-const multiple = ref(true);
+const { loading, withLoading } = useLoading(true);
+const { showSearch } = useSearchToggle();
 const total = ref(0);
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
@@ -288,11 +290,6 @@ const dateRange${AttrName} = ref<[DateModelType, DateModelType]>(['', '']);
 
 const queryFormRef = ref<ElFormInstance>();
 const ${businessName}FormRef = ref<ElFormInstance>();
-
-const dialog = reactive<DialogOption>({
-  visible: false,
-  title: ''
-});
 
 const initFormData: ${BusinessName}Form = {
 #foreach ($column in $columns)
@@ -347,38 +344,38 @@ const data = reactive<PageData<${BusinessName}Form, ${BusinessName}Query>>({
 });
 
 const { queryParams, form, rules } = toRefs(data);
+const { ids, single, multiple, handleSelectionChange } = useTableSelection<${BusinessName}VO>(item => item.${pkColumn.javaField});
+const { dialog, resetForm: reset, openDialog, showDialog, closeDialog } = useFormDialog({
+  form,
+  formRef: ${businessName}FormRef,
+  initialFormData: initFormData
+});
 
 /** 查询${functionName}列表 */
 const getList = async () => {
-  loading.value = true;
+  await withLoading(async () => {
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-  queryParams.value.params = {};
+    queryParams.value.params = {};
 #break
 #end
 #end
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-  addDateRange(queryParams.value, dateRange${AttrName}.value, '${AttrName}');
+    addDateRange(queryParams.value, dateRange${AttrName}.value, '${AttrName}');
 #end
 #end
-  const res = await list${BusinessName}(queryParams.value);
-  ${businessName}List.value = res.data?.rows;
-  total.value = res.data?.total;
-  loading.value = false;
+    const res = await list${BusinessName}(queryParams.value);
+    ${businessName}List.value = res.data?.rows;
+    total.value = res.data?.total;
+  });
 };
 
 /** 取消按钮 */
 const cancel = () => {
   reset();
-  dialog.visible = false;
-};
-
-/** 表单重置 */
-const reset = () => {
-  form.value = { ...initFormData };
-  ${businessName}FormRef.value?.resetFields();
+  closeDialog();
 };
 
 /** 搜索按钮操作 */
@@ -387,30 +384,28 @@ const handleQuery = () => {
   getList();
 };
 
-/** 重置按钮操作 */
-const resetQuery = () => {
+const { resetQuery } = useSearchReset({
+  queryFormRef,
+  queryParams,
+  pageNumKey: 'pageNum',
+  pageSizeKey: 'pageSize',
+  initialPageSize: 10,
+  resetExtras: () => {
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-  dateRange${AttrName}.value = ['', ''];
+    dateRange${AttrName}.value = ['', ''];
 #end
 #end
-  queryFormRef.value?.resetFields();
-  handleQuery();
-};
-
-/** 多选框选中数据 */
-const handleSelectionChange = (selection: ${BusinessName}VO[]) => {
-  ids.value = selection.map(item => item.${pkColumn.javaField});
-  single.value = selection.length != 1;
-  multiple.value = !selection.length;
-};
+  },
+  afterReset: () => {
+    handleQuery();
+  }
+});
 
 /** 新增按钮操作 */
 const handleAdd = () => {
-  reset();
-  dialog.visible = true;
-  dialog.title = '添加${functionName}';
+  openDialog('添加${functionName}');
 };
 
 /** 修改按钮操作 */
@@ -424,8 +419,7 @@ const handleUpdate = async (row?: ${BusinessName}VO) => {
   form.value.$column.javaField = form.value.${column.javaField}.split(",");
   #end
 #end
-  dialog.visible = true;
-  dialog.title = '修改${functionName}';
+  showDialog('修改${functionName}');
 };
 
 /** 提交按钮 */
@@ -444,7 +438,7 @@ const submitForm = () => {
         await add${BusinessName}(form.value).finally(() => (buttonLoading.value = false));
       }
       modal.msgSuccess('操作成功');
-      dialog.visible = false;
+      closeDialog();
       await getList();
     }
   });
@@ -453,7 +447,7 @@ const submitForm = () => {
 /** 删除按钮操作 */
 const handleDelete = async (row?: ${BusinessName}VO) => {
   const _${pkColumn.javaField}s = row?.${pkColumn.javaField} || ids.value;
-  await modal.confirm('是否确认删除${functionName}编号为"' + _${pkColumn.javaField}s + '"的数据项？').finally(() => (loading.value = false));
+  await modal.confirm('是否确认删除${functionName}编号为"' + _${pkColumn.javaField}s + '"的数据项？');
   await del${BusinessName}(_${pkColumn.javaField}s);
   modal.msgSuccess('删除成功');
   await getList();
