@@ -297,13 +297,17 @@ import { add${BusinessName}, del${BusinessName}, get${BusinessName}, list${Busin
 import { ${BusinessName}Form, ${BusinessName}Query, ${BusinessName}VO } from '@/api/${moduleName}/${businessName}/types';
 import { useLoading } from '@/hooks/async/useLoading';
 import { useFormDialog } from '@/hooks/dialog/useFormDialog';
+#if($needAddDateRange)
+import { useDateRangeQuery } from '@/hooks/form/useDateRangeQuery';
+#end
 import { useSearchReset } from '@/hooks/form/useSearchReset';
 import { useSearchToggle } from '@/hooks/form/useSearchToggle';
+import { useTreeTableExpand } from '@/hooks/tree/useTreeTableExpand';
 #if(${dicts} != '')
 import { useDict } from '@/utils/dict';
 #end
 import modal from '@/plugins/modal';
-import { handleTree#if($needAddDateRange), addDateRange#end } from '@/utils/ruoyi';
+import { handleTree } from '@/utils/ruoyi';
 
 #if(${dicts} != '')
 #set($dictsNoSymbol=$dicts.replace("'", ""))
@@ -320,17 +324,24 @@ const ${businessName}List = ref<${BusinessName}VO[]>([]);
 const ${businessName}Options = ref<${BusinessName}Option[]>([]);
 const buttonLoading = ref(false);
 const { showSearch } = useSearchToggle();
-const isExpandAll = ref(true);
 const { loading, setLoading, withLoading } = useLoading();
 
 const queryFormRef = ref<ElFormInstance>();
 const ${businessName}FormRef = ref<ElFormInstance>();
 const ${businessName}TableRef = ref<ElTableInstance>();
+const { isExpandAll, handleToggleExpandAll } = useTreeTableExpand<${BusinessName}VO>({
+  tableRef: ${businessName}TableRef,
+  data: ${businessName}List
+});
 
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-const dateRange${AttrName} = ref<[DateModelType, DateModelType]>(['', '']);
+const {
+  dateRange: dateRange${AttrName},
+  applyDateRange: apply${AttrName}DateRange,
+  resetDateRange: reset${AttrName}DateRange
+} = useDateRangeQuery('${AttrName}');
 #end
 #end
 
@@ -395,19 +406,18 @@ const { dialog, resetForm: reset, openDialog, showDialog, closeDialog } = useFor
 /** 查询${functionName}列表 */
 const getList = async () => {
   await withLoading(async () => {
-#foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-    queryParams.value.params = {};
-#break
-#end
-#end
+#if($needAddDateRange)
+    let params = queryParams.value;
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-    addDateRange(queryParams.value, dateRange${AttrName}.value, '${AttrName}');
+    params = apply${AttrName}DateRange(params);
 #end
 #end
+    const res = await list${BusinessName}(params);
+#else
     const res = await list${BusinessName}(queryParams.value);
+#end
     const data = handleTree<${BusinessName}VO>(res.data, '${treeCode}', '${treeParentCode}');
     if (data) {
       ${businessName}List.value = data;
@@ -442,7 +452,7 @@ const { resetQuery } = useSearchReset({
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-    dateRange${AttrName}.value = ['', ''];
+    reset${AttrName}DateRange();
 #end
 #end
   },
@@ -460,20 +470,6 @@ const handleAdd = (row?: ${BusinessName}VO) => {
   } else {
     form.value.${treeParentCode} = 0;
   }
-};
-
-/** 展开/折叠操作 */
-const handleToggleExpandAll = () => {
-  isExpandAll.value = !isExpandAll.value;
-  toggleExpandAll(${businessName}List.value, isExpandAll.value);
-};
-
-/** 展开/折叠操作 */
-const toggleExpandAll = (data: ${BusinessName}VO[], status: boolean) => {
-  data.forEach(item => {
-    ${businessName}TableRef.value?.toggleRowExpansion(item, status);
-    if (item.children && item.children.length > 0) toggleExpandAll(item.children, status);
-  });
 };
 
 /** 修改按钮操作 */

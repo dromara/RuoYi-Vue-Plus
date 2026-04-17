@@ -259,14 +259,14 @@ import { add${BusinessName}, del${BusinessName}, get${BusinessName}, list${Busin
 import { ${BusinessName}Form, ${BusinessName}Query, ${BusinessName}VO } from '@/api/${moduleName}/${businessName}/types';
 import { useLoading } from '@/hooks/async/useLoading';
 import { useFormDialog } from '@/hooks/dialog/useFormDialog';
+#if($needAddDateRange)
+import { useDateRangeQuery } from '@/hooks/form/useDateRangeQuery';
+#end
 import { useSearchReset } from '@/hooks/form/useSearchReset';
 import { useSearchToggle } from '@/hooks/form/useSearchToggle';
 import { useTableSelection } from '@/hooks/table/useTableSelection';
 #if(${dicts} != '')
 import { useDict } from '@/utils/dict';
-#end
-#if($needAddDateRange)
-import { addDateRange } from '@/utils/ruoyi';
 #end
 import modal from '@/plugins/modal';
 import { download as requestDownload } from '@/utils/request';
@@ -284,7 +284,11 @@ const total = ref(0);
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-const dateRange${AttrName} = ref<[DateModelType, DateModelType]>(['', '']);
+const {
+  dateRange: dateRange${AttrName},
+  applyDateRange: apply${AttrName}DateRange,
+  resetDateRange: reset${AttrName}DateRange
+} = useDateRangeQuery('${AttrName}');
 #end
 #end
 
@@ -354,19 +358,18 @@ const { dialog, resetForm: reset, openDialog, showDialog, closeDialog } = useFor
 /** 查询${functionName}列表 */
 const getList = async () => {
   await withLoading(async () => {
-#foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-    queryParams.value.params = {};
-#break
-#end
-#end
+#if($needAddDateRange)
+    let params = queryParams.value;
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-    addDateRange(queryParams.value, dateRange${AttrName}.value, '${AttrName}');
+    params = apply${AttrName}DateRange(params);
 #end
 #end
+    const res = await list${BusinessName}(params);
+#else
     const res = await list${BusinessName}(queryParams.value);
+#end
     ${businessName}List.value = res.data?.rows;
     total.value = res.data?.total;
   });
@@ -394,7 +397,7 @@ const { resetQuery } = useSearchReset({
 #foreach ($column in $columns)
 #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-    dateRange${AttrName}.value = ['', ''];
+    reset${AttrName}DateRange();
 #end
 #end
   },
