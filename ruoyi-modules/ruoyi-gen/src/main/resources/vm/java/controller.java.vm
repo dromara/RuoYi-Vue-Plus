@@ -3,7 +3,9 @@ package ${packageName}.controller;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+#if($enableExport)
 import jakarta.servlet.http.HttpServletResponse;
+#end
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +18,9 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.log.enums.BusinessType;
+#if($enableExport)
 import org.dromara.common.excel.utils.ExcelUtil;
+#end
 import ${packageName}.domain.vo.${ClassName}Vo;
 import ${packageName}.domain.bo.${ClassName}Bo;
 import ${packageName}.service.I${ClassName}Service;
@@ -58,6 +62,7 @@ public class ${ClassName}Controller extends BaseController {
     /**
      * 导出${functionName}列表
      */
+#if($enableExport)
     @SaCheckPermission("${permissionPrefix}:export")
     @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
@@ -65,6 +70,7 @@ public class ${ClassName}Controller extends BaseController {
         List<${ClassName}Vo> list = ${className}Service.queryList(bo);
         ExcelUtil.exportExcel(list, "${functionName}", ${ClassName}Vo.class, response);
     }
+#end
 
     /**
      * 获取${functionName}详细信息
@@ -86,6 +92,11 @@ public class ${ClassName}Controller extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody ${ClassName}Bo bo) {
+#if($enableUnique)
+        if (!${className}Service.checkUnique(bo)) {
+            return R.fail("新增${functionName}失败，组合唯一字段已存在");
+        }
+#end
         return toAjax(${className}Service.insertByBo(bo));
     }
 
@@ -97,8 +108,37 @@ public class ${ClassName}Controller extends BaseController {
     @RepeatSubmit()
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody ${ClassName}Bo bo) {
+#if($enableUnique)
+        if (!${className}Service.checkUnique(bo)) {
+            return R.fail("修改${functionName}失败，组合唯一字段已存在");
+        }
+#end
         return toAjax(${className}Service.updateByBo(bo));
     }
+
+#if($enableStatus)
+    /**
+     * 修改${functionName}状态
+     */
+    @SaCheckPermission("${permissionPrefix}:edit")
+    @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
+    @PutMapping("/changeStatus")
+    public R<Void> changeStatus(@RequestBody ${ClassName}Bo bo) {
+        return toAjax(${className}Service.updateStatus(bo.get${pkColumn.capJavaField}(), bo.get${statusColumn.capJavaField}()));
+    }
+#end
+
+#if($enableSort)
+    /**
+     * 调整${functionName}排序
+     */
+    @SaCheckPermission("${permissionPrefix}:edit")
+    @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
+    @PutMapping("/updateSort")
+    public R<Void> updateSort(@RequestBody ${ClassName}Bo bo) {
+        return toAjax(${className}Service.updateSort(bo.get${pkColumn.capJavaField}(), bo.get${sortColumn.capJavaField}()));
+    }
+#end
 
     /**
      * 删除${functionName}

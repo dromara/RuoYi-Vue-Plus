@@ -45,6 +45,16 @@ public interface I${ClassName}Service {
      */
     List<${ClassName}Vo> queryList(${ClassName}Bo bo);
 
+#if($enableUnique)
+    /**
+     * 校验${functionName}是否满足组合唯一约束
+     *
+     * @param bo ${functionName}
+     * @return 是否唯一
+     */
+    boolean checkUnique(${ClassName}Bo bo);
+#end
+
     /**
      * 新增${functionName}
      *
@@ -60,6 +70,28 @@ public interface I${ClassName}Service {
      * @return 是否修改成功
      */
     Boolean updateByBo(${ClassName}Bo bo);
+
+#if($enableStatus)
+    /**
+     * 修改${functionName}状态
+     *
+     * @param ${pkColumn.javaField} 主键
+     * @param status 状态值
+     * @return 是否修改成功
+     */
+    Boolean updateStatus(${pkColumn.javaType} ${pkColumn.javaField}, ${statusColumn.javaType} status);
+#end
+
+#if($enableSort)
+    /**
+     * 调整${functionName}排序
+     *
+     * @param ${pkColumn.javaField} 主键
+     * @param sortValue 排序值
+     * @return 是否修改成功
+     */
+    Boolean updateSort(${pkColumn.javaType} ${pkColumn.javaField}, ${sortColumn.javaType} sortValue);
+#end
 
     /**
      * 校验并批量删除${functionName}信息

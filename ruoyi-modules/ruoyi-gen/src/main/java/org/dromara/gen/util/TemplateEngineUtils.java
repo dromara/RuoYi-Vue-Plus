@@ -3,6 +3,7 @@ package org.dromara.gen.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
 import lombok.AccessLevel;
@@ -108,6 +109,22 @@ public class TemplateEngineUtils {
         Dict paramsObj = JsonUtils.parseMap(options);
         String parentMenuId = getParentMenuId(paramsObj);
         context.put("parentMenuId", parentMenuId);
+        boolean enableExport = getBooleanOption(paramsObj, GenConstants.ENABLE_EXPORT, true);
+        boolean enableStatus = getBooleanOption(paramsObj, GenConstants.ENABLE_STATUS, false);
+        boolean enableUnique = getBooleanOption(paramsObj, GenConstants.ENABLE_UNIQUE, false);
+        boolean enableSort = getBooleanOption(paramsObj, GenConstants.ENABLE_SORT, false);
+        GenTableColumn statusColumn = getColumn(genTable, paramsObj.getStr(GenConstants.STATUS_FIELD));
+        GenTableColumn sortColumn = getColumn(genTable, paramsObj.getStr(GenConstants.SORT_FIELD));
+        List<GenTableColumn> uniqueColumns = getColumns(genTable, paramsObj.get(GenConstants.UNIQUE_FIELDS));
+        context.put("enableExport", enableExport);
+        context.put("enableStatus", enableStatus && ObjectUtil.isNotNull(statusColumn));
+        context.put("statusColumn", statusColumn);
+        context.put("statusField", ObjectUtil.isNotNull(statusColumn) ? statusColumn.getJavaField() : StringUtils.EMPTY);
+        context.put("enableUnique", enableUnique && CollUtil.isNotEmpty(uniqueColumns));
+        context.put("uniqueColumns", uniqueColumns);
+        context.put("enableSort", enableSort && ObjectUtil.isNotNull(sortColumn));
+        context.put("sortColumn", sortColumn);
+        context.put("sortField", ObjectUtil.isNotNull(sortColumn) ? sortColumn.getJavaField() : StringUtils.EMPTY);
 
         // 向树形模板上下文写入树字段相关变量
         if (GenConstants.TPL_TREE.equals(tplCategory)) {
@@ -128,10 +145,21 @@ public class TemplateEngineUtils {
         String treeCode = getTreeCode(paramsObj);
         String treeParentCode = getTreeParentCode(paramsObj);
         String treeName = getTreeName(paramsObj);
+        GenTableColumn treeParentColumn = getColumn(genTable, paramsObj.getStr(GenConstants.TREE_PARENT_CODE));
+        GenTableColumn treeAncestorsColumn = getColumn(genTable, paramsObj.getStr(GenConstants.TREE_ANCESTORS));
+        GenTableColumn treeOrderColumn = getColumn(genTable, paramsObj.getStr(GenConstants.TREE_ORDER_FIELD));
+        String treeRootValue = getTreeRootValue(paramsObj, treeParentColumn);
 
         context.put("treeCode", treeCode);
         context.put("treeParentCode", treeParentCode);
         context.put("treeName", treeName);
+        context.put("treeParentColumn", treeParentColumn);
+        context.put("treeAncestorsField", ObjectUtil.isNotNull(treeAncestorsColumn) ? treeAncestorsColumn.getJavaField() : StringUtils.EMPTY);
+        context.put("treeOrderField", ObjectUtil.isNotNull(treeOrderColumn) ? treeOrderColumn.getJavaField() : StringUtils.EMPTY);
+        context.put("treeOrderColumn", treeOrderColumn);
+        context.put("treeRootValue", treeRootValue);
+        context.put("treeRootValueJavaLiteral", getJavaLiteral(treeParentColumn, treeRootValue));
+        context.put("treeRootValueTsLiteral", getTsLiteral(treeParentColumn, treeRootValue));
         String expandTreeName = paramsObj.getStr(GenConstants.TREE_NAME);
         int expandColumn = 0;
         for (GenTableColumn column : genTable.getColumns()) {
@@ -307,7 +335,7 @@ public class TemplateEngineUtils {
         for (GenTableColumn column : columns) {
             if (!column.isSuperColumn() && StringUtils.isNotEmpty(column.getDictType()) && StringUtils.equalsAny(
                 column.getHtmlType(),
-                new String[] { GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_CHECKBOX })) {
+                new String[] { GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_CHECKBOX, GenConstants.HTML_SWITCH })) {
                 dicts.add("'" + column.getDictType() + "'");
             }
         }
@@ -375,5 +403,82 @@ public class TemplateEngineUtils {
             return StringUtils.toCamelCase(paramsObj.getStr(GenConstants.TREE_NAME));
         }
         return StringUtils.EMPTY;
+    }
+
+    /**
+     * 获取树根节点值。
+     *
+     * @param paramsObj 其他选项
+     * @param treeParentColumn 父节点字段
+     * @return 树根节点值
+     */
+    public static String getTreeRootValue(Dict paramsObj, GenTableColumn treeParentColumn) {
+        String defaultValue = "0";
+        if (ObjectUtil.isNotNull(treeParentColumn) && StringUtils.equals(treeParentColumn.getJavaType(), GenConstants.TYPE_STRING)) {
+            defaultValue = "0";
+        }
+        if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_ROOT_VALUE)) {
+            return StringUtils.blankToDefault(paramsObj.getStr(GenConstants.TREE_ROOT_VALUE), defaultValue);
+        }
+        return defaultValue;
+    }
+
+    private static boolean getBooleanOption(Dict paramsObj, String key, boolean defaultValue) {
+        if (CollUtil.isEmpty(paramsObj) || !paramsObj.containsKey(key)) {
+            return defaultValue;
+        }
+        return Convert.toBool(paramsObj.get(key), defaultValue);
+    }
+
+    private static GenTableColumn getColumn(GenTable genTable, String field) {
+        if (StringUtils.isBlank(field) || CollUtil.isEmpty(genTable.getColumns())) {
+            return null;
+        }
+        for (GenTableColumn column : genTable.getColumns()) {
+            if (StringUtils.equalsAny(field, column.getColumnName(), column.getJavaField())) {
+                return column;
+            }
+        }
+        return null;
+    }
+
+    private static List<GenTableColumn> getColumns(GenTable genTable, Object fieldValues) {
+        List<String> fields = new ArrayList<>();
+        if (fieldValues instanceof Collection<?> collection) {
+            collection.stream().map(Convert::toStr).forEach(fields::add);
+        } else if (ObjectUtil.isNotNull(fieldValues)) {
+            fields.addAll(StringUtils.str2List(Convert.toStr(fieldValues), StringUtils.SEPARATOR, true, true));
+        }
+        List<GenTableColumn> columns = new ArrayList<>();
+        for (String field : fields) {
+            GenTableColumn column = getColumn(genTable, field);
+            if (ObjectUtil.isNotNull(column)) {
+                columns.add(column);
+            }
+        }
+        return columns;
+    }
+
+    private static String getJavaLiteral(GenTableColumn column, String value) {
+        if (ObjectUtil.isNull(column) || StringUtils.isBlank(value)) {
+            return "null";
+        }
+        if (StringUtils.equals(column.getJavaType(), GenConstants.TYPE_LONG)) {
+            return value + "L";
+        }
+        if (StringUtils.equalsAny(column.getJavaType(), GenConstants.TYPE_INTEGER, GenConstants.TYPE_DOUBLE, GenConstants.TYPE_BIGDECIMAL)) {
+            return value;
+        }
+        return "\"" + value + "\"";
+    }
+
+    private static String getTsLiteral(GenTableColumn column, String value) {
+        if (ObjectUtil.isNull(column) || StringUtils.isBlank(value)) {
+            return "undefined";
+        }
+        if (StringUtils.equalsAny(column.getJavaType(), GenConstants.TYPE_LONG, GenConstants.TYPE_INTEGER, GenConstants.TYPE_DOUBLE, GenConstants.TYPE_BIGDECIMAL)) {
+            return value;
+        }
+        return "'" + value + "'";
     }
 }

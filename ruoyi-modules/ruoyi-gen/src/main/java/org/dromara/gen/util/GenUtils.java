@@ -45,9 +45,11 @@ public class GenUtils {
      * @param table  所属业务表对象
      */
     public static void initColumnField(GenTableColumn column, GenTable table) {
-        String dataType = getDbType(column.getColumnType());
+        String dataType = getDbType(column.getColumnType()).toLowerCase();
         // 统一转小写 避免有些数据库默认大写问题 如果需要特别书写方式 请在实体类增加注解标注别名
         String columnName = column.getColumnName().toLowerCase();
+        Integer columnLength = getColumnLength(column.getColumnType());
+        Integer columnScale = getColumnScale(column.getColumnType());
         column.setTableId(table.getTableId());
         column.setCreateTime(null);
         column.setUpdateTime(null);
@@ -59,17 +61,18 @@ public class GenUtils {
 
         if (arraysContains(GenConstants.COLUMNTYPE_STR, dataType) || arraysContains(GenConstants.COLUMNTYPE_TEXT, dataType)) {
             // 字符串长度超过500设置为文本域
-            Integer columnLength = getColumnLength(column.getColumnType());
             String htmlType = columnLength >= 500 || arraysContains(GenConstants.COLUMNTYPE_TEXT, dataType) ? GenConstants.HTML_TEXTAREA : GenConstants.HTML_INPUT;
+            if (isBooleanColumn(dataType, columnLength, columnScale, columnName)) {
+                column.setJavaType(GenConstants.TYPE_BOOLEAN);
+                htmlType = GenConstants.HTML_SWITCH;
+            }
             column.setHtmlType(htmlType);
         } else if (arraysContains(GenConstants.COLUMNTYPE_TIME, dataType)) {
             column.setJavaType(GenConstants.TYPE_DATE);
             column.setHtmlType(GenConstants.HTML_DATETIME);
         } else if (arraysContains(GenConstants.COLUMNTYPE_NUMBER, dataType)) {
-            column.setHtmlType(GenConstants.HTML_INPUT);
-            // 数据库的数字字段与java不匹配 且很多数据库的数字字段很模糊 例如oracle只有number没有细分
-            // 所以默认数字类型全为Long可在界面上自行编辑想要的类型 有什么特殊需求也可以在这里特殊处理
-            column.setJavaType(GenConstants.TYPE_LONG);
+            column.setJavaType(resolveNumberJavaType(dataType, columnLength, columnScale, columnName));
+            column.setHtmlType(GenConstants.TYPE_BOOLEAN.equals(column.getJavaType()) ? GenConstants.HTML_SWITCH : GenConstants.HTML_INPUT_NUMBER);
         }
 
         // BO对象 默认插入勾选
@@ -93,27 +96,100 @@ public class GenUtils {
         if (StringUtils.endsWithIgnoreCase(columnName, "name")) {
             column.setQueryType(GenConstants.QUERY_LIKE);
         }
+        if (GenConstants.HTML_DATETIME.equals(column.getHtmlType()) && column.isQuery()) {
+            column.setQueryType(GenConstants.QUERY_BETWEEN);
+        }
         // 状态字段设置单选框
+        if (isSwitchColumn(columnName) || GenConstants.TYPE_BOOLEAN.equals(column.getJavaType())) {
+            column.setHtmlType(GenConstants.HTML_SWITCH);
+        }
+        // 状态字段设置单选框/开关
         if (StringUtils.endsWithIgnoreCase(columnName, "status")) {
-            column.setHtmlType(GenConstants.HTML_RADIO);
+            column.setHtmlType(GenConstants.TYPE_BOOLEAN.equals(column.getJavaType()) ? GenConstants.HTML_SWITCH : GenConstants.HTML_RADIO);
         }
         // 类型&性别字段设置下拉框
         else if (StringUtils.endsWithIgnoreCase(columnName, "type")
             || StringUtils.endsWithIgnoreCase(columnName, "sex")) {
             column.setHtmlType(GenConstants.HTML_SELECT);
         }
+        // 排序字段设置数字输入控件
+        else if (isSortColumn(columnName)) {
+            column.setHtmlType(GenConstants.HTML_INPUT_NUMBER);
+        }
         // 图片字段设置图片上传控件
-        else if (StringUtils.endsWithIgnoreCase(columnName, "image")) {
+        else if (StringUtils.endsWithAny(columnName, "image", "avatar", "logo", "picture")) {
             column.setHtmlType(GenConstants.HTML_IMAGE_UPLOAD);
         }
         // 文件字段设置文件上传控件
-        else if (StringUtils.endsWithIgnoreCase(columnName, "file")) {
+        else if (StringUtils.endsWithAny(columnName, "file", "attachment")) {
             column.setHtmlType(GenConstants.HTML_FILE_UPLOAD);
         }
+        // 备注描述类字段设置文本域
+        else if (StringUtils.endsWithAny(columnName, "remark", "description", "desc", "note")) {
+            column.setHtmlType(GenConstants.HTML_TEXTAREA);
+        }
         // 内容字段设置富文本控件
-        else if (StringUtils.endsWithIgnoreCase(columnName, "content")) {
+        else if (StringUtils.endsWithAny(columnName, "content", "html", "body")) {
             column.setHtmlType(GenConstants.HTML_EDITOR);
         }
+    }
+
+    private static String resolveNumberJavaType(String dataType, Integer columnLength, Integer columnScale, String columnName) {
+        if (isBooleanColumn(dataType, columnLength, columnScale, columnName)) {
+            return GenConstants.TYPE_BOOLEAN;
+        }
+        if (arraysContains(new String[]{"decimal", "numeric", "money", "smallmoney"}, dataType)) {
+            return columnScale > 0 ? GenConstants.TYPE_BIGDECIMAL : resolveIntegerJavaType(columnLength);
+        }
+        if (arraysContains(new String[]{"float", "float4", "float8", "double", "real", "double precision"}, dataType)) {
+            return GenConstants.TYPE_DOUBLE;
+        }
+        if (arraysContains(new String[]{"bigint", "int8", "bigserial"}, dataType)) {
+            return GenConstants.TYPE_LONG;
+        }
+        if (arraysContains(new String[]{"smallint", "mediumint", "int", "int2", "int4", "integer", "smallserial", "serial"}, dataType)) {
+            return GenConstants.TYPE_INTEGER;
+        }
+        if (StringUtils.equals(dataType, "number")) {
+            if (columnScale > 0) {
+                return GenConstants.TYPE_BIGDECIMAL;
+            }
+            return resolveIntegerJavaType(columnLength);
+        }
+        return GenConstants.TYPE_LONG;
+    }
+
+    private static String resolveIntegerJavaType(Integer columnLength) {
+        if (columnLength > 0 && columnLength <= 9) {
+            return GenConstants.TYPE_INTEGER;
+        }
+        return GenConstants.TYPE_LONG;
+    }
+
+    private static boolean isBooleanColumn(String dataType, Integer columnLength, Integer columnScale, String columnName) {
+        if (columnScale > 0) {
+            return false;
+        }
+        if (StringUtils.equalsAny(dataType, "bit", "boolean", "bool")) {
+            return true;
+        }
+        if (StringUtils.equalsAny(dataType, "tinyint", "number", "numeric", "decimal", "char", "nchar")
+            && columnLength == 1 && isSwitchColumn(columnName)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isSwitchColumn(String columnName) {
+        return StringUtils.endsWithAny(columnName, "status", "flag", "enabled", "disabled", "available", "visible")
+            || columnName.startsWith("is_")
+            || columnName.startsWith("has_")
+            || columnName.startsWith("enable_")
+            || columnName.startsWith("disable_");
+    }
+
+    private static boolean isSortColumn(String columnName) {
+        return StringUtils.endsWithAny(columnName, "sort", "order_num", "order", "rank", "seq", "sequence");
     }
 
     /**
@@ -219,14 +295,30 @@ public class GenUtils {
      */
     public static Integer getColumnLength(String columnType) {
         if (StringUtils.indexOf(columnType, "(") > 0) {
-            String length = StringUtils.substringBetween(columnType, "(", ")");
+            String length = StringUtils.substringBetween(columnType, "(", ")").trim();
             // 处理 decimal(10,2) 这类带精度的类型，只取长度部分
             if (length.contains(",")) {
-                length = StringUtils.substringBefore(length, ",");
+                length = StringUtils.substringBefore(length, ",").trim();
             }
             return Integer.valueOf(length);
         } else {
             return 0;
         }
+    }
+
+    /**
+     * 获取字段精度
+     *
+     * @param columnType 列类型
+     * @return 字段精度，未声明精度时返回 0
+     */
+    public static Integer getColumnScale(String columnType) {
+        if (StringUtils.indexOf(columnType, "(") > 0) {
+            String length = StringUtils.substringBetween(columnType, "(", ")").trim();
+            if (length.contains(",")) {
+                return Integer.valueOf(StringUtils.substringAfter(length, ",").trim());
+            }
+        }
+        return 0;
     }
 }

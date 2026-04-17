@@ -55,19 +55,17 @@ public class GenController extends BaseController {
      * 修改代码生成业务
      *
      * @param tableId 表ID
-     * @return 表、字段与可选业务表信息
+     * @return 表与字段信息
      */
     @RepeatSubmit()
     @SaCheckPermission("tool:gen:query")
     @GetMapping(value = "/{tableId}")
     public R<Map<String, Object>> getInfo(@PathVariable Long tableId) {
         GenTable table = genTableService.selectGenTableById(tableId);
-        List<GenTable> tables = genTableService.selectGenTableAll();
         List<GenTableColumn> list = genTableService.selectGenTableColumnListByTableId(tableId);
-        Map<String, Object> map = new HashMap<>(3);
+        Map<String, Object> map = new HashMap<>(2);
         map.put("info", table);
         map.put("rows", list);
-        map.put("tables", tables);
         return R.ok(map);
     }
 

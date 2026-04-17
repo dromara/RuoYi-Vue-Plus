@@ -1,11 +1,15 @@
 package ${packageName}.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 #if($table.crud)
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+#end
+#if($enableStatus || $enableSort)
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 #end
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -17,7 +21,11 @@ import ${packageName}.domain.vo.${ClassName}Vo;
 import ${packageName}.domain.${ClassName};
 import ${packageName}.mapper.${ClassName}Mapper;
 import ${packageName}.service.I${ClassName}Service;
+#if($table.tree)
+import org.dromara.common.core.exception.ServiceException;
+#end
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -35,6 +43,19 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 
     private final ${ClassName}Mapper baseMapper;
 
+#set($TreeParentCap = "")
+#if("" != $treeParentCode)
+#set($TreeParentCap = $treeParentCode.substring(0,1).toUpperCase() + $treeParentCode.substring(1))
+#end
+#set($TreeAncestorsCap = "")
+#if("" != $treeAncestorsField)
+#set($TreeAncestorsCap = $treeAncestorsField.substring(0,1).toUpperCase() + $treeAncestorsField.substring(1))
+#end
+#set($TreeOrderCap = "")
+#if("" != $treeOrderField)
+#set($TreeOrderCap = $treeOrderField.substring(0,1).toUpperCase() + $treeOrderField.substring(1))
+#end
+
     /**
      * 查询${functionName}
      *
@@ -42,7 +63,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
      * @return ${functionName}
      */
     @Override
-    public ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField}){
+    public ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField}) {
         return baseMapper.selectVoById(${pkColumn.javaField});
     }
 
@@ -74,7 +95,37 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         return baseMapper.selectVoList(lqw);
     }
 
+#if($enableUnique)
+    /**
+     * 校验${functionName}是否满足组合唯一约束
+     *
+     * @param bo ${functionName}
+     * @return 是否唯一
+     */
+    @Override
+    public boolean checkUnique(${ClassName}Bo bo) {
+        boolean hasUniqueValue = true;
+#foreach($column in $uniqueColumns)
+#if($column.javaType == 'String')
+        hasUniqueValue = hasUniqueValue && StringUtils.isNotBlank(bo.get${column.capJavaField}());
+#else
+        hasUniqueValue = hasUniqueValue && bo.get${column.capJavaField}() != null;
+#end
+#end
+        if (!hasUniqueValue) {
+            return true;
+        }
+        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery();
+#foreach($column in $uniqueColumns)
+        lqw.eq(${ClassName}::get${column.capJavaField}, bo.get${column.capJavaField}());
+#end
+        lqw.ne(bo.get${pkColumn.capJavaField}() != null, ${ClassName}::get${pkColumn.capJavaField}, bo.get${pkColumn.capJavaField}());
+        return !baseMapper.exists(lqw);
+    }
+#end
+
     private LambdaQueryWrapper<${ClassName}> buildQueryWrapper(${ClassName}Bo bo) {
+#set($hasBetween = false)
 #foreach ($column in $columns)
 #if($column.query && $column.queryType == 'BETWEEN')
     #set($hasBetween = true)
@@ -87,10 +138,8 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 #foreach($column in $columns)
 #if($column.query)
 #set($queryType=$column.queryType)
-#set($javaField=$column.javaField)
 #set($javaType=$column.javaType)
-#set($columnName=$column.columnName)
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+#set($AttrName=$column.capJavaField)
 #set($mpMethod=$column.queryType.toLowerCase())
 #if($queryType != 'BETWEEN')
 #if($javaType == 'String')
@@ -101,14 +150,22 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         lqw.$mpMethod($condition, ${ClassName}::get$AttrName, bo.get$AttrName());
 #else
         lqw.between(params.get("begin$AttrName") != null && params.get("end$AttrName") != null,
-            ${ClassName}::get$AttrName ,params.get("begin$AttrName"), params.get("end$AttrName"));
+            ${ClassName}::get$AttrName, params.get("begin$AttrName"), params.get("end$AttrName"));
 #end
 #end
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-#if($column.isPk==1)
-        lqw.orderByAsc(${ClassName}::get$AttrName);
 #end
+#if($table.tree && "" != $treeAncestorsField)
+        lqw.orderByAsc(${ClassName}::get${TreeAncestorsCap});
 #end
+#if($table.tree && "" != $treeParentCode)
+        lqw.orderByAsc(${ClassName}::get${TreeParentCap});
+#end
+#if($table.tree && "" != $treeOrderField)
+        lqw.orderByAsc(${ClassName}::get${TreeOrderCap});
+#elseif($enableSort)
+        lqw.orderByAsc(${ClassName}::get${sortColumn.capJavaField});
+#end
+        lqw.orderByAsc(${ClassName}::get${pkColumn.capJavaField});
         return lqw;
     }
 
@@ -121,11 +178,13 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     @Override
     public Boolean insertByBo(${ClassName}Bo bo) {
         ${ClassName} add = MapstructUtils.convert(bo, ${ClassName}.class);
+#if($table.tree)
+        fillTreeMetaBeforeSave(add, false);
+#end
         validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
-#set($pk=$pkColumn.javaField.substring(0,1).toUpperCase() + ${pkColumn.javaField.substring(1)})
         if (flag) {
-            bo.set$pk(add.get$pk());
+            bo.set${pkColumn.capJavaField}(add.get${pkColumn.capJavaField}());
         }
         return flag;
     }
@@ -139,16 +198,132 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     @Override
     public Boolean updateByBo(${ClassName}Bo bo) {
         ${ClassName} update = MapstructUtils.convert(bo, ${ClassName}.class);
+#if($table.tree)
+        fillTreeMetaBeforeSave(update, true);
+#end
         validEntityBeforeSave(update);
         return baseMapper.updateById(update) > 0;
     }
 
+#if($enableStatus)
+    /**
+     * 修改${functionName}状态
+     *
+     * @param ${pkColumn.javaField} 主键
+     * @param status 状态值
+     * @return 是否修改成功
+     */
+    @Override
+    public Boolean updateStatus(${pkColumn.javaType} ${pkColumn.javaField}, ${statusColumn.javaType} status) {
+        return baseMapper.update(null, new LambdaUpdateWrapper<${ClassName}>()
+            .set(${ClassName}::get${statusColumn.capJavaField}, status)
+            .eq(${ClassName}::get${pkColumn.capJavaField}, ${pkColumn.javaField})) > 0;
+    }
+#end
+
+#if($enableSort)
+    /**
+     * 调整${functionName}排序
+     *
+     * @param ${pkColumn.javaField} 主键
+     * @param sortValue 排序值
+     * @return 是否修改成功
+     */
+    @Override
+    public Boolean updateSort(${pkColumn.javaType} ${pkColumn.javaField}, ${sortColumn.javaType} sortValue) {
+        return baseMapper.update(null, new LambdaUpdateWrapper<${ClassName}>()
+            .set(${ClassName}::get${sortColumn.capJavaField}, sortValue)
+            .eq(${ClassName}::get${pkColumn.capJavaField}, ${pkColumn.javaField})) > 0;
+    }
+#end
+
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(${ClassName} entity){
-        //TODO 做一些数据校验,如唯一约束
+    private void validEntityBeforeSave(${ClassName} entity) {
+        // 可在此扩展通用业务校验
     }
+
+#if($table.tree)
+    private void fillTreeMetaBeforeSave(${ClassName} entity, boolean updateMode) {
+#if("" != $treeParentCode)
+        if (entity.get${TreeParentCap}() == null) {
+            entity.set${TreeParentCap}(${treeRootValueJavaLiteral});
+        }
+        if (ObjectUtil.equal(entity.get${pkColumn.capJavaField}(), entity.get${TreeParentCap}())) {
+            throw new ServiceException("${functionName}父节点不能选择自身");
+        }
+#if("" != $treeAncestorsField)
+        ${ClassName} parent = null;
+        if (!ObjectUtil.equal(entity.get${TreeParentCap}(), ${treeRootValueJavaLiteral})) {
+            parent = baseMapper.selectById(entity.get${TreeParentCap}());
+            if (ObjectUtil.isNull(parent)) {
+                throw new ServiceException("${functionName}父节点不存在");
+            }
+        }
+        if (updateMode && entity.get${pkColumn.capJavaField}() != null && ObjectUtil.isNotNull(parent)
+            && containsAncestor(parent.get${TreeAncestorsCap}(), entity.get${pkColumn.capJavaField}())) {
+            throw new ServiceException("不能选择当前节点或其子节点作为父节点");
+        }
+        String newAncestors = resolveAncestors(entity.get${TreeParentCap}(), parent);
+        if (updateMode && entity.get${pkColumn.capJavaField}() != null) {
+            ${ClassName} oldEntity = baseMapper.selectById(entity.get${pkColumn.capJavaField}());
+            if (ObjectUtil.isNull(oldEntity)) {
+                throw new ServiceException("${functionName}不存在，无法修改");
+            }
+            String oldAncestors = oldEntity.get${TreeAncestorsCap}();
+            entity.set${TreeAncestorsCap}(newAncestors);
+            if (!StringUtils.equals(oldAncestors, newAncestors)) {
+                updateChildrenAncestors(entity.get${pkColumn.capJavaField}(), newAncestors, oldAncestors);
+            }
+        } else {
+            entity.set${TreeAncestorsCap}(newAncestors);
+        }
+#end
+#end
+    }
+#if("" != $treeAncestorsField)
+
+    private String resolveAncestors(${treeParentColumn.javaType} parentId, ${ClassName} parent) {
+        if (ObjectUtil.equal(parentId, ${treeRootValueJavaLiteral})) {
+            return "${treeRootValue}";
+        }
+        String parentAncestors = parent.get${TreeAncestorsCap}();
+        if (StringUtils.isBlank(parentAncestors)) {
+            return String.valueOf(parentId);
+        }
+        return parentAncestors + StringUtils.SEPARATOR + parentId;
+    }
+
+    private void updateChildrenAncestors(${pkColumn.javaType} currentId, String newAncestors, String oldAncestors) {
+        List<${ClassName}> children = baseMapper.selectList(new LambdaQueryWrapper<${ClassName}>()
+            .select(${ClassName}::get${pkColumn.capJavaField}, ${ClassName}::get${TreeAncestorsCap}()));
+        List<${ClassName}> updateList = new ArrayList<>();
+        for (${ClassName} child : children) {
+            String ancestors = child.get${TreeAncestorsCap}();
+            if (StringUtils.isBlank(ancestors) || !containsAncestor(ancestors, currentId)) {
+                continue;
+            }
+            ${ClassName} update = new ${ClassName}();
+            update.set${pkColumn.capJavaField}(child.get${pkColumn.capJavaField}());
+            update.set${TreeAncestorsCap}(StringUtils.replaceOnce(ancestors, oldAncestors, newAncestors));
+            updateList.add(update);
+        }
+        if (!updateList.isEmpty()) {
+            baseMapper.updateBatchById(updateList);
+        }
+    }
+
+    private boolean containsAncestor(String ancestors, ${pkColumn.javaType} nodeId) {
+        for (String item : StringUtils.splitList(ancestors)) {
+            if (StringUtils.equals(item, String.valueOf(nodeId))) {
+                return true;
+            }
+        }
+        return false;
+    }
+#end
+#end
 
     /**
      * 校验并批量删除${functionName}信息
@@ -159,8 +334,8 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<${pkColumn.javaType}> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
+        if (isValid) {
+            // 可在此扩展删除前业务校验
         }
         return baseMapper.deleteByIds(ids) > 0;
     }

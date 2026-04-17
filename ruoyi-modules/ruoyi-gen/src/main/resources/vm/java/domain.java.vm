@@ -38,6 +38,8 @@ public class ${ClassName} extends ${Entity} {
 #end
 #if($column.isPk==1)
     @TableId(value = "$column.columnName")
+#elseif($column.needTableField)
+    @TableField(value = "$column.columnName")
 #end
     private $column.javaType $column.javaField;
 

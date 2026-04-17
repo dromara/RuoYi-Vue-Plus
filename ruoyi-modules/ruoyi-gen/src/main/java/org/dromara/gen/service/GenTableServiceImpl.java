@@ -1,6 +1,7 @@
 package org.dromara.gen.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Dict;
@@ -221,17 +222,6 @@ public class GenTableServiceImpl implements IGenTableService {
     }
 
     /**
-     * 查询所有表信息
-     *
-     * @return 表信息集合
-     */
-    @Override
-    public List<GenTable> selectGenTableAll() {
-        return fillTableColumns(baseMapper.selectList(new LambdaQueryWrapper<GenTable>()
-            .orderByAsc(GenTable::getTableId)));
-    }
-
-    /**
      * 修改业务
      *
      * @param genTable 业务信息
@@ -239,6 +229,7 @@ public class GenTableServiceImpl implements IGenTableService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateGenTable(GenTable genTable) {
+        normalizeColumnOptions(genTable.getColumns());
         String options = JsonUtils.toJsonString(genTable.getParams());
         genTable.setOptions(options);
         int row = baseMapper.updateById(genTable);
@@ -372,16 +363,13 @@ public class GenTableServiceImpl implements IGenTableService {
         List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory(), table.getDataName());
         for (PathNamedTemplate template : templates) {
             String pathName = template.getPathName();
-            // 渲染模板
-            if (!StringUtils.containsAny(pathName, "sql.vm", "api.ts.vm", "types.ts.vm", "index.vue.vm", "index-tree.vue.vm")) {
-                // 渲染模板
-                try {
-                    String render = template.render(context);
-                    String path = getGenPath(table, pathName);
-                    FileUtils.writeUtf8String(render, path);
-                } catch (Exception e) {
-                    throw new ServiceException("渲染模板失败，表名：" + table.getTableName());
-                }
+            try {
+                String render = template.render(context);
+                String path = getGenPath(table, pathName);
+                FileUtils.writeUtf8String(render, path);
+            } catch (Exception e) {
+                log.error("渲染模板失败，表名：{}，模板：{}", table.getTableName(), pathName, e);
+                throw new ServiceException("渲染模板失败，表名：" + table.getTableName() + "，模板：" + pathName);
             }
         }
     }
@@ -426,6 +414,7 @@ public class GenTableServiceImpl implements IGenTableService {
             saveColumns.add(column);
         });
         if (CollUtil.isNotEmpty(saveColumns)) {
+            normalizeColumnOptions(saveColumns);
             genTableColumnMapper.insertOrUpdateBatch(saveColumns);
         }
         List<GenTableColumn> delColumns = StreamUtils.filter(tableColumns, column -> !dbTableColumnNames.contains(column.getColumnName()));
@@ -506,6 +495,7 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     @Override
     public void validateEdit(GenTable genTable) {
+        validateOptionColumns(genTable);
         if (GenConstants.TPL_TREE.equals(genTable.getTplCategory())) {
             String options = JsonUtils.toJsonString(genTable.getParams());
             Dict paramsObj = JsonUtils.parseMap(options);
@@ -515,6 +505,52 @@ public class GenTableServiceImpl implements IGenTableService {
                 throw new ServiceException("树父编码字段不能为空");
             } else if (StringUtils.isEmpty(paramsObj.getStr(GenConstants.TREE_NAME))) {
                 throw new ServiceException("树名称字段不能为空");
+            }
+        }
+    }
+
+    private void validateOptionColumns(GenTable genTable) {
+        Map<String, Object> params = genTable.getParams();
+        if (CollUtil.isEmpty(params) || CollUtil.isEmpty(genTable.getColumns())) {
+            return;
+        }
+        Set<String> validFields = new HashSet<>();
+        genTable.getColumns().forEach(column -> {
+            validFields.add(column.getColumnName());
+            validFields.add(column.getJavaField());
+        });
+        validateOptionField(validFields, params.get(GenConstants.STATUS_FIELD), "状态字段");
+        validateOptionField(validFields, params.get(GenConstants.SORT_FIELD), "排序字段");
+        validateOptionField(validFields, params.get(GenConstants.TREE_ANCESTORS), "树祖级字段");
+        validateOptionField(validFields, params.get(GenConstants.TREE_ORDER_FIELD), "树排序字段");
+        Object uniqueFields = params.get(GenConstants.UNIQUE_FIELDS);
+        if (uniqueFields instanceof Collection<?> collection) {
+            for (Object field : collection) {
+                validateOptionField(validFields, field, "组合唯一字段");
+            }
+        }
+    }
+
+    private void validateOptionField(Set<String> validFields, Object field, String label) {
+        if (ObjectUtil.isNull(field)) {
+            return;
+        }
+        String fieldValue = Convert.toStr(field);
+        if (StringUtils.isBlank(fieldValue)) {
+            return;
+        }
+        if (!validFields.contains(fieldValue)) {
+            throw new ServiceException(label + "不存在，请刷新字段后重试");
+        }
+    }
+
+    private void normalizeColumnOptions(List<GenTableColumn> columns) {
+        if (CollUtil.isEmpty(columns)) {
+            return;
+        }
+        for (GenTableColumn column : columns) {
+            if (!column.isDictColumn()) {
+                column.setDictType(StringUtils.EMPTY);
             }
         }
     }
@@ -588,12 +624,32 @@ public class GenTableServiceImpl implements IGenTableService {
             String treeName = paramsObj.getStr(GenConstants.TREE_NAME);
             Long parentMenuId = paramsObj.getLong(GenConstants.PARENT_MENU_ID);
             String parentMenuName = paramsObj.getStr(GenConstants.PARENT_MENU_NAME);
+            Boolean enableExport = Convert.toBool(paramsObj.get(GenConstants.ENABLE_EXPORT), true);
+            Boolean enableStatus = Convert.toBool(paramsObj.get(GenConstants.ENABLE_STATUS), false);
+            String statusField = paramsObj.getStr(GenConstants.STATUS_FIELD);
+            Boolean enableUnique = Convert.toBool(paramsObj.get(GenConstants.ENABLE_UNIQUE), false);
+            List<String> uniqueFields = Convert.toList(String.class, paramsObj.get(GenConstants.UNIQUE_FIELDS));
+            Boolean enableSort = Convert.toBool(paramsObj.get(GenConstants.ENABLE_SORT), false);
+            String sortField = paramsObj.getStr(GenConstants.SORT_FIELD);
+            String treeRootValue = paramsObj.getStr(GenConstants.TREE_ROOT_VALUE);
+            String treeAncestorsField = paramsObj.getStr(GenConstants.TREE_ANCESTORS);
+            String treeOrderField = paramsObj.getStr(GenConstants.TREE_ORDER_FIELD);
 
             genTable.setTreeCode(treeCode);
             genTable.setTreeParentCode(treeParentCode);
             genTable.setTreeName(treeName);
             genTable.setParentMenuId(parentMenuId);
             genTable.setParentMenuName(parentMenuName);
+            genTable.setEnableExport(enableExport);
+            genTable.setEnableStatus(enableStatus);
+            genTable.setStatusField(statusField);
+            genTable.setEnableUnique(enableUnique);
+            genTable.setUniqueFields(uniqueFields);
+            genTable.setEnableSort(enableSort);
+            genTable.setSortField(sortField);
+            genTable.setTreeRootValue(treeRootValue);
+            genTable.setTreeAncestorsField(treeAncestorsField);
+            genTable.setTreeOrderField(treeOrderField);
         }
     }
 
@@ -605,11 +661,12 @@ public class GenTableServiceImpl implements IGenTableService {
      * @return 生成地址
      */
     public static String getGenPath(GenTable table, String template) {
+        String relativePath = StringUtils.replace(TemplateEngineUtils.getFileName(template, table), "/", File.separator);
         String genPath = table.getGenPath();
         if (StringUtils.equals(genPath, "/")) {
-            return System.getProperty("user.dir") + File.separator + "src" + File.separator + TemplateEngineUtils.getFileName(template, table);
+            return System.getProperty("user.dir") + File.separator + "src" + File.separator + relativePath;
         }
-        return genPath + File.separator + TemplateEngineUtils.getFileName(template, table);
+        return genPath + File.separator + relativePath;
     }
 }
 

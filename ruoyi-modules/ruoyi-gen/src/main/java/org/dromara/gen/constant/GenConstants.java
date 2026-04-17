@@ -46,6 +46,56 @@ public interface GenConstants {
     String PARENT_MENU_NAME = "parentMenuName";
 
     /**
+     * 是否启用导出能力
+     */
+    String ENABLE_EXPORT = "enableExport";
+
+    /**
+     * 是否启用状态切换能力
+     */
+    String ENABLE_STATUS = "enableStatus";
+
+    /**
+     * 状态字段
+     */
+    String STATUS_FIELD = "statusField";
+
+    /**
+     * 是否启用组合唯一校验
+     */
+    String ENABLE_UNIQUE = "enableUnique";
+
+    /**
+     * 组合唯一字段
+     */
+    String UNIQUE_FIELDS = "uniqueFields";
+
+    /**
+     * 是否启用排序调整能力
+     */
+    String ENABLE_SORT = "enableSort";
+
+    /**
+     * 排序字段
+     */
+    String SORT_FIELD = "sortField";
+
+    /**
+     * 树根节点值
+     */
+    String TREE_ROOT_VALUE = "treeRootValue";
+
+    /**
+     * 树祖级字段
+     */
+    String TREE_ANCESTORS = "treeAncestors";
+
+    /**
+     * 树排序字段
+     */
+    String TREE_ORDER_FIELD = "treeOrderField";
+
+    /**
      * 数据库字符串类型
      */
     String[] COLUMNTYPE_STR = {"char", "varchar", "enum", "set", "nchar", "nvarchar", "varchar2", "nvarchar2"};
@@ -129,6 +179,16 @@ public interface GenConstants {
     String HTML_DATETIME = "datetime";
 
     /**
+     * 开关控件
+     */
+    String HTML_SWITCH = "switch";
+
+    /**
+     * 数字输入控件
+     */
+    String HTML_INPUT_NUMBER = "inputNumber";
+
+    /**
      * 图片上传控件
      */
     String HTML_IMAGE_UPLOAD = "imageUpload";
@@ -167,6 +227,11 @@ public interface GenConstants {
      * 高精度计算类型
      */
     String TYPE_BIGDECIMAL = "BigDecimal";
+
+    /**
+     * 布尔类型
+     */
+    String TYPE_BOOLEAN = "Boolean";
 
     /**
      * 时间类型

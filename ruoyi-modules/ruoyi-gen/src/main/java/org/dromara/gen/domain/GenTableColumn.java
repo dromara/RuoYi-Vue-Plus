@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import org.apache.ibatis.type.JdbcType;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
+import org.dromara.gen.constant.GenConstants;
 
 /**
  * 代码生成业务字段表 gen_table_column
@@ -305,6 +306,31 @@ public class GenTableColumn extends BaseEntity {
     public static boolean isUsableColumn(String javaField) {
         // isSuperColumn()中的名单用于避免生成多余Domain属性，若某些属性在生成页面时需要用到不能忽略，则放在此处白名单
         return StringUtils.equalsAnyIgnoreCase(javaField, "parentId", "orderNum", "remark");
+    }
+
+    /**
+     * 判断当前列是否需要显式声明 MP 字段映射。
+     *
+     * @return 字段名与下划线列名不一致时返回 {@code true}
+     */
+    public boolean isNeedTableField() {
+        if (StringUtils.isAnyBlank(this.columnName, this.javaField)) {
+            return false;
+        }
+        return !StringUtils.equalsIgnoreCase(this.columnName, StringUtils.toUnderScoreCase(this.javaField));
+    }
+
+    /**
+     * 判断当前列是否属于字典控件列。
+     *
+     * @return 仅当已配置字典类型且显示类型支持字典时返回 {@code true}
+     */
+    public boolean isDictColumn() {
+        return StringUtils.isNotBlank(this.dictType) && StringUtils.equalsAny(this.htmlType,
+            GenConstants.HTML_SELECT,
+            GenConstants.HTML_RADIO,
+            GenConstants.HTML_CHECKBOX,
+            GenConstants.HTML_SWITCH);
     }
 
     /**
