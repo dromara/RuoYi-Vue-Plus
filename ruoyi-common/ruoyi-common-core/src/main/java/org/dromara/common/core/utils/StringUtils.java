@@ -562,4 +562,11 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return Strings.CS.endsWithAny(sequence, searchStrings);
     }
 
+    /**
+     * 测试 CharSequence 是否以指定的后缀结尾。
+     */
+    public static boolean endsWith(final CharSequence str, final CharSequence suffix) {
+        return Strings.CS.endsWith(str, suffix);
+    }
+
 }

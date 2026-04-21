@@ -34,7 +34,7 @@ public class ThreadPoolConfig {
     @Bean(name = "scheduledExecutorService")
     protected ScheduledExecutorService scheduledExecutorService() {
         // daemon 必须为 true
-        BasicThreadFactory.Builder builder = new BasicThreadFactory.Builder().daemon(true);
+        BasicThreadFactory.Builder builder = BasicThreadFactory.builder().daemon(true);
         if (SpringUtils.isVirtual()) {
             builder.namingPattern("virtual-schedule-pool-%d").wrappedFactory(new VirtualThreadTaskExecutor().getVirtualThreadFactory());
         } else {
