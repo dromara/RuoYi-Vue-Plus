@@ -3,7 +3,6 @@ package org.dromara.web.controller;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthResponse;
@@ -21,8 +20,6 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.common.redis.annotation.RateLimiter;
-import org.dromara.common.redis.enums.LimitType;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
@@ -190,25 +187,4 @@ public class AuthController {
         return R.ok();
     }
 
-    /**
-     * 获取登录页租户下拉框数据，当前仅预留返回结构。
-     *
-     * @param request 当前请求
-     * @return 租户列表
-     * @throws Exception 异常
-     */
-    @RateLimiter(time = 60, count = 20, limitType = LimitType.IP)
-    @GetMapping("/tenant/list")
-    public R<LoginTenantVo> tenantList(HttpServletRequest request) throws Exception {
-        // 暂时预留给前端使用 后续删除
-        return R.ok(new LoginTenantVo(false));
-    }
-
-    /**
-     * 登录租户列表响应对象。
-     *
-     * @param tenantEnabled 是否启用租户
-     */
-    public record LoginTenantVo(Boolean tenantEnabled) {
-    }
 }
