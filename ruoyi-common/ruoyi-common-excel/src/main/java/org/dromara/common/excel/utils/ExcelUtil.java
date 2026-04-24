@@ -119,15 +119,22 @@ public class ExcelUtil {
      * @param pageSize  每页条数
      */
     public static <T> void exportExcelZip(List<T> list, String sheetName, Class<T> clazz, HttpServletResponse response, int pageSize) {
+        // 数据分页
         List<List<T>> pageList = ListUtil.partition(list, pageSize);
+        // 只有一页，直接导出普通Excel
         if (pageList.size() <= 1) {
             exportSingleExcel(list, sheetName, clazz, response);
             return;
         }
+        // 多线程生成所有Excel文件（字节数组）
         Map<String, byte[]> excelMap = buildExcelZipData(pageList, sheetName, clazz);
+        // 写入ZIP并下载
         writeExcelZipResponse(sheetName, response, excelMap);
     }
 
+    /**
+     * 导出【单文件】Excel
+     */
     private static <T> void exportSingleExcel(List<T> list, String sheetName, Class<T> clazz, HttpServletResponse response) {
         try {
             resetResponse(sheetName, response);
@@ -138,15 +145,26 @@ public class ExcelUtil {
         }
     }
 
+    /**
+     * 多线程并行生成多个Excel文件
+     * 使用虚拟线程，高并发、低资源占用
+     *
+     * @return Map<文件名, 文件字节数组>
+     */
     private static <T> Map<String, byte[]> buildExcelZipData(List<List<T>> pageList, String sheetName, Class<T> clazz) {
+        // 有序Map，保证文件按页码顺序打包
         Map<String, byte[]> excelMap = new LinkedHashMap<>(pageList.size());
         List<Future<Map.Entry<String, byte[]>>> futures = new ArrayList<>(pageList.size());
+
+        // 使用虚拟线程池执行导出任务
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            // 1. 提交所有分页导出任务
             for (int i = 0; i < pageList.size(); i++) {
                 int pageNum = i + 1;
                 List<T> pageData = pageList.get(i);
                 futures.add(executor.submit(() -> buildExcelZipEntry(pageData, sheetName, clazz, pageNum)));
             }
+            // 2. 获取所有线程执行结果
             for (Future<Map.Entry<String, byte[]>> future : futures) {
                 Map.Entry<String, byte[]> excel = getExcelZipEntry(future);
                 excelMap.put(excel.getKey(), excel.getValue());
@@ -155,6 +173,13 @@ public class ExcelUtil {
         return excelMap;
     }
 
+    /**
+     * 单页Excel生成任务（线程执行单元）
+     *
+     * @param pageData 当前页数据
+     * @param pageNum  当前页码
+     * @return 文件名 + 文件字节
+     */
     private static <T> Map.Entry<String, byte[]> buildExcelZipEntry(List<T> pageData, String sheetName, Class<T> clazz, int pageNum) {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             String exportSheetName = sheetName + "_第" + pageNum + "页";
@@ -165,10 +190,15 @@ public class ExcelUtil {
         }
     }
 
+    /**
+     * 安全获取异步任务结果
+     * 处理中断异常、执行异常，保证任务稳定
+     */
     private static Map.Entry<String, byte[]> getExcelZipEntry(Future<Map.Entry<String, byte[]>> future) {
         try {
             return future.get();
         } catch (InterruptedException e) {
+            // 恢复中断标志
             Thread.currentThread().interrupt();
             throw new RuntimeException("Excel导出线程被中断", e);
         } catch (ExecutionException e) {
@@ -176,11 +206,19 @@ public class ExcelUtil {
         }
     }
 
+    /**
+     * 将多个Excel文件打包成ZIP并输出到浏览器下载
+     *
+     * @param excelMap 文件名 -> 文件字节
+     */
     private static void writeExcelZipResponse(String sheetName, HttpServletResponse response, Map<String, byte[]> excelMap) {
         try {
+            // 设置ZIP下载响应头
             response.setContentType("application/zip");
             response.setHeader("Content-Disposition",
                 "attachment;filename*=UTF-8''" + URLEncoder.encode(sheetName, StandardCharsets.UTF_8) + ".zip");
+
+            // 压缩写入多个Excel文件
             try (ZipOutputStream zipOut = ZipUtil.getZipOutputStream(response.getOutputStream(), CharsetUtil.CHARSET_UTF_8)) {
                 for (Map.Entry<String, byte[]> entry : excelMap.entrySet()) {
                     zipOut.putNextEntry(new ZipEntry(entry.getKey()));
