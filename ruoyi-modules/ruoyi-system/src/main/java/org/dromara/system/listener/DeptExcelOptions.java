@@ -7,6 +7,7 @@ import org.dromara.common.core.utils.TreeBuildUtils;
 import org.dromara.common.excel.core.ExcelOptionsProvider;
 import org.dromara.system.domain.bo.SysDeptBo;
 import org.dromara.system.service.ISysDeptService;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.Set;
  *
  * @author AprilWind
  */
+@Component
 @RequiredArgsConstructor
 public class DeptExcelOptions implements ExcelOptionsProvider {
 

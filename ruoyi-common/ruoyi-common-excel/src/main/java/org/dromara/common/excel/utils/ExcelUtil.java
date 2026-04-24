@@ -3,17 +3,17 @@ package org.dromara.common.excel.utils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.IdUtil;
-import org.apache.fesod.sheet.FesodSheet;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.fesod.sheet.ExcelWriter;
+import org.apache.fesod.sheet.FesodSheet;
 import org.apache.fesod.sheet.write.builder.ExcelWriterSheetBuilder;
 import org.apache.fesod.sheet.write.metadata.WriteSheet;
 import org.apache.fesod.sheet.write.metadata.fill.FillConfig;
 import org.apache.fesod.sheet.write.metadata.fill.FillWrapper;
 import org.apache.fesod.sheet.write.style.column.LongestMatchColumnWidthStyleStrategy;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.excel.convert.ExcelBigNumberConvert;
@@ -38,23 +38,23 @@ import java.util.function.Consumer;
 public class ExcelUtil {
 
     /**
-     * 同步导入(适用于小数据量)
+     * 读取Excel并返回对象集合
      *
-     * @param is 输入流
-     * @return 转换后集合
+     * @param is    文件流
+     * @param clazz 接收实体类
+     * @return 数据列表
      */
     public static <T> List<T> importExcel(InputStream is, Class<T> clazz) {
         return FesodSheet.read(is).head(clazz).autoCloseStream(false).sheet().doReadSync();
     }
 
-
     /**
-     * 使用校验监听器 异步导入 同步返回
+     * 读取Excel并返回解析结果（带默认校验功能）
      *
-     * @param is         输入流
-     * @param clazz      对象类型
-     * @param isValidate 是否 Validator 检验 默认为是
-     * @return 转换后集合
+     * @param is         文件流
+     * @param clazz      接收实体类
+     * @param isValidate 是否开启校验
+     * @return 解析结果（含成功数据、错误信息）
      */
     public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, boolean isValidate) {
         DefaultExcelListener<T> listener = new DefaultExcelListener<>(isValidate);
@@ -63,12 +63,12 @@ public class ExcelUtil {
     }
 
     /**
-     * 使用自定义监听器 异步导入 自定义返回
+     * 读取Excel并返回解析结果（使用自定义监听器）
      *
-     * @param is       输入流
-     * @param clazz    对象类型
+     * @param is       文件流
+     * @param clazz    接收实体类
      * @param listener 自定义监听器
-     * @return 转换后集合
+     * @return 解析结果（含成功数据、错误信息）
      */
     public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, ExcelListener<T> listener) {
         FesodSheet.read(is, clazz, listener).sheet().doRead();
