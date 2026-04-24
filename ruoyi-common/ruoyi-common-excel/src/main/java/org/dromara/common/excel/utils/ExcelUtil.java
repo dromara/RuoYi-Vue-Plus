@@ -2,9 +2,7 @@ package org.dromara.common.excel.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
-import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ZipUtil;
@@ -26,13 +24,13 @@ import org.dromara.common.excel.core.*;
 import org.dromara.common.excel.handler.DataWriteHandler;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.CountDownLatch;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -109,84 +107,89 @@ public class ExcelUtil {
      * @param clazz     实体类
      */
     public static <T> void exportExcelZip(List<T> list, String sheetName, Class<T> clazz, HttpServletResponse response) {
-        exportExcelZip(list, sheetName, clazz, response, 999, 5, 10);
+        exportExcelZip(list, sheetName, clazz, response, 999);
     }
 
     /**
      * 大数据量Excel导出
      *
-     * @param list       导出数据集合
-     * @param sheetName  工作表的名称
-     * @param clazz      实体类
-     * @param pageSize   每页条数
-     * @param coreThread 核心线程
-     * @param maxThread  最大线程
+     * @param list      导出数据集合
+     * @param sheetName 工作表的名称
+     * @param clazz     实体类
+     * @param pageSize  每页条数
      */
-    public static <T> void exportExcelZip(List<T> list, String sheetName, Class<T> clazz, HttpServletResponse response, int pageSize, int coreThread, int maxThread) {
+    public static <T> void exportExcelZip(List<T> list, String sheetName, Class<T> clazz, HttpServletResponse response, int pageSize) {
+        List<List<T>> pageList = ListUtil.partition(list, pageSize);
+        if (pageList.size() <= 1) {
+            exportSingleExcel(list, sheetName, clazz, response);
+            return;
+        }
+        Map<String, byte[]> excelMap = buildExcelZipData(pageList, sheetName, clazz);
+        writeExcelZipResponse(sheetName, response, excelMap);
+    }
+
+    private static <T> void exportSingleExcel(List<T> list, String sheetName, Class<T> clazz, HttpServletResponse response) {
         try {
-            List<List<T>> pageList = ListUtil.partition(list, pageSize);
-            int totalPage = pageList.size();
+            resetResponse(sheetName, response);
+            ServletOutputStream os = response.getOutputStream();
+            exportExcel(list, sheetName, clazz, false, os, null);
+        } catch (IOException e) {
+            throw new RuntimeException("导出Excel异常", e);
+        }
+    }
 
-            // 数据量不足1页，直接导出普通Excel
-            if (totalPage == 1) {
-                resetResponse(sheetName, response);
-                ServletOutputStream os = response.getOutputStream();
-                exportExcel(list, sheetName, clazz, false, os, null);
-                return;
-            }
-
-            // ====================== 初始化线程池 ======================
-            ExecutorService executor = ThreadUtil.newExecutor(coreThread, maxThread);
-
-            // 存储结果：key=文件名，value=文件字节码（线程安全Map）
-            Map<String, byte[]> excelMap = new ConcurrentSkipListMap<>();
-
-            // 计数器：等待所有线程完成
-            CountDownLatch latch = new CountDownLatch(totalPage);
-
-            // ====================== 多线程生成Excel ======================
-            for (int i = 0; i < totalPage; i++) {
+    private static <T> Map<String, byte[]> buildExcelZipData(List<List<T>> pageList, String sheetName, Class<T> clazz) {
+        Map<String, byte[]> excelMap = new LinkedHashMap<>(pageList.size());
+        List<Future<Map.Entry<String, byte[]>>> futures = new ArrayList<>(pageList.size());
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (int i = 0; i < pageList.size(); i++) {
                 int pageNum = i + 1;
                 List<T> pageData = pageList.get(i);
-
-                executor.execute(() -> {
-                    try {
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        String fileName = sheetName + "_第" + pageNum + "页.xlsx";
-                        // 生成Excel
-                        exportExcel(pageData, sheetName + "_第" + pageNum + "页", clazz, false, bos, null);
-                        excelMap.put(fileName, bos.toByteArray());
-                    } catch (Exception e) {
-                        throw new RuntimeException("第" + pageNum + "页Excel生成失败", e);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
+                futures.add(executor.submit(() -> buildExcelZipEntry(pageData, sheetName, clazz, pageNum)));
             }
+            for (Future<Map.Entry<String, byte[]>> future : futures) {
+                Map.Entry<String, byte[]> excel = getExcelZipEntry(future);
+                excelMap.put(excel.getKey(), excel.getValue());
+            }
+        }
+        return excelMap;
+    }
 
-            // 等待所有线程执行完毕（最多等待10分钟）
-            latch.await(10, TimeUnit.MINUTES);
+    private static <T> Map.Entry<String, byte[]> buildExcelZipEntry(List<T> pageData, String sheetName, Class<T> clazz, int pageNum) {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            String exportSheetName = sheetName + "_第" + pageNum + "页";
+            exportExcel(pageData, exportSheetName, clazz, false, bos, null);
+            return Map.entry(exportSheetName + ".xlsx", bos.toByteArray());
+        } catch (Exception e) {
+            throw new RuntimeException("第" + pageNum + "页Excel生成失败", e);
+        }
+    }
 
-            // ====================== 打包ZIP并下载 ======================
+    private static Map.Entry<String, byte[]> getExcelZipEntry(Future<Map.Entry<String, byte[]>> future) {
+        try {
+            return future.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Excel导出线程被中断", e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException("Excel导出失败", e.getCause());
+        }
+    }
+
+    private static void writeExcelZipResponse(String sheetName, HttpServletResponse response, Map<String, byte[]> excelMap) {
+        try {
             response.setContentType("application/zip");
             response.setHeader("Content-Disposition",
-                "attachment;filename*=UTF-8''" + java.net.URLEncoder.encode(sheetName, "UTF-8") + ".zip");
-
-            ZipOutputStream zipOut = ZipUtil.getZipOutputStream(response.getOutputStream(), CharsetUtil.CHARSET_UTF_8);
-
-            // 写入ZIP
-            for (Map.Entry<String, byte[]> entry : excelMap.entrySet()) {
-                zipOut.putNextEntry(new ZipEntry(entry.getKey()));
-                zipOut.write(entry.getValue());
-                zipOut.closeEntry();
+                "attachment;filename*=UTF-8''" + URLEncoder.encode(sheetName, StandardCharsets.UTF_8) + ".zip");
+            try (ZipOutputStream zipOut = ZipUtil.getZipOutputStream(response.getOutputStream(), CharsetUtil.CHARSET_UTF_8)) {
+                for (Map.Entry<String, byte[]> entry : excelMap.entrySet()) {
+                    zipOut.putNextEntry(new ZipEntry(entry.getKey()));
+                    zipOut.write(entry.getValue());
+                    zipOut.closeEntry();
+                }
             }
-
-            // 关闭资源
-            IoUtil.close(zipOut);
-            executor.shutdown();
-
-        } catch (Exception e) {
-            throw new RuntimeException("Excel导出失败", e);
+        } catch (IOException e) {
+            throw new RuntimeException("导出Zip异常", e);
         }
     }
 
