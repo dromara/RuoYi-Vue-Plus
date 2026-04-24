@@ -1,8 +1,13 @@
 package org.dromara.common.excel.utils;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ZipUtil;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -20,14 +25,17 @@ import org.dromara.common.excel.convert.ExcelBigNumberConvert;
 import org.dromara.common.excel.core.*;
 import org.dromara.common.excel.handler.DataWriteHandler;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Excel相关处理
@@ -90,6 +98,95 @@ public class ExcelUtil {
             exportExcel(list, sheetName, clazz, false, os, null);
         } catch (IOException e) {
             throw new RuntimeException("导出Excel异常", e);
+        }
+    }
+
+    /**
+     * 大数据量Excel导出
+     *
+     * @param list      导出数据集合
+     * @param sheetName 工作表的名称
+     * @param clazz     实体类
+     */
+    public static <T> void exportExcelZip(List<T> list, String sheetName, Class<T> clazz, HttpServletResponse response) {
+        exportExcelZip(list, sheetName, clazz, response, 999, 5, 10);
+    }
+
+    /**
+     * 大数据量Excel导出
+     *
+     * @param list       导出数据集合
+     * @param sheetName  工作表的名称
+     * @param clazz      实体类
+     * @param pageSize   每页条数
+     * @param coreThread 核心线程
+     * @param maxThread  最大线程
+     */
+    public static <T> void exportExcelZip(List<T> list, String sheetName, Class<T> clazz, HttpServletResponse response, int pageSize, int coreThread, int maxThread) {
+        try {
+            List<List<T>> pageList = ListUtil.partition(list, pageSize);
+            int totalPage = pageList.size();
+
+            // 数据量不足1页，直接导出普通Excel
+            if (totalPage == 1) {
+                resetResponse(sheetName, response);
+                ServletOutputStream os = response.getOutputStream();
+                exportExcel(list, sheetName, clazz, false, os, null);
+                return;
+            }
+
+            // ====================== 初始化线程池 ======================
+            ExecutorService executor = ThreadUtil.newExecutor(coreThread, maxThread);
+
+            // 存储结果：key=文件名，value=文件字节码（线程安全Map）
+            Map<String, byte[]> excelMap = new ConcurrentSkipListMap<>();
+
+            // 计数器：等待所有线程完成
+            CountDownLatch latch = new CountDownLatch(totalPage);
+
+            // ====================== 多线程生成Excel ======================
+            for (int i = 0; i < totalPage; i++) {
+                int pageNum = i + 1;
+                List<T> pageData = pageList.get(i);
+
+                executor.execute(() -> {
+                    try {
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        String fileName = sheetName + "_第" + pageNum + "页.xlsx";
+                        // 生成Excel
+                        exportExcel(pageData, sheetName + "_第" + pageNum + "页", clazz, false, bos, null);
+                        excelMap.put(fileName, bos.toByteArray());
+                    } catch (Exception e) {
+                        throw new RuntimeException("第" + pageNum + "页Excel生成失败", e);
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
+
+            // 等待所有线程执行完毕（最多等待10分钟）
+            latch.await(10, TimeUnit.MINUTES);
+
+            // ====================== 打包ZIP并下载 ======================
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition",
+                "attachment;filename*=UTF-8''" + java.net.URLEncoder.encode(sheetName, "UTF-8") + ".zip");
+
+            ZipOutputStream zipOut = ZipUtil.getZipOutputStream(response.getOutputStream(), CharsetUtil.CHARSET_UTF_8);
+
+            // 写入ZIP
+            for (Map.Entry<String, byte[]> entry : excelMap.entrySet()) {
+                zipOut.putNextEntry(new ZipEntry(entry.getKey()));
+                zipOut.write(entry.getValue());
+                zipOut.closeEntry();
+            }
+
+            // 关闭资源
+            IoUtil.close(zipOut);
+            executor.shutdown();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Excel导出失败", e);
         }
     }
 
