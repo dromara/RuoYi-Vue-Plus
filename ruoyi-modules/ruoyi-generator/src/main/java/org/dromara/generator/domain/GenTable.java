@@ -101,12 +101,12 @@ public class GenTable extends BaseEntity {
     private String functionAuthor;
 
     /**
-     * 生成代码方式（0zip压缩包 1自定义路径）
+     * 生成代码方式（固定为0zip压缩包）
      */
     private String genType;
 
     /**
-     * 生成路径（不填默认项目路径）
+     * 生成路径（兼容历史字段）
      */
     @TableField(updateStrategy = FieldStrategy.NOT_EMPTY)
     private String genPath;

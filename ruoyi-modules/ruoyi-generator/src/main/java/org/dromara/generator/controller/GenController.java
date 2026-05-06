@@ -158,19 +158,6 @@ public class GenController extends BaseController {
     }
 
     /**
-     * 生成代码（自定义路径）
-     *
-     * @param tableId 表ID
-     */
-    @SaCheckPermission("tool:gen:code")
-    @Log(title = "代码生成", businessType = BusinessType.GENCODE)
-    @GetMapping("/genCode/{tableId}")
-    public R<Void> genCode(@PathVariable("tableId") Long tableId) {
-        genTableService.generatorCode(tableId);
-        return R.ok();
-    }
-
-    /**
      * 同步数据库
      *
      * @param tableId 表ID

@@ -111,13 +111,6 @@ public interface IGenTableService {
     byte[] downloadCode(Long tableId);
 
     /**
-     * 生成代码（自定义路径）
-     *
-     * @param tableId 表名称
-     */
-    void generatorCode(Long tableId);
-
-    /**
      * 同步数据库
      *
      * @param tableId 表名称
