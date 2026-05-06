@@ -22,7 +22,6 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.utils.IdGeneratorUtil;
@@ -38,7 +37,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -341,37 +339,9 @@ public class GenTableServiceImpl implements IGenTableService {
     public byte[] downloadCode(Long tableId) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ZipOutputStream zip = new ZipOutputStream(outputStream);
-        generatorCode(tableId, zip);
+        writeCodeToZip(tableId, zip);
         IoUtil.close(zip);
         return outputStream.toByteArray();
-    }
-
-    /**
-     * 生成代码（自定义路径）
-     *
-     * @param tableId 表名称
-     */
-    @Override
-    public void generatorCode(Long tableId) {
-        // 查询表信息
-        GenTable table = getGenTable(tableId);
-        // 设置主键列信息
-        setPkColumn(table);
-
-        Dict context = TemplateEngineUtils.buildContext(table);
-        // 获取模板列表
-        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory(), table.getDataName());
-        for (PathNamedTemplate template : templates) {
-            String pathName = template.getPathName();
-            try {
-                String render = template.render(context);
-                String path = getGenPath(table, pathName);
-                FileUtils.writeUtf8String(render, path);
-            } catch (Exception e) {
-                log.error("渲染模板失败，表名：{}，模板：{}", table.getTableName(), pathName, e);
-                throw new ServiceException("渲染模板失败，表名：" + table.getTableName() + "，模板：" + pathName);
-            }
-        }
     }
 
     /**
@@ -437,7 +407,7 @@ public class GenTableServiceImpl implements IGenTableService {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ZipOutputStream zip = new ZipOutputStream(outputStream);
         for (String tableId : tableIds) {
-            generatorCode(Long.parseLong(tableId), zip);
+            writeCodeToZip(Long.parseLong(tableId), zip);
         }
         IoUtil.close(zip);
         return outputStream.toByteArray();
@@ -449,7 +419,7 @@ public class GenTableServiceImpl implements IGenTableService {
      * @param tableId 业务表主键
      * @param zip     代码压缩输出流
      */
-    private void generatorCode(Long tableId, ZipOutputStream zip) {
+    private void writeCodeToZip(Long tableId, ZipOutputStream zip) {
         RenderContext rc = buildRenderContext(tableId);
         GenTable table = rc.table();
         for (PathNamedTemplate template : rc.templates()) {
@@ -653,20 +623,5 @@ public class GenTableServiceImpl implements IGenTableService {
         }
     }
 
-    /**
-     * 获取代码生成地址
-     *
-     * @param table    业务表信息
-     * @param template 模板文件路径
-     * @return 生成地址
-     */
-    public static String getGenPath(GenTable table, String template) {
-        String relativePath = StringUtils.replace(TemplateEngineUtils.getFileName(template, table), "/", File.separator);
-        String genPath = table.getGenPath();
-        if (StringUtils.equals(genPath, "/")) {
-            return System.getProperty("user.dir") + File.separator + "src" + File.separator + relativePath;
-        }
-        return genPath + File.separator + relativePath;
-    }
 }
 
