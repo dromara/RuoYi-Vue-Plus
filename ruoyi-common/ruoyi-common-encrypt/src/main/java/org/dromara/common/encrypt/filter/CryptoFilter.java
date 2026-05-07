@@ -10,6 +10,7 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.encrypt.properties.ApiDecryptProperties;
+import org.dromara.common.encrypt.utils.EncryptUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -29,6 +30,8 @@ public class CryptoFilter implements Filter {
 
     public CryptoFilter(ApiDecryptProperties properties) {
         this.properties = properties;
+        EncryptUtils.validateRsaPublicKey(properties.getPublicKey());
+        EncryptUtils.validateRsaPrivateKey(properties.getPrivateKey());
     }
 
     @Override
