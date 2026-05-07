@@ -107,6 +107,9 @@ public class TemplateEngineUtils {
         // 向模板上下文写入菜单相关变量
         String options = genTable.getOptions();
         Dict paramsObj = JsonUtils.parseMap(options);
+        if (ObjectUtil.isNull(paramsObj)) {
+            paramsObj = new Dict();
+        }
         String parentMenuId = getParentMenuId(paramsObj);
         context.put("parentMenuId", parentMenuId);
         boolean enableExport = getBooleanOption(paramsObj, GenConstants.ENABLE_EXPORT, true);
@@ -300,9 +303,6 @@ public class TemplateEngineUtils {
                 importList.add("com.fasterxml.jackson.annotation.JsonFormat");
             } else if (!column.isSuperColumn() && GenConstants.TYPE_BIGDECIMAL.equals(column.getJavaType())) {
                 importList.add("java.math.BigDecimal");
-            } else if (!column.isSuperColumn() && "imageUpload".equals(column.getHtmlType())) {
-                importList.add("org.dromara.common.translation.annotation.Translation");
-                importList.add("org.dromara.common.translation.constant.TransConstant");
             }
             if (!column.isSuperColumn() && GenConstants.QUERY_BETWEEN.equals(column.getQueryType())) {
                 importList.add("java.util.HashMap");
@@ -335,7 +335,7 @@ public class TemplateEngineUtils {
         for (GenTableColumn column : columns) {
             if (!column.isSuperColumn() && StringUtils.isNotEmpty(column.getDictType()) && StringUtils.equalsAny(
                 column.getHtmlType(),
-                new String[] { GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_CHECKBOX, GenConstants.HTML_SWITCH })) {
+                GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_CHECKBOX, GenConstants.HTML_SWITCH)) {
                 dicts.add("'" + column.getDictType() + "'");
             }
         }
