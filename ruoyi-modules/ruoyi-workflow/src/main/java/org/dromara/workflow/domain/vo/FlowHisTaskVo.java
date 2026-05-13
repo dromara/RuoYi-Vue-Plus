@@ -109,7 +109,7 @@ public class FlowHisTaskVo implements Serializable {
      * 审批者
      */
     @Translation(type = TransConstant.USER_ID_TO_NICKNAME, mapper = "approver")
-    private String approveName;
+    private String approverName;
 
     /**
      * 协作人(只有转办、会签、票签、委派)
