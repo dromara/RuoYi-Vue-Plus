@@ -1,7 +1,7 @@
 interface:
   display_name: "RuoYi Plus 编码"
-  short_description: "按生成器与仓库约定编写代码"
-  default_prompt: "使用 $ruoyi-plus-ai-coding 在这个仓库里按现有约定实现代码修改。"
+  short_description: "按生成器、common 与仓库约定编写代码"
+  default_prompt: "使用 $ruoyi-plus-ai-coding 在这个仓库里按现有约定实现代码修改，保持生成器、公共模块和业务模块风格一致。"
 
 policy:
   allow_implicit_invocation: true

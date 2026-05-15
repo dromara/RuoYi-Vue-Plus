@@ -1,6 +1,6 @@
 ---
 name: ruoyi-plus-ai-coding
-description: 在仓库内按代码生成器模板和项目既有约定生成或修改代码。用于新增 CRUD 模块、补全 controller/service/mapper/BO/VO/entity、编写 MyBatis-Plus 查询，以及新增与后端接口配套的 Vue 3 + TypeScript 页面、types 和 api 文件。
+description: 在仓库内按代码生成器模板和项目既有约定生成或修改代码。用于新增或修改 CRUD 模块、controller/service/mapper/BO/VO/entity、MyBatis-Plus/MPJ 查询、数据权限、缓存、翻译/JSON 增强、公共 common 模块能力、JavaDoc 注释，以及与后端接口配套的 Vue 3 + TypeScript 页面、types 和 api 文件。
 ---
 
 # RuoYi Plus AI 编码规范
@@ -14,6 +14,8 @@ description: 在仓库内按代码生成器模板和项目既有约定生成或�
 - 新增标准 CRUD 模块。
 - 根据新表结构补齐 entity、bo、vo、mapper、service、controller。
 - 修改已有模块的查询、校验、导入导出、数据权限、事务逻辑。
+- 修改 `ruoyi-common` 公共能力，例如 mybatis 查询构造器、translation、json enhance、excel、oss、redis、web 配置。
+- 补充或修正 JavaDoc 注释，尤其是公共 API、接口、BO/VO/Entity 字段、Mapper 默认方法、Service/Controller 方法。
 - 在系统、监控、工作流、demo 等模块内按现有约定扩展业务代码。
 - 为后端新增接口同步补前端 `api/types/index.vue` 骨架。
 
@@ -34,6 +36,8 @@ description: 在仓库内按代码生成器模板和项目既有约定生成或�
    `domain` entity、`domain.bo`、`domain.vo`、`mapper`、`service`、`service.impl`、`controller`。
 4. 优先在生成器结构上扩展，不要自行发明新的分层。
 5. 修改 `ruoyi-system` 这类复杂模块前，先阅读同类现有实现，因为这些模块通常比生成器默认产物多出数据权限、联表、缓存、安全校验等逻辑。
+6. 修改 `ruoyi-common` 公共模块前，先阅读同包接口、实现类和调用点，优先保持已有 API 语义与兼容性。
+7. 只补注释或文档时，不运行无关格式化，不重排 import，不改代码逻辑。
 
 ## 优先级规则
 
@@ -76,6 +80,8 @@ Vue 3、TypeScript API 文件、生成式列表页、表单状态、字典和日
 - 如果目标模块已经存在自定义校验、数据权限、事务、缓存、Excel 导入导出、联表查询等逻辑，应在此基础上扩展，不要为了“简洁”把它们削平。
 - 如果附近 controller 接口已经带有权限、日志、防重、加密、分组校验等注解，新接口默认同步保持一致，除非有明确理由不这样做。
 - 如果 BO 或 VO 需要字段校验、翻译、Excel 注解，应优先参考同模块同用途对象，不要机械套通用注解。
+- 如果修改公共基础模块，优先保持公开 API 兼容，新增能力要查调用点和同包风格。
+- 如果任务只涉及注释，默认补 JavaDoc 并保持实现不变；框架覆写方法不强行重复注释，除非业务语义不直观。
 
 ## 目录映射规则
 
@@ -114,6 +120,14 @@ Vue 3、TypeScript API 文件、生成式列表页、表单状态、字典和日
 
 如果涉及数据权限、缓存、事务、导入导出、字典、翻译、加密、分组校验，优先查项目已有做法并复用公共能力。
 
+### 4. 公共基础模块修改
+
+修改 `ruoyi-common` 下的基础能力时，优先保证二进制/API 兼容：不要轻易改公开方法签名、泛型、返回值或异常语义。新增注释和小范围能力时，先查同包现有风格，例如 `common-mybatis` 的链式 wrapper、`common-translation` 的 `TranslationInterface` 实现、`common-json` 的字段处理器。
+
+### 5. 注释修正任务
+
+只要求“加注释/完善注释”时，默认补 JavaDoc，不改实现。优先补公共 API、接口方法、字段含义、复杂私有辅助方法；覆写框架回调方法只有在当前文件已有注释风格或业务语义不直观时才补。
+
 ## 输出要求
 
 使用本 skill 时，默认期望产出应满足：
@@ -132,6 +146,9 @@ Vue 3、TypeScript API 文件、生成式列表页、表单状态、字典和日
 - 手写 Service 注入 Mapper 时使用具体业务短名；代码生成器模板按类名首字母小写命名，例如 `SysRoleMapper` 生成 `sysRoleMapper`。
 - Service 按场景返回 `PageResult` 或 `List<Vo>`。
 - 查询代码优先使用 `LambdaQueryWrapper`，复杂模块沿用既有 MPJ 联表风格。
+- 公共 Mapper 链式能力优先沿用 `LambdaCrudChainWrapper`、`LambdaQueryBuilder`、`LambdaQueryCondition` 的 `IfPresent` / `IfText` / `IfNotEmpty` 风格。
+- 翻译能力优先沿用 `TranslationInterface` + `@TranslationType` + `@Translation`，批量翻译实现 `translationBatch`，避免退化成逐条查询。
+- JSON 响应增强优先沿用 `JsonFieldProcessor` 的 `collect` / `prepare` / `process` 三阶段模型。
 - BO 使用 `@AutoMapper(target = Entity.class, reverseConvertGenerate = false)`。
 - VO 使用 `@AutoMapper(target = Entity.class)`。
 - 前端 API 路径与后端路由完全对应。

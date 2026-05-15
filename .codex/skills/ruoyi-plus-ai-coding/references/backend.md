@@ -64,6 +64,8 @@
 - 模块已经使用 `@DataPermission` 时，在重写方法和自定义查询上继续保留。
 - 复杂模块里 mapper 可能同时继承 `MPJBaseMapper<Entity>` 并使用 `JoinWrappers.lambda(...)`，遇到这种风格要延续，不要换一种写法。
 - 只有在 `selectVoList/selectVoPage` 不够用时，才补 XML 或自定义 mapper 方法。
+- Mapper 默认方法可以承载短小的 wrapper 查询；涉及复杂业务编排、缓存、事务或跨 mapper 写入时放到 service。
+- `ruoyi-system` 的用户、角色、菜单、部门等模块常带数据权限、MPJ 联表、角色状态过滤，修改前先读对应 mapper/service。
 
 ### Mapper 建议结构
 
@@ -164,6 +166,46 @@
 - 优先使用项目工具类：`MapstructUtils`、`StringUtils`、`StreamUtils`、`ValidatorUtils`、`SpringUtils`、`RedisUtils`。
 - 数组转列表按附近代码习惯使用 `List.of(ids)` 或 `Arrays.asList(ids)`。
 - 日期范围查询通常从 `bo.getParams()` 中读取 `beginTime`、`endTime` 或 `beginFieldName`、`endFieldName`。
+
+## common-mybatis 规则
+
+- 链式查询能力优先沿用 `BaseMapperPlus#lambda()`、`LambdaCrudChainWrapper`、`LambdaQueryBuilder`、`LambdaQueryCondition`。
+- 条件辅助方法使用项目已有命名：`eqIfPresent`、`eqIfText`、`likeIfText`、`betweenIfPresent`、`inIfNotEmpty`、`findInSetIfPresent`。
+- 新增 wrapper 方法时保持链式返回 `this` / `typedThis`，不要返回底层 `LambdaQueryWrapper` 破坏调用链。
+- `LambdaCrudChainWrapper` 既承担查询又承担更新 set 片段，新增能力时要同时考虑 `getSqlSelect`、`getSqlSet`、`clear`、`instance` 的状态复制和清理。
+- MPJ 联表查询沿用别名风格，例如 `JoinWrappers.lambda("u", SysUser.class)`、`.leftJoin(..., "d", ...)`、`.eq("u", Entity::getField, value)`。
+- 数据权限注解使用 `@DataPermission` + `@DataColumn`，列名需和实际 SQL 别名一致，例如 `d.dept_id`、`u.create_by`。
+
+## translation / JSON 增强规则
+
+- 翻译实现类实现 `TranslationInterface<T>` 并标注 `@TranslationType(type = ...)`。
+- 使用方在 VO 字段上通过 `@Translation(type = ..., mapper = "...", other = "...")` 指定翻译来源。
+- 批量翻译必须优先实现 `translationBatch(Set<Object> keys, String other)`，避免默认逐条查询。
+- 支持逗号分隔 ID 的翻译实现应复用 `collectLongIds`、`parseLongIds`、`joinMappedValues`。
+- `TranslationJsonFieldProcessor` 遵循三阶段：`collect` 收集待翻译值，`prepare` 批量查询，`process` 写入翻译结果；新增处理器也应优先套这个模型。
+- 翻译失败时保持降级返回原值或 `null` 的现有语义，不要让响应增强中断主流程。
+
+## 缓存与异步/监听规则
+
+- 已有 service 使用 `@Cacheable`、`@CacheEvict`、`@Caching` 时，新增写操作要同步考虑缓存失效。
+- 部门、字典、OSS 配置等模块已有缓存初始化或失效逻辑，不要只改数据库不处理缓存。
+- Excel 导入监听器实现 `ExcelListener` 时，保留 `getExcelResult()` 的回执语义和错误聚合方式。
+- 定时任务、MQTT、SSE、异步回调等框架方法一般按接口覆写语义实现，除非业务不直观，不要添加冗长注释。
+
+## 工作流模块规则
+
+- `ruoyi-workflow` 通常带 `@ConditionalOnEnable`，新增 workflow bean、controller、service 时检查同包是否需要该条件。
+- 流程分类、任务、实例等查询常带分类权限或用户维度过滤，先读同类 mapper/service 再改。
+- 工作流的翻译实现可以放在 workflow 模块内，例如流程分类 ID 到名称，仍应遵守 `TranslationInterface` 批量翻译规则。
+
+## JavaDoc 注释规则
+
+- 公共 API、接口、VO/BO/Entity 字段、Mapper 默认方法、Service/Controller 方法应有简洁 JavaDoc。
+- 注释描述“做什么”和关键参数语义，不复述显而易见的实现细节。
+- `void` 方法不要写 `@return`；返回布尔值时说明 `true/false` 含义。
+- 私有方法只有在业务规则、算法、映射关系不直观时补注释。
+- 框架覆写方法如果只是标准回调，可不重复注释；但当前文件已有统一注释风格时保持一致。
+- 只改注释时，不重排 import、不格式化全文件、不修改代码行为。
 
 ## 前后端联动规则
 
