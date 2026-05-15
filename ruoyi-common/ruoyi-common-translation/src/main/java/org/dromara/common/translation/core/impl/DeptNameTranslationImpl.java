@@ -39,6 +39,13 @@ public class DeptNameTranslationImpl implements TranslationInterface<String> {
         return null;
     }
 
+    /**
+     * 批量将部门 ID 翻译为部门名称。
+     *
+     * @param keys 部门 ID 集合
+     * @param other 额外参数
+     * @return 部门 ID 与部门名称映射
+     */
     @Override
     public Map<Object, String> translationBatch(Set<Object> keys, String other) {
         Set<Long> deptIds = collectLongIds(keys);
@@ -53,6 +60,13 @@ public class DeptNameTranslationImpl implements TranslationInterface<String> {
         return result;
     }
 
+    /**
+     * 根据原始键构建部门名称翻译值。
+     *
+     * @param source 原始键
+     * @param deptNames 部门 ID 与部门名称映射
+     * @return 部门名称
+     */
     private String buildValue(Object source, Map<Long, String> deptNames) {
         if (source instanceof String ids) {
             return joinMappedValues(ids, deptNames::get);

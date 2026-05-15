@@ -26,12 +26,26 @@ import java.util.Set;
 @Order(0)
 public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
 
+    /**
+     * 响应增强上下文中保存待批量翻译数据的属性键。
+     */
     private static final String ATTR_BATCHES = TranslationJsonFieldProcessor.class.getName() + ".batches";
 
+    /**
+     * 响应增强上下文中保存批量翻译结果的属性键。
+     */
     private static final String ATTR_RESULTS = TranslationJsonFieldProcessor.class.getName() + ".results";
 
+    /**
+     * 翻译类型与翻译实现映射。
+     */
     private final Map<String, TranslationInterface<?>> translationMap;
 
+    /**
+     * 构造翻译响应处理器。
+     *
+     * @param translations 翻译实现列表
+     */
     public TranslationJsonFieldProcessor(List<TranslationInterface<?>> translations) {
         Map<String, TranslationInterface<?>> map = new LinkedHashMap<>(translations.size());
         for (TranslationInterface<?> t : translations) {
@@ -43,6 +57,12 @@ public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
         this.translationMap = Collections.unmodifiableMap(map);
     }
 
+    /**
+     * 收集字段上的翻译注解和原始值，供后续批量翻译使用。
+     *
+     * @param fieldContext 字段上下文
+     * @param context      响应增强上下文
+     */
     @Override
     public void collect(JsonFieldContext fieldContext, JsonEnhancementContext context) {
         Translation translation = fieldContext.getAnnotation(Translation.class);
@@ -58,6 +78,11 @@ public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
             .add(sourceValue);
     }
 
+    /**
+     * 根据收集到的原始值执行批量翻译，并将翻译结果写入响应增强上下文。
+     *
+     * @param context 响应增强上下文
+     */
     @Override
     public void prepare(JsonEnhancementContext context) {
         Map<TranslationBatchKey, Set<Object>> batches = context.getAttribute(ATTR_BATCHES);
@@ -80,6 +105,14 @@ public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
         context.setAttribute(ATTR_RESULTS, results);
     }
 
+    /**
+     * 处理单个字段的翻译值，优先使用批量翻译结果，缺失时回退到单值翻译。
+     *
+     * @param fieldContext 字段上下文
+     * @param value        当前字段值
+     * @param context      响应增强上下文
+     * @return 翻译后的字段值
+     */
     @Override
     public Object process(JsonFieldContext fieldContext, Object value, JsonEnhancementContext context) {
         Translation translation = fieldContext.getAnnotation(Translation.class);
@@ -110,6 +143,12 @@ public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
         }
     }
 
+    /**
+     * 获取或创建待批量翻译数据映射。
+     *
+     * @param context 响应增强上下文
+     * @return 待批量翻译数据映射
+     */
     private Map<TranslationBatchKey, Set<Object>> getOrCreateBatches(JsonEnhancementContext context) {
         Map<TranslationBatchKey, Set<Object>> batches = context.getAttribute(ATTR_BATCHES);
         if (batches == null) {
@@ -119,6 +158,13 @@ public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
         return batches;
     }
 
+    /**
+     * 解析翻译原始值。
+     *
+     * @param fieldContext 字段上下文
+     * @param translation  翻译注解
+     * @return 翻译原始值
+     */
     private Object resolveSourceValue(JsonFieldContext fieldContext, Translation translation) {
         if (StringUtils.isNotBlank(translation.mapper())) {
             return ReflectUtils.invokeGetter(fieldContext.owner(), translation.mapper());
@@ -126,10 +172,22 @@ public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
         return fieldContext.value();
     }
 
+    /**
+     * 根据翻译类型获取翻译实现。
+     *
+     * @param type 翻译类型
+     * @return 翻译实现
+     */
     private TranslationInterface<?> getTranslation(String type) {
         return translationMap.get(type);
     }
 
+    /**
+     * 批量翻译分组键。
+     *
+     * @param type  翻译类型
+     * @param other 额外参数
+     */
     private record TranslationBatchKey(String type, String other) {
     }
 

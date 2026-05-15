@@ -29,11 +29,25 @@ public class CategoryNameTranslationImpl implements TranslationInterface<String>
 
     private final IFlwCategoryService flwCategoryService;
 
+    /**
+     * 将流程分类 ID 翻译为分类名称。
+     *
+     * @param key 流程分类 ID
+     * @param other 额外参数
+     * @return 流程分类名称
+     */
     @Override
     public String translation(Object key, String other) {
         return flwCategoryService.selectCategoryNameById(Convert.toLong(key));
     }
 
+    /**
+     * 批量将流程分类 ID 翻译为分类名称。
+     *
+     * @param keys 流程分类 ID 集合
+     * @param other 额外参数
+     * @return 流程分类 ID 与分类名称映射
+     */
     @Override
     public Map<Object, String> translationBatch(Set<Object> keys, String other) {
         Set<Long> categoryIds = collectLongIds(keys);
@@ -48,6 +62,13 @@ public class CategoryNameTranslationImpl implements TranslationInterface<String>
         return result;
     }
 
+    /**
+     * 根据原始键构建流程分类名称翻译值。
+     *
+     * @param source 原始键
+     * @param categoryNames 流程分类 ID 与分类名称映射
+     * @return 流程分类名称
+     */
     private String buildValue(Object source, Map<Long, String> categoryNames) {
         if (source instanceof String ids) {
             return joinMappedValues(ids, categoryNames::get);

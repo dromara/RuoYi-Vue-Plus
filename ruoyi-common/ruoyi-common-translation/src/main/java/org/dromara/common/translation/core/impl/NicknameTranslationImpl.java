@@ -39,6 +39,13 @@ public class NicknameTranslationImpl implements TranslationInterface<String> {
         return null;
     }
 
+    /**
+     * 批量将用户 ID 翻译为用户昵称。
+     *
+     * @param keys 用户 ID 集合
+     * @param other 额外参数
+     * @return 用户 ID 与用户昵称映射
+     */
     @Override
     public Map<Object, String> translationBatch(Set<Object> keys, String other) {
         Set<Long> userIds = collectLongIds(keys);
@@ -53,6 +60,13 @@ public class NicknameTranslationImpl implements TranslationInterface<String> {
         return result;
     }
 
+    /**
+     * 根据原始键构建用户昵称翻译值。
+     *
+     * @param source 原始键
+     * @param userNames 用户 ID 与用户昵称映射
+     * @return 用户昵称
+     */
     private String buildValue(Object source, Map<Long, String> userNames) {
         if (source instanceof String ids) {
             return joinMappedValues(ids, userNames::get);
