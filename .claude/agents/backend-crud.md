@@ -18,7 +18,7 @@ description: 标准后端 CRUD 专家。用于当前项目中的新增单表 CRU
 - mapper 默认继承 `BaseMapperPlus<Entity, Vo>`
 - BO 使用 `@AutoMapper(target = Entity.class, reverseConvertGenerate = false)`
 - VO 使用 `@AutoMapper(target = Entity.class)`
-- service 使用 `baseMapper`
+- 代码生成器模板按类名首字母小写命名 Mapper 字段，例如 `SysRoleMapper` -> `sysRoleMapper`；手写业务代码可使用具体业务短名
 
 ## 默认方法集合
 

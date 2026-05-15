@@ -59,7 +59,7 @@ import java.util.Map;
 @Service
 public class SysOssServiceImpl implements ISysOssService, OssService {
 
-    private final SysOssMapper baseMapper;
+    private final SysOssMapper ossMapper;
 
     /**
      * 查询OSS对象存储列表
@@ -71,7 +71,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     @Override
     public PageResult<SysOssVo> queryPageList(SysOssBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<SysOss> lqw = buildQueryWrapper(bo);
-        Page<SysOssVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<SysOssVo> result = ossMapper.selectVoPage(pageQuery.build(), lqw);
         List<SysOssVo> filterResult = StreamUtils.toList(result.getRecords(), this::matchingUrl);
         result.setRecords(filterResult);
         return PageResult.build(result.getRecords(), result.getTotal());
@@ -178,7 +178,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     @Cacheable(cacheNames = CacheNames.SYS_OSS, key = "#ossId")
     @Override
     public SysOssVo getById(Long ossId) {
-        return baseMapper.selectVoById(ossId);
+        return ossMapper.selectVoById(ossId);
     }
 
 
@@ -284,7 +284,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         oss.setOriginalName(originalfileName);
         oss.setService(configKey);
         oss.setExt1(JsonUtils.toJsonString(ext1));
-        baseMapper.insert(oss);
+        ossMapper.insert(oss);
         SysOssVo sysOssVo = MapstructUtils.convert(oss, SysOssVo.class);
         return this.matchingUrl(sysOssVo);
     }
@@ -301,11 +301,11 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         if (isValid) {
             // 做一些业务上的校验,判断是否需要校验
         }
-        List<SysOss> list = baseMapper.selectByIds(ids);
+        List<SysOss> list = ossMapper.selectByIds(ids);
         for (SysOss sysOss : list) {
             OssFactory.instance(sysOss.getService()).delete(sysOss.getFileName());
         }
-        return baseMapper.deleteByIds(ids) > 0;
+        return ossMapper.deleteByIds(ids) > 0;
     }
 
     /**

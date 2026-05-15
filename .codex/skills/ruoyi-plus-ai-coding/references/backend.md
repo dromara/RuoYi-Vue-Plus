@@ -86,13 +86,15 @@
 ## Service 规则
 
 - 类声明通常是 `@RequiredArgsConstructor`、`@Service`，按需补 `@Slf4j`。
-- mapper 注入字段命名为 `private final XxxMapper baseMapper;`。
+- 手写 mapper 注入字段使用具体业务短名；代码生成器模板按类名首字母小写命名。
+- 命名时去掉清晰的模块/系统前缀后使用 lowerCamel + `Mapper`，例如 `SysRoleMapper` -> `roleMapper`、`SysDictDataMapper` -> `dictDataMapper`。
+- 如果去掉前缀会产生歧义或命名冲突，保留必要前缀。
 - 读操作通常返回 `Vo`、`List<Vo>` 或 `PageResult<Vo>`。
 - BO 转实体用 `MapstructUtils.convert(bo, Entity.class)`。
 - 查询条件优先用 `LambdaQueryWrapper` 和 `Wrappers.lambdaQuery()`。
 - 在 wrapper 条件里直接写 `StringUtils.isNotBlank(...)` 和 null 判断。
 - 分页查询优先采用：
-  `Page<Vo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);`
+  `Page<Vo> result = entityMapper.selectVoPage(pageQuery.build(), lqw);`
   `return PageResult.build(result.getRecords(), result.getTotal());`
 - 生成器风格模块保留 `validEntityBeforeSave(...)` 这种扩展点。
 - 多表写操作使用 `@Transactional(rollbackFor = Exception.class)`。

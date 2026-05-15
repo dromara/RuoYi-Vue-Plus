@@ -50,7 +50,7 @@ import java.util.Map;
 @Slf4j
 public class TestLeaveServiceImpl implements ITestLeaveService {
 
-    private final TestLeaveMapper baseMapper;
+    private final TestLeaveMapper leaveMapper;
     private final WorkflowService workflowService;
 
     /**
@@ -74,7 +74,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      */
     @Override
     public TestLeaveVo queryById(Long id) {
-        return baseMapper.selectVoById(id);
+        return leaveMapper.selectVoById(id);
     }
 
     /**
@@ -87,7 +87,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Override
     public PageResult<TestLeaveVo> queryPageList(TestLeaveBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<TestLeave> lqw = buildQueryWrapper(bo);
-        Page<TestLeaveVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<TestLeaveVo> result = leaveMapper.selectVoPage(pageQuery.build(), lqw);
         return PageResult.build(result.getRecords(), result.getTotal());
     }
 
@@ -100,7 +100,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Override
     public List<TestLeaveVo> queryList(TestLeaveBo bo) {
         LambdaQueryWrapper<TestLeave> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
+        return leaveMapper.selectVoList(lqw);
     }
 
     /**
@@ -134,7 +134,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         if (StringUtils.isBlank(add.getStatus())) {
             add.setStatus(BusinessStatusEnum.DRAFT.getStatus());
         }
-        boolean flag = baseMapper.insert(add) > 0;
+        boolean flag = leaveMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
         }
@@ -157,7 +157,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
             bo.setApplyCode(System.currentTimeMillis() + StrUtil.EMPTY);
         }
         TestLeave leave = MapstructUtils.convert(bo, TestLeave.class);
-        boolean flag = baseMapper.insertOrUpdate(leave);
+        boolean flag = leaveMapper.insertOrUpdate(leave);
         if (flag) {
             bo.setId(leave.getId());
             // 后端发起需要忽略权限
@@ -187,7 +187,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Override
     public TestLeaveVo updateByBo(TestLeaveBo bo) {
         TestLeave update = MapstructUtils.convert(bo, TestLeave.class);
-        baseMapper.updateById(update);
+        leaveMapper.updateById(update);
         return MapstructUtils.convert(update, TestLeaveVo.class);
     }
 
@@ -201,7 +201,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
         workflowService.deleteInstance(StreamUtils.toList(ids, Convert::toStr));
-        return baseMapper.deleteByIds(ids) > 0;
+        return leaveMapper.deleteByIds(ids) > 0;
     }
 
     /**
@@ -214,7 +214,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @EventListener(condition = "#processEvent.flowCode.startsWith('leave')")
     public void processHandler(ProcessEvent processEvent) {
         log.info("当前任务执行了{}", processEvent.toString());
-        TestLeave testLeave = baseMapper.selectById(Convert.toLong(processEvent.getBusinessId()));
+        TestLeave testLeave = leaveMapper.selectById(Convert.toLong(processEvent.getBusinessId()));
         testLeave.setStatus(processEvent.getStatus());
         // 用于例如审批附件 审批意见等 存储到业务表内 自行根据业务实现存储流程
         Map<String, Object> params = processEvent.getParams();
@@ -236,7 +236,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         }
         String status = BusinessStatusEnum.findByStatus(processEvent.getStatus());
         log.info("当前流程状态为{}", status);
-        baseMapper.updateById(testLeave);
+        leaveMapper.updateById(testLeave);
     }
 
     /**
@@ -264,11 +264,11 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @EventListener(condition = "#processDeleteEvent.flowCode.startsWith('leave')")
     public void processDeleteHandler(ProcessDeleteEvent processDeleteEvent) {
         log.info("监听删除流程事件，当前任务执行了{}", processDeleteEvent.toString());
-        TestLeave testLeave = baseMapper.selectById(Convert.toLong(processDeleteEvent.getBusinessId()));
+        TestLeave testLeave = leaveMapper.selectById(Convert.toLong(processDeleteEvent.getBusinessId()));
         if (ObjectUtil.isNull(testLeave)) {
             return;
         }
-        baseMapper.deleteById(testLeave.getId());
+        leaveMapper.deleteById(testLeave.getId());
     }
 
 }

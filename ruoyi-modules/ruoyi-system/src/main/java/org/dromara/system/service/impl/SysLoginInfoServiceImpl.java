@@ -43,7 +43,7 @@ import java.util.Map;
 @Service
 public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
 
-    private final SysLoginInfoMapper baseMapper;
+    private final SysLoginInfoMapper loginInfoMapper;
 
     private final ISysClientService clientService;
 
@@ -126,7 +126,7 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
         if (StringUtils.isBlank(pageQuery.getOrderByColumn())) {
             lqw.orderByDesc(SysLoginInfo::getInfoId);
         }
-        Page<SysLoginInfoVo> page = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<SysLoginInfoVo> page = loginInfoMapper.selectVoPage(pageQuery.build(), lqw);
         return PageResult.build(page.getRecords(), page.getTotal());
     }
 
@@ -139,7 +139,7 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
     public void insertLoginInfo(SysLoginInfoBo bo) {
         SysLoginInfo loginInfo = MapstructUtils.convert(bo, SysLoginInfo.class);
         loginInfo.setLoginTime(LocalDateTime.now());
-        baseMapper.insert(loginInfo);
+        loginInfoMapper.insert(loginInfo);
     }
 
     /**
@@ -150,7 +150,7 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
      */
     @Override
     public List<SysLoginInfoVo> selectLoginInfoList(SysLoginInfoBo loginInfo) {
-        return baseMapper.selectVoList(buildQueryWrapper(loginInfo)
+        return loginInfoMapper.selectVoList(buildQueryWrapper(loginInfo)
             .orderByDesc(SysLoginInfo::getInfoId));
     }
 
@@ -162,7 +162,7 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
      */
     private LambdaCrudChainWrapper<SysLoginInfo, SysLoginInfoVo> buildQueryWrapper(SysLoginInfoBo loginInfo) {
         Map<String, Object> params = loginInfo.getParams();
-        return baseMapper.lambda()
+        return loginInfoMapper.lambda()
             .likeIfText(SysLoginInfo::getIpaddr, loginInfo.getIpaddr())
             .eqIfText(SysLoginInfo::getStatus, loginInfo.getStatus())
             .likeIfText(SysLoginInfo::getUserName, loginInfo.getUserName())
@@ -177,7 +177,7 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
      */
     @Override
     public int deleteLoginInfoByIds(Long[] infoIds) {
-        return baseMapper.deleteByIds(Arrays.asList(infoIds));
+        return loginInfoMapper.deleteByIds(Arrays.asList(infoIds));
     }
 
     /**
@@ -185,6 +185,6 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
      */
     @Override
     public void cleanLoginInfo() {
-        baseMapper.lambda().delete();
+        loginInfoMapper.lambda().delete();
     }
 }

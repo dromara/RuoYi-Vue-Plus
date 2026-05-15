@@ -129,7 +129,8 @@ Vue 3、TypeScript API 文件、生成式列表页、表单状态、字典和日
 - 包路径和 `@RequestMapping` 与模块保持一致。
 - 权限标识遵循 `${module}:${business}:${action}`。
 - Mapper 继承 `BaseMapperPlus<Entity, Vo>`。
-- Service 使用 `baseMapper`，并按场景返回 `PageResult` 或 `List<Vo>`。
+- 手写 Service 注入 Mapper 时使用具体业务短名；代码生成器模板按类名首字母小写命名，例如 `SysRoleMapper` 生成 `sysRoleMapper`。
+- Service 按场景返回 `PageResult` 或 `List<Vo>`。
 - 查询代码优先使用 `LambdaQueryWrapper`，复杂模块沿用既有 MPJ 联表风格。
 - BO 使用 `@AutoMapper(target = Entity.class, reverseConvertGenerate = false)`。
 - VO 使用 `@AutoMapper(target = Entity.class)`。

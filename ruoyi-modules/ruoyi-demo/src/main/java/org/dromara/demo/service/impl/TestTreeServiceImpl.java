@@ -26,7 +26,7 @@ import java.util.List;
 @Service
 public class TestTreeServiceImpl implements ITestTreeService {
 
-    private final TestTreeMapper baseMapper;
+    private final TestTreeMapper treeMapper;
 
     /**
      * 根据主键查询测试树表详情。
@@ -36,7 +36,7 @@ public class TestTreeServiceImpl implements ITestTreeService {
      */
     @Override
     public TestTreeVo queryById(Long id) {
-        return baseMapper.selectVoById(id);
+        return treeMapper.selectVoById(id);
     }
 
     // @DS("slave") // 切换从库查询
@@ -49,7 +49,7 @@ public class TestTreeServiceImpl implements ITestTreeService {
     @Override
     public List<TestTreeVo> queryList(TestTreeBo bo) {
         LambdaQueryWrapper<TestTree> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
+        return treeMapper.selectVoList(lqw);
     }
 
     /**
@@ -77,7 +77,7 @@ public class TestTreeServiceImpl implements ITestTreeService {
     public Boolean insertByBo(TestTreeBo bo) {
         TestTree add = MapstructUtils.convert(bo, TestTree.class);
         validEntityBeforeSave(add);
-        boolean flag = baseMapper.insert(add) > 0;
+        boolean flag = treeMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
         }
@@ -94,7 +94,7 @@ public class TestTreeServiceImpl implements ITestTreeService {
     public Boolean updateByBo(TestTreeBo bo) {
         TestTree update = MapstructUtils.convert(bo, TestTree.class);
         validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        return treeMapper.updateById(update) > 0;
     }
 
     /**
@@ -118,6 +118,6 @@ public class TestTreeServiceImpl implements ITestTreeService {
         if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return baseMapper.deleteByIds(ids) > 0;
+        return treeMapper.deleteByIds(ids) > 0;
     }
 }

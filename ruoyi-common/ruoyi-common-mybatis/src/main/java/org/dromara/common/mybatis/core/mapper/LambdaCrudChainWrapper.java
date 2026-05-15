@@ -36,22 +36,22 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
     Update<LambdaCrudChainWrapper<T, V>, SFunction<T, ?>>,
     LambdaQueryCondition<T, LambdaCrudChainWrapper<T, V>> {
 
-    private final BaseMapperPlus<T, V> baseMapper;
+    private final BaseMapperPlus<T, V> crudMapper;
     private final List<String> sqlSet;
     private SharedString sqlSelect = new SharedString();
 
-    public LambdaCrudChainWrapper(BaseMapperPlus<T, V> baseMapper) {
-        this.baseMapper = baseMapper;
-        super.setEntityClass(baseMapper.currentModelClass());
+    public LambdaCrudChainWrapper(BaseMapperPlus<T, V> crudMapper) {
+        this.crudMapper = crudMapper;
+        super.setEntityClass(crudMapper.currentModelClass());
         super.initNeed();
         this.sqlSet = new ArrayList<>();
     }
 
-    LambdaCrudChainWrapper(BaseMapperPlus<T, V> baseMapper, T entity, Class<T> entityClass, SharedString sqlSelect,
+    LambdaCrudChainWrapper(BaseMapperPlus<T, V> crudMapper, T entity, Class<T> entityClass, SharedString sqlSelect,
                            List<String> sqlSet, AtomicInteger paramNameSeq, Map<String, Object> paramNameValuePairs,
                            MergeSegments mergeSegments, SharedString paramAlias, SharedString lastSql,
                            SharedString sqlComment, SharedString sqlFirst) {
-        this.baseMapper = baseMapper;
+        this.crudMapper = crudMapper;
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.sqlSelect = sqlSelect == null ? new SharedString() : sqlSelect;
@@ -197,7 +197,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 实体列表
      */
     public List<T> list() {
-        return baseMapper.selectList(typedThis);
+        return crudMapper.selectList(typedThis);
     }
 
     /**
@@ -207,7 +207,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 实体分页记录
      */
     public List<T> list(IPage<T> page) {
-        return baseMapper.selectList(page, typedThis);
+        return crudMapper.selectList(page, typedThis);
     }
 
     /**
@@ -216,7 +216,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return VO 列表
      */
     public List<V> voList() {
-        return baseMapper.selectVoList(typedThis);
+        return crudMapper.selectVoList(typedThis);
     }
 
     /**
@@ -225,7 +225,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 单列对象列表
      */
     public List<Object> objs() {
-        return baseMapper.selectObjs(typedThis);
+        return crudMapper.selectObjs(typedThis);
     }
 
     /**
@@ -236,7 +236,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 单列对象列表
      */
     public <C> List<C> objs(Function<? super Object, C> mapper) {
-        return baseMapper.selectObjs(typedThis, mapper);
+        return crudMapper.selectObjs(typedThis, mapper);
     }
 
     /**
@@ -245,7 +245,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 实体
      */
     public T one() {
-        return baseMapper.selectOne(typedThis);
+        return crudMapper.selectOne(typedThis);
     }
 
     /**
@@ -255,7 +255,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 实体
      */
     public T one(boolean throwEx) {
-        return baseMapper.selectOne(typedThis, throwEx);
+        return crudMapper.selectOne(typedThis, throwEx);
     }
 
     /**
@@ -273,7 +273,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return VO
      */
     public V voOne() {
-        return baseMapper.selectVoOne(typedThis);
+        return crudMapper.selectVoOne(typedThis);
     }
 
     /**
@@ -283,7 +283,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return VO
      */
     public V voOne(boolean throwEx) {
-        return baseMapper.selectVoOne(typedThis, throwEx);
+        return crudMapper.selectVoOne(typedThis, throwEx);
     }
 
     /**
@@ -292,7 +292,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 数量
      */
     public Long count() {
-        return baseMapper.selectCount(typedThis);
+        return crudMapper.selectCount(typedThis);
     }
 
     /**
@@ -301,7 +301,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 是否存在
      */
     public boolean exists() {
-        return baseMapper.exists(typedThis);
+        return crudMapper.exists(typedThis);
     }
 
     /**
@@ -312,7 +312,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 实体分页
      */
     public <P extends IPage<T>> P page(P page) {
-        return baseMapper.selectPage(page, typedThis);
+        return crudMapper.selectPage(page, typedThis);
     }
 
     /**
@@ -323,7 +323,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return VO 分页
      */
     public <P extends IPage<V>> P voPage(IPage<T> page) {
-        return baseMapper.selectVoPage(page, typedThis);
+        return crudMapper.selectVoPage(page, typedThis);
     }
 
     /**
@@ -341,7 +341,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 影响行数
      */
     public int deleteCount() {
-        return baseMapper.delete(typedThis);
+        return crudMapper.delete(typedThis);
     }
 
     /**
@@ -369,7 +369,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 影响行数
      */
     public int updateCount() {
-        return baseMapper.update(typedThis);
+        return crudMapper.update(typedThis);
     }
 
     /**
@@ -379,12 +379,12 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return 影响行数
      */
     public int updateCount(T entity) {
-        return baseMapper.update(entity, typedThis);
+        return crudMapper.update(entity, typedThis);
     }
 
     @Override
     protected LambdaCrudChainWrapper<T, V> instance() {
-        return new LambdaCrudChainWrapper<>(baseMapper, getEntity(), getEntityClass(), null, null, paramNameSeq,
+        return new LambdaCrudChainWrapper<>(crudMapper, getEntity(), getEntityClass(), null, null, paramNameSeq,
             paramNameValuePairs, new MergeSegments(), paramAlias, SharedString.emptyString(), SharedString.emptyString(),
             SharedString.emptyString());
     }

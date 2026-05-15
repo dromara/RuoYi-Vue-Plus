@@ -36,7 +36,7 @@ import java.util.Map;
 @Service
 public class SysPostServiceImpl implements ISysPostService, PostService {
 
-    private final SysPostMapper baseMapper;
+    private final SysPostMapper postMapper;
     private final SysDeptMapper deptMapper;
     private final SysUserPostMapper userPostMapper;
 
@@ -49,7 +49,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public PageResult<SysPostVo> selectPagePostList(SysPostBo post, PageQuery pageQuery) {
-        Page<SysPostVo> page = baseMapper.selectPagePostList(pageQuery.build(), buildQueryWrapper(post));
+        Page<SysPostVo> page = postMapper.selectPagePostList(pageQuery.build(), buildQueryWrapper(post));
         return PageResult.build(page.getRecords(), page.getTotal());
     }
 
@@ -61,7 +61,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public List<SysPostVo> selectPostList(SysPostBo post) {
-        return baseMapper.selectVoList(buildQueryWrapper(post));
+        return postMapper.selectVoList(buildQueryWrapper(post));
     }
 
     /**
@@ -72,7 +72,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public List<SysPostVo> selectPostsByUserId(Long userId) {
-        return baseMapper.selectPostsByUserId(userId);
+        return postMapper.selectPostsByUserId(userId);
     }
 
     /**
@@ -83,7 +83,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     private Wrapper<SysPost> buildQueryWrapper(SysPostBo bo) {
         Map<String, Object> params = bo.getParams();
-        var wrapper = baseMapper.lambda()
+        var wrapper = postMapper.lambda()
             .likeIfText(SysPost::getPostCode, bo.getPostCode())
             .likeIfText(SysPost::getPostCategory, bo.getPostCategory())
             .likeIfText(SysPost::getPostName, bo.getPostName())
@@ -110,7 +110,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public List<SysPostVo> selectPostAll() {
-        return baseMapper.lambda().voList();
+        return postMapper.lambda().voList();
     }
 
     /**
@@ -121,7 +121,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public SysPostVo selectPostById(Long postId) {
-        return baseMapper.selectVoById(postId);
+        return postMapper.selectVoById(postId);
     }
 
     /**
@@ -132,7 +132,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public List<Long> selectPostListByUserId(Long userId) {
-        List<SysPostVo> list = baseMapper.selectPostsByUserId(userId);
+        List<SysPostVo> list = postMapper.selectPostsByUserId(userId);
         return StreamUtils.toList(list, SysPostVo::getPostId);
     }
 
@@ -144,7 +144,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public List<SysPostVo> selectPostByIds(Collection<Long> postIds) {
-        return baseMapper.lambda()
+        return postMapper.lambda()
             .select(SysPost::getPostId, SysPost::getPostName, SysPost::getPostCode)
             .eq(SysPost::getStatus, SystemConstants.NORMAL)
             .in(CollUtil.isNotEmpty(postIds), SysPost::getPostId, postIds)
@@ -159,7 +159,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public boolean checkPostNameUnique(SysPostBo post) {
-        boolean exist = baseMapper.lambda()
+        boolean exist = postMapper.lambda()
             .eq(SysPost::getPostName, post.getPostName())
             .eq(SysPost::getDeptId, post.getDeptId())
             .neIfPresent(SysPost::getPostId, post.getPostId())
@@ -175,7 +175,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public boolean checkPostCodeUnique(SysPostBo post) {
-        boolean exist = baseMapper.lambda()
+        boolean exist = postMapper.lambda()
             .eq(SysPost::getPostCode, post.getPostCode())
             .neIfPresent(SysPost::getPostId, post.getPostId())
             .exists();
@@ -201,7 +201,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public long countPostByDeptId(Long deptId) {
-        return baseMapper.lambda().eq(SysPost::getDeptId, deptId).count();
+        return postMapper.lambda().eq(SysPost::getDeptId, deptId).count();
     }
 
     /**
@@ -212,7 +212,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public int deletePostById(Long postId) {
-        return baseMapper.deleteById(postId);
+        return postMapper.deleteById(postId);
     }
 
     /**
@@ -223,13 +223,13 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public int deletePostByIds(Collection<Long> postIds) {
-        List<SysPost> list = baseMapper.selectByIds(postIds);
+        List<SysPost> list = postMapper.selectByIds(postIds);
         for (SysPost post : list) {
             if (this.countUserPostById(post.getPostId()) > 0) {
                 throw new ServiceException("{}已分配，不能删除!", post.getPostName());
             }
         }
-        return baseMapper.deleteByIds(postIds);
+        return postMapper.deleteByIds(postIds);
     }
 
     /**
@@ -241,7 +241,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
     @Override
     public int insertPost(SysPostBo bo) {
         SysPost post = MapstructUtils.convert(bo, SysPost.class);
-        return baseMapper.insert(post);
+        return postMapper.insert(post);
     }
 
     /**
@@ -253,7 +253,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
     @Override
     public int updatePost(SysPostBo bo) {
         SysPost post = MapstructUtils.convert(bo, SysPost.class);
-        return baseMapper.updateById(post);
+        return postMapper.updateById(post);
     }
 
     /**
@@ -267,7 +267,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
         if (CollUtil.isEmpty(postIds)) {
             return Collections.emptyMap();
         }
-        List<SysPost> list = baseMapper.lambda()
+        List<SysPost> list = postMapper.lambda()
             .select(SysPost::getPostId, SysPost::getPostName)
             .in(SysPost::getPostId, postIds)
             .list();

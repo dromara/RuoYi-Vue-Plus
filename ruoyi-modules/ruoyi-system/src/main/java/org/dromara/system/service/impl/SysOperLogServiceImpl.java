@@ -34,7 +34,7 @@ import java.util.Map;
 @Service
 public class SysOperLogServiceImpl implements ISysOperLogService {
 
-    private final SysOperLogMapper baseMapper;
+    private final SysOperLogMapper operLogMapper;
 
     /**
      * 操作日志记录
@@ -63,7 +63,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
         if (StringUtils.isBlank(pageQuery.getOrderByColumn())) {
             lqw.orderByDesc(SysOperLog::getOperId);
         }
-        Page<SysOperLogVo> page = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<SysOperLogVo> page = operLogMapper.selectVoPage(pageQuery.build(), lqw);
         return PageResult.build(page.getRecords(), page.getTotal());
     }
 
@@ -106,7 +106,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     public void insertOperlog(SysOperLogBo bo) {
         SysOperLog operLog = MapstructUtils.convert(bo, SysOperLog.class);
         operLog.setOperTime(LocalDateTime.now());
-        baseMapper.insert(operLog);
+        operLogMapper.insert(operLog);
     }
 
     /**
@@ -118,7 +118,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
     @Override
     public List<SysOperLogVo> selectOperLogList(SysOperLogBo operLog) {
         LambdaQueryWrapper<SysOperLog> lqw = buildQueryWrapper(operLog);
-        return baseMapper.selectVoList(lqw.orderByDesc(SysOperLog::getOperId));
+        return operLogMapper.selectVoList(lqw.orderByDesc(SysOperLog::getOperId));
     }
 
     /**
@@ -129,7 +129,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      */
     @Override
     public int deleteOperLogByIds(Long[] operIds) {
-        return baseMapper.deleteByIds(Arrays.asList(operIds));
+        return operLogMapper.deleteByIds(Arrays.asList(operIds));
     }
 
     /**
@@ -140,7 +140,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      */
     @Override
     public SysOperLogVo selectOperLogById(Long operId) {
-        return baseMapper.selectVoById(operId);
+        return operLogMapper.selectVoById(operId);
     }
 
     /**
@@ -148,6 +148,6 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      */
     @Override
     public void cleanOperLog() {
-        baseMapper.lambda().delete();
+        operLogMapper.lambda().delete();
     }
 }

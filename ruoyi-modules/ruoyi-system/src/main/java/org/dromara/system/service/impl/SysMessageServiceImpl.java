@@ -63,7 +63,7 @@ public class SysMessageServiceImpl implements ISysMessageService, MessageService
      */
     private static final long BOX_DAYS = 30L;
 
-    private final SysMessageMapper baseMapper;
+    private final SysMessageMapper messageMapper;
 
     /**
      * 查询当前用户消息盒子数据
@@ -190,7 +190,7 @@ public class SysMessageServiceImpl implements ISysMessageService, MessageService
             return payload;
         }
         SysMessage message = buildMessage(userIds, payload);
-        baseMapper.insert(message);
+        messageMapper.insert(message);
         payload.setMessageId(message.getMessageId());
         return payload;
     }
@@ -204,7 +204,7 @@ public class SysMessageServiceImpl implements ISysMessageService, MessageService
      * @return 消息VO列表
      */
     private List<SysMessageVo> selectMessageList(String category, Long userId) {
-        List<SysMessage> list = baseMapper.lambda()
+        List<SysMessage> list = messageMapper.lambda()
             .eq(SysMessage::getCategory, category)
             // 仅查询30天内消息
             .ge(SysMessage::getCreateTime, LocalDateTime.now().minusDays(BOX_DAYS))

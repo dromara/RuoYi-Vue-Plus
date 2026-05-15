@@ -40,7 +40,7 @@ import java.util.Map;
 @Service
 public class FlwSpelServiceImpl implements IFlwSpelService {
 
-    private final FlwSpelMapper baseMapper;
+    private final FlwSpelMapper spelMapper;
 
     /**
      * 查询流程spel表达式定义
@@ -50,7 +50,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
      */
     @Override
     public FlowSpelVo queryById(Long id){
-        return baseMapper.selectVoById(id);
+        return spelMapper.selectVoById(id);
     }
 
     /**
@@ -63,7 +63,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
     @Override
     public PageResult<FlowSpelVo> queryPageList(FlowSpelBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<FlowSpel> lqw = buildQueryWrapper(bo);
-        Page<FlowSpelVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<FlowSpelVo> result = spelMapper.selectVoPage(pageQuery.build(), lqw);
         return PageResult.build(result.getRecords(), result.getTotal());
     }
 
@@ -76,7 +76,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
     @Override
     public List<FlowSpelVo> queryList(FlowSpelBo bo) {
         LambdaQueryWrapper<FlowSpel> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
+        return spelMapper.selectVoList(lqw);
     }
 
     /**
@@ -107,7 +107,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
     public Boolean insertByBo(FlowSpelBo bo) {
         FlowSpel add = MapstructUtils.convert(bo, FlowSpel.class);
         validEntityBeforeSave(add);
-        boolean flag = baseMapper.insert(add) > 0;
+        boolean flag = spelMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
         }
@@ -124,7 +124,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
     public Boolean updateByBo(FlowSpelBo bo) {
         FlowSpel update = MapstructUtils.convert(bo, FlowSpel.class);
         validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        return spelMapper.updateById(update) > 0;
     }
 
     /**
@@ -134,7 +134,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
      */
     private void validEntityBeforeSave(FlowSpel entity){
         if (StringUtils.isNotBlank(entity.getViewSpel())) {
-            boolean exists = baseMapper.lambda()
+            boolean exists = spelMapper.lambda()
                 .eq(FlowSpel::getViewSpel, entity.getViewSpel())
                 .neIfPresent(FlowSpel::getId, entity.getId())
                 .exists();
@@ -156,7 +156,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
         if (isValid){
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return baseMapper.deleteByIds(ids) > 0;
+        return spelMapper.deleteByIds(ids) > 0;
     }
 
     /**
@@ -193,7 +193,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
         if (CollUtil.isEmpty(viewSpels)) {
             return Collections.emptyMap();
         }
-        List<FlowSpel> list = baseMapper.lambda()
+        List<FlowSpel> list = spelMapper.lambda()
             .select(FlowSpel::getViewSpel, FlowSpel::getRemark)
             .in(FlowSpel::getViewSpel, viewSpels)
             .list();

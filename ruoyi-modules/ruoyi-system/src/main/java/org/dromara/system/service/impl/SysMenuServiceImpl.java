@@ -37,7 +37,7 @@ import java.util.*;
 @Service
 public class SysMenuServiceImpl implements ISysMenuService {
 
-    private final SysMenuMapper baseMapper;
+    private final SysMenuMapper menuMapper;
     private final SysRoleMapper roleMapper;
     private final SysRoleMenuMapper roleMenuMapper;
 
@@ -63,7 +63,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     public List<SysMenuVo> selectMenuList(SysMenuBo menu, Long userId) {
         // 管理员显示所有菜单信息 不是管理员 按用户id过滤菜单
         if (LoginHelper.isSuperAdmin(userId)) {
-            return baseMapper.lambda()
+            return menuMapper.lambda()
                 .likeIfText(SysMenu::getMenuName, menu.getMenuName())
                 .eqIfText(SysMenu::getVisible, menu.getVisible())
                 .eqIfText(SysMenu::getStatus, menu.getStatus())
@@ -73,7 +73,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 .orderByAsc(SysMenu::getOrderNum)
                 .voList();
         }
-        return baseMapper.selectMenuListByUserId(menu, userId);
+        return menuMapper.selectMenuListByUserId(menu, userId);
     }
 
     /**
@@ -84,7 +84,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public Set<String> selectMenuPermsByUserId(Long userId) {
-        return baseMapper.selectMenuPermsByUserId(userId);
+        return menuMapper.selectMenuPermsByUserId(userId);
     }
 
     /**
@@ -95,7 +95,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public Set<String> selectMenuPermsByRoleId(Long roleId) {
-        return baseMapper.selectMenuPermsByRoleId(roleId);
+        return menuMapper.selectMenuPermsByRoleId(roleId);
     }
 
     /**
@@ -106,7 +106,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public Map<Long, Set<String>> selectMenuPermsByRoleIds(Collection<Long> roleIds) {
-        return baseMapper.selectMenuPermsByRoleIds(roleIds);
+        return menuMapper.selectMenuPermsByRoleIds(roleIds);
     }
 
     /**
@@ -119,9 +119,9 @@ public class SysMenuServiceImpl implements ISysMenuService {
     public List<SysMenu> selectMenuTreeByUserId(Long userId) {
         List<SysMenu> menus;
         if (LoginHelper.isSuperAdmin(userId)) {
-            menus = baseMapper.selectMenuTreeAll();
+            menus = menuMapper.selectMenuTreeAll();
         } else {
-            menus = baseMapper.selectMenuTreeByUserId(userId);
+            menus = menuMapper.selectMenuTreeByUserId(userId);
         }
 
         return TreeBuildUtils.build(menus, Constants.TOP_PARENT_ID, SysMenu::getParentId, (menu, nodeTreeMaps) -> {
@@ -145,7 +145,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public List<Long> selectMenuListByRoleId(Long roleId) {
         SysRole role = roleMapper.selectById(roleId);
-        return baseMapper.selectMenuListByRoleId(roleId, role.getMenuCheckStrictly());
+        return menuMapper.selectMenuListByRoleId(roleId, role.getMenuCheckStrictly());
     }
 
     /**
@@ -234,7 +234,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public SysMenuVo selectMenuById(Long menuId) {
-        return baseMapper.selectVoById(menuId);
+        return menuMapper.selectVoById(menuId);
     }
 
     /**
@@ -245,7 +245,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public boolean hasChildByMenuId(Long menuId) {
-        return baseMapper.lambda().eq(SysMenu::getParentId, menuId).exists();
+        return menuMapper.lambda().eq(SysMenu::getParentId, menuId).exists();
     }
 
     /**
@@ -256,7 +256,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public boolean hasChildByMenuId(Collection<Long> menuIds) {
-        return baseMapper.lambda()
+        return menuMapper.lambda()
             .in(SysMenu::getParentId, menuIds)
             .notIn(SysMenu::getMenuId, menuIds)
             .exists();
@@ -282,7 +282,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public int insertMenu(SysMenuBo bo) {
         SysMenu menu = MapstructUtils.convert(bo, SysMenu.class);
-        return baseMapper.insert(menu);
+        return menuMapper.insert(menu);
     }
 
     /**
@@ -294,7 +294,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public int updateMenu(SysMenuBo bo) {
         SysMenu menu = MapstructUtils.convert(bo, SysMenu.class);
-        return baseMapper.updateById(menu);
+        return menuMapper.updateById(menu);
     }
 
     /**
@@ -305,7 +305,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public int deleteMenuById(Long menuId) {
-        return baseMapper.deleteById(menuId);
+        return menuMapper.deleteById(menuId);
     }
 
     /**
@@ -316,7 +316,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteMenuById(Collection<Long> menuIds) {
-        baseMapper.deleteByIds(menuIds);
+        menuMapper.deleteByIds(menuIds);
         roleMenuMapper.deleteByMenuIds(menuIds);
     }
 
@@ -328,7 +328,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public boolean checkMenuNameUnique(SysMenuBo menu) {
-        boolean exist = baseMapper.lambda()
+        boolean exist = menuMapper.lambda()
             .eq(SysMenu::getMenuName, menu.getMenuName())
             .eq(SysMenu::getParentId, menu.getParentId())
             .neIfPresent(SysMenu::getMenuId, menu.getMenuId())
@@ -352,7 +352,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         Long parentId = menu.getParentId();
         String path = menu.getPath();
         String routeName = StringUtils.isEmpty(menu.getRouteName()) ? path : menu.getRouteName();
-        List<SysMenu> sysMenuList = baseMapper.lambda()
+        List<SysMenu> sysMenuList = menuMapper.lambda()
             .in(SysMenu::getMenuType, SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
             .and(w -> {
                 w.eq(SysMenu::getPath, path).or().eq(SysMenu::getPath, routeName);
