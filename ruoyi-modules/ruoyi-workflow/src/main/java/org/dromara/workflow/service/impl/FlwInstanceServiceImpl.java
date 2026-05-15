@@ -6,7 +6,6 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +15,7 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.query.LambdaJoinQueryBuilder;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.FlowEngine;
@@ -138,43 +138,32 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * @return 查询条件构造方法
      */
     private MPJLambdaWrapper<FlowInstance> buildQueryWrapper(FlowInstanceBo flowInstanceBo) {
-        MPJLambdaWrapper<FlowInstance> queryWrapper = JoinWrappers.lambda("fi", FlowInstance.class)
-            .selectAs(FlowInstance::getId, FlowInstanceVo::getId)
-            .selectAs(FlowInstance::getCreateTime, FlowInstanceVo::getCreateTime)
-            .selectAs(FlowInstance::getUpdateTime, FlowInstanceVo::getUpdateTime)
-            .selectAs(FlowInstance::getDelFlag, FlowInstanceVo::getDelFlag)
-            .selectAs(FlowInstance::getDefinitionId, FlowInstanceVo::getDefinitionId)
-            .selectAs(FlowInstance::getBusinessId, FlowInstanceVo::getBusinessId)
-            .selectAs(FlowInstance::getNodeType, FlowInstanceVo::getNodeType)
-            .selectAs(FlowInstance::getNodeCode, FlowInstanceVo::getNodeCode)
-            .selectAs(FlowInstance::getNodeName, FlowInstanceVo::getNodeName)
-            .selectAs(FlowInstance::getVariable, FlowInstanceVo::getVariable)
-            .selectAs(FlowInstance::getFlowStatus, FlowInstanceVo::getFlowStatus)
-            .selectAs(FlowInstance::getActivityStatus, FlowInstanceVo::getActivityStatus)
-            .selectAs(FlowInstance::getCreateBy, FlowInstanceVo::getCreateBy)
-            .selectAs(FlowInstance::getExt, FlowInstanceVo::getExt)
-            .selectAs(org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowName, FlowInstanceVo::getFlowName)
-            .selectAs(org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowCode, FlowInstanceVo::getFlowCode)
-            .selectAs(org.dromara.warm.flow.orm.entity.FlowDefinition::getVersion, FlowInstanceVo::getVersion)
-            .selectAs(org.dromara.warm.flow.orm.entity.FlowDefinition::getFormCustom, FlowInstanceVo::getFormCustom)
-            .selectAs(org.dromara.warm.flow.orm.entity.FlowDefinition::getFormPath, FlowInstanceVo::getFormPath)
-            .selectAs(org.dromara.warm.flow.orm.entity.FlowDefinition::getCategory, FlowInstanceVo::getCategory)
-            .selectAs(FlowInstanceBizExt::getBusinessCode, FlowInstanceVo::getBusinessCode)
-            .selectAs(FlowInstanceBizExt::getBusinessTitle, FlowInstanceVo::getBusinessTitle)
+        LambdaJoinQueryBuilder<FlowInstance> queryBuilder = QueryBuilder.lambdaJoin("fi", FlowInstance.class)
+            .select(FlowInstance::getId, FlowInstance::getCreateTime, FlowInstance::getUpdateTime,
+                FlowInstance::getDelFlag, FlowInstance::getDefinitionId, FlowInstance::getBusinessId,
+                FlowInstance::getNodeType, FlowInstance::getNodeCode, FlowInstance::getNodeName,
+                FlowInstance::getVariable, FlowInstance::getFlowStatus, FlowInstance::getActivityStatus,
+                FlowInstance::getCreateBy, FlowInstance::getExt)
+            .select("fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowName,
+                org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowCode,
+                org.dromara.warm.flow.orm.entity.FlowDefinition::getVersion,
+                org.dromara.warm.flow.orm.entity.FlowDefinition::getFormCustom,
+                org.dromara.warm.flow.orm.entity.FlowDefinition::getFormPath,
+                org.dromara.warm.flow.orm.entity.FlowDefinition::getCategory)
+            .select("biz", FlowInstanceBizExt::getBusinessCode, FlowInstanceBizExt::getBusinessTitle)
             .leftJoin(org.dromara.warm.flow.orm.entity.FlowDefinition.class, "fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getId, FlowInstance::getDefinitionId)
             .leftJoin(FlowInstanceBizExt.class, "biz", FlowInstanceBizExt::getInstanceId, FlowInstance::getId);
-        queryWrapper.like(StringUtils.isNotBlank(flowInstanceBo.getNodeName()), "fi", FlowInstance::getNodeName, flowInstanceBo.getNodeName());
-        queryWrapper.like(StringUtils.isNotBlank(flowInstanceBo.getFlowName()), "fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowName, flowInstanceBo.getFlowName());
-        queryWrapper.like(StringUtils.isNotBlank(flowInstanceBo.getFlowCode()), "fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowCode, flowInstanceBo.getFlowCode());
+        queryBuilder.likeIfText("fi", FlowInstance::getNodeName, flowInstanceBo.getNodeName());
+        queryBuilder.likeIfText("fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowName, flowInstanceBo.getFlowName());
+        queryBuilder.likeIfText("fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowCode, flowInstanceBo.getFlowCode());
         if (StringUtils.isNotBlank(flowInstanceBo.getCategory())) {
             List<Long> categoryIds = flwCategoryMapper.selectCategoryIdsByParentId(Convert.toLong(flowInstanceBo.getCategory()));
-            queryWrapper.in(CollUtil.isNotEmpty(categoryIds), "fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getCategory, StreamUtils.toList(categoryIds, Convert::toStr));
+            queryBuilder.inIfNotEmpty("fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getCategory, StreamUtils.toList(categoryIds, Convert::toStr));
         }
-        queryWrapper.eq(StringUtils.isNotBlank(flowInstanceBo.getBusinessId()), "fi", FlowInstance::getBusinessId, flowInstanceBo.getBusinessId());
-        queryWrapper.in(CollUtil.isNotEmpty(flowInstanceBo.getCreateByIds()), "fi", FlowInstance::getCreateBy, flowInstanceBo.getCreateByIds());
-        queryWrapper.eq("fi", FlowInstance::getDelFlag, "0");
-        queryWrapper.orderByDesc("fi", FlowInstance::getCreateTime);
-        return queryWrapper;
+        queryBuilder.eqIfText("fi", FlowInstance::getBusinessId, flowInstanceBo.getBusinessId());
+        queryBuilder.inIfNotEmpty("fi", FlowInstance::getCreateBy, flowInstanceBo.getCreateByIds());
+        queryBuilder.orderByDesc("fi", FlowInstance::getCreateTime);
+        return queryBuilder.build();
     }
 
     /**

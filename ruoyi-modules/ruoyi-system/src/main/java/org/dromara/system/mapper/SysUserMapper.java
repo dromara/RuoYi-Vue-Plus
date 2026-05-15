@@ -4,14 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseMapper;
-import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Param;
-import org.dromara.common.core.constant.SystemConstants;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.system.domain.SysDept;
 import org.dromara.system.domain.SysRole;
 import org.dromara.system.domain.SysUser;
@@ -70,20 +68,19 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo>, MPJBa
         @DataColumn(key = "userName", value = "u.create_by")
     })
     default List<SysUserExportVo> selectUserExportList(SysUserBo user, List<Long> deptIds) {
-        MPJLambdaWrapper<SysUser> wrapper = JoinWrappers.lambda("u", SysUser.class)
+        MPJLambdaWrapper<SysUser> wrapper = QueryBuilder.lambdaJoin("u", SysUser.class)
             .selectAll(SysUser.class)
             .selectAs("u1", SysUser::getUserName, SysUserExportVo::getLeaderName)
             .leftJoin(SysDept.class, "d", SysDept::getDeptId, SysUser::getDeptId)
             .leftJoin(SysUser.class, "u1", SysUser::getUserId, SysDept::getLeader)
-            .eq("u", SysUser::getDelFlag, SystemConstants.NORMAL)
-            .like(StringUtils.isNotBlank(user.getUserName()), "u", SysUser::getUserName, user.getUserName())
-            .like(StringUtils.isNotBlank(user.getNickName()), "u", SysUser::getNickName, user.getNickName())
-            .eq(StringUtils.isNotBlank(user.getStatus()), "u", SysUser::getStatus, user.getStatus())
-            .like(StringUtils.isNotBlank(user.getPhoneNumber()), "u", SysUser::getPhoneNumber, user.getPhoneNumber())
-            .between(user.getParams().get("beginTime") != null && user.getParams().get("endTime") != null,
-                "u", SysUser::getCreateTime, user.getParams().get("beginTime"), user.getParams().get("endTime"))
-            .in(deptIds != null && !deptIds.isEmpty(), "u", SysUser::getDeptId, deptIds)
-            .orderByAsc("u", SysUser::getUserId);
+            .likeIfText("u", SysUser::getUserName, user.getUserName())
+            .likeIfText("u", SysUser::getNickName, user.getNickName())
+            .eqIfText("u", SysUser::getStatus, user.getStatus())
+            .likeIfText("u", SysUser::getPhoneNumber, user.getPhoneNumber())
+            .betweenParams("u", SysUser::getCreateTime, user.getParams(), "beginTime", "endTime")
+            .inIfNotEmpty("u", SysUser::getDeptId, deptIds)
+            .orderByAsc("u", SysUser::getUserId)
+            .build();
         return this.selectJoinList(SysUserExportVo.class, wrapper);
     }
 
@@ -172,16 +169,16 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo>, MPJBa
      * @return 用户角色关联查询包装器
      */
     default MPJLambdaWrapper<SysUser> buildUserRoleJoinWrapper(SysUserBo user) {
-        return JoinWrappers.lambda("u", SysUser.class)
+        return QueryBuilder.lambdaJoin("u", SysUser.class)
             .distinct()
             .selectAll(SysUser.class)
             .leftJoin(SysDept.class, "d", SysDept::getDeptId, SysUser::getDeptId)
             .leftJoin(SysUserRole.class, "sur", SysUserRole::getUserId, SysUser::getUserId)
             .leftJoin(SysRole.class, "r", SysRole::getRoleId, SysUserRole::getRoleId)
-            .eq("u", SysUser::getDelFlag, SystemConstants.NORMAL)
-            .like(StringUtils.isNotBlank(user.getUserName()), "u", SysUser::getUserName, user.getUserName())
-            .eq(StringUtils.isNotBlank(user.getStatus()), "u", SysUser::getStatus, user.getStatus())
-            .like(StringUtils.isNotBlank(user.getPhoneNumber()), "u", SysUser::getPhoneNumber, user.getPhoneNumber());
+            .likeIfText("u", SysUser::getUserName, user.getUserName())
+            .eqIfText("u", SysUser::getStatus, user.getStatus())
+            .likeIfText("u", SysUser::getPhoneNumber, user.getPhoneNumber())
+            .build();
     }
 
 }

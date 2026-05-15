@@ -2,11 +2,11 @@ package org.dromara.system.mapper;
 
 import cn.hutool.core.collection.CollUtil;
 import com.github.yulichang.base.MPJBaseMapper;
-import com.github.yulichang.toolkit.JoinWrappers;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.system.domain.SysMenu;
 import org.dromara.system.domain.SysRole;
 import org.dromara.system.domain.SysRoleMenu;
@@ -31,7 +31,7 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
      * @return 权限列表
      */
     default Set<String> selectMenuPermsByUserId(Long userId) {
-        List<SysMenu> list = this.selectJoinList(SysMenu.class, JoinWrappers.lambda("m", SysMenu.class)
+        List<SysMenu> list = this.selectJoinList(SysMenu.class, QueryBuilder.lambdaJoin("m", SysMenu.class)
             .distinct()
             .select(SysMenu::getPerms)
             .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
@@ -39,7 +39,8 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
             .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleMenu::getRoleId)
             .eq("sur", SysUserRole::getUserId, userId)
             .eq("sr", SysRole::getStatus, SystemConstants.NORMAL)
-            .isNotNull("m", SysMenu::getPerms));
+            .isNotNull("m", SysMenu::getPerms)
+            .build());
         return new HashSet<>(StreamUtils.filter(StreamUtils.toList(list, SysMenu::getPerms), StringUtils::isNotBlank));
     }
 
@@ -50,14 +51,15 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
      * @return 权限列表
      */
     default Set<String> selectMenuPermsByRoleId(Long roleId) {
-        List<SysMenu> list = this.selectJoinList(SysMenu.class, JoinWrappers.lambda("m", SysMenu.class)
+        List<SysMenu> list = this.selectJoinList(SysMenu.class, QueryBuilder.lambdaJoin("m", SysMenu.class)
             .distinct()
             .select(SysMenu::getPerms)
             .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
             .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleMenu::getRoleId)
             .eq("srm", SysRoleMenu::getRoleId, roleId)
             .eq("sr", SysRole::getStatus, SystemConstants.NORMAL)
-            .isNotNull("m", SysMenu::getPerms));
+            .isNotNull("m", SysMenu::getPerms)
+            .build());
         return new HashSet<>(StreamUtils.filter(StreamUtils.toList(list, SysMenu::getPerms), StringUtils::isNotBlank));
     }
 
@@ -71,7 +73,7 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
         if (CollUtil.isEmpty(roleIds)) {
             return Map.of();
         }
-        List<SysRoleMenuPermVo> list = this.selectJoinList(SysRoleMenuPermVo.class, JoinWrappers.lambda("m", SysMenu.class)
+        List<SysRoleMenuPermVo> list = this.selectJoinList(SysRoleMenuPermVo.class, QueryBuilder.lambdaJoin("m", SysMenu.class)
             .distinct()
             .selectAs("srm", SysRoleMenu::getRoleId, SysRoleMenuPermVo::getRoleId)
             .selectAs(SysMenu::getPerms, SysRoleMenuPermVo::getPerms)
@@ -79,7 +81,8 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
             .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleMenu::getRoleId)
             .in("srm", SysRoleMenu::getRoleId, roleIds)
             .eq("sr", SysRole::getStatus, SystemConstants.NORMAL)
-            .isNotNull("m", SysMenu::getPerms));
+            .isNotNull("m", SysMenu::getPerms)
+            .build());
         Map<Long, Set<String>> result = new LinkedHashMap<>();
         for (SysRoleMenuPermVo item : list) {
             if (StringUtils.isBlank(item.getPerms())) {
@@ -112,7 +115,7 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
      * @return 选中菜单列表
      */
     default List<Long> selectMenuListByRoleId(Long roleId, boolean menuCheckStrictly) {
-        List<SysMenu> menus = this.selectJoinList(SysMenu.class, JoinWrappers.lambda("m", SysMenu.class)
+        List<SysMenu> menus = this.selectJoinList(SysMenu.class, QueryBuilder.lambdaJoin("m", SysMenu.class)
             .distinct()
             .select(SysMenu::getMenuId, SysMenu::getParentId, SysMenu::getOrderNum)
             .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
@@ -120,7 +123,8 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
             .eq("srm", SysRoleMenu::getRoleId, roleId)
             .eq("sr", SysRole::getStatus, SystemConstants.NORMAL)
             .orderByAsc("m", SysMenu::getParentId)
-            .orderByAsc("m", SysMenu::getOrderNum));
+            .orderByAsc("m", SysMenu::getOrderNum)
+            .build());
         Set<Long> parentIds = menuCheckStrictly ? new HashSet<>(StreamUtils.toList(menus, SysMenu::getParentId)) : Collections.emptySet();
         return menus.stream()
             .map(SysMenu::getMenuId)
@@ -136,7 +140,7 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
      * @return 菜单列表
      */
     default List<SysMenuVo> selectMenuListByUserId(SysMenuBo menu, Long userId) {
-        return this.selectJoinList(SysMenuVo.class, JoinWrappers.lambda("m", SysMenu.class)
+        return this.selectJoinList(SysMenuVo.class, QueryBuilder.lambdaJoin("m", SysMenu.class)
             .distinct()
             .selectAll(SysMenu.class)
             .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
@@ -144,13 +148,14 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
             .leftJoin(SysRole.class, "sr", SysRole::getRoleId, SysRoleMenu::getRoleId)
             .eq("sur", SysUserRole::getUserId, userId)
             .eq("sr", SysRole::getStatus, SystemConstants.NORMAL)
-            .like(StringUtils.isNotBlank(menu.getMenuName()), "m", SysMenu::getMenuName, menu.getMenuName())
-            .eq(StringUtils.isNotBlank(menu.getVisible()), "m", SysMenu::getVisible, menu.getVisible())
-            .eq(StringUtils.isNotBlank(menu.getStatus()), "m", SysMenu::getStatus, menu.getStatus())
-            .eq(StringUtils.isNotBlank(menu.getMenuType()), "m", SysMenu::getMenuType, menu.getMenuType())
-            .eq(Objects.nonNull(menu.getParentId()), "m", SysMenu::getParentId, menu.getParentId())
+            .likeIfText("m", SysMenu::getMenuName, menu.getMenuName())
+            .eqIfText("m", SysMenu::getVisible, menu.getVisible())
+            .eqIfText("m", SysMenu::getStatus, menu.getStatus())
+            .eqIfText("m", SysMenu::getMenuType, menu.getMenuType())
+            .eqIfPresent("m", SysMenu::getParentId, menu.getParentId())
             .orderByAsc("m", SysMenu::getParentId)
-            .orderByAsc("m", SysMenu::getOrderNum));
+            .orderByAsc("m", SysMenu::getOrderNum)
+            .build());
     }
 
     /**
@@ -160,7 +165,7 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
      * @return 菜单列表
      */
     default List<SysMenu> selectMenuTreeByUserId(Long userId) {
-        return this.selectJoinList(SysMenu.class, JoinWrappers.lambda("m", SysMenu.class)
+        return this.selectJoinList(SysMenu.class, QueryBuilder.lambdaJoin("m", SysMenu.class)
             .distinct()
             .selectAll(SysMenu.class)
             .leftJoin(SysRoleMenu.class, "srm", SysRoleMenu::getMenuId, SysMenu::getMenuId)
@@ -171,7 +176,8 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
             .in("m", SysMenu::getMenuType, SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
             .eq("m", SysMenu::getStatus, SystemConstants.NORMAL)
             .orderByAsc("m", SysMenu::getParentId)
-            .orderByAsc("m", SysMenu::getOrderNum));
+            .orderByAsc("m", SysMenu::getOrderNum)
+            .build());
     }
 
 }

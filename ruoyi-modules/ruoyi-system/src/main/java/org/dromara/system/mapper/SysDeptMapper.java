@@ -3,11 +3,11 @@ package org.dromara.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseMapper;
-import com.github.yulichang.toolkit.JoinWrappers;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.system.domain.SysDept;
 import org.dromara.system.domain.SysRole;
 import org.dromara.system.domain.SysRoleDept;
@@ -101,7 +101,7 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo>, MPJBa
      * @return 选中部门列表
      */
     default List<Long> selectDeptListByRoleId(Long roleId, boolean deptCheckStrictly) {
-        List<SysDept> depts = this.selectJoinList(SysDept.class, JoinWrappers.lambda("d", SysDept.class)
+        List<SysDept> depts = this.selectJoinList(SysDept.class, QueryBuilder.lambdaJoin("d", SysDept.class)
             .distinct()
             .select(SysDept::getDeptId, SysDept::getParentId, SysDept::getOrderNum)
             .leftJoin(SysRoleDept.class, "srd", SysRoleDept::getDeptId, SysDept::getDeptId)
@@ -109,7 +109,8 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo>, MPJBa
             .eq("srd", SysRoleDept::getRoleId, roleId)
             .eq("sr", SysRole::getStatus, NORMAL)
             .orderByAsc("d", SysDept::getParentId)
-            .orderByAsc("d", SysDept::getOrderNum));
+            .orderByAsc("d", SysDept::getOrderNum)
+            .build());
         Set<Long> parentIds = deptCheckStrictly ? new HashSet<>(StreamUtils.toList(depts, SysDept::getParentId)) : Collections.emptySet();
         return depts.stream()
             .map(SysDept::getDeptId)

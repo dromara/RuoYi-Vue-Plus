@@ -3,10 +3,10 @@ package org.dromara.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseMapper;
-import com.github.yulichang.toolkit.JoinWrappers;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.system.domain.SysPost;
 import org.dromara.system.domain.SysUserPost;
 import org.dromara.system.domain.vo.SysPostVo;
@@ -71,10 +71,11 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo>, MPJBa
      * @return 岗位信息列表
      */
     default List<SysPostVo> selectPostsByUserId(Long userId) {
-        return this.selectJoinList(SysPostVo.class, JoinWrappers.lambda("p", SysPost.class)
+        return this.selectJoinList(SysPostVo.class, QueryBuilder.lambdaJoin("p", SysPost.class)
             .selectAll(SysPost.class)
             .leftJoin(SysUserPost.class, "sup", SysUserPost::getPostId, SysPost::getPostId)
-            .eq("sup", SysUserPost::getUserId, userId));
+            .eq("sup", SysUserPost::getUserId, userId)
+            .build());
     }
 
 }

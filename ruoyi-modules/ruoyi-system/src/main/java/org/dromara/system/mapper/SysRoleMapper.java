@@ -4,11 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseMapper;
-import com.github.yulichang.toolkit.JoinWrappers;
 import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.system.domain.SysRole;
 import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.vo.SysRoleVo;
@@ -87,11 +87,12 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRole, SysRoleVo>, MPJBa
      * @return 角色列表
      */
     default List<SysRoleVo> selectRolesByUserId(Long userId) {
-        return this.selectJoinList(SysRoleVo.class, JoinWrappers.lambda("r", SysRole.class)
+        return this.selectJoinList(SysRoleVo.class, QueryBuilder.lambdaJoin("r", SysRole.class)
             .select(SysRole::getRoleId, SysRole::getRoleName, SysRole::getRoleKey,
                 SysRole::getRoleSort, SysRole::getDataScope, SysRole::getStatus)
             .leftJoin(SysUserRole.class, "sur", SysUserRole::getRoleId, SysRole::getRoleId)
-            .eq("sur", SysUserRole::getUserId, userId));
+            .eq("sur", SysUserRole::getUserId, userId)
+            .build());
     }
 
 }
