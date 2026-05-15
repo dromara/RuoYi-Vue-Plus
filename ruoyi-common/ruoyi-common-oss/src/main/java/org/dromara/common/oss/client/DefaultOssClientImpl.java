@@ -5,6 +5,8 @@ import org.dromara.common.oss.config.OssClientConfig;
 import org.dromara.common.oss.exception.S3StorageException;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.checksums.RequestChecksumCalculation;
+import software.amazon.awssdk.core.checksums.ResponseChecksumValidation;
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -44,6 +46,10 @@ public class DefaultOssClientImpl extends AbstractOssClientImpl {
 
         // 创建 AWS 认证信息
         StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
+        S3Configuration s3Configuration = S3Configuration.builder()
+            .chunkedEncodingEnabled(false)
+            .pathStyleAccessEnabled(usePathStyleAccess)
+            .build();
 
         // 创建AWS基于 Netty 的 S3 客户端
         this.s3AsyncClient = S3AsyncClient.builder()
@@ -51,6 +57,9 @@ public class DefaultOssClientImpl extends AbstractOssClientImpl {
             .endpointOverride(URI.create(endpointUrl))
             .region(region)
             .forcePathStyle(usePathStyleAccess)
+            .serviceConfiguration(s3Configuration)
+            .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED)
+            .responseChecksumValidation(ResponseChecksumValidation.WHEN_REQUIRED)
             .httpClient(
                 NettyNioAsyncHttpClient.builder()
                     .connectionTimeout(Duration.ofSeconds(60))
@@ -69,13 +78,7 @@ public class DefaultOssClientImpl extends AbstractOssClientImpl {
             .region(region)
             .credentialsProvider(credentialsProvider)
             .endpointOverride(URI.create(domainUrl))
-            .serviceConfiguration(
-                // 创建 S3 配置对象
-                S3Configuration.builder()
-                    .chunkedEncodingEnabled(false)
-                    .pathStyleAccessEnabled(usePathStyleAccess)
-                    .build()
-            )
+            .serviceConfiguration(s3Configuration)
             .build();
 
         // 创建异步调度器对象
