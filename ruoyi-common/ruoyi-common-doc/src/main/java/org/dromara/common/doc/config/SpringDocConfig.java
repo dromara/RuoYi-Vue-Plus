@@ -6,18 +6,14 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.doc.core.customizer.ClassTagOperationCustomizer;
+import org.dromara.common.doc.core.customizer.JavadocOperationCustomizer;
 import org.dromara.common.doc.config.properties.SpringDocProperties;
 import org.dromara.common.doc.core.resolver.JavadocResolver;
 import org.dromara.common.doc.core.resolver.SaTokenAnnotationMetadataJavadocResolver;
-import org.dromara.common.doc.handler.OpenApiHandler;
 import org.springdoc.core.configuration.SpringDocConfiguration;
-import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
 import org.springdoc.core.customizers.OpenApiCustomizer;
-import org.springdoc.core.customizers.ServerBaseUrlCustomizer;
-import org.springdoc.core.properties.SpringDocConfigProperties;
 import org.springdoc.core.providers.JavadocProvider;
-import org.springdoc.core.service.OpenAPIService;
-import org.springdoc.core.service.SecurityService;
 import org.springdoc.core.utils.PropertyResolverUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -91,16 +87,21 @@ public class SpringDocConfig {
     }
 
     /**
-     * 自定义 openapi 处理器
+     * Controller 类级标签增强
      */
     @Bean
-    public OpenAPIService openApiBuilder(Optional<OpenAPI> openAPI,
-                                         SecurityService securityParser,
-                                         SpringDocConfigProperties springDocConfigProperties, PropertyResolverUtils propertyResolverUtils,
-                                         Optional<List<OpenApiBuilderCustomizer>> openApiBuilderCustomisers,
-                                         Optional<List<ServerBaseUrlCustomizer>> serverBaseUrlCustomisers, Optional<JavadocProvider> javadocProvider,
-                                         List<JavadocResolver> javadocResolvers) {
-        return new OpenApiHandler(openAPI, securityParser, springDocConfigProperties, propertyResolverUtils, openApiBuilderCustomisers, serverBaseUrlCustomisers, javadocProvider, javadocResolvers);
+    public ClassTagOperationCustomizer classTagOperationCustomizer(Optional<JavadocProvider> javadocProvider,
+                                                                   PropertyResolverUtils propertyResolverUtils) {
+        return new ClassTagOperationCustomizer(javadocProvider, propertyResolverUtils);
+    }
+
+    /**
+     * 方法 JavaDoc 与权限描述增强
+     */
+    @Bean
+    public JavadocOperationCustomizer javadocOperationCustomizer(Optional<JavadocProvider> javadocProvider,
+                                                                 List<JavadocResolver> javadocResolvers) {
+        return new JavadocOperationCustomizer(javadocProvider, javadocResolvers);
     }
 
     /**
