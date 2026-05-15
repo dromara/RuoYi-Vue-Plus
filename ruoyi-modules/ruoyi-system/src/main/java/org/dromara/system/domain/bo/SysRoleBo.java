@@ -88,10 +88,6 @@ public class SysRoleBo implements Serializable {
      */
     private Long[] deptIds;
 
-    public SysRoleBo(Long roleId) {
-        this.roleId = roleId;
-    }
-
     public boolean isSuperAdmin() {
         return SystemConstants.SUPER_ADMIN_ROLE_ID.equals(this.roleId);
     }

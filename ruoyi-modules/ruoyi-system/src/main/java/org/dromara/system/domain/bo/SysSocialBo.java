@@ -140,6 +140,4 @@ public class SysSocialBo implements Serializable {
      */
     private String oauthTokenSecret;
 
-
-
 }

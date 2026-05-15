@@ -133,10 +133,6 @@ public class SysUserBo implements Serializable {
      */
     private Map<String, Object> params = new HashMap<>();
 
-    public SysUserBo(Long userId) {
-        this.userId = userId;
-    }
-
     public boolean isSuperAdmin() {
         return SystemConstants.SUPER_ADMIN_USER_ID.equals(this.userId);
     }

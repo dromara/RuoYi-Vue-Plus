@@ -72,8 +72,4 @@ public class SysRole extends BaseEntity {
      */
     private String remark;
 
-    public SysRole(Long roleId) {
-        this.roleId = roleId;
-    }
-
 }

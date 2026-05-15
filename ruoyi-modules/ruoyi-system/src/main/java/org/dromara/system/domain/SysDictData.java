@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 
 /**
@@ -63,9 +62,5 @@ public class SysDictData extends BaseEntity {
      * 备注
      */
     private String remark;
-
-    public boolean getDefault() {
-        return SystemConstants.YES.equals(this.isDefault);
-    }
 
 }

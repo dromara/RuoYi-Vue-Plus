@@ -14,7 +14,13 @@ public class SysRoleMenuPermVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 角色ID
+     */
     private Long roleId;
 
+    /**
+     * 权限字符串
+     */
     private String perms;
 }
