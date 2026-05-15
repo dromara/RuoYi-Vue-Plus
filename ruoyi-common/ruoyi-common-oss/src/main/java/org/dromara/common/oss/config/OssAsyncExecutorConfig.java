@@ -32,7 +32,7 @@ public record OssAsyncExecutorConfig(
      * 默认异步执行器配置
      */
     public static final OssAsyncExecutorConfig DEFAULT = OssAsyncExecutorConfig.builder()
-        .enabledVirtualThread(false)
+        .enabledVirtualThread(true)
         .corePoolSize(DEFAULT_CORE_POOL_SIZE)
         .build();
 
