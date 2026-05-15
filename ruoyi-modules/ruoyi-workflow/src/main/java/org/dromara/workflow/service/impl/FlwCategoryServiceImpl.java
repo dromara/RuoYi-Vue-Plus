@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.*;
-import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.warm.flow.core.service.DefService;
 import org.dromara.warm.flow.orm.entity.FlowDefinition;
 import org.dromara.warm.flow.ui.service.CategoryService;
@@ -64,8 +63,10 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
         if (ObjectUtil.isNull(categoryId)) {
             return null;
         }
-        FlowCategory category = baseMapper.selectOne(new LambdaQueryWrapper<FlowCategory>()
-            .select(FlowCategory::getCategoryName).eq(FlowCategory::getCategoryId, categoryId));
+        FlowCategory category = baseMapper.lambda()
+            .select(FlowCategory::getCategoryName)
+            .eq(FlowCategory::getCategoryId, categoryId)
+            .one();
         return ObjectUtils.notNullGetter(category, FlowCategory::getCategoryName);
     }
 
@@ -80,9 +81,10 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
         if (CollUtil.isEmpty(categoryIds)) {
             return Collections.emptyMap();
         }
-        List<FlowCategory> list = baseMapper.selectList(new LambdaQueryWrapper<FlowCategory>()
+        List<FlowCategory> list = baseMapper.lambda()
             .select(FlowCategory::getCategoryId, FlowCategory::getCategoryName)
-            .in(FlowCategory::getCategoryId, categoryIds));
+            .in(FlowCategory::getCategoryId, categoryIds)
+            .list();
         return StreamUtils.toMap(list, FlowCategory::getCategoryId, FlowCategory::getCategoryName);
     }
 
@@ -145,10 +147,11 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      */
     @Override
     public boolean checkCategoryNameUnique(FlowCategoryBo category) {
-        boolean exist = baseMapper.exists(new LambdaQueryWrapper<FlowCategory>()
+        boolean exist = baseMapper.lambda()
             .eq(FlowCategory::getCategoryName, category.getCategoryName())
             .eq(FlowCategory::getParentId, category.getParentId())
-            .ne(ObjectUtil.isNotNull(category.getCategoryId()), FlowCategory::getCategoryId, category.getCategoryId()));
+            .neIfPresent(FlowCategory::getCategoryId, category.getCategoryId())
+            .exists();
         return !exist;
     }
 
@@ -173,8 +176,7 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      */
     @Override
     public boolean hasChildByCategoryId(Long categoryId) {
-        return baseMapper.exists(new LambdaQueryWrapper<FlowCategory>()
-            .eq(FlowCategory::getParentId, categoryId));
+        return baseMapper.lambda().eq(FlowCategory::getParentId, categoryId).exists();
     }
 
     /**
@@ -255,8 +257,9 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @param oldAncestors 旧的父ID集合
      */
     private void updateCategoryChildren(Long categoryId, String newAncestors, String oldAncestors) {
-        List<FlowCategory> children = baseMapper.selectList(new LambdaQueryWrapper<FlowCategory>()
-            .apply(DataBaseHelper.findInSet(categoryId, "ancestors")));
+        List<FlowCategory> children = baseMapper.lambda()
+            .findInSet(categoryId, FlowCategory::getAncestors)
+            .list();
         List<FlowCategory> list = new ArrayList<>();
         for (FlowCategory child : children) {
             FlowCategory category = new FlowCategory();

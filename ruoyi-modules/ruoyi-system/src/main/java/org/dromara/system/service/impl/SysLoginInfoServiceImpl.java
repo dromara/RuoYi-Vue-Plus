@@ -3,7 +3,6 @@ package org.dromara.system.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,7 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ip.AddressUtils;
 import org.dromara.common.log.event.LoginInfoEvent;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.mapper.LambdaCrudChainWrapper;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.SysLoginInfo;
 import org.dromara.system.domain.bo.SysLoginInfoBo;
@@ -122,13 +122,7 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
      */
     @Override
     public PageResult<SysLoginInfoVo> selectPageLoginInfoList(SysLoginInfoBo loginInfo, PageQuery pageQuery) {
-        Map<String, Object> params = loginInfo.getParams();
-        LambdaQueryWrapper<SysLoginInfo> lqw = new LambdaQueryWrapper<SysLoginInfo>()
-            .like(StringUtils.isNotBlank(loginInfo.getIpaddr()), SysLoginInfo::getIpaddr, loginInfo.getIpaddr())
-            .eq(StringUtils.isNotBlank(loginInfo.getStatus()), SysLoginInfo::getStatus, loginInfo.getStatus())
-            .like(StringUtils.isNotBlank(loginInfo.getUserName()), SysLoginInfo::getUserName, loginInfo.getUserName())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysLoginInfo::getLoginTime, params.get("beginTime"), params.get("endTime"));
+        LambdaCrudChainWrapper<SysLoginInfo, SysLoginInfoVo> lqw = buildQueryWrapper(loginInfo);
         if (StringUtils.isBlank(pageQuery.getOrderByColumn())) {
             lqw.orderByDesc(SysLoginInfo::getInfoId);
         }
@@ -156,14 +150,23 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
      */
     @Override
     public List<SysLoginInfoVo> selectLoginInfoList(SysLoginInfoBo loginInfo) {
-        Map<String, Object> params = loginInfo.getParams();
-        return baseMapper.selectVoList(new LambdaQueryWrapper<SysLoginInfo>()
-            .like(StringUtils.isNotBlank(loginInfo.getIpaddr()), SysLoginInfo::getIpaddr, loginInfo.getIpaddr())
-            .eq(StringUtils.isNotBlank(loginInfo.getStatus()), SysLoginInfo::getStatus, loginInfo.getStatus())
-            .like(StringUtils.isNotBlank(loginInfo.getUserName()), SysLoginInfo::getUserName, loginInfo.getUserName())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysLoginInfo::getLoginTime, params.get("beginTime"), params.get("endTime"))
+        return baseMapper.selectVoList(buildQueryWrapper(loginInfo)
             .orderByDesc(SysLoginInfo::getInfoId));
+    }
+
+    /**
+     * 构造登录日志列表查询条件。
+     *
+     * @param loginInfo 登录日志筛选条件
+     * @return 登录日志查询包装器
+     */
+    private LambdaCrudChainWrapper<SysLoginInfo, SysLoginInfoVo> buildQueryWrapper(SysLoginInfoBo loginInfo) {
+        Map<String, Object> params = loginInfo.getParams();
+        return baseMapper.lambda()
+            .likeIfText(SysLoginInfo::getIpaddr, loginInfo.getIpaddr())
+            .eqIfText(SysLoginInfo::getStatus, loginInfo.getStatus())
+            .likeIfText(SysLoginInfo::getUserName, loginInfo.getUserName())
+            .betweenParams(SysLoginInfo::getLoginTime, params, "beginTime", "endTime");
     }
 
     /**
@@ -182,6 +185,6 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
      */
     @Override
     public void cleanLoginInfo() {
-        baseMapper.delete(new LambdaQueryWrapper<>());
+        baseMapper.lambda().delete();
     }
 }

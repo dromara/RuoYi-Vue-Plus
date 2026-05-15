@@ -4,8 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
@@ -17,6 +16,7 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.constant.ExceptionCons;
@@ -185,7 +185,10 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      */
     @Override
     public FlowInstance selectInstByBusinessId(String businessId) {
-        return flowInstanceMapper.selectOne(new LambdaQueryWrapper<FlowInstance>().eq(FlowInstance::getBusinessId, businessId));
+        return flowInstanceMapper.selectOne(
+            QueryBuilder.lambda(FlowInstance.class)
+                .eq(FlowInstance::getBusinessId, businessId)
+                .build());
     }
 
     /**
@@ -219,7 +222,10 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteByBusinessIds(List<String> businessIds) {
-        List<FlowInstance> flowInstances = flowInstanceMapper.selectList(new LambdaQueryWrapper<FlowInstance>().in(FlowInstance::getBusinessId, businessIds));
+        List<FlowInstance> flowInstances = flowInstanceMapper.selectList(
+            QueryBuilder.lambda(FlowInstance.class)
+                .in(FlowInstance::getBusinessId, businessIds)
+                .build());
         if (CollUtil.isEmpty(flowInstances)) {
             log.warn("未找到对应的流程实例信息，无法执行删除操作。");
             return false;
@@ -393,10 +399,11 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         // 再组装历史任务（已处理任务）
         List<FlowHisTaskVo> hisTaskVos = new ArrayList<>();
         List<FlowHisTask> hisTasks = flowHisTaskMapper.selectList(
-            new LambdaQueryWrapper<FlowHisTask>()
+            QueryBuilder.lambda(FlowHisTask.class)
                 .eq(FlowHisTask::getInstanceId, instanceId)
                 .eq(FlowHisTask::getNodeType, NodeType.BETWEEN.getKey())
                 .orderByDesc(FlowHisTask::getUpdateTime)
+                .build()
         );
         if (CollUtil.isNotEmpty(hisTasks)) {
             hisTaskVos = BeanUtil.copyToList(hisTasks, FlowHisTaskVo.class);
@@ -418,10 +425,9 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      */
     @Override
     public void updateStatus(Long instanceId, String status) {
-        LambdaUpdateWrapper<FlowInstance> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.set(FlowInstance::getFlowStatus, status);
-        wrapper.eq(FlowInstance::getId, instanceId);
-        flowInstanceMapper.update(wrapper);
+        flowInstanceMapper.update(Wrappers.lambdaUpdate(FlowInstance.class)
+            .set(FlowInstance::getFlowStatus, status)
+            .eq(FlowInstance::getId, instanceId));
     }
 
     /**

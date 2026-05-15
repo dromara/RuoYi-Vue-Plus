@@ -4,8 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
@@ -19,6 +17,7 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.system.domain.SysDictData;
 import org.dromara.system.domain.SysDictType;
@@ -81,11 +80,11 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      * @return 包含名称、类型与创建时间区间的查询包装器
      */
     private LambdaQueryWrapper<SysDictType> buildQueryWrapper(SysDictTypeBo bo) {
-        LambdaQueryWrapper<SysDictType> lqw = Wrappers.lambdaQuery();
-        lqw.like(StringUtils.isNotBlank(bo.getDictName()), SysDictType::getDictName, bo.getDictName());
-        lqw.like(StringUtils.isNotBlank(bo.getDictType()), SysDictType::getDictType, bo.getDictType());
-        lqw.orderByAsc(SysDictType::getDictId);
-        return lqw;
+        return QueryBuilder.lambda(SysDictType.class)
+            .likeIfText(SysDictType::getDictName, bo.getDictName())
+            .likeIfText(SysDictType::getDictType, bo.getDictType())
+            .orderByAsc(SysDictType::getDictId)
+            .build();
     }
 
     /**
@@ -131,7 +130,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Cacheable(cacheNames = CacheNames.SYS_DICT_TYPE, key = "#dictType")
     @Override
     public SysDictTypeVo selectDictTypeByType(String dictType) {
-        return baseMapper.selectVoOne(new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, dictType));
+        return baseMapper.lambda().eq(SysDictType::getDictType, dictType).voOne();
     }
 
     /**
@@ -143,8 +142,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     public void deleteDictTypeByIds(Collection<Long> dictIds) {
         List<SysDictType> list = baseMapper.selectByIds(dictIds);
         list.forEach(x -> {
-            boolean assigned = dictDataMapper.exists(new LambdaQueryWrapper<SysDictData>()
-                .eq(SysDictData::getDictType, x.getDictType()));
+            boolean assigned = dictDataMapper.lambda().eq(SysDictData::getDictType, x.getDictType()).exists();
             if (assigned) {
                 throw new ServiceException("{}已分配,不能删除", x.getDictName());
             }
@@ -195,9 +193,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     public List<SysDictDataVo> updateDictType(SysDictTypeBo bo) {
         SysDictType dict = MapstructUtils.convert(bo, SysDictType.class);
         SysDictType oldDict = baseMapper.selectById(dict.getDictId());
-        dictDataMapper.update(null, new LambdaUpdateWrapper<SysDictData>()
+        dictDataMapper.lambda()
             .set(SysDictData::getDictType, dict.getDictType())
-            .eq(SysDictData::getDictType, oldDict.getDictType()));
+            .eq(SysDictData::getDictType, oldDict.getDictType())
+            .update();
         int row = baseMapper.updateById(dict);
         if (row > 0) {
             CacheUtils.evict(CacheNames.SYS_DICT, oldDict.getDictType());
@@ -215,9 +214,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
      */
     @Override
     public boolean checkDictTypeUnique(SysDictTypeBo dictType) {
-        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDictType>()
+        boolean exist = baseMapper.lambda()
             .eq(SysDictType::getDictType, dictType.getDictType())
-            .ne(ObjectUtil.isNotNull(dictType.getDictId()), SysDictType::getDictId, dictType.getDictId()));
+            .neIfPresent(SysDictType::getDictId, dictType.getDictId())
+            .exists();
         return !exist;
     }
 

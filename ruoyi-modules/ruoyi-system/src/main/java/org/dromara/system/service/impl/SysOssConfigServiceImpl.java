@@ -3,8 +3,6 @@ package org.dromara.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +15,7 @@ import org.dromara.common.core.utils.ObjectUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.oss.constant.OssConstant;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.common.redis.utils.RedisUtils;
@@ -94,12 +93,12 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
      * @return 包含配置标识、桶名称和状态条件的查询包装器
      */
     private LambdaQueryWrapper<SysOssConfig> buildQueryWrapper(SysOssConfigBo bo) {
-        LambdaQueryWrapper<SysOssConfig> lqw = Wrappers.lambdaQuery();
-        lqw.eq(StringUtils.isNotBlank(bo.getConfigKey()), SysOssConfig::getConfigKey, bo.getConfigKey());
-        lqw.like(StringUtils.isNotBlank(bo.getBucketName()), SysOssConfig::getBucketName, bo.getBucketName());
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), SysOssConfig::getStatus, bo.getStatus());
-        lqw.orderByAsc(SysOssConfig::getOssConfigId);
-        return lqw;
+        return QueryBuilder.lambda(SysOssConfig.class)
+            .eqIfText(SysOssConfig::getConfigKey, bo.getConfigKey())
+            .likeIfText(SysOssConfig::getBucketName, bo.getBucketName())
+            .eqIfText(SysOssConfig::getStatus, bo.getStatus())
+            .orderByAsc(SysOssConfig::getOssConfigId)
+            .build();
     }
 
     /**
@@ -131,13 +130,13 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
     public Boolean updateByBo(SysOssConfigBo bo) {
         SysOssConfig config = MapstructUtils.convert(bo, SysOssConfig.class);
         validEntityBeforeSave(config);
-        LambdaUpdateWrapper<SysOssConfig> luw = new LambdaUpdateWrapper<>();
-        luw.set(ObjectUtil.isNull(config.getPrefix()), SysOssConfig::getPrefix, "");
-        luw.set(ObjectUtil.isNull(config.getRegion()), SysOssConfig::getRegion, "");
-        luw.set(ObjectUtil.isNull(config.getExt1()), SysOssConfig::getExt1, "");
-        luw.set(ObjectUtil.isNull(config.getRemark()), SysOssConfig::getRemark, "");
-        luw.eq(SysOssConfig::getOssConfigId, config.getOssConfigId());
-        boolean flag = baseMapper.update(config, luw) > 0;
+        boolean flag = baseMapper.lambda()
+            .set(ObjectUtil.isNull(config.getPrefix()), SysOssConfig::getPrefix, "")
+            .set(ObjectUtil.isNull(config.getRegion()), SysOssConfig::getRegion, "")
+            .set(ObjectUtil.isNull(config.getExt1()), SysOssConfig::getExt1, "")
+            .set(ObjectUtil.isNull(config.getRemark()), SysOssConfig::getRemark, "")
+            .eq(SysOssConfig::getOssConfigId, config.getOssConfigId())
+            .update(config);
         if (flag) {
             // 从数据库查询完整的数据做缓存
             config = baseMapper.selectById(config.getOssConfigId());
@@ -193,9 +192,10 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
      */
     private boolean checkConfigKeyUnique(SysOssConfig sysOssConfig) {
         long ossConfigId = ObjectUtils.notNull(sysOssConfig.getOssConfigId(), -1L);
-        SysOssConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysOssConfig>()
+        SysOssConfig info = baseMapper.lambda()
             .select(SysOssConfig::getOssConfigId, SysOssConfig::getConfigKey)
-            .eq(SysOssConfig::getConfigKey, sysOssConfig.getConfigKey()));
+            .eq(SysOssConfig::getConfigKey, sysOssConfig.getConfigKey())
+            .one();
         if (ObjectUtil.isNotNull(info) && info.getOssConfigId() != ossConfigId) {
             return false;
         }
@@ -212,8 +212,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
     @Transactional(rollbackFor = Exception.class)
     public int updateOssConfigStatus(SysOssConfigBo bo) {
         SysOssConfig sysOssConfig = MapstructUtils.convert(bo, SysOssConfig.class);
-        int row = baseMapper.update(null, new LambdaUpdateWrapper<SysOssConfig>()
-            .set(SysOssConfig::getStatus, SystemConstants.NO));
+        int row = baseMapper.lambda().set(SysOssConfig::getStatus, SystemConstants.NO).updateCount();
         row += baseMapper.updateById(sysOssConfig);
         if (row > 0) {
             RedisUtils.setCacheObject(OssConstant.DEFAULT_CONFIG_KEY, sysOssConfig.getConfigKey());

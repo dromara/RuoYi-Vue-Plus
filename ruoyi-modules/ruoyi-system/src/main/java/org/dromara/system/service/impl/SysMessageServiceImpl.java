@@ -2,8 +2,6 @@ package org.dromara.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.enums.PushSourceEnum;
@@ -11,7 +9,6 @@ import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.common.mybatis.utils.IdGeneratorUtil;
 import org.dromara.common.push.helper.PushHelper;
 import org.dromara.system.api.MessageService;
@@ -207,20 +204,19 @@ public class SysMessageServiceImpl implements ISysMessageService, MessageService
      * @return 消息VO列表
      */
     private List<SysMessageVo> selectMessageList(String category, Long userId) {
-        LambdaQueryWrapper<SysMessage> lqw = Wrappers.lambdaQuery();
-        // 分类匹配
-        lqw.eq(SysMessage::getCategory, category);
-        // 仅查询30天内消息
-        lqw.ge(SysMessage::getCreateTime, LocalDateTime.now().minusDays(BOX_DAYS));
-        // 全局消息 或 当前用户在接收人范围内
-        lqw.and(wrapper -> wrapper.eq(SysMessage::getSendUserIds, GLOBAL_USER_IDS)
-            .or()
-            .apply(DataBaseHelper.findInSet(userId, "send_user_ids")));
-        // 按创建时间+消息ID倒序
-        lqw.orderByDesc(SysMessage::getCreateTime, SysMessage::getMessageId);
-        // 分页查询（只查第一页，最多100条）
-        List<SysMessage> list = baseMapper.selectList(new Page<>(1, BOX_LIMIT, false), lqw);
-        // 转换为VO并返回
+        List<SysMessage> list = baseMapper.lambda()
+            .eq(SysMessage::getCategory, category)
+            // 仅查询30天内消息
+            .ge(SysMessage::getCreateTime, LocalDateTime.now().minusDays(BOX_DAYS))
+            // 全局消息 或 当前用户在接收人范围内
+            .and(wrapper -> {
+                wrapper.eq(SysMessage::getSendUserIds, GLOBAL_USER_IDS)
+                    .or()
+                    .findInSet(userId, SysMessage::getSendUserIds);
+            })
+            .orderByDesc(SysMessage::getCreateTime, SysMessage::getMessageId)
+            // 分页查询（只查第一页，最多100条）
+            .list(new Page<>(1, BOX_LIMIT, false));
         return list.stream().map(this::buildVo).toList();
     }
 

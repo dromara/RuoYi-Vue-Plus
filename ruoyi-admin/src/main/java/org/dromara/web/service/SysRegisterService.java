@@ -1,7 +1,6 @@
 package org.dromara.web.service;
 
 import cn.hutool.crypto.digest.BCrypt;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
@@ -58,8 +57,9 @@ public class SysRegisterService {
         sysUser.setPassword(BCrypt.hashpw(password));
         sysUser.setUserType(userType);
 
-        boolean exist = userMapper.exists(new LambdaQueryWrapper<SysUser>()
-            .eq(SysUser::getUserName, sysUser.getUserName()));
+        boolean exist = userMapper.lambda()
+            .eq(SysUser::getUserName, sysUser.getUserName())
+            .exists();
         if (exist) {
             throw new UserException("user.register.save.error", username);
         }

@@ -3,7 +3,6 @@ package org.dromara.web.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
@@ -95,7 +94,9 @@ public class SmsAuthStrategy implements IAuthStrategy {
      * @return 用户信息
      */
     private SysUserVo loadUserByPhoneNumber(String phoneNumber) {
-        SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhoneNumber, phoneNumber));
+        SysUserVo user = userMapper.lambda()
+            .eq(SysUser::getPhoneNumber, phoneNumber)
+            .voOne();
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", phoneNumber);
             throw new UserException("user.not.exists", phoneNumber);

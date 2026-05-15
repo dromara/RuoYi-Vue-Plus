@@ -10,6 +10,7 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ip.AddressUtils;
 import org.dromara.common.log.event.OperLogEvent;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.system.domain.SysOperLog;
 import org.dromara.system.domain.bo.SysOperLogBo;
 import org.dromara.system.domain.vo.SysOperLogVo;
@@ -74,9 +75,9 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      */
     private LambdaQueryWrapper<SysOperLog> buildQueryWrapper(SysOperLogBo operLog) {
         Map<String, Object> params = operLog.getParams();
-        return new LambdaQueryWrapper<SysOperLog>()
-            .like(StringUtils.isNotBlank(operLog.getOperIp()), SysOperLog::getOperIp, operLog.getOperIp())
-            .like(StringUtils.isNotBlank(operLog.getTitle()), SysOperLog::getTitle, operLog.getTitle())
+        return QueryBuilder.lambda(SysOperLog.class)
+            .likeIfText(SysOperLog::getOperIp, operLog.getOperIp())
+            .likeIfText(SysOperLog::getTitle, operLog.getTitle())
             .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
                 SysOperLog::getBusinessType, operLog.getBusinessType())
             .func(f -> {
@@ -84,17 +85,16 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
                     f.in(SysOperLog::getBusinessType, Arrays.asList(operLog.getBusinessTypes()));
                 }
             })
-            .eq(operLog.getStatus() != null,
-                SysOperLog::getStatus, operLog.getStatus())
-            .like(StringUtils.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
-            .eq(operLog.getUserId() != null, SysOperLog::getUserId, operLog.getUserId())
-            .eq(operLog.getDeptId() != null, SysOperLog::getDeptId, operLog.getDeptId())
-            .eq(StringUtils.isNotBlank(operLog.getClientKey()), SysOperLog::getClientKey, operLog.getClientKey())
-            .eq(StringUtils.isNotBlank(operLog.getDeviceType()), SysOperLog::getDeviceType, operLog.getDeviceType())
-            .like(StringUtils.isNotBlank(operLog.getBrowser()), SysOperLog::getBrowser, operLog.getBrowser())
-            .like(StringUtils.isNotBlank(operLog.getOs()), SysOperLog::getOs, operLog.getOs())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysOperLog::getOperTime, params.get("beginTime"), params.get("endTime"));
+            .eqIfPresent(SysOperLog::getStatus, operLog.getStatus())
+            .likeIfText(SysOperLog::getOperName, operLog.getOperName())
+            .eqIfPresent(SysOperLog::getUserId, operLog.getUserId())
+            .eqIfPresent(SysOperLog::getDeptId, operLog.getDeptId())
+            .eqIfText(SysOperLog::getClientKey, operLog.getClientKey())
+            .eqIfText(SysOperLog::getDeviceType, operLog.getDeviceType())
+            .likeIfText(SysOperLog::getBrowser, operLog.getBrowser())
+            .likeIfText(SysOperLog::getOs, operLog.getOs())
+            .betweenParams(SysOperLog::getOperTime, params, "beginTime", "endTime")
+            .build();
     }
 
     /**
@@ -148,6 +148,6 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
      */
     @Override
     public void cleanOperLog() {
-        baseMapper.delete(new LambdaQueryWrapper<>());
+        baseMapper.lambda().delete();
     }
 }

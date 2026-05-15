@@ -3,7 +3,6 @@ package org.dromara.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.utils.StreamUtils;
@@ -44,10 +43,10 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
         if (ObjectUtil.isNull(roleId)) {
             return "-1";
         }
-        List<SysRoleDept> list = roleDeptMapper.selectList(
-            new LambdaQueryWrapper<SysRoleDept>()
-                .select(SysRoleDept::getDeptId)
-                .eq(SysRoleDept::getRoleId, roleId));
+        List<SysRoleDept> list = roleDeptMapper.lambda()
+            .select(SysRoleDept::getDeptId)
+            .eq(SysRoleDept::getRoleId, roleId)
+            .list();
         if (CollUtil.isNotEmpty(list)) {
             return StreamUtils.join(list, rd -> Convert.toStr(rd.getDeptId()));
         }

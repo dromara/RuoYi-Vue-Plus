@@ -1,7 +1,6 @@
 package org.dromara.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseMapper;
@@ -64,7 +63,7 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRole, SysRoleVo>, MPJBa
         @DataColumn(key = "userName", value = "create_by")
     })
     default long selectRoleCount(Collection<Long> roleIds) {
-        return this.selectCount(new LambdaQueryWrapper<SysRole>().in(SysRole::getRoleId, roleIds));
+        return this.lambda().in(SysRole::getRoleId, roleIds).count();
     }
 
     /**

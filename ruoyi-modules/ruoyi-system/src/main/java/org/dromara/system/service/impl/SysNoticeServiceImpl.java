@@ -1,7 +1,6 @@
 package org.dromara.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
@@ -9,6 +8,8 @@ import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.ObjectUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.query.LambdaQueryBuilder;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.system.domain.SysNotice;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.bo.SysNoticeBo;
@@ -78,15 +79,14 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
      * @return 包含标题、类型、创建人和排序条件的查询包装器
      */
     private LambdaQueryWrapper<SysNotice> buildQueryWrapper(SysNoticeBo bo) {
-        LambdaQueryWrapper<SysNotice> lqw = Wrappers.lambdaQuery();
-        lqw.like(StringUtils.isNotBlank(bo.getNoticeTitle()), SysNotice::getNoticeTitle, bo.getNoticeTitle());
-        lqw.eq(StringUtils.isNotBlank(bo.getNoticeType()), SysNotice::getNoticeType, bo.getNoticeType());
+        LambdaQueryBuilder<SysNotice> builder = QueryBuilder.lambda(SysNotice.class)
+            .likeIfText(SysNotice::getNoticeTitle, bo.getNoticeTitle())
+            .eqIfText(SysNotice::getNoticeType, bo.getNoticeType());
         if (StringUtils.isNotBlank(bo.getCreateByName())) {
-            SysUserVo sysUser = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, bo.getCreateByName()));
-            lqw.eq(SysNotice::getCreateBy, ObjectUtils.notNullGetter(sysUser, SysUserVo::getUserId));
+            SysUserVo sysUser = userMapper.lambda().eq(SysUser::getUserName, bo.getCreateByName()).voOne();
+            builder.eq(SysNotice::getCreateBy, ObjectUtils.notNullGetter(sysUser, SysUserVo::getUserId));
         }
-        lqw.orderByAsc(SysNotice::getNoticeId);
-        return lqw;
+        return builder.orderByAsc(SysNotice::getNoticeId).build();
     }
 
     /**

@@ -1,16 +1,14 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.system.domain.SysDictData;
 import org.dromara.system.domain.bo.SysDictDataBo;
@@ -67,12 +65,12 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      * @return 包含排序号、标签和字典类型条件的查询包装器
      */
     private LambdaQueryWrapper<SysDictData> buildQueryWrapper(SysDictDataBo bo) {
-        LambdaQueryWrapper<SysDictData> lqw = Wrappers.lambdaQuery();
-        lqw.eq(bo.getDictSort() != null, SysDictData::getDictSort, bo.getDictSort());
-        lqw.like(StringUtils.isNotBlank(bo.getDictLabel()), SysDictData::getDictLabel, bo.getDictLabel());
-        lqw.eq(StringUtils.isNotBlank(bo.getDictType()), SysDictData::getDictType, bo.getDictType());
-        lqw.orderByAsc(SysDictData::getDictSort, SysDictData::getDictCode);
-        return lqw;
+        return QueryBuilder.lambda(SysDictData.class)
+            .eqIfPresent(SysDictData::getDictSort, bo.getDictSort())
+            .likeIfText(SysDictData::getDictLabel, bo.getDictLabel())
+            .eqIfText(SysDictData::getDictType, bo.getDictType())
+            .orderByAsc(SysDictData::getDictSort, SysDictData::getDictCode)
+            .build();
     }
 
     /**
@@ -84,10 +82,11 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      */
     @Override
     public String selectDictLabel(String dictType, String dictValue) {
-        return baseMapper.selectOne(new LambdaQueryWrapper<SysDictData>()
-                .select(SysDictData::getDictLabel)
-                .eq(SysDictData::getDictType, dictType)
-                .eq(SysDictData::getDictValue, dictValue))
+        return baseMapper.lambda()
+            .select(SysDictData::getDictLabel)
+            .eq(SysDictData::getDictType, dictType)
+            .eq(SysDictData::getDictValue, dictValue)
+            .one()
             .getDictLabel();
     }
 
@@ -156,10 +155,11 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      */
     @Override
     public boolean checkDictDataUnique(SysDictDataBo dict) {
-        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDictData>()
+        boolean exist = baseMapper.lambda()
             .eq(SysDictData::getDictType, dict.getDictType())
             .eq(SysDictData::getDictValue, dict.getDictValue())
-            .ne(ObjectUtil.isNotNull(dict.getDictCode()), SysDictData::getDictCode, dict.getDictCode()));
+            .neIfPresent(SysDictData::getDictCode, dict.getDictCode())
+            .exists();
         return !exist;
     }
 

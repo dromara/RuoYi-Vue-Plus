@@ -1,7 +1,6 @@
 package org.dromara.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.toolkit.JoinWrappers;
@@ -62,7 +61,7 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo>, MPJBa
         @DataColumn(key = "userName", value = "create_by")
     })
     default long selectPostCount(Collection<Long> postIds) {
-        return this.selectCount(new LambdaQueryWrapper<SysPost>().in(SysPost::getPostId, postIds));
+        return this.lambda().in(SysPost::getPostId, postIds).count();
     }
 
     /**

@@ -5,7 +5,6 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +18,7 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.oss.client.OssClient;
 import org.dromara.common.oss.enums.AccessPolicy;
 import org.dromara.common.oss.factory.OssFactory;
@@ -157,17 +157,16 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      */
     private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {
         Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<SysOss> lqw = Wrappers.lambdaQuery();
-        lqw.like(StringUtils.isNotBlank(bo.getFileName()), SysOss::getFileName, bo.getFileName());
-        lqw.like(StringUtils.isNotBlank(bo.getOriginalName()), SysOss::getOriginalName, bo.getOriginalName());
-        lqw.eq(StringUtils.isNotBlank(bo.getFileSuffix()), SysOss::getFileSuffix, bo.getFileSuffix());
-        lqw.eq(StringUtils.isNotBlank(bo.getUrl()), SysOss::getUrl, bo.getUrl());
-        lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
-            SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
-        lqw.eq(ObjectUtil.isNotNull(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
-        lqw.eq(StringUtils.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
-        lqw.orderByAsc(SysOss::getOssId);
-        return lqw;
+        return QueryBuilder.lambda(SysOss.class)
+            .likeIfText(SysOss::getFileName, bo.getFileName())
+            .likeIfText(SysOss::getOriginalName, bo.getOriginalName())
+            .eqIfText(SysOss::getFileSuffix, bo.getFileSuffix())
+            .eqIfText(SysOss::getUrl, bo.getUrl())
+            .betweenParams(SysOss::getCreateTime, params, "beginCreateTime", "endCreateTime")
+            .eqIfPresent(SysOss::getCreateBy, bo.getCreateBy())
+            .eqIfText(SysOss::getService, bo.getService())
+            .orderByAsc(SysOss::getOssId)
+            .build();
     }
 
     /**

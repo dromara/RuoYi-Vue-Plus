@@ -3,7 +3,6 @@ package org.dromara.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
@@ -64,15 +63,15 @@ public class SysMenuServiceImpl implements ISysMenuService {
     public List<SysMenuVo> selectMenuList(SysMenuBo menu, Long userId) {
         // 管理员显示所有菜单信息 不是管理员 按用户id过滤菜单
         if (LoginHelper.isSuperAdmin(userId)) {
-            return baseMapper.selectVoList(
-                new LambdaQueryWrapper<SysMenu>()
-                    .like(StringUtils.isNotBlank(menu.getMenuName()), SysMenu::getMenuName, menu.getMenuName())
-                    .eq(StringUtils.isNotBlank(menu.getVisible()), SysMenu::getVisible, menu.getVisible())
-                    .eq(StringUtils.isNotBlank(menu.getStatus()), SysMenu::getStatus, menu.getStatus())
-                    .eq(StringUtils.isNotBlank(menu.getMenuType()), SysMenu::getMenuType, menu.getMenuType())
-                    .eq(ObjectUtil.isNotNull(menu.getParentId()), SysMenu::getParentId, menu.getParentId())
-                    .orderByAsc(SysMenu::getParentId)
-                    .orderByAsc(SysMenu::getOrderNum));
+            return baseMapper.lambda()
+                .likeIfText(SysMenu::getMenuName, menu.getMenuName())
+                .eqIfText(SysMenu::getVisible, menu.getVisible())
+                .eqIfText(SysMenu::getStatus, menu.getStatus())
+                .eqIfText(SysMenu::getMenuType, menu.getMenuType())
+                .eqIfPresent(SysMenu::getParentId, menu.getParentId())
+                .orderByAsc(SysMenu::getParentId)
+                .orderByAsc(SysMenu::getOrderNum)
+                .voList();
         }
         return baseMapper.selectMenuListByUserId(menu, userId);
     }
@@ -246,7 +245,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public boolean hasChildByMenuId(Long menuId) {
-        return baseMapper.exists(new LambdaQueryWrapper<SysMenu>().eq(SysMenu::getParentId, menuId));
+        return baseMapper.lambda().eq(SysMenu::getParentId, menuId).exists();
     }
 
     /**
@@ -257,7 +256,10 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public boolean hasChildByMenuId(Collection<Long> menuIds) {
-        return baseMapper.exists(new LambdaQueryWrapper<SysMenu>().in(SysMenu::getParentId, menuIds).notIn(SysMenu::getMenuId, menuIds));
+        return baseMapper.lambda()
+            .in(SysMenu::getParentId, menuIds)
+            .notIn(SysMenu::getMenuId, menuIds)
+            .exists();
     }
 
     /**
@@ -268,7 +270,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public boolean checkMenuExistRole(Long menuId) {
-        return roleMenuMapper.exists(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getMenuId, menuId));
+        return roleMenuMapper.lambda().eq(SysRoleMenu::getMenuId, menuId).exists();
     }
 
     /**
@@ -326,10 +328,11 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public boolean checkMenuNameUnique(SysMenuBo menu) {
-        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysMenu>()
+        boolean exist = baseMapper.lambda()
             .eq(SysMenu::getMenuName, menu.getMenuName())
             .eq(SysMenu::getParentId, menu.getParentId())
-            .ne(ObjectUtil.isNotNull(menu.getMenuId()), SysMenu::getMenuId, menu.getMenuId()));
+            .neIfPresent(SysMenu::getMenuId, menu.getMenuId())
+            .exists();
         return !exist;
     }
 
@@ -349,12 +352,11 @@ public class SysMenuServiceImpl implements ISysMenuService {
         Long parentId = menu.getParentId();
         String path = menu.getPath();
         String routeName = StringUtils.isEmpty(menu.getRouteName()) ? path : menu.getRouteName();
-        List<SysMenu> sysMenuList = baseMapper.selectList(
-            new LambdaQueryWrapper<SysMenu>()
-                .in(SysMenu::getMenuType, SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
-                .and(w ->
-                    w.eq(SysMenu::getPath, path).or().eq(SysMenu::getPath, routeName)
-                ));
+        List<SysMenu> sysMenuList = baseMapper.lambda()
+            .in(SysMenu::getMenuType, SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
+            .and(w -> {
+                w.eq(SysMenu::getPath, path).or().eq(SysMenu::getPath, routeName);
+            }).list();
         for (SysMenu sysMenu : sysMenuList) {
             if (!sysMenu.getMenuId().equals(menuId)) {
                 Long dbParentId = sysMenu.getParentId();

@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.reflect.GenericTypeUtils;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -58,6 +60,24 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      */
     default List<T> selectList() {
         return this.selectList(new QueryWrapper<>());
+    }
+
+    /**
+     * 创建当前 Mapper 绑定的 Lambda CRUD 链式操作。
+     *
+     * @return Lambda CRUD 链式包装器
+     */
+    default LambdaCrudChainWrapper<T, V> lambda() {
+        return new LambdaCrudChainWrapper<>(this);
+    }
+
+    /**
+     * 创建当前 Mapper 绑定的 Lambda 链式更新。
+     *
+     * @return Lambda 链式更新包装器
+     */
+    default LambdaUpdateChainWrapper<T> lambdaUpdate() {
+        return ChainWrappers.lambdaUpdateChain(this);
     }
 
     /**

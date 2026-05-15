@@ -8,7 +8,6 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -66,9 +65,10 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     @Override
     public List<GenTableColumn> selectGenTableColumnListByTableId(Long tableId) {
-        return genTableColumnMapper.selectList(new LambdaQueryWrapper<GenTableColumn>()
+        return genTableColumnMapper.lambda()
             .eq(GenTableColumn::getTableId, tableId)
-            .orderByAsc(GenTableColumn::getSort));
+            .orderByAsc(GenTableColumn::getSort)
+            .list();
     }
 
     /**
@@ -246,7 +246,9 @@ public class GenTableServiceImpl implements IGenTableService {
     public void deleteGenTableByIds(Long[] tableIds) {
         List<Long> ids = Arrays.asList(tableIds);
         baseMapper.deleteByIds(ids);
-        genTableColumnMapper.delete(new LambdaQueryWrapper<GenTableColumn>().in(GenTableColumn::getTableId, ids));
+        genTableColumnMapper.lambda()
+            .in(GenTableColumn::getTableId, ids)
+            .deleteCount();
     }
 
     /**
@@ -551,10 +553,11 @@ public class GenTableServiceImpl implements IGenTableService {
             return tables;
         }
         List<Long> tableIds = StreamUtils.toList(tables, GenTable::getTableId);
-        List<GenTableColumn> columns = genTableColumnMapper.selectList(new LambdaQueryWrapper<GenTableColumn>()
+        List<GenTableColumn> columns = genTableColumnMapper.lambda()
             .in(GenTableColumn::getTableId, tableIds)
             .orderByAsc(GenTableColumn::getTableId)
-            .orderByAsc(GenTableColumn::getSort));
+            .orderByAsc(GenTableColumn::getSort)
+            .list();
         Map<Long, List<GenTableColumn>> columnMap = StreamUtils.groupByKey(columns, GenTableColumn::getTableId);
         tables.forEach(table -> table.setColumns(columnMap.getOrDefault(table.getTableId(), new ArrayList<>())));
         return tables;

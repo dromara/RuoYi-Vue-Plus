@@ -1,7 +1,6 @@
 package org.dromara.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.toolkit.JoinWrappers;
@@ -9,7 +8,6 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
-import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.system.domain.SysDept;
 import org.dromara.system.domain.SysRole;
 import org.dromara.system.domain.SysRoleDept;
@@ -66,7 +64,7 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo>, MPJBa
         @DataColumn(key = "deptName", value = "dept_id")
     })
     default long countDeptById(Long deptId) {
-        return this.selectCount(new LambdaQueryWrapper<SysDept>().eq(SysDept::getDeptId, deptId));
+        return this.lambda().eq(SysDept::getDeptId, deptId).count();
     }
 
     /**
@@ -76,9 +74,10 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo>, MPJBa
      * @return 包含子部门的列表
      */
     default List<SysDept> selectListByParentId(Long parentId) {
-        return this.selectList(new LambdaQueryWrapper<SysDept>()
+        return this.lambda()
             .select(SysDept::getDeptId)
-            .apply(DataBaseHelper.findInSet(parentId, "ancestors")));
+            .findInSet(parentId, SysDept::getAncestors)
+            .list();
     }
 
     /**

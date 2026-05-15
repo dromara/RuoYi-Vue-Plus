@@ -1,7 +1,6 @@
 package org.dromara.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseMapper;
@@ -136,7 +135,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo>, MPJBa
         @DataColumn(key = "userName", value = "create_by")
     })
     default long countUserById(Long userId) {
-        return this.selectCount(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, userId));
+        return lambda().eq(SysUser::getUserId, userId).count();
     }
 
     /**

@@ -1,7 +1,6 @@
 package org.dromara.system.mapper;
 
 import cn.hutool.core.collection.CollUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.toolkit.JoinWrappers;
 import org.dromara.common.core.constant.SystemConstants;
@@ -97,12 +96,12 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo>, MPJBa
      * @return 菜单列表
      */
     default List<SysMenu> selectMenuTreeAll() {
-        LambdaQueryWrapper<SysMenu> lqw = new LambdaQueryWrapper<SysMenu>()
+        return this.lambda()
             .in(SysMenu::getMenuType, SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
             .eq(SysMenu::getStatus, SystemConstants.NORMAL)
             .orderByAsc(SysMenu::getParentId)
-            .orderByAsc(SysMenu::getOrderNum);
-        return this.selectList(lqw);
+            .orderByAsc(SysMenu::getOrderNum)
+            .list();
     }
 
     /**

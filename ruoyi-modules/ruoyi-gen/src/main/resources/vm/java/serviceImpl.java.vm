@@ -8,11 +8,11 @@ import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 #end
-#if($enableStatus || $enableSort)
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-#end
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+#if($enableUnique)
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+#end
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -134,7 +134,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 #if($hasBetween)
         Map<String, Object> params = bo.getParams();
 #end
-        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery();
+        return QueryBuilder.lambda(${ClassName}.class)
 #foreach($column in $columns)
 #if($column.query)
 #set($queryType=$column.queryType)
@@ -144,29 +144,47 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 #if($queryType != 'BETWEEN')
 #if($javaType == 'String')
 #set($condition='StringUtils.isNotBlank(bo.get'+$AttrName+'())')
+#if($queryType == 'LIKE')
+            .likeIfText(${ClassName}::get$AttrName, bo.get$AttrName())
+#elseif($queryType == 'EQ')
+            .eqIfText(${ClassName}::get$AttrName, bo.get$AttrName())
+#elseif($queryType == 'NE')
+            .neIfText(${ClassName}::get$AttrName, bo.get$AttrName())
+#else
+            .$mpMethod($condition, ${ClassName}::get$AttrName, bo.get$AttrName())
+#end
 #else
 #set($condition='bo.get'+$AttrName+'() != null')
-#end
-        lqw.$mpMethod($condition, ${ClassName}::get$AttrName, bo.get$AttrName());
+#if($queryType == 'EQ')
+            .eqIfPresent(${ClassName}::get$AttrName, bo.get$AttrName())
+#elseif($queryType == 'NE')
+            .neIfPresent(${ClassName}::get$AttrName, bo.get$AttrName())
+#elseif($queryType == 'GT')
+            .gtIfPresent(${ClassName}::get$AttrName, bo.get$AttrName())
+#elseif($queryType == 'LT')
+            .ltIfPresent(${ClassName}::get$AttrName, bo.get$AttrName())
 #else
-        lqw.between(params.get("begin$AttrName") != null && params.get("end$AttrName") != null,
-            ${ClassName}::get$AttrName, params.get("begin$AttrName"), params.get("end$AttrName"));
+            .$mpMethod($condition, ${ClassName}::get$AttrName, bo.get$AttrName())
+#end
+#end
+#else
+            .betweenParams(${ClassName}::get$AttrName, params, "begin$AttrName", "end$AttrName")
 #end
 #end
 #end
 #if($table.tree && "" != $treeAncestorsField)
-        lqw.orderByAsc(${ClassName}::get${TreeAncestorsCap});
+            .orderByAsc(${ClassName}::get${TreeAncestorsCap})
 #end
 #if($table.tree && "" != $treeParentCode)
-        lqw.orderByAsc(${ClassName}::get${TreeParentCap});
+            .orderByAsc(${ClassName}::get${TreeParentCap})
 #end
 #if($table.tree && "" != $treeOrderField)
-        lqw.orderByAsc(${ClassName}::get${TreeOrderCap});
+            .orderByAsc(${ClassName}::get${TreeOrderCap})
 #elseif($enableSort)
-        lqw.orderByAsc(${ClassName}::get${sortColumn.capJavaField});
+            .orderByAsc(${ClassName}::get${sortColumn.capJavaField})
 #end
-        lqw.orderByAsc(${ClassName}::get${pkColumn.capJavaField});
-        return lqw;
+            .orderByAsc(${ClassName}::get${pkColumn.capJavaField})
+            .build();
     }
 
     /**
@@ -215,9 +233,10 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
      */
     @Override
     public Boolean updateStatus(${pkColumn.javaType} ${pkColumn.javaField}, ${statusColumn.javaType} status) {
-        return baseMapper.update(null, new LambdaUpdateWrapper<${ClassName}>()
+        return baseMapper.lambda()
             .set(${ClassName}::get${statusColumn.capJavaField}, status)
-            .eq(${ClassName}::get${pkColumn.capJavaField}, ${pkColumn.javaField})) > 0;
+            .eq(${ClassName}::get${pkColumn.capJavaField}, ${pkColumn.javaField})
+            .update();
     }
 #end
 
@@ -231,9 +250,10 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
      */
     @Override
     public Boolean updateSort(${pkColumn.javaType} ${pkColumn.javaField}, ${sortColumn.javaType} sortValue) {
-        return baseMapper.update(null, new LambdaUpdateWrapper<${ClassName}>()
+        return baseMapper.lambda()
             .set(${ClassName}::get${sortColumn.capJavaField}, sortValue)
-            .eq(${ClassName}::get${pkColumn.capJavaField}, ${pkColumn.javaField})) > 0;
+            .eq(${ClassName}::get${pkColumn.capJavaField}, ${pkColumn.javaField})
+            .update();
     }
 #end
 
@@ -296,12 +316,14 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     }
 
     private void updateChildrenAncestors(${pkColumn.javaType} currentId, String newAncestors, String oldAncestors) {
-        List<${ClassName}> children = baseMapper.selectList(new LambdaQueryWrapper<${ClassName}>()
-            .select(${ClassName}::get${pkColumn.capJavaField}, ${ClassName}::get${TreeAncestorsCap}()));
+        List<${ClassName}> children = baseMapper.lambda()
+            .select(${ClassName}::get${pkColumn.capJavaField}, ${ClassName}::get${TreeAncestorsCap})
+            .findInSet(currentId, ${ClassName}::get${TreeAncestorsCap})
+            .list();
         List<${ClassName}> updateList = new ArrayList<>();
         for (${ClassName} child : children) {
             String ancestors = child.get${TreeAncestorsCap}();
-            if (StringUtils.isBlank(ancestors) || !containsAncestor(ancestors, currentId)) {
+            if (StringUtils.isBlank(ancestors)) {
                 continue;
             }
             ${ClassName} update = new ${ClassName}();

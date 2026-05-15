@@ -4,8 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +12,7 @@ import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.bo.SysClientBo;
 import org.dromara.system.domain.vo.SysClientVo;
@@ -64,7 +63,7 @@ public class SysClientServiceImpl implements ISysClientService {
     @Cacheable(cacheNames = CacheNames.SYS_CLIENT, key = "#clientId")
     @Override
     public SysClientVo queryByClientId(String clientId) {
-        SysClientVo vo = baseMapper.selectVoOne(new LambdaQueryWrapper<SysClient>().eq(SysClient::getClientId, clientId));
+        SysClientVo vo = baseMapper.lambda().eq(SysClient::getClientId, clientId).voOne();
         fillClientRuleFields(vo);
         return vo;
     }
@@ -105,13 +104,13 @@ public class SysClientServiceImpl implements ISysClientService {
      * @return 包含 clientId、clientKey、状态等条件的查询包装器
      */
     private LambdaQueryWrapper<SysClient> buildQueryWrapper(SysClientBo bo) {
-        LambdaQueryWrapper<SysClient> lqw = Wrappers.lambdaQuery();
-        lqw.eq(StringUtils.isNotBlank(bo.getClientId()), SysClient::getClientId, bo.getClientId());
-        lqw.eq(StringUtils.isNotBlank(bo.getClientKey()), SysClient::getClientKey, bo.getClientKey());
-        lqw.eq(StringUtils.isNotBlank(bo.getClientSecret()), SysClient::getClientSecret, bo.getClientSecret());
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), SysClient::getStatus, bo.getStatus());
-        lqw.orderByAsc(SysClient::getId);
-        return lqw;
+        return QueryBuilder.lambda(SysClient.class)
+            .eqIfText(SysClient::getClientId, bo.getClientId())
+            .eqIfText(SysClient::getClientKey, bo.getClientKey())
+            .eqIfText(SysClient::getClientSecret, bo.getClientSecret())
+            .eqIfText(SysClient::getStatus, bo.getStatus())
+            .orderByAsc(SysClient::getId)
+            .build();
     }
 
     /**
@@ -163,10 +162,10 @@ public class SysClientServiceImpl implements ISysClientService {
     @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, key = "#clientId")
     @Override
     public int updateClientStatus(String clientId, String status) {
-        return baseMapper.update(null,
-            new LambdaUpdateWrapper<SysClient>()
-                .set(SysClient::getStatus, status)
-                .eq(SysClient::getClientId, clientId));
+        return baseMapper.lambda()
+            .set(SysClient::getStatus, status)
+            .eq(SysClient::getClientId, clientId)
+            .updateCount();
     }
 
     /**
@@ -190,9 +189,10 @@ public class SysClientServiceImpl implements ISysClientService {
      */
     @Override
     public boolean checkClickKeyUnique(SysClientBo client) {
-        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysClient>()
+        boolean exist = baseMapper.lambda()
             .eq(SysClient::getClientKey, client.getClientKey())
-            .ne(ObjectUtil.isNotNull(client.getId()), SysClient::getId, client.getId()));
+            .neIfPresent(SysClient::getId, client.getId())
+            .exists();
         return !exist;
     }
 

@@ -1,11 +1,10 @@
 package org.dromara.demo.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.demo.domain.TestDemo;
 import org.dromara.demo.mapper.TestDemoMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -83,8 +82,9 @@ public class TestBatchController extends BaseController {
     @DeleteMapping()
 //    @DS("slave")
     public R<Void> remove() {
-        return toAjax(testDemoMapper.delete(new LambdaQueryWrapper<TestDemo>()
-            .eq(TestDemo::getOrderNum, -1L)));
+        return toAjax(testDemoMapper.lambda()
+            .eq(TestDemo::getOrderNum, -1L)
+            .deleteCount());
     }
 
 }

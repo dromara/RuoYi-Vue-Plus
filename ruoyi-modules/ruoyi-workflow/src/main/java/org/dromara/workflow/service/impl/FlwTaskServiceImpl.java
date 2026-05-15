@@ -7,7 +7,6 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.lock.annotation.Lock4j;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +20,7 @@ import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.mybatis.utils.IdGeneratorUtil;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.domain.UserDTO;
@@ -121,8 +121,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         FlowInstanceBizExt bizExt = startProcessBo.getBizExt();
 
         // 获取已有流程实例
-        FlowInstance flowInstance = flowInstanceMapper.selectOne(new LambdaQueryWrapper<>(FlowInstance.class)
-            .eq(FlowInstance::getBusinessId, businessId));
+        FlowInstance flowInstance = flowInstanceMapper.selectOne(QueryBuilder.lambda(FlowInstance.class)
+            .eq(FlowInstance::getBusinessId, businessId)
+            .build());
 
         if (ObjectUtil.isNotNull(flowInstance)) {
             // 已存在流程
@@ -339,8 +340,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         }
         // 添加抄送人记录
         FlowHisTask flowHisTask = flowHisTaskMapper.selectList(
-            new LambdaQueryWrapper<>(FlowHisTask.class)
-                .eq(FlowHisTask::getTaskId, task.getId())).get(0);
+            QueryBuilder.lambda(FlowHisTask.class)
+                .eq(FlowHisTask::getTaskId, task.getId())
+                .build()).get(0);
         FlowNode flowNode = new FlowNode();
         flowNode.setNodeCode(flowHisTask.getTargetNodeCode());
         flowNode.setNodeName(flowHisTask.getTargetNodeName());
@@ -599,7 +601,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public List<FlowTask> selectByIdList(Collection<Long> taskIdList) {
-        return flowTaskMapper.selectList(new LambdaQueryWrapper<>(FlowTask.class).in(FlowTask::getId, taskIdList));
+        return flowTaskMapper.selectList(QueryBuilder.lambda(FlowTask.class)
+            .in(FlowTask::getId, taskIdList)
+            .build());
     }
 
     /**
@@ -713,7 +717,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public FlowHisTask selectHisTaskById(Long taskId) {
-        return flowHisTaskMapper.selectOne(new LambdaQueryWrapper<>(FlowHisTask.class).eq(FlowHisTask::getId, taskId));
+        return flowHisTaskMapper.selectOne(QueryBuilder.lambda(FlowHisTask.class)
+            .eq(FlowHisTask::getId, taskId)
+            .build());
     }
 
     /**
@@ -724,7 +730,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public List<FlowTask> selectByInstId(Long instanceId) {
-        return flowTaskMapper.selectList(new LambdaQueryWrapper<>(FlowTask.class).eq(FlowTask::getInstanceId, instanceId));
+        return flowTaskMapper.selectList(QueryBuilder.lambda(FlowTask.class)
+            .eq(FlowTask::getInstanceId, instanceId)
+            .build());
     }
 
     /**
@@ -735,7 +743,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public List<FlowTask> selectByInstIds(Collection<Long> instanceIds) {
-        return flowTaskMapper.selectList(new LambdaQueryWrapper<>(FlowTask.class).in(FlowTask::getInstanceId, instanceIds));
+        return flowTaskMapper.selectList(QueryBuilder.lambda(FlowTask.class)
+            .in(FlowTask::getInstanceId, instanceIds)
+            .build());
     }
 
     /**
@@ -746,7 +756,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public boolean isTaskEnd(Long instanceId) {
-        boolean exists = flowTaskMapper.exists(new LambdaQueryWrapper<FlowTask>().eq(FlowTask::getInstanceId, instanceId));
+        boolean exists = flowTaskMapper.exists(QueryBuilder.lambda(FlowTask.class)
+            .eq(FlowTask::getInstanceId, instanceId)
+            .build());
         return !exists;
     }
 
@@ -897,9 +909,10 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public FlowNode getByNodeCode(String nodeCode, Long definitionId) {
-        return flowNodeMapper.selectOne(new LambdaQueryWrapper<FlowNode>()
+        return flowNodeMapper.selectOne(QueryBuilder.lambda(FlowNode.class)
             .eq(FlowNode::getNodeCode, nodeCode)
-            .eq(FlowNode::getDefinitionId, definitionId));
+            .eq(FlowNode::getDefinitionId, definitionId)
+            .build());
     }
 
     /**

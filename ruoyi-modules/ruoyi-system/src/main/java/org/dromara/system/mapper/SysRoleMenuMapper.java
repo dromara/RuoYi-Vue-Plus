@@ -1,6 +1,5 @@
 package org.dromara.system.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.SysRoleMenu;
 
@@ -20,7 +19,7 @@ public interface SysRoleMenuMapper extends BaseMapperPlus<SysRoleMenu, SysRoleMe
      * @return 结果
      */
     default int deleteByMenuIds(Collection<Long> menuIds) {
-        return this.delete(new LambdaUpdateWrapper<SysRoleMenu>().in(SysRoleMenu::getMenuId, menuIds));
+        return this.lambda().in(SysRoleMenu::getMenuId, menuIds).deleteCount();
     }
 
 }
