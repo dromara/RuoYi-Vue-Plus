@@ -27,12 +27,12 @@
         <mybatis-plus.version>3.5.16</mybatis-plus.version>
         <mybatis-plus-join.version>1.5.6</mybatis-plus-join.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.8.43</hutool.version>
+        <hutool.version>5.8.44</hutool.version>
         <spring-boot-admin.version>4.0.2</spring-boot-admin.version>
         <redisson.version>4.4.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.5.0</dynamic-ds.version>
-        <snailjob.version>1.9.0</snailjob.version>
+        <snailjob.version>2.0.0</snailjob.version>
         <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.42</lombok.version>
@@ -270,6 +270,11 @@
             <dependency>
                 <groupId>com.aizuda</groupId>
                 <artifactId>snail-job-client-starter</artifactId>
+                <version>${snailjob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aizuda</groupId>
+                <artifactId>snail-job-client-retry-core</artifactId>
                 <version>${snailjob.version}</version>
             </dependency>
             <dependency>

@@ -1428,6 +1428,7 @@ CREATE TABLE sj_job
 (
     id               bigint        NOT NULL PRIMARY KEY IDENTITY,
     namespace_id     nvarchar(64)  NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a',
+    biz_id           nvarchar(64)  NOT NULL,
     group_name       nvarchar(64)  NOT NULL,
     job_name         nvarchar(64)  NOT NULL,
     args_str         nvarchar(max) NULL     DEFAULT NULL,
@@ -1464,6 +1465,8 @@ CREATE INDEX idx_sj_job_02 ON sj_job (job_status, bucket_index)
 GO
 CREATE INDEX idx_sj_job_03 ON sj_job (create_dt)
 GO
+CREATE UNIQUE INDEX uk_sj_job_01 ON sj_job (namespace_id, biz_id)
+GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
@@ -1477,6 +1480,13 @@ EXEC sp_addextendedproperty
      'SCHEMA', N'dbo',
      'TABLE', N'sj_job',
      'COLUMN', N'namespace_id'
+GO
+
+EXEC sp_addextendedproperty
+     'MS_Description', N'业务ID',
+     'SCHEMA', N'dbo',
+     'TABLE', N'sj_job',
+     'COLUMN', N'biz_id'
 GO
 
 EXEC sp_addextendedproperty
@@ -1674,7 +1684,7 @@ EXEC sp_addextendedproperty
      'TABLE', N'sj_job'
 GO
 
-INSERT INTO sj_job (namespace_id, group_name, job_name, args_str, args_type, next_trigger_at, job_status, task_type, route_key, executor_type, executor_info, trigger_type, trigger_interval, block_strategy,executor_timeout, max_retry_times, parallel_num, retry_interval, bucket_index, resident, notify_ids, owner_id, labels, description, ext_attrs, deleted, create_dt, update_dt) VALUES (N'dev', N'ruoyi_group', N'demo-job', null, 1, 1710344035622, 1, 1, 4, 1, N'testJobExecutor', 2, N'60', 1, 60, 3, 1, 1, 116, 0, N'', 1, N'', N'', N'', 0, getdate(), getdate())
+INSERT INTO sj_job (namespace_id, biz_id, group_name, job_name, args_str, args_type, next_trigger_at, job_status, task_type, route_key, executor_type, executor_info, trigger_type, trigger_interval, block_strategy,executor_timeout, max_retry_times, parallel_num, retry_interval, bucket_index, resident, notify_ids, owner_id, labels, description, ext_attrs, deleted, create_dt, update_dt) VALUES (N'dev', N'demo-job', N'ruoyi_group', N'demo-job', null, 1, 1710344035622, 1, 1, 4, 1, N'testJobExecutor', 2, N'60', 1, 60, 3, 1, 1, 116, 0, N'', 1, N'', N'', N'', 0, getdate(), getdate())
 GO
 
 -- sj_job_log_message
@@ -2354,6 +2364,7 @@ CREATE TABLE sj_workflow
     id               bigint        NOT NULL PRIMARY KEY IDENTITY,
     workflow_name    nvarchar(64)  NOT NULL,
     namespace_id     nvarchar(64)  NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a',
+    biz_id           nvarchar(64)  NOT NULL,
     group_name       nvarchar(64)  NOT NULL,
     workflow_status  tinyint       NOT NULL DEFAULT 1,
     trigger_type     tinyint       NOT NULL,
@@ -2379,6 +2390,8 @@ CREATE INDEX idx_sj_workflow_01 ON sj_workflow (create_dt)
 GO
 CREATE INDEX idx_sj_workflow_02 ON sj_workflow (namespace_id, group_name)
 GO
+CREATE UNIQUE INDEX uk_sj_workflow_01 ON sj_workflow (namespace_id, biz_id)
+GO
 
 EXEC sp_addextendedproperty
      'MS_Description', N'主键',
@@ -2399,6 +2412,13 @@ EXEC sp_addextendedproperty
      'SCHEMA', N'dbo',
      'TABLE', N'sj_workflow',
      'COLUMN', N'namespace_id'
+GO
+
+EXEC sp_addextendedproperty
+     'MS_Description', N'业务ID',
+     'SCHEMA', N'dbo',
+     'TABLE', N'sj_workflow',
+     'COLUMN', N'biz_id'
 GO
 
 EXEC sp_addextendedproperty

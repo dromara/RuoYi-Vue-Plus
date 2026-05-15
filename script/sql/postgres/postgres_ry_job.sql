@@ -445,6 +445,7 @@ CREATE TABLE sj_job
 (
     id               bigserial PRIMARY KEY,
     namespace_id     varchar(64)  NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a',
+    biz_id           varchar(64)  NOT NULL,
     group_name       varchar(64)  NOT NULL,
     job_name         varchar(64)  NOT NULL,
     args_str         text         NULL     DEFAULT NULL,
@@ -477,9 +478,11 @@ CREATE TABLE sj_job
 CREATE INDEX idx_sj_job_01 ON sj_job (namespace_id, group_name);
 CREATE INDEX idx_sj_job_02 ON sj_job (job_status, bucket_index);
 CREATE INDEX idx_sj_job_03 ON sj_job (create_dt);
+CREATE UNIQUE INDEX uk_sj_job_01 ON sj_job (namespace_id, biz_id);
 
 COMMENT ON COLUMN sj_job.id IS '主键';
 COMMENT ON COLUMN sj_job.namespace_id IS '命名空间id';
+COMMENT ON COLUMN sj_job.biz_id IS '业务ID';
 COMMENT ON COLUMN sj_job.group_name IS '组名称';
 COMMENT ON COLUMN sj_job.job_name IS '名称';
 COMMENT ON COLUMN sj_job.args_str IS '执行方法参数';
@@ -509,7 +512,7 @@ COMMENT ON COLUMN sj_job.create_dt IS '创建时间';
 COMMENT ON COLUMN sj_job.update_dt IS '修改时间';
 COMMENT ON TABLE sj_job IS '任务信息';
 
-INSERT INTO sj_job VALUES (1, 'dev', 'ruoyi_group', 'demo-job', null, 1, 1710344035622, 1, 1, 4, 1, 'testJobExecutor', 2, '60', 1, 60, 3, 1, 1, 116, 0, '', 1, '', '', '', 0, now(), now());
+INSERT INTO sj_job VALUES (1, 'dev', 'demo-job', 'ruoyi_group', 'demo-job', null, 1, 1710344035622, 1, 1, 4, 1, 'testJobExecutor', 2, '60', 1, 60, 3, 1, 1, 116, 0, '', 1, '', '', '', 0, now(), now());
 
 -- sj_job_log_message
 CREATE TABLE sj_job_log_message
@@ -717,6 +720,7 @@ CREATE TABLE sj_workflow
     id               bigserial PRIMARY KEY,
     workflow_name    varchar(64)  NOT NULL,
     namespace_id     varchar(64)  NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a',
+    biz_id           varchar(64)  NOT NULL,
     group_name       varchar(64)  NOT NULL,
     workflow_status  smallint     NOT NULL DEFAULT 1,
     trigger_type     smallint     NOT NULL,
@@ -739,10 +743,12 @@ CREATE TABLE sj_workflow
 
 CREATE INDEX idx_sj_workflow_01 ON sj_workflow (create_dt);
 CREATE INDEX idx_sj_workflow_02 ON sj_workflow (namespace_id, group_name);
+CREATE UNIQUE INDEX uk_sj_workflow_01 ON sj_workflow (namespace_id, biz_id);
 
 COMMENT ON COLUMN sj_workflow.id IS '主键';
 COMMENT ON COLUMN sj_workflow.workflow_name IS '工作流名称';
 COMMENT ON COLUMN sj_workflow.namespace_id IS '命名空间id';
+COMMENT ON COLUMN sj_workflow.biz_id IS '业务ID';
 COMMENT ON COLUMN sj_workflow.group_name IS '组名称';
 COMMENT ON COLUMN sj_workflow.workflow_status IS '工作流状态 0、关闭、1、开启';
 COMMENT ON COLUMN sj_workflow.trigger_type IS '触发类型 1.CRON 表达式 2. 固定时间';
