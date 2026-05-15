@@ -110,7 +110,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     }
 
     /**
-     * 根据用户ID查询菜单
+     * 根据用户ID查询菜单树信息
      *
      * @param userId 用户ID
      * @return 按树结构组织的菜单列表
@@ -251,7 +251,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     /**
      * 是否存在菜单子节点
      *
-     * @param menuIds 菜单ID串
+     * @param menuIds 菜单ID列表
      * @return 结果
      */
     @Override
@@ -337,7 +337,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     }
 
     /**
-     * 校验路由名称是否唯一
+     * 校验路由组合是否唯一
      *
      * @param menuBo 菜单信息
      * @return 结果

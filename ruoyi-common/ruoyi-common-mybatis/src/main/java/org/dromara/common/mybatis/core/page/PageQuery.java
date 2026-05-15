@@ -114,11 +114,22 @@ public class PageQuery implements Serializable {
         return list;
     }
 
+    /**
+     * 获取当前页起始行号。
+     *
+     * @return 起始行号
+     */
     @JsonIgnore
     public Integer getFirstNum() {
         return (pageNum - 1) * pageSize;
     }
 
+    /**
+     * 构造分页查询对象。
+     *
+     * @param pageSize 分页大小
+     * @param pageNum  当前页码
+     */
     public PageQuery(Integer pageSize, Integer pageNum) {
         this.pageSize = pageSize;
         this.pageNum = pageNum;

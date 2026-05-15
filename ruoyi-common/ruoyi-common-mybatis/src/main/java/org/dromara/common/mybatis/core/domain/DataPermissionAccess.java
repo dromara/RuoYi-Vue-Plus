@@ -18,6 +18,11 @@ public record DataPermissionAccess(Set<String> perms, Set<String> roleKeys) impl
 
     public static final DataPermissionAccess EMPTY = new DataPermissionAccess(Set.of(), Set.of());
 
+    /**
+     * 是否存在数据权限约束。
+     *
+     * @return true 存在权限约束 false 不存在权限约束
+     */
     public boolean constrained() {
         return CollUtil.isNotEmpty(perms) || CollUtil.isNotEmpty(roleKeys);
     }

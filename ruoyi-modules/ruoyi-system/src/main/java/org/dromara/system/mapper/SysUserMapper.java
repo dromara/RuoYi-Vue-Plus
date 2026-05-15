@@ -165,6 +165,12 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo>, MPJBa
     })
     int updateById(@Param(Constants.ENTITY) SysUser user);
 
+    /**
+     * 构建用户与角色关联查询条件
+     *
+     * @param user 查询条件
+     * @return 用户角色关联查询包装器
+     */
     default MPJLambdaWrapper<SysUser> buildUserRoleJoinWrapper(SysUserBo user) {
         return JoinWrappers.lambda("u", SysUser.class)
             .distinct()

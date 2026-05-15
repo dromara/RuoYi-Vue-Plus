@@ -110,7 +110,7 @@ public interface ISysMenuService {
     /**
      * 是否存在菜单子节点
      *
-     * @param menuIds 菜单ID串
+     * @param menuIds 菜单ID列表
      * @return 结果 true 存在 false 不存在
      */
     boolean hasChildByMenuId(Collection<Long> menuIds);
@@ -150,8 +150,7 @@ public interface ISysMenuService {
     /**
      * 批量删除菜单管理信息
      *
-     * @param menuIds 菜单ID串
-     * @return 结果
+     * @param menuIds 菜单ID列表
      */
     void deleteMenuById(Collection<Long> menuIds);
 

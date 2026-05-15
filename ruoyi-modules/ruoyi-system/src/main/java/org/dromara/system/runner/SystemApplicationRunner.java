@@ -19,6 +19,11 @@ public class SystemApplicationRunner implements ApplicationRunner {
 
     private final ISysOssConfigService ossConfigService;
 
+    /**
+     * 应用启动后初始化 OSS 配置缓存。
+     *
+     * @param args 启动参数
+     */
     @Override
     public void run(ApplicationArguments args) throws Exception {
         ossConfigService.init();

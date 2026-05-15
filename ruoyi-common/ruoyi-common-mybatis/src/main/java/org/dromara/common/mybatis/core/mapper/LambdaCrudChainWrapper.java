@@ -40,6 +40,11 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
     private final List<String> sqlSet;
     private SharedString sqlSelect = new SharedString();
 
+    /**
+     * 构造 Mapper 级 Lambda CRUD 链式包装器。
+     *
+     * @param crudMapper Mapper 对象
+     */
     public LambdaCrudChainWrapper(BaseMapperPlus<T, V> crudMapper) {
         this.crudMapper = crudMapper;
         super.setEntityClass(crudMapper.currentModelClass());
@@ -47,6 +52,22 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
         this.sqlSet = new ArrayList<>();
     }
 
+    /**
+     * 构造 Mapper 级 Lambda CRUD 链式包装器实例。
+     *
+     * @param crudMapper          Mapper 对象
+     * @param entity              实体对象
+     * @param entityClass         实体类型
+     * @param sqlSelect           查询字段 SQL 片段
+     * @param sqlSet              更新 set SQL 片段集合
+     * @param paramNameSeq        参数名称序列
+     * @param paramNameValuePairs 参数名称与参数值映射
+     * @param mergeSegments       查询条件表达式
+     * @param paramAlias          参数别名
+     * @param lastSql             SQL 尾部片段
+     * @param sqlComment          SQL 注释片段
+     * @param sqlFirst            SQL 起始片段
+     */
     LambdaCrudChainWrapper(BaseMapperPlus<T, V> crudMapper, T entity, Class<T> entityClass, SharedString sqlSelect,
                            List<String> sqlSet, AtomicInteger paramNameSeq, Map<String, Object> paramNameValuePairs,
                            MergeSegments mergeSegments, SharedString paramAlias, SharedString lastSql,
@@ -65,6 +86,13 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
         this.sqlFirst = sqlFirst;
     }
 
+    /**
+     * 按条件选择查询字段。
+     *
+     * @param condition 是否选择字段
+     * @param columns   查询字段集合
+     * @return this
+     */
     @Override
     public LambdaCrudChainWrapper<T, V> select(boolean condition, List<SFunction<T, ?>> columns) {
         if (condition && CollectionUtils.isNotEmpty(columns)) {
@@ -73,16 +101,36 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
         return typedThis;
     }
 
+    /**
+     * 选择查询字段。
+     *
+     * @param columns 查询字段
+     * @return this
+     */
     @SafeVarargs
     public final LambdaCrudChainWrapper<T, V> select(SFunction<T, ?>... columns) {
         return select(true, CollectionUtils.toList(columns));
     }
 
+    /**
+     * 按条件选择查询字段。
+     *
+     * @param condition 是否选择字段
+     * @param columns   查询字段
+     * @return this
+     */
     @SafeVarargs
     public final LambdaCrudChainWrapper<T, V> select(boolean condition, SFunction<T, ?>... columns) {
         return select(condition, CollectionUtils.toList(columns));
     }
 
+    /**
+     * 按字段过滤条件选择查询字段。
+     *
+     * @param entityClass 实体类型
+     * @param predicate   字段过滤条件
+     * @return this
+     */
     @Override
     public LambdaCrudChainWrapper<T, V> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         if (entityClass == null) {
@@ -95,11 +143,25 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
         return typedThis;
     }
 
+    /**
+     * 获取查询字段 SQL 片段。
+     *
+     * @return 查询字段 SQL 片段
+     */
     @Override
     public String getSqlSelect() {
         return sqlSelect.getStringValue();
     }
 
+    /**
+     * 按条件设置更新字段。
+     *
+     * @param condition 是否设置该字段
+     * @param column    字段
+     * @param val       字段值
+     * @param mapping   参数映射
+     * @return this
+     */
     @Override
     public LambdaCrudChainWrapper<T, V> set(boolean condition, SFunction<T, ?> column, Object val, String mapping) {
         return maybeDo(condition, () -> {
@@ -130,11 +192,27 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
         return set(org.dromara.common.core.utils.StringUtils.isNotBlank(value), column, value);
     }
 
+    /**
+     * 按条件设置自定义 SQL 更新片段。
+     *
+     * @param condition 是否设置该片段
+     * @param setSql    SQL 更新片段
+     * @param params    SQL 片段参数
+     * @return this
+     */
     @Override
     public LambdaCrudChainWrapper<T, V> setSql(boolean condition, String setSql, Object... params) {
         return maybeDo(condition && StringUtils.isNotBlank(setSql), () -> sqlSet.add(formatSqlMaybeWithParam(setSql, params)));
     }
 
+    /**
+     * 按条件设置字段自增。
+     *
+     * @param condition 是否设置该字段
+     * @param column    字段
+     * @param val       自增值
+     * @return this
+     */
     @Override
     public LambdaCrudChainWrapper<T, V> setIncrBy(boolean condition, SFunction<T, ?> column, Number val) {
         return maybeDo(condition, () -> {
@@ -144,6 +222,14 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
         });
     }
 
+    /**
+     * 按条件设置字段自减。
+     *
+     * @param condition 是否设置该字段
+     * @param column    字段
+     * @param val       自减值
+     * @return this
+     */
     @Override
     public LambdaCrudChainWrapper<T, V> setDecrBy(boolean condition, SFunction<T, ?> column, Number val) {
         return maybeDo(condition, () -> {
@@ -153,6 +239,11 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
         });
     }
 
+    /**
+     * 获取更新 set SQL 片段。
+     *
+     * @return 更新 set SQL 片段
+     */
     @Override
     public String getSqlSet() {
         if (CollectionUtils.isEmpty(sqlSet)) {
@@ -170,14 +261,36 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
         return typedThis;
     }
 
+    /**
+     * 添加 FIND_IN_SET 条件。
+     *
+     * @param value  匹配值
+     * @param column 字段
+     * @return this
+     */
     public LambdaCrudChainWrapper<T, V> findInSet(Object value, SFunction<T, ?> column) {
         return findInSet(true, value, column);
     }
 
+    /**
+     * 添加 FIND_IN_SET 条件。
+     *
+     * @param condition 是否添加该条件
+     * @param value     匹配值
+     * @param column    字段
+     * @return this
+     */
     public LambdaCrudChainWrapper<T, V> findInSet(boolean condition, Object value, SFunction<T, ?> column) {
         return findInSet(condition, value, columnToString(column));
     }
 
+    /**
+     * 值不为空时添加 FIND_IN_SET 条件。
+     *
+     * @param value  匹配值
+     * @param column 字段
+     * @return this
+     */
     public LambdaCrudChainWrapper<T, V> findInSetIfPresent(Object value, SFunction<T, ?> column) {
         return findInSet(value != null, value, column);
     }
@@ -382,6 +495,11 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
         return crudMapper.update(entity, typedThis);
     }
 
+    /**
+     * 创建新的链式包装器实例。
+     *
+     * @return 新的链式包装器实例
+     */
     @Override
     protected LambdaCrudChainWrapper<T, V> instance() {
         return new LambdaCrudChainWrapper<>(crudMapper, getEntity(), getEntityClass(), null, null, paramNameSeq,
@@ -389,6 +507,9 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
             SharedString.emptyString());
     }
 
+    /**
+     * 清空当前 Wrapper 状态。
+     */
     @Override
     public void clear() {
         super.clear();

@@ -31,6 +31,12 @@ public class JsonValueEnhancer {
 
     private final Map<Class<?>, List<PropertyMetadata>> propertyCache = new ConcurrentHashMap<>();
 
+    /**
+     * 构造统一响应增强器。
+     *
+     * @param jsonMapper JSON 映射器
+     * @param processors 字段处理器列表
+     */
     public JsonValueEnhancer(JsonMapper jsonMapper, List<JsonFieldProcessor> processors) {
         this.jsonMapper = jsonMapper;
         List<JsonFieldProcessor> sortedProcessors = new ArrayList<>(processors);
@@ -38,6 +44,12 @@ public class JsonValueEnhancer {
         this.processors = Collections.unmodifiableList(sortedProcessors);
     }
 
+    /**
+     * 增强响应对象。
+     *
+     * @param body 响应对象
+     * @return 增强后的响应对象
+     */
     public Object enhance(Object body) {
         if (body == null || body instanceof JsonNode || processors.isEmpty()) {
             return body;
@@ -45,6 +57,12 @@ public class JsonValueEnhancer {
         return enhanceTree(body);
     }
 
+    /**
+     * 判断消息转换器是否支持响应增强。
+     *
+     * @param converterType 消息转换器类型
+     * @return true 支持 false 不支持
+     */
     public boolean supports(Class<?> converterType) {
         return !processors.isEmpty()
             && !ByteArrayHttpMessageConverter.class.isAssignableFrom(converterType)

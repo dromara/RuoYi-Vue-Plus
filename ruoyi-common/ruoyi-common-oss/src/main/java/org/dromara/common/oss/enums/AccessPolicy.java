@@ -47,6 +47,12 @@ public enum AccessPolicy {
      */
     private final ObjectCannedACL objectCannedACL;
 
+    /**
+     * 根据策略类型查找访问策略。
+     *
+     * @param type 策略类型
+     * @return 访问策略
+     */
     public static AccessPolicy formType(String type) {
         return Arrays.stream(values())
             .filter(policy -> policy.getType().toString().equals(type))

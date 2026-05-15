@@ -104,10 +104,20 @@ public class SysUser extends BaseEntity {
     private String remark;
 
 
+    /**
+     * 使用用户ID构造系统用户对象。
+     *
+     * @param userId 用户ID
+     */
     public SysUser(Long userId) {
         this.userId = userId;
     }
 
+    /**
+     * 判断当前用户是否为超级管理员。
+     *
+     * @return true 是超级管理员 false 不是超级管理员
+     */
     public boolean isSuperAdmin() {
         return SystemConstants.SUPER_ADMIN_USER_ID.equals(this.userId);
     }

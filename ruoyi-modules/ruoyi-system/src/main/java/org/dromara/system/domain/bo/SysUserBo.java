@@ -133,6 +133,11 @@ public class SysUserBo implements Serializable {
      */
     private Map<String, Object> params = new HashMap<>();
 
+    /**
+     * 判断当前用户是否为超级管理员。
+     *
+     * @return true 是超级管理员 false 不是超级管理员
+     */
     public boolean isSuperAdmin() {
         return SystemConstants.SUPER_ADMIN_USER_ID.equals(this.userId);
     }

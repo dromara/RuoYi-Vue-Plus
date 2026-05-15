@@ -88,6 +88,11 @@ public class SysRoleBo implements Serializable {
      */
     private Long[] deptIds;
 
+    /**
+     * 判断当前角色是否为超级管理员角色。
+     *
+     * @return true 是超级管理员角色 false 不是超级管理员角色
+     */
     public boolean isSuperAdmin() {
         return SystemConstants.SUPER_ADMIN_ROLE_ID.equals(this.roleId);
     }

@@ -149,10 +149,22 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
         return Optional.ofNullable(prefix);
     }
 
+    /**
+     * 根据 OSS 配置属性构建客户端配置。
+     *
+     * @param properties OSS 配置属性
+     * @return 客户端配置
+     */
     public static OssClientConfig formProperties(OssProperties properties) {
         return formPropertiesBuilder(properties).build();
     }
 
+    /**
+     * 根据 OSS 配置属性构建客户端配置构造器。
+     *
+     * @param properties OSS 配置属性
+     * @return 客户端配置构造器
+     */
     public static OssClientConfigBuilder formPropertiesBuilder(OssProperties properties) {
         String regionString = properties.getRegion();
         Region region = Region.US_EAST_1;
