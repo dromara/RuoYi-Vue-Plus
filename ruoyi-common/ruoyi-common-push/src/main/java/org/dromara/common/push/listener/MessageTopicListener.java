@@ -32,12 +32,12 @@ public class MessageTopicListener implements ApplicationRunner, Ordered {
     public void run(ApplicationArguments args) {
         // 订阅消息主题，处理消息分发
         pushSessionManager.subscribeMessage(message -> {
-            log.info("消息主题订阅收到消息userIds={} message={}",
-                message.getUserIds(),
-                message.getPayload() == null ? null : message.getPayload().getMessage());
-            if (message.getPayload() == null) {
+            if (message == null || message.getPayload() == null) {
                 return;
             }
+            log.info("消息主题订阅收到消息userIds={} message={}",
+                message.getUserIds(),
+                message.getPayload().getMessage());
             // 有指定用户 -> 单发
             if (CollUtil.isNotEmpty(message.getUserIds())) {
                 message.getUserIds().forEach(userId -> pushSessionManager.sendMessage(userId, message.getPayload()));

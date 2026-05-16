@@ -3,10 +3,10 @@ package org.dromara.common.push.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.push.constant.MessageConstants;
 import org.dromara.common.push.dto.PushDTO;
+import org.dromara.common.push.properties.MessageProperties;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.system.api.domain.PushPayloadDTO;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -30,10 +30,17 @@ public class SseEmitterSessionManager implements PushSessionManager {
 
     private final static Map<Long, Map<String, SseEmitter>> USER_TOKEN_EMITTERS = new ConcurrentHashMap<>();
 
-    public SseEmitterSessionManager() {
+    private final MessageProperties messageProperties;
+
+    public SseEmitterSessionManager(ScheduledExecutorService scheduledExecutorService, MessageProperties messageProperties) {
+        this.messageProperties = messageProperties;
         // 定时执行 SSE 心跳检测
-        SpringUtils.getBean(ScheduledExecutorService.class)
-            .scheduleWithFixedDelay(this::sseMonitor, 60L, 60L, TimeUnit.SECONDS);
+        scheduledExecutorService.scheduleWithFixedDelay(
+            this::sseMonitor,
+            messageProperties.getHeartbeatInterval(),
+            messageProperties.getHeartbeatInterval(),
+            TimeUnit.SECONDS
+        );
     }
 
     /**
@@ -54,8 +61,8 @@ public class SseEmitterSessionManager implements PushSessionManager {
             oldEmitter.complete();
         }
 
-        // 创建一个新的 SseEmitter 实例，超时时间设置为一天 避免连接之后直接关闭浏览器导致连接停滞
-        SseEmitter emitter = new SseEmitter(86400000L);
+        // 创建一个新的 SseEmitter 实例，避免连接之后直接关闭浏览器导致连接停滞
+        SseEmitter emitter = new SseEmitter(messageProperties.getSseTimeout());
 
         emitters.put(token, emitter);
 
@@ -195,6 +202,9 @@ public class SseEmitterSessionManager implements PushSessionManager {
      */
     @Override
     public void sendMessage(Long userId, PushPayloadDTO payload) {
+        if (payload == null) {
+            return;
+        }
         sendMessage(userId, JsonUtils.toJsonString(payload));
     }
 
@@ -229,6 +239,9 @@ public class SseEmitterSessionManager implements PushSessionManager {
      */
     @Override
     public void sendMessage(PushPayloadDTO payload) {
+        if (payload == null) {
+            return;
+        }
         sendMessage(JsonUtils.toJsonString(payload));
     }
 
@@ -239,6 +252,9 @@ public class SseEmitterSessionManager implements PushSessionManager {
      */
     @Override
     public void publishMessage(PushDTO pushDTO) {
+        if (pushDTO == null || pushDTO.getPayload() == null) {
+            return;
+        }
         RedisUtils.publish(MessageConstants.MESSAGE_TOPIC, pushDTO, consumer -> log.info(
             "发送主题订阅消息topic:{} userIds:{} message:{}",
             MessageConstants.MESSAGE_TOPIC,
@@ -263,11 +279,6 @@ public class SseEmitterSessionManager implements PushSessionManager {
      */
     @Override
     public void publishAll(PushPayloadDTO payload) {
-        PushDTO dto = new PushDTO();
-        dto.setPayload(payload);
-        RedisUtils.publish(MessageConstants.MESSAGE_TOPIC, dto, consumer -> {
-            log.info("发送主题订阅消息topic:{} type:{} source:{} message:{}",
-                MessageConstants.MESSAGE_TOPIC, payload.getType(), payload.getSource(), payload.getMessage());
-        });
+        publishMessage(PushDTO.broadcast(payload));
     }
 }

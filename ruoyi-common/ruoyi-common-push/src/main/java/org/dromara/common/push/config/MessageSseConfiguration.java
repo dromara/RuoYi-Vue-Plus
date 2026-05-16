@@ -3,9 +3,12 @@ package org.dromara.common.push.config;
 import org.dromara.common.push.controller.SseController;
 import org.dromara.common.push.core.SseEmitterSessionManager;
 import org.dromara.common.push.listener.MessageTopicListener;
+import org.dromara.common.push.properties.MessageProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
+
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * SSE 消息推送自动装配。
@@ -13,7 +16,7 @@ import org.springframework.context.annotation.Bean;
  * @author Lion Li
  */
 @AutoConfiguration(after = MessageAutoConfiguration.class)
-@ConditionalOnProperty(prefix = "message", name = "transport", havingValue = "sse", matchIfMissing = true)
+@ConditionalOnExpression("'${message.enabled:true}'.equalsIgnoreCase('true') && '${message.transport:sse}'.equalsIgnoreCase('sse')")
 public class MessageSseConfiguration {
 
     /**
@@ -23,8 +26,9 @@ public class MessageSseConfiguration {
      * @return SseEmitterSessionManager 实例
      */
     @Bean
-    public SseEmitterSessionManager sseEmitterManager() {
-        return new SseEmitterSessionManager();
+    public SseEmitterSessionManager sseEmitterManager(ScheduledExecutorService scheduledExecutorService,
+                                                      MessageProperties messageProperties) {
+        return new SseEmitterSessionManager(scheduledExecutorService, messageProperties);
     }
 
     /**

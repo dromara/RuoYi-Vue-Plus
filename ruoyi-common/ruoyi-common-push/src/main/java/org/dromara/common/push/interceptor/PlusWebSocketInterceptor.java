@@ -3,7 +3,6 @@ package org.dromara.common.push.interceptor;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.push.constant.MessageConstants;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -12,6 +11,7 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 
@@ -44,12 +44,15 @@ public class PlusWebSocketInterceptor implements HandshakeInterceptor {
             }
 
             // 3. 校验客户端ID（防止多端冒用）
-            String headerCid = ServletUtils.getRequest().getHeader(LoginHelper.CLIENT_KEY);
-            String paramCid = ServletUtils.getParameter(LoginHelper.CLIENT_KEY);
-            String clientId = StpUtil.getExtra(LoginHelper.CLIENT_KEY).toString();
+            String headerCid = request.getHeaders().getFirst(LoginHelper.CLIENT_KEY);
+            String paramCid = UriComponentsBuilder.fromUri(request.getURI())
+                .build()
+                .getQueryParams()
+                .getFirst(LoginHelper.CLIENT_KEY);
+            Object clientExtra = StpUtil.getExtra(LoginHelper.CLIENT_KEY);
 
             // 客户端ID必须与请求头/参数中的一致，否则拒绝连接
-            if (!StringUtils.equalsAny(clientId, headerCid, paramCid)) {
+            if (clientExtra == null || !StringUtils.equalsAny(clientExtra.toString(), headerCid, paramCid)) {
                 throw NotLoginException.newInstance(StpUtil.getLoginType(),
                     "-100", "客户端ID与Token不匹配",
                     StpUtil.getTokenValue());

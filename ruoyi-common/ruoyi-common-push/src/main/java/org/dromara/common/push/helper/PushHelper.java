@@ -70,10 +70,7 @@ public class PushHelper {
      * @param payload 消息推送体
      */
     public static void publishMessage(List<Long> userIds, PushPayloadDTO payload) {
-        PushDTO dto = new PushDTO();
-        dto.setUserIds(userIds);
-        dto.setPayload(payload);
-        publishMessage(dto);
+        publishMessage(PushDTO.of(userIds, payload));
     }
 
     /**

@@ -220,6 +220,14 @@ message:
   path: /resource/message
   # websocket 允许的跨域来源
   allowedOrigins: '*'
+  # SSE 连接超时时间，单位毫秒
+  sse-timeout: 86400000
+  # 本地连接心跳检测间隔，单位秒
+  heartbeat-interval: 60
+  # WebSocket 单次发送超时时间，单位毫秒
+  web-socket-send-time-limit: 10000
+  # WebSocket 发送缓冲区大小
+  web-socket-buffer-size-limit: 64000
 
 --- # warm-flow工作流配置
 warm-flow:

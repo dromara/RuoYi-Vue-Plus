@@ -9,6 +9,7 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.push.constant.MessageConstants;
 import org.dromara.common.push.core.WebSocketSessionManager;
 import org.dromara.common.push.dto.PushDTO;
+import org.dromara.common.push.properties.MessageProperties;
 import org.dromara.system.api.domain.PushPayloadDTO;
 import org.dromara.system.api.model.LoginUser;
 import org.springframework.web.socket.*;
@@ -34,6 +35,11 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     private final WebSocketSessionManager webSocketSessionManager;
 
     /**
+     * 消息推送配置
+     */
+    private final MessageProperties messageProperties;
+
+    /**
      * 建立WebSocket连接后触发
      * 校验用户登录信息，注册会话
      *
@@ -56,7 +62,11 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         webSocketSessionManager.connect(
             loginUser.getUserId(),
             token,
-            new ConcurrentWebSocketSessionDecorator(session, 10 * 1000, 64_000)
+            new ConcurrentWebSocketSessionDecorator(
+                session,
+                messageProperties.getWebSocketSendTimeLimit(),
+                messageProperties.getWebSocketBufferSizeLimit()
+            )
         );
         log.info("[connect] sessionId: {}, userId:{}, token:***{}", session.getId(), loginUser.getUserId(), StringUtils.right(token, 8));
     }
@@ -82,9 +92,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         }
 
         // 构建客户端自定义消息并发布
-        PushDTO dto = new PushDTO();
-        dto.setUserIds(List.of(loginUser.getUserId()));
-        dto.setPayload(PushPayloadDTO.of(
+        PushDTO dto = PushDTO.of(List.of(loginUser.getUserId()), PushPayloadDTO.of(
             PushTypeEnum.CUSTOM,
             PushSourceEnum.CLIENT,
             message.getPayload(),
@@ -116,7 +124,14 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
      */
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
-        log.error("[transport error] sessionId: {}, exception:{}", session.getId(), exception.getMessage());
+        log.error("[transport error] sessionId: {}, exception:{}", session.getId(), exception.getMessage(), exception);
+        LoginUser loginUser = (LoginUser) session.getAttributes().get(MessageConstants.LOGIN_USER_KEY);
+        String token = (String) session.getAttributes().get(MessageConstants.LOGIN_TOKEN_KEY);
+        if (ObjectUtil.hasNull(loginUser, token)) {
+            webSocketSessionManager.closeSession(session, CloseStatus.SERVER_ERROR);
+            return;
+        }
+        webSocketSessionManager.disconnect(loginUser.getUserId(), token, CloseStatus.SERVER_ERROR);
     }
 
     /**

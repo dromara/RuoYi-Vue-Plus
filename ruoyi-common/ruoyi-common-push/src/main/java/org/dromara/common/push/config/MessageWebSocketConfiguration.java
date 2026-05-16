@@ -6,12 +6,14 @@ import org.dromara.common.push.handler.PlusWebSocketHandler;
 import org.dromara.common.push.interceptor.PlusWebSocketInterceptor;
 import org.dromara.common.push.properties.MessageProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.server.HandshakeInterceptor;
+
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * WebSocket 消息推送自动装配。
@@ -20,7 +22,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
  */
 @EnableWebSocket
 @AutoConfiguration(after = MessageAutoConfiguration.class)
-@ConditionalOnProperty(prefix = "message", name = "transport", havingValue = "websocket")
+@ConditionalOnExpression("'${message.enabled:true}'.equalsIgnoreCase('true') && '${message.transport:sse}'.equalsIgnoreCase('websocket')")
 public class MessageWebSocketConfiguration {
 
     /**
@@ -42,8 +44,9 @@ public class MessageWebSocketConfiguration {
      * 负责连接管理、消息发送、定时清理失效会话
      */
     @Bean
-    public WebSocketSessionManager webSocketSessionManager() {
-        return new WebSocketSessionManager();
+    public WebSocketSessionManager webSocketSessionManager(ScheduledExecutorService scheduledExecutorService,
+                                                           MessageProperties messageProperties) {
+        return new WebSocketSessionManager(scheduledExecutorService, messageProperties);
     }
 
     /**
@@ -60,8 +63,9 @@ public class MessageWebSocketConfiguration {
      * 处理连接、消息、心跳、断开、异常等事件
      */
     @Bean
-    public WebSocketHandler webSocketHandler(WebSocketSessionManager webSocketSessionManager) {
-        return new PlusWebSocketHandler(webSocketSessionManager);
+    public WebSocketHandler webSocketHandler(WebSocketSessionManager webSocketSessionManager,
+                                             MessageProperties messageProperties) {
+        return new PlusWebSocketHandler(webSocketSessionManager, messageProperties);
     }
 
     /**

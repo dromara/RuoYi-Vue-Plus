@@ -3,9 +3,9 @@ package org.dromara.common.push.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.push.dto.PushDTO;
+import org.dromara.common.push.properties.MessageProperties;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.system.api.domain.PushPayloadDTO;
 import org.springframework.web.socket.*;
@@ -40,9 +40,13 @@ public class WebSocketSessionManager implements PushSessionManager {
      * 构造函数
      * 初始化定时任务：每60秒执行一次会话监控，自动清理无效连接
      */
-    public WebSocketSessionManager() {
-        SpringUtils.getBean(ScheduledExecutorService.class)
-            .scheduleWithFixedDelay(this::sessionMonitor, 60L, 60L, TimeUnit.SECONDS);
+    public WebSocketSessionManager(ScheduledExecutorService scheduledExecutorService, MessageProperties messageProperties) {
+        scheduledExecutorService.scheduleWithFixedDelay(
+            this::sessionMonitor,
+            messageProperties.getHeartbeatInterval(),
+            messageProperties.getHeartbeatInterval(),
+            TimeUnit.SECONDS
+        );
     }
 
     /**
@@ -68,6 +72,17 @@ public class WebSocketSessionManager implements PushSessionManager {
      * @param token  客户端唯一标识
      */
     public void disconnect(Long userId, String token) {
+        disconnect(userId, token, CloseStatus.NORMAL);
+    }
+
+    /**
+     * 用户断开WebSocket连接
+     *
+     * @param userId 用户ID
+     * @param token  客户端唯一标识
+     * @param status 关闭状态码
+     */
+    public void disconnect(Long userId, String token, CloseStatus status) {
         if (userId == null || token == null) {
             return;
         }
@@ -77,7 +92,7 @@ public class WebSocketSessionManager implements PushSessionManager {
             return;
         }
         // 移除指定token会话并关闭
-        closeSession(sessions.remove(token), CloseStatus.NORMAL);
+        closeSession(sessions.remove(token), status);
         // 该用户无任何会话时，从缓存中移除
         if (sessions.isEmpty()) {
             USER_TOKEN_SESSIONS.remove(userId);
@@ -163,6 +178,9 @@ public class WebSocketSessionManager implements PushSessionManager {
      */
     @Override
     public void sendMessage(PushPayloadDTO payload) {
+        if (payload == null) {
+            return;
+        }
         USER_TOKEN_SESSIONS.keySet().forEach(userId -> sendMessage(userId, payload));
     }
 
@@ -174,6 +192,9 @@ public class WebSocketSessionManager implements PushSessionManager {
      */
     @Override
     public void publishMessage(PushDTO pushDTO) {
+        if (pushDTO == null || pushDTO.getPayload() == null) {
+            return;
+        }
         RedisUtils.publish(MESSAGE_TOPIC, pushDTO, consumer -> log.info(
             "WebSocket发送主题订阅消息topic:{} userIds:{} message:{}",
             MESSAGE_TOPIC,
@@ -189,9 +210,7 @@ public class WebSocketSessionManager implements PushSessionManager {
      */
     @Override
     public void publishAll(PushPayloadDTO payload) {
-        PushDTO dto = new PushDTO();
-        dto.setPayload(payload);
-        publishMessage(dto);
+        publishMessage(PushDTO.broadcast(payload));
     }
 
     /**
@@ -241,7 +260,7 @@ public class WebSocketSessionManager implements PushSessionManager {
      * @param session 待关闭的会话
      * @param status  关闭状态码
      */
-    private void closeSession(WebSocketSession session, CloseStatus status) {
+    public void closeSession(WebSocketSession session, CloseStatus status) {
         if (session == null) {
             return;
         }
