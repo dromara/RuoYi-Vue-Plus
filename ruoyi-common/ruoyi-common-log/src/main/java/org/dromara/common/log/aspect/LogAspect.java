@@ -9,10 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
@@ -28,6 +27,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -41,45 +41,40 @@ import java.util.*;
 public class LogAspect {
 
     /**
-     * 计时 key
+     * URL 最大记录长度
      */
-    private static final ThreadLocal<StopWatch> KEY_CACHE = new ThreadLocal<>();
+    private static final int MAX_URL_LENGTH = 255;
 
     /**
-     * 在目标方法执行前启动耗时统计。
+     * 客户端标识最大记录长度
+     */
+    private static final int MAX_CLIENT_KEY_LENGTH = 32;
+
+    /**
+     * 日志内容最大记录长度
+     */
+    private static final int MAX_CONTENT_LENGTH = 3800;
+
+    /**
+     * 执行目标方法并记录操作日志。
      *
      * @param joinPoint 切点
      * @param controllerLog 日志注解
+     * @return 目标方法返回值
+     * @throws Throwable 目标方法异常
      */
-    @Before(value = "@annotation(controllerLog)")
-    public void doBefore(JoinPoint joinPoint, Log controllerLog) {
+    @Around(value = "@annotation(controllerLog)")
+    public Object doAround(ProceedingJoinPoint joinPoint, Log controllerLog) throws Throwable {
         StopWatch stopWatch = new StopWatch();
-        KEY_CACHE.set(stopWatch);
         stopWatch.start();
-    }
-
-    /**
-     * 在目标方法正常返回后记录操作日志。
-     *
-     * @param joinPoint 切点
-     * @param controllerLog 日志注解
-     * @param jsonResult 返回结果
-     */
-    @AfterReturning(pointcut = "@annotation(controllerLog)", returning = "jsonResult")
-    public void doAfterReturning(JoinPoint joinPoint, Log controllerLog, Object jsonResult) {
-        handleLog(joinPoint, controllerLog, null, jsonResult);
-    }
-
-    /**
-     * 在目标方法抛出异常后记录操作日志。
-     *
-     * @param joinPoint 切点
-     * @param controllerLog 日志注解
-     * @param e         异常
-     */
-    @AfterThrowing(value = "@annotation(controllerLog)", throwing = "e")
-    public void doAfterThrowing(JoinPoint joinPoint, Log controllerLog, Exception e) {
-        handleLog(joinPoint, controllerLog, e, null);
+        try {
+            Object jsonResult = joinPoint.proceed();
+            handleLog(joinPoint, controllerLog, null, jsonResult, stopWatch);
+            return jsonResult;
+        } catch (Exception e) {
+            handleLog(joinPoint, controllerLog, e, null, stopWatch);
+            throw e;
+        }
     }
 
     /**
@@ -89,8 +84,9 @@ public class LogAspect {
      * @param controllerLog 日志注解
      * @param e 异常信息
      * @param jsonResult 返回结果
+     * @param stopWatch 耗时统计
      */
-    protected void handleLog(final JoinPoint joinPoint, Log controllerLog, final Exception e, Object jsonResult) {
+    protected void handleLog(final JoinPoint joinPoint, Log controllerLog, final Exception e, Object jsonResult, StopWatch stopWatch) {
         try {
 
             // *========数据库日志=========*//
@@ -100,8 +96,8 @@ public class LogAspect {
             // 请求的地址
             String ip = ServletUtils.getClientIP();
             operLog.setOperIp(ip);
-            operLog.setOperUrl(StringUtils.substring(request.getRequestURI(), 0, 255));
-            operLog.setClientKey(StringUtils.substring(request.getHeader(LoginHelper.CLIENT_KEY), 0, 32));
+            operLog.setOperUrl(limit(request.getRequestURI(), MAX_URL_LENGTH));
+            operLog.setClientKey(limit(request.getHeader(LoginHelper.CLIENT_KEY), MAX_CLIENT_KEY_LENGTH));
             LoginUser loginUser = LoginHelper.getLoginUser();
             if (ObjectUtil.isNotNull(loginUser)) {
                 operLog.setOperName(loginUser.getUsername());
@@ -118,7 +114,7 @@ public class LogAspect {
 
             if (e != null) {
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());
-                operLog.setErrorMsg(StringUtils.substring(e.getMessage(), 0, 3800));
+                operLog.setErrorMsg(limit(e.getMessage(), MAX_CONTENT_LENGTH));
             }
             // 设置方法名称
             String className = joinPoint.getTarget().getClass().getName();
@@ -129,16 +125,13 @@ public class LogAspect {
             // 处理设置注解上的参数
             getControllerMethodDescription(joinPoint, controllerLog, operLog, jsonResult);
             // 设置消耗时间
-            StopWatch stopWatch = KEY_CACHE.get();
             stopWatch.stop();
             operLog.setCostTime(stopWatch.getDuration().toMillis());
             // 发布事件保存数据库
             SpringUtils.context().publishEvent(operLog);
         } catch (Exception exp) {
             // 记录本地异常日志
-            log.error("异常信息:{}", exp.getMessage());
-        } finally {
-            KEY_CACHE.remove();
+            log.error("记录操作日志异常", exp);
         }
     }
 
@@ -165,7 +158,7 @@ public class LogAspect {
         }
         // 是否需要保存response，参数和值
         if (log.isSaveResponseData() && ObjectUtil.isNotNull(jsonResult)) {
-            operLog.setJsonResult(StringUtils.substring(JsonUtils.toJsonString(jsonResult), 0, 3800));
+            operLog.setJsonResult(limit(JsonUtils.toJsonString(jsonResult), MAX_CONTENT_LENGTH));
         }
     }
 
@@ -182,11 +175,11 @@ public class LogAspect {
         String requestMethod = operLog.getRequestMethod();
         if (MapUtil.isEmpty(paramsMap) && StringUtils.equalsAny(requestMethod, HttpMethod.PUT.name(), HttpMethod.POST.name(), HttpMethod.DELETE.name())) {
             String params = argsArrayToString(joinPoint.getArgs(), excludeParamNames);
-            operLog.setOperParam(StringUtils.substring(params, 0, 3800));
+            operLog.setOperParam(limit(params, MAX_CONTENT_LENGTH));
         } else {
             MapUtil.removeAny(paramsMap, SystemConstants.EXCLUDE_PROPERTIES);
             MapUtil.removeAny(paramsMap, excludeParamNames);
-            operLog.setOperParam(StringUtils.substring(JsonUtils.toJsonString(paramsMap), 0, 3800));
+            operLog.setOperParam(limit(JsonUtils.toJsonString(paramsMap), MAX_CONTENT_LENGTH));
         }
     }
 
@@ -205,30 +198,64 @@ public class LogAspect {
         String[] exclude = ArrayUtil.addAll(excludeParamNames, SystemConstants.EXCLUDE_PROPERTIES);
         for (Object o : paramsArray) {
             if (ObjectUtil.isNotNull(o) && !isFilterObject(o)) {
-                String str = "";
-                if (o instanceof List<?> list) {
-                    List<Dict> list1 = new ArrayList<>();
-                    for (Object obj : list) {
-                        String str1 = JsonUtils.toJsonString(obj);
-                        Dict dict = JsonUtils.parseMap(str1);
-                        if (MapUtil.isNotEmpty(dict)) {
-                            MapUtil.removeAny(dict, exclude);
-                            list1.add(dict);
-                        }
-                    }
-                    str = JsonUtils.toJsonString(list1);
-                } else {
-                    str = JsonUtils.toJsonString(o);
-                    Dict dict = JsonUtils.parseMap(str);
-                    if (MapUtil.isNotEmpty(dict)) {
-                        MapUtil.removeAny(dict, exclude);
-                        str = JsonUtils.toJsonString(dict);
-                    }
-                }
-                params.add(str);
+                params.add(serializeArg(o, exclude));
             }
         }
         return params.toString();
+    }
+
+    /**
+     * 序列化单个方法参数，并移除排除字段。
+     *
+     * @param arg 参数对象
+     * @param exclude 排除字段名
+     * @return 参数日志字符串
+     */
+    private String serializeArg(Object arg, String[] exclude) {
+        if (arg instanceof Collection<?> collection) {
+            List<Dict> list = new ArrayList<>(collection.size());
+            for (Object item : collection) {
+                Dict dict = toFilteredDict(item, exclude);
+                if (MapUtil.isNotEmpty(dict)) {
+                    list.add(dict);
+                }
+            }
+            return JsonUtils.toJsonString(list);
+        }
+        String str = JsonUtils.toJsonString(arg);
+        Dict dict = JsonUtils.parseMap(str);
+        if (MapUtil.isNotEmpty(dict)) {
+            MapUtil.removeAny(dict, exclude);
+            return JsonUtils.toJsonString(dict);
+        }
+        return str;
+    }
+
+    /**
+     * 将参数转为已排除指定字段的字典。
+     *
+     * @param value 参数值
+     * @param exclude 排除字段名
+     * @return 已过滤字段的字典
+     */
+    private Dict toFilteredDict(Object value, String[] exclude) {
+        String str = JsonUtils.toJsonString(value);
+        Dict dict = JsonUtils.parseMap(str);
+        if (MapUtil.isNotEmpty(dict)) {
+            MapUtil.removeAny(dict, exclude);
+        }
+        return dict;
+    }
+
+    /**
+     * 限制日志字段长度。
+     *
+     * @param value 原始字符串
+     * @param maxLength 最大长度
+     * @return 截断后的字符串
+     */
+    private String limit(String value, int maxLength) {
+        return StringUtils.substring(value, 0, maxLength);
     }
 
     /**
@@ -237,23 +264,45 @@ public class LogAspect {
      * @param o 对象信息。
      * @return 如果是需要过滤的对象，则返回true；否则返回false。
      */
-    @SuppressWarnings("rawtypes")
     public boolean isFilterObject(final Object o) {
         Class<?> clazz = o.getClass();
         if (clazz.isArray()) {
-            return MultipartFile.class.isAssignableFrom(clazz.getComponentType());
+            if (MultipartFile.class.isAssignableFrom(clazz.getComponentType())) {
+                return true;
+            }
+            int length = Array.getLength(o);
+            for (int i = 0; i < length; i++) {
+                if (isFilterValue(Array.get(o, i))) {
+                    return true;
+                }
+            }
+            return false;
         } else if (Collection.class.isAssignableFrom(clazz)) {
-            Collection collection = (Collection) o;
+            Collection<?> collection = (Collection<?>) o;
             for (Object value : collection) {
-                return value instanceof MultipartFile;
+                if (isFilterValue(value)) {
+                    return true;
+                }
             }
         } else if (Map.class.isAssignableFrom(clazz)) {
-            Map map = (Map) o;
+            Map<?, ?> map = (Map<?, ?>) o;
             for (Object value : map.values()) {
-                return value instanceof MultipartFile;
+                if (isFilterValue(value)) {
+                    return true;
+                }
             }
         }
-        return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse
-               || o instanceof BindingResult;
+        return isFilterValue(o);
+    }
+
+    /**
+     * 判断是否为日志参数过滤类型。
+     *
+     * @param value 参数值
+     * @return true 需要过滤 false 不需要过滤
+     */
+    private boolean isFilterValue(Object value) {
+        return value instanceof MultipartFile || value instanceof HttpServletRequest || value instanceof HttpServletResponse
+               || value instanceof BindingResult;
     }
 }
