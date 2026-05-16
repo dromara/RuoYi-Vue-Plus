@@ -3,6 +3,7 @@ package org.dromara.common.satoken.utils;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.useragent.UserAgent;
@@ -98,13 +99,12 @@ public class LoginHelper {
      *
      * @return 登录用户
      */
-    @SuppressWarnings("unchecked")
     public static <T extends LoginUser> T getLoginUser() {
-        SaSession session = StpUtil.getTokenSession();
-        if (ObjectUtil.isNull(session)) {
+        try {
+            return getLoginUser(StpUtil.getTokenSession());
+        } catch (NotLoginException e) {
             return null;
         }
-        return (T) session.get(LOGIN_USER_KEY);
     }
 
     /**
@@ -113,9 +113,27 @@ public class LoginHelper {
      * @param token Token
      * @return 登录用户
      */
-    @SuppressWarnings("unchecked")
     public static <T extends LoginUser> T getLoginUser(String token) {
-        SaSession session = StpUtil.getTokenSessionByToken(token);
+        if (StringUtils.isBlank(token)) {
+            return null;
+        }
+        SaSession session;
+        try {
+            session = StpUtil.getTokenSessionByToken(token);
+        } catch (NotLoginException e) {
+            return null;
+        }
+        return getLoginUser(session);
+    }
+
+    /**
+     * 从会话中读取登录用户。
+     *
+     * @param session 登录会话
+     * @return 登录用户
+     */
+    @SuppressWarnings("unchecked")
+    private static <T extends LoginUser> T getLoginUser(SaSession session) {
         if (ObjectUtil.isNull(session)) {
             return null;
         }
@@ -225,12 +243,7 @@ public class LoginHelper {
      * @return 是否已登录
      */
     public static boolean isLogin() {
-        try {
-            StpUtil.checkLogin();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return StpUtil.isLogin();
     }
 
 }

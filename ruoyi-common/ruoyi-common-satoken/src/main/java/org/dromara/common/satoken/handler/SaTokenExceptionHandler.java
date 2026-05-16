@@ -26,24 +26,11 @@ public class SaTokenExceptionHandler {
      * @param request 当前请求
      * @return 统一失败响应
      */
-    @ExceptionHandler(NotPermissionException.class)
-    public R<Void> handleNotPermissionException(NotPermissionException e, HttpServletRequest request) {
+    @ExceptionHandler({NotPermissionException.class, NotRoleException.class})
+    public R<Void> handleNotAccessException(RuntimeException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',权限码校验失败'{}'", requestURI, e.getMessage());
-        return R.fail(HttpStatus.HTTP_FORBIDDEN, "没有访问权限，请联系管理员授权");
-    }
-
-    /**
-     * 处理角色权限校验失败异常。
-     *
-     * @param e 异常信息
-     * @param request 当前请求
-     * @return 统一失败响应
-     */
-    @ExceptionHandler(NotRoleException.class)
-    public R<Void> handleNotRoleException(NotRoleException e, HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',角色权限校验失败'{}'", requestURI, e.getMessage());
+        String reason = e instanceof NotRoleException ? "角色权限校验失败" : "权限码校验失败";
+        log.error("请求地址'{}',{}'{}'", requestURI, reason, e.getMessage());
         return R.fail(HttpStatus.HTTP_FORBIDDEN, "没有访问权限，请联系管理员授权");
     }
 

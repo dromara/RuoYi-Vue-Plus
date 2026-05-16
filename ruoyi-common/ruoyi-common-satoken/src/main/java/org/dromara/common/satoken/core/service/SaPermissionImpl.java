@@ -3,16 +3,16 @@ package org.dromara.common.satoken.core.service;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import org.dromara.common.core.enums.UserType;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.PermissionService;
 import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.model.LoginUser;
 
+import java.util.Collection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * sa-token 权限管理实现类
@@ -30,26 +30,7 @@ public class SaPermissionImpl implements StpInterface {
      */
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
-        LoginUser loginUser = LoginHelper.getLoginUser();
-        if (ObjectUtil.isNull(loginUser) || !loginUser.getLoginId().equals(loginId)) {
-            PermissionService permissionService = getPermissionService();
-            if (ObjectUtil.isNotNull(permissionService)) {
-                List<String> list = StringUtils.splitList(loginId.toString(), ":");
-                return new ArrayList<>(permissionService.getMenuPermission(Long.parseLong(list.get(1))));
-            } else {
-                throw new ServiceException("PermissionService 实现类不存在");
-            }
-        }
-        UserType userType = UserType.getUserType(loginUser.getUserType());
-        if (userType == UserType.APP_USER) {
-            // 其他端 自行根据业务编写
-        }
-        if (CollUtil.isNotEmpty(loginUser.getMenuPermission())) {
-            // SYS_USER 默认返回权限
-            return new ArrayList<>(loginUser.getMenuPermission());
-        } else {
-            return new ArrayList<>();
-        }
+        return resolvePermissionList(loginId, LoginUser::getMenuPermission, PermissionService::getMenuPermission);
     }
 
     /**
@@ -61,26 +42,33 @@ public class SaPermissionImpl implements StpInterface {
      */
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
+        return resolvePermissionList(loginId, LoginUser::getRolePermission, PermissionService::getRolePermission);
+    }
+
+    /**
+     * 解析当前登录对象的权限列表。
+     *
+     * @param loginId 登录ID
+     * @param localPermissionExtractor 当前登录用户权限提取器
+     * @param remotePermissionExtractor 远程权限提取器
+     * @return 权限列表
+     */
+    private List<String> resolvePermissionList(Object loginId,
+                                               java.util.function.Function<LoginUser, Collection<String>> localPermissionExtractor,
+                                               BiFunction<PermissionService, Long, Collection<String>> remotePermissionExtractor) {
         LoginUser loginUser = LoginHelper.getLoginUser();
         if (ObjectUtil.isNull(loginUser) || !loginUser.getLoginId().equals(loginId)) {
             PermissionService permissionService = getPermissionService();
             if (ObjectUtil.isNotNull(permissionService)) {
-                List<String> list = StringUtils.splitList(loginId.toString(), ":");
-                return new ArrayList<>(permissionService.getRolePermission(Long.parseLong(list.get(1))));
-            } else {
-                throw new ServiceException("PermissionService 实现类不存在");
+                return new ArrayList<>(remotePermissionExtractor.apply(permissionService, resolveUserId(loginId)));
             }
+            throw new ServiceException("PermissionService 实现类不存在");
         }
-        UserType userType = UserType.getUserType(loginUser.getUserType());
-        if (userType == UserType.APP_USER) {
-            // 其他端 自行根据业务编写
+        Collection<String> permissionList = localPermissionExtractor.apply(loginUser);
+        if (CollUtil.isNotEmpty(permissionList)) {
+            return new ArrayList<>(permissionList);
         }
-        if (CollUtil.isNotEmpty(loginUser.getRolePermission())) {
-            // SYS_USER 默认返回权限
-            return new ArrayList<>(loginUser.getRolePermission());
-        } else {
-            return new ArrayList<>();
-        }
+        return new ArrayList<>();
     }
 
     /**
@@ -94,6 +82,21 @@ public class SaPermissionImpl implements StpInterface {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * 从登录ID中提取用户ID。
+     *
+     * @param loginId 登录ID
+     * @return 用户ID
+     */
+    private Long resolveUserId(Object loginId) {
+        String loginIdStr = loginId.toString();
+        int separatorIndex = loginIdStr.indexOf(':');
+        if (separatorIndex < 0 || separatorIndex == loginIdStr.length() - 1) {
+            throw new ServiceException("登录ID格式错误");
+        }
+        return Long.parseLong(loginIdStr.substring(separatorIndex + 1));
     }
 
 }
