@@ -17,7 +17,7 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.regex.RegexValidator;
 import org.dromara.common.mail.config.properties.MailProperties;
-import org.dromara.common.mail.utils.MailUtils;
+import org.dromara.common.mail.core.MailBuilder;
 import org.dromara.common.redis.annotation.RateLimiter;
 import org.dromara.common.redis.enums.LimitType;
 import org.dromara.common.redis.utils.RedisUtils;
@@ -109,7 +109,11 @@ public class CaptchaController {
         String code = RandomUtil.randomNumbers(4);
         RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         try {
-            MailUtils.sendText(email, "登录验证码", "您本次验证码为：" + code + "，有效性为" + Constants.CAPTCHA_EXPIRATION + "分钟，请尽快填写。");
+            MailBuilder.of()
+                .to(email)
+                .subject("登录验证码")
+                .text("您本次验证码为：" + code + "，有效性为" + Constants.CAPTCHA_EXPIRATION + "分钟，请尽快填写。")
+                .send();
         } catch (Exception e) {
             log.error("验证码短信发送异常 => {}", e.getMessage());
             throw new ServiceException(e.getMessage());

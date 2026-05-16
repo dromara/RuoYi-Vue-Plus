@@ -1,5 +1,6 @@
 package org.dromara.common.mail.config.properties;
 
+import cn.hutool.extra.mail.MailAccount;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -72,4 +73,25 @@ public class MailProperties {
      * Socket连接超时值，单位毫秒，缺省值不超时
      */
     private Long connectionTimeout;
+
+    /**
+     * 转换为 Hutool 邮件账户配置。
+     *
+     * @return 邮件账户配置
+     */
+    public MailAccount toMailAccount() {
+        MailAccount account = new MailAccount();
+        account.setHost(host);
+        account.setPort(port);
+        account.setAuth(auth);
+        account.setFrom(from);
+        account.setUser(user);
+        account.setPass(pass);
+        account.setSocketFactoryPort(port);
+        account.setStarttlsEnable(starttlsEnable);
+        account.setSslEnable(sslEnable);
+        account.setTimeout(timeout);
+        account.setConnectionTimeout(connectionTimeout);
+        return account;
+    }
 }

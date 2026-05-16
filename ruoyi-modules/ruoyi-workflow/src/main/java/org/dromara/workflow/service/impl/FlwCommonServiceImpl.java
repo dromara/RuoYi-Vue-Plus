@@ -11,7 +11,7 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.mail.utils.MailUtils;
+import org.dromara.common.mail.core.MailBuilder;
 import org.dromara.system.api.MessageService;
 import org.dromara.system.api.domain.PushPayloadDTO;
 import org.dromara.system.api.domain.UserDTO;
@@ -122,7 +122,7 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
                             message, null, path
                         ));
                     }
-                    case EMAIL_MESSAGE -> MailUtils.sendText(emails, subject, message);
+                    case EMAIL_MESSAGE -> MailBuilder.of().to(emails).subject(subject).text(message).send();
                     case SMS_MESSAGE -> {
 //                        LinkedHashMap<String, String> map = new LinkedHashMap<>(1);
 //                        // 根据具体短信服务商参数用法传参
