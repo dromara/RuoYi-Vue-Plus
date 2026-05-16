@@ -15,6 +15,7 @@ import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.ThreadUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -44,10 +45,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * 文件上传 服务层实现
@@ -85,19 +87,21 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      */
     @Override
     public List<SysOssVo> listByIds(Collection<Long> ossIds) {
-        List<SysOssVo> list = new ArrayList<>();
         SysOssServiceImpl ossService = SpringUtils.getAopProxy(this);
-        for (Long id : ossIds) {
+        List<Supplier<SysOssVo>> suppliers = ossIds.stream().map(id -> (Supplier<SysOssVo>) () -> {
             SysOssVo vo = ossService.getById(id);
             if (ObjectUtil.isNotNull(vo)) {
                 try {
-                    list.add(this.matchingUrl(vo));
+                    return this.matchingUrl(vo);
                 } catch (Exception ignored) {
                     // 如果oss异常无法连接则将数据直接返回
-                    list.add(vo);
+                    return vo;
                 }
             }
-        }
+            return null;
+        }).toList();
+        List<SysOssVo> list = ThreadUtils.virtualSubmitAll(suppliers);
+        list.removeAll(Collections.singleton(null));
         return list;
     }
 
@@ -109,19 +113,22 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      */
     @Override
     public String selectUrlByIds(String ossIds) {
-        List<String> list = new ArrayList<>();
+        List<Long> ids = StringUtils.splitTo(ossIds, Convert::toLong);
         SysOssServiceImpl ossService = SpringUtils.getAopProxy(this);
-        for (Long id : StringUtils.splitTo(ossIds, Convert::toLong)) {
+        List<Supplier<String>> suppliers = ids.stream().map(id -> (Supplier<String>) () -> {
             SysOssVo vo = ossService.getById(id);
             if (ObjectUtil.isNotNull(vo)) {
                 try {
-                    list.add(this.matchingUrl(vo).getUrl());
+                    return this.matchingUrl(vo).getUrl();
                 } catch (Exception ignored) {
                     // 如果oss异常无法连接则将数据直接返回
-                    list.add(vo.getUrl());
+                    return vo.getUrl();
                 }
             }
-        }
+            return null;
+        }).toList();
+        List<String> list = ThreadUtils.virtualSubmitAll(suppliers);
+        list.removeAll(Collections.singleton(null));
         return StringUtils.joinComma(list);
     }
 
@@ -133,19 +140,23 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      */
     @Override
     public List<OssDTO> selectByIds(String ossIds) {
-        List<OssDTO> list = new ArrayList<>();
-        for (Long id : StringUtils.splitTo(ossIds, Convert::toLong)) {
-            SysOssVo vo = SpringUtils.getAopProxy(this).getById(id);
+        List<Long> ids = StringUtils.splitTo(ossIds, Convert::toLong);
+        var ossService = SpringUtils.getAopProxy(this);
+        List<Supplier<OssDTO>> suppliers = ids.stream().map(id -> (Supplier<OssDTO>) () -> {
+            SysOssVo vo = ossService.getById(id);
             if (ObjectUtil.isNotNull(vo)) {
                 try {
                     vo.setUrl(this.matchingUrl(vo).getUrl());
-                    list.add(BeanUtil.toBean(vo, OssDTO.class));
+                    return BeanUtil.toBean(vo, OssDTO.class);
                 } catch (Exception ignored) {
                     // 如果oss异常无法连接则将数据直接返回
-                    list.add(BeanUtil.toBean(vo, OssDTO.class));
+                    return BeanUtil.toBean(vo, OssDTO.class);
                 }
             }
-        }
+            return null;
+        }).toList();
+        List<OssDTO> list = ThreadUtils.virtualSubmitAll(suppliers);
+        list.removeAll(Collections.singleton(null));
         return list;
     }
 

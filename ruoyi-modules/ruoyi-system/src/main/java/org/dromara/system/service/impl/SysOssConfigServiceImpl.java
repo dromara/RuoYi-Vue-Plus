@@ -12,17 +12,18 @@ import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.ObjectUtils;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.oss.constant.OssConstant;
-import org.dromara.common.oss.factory.OssFactory;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.system.domain.SysOssConfig;
 import org.dromara.system.domain.bo.SysOssConfigBo;
 import org.dromara.system.domain.vo.SysOssConfigVo;
+import org.dromara.system.event.OssConfigChangeEvent;
 import org.dromara.system.mapper.SysOssConfigMapper;
 import org.dromara.system.service.ISysOssConfigService;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 对象存储配置Service业务层处理
@@ -117,7 +117,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         if (flag) {
             // 从数据库查询完整的数据做缓存
             config = ossConfigMapper.selectById(config.getOssConfigId());
-            CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
+            publishOssConfigSaved(config, null);
         }
         return flag;
     }
@@ -143,12 +143,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         if (flag) {
             // 从数据库查询完整的数据做缓存
             config = ossConfigMapper.selectById(config.getOssConfigId());
-            if (ObjectUtil.isNotNull(oldConfig) && !Objects.equals(oldConfig.getConfigKey(), config.getConfigKey())) {
-                CacheUtils.evict(CacheNames.SYS_OSS_CONFIG, oldConfig.getConfigKey());
-                OssFactory.remove(oldConfig.getConfigKey());
-            }
-            CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
-            OssFactory.remove(config.getConfigKey());
+            publishOssConfigSaved(config, ObjectUtils.notNullGetter(oldConfig, SysOssConfig::getConfigKey));
         }
         return flag;
     }
@@ -188,10 +183,8 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         }
         boolean flag = ossConfigMapper.deleteByIds(ids) > 0;
         if (flag) {
-            list.forEach(sysOssConfig -> {
-                CacheUtils.evict(CacheNames.SYS_OSS_CONFIG, sysOssConfig.getConfigKey());
-                OssFactory.remove(sysOssConfig.getConfigKey());
-            });
+            list.forEach(sysOssConfig ->
+                SpringUtils.context().publishEvent(OssConfigChangeEvent.remove(sysOssConfig.getConfigKey())));
         }
         return flag;
     }
@@ -227,9 +220,23 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         int row = ossConfigMapper.lambda().set(SysOssConfig::getStatus, SystemConstants.NO).updateCount();
         row += ossConfigMapper.updateById(sysOssConfig);
         if (row > 0) {
-            RedisUtils.setCacheObject(OssConstant.DEFAULT_CONFIG_KEY, sysOssConfig.getConfigKey());
+            SpringUtils.context().publishEvent(OssConfigChangeEvent.useDefault(sysOssConfig.getConfigKey()));
         }
         return row;
+    }
+
+    /**
+     * 发布 OSS 配置保存事件。
+     *
+     * @param config       当前配置
+     * @param oldConfigKey 变更前配置 key
+     */
+    private void publishOssConfigSaved(SysOssConfig config, String oldConfigKey) {
+        SpringUtils.context().publishEvent(OssConfigChangeEvent.save(
+            config.getConfigKey(),
+            oldConfigKey,
+            JsonUtils.toJsonString(config)
+        ));
     }
 
 }

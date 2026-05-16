@@ -175,7 +175,7 @@ public class SysLoginService {
      * @param userId 用户ID
      * @param ip     登录IP
      */
-    public void recordLoginInfo(Long userId, String ip) {
+    public void updateLastLoginInfo(Long userId, String ip) {
         SysUser sysUser = new SysUser();
         sysUser.setUserId(userId);
         sysUser.setLoginIp(ip);

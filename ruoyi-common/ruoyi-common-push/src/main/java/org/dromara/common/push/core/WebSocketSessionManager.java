@@ -3,6 +3,7 @@ package org.dromara.common.push.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.utils.ThreadUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.push.dto.PushDTO;
 import org.dromara.common.push.properties.MessageProperties;
@@ -181,7 +182,11 @@ public class WebSocketSessionManager implements PushSessionManager {
         if (payload == null) {
             return;
         }
-        USER_TOKEN_SESSIONS.keySet().forEach(userId -> sendMessage(userId, payload));
+        List<Long> userIds = new ArrayList<>(USER_TOKEN_SESSIONS.keySet());
+        Runnable[] sendTasks = userIds.stream()
+            .map(userId -> (Runnable) () -> sendMessage(userId, payload))
+            .toArray(Runnable[]::new);
+        ThreadUtils.virtualInvokeAll(sendTasks);
     }
 
     /**

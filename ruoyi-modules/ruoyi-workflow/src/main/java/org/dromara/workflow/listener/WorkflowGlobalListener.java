@@ -9,10 +9,10 @@ import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.enums.BusinessStatusEnum;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.system.api.UserService;
-import org.dromara.system.api.domain.UserDTO;
 import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.dto.FlowParams;
 import org.dromara.warm.flow.core.entity.Definition;
@@ -22,10 +22,12 @@ import org.dromara.warm.flow.core.listener.GlobalListener;
 import org.dromara.warm.flow.core.listener.ListenerVariable;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.constant.FlowConstant;
-import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.FlowCopyBo;
 import org.dromara.workflow.domain.vo.NodeExtVo;
+import org.dromara.workflow.event.WorkflowCopyEvent;
+import org.dromara.workflow.event.WorkflowResultMessageEvent;
+import org.dromara.workflow.event.WorkflowTaskMessageEvent;
 import org.dromara.workflow.handler.FlowProcessEventHandler;
 import org.dromara.workflow.service.IFlwCommonService;
 import org.dromara.workflow.service.IFlwInstanceService;
@@ -232,7 +234,7 @@ public class WorkflowGlobalListener implements GlobalListener {
             List<FlowCopyBo> flowCopyList = MapUtil.get(variable, FlowConstant.FLOW_COPY_LIST, new TypeReference<>() {
             });
             // 添加抄送人
-            flwTaskService.setCopy(task, flowCopyList);
+            SpringUtils.context().publishEvent(new WorkflowCopyEvent(task, flowCopyList));
         }
         if (variable.containsKey(FlowConstant.MESSAGE_TYPE)) {
             List<String> messageType = MapUtil.get(variable, FlowConstant.MESSAGE_TYPE, new TypeReference<>() {
@@ -240,7 +242,7 @@ public class WorkflowGlobalListener implements GlobalListener {
             String notice = MapUtil.getStr(variable, FlowConstant.MESSAGE_NOTICE);
             // 退回到申请人时只保留“已退回”结果消息，避免再追加一条“新的待办”形成重复提醒。
             if (shouldSendTaskMessage(flowParams, definition, nextTasks)) {
-                flwCommonService.sendMessage(definition.getFlowName(), instance.getId(), messageType, notice);
+                SpringUtils.context().publishEvent(new WorkflowTaskMessageEvent(definition.getFlowName(), instance.getId(), messageType, notice));
             }
         }
         FlowEngine.insService().removeVariables(instance.getId(),
@@ -270,25 +272,13 @@ public class WorkflowGlobalListener implements GlobalListener {
         if (StringUtils.isBlank(instance.getCreateBy())) {
             return;
         }
-        BusinessStatusEnum statusEnum = BusinessStatusEnum.getByStatus(status);
-        if (statusEnum == null) {
-            return;
-        }
-        Long createBy = Convert.toLong(instance.getCreateBy(), null);
-        if (createBy == null) {
-            return;
-        }
-        UserDTO initiator = userService.selectById(createBy);
-        if (initiator == null || initiator.getUserId() == null) {
-            return;
-        }
         // 已完成、已退回这类结果消息只发给发起人，不再混入处理人待办消息。
-        List<String> messageType = Collections.singletonList(MessageTypeEnum.SYSTEM_MESSAGE.getCode());
+        List<String> messageType = null;
         if (MapUtil.isNotEmpty(variable) && variable.containsKey(FlowConstant.MESSAGE_TYPE)) {
             messageType = MapUtil.get(variable, FlowConstant.MESSAGE_TYPE, new TypeReference<>() {
             });
         }
-        flwCommonService.sendResultMessage(definition.getFlowName(), statusEnum, messageType, Collections.singletonList(initiator));
+        SpringUtils.context().publishEvent(new WorkflowResultMessageEvent(definition.getFlowName(), status, instance.getCreateBy(), messageType));
     }
 
     /**

@@ -11,6 +11,7 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.ThreadUtils;
 import org.dromara.common.mail.core.MailBuilder;
 import org.dromara.system.api.MessageService;
 import org.dromara.system.api.domain.PushPayloadDTO;
@@ -107,23 +108,29 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
         Set<String> emails = StreamUtils.toSet(userList, UserDTO::getEmail);
         emails.removeIf(StringUtils::isBlank);
 
-        for (String code : messageType) {
-            MessageTypeEnum messageTypeEnum = MessageTypeEnum.getByCode(code);
-            if (ObjectUtil.isEmpty(messageTypeEnum)) {
-                continue;
-            }
-            try {
-                switch (messageTypeEnum) {
-                    case SYSTEM_MESSAGE -> {
-                        // 站内消息直接携带前端路由，消息盒子点击后可按路径分流。
-                        messageService.publishMessage(userIds, PushPayloadDTO.of(
-                            PushTypeEnum.MESSAGE,
-                            PushSourceEnum.WORKFLOW,
-                            message, null, path
-                        ));
-                    }
-                    case EMAIL_MESSAGE -> MailBuilder.of().to(emails).subject(subject).text(message).send();
-                    case SMS_MESSAGE -> {
+        Runnable[] sendTasks = messageType.stream()
+            .map(code -> (Runnable) () -> sendMessageByType(code, message, subject, path, userIds, emails, userList.size()))
+            .toArray(Runnable[]::new);
+        ThreadUtils.virtualInvokeAll(sendTasks);
+    }
+
+    private void sendMessageByType(String code, String message, String subject, String path, List<Long> userIds, Set<String> emails, int userCount) {
+        MessageTypeEnum messageTypeEnum = MessageTypeEnum.getByCode(code);
+        if (ObjectUtil.isEmpty(messageTypeEnum)) {
+            return;
+        }
+        try {
+            switch (messageTypeEnum) {
+                case SYSTEM_MESSAGE -> {
+                    // 站内消息直接携带前端路由，消息盒子点击后可按路径分流。
+                    messageService.publishMessage(userIds, PushPayloadDTO.of(
+                        PushTypeEnum.MESSAGE,
+                        PushSourceEnum.WORKFLOW,
+                        message, null, path
+                    ));
+                }
+                case EMAIL_MESSAGE -> MailBuilder.of().to(emails).subject(subject).text(message).send();
+                case SMS_MESSAGE -> {
 //                        LinkedHashMap<String, String> map = new LinkedHashMap<>(1);
 //                        // 根据具体短信服务商参数用法传参
 //                        map.put("code", "1234");
@@ -132,14 +139,13 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
 //                        // 指定获取一个短信服务商 configKey
 //                        SmsBlend smsBlend = SmsFactory.getSmsBlend("config1");
 //                        SmsResponse smsResponse = smsBlend.sendMessage(phones, templateId, map);
-                        log.info("【短信发送 - TODO】用户数量={} 内容={}", userList.size(), message);
-                    }
-                    default -> log.warn("【消息发送】未处理的消息类型：{}", messageTypeEnum);
+                    log.info("【短信发送 - TODO】用户数量={} 内容={}", userCount, message);
                 }
-            } catch (Exception ex) {
-                // 记录错误但不抛出，确保主逻辑不受影响
-                log.error("【消息发送失败】类型={}，原因={}", messageTypeEnum, ex.getMessage(), ex);
+                default -> log.warn("【消息发送】未处理的消息类型：{}", messageTypeEnum);
             }
+        } catch (Exception ex) {
+            // 记录错误但不抛出，确保主逻辑不受影响
+            log.error("【消息发送失败】类型={}，原因={}", messageTypeEnum, ex.getMessage(), ex);
         }
     }
 

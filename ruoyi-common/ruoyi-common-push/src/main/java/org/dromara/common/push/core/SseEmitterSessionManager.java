@@ -3,6 +3,7 @@ package org.dromara.common.push.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.utils.ThreadUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.push.constant.MessageConstants;
 import org.dromara.common.push.dto.PushDTO;
@@ -227,9 +228,11 @@ public class SseEmitterSessionManager implements PushSessionManager {
      * @param message 要发送的消息内容
      */
     public void sendMessage(String message) {
-        for (Long userId : USER_TOKEN_EMITTERS.keySet()) {
-            sendMessage(userId, message);
-        }
+        List<Long> userIds = new ArrayList<>(USER_TOKEN_EMITTERS.keySet());
+        Runnable[] sendTasks = userIds.stream()
+            .map(userId -> (Runnable) () -> sendMessage(userId, message))
+            .toArray(Runnable[]::new);
+        ThreadUtils.virtualInvokeAll(sendTasks);
     }
 
     /**

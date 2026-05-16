@@ -10,6 +10,7 @@ import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.ThreadUtils;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.redis.annotation.RepeatSubmit;
@@ -19,11 +20,10 @@ import org.dromara.system.api.domain.UserOnlineDTO;
 import org.dromara.system.domain.SysUserOnline;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
 /**
  * 在线用户监控
@@ -47,15 +47,16 @@ public class SysUserOnlineController extends BaseController {
     public R<PageResult<SysUserOnline>> list(String ipaddr, String userName) {
         // 获取所有未过期的 token
         Collection<String> keys = RedisUtils.keys(CacheNames.ONLINE_TOKEN_KEY + "*");
-        List<UserOnlineDTO> userOnlineDTOList = new ArrayList<>();
-        for (String key : keys) {
+        List<Supplier<UserOnlineDTO>> suppliers = keys.stream().map(key -> (Supplier<UserOnlineDTO>) () -> {
             String token = StringUtils.substringAfterLast(key, ":");
             // 如果已经过期则跳过
             if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
-                continue;
+                return null;
             }
-            userOnlineDTOList.add(RedisUtils.getCacheObject(CacheNames.ONLINE_TOKEN_KEY + token));
-        }
+            return RedisUtils.getCacheObject(CacheNames.ONLINE_TOKEN_KEY + token);
+        }).toList();
+        List<UserOnlineDTO> userOnlineDTOList = ThreadUtils.virtualSubmitAll(suppliers);
+        userOnlineDTOList.removeAll(Collections.singleton(null));
         if (StringUtils.isNotEmpty(ipaddr) && StringUtils.isNotEmpty(userName)) {
             userOnlineDTOList = StreamUtils.filter(userOnlineDTOList, userOnline ->
                 StringUtils.equals(ipaddr, userOnline.getIpaddr()) &&
@@ -71,7 +72,6 @@ public class SysUserOnlineController extends BaseController {
             );
         }
         Collections.reverse(userOnlineDTOList);
-        userOnlineDTOList.removeAll(Collections.singleton(null));
         List<SysUserOnline> userOnlineList = BeanUtil.copyToList(userOnlineDTOList, SysUserOnline.class);
         return R.ok(PageResult.build(userOnlineList));
     }
@@ -103,10 +103,13 @@ public class SysUserOnlineController extends BaseController {
     public R<PageResult<SysUserOnline>> getInfo() {
         // 获取指定账号 id 的 token 集合
         List<String> tokenIds = StpUtil.getTokenValueListByLoginId(StpUtil.getLoginIdAsString());
-        List<UserOnlineDTO> userOnlineDTOList = tokenIds.stream()
-            .filter(token -> StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) >= -1)
-            .map(token -> (UserOnlineDTO) RedisUtils.getCacheObject(CacheNames.ONLINE_TOKEN_KEY + token))
-            .collect(Collectors.toList());
+        List<Supplier<UserOnlineDTO>> suppliers = tokenIds.stream().map(token -> (Supplier<UserOnlineDTO>) () -> {
+            if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
+                return null;
+            }
+            return RedisUtils.getCacheObject(CacheNames.ONLINE_TOKEN_KEY + token);
+        }).toList();
+        List<UserOnlineDTO> userOnlineDTOList = ThreadUtils.virtualSubmitAll(suppliers);
         //复制和处理 SysUserOnline 对象列表
         Collections.reverse(userOnlineDTOList);
         userOnlineDTOList.removeAll(Collections.singleton(null));
