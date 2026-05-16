@@ -1,31 +1,20 @@
 package org.dromara.common.encrypt.interceptor;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.plugin.*;
-import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.encrypt.annotation.EncryptField;
-import org.dromara.common.encrypt.core.EncryptContext;
-import org.dromara.common.encrypt.core.EncryptorManager;
-import org.dromara.common.encrypt.enums.AlgorithmType;
-import org.dromara.common.encrypt.enums.EncodeType;
-import org.dromara.common.encrypt.properties.EncryptorProperties;
+import org.dromara.common.encrypt.core.EncryptedFieldProcessor;
 
-import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * 入参加密拦截器
  *
- * @author 老马
- * @version 4.6.0
+ * @author Lion Li
  */
-@Slf4j
 @Intercepts({@Signature(
     type = ParameterHandler.class,
     method = "setParameters",
@@ -34,86 +23,31 @@ import java.util.*;
 @AllArgsConstructor
 public class MybatisEncryptInterceptor implements Interceptor {
 
-    private final EncryptorManager encryptorManager;
-    private final EncryptorProperties defaultProperties;
+    private final EncryptedFieldProcessor encryptedFieldProcessor;
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
+        List<EncryptedFieldProcessor.FieldSnapshot> snapshots = List.of();
         Object target = invocation.getTarget();
         if (target instanceof ParameterHandler parameterHandler) {
             Object parameterObject = parameterHandler.getParameterObject();
             if (ObjectUtil.isNotNull(parameterObject) && !(parameterObject instanceof String)) {
-                this.encryptHandler(parameterObject);
+                snapshots = encryptedFieldProcessor.encrypt(parameterObject);
             }
         }
-        return invocation.proceed();
+        try {
+            return invocation.proceed();
+        } finally {
+            for (EncryptedFieldProcessor.FieldSnapshot snapshot : snapshots) {
+                snapshot.restore();
+            }
+        }
     }
 
     @Override
     public Object plugin(Object target) {
         return Plugin.wrap(target, this);
     }
-
-    /**
-     * 加密对象
-     *
-     * @param sourceObject 待加密对象
-     */
-    private void encryptHandler(Object sourceObject) {
-        if (ObjectUtil.isNull(sourceObject)) {
-            return;
-        }
-        if (sourceObject instanceof Map<?, ?> map) {
-            new HashSet<>(map.values()).forEach(this::encryptHandler);
-            return;
-        }
-        if (sourceObject instanceof List<?> list) {
-            if(CollUtil.isEmpty(list)) {
-                return;
-            }
-            // 判断第一个元素是否含有注解。如果没有直接返回，提高效率
-            Object firstItem = list.get(0);
-            if (ObjectUtil.isNull(firstItem) || CollUtil.isEmpty(encryptorManager.getFieldCache(firstItem.getClass()))) {
-                return;
-            }
-            list.forEach(this::encryptHandler);
-            return;
-        }
-        // 不在缓存中的类,就是没有加密注解的类(当然也有可能是typeAliasesPackage写错)
-        Set<Field> fields = encryptorManager.getFieldCache(sourceObject.getClass());
-        if(ObjectUtil.isNull(fields)){
-            return;
-        }
-        try {
-            for (Field field : fields) {
-                field.set(sourceObject, this.encryptField(Convert.toStr(field.get(sourceObject)), field));
-            }
-        } catch (Exception e) {
-            log.error("处理加密字段时出错", e);
-        }
-    }
-
-    /**
-     * 字段值进行加密。通过字段的批注注册新的加密算法
-     *
-     * @param value 待加密的值
-     * @param field 待加密字段
-     * @return 加密后结果
-     */
-    private String encryptField(String value, Field field) {
-        if (ObjectUtil.isNull(value)) {
-            return null;
-        }
-        EncryptField encryptField = field.getAnnotation(EncryptField.class);
-        EncryptContext encryptContext = new EncryptContext();
-        encryptContext.setAlgorithm(encryptField.algorithm() == AlgorithmType.DEFAULT ? defaultProperties.getAlgorithm() : encryptField.algorithm());
-        encryptContext.setEncode(encryptField.encode() == EncodeType.DEFAULT ? defaultProperties.getEncode() : encryptField.encode());
-        encryptContext.setPassword(StringUtils.isBlank(encryptField.password()) ? defaultProperties.getPassword() : encryptField.password());
-        encryptContext.setPrivateKey(StringUtils.isBlank(encryptField.privateKey()) ? defaultProperties.getPrivateKey() : encryptField.privateKey());
-        encryptContext.setPublicKey(StringUtils.isBlank(encryptField.publicKey()) ? defaultProperties.getPublicKey() : encryptField.publicKey());
-        return this.encryptorManager.encrypt(value, encryptContext);
-    }
-
 
     @Override
     public void setProperties(Properties properties) {

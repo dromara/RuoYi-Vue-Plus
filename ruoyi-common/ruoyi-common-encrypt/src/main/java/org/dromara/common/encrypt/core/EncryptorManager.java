@@ -2,13 +2,13 @@ package org.dromara.common.encrypt.core;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.dromara.common.core.constant.Constants;
-import org.dromara.common.core.utils.ObjectUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.encrypt.annotation.EncryptField;
+import org.dromara.common.encrypt.enums.AlgorithmType;
+import org.dromara.common.encrypt.enums.EncodeType;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -28,17 +28,15 @@ import java.util.stream.Collectors;
 /**
  * 加密管理类
  *
- * @author 老马
- * @version 4.6.0
+ * @author Lion Li
  */
 @Slf4j
-@NoArgsConstructor
 public class EncryptorManager {
 
     /**
      * 缓存加密器
      */
-    Map<Integer, IEncryptor> encryptorMap = new ConcurrentHashMap<>();
+    Map<EncryptorCacheKey, IEncryptor> encryptorMap = new ConcurrentHashMap<>();
 
     /**
      * 类加密字段缓存
@@ -59,7 +57,13 @@ public class EncryptorManager {
      * 获取类加密字段缓存
      */
     public Set<Field> getFieldCache(Class<?> sourceClazz) {
-        return ObjectUtils.notNullGetter(fieldCache, f -> f.get(sourceClazz));
+        if (sourceClazz == null || sourceClazz.isPrimitive() || sourceClazz.isArray()
+            || sourceClazz.isEnum() || sourceClazz.isAnnotation()
+            || ClassUtils.isPrimitiveOrWrapper(sourceClazz)
+            || sourceClazz.getName().startsWith("java.")) {
+            return Set.of();
+        }
+        return fieldCache.computeIfAbsent(sourceClazz, this::getEncryptFieldSetFromClazz);
     }
 
     /**
@@ -68,13 +72,9 @@ public class EncryptorManager {
      * @param encryptContext 加密执行者需要的相关配置参数
      */
     public IEncryptor registAndGetEncryptor(EncryptContext encryptContext) {
-        int key = encryptContext.hashCode();
-        if (encryptorMap.containsKey(key)) {
-            return encryptorMap.get(key);
-        }
-        IEncryptor encryptor = ReflectUtil.newInstance(encryptContext.getAlgorithm().getClazz(), encryptContext);
-        encryptorMap.put(key, encryptor);
-        return encryptor;
+        EncryptorCacheKey key = EncryptorCacheKey.of(encryptContext);
+        return encryptorMap.computeIfAbsent(key, cacheKey ->
+            ReflectUtil.newInstance(cacheKey.algorithm().getClazz(), encryptContext));
     }
 
     /**
@@ -83,7 +83,7 @@ public class EncryptorManager {
      * @param encryptContext 加密执行者需要的相关配置参数
      */
     public void removeEncryptor(EncryptContext encryptContext) {
-        this.encryptorMap.remove(encryptContext.hashCode());
+        this.encryptorMap.remove(EncryptorCacheKey.of(encryptContext));
     }
 
     /**
@@ -120,6 +120,9 @@ public class EncryptorManager {
      * 通过 typeAliasesPackage 设置的扫描包 扫描缓存实体
      */
     private void scanEncryptClasses(String typeAliasesPackage) {
+        if (StringUtils.isBlank(typeAliasesPackage)) {
+            return;
+        }
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         CachingMetadataReaderFactory factory = new CachingMetadataReaderFactory();
         String[] packagePatternArray = StringUtils.splitPreserveAllTokens(typeAliasesPackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
@@ -149,7 +152,7 @@ public class EncryptorManager {
         Set<Field> fieldSet = new HashSet<>();
         // 判断clazz如果是接口,内部类,匿名类就直接返回
         if (clazz.isInterface() || clazz.isMemberClass() || clazz.isAnonymousClass()) {
-            return fieldSet;
+            return Set.of();
         }
         while (clazz != null) {
             Field[] fields = clazz.getDeclaredFields();
@@ -163,6 +166,24 @@ public class EncryptorManager {
             field.setAccessible(true);
         }
         return fieldSet;
+    }
+
+    private record EncryptorCacheKey(
+        AlgorithmType algorithm,
+        EncodeType encode,
+        String password,
+        String publicKey,
+        String privateKey
+    ) {
+
+        private static EncryptorCacheKey of(EncryptContext encryptContext) {
+            return new EncryptorCacheKey(
+                encryptContext.getAlgorithm(),
+                encryptContext.getEncode(),
+                encryptContext.getPassword(),
+                encryptContext.getPublicKey(),
+                encryptContext.getPrivateKey());
+        }
     }
 
 }

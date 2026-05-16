@@ -23,7 +23,7 @@ public class EncryptorProperties {
     /**
      * 默认算法
      */
-    private AlgorithmType algorithm;
+    private AlgorithmType algorithm = AlgorithmType.BASE64;
 
     /**
      * 安全秘钥
@@ -43,6 +43,6 @@ public class EncryptorProperties {
     /**
      * 编码方式，base64/hex
      */
-    private EncodeType encode;
+    private EncodeType encode = EncodeType.BASE64;
 
 }
