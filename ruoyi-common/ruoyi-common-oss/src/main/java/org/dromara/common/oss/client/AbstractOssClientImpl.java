@@ -37,7 +37,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -119,10 +121,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
             // 将状态转为已初始化
             initialized.compareAndSet(false, true);
         } catch (Exception e) {
-            if (e instanceof S3StorageException) {
-                throw e;
-            }
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -168,10 +167,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
                 .handleAsync(handleAsyncAction)
                 .join();
         } catch (Exception e) {
-            if (e instanceof S3StorageException ex) {
-                throw ex;
-            }
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -229,10 +225,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
             options.setLength(file.length());
             return bucketUpload(bucket, key, file.getChannel(), -1L, options);
         } catch (Exception e) {
-            if (e instanceof S3StorageException ex) {
-                throw ex;
-            }
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -253,10 +246,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
             }
             return bucketUpload(bucket, key, in, size, options);
         } catch (Exception e) {
-            if (e instanceof S3StorageException ex) {
-                throw ex;
-            }
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -282,10 +272,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
         try (ByteArrayInputStream in = new ByteArrayInputStream(data)) {
             return bucketUpload(bucket, key, in, data.length, options);
         } catch (Exception e) {
-            if (e instanceof S3StorageException ex) {
-                throw ex;
-            }
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -341,10 +328,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
                 .join()
                 .result();
         } catch (Exception e) {
-            if (e instanceof S3StorageException ex) {
-                throw ex;
-            }
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -356,25 +340,18 @@ public abstract class AbstractOssClientImpl implements OssClient {
             publisher.subscribe(downloadSubscriber).join();
             return getObjectResult;
         } catch (Exception e) {
-            if (e instanceof S3StorageException ex) {
-                throw ex;
-            }
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
     @Override
     public <T> T bucketDownload(String bucket, String key, BiFunction<GetObjectResult, InputStream, T> downloadTransformer) {
-        try {
-            ResponseInputStream<GetObjectResponse> responseInputStream = doCustomDownload(builder -> builder.bucket(bucket).key(key), AsyncResponseTransformer.toBlockingInputStream(), null);
+        try (ResponseInputStream<GetObjectResponse> responseInputStream = doCustomDownload(builder -> builder.bucket(bucket).key(key), AsyncResponseTransformer.toBlockingInputStream(), null)) {
             GetObjectResponse response = responseInputStream.response();
             GetObjectResult getObjectResult = buildGetObjectResult(key, response);
             return downloadTransformer.apply(getObjectResult, responseInputStream);
         } catch (Exception e) {
-            if (e instanceof S3StorageException ex) {
-                throw ex;
-            }
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -383,10 +360,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
         try (OutputStream out = Files.newOutputStream(path)) {
             return bucketDownload(bucket, key, out);
         } catch (Exception e) {
-            if (e instanceof S3StorageException ex) {
-                throw ex;
-            }
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -395,10 +369,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
         try (FileOutputStream out = new FileOutputStream(file)) {
             return bucketDownload(bucket, key, out);
         } catch (Exception e) {
-            if (e instanceof S3StorageException ex) {
-                throw ex;
-            }
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -438,7 +409,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
             s3AsyncClient.deleteObject(builder -> builder.bucket(bucket).key(key)).join();
             return true;
         } catch (Exception e) {
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -452,7 +423,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
                 .url()
                 .toExternalForm();
         } catch (Exception e) {
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -466,7 +437,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
                 .url()
                 .toExternalForm();
         } catch (Exception e) {
-            throw S3StorageException.form(e);
+            throw toStorageException(e);
         }
     }
 
@@ -621,6 +592,22 @@ public abstract class AbstractOssClientImpl implements OssClient {
             return "";
         }
         return fileName.substring(index);
+    }
+
+    private S3StorageException toStorageException(Throwable e) {
+        Throwable cause = unwrapAsyncException(e);
+        if (cause instanceof S3StorageException ex) {
+            return ex;
+        }
+        return S3StorageException.form(cause);
+    }
+
+    private Throwable unwrapAsyncException(Throwable e) {
+        Throwable cause = e;
+        while ((cause instanceof CompletionException || cause instanceof ExecutionException) && cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        return cause;
     }
 
     @Override

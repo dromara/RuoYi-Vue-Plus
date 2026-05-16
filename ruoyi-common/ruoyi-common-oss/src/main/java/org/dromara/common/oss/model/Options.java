@@ -74,6 +74,13 @@ public class Options {
      * 创建可选项对象
      */
     public static Options builder() {
+        return create();
+    }
+
+    /**
+     * 创建可选项对象
+     */
+    public static Options create() {
         return new Options();
     }
 }

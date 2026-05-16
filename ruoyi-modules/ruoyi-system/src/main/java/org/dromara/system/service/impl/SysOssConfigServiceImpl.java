@@ -17,6 +17,7 @@ import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.oss.constant.OssConstant;
+import org.dromara.common.oss.factory.OssFactory;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.system.domain.SysOssConfig;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 对象存储配置Service业务层处理
@@ -130,6 +132,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
     public Boolean updateByBo(SysOssConfigBo bo) {
         SysOssConfig config = MapstructUtils.convert(bo, SysOssConfig.class);
         validEntityBeforeSave(config);
+        SysOssConfig oldConfig = ossConfigMapper.selectById(config.getOssConfigId());
         boolean flag = ossConfigMapper.lambda()
             .set(ObjectUtil.isNull(config.getPrefix()), SysOssConfig::getPrefix, "")
             .set(ObjectUtil.isNull(config.getRegion()), SysOssConfig::getRegion, "")
@@ -140,7 +143,12 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         if (flag) {
             // 从数据库查询完整的数据做缓存
             config = ossConfigMapper.selectById(config.getOssConfigId());
+            if (ObjectUtil.isNotNull(oldConfig) && !Objects.equals(oldConfig.getConfigKey(), config.getConfigKey())) {
+                CacheUtils.evict(CacheNames.SYS_OSS_CONFIG, oldConfig.getConfigKey());
+                OssFactory.remove(oldConfig.getConfigKey());
+            }
             CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
+            OssFactory.remove(config.getConfigKey());
         }
         return flag;
     }
@@ -174,12 +182,16 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         List<SysOssConfig> list = CollUtil.newArrayList();
         for (Long configId : ids) {
             SysOssConfig config = ossConfigMapper.selectById(configId);
-            list.add(config);
+            if (ObjectUtil.isNotNull(config)) {
+                list.add(config);
+            }
         }
         boolean flag = ossConfigMapper.deleteByIds(ids) > 0;
         if (flag) {
-            list.forEach(sysOssConfig ->
-                CacheUtils.evict(CacheNames.SYS_OSS_CONFIG, sysOssConfig.getConfigKey()));
+            list.forEach(sysOssConfig -> {
+                CacheUtils.evict(CacheNames.SYS_OSS_CONFIG, sysOssConfig.getConfigKey());
+                OssFactory.remove(sysOssConfig.getConfigKey());
+            });
         }
         return flag;
     }

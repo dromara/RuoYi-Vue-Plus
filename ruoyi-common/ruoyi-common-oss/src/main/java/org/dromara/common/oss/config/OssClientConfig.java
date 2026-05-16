@@ -166,38 +166,17 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
      * @return 客户端配置构造器
      */
     public static OssClientConfigBuilder formPropertiesBuilder(OssProperties properties) {
-        String regionString = properties.getRegion();
-        Region region = Region.US_EAST_1;
-        if (StringUtils.isNotBlank(regionString)) {
-            region = Region.of(regionString);
-        }
-
-        // 是否使用路径风格应当由使用者明确去配置，此处的配置只是为了适配旧的配置项
-        // MinIO 使用 HTTPS 限制使用域名访问，站点填域名。需要启用路径样式访问
-        boolean usePathStyleAccess = !StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
-
-        // 绝大多数的云厂商都是不允许操作ACL的，所以此处的默认配置也是禁用ACL的
-        AccessControlPolicyConfig accessControlPolicyConfig = AccessControlPolicyConfig.DEFAULT;
-        // 目前自定义实现的 Client 上传/下载/删除中并没有实际使用到ACL相关配置
-        // 仅有业务中的链接预签名使用到（SysOssServiceImpl#matchingUrl），更多只是作为一个扩展点保留，如有需要ACL的自行实现调用逻辑
-        String accessPolicyString = properties.getAccessPolicy();
-        if (StringUtils.isNotBlank(accessPolicyString)) {
-            accessControlPolicyConfig = AccessControlPolicyConfig.builder()
-                .enabled(true)
-                .accessPolicy(AccessPolicy.formType(accessPolicyString))
-                .build();
-        }
         return builder()
             .endpoint(properties.getEndpoint())
             .domain(properties.getDomainUrl())
             .accessKey(properties.getAccessKey())
             .secretKey(properties.getSecretKey())
             .bucket(properties.getBucketName())
-            .region(region)
+            .region(parseRegion(properties.getRegion()))
             .prefix(properties.getPrefix())
             .useHttps(SystemConstants.YES.equals(properties.getIsHttps()))
-            .usePathStyleAccess(usePathStyleAccess)
-            .accessControlPolicyConfig(accessControlPolicyConfig);
+            .usePathStyleAccess(resolvePathStyleAccess(properties))
+            .accessControlPolicyConfig(resolveAccessControlPolicy(properties.getAccessPolicy()));
     }
 
     /**
@@ -206,10 +185,7 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
      * @return 访问站点URL地址
      */
     public String getEndpointUrl() {
-        String endpoint = endpoint()
-            .filter(s -> !s.isBlank())
-            .orElseThrow(() -> S3StorageException.form("endpoint is not configured."));
-        return BucketUrlUtil.rebuildUrlHeader(useHttps, endpoint);
+        return BucketUrlUtil.rebuildUrlHeader(useHttps, getEndpoint());
     }
 
     /**
@@ -221,7 +197,7 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
         return domain()
             // 如果已经配置了自定义域名，则优先使用域名
             // 检查携带协议头
-            .filter(s -> HttpUtil.isHttp(s) || HttpUtil.isHttps(s))
+            .filter(OssClientConfig::hasHttpHeader)
             // 否则使用站点
             .orElseGet(this::getEndpointUrl);
     }
@@ -245,18 +221,48 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
      * @return 桶URL地址
      */
     public String getBucketUrl(String bucket) {
-        // 如果已经配置了自定义域名，则优先使用域名
-        String url = domain()
-            // 检查携带协议头
-            .filter(s -> HttpUtil.isHttp(s) || HttpUtil.isHttps(s))
-            // 否则使用站点
-            .orElseGet(() ->
-                endpoint()
-                    .filter(s -> !s.isBlank())
-                    .orElseThrow(() -> S3StorageException.form("endpoint is not configured."))
-            );
+        String url = getAccessBaseUrl();
         // 根据是否使用路径风格配置项决定存储桶的URL风格
         return usePathStyleAccess ? BucketUrlUtil.getPathStyleBucketUrl(useHttps, url, bucket) : BucketUrlUtil.getSiteStyleBucketUrl(useHttps, url, bucket);
+    }
+
+    private static Region parseRegion(String regionString) {
+        if (StringUtils.isBlank(regionString)) {
+            return Region.US_EAST_1;
+        }
+        return Region.of(regionString);
+    }
+
+    private static boolean resolvePathStyleAccess(OssProperties properties) {
+        // 旧配置没有显式路径风格字段，只能继续按内置云厂商 endpoint 做兼容推断。
+        return !StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
+    }
+
+    private static AccessControlPolicyConfig resolveAccessControlPolicy(String accessPolicyString) {
+        // 绝大多数云厂商不允许操作 ACL，默认禁用；当前业务只用访问策略判断是否生成预签名 URL。
+        if (StringUtils.isBlank(accessPolicyString)) {
+            return AccessControlPolicyConfig.DEFAULT;
+        }
+        return AccessControlPolicyConfig.builder()
+            .enabled(true)
+            .accessPolicy(AccessPolicy.formType(accessPolicyString))
+            .build();
+    }
+
+    private String getAccessBaseUrl() {
+        return domain()
+            .filter(OssClientConfig::hasHttpHeader)
+            .orElseGet(this::getEndpoint);
+    }
+
+    private String getEndpoint() {
+        return endpoint()
+            .filter(s -> !s.isBlank())
+            .orElseThrow(() -> S3StorageException.form("endpoint is not configured."));
+    }
+
+    private static boolean hasHttpHeader(String url) {
+        return HttpUtil.isHttp(url) || HttpUtil.isHttps(url);
     }
 
     /**

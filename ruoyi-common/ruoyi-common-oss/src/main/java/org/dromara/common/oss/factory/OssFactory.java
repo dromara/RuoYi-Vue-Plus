@@ -26,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class OssFactory {
 
     private static final Map<String, OssClient> CLIENT_CACHE = new ConcurrentHashMap<>();
-    private static final ReentrantLock LOCK = new ReentrantLock();
+    private static final Map<String, ReentrantLock> CLIENT_LOCKS = new ConcurrentHashMap<>();
 
     /**
      * 获取默认实例
@@ -44,13 +44,17 @@ public class OssFactory {
      * 根据类型获取实例
      */
     public static OssClient instance(String configKey) {
+        if (StringUtils.isBlank(configKey)) {
+            throw S3StorageException.form("文件存储服务类型无法找到!");
+        }
         String json = CacheUtils.get(CacheNames.SYS_OSS_CONFIG, configKey);
         if (json == null) {
             throw S3StorageException.form("系统异常, '" + configKey + "'配置信息不存在!");
         }
         OssProperties properties = JsonUtils.parseObject(json, OssProperties.class);
         OssClientConfig config = OssClientConfig.formProperties(properties);
-        LOCK.lock();
+        ReentrantLock lock = getClientLock(configKey);
+        lock.lock();
         try {
             OssClient client = CLIENT_CACHE.get(configKey);
             if (client != null) {
@@ -63,7 +67,7 @@ public class OssFactory {
             CLIENT_CACHE.put(configKey, newClient);
             return newClient;
         } finally {
-            LOCK.unlock();
+            lock.unlock();
         }
     }
 
@@ -71,12 +75,25 @@ public class OssFactory {
      * 移除实例
      */
     public static boolean remove(String configKey) {
-        OssClient client = CLIENT_CACHE.remove(configKey);
-        if (client == null) {
+        if (StringUtils.isBlank(configKey)) {
             return false;
         }
-        closeClient(configKey, client);
-        return true;
+        ReentrantLock lock = getClientLock(configKey);
+        lock.lock();
+        try {
+            OssClient client = CLIENT_CACHE.remove(configKey);
+            if (client == null) {
+                return false;
+            }
+            closeClient(configKey, client);
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private static ReentrantLock getClientLock(String configKey) {
+        return CLIENT_LOCKS.computeIfAbsent(configKey, key -> new ReentrantLock());
     }
 
     private static void closeClient(String configKey, OssClient client) {
