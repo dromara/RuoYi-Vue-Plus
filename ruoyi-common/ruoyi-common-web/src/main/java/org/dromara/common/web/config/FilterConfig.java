@@ -33,8 +33,8 @@ public class FilterConfig {
         order = FilterRegistrationBean.HIGHEST_PRECEDENCE + 1,
         dispatcherTypes = DispatcherType.REQUEST
     )
-    public XssFilter xssFilter() {
-        return new XssFilter();
+    public XssFilter xssFilter(XssProperties xssProperties) {
+        return new XssFilter(xssProperties);
     }
 
     /**

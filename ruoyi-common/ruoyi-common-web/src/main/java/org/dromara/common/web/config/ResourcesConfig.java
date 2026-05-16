@@ -5,16 +5,17 @@ import cn.hutool.core.date.DateUtil;
 import org.dromara.common.core.utils.ObjectUtils;
 import org.dromara.common.json.enhance.JsonValueEnhancer;
 import org.dromara.common.web.advice.ResponseEnhancementAdvice;
+import org.dromara.common.web.config.properties.CorsProperties;
 import org.dromara.common.web.handler.GlobalExceptionHandler;
 import org.dromara.common.web.interceptor.PlusWebInvokeTimeInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Date;
@@ -25,6 +26,7 @@ import java.util.Date;
  * @author Lion Li
  */
 @AutoConfiguration
+@EnableConfigurationProperties(CorsProperties.class)
 public class ResourcesConfig implements WebMvcConfigurer {
 
     /**
@@ -56,31 +58,18 @@ public class ResourcesConfig implements WebMvcConfigurer {
     }
 
     /**
-     * 注册静态资源处理器。
-     *
-     * @param registry 资源处理器注册表
-     */
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    }
-
-    /**
      * 跨域配置
      *
      * @return 全局 Cors 过滤器
      */
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsFilter corsFilter(CorsProperties corsProperties) {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        // 设置访问源地址
-        config.addAllowedOriginPattern("*");
-        // 设置访问源请求头
-        config.addAllowedHeader("*");
-        // 设置访问源请求方法
-        config.addAllowedMethod("*");
-        // 有效期 1800秒
-        config.setMaxAge(1800L);
+        config.setAllowCredentials(corsProperties.getAllowCredentials());
+        config.setAllowedOriginPatterns(corsProperties.getAllowedOriginPatterns());
+        config.setAllowedHeaders(corsProperties.getAllowedHeaders());
+        config.setAllowedMethods(corsProperties.getAllowedMethods());
+        config.setMaxAge(corsProperties.getMaxAge());
         // 添加映射路径，拦截一切请求
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

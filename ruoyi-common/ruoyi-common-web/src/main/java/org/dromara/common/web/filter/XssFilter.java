@@ -1,6 +1,6 @@
 package org.dromara.common.web.filter;
 
-import org.dromara.common.core.utils.SpringUtils;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.web.config.properties.XssProperties;
 import org.springframework.http.HttpMethod;
@@ -17,11 +17,14 @@ import java.util.List;
  *
  * @author ruoyi
  */
+@RequiredArgsConstructor
 public class XssFilter implements Filter {
     /**
      * 跳过 XSS 过滤的请求路径集合。
      */
-    public List<String> excludes = new ArrayList<>();
+    private final List<String> excludes = new ArrayList<>();
+
+    private final XssProperties properties;
 
     /**
      * 初始化过滤器并加载配置中的排除路径。
@@ -31,8 +34,9 @@ public class XssFilter implements Filter {
      */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        XssProperties properties = SpringUtils.getBean(XssProperties.class);
-        excludes.addAll(properties.getExcludeUrls());
+        if (properties.getExcludeUrls() != null) {
+            excludes.addAll(properties.getExcludeUrls());
+        }
     }
 
     /**

@@ -14,7 +14,6 @@ import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.web.filter.RepeatedlyRequestWrapper;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ArrayNode;
@@ -37,6 +36,11 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
     private final static ThreadLocal<StopWatch> KEY_CACHE = new ThreadLocal<>();
 
     /**
+     * 请求参数日志最大长度。
+     */
+    private static final int MAX_PARAM_LOG_LENGTH = 4000;
+
+    /**
      * 请求进入控制器前记录入参并启动耗时统计。
      *
      * @param request 当前请求
@@ -54,20 +58,17 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
             if (request instanceof RepeatedlyRequestWrapper) {
                 jsonParam = IoUtil.read(request.getReader());
                 if (StringUtils.isNotBlank(jsonParam)) {
-                    JsonMapper jsonMapper = JsonUtils.getJsonMapper();
-                    JsonNode rootNode = jsonMapper.readTree(jsonParam);
-                    removeSensitiveFields(rootNode, SystemConstants.EXCLUDE_PROPERTIES);
-                    jsonParam = rootNode.toString();
+                    jsonParam = sanitizeJsonParam(jsonParam);
                 }
             }
-            log.info("[PLUS]开始请求 => URL[{}],参数类型[json],参数:[{}]", url, jsonParam);
+            log.info("[PLUS]开始请求 => URL[{}],参数类型[json],参数:[{}]", url, limit(jsonParam));
         } else {
             Map<String, String[]> parameterMap = request.getParameterMap();
             if (MapUtil.isNotEmpty(parameterMap)) {
                 Map<String, String[]> map = new LinkedHashMap<>(parameterMap);
                 MapUtil.removeAny(map, SystemConstants.EXCLUDE_PROPERTIES);
                 String parameters = JsonUtils.toJsonString(map);
-                log.info("[PLUS]开始请求 => URL[{}],参数类型[param],参数:[{}]", url, parameters);
+                log.info("[PLUS]开始请求 => URL[{}],参数类型[param],参数:[{}]", url, limit(parameters));
             } else {
                 log.info("[PLUS]开始请求 => URL[{}],无参数", url);
             }
@@ -110,9 +111,32 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
         }
     }
 
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+    /**
+     * 清洗 JSON 请求参数日志，解析失败时不影响主请求。
+     *
+     * @param jsonParam 原始 JSON 字符串
+     * @return 清洗后的参数日志
+     */
+    private String sanitizeJsonParam(String jsonParam) {
+        try {
+            JsonMapper jsonMapper = JsonUtils.getJsonMapper();
+            JsonNode rootNode = jsonMapper.readTree(jsonParam);
+            removeSensitiveFields(rootNode, SystemConstants.EXCLUDE_PROPERTIES);
+            return rootNode.toString();
+        } catch (Exception e) {
+            log.debug("[PLUS]请求参数 JSON 解析失败，跳过结构化脱敏: {}", e.getMessage());
+            return jsonParam;
+        }
+    }
 
+    /**
+     * 限制日志字段长度。
+     *
+     * @param value 原始字符串
+     * @return 截断后的字符串
+     */
+    private String limit(String value) {
+        return StringUtils.substring(value, 0, MAX_PARAM_LOG_LENGTH);
     }
 
     /**
