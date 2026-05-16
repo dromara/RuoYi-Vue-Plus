@@ -5,6 +5,9 @@ import jakarta.validation.ConstraintValidatorContext;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * 自定义枚举校验注解实现
  *
@@ -13,25 +16,29 @@ import org.dromara.common.core.utils.reflect.ReflectUtils;
  */
 public class EnumPatternValidator implements ConstraintValidator<EnumPattern, String> {
 
-    private EnumPattern annotation;
+    private final Set<String> values = new HashSet<>();
 
     @Override
     public void initialize(EnumPattern annotation) {
         ConstraintValidator.super.initialize(annotation);
-        this.annotation = annotation;
+        String fieldName = annotation.fieldName();
+        if (StringUtils.isBlank(fieldName)) {
+            return;
+        }
+        for (Object e : annotation.type().getEnumConstants()) {
+            Object fieldValue = ReflectUtils.invokeGetter(e, fieldName);
+            if (fieldValue != null) {
+                values.add(String.valueOf(fieldValue));
+            }
+        }
     }
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
-        if (StringUtils.isNotBlank(value)) {
-            String fieldName = annotation.fieldName();
-            for (Object e : annotation.type().getEnumConstants()) {
-                if (value.equals(ReflectUtils.invokeGetter(e, fieldName))) {
-                    return true;
-                }
-            }
+        if (StringUtils.isBlank(value)) {
+            return true;
         }
-        return false;
+        return values.contains(value);
     }
 
 }

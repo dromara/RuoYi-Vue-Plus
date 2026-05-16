@@ -45,7 +45,10 @@ public class DictPatternValidator implements ConstraintValidator<DictPattern, St
      */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (StringUtils.isBlank(dictType) || StringUtils.isBlank(value)) {
+        if (StringUtils.isBlank(value)) {
+            return true;
+        }
+        if (StringUtils.isBlank(dictType)) {
             return false;
         }
         String dictLabel = SpringUtils.getBean(DictService.class).getDictLabel(dictType, value, separator);

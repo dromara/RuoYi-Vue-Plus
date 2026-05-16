@@ -197,7 +197,7 @@ public class R<T> implements Serializable {
      * @return true=成功，false=失败
      */
     public static <T> Boolean isSuccess(R<T> ret) {
-        return SUCCESS == ret.getCode();
+        return ret != null && SUCCESS == ret.getCode();
     }
 
 }

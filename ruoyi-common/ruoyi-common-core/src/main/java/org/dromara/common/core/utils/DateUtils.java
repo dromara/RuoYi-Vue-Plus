@@ -156,7 +156,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         try {
             return new SimpleDateFormat(format.getTimeFormat()).parse(ts);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new ServiceException("日期时间解析失败：" + ts, e);
         }
     }
 

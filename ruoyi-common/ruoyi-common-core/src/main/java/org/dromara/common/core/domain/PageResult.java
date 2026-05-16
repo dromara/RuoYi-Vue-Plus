@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * 表格分页数据对象
@@ -36,7 +37,7 @@ public class PageResult<T> implements Serializable {
      * @param total 总记录数
      */
     public PageResult(Collection<T> list, long total) {
-        this.rows = list;
+        this.rows = emptyIfNull(list);
         this.total = total;
     }
 
@@ -45,7 +46,7 @@ public class PageResult<T> implements Serializable {
      */
     public static <T> PageResult<T> build(Collection<T> list, long total) {
         PageResult<T> rspData = new PageResult<>();
-        rspData.setRows(list);
+        rspData.setRows(emptyIfNull(list));
         rspData.setTotal(total);
         return rspData;
     }
@@ -55,8 +56,9 @@ public class PageResult<T> implements Serializable {
      */
     public static <T> PageResult<T> build(Collection<T> list) {
         PageResult<T> rspData = new PageResult<>();
-        rspData.setRows(list);
-        rspData.setTotal(list.size());
+        Collection<T> rows = emptyIfNull(list);
+        rspData.setRows(rows);
+        rspData.setTotal(rows.size());
         return rspData;
     }
 
@@ -65,6 +67,10 @@ public class PageResult<T> implements Serializable {
      */
     public static <T> PageResult<T> build() {
         return new PageResult<>();
+    }
+
+    private static <T> Collection<T> emptyIfNull(Collection<T> list) {
+        return list == null ? Collections.emptyList() : list;
     }
 
 }

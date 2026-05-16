@@ -58,6 +58,17 @@ public final class ServiceException extends RuntimeException {
     }
 
     /**
+     * 使用错误消息和根因构造业务异常。
+     *
+     * @param message 错误消息
+     * @param cause 根因
+     */
+    public ServiceException(String message, Throwable cause) {
+        super(cause);
+        this.message = message;
+    }
+
+    /**
      * 使用占位符参数格式化错误消息。
      *
      * @param message 模板消息

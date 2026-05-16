@@ -26,7 +26,7 @@ public @interface DictPattern {
     /**
      * 分隔符
      */
-    String separator();
+    String separator() default ",";
 
     /**
      * 默认校验失败提示信息

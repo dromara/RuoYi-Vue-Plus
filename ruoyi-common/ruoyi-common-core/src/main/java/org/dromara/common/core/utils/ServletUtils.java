@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.context.request.RequestAttributes;
@@ -31,6 +32,7 @@ import java.util.Map;
  * @author ruoyi
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public class ServletUtils extends JakartaServletUtil {
 
     /**
@@ -223,7 +225,7 @@ public class ServletUtils extends JakartaServletUtil {
             response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
             response.getWriter().print(string);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("渲染响应内容异常", e);
         }
     }
 
@@ -249,7 +251,7 @@ public class ServletUtils extends JakartaServletUtil {
 
         // 判断 URI 后缀是否为 .json 或 .xml
         String uri = request.getRequestURI();
-        if (StringUtils.equalsAnyIgnoreCase(uri, ".json", ".xml")) {
+        if (StringUtils.endsWithAny(StringUtils.lowerCase(uri), ".json", ".xml")) {
             return true;
         }
 

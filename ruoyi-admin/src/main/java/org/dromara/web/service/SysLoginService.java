@@ -153,7 +153,7 @@ public class SysLoginService {
             loginUser.setDeptName(deptOpt.map(SysDeptVo::getDeptName).orElse(StringUtils.EMPTY));
             loginUser.setDeptCategory(deptOpt.map(SysDeptVo::getDeptCategory).orElse(StringUtils.EMPTY));
         }
-        ThreadUtils.virtualSubmit(() -> {
+        ThreadUtils.virtualInvokeAll(() -> {
             loginUser.setMenuPermission(permissionService.getMenuPermission(userId));
         }, () -> {
             loginUser.setRolePermission(permissionService.getRolePermission(userId));

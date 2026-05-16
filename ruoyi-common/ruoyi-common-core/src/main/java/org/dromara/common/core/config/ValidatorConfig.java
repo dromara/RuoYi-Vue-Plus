@@ -26,19 +26,16 @@ public class ValidatorConfig {
      */
     @Bean
     public Validator validator(MessageSource messageSource) {
-        try (LocalValidatorFactoryBean factoryBean = new LocalValidatorFactoryBean()) {
-            // 国际化
-            factoryBean.setValidationMessageSource(messageSource);
-            // 设置使用 HibernateValidator 校验器
-            factoryBean.setProviderClass(HibernateValidator.class);
-            Properties properties = new Properties();
-            // 设置快速失败模式（fail-fast），即校验过程中一旦遇到失败，立即停止并返回错误
-            properties.setProperty("hibernate.validator.fail_fast", "true");
-            factoryBean.setValidationProperties(properties);
-            // 加载配置
-            factoryBean.afterPropertiesSet();
-            return factoryBean.getValidator();
-        }
+        LocalValidatorFactoryBean factoryBean = new LocalValidatorFactoryBean();
+        // 国际化
+        factoryBean.setValidationMessageSource(messageSource);
+        // 设置使用 HibernateValidator 校验器
+        factoryBean.setProviderClass(HibernateValidator.class);
+        Properties properties = new Properties();
+        // 设置快速失败模式（fail-fast），即校验过程中一旦遇到失败，立即停止并返回错误
+        properties.setProperty("hibernate.validator.fail_fast", "true");
+        factoryBean.setValidationProperties(properties);
+        return factoryBean;
     }
 
 }
