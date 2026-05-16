@@ -83,7 +83,7 @@ public class RepeatSubmitAspect {
                 if (r.getCode() == HttpStatus.SUCCESS) {
                     return;
                 }
-                RedisUtils.deleteObject(KEY_CACHE.get());
+                deleteRepeatKey();
             }
         } finally {
             KEY_CACHE.remove();
@@ -98,8 +98,18 @@ public class RepeatSubmitAspect {
      */
     @AfterThrowing(value = "@annotation(repeatSubmit)", throwing = "e")
     public void doAfterThrowing(JoinPoint joinPoint, RepeatSubmit repeatSubmit, Exception e) {
-        RedisUtils.deleteObject(KEY_CACHE.get());
-        KEY_CACHE.remove();
+        try {
+            deleteRepeatKey();
+        } finally {
+            KEY_CACHE.remove();
+        }
+    }
+
+    private void deleteRepeatKey() {
+        String key = KEY_CACHE.get();
+        if (StringUtils.isNotBlank(key)) {
+            RedisUtils.deleteObject(key);
+        }
     }
 
     /**

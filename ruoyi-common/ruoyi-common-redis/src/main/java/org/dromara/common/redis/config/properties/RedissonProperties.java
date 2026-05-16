@@ -23,12 +23,12 @@ public class RedissonProperties {
     /**
      * 线程池数量,默认值 = 当前处理核数量 * 2
      */
-    private int threads;
+    private int threads = Runtime.getRuntime().availableProcessors() * 2;
 
     /**
      * Netty线程池数量,默认值 = 当前处理核数量 * 2
      */
-    private int nettyThreads;
+    private int nettyThreads = Runtime.getRuntime().availableProcessors() * 2;
 
     /**
      * 单机服务配置

@@ -77,7 +77,9 @@ public class RedisUtils {
     public static <T> void publish(String channelKey, T msg, Consumer<T> consumer) {
         RTopic topic = CLIENT.getTopic(channelKey);
         topic.publish(msg);
-        consumer.accept(msg);
+        if (consumer != null) {
+            consumer.accept(msg);
+        }
     }
 
     /**
@@ -99,8 +101,31 @@ public class RedisUtils {
      * @param consumer   自定义处理
      */
     public static <T> void subscribe(String channelKey, Class<T> clazz, Consumer<T> consumer) {
+        subscribeAndGetListenerId(channelKey, clazz, consumer);
+    }
+
+    /**
+     * 订阅通道接收消息，并返回监听器 ID。
+     *
+     * @param channelKey 通道key
+     * @param clazz      消息类型
+     * @param consumer   自定义处理
+     * @return 监听器 ID，可用于取消订阅
+     */
+    public static <T> int subscribeAndGetListenerId(String channelKey, Class<T> clazz, Consumer<T> consumer) {
         RTopic topic = CLIENT.getTopic(channelKey);
-        topic.addListener(clazz, (channel, msg) -> consumer.accept(msg));
+        return topic.addListener(clazz, (channel, msg) -> consumer.accept(msg));
+    }
+
+    /**
+     * 取消通道订阅。
+     *
+     * @param channelKey 通道key
+     * @param listenerId 监听器 ID
+     */
+    public static void unsubscribe(String channelKey, int listenerId) {
+        RTopic topic = CLIENT.getTopic(channelKey);
+        topic.removeListener(listenerId);
     }
 
     /**
@@ -128,7 +153,7 @@ public class RedisUtils {
                 bucket.setAndKeepTTL(value);
             } catch (Exception e) {
                 long timeToLive = bucket.remainTimeToLive();
-                if (timeToLive == -1) {
+                if (timeToLive <= 0) {
                     bucket.set(value);
                 } else {
                     bucket.set(value, Duration.ofMillis(timeToLive));
@@ -239,6 +264,9 @@ public class RedisUtils {
      * @param key 缓存的键值
      */
     public static boolean deleteObject(final String key) {
+        if (key == null) {
+            return false;
+        }
         return CLIENT.getBucket(key).delete();
     }
 
@@ -247,7 +275,10 @@ public class RedisUtils {
      *
      * @param collection 多个对象
      */
-    public static void deleteObject(final Collection collection) {
+    public static void deleteObject(final Collection<?> collection) {
+        if (collection == null || collection.isEmpty()) {
+            return;
+        }
         RBatch batch = CLIENT.createBatch();
         collection.forEach(t -> {
             batch.getBucket(t.toString()).deleteAsync();
@@ -407,7 +438,7 @@ public class RedisUtils {
      */
     public static <T> Map<String, T> getCacheMap(final String key) {
         RMap<String, T> rMap = CLIENT.getMap(key);
-        return rMap.getAll(rMap.keySet());
+        return rMap.readAllMap();
     }
 
     /**
