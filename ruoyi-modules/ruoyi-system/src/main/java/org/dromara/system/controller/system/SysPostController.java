@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -64,7 +64,7 @@ public class SysPostController extends BaseController {
     @PostMapping("/export")
     public void export(SysPostBo post, HttpServletResponse response) {
         List<SysPostVo> list = postService.selectPostList(post);
-        ExcelUtil.exportExcel(list, "岗位数据", SysPostVo.class, response);
+        ExcelBuilder.of(list, SysPostVo.class).sheetName("岗位数据").toResponse(response);
     }
 
     /**

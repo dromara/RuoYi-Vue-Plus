@@ -9,7 +9,7 @@ import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -61,7 +61,7 @@ public class SysClientController extends BaseController {
     @PostMapping("/export")
     public void export(SysClientBo bo, HttpServletResponse response) {
         List<SysClientVo> list = sysClientService.queryList(bo);
-        ExcelUtil.exportExcel(list, "客户端管理", SysClientVo.class, response);
+        ExcelBuilder.of(list, SysClientVo.class).sheetName("客户端管理").toResponse(response);
     }
 
     /**

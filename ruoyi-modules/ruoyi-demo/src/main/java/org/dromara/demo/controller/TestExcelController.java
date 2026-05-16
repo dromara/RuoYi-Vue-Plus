@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.excel.core.ExcelResult;
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.demo.domain.vo.ExportDemoVo;
 import org.dromara.demo.listener.ExportDemoListener;
 import org.dromara.demo.service.IExportExcelService;
@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +47,10 @@ public class TestExcelController {
         list.add(new TestObj("单列表测试1", "列表测试1", "列表测试2", "列表测试3", "列表测试4"));
         list.add(new TestObj("单列表测试2", "列表测试5", "列表测试6", "列表测试7", "列表测试8"));
         list.add(new TestObj("单列表测试3", "列表测试9", "列表测试10", "列表测试11", "列表测试12"));
-        ExcelUtil.exportTemplate(CollUtil.newArrayList(map, list), "单列表.xlsx", "excel/单列表.xlsx", response);
+        ExcelBuilder.template("excel/单列表.xlsx")
+            .filename("单列表.xlsx")
+            .data(CollUtil.newArrayList(map, list))
+            .toResponse(response);
     }
 
     /**
@@ -82,7 +84,10 @@ public class TestExcelController {
         multiListMap.put("data2", list2);
         multiListMap.put("data3", list3);
         multiListMap.put("data4", list4);
-        ExcelUtil.exportTemplateMultiList(multiListMap, "多列表.xlsx", "excel/多列表.xlsx", response);
+        ExcelBuilder.template("excel/多列表.xlsx")
+            .filename("多列表.xlsx")
+            .multiList(multiListMap)
+            .toResponse(response);
     }
 
     /**
@@ -101,7 +106,7 @@ public class TestExcelController {
      * @param response /
      */
     @GetMapping("/customExport")
-    public void customExport(HttpServletResponse response) throws IOException {
+    public void customExport(HttpServletResponse response) {
         exportExcelService.customExport(response);
     }
 
@@ -137,7 +142,10 @@ public class TestExcelController {
         list.add(sheetMap2);
         list.add(sheetMap3);
         list.add(sheetMap4);
-        ExcelUtil.exportTemplateMultiSheet(list, "多sheet列表", "excel/多sheet列表.xlsx", response);
+        ExcelBuilder.template("excel/多sheet列表.xlsx")
+            .filename("多sheet列表")
+            .multiSheet(list)
+            .toResponse(response);
     }
 
     /**
@@ -146,7 +154,9 @@ public class TestExcelController {
     @PostMapping(value = "/importWithOptions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public List<ExportDemoVo> importWithOptions(@RequestPart("file") MultipartFile file) throws Exception {
         // 处理解析结果
-        ExcelResult<ExportDemoVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), ExportDemoVo.class, new ExportDemoListener());
+        ExcelResult<ExportDemoVo> excelResult = ExcelBuilder.read(file.getInputStream(), ExportDemoVo.class)
+            .listener(new ExportDemoListener())
+            .doRead();
         return excelResult.getList();
     }
 

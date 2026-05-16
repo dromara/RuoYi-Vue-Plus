@@ -2,8 +2,6 @@ package org.dromara.demo.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-
 /**
  * 导出下拉框Excel示例
  *
@@ -23,5 +21,5 @@ public interface IExportExcelService {
      *
      * @param response /
      */
-    void customExport(HttpServletResponse response) throws IOException;
+    void customExport(HttpServletResponse response);
 }

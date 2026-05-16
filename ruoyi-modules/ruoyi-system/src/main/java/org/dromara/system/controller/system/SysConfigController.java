@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -57,7 +57,7 @@ public class SysConfigController extends BaseController {
     @PostMapping("/export")
     public void export(SysConfigBo config, HttpServletResponse response) {
         List<SysConfigVo> list = configService.selectConfigList(config);
-        ExcelUtil.exportExcel(list, "参数数据", SysConfigVo.class, response);
+        ExcelBuilder.of(list, SysConfigVo.class).sheetName("参数数据").toResponse(response);
     }
 
     /**

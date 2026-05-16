@@ -16,6 +16,7 @@ import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.dromara.common.excel.annotation.ExcelNotation;
 import org.dromara.common.excel.annotation.ExcelRequired;
+import org.dromara.common.core.utils.reflect.ReflectUtils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -51,6 +52,9 @@ public class DataWriteHandler implements SheetWriteHandler, CellWriteHandler {
         }
         // 第一行
         WriteCellData<?> cellData = context.getFirstCellData();
+        if (cellData == null) {
+            return;
+        }
         // 第一个格子
         WriteCellStyle writeCellStyle = cellData.getOrCreateStyle();
 
@@ -92,7 +96,7 @@ public class DataWriteHandler implements SheetWriteHandler, CellWriteHandler {
      */
     private static Map<String, Short> getRequiredMap(Class<?> clazz) {
         Map<String, Short> requiredMap = new HashMap<>();
-        Field[] fields = clazz.getDeclaredFields();
+        Field[] fields = ReflectUtils.getFields(clazz);
         for (Field field : fields) {
             if (!field.isAnnotationPresent(ExcelRequired.class)) {
                 continue;
@@ -112,7 +116,7 @@ public class DataWriteHandler implements SheetWriteHandler, CellWriteHandler {
      */
     private static Map<String, String> getNotationMap(Class<?> clazz) {
         Map<String, String> notationMap = new HashMap<>();
-        Field[] fields = clazz.getDeclaredFields();
+        Field[] fields = ReflectUtils.getFields(clazz);
         for (Field field : fields) {
             if (!field.isAnnotationPresent(ExcelNotation.class)) {
                 continue;

@@ -129,11 +129,14 @@ public class CellMergeHandler {
                 continue;
             }
             CellMerge cm = field.getAnnotation(CellMerge.class);
-            int index = cm.index() == -1 ? i : cm.index();
+            ExcelProperty property = field.getAnnotation(ExcelProperty.class);
+            int index = cm.index();
+            if (index == -1) {
+                index = property != null && property.index() != -1 ? property.index() : i;
+            }
             mergeFields.put(field, FieldColumnIndex.of(index, cm));
 
-            if (hasTitle) {
-                ExcelProperty property = field.getAnnotation(ExcelProperty.class);
+            if (hasTitle && property != null && property.value().length > 0) {
                 rowIndex = Math.max(rowIndex, property.value().length);
             }
         }

@@ -12,7 +12,7 @@ import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.excel.core.ExcelResult;
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.demo.domain.TestDemo;
@@ -74,7 +74,9 @@ public class TestDemoController extends BaseController {
     @SaCheckPermission("demo:demo:import")
     @PostMapping(value = "/importData", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
-        ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
+        ExcelResult<TestDemoImportVo> excelResult = ExcelBuilder.read(file.getInputStream(), TestDemoImportVo.class)
+            .validate(true)
+            .doRead();
         List<TestDemo> list = MapstructUtils.convert(excelResult.getList(), TestDemo.class);
         testDemoService.saveBatch(list);
         return R.ok(excelResult.getAnalysis());
@@ -92,7 +94,7 @@ public class TestDemoController extends BaseController {
 //        for (TestDemoVo vo : list) {
 //            vo.setId(1234567891234567893L);
 //        }
-        ExcelUtil.exportExcel(list, "测试单表", TestDemoVo.class, response);
+        ExcelBuilder.of(list, TestDemoVo.class).sheetName("测试单表").toResponse(response);
     }
 
     /**

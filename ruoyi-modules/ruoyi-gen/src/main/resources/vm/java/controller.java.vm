@@ -19,7 +19,7 @@ import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.log.enums.BusinessType;
 #if($enableExport)
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 #end
 import ${packageName}.domain.vo.${ClassName}Vo;
 import ${packageName}.domain.bo.${ClassName}Bo;
@@ -68,7 +68,7 @@ public class ${ClassName}Controller extends BaseController {
     @PostMapping("/export")
     public void export(${ClassName}Bo bo, HttpServletResponse response) {
         List<${ClassName}Vo> list = ${className}Service.queryList(bo);
-        ExcelUtil.exportExcel(list, "${functionName}", ${ClassName}Vo.class, response);
+        ExcelBuilder.of(list, ${ClassName}Vo.class).sheetName("${functionName}").toResponse(response);
     }
 #end
 

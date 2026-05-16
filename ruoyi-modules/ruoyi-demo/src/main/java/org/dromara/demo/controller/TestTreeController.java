@@ -6,7 +6,7 @@ import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.core.validate.QueryGroup;
 import org.dromara.common.web.core.BaseController;
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
@@ -55,7 +55,7 @@ public class TestTreeController extends BaseController {
     @GetMapping("/export")
     public void export(@Validated TestTreeBo bo, HttpServletResponse response) {
         List<TestTreeVo> list = testTreeService.queryList(bo);
-        ExcelUtil.exportExcel(list, "测试树表", TestTreeVo.class, response);
+        ExcelBuilder.of(list, TestTreeVo.class).sheetName("测试树表").toResponse(response);
     }
 
     /**

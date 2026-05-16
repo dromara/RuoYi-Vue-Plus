@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -61,7 +61,7 @@ public class SysDictDataController extends BaseController {
     @PostMapping("/export")
     public void export(SysDictDataBo dictData, HttpServletResponse response) {
         List<SysDictDataVo> list = dictDataService.selectDictDataList(dictData);
-        ExcelUtil.exportExcel(list, "字典数据", SysDictDataVo.class, response);
+        ExcelBuilder.of(list, SysDictDataVo.class).sheetName("字典数据").toResponse(response);
     }
 
     /**

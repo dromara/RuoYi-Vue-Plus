@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ExcelEnumConvert implements Converter<Object> {
 
     private static final Map<Field, Map<Object, String>> ENUM_MAP_CACHE = new ConcurrentHashMap<>();
-    private static final Map<Field, Map<Object, Object>> ENUM_REVERSE_MAP_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Field, Map<String, Object>> ENUM_REVERSE_MAP_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public Class<Object> supportJavaTypeKey() {
@@ -55,16 +55,24 @@ public class ExcelEnumConvert implements Converter<Object> {
         }
         Map<Object, String> enumCodeToTextMap = beforeConvert(contentProperty);
         // 从Java输出至Excel是code转text，从Excel转Java应将text与code对调
-        Map<Object, Object> enumTextToCodeMap = ENUM_REVERSE_MAP_CACHE.computeIfAbsent(
+        Map<String, Object> enumTextToCodeMap = ENUM_REVERSE_MAP_CACHE.computeIfAbsent(
             contentProperty.getField(),
             f -> {
-                Map<Object, Object> reverseMap = new HashMap<>();
-                enumCodeToTextMap.forEach((key, value) -> reverseMap.put(value, key));
+                Map<String, Object> reverseMap = new HashMap<>();
+                enumCodeToTextMap.forEach((key, value) -> {
+                    Object oldValue = reverseMap.put(value, key);
+                    if (ObjectUtil.isNotNull(oldValue)) {
+                        throw new IllegalArgumentException("枚举导入文本值重复: " + value);
+                    }
+                });
                 return reverseMap;
             }
         );
         // 应该从text -> code中查找
-        Object codeValue = enumTextToCodeMap.get(textValue);
+        Object codeValue = enumTextToCodeMap.get(Convert.toStr(textValue));
+        if (ObjectUtil.isNull(codeValue)) {
+            throw new IllegalArgumentException("枚举值不匹配: " + textValue + "，允许值: " + enumTextToCodeMap.keySet());
+        }
         return Convert.convert(contentProperty.getField().getType(), codeValue);
     }
 
@@ -86,6 +94,9 @@ public class ExcelEnumConvert implements Converter<Object> {
             for (Enum<?> enumConstant : enumConstants) {
                 Object codeValue = ReflectUtils.invokeGetter(enumConstant, anno.codeField());
                 String textValue = ReflectUtils.invokeGetter(enumConstant, anno.textField());
+                if (ObjectUtil.isNull(codeValue) || ObjectUtil.isNull(textValue)) {
+                    throw new IllegalArgumentException("枚举字段 code/text 不能为空: " + enumConstant.name());
+                }
                 enumValueMap.put(codeValue, textValue);
             }
             return enumValueMap;

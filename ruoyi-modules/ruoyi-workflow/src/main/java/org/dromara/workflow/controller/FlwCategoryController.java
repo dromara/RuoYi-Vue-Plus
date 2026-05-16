@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.redis.annotation.RepeatSubmit;
@@ -61,7 +61,7 @@ public class FlwCategoryController extends BaseController {
     @PostMapping("/export")
     public void export(FlowCategoryBo bo, HttpServletResponse response) {
         List<FlowCategoryVo> list = flwCategoryService.queryList(bo);
-        ExcelUtil.exportExcel(list, "流程分类", FlowCategoryVo.class, response);
+        ExcelBuilder.of(list, FlowCategoryVo.class).sheetName("流程分类").toResponse(response);
     }
 
     /**

@@ -39,11 +39,20 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
     /**
      * 导入回执
      */
-    private ExcelResult<T> excelResult;
+    private final ExcelResult<T> excelResult = new DefaultExcelResult<>();
+
+    /**
+     * 发生异常时是否立即终止读取，默认保持原有快速失败行为
+     */
+    private Boolean failFast = Boolean.TRUE;
 
     public DefaultExcelListener(boolean isValidate) {
-        this.excelResult = new DefaultExcelResult<>();
         this.isValidate = isValidate;
+    }
+
+    public DefaultExcelListener(boolean isValidate, boolean failFast) {
+        this.isValidate = isValidate;
+        this.failFast = failFast;
     }
 
     /**
@@ -60,7 +69,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
             Integer rowIndex = excelDataConvertException.getRowIndex();
             Integer columnIndex = excelDataConvertException.getColumnIndex();
             errMsg = StrUtil.format("第{}行-第{}列-表头{}: 解析异常<br/>",
-                rowIndex + 1, columnIndex + 1, headMap.get(columnIndex));
+                rowIndex + 1, columnIndex + 1, headMap == null ? "" : headMap.get(columnIndex));
             if (log.isDebugEnabled()) {
                 log.warn(errMsg);
             }
@@ -78,7 +87,9 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
             log.warn(errMsg, exception);
         }
         excelResult.getErrorList().add(errMsg);
-        throw new ExcelAnalysisException(errMsg);
+        if (failFast) {
+            throw new ExcelAnalysisException(errMsg);
+        }
     }
 
     @Override

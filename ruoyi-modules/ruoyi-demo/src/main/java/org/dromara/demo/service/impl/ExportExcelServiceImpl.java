@@ -8,15 +8,13 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.StreamUtils;
-import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.excel.core.DropDownOptions;
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.excel.utils.ExcelWriterWrapper;
 import org.dromara.demo.domain.vo.ExportDemoVo;
 import org.dromara.demo.service.IExportExcelService;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +101,10 @@ public class ExportExcelServiceImpl implements IExportExcelService {
             return everyRowData;
         });
 
-        ExcelUtil.exportExcel(outList, "下拉框示例", ExportDemoVo.class, response, options);
+        ExcelBuilder.of(outList, ExportDemoVo.class)
+            .sheetName("下拉框示例")
+            .options(options)
+            .toResponse(response);
     }
 
     private String buildOptions(List<DemoCityData> cityDataList, Integer id) {
@@ -240,12 +241,8 @@ public class ExportExcelServiceImpl implements IExportExcelService {
 
 
     @Override
-    public void customExport(HttpServletResponse response) throws IOException {
-        String filename = ExcelUtil.encodingFilename("自定义导出");
-        FileUtils.setAttachmentResponseHeader(response, filename);
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");
-
-        ExcelUtil.exportExcel(ExportDemoVo.class, response.getOutputStream(), wrapper -> {
+    public void customExport(HttpServletResponse response) {
+        ExcelBuilder.writer(ExportDemoVo.class).sheetName("自定义导出").toResponse(response, wrapper -> {
             // 创建表格数据，业务中一般通过数据库查询
             List<ExportDemoVo> excelDataList = new ArrayList<>();
             for (int i = 0; i < 30; i++) {

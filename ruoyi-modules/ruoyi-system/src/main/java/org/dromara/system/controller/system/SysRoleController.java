@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -66,7 +66,7 @@ public class SysRoleController extends BaseController {
     @PostMapping("/export")
     public void export(SysRoleBo role, HttpServletResponse response) {
         List<SysRoleVo> list = roleService.selectRoleList(role);
-        ExcelUtil.exportExcel(list, "角色数据", SysRoleVo.class, response);
+        ExcelBuilder.of(list, SysRoleVo.class).sheetName("角色数据").toResponse(response);
     }
 
     /**

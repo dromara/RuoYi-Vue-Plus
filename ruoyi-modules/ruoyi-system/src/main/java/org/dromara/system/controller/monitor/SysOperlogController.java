@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
-import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -56,7 +56,7 @@ public class SysOperlogController extends BaseController {
     @PostMapping("/export")
     public void export(SysOperLogBo operLog, HttpServletResponse response) {
         List<SysOperLogVo> list = operLogService.selectOperLogList(operLog);
-        ExcelUtil.exportExcel(list, "操作日志", SysOperLogVo.class, response);
+        ExcelBuilder.of(list, SysOperLogVo.class).sheetName("操作日志").toResponse(response);
     }
 
     /**
