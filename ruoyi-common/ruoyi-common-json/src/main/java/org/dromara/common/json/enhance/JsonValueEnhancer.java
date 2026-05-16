@@ -54,7 +54,13 @@ public class JsonValueEnhancer {
         if (body == null || body instanceof JsonNode || processors.isEmpty()) {
             return body;
         }
-        return enhanceTree(body);
+        JsonEnhancementContext context = new JsonEnhancementContext(jsonMapper);
+        collectValue(body, context, new IdentityHashMap<>());
+        if (!context.isProcessingRequired()) {
+            return body;
+        }
+        processors.forEach(processor -> processor.prepare(context));
+        return renderValue(body, context, new IdentityHashMap<>());
     }
 
     /**
@@ -73,6 +79,9 @@ public class JsonValueEnhancer {
     private JsonNode enhanceTree(Object value) {
         JsonEnhancementContext context = new JsonEnhancementContext(jsonMapper);
         collectValue(value, context, new IdentityHashMap<>());
+        if (!context.isProcessingRequired()) {
+            return jsonMapper.valueToTree(value);
+        }
         processors.forEach(processor -> processor.prepare(context));
         return renderValue(value, context, new IdentityHashMap<>());
     }
@@ -103,11 +112,20 @@ public class JsonValueEnhancer {
             for (PropertyMetadata metadata : getProperties(value.getClass())) {
                 Object propertyValue = metadata.getValue(value);
                 JsonFieldContext fieldContext = new JsonFieldContext(value, metadata.propertyName(), metadata.member(), propertyValue);
-                processors.forEach(processor -> processor.collect(fieldContext, context));
+                collectField(fieldContext, context);
                 collectValue(propertyValue, context, visited);
             }
         } finally {
             visited.remove(value);
+        }
+    }
+
+    private void collectField(JsonFieldContext fieldContext, JsonEnhancementContext context) {
+        for (JsonFieldProcessor processor : processors) {
+            if (processor.supports(fieldContext)) {
+                context.markProcessingRequired();
+                processor.collect(fieldContext, context);
+            }
         }
     }
 
@@ -120,27 +138,16 @@ public class JsonValueEnhancer {
                 return jsonNode;
             }
             case Map<?, ?> map -> {
-                ObjectNode objectNode = jsonMapper.createObjectNode();
-                map.forEach((key, childValue) -> objectNode.set(String.valueOf(key), renderValue(childValue, context, visited)));
-                return objectNode;
+                return renderMap(map, context, visited);
             }
             case Iterable<?> iterable -> {
-                ArrayNode arrayNode = jsonMapper.createArrayNode();
-                for (Object child : iterable) {
-                    arrayNode.add(renderValue(child, context, visited));
-                }
-                return arrayNode;
+                return renderIterable(iterable, context, visited);
             }
             default -> {
             }
         }
         if (value.getClass().isArray()) {
-            ArrayNode arrayNode = jsonMapper.createArrayNode();
-            int length = Array.getLength(value);
-            for (int i = 0; i < length; i++) {
-                arrayNode.add(renderValue(Array.get(value, i), context, visited));
-            }
-            return arrayNode;
+            return renderArray(value, context, visited);
         }
         if (isSimpleValue(value.getClass())) {
             return jsonMapper.valueToTree(value);
@@ -149,26 +156,56 @@ public class JsonValueEnhancer {
             return jsonMapper.valueToTree(value);
         }
         try {
-            ObjectNode objectNode = jsonMapper.createObjectNode();
-            for (PropertyMetadata metadata : getProperties(value.getClass())) {
-                Object originalValue = metadata.getValue(value);
-                JsonFieldContext fieldContext = new JsonFieldContext(value, metadata.propertyName(), metadata.member(), originalValue);
-                Object processedValue = originalValue;
-                boolean changed = false;
-                for (JsonFieldProcessor processor : processors) {
-                    Object nextValue = processor.process(fieldContext, processedValue, context);
-                    changed = changed || !Objects.equals(processedValue, nextValue);
-                    processedValue = nextValue;
-                }
-                JsonNode childNode = changed
-                    ? enhanceTranslatedValue(processedValue, context, visited)
-                    : renderValue(processedValue, context, visited);
-                objectNode.set(metadata.propertyName(), childNode);
-            }
-            return objectNode;
+            return renderPojo(value, context, visited);
         } finally {
             visited.remove(value);
         }
+    }
+
+    private ObjectNode renderMap(Map<?, ?> map, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {
+        ObjectNode objectNode = jsonMapper.createObjectNode();
+        map.forEach((key, childValue) -> objectNode.set(String.valueOf(key), renderValue(childValue, context, visited)));
+        return objectNode;
+    }
+
+    private ArrayNode renderIterable(Iterable<?> iterable, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {
+        ArrayNode arrayNode = jsonMapper.createArrayNode();
+        for (Object child : iterable) {
+            arrayNode.add(renderValue(child, context, visited));
+        }
+        return arrayNode;
+    }
+
+    private ArrayNode renderArray(Object value, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {
+        ArrayNode arrayNode = jsonMapper.createArrayNode();
+        int length = Array.getLength(value);
+        for (int i = 0; i < length; i++) {
+            arrayNode.add(renderValue(Array.get(value, i), context, visited));
+        }
+        return arrayNode;
+    }
+
+    private ObjectNode renderPojo(Object value, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {
+        ObjectNode objectNode = jsonMapper.createObjectNode();
+        for (PropertyMetadata metadata : getProperties(value.getClass())) {
+            Object originalValue = metadata.getValue(value);
+            JsonFieldContext fieldContext = new JsonFieldContext(value, metadata.propertyName(), metadata.member(), originalValue);
+            Object processedValue = originalValue;
+            boolean changed = false;
+            for (JsonFieldProcessor processor : processors) {
+                if (!processor.supports(fieldContext)) {
+                    continue;
+                }
+                Object nextValue = processor.process(fieldContext, processedValue, context);
+                changed = changed || !Objects.equals(processedValue, nextValue);
+                processedValue = nextValue;
+            }
+            JsonNode childNode = changed
+                ? enhanceTranslatedValue(processedValue, context, visited)
+                : renderValue(processedValue, context, visited);
+            objectNode.set(metadata.propertyName(), childNode);
+        }
+        return objectNode;
     }
 
     private JsonNode enhanceTranslatedValue(Object value, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {

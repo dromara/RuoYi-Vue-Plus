@@ -19,6 +19,10 @@ import java.util.List;
  */
 public class CustomLocalDateTimeDeserializer extends ValueDeserializer<LocalDateTime> {
 
+    private static final int SECOND_TIMESTAMP_LENGTH = 10;
+
+    private static final int MILLIS_TIMESTAMP_LENGTH = 13;
+
     /** 支持时间的格式列表（直接解析为 LocalDateTime） */
     private static final List<DateTimeFormatter> DATETIME_FORMATTERS = List.of(
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
@@ -52,11 +56,10 @@ public class CustomLocalDateTimeDeserializer extends ValueDeserializer<LocalDate
         }
         text = text.trim();
 
-        // 纯数字：按时间戳处理（毫秒）
-        if (text.chars().allMatch(Character::isDigit)) {
-            return Instant.ofEpochMilli(Long.parseLong(text))
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+        // 纯数字：支持秒级与毫秒级时间戳
+        LocalDateTime timestamp = parseTimestamp(text);
+        if (timestamp != null) {
+            return timestamp;
         }
 
         // 尝试带时间的格式
@@ -76,6 +79,29 @@ public class CustomLocalDateTimeDeserializer extends ValueDeserializer<LocalDate
         }
 
         return null;
+    }
+
+    private LocalDateTime parseTimestamp(String text) {
+        int startIndex = text.startsWith("-") ? 1 : 0;
+        if (startIndex == text.length()) {
+            return null;
+        }
+        for (int i = startIndex; i < text.length(); i++) {
+            if (!Character.isDigit(text.charAt(i))) {
+                return null;
+            }
+        }
+        int digitLength = text.length() - startIndex;
+        long timestamp = Long.parseLong(text);
+        Instant instant;
+        if (digitLength == SECOND_TIMESTAMP_LENGTH) {
+            instant = Instant.ofEpochSecond(timestamp);
+        } else if (digitLength == MILLIS_TIMESTAMP_LENGTH) {
+            instant = Instant.ofEpochMilli(timestamp);
+        } else {
+            return null;
+        }
+        return instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
 }

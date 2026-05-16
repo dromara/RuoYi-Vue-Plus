@@ -2,7 +2,6 @@ package org.dromara.common.json.handler;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import org.dromara.common.core.utils.ObjectUtils;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ValueDeserializer;
@@ -25,10 +24,11 @@ public class CustomDateDeserializer extends ValueDeserializer<Date> {
      */
     @Override
     public Date deserialize(JsonParser p, DeserializationContext ctxt) {
-        DateTime parse = DateUtil.parse(p.getString());
-        if (ObjectUtils.isNull(parse)) {
+        String text = p.getString();
+        if (text == null || text.isBlank()) {
             return null;
         }
+        DateTime parse = DateUtil.parse(text.trim());
         return parse.toJdkDate();
     }
 

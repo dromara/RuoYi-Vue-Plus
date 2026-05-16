@@ -21,6 +21,11 @@ public class SensitiveJsonFieldProcessor implements JsonFieldProcessor {
     private SensitiveService sensitiveService;
 
     @Override
+    public boolean supports(JsonFieldContext fieldContext) {
+        return fieldContext.getAnnotation(Sensitive.class) != null;
+    }
+
+    @Override
     public Object process(JsonFieldContext fieldContext, Object value, JsonEnhancementContext context) {
         Sensitive sensitive = fieldContext.getAnnotation(Sensitive.class);
         if (sensitive == null || !(value instanceof String text)) {

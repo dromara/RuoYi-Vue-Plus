@@ -146,15 +146,7 @@ public class JsonUtils {
      * @return true = 合法 JSON，false = 非法或空
      */
     public static boolean isJson(String str) {
-        if (StringUtils.isBlank(str)) {
-            return false;
-        }
-        try {
-            JSON_MAPPER.readTree(str);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return readTreeQuietly(str) != null;
     }
 
     /**
@@ -164,15 +156,8 @@ public class JsonUtils {
      * @return true = JSON 对象
      */
     public static boolean isJsonObject(String str) {
-        if (StringUtils.isBlank(str)) {
-            return false;
-        }
-        try {
-            JsonNode node = JSON_MAPPER.readTree(str);
-            return node.isObject();
-        } catch (Exception e) {
-            return false;
-        }
+        JsonNode node = readTreeQuietly(str);
+        return node != null && node.isObject();
     }
 
     /**
@@ -185,11 +170,18 @@ public class JsonUtils {
         if (StringUtils.isBlank(str)) {
             return false;
         }
+        JsonNode node = readTreeQuietly(str);
+        return node != null && node.isArray();
+    }
+
+    private static JsonNode readTreeQuietly(String str) {
+        if (StringUtils.isBlank(str)) {
+            return null;
+        }
         try {
-            JsonNode node = JSON_MAPPER.readTree(str);
-            return node.isArray();
+            return JSON_MAPPER.readTree(str);
         } catch (Exception e) {
-            return false;
+            return null;
         }
     }
 

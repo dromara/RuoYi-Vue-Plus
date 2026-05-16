@@ -58,6 +58,17 @@ public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
     }
 
     /**
+     * 判断字段是否包含翻译注解。
+     *
+     * @param fieldContext 字段上下文
+     * @return true 需要处理 false 无需处理
+     */
+    @Override
+    public boolean supports(JsonFieldContext fieldContext) {
+        return fieldContext.getAnnotation(Translation.class) != null;
+    }
+
+    /**
      * 收集字段上的翻译注解和原始值，供后续批量翻译使用。
      *
      * @param fieldContext 字段上下文
@@ -150,12 +161,7 @@ public class TranslationJsonFieldProcessor implements JsonFieldProcessor {
      * @return 待批量翻译数据映射
      */
     private Map<TranslationBatchKey, Set<Object>> getOrCreateBatches(JsonEnhancementContext context) {
-        Map<TranslationBatchKey, Set<Object>> batches = context.getAttribute(ATTR_BATCHES);
-        if (batches == null) {
-            batches = new LinkedHashMap<>();
-            context.setAttribute(ATTR_BATCHES, batches);
-        }
-        return batches;
+        return context.getOrCreateAttribute(ATTR_BATCHES, LinkedHashMap::new);
     }
 
     /**
