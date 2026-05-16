@@ -35,13 +35,20 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
 
     Log log = LogFactory.getLog(BaseMapperPlus.class);
 
+    ClassValue<Class<?>[]> TYPE_ARGUMENT_CACHE = new ClassValue<>() {
+        @Override
+        protected Class<?>[] computeValue(Class<?> type) {
+            return GenericTypeUtils.resolveTypeArguments(type, BaseMapperPlus.class);
+        }
+    };
+
     /**
      * 获取当前实例对象关联的泛型类型 V 的 Class 对象
      *
      * @return 返回当前实例对象关联的泛型类型 V 的 Class 对象
      */
     default Class<V> currentVoClass() {
-        return (Class<V>) GenericTypeUtils.resolveTypeArguments(this.getClass(), BaseMapperPlus.class)[1];
+        return (Class<V>) currentMapperTypes()[1];
     }
 
     /**
@@ -50,7 +57,20 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 返回当前实例对象关联的泛型类型 T 的 Class 对象
      */
     default Class<T> currentModelClass() {
-        return (Class<T>) GenericTypeUtils.resolveTypeArguments(this.getClass(), BaseMapperPlus.class)[0];
+        return (Class<T>) currentMapperTypes()[0];
+    }
+
+    /**
+     * 获取当前 Mapper 的实体与 VO 泛型类型。
+     *
+     * @return 泛型类型数组
+     */
+    private Class<?>[] currentMapperTypes() {
+        Class<?>[] types = TYPE_ARGUMENT_CACHE.get(this.getClass());
+        if (types == null || types.length < 2) {
+            throw new IllegalStateException("无法解析 Mapper 泛型类型: " + this.getClass().getName());
+        }
+        return types;
     }
 
     /**

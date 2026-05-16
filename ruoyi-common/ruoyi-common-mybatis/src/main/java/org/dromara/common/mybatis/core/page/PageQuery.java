@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.sql.SqlUtil;
@@ -21,6 +22,7 @@ import java.util.List;
  * @author Lion Li
  */
 @Data
+@NoArgsConstructor
 public class PageQuery implements Serializable {
 
     @Serial
@@ -84,16 +86,16 @@ public class PageQuery implements Serializable {
      */
     private List<OrderItem> buildOrderItem() {
         if (StringUtils.isBlank(orderByColumn) || StringUtils.isBlank(isAsc)) {
-            return null;
+            return List.of();
         }
         String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
         orderBy = StringUtils.toUnderScoreCase(orderBy);
 
         // 兼容前端排序类型
-        isAsc = StringUtils.replaceEach(isAsc, new String[]{"ascending", "descending"}, new String[]{"asc", "desc"});
+        String orderDirection = StringUtils.replaceEach(isAsc, new String[]{"ascending", "descending"}, new String[]{"asc", "desc"});
 
         String[] orderByArr = orderBy.split(StringUtils.SEPARATOR);
-        String[] isAscArr = isAsc.split(StringUtils.SEPARATOR);
+        String[] isAscArr = orderDirection.split(StringUtils.SEPARATOR);
         if (isAscArr.length != 1 && isAscArr.length != orderByArr.length) {
             throw new ServiceException("排序参数有误");
         }
@@ -121,7 +123,12 @@ public class PageQuery implements Serializable {
      */
     @JsonIgnore
     public Integer getFirstNum() {
-        return (pageNum - 1) * pageSize;
+        Integer currentPageNum = ObjectUtil.defaultIfNull(getPageNum(), DEFAULT_PAGE_NUM);
+        Integer currentPageSize = ObjectUtil.defaultIfNull(getPageSize(), DEFAULT_PAGE_SIZE);
+        if (currentPageNum <= 0) {
+            currentPageNum = DEFAULT_PAGE_NUM;
+        }
+        return (currentPageNum - 1) * currentPageSize;
     }
 
     /**

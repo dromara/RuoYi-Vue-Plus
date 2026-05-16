@@ -2,18 +2,12 @@ package org.dromara.common.mybatis.helper;
 
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.context.model.SaStorage;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
-import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.dromara.common.mybatis.core.domain.DataPermissionAccess;
-import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mybatis.annotation.DataPermission;
+import org.dromara.common.mybatis.core.domain.DataPermissionAccess;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -30,8 +24,6 @@ public class DataPermissionHelper {
 
     private static final String DATA_PERMISSION_KEY = "data:permission";
     private static final String ACCESS_KEY = "data:permission:access";
-
-    private static final ThreadLocal<Deque<Integer>> REENTRANT_IGNORE = ThreadLocal.withInitial(ArrayDeque::new);
 
     private static final ThreadLocal<DataPermission> PERMISSION_CACHE = new ThreadLocal<>();
 
@@ -121,67 +113,16 @@ public class DataPermissionHelper {
     }
 
     /**
-     * 获取当前忽略策略。
-     *
-     * @return 忽略策略
-     */
-    private static IgnoreStrategy getIgnoreStrategy() {
-        Object ignoreStrategyLocal = ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
-        if (ignoreStrategyLocal instanceof ThreadLocal<?> IGNORE_STRATEGY_LOCAL) {
-            if (IGNORE_STRATEGY_LOCAL.get() instanceof IgnoreStrategy ignoreStrategy) {
-                return ignoreStrategy;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 开启忽略数据权限(开启后需手动调用 {@link #disableIgnore()} 关闭)
-     */
-    private static void enableIgnore() {
-        IgnoreStrategy ignoreStrategy = getIgnoreStrategy();
-        if (ObjectUtil.isNull(ignoreStrategy)) {
-            InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().dataPermission(true).build());
-        } else {
-            ignoreStrategy.setDataPermission(true);
-        }
-        Deque<Integer> reentrantStack = REENTRANT_IGNORE.get();
-        reentrantStack.push(reentrantStack.size() + 1);
-    }
-
-    /**
-     * 关闭忽略数据权限
-     */
-    private static void disableIgnore() {
-        IgnoreStrategy ignoreStrategy = getIgnoreStrategy();
-        if (ObjectUtil.isNotNull(ignoreStrategy)) {
-            boolean noOtherIgnoreStrategy = !Boolean.TRUE.equals(ignoreStrategy.getDynamicTableName())
-                && !Boolean.TRUE.equals(ignoreStrategy.getBlockAttack())
-                && !Boolean.TRUE.equals(ignoreStrategy.getIllegalSql())
-                && !Boolean.TRUE.equals(ignoreStrategy.getTenantLine())
-                && CollectionUtil.isEmpty(ignoreStrategy.getOthers());
-            Deque<Integer> reentrantStack = REENTRANT_IGNORE.get();
-            boolean empty = reentrantStack.isEmpty() || reentrantStack.pop() == 1;
-            if (noOtherIgnoreStrategy && empty) {
-                InterceptorIgnoreHelper.clearIgnoreStrategy();
-            } else if (empty) {
-                ignoreStrategy.setDataPermission(false);
-            }
-
-        }
-    }
-
-    /**
      * 在忽略数据权限中执行
      *
      * @param handle 处理执行方法
      */
     public static void ignore(Runnable handle) {
-        enableIgnore();
+        DataPermissionIgnoreContext.enable();
         try {
             handle.run();
         } finally {
-            disableIgnore();
+            DataPermissionIgnoreContext.disable();
         }
     }
 
@@ -192,11 +133,11 @@ public class DataPermissionHelper {
      * @return 执行结果
      */
     public static <T> T ignore(Supplier<T> handle) {
-        enableIgnore();
+        DataPermissionIgnoreContext.enable();
         try {
             return handle.get();
         } finally {
-            disableIgnore();
+            DataPermissionIgnoreContext.disable();
         }
     }
 
