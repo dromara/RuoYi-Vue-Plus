@@ -52,6 +52,8 @@
         <warm-flow.version>1.8.7</warm-flow.version>
         <!-- mqtt客户端 -->
         <mica-mqtt.version>2.5.12</mica-mqtt.version>
+        <easy-es.version>3.0.2</easy-es.version>
+        <elasticsearch-client.version>7.17.28</elasticsearch-client.version>
         <!-- Spring AI 2.0 预览版，正式版发布后仅需调整此版本号 -->
         <spring-ai.version>2.0.0-M6</spring-ai.version>
 
@@ -323,6 +325,24 @@
                 <groupId>org.dromara.mica-mqtt</groupId>
                 <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
                 <version>${mica-mqtt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara.easy-es</groupId>
+                <artifactId>easy-es-boot-starter</artifactId>
+                <version>${easy-es.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>co.elastic.clients</groupId>
+                <artifactId>elasticsearch-java</artifactId>
+                <version>${elasticsearch-client.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-client</artifactId>
+                <version>${elasticsearch-client.version}</version>
             </dependency>
 
             <!-- JustAuth 的依赖配置-->

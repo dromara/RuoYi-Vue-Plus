@@ -1,0 +1,2 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  org.dromara.common.elasticsearch.config.ActuatorEnvironmentPostProcessor

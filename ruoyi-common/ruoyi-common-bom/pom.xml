@@ -103,6 +103,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- ES搜索引擎服务 -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-common-elasticsearch</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- 授权认证 -->
             <dependency>
                 <groupId>org.dromara</groupId>

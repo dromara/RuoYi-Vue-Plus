@@ -282,6 +282,52 @@ mqtt.client:
     truststore-path:
     truststore-pass:
 
+--- # elasticsearch 功能配置
+# 文档地址: https://www.easy-es.cn/
+# 更改包名需要去 EasyEsConfiguration 修改包扫描(后续版本支持配置文件读取)
+easy-es:
+  # 是否开启EE自动配置
+  enable: false
+  # 兼容模式
+  compatible: true
+  # es连接地址+端口 格式必须为ip:port,如果是集群则可用逗号隔开
+  address: localhost:9200
+  # 默认为http
+  schema: http
+  # 注意ES建议使用账号认证 不使用会报警告日志
+  # 如果无账号密码则可不配置此行
+  # username:
+  # 如果无账号密码则可不配置此行
+  # password:
+  # 心跳策略时间 单位:ms
+  keep-alive-millis: 18000
+  # 连接超时时间 单位:ms
+  connectTimeout: 5000
+  # 通信超时时间 单位:ms
+  socketTimeout: 5000
+  # 连接请求超时时间 单位:ms
+  connectionRequestTimeout: 5000
+  # 最大连接数 单位:个
+  maxConnTotal: 100
+  # 最大连接路由数 单位:个
+  maxConnPerRoute: 100
+  global-config:
+    # 开启控制台打印通过本框架生成的DSL语句,默认为开启,测试稳定后的生产环境建议关闭,以提升少量性能
+    print-dsl: true
+    # 异步处理索引是否阻塞主线程 默认阻塞 数据量过大时调整为非阻塞异步进行 项目启动更快
+    asyncProcessIndexBlocking: true
+    db-config:
+      # 是否开启下划线转驼峰 默认为false
+      map-underscore-to-camel-case: true
+      # id生成策略 customize为自定义,id值由用户生成,比如取MySQL中的数据id,如缺省此项配置,则id默认策略为es自动生成
+      id-type: customize
+      # 字段更新策略 默认为not_null
+      field-strategy: not_null
+      # 默认开启,查询若指定了size超过1w条时也会自动开启,开启后查询所有匹配数据,若不开启,会导致无法获取数据总条数,其它功能不受影响.
+      enable-track-total-hits: true
+      # 数据刷新策略,默认为不刷新
+      refresh-policy: immediate
+
 --- # MCP 服务端配置
 spring.ai.mcp:
   server:
