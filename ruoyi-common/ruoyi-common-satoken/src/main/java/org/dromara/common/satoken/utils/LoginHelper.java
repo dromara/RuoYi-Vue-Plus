@@ -1,5 +1,6 @@
 package org.dromara.common.satoken.utils;
 
+import cn.dev33.satoken.exception.ApiDisabledException;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
@@ -8,6 +9,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.domain.model.LoginUser;
@@ -28,8 +30,11 @@ import java.util.Set;
  *
  * @author Lion Li
  */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginHelper {
+
+    private static final boolean useJWT = false;
 
     public static final String LOGIN_USER_KEY = "loginUser";
     public static final String TENANT_KEY = "tenantId";
@@ -57,6 +62,7 @@ public class LoginHelper {
                 .setExtra(DEPT_NAME_KEY, loginUser.getDeptName())
                 .setExtra(DEPT_CATEGORY_KEY, loginUser.getDeptCategory())
         );
+        loginUser.setClientId(Convert.toStr(model.getExtra(LoginHelper.CLIENT_KEY)));
         StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
     }
 
@@ -88,49 +94,81 @@ public class LoginHelper {
      * 获取用户id
      */
     public static Long getUserId() {
-        return Convert.toLong(getExtra(USER_KEY));
+        Object object = getExtra(USER_KEY);
+        if(object instanceof LoginUser loginUser){
+            return loginUser.getUserId();
+        }
+        return Convert.toLong(object);
     }
 
     /**
      * 获取用户id
      */
     public static String getUserIdStr() {
-        return Convert.toStr(getExtra(USER_KEY));
+        return Convert.toStr(getUserId());
     }
 
     /**
      * 获取用户账户
      */
     public static String getUsername() {
-        return Convert.toStr(getExtra(USER_NAME_KEY));
+        Object object = getExtra(USER_NAME_KEY);
+        if(object instanceof LoginUser loginUser){
+            return loginUser.getUsername();
+        }
+        return Convert.toStr(object);
     }
 
     /**
      * 获取租户ID
      */
     public static String getTenantId() {
-        return Convert.toStr(getExtra(TENANT_KEY));
+        Object object = getExtra(TENANT_KEY);
+        if(object instanceof LoginUser loginUser){
+            return loginUser.getTenantId();
+        }
+        return Convert.toStr(object);
     }
 
     /**
      * 获取部门ID
      */
     public static Long getDeptId() {
-        return Convert.toLong(getExtra(DEPT_KEY));
+        Object object = getExtra(DEPT_KEY);
+        if(object instanceof LoginUser loginUser){
+            return loginUser.getDeptId();
+        }
+        return Convert.toLong(object);
     }
 
     /**
      * 获取部门名
      */
     public static String getDeptName() {
-        return Convert.toStr(getExtra(DEPT_NAME_KEY));
+        Object object = getExtra(DEPT_NAME_KEY);
+        if(object instanceof LoginUser loginUser){
+            return loginUser.getDeptName();
+        }
+        return Convert.toStr(object);
     }
 
     /**
      * 获取部门类别编码
      */
     public static String getDeptCategory() {
-        return Convert.toStr(getExtra(DEPT_CATEGORY_KEY));
+        Object object = getExtra(DEPT_CATEGORY_KEY);
+        if(object instanceof LoginUser loginUser){
+            return loginUser.getDeptCategory();
+        }
+        return Convert.toStr(object);
+    }
+
+    public static String getClientId() {
+        Object object = getExtra(CLIENT_KEY);
+        if(object instanceof LoginUser loginUser){
+            return loginUser.getClientId();
+        }
+        return Convert.toStr(object);
     }
 
     /**
@@ -141,10 +179,26 @@ public class LoginHelper {
      */
     private static Object getExtra(String key) {
         try {
-            return StpUtil.getExtra(key);
+            if(useJWT) {
+                return StpUtil.getExtra(key);
+            }else{
+                try{
+                    return StpUtil.getTokenSession().get(LOGIN_USER_KEY);
+                } catch (Exception ne){
+                    log.error(ne.getMessage());
+                }
+            }
+        } catch (ApiDisabledException ade) {
+            log.error(ade.getMessage());
+            try{
+                return StpUtil.getTokenSession().get(LOGIN_USER_KEY);
+            } catch (Exception ne){
+                log.error(ne.getMessage());
+            }
         } catch (Exception e) {
-            return null;
+            log.error(e.getMessage(), e);
         }
+        return null;
     }
 
     /**

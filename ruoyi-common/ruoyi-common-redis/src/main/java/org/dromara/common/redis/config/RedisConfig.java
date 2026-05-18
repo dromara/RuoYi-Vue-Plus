@@ -6,8 +6,12 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.redis.config.properties.RedissonProperties;
 import org.dromara.common.redis.handler.KeyPrefixHandler;
@@ -21,7 +25,9 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
@@ -45,6 +51,15 @@ public class RedisConfig {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
             javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
+
+            DateTimeFormatter localDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(localDateFormatter));
+            javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(localDateFormatter));
+
+            DateTimeFormatter localTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(localTimeFormatter));
+            javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(localTimeFormatter));
+
             ObjectMapper om = new ObjectMapper();
             om.registerModule(javaTimeModule);
             om.setTimeZone(TimeZone.getDefault());

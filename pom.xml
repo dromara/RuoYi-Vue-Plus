@@ -50,6 +50,8 @@
         <!-- 工作流配置 -->
         <warm-flow.version>1.8.5</warm-flow.version>
 
+        <alibaba-ttl.version>2.14.5</alibaba-ttl.version>
+
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
@@ -130,6 +132,12 @@
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
 
@@ -355,6 +363,12 @@
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-workflow</artifactId>
                 <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId>
+                <version>${alibaba-ttl.version}</version>
             </dependency>
 
         </dependencies>

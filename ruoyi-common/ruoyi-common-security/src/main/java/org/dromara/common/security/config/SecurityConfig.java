@@ -65,7 +65,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                         // 检查 header 与 param 里的 clientid 与 token 里的是否一致
                         String headerCid = request.getHeader(LoginHelper.CLIENT_KEY);
                         String paramCid = ServletUtils.getParameter(LoginHelper.CLIENT_KEY);
-                        String clientId = StpUtil.getExtra(LoginHelper.CLIENT_KEY).toString();
+                        //String clientId = StpUtil.getExtra(LoginHelper.CLIENT_KEY).toString();
+                        String clientId = LoginHelper.getClientId();
                         if (!StringUtils.equalsAny(clientId, headerCid, paramCid)) {
                             // token 无效
                             throw NotLoginException.newInstance(StpUtil.getLoginType(),

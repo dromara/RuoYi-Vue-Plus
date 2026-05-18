@@ -82,16 +82,16 @@
         </dependency>
 
         <!--  demo模块  -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-demo</artifactId>
-        </dependency>
+        </dependency>-->
 
         <!--  工作流模块  -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-workflow</artifactId>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>de.codecentric</groupId>

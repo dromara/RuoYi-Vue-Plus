@@ -1,6 +1,7 @@
 package org.dromara.common.json.config;
 
 import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -48,6 +49,7 @@ public class JacksonConfig {
     public Jackson2ObjectMapperBuilderCustomizer customizer() {
         return builder -> {
             builder.timeZone(TimeZone.getDefault());
+            builder.featuresToEnable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
             log.info("初始化 jackson 配置");
         };
     }

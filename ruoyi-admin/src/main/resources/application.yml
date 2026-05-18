@@ -120,7 +120,7 @@ security:
 # 多租户配置
 tenant:
   # 是否开启
-  enable: true
+  enable: false
   # 排除表
   excludes:
     - sys_menu
@@ -169,7 +169,7 @@ mybatis-encryptor:
 # api接口加密
 api-decrypt:
   # 是否开启全局接口加密
-  enabled: true
+  enabled: false
   # AES 加密头标识
   headerFlag: encrypt-key
   # 响应加密公钥 非对称算法的公私钥 如：SM2，RSA 使用者请自行更换
@@ -197,16 +197,16 @@ springdoc:
       url: https://gitee.com/dromara/RuoYi-Vue-Plus
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
-    - group: 1.演示模块
-      packages-to-scan: org.dromara.demo
+    #- group: 1.演示模块
+    #  packages-to-scan: org.dromara.demo
     - group: 2.通用模块
       packages-to-scan: org.dromara.web
     - group: 3.系统模块
       packages-to-scan: org.dromara.system
-    - group: 4.代码生成模块
-      packages-to-scan: org.dromara.generator
-    - group: 5.工作流模块
-      packages-to-scan: org.dromara.workflow
+    #- group: 4.代码生成模块
+    #  packages-to-scan: org.dromara.generator
+    #- group: 5.工作流模块
+    #  packages-to-scan: org.dromara.workflow
 
 # 防止XSS攻击
 xss:
@@ -252,9 +252,9 @@ websocket:
 --- # warm-flow工作流配置
 warm-flow:
   # 是否开启工作流，默认true
-  enabled: true
+  enabled: false
   # 是否开启设计器ui
-  ui: true
+  ui: false
   # 是否显示流程图顶部文字
   top-text-show: true
   # 是否渲染节点悬浮提示，默认true

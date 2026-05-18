@@ -132,6 +132,8 @@ public class LoginUser implements Serializable {
      */
     private String deviceType;
 
+    private String clientId;
+
     /**
      * 获取登录id
      */
