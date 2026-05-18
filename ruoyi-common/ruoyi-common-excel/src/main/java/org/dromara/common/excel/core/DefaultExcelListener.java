@@ -46,10 +46,21 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
      */
     private Boolean failFast = Boolean.TRUE;
 
+    /**
+     * 构造 Excel 导入监听器。
+     *
+     * @param isValidate 是否执行 Validator 校验
+     */
     public DefaultExcelListener(boolean isValidate) {
         this.isValidate = isValidate;
     }
 
+    /**
+     * 构造 Excel 导入监听器。
+     *
+     * @param isValidate 是否执行 Validator 校验
+     * @param failFast 发生异常时是否立即终止读取
+     */
     public DefaultExcelListener(boolean isValidate, boolean failFast) {
         this.isValidate = isValidate;
         this.failFast = failFast;

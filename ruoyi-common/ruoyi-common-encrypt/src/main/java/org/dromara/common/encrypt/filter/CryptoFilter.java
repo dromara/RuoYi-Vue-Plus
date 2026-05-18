@@ -29,6 +29,13 @@ public class CryptoFilter implements Filter {
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
+    /**
+     * 构造加解密过滤器。
+     *
+     * @param properties API 解密配置
+     * @param requestMappingHandlerMapping 请求映射处理器
+     * @param handlerExceptionResolver 异常处理器
+     */
     public CryptoFilter(ApiDecryptProperties properties,
                         RequestMappingHandlerMapping requestMappingHandlerMapping,
                         HandlerExceptionResolver handlerExceptionResolver) {

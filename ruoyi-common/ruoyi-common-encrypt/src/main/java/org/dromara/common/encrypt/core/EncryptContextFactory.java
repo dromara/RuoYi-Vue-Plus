@@ -17,6 +17,11 @@ public class EncryptContextFactory {
 
     private final EncryptorProperties defaultProperties;
 
+    /**
+     * 构造加密上下文工厂。
+     *
+     * @param defaultProperties 默认加密配置
+     */
     public EncryptContextFactory(EncryptorProperties defaultProperties) {
         this.defaultProperties = defaultProperties;
     }

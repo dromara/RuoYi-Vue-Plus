@@ -19,10 +19,22 @@ public record OnlineUserCleanEvent(Long roleId, Collection<Long> userIds) {
         }
     }
 
+    /**
+     * 创建按角色清理在线用户事件。
+     *
+     * @param roleId 角色 ID
+     * @return 在线用户清理事件
+     */
     public static OnlineUserCleanEvent byRole(Long roleId) {
         return new OnlineUserCleanEvent(roleId, null);
     }
 
+    /**
+     * 创建按用户清理在线用户事件。
+     *
+     * @param userIds 用户 ID 集合
+     * @return 在线用户清理事件
+     */
     public static OnlineUserCleanEvent byUsers(Collection<Long> userIds) {
         return new OnlineUserCleanEvent(null, userIds);
     }

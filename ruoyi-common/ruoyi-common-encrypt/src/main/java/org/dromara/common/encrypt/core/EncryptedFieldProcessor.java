@@ -19,6 +19,12 @@ public class EncryptedFieldProcessor {
     private final EncryptorManager encryptorManager;
     private final EncryptContextFactory contextFactory;
 
+    /**
+     * 构造加密字段处理器。
+     *
+     * @param encryptorManager 加解密管理器
+     * @param contextFactory 加密上下文工厂
+     */
     public EncryptedFieldProcessor(EncryptorManager encryptorManager, EncryptContextFactory contextFactory) {
         this.encryptorManager = encryptorManager;
         this.contextFactory = contextFactory;

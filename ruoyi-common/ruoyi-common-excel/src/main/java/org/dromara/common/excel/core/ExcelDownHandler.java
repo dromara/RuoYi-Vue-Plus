@@ -65,6 +65,11 @@ public class ExcelDownHandler implements SheetWriteHandler {
      */
     private int currentLinkedOptionsSheetIndex;
 
+    /**
+     * 构造 Excel 下拉选处理器。
+     *
+     * @param options 外部指定的下拉选项
+     */
     public ExcelDownHandler(List<DropDownOptions> options) {
         this.dropDownOptions = options;
         this.currentOptionsColumnIndex = 0;

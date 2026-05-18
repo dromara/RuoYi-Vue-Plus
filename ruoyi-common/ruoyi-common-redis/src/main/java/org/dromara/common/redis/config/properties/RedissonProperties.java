@@ -40,6 +40,9 @@ public class RedissonProperties {
      */
     private ClusterServersConfig clusterServersConfig;
 
+    /**
+     * Redisson 单机服务配置。
+     */
     @Data
     @NoArgsConstructor
     public static class SingleServerConfig {
@@ -76,6 +79,9 @@ public class RedissonProperties {
 
     }
 
+    /**
+     * Redisson 集群服务配置。
+     */
     @Data
     @NoArgsConstructor
     public static class ClusterServersConfig {

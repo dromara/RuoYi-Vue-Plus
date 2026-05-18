@@ -31,27 +31,57 @@ public class EncryptorAutoConfiguration {
     @Autowired
     private EncryptorProperties properties;
 
+    /**
+     * 创建字段加解密管理器。
+     *
+     * @param mybatisPlusProperties MyBatis-Plus 配置
+     * @return 字段加解密管理器
+     */
     @Bean
     public EncryptorManager encryptorManager(MybatisPlusProperties mybatisPlusProperties) {
         validateEncryptorProperties(properties);
         return new EncryptorManager(mybatisPlusProperties.getTypeAliasesPackage());
     }
 
+    /**
+     * 创建加密上下文工厂。
+     *
+     * @return 加密上下文工厂
+     */
     @Bean
     public EncryptContextFactory encryptContextFactory() {
         return new EncryptContextFactory(properties);
     }
 
+    /**
+     * 创建加密字段处理器。
+     *
+     * @param encryptorManager 加解密管理器
+     * @param encryptContextFactory 加密上下文工厂
+     * @return 加密字段处理器
+     */
     @Bean
     public EncryptedFieldProcessor encryptedFieldProcessor(EncryptorManager encryptorManager, EncryptContextFactory encryptContextFactory) {
         return new EncryptedFieldProcessor(encryptorManager, encryptContextFactory);
     }
 
+    /**
+     * 创建 MyBatis 入参加密拦截器。
+     *
+     * @param encryptedFieldProcessor 加密字段处理器
+     * @return MyBatis 入参加密拦截器
+     */
     @Bean
     public MybatisEncryptInterceptor mybatisEncryptInterceptor(EncryptedFieldProcessor encryptedFieldProcessor) {
         return new MybatisEncryptInterceptor(encryptedFieldProcessor);
     }
 
+    /**
+     * 创建 MyBatis 出参解密拦截器。
+     *
+     * @param encryptedFieldProcessor 加密字段处理器
+     * @return MyBatis 出参解密拦截器
+     */
     @Bean
     public MybatisDecryptInterceptor mybatisDecryptInterceptor(EncryptedFieldProcessor encryptedFieldProcessor) {
         return new MybatisDecryptInterceptor(encryptedFieldProcessor);
@@ -72,6 +102,5 @@ public class EncryptorAutoConfiguration {
     }
 
 }
-
 
 

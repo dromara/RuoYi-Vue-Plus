@@ -22,6 +22,14 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @ConditionalOnProperty(value = "api-decrypt.enabled", havingValue = "true")
 public class ApiDecryptAutoConfiguration {
 
+    /**
+     * 注册 API 加解密过滤器。
+     *
+     * @param properties API 解密配置
+     * @param requestMappingHandlerMapping 请求映射处理器
+     * @param handlerExceptionResolver 异常处理器
+     * @return API 加解密过滤器
+     */
     @Bean
     @FilterRegistration(
         name = "cryptoFilter",

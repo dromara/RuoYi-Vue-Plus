@@ -39,6 +39,12 @@ public class RepeatSubmitAspect {
 
     private static final ThreadLocal<String> KEY_CACHE = new ThreadLocal<>();
 
+    /**
+     * 请求进入前校验是否重复提交。
+     *
+     * @param point 切点
+     * @param repeatSubmit 防重复提交注解
+     */
     @Before("@annotation(repeatSubmit)")
     public void doBefore(JoinPoint point, RepeatSubmit repeatSubmit) throws Throwable {
         // 如果注解不为0 则使用注解数值

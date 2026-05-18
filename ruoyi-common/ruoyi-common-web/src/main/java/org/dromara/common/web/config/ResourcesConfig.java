@@ -87,6 +87,12 @@ public class ResourcesConfig implements WebMvcConfigurer {
         return new GlobalExceptionHandler();
     }
 
+    /**
+     * 注册响应增强处理器。
+     *
+     * @param jsonValueEnhancer JSON 字段增强器
+     * @return 响应增强处理器
+     */
     @Bean
     public ResponseEnhancementAdvice responseEnhancementAdvice(JsonValueEnhancer jsonValueEnhancer) {
         return new ResponseEnhancementAdvice(jsonValueEnhancer);

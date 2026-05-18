@@ -40,6 +40,11 @@ public class RedisConfig {
     @Autowired
     private RedissonProperties redissonProperties;
 
+    /**
+     * 自定义 Redisson 序列化、线程与连接模式配置。
+     *
+     * @return Redisson 自动配置定制器
+     */
     @Bean
     public RedissonAutoConfigurationCustomizer redissonCustomizer() {
         return config -> {

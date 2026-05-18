@@ -26,6 +26,12 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
     private PrintWriter printWriter;
     private Charset charset;
 
+    /**
+     * 构造加密响应包装器。
+     *
+     * @param response 原始响应
+     * @throws IOException 创建输出流异常
+     */
     public EncryptResponseBodyWrapper(HttpServletResponse response) throws IOException {
         super(response);
         this.byteArrayOutputStream = new ByteArrayOutputStream();
@@ -62,11 +68,23 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
         byteArrayOutputStream.reset();
     }
 
+    /**
+     * 获取已缓存的响应字节。
+     *
+     * @return 响应字节数组
+     * @throws IOException 刷新响应缓冲异常
+     */
     public byte[] getResponseData() throws IOException {
         flushBuffer();
         return byteArrayOutputStream.toByteArray();
     }
 
+    /**
+     * 获取已缓存的响应内容。
+     *
+     * @return 响应文本
+     * @throws IOException 刷新响应缓冲异常
+     */
     public String getContent() throws IOException {
         flushBuffer();
         return byteArrayOutputStream.toString(charset);

@@ -40,6 +40,11 @@ public class DataWriteHandler implements SheetWriteHandler, CellWriteHandler {
     private final Map<String, Short> headColumnMap;
 
 
+    /**
+     * 构造批注与必填样式处理器。
+     *
+     * @param clazz 表头类型
+     */
     public DataWriteHandler(Class<?> clazz) {
         notationMap = getNotationMap(clazz);
         headColumnMap = getRequiredMap(clazz);

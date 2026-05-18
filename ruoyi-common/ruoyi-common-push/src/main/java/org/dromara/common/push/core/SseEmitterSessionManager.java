@@ -33,6 +33,12 @@ public class SseEmitterSessionManager implements PushSessionManager {
 
     private final MessageProperties messageProperties;
 
+    /**
+     * 构造 SSE 会话管理器并启动心跳检测。
+     *
+     * @param scheduledExecutorService 定时任务线程池
+     * @param messageProperties 消息推送配置
+     */
     public SseEmitterSessionManager(ScheduledExecutorService scheduledExecutorService, MessageProperties messageProperties) {
         this.messageProperties = messageProperties;
         // 定时执行 SSE 心跳检测

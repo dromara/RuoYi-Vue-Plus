@@ -25,6 +25,14 @@ public class DecryptRequestBodyWrapper extends HttpServletRequestWrapper {
 
     private final byte[] body;
 
+    /**
+     * 解密请求体并缓存为可重复读取的 JSON 请求体。
+     *
+     * @param request 原始请求
+     * @param privateKey RSA 私钥
+     * @param headerFlag 加密密钥请求头
+     * @throws IOException 读取请求体异常
+     */
     public DecryptRequestBodyWrapper(HttpServletRequest request, String privateKey, String headerFlag) throws IOException {
         super(request);
         // 获取 AES 密码 采用 RSA 加密

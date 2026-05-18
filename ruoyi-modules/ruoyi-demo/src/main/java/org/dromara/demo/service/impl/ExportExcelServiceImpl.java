@@ -232,6 +232,13 @@ public class ExportExcelServiceImpl implements IExportExcelService {
          */
         private DemoCityData pData;
 
+        /**
+         * 构造城市演示数据。
+         *
+         * @param id 数据库 id
+         * @param pid 父级 id
+         * @param name 名称
+         */
         public DemoCityData(Integer id, Integer pid, String name) {
             this.id = id;
             this.pid = pid;

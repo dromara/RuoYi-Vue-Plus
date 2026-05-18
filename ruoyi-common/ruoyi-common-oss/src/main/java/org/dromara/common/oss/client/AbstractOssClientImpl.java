@@ -86,6 +86,12 @@ public abstract class AbstractOssClientImpl implements OssClient {
      */
     protected ExecutorService asyncExecutor;
 
+    /**
+     * 构造 S3 存储客户端基础实现。
+     *
+     * @param clientId 客户端 ID
+     * @param config S3 存储客户端配置
+     */
     public AbstractOssClientImpl(String clientId, OssClientConfig config) {
         Assert.notNull(config, () -> S3StorageException.form("S3StorageClientConfig must not be null"));
         // 如果没有设置存储客户端ID，则随机生成一个
