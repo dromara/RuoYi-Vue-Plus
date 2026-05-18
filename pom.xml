@@ -14,7 +14,7 @@
 
     <properties>
         <revision>5.5.3</revision>
-        <spring-boot.version>4.0.3</spring-boot.version>
+        <spring-boot.version>4.0.6</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
@@ -28,7 +28,7 @@
         <mybatis-plus-join.version>1.5.6</mybatis-plus-join.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.44</hutool.version>
-        <spring-boot-admin.version>4.0.2</spring-boot-admin.version>
+        <spring-boot-admin.version>4.0.4</spring-boot-admin.version>
         <redisson.version>4.4.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.5.0</dynamic-ds.version>
