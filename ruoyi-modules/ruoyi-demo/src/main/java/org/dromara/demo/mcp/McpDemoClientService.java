@@ -4,11 +4,12 @@ import org.dromara.common.mcp.core.McpClientTemplate;
 import org.dromara.common.mcp.core.McpResourceReadResult;
 import org.dromara.common.mcp.core.McpToolCallResult;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * MCP Client 演示服务，从外部 MCP Server 接收数据后交给业务层处理。
@@ -16,6 +17,7 @@ import java.util.Map;
  * 本服务会注入 Spring AI 自动创建的多个 `McpSyncClient`。当
  * `spring.ai.mcp.client.enabled=true` 且配置了多个 connection 时，
  * 这里可以统一遍历这些 MCP Server。
+ * 未启用 MCP Client 时，本服务仍会注册，避免演示 Controller 影响应用启动。
  * <p>
  * 如果要用当前项目自己连自己测试，建议启动两个 `ruoyi-admin` 实例：
  * 一个作为 server，一个作为 client，client 指向 server 的地址。
@@ -24,10 +26,9 @@ import java.util.Map;
  */
 @Service
 @RequiredArgsConstructor
-@ConditionalOnBean(McpClientTemplate.class)
 public class McpDemoClientService {
 
-    private final McpClientTemplate mcpClientTemplate;
+    private final ObjectProvider<McpClientTemplate> mcpClientTemplateProvider;
 
     /**
      * 查询已接入的 MCP Server 与工具列表。
@@ -35,7 +36,7 @@ public class McpDemoClientService {
      * @return Server 名称与工具名称列表
      */
     public Map<String, List<String>> listRemoteTools() {
-        return mcpClientTemplate.listTools();
+        return execute(McpClientTemplate::listTools);
     }
 
     /**
@@ -46,7 +47,7 @@ public class McpDemoClientService {
      * @return 工具返回内容
      */
     public Map<String, McpToolCallResult> callRemoteTool(String toolName, Map<String, Object> arguments) {
-        return mcpClientTemplate.callTool(toolName, arguments);
+        return execute(template -> template.callTool(toolName, arguments));
     }
 
     /**
@@ -56,7 +57,7 @@ public class McpDemoClientService {
      * @return 资源内容
      */
     public Map<String, McpResourceReadResult> readRemoteResource(String uri) {
-        return mcpClientTemplate.readResource(uri);
+        return execute(template -> template.readResource(uri));
     }
 
     /**
@@ -70,6 +71,14 @@ public class McpDemoClientService {
      */
     public McpDemoHandleResult receiveAndHandle(String toolName, Map<String, Object> arguments) {
         return new McpDemoHandleResult("MCP", true, callRemoteTool(toolName, arguments));
+    }
+
+    private <T> T execute(Function<McpClientTemplate, T> action) {
+        McpClientTemplate template = mcpClientTemplateProvider.getIfAvailable();
+        if (template == null) {
+            throw new IllegalStateException("MCP Client 未启用，请配置 spring.ai.mcp.client.enabled=true 并设置 connections");
+        }
+        return action.apply(template);
     }
 
     /**
