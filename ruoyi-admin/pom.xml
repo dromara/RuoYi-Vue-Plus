@@ -116,6 +116,11 @@
 <!--            <version>${与你的agent探针版本保持一致}</version>-->
 <!--        </dependency>-->
 
+        <!--<dependency>
+            <groupId>com.wudgaby.ai</groupId>
+            <artifactId>ai-structured</artifactId>
+        </dependency>-->
+
     </dependencies>
 
     <build>

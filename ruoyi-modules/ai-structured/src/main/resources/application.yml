@@ -1,0 +1,70 @@
+# 开发环境配置
+server:
+  # 服务器的HTTP端口，默认为8080
+  port: 8080
+  servlet:
+    # 应用的访问路径
+    context-path: /
+  # undertow 配置
+  undertow:
+    # HTTP post内容的最大大小。当值为-1时，默认值为大小是无限的
+    max-http-post-size: 1GB
+    # 以下的配置会影响buffer,这些buffer会用于服务器连接的IO操作,有点类似netty的池化内存管理
+    # 每块buffer的空间大小,越小的空间被利用越充分
+    buffer-size: 512
+    # 是否分配的直接内存
+    direct-buffers: true
+    threads:
+      # 设置IO线程数, 它主要执行非阻塞的任务,它们会负责多个连接, 默认设置每个CPU核心一个线程
+      io: 8
+      # 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载
+      worker: 256
+
+spring:
+ application:
+    name: intelligent-ticket-router
+
+ threads:
+  virtual:
+     enabled: true
+
+ ai:
+  deepseek:
+    api-key: ${OPENAI_API_KEY:sk-0b22a3195a834bcdb5f52cef0e0f4445}
+    chat:
+     options:
+       model: deepseek-4-pro
+       temperature: 0.1
+       max-tokens: 800
+
+ data:
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    timeout: 2s
+    password: pwd123
+
+ kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+management:
+ endpoints:
+  web:
+   exposure:
+      include: health,info,prometheus,metrics
+
+resilience4j:
+ timelimiter:
+  instances:
+   ticketDecision:
+      timeout-duration: 3s
+ circuitbreaker:
+  instances:
+   ticketDecision:
+      sliding-window-size: 50
+      failure-rate-threshold: 50
+      wait-duration-in-open-state: 20s
+ bulkhead:
+  instances:
+   ticketDecision:
+      max-concurrent-calls: 100

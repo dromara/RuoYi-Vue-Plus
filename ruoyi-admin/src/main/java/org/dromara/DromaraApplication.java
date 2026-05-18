@@ -10,7 +10,7 @@ import org.springframework.boot.context.metrics.buffering.BufferingApplicationSt
  * @author Lion Li
  */
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"org.dromara", "com.wudgaby"})
 public class DromaraApplication {
 
     public static void main(String[] args) {

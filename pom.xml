@@ -102,6 +102,14 @@
     <dependencyManagement>
         <dependencies>
 
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>1.1.6</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- SpringBoot的依赖配置-->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -355,6 +363,12 @@
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-demo</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.wudgaby.ai</groupId>
+                <artifactId>ai-structured</artifactId>
                 <version>${revision}</version>
             </dependency>
 
