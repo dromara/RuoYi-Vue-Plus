@@ -52,6 +52,8 @@
         <warm-flow.version>1.8.7</warm-flow.version>
         <!-- mqtt客户端 -->
         <mica-mqtt.version>2.5.12</mica-mqtt.version>
+        <!-- Spring AI 2.0 预览版，正式版发布后仅需调整此版本号 -->
+        <spring-ai.version>2.0.0-M6</spring-ai.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
@@ -109,6 +111,15 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring AI MCP 依赖配置 -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

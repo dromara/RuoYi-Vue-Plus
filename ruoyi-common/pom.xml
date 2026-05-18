@@ -37,6 +37,7 @@
         <module>ruoyi-common-encrypt</module>
         <module>ruoyi-common-push</module>
         <module>ruoyi-common-mqtt</module>
+        <module>ruoyi-common-mcp</module>
     </modules>
 
 </project>

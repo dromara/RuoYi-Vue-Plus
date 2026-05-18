@@ -281,3 +281,49 @@ mqtt.client:
     keystore-pass:
     truststore-path:
     truststore-pass:
+
+--- # MCP 服务端配置
+spring.ai.mcp:
+  server:
+    # 与 ruoyi-admin 共用端口，默认端点为 /mcp
+    enabled: true
+    protocol: STREAMABLE
+    name: ${spring.application.name}
+    version: ${project.version}
+    type: SYNC
+    annotation-scanner:
+      enabled: true
+    streamable-http:
+      mcp-endpoint: /mcp
+
+--- # MCP 客户端配置
+spring.ai.mcp:
+  client:
+    # 需要接入外部 MCP Server 时再打开，并配置 streamable-http/sse/stdio connections
+    enabled: false
+    name: ${spring.application.name}-mcp-client
+    version: ${project.version}
+    type: SYNC
+    toolcallback:
+      enabled: false
+    # Streamable HTTP 多服务端示例
+    streamable-http:
+      connections:
+        knowledge:
+          url: http://localhost:9001
+        crm:
+          url: http://localhost:9002
+    # SSE 多服务端示例
+    sse:
+      connections:
+        search:
+          url: http://localhost:9003
+    # STDIO 多服务端示例
+    stdio:
+      connections:
+        filesystem:
+          command: npx
+          args:
+            - -y
+            - '@modelcontextprotocol/server-filesystem'
+            - D:/data

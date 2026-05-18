@@ -98,6 +98,11 @@
             <artifactId>ruoyi-common-mqtt</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-common-mcp</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
