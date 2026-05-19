@@ -29,13 +29,21 @@ spring:
      enabled: true
 
  ai:
-  deepseek:
-    api-key: ${OPENAI_API_KEY:sk-0b22a3195a834bcdb5f52cef0e0f4445}
+  chat:
+    client:
+      enabled: false
+  openai:
+    api-key: ${api-key}
+    base-url: https://api.deepseek.com
     chat:
-     options:
-       model: deepseek-4-pro
-       temperature: 0.1
-       max-tokens: 800
+      options:
+        model: deepseek-v4-pro
+        max-tokens: 800
+  deepseek:
+    api-key: ${api-key}
+    chat:
+      options:
+        model: deepseek-chat
 
  data:
   redis:
@@ -46,6 +54,30 @@ spring:
 
  kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${ticket.kafka.consumer-group}
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.wudgaby.ticket.*
+        spring.json.use.type.headers: false
+    producer:
+      acks: all
+      retries: 3
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    listener:
+      ack-mode: record
+      concurrency: 3
+
+ticket:
+  kafka:
+    analysis-topic: ticket-analysis
+    result-topic: ticket-routing-result
+    consumer-group: ticket-router
+    dlt-suffix: .dlt
 
 management:
  endpoints:
@@ -68,3 +100,5 @@ resilience4j:
   instances:
    ticketDecision:
       max-concurrent-calls: 100
+
+api-key: sk-0b22a3195a834bcdb5f52cef0e0f4445

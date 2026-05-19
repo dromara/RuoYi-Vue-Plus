@@ -1,6 +1,6 @@
 package com.wudgaby.ticket.domain;
 
-import cn.hutool.extra.ssh.ChannelType;
+import com.wudgaby.ticket.enums.ChannelType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

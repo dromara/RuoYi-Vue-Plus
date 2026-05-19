@@ -10,8 +10,8 @@ public class TicketDecisionClient {
     private final
     ChatClient chatClient;
 
-    public TicketDecisionClient(ChatClient.Builder builder) {
-        this.chatClient = builder.build();
+    public TicketDecisionClient(ChatClient structuredOutputChatClient) {
+        this.chatClient = structuredOutputChatClient;
     }
 
     public TicketRoutingDecision analyze(String content) {
