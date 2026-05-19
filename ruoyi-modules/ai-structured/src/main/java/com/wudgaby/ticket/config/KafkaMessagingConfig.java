@@ -58,6 +58,30 @@ public class KafkaMessagingConfig {
     }
 
     @Bean
+    ConsumerFactory<String, TicketRoutingResult> routingResultConsumerFactory(
+        KafkaProperties kafkaProperties,
+        ObjectMapper objectMapper) {
+        Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        JsonDeserializer<TicketRoutingResult> valueDeserializer =
+            new JsonDeserializer<>(TicketRoutingResult.class, objectMapper);
+        valueDeserializer.addTrustedPackages("com.wudgaby.ticket.*");
+        valueDeserializer.setUseTypeHeaders(false);
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), valueDeserializer);
+    }
+
+    @Bean
+    ConcurrentKafkaListenerContainerFactory<String, TicketRoutingResult> routingResultListenerContainerFactory(
+        ConsumerFactory<String, TicketRoutingResult> routingResultConsumerFactory,
+        DefaultErrorHandler ticketKafkaErrorHandler) {
+        ConcurrentKafkaListenerContainerFactory<String, TicketRoutingResult> factory =
+            new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(routingResultConsumerFactory);
+        factory.setCommonErrorHandler(ticketKafkaErrorHandler);
+        return factory;
+    }
+
+    @Bean
     ProducerFactory<String, TicketAnalysisCommand> ticketAnalysisProducerFactory(
         KafkaProperties kafkaProperties,
         ObjectMapper objectMapper) {

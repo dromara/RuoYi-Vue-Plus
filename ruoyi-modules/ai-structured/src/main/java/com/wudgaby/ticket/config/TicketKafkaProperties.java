@@ -7,6 +7,7 @@ public record TicketKafkaProperties(
     String analysisTopic,
     String resultTopic,
     String consumerGroup,
+    String resultConsumerGroup,
     String dltSuffix
 ) {
 }
