@@ -29,7 +29,7 @@ public class SysPermissionServiceImpl implements ISysPermissionService, Permissi
     /**
      * 获取角色数据权限
      *
-     * @param userId  用户id
+     * @param userId 用户id
      * @return 角色权限信息
      */
     @Override
@@ -47,7 +47,7 @@ public class SysPermissionServiceImpl implements ISysPermissionService, Permissi
     /**
      * 获取菜单数据权限
      *
-     * @param userId  用户id
+     * @param userId 用户id
      * @return 菜单权限信息
      */
     @Override
@@ -76,11 +76,11 @@ public class SysPermissionServiceImpl implements ISysPermissionService, Permissi
         List<Long> roleIds = StreamUtils.toList(roles, RoleDTO::getRoleId);
         Map<Long, Set<String>> permsRoleIds = menuService.selectMenuPermsByRoleIds(roleIds);
         Map<String, List<Long>> rolePermsMap = new LinkedHashMap<>();
-        permsRoleIds.forEach((roleId, perms) ->  {
-            perms.forEach(perm -> {
-                rolePermsMap.computeIfAbsent(perm, key -> new ArrayList<>()).add(roleId);
-            });
-        });
+        permsRoleIds.forEach((roleId, perms) ->
+            perms.forEach(perm ->
+                rolePermsMap.computeIfAbsent(perm, key -> new ArrayList<>()).add(roleId)
+            )
+        );
         return rolePermsMap;
     }
 }

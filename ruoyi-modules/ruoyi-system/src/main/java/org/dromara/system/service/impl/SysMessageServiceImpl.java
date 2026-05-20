@@ -209,11 +209,11 @@ public class SysMessageServiceImpl implements ISysMessageService, MessageService
             // 仅查询30天内消息
             .ge(SysMessage::getCreateTime, LocalDateTime.now().minusDays(BOX_DAYS))
             // 全局消息 或 当前用户在接收人范围内
-            .and(wrapper -> {
+            .and(wrapper ->
                 wrapper.eq(SysMessage::getSendUserIds, GLOBAL_USER_IDS)
-                    .or()
-                    .findInSet(userId, SysMessage::getSendUserIds);
-            })
+                .or()
+                .findInSet(userId, SysMessage::getSendUserIds)
+            )
             .orderByDesc(SysMessage::getCreateTime, SysMessage::getMessageId)
             // 分页查询（只查第一页，最多100条）
             .list(new Page<>(1, BOX_LIMIT, false));

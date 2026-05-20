@@ -201,10 +201,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
             .select(SysOssConfig::getOssConfigId, SysOssConfig::getConfigKey)
             .eq(SysOssConfig::getConfigKey, sysOssConfig.getConfigKey())
             .one();
-        if (ObjectUtil.isNotNull(info) && info.getOssConfigId() != ossConfigId) {
-            return false;
-        }
-        return true;
+        return ObjectUtil.isNull(info) || ObjectUtil.equals(info.getOssConfigId(), ossConfigId);
     }
 
     /**

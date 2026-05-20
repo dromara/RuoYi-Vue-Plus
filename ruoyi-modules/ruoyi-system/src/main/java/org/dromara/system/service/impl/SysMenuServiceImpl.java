@@ -354,9 +354,9 @@ public class SysMenuServiceImpl implements ISysMenuService {
         String routeName = StringUtils.isEmpty(menu.getRouteName()) ? path : menu.getRouteName();
         List<SysMenu> sysMenuList = menuMapper.lambda()
             .in(SysMenu::getMenuType, SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
-            .and(w -> {
-                w.eq(SysMenu::getPath, path).or().eq(SysMenu::getPath, routeName);
-            }).list();
+            .and(w ->
+                w.eq(SysMenu::getPath, path).or().eq(SysMenu::getPath, routeName)
+            ).list();
         for (SysMenu sysMenu : sysMenuList) {
             if (!sysMenu.getMenuId().equals(menuId)) {
                 Long dbParentId = sysMenu.getParentId();

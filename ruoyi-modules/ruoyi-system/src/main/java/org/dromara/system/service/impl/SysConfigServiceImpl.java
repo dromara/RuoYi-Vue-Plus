@@ -88,7 +88,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      */
     @Override
     public boolean selectRegisterEnabled() {
-        return Convert.toBool(this.selectConfigByKey("sys.account.registerUser"));
+        return Convert.toBool(this.getConfigValue("sys.account.registerUser"));
     }
 
     /**
@@ -146,7 +146,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     @CachePut(cacheNames = CacheNames.SYS_CONFIG, key = "#bo.configKey")
     @Override
     public String updateConfig(SysConfigBo bo) {
-        int row = 0;
+        int row;
         SysConfig config = MapstructUtils.convert(bo, SysConfig.class);
         if (config.getConfigId() != null) {
             SysConfig temp = configMapper.selectById(config.getConfigId());
