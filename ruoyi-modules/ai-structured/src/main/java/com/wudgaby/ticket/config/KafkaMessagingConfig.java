@@ -37,7 +37,7 @@ public class KafkaMessagingConfig {
     ConsumerFactory<String, TicketAnalysisCommand> ticketAnalysisConsumerFactory(
         KafkaProperties kafkaProperties,
         ObjectMapper objectMapper) {
-        Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
+        Map<String, Object> props = consumerPropsWithoutValueDeserializer(kafkaProperties);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         JsonDeserializer<TicketAnalysisCommand> valueDeserializer =
             new JsonDeserializer<>(TicketAnalysisCommand.class, objectMapper);
@@ -61,7 +61,7 @@ public class KafkaMessagingConfig {
     ConsumerFactory<String, TicketRoutingResult> routingResultConsumerFactory(
         KafkaProperties kafkaProperties,
         ObjectMapper objectMapper) {
-        Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
+        Map<String, Object> props = consumerPropsWithoutValueDeserializer(kafkaProperties);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         JsonDeserializer<TicketRoutingResult> valueDeserializer =
             new JsonDeserializer<>(TicketRoutingResult.class, objectMapper);
@@ -85,9 +85,8 @@ public class KafkaMessagingConfig {
     ProducerFactory<String, TicketAnalysisCommand> ticketAnalysisProducerFactory(
         KafkaProperties kafkaProperties,
         ObjectMapper objectMapper) {
-        Map<String, Object> props = new HashMap<>(kafkaProperties.buildProducerProperties());
+        Map<String, Object> props = producerPropsWithoutValueSerializer(kafkaProperties);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return new DefaultKafkaProducerFactory<>(
             props,
             new StringSerializer(),
@@ -104,9 +103,8 @@ public class KafkaMessagingConfig {
     ProducerFactory<String, TicketRoutingResult> routingResultProducerFactory(
         KafkaProperties kafkaProperties,
         ObjectMapper objectMapper) {
-        Map<String, Object> props = new HashMap<>(kafkaProperties.buildProducerProperties());
+        Map<String, Object> props = producerPropsWithoutValueSerializer(kafkaProperties);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return new DefaultKafkaProducerFactory<>(
             props,
             new StringSerializer(),
@@ -136,5 +134,23 @@ public class KafkaMessagingConfig {
         DefaultErrorHandler handler = new DefaultErrorHandler(recoverer, new FixedBackOff(2_000L, 3L));
         handler.addNotRetryableExceptions(IllegalArgumentException.class);
         return handler;
+    }
+
+    /**
+     * Explicit JsonDeserializer instances must not also receive JsonDeserializer config via consumer properties.
+     */
+    private static Map<String, Object> consumerPropsWithoutValueDeserializer(KafkaProperties kafkaProperties) {
+        Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
+        props.remove(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG);
+        props.remove(JsonDeserializer.TRUSTED_PACKAGES);
+        props.remove(JsonDeserializer.USE_TYPE_INFO_HEADERS);
+        props.remove(JsonDeserializer.VALUE_DEFAULT_TYPE);
+        return props;
+    }
+
+    private static Map<String, Object> producerPropsWithoutValueSerializer(KafkaProperties kafkaProperties) {
+        Map<String, Object> props = new HashMap<>(kafkaProperties.buildProducerProperties());
+        props.remove(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG);
+        return props;
     }
 }

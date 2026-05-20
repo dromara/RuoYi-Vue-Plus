@@ -90,12 +90,13 @@ resilience4j:
  timelimiter:
   instances:
    ticketDecision:
-      timeout-duration: 3s
+      timeout-duration: 30s
  circuitbreaker:
   instances:
    ticketDecision:
       sliding-window-size: 50
-      failure-rate-threshold: 50
+      failure-rate-threshold: 80
+      minimum-number-of-calls: 3  # 至少 N 次后再算失败率
       wait-duration-in-open-state: 20s
  bulkhead:
   instances:
