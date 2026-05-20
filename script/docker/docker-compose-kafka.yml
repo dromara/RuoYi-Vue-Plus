@@ -1,3 +1,5 @@
+name: kafka-dev
+
 services:
   kafka:
     image: apache/kafka:3.8.0
