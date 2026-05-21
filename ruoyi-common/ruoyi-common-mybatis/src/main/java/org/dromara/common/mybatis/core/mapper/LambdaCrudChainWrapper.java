@@ -189,7 +189,7 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
      * @return this
      */
     public LambdaCrudChainWrapper<T, V> setIfText(SFunction<T, ?> column, String value) {
-        return set(org.dromara.common.core.utils.StringUtils.isNotBlank(value), column, value);
+        return set(StringUtils.isNotBlank(value), column, value);
     }
 
     /**

@@ -5,7 +5,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.lock.annotation.Lock4j;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +75,8 @@ import static org.dromara.workflow.common.constant.FlowConstant.*;
 @RequiredArgsConstructor
 @Service
 public class FlwTaskServiceImpl implements IFlwTaskService {
+
+    private static final String NODE_KEY_SEPARATOR = ":";
 
     private final TaskService taskService;
     private final InsService insService;
@@ -311,17 +312,17 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
                 if (StringUtils.isNotBlank(userIds)) {
                     Set<String> hashSet = new HashSet<>();
                     //弹窗传入的选人
-                    List<String> popUserIds = Arrays.asList(entry.getValue().toString().split(StringUtils.SEPARATOR));
+                    List<String> popUserIds = StringUtils.str2List(entry.getValue().toString(), StringUtils.SEPARATOR, true, true);
                     //已有的选人
-                    List<String> variableUserIds = Arrays.asList(userIds.split(StringUtils.SEPARATOR));
+                    List<String> variableUserIds = StringUtils.str2List(userIds, StringUtils.SEPARATOR, true, true);
                     hashSet.addAll(popUserIds);
                     hashSet.addAll(variableUserIds);
-                    map.put(TaskStatusEnum.PASS.getStatus() + StrUtil.COLON + entry.getKey(), StringUtils.joinComma(hashSet));
-                    map.put(TaskStatusEnum.BACK.getStatus() + StrUtil.COLON + entry.getKey(), StringUtils.joinComma(hashSet));
+                    map.put(TaskStatusEnum.PASS.getStatus() + NODE_KEY_SEPARATOR + entry.getKey(), StringUtils.joinComma(hashSet));
+                    map.put(TaskStatusEnum.BACK.getStatus() + NODE_KEY_SEPARATOR + entry.getKey(), StringUtils.joinComma(hashSet));
                 }
             } else {
-                map.put(TaskStatusEnum.PASS.getStatus() + StrUtil.COLON + entry.getKey(), entry.getValue());
-                map.put(TaskStatusEnum.BACK.getStatus() + StrUtil.COLON + entry.getKey(), entry.getValue());
+                map.put(TaskStatusEnum.PASS.getStatus() + NODE_KEY_SEPARATOR + entry.getKey(), entry.getValue());
+                map.put(TaskStatusEnum.BACK.getStatus() + NODE_KEY_SEPARATOR + entry.getKey(), entry.getValue());
             }
         }
         return map;
@@ -838,7 +839,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         // 操作执行成功后再发送消息
         if (result && CollUtil.isNotEmpty(bo.getMessageType())) {
             List<Long> userIdList = new ArrayList<>();
-            if (StrUtil.isNotBlank(bo.getUserId())) {
+            if (StringUtils.isNotBlank(bo.getUserId())) {
                 userIdList.add(Convert.toLong(bo.getUserId()));
             }
             if (CollUtil.isNotEmpty(bo.getUserIds())) {

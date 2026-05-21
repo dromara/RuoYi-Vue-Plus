@@ -1,13 +1,13 @@
 package org.dromara.demo.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
 import org.apache.fesod.sheet.write.metadata.WriteSheet;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.StreamUtils;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.excel.core.DropDownOptions;
 import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.excel.utils.ExcelWriterWrapper;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 导出下拉框Excel示例
@@ -109,12 +108,12 @@ public class ExportExcelServiceImpl implements IExportExcelService {
 
     private String buildOptions(List<DemoCityData> cityDataList, Integer id) {
         Map<Integer, List<DemoCityData>> groupByIdMap =
-            cityDataList.stream().collect(Collectors.groupingBy(DemoCityData::getId));
+            StreamUtils.groupByKey(cityDataList, DemoCityData::getId);
         if (groupByIdMap.containsKey(id)) {
             DemoCityData demoCityData = groupByIdMap.get(id).get(0);
             return DropDownOptions.createOptionValue(demoCityData.getName(), demoCityData.getId());
         } else {
-            return StrUtil.EMPTY;
+            return StringUtils.EMPTY;
         }
     }
 
@@ -201,7 +200,7 @@ public class ExportExcelServiceImpl implements IExportExcelService {
      */
     private void selectParentData(List<DemoCityData> parentList, List<DemoCityData> sonList) {
         Map<Integer, List<DemoCityData>> parentGroupByIdMap =
-            parentList.stream().collect(Collectors.groupingBy(DemoCityData::getId));
+            StreamUtils.groupByKey(parentList, DemoCityData::getId);
 
         sonList.forEach(everySon -> {
             if (parentGroupByIdMap.containsKey(everySon.getPid())) {

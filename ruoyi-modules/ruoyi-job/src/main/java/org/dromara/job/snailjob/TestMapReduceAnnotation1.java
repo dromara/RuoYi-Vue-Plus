@@ -10,11 +10,11 @@ import com.aizuda.snailjob.client.job.core.dto.MapArgs;
 import com.aizuda.snailjob.client.job.core.dto.ReduceArgs;
 import com.aizuda.snailjob.common.log.SnailJobLog;
 import com.aizuda.snailjob.model.dto.ExecuteResult;
+import org.dromara.common.core.utils.StreamUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -31,12 +31,11 @@ public class TestMapReduceAnnotation1 {
     @MapExecutor
     public ExecuteResult rootMapExecute(MapArgs mapArgs, MapHandler mapHandler) {
         int partitionSize = 50;
-        List<List<Integer>> partition = IntStream.rangeClosed(1, 200)
-                .boxed()
-                .collect(Collectors.groupingBy(i -> (i - 1) / partitionSize))
-                .values()
-                .stream()
-                .toList();
+        List<Integer> sourceList = IntStream.rangeClosed(1, 200).boxed().toList();
+        List<List<Integer>> partition = StreamUtils.groupByKey(sourceList, i -> (i - 1) / partitionSize)
+            .values()
+            .stream()
+            .toList();
         SnailJobLog.REMOTE.info("端口:{}完成分配任务", SpringUtil.getProperty("server.port"));
         return mapHandler.doMap(partition, "doCalc");
     }

@@ -5,7 +5,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.DateUtils;
@@ -45,6 +44,8 @@ import java.util.stream.Collectors;
 public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, HandlerSelectService {
 
     private static final String DEFAULT_GROUP_NAME = "默认分组";
+    private static final String STORAGE_ID_SEPARATOR = ":";
+
     private final TaskAssigneeService taskAssigneeService;
     private final UserService userService;
     private final DeptService deptService;
@@ -208,7 +209,7 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
             return List.of();
         }
         Map<TaskAssigneeEnum, List<String>> typeIdMap = new EnumMap<>(TaskAssigneeEnum.class);
-        for (String storageId : storageIds.split(StringUtils.SEPARATOR)) {
+        for (String storageId : StringUtils.str2List(storageIds, StringUtils.SEPARATOR, true, true)) {
             Pair<TaskAssigneeEnum, String> parsed = this.parseStorageId(storageId);
             if (parsed != null) {
                 typeIdMap.computeIfAbsent(parsed.getKey(), k -> new ArrayList<>()).add(parsed.getValue());
@@ -311,11 +312,11 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
             return Pair.of(TaskAssigneeEnum.SPEL, storageId);
         }
         try {
-            String[] parts = storageId.split(StrUtil.COLON, 2);
+            String[] parts = storageId.split(STORAGE_ID_SEPARATOR, 2);
             if (parts.length < 2) {
                 return Pair.of(TaskAssigneeEnum.USER, parts[0]);
             } else {
-                TaskAssigneeEnum type = TaskAssigneeEnum.fromCode(parts[0] + StrUtil.COLON);
+                TaskAssigneeEnum type = TaskAssigneeEnum.fromCode(parts[0] + STORAGE_ID_SEPARATOR);
                 return Pair.of(type, parts[1]);
             }
         } catch (Exception e) {

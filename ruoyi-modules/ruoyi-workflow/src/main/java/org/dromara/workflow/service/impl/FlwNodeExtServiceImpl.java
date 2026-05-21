@@ -259,7 +259,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
             } else if (VariablesEnum.class.getSimpleName().equals(code)) {
                 // 解析自定义参数
                 // 将 key=value 字符串拆分为 Map
-                Map<String, String> variables = Arrays.stream(StringUtils.split(value, StringUtils.SEPARATOR))
+                Map<String, String> variables = StringUtils.str2List(value, StringUtils.SEPARATOR, true, true).stream()
                     .map(s -> StringUtils.split(s, "="))
                     .filter(arr -> arr.length == 2)
                     .collect(Collectors.toMap(arr -> arr[0], arr -> arr[1]));

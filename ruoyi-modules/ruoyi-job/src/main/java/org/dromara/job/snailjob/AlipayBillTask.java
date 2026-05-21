@@ -1,11 +1,11 @@
 package org.dromara.job.snailjob;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.job.core.dto.JobArgs;
 import com.aizuda.snailjob.common.log.SnailJobLog;
 import com.aizuda.snailjob.model.dto.ExecuteResult;
+import org.dromara.common.core.utils.DateUtils;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.job.entity.BillDTO;
 import org.springframework.stereotype.Component;
@@ -25,8 +25,8 @@ public class AlipayBillTask {
     public ExecuteResult jobExecute(JobArgs jobArgs) throws InterruptedException {
         // 设置清算日期
         String settlementDate = (String) jobArgs.getWfContext().get("settlementDate");
-        if (StrUtil.equals(settlementDate, "sysdate")) {
-            settlementDate = DateUtil.today();
+        if (StringUtils.equals(settlementDate, "sysdate")) {
+            settlementDate = DateUtils.getDate();
         }
         BillDTO billDTO = new BillDTO(23456789L, "alipay", settlementDate, new BigDecimal("2345.67"));
         // 把billDTO对象放入上下文进行传递

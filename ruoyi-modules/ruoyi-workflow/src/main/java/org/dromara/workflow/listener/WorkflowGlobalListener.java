@@ -5,7 +5,6 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.enums.BusinessStatusEnum;
@@ -47,6 +46,8 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 public class WorkflowGlobalListener implements GlobalListener {
+
+    private static final String NODE_KEY_SEPARATOR = ":";
 
     private final IFlwTaskService flwTaskService;
     private final IFlwInstanceService flwInstanceService;
@@ -138,7 +139,7 @@ public class WorkflowGlobalListener implements GlobalListener {
      * @param taskStatus 任务状态
      */
     private void processTaskPermission(Map<String, Object> variable, Task flowTask, String taskStatus) {
-        String nodeKey = taskStatus + StrUtil.COLON + flowTask.getNodeCode();
+        String nodeKey = taskStatus + NODE_KEY_SEPARATOR + flowTask.getNodeCode();
 
         // 检查是否存在状态相关的变量
         if (!variable.containsKey(nodeKey)) {
@@ -157,9 +158,9 @@ public class WorkflowGlobalListener implements GlobalListener {
         }
 
         // 分割用户ID并设置权限列表
-        String[] userIdArray = userIds.split(StringUtils.SEPARATOR);
-        if (userIdArray.length > 0) {
-            flowTask.setPermissionList(List.of(userIdArray));
+        List<String> userIdList = StringUtils.str2List(userIds, StringUtils.SEPARATOR, true, true);
+        if (CollUtil.isNotEmpty(userIdList)) {
+            flowTask.setPermissionList(userIdList);
             // 移除已处理的状态变量
             variable.remove(nodeKey);
             FlowEngine.insService().removeVariables(flowTask.getInstanceId(), nodeKey);

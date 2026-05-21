@@ -1,10 +1,10 @@
 package org.dromara.job.snailjob;
 
-import cn.hutool.core.util.StrUtil;
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.job.core.dto.JobArgs;
 import com.aizuda.snailjob.common.log.SnailJobLog;
 import com.aizuda.snailjob.model.dto.ExecuteResult;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.job.entity.BillDTO;
 import org.springframework.stereotype.Component;
@@ -25,14 +25,14 @@ public class SummaryBillTask {
         // 获得微信账单
         BigDecimal wechatAmount = BigDecimal.valueOf(0);
         String wechat = (String) jobArgs.getWfContext("wechat");
-        if (StrUtil.isNotBlank(wechat)) {
+        if (StringUtils.isNotBlank(wechat)) {
             BillDTO wechatBillDTO = JsonUtils.parseObject(wechat, BillDTO.class);
             wechatAmount = wechatBillDTO.billAmount();
         }
         // 获得支付宝账单
         BigDecimal alipayAmount = BigDecimal.valueOf(0);
         String alipay = (String) jobArgs.getWfContext("alipay");
-        if (StrUtil.isNotBlank(alipay)) {
+        if (StringUtils.isNotBlank(alipay)) {
             BillDTO alipayBillDTO = JsonUtils.parseObject(alipay, BillDTO.class);
             alipayAmount = alipayBillDTO.billAmount();
         }
