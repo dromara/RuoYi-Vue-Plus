@@ -166,6 +166,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
             router.setPath(menu.getRouterPath());
             router.setComponent(menu.getComponentInfo());
             router.setQuery(menu.getQueryParam());
+            router.setExt(menu.getExt());
             router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StringUtils.equals(SystemConstants.NO, menu.getIsCache()), menu.getPath(), menu.getActiveMenu()));
             List<SysMenu> cMenus = menu.getChildren();
             if (CollUtil.isNotEmpty(cMenus) && SystemConstants.TYPE_DIR.equals(menu.getMenuType())) {
@@ -182,6 +183,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 children.setName(frameName);
                 children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StringUtils.equals(SystemConstants.NO, menu.getIsCache()), menu.getPath(), menu.getActiveMenu()));
                 children.setQuery(menu.getQueryParam());
+                children.setExt(menu.getExt());
                 childrenList.add(children);
                 router.setChildren(childrenList);
             } else if (menu.getParentId().equals(Constants.TOP_PARENT_ID) && menu.isInnerLink()) {
@@ -195,6 +197,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 children.setComponent(SystemConstants.INNER_LINK);
                 children.setName(innerLinkName);
                 children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), menu.getPath()));
+                children.setExt(menu.getExt());
                 childrenList.add(children);
                 router.setChildren(childrenList);
             }
