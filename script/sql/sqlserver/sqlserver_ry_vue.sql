@@ -1412,8 +1412,6 @@ insert into sys_menu values(1761400000000000130, N'分配用户', 17614000000000
 GO
 insert into sys_menu values(1761400000000000131, N'分配角色', 1761400000000000001, 1, N'user-auth/role/:userId', N'system/user/authRole', N'', N'N', N'N', N'C', N'1', N'0', N'system:user:edit', N'#', N'/system/user', N'', 1761000000000000103, 1761100000000000001, getdate(), null, null, N'');
 GO
-insert into sys_menu values(1761400000000000132, N'字典数据', 1761400000000000001, 6, N'dict-data/index/:dictId', N'system/dict/data', N'', N'N', N'N', N'C', N'1', N'0', N'system:dict:list', N'#', N'/system/dict', N'', 1761000000000000103, 1761100000000000001, getdate(), null, null, N'');
-GO
 insert into sys_menu values(1761400000000000133, N'文件配置管理', 1761400000000000001, 10, N'oss-config/index', N'system/oss/config', N'', N'N', N'N', N'C', N'1', N'0', N'system:ossConfig:list', N'#', N'/system/oss', N'', 1761000000000000103, 1761100000000000001, getdate(), null, null, N'');
 GO
 
@@ -2339,8 +2337,6 @@ GO
 INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000130);
 GO
 INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000131);
-GO
-INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000132);
 GO
 INSERT sys_role_menu VALUES (1761300000000000003, 1761400000000000133);
 GO

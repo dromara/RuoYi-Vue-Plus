@@ -230,7 +230,6 @@ insert into sys_menu values(1761400000000000123, '客户端管理', 176140000000
 insert into sys_menu values(1761400000000000116, '修改生成配置', 1761400000000000003, 2, 'gen-edit/index/:tableId', 'tool/gen/editTable', '', 'N', 'N', 'C', '1', '0', 'tool:gen:edit', '#', '/tool/gen', '', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
 insert into sys_menu values(1761400000000000130, '分配用户', 1761400000000000001, 2, 'role-auth/user/:roleId', 'system/role/authUser', '', 'N', 'N', 'C', '1', '0', 'system:role:edit', '#', '/system/role', '', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
 insert into sys_menu values(1761400000000000131, '分配角色', 1761400000000000001, 1, 'user-auth/role/:userId', 'system/user/authRole', '', 'N', 'N', 'C', '1', '0', 'system:user:edit', '#', '/system/user', '', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
-insert into sys_menu values(1761400000000000132, '字典数据', 1761400000000000001, 6, 'dict-data/index/:dictId', 'system/dict/data', '', 'N', 'N', 'C', '1', '0', 'system:dict:list', '#', '/system/dict', '', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
 insert into sys_menu values(1761400000000000133, '文件配置管理', 1761400000000000001, 10, 'oss-config/index', 'system/oss/config', '', 'N', 'N', 'C', '1', '0', 'system:ossConfig:list', '#', '/system/oss', '', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
 
 -- springboot-admin监控
@@ -384,7 +383,6 @@ insert into sys_role_menu values (1761300000000000003, 1761400000000000118);
 insert into sys_role_menu values (1761300000000000003, 1761400000000000123);
 insert into sys_role_menu values (1761300000000000003, 1761400000000000130);
 insert into sys_role_menu values (1761300000000000003, 1761400000000000131);
-insert into sys_role_menu values (1761300000000000003, 1761400000000000132);
 insert into sys_role_menu values (1761300000000000003, 1761400000000000133);
 insert into sys_role_menu values (1761300000000000003, 1761400000000000500);
 insert into sys_role_menu values (1761300000000000003, 1761400000000000501);
