@@ -372,6 +372,12 @@
                 <version>${revision}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.wudgaby.stars</groupId>
+                <artifactId>stars-library</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!--  工作流模块  -->
             <dependency>
                 <groupId>org.dromara</groupId>

@@ -103,4 +103,4 @@ resilience4j:
    ticketDecision:
       max-concurrent-calls: 100
 
-api-key: sk-0b22a3195a834bcdb5f52cef0e0f4445
+api-key: xxx

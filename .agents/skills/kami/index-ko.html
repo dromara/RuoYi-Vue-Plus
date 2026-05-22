@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Kami 紙: AI 에이전트를 위한 문서 디자인 시스템</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kami - AI 기반 전문 문서를 위한 따뜻한 양피지 디자인 시스템. 하나의 강조색, 세리프 주도 계층 구조, 에디토리얼 여백으로 구성됩니다.">
+  <link rel="icon" href="https://gw.alipayobjects.com/zos/k/vl/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="canonical" href="https://kami.tw93.fun/index-ko.html">
+  <link rel="alternate" hreflang="en" href="https://kami.tw93.fun/">
+  <link rel="alternate" hreflang="zh-CN" href="https://kami.tw93.fun/index-zh.html">
+  <link rel="alternate" hreflang="ja" href="https://kami.tw93.fun/index-ja.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://kami.tw93.fun/index-tw.html">
+  <link rel="alternate" hreflang="ko" href="https://kami.tw93.fun/index-ko.html">
+  <link rel="alternate" hreflang="x-default" href="https://kami.tw93.fun/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Kami: AI 에이전트를 위한 문서 디자인 시스템">
+  <meta property="og:description" content="Kami - AI 기반 전문 문서를 위한 따뜻한 양피지 디자인 시스템. 하나의 강조색, 세리프 주도 계층 구조, 에디토리얼 여백으로 구성됩니다.">
+  <meta property="og:url" content="https://kami.tw93.fun/index-ko.html">
+  <meta property="og:image" content="https://kami.tw93.fun/assets/images/1.png">
+  <meta property="og:image:width" content="3110">
+  <meta property="og:image:height" content="2392">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Kami: AI 에이전트를 위한 문서 디자인 시스템">
+  <meta name="twitter:description" content="Kami - AI 기반 전문 문서를 위한 따뜻한 양피지 디자인 시스템. 하나의 강조색, 세리프 주도 계층 구조, 에디토리얼 여백으로 구성됩니다.">
+  <meta name="twitter:image" content="https://kami.tw93.fun/assets/images/1.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Kami",
+    "description": "AI 기반 전문 문서를 위한 따뜻한 양피지 디자인 시스템. 하나의 강조색, 세리프 주도 계층 구조, 에디토리얼 여백.",
+    "url": "https://kami.tw93.fun",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Any",
+    "author": {
+      "@type": "Person",
+      "name": "Tw93",
+      "url": "https://tw93.fun",
+      "sameAs": ["https://github.com/tw93", "https://twitter.com/HiTw93", "https://tw93.fun", "https://weekly.tw93.fun", "https://yobi.tw93.fun"]
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Kami란 무엇인가요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "AI 생성 문서를 위한 제약 기반 디자인 시스템입니다. 하나의 강조색, 세리프 주도 계층 구조, 따뜻한 양피지 캔버스. 이미지 렌더러를 위한 비주얼 브리프로도 활용할 수 있습니다."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Kami로 무엇을 만들 수 있나요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "10가지 템플릿 유형: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드, 주식 리포트, 변경 로그, 랜딩 페이지(영문 + 중문). 14가지 인라인 SVG 다이어그램 유형 포함. HTML 출력물을 PDF, PNG 또는 슬라이드 덱으로 내보낼 수 있습니다."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Kami는 어떻게 설정하나요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude Code: npx skills add tw93/kami -a claude-code -g -y. 플러그인 마켓플레이스 설치는 Claude Code 2.1.136-2.1.138 버전에서 일시적으로 영향을 받습니다. 범용 에이전트: npx skills add tw93/kami -a '*'. Claude Desktop: GitHub Releases에서 kami.zip을 다운로드하여 Skills 설정에서 업로드하세요."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Kami는 어떤 언어를 지원하나요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "영어, 중국어, 일본어를 지원합니다. 각 언어별 전용 세리프 폰트를 사용합니다: 영어는 Charter, 중국어는 TsangerJinKai02, 일본어는 YuMincho이며, 언어별 타이포그래피 튜닝이 적용됩니다."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<main class="page">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="eyebrow">
+      <span>Design System · v1.5.0<span class="eyebrow-date"> · 2026.05</span></span>
+      <span class="hero-links">
+        <nav class="lang-switch" aria-label="Language" data-lang-switch>
+          <button class="lang-trigger" type="button" aria-expanded="false" data-lang-trigger>한국어</button>
+          <div class="lang-menu" data-lang-menu>
+            <a href="./index.html" data-lang="en">English</a>
+            <a href="./index-zh.html" data-lang="zh">简体中文</a>
+            <a href="./index-tw.html" data-lang="tw">繁體中文</a>
+            <a href="./index-ja.html" data-lang="ja">日本語</a>
+            <a href="./index-ko.html" class="active" data-lang="ko">한국어</a>
+          </div>
+        </nav>
+        <a href="https://github.com/tw93/kami" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+        </a>
+        <a href="https://x.com/HiTw93" target="_blank" rel="noopener" aria-label="X">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        </a>
+      </span>
+    </div>
+    <h1>Kami<span class="cn">紙</span></h1>
+    <p class="tagline">좋은 콘텐츠는 좋은 종이를 만날 자격이 있습니다. Kami는 AI 시대를 위한 레이아웃 디자인 시스템으로, 문서를 명확하고 읽기 쉽고 기억에 남게 만듭니다.</p>
+    <div class="hero-tokens">
+      <span><b>Canvas</b>#f5f4ed</span>
+      <span><b>Accent</b>#1B365D</span>
+      <span><b>Serif</b>Charter / TsangerJinKai</span>
+      <span><b>Sans</b>= Serif (페이지당 단일 폰트)</span>
+    </div>
+  </header>
+
+  <!-- ============ 00 DEMOS ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">00 · See it</p>
+      <h2 class="section-title">출력 샘플</h2>
+      <p class="section-lede">Claude에게 브리프를 전달하세요: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드 모두 하나의 작고 신뢰할 수 있는 규칙 세트에서 정돈된 레이아웃으로 완성됩니다. 동일한 브리프는 <a href="https://github.com/tw93/kami#travel" style="color:var(--brand); text-decoration:none; font-weight:500;">이미지 렌더러에도 적용</a>할 수 있으며, README에 복사-붙여넣기 프롬프트와 샘플 출력물이 포함되어 있습니다.</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-card">
+        <a href="assets/demos/demo-tesla.pdf" target="_blank"><img src="assets/demos/demo-tesla.png" alt="Tesla equity report" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Equity Report</p>
+        <p class="demo-desc">Tesla 2026년 1분기 실적 분석</p>
+      </div>
+      <div class="demo-card">
+        <a href="assets/demos/demo-musk-resume.pdf" target="_blank"><img src="assets/demos/demo-musk-resume.png" alt="Musk resume" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Resume</p>
+        <p class="demo-desc">창업자 이력서, 2페이지</p>
+      </div>
+      <div class="demo-card">
+        <a href="assets/demos/demo-kaku.pdf" target="_blank"><img src="assets/demos/demo-kaku.png" alt="Kaku portfolio" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Portfolio</p>
+        <p class="demo-desc">Kaku 터미널 포트폴리오, 일본어, 7페이지</p>
+      </div>
+      <div class="demo-card">
+        <a href="assets/demos/demo-agent-slides.pdf" target="_blank"><img src="assets/demos/demo-agent-slides.png" alt="Agent slides" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Slides</p>
+        <p class="demo-desc">에이전트 키노트, 6슬라이드</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LANDING PAGES ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">Landing Pages</p>
+      <h2 class="section-title">Kami로 제작</h2>
+      <p class="section-lede">동일한 랜딩 페이지 템플릿을 세 가지 다른 제품에 적용한 결과. 하나의 제약 세트, 세 가지 다른 목적.</p>
+    </div>
+    <div class="landing-grid">
+      <div class="landing-card">
+        <a href="https://kami.tw93.fun" target="_blank" rel="noopener"><img src="assets/images/1.png" alt="Kami landing page" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Kami</p>
+        <p class="demo-desc">디자인 시스템 홈페이지</p>
+      </div>
+      <div class="landing-card">
+        <a href="https://luo.tw93.fun" target="_blank" rel="noopener"><img src="assets/images/2.png" alt="Luo landing page" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Luo</p>
+        <p class="demo-desc">CJK 읽기용 폰트, 중국어</p>
+      </div>
+      <div class="landing-card">
+        <a href="https://mole.fit" target="_blank" rel="noopener"><img src="assets/images/3.png" alt="Mole landing page" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Mole</p>
+        <p class="demo-desc">macOS 시스템 유틸리티</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 01 INSTALL ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">01 · Usage</p>
+      <h2 class="section-title">설치 및 사용</h2>
+      <p class="section-lede">Claude에게 필요한 것을 말하세요. 예를 들어 "이력서 만들어 줘", "스타트업 원페이저 만들어 줘", "발표용 슬라이드 디자인해 줘". 스킬이 자동으로 실행되며, 슬래시 명령어가 필요 없습니다.</p>
+    </div>
+<pre class="code"><span class="c"># Claude Code</span>
+npx skills add tw93/kami -a claude-code -g -y
+
+<span class="c"># Codex</span>
+npx skills add tw93/kami -a codex -g -y</pre>
+    <p class="section-lede" style="font-size:14px;">Claude Code 플러그인 마켓플레이스 설치는 버전 2.1.136-2.1.138에서 일시적으로 영향을 받습니다; 업스트림에서 루트 스킬 경로 검증이 수정될 때까지 위의 Claude Code 명령어를 사용하세요.</p>
+    <p class="section-lede" style="font-size:14px;">Claude Desktop: <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a>을 다운로드한 후, Customize &gt; Skills &gt; "+" &gt; Create skill에서 업로드하세요.</p>
+  </section>
+
+  <!-- ============ 02 MANIFESTO ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">02 · Manifesto</p>
+      <h2 class="section-title">디자인 원칙</h2>
+    </div>
+    <p class="manifesto">따뜻한 양피지 캔버스, <em>잉크 블루</em>를 유일한 강조색으로, 세리프가 계층 구조를 담당하며, 하드 섀도우와 화려한 팔레트는 배제합니다. 이 시스템은 인쇄물을 위해 만들어졌습니다: 안정적이고, 명확하며, 절제되어 있습니다.</p>
+    <ol class="rules">
+      <li><span class="n">1</span><p>페이지 배경은 양피지 <code>#f5f4ed</code>, 순백은 절대 사용하지 않음</p></li>
+      <li><span class="n">2</span><p>강조색은 잉크 블루 <code>#1B365D</code> 하나만; 두 번째 유채색 없음</p></li>
+      <li><span class="n">3</span><p>모든 회색은 따뜻한 색조, 황갈색 기반; 차가운 청회색 사용 금지</p></li>
+      <li><span class="n">4</span><p>영문은 제목과 본문 모두 세리프; 중문은 제목에 세리프, 본문에 산세리프</p></li>
+      <li><span class="n">5</span><p>세리프 본문은 400, 제목은 500. 합성 볼드 사용 금지</p></li>
+      <li><span class="n">6</span><p>세 가지 행간 밴드: 타이트 제목 1.1-1.3 / 밀집 1.4-1.45 / 읽기 1.5-1.55</p></li>
+      <li><span class="n">7</span><p>태그 배경은 반드시 솔리드 hex; rgba 금지, WeasyPrint 이중 사각형 버그</p></li>
+      <li><span class="n">8</span><p>그림자: 링 또는 위스퍼만 허용, 하드 드롭 섀도우 금지</p></li>
+    </ol>
+  </section>
+
+  <!-- ============ 03 COLOR ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">03 · Color</p>
+      <h2 class="section-title">따뜻한 절제</h2>
+      <p class="section-lede">하나의 강조색 + 따뜻한 중성색 + 차가운 색상 제로. 잉크 블루는 어떤 페이지에서든 <b>5%</b> 이하만 차지합니다. 그 이상은 절제가 아니라 혼잡입니다.</p>
+    </div>
+
+    <h3 class="subhead">Canvas</h3>
+    <div class="swatches">
+      <div class="swatch"><div class="chip" style="background:#f5f4ed"></div><div class="info"><p class="name">Parchment</p><p class="role">페이지 배경, 감성의 기초</p><span class="hex">#F5F4ED</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#faf9f5"></div><div class="info"><p class="name">Ivory</p><p class="role">카드 / 부상된 표면</p><span class="hex">#FAF9F5</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#e8e6dc"></div><div class="info"><p class="name">Warm Sand</p><p class="role">버튼 기본 / 인터랙티브 표면</p><span class="hex">#E8E6DC</span></div></div>
+      <div class="swatch dark"><div class="chip" style="background:#141413"></div><div class="info"><p class="name" style="color:var(--deep-dark)">Deep Dark</p><p class="role">다크 테마 페이지 기본, 순수 블랙 아님</p><span class="hex">#141413</span></div></div>
+    </div>
+
+    <h3 class="subhead">Brand</h3>
+    <div class="swatches">
+      <div class="swatch brand"><div class="chip" style="background:#1B365D"></div><div class="info"><p class="name">Ink Blue</p><p class="role">기본 색상 · CTA · 인용 바 · 섹션 오버라인</p><span class="hex">#1B365D</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#2D5A8A"></div><div class="info"><p class="name">Ink Light</p><p class="role">다크 표면 위 링크 · 밝은 변형</p><span class="hex">#2D5A8A</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#30302e"></div><div class="info"><p class="name" style="color:var(--deep-dark)">Dark Surface</p><p class="role">다크 테마 컨테이너 · 웜 차콜</p><span class="hex">#30302E</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#b53333"></div><div class="info"><p class="name">Error</p><p class="role">오류 상태, 깊은 따뜻한 레드</p><span class="hex">#B53333</span></div></div>
+    </div>
+
+    <h3 class="subhead">Warm Neutrals</h3>
+    <div class="swatches" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="swatch"><div class="chip" style="background:#141413"></div><div class="info"><p class="name">Near Black</p><span class="hex">#141413</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#3d3d3a"></div><div class="info"><p class="name">Dark Warm</p><span class="hex">#3D3D3A</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#504e49"></div><div class="info"><p class="name">Olive</p><span class="hex">#504e49</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#6b6a64"></div><div class="info"><p class="name">Stone</p><span class="hex">#6b6a64</span></div></div>
+    </div>
+
+    <h3 class="subhead">Tag Tints: rgba에서 솔리드 hex로</h3>
+    <p style="font-size:14px; color: var(--olive); margin: 0 0 16px; line-height: 1.55;">양피지 위 잉크 블루 <code style="font-family:var(--mono);font-size:12px;background:#EEF2F7;color:var(--brand);padding:1px 5px;border-radius:2px">#1B365D</code>의 솔리드 hex 등가값. 태그는 WeasyPrint 이중 사각형 렌더링 버그를 피하기 위해 <code style="font-family:var(--mono);font-size:12px;background:#EEF2F7;color:var(--brand);padding:1px 5px;border-radius:2px">rgba()</code> 대신 솔리드 hex를 사용합니다.</p>
+    <div class="tint-strip">
+      <div class="tint"><span class="flag">&nbsp;</span><span class="sample" style="background:#EEF2F7">Tag sample</span><p class="opacity">0.08</p><span class="hex">#EEF2F7</span></div>
+      <div class="tint"><span class="flag">&nbsp;</span><span class="sample" style="background:#E4ECF5">Tag sample</span><p class="opacity">0.14</p><span class="hex">#E4ECF5</span></div>
+      <div class="tint default"><span class="flag">Default</span><span class="sample" style="background:#E4ECF5">Tag sample</span><p class="opacity">0.18</p><span class="hex">#E4ECF5</span></div>
+      <div class="tint"><span class="flag">&nbsp;</span><span class="sample" style="background:#D0DCE9">Tag sample</span><p class="opacity">0.22</p><span class="hex">#D0DCE9</span></div>
+      <div class="tint"><span class="flag">&nbsp;</span><span class="sample" style="background:#D6E1EE">Tag sample</span><p class="opacity">0.30</p><span class="hex">#D6E1EE</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 04 TYPE ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">04 · Typography</p>
+      <h2 class="section-title">타입 시스템</h2>
+      <p class="section-lede">세리프는 계층을, 산세리프는 기능을 담당합니다. 세리프 본문은 400, 제목은 500.</p>
+    </div>
+
+    <div class="family-grid">
+      <div class="family serif">
+        <p class="glyph">Aa</p>
+        <p class="role">Serif · 제목 + 본문</p>
+        <p class="name">Charter / TsangerJinKai02</p>
+        <p class="use">제목, 본문, 풀 인용, 숫자 강조에 사용됩니다. 영문은 Charter, 중문은 TsangerJinKai02를 사용합니다.</p>
+      </div>
+      <div class="family mono">
+        <p class="glyph">&lt;/&gt;</p>
+        <p class="role">Mono · 코드</p>
+        <p class="name">JetBrains Mono</p>
+        <p class="use">코드 블록, 버전 번호, hex 값, 표형 숫자.</p>
+      </div>
+    </div>
+
+    <h3 class="subhead">스케일 (인쇄 pt; 화면 px = pt x 1.33)</h3>
+    <div class="type-grid">
+      <div class="type-row">
+        <div class="type-label">Display</div>
+        <div class="type-sample display">좋은 문서는 명확하고<br>안정적이며 절제되어 있다</div>
+        <div class="type-specs"><b>36-48 pt</b><br>weight 500<br>line 1.10</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">H1 Section</div>
+        <div class="type-sample h1">Color System · Palette</div>
+        <div class="type-specs"><b>18-22 pt</b><br>weight 500<br>line 1.20</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">H2 Subsection</div>
+        <div class="type-sample h2">Canvas · Warm Neutrals</div>
+        <div class="type-specs"><b>14-16 pt</b><br>weight 500<br>line 1.25</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">H3 Item</div>
+        <div class="type-sample h3">Tag Tints · Solid Hex</div>
+        <div class="type-specs"><b>12-13 pt</b><br>weight 500<br>line 1.30</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">Body</div>
+        <div class="type-sample body">잉크 블루는 어떤 페이지에서든 5% 이하만 차지합니다. 그 이상은 절제가 아니라 혼잡입니다. 모든 회색은 황갈색 기반입니다: R ≈ G > B가 기본 원칙입니다.</div>
+        <div class="type-specs"><b>9.5-10 pt</b><br>weight 400<br>line 1.55</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">Caption</div>
+        <div class="type-sample caption">그림 주석, 각주, 주석 텍스트. 색상은 올리브 또는 스톤으로 낮아집니다.</div>
+        <div class="type-specs"><b>8.5-9 pt</b><br>weight 400<br>line 1.45</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">Label</div>
+        <div class="type-sample label">Design System · v1.5.0</div>
+        <div class="type-specs"><b>7.5-8 pt</b><br>weight 600<br>line 1.35</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 SPACING ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">05 · Spacing &amp; Shape</p>
+      <h2 class="section-title">리듬과 형태</h2>
+      <p class="section-lede">기본 단위: 4pt. 밀집 레이아웃은 더 작은 여백을, 격식 있는 문서는 더 큰 여백을 사용합니다.</p>
+    </div>
+
+    <table class="space-table">
+      <tr><th>스케일</th><th>값</th><th>용도</th><th></th></tr>
+      <tr><td class="name">xs</td><td class="val">2-3 pt</td><td class="use">인라인 요소</td><td class="bar"><span style="width:6px"></span></td></tr>
+      <tr><td class="name">sm</td><td class="val">4-5 pt</td><td class="use">태그 패딩 · 타이트 레이아웃</td><td class="bar"><span style="width:12px"></span></td></tr>
+      <tr><td class="name">md</td><td class="val">8-10 pt</td><td class="use">컴포넌트 내부</td><td class="bar"><span style="width:24px"></span></td></tr>
+      <tr><td class="name">lg</td><td class="val">16-20 pt</td><td class="use">컴포넌트 간격 · 카드 패딩</td><td class="bar"><span style="width:48px"></span></td></tr>
+      <tr><td class="name">xl</td><td class="val">24-32 pt</td><td class="use">섹션 제목 마진</td><td class="bar"><span style="width:72px"></span></td></tr>
+      <tr><td class="name">2xl</td><td class="val">40-60 pt</td><td class="use">주요 섹션 간격</td><td class="bar"><span style="width:140px"></span></td></tr>
+      <tr><td class="name">3xl</td><td class="val">80-120 pt</td><td class="use">긴 문서 챕터 간격</td><td class="bar"><span style="width:240px"></span></td></tr>
+    </table>
+
+    <h3 class="subhead">Radii</h3>
+    <div class="radii">
+      <div class="radius"><div class="box" style="border-radius:4px"></div><div class="r"><b>4</b> pt</div><div class="label">타이트</div></div>
+      <div class="radius"><div class="box" style="border-radius:6px"></div><div class="r"><b>6</b> pt</div><div class="label">코드 블록</div></div>
+      <div class="radius"><div class="box" style="border-radius:8px"></div><div class="r"><b>8</b> pt</div><div class="label">기본 카드</div></div>
+      <div class="radius"><div class="box" style="border-radius:12px"></div><div class="r"><b>12</b> pt</div><div class="label">컨테이너</div></div>
+      <div class="radius"><div class="box" style="border-radius:16px"></div><div class="r"><b>16</b> pt</div><div class="label">피처 카드</div></div>
+      <div class="radius"><div class="box" style="border-radius:24px"></div><div class="r"><b>24</b> pt</div><div class="label">대형 컨테이너</div></div>
+      <div class="radius"><div class="box" style="border-radius:32px"></div><div class="r"><b>32</b> pt</div><div class="label">히어로</div></div>
+    </div>
+
+    <h3 class="subhead">깊이: 세 가지 그림자 방식</h3>
+    <p style="font-size:14px; color: var(--olive); margin: 0 0 12px; line-height: 1.55;">Kami는 전통적인 하드 섀도우를 피합니다. 깊이감은 링 섀도우, 위스퍼 섀도우, 명암 교차를 통해 표현합니다.</p>
+    <div class="shadow-row">
+      <div class="shadow-demo sd-ring">
+        <p class="t">링 섀도우</p>
+        <p class="s">0 0 0 1pt var(--ring-warm)<br>&nbsp;<br>버튼 · 카드 호버</p>
+      </div>
+      <div class="shadow-demo sd-whisper">
+        <p class="t">위스퍼 섀도우</p>
+        <p class="s">0 4pt 24pt rgba(0,0,0,0.05)<br>&nbsp;<br>부드러운 부상 · 피처 카드</p>
+      </div>
+      <div class="shadow-demo sd-alt">
+        <p class="t">라이트 ⇌ 다크</p>
+        <p class="s">parchment ⇌ deep-dark<br>&nbsp;<br>섹션 레벨 · 가장 강한 대비</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 06 COMPONENTS ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">06 · Components</p>
+      <h2 class="section-title">원자 모듈</h2>
+      <p class="section-lede">작은 고정 세트로, 구체적인 문서 문제를 해결하는 곳에만 유지합니다.</p>
+    </div>
+
+    <div class="comp-grid">
+      <div class="comp">
+        <h4>버튼</h4>
+        <p class="hint">하드 드롭 대신 링 섀도우 · 8pt radius</p>
+        <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap;">
+          <span class="btn btn-primary">Primary CTA</span>
+          <span class="btn btn-secondary">Secondary</span>
+          <span class="btn btn-ghost">Ghost</span>
+        </div>
+      </div>
+      <div class="comp">
+        <h4>태그, 세 단계</h4>
+        <p class="hint">솔리드 hex · 약에서 강으로 선택</p>
+        <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <span class="tag calm">Light 0.08</span>
+          <span class="tag standard">Standard 0.18</span>
+          <span class="tag brush">Brush gradient</span>
+        </div>
+      </div>
+      <div class="comp">
+        <h4>인용</h4>
+        <p class="hint">좌측 2pt brand solid + olive 텍스트</p>
+        <blockquote class="quote">천 번의 거절 끝에 하나의 승낙, 장식보다 명확함을 우선합니다.</blockquote>
+      </div>
+      <div class="comp">
+        <h4>메트릭</h4>
+        <p class="hint">세리프 숫자 + 산세리프 레이블 · tabular-nums</p>
+        <div class="metrics demo">
+          <div class="metric"><span class="metric-value">6</span><span class="metric-label">문서 유형</span></div>
+          <div class="metric"><span class="metric-value">1</span><span class="metric-label">강조색</span></div>
+          <div class="metric"><span class="metric-value">8</span><span class="metric-label">규칙</span></div>
+        </div>
+      </div>
+      <div class="comp">
+        <h4>섹션 제목</h4>
+        <p class="hint">serif 500 · 15pt · 크기 주도 계층, 장식 없음</p>
+        <div class="demo">
+          <span class="sample-section-title">Selected Works · Projects</span>
+        </div>
+      </div>
+      <div class="comp">
+        <h4>대시 목록</h4>
+        <p class="hint">불릿 대신 대시 · 에디토리얼 톤</p>
+        <ul class="dash demo">
+          <li>따뜻한 양피지, 순백은 절대 아님</li>
+          <li>잉크 블루 강조색, 두 번째 색상 없음</li>
+          <li>세리프가 권위를 담당</li>
+        </ul>
+      </div>
+      <div class="comp">
+        <h4>코드 블록</h4>
+        <p class="hint">ivory bg + 0.5pt border + 6pt radius</p>
+<pre class="code"><span class="c">// warmth from restraint, not from color</span>
+canvas   = parchment; accent = <span class="k">ink_blue</span>
+palette  = <span class="k">warm_neutrals</span> − cool_grays
+document = <span class="k">serif</span> × hierarchy + generous_space
+beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
+      </div>
+      <div class="comp">
+        <h4>피처 카드</h4>
+        <p class="hint">whisper shadow + 16pt radius</p>
+        <div class="demo" style="background:var(--ivory); border-radius:16px; padding:18px 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.05); border: 1px solid var(--border-cream);">
+          <p style="font-family:var(--serif); font-weight:500; font-size:15px; margin:0 0 6px; color:var(--near-black);">Tesla Company Profile · One-Pager</p>
+          <p style="font-size:12px; color:var(--olive); margin:0 0 10px; line-height:1.5;">단일 A4 페이지 · 메트릭 카드 4개 + 본문 섹션 3개 + 타임라인</p>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="tag calm">English</span>
+            <span class="tag calm">A4 x 1</span>
+            <span class="tag calm">Ink Blue</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 07 DIAGRAMS ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">07 · Diagrams</p>
+      <h2 class="section-title">인라인 차트</h2>
+      <p class="section-lede">아키텍처, 프로세스, 데이터 차트 시나리오를 아우르는 14가지 인라인 SVG 다이어그램 유형. Claude에게 필요한 유형을 말하면 문서에 직접 삽입되며, 색상과 폰트는 Kami 디자인 언어를 따릅니다.</p>
+    </div>
+    <div class="chart-showcase">
+      <!-- Architecture mini -->
+      <div class="chart-card">
+        <div class="chart-label">Architecture</div>
+        <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">
+          <rect width="280" height="160" fill="#f5f4ed"/>
+          <!-- Browser → API -->
+          <path d="M 84,79.5 L 103,79.5 L 103,78 L 107,80 L 103,82 L 103,80.5 L 84,80.5 Z" fill="#6b6a64"/>
+          <!-- API → Database -->
+          <path d="M 172,79.5 L 191,79.5 L 191,78 L 195,80 L 191,82 L 191,80.5 L 172,80.5 Z" fill="#504e49"/>
+          <!-- Node: Client -->
+          <rect x="20" y="58" width="64" height="44" rx="3" fill="#f5f4ed" stroke="#6b6a64" stroke-width="0.8"/>
+          <text x="52" y="76" text-anchor="middle" font-size="7" letter-spacing="0.5" fill="#6b6a64">CLIENT</text>
+          <text x="52" y="91" text-anchor="middle" font-size="9" font-weight="600" fill="#141413">Browser</text>
+          <!-- Node: API (focal) -->
+          <rect x="108" y="58" width="64" height="44" rx="3" fill="#EEF2F7" stroke="#1B365D" stroke-width="1"/>
+          <text x="140" y="76" text-anchor="middle" font-size="7" letter-spacing="0.5" fill="#1B365D">SERVICE</text>
+          <text x="140" y="91" text-anchor="middle" font-size="9" font-weight="600" fill="#141413">API</text>
+          <!-- Node: Database -->
+          <rect x="196" y="58" width="64" height="44" rx="3" fill="#f5f4ed" stroke="#504e49" stroke-width="0.8"/>
+          <text x="228" y="76" text-anchor="middle" font-size="7" letter-spacing="0.5" fill="#6b6a64">DATA</text>
+          <text x="228" y="91" text-anchor="middle" font-size="9" font-weight="600" fill="#141413">Database</text>
+        </svg>
+        <p class="chart-caption">시스템 구성 요소와 연결, 하나의 포컬 노드</p>
+      </div>
+      <!-- Flowchart mini -->
+      <div class="chart-card">
+        <div class="chart-label">Flowchart</div>
+        <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">
+          <rect width="280" height="160" fill="#f5f4ed"/>
+          <rect x="100" y="8" width="80" height="28" rx="14" fill="#141413"/>
+          <text x="140" y="25" text-anchor="middle" font-size="9" fill="#f5f4ed">Start</text>
+          <!-- Start → diamond -->
+          <path d="M 139.5,36 L 139.5,48 L 138,48 L 140,52 L 142,48 L 140.5,48 L 140.5,36 Z" fill="#504e49"/>
+          <polygon points="140,52 172,72 140,92 108,72" fill="#f5f4ed" stroke="#141413" stroke-width="1"/>
+          <text x="140" y="76" text-anchor="middle" font-size="8" fill="#141413">Valid?</text>
+          <!-- Yes right -->
+          <path d="M 172,71.5 L 204,71.5 L 204,70 L 208,72 L 204,74 L 204,72.5 L 172,72.5 Z" fill="#1B365D"/>
+          <text x="186" y="68" text-anchor="middle" font-size="8" fill="#1B365D">Yes</text>
+          <rect x="208" y="56" width="64" height="32" rx="4" fill="#EEF2F7" stroke="#1B365D" stroke-width="1"/>
+          <text x="240" y="75" text-anchor="middle" font-size="9" fill="#141413">Process</text>
+          <!-- No down -->
+          <path d="M 139.5,92 L 139.5,112 L 138,112 L 140,116 L 142,112 L 140.5,112 L 140.5,92 Z" fill="#504e49"/>
+          <text x="151" y="106" font-size="8" fill="#504e49">No</text>
+          <rect x="96" y="116" width="88" height="32" rx="4" fill="#f5f4ed" stroke="#6b6a64" stroke-width="0.8"/>
+          <text x="140" y="134" text-anchor="middle" font-size="9" fill="#504e49">Reject</text>
+        </svg>
+        <p class="chart-caption">분기 결정, 예/아니오 경로, 성공에 포컬</p>
+      </div>
+      <!-- Bar chart (shifted left) -->
+      <div class="chart-card">
+        <div class="chart-label">Bar Chart</div>
+        <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">
+          <rect width="280" height="160" fill="#f5f4ed"/>
+          <rect x="18" y="78" width="42" height="50" rx="3" fill="#6b6a64"/>
+          <rect x="78" y="62" width="42" height="66" rx="3" fill="#504e49"/>
+          <rect x="138" y="44" width="42" height="84" rx="3" fill="#2d4e7a"/>
+          <rect x="198" y="30" width="42" height="98" rx="3" fill="#1B365D"/>
+          <text x="39" y="145" text-anchor="middle" font-size="10" fill="#6b6a64">Q1</text>
+          <text x="99" y="145" text-anchor="middle" font-size="10" fill="#504e49">Q2</text>
+          <text x="159" y="145" text-anchor="middle" font-size="10" fill="#4d4c48">Q3</text>
+          <text x="219" y="145" text-anchor="middle" font-size="10" fill="#4d4c48">Q4</text>
+          <text x="39" y="73" text-anchor="middle" font-size="9" font-weight="600" fill="#6b6a64">180</text>
+          <text x="99" y="57" text-anchor="middle" font-size="9" font-weight="600" fill="#504e49">220</text>
+          <text x="159" y="39" text-anchor="middle" font-size="9" font-weight="600" fill="#2d4e7a">195</text>
+          <text x="219" y="25" text-anchor="middle" font-size="9" font-weight="600" fill="#1B365D">240</text>
+        </svg>
+        <p class="chart-caption">분기별 매출 비교, 그라데이션 또는 단색</p>
+      </div>
+      <!-- Donut chart -->
+      <div class="chart-card">
+        <div class="chart-label">Donut Chart</div>
+        <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">
+          <rect width="280" height="160" fill="#f5f4ed"/>
+          <path d="M 80,25 A 55,55 0 1,1 47.7,124.5 L 62.4,104.3 A 30,30 0 1,0 80,50 Z" fill="#1B365D" stroke="white" stroke-width="1.5"/>
+          <path d="M 47.7,124.5 A 55,55 0 0,1 35.5,47.7 L 55.7,62.4 A 30,30 0 0,0 62.4,104.3 Z" fill="#504e49" stroke="white" stroke-width="1.5"/>
+          <path d="M 35.5,47.7 A 55,55 0 0,1 80,25 L 80,50 A 30,30 0 0,0 55.7,62.4 Z" fill="#6b6a64" stroke="white" stroke-width="1.5"/>
+          <text x="80" y="77" text-anchor="middle" font-size="13" font-weight="600" fill="#1B365D">60%</text>
+          <text x="80" y="92" text-anchor="middle" font-size="10" fill="#504e49">Primary</text>
+          <rect x="150" y="46" width="10" height="10" rx="2" fill="#1B365D"/>
+          <text x="165" y="55" font-size="11" fill="#4d4c48">Core revenue · 60%</text>
+          <rect x="150" y="72" width="10" height="10" rx="2" fill="#504e49"/>
+          <text x="165" y="81" font-size="11" fill="#4d4c48">Services · 25%</text>
+          <rect x="150" y="98" width="10" height="10" rx="2" fill="#6b6a64"/>
+          <text x="165" y="107" font-size="11" fill="#4d4c48">Other · 15%</text>
+        </svg>
+        <p class="chart-caption">매출 구조 분석, 3-6개 세그먼트 지원</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 07 DECISION TABLE ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">08 · Decision Lookup</p>
+      <h2 class="section-title">빠른 참조</h2>
+      <p class="section-lede">무엇을 사용해야 할지 확신이 없을 때 이 표를 참고하세요. 여기에 없다면, 기본 원칙으로 돌아가세요.</p>
+    </div>
+    <table class="decision">
+      <tr><th>작업</th><th>방법</th></tr>
+      <tr><td class="task">큰 제목</td><td class="how">serif <code>500</code>, 계층에 따른 크기, line-height <code>1.10-1.30</code></td></tr>
+      <tr><td class="task">읽기 본문</td><td class="how">serif <code>400</code>, <code>9.5-10 pt</code>, line-height <code>1.55</code></td></tr>
+      <tr><td class="task">숫자 강조</td><td class="how"><code>color: var(--brand)</code>, 볼드 아님</td></tr>
+      <tr><td class="task">두 섹션 구분</td><td class="how"><code>2.5pt</code> brand 좌측 바, 또는 <code>0.5pt</code> warm-gray 점선</td></tr>
+      <tr><td class="task">인용</td><td class="how">좌측 <code>2pt</code> brand solid + olive 텍스트</td></tr>
+      <tr><td class="task">코드 표시</td><td class="how">Ivory bg + <code>0.5pt</code> border + <code>6pt</code> radius + mono font</td></tr>
+      <tr><td class="task">기본 vs 보조</td><td class="how">기본: brand fill + ivory text; 보조: warm-sand + charcoal</td></tr>
+      <tr><td class="task">특별 카드 표시</td><td class="how"><code>border: 0.5pt solid var(--brand)</code> 또는 <code>border-left: 3pt</code></td></tr>
+      <tr><td class="task">섹션 시작</td><td class="how">Serif <code>500</code> · <code>15pt</code> · 크기 주도 계층, 장식 불필요</td></tr>
+      <tr><td class="task">문서 표지</td><td class="how">단일 페이지, Display 크기 + 우측 정렬 저자/날짜 + 넉넉한 여백</td></tr>
+      <tr><td class="task">데이터 카드</td><td class="how">Ivory bg + <code>8pt</code> radius + serif 큰 숫자, ink blue + sans 작은 레이블</td></tr>
+    </table>
+  </section>
+
+  <!-- ============ 09 ANTI ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">09 · Anti-Patterns</p>
+      <h2 class="section-title">피해야 할 것</h2>
+      <p class="section-lede">예외는 허용되지만, 이유는 명시적이어야 합니다.</p>
+    </div>
+
+    <div class="anti">
+      <div class="no">
+        <h5>하지 마세요</h5>
+        <p><code>#ffffff</code> 순백이나 <code>#f3f4f6</code> 쿨 그레이를 페이지 배경으로 사용하지 마세요. 페이지가 딱딱해지고 따뜻한 양피지 특성이 약해집니다.</p>
+      </div>
+      <div class="yes">
+        <h5>하세요</h5>
+        <p>항상 <code>#f5f4ed</code> 양피지를 사용하세요. 인쇄 시 흰 테두리를 방지하기 위해 <code>@page background</code>도 같은 색상으로 설정하세요.</p>
+      </div>
+      <div class="no">
+        <h5>하지 마세요</h5>
+        <p>태그에 <code>rgba(27,54,93,0.18)</code>를 사용하지 마세요. WeasyPrint는 패딩과 글리프 영역을 다른 불투명도로 렌더링하여 이중 사각형을 만듭니다.</p>
+      </div>
+      <div class="yes">
+        <h5>하세요</h5>
+        <p>등가 솔리드 hex <code>#E4ECF5</code>를 위한 틴트 조회 표를 사용하세요. 렌더링이 깔끔하게 유지되고 색상이 안정적입니다.</p>
+      </div>
+      <div class="no">
+        <h5>하지 마세요</h5>
+        <p>제목을 <code>font-weight: 600</code> 이상의 합성 볼드로 설정하지 마세요. 합성 볼드는 획을 흐리게 하고 타이포그래피 품질을 떨어뜨립니다.</p>
+      </div>
+      <div class="yes">
+        <h5>하세요</h5>
+        <p>본문 400, 제목 500 (실제 W05). 더 강한 존재감이 필요하면 크기나 brand 좌측 바를 사용하고, 합성 볼드는 절대 사용하지 마세요.</p>
+      </div>
+      <div class="no">
+        <h5>하지 마세요</h5>
+        <p>하드 드롭 섀도우 <code>0 2px 8px rgba(0,0,0,0.3)</code>을 사용하지 마세요. 시각적으로 무겁고 인쇄 시 어두운 얼룩으로 나타날 수 있습니다.</p>
+      </div>
+      <div class="yes">
+        <h5>하세요</h5>
+        <p>링 섀도우 <code>0 0 0 1pt</code> 또는 위스퍼 <code>rgba 0.05</code>, 아니면 단순히 밝고 어두운 섹션을 교차시키세요.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 10 BACKGROUND ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">10 · Background</p>
+      <h2 class="section-title">디자인 기원</h2>
+    </div>
+    <div class="background-text">
+      <p>저는 미국 주식에 투자하며 항상 Claude에게 리서치 리포트를 작성해 달라고 합니다. 매번 출력물은 같은 기본 문서 모양이었습니다: 회색이고, 평면적이며, 세션마다 레이아웃이 달랐습니다. 구조를 파악하기 어렵고, 서식은 구식이었으며, 페이지의 어떤 것도 계속 읽고 싶게 만들지 못했습니다. 그래서 타이포그래피, 팔레트, 간격을 하나의 규칙씩 고쳐나가기 시작했고, 결국 리포트는 제가 실제로 즐길 수 있는 페이지가 되었습니다.</p>
+      <p>나중에 "당신이 모르는 에이전트: 원칙, 아키텍처, 엔지니어링 실무"를 발표해야 했습니다. 이미 문서가 있었고 슬라이드를 처음부터 만들고 싶지 않아서, Claude Design으로 제 스타일에 맞게 레이아웃을 잡고 여러 차례 수정하여 만족스러운 수준에 도달했습니다. 그 과정에서 인라인 SVG 차트, 통일된 웜 팔레트, 더 타이트한 에디토리얼 리듬이 추가되었습니다. 정기적으로 작성하는 모든 문서를 커버할 때까지 계속 성장했고, 추상화 과정을 거쳐 kami가 되었습니다: 어떤 에이전트에게든 넘겨주고 출력물을 신뢰할 수 있는, 하나의 조용한 디자인 시스템입니다.</p>
+    </div>
+  </section>
+
+  <!-- ============ 11 FAQ ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">11 · Questions</p>
+      <h2 class="section-title">FAQ</h2>
+    </div>
+    <dl class="faq">
+      <div class="faq-pair">
+        <dt>Kami란 무엇인가요?</dt>
+        <dd>AI 생성 문서를 위한 제약 기반 디자인 시스템입니다. 하나의 강조색, 세리프 주도 계층 구조, 따뜻한 양피지 캔버스. LLM 에이전트에게 브리프를 전달하면 정돈된 레이아웃을 돌려받습니다. Claude Design이나 GPT Canvas 같은 이미지 렌더러에 전달할 수 있는 비주얼 브리프로도 활용됩니다.</dd>
+      </div>
+      <div class="faq-pair">
+        <dt>무엇을 만들 수 있나요?</dt>
+        <dd>10가지 템플릿 유형: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드, 주식 리포트, 변경 로그, 랜딩 페이지(영문 + 중문). 비주얼 설명을 위한 14가지 인라인 SVG 다이어그램 유형 포함. HTML 출력물을 PDF, PNG 또는 슬라이드 덱으로 내보낼 수 있습니다.</dd>
+      </div>
+      <div class="faq-pair">
+        <dt>어떻게 설정하나요?</dt>
+        <dd>Claude Code: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a claude-code -g -y</code>. 플러그인 마켓플레이스 설치는 Claude Code 2.1.136-2.1.138에서 일시적으로 영향을 받습니다. Codex나 OpenCode 같은 범용 에이전트: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a '*' -g -y</code>. Claude Desktop: GitHub Releases에서 kami.zip을 다운로드하여 Customize &gt; Skills에서 업로드하세요. 슬래시 명령어가 필요 없으며, 자연어 요청으로 스킬이 자동 실행됩니다.</dd>
+      </div>
+      <div class="faq-pair">
+        <dt>어떤 언어를 지원하나요?</dt>
+        <dd>영어, 중국어, 일본어를 지원합니다. 각 언어별 전용 세리프 폰트를 사용합니다: 영어는 Charter, 중국어는 TsangerJinKai02, 일본어는 YuMincho. 자간, 행간, 폰트 크기는 인쇄 품질을 위해 언어별로 튜닝됩니다. 일본어는 배포 전 비주얼 QA를 포함하는 최선의 CJK 경로입니다.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="mark">
+      <svg width="56" height="56" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-label="Kami mark">
+        <rect x="6" y="6" width="68" height="68" rx="10" fill="#faf9f5" stroke="#1B365D" stroke-width="1.25"/>
+        <line x1="16" y1="26" x2="64" y2="26" stroke="#1B365D" stroke-width="1.25"/>
+        <text x="40" y="56" font-family="TsangerJinKai02, Georgia, serif" font-size="34" font-weight="500" fill="#141413" text-anchor="middle">紙</text>
+      </svg>
+      <div>
+        <p class="wm-name">Kami · 紙</p>
+        <p class="wm-sub">좋은 콘텐츠는 좋은 종이를 만날 자격이 있습니다.</p>
+      </div>
+    </div>
+    <div class="colophon">
+      <div><a href="https://github.com/tw93/kami" style="color:var(--brand); text-decoration:none; font-weight:500;">GitHub</a>&nbsp;&nbsp;·&nbsp;&nbsp;One-Pager · Long Doc · Letter · Portfolio · Resume · Slides</div>
+      <div style="margin-top:8px; color: var(--olive); font-family: var(--serif);">
+        Serif는 권위를, sans는 기능을, 따뜻한 회색은 리듬을, 잉크 블루는 초점을 담당합니다.
+      </div>
+    </div>
+  </footer>
+
+</main>
+<script>
+(function(){
+  var sw=document.querySelector('[data-lang-switch]');
+  if(!sw)return;
+  var trigger=sw.querySelector('[data-lang-trigger]');
+  function setOpen(open){
+    sw.classList.toggle('is-open',open);
+    trigger.setAttribute('aria-expanded',open);
+  }
+  trigger.addEventListener('click',function(e){
+    e.stopPropagation();
+    setOpen(!sw.classList.contains('is-open'));
+  });
+  sw.querySelectorAll('[data-lang-menu] a').forEach(function(a){
+    a.addEventListener('click',function(){
+      localStorage.setItem('kami-lang',a.getAttribute('data-lang'));
+    });
+  });
+  document.addEventListener('click',function(e){
+    if(!sw.contains(e.target))setOpen(false);
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape')setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>

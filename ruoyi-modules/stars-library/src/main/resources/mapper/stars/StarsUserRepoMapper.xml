@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wudgaby.stars.mapper.StarsUserRepoMapper">
+
+    <resultMap id="StarsRepoCardRowResult" type="com.wudgaby.stars.domain.vo.StarsRepoCardRow">
+        <id property="id" column="id"/>
+        <result property="repoId" column="repo_id"/>
+        <result property="fullName" column="full_name"/>
+        <result property="owner" column="owner"/>
+        <result property="repoName" column="repo_name"/>
+        <result property="description" column="description"/>
+        <result property="language" column="language"/>
+        <result property="stargazersCount" column="stargazers_count"/>
+        <result property="htmlUrl" column="html_url"/>
+        <result property="readmeSnippet" column="readme_snippet"/>
+        <result property="category" column="category"/>
+        <result property="tagNamesCsv" column="tag_names_csv"/>
+        <result property="tagIdsCsv" column="tag_ids_csv"/>
+        <result property="summaryOneLiner" column="summary_one_liner"/>
+        <result property="summaryText" column="summary_text"/>
+        <result property="summaryStatus" column="summary_status"/>
+        <result property="note" column="note"/>
+        <result property="importSource" column="import_source"/>
+        <result property="classificationSource" column="classification_source"/>
+        <result property="summarySource" column="summary_source"/>
+        <result property="importTime" column="import_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="repoSelectColumns">
+        ur.id,
+        ur.repo_id,
+        r.full_name,
+        r.owner,
+        r.repo_name,
+        r.description,
+        r.language,
+        r.stargazers_count,
+        r.html_url,
+        r.readme_snippet,
+        ur.category,
+        ur.summary_one_liner,
+        ur.summary_text,
+        ur.summary_status,
+        ur.note,
+        ur.import_source,
+        ur.classification_source,
+        ur.summary_source,
+        ur.import_time,
+        ur.update_time
+    </sql>
+
+    <sql id="tagNamesSubquery">
+        (SELECT GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',')
+         FROM stars_user_repo_tag urt
+                  INNER JOIN stars_tag t ON urt.tag_id = t.id
+         WHERE urt.user_repo_id = ur.id
+           AND t.user_id = ur.user_id)
+    </sql>
+
+    <sql id="tagIdsSubquery">
+        (SELECT GROUP_CONCAT(DISTINCT t.id ORDER BY t.name SEPARATOR ',')
+         FROM stars_user_repo_tag urt
+                  INNER JOIN stars_tag t ON urt.tag_id = t.id
+         WHERE urt.user_repo_id = ur.id
+           AND t.user_id = ur.user_id)
+    </sql>
+
+    <sql id="repoListWhere">
+        WHERE ur.user_id = #{query.userId}
+        <if test="query.category != null and query.category != ''">
+            AND ur.category = #{query.category}
+        </if>
+        <if test="query.importSource != null and query.importSource != ''">
+            AND ur.import_source = #{query.importSource}
+        </if>
+        <if test="query.summaryStatus != null and query.summaryStatus != ''">
+            AND ur.summary_status = #{query.summaryStatus}
+        </if>
+        <if test="query.tagIds != null and query.tagIds.size() > 0">
+            AND EXISTS (
+            SELECT 1
+            FROM stars_user_repo_tag urt_filter
+            WHERE urt_filter.user_repo_id = ur.id
+              AND urt_filter.tag_id IN
+            <foreach collection="query.tagIds" item="tagId" open="(" separator="," close=")">
+                #{tagId}
+            </foreach>
+            )
+        </if>
+        <if test="query.keyword != null and query.keyword != ''">
+            AND (
+                r.full_name LIKE CONCAT('%', #{query.keyword}, '%')
+                OR r.owner LIKE CONCAT('%', #{query.keyword}, '%')
+                OR r.repo_name LIKE CONCAT('%', #{query.keyword}, '%')
+                OR r.description LIKE CONCAT('%', #{query.keyword}, '%')
+                OR ur.summary_one_liner LIKE CONCAT('%', #{query.keyword}, '%')
+                OR ur.summary_text LIKE CONCAT('%', #{query.keyword}, '%')
+                OR ur.note LIKE CONCAT('%', #{query.keyword}, '%')
+                OR ur.category LIKE CONCAT('%', #{query.keyword}, '%')
+                OR EXISTS (
+                    SELECT 1
+                    FROM stars_user_repo_tag urt_kw
+                             INNER JOIN stars_tag t_kw ON urt_kw.tag_id = t_kw.id
+                    WHERE urt_kw.user_repo_id = ur.id
+                      AND t_kw.user_id = ur.user_id
+                      AND t_kw.name LIKE CONCAT('%', #{query.keyword}, '%')
+                )
+            )
+        </if>
+    </sql>
+
+    <sql id="repoListOrderBy">
+        ORDER BY
+        <choose>
+            <when test="query.orderBy == 'stars_desc'">
+                r.stargazers_count DESC, ur.import_time DESC
+            </when>
+            <when test="query.orderBy == 'stars_asc'">
+                r.stargazers_count ASC, ur.import_time DESC
+            </when>
+            <when test="query.orderBy == 'name_asc'">
+                r.full_name ASC
+            </when>
+            <when test="query.orderBy == 'name_desc'">
+                r.full_name DESC
+            </when>
+            <when test="query.orderBy == 'import_time_asc'">
+                ur.import_time ASC
+            </when>
+            <when test="query.orderBy == 'update_time_desc'">
+                ur.update_time DESC, ur.import_time DESC
+            </when>
+            <otherwise>
+                ur.import_time DESC
+            </otherwise>
+        </choose>
+    </sql>
+
+    <select id="selectRepoCardPage" resultMap="StarsRepoCardRowResult">
+        SELECT
+        <include refid="repoSelectColumns"/>,
+        <include refid="tagNamesSubquery"/> AS tag_names_csv,
+        <include refid="tagIdsSubquery"/> AS tag_ids_csv
+        FROM stars_user_repo ur
+        INNER JOIN stars_repo r ON ur.repo_id = r.id
+        <include refid="repoListWhere"/>
+        <include refid="repoListOrderBy"/>
+    </select>
+
+    <select id="selectRepoDetail" resultMap="StarsRepoCardRowResult">
+        SELECT
+        <include refid="repoSelectColumns"/>,
+        <include refid="tagNamesSubquery"/> AS tag_names_csv,
+        <include refid="tagIdsSubquery"/> AS tag_ids_csv
+        FROM stars_user_repo ur
+        INNER JOIN stars_repo r ON ur.repo_id = r.id
+        WHERE ur.user_id = #{userId}
+          AND ur.id = #{userRepoId}
+    </select>
+
+</mapper>

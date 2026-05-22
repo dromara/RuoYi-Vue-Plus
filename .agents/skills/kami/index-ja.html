@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Kami 紙：AIエージェント向けドキュメントデザインシステム</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kami（紙）は、AI時代の文書制作に向けた、あたたかな紙面デザインシステムです。単一アクセントカラー、serif中心の階層、編集的な余白で一貫した可読性をつくります。">
+  <link rel="icon" href="https://gw.alipayobjects.com/zos/k/vl/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="canonical" href="https://kami.tw93.fun/index-ja.html">
+  <link rel="alternate" hreflang="en" href="https://kami.tw93.fun/">
+  <link rel="alternate" hreflang="zh-CN" href="https://kami.tw93.fun/index-zh.html">
+  <link rel="alternate" hreflang="ja" href="https://kami.tw93.fun/index-ja.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://kami.tw93.fun/index-tw.html">
+  <link rel="alternate" hreflang="ko" href="https://kami.tw93.fun/index-ko.html">
+  <link rel="alternate" hreflang="x-default" href="https://kami.tw93.fun/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Kami 紙：AIエージェント向けドキュメントデザインシステム">
+  <meta property="og:description" content="Kami（紙）は、AI時代の文書制作に向けた、あたたかな紙面デザインシステムです。単一アクセントカラー、serif中心の階層、編集的な余白で一貫した可読性をつくります。">
+  <meta property="og:url" content="https://kami.tw93.fun/index-ja.html">
+  <meta property="og:image" content="https://kami.tw93.fun/assets/images/1.png">
+  <meta property="og:image:width" content="3110">
+  <meta property="og:image:height" content="2392">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Kami 紙：AIエージェント向けドキュメントデザインシステム">
+  <meta name="twitter:description" content="Kami（紙）は、AI時代の文書制作に向けた、あたたかな紙面デザインシステムです。単一アクセントカラー、serif中心の階層、編集的な余白で一貫した可読性をつくります。">
+  <meta name="twitter:image" content="https://kami.tw93.fun/assets/images/1.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Kami",
+    "description": "AI時代の文書制作に向けた、あたたかな紙面デザインシステム。",
+    "url": "https://kami.tw93.fun/index-ja.html",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Any",
+    "author": {
+      "@type": "Person",
+      "name": "Tw93",
+      "url": "https://tw93.fun",
+      "sameAs": ["https://github.com/tw93", "https://twitter.com/HiTw93", "https://tw93.fun", "https://weekly.tw93.fun", "https://yobi.tw93.fun"]
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Kamiとは？",
+        "acceptedAnswer": { "@type": "Answer", "text": "AIエージェント向けのドキュメントデザインシステムです。単一アクセントカラー、serif階層、あたたかなパーチメントキャンバスで安定したレイアウトを出力します。" }
+      },
+      {
+        "@type": "Question",
+        "name": "どんなドキュメントを作れますか？",
+        "acceptedAnswer": { "@type": "Answer", "text": "10種類：ワンページャー、長文ドキュメント、レター、ポートフォリオ、履歴書、スライド、個別株レポート、変更履歴、ランディングページ（EN + CN）。加えて14種のインラインSVG図表。HTML出力でPDF、PNG、スライドに変換可能です。" }
+      },
+      {
+        "@type": "Question",
+        "name": "セットアップ方法は？",
+        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code: npx skills add tw93/kami -a claude-code -g -y。プラグインマーケットプレイス経由のインストールは Claude Code 2.1.136-2.1.138 で一時的に影響を受けています。汎用エージェント：npx skills add tw93/kami -a '*' -g -y。Claude Desktop：GitHub Releases から kami.zip をダウンロードし、Skills 設定でアップロード。" }
+      },
+      {
+        "@type": "Question",
+        "name": "対応言語は？",
+        "acceptedAnswer": { "@type": "Answer", "text": "英語、中国語、日本語。各言語に専用のserifフォント：英語はCharter、中国語はTsangerJinKai02、日本語はYuMinchoを使用します。" }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<main class="page">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="eyebrow">
+      <span>Design System · v1.5.0<span class="eyebrow-date"> · 2026.05</span></span>
+      <span class="hero-links">
+        <nav class="lang-switch" aria-label="Language" data-lang-switch>
+          <button class="lang-trigger" type="button" aria-expanded="false" data-lang-trigger>日本語</button>
+          <div class="lang-menu" data-lang-menu>
+            <a href="./index.html" data-lang="en">English</a>
+            <a href="./index-zh.html" data-lang="zh">简体中文</a>
+            <a href="./index-tw.html" data-lang="tw">繁體中文</a>
+            <a href="./index-ja.html" class="active" data-lang="ja">日本語</a>
+            <a href="./index-ko.html" data-lang="ko">한국어</a>
+          </div>
+        </nav>
+        <a href="https://github.com/tw93/kami" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+        </a>
+        <a href="https://x.com/HiTw93" target="_blank" rel="noopener" aria-label="X">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        </a>
+      </span>
+    </div>
+    <h1>Kami<span class="cn">紙</span></h1>
+    <p class="tagline">よい内容には、よい版面を。Kami は AI 時代のための文書組版デザインシステム。文書を明快で読みやすく、記憶に残る形へ整えます。</p>
+    <div class="hero-tokens">
+      <span><b>Canvas</b>#f5f4ed</span>
+      <span><b>Accent</b>#1B365D</span>
+      <span><b>Serif</b>JP Mincho / Tsanger fallback</span>
+      <span><b>Sans</b>= Serif (一頁一書体)</span>
+    </div>
+  </header>
+
+  <!-- ============ 00 DEMOS ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">00 · See it</p>
+      <h2 class="section-title">出力サンプル</h2>
+      <p class="section-lede section-lede-nowrap">Claude に要件を渡すだけで、一枚資料、長文、正式書簡、ポートフォリオ、履歴書、スライドまで、少数の明確なルールで整った版面に仕上がります。</p>
+      <p class="section-lede" style="margin-top:6px;">同じ brief は <a href="https://github.com/tw93/kami#travel" style="color:var(--brand); text-decoration:none; font-weight:500;">画像生成モデル</a> にも渡せます。サンプル画像とコピペできるプロンプトは README に置いています。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-card">
+        <a href="assets/demos/demo-tesla.pdf" target="_blank"><img src="assets/demos/demo-tesla.png" alt="Tesla Q1 2026 個別株レポート" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Equity Report</p>
+        <p class="demo-desc">Tesla Q1 2026 決算レポート</p>
+      </div>
+      <div class="demo-card">
+        <a href="assets/demos/demo-musk-resume.pdf" target="_blank"><img src="assets/demos/demo-musk-resume.png" alt="Musk resume" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Resume</p>
+        <p class="demo-desc">創業者 CV、2ページ</p>
+      </div>
+      <div class="demo-card">
+        <a href="assets/demos/demo-kaku.pdf" target="_blank"><img src="assets/demos/demo-kaku.png" alt="Kaku portfolio" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Portfolio</p>
+        <p class="demo-desc demo-desc-nowrap">Kaku ターミナル作品集、7ページ</p>
+      </div>
+      <div class="demo-card">
+        <a href="assets/demos/demo-agent-slides.pdf" target="_blank"><img src="assets/demos/demo-agent-slides.png" alt="Agent slides" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Slides</p>
+        <p class="demo-desc">Agent キーノート、6枚</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LANDING PAGES ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">Landing Pages</p>
+      <h2 class="section-title">Kami で構築</h2>
+      <p class="section-lede">同じランディングページテンプレートを 3 つの異なるプロダクトに適用。ひとつの制約セットから、3 つの異なる目的に。</p>
+    </div>
+    <div class="landing-grid">
+      <div class="landing-card">
+        <a href="https://kami.tw93.fun" target="_blank" rel="noopener"><img src="assets/images/1.png" alt="Kami ランディングページ" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Kami</p>
+        <p class="demo-desc">デザインシステム ホームページ</p>
+      </div>
+      <div class="landing-card">
+        <a href="https://luo.tw93.fun" target="_blank" rel="noopener"><img src="assets/images/2.png" alt="Luo ランディングページ" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Luo 落文</p>
+        <p class="demo-desc">CJK リーディングフォント</p>
+      </div>
+      <div class="landing-card">
+        <a href="https://mole.fit" target="_blank" rel="noopener"><img src="assets/images/3.png" alt="Mole ランディングページ" loading="lazy" decoding="async"></a>
+        <p class="demo-title">Mole 鼹</p>
+        <p class="demo-desc">macOS システムユーティリティ</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 01 INSTALL ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">01 · Usage</p>
+      <h2 class="section-title">インストールと呼び出し</h2>
+      <p class="section-lede">「履歴書を作って」「スタートアップ紹介の一枚資料を作って」「登壇用スライドを作って」のように要件を伝えるだけで、skill が自動起動します。スラッシュコマンドは不要です。</p>
+    </div>
+<pre class="code"><span class="c"># Claude Code</span>
+npx skills add tw93/kami -a claude-code -g -y
+
+<span class="c"># Codex</span>
+npx skills add tw93/kami -a codex -g -y</pre>
+    <p class="section-lede" style="font-size:14px;">Claude Code 2.1.136-2.1.138 ではプラグインマーケットプレイス経由のインストールが一時的に影響を受けています。上流のルート skill パス検証が修正されるまでは、上の Claude Code コマンドを使ってください。</p>
+    <p class="section-lede" style="font-size:14px;">Claude Desktop の場合は <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a> をダウンロードし、Customize &gt; Skills &gt; "+" &gt; Create skill からそのままアップロードします。</p>
+  </section>
+
+  <!-- ============ 02 MANIFESTO ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">02 · Manifesto</p>
+      <h2 class="section-title">設計原則</h2>
+    </div>
+    <p class="manifesto">暖かい紙色を土台に、強調色は <em>ink blue</em> のみ。階層は serif で作り、強い影や派手な配色は退かせます。印刷文書に向けて、安定し、明快で、読みやすい紙面を保つための設計です。</p>
+    <ol class="rules">
+      <li><span class="n">1</span><p>ページ背景は parchment <code>#f5f4ed</code>、純白は使わない</p></li>
+      <li><span class="n">2</span><p>強調色は ink blue <code>#1B365D</code> のみ、第二の彩色は入れない</p></li>
+      <li><span class="n">3</span><p>グレーはすべて暖色寄り、冷たいブルーグレーは禁止</p></li>
+      <li><span class="n">4</span><p>英語は見出しと本文を serif、中国語は見出しを serif、本文は読みやすい本文体</p></li>
+      <li><span class="n">5</span><p>serif 本文 400、見出し 500、合成ボールドは使わない</p></li>
+      <li><span class="n">6</span><p>行間は 2 段階、見出し 1.1-1.3 / 本文 1.4-1.45</p></li>
+      <li><span class="n">7</span><p>タグ背景は hex の実色のみ、rgba は使わない。WeasyPrint で二重矩形が出るためです</p></li>
+      <li><span class="n">8</span><p>影は ring か whisper のみ、強い drop shadow は使わない</p></li>
+    </ol>
+  </section>
+
+  <!-- ============ 03 COLOR ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">03 · Color</p>
+      <h2 class="section-title">暖色で抑制する</h2>
+      <p class="section-lede">強調色は 1 つ、ニュートラルは暖色のみ、寒色は入れない。Ink blue の使用面積はページ全体の <b>5%</b> 以内に抑えます。超えると統制ではなく過剰になります。</p>
+    </div>
+
+    <h3 class="subhead">Canvas</h3>
+    <div class="swatches">
+      <div class="swatch"><div class="chip" style="background:#f5f4ed"></div><div class="info"><p class="name">Parchment</p><p class="role">Page background, the emotional foundation</p><span class="hex">#F5F4ED</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#faf9f5"></div><div class="info"><p class="name">Ivory</p><p class="role">Cards / elevated surfaces</p><span class="hex">#FAF9F5</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#e8e6dc"></div><div class="info"><p class="name">Warm Sand</p><p class="role">Button default / interactive surfaces</p><span class="hex">#E8E6DC</span></div></div>
+      <div class="swatch dark"><div class="chip" style="background:#141413"></div><div class="info"><p class="name" style="color:var(--deep-dark)">Deep Dark</p><p class="role">Dark theme page base, not pure black</p><span class="hex">#141413</span></div></div>
+    </div>
+
+    <h3 class="subhead">Brand</h3>
+    <div class="swatches">
+      <div class="swatch brand"><div class="chip" style="background:#1B365D"></div><div class="info"><p class="name">Ink Blue</p><p class="role">Primary color · CTA · quote bar · section overline</p><span class="hex">#1B365D</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#2D5A8A"></div><div class="info"><p class="name">Ink Light</p><p class="role">Links on dark surfaces · lighter variant</p><span class="hex">#2D5A8A</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#30302e"></div><div class="info"><p class="name" style="color:var(--deep-dark)">Dark Surface</p><p class="role">Dark theme container · warm charcoal</p><span class="hex">#30302E</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#b53333"></div><div class="info"><p class="name">Error</p><p class="role">Error state, deep warm red</p><span class="hex">#B53333</span></div></div>
+    </div>
+
+    <h3 class="subhead">Warm Neutrals</h3>
+    <div class="swatches" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="swatch"><div class="chip" style="background:#141413"></div><div class="info"><p class="name">Near Black</p><span class="hex">#141413</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#3d3d3a"></div><div class="info"><p class="name">Dark Warm</p><span class="hex">#3D3D3A</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#504e49"></div><div class="info"><p class="name">Olive</p><span class="hex">#504e49</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#6b6a64"></div><div class="info"><p class="name">Stone</p><span class="hex">#6b6a64</span></div></div>
+    </div>
+
+    <h3 class="subhead">Tag Tints: rgba から実色 hex へ</h3>
+    <p style="font-size:14px; color: var(--olive); margin: 0 0 16px; line-height: 1.55;">下記は ink blue <code style="font-family:var(--mono);font-size:12px;background:#EEF2F7;color:var(--brand);padding:1px 5px;border-radius:2px">#1B365D</code> を parchment 上に重ねたときの等価な実色 hex です。タグ背景は <code style="font-family:var(--mono);font-size:12px;background:#EEF2F7;color:var(--brand);padding:1px 5px;border-radius:2px">rgba()</code> を避け、WeasyPrint の二重矩形を防ぎます。</p>
+    <div class="tint-strip">
+      <div class="tint"><span class="flag">&nbsp;</span><span class="sample" style="background:#EEF2F7">Tag sample</span><p class="opacity">0.08</p><span class="hex">#EEF2F7</span></div>
+      <div class="tint"><span class="flag">&nbsp;</span><span class="sample" style="background:#E4ECF5">Tag sample</span><p class="opacity">0.14</p><span class="hex">#E4ECF5</span></div>
+      <div class="tint default"><span class="flag">Default</span><span class="sample" style="background:#E4ECF5">Tag sample</span><p class="opacity">0.18</p><span class="hex">#E4ECF5</span></div>
+      <div class="tint"><span class="flag">&nbsp;</span><span class="sample" style="background:#D0DCE9">Tag sample</span><p class="opacity">0.22</p><span class="hex">#D0DCE9</span></div>
+      <div class="tint"><span class="flag">&nbsp;</span><span class="sample" style="background:#D6E1EE">Tag sample</span><p class="opacity">0.30</p><span class="hex">#D6E1EE</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 04 TYPE ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">04 · Typography</p>
+      <h2 class="section-title">タイポグラフィ体系</h2>
+      <p class="section-lede">階層は serif、機能要素は sans。serif は本文 400、見出し 500 を基本にします。</p>
+    </div>
+
+    <div class="family-grid">
+      <div class="family serif">
+        <p class="glyph">Aa</p>
+        <p class="role">Serif · 見出し + 本文</p>
+        <p class="name">JP Mincho / TsangerJinKai02</p>
+        <p class="use">見出し、本文、引用、数値強調に使用。日本語は明朝体を優先し、TsangerJinKai02 は CJK fallback として扱います。</p>
+      </div>
+      <div class="family mono">
+        <p class="glyph">&lt;/&gt;</p>
+        <p class="role">Mono · コード</p>
+        <p class="name">JetBrains Mono</p>
+        <p class="use">コードブロック、バージョン番号、hex 値、等幅数字に使用。</p>
+      </div>
+    </div>
+
+    <h3 class="subhead">スケール（印刷 pt、画面 px = pt x 1.33）</h3>
+    <div class="type-grid">
+      <div class="type-row">
+        <div class="type-label">Display</div>
+        <div class="type-sample display">よい文書は<br><span class="display-line-nowrap">明快で、安定し、読みやすい</span></div>
+        <div class="type-specs"><b>36-48 pt</b><br>weight 500<br>line 1.10</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">H1 Section</div>
+        <div class="type-sample h1">Color System · Palette</div>
+        <div class="type-specs"><b>18-22 pt</b><br>weight 500<br>line 1.20</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">H2 Subsection</div>
+        <div class="type-sample h2">Canvas · Warm Neutrals</div>
+        <div class="type-specs"><b>14-16 pt</b><br>weight 500<br>line 1.25</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">H3 Item</div>
+        <div class="type-sample h3">Tag Tints · Solid Hex</div>
+        <div class="type-specs"><b>12-13 pt</b><br>weight 500<br>line 1.30</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">Body</div>
+        <div class="type-sample body">Ink blue は各ページで 5% 以内。超えると抑制ではなく過剰になります。グレーは黄褐色の下地を持ち、R ≈ G > B を目安にします。</div>
+        <div class="type-specs"><b>9.5-10 pt</b><br>weight 400<br>line 1.55</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">Caption</div>
+        <div class="type-sample caption">図注、脚注、補足説明。色は olive または stone へ一段落とします。</div>
+        <div class="type-specs"><b>8.5-9 pt</b><br>weight 400<br>line 1.45</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">Label</div>
+        <div class="type-sample label">Design System · v1.5.0</div>
+        <div class="type-specs"><b>7.5-8 pt</b><br>weight 600<br>line 1.35</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 SPACING ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">05 · Spacing &amp; Shape</p>
+      <h2 class="section-title">リズムと形</h2>
+      <p class="section-lede">基本単位は 4pt。情報密度が高いほどマージンを詰め、フォーマルな文書ほど広く取ります。</p>
+    </div>
+
+    <table class="space-table">
+      <tr><th>Scale</th><th>Value</th><th>Use</th><th></th></tr>
+      <tr><td class="name">xs</td><td class="val">2-3 pt</td><td class="use">Inline elements</td><td class="bar"><span style="width:6px"></span></td></tr>
+      <tr><td class="name">sm</td><td class="val">4-5 pt</td><td class="use">Tag padding · tight layout</td><td class="bar"><span style="width:12px"></span></td></tr>
+      <tr><td class="name">md</td><td class="val">8-10 pt</td><td class="use">Component internals</td><td class="bar"><span style="width:24px"></span></td></tr>
+      <tr><td class="name">lg</td><td class="val">16-20 pt</td><td class="use">Between components · card padding</td><td class="bar"><span style="width:48px"></span></td></tr>
+      <tr><td class="name">xl</td><td class="val">24-32 pt</td><td class="use">Section title margins</td><td class="bar"><span style="width:72px"></span></td></tr>
+      <tr><td class="name">2xl</td><td class="val">40-60 pt</td><td class="use">Between major sections</td><td class="bar"><span style="width:140px"></span></td></tr>
+      <tr><td class="name">3xl</td><td class="val">80-120 pt</td><td class="use">Between long-doc chapters</td><td class="bar"><span style="width:240px"></span></td></tr>
+    </table>
+
+    <h3 class="subhead">Radii</h3>
+    <div class="radii">
+      <div class="radius"><div class="box" style="border-radius:4px"></div><div class="r"><b>4</b> pt</div><div class="label">Tight</div></div>
+      <div class="radius"><div class="box" style="border-radius:6px"></div><div class="r"><b>6</b> pt</div><div class="label">Code block</div></div>
+      <div class="radius"><div class="box" style="border-radius:8px"></div><div class="r"><b>8</b> pt</div><div class="label">Default card</div></div>
+      <div class="radius"><div class="box" style="border-radius:12px"></div><div class="r"><b>12</b> pt</div><div class="label">Container</div></div>
+      <div class="radius"><div class="box" style="border-radius:16px"></div><div class="r"><b>16</b> pt</div><div class="label">Feature card</div></div>
+      <div class="radius"><div class="box" style="border-radius:24px"></div><div class="r"><b>24</b> pt</div><div class="label">Large container</div></div>
+      <div class="radius"><div class="box" style="border-radius:32px"></div><div class="r"><b>32</b> pt</div><div class="label">Hero</div></div>
+    </div>
+
+    <h3 class="subhead">奥行き: 3 つの影の方法</h3>
+    <p style="font-size:14px; color: var(--olive); margin: 0 0 12px; line-height: 1.55;">Kami は強い影を使いません。奥行きは ring shadow、whisper shadow、明暗切り替えで作ります。</p>
+    <div class="shadow-row">
+      <div class="shadow-demo sd-ring">
+        <p class="t">Ring Shadow</p>
+        <p class="s">0 0 0 1pt var(--ring-warm)<br>&nbsp;<br>ボタン・カード hover</p>
+      </div>
+      <div class="shadow-demo sd-whisper">
+        <p class="t">Whisper Shadow</p>
+        <p class="s">0 4pt 24pt rgba(0,0,0,0.05)<br>&nbsp;<br>軽い浮き上がり・特集カード</p>
+      </div>
+      <div class="shadow-demo sd-alt">
+        <p class="t">Light ⇌ Dark</p>
+        <p class="s">parchment ⇌ deep-dark<br>&nbsp;<br>セクション単位・最も強い対比</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 06 COMPONENTS ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">06 · Components</p>
+      <h2 class="section-title">モジュール</h2>
+      <p class="section-lede">必要最小限の固定セットを使い、文書上の具体的な課題に効く場面だけで使います。</p>
+    </div>
+
+    <div class="comp-grid">
+      <div class="comp">
+        <h4>Buttons</h4>
+        <p class="hint">強い drop shadow ではなく ring shadow ・角丸 8pt</p>
+        <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap;">
+          <span class="btn btn-primary">主要 CTA</span>
+          <span class="btn btn-secondary">副次 CTA</span>
+          <span class="btn btn-ghost">Ghost</span>
+        </div>
+      </div>
+      <div class="comp">
+        <h4>タグ（3 段階）</h4>
+        <p class="hint">実色 hex ・弱から強へ選択</p>
+        <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <span class="tag calm">Light 0.08</span>
+          <span class="tag standard">Standard 0.18</span>
+          <span class="tag brush">Brush gradient</span>
+        </div>
+      </div>
+      <div class="comp">
+        <h4>引用</h4>
+        <p class="hint">左 2pt のブランド実線 + olive テキスト</p>
+        <blockquote class="quote">装飾より明快さを優先する。ひとつの Yes のために多くの No を選ぶ。</blockquote>
+      </div>
+      <div class="comp">
+        <h4>指標カード</h4>
+        <p class="hint">serif 数字 + sans ラベル ・ tabular-nums</p>
+        <div class="metrics demo">
+          <div class="metric"><span class="metric-value">6</span><span class="metric-label">文書タイプ</span></div>
+          <div class="metric"><span class="metric-value">1</span><span class="metric-label">強調色</span></div>
+          <div class="metric"><span class="metric-value">8</span><span class="metric-label">基本ルール</span></div>
+        </div>
+      </div>
+      <div class="comp">
+        <h4>セクション見出し</h4>
+        <p class="hint">serif 500 ・ 15pt ・サイズ主導の階層、装飾は不要</p>
+        <div class="demo">
+          <span class="sample-section-title">Selected Works · Projects</span>
+        </div>
+      </div>
+      <div class="comp">
+        <h4>Dash List</h4>
+        <p class="hint">丸点ではなくダッシュ ・ 編集文体</p>
+        <ul class="dash demo">
+          <li>紙色は暖色、純白は使わない</li>
+          <li>強調色は ink blue だけ、第二色は入れない</li>
+          <li>階層は serif で担保する</li>
+        </ul>
+      </div>
+      <div class="comp">
+        <h4>コードブロック</h4>
+        <p class="hint">ivory 背景 + 0.5pt 枠線 + 6pt 角丸</p>
+<pre class="code"><span class="c">// 温かみは色数ではなく、抑制で作る</span>
+canvas   = parchment; accent = <span class="k">ink_blue</span>
+palette  = <span class="k">warm_neutrals</span> − cool_grays
+document = <span class="k">serif</span> × hierarchy + generous_space
+beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
+      </div>
+      <div class="comp">
+        <h4>特集カード</h4>
+        <p class="hint">whisper shadow + 16pt 角丸</p>
+        <div class="demo" style="background:var(--ivory); border-radius:16px; padding:18px 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.05); border: 1px solid var(--border-cream);">
+          <p style="font-family:var(--serif); font-weight:500; font-size:15px; margin:0 0 6px; color:var(--near-black);">Tesla 企業紹介 · One-Pager</p>
+          <p style="font-size:12px; color:var(--olive); margin:0 0 10px; line-height:1.5;">A4 1ページ ・ 指標カード 4 枚 + 本文 3 セクション + タイムライン</p>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="tag calm">日本語</span>
+            <span class="tag calm">A4 x 1</span>
+            <span class="tag calm">Ink Blue</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 07 DIAGRAMS ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">07 · Diagrams</p>
+      <h2 class="section-title">インライン図表</h2>
+      <p class="section-lede">アーキテクチャ、フロー、データ可視化をカバーする 14 種の SVG 図表を用意。必要な種類を Claude に伝えると、Kami の色と書体規則に沿って文書へ直接埋め込みます。</p>
+    </div>
+    <div class="chart-showcase">
+      <!-- Architecture mini -->
+      <div class="chart-card">
+        <div class="chart-label">アーキテクチャ図 · Architecture</div>
+        <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">
+          <rect width="280" height="160" fill="#f5f4ed"/>
+          <!-- Browser → API -->
+          <path d="M 84,79.5 L 103,79.5 L 103,78 L 107,80 L 103,82 L 103,80.5 L 84,80.5 Z" fill="#6b6a64"/>
+          <!-- API → Database -->
+          <path d="M 172,79.5 L 191,79.5 L 191,78 L 195,80 L 191,82 L 191,80.5 L 172,80.5 Z" fill="#504e49"/>
+          <!-- Node: Client -->
+          <rect x="20" y="58" width="64" height="44" rx="3" fill="#f5f4ed" stroke="#6b6a64" stroke-width="0.8"/>
+          <text x="52" y="76" text-anchor="middle" font-size="7" letter-spacing="0.5" fill="#6b6a64">CLIENT</text>
+          <text x="52" y="91" text-anchor="middle" font-size="9" font-weight="600" fill="#141413">Browser</text>
+          <!-- Node: API (focal) -->
+          <rect x="108" y="58" width="64" height="44" rx="3" fill="#EEF2F7" stroke="#1B365D" stroke-width="1"/>
+          <text x="140" y="76" text-anchor="middle" font-size="7" letter-spacing="0.5" fill="#1B365D">SERVICE</text>
+          <text x="140" y="91" text-anchor="middle" font-size="9" font-weight="600" fill="#141413">API</text>
+          <!-- Node: Database -->
+          <rect x="196" y="58" width="64" height="44" rx="3" fill="#f5f4ed" stroke="#504e49" stroke-width="0.8"/>
+          <text x="228" y="76" text-anchor="middle" font-size="7" letter-spacing="0.5" fill="#6b6a64">DATA</text>
+          <text x="228" y="91" text-anchor="middle" font-size="9" font-weight="600" fill="#141413">Database</text>
+        </svg>
+        <p class="chart-caption">システム構成と接続関係、焦点ノードを 1 つに絞る</p>
+      </div>
+      <!-- Flowchart mini -->
+      <div class="chart-card">
+        <div class="chart-label">フローチャート · Flowchart</div>
+        <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">
+          <rect width="280" height="160" fill="#f5f4ed"/>
+          <rect x="100" y="8" width="80" height="28" rx="14" fill="#141413"/>
+          <text x="140" y="25" text-anchor="middle" font-size="9" fill="#f5f4ed">Start</text>
+          <!-- Start → diamond -->
+          <path d="M 139.5,36 L 139.5,48 L 138,48 L 140,52 L 142,48 L 140.5,48 L 140.5,36 Z" fill="#504e49"/>
+          <polygon points="140,52 172,72 140,92 108,72" fill="#f5f4ed" stroke="#141413" stroke-width="1"/>
+          <text x="140" y="76" text-anchor="middle" font-size="8" fill="#141413">Valid?</text>
+          <!-- Yes right -->
+          <path d="M 172,71.5 L 204,71.5 L 204,70 L 208,72 L 204,74 L 204,72.5 L 172,72.5 Z" fill="#1B365D"/>
+          <text x="186" y="68" text-anchor="middle" font-size="8" fill="#1B365D">Yes</text>
+          <rect x="208" y="56" width="64" height="32" rx="4" fill="#EEF2F7" stroke="#1B365D" stroke-width="1"/>
+          <text x="240" y="75" text-anchor="middle" font-size="9" fill="#141413">Process</text>
+          <!-- No down -->
+          <path d="M 139.5,92 L 139.5,112 L 138,112 L 140,116 L 142,112 L 140.5,112 L 140.5,92 Z" fill="#504e49"/>
+          <text x="151" y="106" font-size="8" fill="#504e49">No</text>
+          <rect x="96" y="116" width="88" height="32" rx="4" fill="#f5f4ed" stroke="#6b6a64" stroke-width="0.8"/>
+          <text x="140" y="134" text-anchor="middle" font-size="9" fill="#504e49">Reject</text>
+        </svg>
+        <p class="chart-caption">分岐と yes/no の流れ、成功側を主軸に配置</p>
+      </div>
+      <!-- Bar chart (shifted left) -->
+      <div class="chart-card">
+        <div class="chart-label">棒グラフ · Bar Chart</div>
+        <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">
+          <rect width="280" height="160" fill="#f5f4ed"/>
+          <rect x="18" y="78" width="42" height="50" rx="3" fill="#6b6a64"/>
+          <rect x="78" y="62" width="42" height="66" rx="3" fill="#504e49"/>
+          <rect x="138" y="44" width="42" height="84" rx="3" fill="#2d4e7a"/>
+          <rect x="198" y="30" width="42" height="98" rx="3" fill="#1B365D"/>
+          <text x="39" y="145" text-anchor="middle" font-size="10" fill="#6b6a64">Q1</text>
+          <text x="99" y="145" text-anchor="middle" font-size="10" fill="#504e49">Q2</text>
+          <text x="159" y="145" text-anchor="middle" font-size="10" fill="#4d4c48">Q3</text>
+          <text x="219" y="145" text-anchor="middle" font-size="10" fill="#4d4c48">Q4</text>
+          <text x="39" y="73" text-anchor="middle" font-size="9" font-weight="600" fill="#6b6a64">180</text>
+          <text x="99" y="57" text-anchor="middle" font-size="9" font-weight="600" fill="#504e49">220</text>
+          <text x="159" y="39" text-anchor="middle" font-size="9" font-weight="600" fill="#2d4e7a">195</text>
+          <text x="219" y="25" text-anchor="middle" font-size="9" font-weight="600" fill="#1B365D">240</text>
+        </svg>
+        <p class="chart-caption">四半期売上の比較、単色または段階色で表現</p>
+      </div>
+      <!-- Donut chart -->
+      <div class="chart-card">
+        <div class="chart-label">ドーナツチャート · Donut Chart</div>
+        <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">
+          <rect width="280" height="160" fill="#f5f4ed"/>
+          <path d="M 80,25 A 55,55 0 1,1 47.7,124.5 L 62.4,104.3 A 30,30 0 1,0 80,50 Z" fill="#1B365D" stroke="white" stroke-width="1.5"/>
+          <path d="M 47.7,124.5 A 55,55 0 0,1 35.5,47.7 L 55.7,62.4 A 30,30 0 0,0 62.4,104.3 Z" fill="#504e49" stroke="white" stroke-width="1.5"/>
+          <path d="M 35.5,47.7 A 55,55 0 0,1 80,25 L 80,50 A 30,30 0 0,0 55.7,62.4 Z" fill="#6b6a64" stroke="white" stroke-width="1.5"/>
+          <text x="80" y="77" text-anchor="middle" font-size="13" font-weight="600" fill="#1B365D">60%</text>
+          <text x="80" y="92" text-anchor="middle" font-size="10" fill="#504e49">Primary</text>
+          <rect x="150" y="46" width="10" height="10" rx="2" fill="#1B365D"/>
+          <text x="165" y="55" font-size="11" fill="#4d4c48">Core revenue · 60%</text>
+          <rect x="150" y="72" width="10" height="10" rx="2" fill="#504e49"/>
+          <text x="165" y="81" font-size="11" fill="#4d4c48">Services · 25%</text>
+          <rect x="150" y="98" width="10" height="10" rx="2" fill="#6b6a64"/>
+          <text x="165" y="107" font-size="11" fill="#4d4c48">Other · 15%</text>
+        </svg>
+        <p class="chart-caption">売上構成の内訳、3-6 セグメントに対応</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 07 DECISION TABLE ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">08 · Decision Lookup</p>
+      <h2 class="section-title">クイック参照</h2>
+      <p class="section-lede">どの手法を使うか迷ったらこの表を参照。該当がなければ基本原則に戻って判断します。</p>
+    </div>
+    <table class="decision">
+      <tr><th>場面</th><th>処方</th></tr>
+      <tr><td class="task">大きな見出し</td><td class="how">serif <code>500</code>、サイズで階層化、行間 <code>1.10-1.30</code></td></tr>
+      <tr><td class="task">本文（可読重視）</td><td class="how">serif <code>400</code>、<code>9.5-10 pt</code>、行間 <code>1.55</code></td></tr>
+      <tr><td class="task">数値を強調</td><td class="how"><code>color: var(--brand)</code> を使い、太字には頼らない</td></tr>
+      <tr><td class="task">セクション分離</td><td class="how">左 <code>2.5pt</code> の brand 実線、または <code>0.5pt</code> 暖色破線</td></tr>
+      <tr><td class="task">引用を置く</td><td class="how">左 <code>2pt</code> brand 実線 + olive テキスト</td></tr>
+      <tr><td class="task">コードを載せる</td><td class="how">ivory 背景 + <code>0.5pt</code> 枠線 + <code>6pt</code> 角丸 + mono 書体</td></tr>
+      <tr><td class="task">主ボタンと副ボタン</td><td class="how">主: brand 塗り + ivory 文字、副: warm-sand + charcoal</td></tr>
+      <tr><td class="task">特別カードを示す</td><td class="how"><code>border: 0.5pt solid var(--brand)</code> または <code>border-left: 3pt</code></td></tr>
+      <tr><td class="task">セクション開始</td><td class="how">serif <code>500</code> ・ <code>15pt</code> ・サイズ主導の階層、装飾は不要</td></tr>
+      <tr><td class="task">表紙を作る</td><td class="how">1 ページ構成、Display サイズ + 右寄せの著者/日付 + 広い余白</td></tr>
+      <tr><td class="task">データカード</td><td class="how">ivory 背景 + <code>8pt</code> 角丸 + serif 大数字 + sans 小ラベル</td></tr>
+    </table>
+  </section>
+
+  <!-- ============ 09 ANTI ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">09 · Anti-Patterns</p>
+      <h2 class="section-title">避けるべきこと</h2>
+      <p class="section-lede">例外は許容できますが、理由を明示できる場合に限ります。</p>
+    </div>
+
+    <div class="anti">
+      <div class="no">
+        <h5>Don't</h5>
+        <p>ページ背景に <code>#ffffff</code> の純白や <code>#f3f4f6</code> の寒色グレーを使わない。紙面が硬く見え、温かい紙質感が崩れます。</p>
+      </div>
+      <div class="yes">
+        <h5>Do</h5>
+        <p>常に <code>#f5f4ed</code> の parchment を使う。印刷時の白フチを防ぐため、<code>@page background</code> も同色に設定します。</p>
+      </div>
+      <div class="no">
+        <h5>Don't</h5>
+        <p>タグに <code>rgba(27,54,93,0.18)</code> を使わない。WeasyPrint で文字領域と余白領域の不透明度がずれ、二重矩形が出ます。</p>
+      </div>
+      <div class="yes">
+        <h5>Do</h5>
+        <p>tint 対照表の実色 hex <code>#E4ECF5</code> を使う。描画が安定し、色ぶれを防げます。</p>
+      </div>
+      <div class="no">
+        <h5>Don't</h5>
+        <p>見出しに <code>font-weight: 600</code> 以上の合成ボールドを使わない。線が潰れて可読性と品位が落ちます。</p>
+      </div>
+      <div class="yes">
+        <h5>Do</h5>
+        <p>本文 400、見出し 500（実フォント W05）。強調が必要ならサイズや左バーで対応し、合成ボールドは使わない。</p>
+      </div>
+      <div class="no">
+        <h5>Don't</h5>
+        <p>強い drop shadow <code>0 2px 8px rgba(0,0,0,0.3)</code> を使わない。重く見え、印刷時に黒く潰れやすい。</p>
+      </div>
+      <div class="yes">
+        <h5>Do</h5>
+        <p>ring shadow <code>0 0 0 1pt</code> か whisper <code>rgba 0.05</code> を使う。あるいは明暗の切り替えで階層を作る。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 10 BACKGROUND ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">10 · Background</p>
+      <h2 class="section-title">設計の背景</h2>
+    </div>
+    <div class="background-text">
+      <p>米国株投資が好きで、Claude にリサーチレポートを書かせる場面が多いです。出力はいつも既定のドキュメント風で、灰色で平板、セッションごとにレイアウトが変わる。構成は追いづらく書式は古臭く、読み続ける気になれませんでした。書体、配色、余白をひとつずつ直していき、読んでいて心地よいページに仕上げました。</p>
+      <p>その後「あなたの知らない Agent：原理、アーキテクチャとエンジニアリング実践」の発表をすることになりました。すでに原稿があったのでスライドを一から作る気にならず、Claude Design で自分のスタイルのまま組版し、何度も調整を繰り返して、ようやく納得のいく仕上がりになりました。inline SVG 図表、暖色パレットの統一、編集リズムの引き締めを加え、よく使う文書形式をすべてカバーするまで育ったので、このプロセスをさらに抽象化して kami にしました。どのエージェントに渡しても安心して出せる、静かなデザインシステムです。</p>
+    </div>
+  </section>
+
+  <!-- ============ 11 FAQ ============ -->
+  <section>
+    <div class="section-head">
+      <p class="section-num">11 · よくある質問</p>
+      <h2 class="section-title">FAQ</h2>
+    </div>
+    <dl class="faq">
+      <div class="faq-pair">
+        <dt>Kamiとは？</dt>
+        <dd>AIエージェント向けのドキュメントデザインシステムです。単一アクセントカラー、serif階層、あたたかなパーチメントキャンバス。LLMエージェントに指示を出すだけで安定したレイアウトが返ってきます。Claude DesignやGPT Canvasなどの画像レンダラーへのビジュアルブリーフとしても使えます。</dd>
+      </div>
+      <div class="faq-pair">
+        <dt>どんなドキュメントを作れますか？</dt>
+        <dd>10種類のテンプレート：ワンページャー、長文ドキュメント、レター、ポートフォリオ、履歴書、スライド、個別株レポート、変更履歴、ランディングページ（EN + CN）。加えて14種のインラインSVG図表で視覚的な説明も可能です。出力はHTMLで、PDF、PNG、スライドに変換できます。</dd>
+      </div>
+      <div class="faq-pair">
+        <dt>セットアップ方法は？</dt>
+        <dd>Claude Code：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a claude-code -g -y</code>。プラグインマーケットプレイス経由のインストールは Claude Code 2.1.136-2.1.138 で一時的に影響を受けています。汎用エージェント：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a '*' -g -y</code>。Claude Desktop：GitHub Releasesからkami.zipをダウンロードし、カスタマイズ &gt; スキルでアップロード。</dd>
+      </div>
+      <div class="faq-pair">
+        <dt>対応言語は？</dt>
+        <dd>英語、中国語、日本語。各言語に専用のserifフォントを使用：英語はCharter、中国語はTsangerJinKai02、日本語はYuMincho。字間、行高、フォントサイズは言語ごとに印刷品質レベルで調整されています。</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="mark">
+      <svg width="56" height="56" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-label="Kami mark">
+        <rect x="6" y="6" width="68" height="68" rx="10" fill="#faf9f5" stroke="#1B365D" stroke-width="1.25"/>
+        <line x1="16" y1="26" x2="64" y2="26" stroke="#1B365D" stroke-width="1.25"/>
+        <text x="40" y="56" font-family="TsangerJinKai02, Georgia, serif" font-size="34" font-weight="500" fill="#141413" text-anchor="middle">紙</text>
+      </svg>
+      <div>
+        <p class="wm-name">Kami · 紙</p>
+        <p class="wm-sub">よい内容には、よい版面を。</p>
+      </div>
+    </div>
+    <div class="colophon">
+      <div><a href="https://github.com/tw93/kami" style="color:var(--brand); text-decoration:none; font-weight:500;">GitHub</a>&nbsp;&nbsp;·&nbsp;&nbsp;One-Pager · Long Doc · Letter · Portfolio · Resume · Slides</div>
+      <div style="margin-top:8px; color: var(--olive); font-family: var(--serif);">
+        Serif が階層を担い、sans が機能を担い、暖色グレーがリズムを作り、ink blue が焦点を作ります。
+      </div>
+    </div>
+  </footer>
+
+</main>
+<script>
+(function(){
+  var sw=document.querySelector('[data-lang-switch]');
+  if(!sw)return;
+  var trigger=sw.querySelector('[data-lang-trigger]');
+  function setOpen(open){
+    sw.classList.toggle('is-open',open);
+    trigger.setAttribute('aria-expanded',open);
+  }
+  trigger.addEventListener('click',function(e){
+    e.stopPropagation();
+    setOpen(!sw.classList.contains('is-open'));
+  });
+  sw.querySelectorAll('[data-lang-menu] a').forEach(function(a){
+    a.addEventListener('click',function(){
+      localStorage.setItem('kami-lang',a.getAttribute('data-lang'));
+    });
+  });
+  document.addEventListener('click',function(e){
+    if(!sw.contains(e.target))setOpen(false);
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape')setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>

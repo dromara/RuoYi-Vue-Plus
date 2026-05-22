@@ -1,0 +1,49 @@
+name: release
+
+on:
+  push:
+    tags: ['V*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to attach kami.zip to (e.g. V1.4.1)'
+        required: true
+
+jobs:
+  attach-archive:
+    name: build kami.zip and attach to release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Resolve tag name
+        id: tag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "name=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Resolved tag: $TAG"
+
+      - name: Build kami.zip
+        run: |
+          bash scripts/package-skill.sh dist/kami.zip
+          ls -lah dist/kami.zip
+
+      - name: Ensure release exists, then attach archive
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.tag.outputs.name }}
+        run: |
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG does not exist, creating placeholder"
+            gh release create "$TAG" --title "$TAG" --notes "Release notes pending. Edit on GitHub."
+          fi
+          gh release upload "$TAG" dist/kami.zip --clobber
+          echo "OK: kami.zip attached to release $TAG"

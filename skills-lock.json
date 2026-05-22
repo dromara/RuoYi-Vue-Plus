@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "jobs-to-be-done": {
+      "source": "deanpeters/product-manager-skills",
+      "sourceType": "github",
+      "skillPath": "skills/jobs-to-be-done/SKILL.md",
+      "computedHash": "8aa88b3fd1044390bd1d094f50d1d14c91587bfd06251239ae8c0754f77ac9d8"
+    },
+    "kami": {
+      "source": "tw93/kami",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "4a51b613b6e714e7707b6ee0e0f966ec08f27898ee05c50d6acc53e379a537e2"
+    },
+    "prd-development": {
+      "source": "deanpeters/product-manager-skills",
+      "sourceType": "github",
+      "skillPath": "skills/prd-development/SKILL.md",
+      "computedHash": "1b7f6de0d407c7ed581ab96fcdd332392f4552ddafa26da5fe29eff863123c7f"
+    }
+  }
+}

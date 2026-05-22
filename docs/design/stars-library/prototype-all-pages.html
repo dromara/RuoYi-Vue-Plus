@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stars 库 — Kami 风格全页面原型</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --parchment: #f5f4ed;
+      --ivory: #faf9f5;
+      --warm-sand: #e8e6dc;
+      --brand: #1B365D;
+      --brand-light: #2D5A8A;
+      --brand-tint: #EEF2F7;
+      --brand-tag: #E4ECF5;
+      --near-black: #141413;
+      --dark-warm: #3d3d3a;
+      --olive: #504e49;
+      --stone: #6b6a64;
+      --border: #e8e6dc;
+      --border-soft: #e5e3d8;
+      --status-ok: #3d5a4a;
+      --status-warn: #6b5a3d;
+      --status-fail: #6b3d3d;
+      --bg: var(--parchment);
+      --surface: var(--ivory);
+      --text: var(--near-black);
+      --muted: var(--olive);
+      --accent: var(--brand);
+      --accent-hover: var(--brand-light);
+      --radius: 8px;
+      --radius-sm: 6px;
+      --shadow: 0 1px 0 var(--border-soft), 0 8px 24px rgba(20, 19, 19, 0.06);
+      --shadow-hover: 0 1px 0 var(--border-soft), 0 12px 32px rgba(20, 19, 19, 0.08);
+      --font-serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif;
+      --font-ui: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", Consolas, monospace;
+      --sidebar-w: 200px;
+      --topbar-h: 56px;
+      --tabbar-h: 52px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-ui);
+      background: var(--warm-sand);
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 14px;
+      letter-spacing: 0.02em;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
+    .doc-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--ivory);
+      color: var(--near-black);
+      padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 0 var(--border-soft);
+    }
+    .doc-header h1 { font-family: var(--font-serif); font-size: 20px; font-weight: 500; }
+    .doc-header p { font-size: 12px; color: var(--stone); margin-top: 4px; }
+    .doc-nav { display: flex; flex-wrap: wrap; gap: 8px; }
+    .doc-nav a {
+      color: var(--olive); text-decoration: none; font-size: 12px;
+      padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border);
+      background: var(--parchment);
+      transition: background .2s, color .2s, border-color .2s;
+    }
+    .doc-nav a:hover { background: var(--brand-tint); color: var(--brand); border-color: var(--border-soft); cursor: pointer; }
+
+    .doc-main { max-width: 1600px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    .section {
+      margin-bottom: 48px;
+      background: var(--ivory);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .section-head {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--parchment);
+    }
+    .section-head h2 {
+      font-family: var(--font-serif);
+      font-size: 17px; font-weight: 500;
+      display: flex; align-items: center; gap: 10px;
+      padding-left: 12px;
+      border-left: 3px solid var(--brand);
+    }
+    .section-head .badge {
+      font-family: var(--font-ui); font-size: 11px; font-weight: 500;
+      background: var(--brand-tag); color: var(--brand);
+      padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border-soft);
+    }
+    .section-head p { color: var(--olive); font-size: 13px; margin-top: 8px; }
+
+    .frames {
+      display: grid;
+      grid-template-columns: 1fr 375px;
+      gap: 24px;
+      padding: 24px;
+      align-items: start;
+      background: var(--parchment);
+    }
+    @media (max-width: 1100px) { .frames { grid-template-columns: 1fr; } }
+
+    .frame-label {
+      font-size: 11px; font-weight: 500;
+      letter-spacing: .08em; color: var(--stone);
+      margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+      font-family: var(--font-ui);
+    }
+    .frame-label span { background: var(--warm-sand); padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; }
+
+    .frame {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg);
+      box-shadow: var(--shadow);
+    }
+    .frame-pc { min-height: 520px; }
+    .frame-mobile { width: 375px; max-width: 100%; min-height: 680px; margin: 0 auto; }
+
+    .app { display: flex; flex-direction: column; height: 100%; min-height: inherit; font-size: 13px; }
+
+    .layout-pc { display: flex; min-height: 520px; }
+    .sidebar {
+      width: var(--sidebar-w); background: var(--ivory);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .sidebar-brand {
+      padding: 18px 16px; font-family: var(--font-serif); font-weight: 500; font-size: 15px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px; color: var(--near-black);
+    }
+    .sidebar-brand svg { color: var(--brand); stroke-width: 1.5; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; color: var(--olive); cursor: pointer;
+      transition: background .2s, color .2s; border-left: 3px solid transparent;
+      font-family: var(--font-ui);
+    }
+    .nav-item:hover { background: var(--parchment); color: var(--dark-warm); }
+    .nav-item.active { background: var(--brand-tint); color: var(--brand); border-left-color: var(--brand); font-weight: 500; }
+    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; stroke-width: 1.5; }
+
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--parchment); }
+    .topbar {
+      height: var(--topbar-h); background: var(--ivory);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 20px; gap: 12px;
+    }
+    .search-box {
+      flex: 1; max-width: 360px;
+      display: flex; align-items: center; gap: 8px;
+      background: var(--ivory); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 8px 12px;
+    }
+    .search-box svg { color: var(--stone); width: 16px; height: 16px; }
+    .search-box input { border: none; background: none; outline: none; flex: 1; font-size: 13px; font-family: var(--font-ui); color: var(--dark-warm); }
+
+    .content { flex: 1; padding: 20px; overflow: auto; }
+
+    .section-title {
+      font-family: var(--font-serif); font-weight: 500; font-size: 15px;
+      color: var(--near-black); padding-left: 10px;
+      border-left: 3px solid var(--brand); margin-bottom: 12px;
+    }
+
+    .layout-mobile { display: flex; flex-direction: column; min-height: 680px; background: var(--parchment); }
+    .mobile-topbar {
+      height: 48px; background: var(--ivory); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+      font-family: var(--font-serif); font-weight: 500; font-size: 16px;
+    }
+    .mobile-content { flex: 1; padding: 12px 16px; overflow: auto; }
+    .tabbar {
+      height: var(--tabbar-h); background: var(--ivory);
+      border-top: 1px solid var(--border);
+      display: flex; padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    .tab-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; font-size: 10px; color: var(--stone); cursor: pointer; padding: 8px 0;
+      transition: color .2s; font-family: var(--font-ui);
+    }
+    .tab-item.active { color: var(--brand); font-weight: 500; }
+    .tab-item svg { width: 20px; height: 20px; stroke-width: 1.5; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500;
+      border: none; cursor: pointer; transition: background .2s, color .2s, border-color .2s;
+      font-family: var(--font-ui);
+    }
+    .btn-primary { background: var(--brand); color: var(--ivory); }
+    .btn-primary:hover { background: var(--brand-light); }
+    .btn-secondary { background: var(--ivory); color: var(--brand); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--brand-tint); }
+    .btn-ghost { background: transparent; color: var(--brand-light); padding: 6px 10px; }
+    .btn-ghost:hover { background: var(--brand-tint); }
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+    .btn-danger { color: var(--status-fail); border: 1px solid var(--border); background: var(--ivory); }
+    .btn-danger:hover { background: #f5efef; }
+
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 500;
+      background: var(--brand-tag); color: var(--brand); border: 1px solid var(--border-soft);
+      cursor: pointer; transition: background .2s, color .2s; font-family: var(--font-ui);
+    }
+    .chip:hover { background: var(--brand-tint); }
+    .chip.selected { background: var(--brand); color: var(--ivory); border-color: var(--brand); }
+
+    .badge-status { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 4px; font-family: var(--font-ui); }
+    .badge-pending { background: var(--warm-sand); color: var(--stone); }
+    .badge-processing { background: #f5f0e8; color: var(--status-warn); }
+    .badge-done { background: #eef3f0; color: var(--status-ok); }
+    .badge-failed { background: #f5efef; color: var(--status-fail); }
+
+    .repo-card {
+      background: var(--ivory); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 20px;
+      transition: box-shadow .2s, border-color .2s; cursor: pointer;
+      box-shadow: 0 1px 0 var(--border-soft);
+    }
+    .repo-card:hover {
+      border-color: color-mix(in srgb, var(--brand) 22%, var(--border));
+      box-shadow: var(--shadow-hover);
+    }
+    .repo-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+    .repo-name { font-family: var(--font-mono); font-weight: 500; font-size: 13px; color: var(--near-black); }
+    .repo-meta { font-size: 11px; color: var(--stone); display: flex; gap: 8px; align-items: center; font-family: var(--font-ui); }
+    .repo-oneliner {
+      font-family: var(--font-serif); font-size: 14px; font-weight: 500;
+      color: var(--dark-warm); margin: 10px 0 4px; padding-left: 10px;
+      border-left: 2px solid var(--brand); line-height: 1.45;
+    }
+    .repo-summary { font-size: 12px; color: var(--olive); line-height: 1.6; font-family: var(--font-serif); }
+    .repo-meta-note { font-size: 10px; color: var(--stone); margin-top: 4px; }
+    .repo-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+    .repo-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-soft); }
+    .repo-links { display: flex; gap: 12px; }
+    .link-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 0; font-size: 11px; color: var(--stone);
+      background: none; border: none; border-bottom: 1px solid transparent;
+      cursor: pointer; transition: color .2s, border-color .2s; font-family: var(--font-ui);
+    }
+    .link-btn:hover { color: var(--brand); border-bottom-color: var(--brand); }
+
+    .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    @media (max-width: 900px) { .card-grid { grid-template-columns: 1fr; } }
+
+    .filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; align-items: center; }
+    .filter-label { font-size: 11px; color: var(--stone); font-weight: 500; margin-right: 4px; font-family: var(--font-ui); }
+
+    .skeleton { height: 14px; background: linear-gradient(90deg, #e8e6dc 25%, #f5f4ed 50%, #e8e6dc 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    .spinner { width: 14px; height: 14px; border: 2px solid var(--brand-tint); border-top-color: var(--brand); border-radius: 50%; animation: spin .8s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .login-page {
+      min-height: 520px; display: flex; align-items: center; justify-content: center;
+      background: var(--parchment); padding: 24px;
+    }
+    .login-card {
+      width: 100%; max-width: 400px; background: var(--ivory);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 36px 32px; box-shadow: var(--shadow);
+    }
+    .login-card h2 { font-family: var(--font-serif); font-size: 24px; font-weight: 500; margin-bottom: 6px; }
+    .login-card .sub { color: var(--olive); font-size: 13px; margin-bottom: 28px; font-family: var(--font-serif); }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 500; margin-bottom: 6px; color: var(--stone); letter-spacing: .06em; font-family: var(--font-ui); }
+    .form-input {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 14px; font-family: var(--font-ui);
+      background: var(--ivory); color: var(--dark-warm);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent); }
+    .captcha-row { display: flex; gap: 8px; }
+    .captcha-row .form-input { flex: 1; }
+    .captcha-img { width: 100px; height: 40px; background: var(--warm-sand); border: 1px solid var(--border); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 16px; letter-spacing: 4px; color: var(--brand); cursor: pointer; }
+
+    .panel {
+      background: var(--ivory); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 22px; margin-bottom: 16px;
+      box-shadow: 0 1px 0 var(--border-soft);
+    }
+    .panel h3 { font-family: var(--font-serif); font-size: 15px; font-weight: 500; margin-bottom: 6px; padding-left: 10px; border-left: 3px solid var(--brand); }
+    .panel p { font-size: 12px; color: var(--olive); margin-bottom: 16px; line-height: 1.55; }
+    .status-row { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: var(--parchment); border: 1px solid var(--border); border-left: 3px solid var(--status-ok); border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 13px; }
+    .status-row svg { color: var(--status-ok); }
+    .progress-wrap { margin-top: 12px; }
+    .progress-bar { height: 6px; background: var(--warm-sand); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--brand); border-radius: 3px; transition: width .3s; }
+    .progress-text { font-size: 12px; color: var(--stone); margin-top: 8px; display: flex; justify-content: space-between; font-family: var(--font-ui); }
+
+    .detail-section { margin-bottom: 24px; }
+    .detail-section h4 {
+      font-family: var(--font-serif); font-size: 14px; font-weight: 500;
+      color: var(--near-black); padding-left: 10px; border-left: 3px solid var(--brand);
+      margin-bottom: 10px;
+    }
+    .detail-textarea {
+      width: 100%; min-height: 72px; padding: 10px 12px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: var(--font-serif); font-size: 13px; resize: vertical; background: var(--ivory); line-height: 1.55;
+    }
+    .detail-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; align-items: center; }
+
+    .tag-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .tag-table th { text-align: left; padding: 10px 12px; background: var(--parchment); color: var(--stone); font-size: 11px; font-weight: 500; border-bottom: 1px solid var(--border); font-family: var(--font-ui); }
+    .tag-table td { padding: 12px; border-bottom: 1px solid var(--border-soft); }
+    .color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+    .states-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding: 24px; background: var(--parchment); }
+    .state-card { border: 1px dashed var(--border); border-radius: var(--radius); padding: 18px; background: var(--ivory); }
+    .state-card h4 { font-family: var(--font-serif); font-size: 13px; font-weight: 500; margin-bottom: 12px; color: var(--olive); }
+
+    .empty-state { text-align: center; padding: 40px 20px; }
+    .empty-state svg { color: var(--stone); margin-bottom: 12px; stroke-width: 1.25; }
+    .empty-state h3 { font-family: var(--font-serif); font-size: 16px; font-weight: 500; margin-bottom: 6px; }
+    .empty-state p { font-size: 13px; color: var(--olive); margin-bottom: 16px; }
+
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand-tint); color: var(--brand); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; margin-left: auto; cursor: pointer; font-family: var(--font-ui); border: 1px solid var(--border-soft); }
+  </style>
+</head>
+<body>
+
+<header class="doc-header">
+  <div>
+    <h1>Stars 库 · Kami 风格原型</h1>
+    <p>暖色纸感 · 墨蓝强调 · 衬线层级 · 全页面平铺</p>
+  </div>
+  <nav class="doc-nav">
+    <a href="#login">登录</a>
+    <a href="#list">列表</a>
+    <a href="#import">导入</a>
+    <a href="#detail">详情</a>
+    <a href="#tags">标签</a>
+    <a href="#states">组件状态</a>
+    <a href="global-design-spec.md">设计说明</a>
+  </nav>
+</header>
+
+<main class="doc-main">
+
+  <!-- ═══ P0 登录 ═══ -->
+  <section class="section" id="login">
+    <div class="section-head">
+      <h2>P0 · 登录 <span class="badge">/login</span></h2>
+      <p>RuoYi 认证 · 用户名 + 密码 + 验证码 · 成功后跳转列表页</p>
+    </div>
+    <div class="frames">
+      <div>
+        <div class="frame-label">PC <span>1280×720</span></div>
+        <div class="frame frame-pc">
+          <div class="login-page">
+            <div class="login-card">
+              <h2>Stars 库</h2>
+              <p class="sub">整理你的 GitHub Stars，像藏书一样浏览</p>
+              <div class="form-group">
+                <label for="user">用户名</label>
+                <input class="form-input" id="user" type="text" placeholder="admin" value="admin" />
+              </div>
+              <div class="form-group">
+                <label for="pwd">密码</label>
+                <input class="form-input" id="pwd" type="password" placeholder="••••••••" />
+              </div>
+              <div class="form-group">
+                <label for="cap">验证码</label>
+                <div class="captcha-row">
+                  <input class="form-input" id="cap" type="text" placeholder="验证码" />
+                  <div class="captcha-img" title="点击刷新">8K3M</div>
+                </div>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;">进 入</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="frame-label">H5 <span>375×812</span></div>
+        <div class="frame frame-mobile">
+          <div class="login-page" style="min-height:680px;">
+            <div class="login-card" style="padding:24px;">
+              <h2 style="font-size:20px;">Stars 库</h2>
+              <p class="sub">整理你的 Stars</p>
+              <div class="form-group"><label>用户名</label><input class="form-input" type="text" value="admin" /></div>
+              <div class="form-group"><label>密码</label><input class="form-input" type="password" /></div>
+              <div class="form-group"><label>验证码</label><div class="captcha-row"><input class="form-input" /><div class="captcha-img">8K3M</div></div></div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;">登 录</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ P1 列表 ═══ -->
+  <section class="section" id="list">
+    <div class="section-head">
+      <h2>P1 · Stars 列表 <span class="badge">/repos</span></h2>
+      <p>搜索 · 分类/标签/来源筛选 · 排序 · AI 概述状态 · 外链 · 点击进入详情</p>
+    </div>
+    <div class="frames">
+      <div>
+        <div class="frame-label">PC · Sidebar 布局</div>
+        <div class="frame frame-pc">
+          <div class="layout-pc app">
+            <aside class="sidebar">
+              <div class="sidebar-brand">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Stars 库
+              </div>
+              <div class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                Stars 目录
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                导入中心
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                标签管理
+              </div>
+            </aside>
+            <div class="main">
+              <div class="topbar">
+                <div class="search-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" placeholder="搜索仓库名、概述、标签…" />
+                </div>
+                <button class="btn btn-secondary btn-sm">排序：导入时间 ↓</button>
+                <div class="avatar">A</div>
+              </div>
+              <div class="content">
+                <div class="filter-row">
+                  <span class="filter-label">分类</span>
+                  <span class="chip selected">AI/RAG</span>
+                  <span class="chip">后端框架</span>
+                  <span class="chip">DevOps</span>
+                  <span class="filter-label" style="margin-left:12px;">标签</span>
+                  <span class="chip">Spring AI</span>
+                  <span class="chip selected">RAG</span>
+                </div>
+                <div class="card-grid">
+                  <div class="repo-card">
+                    <div class="repo-card-head">
+                      <span class="repo-name">spring-projects/spring-ai</span>
+                      <span class="badge-status badge-done">已概述</span>
+                    </div>
+                    <div class="repo-meta"><span>★ 4.2k</span><span>Java</span><span>来源：self</span></div>
+                    <div class="repo-tags"><span class="chip">AI/RAG</span><span class="chip">Spring AI</span><span class="chip">RAG</span></div>
+                    <p class="repo-oneliner">Spring 官方 AI 应用开发框架</p>
+                    <p class="repo-summary">提供 ChatClient、RAG、向量存储集成，适合 Java 后端接入大模型。</p>
+                    <p class="repo-meta-note">自动撰写 · 可编辑</p>
+                    <div class="repo-foot">
+                      <div class="repo-links">
+                        <span class="link-btn">GitHub</span>
+                        <span class="link-btn">Zread</span>
+                        <span class="link-btn">DeepWiki</span>
+                      </div>
+                      <span class="btn-ghost btn-sm">阅读 →</span>
+                    </div>
+                  </div>
+                  <div class="repo-card">
+                    <div class="repo-card-head">
+                      <span class="repo-name">langchain-ai/langchain</span>
+                      <span class="badge-status badge-processing"><span class="spinner"></span> 撰写中</span>
+                    </div>
+                    <div class="repo-meta"><span>★ 112k</span><span>Python</span><span>来源：torvalds</span></div>
+                    <div class="repo-tags"><span class="chip">待评估</span></div>
+                    <p class="repo-meta-note" style="margin-top:12px;">正在撰写概述…</p>
+                    <div class="skeleton" style="width:90%;margin:8px 0;"></div>
+                    <div class="skeleton" style="width:70%;"></div>
+                    <div class="repo-foot">
+                      <div class="repo-links"><span class="link-btn">GitHub</span><span class="link-btn">Zread</span></div>
+                      <span class="btn-ghost btn-sm">详情 →</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="frame-label">H5 · 底部 Tab</div>
+        <div class="frame frame-mobile">
+          <div class="layout-mobile app">
+            <div class="mobile-topbar">
+              <span>Stars 目录</span>
+              <button class="btn btn-secondary btn-sm">筛选</button>
+            </div>
+            <div class="mobile-content">
+              <div class="search-box" style="max-width:none;margin-bottom:12px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" placeholder="搜索…" />
+              </div>
+              <div class="filter-row" style="margin-bottom:12px;">
+                <span class="chip selected">AI/RAG</span>
+                <span class="chip">RAG</span>
+              </div>
+              <div class="repo-card" style="margin-bottom:12px;">
+                <div class="repo-card-head"><span class="repo-name" style="font-size:13px;">spring-projects/spring-ai</span><span class="badge-status badge-done">已概述</span></div>
+                <p class="repo-oneliner" style="font-size:13px;">Spring 官方 AI 框架</p>
+                <div class="repo-tags"><span class="chip">Spring AI</span></div>
+                <div class="repo-foot" style="margin-top:8px;padding-top:8px;"><div class="repo-links"><span class="link-btn">GitHub</span><span class="link-btn">Zread</span></div></div>
+              </div>
+              <div class="repo-card">
+                <div class="repo-card-head"><span class="repo-name" style="font-size:13px;">langchain-ai/langchain</span><span class="badge-status badge-processing">撰写中</span></div>
+                <div class="skeleton" style="width:80%;margin-top:8px;"></div>
+              </div>
+            </div>
+            <nav class="tabbar">
+              <div class="tab-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>列表</div>
+              <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>导入</div>
+              <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/></svg>标签</div>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ P2 导入 ═══ -->
+  <section class="section" id="import">
+    <div class="section-head">
+      <h2>P2 · 导入中心 <span class="badge">/import</span></h2>
+      <p>GitHub PAT 绑定 · 同步我的 Stars · 导入他人清单 · 异步任务进度</p>
+    </div>
+    <div class="frames">
+      <div>
+        <div class="frame-label">PC</div>
+        <div class="frame frame-pc">
+          <div class="layout-pc app">
+            <aside class="sidebar">
+              <div class="sidebar-brand"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Stars 库</div>
+              <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> Stars 列表</div>
+              <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg> 导入中心</div>
+              <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/></svg> 标签管理</div>
+            </aside>
+            <div class="main">
+              <div class="topbar"><span style="font-weight:600;">导入中心</span></div>
+              <div class="content">
+                <div class="panel">
+                  <h3>GitHub 账号绑定</h3>
+                  <p>绑定 Personal Access Token 以同步你的 Stars（scopes: read:user）</p>
+                  <div class="status-row">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <span>已绑定：<strong>@dev-user</strong></span>
+                    <button class="btn btn-danger btn-sm" style="margin-left:auto;">解绑</button>
+                  </div>
+                </div>
+                <div class="panel">
+                  <h3>同步我的 Stars</h3>
+                  <p>增量同步，不会覆盖你已编辑的概述与标签</p>
+                  <button class="btn btn-primary">开始同步</button>
+                </div>
+                <div class="panel">
+                  <h3>导入他人 Stars</h3>
+                  <p>输入 GitHub 用户名，导入其公开 Stars 清单</p>
+                  <div style="display:flex;gap:8px;max-width:400px;">
+                    <input class="form-input" placeholder="例如：torvalds" style="flex:1;" />
+                    <button class="btn btn-primary">导入</button>
+                  </div>
+                </div>
+                <div class="panel">
+                  <h3>导入任务</h3>
+                  <p>self_sync · 进行中</p>
+                  <div class="progress-wrap">
+                    <div class="progress-bar"><div class="progress-fill" style="width:64%;"></div></div>
+                    <div class="progress-text"><span>已收录 320 / 500 项</span><span>失败 0</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="frame-label">H5</div>
+        <div class="frame frame-mobile">
+          <div class="layout-mobile app">
+            <div class="mobile-topbar"><span>导入中心</span></div>
+            <div class="mobile-content">
+              <div class="panel" style="padding:16px;">
+                <h3>GitHub 绑定</h3>
+                <div class="status-row" style="padding:10px;font-size:12px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> @dev-user</div>
+                <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;">同步我的 Stars</button>
+              </div>
+              <div class="panel" style="padding:16px;">
+                <h3>导入他人</h3>
+                <input class="form-input" placeholder="GitHub 用户名" style="margin-bottom:8px;" />
+                <button class="btn btn-secondary" style="width:100%;justify-content:center;">导入</button>
+              </div>
+              <div class="panel" style="padding:16px;">
+                <div class="progress-bar"><div class="progress-fill" style="width:64%;"></div></div>
+                <div class="progress-text"><span>320 / 500</span></div>
+              </div>
+            </div>
+            <nav class="tabbar">
+              <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>列表</div>
+              <div class="tab-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>导入</div>
+              <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/></svg>标签</div>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ P3 详情 ═══ -->
+  <section class="section" id="detail">
+    <div class="section-head">
+      <h2>P3 · 仓库详情 <span class="badge">/repos/:id</span></h2>
+      <p>查看/编辑中文概述、分类、标签、收藏理由 · 重新生成 · 外链</p>
+    </div>
+    <div class="frames">
+      <div>
+        <div class="frame-label">PC</div>
+        <div class="frame frame-pc">
+          <div class="layout-pc app">
+            <aside class="sidebar">
+              <div class="sidebar-brand"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Stars 库</div>
+              <div class="nav-item active">Stars 列表</div>
+            </aside>
+            <div class="main">
+              <div class="topbar">
+                <button class="btn btn-ghost btn-sm">← 返回列表</button>
+                <span class="repo-name">spring-projects/spring-ai</span>
+                <span class="repo-meta" style="margin-left:8px;">★ 4.2k · Java</span>
+              </div>
+              <div class="content">
+                <div class="detail-section">
+                  <h4>中文概述 <span class="badge-status badge-done" style="margin-left:8px;">自动撰写</span></h4>
+                  <input class="form-input" value="Spring 官方 AI 应用开发框架" style="margin-bottom:8px;" />
+                  <textarea class="detail-textarea">提供 ChatClient、RAG、向量存储集成，适合 Java 后端快速接入大模型能力。</textarea>
+                </div>
+                <div class="detail-section">
+                  <h4>主分类</h4>
+                  <select class="form-input" style="max-width:240px;"><option>AI/RAG</option><option>后端框架</option></select>
+                </div>
+                <div class="detail-section">
+                  <h4>标签</h4>
+                  <div class="repo-tags"><span class="chip selected">Spring AI</span><span class="chip selected">RAG</span><span class="chip">参考实现</span><span class="chip" style="border:1px dashed var(--border);background:var(--parchment);">+ 添加</span></div>
+                </div>
+                <div class="detail-section">
+                  <h4>收藏理由</h4>
+                  <textarea class="detail-textarea" style="min-height:56px;" placeholder="记录为什么收藏这个项目…">用于工单分类模块的 RAG 参考</textarea>
+                </div>
+                <div class="detail-actions">
+                  <button class="btn btn-primary">保存</button>
+                  <button class="btn btn-primary">重新撰写概述</button>
+                  <span class="link-btn">GitHub</span>
+                  <span class="link-btn">Zread</span>
+                  <span class="link-btn">DeepWiki</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="frame-label">H5</div>
+        <div class="frame frame-mobile">
+          <div class="layout-mobile app">
+            <div class="mobile-topbar">
+              <button class="btn btn-ghost btn-sm" style="padding:4px;">←</button>
+              <span style="font-family:var(--font-mono);font-size:12px;">spring-ai</span>
+              <span></span>
+            </div>
+            <div class="mobile-content">
+              <div class="detail-section"><h4>概述</h4><textarea class="detail-textarea">Spring 官方 AI 应用开发框架…</textarea></div>
+              <div class="detail-section"><h4>分类</h4><select class="form-input"><option>AI/RAG</option></select></div>
+              <div class="detail-section"><h4>标签</h4><div class="repo-tags"><span class="chip">Spring AI</span><span class="chip">RAG</span></div></div>
+              <div class="detail-section"><h4>收藏理由</h4><textarea class="detail-textarea" style="min-height:48px;"></textarea></div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:8px;">保存</button>
+              <button class="btn btn-secondary" style="width:100%;justify-content:center;">重新撰写</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ P4 标签 ═══ -->
+  <section class="section" id="tags">
+    <div class="section-head">
+      <h2>P4 · 标签管理 <span class="badge">/tags</span></h2>
+      <p>PC 完整 CRUD · H5 精简（列表 + 创建 + 删除）</p>
+    </div>
+    <div class="frames">
+      <div>
+        <div class="frame-label">PC · 表格 CRUD</div>
+        <div class="frame frame-pc">
+          <div class="layout-pc app">
+            <aside class="sidebar">
+              <div class="sidebar-brand">Stars 库</div>
+              <div class="nav-item active">标签管理</div>
+            </aside>
+            <div class="main">
+              <div class="topbar">
+                <span style="font-weight:600;">标签管理</span>
+                <button class="btn btn-primary btn-sm" style="margin-left:auto;">新建标签</button>
+              </div>
+              <div class="content">
+                <table class="tag-table">
+                  <thead><tr><th>颜色</th><th>名称</th><th>使用次数</th><th>操作</th></tr></thead>
+                  <tbody>
+                    <tr><td><span class="color-dot" style="background:#1B365D;"></span></td><td>Spring AI</td><td>12</td><td><button class="btn btn-ghost btn-sm">编辑</button><button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button></td></tr>
+                    <tr><td><span class="color-dot" style="background:#2D5A8A;"></span></td><td>RAG</td><td>8</td><td><button class="btn btn-ghost btn-sm">编辑</button><button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button></td></tr>
+                    <tr><td><span class="color-dot" style="background:#504e49;"></span></td><td>参考实现</td><td>5</td><td><button class="btn btn-ghost btn-sm">编辑</button><button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="frame-label">H5 · 精简</div>
+        <div class="frame frame-mobile">
+          <div class="layout-mobile app">
+            <div class="mobile-topbar"><span>标签</span><button class="btn btn-primary btn-sm">新建</button></div>
+            <div class="mobile-content">
+              <div class="repo-card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+                <span><span class="color-dot" style="background:#1B365D;margin-right:8px;"></span>Spring AI <span style="color:var(--muted);font-size:11px;">(12)</span></span>
+                <button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button>
+              </div>
+              <div class="repo-card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+                <span><span class="color-dot" style="background:#2D5A8A;margin-right:8px;"></span>RAG <span style="color:var(--muted);font-size:11px;">(8)</span></span>
+                <button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button>
+              </div>
+            </div>
+            <nav class="tabbar">
+              <div class="tab-item">列表</div>
+              <div class="tab-item">导入</div>
+              <div class="tab-item active">标签</div>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 组件状态 ═══ -->
+  <section class="section" id="states">
+    <div class="section-head">
+      <h2>通用组件状态</h2>
+      <p>空态 · 概述撰写 · 按钮 · 搜索无结果 · Toast</p>
+    </div>
+    <div class="states-grid">
+      <div class="state-card">
+        <h4>空状态 · 无 Stars</h4>
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <h3>目录还是空的</h3>
+          <p>绑定 GitHub 并同步，或导入他人清单</p>
+          <button class="btn btn-primary">去导入中心</button>
+        </div>
+      </div>
+      <div class="state-card">
+        <h4>搜索无结果</h4>
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <h3>未找到匹配项目</h3>
+          <p>试试其他关键词，或清除筛选条件</p>
+          <button class="btn btn-secondary">清除筛选</button>
+        </div>
+      </div>
+      <div class="state-card">
+        <h4>概述撰写状态</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <span class="badge-status badge-pending">pending · 等待撰写</span>
+          <span class="badge-status badge-processing"><span class="spinner"></span> processing · 撰写中</span>
+          <span class="badge-status badge-done">done · 已概述</span>
+          <span class="badge-status badge-failed">failed · 未完成</span>
+          <button class="btn btn-secondary btn-sm" style="margin-top:4px;">重试</button>
+        </div>
+      </div>
+      <div class="state-card">
+        <h4>按钮状态</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <button class="btn btn-primary">Primary</button>
+          <button class="btn btn-secondary">Secondary</button>
+          <button class="btn btn-ghost">Ghost</button>
+          <button class="btn btn-primary" disabled style="opacity:.5;cursor:not-allowed;">Disabled</button>
+          <button class="btn btn-primary"><span class="spinner"></span> Loading</button>
+        </div>
+      </div>
+      <div class="state-card">
+        <h4>Tag Chips</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span class="chip">默认</span>
+          <span class="chip selected">选中筛选</span>
+          <span class="chip">自动标签</span>
+        </div>
+      </div>
+      <div class="state-card">
+        <h4>导入任务进度</h4>
+        <div class="progress-bar"><div class="progress-fill" style="width:45%;"></div></div>
+        <div class="progress-text"><span>已收录 225 / 500 项</span><span>失败 2</span></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer style="text-align:center;padding:24px;color:var(--muted);font-size:12px;">
+  Stars 库 UI Prototype · Kami 纸感设计 · 见 global-design-spec.md
+</footer>
+
+</body>
+</html>

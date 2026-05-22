@@ -121,6 +121,11 @@
             <artifactId>ai-structured</artifactId>
         </dependency>-->
 
+        <dependency>
+            <groupId>com.wudgaby.stars</groupId>
+            <artifactId>stars-library</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

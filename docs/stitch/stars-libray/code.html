@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "background": "#fcf8f9",
+                        "surface-container-high": "#ebe7e7",
+                        "surface": "#fcf8f9",
+                        "on-primary-fixed": "#181c22",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#918176",
+                        "surface-container-low": "#f6f3f3",
+                        "on-secondary-fixed-variant": "#404750",
+                        "on-tertiary-fixed": "#231a12",
+                        "tertiary": "#000000",
+                        "inverse-on-surface": "#f3f0f0",
+                        "on-secondary-container": "#5e656e",
+                        "on-surface-variant": "#45474b",
+                        "on-primary-container": "#80848c",
+                        "secondary-fixed": "#dce3ee",
+                        "surface-container-highest": "#e5e2e2",
+                        "primary-fixed": "#dfe2eb",
+                        "on-tertiary-fixed-variant": "#51443b",
+                        "on-error": "#ffffff",
+                        "surface-container": "#f0eded",
+                        "surface-variant": "#e5e2e2",
+                        "inverse-surface": "#313031",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#f3dfd2",
+                        "outline": "#76777b",
+                        "primary": "#000000",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dcd9d9",
+                        "inverse-primary": "#c3c6cf",
+                        "surface-tint": "#5b5e66",
+                        "secondary-fixed-dim": "#c0c7d2",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1c1b1c",
+                        "surface-bright": "#fcf8f9",
+                        "tertiary-container": "#231a12",
+                        "on-primary-fixed-variant": "#43474e",
+                        "primary-container": "#181c22",
+                        "primary-fixed-dim": "#c3c6cf",
+                        "secondary-container": "#dce3ee",
+                        "on-secondary-fixed": "#151c24",
+                        "secondary": "#585f68",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c6c6cb",
+                        "tertiary-fixed-dim": "#d6c3b7",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#1c1b1c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "container-max": "1280px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "sidebar-width": "260px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-md": ["13px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md">
+<!-- Design Documentation Section (Non-App Shell) -->
+<header class="w-full bg-surface-container-lowest border-b border-outline-variant px-xl py-lg">
+<div class="max-w-container-max mx-auto flex justify-between items-center">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary">GitHub Stars 知识库原型与文档 <span class="text-on-surface-variant font-normal opacity-50">v1.0 MVP</span></h1>
+<p class="text-on-surface-variant font-body-md mt-xs">RuoYi-Vue-Plus 模块文档与设计展示</p>
+</div>
+<div class="flex gap-md">
+<span class="bg-secondary-container text-on-secondary-container px-md py-xs rounded-lg font-label-md">状态：评审中</span>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto py-xl px-xl space-y-xl">
+<!-- Section 1: Documentation -->
+<section class="space-y-md">
+<h2 class="font-headline-md text-headline-md border-l-4 border-primary pl-md">1. 功能蓝图</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="col-span-2 bg-surface-container-low border border-outline-variant p-lg rounded-xl">
+<h3 class="font-label-md text-label-md text-on-primary-container mb-md">系统流程</h3>
+<div class="bg-white p-lg rounded border border-outline-variant font-label-sm text-on-surface overflow-x-auto">
+<!-- Mermaid-like flow description -->
+<div class="flex flex-col items-center space-y-4 text-center">
+<div class="px-4 py-2 bg-primary text-white rounded">用户绑定 GitHub 令牌</div>
+<span class="material-symbols-outlined">south</span>
+<div class="flex gap-xl">
+<div class="px-4 py-2 border border-primary rounded">导入任务进入队列</div>
+<div class="px-4 py-2 border border-primary rounded">AI 分析服务</div>
+</div>
+<span class="material-symbols-outlined">south</span>
+<div class="px-4 py-2 bg-surface-container-high rounded">数据库存储与向量索引</div>
+<span class="material-symbols-outlined">south</span>
+<div class="px-4 py-2 border border-primary rounded">可搜索的知识库界面</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low border border-outline-variant p-lg rounded-xl">
+<h3 class="font-label-md text-label-md text-on-primary-container mb-md">业务规则</h3>
+<ul class="space-y-sm font-body-md text-on-surface-variant list-disc pl-md">
+<li>初始仅索引公开的 Star 仓库。</li>
+<li>每用户每分钟 AI 概述生成限制为 20 个。</li>
+<li>标签在团队实例内共享。</li>
+<li>令牌在存储时必须加密。</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Section 2: Main Interface Showcase (The Live App Mockup) -->
+<section class="space-y-md">
+<h2 class="font-headline-md text-headline-md border-l-4 border-primary pl-md">2. 仓库列表界面</h2>
+<div class="relative flex h-[800px] border border-outline-variant rounded-xl overflow-hidden shadow-2xl bg-white">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full z-40 w-[260px] bg-surface border-r border-outline-variant relative">
+<div class="p-lg">
+<div class="font-headline-md text-headline-md font-bold text-primary mb-xs">Stars Library</div>
+<div class="font-body-md text-body-md text-on-surface-variant opacity-60">RuoYi-Vue-Plus</div>
+</div>
+<nav class="flex-1 px-sm space-y-xs mt-md">
+<div class="flex items-center gap-sm px-md py-sm text-primary font-bold border-l-4 border-primary bg-surface-container-high">
+<span class="material-symbols-outlined">star</span>
+<span class="font-label-md text-label-md">我的收藏</span>
+</div>
+<div class="flex items-center gap-sm px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">cloud_download</span>
+<span class="font-label-md text-label-md">导入中心</span>
+</div>
+<div class="flex items-center gap-sm px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">label</span>
+<span class="font-label-md text-label-md">标签管理</span>
+</div>
+</nav>
+<div class="p-lg border-t border-outline-variant">
+<button class="w-full bg-primary text-on-primary py-sm px-md rounded-lg font-label-md mb-md">绑定 GitHub 令牌</button>
+<div class="space-y-xs">
+<div class="flex items-center gap-sm px-md py-xs text-on-surface-variant hover:bg-surface-container-low cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md">设置</span>
+</div>
+<div class="flex items-center gap-sm px-md py-xs text-on-surface-variant hover:bg-surface-container-low cursor-pointer">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md">帮助</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Content Area -->
+<div class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-md md:px-xl sticky top-0 z-50 bg-surface border-b border-outline-variant h-16">
+<div class="flex items-center gap-lg">
+<span class="font-headline-md text-headline-md font-extrabold text-primary">仓库</span>
+<div class="hidden md:flex gap-md">
+<span class="text-primary font-bold border-b-2 border-primary pb-1 font-label-md cursor-pointer">控制台</span>
+<span class="text-on-surface-variant hover:text-primary transition-colors font-label-md cursor-pointer">仓库</span>
+<span class="text-on-surface-variant hover:text-primary transition-colors font-label-md cursor-pointer">标签</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1.5 text-outline text-[20px]">search</span>
+<input class="bg-surface-container-low border border-outline-variant rounded-lg pl-8 pr-4 py-1.5 text-body-md w-64 focus:ring-1 focus:ring-primary focus:outline-none" placeholder="搜索已收藏的仓库..." type="text"/>
+</div>
+<button class="bg-primary text-on-primary px-md py-1.5 rounded-lg font-label-md hover:opacity-90 transition-opacity">立即同步</button>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">notifications</span>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiDi8tckpnSQDL7pDdV2YJp-uJTKgamq4RW1K372ElIoUfNXosdAOVROmwnAEU8OButJDNPKwRJ-wQahbssF11AxYONMiDvg3zEbPgIFnymvmDOBl2a4LHHZSS28lbH70kRT9Fzx8txMnSc7Pfq6J28BQ6oRDa2LgkesMPB2v6RNsQlImLaB7riTQvKiAoSkKlL5GtQTaXyLJPTJiu6eMupWCubwPTrjtLQTusfxvkx5jySAX3u45MMM60yiz96Hh8g0nPvIivN196"/>
+</div>
+</header>
+<!-- Main List Content -->
+<div class="flex-1 overflow-y-auto p-lg bg-background">
+<!-- Importing State -->
+<div class="mb-lg bg-surface-container border border-outline-variant p-md rounded-xl flex items-center gap-md shadow-sm">
+<div class="w-10 h-10 bg-primary-container flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-white animate-spin">sync</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-end mb-xs">
+<span class="font-label-md text-primary">正在导入仓库数据...</span>
+<span class="font-label-sm text-on-surface-variant">425 / 1,280</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 33%"></div>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined">close</span></button>
+</div>
+<!-- Repo Cards Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-md">
+<!-- Card 1: RuoYi-Vue-Plus -->
+<div class="bg-white border border-outline-variant p-lg rounded-xl hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start mb-md">
+<div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">book</span>
+<h4 class="font-headline-md text-headline-md text-primary hover:underline cursor-pointer">yangzongzhuan/RuoYi-Vue-Plus</h4>
+</div>
+<p class="text-on-surface-variant font-body-md mt-xs">基于 SpringBoot &amp; Vue3 的高性能企业级后台管理系统。</p>
+</div>
+<div class="flex items-center gap-xs bg-surface-container px-sm py-1 rounded-full">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md">15.4k</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-lg mb-md border-l-4 border-primary">
+<div class="flex items-center gap-xs mb-xs">
+<span class="material-symbols-outlined text-primary text-[16px]">auto_awesome</span>
+<span class="font-label-sm text-primary">AI 洞察</span>
+</div>
+<p class="font-body-md italic text-on-surface text-sm">“中国生态中企业级 SpringBoot 应用的权威样板，经过深度的 RuoYi 优化。”</p>
+</div>
+<div class="flex flex-wrap gap-xs mb-md">
+<span class="px-sm py-xs bg-secondary-container text-on-secondary-container font-label-sm rounded">Java</span>
+<span class="px-sm py-xs bg-tertiary-fixed text-on-tertiary-fixed font-label-sm rounded">企业级</span>
+<span class="px-sm py-xs bg-surface-container-high text-on-surface-variant font-label-sm rounded">+4 标签</span>
+</div>
+<div class="flex justify-between items-center pt-md border-t border-outline-variant">
+<div class="flex gap-md">
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs font-label-md"><span class="material-symbols-outlined text-[18px]">edit_note</span> 备注</button>
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs font-label-md"><span class="material-symbols-outlined text-[18px]">share</span> 分享</button>
+</div>
+<button class="border border-outline-variant px-md py-1 rounded hover:bg-surface-container-low font-label-md transition-colors">查看仓库</button>
+</div>
+</div>
+<!-- Card 2: Spring AI -->
+<div class="bg-white border border-outline-variant p-lg rounded-xl hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start mb-md">
+<div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">book</span>
+<h4 class="font-headline-md text-headline-md text-primary hover:underline cursor-pointer">spring-projects/spring-ai</h4>
+</div>
+<p class="text-on-surface-variant font-body-md mt-xs">为 AI 工程设计的应用框架。</p>
+</div>
+<div class="flex items-center gap-xs bg-surface-container px-sm py-1 rounded-full">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md">2.8k</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-lg mb-md border-l-4 border-primary">
+<div class="flex items-center gap-xs mb-xs">
+<span class="material-symbols-outlined text-primary text-[16px]">auto_awesome</span>
+<span class="font-label-sm text-primary">AI 洞察</span>
+</div>
+<p class="font-body-md italic text-on-surface text-sm">“Java Spring 生态系统与现代 LLM 能力之间的关键桥梁，支持 OpenAI、Azure 等。”</p>
+</div>
+<div class="flex flex-wrap gap-xs mb-md">
+<span class="px-sm py-xs bg-secondary-container text-on-secondary-container font-label-sm rounded">Spring</span>
+<span class="px-sm py-xs bg-tertiary-fixed text-on-tertiary-fixed font-label-sm rounded">LLM</span>
+</div>
+<div class="flex justify-between items-center pt-md border-t border-outline-variant">
+<div class="flex gap-md">
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs font-label-md"><span class="material-symbols-outlined text-[18px]">edit_note</span> 备注</button>
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs font-label-md"><span class="material-symbols-outlined text-[18px]">share</span> 分享</button>
+</div>
+<button class="border border-outline-variant px-md py-1 rounded hover:bg-surface-container-low font-label-md transition-colors">查看仓库</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Import Center -->
+<section class="space-y-md">
+<h2 class="font-headline-md text-headline-md border-l-4 border-primary pl-md">3. 导入中心工作空间</h2>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+<div class="bg-white border border-outline-variant p-xl rounded-xl">
+<h3 class="font-headline-md mb-md">配置</h3>
+<div class="space-y-lg">
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface-variant">GitHub 个人访问令牌 (PAT)</label>
+<input class="w-full border border-outline-variant bg-surface-container-low p-md rounded-lg focus:ring-1 focus:ring-primary outline-none" placeholder="ghp_************************" type="password"/>
+<p class="text-on-tertiary-container font-label-sm">需要 'read:user' 和 'repo' 权限以访问 Star 列表。</p>
+</div>
+<div class="flex gap-md">
+<button class="flex-1 bg-primary text-on-primary py-md rounded-lg font-label-md hover:opacity-90">导入我的 Stars</button>
+<button class="flex-1 border border-outline-variant text-on-surface py-md rounded-lg font-label-md hover:bg-surface-container-low">导入他人 Stars</button>
+</div>
+</div>
+</div>
+<div class="bg-white border border-outline-variant p-xl rounded-xl">
+<h3 class="font-headline-md mb-md">进行中的任务</h3>
+<div class="space-y-md">
+<div class="p-md border border-outline-variant rounded-lg">
+<div class="flex justify-between mb-sm">
+<span class="font-label-md font-bold text-primary">正在导入: @ruoyi-vue-plus</span>
+<span class="text-on-surface-variant font-label-sm">运行中...</span>
+</div>
+<div class="flex gap-lg text-sm text-on-surface-variant font-label-sm">
+<div class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px] text-primary">check_circle</span> 已处理 892</div>
+<div class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px] text-error">error</span> 失败 0</div>
+<div class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px] text-outline">hourglass_empty</span> 剩余 388</div>
+</div>
+</div>
+<div class="p-md border border-outline-variant rounded-lg bg-surface-container-low">
+<div class="flex justify-between mb-sm">
+<span class="font-label-md font-bold text-on-surface-variant">正在导入: @deepseek-ai</span>
+<span class="text-on-tertiary-container font-label-sm">已完成</span>
+</div>
+<p class="text-on-tertiary-container font-label-sm italic">成功同步 12 个仓库并完成 AI 索引。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Tag Management -->
+<section class="space-y-md">
+<h2 class="font-headline-md text-headline-md border-l-4 border-primary pl-md">4. 标签管理</h2>
+<div class="bg-white border border-outline-variant p-xl rounded-xl">
+<div class="flex justify-between items-center mb-xl">
+<div class="flex gap-md">
+<button class="bg-primary text-on-primary px-lg py-sm rounded font-label-md">+ 创建新标签</button>
+<button class="border border-outline-variant text-on-surface px-lg py-sm rounded font-label-md">批量合并</button>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1.5 text-outline text-[20px]">filter_list</span>
+<input class="border border-outline-variant pl-8 pr-4 py-1.5 rounded-lg text-sm" placeholder="搜索标签..." type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-md">
+<!-- Tag Item -->
+<div class="group border border-outline-variant p-md rounded-lg hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-center justify-between mb-sm">
+<div class="w-3 h-3 rounded-full bg-blue-500"></div>
+<span class="material-symbols-outlined text-outline text-[16px] opacity-0 group-hover:opacity-100">more_vert</span>
+</div>
+<div class="font-label-md text-primary mb-xs">前端</div>
+<div class="text-on-tertiary-container font-label-sm">124 仓库</div>
+</div>
+<div class="group border border-outline-variant p-md rounded-lg hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-center justify-between mb-sm">
+<div class="w-3 h-3 rounded-full bg-green-500"></div>
+<span class="material-symbols-outlined text-outline text-[16px] opacity-0 group-hover:opacity-100">more_vert</span>
+</div>
+<div class="font-label-md text-primary mb-xs">后端</div>
+<div class="text-on-tertiary-container font-label-sm">89 仓库</div>
+</div>
+<div class="group border border-outline-variant p-md rounded-lg hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-center justify-between mb-sm">
+<div class="w-3 h-3 rounded-full bg-purple-500"></div>
+<span class="material-symbols-outlined text-outline text-[16px] opacity-0 group-hover:opacity-100">more_vert</span>
+</div>
+<div class="font-label-md text-primary mb-xs">AI/ML</div>
+<div class="text-on-tertiary-container font-label-sm">56 仓库</div>
+</div>
+<div class="group border border-outline-variant p-md rounded-lg hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-center justify-between mb-sm">
+<div class="w-3 h-3 rounded-full bg-orange-500"></div>
+<span class="material-symbols-outlined text-outline text-[16px] opacity-0 group-hover:opacity-100">more_vert</span>
+</div>
+<div class="font-label-md text-primary mb-xs">工具</div>
+<div class="text-on-tertiary-container font-label-sm">42 仓库</div>
+</div>
+<div class="group border border-outline-variant p-md rounded-lg hover:border-primary transition-colors cursor-pointer border-dashed">
+<div class="flex items-center justify-center h-full">
+<span class="material-symbols-outlined text-outline">add</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 5: Responsive Preview -->
+<section class="space-y-md pb-xl">
+<h2 class="font-headline-md text-headline-md border-l-4 border-primary pl-md">5. 响应式预览 (移动端)</h2>
+<div class="flex justify-center bg-surface-container-high py-xl rounded-xl">
+<!-- Mobile Mockup Frame -->
+<div class="w-[375px] h-[667px] bg-background rounded-[3rem] border-[12px] border-primary-container shadow-2xl relative overflow-hidden flex flex-col">
+<!-- Mobile Top Bar -->
+<div class="pt-10 px-md pb-md bg-surface border-b border-outline-variant flex justify-between items-center">
+<h5 class="font-headline-md text-headline-md text-primary">收藏</h5>
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</div>
+<!-- Mobile Content -->
+<div class="flex-1 overflow-y-auto p-md space-y-md">
+<div class="bg-white p-md border border-outline-variant rounded-xl">
+<div class="flex justify-between items-start mb-sm">
+<h6 class="font-label-md text-primary font-bold">RuoYi-Vue-Plus</h6>
+<span class="text-on-surface-variant text-[12px]">15.4k ★</span>
+</div>
+<p class="text-[12px] text-on-surface-variant mb-md">企业级样板项目...</p>
+<div class="bg-surface-container p-xs px-sm rounded text-[11px] italic border-l-2 border-primary mb-md">
+                            “中国生态中企业级应用...”
+                        </div>
+<div class="flex gap-xs">
+<span class="bg-secondary-container px-xs py-0.5 rounded text-[10px]">Java</span>
+<span class="bg-tertiary-fixed px-xs py-0.5 rounded text-[10px]">ERP</span>
+</div>
+</div>
+<div class="bg-white p-md border border-outline-variant rounded-xl">
+<div class="flex justify-between items-start mb-sm">
+<h6 class="font-label-md text-primary font-bold">deepseek-chat</h6>
+<span class="text-on-surface-variant text-[12px]">8.2k ★</span>
+</div>
+<p class="text-[12px] text-on-surface-variant mb-md">官方 DeepSeek API 实现...</p>
+</div>
+</div>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-gutter py-xs pb-6 bg-surface border-t border-outline-variant rounded-t-xl z-50">
+<div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1">
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="font-label-sm text-[10px]">我的收藏</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">sync</span>
+<span class="font-label-sm text-[10px]">导入</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">label</span>
+<span class="font-label-sm text-[10px]">标签</span>
+</div>
+</nav>
+</div>
+</div>
+</section>
+</main>
+<footer class="w-full bg-surface-container-highest border-t border-outline-variant py-xl text-center">
+<p class="font-label-md text-on-surface-variant">© 2024 RuoYi-Vue-Plus 设计系统。为卓越技术而建。</p>
+</footer>
+<script>
+    // Micro-interactions
+    document.querySelectorAll('.group').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-2px)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Theme Toggle Logic
+    const themeBtn = document.createElement('button');
+    themeBtn.className = "fixed bottom-8 right-8 bg-primary text-on-primary p-4 rounded-full shadow-lg z-[100] flex items-center justify-center";
+    themeBtn.innerHTML = '<span class="material-symbols-outlined">contrast</span>';
+    themeBtn.onclick = () => {
+        document.documentElement.classList.toggle('dark');
+    };
+    document.body.appendChild(themeBtn);
+</script>
+</body></html>

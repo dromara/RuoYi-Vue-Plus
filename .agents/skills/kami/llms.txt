@@ -1,0 +1,31 @@
+# Kami
+
+> A warm parchment design system for AI-assisted professional documents. One accent color, serif-led hierarchy, and editorial whitespace.
+
+## Author
+- Name: Tw93
+- Site: https://tw93.fun
+
+## What is Kami
+Kami is a layout design system for the AI era. Give Claude (or any LLM) a brief, and it produces polished documents: one-pagers, resumes, portfolios, slides, long docs, letters, equity reports, and changelogs. The system uses a warm parchment canvas (#f5f4ed), ink-blue accent (#1B365D), and Charter/TsangerJinKai serif fonts.
+
+## Key Pages
+- [English showcase](https://kami.tw93.fun): Design system overview with live demos
+- [Chinese showcase](https://kami.tw93.fun/index-zh.html): Chinese version
+- [Japanese showcase](https://kami.tw93.fun/index-ja.html): Japanese version (best-effort CJK path)
+- [GitHub](https://github.com/tw93/kami): Source code and templates
+
+## Install
+- Claude Code: `npx skills add tw93/kami -a claude-code -g -y`
+- Claude Code plugin marketplace: temporarily affected in Claude Code 2.1.136-2.1.138; prefer the `npx skills` command above until upstream fixes root skill path validation
+- Generic agents: `npx skills add tw93/kami -a '*' -g -y`
+- Claude Desktop: download `kami.zip` from GitHub Releases and upload it in Skills settings
+
+## Templates
+- One-pager, Letter, Resume, Long document, Portfolio, Slides, Equity report, Changelog
+- 14 diagram types: architecture, flowchart, quadrant, bar chart, line chart, donut chart, state machine, timeline, swimlane, tree, layer stack, venn, candlestick, waterfall
+
+## Links
+- GitHub: https://github.com/tw93
+- Blog: https://tw93.fun
+- AI Profile: https://tw93.fun/llms-full.txt

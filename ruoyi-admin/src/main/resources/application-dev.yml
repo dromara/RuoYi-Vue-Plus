@@ -268,3 +268,35 @@ justauth:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
       redirect-uri: ${justauth.address}/social-callback?source=gitea
+
+--- # stars-library 配置
+spring:
+  ai:
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY}
+      chat:
+        options:
+          model: deepseek-chat
+
+stars:
+  import-config:
+    default-limit: 100
+    max-limit: 5000
+  github:
+    api-base: https://api.github.com
+    page-size: 100
+    request-interval-ms: 100
+    token-encrypt-key: ${STARS_TOKEN_ENCRYPT_KEY:ruoyi-stars-github-token-key-32b}
+  summary:
+    kafka:
+      request-topic: stars.enrichment.request
+      consumer-group: stars-enrichment-consumer
+      max-poll-records: 10
+    max-concurrent-per-pod: 5
+    max-concurrent-global: 30
+    max-concurrent-per-user: 3
+    readme-max-chars: 3000
+    retry-max: 3
+  deep-link:
+    zread-template: "https://zread.ai/{owner}/{repo}"
+    deepwiki-template: "https://deepwiki.com/{owner}/{repo}"

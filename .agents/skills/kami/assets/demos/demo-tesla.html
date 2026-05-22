@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<!-- ==================================================================
+     特斯拉 Q1 2026 投资分析 · 基于 equity-report.html 模板
+     数据来源：Tesla Q1 2026 财报，2026.04.22 发布
+     ================================================================== -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>特斯拉 · Q1 2026 投资分析</title>
+<meta name="author" content="Tw93">
+<meta name="description" content="特斯拉 Q1 2026 财报分析：营收 $22.4B 超预期，毛利率恢复至 21.1%，Robotaxi 落地 Dallas/Houston，$25B 资本开支指引引发市场分歧">
+<meta name="keywords" content="特斯拉, TSLA, Q1 2026, 财报, 投资分析, Robotaxi, 电动车">
+<meta name="generator" content="Kami">
+<style>
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("../fonts/TsangerJinKai02-W04.ttf") format("truetype"),
+       url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W04.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("../fonts/TsangerJinKai02-W05.ttf") format("truetype"),
+       url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W05.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  @page {
+    size: A4;
+    margin: 12mm 16mm 12mm 16mm;
+    background: #f5f4ed;
+
+    @bottom-center {
+      content: counter(page) "  ·  特斯拉 Q1 2026 投资分析";
+      font-family: "TsangerJinKai02", "Source Han Serif SC",
+                   "Noto Serif CJK SC", "Songti SC", Georgia, serif;
+      font-size: 9pt;
+      color: #6b6a64;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --parchment: #f5f4ed;
+    --ivory:     #faf9f5;
+    --near-black:#141413;
+    --dark-warm: #3d3d3a;
+    --olive:     #504e49;
+    --stone:     #6b6a64;
+    --brand:     #1B365D;
+    --border:    #e8e6dc;
+    --border-soft:#e5e3d8;
+    --tag-bg:    #E4ECF5;
+    --serif: "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", Georgia, serif;
+    --sans: var(--serif);
+  }
+
+  html, body { background: var(--parchment); }
+
+  @media screen {
+    body { max-width: 210mm; margin: 0 auto; padding: 12mm 16mm; }
+  }
+
+  body {
+    color: var(--near-black);
+    font-family: var(--serif);
+    font-size: 9.5pt;
+    line-height: 1.42;
+    letter-spacing: 0.3pt;
+  }
+
+  strong { font-weight: 500; }
+  .hl { color: var(--brand); font-weight: 500; }
+
+  /* ========== HEADER ========== */
+  .report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12pt;
+    border-left: 2.5pt solid var(--brand);
+    border-radius: 1.5pt;
+    padding-left: 8pt;
+  }
+  .ticker-block { flex: 1; }
+  .ticker-eyebrow {
+    font-size: 9pt;
+    color: var(--brand);
+    letter-spacing: 1pt;
+    text-transform: uppercase;
+    margin-bottom: 4pt;
+  }
+  .ticker-name {
+    font-family: var(--serif);
+    font-size: 24pt;
+    font-weight: 500;
+    color: var(--near-black);
+    line-height: 1.15;
+    margin-bottom: 4pt;
+  }
+  .ticker-sub {
+    font-size: 10pt;
+    color: var(--olive);
+    line-height: 1.4;
+  }
+  .price-block {
+    text-align: right;
+    padding-top: 4pt;
+  }
+  .price-current {
+    font-family: var(--serif);
+    font-size: 28pt;
+    font-weight: 500;
+    color: var(--near-black);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .price-change {
+    font-size: 10pt;
+    font-weight: 500;
+    margin-top: 2pt;
+    font-variant-numeric: tabular-nums;
+    color: var(--stone);
+  }
+  .price-date {
+    font-size: 9pt;
+    color: var(--stone);
+    margin-top: 2pt;
+  }
+
+  /* ========== METRICS ========== */
+  .metrics {
+    display: flex;
+    gap: 14pt;
+    margin-bottom: 14pt;
+    padding: 4pt 0;
+    border-top: 0.3pt dotted var(--border);
+    border-bottom: 0.3pt dotted var(--border);
+  }
+  .metric {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 4pt;
+  }
+  .metric-value {
+    font-family: var(--serif);
+    font-size: 16pt;
+    font-weight: 500;
+    color: var(--brand);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .metric-label {
+    font-size: 9pt;
+    color: var(--olive);
+    line-height: 1.3;
+  }
+
+  /* ========== SECTIONS ========== */
+  h2 {
+    font-family: var(--serif);
+    font-size: 15pt;
+    font-weight: 500;
+    color: var(--near-black);
+    margin: 9pt 0 3pt 0;
+    break-after: avoid;
+  }
+
+  h3 {
+    font-size: 12pt;
+    font-weight: 500;
+    color: var(--dark-warm);
+    margin: 6pt 0 2pt 0;
+    break-after: avoid;
+  }
+
+  p { margin: 0 0 4pt 0; line-height: 1.42; }
+
+  ul, ol {
+    margin: 4pt 0 8pt 0;
+    padding-left: 18pt;
+    line-height: 1.45;
+  }
+  ul li { margin-bottom: 1pt; }
+  ul li::marker { color: var(--brand); }
+
+  /* ========== TABLE ========== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+    margin: 8pt 0;
+    break-inside: avoid;
+  }
+  table th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--dark-warm);
+    padding: 5pt 8pt;
+    border-bottom: 1pt solid var(--border);
+    background: transparent;
+  }
+  table td {
+    padding: 5pt 8pt;
+    border-bottom: 0.3pt solid var(--border-soft);
+    vertical-align: top;
+  }
+  table.financial td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+  table.financial th:not(:first-child) { text-align: right; }
+  table.striped tbody tr:nth-child(even) td { background: var(--ivory); }
+  table.compact th { padding: 4pt 6pt; font-size: 8.5pt; }
+  table.compact td { padding: 3pt 6pt; font-size: 8.5pt; line-height: 1.4; }
+
+  /* ========== CALLOUT ========== */
+  .callout {
+    background: var(--ivory);
+    border-left: 2pt solid var(--brand);
+    padding: 8pt 12pt;
+    border-radius: 3pt;
+    margin: 8pt 0;
+    line-height: 1.42;
+    break-inside: avoid;
+  }
+
+  /* ========== FIGURE ========== */
+  figure { margin: 8pt 0; break-inside: avoid; }
+  figure svg { width: 100%; height: auto; max-height: 70mm; }
+  figcaption {
+    font-size: 9pt;
+    color: var(--stone);
+    margin-top: 4pt;
+    text-align: center;
+  }
+
+  /* ========== RISK MATRIX ========== */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8pt;
+    margin: 6pt 0;
+  }
+  .risk-item {
+    padding: 5pt 9pt;
+    background: var(--ivory);
+    border-radius: 3pt;
+    break-inside: avoid;
+  }
+  .risk-label {
+    font-size: 9pt;
+    font-weight: 500;
+    color: var(--brand);
+    margin-bottom: 2pt;
+  }
+  .risk-desc {
+    font-size: 9pt;
+    color: var(--olive);
+    line-height: 1.42;
+  }
+
+  /* ========== ANALYST BOX ========== */
+  .analyst-box {
+    background: var(--ivory);
+    border: 0.5pt solid var(--border);
+    border-radius: 4pt;
+    padding: 8pt 12pt;
+    margin: 6pt 0;
+    break-inside: avoid;
+  }
+  .analyst-label {
+    font-size: 9pt;
+    color: var(--brand);
+    letter-spacing: 0.5pt;
+    text-transform: uppercase;
+    margin-bottom: 4pt;
+  }
+
+  /* ========== FOOTER ========== */
+  .report-footer {
+    margin-top: 6pt;
+    padding-top: 4pt;
+    border-top: 0.3pt dotted var(--border);
+    font-size: 9pt;
+    color: var(--stone);
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<div class="report-header">
+  <div class="ticker-block">
+    <div class="ticker-eyebrow">Q1 2026 财报点评</div>
+    <div class="ticker-name">特斯拉 <span style="font-size: 14pt; color: var(--stone);">TSLA</span></div>
+    <div class="ticker-sub">汽车与能源 · NASDAQ · 利润率在恢复，但资本开支的账单到了</div>
+  </div>
+  <div class="price-block">
+    <div class="price-current">$373.72</div>
+    <div class="price-change">财报后 -3.56%</div>
+    <div class="price-date">2026.04.23 收盘</div>
+  </div>
+</div>
+
+<!-- ========== METRICS ========== -->
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-value">$1.2T</div>
+    <div class="metric-label">市值</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">~220x</div>
+    <div class="metric-label">前瞻 P/E</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">$22.4B</div>
+    <div class="metric-label">Q1 营收</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">21.1%</div>
+    <div class="metric-label">毛利率</div>
+  </div>
+</div>
+
+<!-- ========== 投资逻辑 ========== -->
+<h2>投资逻辑</h2>
+<p>特斯拉 Q1 2026 营收 <span class="hl">$22.39B（同比 +16%）</span>，超市场预期的 $21.92B；Non-GAAP EPS <span class="hl">$0.41，高于预期的 $0.37</span>。毛利率从去年同期的 16.3% 恢复到 21.1%（+478 bps），能源业务毛利率创历史新高 39.5%。汽车业务释放了矛盾信号：交付 358,023 辆，低于市场预期约 7,600 辆，但利润率扩张的叙事依然成立。</p>
+
+<p>核心矛盾：短期利润率恢复 vs 2026 全年 $25B+ 资本开支承诺。管理层预期全年自由现金流转负。财报后股价下跌 3.56%，市场定价的是资本开支冲击而非盈利超预期。</p>
+
+<div class="callout">
+  <strong>持有。</strong>Q1 利润率恢复验证了降本能力，但 $25B capex + 负 FCF 指引意味着当前股价定价了 AI/Robotaxi 的期权价值，而这部分尚无规模化收入贡献。建议等 Q2 交付数据和 Robotaxi 单位经济学落地后再做加仓决策。
+</div>
+
+<!-- ========== K 线图 ========== -->
+<h2>近期价格走势</h2>
+<figure>
+  <svg viewBox="0 0 760 270" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100%" height="100%" fill="#f5f4ed"/>
+
+    <!-- 网格：价格区间 335-410，图表区 x=56 y=20 w=660 h=220，基线 y=240 -->
+    <!-- scale: 1 dollar = 2.93px (220/75) -->
+    <line x1="56" y1="240" x2="716" y2="240" stroke="#e8e7e1" stroke-width="0.8"/>
+    <line x1="56" y1="211" x2="716" y2="211" stroke="#e8e7e1" stroke-width="0.8"/>
+    <line x1="56" y1="181" x2="716" y2="181" stroke="#e8e7e1" stroke-width="0.8"/>
+    <line x1="56" y1="152" x2="716" y2="152" stroke="#e8e7e1" stroke-width="0.8"/>
+    <line x1="56" y1="123" x2="716" y2="123" stroke="#e8e7e1" stroke-width="0.8"/>
+    <line x1="56" y1="93"  x2="716" y2="93"  stroke="#e8e7e1" stroke-width="0.8"/>
+    <line x1="56" y1="64"  x2="716" y2="64"  stroke="#e8e7e1" stroke-width="0.8"/>
+    <line x1="56" y1="35"  x2="716" y2="35"  stroke="#e8e7e1" stroke-width="0.8"/>
+
+    <!-- Y 轴标签 -->
+    <text x="48" y="244" fill="#6b6a64" font-size="9" text-anchor="end" font-family="Charter,Georgia,serif">335</text>
+    <text x="48" y="215" fill="#6b6a64" font-size="9" text-anchor="end" font-family="Charter,Georgia,serif">345</text>
+    <text x="48" y="185" fill="#6b6a64" font-size="9" text-anchor="end" font-family="Charter,Georgia,serif">355</text>
+    <text x="48" y="156" fill="#6b6a64" font-size="9" text-anchor="end" font-family="Charter,Georgia,serif">365</text>
+    <text x="48" y="127" fill="#6b6a64" font-size="9" text-anchor="end" font-family="Charter,Georgia,serif">375</text>
+    <text x="48" y="97"  fill="#6b6a64" font-size="9" text-anchor="end" font-family="Charter,Georgia,serif">385</text>
+    <text x="48" y="68"  fill="#6b6a64" font-size="9" text-anchor="end" font-family="Charter,Georgia,serif">395</text>
+    <text x="48" y="39"  fill="#6b6a64" font-size="9" text-anchor="end" font-family="Charter,Georgia,serif">405</text>
+
+    <!-- 20 K 线, y = 240 - (price-335)*2.93 -->
+
+    <!-- Day 1 Mar 26: O=381.60 H=384.44 L=371.87 C=372.11 DOWN -->
+    <line x1="72" y1="95" x2="72" y2="132" stroke="#6b6a64" stroke-width="1.2"/>
+    <rect x="64" y="103" width="16" height="27" fill="#6b6a64" rx="1"/>
+
+    <!-- Day 2 Mar 27: O=369.69 H=369.86 L=359.47 C=361.83 DOWN -->
+    <line x1="105" y1="138" x2="105" y2="168" stroke="#6b6a64" stroke-width="1.2"/>
+    <rect x="97" y="138" width="16" height="23" fill="#6b6a64" rx="1"/>
+
+    <!-- Day 3 Mar 30: O=365.86 H=367.29 L=352.14 C=355.28 DOWN -->
+    <line x1="138" y1="146" x2="138" y2="190" stroke="#6b6a64" stroke-width="1.2"/>
+    <rect x="130" y="149" width="16" height="31" fill="#6b6a64" rx="1"/>
+
+    <!-- Day 4 Mar 31: O=361.51 H=373.33 L=361.00 C=371.75 UP -->
+    <line x1="171" y1="128" x2="171" y2="164" stroke="#1B365D" stroke-width="1.2"/>
+    <rect x="163" y="132" width="16" height="30" fill="#1B365D" rx="1"/>
+
+    <!-- Day 5 Apr 1: O=378.63 H=383.14 L=374.08 C=381.26 UP -->
+    <line x1="204" y1="99" x2="204" y2="126" stroke="#1B365D" stroke-width="1.2"/>
+    <rect x="196" y="104" width="16" height="15" fill="#1B365D" rx="1"/>
+
+    <!-- Day 6 Apr 2: O=364.20 H=370.28 L=359.03 C=360.59 DOWN -->
+    <line x1="237" y1="137" x2="237" y2="169" stroke="#6b6a64" stroke-width="1.2"/>
+    <rect x="229" y="143" width="16" height="18" fill="#6b6a64" rx="1"/>
+
+    <!-- Day 7 Apr 6: O=362.59 H=367.72 L=346.64 C=352.82 DOWN -->
+    <line x1="270" y1="144" x2="270" y2="206" stroke="#6b6a64" stroke-width="1.2"/>
+    <rect x="262" y="149" width="16" height="40" fill="#6b6a64" rx="1"/>
+
+    <!-- Day 8 Apr 7: O=346.44 H=348.02 L=337.24 C=346.65 UP -->
+    <line x1="303" y1="202" x2="303" y2="233" stroke="#1B365D" stroke-width="1.2"/>
+    <rect x="295" y="202" width="16" height="15" fill="#1B365D" rx="1"/>
+
+    <!-- Day 9 Apr 8: O=363.79 H=364.50 L=339.67 C=343.25 DOWN -->
+    <line x1="336" y1="154" x2="336" y2="226" stroke="#6b6a64" stroke-width="1.2"/>
+    <rect x="328" y="154" width="16" height="60" fill="#6b6a64" rx="1"/>
+
+    <!-- Day 10 Apr 9: O=343.15 H=348.88 L=337.25 C=345.62 UP -->
+    <line x1="369" y1="199" x2="369" y2="233" stroke="#1B365D" stroke-width="1.2"/>
+    <rect x="361" y="209" width="16" height="17" fill="#1B365D" rx="1"/>
+
+    <!-- Day 11 Apr 10: O=346.29 H=350.36 L=342.74 C=348.95 UP -->
+    <line x1="402" y1="195" x2="402" y2="217" stroke="#1B365D" stroke-width="1.2"/>
+    <rect x="394" y="199" width="16" height="13" fill="#1B365D" rx="1"/>
+
+    <!-- Day 12 Apr 13: O=350.07 H=356.35 L=348.57 C=352.42 UP -->
+    <line x1="435" y1="177" x2="435" y2="200" stroke="#1B365D" stroke-width="1.2"/>
+    <rect x="427" y="189" width="16" height="7" fill="#1B365D" rx="1"/>
+
+    <!-- Day 13 Apr 14: O=357.67 H=367.63 L=354.77 C=364.20 UP -->
+    <line x1="468" y1="144" x2="468" y2="182" stroke="#1B365D" stroke-width="1.2"/>
+    <rect x="460" y="154" width="16" height="19" fill="#1B365D" rx="1"/>
+
+    <!-- Day 14 Apr 15: O=366.83 H=394.65 L=362.50 C=391.95 UP -->
+    <line x1="501" y1="65" x2="501" y2="159" stroke="#1B365D" stroke-width="1.2"/>
+    <rect x="493" y="73" width="16" height="74" fill="#1B365D" rx="1"/>
+
+    <!-- Day 15 Apr 16: O=393.81 H=394.06 L=381.80 C=388.90 DOWN -->
+    <line x1="534" y1="67" x2="534" y2="103" stroke="#6b6a64" stroke-width="1.2"/>
+    <rect x="526" y="68" width="16" height="14" fill="#6b6a64" rx="1"/>
+
+    <!-- Day 16 Apr 17: O=395.92 H=409.28 L=391.65 C=400.62 UP -->
+    <line x1="567" y1="23" x2="567" y2="74" stroke="#1B365D" stroke-width="1.2"/>
+    <rect x="559" y="48" width="16" height="14" fill="#1B365D" rx="1"/>
+
+    <!-- Day 17 Apr 20: O=402.58 H=406.80 L=388.33 C=392.50 DOWN -->
+    <line x1="600" y1="30" x2="600" y2="84" stroke="#6b6a64" stroke-width="1.2"/>
+    <rect x="592" y="42" width="16" height="30" fill="#6b6a64" rx="1"/>
+
+    <!-- Day 18 Apr 21: O=393.00 H=393.95 L=385.22 C=386.42 DOWN -->
+    <line x1="633" y1="67" x2="633" y2="94" stroke="#6b6a64" stroke-width="1.2"/>
+    <rect x="625" y="70" width="16" height="19" fill="#6b6a64" rx="1"/>
+
+    <!-- Day 19 Apr 22: O=387.57 H=393.01 L=385.30 C=387.51 DOWN -->
+    <line x1="666" y1="70" x2="666" y2="94" stroke="#6b6a64" stroke-width="1.2"/>
+    <rect x="658" y="86" width="16" height="4" fill="#6b6a64" rx="1"/>
+
+    <!-- Day 20 Apr 23: O=375.28 H=386.00 L=368.39 C=373.72 DOWN -->
+    <line x1="699" y1="91" x2="699" y2="143" stroke="#6b6a64" stroke-width="1.2"/>
+    <rect x="691" y="101" width="16" height="22" fill="#6b6a64" rx="1"/>
+
+    <!-- X 轴 -->
+    <text x="72"  y="260" fill="#6b6a64" font-size="8" text-anchor="middle" font-family="Charter,Georgia,serif">3/26</text>
+    <text x="237" y="260" fill="#6b6a64" font-size="8" text-anchor="middle" font-family="Charter,Georgia,serif">4/2</text>
+    <text x="402" y="260" fill="#6b6a64" font-size="8" text-anchor="middle" font-family="Charter,Georgia,serif">4/10</text>
+    <text x="567" y="260" fill="#6b6a64" font-size="8" text-anchor="middle" font-family="Charter,Georgia,serif">4/17</text>
+    <text x="699" y="260" fill="#6b6a64" font-size="8" text-anchor="middle" font-family="Charter,Georgia,serif">4/23</text>
+
+    <!-- 财报标注 -->
+    <line x1="682" y1="24" x2="682" y2="82" stroke="#1B365D" stroke-width="0.8" stroke-dasharray="3,2"/>
+    <text x="680" y="20" fill="#1B365D" font-size="8" text-anchor="end" font-weight="500" font-family="Charter,Georgia,serif">Earnings</text>
+
+    <!-- 图例 -->
+    <line x1="56" y1="280" x2="716" y2="280" stroke="#e8e7e1" stroke-width="0.8"/>
+    <rect x="56" y="290" width="10" height="10" fill="#1B365D" rx="2"/>
+    <text x="72" y="299" fill="#504e49" font-size="9" font-family="Charter,Georgia,serif">Up</text>
+    <rect x="120" y="290" width="10" height="10" fill="#6b6a64" rx="2"/>
+    <text x="136" y="299" fill="#504e49" font-size="9" font-family="Charter,Georgia,serif">Down</text>
+    <text x="240" y="299" fill="#504e49" font-size="9" font-family="Charter,Georgia,serif">20 trading days | $337 - $409</text>
+  </svg>
+  <figcaption>图 1. TSLA 近 20 个交易日走势（3/26 - 4/23）。4/17 冲高 $409 后回落，财报后因 capex 指引下跌。</figcaption>
+</figure>
+
+<!-- ========== 财务概览 ========== -->
+<h2>财务概览</h2>
+<table class="financial striped">
+  <thead>
+    <tr>
+      <th>指标</th>
+      <th>FY2024</th>
+      <th>FY2025</th>
+      <th>Q1 2026</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>营收</td><td>$97.7B</td><td>$97.0B</td><td>$22.39B</td></tr>
+    <tr><td>GAAP 净利润</td><td>$7.1B</td><td>~$3.0B</td><td>$477M</td></tr>
+    <tr><td>GAAP EPS</td><td>$2.04</td><td>~$0.86</td><td>$0.13</td></tr>
+    <tr><td>Non-GAAP EPS</td><td>--</td><td>--</td><td>$0.41</td></tr>
+    <tr><td>毛利率</td><td>17.9%</td><td>~17%</td><td>21.1%</td></tr>
+    <tr><td>经营利润率</td><td>7.2%</td><td>~4%</td><td>4.2%</td></tr>
+    <tr><td>自由现金流</td><td>--</td><td>--</td><td>$1.4B</td></tr>
+    <tr><td>资本开支</td><td>--</td><td>--</td><td>$2.49B</td></tr>
+  </tbody>
+</table>
+
+<p>毛利率恢复到 <span class="hl">21.1%</span> 是本季最重要的数字，COGS 优化和能源业务混合效应驱动了扩张。但 Electrek 指出，Q1 经营利润增长有一部分来自保修准备金调整和关税退税的一次性收益，意味着底层利润率改善可能更接近 19-20%。</p>
+
+<!-- ========== 分部表现 ========== -->
+<h2>分部表现</h2>
+
+<h3>汽车业务</h3>
+<p>交付 <span class="hl">358,023</span> 辆，低于市场预期 365,645 辆。产量 408,386 辆超过交付约 5 万辆，库存在积累。Model 3/Y 贡献 341,893 辆，Cybertruck 及其他车型 16,130 辆。监管积分收入 $380M（占汽车收入 1.9%），占比继续下降（去年同期 3.7%），说明核心业务的利润质量在提升。</p>
+
+<h3>能源业务</h3>
+<p>能源收入 <span class="hl">$2.41B</span>，同比下降 12%（去年同期 $2.73B 为高基数），但毛利率创历史新高 <span class="hl">39.5%</span>。储能部署 8.8 GWh。这个业务正在成为利润发动机：39.5% 毛利率 vs 汽车业务的 ~17%。Megapack 3 量产预计 2026 年下半年启动。</p>
+
+<!-- ========== 催化剂 ========== -->
+<h2>近期催化剂</h2>
+<p><strong>Robotaxi（Q2-Q3）：</strong>4 月在 Dallas/Houston 上线无人驾驶付费服务，零事故。付费里程环比翻倍，Q2 首次披露单位经济学。</p>
+<p><strong>FSD 国际化（Q3）：</strong>荷兰和中国已获批，欧洲更大范围推广预计 Q3。FSD 转纯订阅，Q1 新增订阅创纪录。</p>
+<p><strong>Cybercab + Q2 交付：</strong>Cybercab H2 量产，预期取代 Model Y 成为自动驾驶网络主力。Q2 交付受益于 Model Y 产线爬坡。</p>
+
+<!-- ========== 竞争格局 ========== -->
+<h2>竞争格局</h2>
+
+<table class="financial compact striped">
+  <thead>
+    <tr>
+      <th>公司</th>
+      <th>市值</th>
+      <th>前瞻 P/E</th>
+      <th>营收增速</th>
+      <th>毛利率</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>特斯拉</strong></td><td>$1.2T</td><td>~220x</td><td>+16%</td><td>21.1%</td></tr>
+    <tr><td>比亚迪</td><td>~$120B</td><td>~22x</td><td>+33%</td><td>~22%</td></tr>
+    <tr><td>Rivian</td><td>~$18B</td><td>N/A</td><td>+8%</td><td>-10%</td></tr>
+    <tr><td>GM（EV）</td><td>$48B</td><td>~5x</td><td>+12%</td><td>~8%</td></tr>
+  </tbody>
+</table>
+
+<p>特斯拉前瞻 P/E 是比亚迪的 <span class="hl">10 倍</span>，但营收增速更低、毛利率接近。溢价完全建立在 AI/Robotaxi 期权价值上。向自动驾驶和储能的战略转型是要跳出单位销量竞争，但如果 Robotaxi 单位经济学在 Q2-Q3 未能验证，估值有明显压缩空间。</p>
+
+<!-- ========== 风险 + 总结 ========== -->
+<h2>风险与总结</h2>
+<div class="risk-grid">
+  <div class="risk-item">
+    <div class="risk-label">资本开支</div>
+    <div class="risk-desc">$25B+ capex 指引，全年 FCF 预计转负。AI/Robotaxi 变现延迟将损害资本配置信任度。</div>
+  </div>
+  <div class="risk-item">
+    <div class="risk-label">交付疲软</div>
+    <div class="risk-desc">年度交付连续两年下滑（峰值 181 万 -> 164 万）。Q1 再次 miss 共识预期。</div>
+  </div>
+  <div class="risk-item">
+    <div class="risk-label">HW3 淘汰</div>
+    <div class="risk-desc">HW3 车辆无法支持无监督 FSD。2024 年前车主面临硬件升级壁垒。</div>
+  </div>
+  <div class="risk-item">
+    <div class="risk-label">竞争与关税</div>
+    <div class="risk-desc">比亚迪 $20-30K 价位段成本优势 35%。美国关税政策增加供应链不确定性。</div>
+  </div>
+</div>
+
+<div class="analyst-box">
+  <div class="analyst-label">总结</div>
+  利润率恢复了，营收超预期了，但股价跌了，因为 $25B capex + 负 FCF 在 Robotaxi 尚无规模收入时是硬伤。多头核心：Dallas/Houston Robotaxi 数据会在 Q2 验证单位经济学并触发重估。空头核心：$25B/年烧在 3-5 年才能变现的项目上，而核心汽车业务在萎缩。已持有者：继续持有到 Q2，等 Robotaxi 数据再评估。新建仓：建议等 7 月交付和 Robotaxi 数据再决定。
+</div>
+
+<!-- ========== FOOTER ========== -->
+<div class="report-footer">
+  <span>仅供个人投资参考，不构成投资建议</span>
+  <span>Tw93 · 2026.04.24</span>
+</div>
+
+</body>
+</html>
