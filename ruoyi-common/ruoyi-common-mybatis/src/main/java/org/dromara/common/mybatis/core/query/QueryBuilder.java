@@ -1,6 +1,5 @@
 package org.dromara.common.mybatis.core.query;
 
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.yulichang.toolkit.JoinWrappers;
 
 /**
@@ -21,7 +20,7 @@ public final class QueryBuilder {
      * @return Lambda 查询构造辅助对象
      */
     public static <T> LambdaQueryBuilder<T> lambda(Class<T> entityClass) {
-        return new LambdaQueryBuilder<>(Wrappers.lambdaQuery(entityClass));
+        return new LambdaQueryBuilder<>(new AggregateLambdaQueryWrapper<>(entityClass));
     }
 
     /**

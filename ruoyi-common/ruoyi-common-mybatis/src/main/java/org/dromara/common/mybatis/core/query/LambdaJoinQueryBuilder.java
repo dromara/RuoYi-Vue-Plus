@@ -1,10 +1,12 @@
 package org.dromara.common.mybatis.core.query;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.enums.DefaultFuncEnum;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import com.github.yulichang.wrapper.segments.SelectNormal;
 import org.dromara.common.core.utils.StringUtils;
@@ -146,6 +148,343 @@ public final class LambdaJoinQueryBuilder<T> {
      */
     public <X> LambdaJoinQueryBuilder<T> selectAs(String column, SFunction<X, ?> alias) {
         wrapper.selectAs(column, alias);
+        return this;
+    }
+
+    /**
+     * 指定子查询字段。
+     * <pre>{@code
+     * QueryBuilder.lambdaJoin("u", SysUser.class)
+     *     .selectAs("u", SysUser::getUserId, UserStatVo::getUserId)
+     *     .selectSub(SysUserRole.class, sub -> sub
+     *         .selectCountAll()
+     *         .eqColumn(SysUserRole::getUserId, "u", SysUser::getUserId),
+     *         UserStatVo::getRoleCount)
+     *     .list(UserStatVo.class);
+     * }</pre>
+     *
+     * @param entityClass 子查询实体类型
+     * @param consumer    子查询构造函数
+     * @param alias       查询别名
+     * @param <S>         子查询实体类型
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectSub(Class<S> entityClass, Consumer<SubQuery<S>> consumer, String alias) {
+        SubQuery<S> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
+        wrapper.selectFunc("(" + subQuery.build() + ")", func -> func.values(subQuery.params()),
+            AggregateSelectUtils.checkAlias(alias));
+        return this;
+    }
+
+    /**
+     * 指定子查询字段。
+     *
+     * @param entityClass 子查询实体类型
+     * @param consumer    子查询构造函数
+     * @param alias       查询别名字段
+     * @param <S>         子查询实体类型
+     * @param <X>         查询结果类型
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S, X> LambdaJoinQueryBuilder<T> selectSub(Class<S> entityClass, Consumer<SubQuery<S>> consumer, SFunction<X, ?> alias) {
+        return selectSub(entityClass, consumer, AggregateSelectUtils.aliasName(alias));
+    }
+
+    /**
+     * 指定 SUM 聚合查询字段。
+     *
+     * @param column 聚合字段
+     * @param alias  查询别名
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectSum(SFunction<S, ?> column, String alias) {
+        wrapper.selectSum(column, AggregateSelectUtils.checkAlias(alias));
+        return this;
+    }
+
+    /**
+     * 指定 SUM 聚合查询字段。
+     *
+     * @param tableAlias 表别名
+     * @param column     聚合字段
+     * @param alias      查询别名
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectSum(String tableAlias, SFunction<S, ?> column, String alias) {
+        wrapper.selectFunc(DefaultFuncEnum.SUM, tableAlias, column, AggregateSelectUtils.checkAlias(alias));
+        return this;
+    }
+
+    /**
+     * 指定 SUM 聚合查询字段。
+     *
+     * @param column 聚合字段
+     * @param alias  查询别名字段
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S, X> LambdaJoinQueryBuilder<T> selectSum(SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectSum(column, AggregateSelectUtils.aliasName(alias));
+    }
+
+    /**
+     * 指定 MAX 聚合查询字段。
+     *
+     * @param column 聚合字段
+     * @param alias  查询别名
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectMax(SFunction<S, ?> column, String alias) {
+        wrapper.selectMax(column, AggregateSelectUtils.checkAlias(alias));
+        return this;
+    }
+
+    /**
+     * 指定 MAX 聚合查询字段。
+     *
+     * @param tableAlias 表别名
+     * @param column     聚合字段
+     * @param alias      查询别名
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectMax(String tableAlias, SFunction<S, ?> column, String alias) {
+        wrapper.selectFunc(DefaultFuncEnum.MAX, tableAlias, column, AggregateSelectUtils.checkAlias(alias));
+        return this;
+    }
+
+    /**
+     * 指定 MAX 聚合查询字段。
+     *
+     * @param column 聚合字段
+     * @param alias  查询别名字段
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S, X> LambdaJoinQueryBuilder<T> selectMax(SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectMax(column, AggregateSelectUtils.aliasName(alias));
+    }
+
+    /**
+     * 指定 MIN 聚合查询字段。
+     *
+     * @param column 聚合字段
+     * @param alias  查询别名
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectMin(SFunction<S, ?> column, String alias) {
+        wrapper.selectMin(column, AggregateSelectUtils.checkAlias(alias));
+        return this;
+    }
+
+    /**
+     * 指定 MIN 聚合查询字段。
+     *
+     * @param tableAlias 表别名
+     * @param column     聚合字段
+     * @param alias      查询别名
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectMin(String tableAlias, SFunction<S, ?> column, String alias) {
+        wrapper.selectFunc(DefaultFuncEnum.MIN, tableAlias, column, AggregateSelectUtils.checkAlias(alias));
+        return this;
+    }
+
+    /**
+     * 指定 MIN 聚合查询字段。
+     *
+     * @param column 聚合字段
+     * @param alias  查询别名字段
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S, X> LambdaJoinQueryBuilder<T> selectMin(SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectMin(column, AggregateSelectUtils.aliasName(alias));
+    }
+
+    /**
+     * 指定 AVG 聚合查询字段。
+     *
+     * @param column 聚合字段
+     * @param alias  查询别名
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectAvg(SFunction<S, ?> column, String alias) {
+        wrapper.selectAvg(column, AggregateSelectUtils.checkAlias(alias));
+        return this;
+    }
+
+    /**
+     * 指定 AVG 聚合查询字段。
+     *
+     * @param tableAlias 表别名
+     * @param column     聚合字段
+     * @param alias      查询别名
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectAvg(String tableAlias, SFunction<S, ?> column, String alias) {
+        wrapper.selectFunc(DefaultFuncEnum.AVG, tableAlias, column, AggregateSelectUtils.checkAlias(alias));
+        return this;
+    }
+
+    /**
+     * 指定 AVG 聚合查询字段。
+     *
+     * @param column 聚合字段
+     * @param alias  查询别名字段
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S, X> LambdaJoinQueryBuilder<T> selectAvg(SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectAvg(column, AggregateSelectUtils.aliasName(alias));
+    }
+
+    /**
+     * 指定 COUNT 聚合查询字段。
+     *
+     * @param column 聚合字段
+     * @param alias  查询别名
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectCount(SFunction<S, ?> column, String alias) {
+        wrapper.selectCount(column, AggregateSelectUtils.checkAlias(alias));
+        return this;
+    }
+
+    /**
+     * 指定 COUNT 聚合查询字段。
+     *
+     * @param tableAlias 表别名
+     * @param column     聚合字段
+     * @param alias      查询别名
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectCount(String tableAlias, SFunction<S, ?> column, String alias) {
+        wrapper.selectFunc(DefaultFuncEnum.COUNT, tableAlias, column, AggregateSelectUtils.checkAlias(alias));
+        return this;
+    }
+
+    /**
+     * 指定 COUNT 聚合查询字段。
+     *
+     * @param column 聚合字段
+     * @param alias  查询别名字段
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S, X> LambdaJoinQueryBuilder<T> selectCount(SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectCount(column, AggregateSelectUtils.aliasName(alias));
+    }
+
+    /**
+     * 指定 COUNT(*) 聚合查询字段。
+     *
+     * @param alias 查询别名
+     * @return 当前联表查询构造辅助对象
+     */
+    public LambdaJoinQueryBuilder<T> selectCountAll(String alias) {
+        wrapper.select(AggregateSelectUtils.aggregateSelect(SqlAggregateFunction.COUNT, "*", alias));
+        return this;
+    }
+
+    /**
+     * 指定 COUNT(*) 聚合查询字段。
+     *
+     * @param alias 查询别名字段
+     * @return 当前联表查询构造辅助对象
+     */
+    public <X> LambdaJoinQueryBuilder<T> selectCountAll(SFunction<X, ?> alias) {
+        return selectCountAll(AggregateSelectUtils.aliasName(alias));
+    }
+
+    /**
+     * 添加等于子查询条件。
+     *
+     * @param alias       表别名
+     * @param column      字段
+     * @param entityClass 子查询实体类型
+     * @param consumer    子查询构造函数
+     * @param <S>         字段实体类型
+     * @param <Q>         子查询实体类型
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S, Q> LambdaJoinQueryBuilder<T> eqSub(String alias, SFunction<S, ?> column, Class<Q> entityClass,
+                                                  Consumer<SubQuery<Q>> consumer) {
+        SubQuery<Q> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
+        wrapper.apply(true, qualifiedColumn(alias, column) + " = (" + subQuery.build() + ")", subQuery.params());
+        return this;
+    }
+
+    /**
+     * 添加 IN 子查询条件。
+     * <pre>{@code
+     * QueryBuilder.lambdaJoin("u", SysUser.class)
+     *     .inSub("u", SysUser::getUserId, SysUserRole.class, sub -> sub
+     *         .select(SysUserRole::getUserId)
+     *         .eq(SysUserRole::getRoleId, roleId))
+     *     .list(SysUserVo.class);
+     * }</pre>
+     *
+     * @param alias       表别名
+     * @param column      字段
+     * @param entityClass 子查询实体类型
+     * @param consumer    子查询构造函数
+     * @param <S>         字段实体类型
+     * @param <Q>         子查询实体类型
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S, Q> LambdaJoinQueryBuilder<T> inSub(String alias, SFunction<S, ?> column, Class<Q> entityClass,
+                                                  Consumer<SubQuery<Q>> consumer) {
+        SubQuery<Q> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
+        wrapper.apply(true, qualifiedColumn(alias, column) + " IN (" + subQuery.build() + ")", subQuery.params());
+        return this;
+    }
+
+    /**
+     * 添加 NOT IN 子查询条件。
+     *
+     * @param alias       表别名
+     * @param column      字段
+     * @param entityClass 子查询实体类型
+     * @param consumer    子查询构造函数
+     * @param <S>         字段实体类型
+     * @param <Q>         子查询实体类型
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S, Q> LambdaJoinQueryBuilder<T> notInSub(String alias, SFunction<S, ?> column, Class<Q> entityClass,
+                                                     Consumer<SubQuery<Q>> consumer) {
+        SubQuery<Q> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
+        wrapper.apply(true, qualifiedColumn(alias, column) + " NOT IN (" + subQuery.build() + ")", subQuery.params());
+        return this;
+    }
+
+    /**
+     * 添加 EXISTS 子查询条件。
+     * <pre>{@code
+     * QueryBuilder.lambdaJoin("u", SysUser.class)
+     *     .existsSub(SysUserRole.class, sub -> sub
+     *         .selectCountAll()
+     *         .eqColumn(SysUserRole::getUserId, "u", SysUser::getUserId)
+     *         .eq(SysUserRole::getRoleId, roleId))
+     *     .list(SysUserVo.class);
+     * }</pre>
+     *
+     * @param entityClass 子查询实体类型
+     * @param consumer    子查询构造函数
+     * @param <Q>         子查询实体类型
+     * @return 当前联表查询构造辅助对象
+     */
+    public <Q> LambdaJoinQueryBuilder<T> existsSub(Class<Q> entityClass, Consumer<SubQuery<Q>> consumer) {
+        SubQuery<Q> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
+        wrapper.apply(true, "EXISTS (" + subQuery.build() + ")", subQuery.params());
+        return this;
+    }
+
+    /**
+     * 添加 NOT EXISTS 子查询条件。
+     *
+     * @param entityClass 子查询实体类型
+     * @param consumer    子查询构造函数
+     * @param <Q>         子查询实体类型
+     * @return 当前联表查询构造辅助对象
+     */
+    public <Q> LambdaJoinQueryBuilder<T> notExistsSub(Class<Q> entityClass, Consumer<SubQuery<Q>> consumer) {
+        SubQuery<Q> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
+        wrapper.apply(true, "NOT EXISTS (" + subQuery.build() + ")", subQuery.params());
         return this;
     }
 
@@ -575,6 +914,17 @@ public final class LambdaJoinQueryBuilder<T> {
      */
     public MPJLambdaWrapper<T> build() {
         return wrapper;
+    }
+
+    private <Q> SubQuery<Q> buildPlaceholderSubQuery(Class<Q> entityClass, Consumer<SubQuery<Q>> consumer) {
+        SubQuery<Q> subQuery = SubQuery.ofPlaceholders(entityClass);
+        consumer.accept(subQuery);
+        return subQuery;
+    }
+
+    private <S> String qualifiedColumn(String alias, SFunction<S, ?> column) {
+        return AggregateSelectUtils.checkAlias(alias) + StringPool.DOT + ColumnCache.getMapField(LambdaUtils.getEntityClass(column))
+            .get(LambdaUtils.getName(column)).getColumn();
     }
 
 }
