@@ -170,8 +170,9 @@
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-common-ai</artifactId>
+                <version>${revision}</version>
             </dependency>
-                
+
             <!-- mcp模块 -->
             <dependency>
                 <groupId>org.dromara</groupId>

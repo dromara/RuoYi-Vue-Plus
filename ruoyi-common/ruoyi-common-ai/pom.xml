@@ -3,8 +3,8 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>ruoyi-common</artifactId>
         <groupId>org.dromara</groupId>
+        <artifactId>ruoyi-common</artifactId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -18,8 +18,8 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
         <dependency>
@@ -30,11 +30,6 @@
         <dependency>
             <groupId>com.aizuda</groupId>
             <artifactId>snail-ai-openapi-starter</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
     </dependencies>

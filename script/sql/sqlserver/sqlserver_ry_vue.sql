@@ -1378,6 +1378,8 @@ insert into sys_menu values(1761400000000000003, N'系统工具', 0, 4, N'tool',
 GO
 insert into sys_menu values(1761400000000000005, N'测试菜单', 0, 5, N'demo', NULL, N'', N'N', N'Y', N'M', N'0', N'0', NULL, N'star', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
 GO
+insert into sys_menu values(1761400000000000006, N'AI会话',  0, 6, N'ai/chat', N'ai/chat/index', N'', N'N', N'Y', N'C', N'0', N'0', N'', N'checkbox', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'AI聊天菜单');
+GO
 insert into sys_menu values(1761400000000000004, N'PLUS官网', 0, 9, N'https://gitee.com/dromara/RuoYi-Vue-Plus', null, N'', N'Y', N'Y', N'M', N'0', N'0', N'', N'guide', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), null, null, N'RuoYi-Vue-Plus官网地址');
 GO
 insert into sys_menu values(1761400000000000100, N'用户管理', 1761400000000000001, 1, N'user', N'system/user/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:user:list', N'user', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'用户管理菜单');
