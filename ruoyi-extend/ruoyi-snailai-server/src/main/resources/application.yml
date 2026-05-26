@@ -1,0 +1,67 @@
+server:
+  port: 8900
+  servlet:
+    context-path: /snail-ai
+
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      # 单个文件的最大限制 (根据 RAG 需求建议设为 50MB - 100MB)
+      max-file-size: 50MB
+      # 单次请求的总文件大小限制 (如果支持多文件并行上传，调大此项)
+      max-request-size: 100MB
+  web:
+    resources:
+      static-locations: classpath:admin/
+  profiles:
+    active: @profiles.active@
+snail-ai:
+  server:
+    grpc-port: 18888
+  skill:
+    upload-dir: ./upload/skills
+  crypto:
+    secret-key: ${SNAIL_AI_CRYPTO_KEY:0123456789abcdef0123456789abcdef}
+    iv: ${SNAIL_AI_CRYPTO_IV:fedcba9876543210fedcba9876543210}
+  resource:
+    storage-type: LOCAL
+    upload-dir: ./upload/resource
+    minio:
+      endpoint: http://localhost:9000
+      access-key: minioadmin
+      secret-key: minioadmin
+      bucket: snail-ai
+  # 短期记忆配置
+  memory:
+    short-term:
+      # 存储类型选项: memory(内存) | db(数据库)
+      # - memory: 适用于单机部署，高性能，重启后数据丢失
+      # - db: 适用于分布式部署，数据持久化，性能较低
+      store-type: db
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+  typeAliasesPackage: com.example.snail.job.po
+  global-config:
+    db-config:
+      capital-mode: false
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+
+logging:
+  config: classpath:logback-plus.xml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+    logfile:
+      external-file: ./logs/ruoyi-snailai-server/console.log

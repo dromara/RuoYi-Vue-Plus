@@ -13,6 +13,7 @@
 
     <modules>
         <module>ruoyi-monitor-admin</module>
+        <module>ruoyi-snailai-server</module>
         <module>ruoyi-snailjob-server</module>
     </modules>
 

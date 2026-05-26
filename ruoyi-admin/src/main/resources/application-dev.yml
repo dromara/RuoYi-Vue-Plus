@@ -44,7 +44,7 @@ snail-ai:
   # 应用 ID（在 Server「应用管理」页面创建后获取）
   app-id: 1
   # 认证令牌（在 Server「应用管理」页面创建时自动生成）
-  token: SAI_ce6fbc820c50456baecc7cdcf2a14b1b
+  token: SAI_7c557fc05a304b0482a65ca67afdb0b8
   port: 18889
   # Skill 文件临时目录
   skill-temp-dir: /tmp/snail-ai-agent/skills
@@ -53,7 +53,7 @@ snail-ai:
     # 启用 OpenAPI Client
     enabled: true
     # Server HTTP 端口
-    web-port: 8080
+    web-port: 8900
     # 是否使用 HTTPS
     https: false
     # API 路径前缀
