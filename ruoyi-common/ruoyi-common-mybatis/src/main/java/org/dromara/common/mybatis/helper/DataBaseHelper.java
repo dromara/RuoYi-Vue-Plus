@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.core.utils.sql.SqlUtil;
 import org.dromara.common.mybatis.enums.DataBaseType;
 
 import javax.sql.DataSource;
@@ -79,6 +80,8 @@ public class DataBaseHelper {
      */
     public static String findInSet(Object var1, String var2) {
         String var = Convert.toStr(var1);
+        SqlUtil.filterKeyword(var);
+        SqlUtil.filterKeyword(var2);
         return switch (getDataBaseType()) {
             // instr(',0,100,101,' , ',100,') <> 0
             case ORACLE -> "instr(','||%s||',' , ',%s,') <> 0".formatted(var2, var);
