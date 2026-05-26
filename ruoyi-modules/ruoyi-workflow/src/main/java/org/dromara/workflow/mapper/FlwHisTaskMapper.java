@@ -41,7 +41,7 @@ public interface FlwHisTaskMapper extends BaseMapperPlus<FlowHisTask, FlowHisTas
             .leftJoin(FlowInstance.class, "b", FlowInstance::getId, FlowHisTask::getInstanceId)
             .leftJoin(FlowDefinition.class, "c", FlowDefinition::getId, FlowHisTask::getDefinitionId)
             .leftJoin(FlowInstanceBizExt.class, "biz", FlowInstanceBizExt::getInstanceId, FlowInstance::getId)
-            .in("a", FlowHisTask::getNodeType, List.of("1", "3", "4"))
+            .in("a", FlowHisTask::getNodeType, List.of(1, 3, 4))
             .ne("a", FlowHisTask::getFlowStatus, TaskStatusEnum.COPY.getStatus())
             .likeIfText("a", FlowHisTask::getNodeName, bo.getNodeName())
             .likeIfText("c", FlowDefinition::getFlowName, bo.getFlowName())
