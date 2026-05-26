@@ -31,6 +31,41 @@ snail-job:
   # 客户端ip指定
   host:
 
+--- # snail-ai 配置
+snail-ai:
+  # 启用客户端模式
+  enabled: true
+  # 聊天发送模式: stream(流式) / sync(同步)
+  chat-mode: stream
+  # ==================== Server 连接 ====================
+  # Server 端 gRPC 地址（即 snail-ai-starter 的 snail-ai.server.grpc-port）
+  server:
+    host: 127.0.0.1
+    port: 18888
+  # ==================== 客户端配置 ====================
+  # 本客户端 gRPC 端口（Server 通过此端口分发 Chat 请求）
+  # 应用 ID（在 Server「应用管理」页面创建后获取）
+  app-id: 1
+  # 认证令牌（在 Server「应用管理」页面创建时自动生成）
+  token: SAI_ce6fbc820c50456baecc7cdcf2a14b1b
+  port: 18889
+  # Skill 文件临时目录
+  skill-temp-dir: /tmp/snail-ai-agent/skills
+  # ==================== OpenAPI Client 配置 ====================
+  open-api:
+    # 启用 OpenAPI Client
+    enabled: true
+    # Server HTTP 端口
+    web-port: 8080
+    # 是否使用 HTTPS
+    https: false
+    # API 路径前缀
+    prefix: snail-ai
+    # 超时配置（毫秒）
+    connect-timeout-ms: 5000
+    read-timeout-ms: 60000
+    chat-timeout-ms: 300000
+
 --- # 数据源配置
 spring:
   datasource:
