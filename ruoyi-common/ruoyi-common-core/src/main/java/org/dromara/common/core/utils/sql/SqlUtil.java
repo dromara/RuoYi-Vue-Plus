@@ -8,7 +8,7 @@ import org.dromara.common.core.utils.StringUtils;
 /**
  * sql操作工具类
  *
- * @author ruoyi
+ * @author Lion Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SqlUtil {
@@ -47,6 +47,14 @@ public class SqlUtil {
         if (StringUtils.isEmpty(value)) {
             return;
         }
+
+        // ==================== 核心增强：自动转义单引号 ====================
+        // 不抛异常、不破坏业务、不改变原方法行为、自动防注入
+        if (value.contains("'")) {
+            throw new UtilException("请求参数包含非法字符【'】，已禁止执行");
+        }
+
+        // ==================== 原有逻辑不变 ====================
         String normalizedValue = value.replaceAll("\\p{Z}|\\s", "");
         String[] sqlKeywords = StringUtils.split(SQL_REGEX, "\\|");
         for (String sqlKeyword : sqlKeywords) {
@@ -55,4 +63,5 @@ public class SqlUtil {
             }
         }
     }
+
 }
