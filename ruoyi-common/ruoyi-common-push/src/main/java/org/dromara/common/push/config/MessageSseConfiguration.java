@@ -1,11 +1,11 @@
 package org.dromara.common.push.config;
 
+import org.dromara.common.push.annotation.ConditionalOnMessageTransport;
 import org.dromara.common.push.controller.SseController;
 import org.dromara.common.push.core.SseEmitterSessionManager;
 import org.dromara.common.push.listener.MessageTopicListener;
 import org.dromara.common.push.properties.MessageProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -16,7 +16,7 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author Lion Li
  */
 @AutoConfiguration(after = MessageAutoConfiguration.class)
-@ConditionalOnExpression("'${message.enabled:true}'.equalsIgnoreCase('true') && '${message.transport:sse}'.equalsIgnoreCase('sse')")
+@ConditionalOnMessageTransport("sse")
 public class MessageSseConfiguration {
 
     /**

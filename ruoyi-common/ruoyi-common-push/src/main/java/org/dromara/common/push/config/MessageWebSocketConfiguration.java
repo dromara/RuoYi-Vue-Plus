@@ -1,12 +1,12 @@
 package org.dromara.common.push.config;
 
+import org.dromara.common.push.annotation.ConditionalOnMessageTransport;
 import org.dromara.common.push.listener.MessageTopicListener;
 import org.dromara.common.push.core.WebSocketSessionManager;
 import org.dromara.common.push.handler.PlusWebSocketHandler;
 import org.dromara.common.push.interceptor.PlusWebSocketInterceptor;
 import org.dromara.common.push.properties.MessageProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -22,7 +22,7 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 @EnableWebSocket
 @AutoConfiguration(after = MessageAutoConfiguration.class)
-@ConditionalOnExpression("'${message.enabled:true}'.equalsIgnoreCase('true') && '${message.transport:sse}'.equalsIgnoreCase('websocket')")
+@ConditionalOnMessageTransport("websocket")
 public class MessageWebSocketConfiguration {
 
     /**

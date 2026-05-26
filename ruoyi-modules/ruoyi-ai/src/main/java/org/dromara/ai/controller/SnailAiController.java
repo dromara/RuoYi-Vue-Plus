@@ -19,6 +19,7 @@ import com.aizuda.snail.ai.openapi.client.core.api.OpenApiChatClient;
 import com.aizuda.snail.ai.openapi.client.core.api.OpenApiConversationClient;
 import com.aizuda.snail.ai.openapi.client.core.api.OpenApiUserClient;
 import com.aizuda.snail.ai.openapi.client.core.listener.SseEventListener;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -190,7 +191,9 @@ public class SnailAiController extends BaseController {
     @PostMapping(value = "/agent/{agentId}/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatStream(
             @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
-            @RequestBody OpenApiChatRequest request) {
+            @RequestBody OpenApiChatRequest request,
+            HttpServletResponse response) {
+        prepareSseResponse(response);
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
         AtomicBoolean closed = new AtomicBoolean(false);
         emitter.onTimeout(() -> {
@@ -301,6 +304,18 @@ public class SnailAiController extends BaseController {
             emitter.completeWithError(e);
             return false;
         }
+    }
+
+    /**
+     * 设置 SSE 响应头，覆盖统一鉴权成功路径中的默认 JSON 响应类型。
+     *
+     * @param response 当前响应
+     */
+    private void prepareSseResponse(HttpServletResponse response) {
+        response.setContentType(MediaType.TEXT_EVENT_STREAM_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("X-Accel-Buffering", "no");
     }
 
     /**

@@ -190,7 +190,10 @@ INSERT IGNORE INTO snail_ai_model_provider (provider_name, provider_key, descrip
 VALUES ('OpenAI', 'openai', 'OpenAI官方模型 (GPT-4, GPT-3.5等)', 1),
        ('Claude', 'claude', 'Anthropic Claude模型', 1),
        ('Ollama', 'ollama', '本地开源模型 (Llama, Mistral等)', 1),
-       ('Google Gemini', 'gemini', 'Google Gemini模型', 1);
+       ('Google Gemini', 'gemini', 'Google Gemini模型', 1),
+       ('阿里云百炼', 'qwen', '阿里云百炼 OpenAI 兼容模型 (Qwen等)', 1),
+       ('DeepSeek', 'deepseek', 'DeepSeek OpenAI 兼容模型', 1),
+       ('智谱AI', 'zhipu', '智谱AI OpenAI 兼容模型 (GLM等)', 1);
 
 -- ============================================
 -- 智能体相关表

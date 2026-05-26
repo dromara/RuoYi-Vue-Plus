@@ -3,12 +3,14 @@ package org.dromara.common.security.config;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.filter.SaServletFilter;
+import cn.dev33.satoken.filter.SaTokenContextFilterForJakartaServlet;
 import cn.dev33.satoken.httpauth.basic.SaHttpBasicUtil;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import cn.dev33.satoken.util.SaTokenConsts;
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +23,15 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.security.config.properties.SecurityProperties;
 import org.dromara.common.security.handler.AllUrlHandler;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -45,8 +49,28 @@ public class SecurityConfig implements WebMvcConfigurer {
     private static final String CLIENT_RULE_SEPARATOR_REGEX = "[,;\\r\\n]+";
 
     private final SecurityProperties securityProperties;
-    @Value("${message.path:/resource/message}")
-    private String messagePath;
+
+    /**
+     * 重新注册 Sa-Token 上下文过滤器，使其覆盖 Servlet 异步分发。
+     * <p>
+     * SSE、WebSocket 握手等场景可能触发 ASYNC/ERROR dispatcher，如果上下文过滤器只处理普通 REQUEST，
+     * 后续统一鉴权或业务代码读取 SaHolder/StpUtil 时会出现 SaTokenContext 未初始化。
+     *
+     * @param filter Sa-Token 官方上下文过滤器
+     * @return 过滤器注册配置
+     */
+    @Bean
+    public FilterRegistrationBean<SaTokenContextFilterForJakartaServlet> saTokenContextFilterRegistration(
+        SaTokenContextFilterForJakartaServlet filter) {
+        FilterRegistrationBean<SaTokenContextFilterForJakartaServlet> registration = new FilterRegistrationBean<>();
+        registration.setFilter(filter);
+        registration.setName("saTokenContextFilterForServlet");
+        registration.addUrlPatterns("/*");
+        registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC, DispatcherType.ERROR));
+        registration.setAsyncSupported(true);
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return registration;
+    }
 
     /**
      * 注册 Sa-Token 路由拦截器并配置鉴权规则。
@@ -91,8 +115,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                     });
             })).addPathPatterns("/**")
             // 排除不需要拦截的路径
-            .excludePathPatterns(securityProperties.getExcludes())
-            .excludePathPatterns(messagePath);
+            .excludePathPatterns(securityProperties.getExcludes());
     }
 
     /**

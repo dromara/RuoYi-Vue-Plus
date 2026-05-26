@@ -2,8 +2,10 @@ package org.dromara.common.push.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.StpUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.push.annotation.ConditionalOnMessageTransport;
 import org.dromara.common.push.core.SseEmitterSessionManager;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.springframework.beans.factory.DisposableBean;
@@ -18,6 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  * @author Lion Li
  */
 @RestController
+@ConditionalOnMessageTransport("sse")
 @RequiredArgsConstructor
 public class SseController implements DisposableBean {
 
@@ -29,10 +32,8 @@ public class SseController implements DisposableBean {
      * @return SSE 发射器
      */
     @GetMapping(value = "${message.path:/resource/message}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter connect() {
-        if (!StpUtil.isLogin()) {
-            return null;
-        }
+    public SseEmitter connect(HttpServletResponse response) {
+        prepareSseResponse(response);
         String tokenValue = StpUtil.getTokenValue();
         Long userId = LoginHelper.getUserId();
         return sessionManager.connect(userId, tokenValue);
@@ -50,6 +51,18 @@ public class SseController implements DisposableBean {
         Long userId = LoginHelper.getUserId();
         sessionManager.disconnect(userId, tokenValue);
         return R.ok();
+    }
+
+    /**
+     * 设置 SSE 响应头，覆盖统一鉴权成功路径中的默认 JSON 响应类型。
+     *
+     * @param response 当前响应
+     */
+    private void prepareSseResponse(HttpServletResponse response) {
+        response.setContentType(MediaType.TEXT_EVENT_STREAM_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("X-Accel-Buffering", "no");
     }
 
     // 以下为demo仅供参考 禁止使用 请在业务逻辑中使用工具发送而不是用接口发送
