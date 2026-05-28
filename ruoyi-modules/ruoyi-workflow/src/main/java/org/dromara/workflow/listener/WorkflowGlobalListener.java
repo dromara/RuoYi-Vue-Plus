@@ -159,9 +159,11 @@ public class WorkflowGlobalListener implements GlobalListener {
         String[] userIdArray = userIds.split(StringUtils.SEPARATOR);
         if (userIdArray.length > 0) {
             flowTask.setPermissionList(List.of(userIdArray));
-            // 移除已处理的状态变量
-            variable.remove(nodeKey);
-            FlowEngine.insService().removeVariables(flowTask.getInstanceId(), nodeKey);
+            if (TaskStatusEnum.PASS.getStatus().equals(taskStatus)) {
+                // 办理指定人变量只消费一次；驳回指定人变量需要保留给后续重复驳回。
+                variable.remove(nodeKey);
+                FlowEngine.insService().removeVariables(flowTask.getInstanceId(), nodeKey);
+            }
         }
     }
 
