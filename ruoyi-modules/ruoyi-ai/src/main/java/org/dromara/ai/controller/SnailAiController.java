@@ -2,18 +2,7 @@ package org.dromara.ai.controller;
 
 import com.aizuda.snail.ai.common.execption.SnailAiException;
 import com.aizuda.snail.ai.common.model.Result;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiAgentIdentityRequest;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiAgentVO;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiChatRequest;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiChatSyncResponse;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiConversationIdentityRequest;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiConversationQueryRequest;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiConversationVO;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiCreateConversationRequest;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiMessageVO;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiUserQueryRequest;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiUserRegisterRequest;
-import com.aizuda.snail.ai.common.openapi.dto.OpenApiUserVO;
+import com.aizuda.snail.ai.common.openapi.dto.*;
 import com.aizuda.snail.ai.openapi.client.core.api.OpenApiAgentClient;
 import com.aizuda.snail.ai.openapi.client.core.api.OpenApiChatClient;
 import com.aizuda.snail.ai.openapi.client.core.api.OpenApiConversationClient;
@@ -31,16 +20,10 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.api.model.LoginUser;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -59,6 +42,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RestController
 @RequestMapping("/snail-ai")
 @RequiredArgsConstructor
+@ConditionalOnBean({OpenApiAgentClient.class, OpenApiChatClient.class,
+    OpenApiConversationClient.class, OpenApiUserClient.class})
 public class SnailAiController extends BaseController {
 
     private static final int SNAIL_AI_SUCCESS = 1;
