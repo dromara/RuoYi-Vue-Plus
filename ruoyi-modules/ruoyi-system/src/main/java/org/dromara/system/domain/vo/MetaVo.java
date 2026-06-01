@@ -37,23 +37,51 @@ public class MetaVo {
      */
     private String activeMenu;
 
+    /**
+     * 构造路由显示信息。
+     *
+     * @param title 路由标题
+     * @param icon  路由图标
+     */
     public MetaVo(String title, String icon) {
         this.title = title;
         this.icon = icon;
     }
 
+    /**
+     * 构造路由显示信息。
+     *
+     * @param title   路由标题
+     * @param icon    路由图标
+     * @param noCache 是否不缓存
+     */
     public MetaVo(String title, String icon, Boolean noCache) {
         this.title = title;
         this.icon = icon;
         this.noCache = noCache;
     }
 
+    /**
+     * 构造带内链地址的路由显示信息。
+     *
+     * @param title 路由标题
+     * @param icon  路由图标
+     * @param link  内链地址
+     */
     public MetaVo(String title, String icon, String link) {
         this.title = title;
         this.icon = icon;
         this.link = link;
     }
 
+    /**
+     * 构造带缓存配置和内链地址的路由显示信息。
+     *
+     * @param title   路由标题
+     * @param icon    路由图标
+     * @param noCache 是否不缓存
+     * @param link    内链地址
+     */
     public MetaVo(String title, String icon, Boolean noCache, String link) {
         this.title = title;
         this.icon = icon;
@@ -63,6 +91,15 @@ public class MetaVo {
         }
     }
 
+    /**
+     * 构造带激活菜单的路由显示信息。
+     *
+     * @param title      路由标题
+     * @param icon       路由图标
+     * @param noCache    是否不缓存
+     * @param link       内链地址
+     * @param activeMenu 激活菜单路径
+     */
     public MetaVo(String title, String icon, Boolean noCache, String link, String activeMenu) {
         this.title = title;
         this.icon = icon;

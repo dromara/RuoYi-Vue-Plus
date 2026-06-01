@@ -103,12 +103,24 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
         }
     }
 
+    /**
+     * 记录 Excel 表头信息。
+     *
+     * @param headMap 表头映射
+     * @param context 解析上下文
+     */
     @Override
     public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
         this.headMap = headMap;
         log.debug("解析到一条表头数据: {}", JsonUtils.toJsonString(headMap));
     }
 
+    /**
+     * 处理一行导入数据。
+     *
+     * @param data 行数据
+     * @param context 解析上下文
+     */
     @Override
     public void invoke(T data, AnalysisContext context) {
         if (isValidate) {
@@ -117,11 +129,21 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
         excelResult.getList().add(data);
     }
 
+    /**
+     * 全部数据解析完成回调。
+     *
+     * @param context 解析上下文
+     */
     @Override
     public void doAfterAllAnalysed(AnalysisContext context) {
         log.debug("所有数据解析完成！");
     }
 
+    /**
+     * 获取 Excel 导入解析结果。
+     *
+     * @return 导入解析结果
+     */
     @Override
     public ExcelResult<T> getExcelResult() {
         return excelResult;

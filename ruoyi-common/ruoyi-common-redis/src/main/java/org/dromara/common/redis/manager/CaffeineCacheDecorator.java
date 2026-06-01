@@ -18,7 +18,7 @@ public class CaffeineCacheDecorator implements Cache {
     /**
      * 创建带 Caffeine 一级缓存的缓存装饰器。
      *
-     * @param name 缓存名称
+     * @param name     缓存名称
      * @param cache    被装饰的缓存实例
      * @param caffeine 本地一级缓存实例
      */
@@ -73,7 +73,7 @@ public class CaffeineCacheDecorator implements Cache {
     /**
      * 按指定类型获取缓存值。
      *
-     * @param key 缓存键
+     * @param key  缓存键
      * @param type 值类型
      * @return 缓存值
      */
@@ -87,7 +87,7 @@ public class CaffeineCacheDecorator implements Cache {
     /**
      * 写入缓存值，并清理本地一级缓存。
      *
-     * @param key 缓存键
+     * @param key   缓存键
      * @param value 缓存值
      */
     @Override
@@ -99,7 +99,7 @@ public class CaffeineCacheDecorator implements Cache {
     /**
      * 当键不存在时写入缓存值。
      *
-     * @param key 缓存键
+     * @param key   缓存键
      * @param value 缓存值
      * @return 原缓存值包装对象
      */
@@ -160,7 +160,7 @@ public class CaffeineCacheDecorator implements Cache {
     /**
      * 获取缓存值，不存在时通过回调加载。
      *
-     * @param key 缓存键
+     * @param key         缓存键
      * @param valueLoader 回调加载器
      * @return 缓存值
      */
@@ -171,6 +171,9 @@ public class CaffeineCacheDecorator implements Cache {
         return (T) o;
     }
 
+    /**
+     * 清理当前缓存命名空间下的本地一级缓存。
+     */
     private void clearLocalCache() {
         String prefix = name + ":";
         caffeine.asMap().keySet().removeIf(key -> key instanceof String cacheKey && cacheKey.startsWith(prefix));

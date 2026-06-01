@@ -32,17 +32,32 @@ public record AccessControlPolicyConfig(
         .accessPolicy(AccessPolicy.PUBLIC_READ_WRITE)
         .build();
 
+    /**
+     * 获取访问策略，未配置时返回默认策略。
+     *
+     * @return 访问策略
+     */
     @Override
     public @NonNull AccessPolicy accessPolicy() {
         return Optional.ofNullable(accessPolicy)
             .orElse(AccessPolicy.PUBLIC_READ_WRITE);
     }
 
+    /**
+     * 复制访问策略配置。
+     *
+     * @return 配置副本
+     */
     @Override
     public AccessControlPolicyConfig copy() {
         return toBuilder().build();
     }
 
+    /**
+     * 转换为构建器。
+     *
+     * @return 配置构建器
+     */
     @Override
     public AccessControlPolicyConfigBuilder toBuilder() {
         return builder()

@@ -15,6 +15,11 @@ public class Sm4Encryptor extends AbstractEncryptor {
 
     private final EncryptContext context;
 
+    /**
+     * 构造 SM4 加密器。
+     *
+     * @param context 加密上下文
+     */
     public Sm4Encryptor(EncryptContext context) {
         super(context);
         this.context = context;
@@ -46,7 +51,7 @@ public class Sm4Encryptor extends AbstractEncryptor {
     /**
      * 解密
      *
-     * @param value      待加密字符串
+     * @param value 待加密字符串
      */
     @Override
     public String decrypt(String value) {

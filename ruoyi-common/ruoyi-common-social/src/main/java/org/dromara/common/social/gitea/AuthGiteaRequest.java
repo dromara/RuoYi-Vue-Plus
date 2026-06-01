@@ -20,6 +20,9 @@ import org.dromara.common.json.utils.JsonUtils;
 @Slf4j
 public class AuthGiteaRequest extends AuthDefaultRequest {
 
+    /**
+     * 服务器地址。
+     */
     public static final String SERVER_URL = SpringUtils.getProperty("justauth.type.gitea.server-url");
 
     /**
@@ -29,10 +32,22 @@ public class AuthGiteaRequest extends AuthDefaultRequest {
         super(config, AuthGiteaSource.GITEA);
     }
 
+    /**
+     * 创建 Gitea 认证请求。
+     *
+     * @param config 授权配置
+     * @param authStateCache 授权状态缓存
+     */
     public AuthGiteaRequest(AuthConfig config, AuthStateCache authStateCache) {
         super(config, AuthGiteaSource.GITEA, authStateCache);
     }
 
+    /**
+     * 获取 Gitea 访问令牌。
+     *
+     * @param authCallback 授权回调参数
+     * @return 访问令牌
+     */
     @Override
     public AuthToken getAccessToken(AuthCallback authCallback) {
         String body = doPostAuthorizationCode(authCallback.getCode());
@@ -54,6 +69,12 @@ public class AuthGiteaRequest extends AuthDefaultRequest {
                 .build();
     }
 
+    /**
+     * 使用授权码换取 Gitea 访问令牌响应。
+     *
+     * @param code 授权码
+     * @return 令牌接口响应体
+     */
     @Override
     protected String doPostAuthorizationCode(String code) {
         HttpRequest request = HttpRequest.post(source.accessToken())
@@ -66,6 +87,12 @@ public class AuthGiteaRequest extends AuthDefaultRequest {
         return response.body();
     }
 
+    /**
+     * 获取 Gitea 用户信息。
+     *
+     * @param authToken 访问令牌
+     * @return 授权用户信息
+     */
     @Override
     public AuthUser getUserInfo(AuthToken authToken) {
         String body = doGetUserInfo(authToken);

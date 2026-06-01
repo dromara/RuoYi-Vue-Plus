@@ -42,7 +42,7 @@ public class RepeatSubmitAspect {
     /**
      * 请求进入前校验是否重复提交。
      *
-     * @param point 切点
+     * @param point        切点
      * @param repeatSubmit 防重复提交注解
      */
     @Before("@annotation(repeatSubmit)")
@@ -111,6 +111,9 @@ public class RepeatSubmitAspect {
         }
     }
 
+    /**
+     * 删除当前请求写入的防重键。
+     */
     private void deleteRepeatKey() {
         String key = KEY_CACHE.get();
         if (StringUtils.isNotBlank(key)) {
@@ -120,6 +123,9 @@ public class RepeatSubmitAspect {
 
     /**
      * 参数拼装
+     *
+     * @param paramsArray 方法参数数组
+     * @return 拼装后的参数字符串
      */
     private String argsArrayToString(Object[] paramsArray) {
         StringJoiner params = new StringJoiner(" ");
@@ -157,7 +163,7 @@ public class RepeatSubmitAspect {
             }
         }
         return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse
-               || o instanceof BindingResult;
+            || o instanceof BindingResult;
     }
 
 }

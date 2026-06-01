@@ -21,14 +21,32 @@ import java.util.*;
  */
 public class CellMergeHandler {
 
+    /**
+     * 是否包含标题行。
+     */
     private final boolean hasTitle;
+    /**
+     * 当前行索引。
+     */
     private int rowIndex;
 
+    /**
+     * 创建单元格合并处理器。
+     *
+     * @param hasTitle 是否存在标题行
+     */
     private CellMergeHandler(final boolean hasTitle) {
         this.hasTitle = hasTitle;
         // 行合并开始下标
         this.rowIndex = hasTitle ? 1 : 0;
     }
+
+    /**
+     * 创建单元格合并处理器。
+     *
+     * @param hasTitle 是否存在标题行
+     * @param rowIndex 起始行索引
+     */
     private CellMergeHandler(final boolean hasTitle, final int rowIndex) {
         this.hasTitle = hasTitle;
         this.rowIndex = hasTitle ? rowIndex : 0;
@@ -143,6 +161,14 @@ public class CellMergeHandler {
         return mergeFields;
     }
 
+    /**
+     * 判断当前行是否满足依赖字段合并条件。
+     *
+     * @param currentRow 当前行数据
+     * @param preRow 上一行数据
+     * @param cellMerge 合并配置
+     * @return 是否允许合并
+     */
     private boolean isMerge(Object currentRow, Object preRow, CellMerge cellMerge) {
         final String[] mergeBy = cellMerge.mergeBy();
         if (StrUtil.isAllNotBlank(mergeBy)) {
@@ -159,10 +185,24 @@ public class CellMergeHandler {
         return true;
     }
 
+    /**
+     * 判断单元格值是否为空。
+     *
+     * @param value 单元格值
+     * @return 是否为空
+     */
     private boolean isBlankCell(Object value) {
         return value == null || StrUtil.isBlankIfStr(value);
     }
 
+    /**
+     * 追加有效的合并区域。
+     *
+     * @param result 合并区域结果集
+     * @param repeatCell 连续重复单元格信息
+     * @param endIndex 结束行索引
+     * @param colNum 列索引
+     */
     private void appendMergeResult(List<CellRangeAddress> result, RepeatCell repeatCell, int endIndex, int colNum) {
         if (repeatCell == null || endIndex <= repeatCell.current()) {
             return;
@@ -174,6 +214,13 @@ public class CellMergeHandler {
      * 单元格合并
      */
     record RepeatCell(Object value, int current) {
+        /**
+         * 创建连续重复单元格信息。
+         *
+         * @param value 单元格值
+         * @param current 当前行索引
+         * @return 连续重复单元格信息
+         */
         static RepeatCell of(Object value, int current) {
             return new RepeatCell(value, current);
         }
@@ -183,10 +230,18 @@ public class CellMergeHandler {
      * 字段列索引和合并注解信息
      */
     record FieldColumnIndex(int colIndex, CellMerge cellMerge) {
+        /**
+         * 创建字段列索引和合并注解信息。
+         *
+         * @param colIndex 列索引
+         * @param cellMerge 合并注解
+         * @return 字段列索引和合并注解信息
+         */
         static FieldColumnIndex of(int colIndex, CellMerge cellMerge) {
             return new FieldColumnIndex(colIndex, cellMerge);
         }
     }
+
     /**
      * 创建一个单元格合并处理器实例
      *

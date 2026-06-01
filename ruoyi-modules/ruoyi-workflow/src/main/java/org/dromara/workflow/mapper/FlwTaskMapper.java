@@ -22,6 +22,15 @@ import java.util.Map;
  */
 public interface FlwTaskMapper extends BaseMapperPlus<FlowTask, FlowTaskVo>, MPJBaseMapper<FlowTask> {
 
+    /**
+     * 分页查询运行中的待办任务。
+     *
+     * @param page 分页对象
+     * @param bo 查询条件
+     * @param categoryIds 流程分类 id 列表
+     * @param userId 当前用户 id
+     * @return 待办任务分页结果
+     */
     default Page<FlowTaskVo> getListRunTask(Page<FlowTaskVo> page, FlowTaskBo bo, List<String> categoryIds, String userId) {
         Map<String, Object> params = bo.getParams();
         return QueryBuilder.lambdaJoin("t", FlowTask.class)
@@ -54,6 +63,15 @@ public interface FlwTaskMapper extends BaseMapperPlus<FlowTask, FlowTaskVo>, MPJ
             .page(page, FlowTaskVo.class);
     }
 
+    /**
+     * 分页查询抄送任务。
+     *
+     * @param page 分页对象
+     * @param bo 查询条件
+     * @param categoryIds 流程分类 id 列表
+     * @param userId 当前用户 id
+     * @return 抄送任务分页结果
+     */
     default Page<FlowTaskVo> getTaskCopyByPage(Page<FlowTaskVo> page, FlowTaskBo bo, List<String> categoryIds, String userId) {
         Map<String, Object> params = bo.getParams();
         return QueryBuilder.lambdaJoin("a", FlowUser.class)

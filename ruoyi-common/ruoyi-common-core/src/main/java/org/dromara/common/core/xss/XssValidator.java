@@ -13,6 +13,13 @@ import org.dromara.common.core.utils.StringUtils;
  */
 public class XssValidator implements ConstraintValidator<Xss, String> {
 
+    /**
+     * 校验字符串是否包含 HTML 标签。
+     *
+     * @param value                      待校验值
+     * @param constraintValidatorContext 校验上下文
+     * @return true 校验通过 false 包含 HTML 标签
+     */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
         if (StringUtils.isBlank(value)) {

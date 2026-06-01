@@ -16,6 +16,11 @@ public class Sm2Encryptor extends AbstractEncryptor {
 
     private final EncryptContext context;
 
+    /**
+     * 构造 SM2 加密器。
+     *
+     * @param context 加密上下文
+     */
     public Sm2Encryptor(EncryptContext context) {
         super(context);
         String privateKey = context.getPrivateKey();
@@ -52,7 +57,7 @@ public class Sm2Encryptor extends AbstractEncryptor {
     /**
      * 解密
      *
-     * @param value      待加密字符串
+     * @param value 待加密字符串
      */
     @Override
     public String decrypt(String value) {

@@ -11,6 +11,11 @@ import org.dromara.common.encrypt.core.IEncryptor;
  */
 public abstract class AbstractEncryptor implements IEncryptor {
 
+    /**
+     * 初始化加密执行者。
+     *
+     * @param context 加密上下文
+     */
     public AbstractEncryptor(EncryptContext context) {
         // 用户配置校验与配置注入
     }

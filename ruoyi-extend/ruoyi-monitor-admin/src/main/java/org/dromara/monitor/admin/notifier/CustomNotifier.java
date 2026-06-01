@@ -20,6 +20,11 @@ import static de.codecentric.boot.admin.server.domain.values.StatusInfo.*;
 @Component
 public class CustomNotifier extends AbstractEventNotifier {
 
+    /**
+     * 初始化自定义事件通知处理器。
+     *
+     * @param repository 实例仓库
+     */
     protected CustomNotifier(InstanceRepository repository) {
         super(repository);
     }

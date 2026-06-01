@@ -120,7 +120,7 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
     /**
      * 根据办理人类型查询右侧候选数据。
      *
-     * @param type 办理人类型
+     * @param type      办理人类型
      * @param taskQuery 查询条件
      * @return 办理人数据
      */
@@ -180,7 +180,7 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
     /**
      * 构建设计器右侧办理人列表数据。
      *
-     * @param dto 办理人数据
+     * @param dto  办理人数据
      * @param type 办理人类型
      * @return 办理人列表构建器
      */
@@ -218,6 +218,12 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
             .toList();
     }
 
+    /**
+     * 按任务分配类型批量查询用户。
+     *
+     * @param typeIdMap 任务分配类型与 id 列表映射
+     * @return 用户列表
+     */
     private List<UserDTO> getUsersByTypes(Map<TaskAssigneeEnum, List<String>> typeIdMap) {
         return typeIdMap.entrySet().stream()
             .map(entry -> this.getUsersByType(entry.getKey(), entry.getValue()))
@@ -226,6 +232,12 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
             .toList();
     }
 
+    /**
+     * 按任务分配类型批量查询名称映射。
+     *
+     * @param typeIdMap 任务分配类型与 id 列表映射
+     * @return 任务分配类型与名称映射
+     */
     private Map<TaskAssigneeEnum, Map<String, String>> getNamesByTypes(Map<TaskAssigneeEnum, List<String>> typeIdMap) {
         Map<TaskAssigneeEnum, Map<String, String>> nameMap = new EnumMap<>(TaskAssigneeEnum.class);
         typeIdMap.forEach((type, ids) -> nameMap.put(type, this.getNamesByType(type, ids)));

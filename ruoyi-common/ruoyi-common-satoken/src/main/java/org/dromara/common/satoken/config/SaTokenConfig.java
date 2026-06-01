@@ -21,6 +21,11 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource(value = "classpath:common-satoken.yml", factory = YmlPropertySourceFactory.class)
 public class SaTokenConfig {
 
+    /**
+     * 创建 Sa-Token JWT 登录逻辑。
+     *
+     * @return JWT 登录逻辑
+     */
     @Bean
     public StpLogic getStpLogicJwt() {
         // Sa-Token 整合 jwt (简单模式)

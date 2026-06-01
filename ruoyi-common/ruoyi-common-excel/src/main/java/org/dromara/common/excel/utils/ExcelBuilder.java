@@ -55,52 +55,127 @@ import java.util.zip.ZipOutputStream;
  */
 public final class ExcelBuilder<T> {
 
+    /**
+     * 默认工作表名称。
+     */
     private static final String DEFAULT_SHEET_NAME = "sheet1";
 
+    /**
+     * 默认 ZIP 分页大小。
+     */
     private static final int DEFAULT_ZIP_PAGE_SIZE = 999;
 
+    /**
+     * 数据内容。
+     */
     private final List<T> data;
 
+    /**
+     * 表头类型。
+     */
     private final Class<T> headType;
 
+    /**
+     * 工作表名称。
+     */
     private String sheetName = DEFAULT_SHEET_NAME;
 
+    /**
+     * 工作表编号。
+     */
     private Integer sheetNo;
 
+    /**
+     * 是否合并单元格。
+     */
     private boolean merge;
 
+    /**
+     * 下拉选项集合。
+     */
     private List<DropDownOptions> options;
 
+    /**
+     * 是否 ZIP 打包。
+     */
     private boolean zip;
 
+    /**
+     * 分页大小。
+     */
     private int pageSize = DEFAULT_ZIP_PAGE_SIZE;
 
+    /**
+     * 认证密码。
+     */
     private String password;
 
+    /**
+     * 是否写入表头。
+     */
     private Boolean needHead;
 
+    /**
+     * 是否自动合并表头。
+     */
     private Boolean automaticMergeHead;
 
+    /**
+     * 包含字段集合。
+     */
     private Collection<String> includeFields;
 
+    /**
+     * 排除字段集合。
+     */
     private Collection<String> excludeFields;
 
+    /**
+     * 包含列索引集合。
+     */
     private Collection<Integer> includeIndexes;
 
+    /**
+     * 排除列索引集合。
+     */
     private Collection<Integer> excludeIndexes;
 
+    /**
+     * 是否按包含列排序。
+     */
     private Boolean orderByIncludeColumn;
 
+    /**
+     * 列宽。
+     */
     private Integer columnWidth;
 
+    /**
+     * 表头行高。
+     */
     private Short headRowHeight;
 
+    /**
+     * 内容行高。
+     */
     private Short contentRowHeight;
 
+    /**
+     * 写入处理器集合。
+     */
     private List<WriteHandler> writeHandlers;
 
+    /**
+     * 转换器集合。
+     */
     private List<Converter<?>> converters;
 
+    /**
+     * 创建 Excel 导出构造器。
+     *
+     * @param data 导出数据
+     * @param headType 表头类型
+     */
     private ExcelBuilder(List<T> data, Class<T> headType) {
         this.data = data;
         this.headType = headType;
@@ -373,6 +448,11 @@ public final class ExcelBuilder<T> {
         }
     }
 
+    /**
+     * 写入单个工作表。
+     *
+     * @param outputStream 输出流
+     */
     private void writeSheet(OutputStream outputStream) {
         ExcelWriterSheetBuilder builder = createSheetBuilder(createWriterBuilder(outputStream));
         if (merge) {
@@ -382,10 +462,22 @@ public final class ExcelBuilder<T> {
         builder.doWrite(data);
     }
 
+    /**
+     * 创建 Excel 写入器。
+     *
+     * @param outputStream 输出流
+     * @return Excel 写入器
+     */
     private ExcelWriter createWriter(OutputStream outputStream) {
         return createWriterBuilder(outputStream).build();
     }
 
+    /**
+     * 创建并配置 Excel 写入构造器。
+     *
+     * @param outputStream 输出流
+     * @return Excel 写入构造器
+     */
     private ExcelWriterBuilder createWriterBuilder(OutputStream outputStream) {
         ExcelWriterBuilder builder = FesodSheet.write(outputStream, headType)
             .autoCloseStream(false)
@@ -437,6 +529,12 @@ public final class ExcelBuilder<T> {
         return builder;
     }
 
+    /**
+     * 创建工作表写入构造器。
+     *
+     * @param builder Excel 写入构造器
+     * @return 工作表写入构造器
+     */
     private ExcelWriterSheetBuilder createSheetBuilder(ExcelWriterBuilder builder) {
         if (sheetNo != null) {
             return builder.sheet(sheetNo, sheetName);
@@ -444,6 +542,11 @@ public final class ExcelBuilder<T> {
         return builder.sheet(sheetName);
     }
 
+    /**
+     * 将大数据导出拆分为多个 Excel 文件并压缩写入响应。
+     *
+     * @param response HTTP 响应
+     */
     private void exportZipToResponse(HttpServletResponse response) {
         if (pageSize <= 0) {
             throw new IllegalArgumentException("pageSize 必须大于 0");
@@ -474,6 +577,13 @@ public final class ExcelBuilder<T> {
         }
     }
 
+    /**
+     * 构建 ZIP 内单个 Excel 文件内容。
+     *
+     * @param pageData 当前分页数据
+     * @param exportSheetName 导出工作表名称
+     * @return Excel 文件字节
+     */
     private byte[] buildZipEntry(List<T> pageData, String exportSheetName) {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             ExcelBuilder<T> builder = ExcelBuilder.of(pageData, headType)
@@ -486,6 +596,11 @@ public final class ExcelBuilder<T> {
         }
     }
 
+    /**
+     * 复制导出配置到分页导出构造器。
+     *
+     * @param builder 目标构造器
+     */
     private void copyOptionsTo(ExcelBuilder<T> builder) {
         builder.merge = merge;
         builder.options = options;
@@ -506,12 +621,22 @@ public final class ExcelBuilder<T> {
 
     /**
      * 重置响应体。
+     *
+     * @param filename 文件名
+     * @param response HTTP 响应
+     * @throws UnsupportedEncodingException 文件名编码异常
      */
     private static void resetResponse(String filename, HttpServletResponse response) throws UnsupportedEncodingException {
         FileUtils.setAttachmentResponseHeader(response, encodingFilename(filename));
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");
     }
 
+    /**
+     * 生成带随机前缀的导出文件名。
+     *
+     * @param filename 原始文件名
+     * @return 编码前的导出文件名
+     */
     private static String encodingFilename(String filename) {
         return IdUtil.fastSimpleUUID() + "_" + filename + ".xlsx";
     }
@@ -521,34 +646,82 @@ public final class ExcelBuilder<T> {
      */
     public static final class ReadBuilder<T> {
 
+        /**
+         * 导入输入流。
+         */
         private final InputStream inputStream;
 
+        /**
+         * 表头类型。
+         */
         private final Class<T> headType;
 
+        /**
+         * 是否执行数据校验。
+         */
         private boolean validate = true;
 
+        /**
+         * 是否快速失败。
+         */
         private boolean failFast = true;
 
+        /**
+         * Excel 监听器。
+         */
         private ExcelListener<T> listener;
 
+        /**
+         * 工作表编号。
+         */
         private Integer sheetNo;
 
+        /**
+         * 工作表名称。
+         */
         private String sheetName;
 
+        /**
+         * 表头行数。
+         */
         private Integer headRowNumber;
 
+        /**
+         * 是否忽略空行。
+         */
         private Boolean ignoreEmptyRow;
 
+        /**
+         * 认证密码。
+         */
         private String password;
 
+        /**
+         * 是否自动裁剪空白。
+         */
         private Boolean autoTrim;
 
+        /**
+         * 是否自动清理不可见字符。
+         */
         private Boolean autoStrip;
 
+        /**
+         * 读取行数。
+         */
         private Integer numRows;
 
+        /**
+         * 转换器集合。
+         */
         private List<Converter<?>> converters;
 
+        /**
+         * 创建 Excel 导入读取构造器。
+         *
+         * @param inputStream 输入流
+         * @param headType 表头类型
+         */
         private ReadBuilder(InputStream inputStream, Class<T> headType) {
             this.inputStream = inputStream;
             this.headType = headType;
@@ -700,6 +873,12 @@ public final class ExcelBuilder<T> {
             return createReaderBuilder(null).doReadAllSync();
         }
 
+        /**
+         * 创建并配置 Excel 读取构造器。
+         *
+         * @param readListener 读取监听器
+         * @return Excel 读取构造器
+         */
         private ExcelReaderBuilder createReaderBuilder(ExcelListener<T> readListener) {
             ExcelReaderBuilder builder = FesodSheet.read(inputStream)
                 .head(headType)
@@ -731,6 +910,12 @@ public final class ExcelBuilder<T> {
             return builder;
         }
 
+        /**
+         * 创建工作表读取构造器。
+         *
+         * @param builder Excel 读取构造器
+         * @return 工作表读取构造器
+         */
         private ExcelReaderSheetBuilder createSheetBuilder(ExcelReaderBuilder builder) {
             ExcelReaderSheetBuilder sheetBuilder;
             if (sheetNo != null && StringUtils.isNotBlank(sheetName)) {
@@ -754,14 +939,31 @@ public final class ExcelBuilder<T> {
      */
     public static final class TemplateBuilder {
 
+        /**
+         * 模板路径。
+         */
         private final String templatePath;
 
+        /**
+         * 文件名称。
+         */
         private String filename = DEFAULT_SHEET_NAME;
 
+        /**
+         * 模板模式。
+         */
         private TemplateMode mode;
 
+        /**
+         * 数据内容。
+         */
         private Object data;
 
+        /**
+         * 创建 Excel 模板导出构造器。
+         *
+         * @param templatePath 模板路径
+         */
         private TemplateBuilder(String templatePath) {
             this.templatePath = templatePath;
         }
@@ -838,6 +1040,11 @@ public final class ExcelBuilder<T> {
             }
         }
 
+        /**
+         * 按模板模式填充数据。
+         *
+         * @param excelWriter Excel 写入器
+         */
         @SuppressWarnings("unchecked")
         private void fill(ExcelWriter excelWriter) {
             if (mode == TemplateMode.LIST) {
@@ -874,6 +1081,9 @@ public final class ExcelBuilder<T> {
             }
         }
 
+        /**
+         * 校验模板导出数据。
+         */
         private void validateData() {
             if (mode == null || data == null) {
                 throw new IllegalArgumentException("数据为空");

@@ -35,6 +35,9 @@ public class DefaultOssClientImpl extends AbstractOssClientImpl {
         super(clientId, config);
     }
 
+    /**
+     * 初始化默认 S3 客户端、传输管理器和预签名生成器。
+     */
     @Override
     void doInitialize() {
         // 校验配置

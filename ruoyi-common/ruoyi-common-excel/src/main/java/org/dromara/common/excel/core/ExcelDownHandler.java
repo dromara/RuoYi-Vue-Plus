@@ -6,13 +6,13 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.fesod.sheet.metadata.FieldCache;
 import org.apache.fesod.sheet.metadata.FieldWrapper;
 import org.apache.fesod.sheet.util.ClassUtils;
 import org.apache.fesod.sheet.write.handler.SheetWriteHandler;
 import org.apache.fesod.sheet.write.metadata.holder.WriteSheetHolder;
 import org.apache.fesod.sheet.write.metadata.holder.WriteWorkbookHolder;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
@@ -41,7 +41,13 @@ import java.util.*;
 @Slf4j
 public class ExcelDownHandler implements SheetWriteHandler {
 
+    /**
+     * 首个数据行索引。
+     */
     private static final int FIRST_DATA_ROW_INDEX = 1;
+    /**
+     * 最后数据行索引。
+     */
     private static final int LAST_DATA_ROW_INDEX = 1000;
     /**
      * 单选数据Sheet名
@@ -411,6 +417,11 @@ public class ExcelDownHandler implements SheetWriteHandler {
         return CellReference.convertNumToColString(columnIndex);
     }
 
+    /**
+     * 延迟获取字典服务。
+     *
+     * @return 字典服务
+     */
     private DictService getDictService() {
         if (dictService == null) {
             dictService = SpringUtils.getBean(DictService.class);

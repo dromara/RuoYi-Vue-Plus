@@ -273,6 +273,11 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     }
 
 
+    /**
+     * 校验当前用户是否有权限删除流程实例，并发布删除事件。
+     *
+     * @param flowInstances 待删除流程实例列表
+     */
     private void processDeleteHandler(List<FlowInstance> flowInstances) {
 
         String userId = LoginHelper.getUserIdStr();

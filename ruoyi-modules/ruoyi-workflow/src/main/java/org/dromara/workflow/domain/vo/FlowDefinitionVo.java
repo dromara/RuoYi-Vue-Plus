@@ -19,6 +19,9 @@ public class FlowDefinitionVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 流程定义主键
+     */
     private Long id;
 
     /**

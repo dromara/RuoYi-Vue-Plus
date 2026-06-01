@@ -85,6 +85,13 @@ public class RateLimiterAspect {
         }
     }
 
+    /**
+     * 组装限流缓存键。
+     *
+     * @param rateLimiter 限流注解配置
+     * @param point 切点信息
+     * @return 限流缓存键
+     */
     private String getCombineKey(RateLimiter rateLimiter, JoinPoint point) {
         String key = rateLimiter.key();
         // 判断 key 不为空 和 不是表达式

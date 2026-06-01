@@ -1,12 +1,12 @@
 /**
  * Copyright (c) 2013-2021 Nikita Koksharov
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -169,6 +169,14 @@ public class PlusSpringCacheManager implements CacheManager {
         return createMapCache(cacheName, name, config, local);
     }
 
+    /**
+     * 解析缓存配置，支持从模板配置复制并叠加缓存名称中的扩展参数。
+     *
+     * @param cacheName 完整缓存名称
+     * @param name 基础缓存名称
+     * @param array 缓存名称拆分参数
+     * @return 缓存配置
+     */
     private CacheConfig resolveCacheConfig(String cacheName, String name, String[] array) {
         CacheConfig config = configMap.get(cacheName);
         if (config != null) {
@@ -196,6 +204,12 @@ public class PlusSpringCacheManager implements CacheManager {
         return config;
     }
 
+    /**
+     * 解析是否启用本地一级缓存。
+     *
+     * @param array 缓存名称拆分参数
+     * @return 本地缓存开关
+     */
     private int resolveLocal(String[] array) {
         int local = 1;
         if (array.length > 4) {
@@ -204,6 +218,12 @@ public class PlusSpringCacheManager implements CacheManager {
         return local;
     }
 
+    /**
+     * 复制 Redisson 缓存配置，避免修改模板配置。
+     *
+     * @param source 模板缓存配置
+     * @return 新缓存配置
+     */
     private CacheConfig copyConfig(CacheConfig source) {
         CacheConfig target = new CacheConfig();
         target.setTTL(source.getTTL());

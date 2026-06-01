@@ -19,32 +19,74 @@ import java.util.*;
  */
 public final class MailBuilder {
 
+    /**
+     * 邮件账户配置。
+     */
     private MailAccount mailAccount;
 
+    /**
+     * 是否使用全局邮件会话。
+     */
     private boolean useGlobalSession = true;
 
+    /**
+     * 收件人列表。
+     */
     private final List<String> tos = new ArrayList<>();
 
+    /**
+     * 抄送人列表。
+     */
     private final List<String> ccs = new ArrayList<>();
 
+    /**
+     * 密送人列表。
+     */
     private final List<String> bccs = new ArrayList<>();
 
+    /**
+     * 内嵌图片集合。
+     */
     private final Map<String, InputStream> images = new LinkedHashMap<>();
 
+    /**
+     * 附件文件集合。
+     */
     private File[] files = new File[0];
 
+    /**
+     * 发件人。
+     */
     private String from;
 
+    /**
+     * 登录用户。
+     */
     private String user;
 
+    /**
+     * 登录密码。
+     */
     private String pass;
 
+    /**
+     * 邮件主题。
+     */
     private String subject;
 
+    /**
+     * 邮件内容。
+     */
     private String content;
 
+    /**
+     * 是否 HTML 内容。
+     */
     private boolean html;
 
+    /**
+     * 私有构造器，统一通过静态工厂创建。
+     */
     private MailBuilder() {
     }
 
@@ -220,7 +262,7 @@ public final class MailBuilder {
      * 设置正文。
      *
      * @param content 正文
-     * @param html 是否 HTML
+     * @param html    是否 HTML
      * @return 当前构建器
      */
     public MailBuilder content(String content, boolean html) {
@@ -232,7 +274,7 @@ public final class MailBuilder {
     /**
      * 添加内联图片。
      *
-     * @param cid 图片 cid
+     * @param cid         图片 cid
      * @param inputStream 图片输入流
      * @return 当前构建器
      */
@@ -297,6 +339,9 @@ public final class MailBuilder {
         }
     }
 
+    /**
+     * 校验邮件发送必填项。
+     */
     private void validate() {
         if (CollUtil.isEmpty(tos)) {
             throw new IllegalArgumentException("邮件收件人不能为空");
@@ -309,6 +354,11 @@ public final class MailBuilder {
         }
     }
 
+    /**
+     * 解析实际使用的邮件账户。
+     *
+     * @return 邮件账户
+     */
     private MailAccount resolveMailAccount() {
         MailAccount account = mailAccount;
         if (account == null) {
@@ -324,6 +374,12 @@ public final class MailBuilder {
         return copy;
     }
 
+    /**
+     * 拆分逗号或分号分隔的邮箱地址。
+     *
+     * @param addresses 邮箱地址字符串
+     * @return 邮箱地址列表
+     */
     private List<String> splitAddress(String addresses) {
         if (StrUtil.isBlank(addresses)) {
             return Collections.emptyList();
@@ -331,6 +387,12 @@ public final class MailBuilder {
         return normalizeAddresses(StrUtil.splitTrim(addresses.replace(';', ','), ','));
     }
 
+    /**
+     * 过滤并标准化邮箱地址集合。
+     *
+     * @param addresses 邮箱地址集合
+     * @return 标准化后的邮箱地址列表
+     */
     private List<String> normalizeAddresses(Collection<String> addresses) {
         if (CollUtil.isEmpty(addresses)) {
             return Collections.emptyList();

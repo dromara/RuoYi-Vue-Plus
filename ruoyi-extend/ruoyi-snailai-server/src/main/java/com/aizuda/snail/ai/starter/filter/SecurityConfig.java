@@ -13,8 +13,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SecurityConfig {
 
+    /**
+     * 认证用户名。
+     */
     @Value("${spring.boot.admin.client.username}")
     private String username;
+    /**
+     * 认证密码。
+     */
     @Value("${spring.boot.admin.client.password}")
     private String password;
 

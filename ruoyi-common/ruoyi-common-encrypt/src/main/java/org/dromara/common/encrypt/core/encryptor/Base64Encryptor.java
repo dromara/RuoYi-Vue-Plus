@@ -13,6 +13,11 @@ import org.dromara.common.encrypt.utils.EncryptUtils;
  */
 public class Base64Encryptor extends AbstractEncryptor {
 
+    /**
+     * 初始化 Base64 加密执行者。
+     *
+     * @param context 加密上下文
+     */
     public Base64Encryptor(EncryptContext context) {
         super(context);
     }

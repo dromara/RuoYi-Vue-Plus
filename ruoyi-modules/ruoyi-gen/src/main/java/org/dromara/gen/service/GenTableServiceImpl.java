@@ -460,8 +460,8 @@ public class GenTableServiceImpl implements IGenTableService {
     /**
      * 模板渲染上下文。
      *
-     * @param table 生成表信息
-     * @param context 模板上下文
+     * @param table     生成表信息
+     * @param context   模板上下文
      * @param templates 待渲染模板
      */
     private record RenderContext(GenTable table, Dict context, List<PathNamedTemplate> templates) {
@@ -488,6 +488,11 @@ public class GenTableServiceImpl implements IGenTableService {
         }
     }
 
+    /**
+     * 校验生成选项中配置的字段是否存在。
+     *
+     * @param genTable 业务表信息
+     */
     private void validateOptionColumns(GenTable genTable) {
         Map<String, Object> params = genTable.getParams();
         if (CollUtil.isEmpty(params) || CollUtil.isEmpty(genTable.getColumns())) {
@@ -510,6 +515,13 @@ public class GenTableServiceImpl implements IGenTableService {
         }
     }
 
+    /**
+     * 校验单个选项字段。
+     *
+     * @param validFields 有效字段集合
+     * @param field       待校验字段
+     * @param label       字段显示名称
+     */
     private void validateOptionField(Set<String> validFields, Object field, String label) {
         if (ObjectUtil.isNull(field)) {
             return;
@@ -523,6 +535,11 @@ public class GenTableServiceImpl implements IGenTableService {
         }
     }
 
+    /**
+     * 规范化字段扩展配置。
+     *
+     * @param columns 表字段列表
+     */
     private void normalizeColumnOptions(List<GenTableColumn> columns) {
         if (CollUtil.isEmpty(columns)) {
             return;

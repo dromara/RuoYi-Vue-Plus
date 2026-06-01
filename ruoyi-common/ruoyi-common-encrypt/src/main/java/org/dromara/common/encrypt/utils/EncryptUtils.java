@@ -381,6 +381,11 @@ public class EncryptUtils {
         }
     }
 
+    /**
+     * 校验 RSA 密钥长度是否满足最低安全要求。
+     *
+     * @param rsaKey RSA 密钥
+     */
     private static void validateRsaKeySize(RSAKey rsaKey) {
         int keySize = rsaKey.getModulus().bitLength();
         if (keySize < MIN_RSA_KEY_SIZE) {

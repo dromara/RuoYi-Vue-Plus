@@ -6,7 +6,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.dromara.common.encrypt.utils.EncryptUtils;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -39,6 +42,11 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
         this.charset = resolveCharset(response);
     }
 
+    /**
+     * 返回缓存响应内容的字符输出器。
+     *
+     * @return 字符输出器
+     */
     @Override
     public PrintWriter getWriter() {
         if (printWriter == null) {
@@ -48,6 +56,11 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
         return printWriter;
     }
 
+    /**
+     * 刷新缓存的响应输出流和字符输出器。
+     *
+     * @throws IOException IO 异常
+     */
     @Override
     public void flushBuffer() throws IOException {
         if (servletOutputStream != null) {
@@ -58,11 +71,17 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
         }
     }
 
+    /**
+     * 重置已缓存的响应内容。
+     */
     @Override
     public void reset() {
         byteArrayOutputStream.reset();
     }
 
+    /**
+     * 重置已缓存的响应缓冲区。
+     */
     @Override
     public void resetBuffer() {
         byteArrayOutputStream.reset();
@@ -122,29 +141,64 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
         return encryptContent;
     }
 
+    /**
+     * 返回缓存响应内容的二进制输出流。
+     *
+     * @return 响应输出流
+     */
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return new ServletOutputStream() {
+            /**
+             * 判断响应输出流是否可写。
+             *
+             * @return 固定为 true
+             */
             @Override
             public boolean isReady() {
                 return true;
             }
 
+            /**
+             * 设置异步写入监听器。
+             *
+             * @param writeListener 写入监听器
+             */
             @Override
             public void setWriteListener(WriteListener writeListener) {
 
             }
 
+            /**
+             * 写入单个字节到响应缓存。
+             *
+             * @param b 待写入字节
+             * @throws IOException IO 异常
+             */
             @Override
             public void write(int b) throws IOException {
                 byteArrayOutputStream.write(b);
             }
 
+            /**
+             * 写入字节数组到响应缓存。
+             *
+             * @param b 待写入字节数组
+             * @throws IOException IO 异常
+             */
             @Override
             public void write(byte[] b) throws IOException {
                 byteArrayOutputStream.write(b);
             }
 
+            /**
+             * 写入字节数组片段到响应缓存。
+             *
+             * @param b 待写入字节数组
+             * @param off 起始偏移量
+             * @param len 写入长度
+             * @throws IOException IO 异常
+             */
             @Override
             public void write(byte[] b, int off, int len) throws IOException {
                 byteArrayOutputStream.write(b, off, len);
@@ -152,6 +206,12 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
         };
     }
 
+    /**
+     * 解析响应字符集，未设置时默认使用 UTF-8。
+     *
+     * @param response 原始响应
+     * @return 响应字符集
+     */
     private Charset resolveCharset(HttpServletResponse response) {
         String characterEncoding = response.getCharacterEncoding();
         if (characterEncoding == null) {
@@ -160,6 +220,11 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
         return Charset.forName(characterEncoding);
     }
 
+    /**
+     * 生成响应内容 AES 加密密钥。
+     *
+     * @return AES 密钥
+     */
     private String generateAesPassword() {
         byte[] bytes = new byte[24];
         SECURE_RANDOM.nextBytes(bytes);

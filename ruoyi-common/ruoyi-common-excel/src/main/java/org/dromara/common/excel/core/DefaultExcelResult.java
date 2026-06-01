@@ -26,26 +26,50 @@ public class DefaultExcelResult<T> implements ExcelResult<T> {
     @Setter
     private List<String> errorList;
 
+    /**
+     * 创建默认导入结果。
+     */
     public DefaultExcelResult() {
         this.list = new ArrayList<>();
         this.errorList = new ArrayList<>();
     }
 
+    /**
+     * 创建导入结果。
+     *
+     * @param list 成功数据列表
+     * @param errorList 错误信息列表
+     */
     public DefaultExcelResult(List<T> list, List<String> errorList) {
         this.list = list;
         this.errorList = errorList;
     }
 
+    /**
+     * 复制导入结果。
+     *
+     * @param excelResult 原导入结果
+     */
     public DefaultExcelResult(ExcelResult<T> excelResult) {
         this.list = excelResult.getList();
         this.errorList = excelResult.getErrorList();
     }
 
+    /**
+     * 获取成功数据列表。
+     *
+     * @return 成功数据列表
+     */
     @Override
     public List<T> getList() {
         return list;
     }
 
+    /**
+     * 获取错误信息列表。
+     *
+     * @return 错误信息列表
+     */
     @Override
     public List<String> getErrorList() {
         return errorList;

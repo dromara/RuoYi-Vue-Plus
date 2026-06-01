@@ -52,11 +52,21 @@ public record OssAsyncExecutorConfig(
         return corePoolSize;
     }
 
+    /**
+     * 复制异步执行器配置。
+     *
+     * @return 配置副本
+     */
     @Override
     public OssAsyncExecutorConfig copy() {
         return toBuilder().build();
     }
 
+    /**
+     * 转换为构建器。
+     *
+     * @return 配置构建器
+     */
     @Override
     public OssAsyncExecutorConfigBuilder toBuilder() {
         return builder()

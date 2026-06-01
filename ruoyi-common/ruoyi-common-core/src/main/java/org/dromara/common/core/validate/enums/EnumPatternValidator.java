@@ -16,8 +16,16 @@ import java.util.Set;
  */
 public class EnumPatternValidator implements ConstraintValidator<EnumPattern, String> {
 
+    /**
+     * 枚举允许值集合。
+     */
     private final Set<String> values = new HashSet<>();
 
+    /**
+     * 初始化枚举允许值集合。
+     *
+     * @param annotation 枚举校验注解
+     */
     @Override
     public void initialize(EnumPattern annotation) {
         ConstraintValidator.super.initialize(annotation);
@@ -33,6 +41,13 @@ public class EnumPatternValidator implements ConstraintValidator<EnumPattern, St
         }
     }
 
+    /**
+     * 校验字符串是否在枚举允许值集合内。
+     *
+     * @param value                      待校验值
+     * @param constraintValidatorContext 校验上下文
+     * @return true 校验通过 false 校验失败
+     */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
         if (StringUtils.isBlank(value)) {

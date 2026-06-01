@@ -34,7 +34,11 @@ import org.dromara.workflow.service.IFlwNodeExtService;
 import org.dromara.workflow.service.IFlwTaskService;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.io.Serial;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 工作流全局监听器，处理任务流转中的扩展变量、消息和事件发布。
@@ -48,6 +52,8 @@ import java.util.*;
 public class WorkflowGlobalListener implements GlobalListener {
 
     private static final String NODE_KEY_SEPARATOR = ":";
+    @Serial
+    private static final long serialVersionUID = -5133036757491932497L;
 
     private final IFlwTaskService flwTaskService;
     private final IFlwInstanceService flwInstanceService;
@@ -256,6 +262,14 @@ public class WorkflowGlobalListener implements GlobalListener {
         );
     }
 
+    /**
+     * 判断是否需要发送后续待办消息。
+     *
+     * @param flowParams 流程参数
+     * @param definition 流程定义
+     * @param nextTasks  后续任务列表
+     * @return 是否发送待办消息
+     */
     private boolean shouldSendTaskMessage(FlowParams flowParams, Definition definition, List<Task> nextTasks) {
         if (flowParams == null || !TaskStatusEnum.BACK.getStatus().equals(flowParams.getHisStatus())) {
             return true;
@@ -268,6 +282,14 @@ public class WorkflowGlobalListener implements GlobalListener {
         return !StringUtils.equals(applyNodeCode, nextTasks.get(0).getNodeCode());
     }
 
+    /**
+     * 在流程完成或退回时通知发起人。
+     *
+     * @param definition 流程定义
+     * @param instance   流程实例
+     * @param status     业务状态
+     * @param variable   流程变量
+     */
     private void notifyInitiatorIfNeeded(Definition definition, Instance instance, String status, Map<String, Object> variable) {
         if (!StringUtils.equalsAny(status, BusinessStatusEnum.FINISH.getStatus(), BusinessStatusEnum.BACK.getStatus())) {
             return;

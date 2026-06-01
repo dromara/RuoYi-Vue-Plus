@@ -15,7 +15,13 @@ import java.util.Base64;
  */
 public class ActuatorAuthFilter implements Filter {
 
+    /**
+     * 认证用户名。
+     */
     private final String username;
+    /**
+     * 认证密码。
+     */
     private final String password;
 
     /**
@@ -29,6 +35,15 @@ public class ActuatorAuthFilter implements Filter {
         this.password = password;
     }
 
+    /**
+     * 校验 Actuator Basic Auth 请求。
+     *
+     * @param servletRequest 原始请求
+     * @param servletResponse 原始响应
+     * @param filterChain 过滤器链
+     * @throws IOException IO 异常
+     * @throws ServletException Servlet 异常
+     */
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
@@ -64,10 +79,18 @@ public class ActuatorAuthFilter implements Filter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * 初始化过滤器。
+     *
+     * @param filterConfig 过滤器配置
+     */
     @Override
     public void init(FilterConfig filterConfig) {
     }
 
+    /**
+     * 销毁过滤器。
+     */
     @Override
     public void destroy() {
     }

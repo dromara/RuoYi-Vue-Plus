@@ -21,6 +21,9 @@ import java.nio.charset.StandardCharsets;
  * @author ruoyi
  */
 public class RepeatedlyRequestWrapper extends HttpServletRequestWrapper {
+    /**
+     * 请求体字节数据。
+     */
     private final byte[] body;
 
     /**
@@ -59,26 +62,53 @@ public class RepeatedlyRequestWrapper extends HttpServletRequestWrapper {
     public ServletInputStream getInputStream() throws IOException {
         final ByteArrayInputStream bais = new ByteArrayInputStream(body);
         return new ServletInputStream() {
+            /**
+             * 读取缓存请求体的下一个字节。
+             *
+             * @return 下一个字节
+             * @throws IOException IO 异常
+             */
             @Override
             public int read() throws IOException {
                 return bais.read();
             }
 
+            /**
+             * 返回缓存请求体剩余可读字节数。
+             *
+             * @return 剩余字节数
+             * @throws IOException IO 异常
+             */
             @Override
             public int available() throws IOException {
                 return bais.available();
             }
 
+            /**
+             * 判断缓存请求体是否已读取完毕。
+             *
+             * @return 是否读取完毕
+             */
             @Override
             public boolean isFinished() {
                 return bais.available() == 0;
             }
 
+            /**
+             * 判断输入流是否可读。
+             *
+             * @return 固定为 true
+             */
             @Override
             public boolean isReady() {
                 return true;
             }
 
+            /**
+             * 设置异步读取监听器。
+             *
+             * @param readListener 读取监听器
+             */
             @Override
             public void setReadListener(ReadListener readListener) {
 

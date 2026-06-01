@@ -124,25 +124,52 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         byte[] jsonBytes = json.getBytes(StandardCharsets.UTF_8);
         final ByteArrayInputStream bis = IoUtil.toStream(jsonBytes);
         return new ServletInputStream() {
+            /**
+             * 判断清洗后的 JSON 流是否已读取完毕。
+             *
+             * @return 是否读取完毕
+             */
             @Override
             public boolean isFinished() {
                 return true;
             }
 
+            /**
+             * 判断清洗后的 JSON 流是否可读。
+             *
+             * @return 固定为 true
+             */
             @Override
             public boolean isReady() {
                 return true;
             }
 
+            /**
+             * 返回清洗后的 JSON 字节数。
+             *
+             * @return JSON 字节数
+             * @throws IOException IO 异常
+             */
             @Override
             public int available() throws IOException {
                 return jsonBytes.length;
             }
 
+            /**
+             * 设置异步读取监听器。
+             *
+             * @param readListener 读取监听器
+             */
             @Override
             public void setReadListener(ReadListener readListener) {
             }
 
+            /**
+             * 读取清洗后的 JSON 流下一个字节。
+             *
+             * @return 下一个字节
+             * @throws IOException IO 异常
+             */
             @Override
             public int read() throws IOException {
                 return bis.read();

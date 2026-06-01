@@ -30,6 +30,9 @@ import static org.dromara.common.social.topiam.AuthTopIamSource.TOPIAM;
 @Slf4j
 public class AuthTopIamRequest extends AuthDefaultRequest {
 
+    /**
+     * 服务器地址。
+     */
     public static final String SERVER_URL = SpringUtils.getProperty("justauth.type.topiam.server-url");
 
     /**
@@ -39,10 +42,22 @@ public class AuthTopIamRequest extends AuthDefaultRequest {
         super(config, TOPIAM);
     }
 
+    /**
+     * 创建 TopIAM 认证请求。
+     *
+     * @param config 授权配置
+     * @param authStateCache 授权状态缓存
+     */
     public AuthTopIamRequest(AuthConfig config, AuthStateCache authStateCache) {
         super(config, TOPIAM, authStateCache);
     }
 
+    /**
+     * 获取 TopIAM 访问令牌。
+     *
+     * @param authCallback 授权回调参数
+     * @return 访问令牌
+     */
     @Override
     public AuthToken getAccessToken(AuthCallback authCallback) {
         String body = doPostAuthorizationCode(authCallback.getCode());
@@ -57,6 +72,12 @@ public class AuthTopIamRequest extends AuthDefaultRequest {
             .build();
     }
 
+    /**
+     * 获取 TopIAM 用户信息。
+     *
+     * @param authToken 访问令牌
+     * @return 授权用户信息
+     */
     @Override
     public AuthUser getUserInfo(AuthToken authToken) {
         String body = doGetUserInfo(authToken);
@@ -73,6 +94,12 @@ public class AuthTopIamRequest extends AuthDefaultRequest {
             .build();
     }
 
+    /**
+     * 使用授权码换取 TopIAM 访问令牌响应。
+     *
+     * @param code 授权码
+     * @return 令牌接口响应体
+     */
     @Override
     protected String doPostAuthorizationCode(String code) {
         HttpRequest request = HttpRequest.post(source.accessToken())
@@ -84,6 +111,12 @@ public class AuthTopIamRequest extends AuthDefaultRequest {
         return response.body();
     }
 
+    /**
+     * 获取 TopIAM 用户信息接口响应。
+     *
+     * @param authToken 访问令牌
+     * @return 用户信息响应体
+     */
     @Override
     protected String doGetUserInfo(AuthToken authToken) {
         return new HttpUtils(config.getHttpConfig()).get(source.userInfo(), null, new HttpHeader()
@@ -92,6 +125,12 @@ public class AuthTopIamRequest extends AuthDefaultRequest {
     }
 
 
+    /**
+     * 生成 TopIAM 授权地址。
+     *
+     * @param state 授权状态
+     * @return 授权地址
+     */
     @Override
     public String authorize(String state) {
         return UrlBuilder.fromBaseUrl(super.authorize(state))
@@ -99,6 +138,11 @@ public class AuthTopIamRequest extends AuthDefaultRequest {
             .build();
     }
 
+    /**
+     * 校验 TopIAM 接口响应。
+     *
+     * @param object 响应内容
+     */
     private static void checkResponse(Dict object) {
         // oauth/token 验证异常
         if (object.containsKey("error")) {

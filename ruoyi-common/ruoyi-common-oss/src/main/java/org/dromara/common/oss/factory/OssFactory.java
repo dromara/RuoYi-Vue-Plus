@@ -92,10 +92,22 @@ public class OssFactory {
         }
     }
 
+    /**
+     * 获取指定配置键对应的客户端锁。
+     *
+     * @param configKey 配置键
+     * @return 客户端锁
+     */
     private static ReentrantLock getClientLock(String configKey) {
         return CLIENT_LOCKS.computeIfAbsent(configKey, key -> new ReentrantLock());
     }
 
+    /**
+     * 关闭 OSS 客户端。
+     *
+     * @param configKey 配置键
+     * @param client    OSS 客户端
+     */
     private static void closeClient(String configKey, OssClient client) {
         try {
             client.close();

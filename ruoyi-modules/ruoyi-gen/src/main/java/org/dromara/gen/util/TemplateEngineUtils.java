@@ -140,9 +140,9 @@ public class TemplateEngineUtils {
     /**
      * 向树形模板上下文写入树字段相关变量。
      *
-     * @param context    模板上下文
-     * @param genTable   代码生成业务表对象
-     * @param paramsObj  已解析的 options 参数（避免重复解析）
+     * @param context   模板上下文
+     * @param genTable  代码生成业务表对象
+     * @param paramsObj 已解析的 options 参数（避免重复解析）
      */
     public static void setTreeContext(Dict context, GenTable genTable, Dict paramsObj) {
         String treeCode = getTreeCode(paramsObj);
@@ -328,7 +328,7 @@ public class TemplateEngineUtils {
     /**
      * 添加字典列表
      *
-     * @param dicts 字典列表
+     * @param dicts   字典列表
      * @param columns 列集合
      */
     public static void addDicts(Set<String> dicts, List<GenTableColumn> columns) {
@@ -408,7 +408,7 @@ public class TemplateEngineUtils {
     /**
      * 获取树根节点值。
      *
-     * @param paramsObj 其他选项
+     * @param paramsObj        其他选项
      * @param treeParentColumn 父节点字段
      * @return 树根节点值
      */
@@ -423,6 +423,14 @@ public class TemplateEngineUtils {
         return defaultValue;
     }
 
+    /**
+     * 读取布尔类型生成选项。
+     *
+     * @param paramsObj    生成选项
+     * @param key          选项键
+     * @param defaultValue 默认值
+     * @return 选项值
+     */
     private static boolean getBooleanOption(Dict paramsObj, String key, boolean defaultValue) {
         if (CollUtil.isEmpty(paramsObj) || !paramsObj.containsKey(key)) {
             return defaultValue;
@@ -430,6 +438,13 @@ public class TemplateEngineUtils {
         return Convert.toBool(paramsObj.get(key), defaultValue);
     }
 
+    /**
+     * 根据字段名查找业务表字段。
+     *
+     * @param genTable 业务表
+     * @param field    字段名称或 Java 属性名
+     * @return 业务表字段
+     */
     private static GenTableColumn getColumn(GenTable genTable, String field) {
         if (StringUtils.isBlank(field) || CollUtil.isEmpty(genTable.getColumns())) {
             return null;
@@ -442,6 +457,13 @@ public class TemplateEngineUtils {
         return null;
     }
 
+    /**
+     * 根据字段配置查找业务表字段列表。
+     *
+     * @param genTable    业务表
+     * @param fieldValues 字段配置值
+     * @return 业务表字段列表
+     */
     private static List<GenTableColumn> getColumns(GenTable genTable, Object fieldValues) {
         List<String> fields = new ArrayList<>();
         if (fieldValues instanceof Collection<?> collection) {
@@ -459,6 +481,13 @@ public class TemplateEngineUtils {
         return columns;
     }
 
+    /**
+     * 转换为 Java 字面量。
+     *
+     * @param column 业务表字段
+     * @param value  字段值
+     * @return Java 字面量
+     */
     private static String getJavaLiteral(GenTableColumn column, String value) {
         if (ObjectUtil.isNull(column) || StringUtils.isBlank(value)) {
             return "null";
@@ -472,6 +501,13 @@ public class TemplateEngineUtils {
         return "\"" + value + "\"";
     }
 
+    /**
+     * 转换为 TypeScript 字面量。
+     *
+     * @param column 业务表字段
+     * @param value  字段值
+     * @return TypeScript 字面量
+     */
     private static String getTsLiteral(GenTableColumn column, String value) {
         if (ObjectUtil.isNull(column) || StringUtils.isBlank(value)) {
             return "undefined";

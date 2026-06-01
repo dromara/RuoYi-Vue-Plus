@@ -23,6 +23,9 @@ public class FlowHisTaskVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 历史任务主键
+     */
     private Long id;
 
     /**

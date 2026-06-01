@@ -26,19 +26,43 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class ExcelEnumConvert implements Converter<Object> {
 
+    /**
+     * 枚举字典缓存。
+     */
     private static final Map<Field, Map<Object, String>> ENUM_MAP_CACHE = new ConcurrentHashMap<>();
+    /**
+     * 枚举反向字典缓存。
+     */
     private static final Map<Field, Map<String, Object>> ENUM_REVERSE_MAP_CACHE = new ConcurrentHashMap<>();
 
+    /**
+     * 支持的 Java 类型。
+     *
+     * @return Object 类型
+     */
     @Override
     public Class<Object> supportJavaTypeKey() {
         return Object.class;
     }
 
+    /**
+     * 支持的 Excel 单元格类型。
+     *
+     * @return 默认支持全部类型
+     */
     @Override
     public CellDataTypeEnum supportExcelTypeKey() {
         return null;
     }
 
+    /**
+     * 将 Excel 枚举文本转换为 Java 字段值。
+     *
+     * @param cellData 单元格数据
+     * @param contentProperty 内容属性
+     * @param globalConfiguration 全局配置
+     * @return Java 字段值
+     */
     @Override
     public Object convertToJavaData(ReadCellData<?> cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
         cellData.checkEmpty();
@@ -76,6 +100,14 @@ public class ExcelEnumConvert implements Converter<Object> {
         return Convert.convert(contentProperty.getField().getType(), codeValue);
     }
 
+    /**
+     * 将 Java 枚举编码转换为 Excel 显示文本。
+     *
+     * @param object Java 字段值
+     * @param contentProperty 内容属性
+     * @param globalConfiguration 全局配置
+     * @return Excel 写入数据
+     */
     @Override
     public WriteCellData<String> convertToExcelData(Object object, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
         if (ObjectUtil.isNull(object)) {
@@ -86,6 +118,12 @@ public class ExcelEnumConvert implements Converter<Object> {
         return new WriteCellData<>(value);
     }
 
+    /**
+     * 准备枚举编码与显示文本映射。
+     *
+     * @param contentProperty 内容属性
+     * @return 枚举编码与显示文本映射
+     */
     private Map<Object, String> beforeConvert(ExcelContentProperty contentProperty) {
         return ENUM_MAP_CACHE.computeIfAbsent(contentProperty.getField(), field -> {
             ExcelEnumFormat anno = getAnnotation(field);
@@ -103,6 +141,12 @@ public class ExcelEnumConvert implements Converter<Object> {
         });
     }
 
+    /**
+     * 获取字段上的枚举格式注解。
+     *
+     * @param field 字段
+     * @return 枚举格式注解
+     */
     private ExcelEnumFormat getAnnotation(Field field) {
         return AnnotationUtil.getAnnotation(field, ExcelEnumFormat.class);
     }

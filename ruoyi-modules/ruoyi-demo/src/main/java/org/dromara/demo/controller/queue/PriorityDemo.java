@@ -12,9 +12,22 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class PriorityDemo implements Comparable<PriorityDemo> {
+    /**
+     * 队列元素名称。
+     */
     private String name;
+
+    /**
+     * 优先级排序值。
+     */
     private Integer orderNum;
 
+    /**
+     * 按排序值比较优先级。
+     *
+     * @param other 另一个队列元素
+     * @return 比较结果
+     */
     @Override
     public int compareTo(PriorityDemo other) {
         return Integer.compare(getOrderNum(), other.getOrderNum());

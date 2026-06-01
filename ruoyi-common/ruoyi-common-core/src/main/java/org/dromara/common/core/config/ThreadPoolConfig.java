@@ -14,7 +14,7 @@ import java.util.concurrent.*;
  * 线程池配置
  *
  * @author Lion Li
- **/
+ */
 @Slf4j
 @AutoConfiguration
 public class ThreadPoolConfig {

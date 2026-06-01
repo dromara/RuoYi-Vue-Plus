@@ -57,6 +57,12 @@ public class CacheUtils {
         getRequiredCache(cacheNames).clear();
     }
 
+    /**
+     * 获取必需存在的缓存实例。
+     *
+     * @param cacheNames 缓存组名称
+     * @return 缓存实例
+     */
     private static Cache getRequiredCache(String cacheNames) {
         Cache cache = CacheManagerHolder.CACHE_MANAGER.getCache(cacheNames);
         if (cache == null) {

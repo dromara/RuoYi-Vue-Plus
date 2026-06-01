@@ -46,13 +46,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
     OpenApiConversationClient.class, OpenApiUserClient.class})
 public class SnailAiController extends BaseController {
 
+    /**
+     * Snail AI 成功状态码。
+     */
     private static final int SNAIL_AI_SUCCESS = 1;
+    /**
+     * SSE 超时时间。
+     */
     private static final long SSE_TIMEOUT = 300000L;
 
     private final OpenApiAgentClient agentClient;
     private final OpenApiChatClient chatClient;
     private final OpenApiConversationClient conversationClient;
     private final OpenApiUserClient userClient;
+    /**
+     * 聊天模式。
+     */
     @Value("${snail-ai.chat-mode:stream}")
     private String chatMode;
 
@@ -97,8 +106,8 @@ public class SnailAiController extends BaseController {
      */
     @PostMapping("/agent/{agentId}/conversation")
     public R<OpenApiConversationVO> createConversation(
-            @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
-            @RequestBody OpenApiCreateConversationRequest request) {
+        @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
+        @RequestBody OpenApiCreateConversationRequest request) {
         request.setAgentId(agentId);
         request.setOpenId(ensureOpenId());
         return toR(conversationClient.createConversation(request));
@@ -109,9 +118,9 @@ public class SnailAiController extends BaseController {
      */
     @GetMapping("/agent/{agentId}/conversations")
     public R<PageResult<OpenApiConversationVO>> listConversations(
-            @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
-            @Min(value = 1, message = "页码不能小于1") @RequestParam(defaultValue = "1") int page,
-            @Min(value = 1, message = "每页条数不能小于1") @RequestParam(defaultValue = "10") int size) {
+        @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
+        @Min(value = 1, message = "页码不能小于1") @RequestParam(defaultValue = "1") int page,
+        @Min(value = 1, message = "每页条数不能小于1") @RequestParam(defaultValue = "10") int size) {
         OpenApiConversationQueryRequest request = new OpenApiConversationQueryRequest();
         request.setAgentId(agentId);
         request.setOpenId(ensureOpenId());
@@ -125,8 +134,8 @@ public class SnailAiController extends BaseController {
      */
     @GetMapping("/agent/{agentId}/conversation/{conversationId}/messages")
     public R<List<OpenApiMessageVO>> getMessages(
-            @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
-            @NotBlank(message = "会话ID不能为空") @PathVariable String conversationId) {
+        @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
+        @NotBlank(message = "会话ID不能为空") @PathVariable String conversationId) {
         OpenApiConversationIdentityRequest request = new OpenApiConversationIdentityRequest();
         request.setAgentId(agentId);
         request.setConversationId(conversationId);
@@ -139,8 +148,8 @@ public class SnailAiController extends BaseController {
      */
     @DeleteMapping("/agent/{agentId}/conversation/{conversationId}")
     public R<Void> deleteConversation(
-            @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
-            @NotBlank(message = "会话ID不能为空") @PathVariable String conversationId) {
+        @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
+        @NotBlank(message = "会话ID不能为空") @PathVariable String conversationId) {
         OpenApiConversationIdentityRequest request = new OpenApiConversationIdentityRequest();
         request.setAgentId(agentId);
         request.setConversationId(conversationId);
@@ -162,8 +171,8 @@ public class SnailAiController extends BaseController {
      */
     @PostMapping("/agent/{agentId}/chat/sync")
     public R<OpenApiChatSyncResponse> chatSync(
-            @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
-            @RequestBody OpenApiChatRequest request) {
+        @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
+        @RequestBody OpenApiChatRequest request) {
         request.setAgentId(agentId);
         request.setOpenId(ensureOpenId());
         log.info("Sync chat request: agentId={}", agentId);
@@ -175,9 +184,9 @@ public class SnailAiController extends BaseController {
      */
     @PostMapping(value = "/agent/{agentId}/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatStream(
-            @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
-            @RequestBody OpenApiChatRequest request,
-            HttpServletResponse response) {
+        @NotNull(message = "智能体ID不能为空") @PathVariable Long agentId,
+        @RequestBody OpenApiChatRequest request,
+        HttpServletResponse response) {
         prepareSseResponse(response);
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
         AtomicBoolean closed = new AtomicBoolean(false);
@@ -202,16 +211,31 @@ public class SnailAiController extends BaseController {
         log.info("Stream chat request: agentId={}", agentId);
         try {
             chatClient.chatStream(request, new SseEventListener() {
+                /**
+                 * 推送普通文本片段。
+                 *
+                 * @param text 文本片段
+                 */
                 @Override
                 public void onText(String text) {
                     safeSend(emitter, closed, "text", text);
                 }
 
+                /**
+                 * 推送思考内容片段。
+                 *
+                 * @param thinking 思考内容
+                 */
                 @Override
                 public void onThinking(String thinking) {
                     safeSend(emitter, closed, "thinking", thinking);
                 }
 
+                /**
+                 * 处理流式对话完成事件。
+                 *
+                 * @param data 完成数据
+                 */
                 @Override
                 public void onComplete(String data) {
                     if (!closed.get()) {
@@ -223,6 +247,11 @@ public class SnailAiController extends BaseController {
                     }
                 }
 
+                /**
+                 * 处理流式对话异常事件。
+                 *
+                 * @param errorMessage 错误信息
+                 */
                 @Override
                 public void onError(String errorMessage) {
                     log.error("Stream chat error: {}", errorMessage);

@@ -15,6 +15,14 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class MqttClientGlobalMessageListener implements IMqttClientGlobalMessageListener {
 
+    /**
+     * 接收并记录全局 MQTT 消息。
+     *
+     * @param context 通道上下文
+     * @param topic 主题
+     * @param message MQTT 消息对象
+     * @param payload 消息载荷
+     */
     @Override
     public void onMessage(ChannelContext context, String topic, MqttPublishMessage message, byte[] payload) {
         log.info("MqttGlobalMessageEvent => topic: {}, msg: {}", topic, new String(payload, StandardCharsets.UTF_8));

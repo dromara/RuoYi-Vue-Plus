@@ -18,11 +18,20 @@ import java.util.List;
  */
 public class ExportDemoListener extends DefaultExcelListener<ExportDemoVo> {
 
+    /**
+     * 创建下拉框导入解析监听器。
+     */
     public ExportDemoListener() {
         // 显示使用构造函数，否则将导致空指针
         super(true);
     }
 
+    /**
+     * 解析并校验一行下拉框演示数据。
+     *
+     * @param data 行数据
+     * @param context 解析上下文
+     */
     @Override
     public void invoke(ExportDemoVo data, AnalysisContext context) {
         // 先校验必填

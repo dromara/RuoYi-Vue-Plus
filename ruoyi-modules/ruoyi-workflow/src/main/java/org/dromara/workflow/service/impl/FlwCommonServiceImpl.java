@@ -89,6 +89,14 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
         sendMessage(messageType, message, subject, userList, null);
     }
 
+    /**
+     * 发送流程结果通知。
+     *
+     * @param flowName    流程名称
+     * @param status      业务状态
+     * @param messageType 消息类型列表
+     * @param userList    接收用户列表
+     */
     @Override
     public void sendResultMessage(String flowName, BusinessStatusEnum status, List<String> messageType, List<UserDTO> userList) {
         if (status == null || CollUtil.isEmpty(messageType) || CollUtil.isEmpty(userList)) {
@@ -99,6 +107,15 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
         sendMessage(messageType, message, DEFAULT_SUBJECT, userList, PATH_MY_DOCUMENT);
     }
 
+    /**
+     * 发送消息给指定用户列表。
+     *
+     * @param messageType 消息类型列表
+     * @param message     消息内容
+     * @param subject     邮件标题
+     * @param userList    接收用户列表
+     * @param path        前端跳转路径
+     */
     @Override
     public void sendMessage(List<String> messageType, String message, String subject, List<UserDTO> userList, String path) {
         if (CollUtil.isEmpty(messageType) || CollUtil.isEmpty(userList)) {
@@ -114,6 +131,17 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
         ThreadUtils.virtualInvokeAll(sendTasks);
     }
 
+    /**
+     * 按消息类型执行具体发送逻辑。
+     *
+     * @param code      消息类型编码
+     * @param message   消息内容
+     * @param subject   邮件标题
+     * @param path      前端跳转路径
+     * @param userIds   接收用户 id 列表
+     * @param emails    接收邮箱集合
+     * @param userCount 接收用户数量
+     */
     private void sendMessageByType(String code, String message, String subject, String path, List<Long> userIds, Set<String> emails, int userCount) {
         MessageTypeEnum messageTypeEnum = MessageTypeEnum.getByCode(code);
         if (ObjectUtil.isEmpty(messageTypeEnum)) {

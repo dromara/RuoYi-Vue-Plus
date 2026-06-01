@@ -20,11 +20,25 @@ public class SensitiveJsonFieldProcessor implements JsonFieldProcessor {
     @Autowired(required = false)
     private SensitiveService sensitiveService;
 
+    /**
+     * 判断字段是否声明了脱敏注解。
+     *
+     * @param fieldContext 字段上下文
+     * @return 是否支持脱敏处理
+     */
     @Override
     public boolean supports(JsonFieldContext fieldContext) {
         return fieldContext.getAnnotation(Sensitive.class) != null;
     }
 
+    /**
+     * 按字段脱敏策略处理字符串值。
+     *
+     * @param fieldContext 字段上下文
+     * @param value        字段原始值
+     * @param context      JSON 增强上下文
+     * @return 脱敏后的字段值
+     */
     @Override
     public Object process(JsonFieldContext fieldContext, Object value, JsonEnhancementContext context) {
         Sensitive sensitive = fieldContext.getAnnotation(Sensitive.class);

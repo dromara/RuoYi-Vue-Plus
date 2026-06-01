@@ -226,6 +226,12 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
         return usePathStyleAccess ? BucketUrlUtil.getPathStyleBucketUrl(useHttps, url, bucket) : BucketUrlUtil.getSiteStyleBucketUrl(useHttps, url, bucket);
     }
 
+    /**
+     * 解析 S3 Region。
+     *
+     * @param regionString Region 字符串
+     * @return Region 对象
+     */
     private static Region parseRegion(String regionString) {
         if (StringUtils.isBlank(regionString)) {
             return Region.US_EAST_1;
@@ -233,11 +239,23 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
         return Region.of(regionString);
     }
 
+    /**
+     * 兼容旧配置推断是否使用路径风格访问。
+     *
+     * @param properties OSS 配置属性
+     * @return 是否使用路径风格访问
+     */
     private static boolean resolvePathStyleAccess(OssProperties properties) {
         // 旧配置没有显式路径风格字段，只能继续按内置云厂商 endpoint 做兼容推断。
         return !StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
     }
 
+    /**
+     * 解析 ACL 访问策略配置。
+     *
+     * @param accessPolicyString 访问策略字符串
+     * @return ACL 访问策略配置
+     */
     private static AccessControlPolicyConfig resolveAccessControlPolicy(String accessPolicyString) {
         // 绝大多数云厂商不允许操作 ACL，默认禁用；当前业务只用访问策略判断是否生成预签名 URL。
         if (StringUtils.isBlank(accessPolicyString)) {
@@ -249,18 +267,34 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
             .build();
     }
 
+    /**
+     * 获取用于访问对象的基础 URL。
+     *
+     * @return 基础 URL
+     */
     private String getAccessBaseUrl() {
         return domain()
             .filter(OssClientConfig::hasHttpHeader)
             .orElseGet(this::getEndpoint);
     }
 
+    /**
+     * 获取 endpoint 配置。
+     *
+     * @return endpoint
+     */
     private String getEndpoint() {
         return endpoint()
             .filter(s -> !s.isBlank())
             .orElseThrow(() -> S3StorageException.form("endpoint is not configured."));
     }
 
+    /**
+     * 判断 URL 是否包含 HTTP 协议头。
+     *
+     * @param url URL
+     * @return 是否包含 HTTP 协议头
+     */
     private static boolean hasHttpHeader(String url) {
         return HttpUtil.isHttp(url) || HttpUtil.isHttps(url);
     }

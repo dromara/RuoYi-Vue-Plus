@@ -23,6 +23,13 @@ public class MybatisDecryptInterceptor implements Interceptor {
 
     private final EncryptedFieldProcessor encryptedFieldProcessor;
 
+    /**
+     * 解密 MyBatis 查询结果中的加密字段。
+     *
+     * @param invocation 拦截调用信息
+     * @return 查询结果
+     * @throws Throwable 拦截处理异常
+     */
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         // 获取执行mysql执行结果
@@ -34,11 +41,22 @@ public class MybatisDecryptInterceptor implements Interceptor {
         return result;
     }
 
+    /**
+     * 包装 MyBatis 目标对象。
+     *
+     * @param target 目标对象
+     * @return 包装后的对象
+     */
     @Override
     public Object plugin(Object target) {
         return Plugin.wrap(target, this);
     }
 
+    /**
+     * 设置插件属性。
+     *
+     * @param properties 插件属性
+     */
     @Override
     public void setProperties(Properties properties) {
 

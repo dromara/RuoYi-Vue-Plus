@@ -46,9 +46,15 @@ import java.util.function.Supplier;
 @Service
 public class SysLoginService {
 
+    /**
+     * 最大重试次数。
+     */
     @Value("${user.password.maxRetryCount}")
     private Integer maxRetryCount;
 
+    /**
+     * 锁定时间。
+     */
     @Value("${user.password.lockTime}")
     private Integer lockTime;
 

@@ -21,8 +21,16 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 @Configuration
 public class SecurityConfig {
 
+    /**
+     * 监控后台上下文路径。
+     */
     private final String adminContextPath;
 
+    /**
+     * 创建监控后台安全配置。
+     *
+     * @param adminServerProperties 监控后台配置
+     */
     public SecurityConfig(AdminServerProperties adminServerProperties) {
         this.adminContextPath = adminServerProperties.getContextPath();
     }

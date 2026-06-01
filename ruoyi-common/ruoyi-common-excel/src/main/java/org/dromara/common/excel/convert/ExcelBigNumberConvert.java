@@ -21,21 +21,47 @@ import java.math.BigDecimal;
 @Slf4j
 public class ExcelBigNumberConvert implements Converter<Long> {
 
+    /**
+     * 支持的 Java 类型。
+     *
+     * @return Long 类型
+     */
     @Override
     public Class<Long> supportJavaTypeKey() {
         return Long.class;
     }
 
+    /**
+     * 支持的 Excel 单元格类型。
+     *
+     * @return 默认支持全部类型
+     */
     @Override
     public CellDataTypeEnum supportExcelTypeKey() {
         return null;
     }
 
+    /**
+     * 将 Excel 单元格数据转换为 Long。
+     *
+     * @param cellData 单元格数据
+     * @param contentProperty 内容属性
+     * @param globalConfiguration 全局配置
+     * @return Long 值
+     */
     @Override
     public Long convertToJavaData(ReadCellData<?> cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
         return Convert.toLong(cellData.getStringValue());
     }
 
+    /**
+     * 将 Long 转换为 Excel 单元格数据，超长数字按字符串写出。
+     *
+     * @param object Java 值
+     * @param contentProperty 内容属性
+     * @param globalConfiguration 全局配置
+     * @return Excel 写入数据
+     */
     @Override
     public WriteCellData<Object> convertToExcelData(Long object, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
         if (ObjectUtil.isNull(object)) {

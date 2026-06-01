@@ -47,6 +47,11 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
     private final StringBuilder successMsg = new StringBuilder();
     private final StringBuilder failureMsg = new StringBuilder();
 
+    /**
+     * 构造用户导入监听器。
+     *
+     * @param isUpdateSupport 是否允许更新已存在用户
+     */
     public SysUserImportListener(Boolean isUpdateSupport) {
         String initPassword = SpringUtils.getBean(ISysConfigService.class).selectConfigByKey("sys.user.initPassword");
         this.userService = SpringUtils.getBean(ISysUserService.class);
@@ -55,6 +60,12 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
         this.operUserId = LoginHelper.getUserId();
     }
 
+    /**
+     * 逐行处理用户导入数据。
+     *
+     * @param userVo  导入用户数据
+     * @param context Excel 解析上下文
+     */
     @Override
     public void invoke(SysUserImportVo userVo, AnalysisContext context) {
         SysUserVo sysUser = this.userService.selectUserByUserName(userVo.getUserName());
@@ -95,15 +106,30 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
         }
     }
 
+    /**
+     * 所有数据解析完成后的回调。
+     *
+     * @param context Excel 解析上下文
+     */
     @Override
     public void doAfterAllAnalysed(AnalysisContext context) {
 
     }
 
+    /**
+     * 获取用户导入结果。
+     *
+     * @return Excel 导入结果
+     */
     @Override
     public ExcelResult<SysUserImportVo> getExcelResult() {
         return new ExcelResult<>() {
 
+            /**
+             * 获取导入结果分析消息。
+             *
+             * @return 导入结果消息
+             */
             @Override
             public String getAnalysis() {
                 if (failureNum > 0) {
@@ -115,11 +141,21 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
                 return successMsg.toString();
             }
 
+            /**
+             * 获取导入成功数据列表。
+             *
+             * @return 导入成功数据列表
+             */
             @Override
             public List<SysUserImportVo> getList() {
                 return null;
             }
 
+            /**
+             * 获取导入错误信息列表。
+             *
+             * @return 导入错误信息列表
+             */
             @Override
             public List<String> getErrorList() {
                 return null;

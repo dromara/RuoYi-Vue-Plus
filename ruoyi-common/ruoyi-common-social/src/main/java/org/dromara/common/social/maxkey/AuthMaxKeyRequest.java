@@ -16,6 +16,9 @@ import org.dromara.common.json.utils.JsonUtils;
  */
 public class AuthMaxKeyRequest extends AuthDefaultRequest {
 
+    /**
+     * 服务器地址。
+     */
     public static final String SERVER_URL = SpringUtils.getProperty("justauth.type.maxkey.server-url");
 
     /**
@@ -25,10 +28,22 @@ public class AuthMaxKeyRequest extends AuthDefaultRequest {
         super(config, AuthMaxKeySource.MAXKEY);
     }
 
+    /**
+     * 创建 MaxKey 认证请求。
+     *
+     * @param config 授权配置
+     * @param authStateCache 授权状态缓存
+     */
     public AuthMaxKeyRequest(AuthConfig config, AuthStateCache authStateCache) {
         super(config, AuthMaxKeySource.MAXKEY, authStateCache);
     }
 
+    /**
+     * 获取 MaxKey 访问令牌。
+     *
+     * @param authCallback 授权回调参数
+     * @return 访问令牌
+     */
     @Override
     public AuthToken getAccessToken(AuthCallback authCallback) {
         String body = doPostAuthorizationCode(authCallback.getCode());
@@ -50,6 +65,12 @@ public class AuthMaxKeyRequest extends AuthDefaultRequest {
             .build();
     }
 
+    /**
+     * 获取 MaxKey 用户信息。
+     *
+     * @param authToken 访问令牌
+     * @return 授权用户信息
+     */
     @Override
     public AuthUser getUserInfo(AuthToken authToken) {
         String body = doGetUserInfo(authToken);

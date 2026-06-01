@@ -134,6 +134,15 @@ public class GenUtils {
         }
     }
 
+    /**
+     * 解析数值类型对应的 Java 类型。
+     *
+     * @param dataType     数据库字段类型
+     * @param columnLength 字段长度
+     * @param columnScale  小数位数
+     * @param columnName   字段名称
+     * @return Java 类型
+     */
     private static String resolveNumberJavaType(String dataType, Integer columnLength, Integer columnScale, String columnName) {
         if (isBooleanColumn(dataType, columnLength, columnScale, columnName)) {
             return GenConstants.TYPE_BOOLEAN;
@@ -159,6 +168,12 @@ public class GenUtils {
         return GenConstants.TYPE_LONG;
     }
 
+    /**
+     * 根据整数字段长度解析 Java 类型。
+     *
+     * @param columnLength 字段长度
+     * @return Java 类型
+     */
     private static String resolveIntegerJavaType(Integer columnLength) {
         if (columnLength > 0 && columnLength <= 9) {
             return GenConstants.TYPE_INTEGER;
@@ -166,6 +181,15 @@ public class GenUtils {
         return GenConstants.TYPE_LONG;
     }
 
+    /**
+     * 判断字段是否适合按布尔类型生成。
+     *
+     * @param dataType     数据库字段类型
+     * @param columnLength 字段长度
+     * @param columnScale  小数位数
+     * @param columnName   字段名称
+     * @return 是否布尔字段
+     */
     private static boolean isBooleanColumn(String dataType, Integer columnLength, Integer columnScale, String columnName) {
         if (columnScale > 0) {
             return false;
@@ -180,6 +204,12 @@ public class GenUtils {
         return false;
     }
 
+    /**
+     * 判断字段名称是否为开关类字段。
+     *
+     * @param columnName 字段名称
+     * @return 是否开关类字段
+     */
     private static boolean isSwitchColumn(String columnName) {
         return StringUtils.endsWithAny(columnName, "status", "flag", "enabled", "disabled", "available", "visible")
             || columnName.startsWith("is_")
@@ -188,6 +218,12 @@ public class GenUtils {
             || columnName.startsWith("disable_");
     }
 
+    /**
+     * 判断字段名称是否为排序字段。
+     *
+     * @param columnName 字段名称
+     * @return 是否排序字段
+     */
     private static boolean isSortColumn(String columnName) {
         return StringUtils.endsWithAny(columnName, "sort", "order_num", "order", "rank", "seq", "sequence");
     }

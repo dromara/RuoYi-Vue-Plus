@@ -17,6 +17,9 @@ public class BigNumberSerializer extends NumberSerializer {
      * 根据 JS Number.MAX_SAFE_INTEGER 与 Number.MIN_SAFE_INTEGER 得来
      */
     private static final long MAX_SAFE_INTEGER = 9007199254740991L;
+    /**
+     * JavaScript 最小安全整数。
+     */
     private static final long MIN_SAFE_INTEGER = -9007199254740991L;
 
     /**

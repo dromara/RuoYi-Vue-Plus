@@ -23,7 +23,7 @@ public class EncryptedFieldProcessor {
      * 构造加密字段处理器。
      *
      * @param encryptorManager 加解密管理器
-     * @param contextFactory 加密上下文工厂
+     * @param contextFactory   加密上下文工厂
      */
     public EncryptedFieldProcessor(EncryptorManager encryptorManager, EncryptContextFactory contextFactory) {
         this.encryptorManager = encryptorManager;
@@ -58,6 +58,13 @@ public class EncryptedFieldProcessor {
             field.set(target, encryptorManager.decrypt(value, contextFactory.create(field))));
     }
 
+    /**
+     * 递归处理对象、集合或 Map 中声明加密注解的字段。
+     *
+     * @param sourceObject 待处理对象
+     * @param visited      已访问对象集合
+     * @param fieldHandler 字段处理回调
+     */
     private void handle(Object sourceObject, Set<Object> visited, FieldHandler fieldHandler) {
         if (ObjectUtil.isNull(sourceObject) || sourceObject instanceof String || visited.contains(sourceObject)) {
             return;
@@ -100,8 +107,8 @@ public class EncryptedFieldProcessor {
          * 处理单个加密字段。
          *
          * @param target 字段所属对象
-         * @param field 加密字段
-         * @param value 字段原始字符串值
+         * @param field  加密字段
+         * @param value  字段原始字符串值
          * @throws IllegalAccessException 字段访问失败时抛出
          */
         void handle(Object target, Field field, String value) throws IllegalAccessException;

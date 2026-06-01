@@ -26,14 +26,31 @@ import java.util.Map;
  */
 public class AuthDingTalkV2Request extends AuthDefaultRequest {
 
+    /**
+     * 创建钉钉 V2 认证请求。
+     *
+     * @param config 授权配置
+     */
     public AuthDingTalkV2Request(AuthConfig config) {
         super(config, AuthDefaultSource.DINGTALK_V2);
     }
 
+    /**
+     * 创建钉钉 V2 认证请求。
+     *
+     * @param config 授权配置
+     * @param authStateCache 授权状态缓存
+     */
     public AuthDingTalkV2Request(AuthConfig config, AuthStateCache authStateCache) {
         super(config, AuthDefaultSource.DINGTALK_V2, authStateCache);
     }
 
+    /**
+     * 生成钉钉 V2 授权地址。
+     *
+     * @param state 授权状态
+     * @return 授权地址
+     */
     @Override
     public String authorize(String state) {
         return UrlBuilder.fromBaseUrl(source.authorize())
@@ -50,6 +67,12 @@ public class AuthDingTalkV2Request extends AuthDefaultRequest {
             .build();
     }
 
+    /**
+     * 获取钉钉 V2 访问令牌。
+     *
+     * @param authCallback 授权回调参数
+     * @return 访问令牌
+     */
     @Override
     public AuthToken getAccessToken(AuthCallback authCallback) {
         Map<String, String> params = new HashMap<>();
@@ -70,6 +93,12 @@ public class AuthDingTalkV2Request extends AuthDefaultRequest {
             .build();
     }
 
+    /**
+     * 获取钉钉 V2 用户信息。
+     *
+     * @param authToken 访问令牌
+     * @return 授权用户信息
+     */
     @Override
     public AuthUser getUserInfo(AuthToken authToken) {
         HttpHeader header = new HttpHeader();

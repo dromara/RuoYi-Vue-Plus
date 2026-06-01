@@ -20,6 +20,9 @@ import org.springframework.stereotype.Component;
 @JobExecutor(name = "testBroadcastJob")
 public class TestBroadcastJob {
 
+    /**
+     * 客户端端口。
+     */
     @Value("${snail-job.port}")
     private int clientPort;
 

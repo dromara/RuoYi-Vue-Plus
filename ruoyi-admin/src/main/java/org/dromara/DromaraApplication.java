@@ -13,6 +13,11 @@ import org.springframework.boot.context.metrics.buffering.BufferingApplicationSt
 @SpringBootApplication
 public class DromaraApplication {
 
+    /**
+     * 应用启动入口。
+     *
+     * @param args 启动参数
+     */
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(DromaraApplication.class);
         application.setApplicationStartup(new BufferingApplicationStartup(2048));

@@ -56,7 +56,7 @@ public class EncryptorAutoConfiguration {
     /**
      * 创建加密字段处理器。
      *
-     * @param encryptorManager 加解密管理器
+     * @param encryptorManager      加解密管理器
      * @param encryptContextFactory 加密上下文工厂
      * @return 加密字段处理器
      */
@@ -87,6 +87,11 @@ public class EncryptorAutoConfiguration {
         return new MybatisDecryptInterceptor(encryptedFieldProcessor);
     }
 
+    /**
+     * 校验字段加解密配置完整性。
+     *
+     * @param properties 字段加解密配置
+     */
     private void validateEncryptorProperties(EncryptorProperties properties) {
         AlgorithmType algorithm = properties.getAlgorithm();
         if (algorithm == AlgorithmType.AES || algorithm == AlgorithmType.SM4) {
@@ -102,5 +107,3 @@ public class EncryptorAutoConfiguration {
     }
 
 }
-
-

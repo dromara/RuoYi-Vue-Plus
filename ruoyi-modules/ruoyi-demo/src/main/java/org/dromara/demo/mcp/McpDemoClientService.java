@@ -1,9 +1,9 @@
 package org.dromara.demo.mcp;
 
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.mcp.core.McpClientTemplate;
 import org.dromara.common.mcp.core.McpResourceReadResult;
 import org.dromara.common.mcp.core.McpToolCallResult;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ public class McpDemoClientService {
     /**
      * 调用外部 MCP 工具接收数据。
      *
-     * @param toolName 工具名称
+     * @param toolName  工具名称
      * @param arguments 工具参数
      * @return 工具返回内容
      */
@@ -65,7 +65,7 @@ public class McpDemoClientService {
      * <p>
      * MCP 返回数据不建议直接入库，应先转换成业务 BO/DTO，再进入业务 Service。
      *
-     * @param toolName 工具名称
+     * @param toolName  工具名称
      * @param arguments 工具参数
      * @return 处理结果
      */
@@ -73,6 +73,13 @@ public class McpDemoClientService {
         return new McpDemoHandleResult("MCP", true, callRemoteTool(toolName, arguments));
     }
 
+    /**
+     * 执行 MCP Client 操作。
+     *
+     * @param action MCP Client 操作
+     * @param <T>    返回值类型
+     * @return 操作结果
+     */
     private <T> T execute(Function<McpClientTemplate, T> action) {
         McpClientTemplate template = mcpClientTemplateProvider.getIfAvailable();
         if (template == null) {
@@ -85,8 +92,8 @@ public class McpDemoClientService {
      * MCP 数据处理结果。
      *
      * @param sourceType 数据来源类型
-     * @param handled 是否已处理
-     * @param data MCP 原始返回数据
+     * @param handled    是否已处理
+     * @param data       MCP 原始返回数据
      */
     public record McpDemoHandleResult(
         String sourceType,

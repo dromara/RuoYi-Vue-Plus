@@ -20,11 +20,23 @@ public class OutputStreamDownloadSubscriber implements Consumer<ByteBuffer>, Aut
 
     private final boolean allowAutoClose;
 
+    /**
+     * 创建输出流下载订阅器。
+     *
+     * @param channel        可写通道
+     * @param allowAutoClose 是否允许自动关闭通道
+     */
     private OutputStreamDownloadSubscriber(WritableByteChannel channel, boolean allowAutoClose) {
         this.channel = channel;
         this.allowAutoClose = allowAutoClose;
     }
 
+    /**
+     * 创建输出流下载订阅器。
+     *
+     * @param out            输出流
+     * @param allowAutoClose 是否允许自动关闭流
+     */
     private OutputStreamDownloadSubscriber(OutputStream out, boolean allowAutoClose) {
         this.allowAutoClose = allowAutoClose;
         // 创建可写入的字节通道
@@ -36,6 +48,11 @@ public class OutputStreamDownloadSubscriber implements Consumer<ByteBuffer>, Aut
         }
     }
 
+    /**
+     * 写入下载到的字节缓冲区。
+     *
+     * @param byteBuffer 字节缓冲区
+     */
     @Override
     public void accept(ByteBuffer byteBuffer) {
         try {
@@ -47,6 +64,11 @@ public class OutputStreamDownloadSubscriber implements Consumer<ByteBuffer>, Aut
         }
     }
 
+    /**
+     * 按配置关闭底层通道。
+     *
+     * @throws Exception 关闭通道异常
+     */
     @Override
     public void close() throws Exception {
         if (channel.isOpen() && allowAutoClose) {

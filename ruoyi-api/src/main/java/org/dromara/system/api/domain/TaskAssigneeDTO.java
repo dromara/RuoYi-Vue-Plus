@@ -34,6 +34,12 @@ public class TaskAssigneeDTO implements Serializable {
      */
     private List<TaskHandler> list;
 
+    /**
+     * 创建任务受让人分页结果。
+     *
+     * @param total 总大小
+     * @param list 受让人列表
+     */
     public TaskAssigneeDTO(Long total, List<TaskHandler> list) {
         this.total = total;
         this.list = list;

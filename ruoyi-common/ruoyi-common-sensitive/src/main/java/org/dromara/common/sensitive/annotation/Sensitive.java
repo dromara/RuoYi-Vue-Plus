@@ -18,6 +18,11 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Sensitive {
 
+    /**
+     * 脱敏策略。
+     *
+     * @return 脱敏策略
+     */
     SensitiveStrategy strategy();
 
     /**

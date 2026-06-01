@@ -23,26 +23,56 @@ public class PathNamedTemplate implements Template {
 
     private final Template delegate;
 
+    /**
+     * 创建基于路径命名的模板。
+     *
+     * @param pathName 路径名称
+     * @param delegate 委托模板
+     */
     private PathNamedTemplate(String pathName, Template delegate) {
         this.pathName = pathName;
         this.delegate = delegate;
     }
 
+    /**
+     * 渲染模板到字符输出器。
+     *
+     * @param bindingMap 模板绑定数据
+     * @param writer     字符输出器
+     */
     @Override
     public void render(Map<?, ?> bindingMap, Writer writer) {
         delegate.render(bindingMap, writer);
     }
 
+    /**
+     * 渲染模板到输出流。
+     *
+     * @param bindingMap 模板绑定数据
+     * @param out        输出流
+     */
     @Override
     public void render(Map<?, ?> bindingMap, OutputStream out) {
         delegate.render(bindingMap, out);
     }
 
+    /**
+     * 渲染模板到文件。
+     *
+     * @param bindingMap 模板绑定数据
+     * @param file       输出文件
+     */
     @Override
     public void render(Map<?, ?> bindingMap, File file) {
         delegate.render(bindingMap, file);
     }
 
+    /**
+     * 渲染模板为字符串。
+     *
+     * @param bindingMap 模板绑定数据
+     * @return 渲染结果
+     */
     @Override
     public String render(Map<?, ?> bindingMap) {
         return delegate.render(bindingMap);
@@ -66,8 +96,8 @@ public class PathNamedTemplate implements Template {
      * @param pathName       路径名称
      * @return 带路径名称的模板
      */
-    public static PathNamedTemplate form(TemplateEngine templateEngine,String pathName) {
-        return new PathNamedTemplate(pathName,templateEngine.getTemplate(pathName));
+    public static PathNamedTemplate form(TemplateEngine templateEngine, String pathName) {
+        return new PathNamedTemplate(pathName, templateEngine.getTemplate(pathName));
     }
 
     /**

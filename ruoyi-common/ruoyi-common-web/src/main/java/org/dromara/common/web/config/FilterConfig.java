@@ -23,6 +23,7 @@ public class FilterConfig {
     /**
      * 注册 XSS 过滤器。
      *
+     * @param xssProperties XSS 配置
      * @return XSS 请求过滤器实例
      */
     @Bean

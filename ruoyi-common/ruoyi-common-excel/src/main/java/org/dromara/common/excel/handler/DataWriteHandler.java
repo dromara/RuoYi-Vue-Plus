@@ -50,6 +50,11 @@ public class DataWriteHandler implements SheetWriteHandler, CellWriteHandler {
         headColumnMap = getRequiredMap(clazz);
     }
 
+    /**
+     * 在单元格写入后设置表头文本格式、必填样式与批注。
+     *
+     * @param context 单元格写入上下文
+     */
     @Override
     public void afterCellDispose(CellWriteHandlerContext context) {
         if (CollUtil.isEmpty(notationMap) && CollUtil.isEmpty(headColumnMap)) {

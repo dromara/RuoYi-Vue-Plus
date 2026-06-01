@@ -28,6 +28,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ExportExcelServiceImpl implements IExportExcelService {
 
+    /**
+     * 导出带下拉框选项的 Excel 示例文件。
+     *
+     * @param response HTTP 响应
+     */
     @Override
     public void exportWithOptions(HttpServletResponse response) {
         // 创建表格数据，业务中一般通过数据库查询
@@ -106,6 +111,13 @@ public class ExportExcelServiceImpl implements IExportExcelService {
             .toResponse(response);
     }
 
+    /**
+     * 构建下拉框显示值。
+     *
+     * @param cityDataList 城市演示数据列表
+     * @param id 选项 id
+     * @return 下拉框显示值
+     */
     private String buildOptions(List<DemoCityData> cityDataList, Integer id) {
         Map<Integer, List<DemoCityData>> groupByIdMap =
             StreamUtils.groupByKey(cityDataList, DemoCityData::getId);
@@ -246,6 +258,11 @@ public class ExportExcelServiceImpl implements IExportExcelService {
     }
 
 
+    /**
+     * 自定义写入多个工作表。
+     *
+     * @param response HTTP 响应
+     */
     @Override
     public void customExport(HttpServletResponse response) {
         ExcelBuilder.writer(ExportDemoVo.class).sheetName("自定义导出").toResponse(response, wrapper -> {

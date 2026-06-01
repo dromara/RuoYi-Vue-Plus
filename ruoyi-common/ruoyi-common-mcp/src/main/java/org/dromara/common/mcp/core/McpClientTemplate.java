@@ -41,7 +41,7 @@ public class McpClientTemplate {
     /**
      * 调用所有 MCP Server 上的同名工具。
      *
-     * @param toolName 工具名称
+     * @param toolName  工具名称
      * @param arguments 工具参数
      * @return 各 Server 的工具调用结果
      */
@@ -58,8 +58,8 @@ public class McpClientTemplate {
      * 调用指定 MCP Server 上的工具。
      *
      * @param serverName Server 名称
-     * @param toolName 工具名称
-     * @param arguments 工具参数
+     * @param toolName   工具名称
+     * @param arguments  工具参数
      * @return 工具调用结果
      */
     public Optional<McpToolCallResult> callTool(String serverName, String toolName, Map<String, Object> arguments) {
@@ -86,7 +86,7 @@ public class McpClientTemplate {
      * 读取指定 MCP Server 上的资源。
      *
      * @param serverName Server 名称
-     * @param uri 资源地址
+     * @param uri        资源地址
      * @return 资源内容
      */
     public Optional<McpResourceReadResult> readResource(String serverName, String uri) {
@@ -115,6 +115,12 @@ public class McpClientTemplate {
         return mcpSyncClients;
     }
 
+    /**
+     * 解析 MCP Server 名称。
+     *
+     * @param client MCP 同步客户端
+     * @return Server 名称
+     */
     private String getServerName(McpSyncClient client) {
         McpSchema.Implementation serverInfo = client.getServerInfo();
         if (serverInfo == null || serverInfo.name() == null) {

@@ -32,9 +32,9 @@ public class CryptoFilter implements Filter {
     /**
      * 构造加解密过滤器。
      *
-     * @param properties API 解密配置
+     * @param properties                   API 解密配置
      * @param requestMappingHandlerMapping 请求映射处理器
-     * @param handlerExceptionResolver 异常处理器
+     * @param handlerExceptionResolver     异常处理器
      */
     public CryptoFilter(ApiDecryptProperties properties,
                         RequestMappingHandlerMapping requestMappingHandlerMapping,
@@ -46,6 +46,15 @@ public class CryptoFilter implements Filter {
         EncryptUtils.validateRsaPrivateKey(properties.getPrivateKey());
     }
 
+    /**
+     * 根据接口注解与请求头执行请求解密和响应加密。
+     *
+     * @param request  原始请求
+     * @param response 原始响应
+     * @param chain    过滤器链
+     * @throws IOException      IO 异常
+     * @throws ServletException Servlet 异常
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest servletRequest = (HttpServletRequest) request;
@@ -96,6 +105,9 @@ public class CryptoFilter implements Filter {
 
     /**
      * 获取 ApiEncrypt 注解
+     *
+     * @param servletRequest 当前请求
+     * @return API 加密注解
      */
     private ApiEncrypt getApiEncryptAnnotation(HttpServletRequest servletRequest) {
         // 获取注解
@@ -116,6 +128,9 @@ public class CryptoFilter implements Filter {
         return null;
     }
 
+    /**
+     * 销毁过滤器。
+     */
     @Override
     public void destroy() {
     }

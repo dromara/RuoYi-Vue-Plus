@@ -37,6 +37,11 @@ public class DeptExcelConverter implements Converter<Long> {
         .expireAfterWrite(30, TimeUnit.SECONDS)
         .build();
 
+    /**
+     * 获取部门导入导出映射缓存。
+     *
+     * @return 部门 ID 与部门路径名称互转映射
+     */
     private DeptMaps getDeptMaps() {
         ISysDeptService deptService = SpringUtils.getBean(ISysDeptService.class);
         return DEPT_CACHE.get(CACHE_KEY, k -> {
