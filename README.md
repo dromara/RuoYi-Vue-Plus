@@ -7,12 +7,12 @@
 [![码云Gitee](https://gitee.com/dromara/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/dromara/RuoYi-Vue-Plus)
 [![GitHub](https://img.shields.io/github/stars/dromara/RuoYi-Vue-Plus.svg?label=Github%20Stars)](https://github.com/dromara/RuoYi-Vue-Plus)
 [![Star](https://gitcode.com/dromara/RuoYi-Vue-Plus/star/badge.svg)](https://gitcode.com/dromara/RuoYi-Vue-Plus)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus/blob/5.X/LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus/blob/6.X/LICENSE)
 <br>
-[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-5.5.3-success.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-blue.svg)]()
-[![JDK-17](https://img.shields.io/badge/JDK-17-green.svg)]()
+[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-6.0.0-success.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-blue.svg)]()
 [![JDK-21](https://img.shields.io/badge/JDK-21-green.svg)]()
+[![JDK-25](https://img.shields.io/badge/JDK-25-green.svg)]()
 
 > Dromara RuoYi-Vue-Plus 是重写 RuoYi-Vue 针对 `分布式集群与多租户` 场景全方位升级(不兼容原框架)
 
@@ -33,11 +33,11 @@
 MaxKey 业界领先单点登录产品 - https://gitee.com/dromara/MaxKey <br>
 CCFlow 驰聘低代码-流程-表单 - https://gitee.com/opencc/RuoYi-JFlow <br>
 数舵科技 软件定制开发APP小程序等 - https://www.shuduokeji.com/ <br>
-引迈信息 软件开发平台 - https://www.jnpfsoft.com/index.html?from=plus-doc <br>
 Mall4J 高质量Java商城系统 - https://www.mall4j.com/cn/?statId=11 <br>
 aizuda flowlong 工作流 - https://gitee.com/aizuda/flowlong <br>
 Ruoyi-Plus-Uniapp - https://ruoyi.plus <br>
 Topiam IAM/IDaaS身份管理平台 - https://www.topiam.cn/ <br>
+稳定低价的大模型中转站 - https://aicodelink.top/register?aff=pHeG <br>
 
 [如何成为赞助商 加群联系作者详谈 每日PV2500-3000 IP1700-2500](https://plus-doc.dromara.org/#/common/add_group)
 
