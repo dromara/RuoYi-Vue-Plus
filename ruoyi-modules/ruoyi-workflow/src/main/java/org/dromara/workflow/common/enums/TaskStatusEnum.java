@@ -87,6 +87,9 @@ public enum TaskStatusEnum {
      */
     private final String desc;
 
+    /**
+     * 状态编码与描述缓存。
+     */
     private static final Map<String, String> STATUS_DESC_MAP = Arrays.stream(values())
         .collect(Collectors.toConcurrentMap(TaskStatusEnum::getStatus, TaskStatusEnum::getDesc));
 
@@ -112,4 +115,3 @@ public enum TaskStatusEnum {
     }
 
 }
-

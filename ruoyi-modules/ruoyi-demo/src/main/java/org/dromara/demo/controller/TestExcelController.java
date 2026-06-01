@@ -160,21 +160,51 @@ public class TestExcelController {
         return excelResult.getList();
     }
 
+    /**
+     * 多列表模板填充测试对象。
+     */
     @Data
     @AllArgsConstructor
     static class TestObj1 {
+        /**
+         * 测试字段1。
+         */
         private String test1;
+        /**
+         * 测试字段2。
+         */
         private String test2;
+        /**
+         * 测试字段3。
+         */
         private String test3;
     }
 
+    /**
+     * 单列表模板填充测试对象。
+     */
     @Data
     @AllArgsConstructor
     static class TestObj {
+        /**
+         * 名称。
+         */
         private String name;
+        /**
+         * 列表字段1。
+         */
         private String list1;
+        /**
+         * 列表字段2。
+         */
         private String list2;
+        /**
+         * 列表字段3。
+         */
         private String list3;
+        /**
+         * 列表字段4。
+         */
         private String list4;
     }
 

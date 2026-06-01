@@ -27,15 +27,49 @@ public class SaTokenAnnotationMetadataJavadocResolver extends AbstractMetadataJa
      */
     public static final Supplier<SaTokenSecurityMetadata> DEFAULT_METADATA_PROVIDER = SaTokenSecurityMetadata::new;
 
+    /**
+     * Sa-Token 注解包名。
+     */
     private static final String BASE_CLASS_NAME = "cn.dev33.satoken.annotation";
+
+    /**
+     * Sa-Token 角色校验注解类名。
+     */
     private static final String SA_CHECK_ROLE_CLASS_NAME = BASE_CLASS_NAME + ".SaCheckRole";
+
+    /**
+     * Sa-Token 权限校验注解类名。
+     */
     private static final String SA_CHECK_PERMISSION_CLASS_NAME = BASE_CLASS_NAME + ".SaCheckPermission";
+
+    /**
+     * Sa-Token 忽略校验注解类名。
+     */
     private static final String SA_IGNORE_CLASS_NAME = BASE_CLASS_NAME + ".SaIgnore";
+
+    /**
+     * Sa-Token 登录校验注解类名。
+     */
     private static final String SA_CHECK_LOGIN_NAME = BASE_CLASS_NAME + ".SaCheckLogin";
 
+    /**
+     * Sa-Token 角色校验注解类型。
+     */
     private static final Class<? extends Annotation> SA_CHECK_ROLE_CLASS;
+
+    /**
+     * Sa-Token 权限校验注解类型。
+     */
     private static final Class<? extends Annotation> SA_CHECK_PERMISSION_CLASS;
+
+    /**
+     * Sa-Token 忽略校验注解类型。
+     */
     private static final Class<? extends Annotation> SA_IGNORE_CLASS;
+
+    /**
+     * Sa-Token 登录校验注解类型。
+     */
     private static final Class<? extends Annotation> SA_CHECK_LOGIN_CLASS;
 
 
@@ -50,6 +84,9 @@ public class SaTokenAnnotationMetadataJavadocResolver extends AbstractMetadataJa
         }
     }
 
+    /**
+     * 构造 Sa-Token 权限解析器。
+     */
     public SaTokenAnnotationMetadataJavadocResolver() {
         this(DEFAULT_METADATA_PROVIDER);
     }

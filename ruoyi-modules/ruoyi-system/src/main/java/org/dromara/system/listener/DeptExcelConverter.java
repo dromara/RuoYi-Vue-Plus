@@ -103,6 +103,12 @@ public class DeptExcelConverter implements Converter<Long> {
         return new WriteCellData<>(deptName);
     }
 
+    /**
+     * 部门导入导出映射缓存。
+     *
+     * @param idToName 部门 ID 到部门名称的映射
+     * @param nameToId 部门名称到部门 ID 的映射
+     */
     private record DeptMaps(Map<Long, String> idToName, Map<String, Long> nameToId) {
     }
 

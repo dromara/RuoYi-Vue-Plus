@@ -15,6 +15,13 @@ import java.lang.reflect.Proxy;
  */
 public class DataPermissionAdvice implements MethodInterceptor {
 
+    /**
+     * 拦截带有数据权限注解的方法调用，设置当前线程的数据权限上下文。
+     *
+     * @param invocation 方法调用上下文
+     * @return 代理方法执行结果
+     * @throws Throwable 代理方法执行异常
+     */
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Object target = invocation.getThis();
@@ -32,6 +39,10 @@ public class DataPermissionAdvice implements MethodInterceptor {
 
     /**
      * 获取数据权限注解
+     *
+     * @param target 目标对象
+     * @param method 当前执行方法
+     * @return 数据权限注解，未配置时返回 null
      */
     private DataPermission getDataPermissionAnnotation(Object target, Method method) {
         DataPermission dataPermission = method.getAnnotation(DataPermission.class);
@@ -48,6 +59,12 @@ public class DataPermissionAdvice implements MethodInterceptor {
         return targetClass.getAnnotation(DataPermission.class);
     }
 
+    /**
+     * 从 JDK 动态代理接口上获取数据权限注解。
+     *
+     * @param targetClass 代理类
+     * @return 数据权限注解，未配置时返回 null
+     */
     private DataPermission getProxyClassDataPermission(Class<?> targetClass) {
         for (Class<?> interfaceClass : targetClass.getInterfaces()) {
             DataPermission dataPermission = interfaceClass.getAnnotation(DataPermission.class);

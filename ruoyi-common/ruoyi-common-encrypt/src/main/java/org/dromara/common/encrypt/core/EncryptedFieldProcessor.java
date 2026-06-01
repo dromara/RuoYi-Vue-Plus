@@ -90,9 +90,20 @@ public class EncryptedFieldProcessor {
         }
     }
 
+    /**
+     * 加密字段处理回调。
+     */
     @FunctionalInterface
     private interface FieldHandler {
 
+        /**
+         * 处理单个加密字段。
+         *
+         * @param target 字段所属对象
+         * @param field 加密字段
+         * @param value 字段原始字符串值
+         * @throws IllegalAccessException 字段访问失败时抛出
+         */
         void handle(Object target, Field field, String value) throws IllegalAccessException;
     }
 

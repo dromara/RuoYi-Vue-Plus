@@ -19,8 +19,14 @@ import java.util.List;
  */
 public class CustomLocalDateTimeDeserializer extends ValueDeserializer<LocalDateTime> {
 
+    /**
+     * 秒级时间戳长度。
+     */
     private static final int SECOND_TIMESTAMP_LENGTH = 10;
 
+    /**
+     * 毫秒级时间戳长度。
+     */
     private static final int MILLIS_TIMESTAMP_LENGTH = 13;
 
     /** 支持时间的格式列表（直接解析为 LocalDateTime） */
@@ -81,6 +87,12 @@ public class CustomLocalDateTimeDeserializer extends ValueDeserializer<LocalDate
         return null;
     }
 
+    /**
+     * 解析秒级或毫秒级时间戳。
+     *
+     * @param text 待解析文本
+     * @return LocalDateTime，非时间戳时返回 null
+     */
     private LocalDateTime parseTimestamp(String text) {
         int startIndex = text.startsWith("-") ? 1 : 0;
         if (startIndex == text.length()) {

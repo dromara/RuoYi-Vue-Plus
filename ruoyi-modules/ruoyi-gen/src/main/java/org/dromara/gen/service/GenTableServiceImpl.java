@@ -457,6 +457,13 @@ public class GenTableServiceImpl implements IGenTableService {
         return new RenderContext(table, context, templates);
     }
 
+    /**
+     * 模板渲染上下文。
+     *
+     * @param table 生成表信息
+     * @param context 模板上下文
+     * @param templates 待渲染模板
+     */
     private record RenderContext(GenTable table, Dict context, List<PathNamedTemplate> templates) {
     }
 
@@ -627,4 +634,3 @@ public class GenTableServiceImpl implements IGenTableService {
     }
 
 }
-

@@ -22,9 +22,19 @@ import java.util.function.Supplier;
 @SuppressWarnings("unchecked")
 public class DataPermissionHelper {
 
+    /**
+     * Sa-Token Storage 中保存数据权限上下文的键。
+     */
     private static final String DATA_PERMISSION_KEY = "data:permission";
+
+    /**
+     * 数据权限访问控制对象在上下文中的键。
+     */
     private static final String ACCESS_KEY = "data:permission:access";
 
+    /**
+     * 当前线程正在执行的 Mapper 数据权限注解缓存。
+     */
     private static final ThreadLocal<DataPermission> PERMISSION_CACHE = new ThreadLocal<>();
 
     /**

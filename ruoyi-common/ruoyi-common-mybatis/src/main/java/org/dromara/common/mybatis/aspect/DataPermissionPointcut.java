@@ -13,6 +13,13 @@ import java.lang.reflect.Proxy;
  */
 public class DataPermissionPointcut extends StaticMethodMatcherPointcut {
 
+    /**
+     * 判断当前方法或目标类型是否命中数据权限切点。
+     *
+     * @param method      当前执行方法
+     * @param targetClass 目标类型
+     * @return true 命中数据权限切点 false 未命中
+     */
     @Override
     public boolean matches(Method method, Class<?> targetClass) {
         // 优先匹配方法
@@ -26,6 +33,12 @@ public class DataPermissionPointcut extends StaticMethodMatcherPointcut {
         return targetClassRef.isAnnotationPresent(DataPermission.class);
     }
 
+    /**
+     * 解析真实目标类型，兼容 MyBatis Mapper 的 JDK 动态代理类。
+     *
+     * @param targetClass Spring AOP 传入的目标类型
+     * @return 真实目标类型或可匹配数据权限注解的接口类型
+     */
     private Class<?> resolveTargetClass(Class<?> targetClass) {
         if (!Proxy.isProxyClass(targetClass)) {
             return targetClass;

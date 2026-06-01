@@ -18,27 +18,63 @@ import java.util.function.Supplier;
  */
 public abstract class AbstractMetadataJavadocResolver<M> implements JavadocResolver {
 
+    /**
+     * 最高优先级。
+     */
     public static final int HIGHEST_PRECEDENCE = Integer.MIN_VALUE;
+
+    /**
+     * 最低优先级。
+     */
     public static final int LOWEST_PRECEDENCE = Integer.MAX_VALUE;
 
+    /**
+     * 元数据提供者。
+     */
     private final Supplier<M> metadataProvider;
 
+    /**
+     * 解析器排序值。
+     */
     private final int order;
 
+    /**
+     * 构造元数据 Javadoc 解析器。
+     *
+     * @param metadataProvider 元数据提供者
+     */
     public AbstractMetadataJavadocResolver(Supplier<M> metadataProvider) {
         this(metadataProvider, LOWEST_PRECEDENCE);
     }
 
+    /**
+     * 构造带排序值的元数据 Javadoc 解析器。
+     *
+     * @param metadataProvider 元数据提供者
+     * @param order            排序值
+     */
     public AbstractMetadataJavadocResolver(Supplier<M> metadataProvider, int order) {
         this.metadataProvider = metadataProvider;
         this.order = order;
     }
 
+    /**
+     * 获取解析器排序值。
+     *
+     * @return 排序值
+     */
     @Override
     public int getOrder() {
         return order;
     }
 
+    /**
+     * 使用当前元数据解析接口文档描述。
+     *
+     * @param handlerMethod 处理器方法
+     * @param operation     Swagger Operation 实例
+     * @return 解析后的 Javadoc 内容
+     */
     @Override
     public String resolve(HandlerMethod handlerMethod, Operation operation) {
         return resolve(handlerMethod, operation, metadataProvider.get());
@@ -157,6 +193,13 @@ public abstract class AbstractMetadataJavadocResolver<M> implements JavadocResol
         return AnnotationUtil.getAnnotationValueMap(handlerMethod.getMethod(), annotationClass);
     }
 
+    /**
+     * 获取指定元素上的注解属性映射。
+     *
+     * @param annotatedElement 被注解元素
+     * @param annotationClass  注解类型
+     * @return 注解属性映射
+     */
     private Map<String, Object> getAnnotationValueMap(AnnotatedElement annotatedElement, Class<? extends Annotation> annotationClass) {
         return AnnotationUtil.getAnnotationValueMap(annotatedElement, annotationClass);
     }

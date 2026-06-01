@@ -12,6 +12,9 @@ public class CaptchaExpireException extends UserException {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 构造验证码失效异常。
+     */
     public CaptchaExpireException() {
         super("user.jcaptcha.expire");
     }

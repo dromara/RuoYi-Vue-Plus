@@ -16,8 +16,14 @@ import java.util.regex.Pattern;
  */
 public final class AggregateSelectUtils {
 
+    /**
+     * 查询别名合法性匹配规则。
+     */
     private static final Pattern ALIAS_PATTERN = Pattern.compile("[A-Za-z_][A-Za-z0-9_]*");
 
+    /**
+     * 工具类不允许实例化。
+     */
     private AggregateSelectUtils() {
     }
 

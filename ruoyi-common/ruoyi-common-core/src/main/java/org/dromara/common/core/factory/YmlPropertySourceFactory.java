@@ -18,6 +18,14 @@ import java.util.Objects;
  */
 public class YmlPropertySourceFactory extends DefaultPropertySourceFactory {
 
+    /**
+     * 创建配置属性源，支持将 yml/yaml 资源解析为 PropertiesPropertySource。
+     *
+     * @param name     属性源名称
+     * @param resource 配置资源
+     * @return 属性源
+     * @throws IOException 读取配置资源失败时抛出
+     */
     @Override
     public PropertySource<?> createPropertySource(@Nullable String name, EncodedResource resource) throws IOException {
         String sourceName = resource.getResource().getFilename();

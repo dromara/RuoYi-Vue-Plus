@@ -44,5 +44,8 @@ public enum AlgorithmType {
      */
     SM4(Sm4Encryptor.class);
 
+    /**
+     * 算法对应的加密器类型。
+     */
     private final Class<? extends AbstractEncryptor> clazz;
 }

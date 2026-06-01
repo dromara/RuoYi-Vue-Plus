@@ -43,6 +43,12 @@ public class ThreadPoolConfig {
         ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(core,
             builder.build(),
             new ThreadPoolExecutor.CallerRunsPolicy()) {
+            /**
+             * 定时任务执行完成后统一打印异常。
+             *
+             * @param r 已执行的任务
+             * @param t 任务执行异常
+             */
             @Override
             protected void afterExecute(Runnable r, Throwable t) {
                 super.afterExecute(r, t);

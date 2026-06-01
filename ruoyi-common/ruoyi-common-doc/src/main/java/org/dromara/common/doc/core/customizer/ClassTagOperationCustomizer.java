@@ -37,14 +37,33 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class ClassTagOperationCustomizer implements OperationCustomizer, OpenApiCustomizer {
 
+    /**
+     * JavaDoc 提供器。
+     */
     private final Optional<JavadocProvider> javadocProvider;
 
+    /**
+     * SpringDoc 属性解析工具。
+     */
     private final PropertyResolverUtils propertyResolverUtils;
 
+    /**
+     * 已解析的 OpenAPI 顶层标签缓存。
+     */
     private final Map<String, Tag> tags = new ConcurrentHashMap<>();
 
+    /**
+     * 已被类 JavaDoc 替换的自动标签名称集合。
+     */
     private final Set<String> replacedAutoTagNames = ConcurrentHashMap.newKeySet();
 
+    /**
+     * 自定义接口操作的标签信息。
+     *
+     * @param operation     OpenAPI 操作对象
+     * @param handlerMethod 处理器方法
+     * @return 自定义后的 OpenAPI 操作对象
+     */
     @Override
     public Operation customize(Operation operation, HandlerMethod handlerMethod) {
         Class<?> beanType = handlerMethod.getBeanType();
@@ -73,6 +92,11 @@ public class ClassTagOperationCustomizer implements OperationCustomizer, OpenApi
         return operation;
     }
 
+    /**
+     * 自定义 OpenAPI 顶层标签集合。
+     *
+     * @param openApi OpenAPI 文档对象
+     */
     @Override
     public void customise(OpenAPI openApi) {
         if (!CollectionUtils.isEmpty(openApi.getTags()) && !CollectionUtils.isEmpty(replacedAutoTagNames)) {
@@ -87,6 +111,12 @@ public class ClassTagOperationCustomizer implements OperationCustomizer, OpenApi
         });
     }
 
+    /**
+     * 获取 Controller 类上的 Swagger 标签注解。
+     *
+     * @param beanType Controller 类型
+     * @return 标签注解列表
+     */
     private List<io.swagger.v3.oas.annotations.tags.Tag> getClassTags(Class<?> beanType) {
         Set<Tags> tagsSet = AnnotatedElementUtils.findAllMergedAnnotations(beanType, Tags.class);
         Set<io.swagger.v3.oas.annotations.tags.Tag> mergedTags = tagsSet.stream()
@@ -96,6 +126,12 @@ public class ClassTagOperationCustomizer implements OperationCustomizer, OpenApi
         return new ArrayList<>(mergedTags);
     }
 
+    /**
+     * 将类级 Swagger 标签追加到接口操作与顶层标签缓存。
+     *
+     * @param operation OpenAPI 操作对象
+     * @param classTags 类级标签注解
+     */
     private void addAnnotationTags(Operation operation, List<io.swagger.v3.oas.annotations.tags.Tag> classTags) {
         classTags.stream()
             .map(io.swagger.v3.oas.annotations.tags.Tag::name)
@@ -113,6 +149,12 @@ public class ClassTagOperationCustomizer implements OperationCustomizer, OpenApi
             }));
     }
 
+    /**
+     * 获取类 JavaDoc 第一行作为标签名称。
+     *
+     * @param beanType Controller 类型
+     * @return 标签名称，未配置 JavaDoc 时返回 null
+     */
     private String getClassJavadocTagName(Class<?> beanType) {
         if (javadocProvider.isEmpty()) {
             return null;
@@ -126,10 +168,23 @@ public class ClassTagOperationCustomizer implements OperationCustomizer, OpenApi
         return lines.stream().filter(StringUtils::isNotBlank).findFirst().orElse(null);
     }
 
+    /**
+     * 判断当前操作是否可以使用类 JavaDoc 标签替换默认标签。
+     *
+     * @param operation   OpenAPI 操作对象
+     * @param autoTagName SpringDoc 自动生成的标签名
+     * @return true 可以替换 false 不替换
+     */
     private boolean shouldUseClassJavadocTag(Operation operation, String autoTagName) {
         return CollectionUtils.isEmpty(operation.getTags()) || operation.getTags().contains(autoTagName);
     }
 
+    /**
+     * 为接口操作追加标签。
+     *
+     * @param operation OpenAPI 操作对象
+     * @param tagName   标签名称
+     */
     private void addOperationTag(Operation operation, String tagName) {
         if (operation.getTags() == null) {
             operation.setTags(new ArrayList<>());
@@ -139,6 +194,12 @@ public class ClassTagOperationCustomizer implements OperationCustomizer, OpenApi
         }
     }
 
+    /**
+     * 从接口操作中移除指定标签。
+     *
+     * @param operation OpenAPI 操作对象
+     * @param tagName   标签名称
+     */
     private void removeOperationTag(Operation operation, String tagName) {
         if (!CollectionUtils.isEmpty(operation.getTags())) {
             operation.getTags().removeIf(item -> Objects.equals(item, tagName));

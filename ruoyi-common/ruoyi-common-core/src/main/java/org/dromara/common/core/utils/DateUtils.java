@@ -25,6 +25,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM",
         "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"};
 
+    /**
+     * 工具类不允许实例化。
+     */
     @Deprecated
     private DateUtils() {
     }

@@ -59,7 +59,10 @@ public class PageQuery implements Serializable {
     public static final int DEFAULT_PAGE_SIZE = Integer.MAX_VALUE;
 
     /**
-     * 构建分页对象
+     * 构建分页对象。
+     *
+     * @param <T> 分页记录类型
+     * @return MyBatis-Plus 分页对象
      */
     public <T> Page<T> build() {
         Integer pageNum = ObjectUtil.defaultIfNull(getPageNum(), DEFAULT_PAGE_NUM);
@@ -77,7 +80,7 @@ public class PageQuery implements Serializable {
 
     /**
      * 构建排序
-     *
+     * <p>
      * 支持的用法如下:
      * {isAsc:"asc",orderByColumn:"id"} order by id asc
      * {isAsc:"asc",orderByColumn:"id,createTime"} order by id asc,create_time asc

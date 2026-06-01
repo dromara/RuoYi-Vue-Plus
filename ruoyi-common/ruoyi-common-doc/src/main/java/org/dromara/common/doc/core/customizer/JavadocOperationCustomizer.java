@@ -20,10 +20,23 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JavadocOperationCustomizer implements OperationCustomizer {
 
+    /**
+     * JavaDoc 提供器。
+     */
     private final Optional<JavadocProvider> javadocProvider;
 
+    /**
+     * JavaDoc 扩展解析器列表。
+     */
     private final List<JavadocResolver> javadocResolvers;
 
+    /**
+     * 自定义接口操作的 JavaDoc 描述。
+     *
+     * @param operation     OpenAPI 操作对象
+     * @param handlerMethod 处理器方法
+     * @return 自定义后的 OpenAPI 操作对象
+     */
     @Override
     public Operation customize(Operation operation, HandlerMethod handlerMethod) {
         javadocProvider.ifPresent(provider -> {

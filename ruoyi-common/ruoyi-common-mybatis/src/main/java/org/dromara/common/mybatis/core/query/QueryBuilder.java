@@ -9,6 +9,9 @@ import com.github.yulichang.toolkit.JoinWrappers;
  */
 public final class QueryBuilder {
 
+    /**
+     * 工具入口类不允许实例化。
+     */
     private QueryBuilder() {
     }
 

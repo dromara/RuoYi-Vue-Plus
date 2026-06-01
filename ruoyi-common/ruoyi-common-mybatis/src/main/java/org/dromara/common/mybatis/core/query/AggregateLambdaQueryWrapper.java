@@ -11,8 +11,16 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
  */
 class AggregateLambdaQueryWrapper<T> extends LambdaQueryWrapper<T> {
 
+    /**
+     * 追加后的聚合查询字段 SQL。
+     */
     private String aggregateSqlSelect;
 
+    /**
+     * 构造聚合查询包装器。
+     *
+     * @param entityClass 实体类型
+     */
     AggregateLambdaQueryWrapper(Class<T> entityClass) {
         super(entityClass);
     }
@@ -75,6 +83,11 @@ class AggregateLambdaQueryWrapper<T> extends LambdaQueryWrapper<T> {
         return columnToString(column);
     }
 
+    /**
+     * 获取最终查询字段 SQL。
+     *
+     * @return 查询字段 SQL
+     */
     @Override
     public String getSqlSelect() {
         if (aggregateSqlSelect != null) {
@@ -83,6 +96,9 @@ class AggregateLambdaQueryWrapper<T> extends LambdaQueryWrapper<T> {
         return super.getSqlSelect();
     }
 
+    /**
+     * 清空查询条件与聚合查询字段。
+     */
     @Override
     public void clear() {
         super.clear();

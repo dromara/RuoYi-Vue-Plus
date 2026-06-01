@@ -24,10 +24,22 @@ public class BigNumberSerializer extends NumberSerializer {
      */
     public static final BigNumberSerializer INSTANCE = new BigNumberSerializer(Number.class);
 
+    /**
+     * 构造大数字序列化器。
+     *
+     * @param rawType 数字类型
+     */
     public BigNumberSerializer(Class<? extends Number> rawType) {
         super(rawType);
     }
 
+    /**
+     * 序列化数字，超出 JS 安全整数范围时输出字符串。
+     *
+     * @param value    数字值
+     * @param gen      JSON 生成器
+     * @param provider 序列化上下文
+     */
     @Override
     public void serialize(Number value, JsonGenerator gen, SerializationContext provider) {
         // 超出范围 序列化为字符串

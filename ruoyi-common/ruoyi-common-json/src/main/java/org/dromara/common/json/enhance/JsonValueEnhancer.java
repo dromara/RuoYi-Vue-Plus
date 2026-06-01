@@ -25,10 +25,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class JsonValueEnhancer {
 
+    /**
+     * JSON 映射器。
+     */
     private final JsonMapper jsonMapper;
 
+    /**
+     * 字段增强处理器列表。
+     */
     private final List<JsonFieldProcessor> processors;
 
+    /**
+     * 类型属性元数据缓存。
+     */
     private final Map<Class<?>, List<PropertyMetadata>> propertyCache = new ConcurrentHashMap<>();
 
     /**
@@ -76,6 +85,12 @@ public class JsonValueEnhancer {
             && !ResourceHttpMessageConverter.class.isAssignableFrom(converterType);
     }
 
+    /**
+     * 对已处理后的对象再次执行树形增强。
+     *
+     * @param value 待增强对象
+     * @return 增强后的 JSON 节点
+     */
     private JsonNode enhanceTree(Object value) {
         JsonEnhancementContext context = new JsonEnhancementContext(jsonMapper);
         collectValue(value, context, new IdentityHashMap<>());
@@ -86,6 +101,13 @@ public class JsonValueEnhancer {
         return renderValue(value, context, new IdentityHashMap<>());
     }
 
+    /**
+     * 递归收集对象中需要增强的字段信息。
+     *
+     * @param value   当前对象
+     * @param context 增强上下文
+     * @param visited 已访问对象集合，用于避免循环引用
+     */
     private void collectValue(Object value, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {
         if (value == null) {
             return;
@@ -120,6 +142,12 @@ public class JsonValueEnhancer {
         }
     }
 
+    /**
+     * 收集单个字段的增强信息。
+     *
+     * @param fieldContext 字段上下文
+     * @param context      增强上下文
+     */
     private void collectField(JsonFieldContext fieldContext, JsonEnhancementContext context) {
         for (JsonFieldProcessor processor : processors) {
             if (processor.supports(fieldContext)) {
@@ -129,6 +157,14 @@ public class JsonValueEnhancer {
         }
     }
 
+    /**
+     * 将对象渲染为增强后的 JSON 节点。
+     *
+     * @param value   当前对象
+     * @param context 增强上下文
+     * @param visited 已访问对象集合，用于避免循环引用
+     * @return JSON 节点
+     */
     private JsonNode renderValue(Object value, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {
         switch (value) {
             case null -> {
@@ -162,12 +198,28 @@ public class JsonValueEnhancer {
         }
     }
 
+    /**
+     * 渲染 Map 对象。
+     *
+     * @param map     Map 对象
+     * @param context 增强上下文
+     * @param visited 已访问对象集合
+     * @return 对象节点
+     */
     private ObjectNode renderMap(Map<?, ?> map, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {
         ObjectNode objectNode = jsonMapper.createObjectNode();
         map.forEach((key, childValue) -> objectNode.set(String.valueOf(key), renderValue(childValue, context, visited)));
         return objectNode;
     }
 
+    /**
+     * 渲染可迭代对象。
+     *
+     * @param iterable 可迭代对象
+     * @param context  增强上下文
+     * @param visited  已访问对象集合
+     * @return 数组节点
+     */
     private ArrayNode renderIterable(Iterable<?> iterable, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {
         ArrayNode arrayNode = jsonMapper.createArrayNode();
         for (Object child : iterable) {
@@ -176,6 +228,14 @@ public class JsonValueEnhancer {
         return arrayNode;
     }
 
+    /**
+     * 渲染数组对象。
+     *
+     * @param value   数组对象
+     * @param context 增强上下文
+     * @param visited 已访问对象集合
+     * @return 数组节点
+     */
     private ArrayNode renderArray(Object value, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {
         ArrayNode arrayNode = jsonMapper.createArrayNode();
         int length = Array.getLength(value);
@@ -185,6 +245,14 @@ public class JsonValueEnhancer {
         return arrayNode;
     }
 
+    /**
+     * 渲染普通 Java 对象。
+     *
+     * @param value   Java 对象
+     * @param context 增强上下文
+     * @param visited 已访问对象集合
+     * @return 对象节点
+     */
     private ObjectNode renderPojo(Object value, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {
         ObjectNode objectNode = jsonMapper.createObjectNode();
         for (PropertyMetadata metadata : getProperties(value.getClass())) {
@@ -208,6 +276,14 @@ public class JsonValueEnhancer {
         return objectNode;
     }
 
+    /**
+     * 对字段处理后得到的复杂对象执行二次增强。
+     *
+     * @param value   字段处理后的值
+     * @param context 增强上下文
+     * @param visited 已访问对象集合
+     * @return JSON 节点
+     */
     private JsonNode enhanceTranslatedValue(Object value, JsonEnhancementContext context, IdentityHashMap<Object, Boolean> visited) {
         if (value == null || value instanceof JsonNode || isSimpleValue(value.getClass())) {
             return renderValue(value, context, visited);
@@ -215,10 +291,22 @@ public class JsonValueEnhancer {
         return enhanceTree(value);
     }
 
+    /**
+     * 获取指定类型可序列化属性元数据。
+     *
+     * @param type 类型
+     * @return 属性元数据列表
+     */
     private List<PropertyMetadata> getProperties(Class<?> type) {
         return propertyCache.computeIfAbsent(type, this::resolveProperties);
     }
 
+    /**
+     * 解析指定类型可序列化属性元数据。
+     *
+     * @param type 类型
+     * @return 属性元数据列表
+     */
     private List<PropertyMetadata> resolveProperties(Class<?> type) {
         if (isSimpleValue(type) || type.isArray() || Map.class.isAssignableFrom(type) || Iterable.class.isAssignableFrom(type)) {
             return Collections.emptyList();
@@ -243,6 +331,12 @@ public class JsonValueEnhancer {
         return Collections.unmodifiableList(properties);
     }
 
+    /**
+     * 判断类型是否为简单值类型。
+     *
+     * @param type 类型
+     * @return true 简单值 false 复杂对象
+     */
     private boolean isSimpleValue(Class<?> type) {
         return type.isPrimitive()
             || CharSequence.class.isAssignableFrom(type)
@@ -256,8 +350,20 @@ public class JsonValueEnhancer {
             || Class.class == type;
     }
 
+    /**
+     * JSON 属性元数据。
+     *
+     * @param propertyName 属性名称
+     * @param member Jackson 属性成员
+     */
     private record PropertyMetadata(String propertyName, AnnotatedMember member) {
 
+        /**
+         * 从源对象读取属性值。
+         *
+         * @param source 源对象
+         * @return 属性值
+         */
         Object getValue(Object source) {
             return member.getValue(source);
         }

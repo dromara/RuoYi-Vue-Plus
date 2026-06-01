@@ -51,18 +51,58 @@ import java.util.stream.Collectors;
  */
 public final class SubQuery<T> {
 
+    /**
+     * 子查询实体类型。
+     */
     private final Class<T> entityClass;
+
+    /**
+     * 外层查询传入的 SQL 参数格式化器。
+     */
     private final SqlParamFormatter paramFormatter;
+
+    /**
+     * 是否使用 {@code {0}} 形式的占位参数模式。
+     */
     private final boolean placeholderParamMode;
+
+    /**
+     * 子查询 SELECT 字段集合。
+     */
     private final List<String> selects = new ArrayList<>();
+
+    /**
+     * 子查询 WHERE 条件集合。
+     */
     private final List<String> conditions = new ArrayList<>();
+
+    /**
+     * 占位参数模式下收集的参数值集合。
+     */
     private final List<Object> params = new ArrayList<>();
+
+    /**
+     * 是否追加逻辑删除条件。
+     */
     private boolean withLogicDelete = true;
 
+    /**
+     * 构造子查询。
+     *
+     * @param entityClass    子查询实体类型
+     * @param paramFormatter SQL 参数格式化器
+     */
     private SubQuery(Class<T> entityClass, SqlParamFormatter paramFormatter) {
         this(entityClass, paramFormatter, false);
     }
 
+    /**
+     * 构造子查询。
+     *
+     * @param entityClass          子查询实体类型
+     * @param paramFormatter       SQL 参数格式化器
+     * @param placeholderParamMode 是否使用占位参数模式
+     */
     private SubQuery(Class<T> entityClass, SqlParamFormatter paramFormatter, boolean placeholderParamMode) {
         this.entityClass = entityClass;
         this.paramFormatter = paramFormatter;
@@ -381,16 +421,37 @@ public final class SubQuery<T> {
         return params.toArray();
     }
 
+    /**
+     * 追加聚合查询字段。
+     *
+     * @param function 聚合函数
+     * @param column   聚合字段
+     * @return 当前子查询构造器
+     */
     private SubQuery<T> selectAggregate(SqlAggregateFunction function, SFunction<T, ?> column) {
         selects.add(function.format(columnName(column)));
         return this;
     }
 
+    /**
+     * 追加普通比较条件。
+     *
+     * @param column   条件字段
+     * @param operator 比较操作符
+     * @param value    条件值
+     * @return 当前子查询构造器
+     */
     private SubQuery<T> condition(SFunction<T, ?> column, String operator, Object value) {
         conditions.add(columnName(column) + StringPool.SPACE + operator + StringPool.SPACE + formatParam(value));
         return this;
     }
 
+    /**
+     * 格式化 SQL 参数。
+     *
+     * @param value 参数值
+     * @return SQL 参数占位符
+     */
     private String formatParam(Object value) {
         if (placeholderParamMode) {
             params.add(value);
@@ -400,10 +461,20 @@ public final class SubQuery<T> {
         return paramFormatter.format(value);
     }
 
+    /**
+     * 获取子查询实体表名。
+     *
+     * @return 表名
+     */
     private String tableName() {
         return tableInfo().getTableName();
     }
 
+    /**
+     * 构建最终 WHERE 条件集合。
+     *
+     * @return WHERE 条件集合
+     */
     private List<String> buildWhereConditions() {
         List<String> whereConditions = new ArrayList<>();
         String logicDeleteSql = logicDeleteSql();
@@ -414,6 +485,11 @@ public final class SubQuery<T> {
         return whereConditions;
     }
 
+    /**
+     * 获取逻辑删除 SQL 条件。
+     *
+     * @return 逻辑删除 SQL 条件，禁用时返回空字符串
+     */
     private String logicDeleteSql() {
         if (!withLogicDelete) {
             return StringPool.EMPTY;
@@ -421,12 +497,23 @@ public final class SubQuery<T> {
         return tableInfo().getLogicDeleteSql(false, true);
     }
 
+    /**
+     * 获取子查询实体对应的 MyBatis-Plus 表信息。
+     *
+     * @return 表信息
+     */
     private TableInfo tableInfo() {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(tableInfo, "无法获取实体表信息: %s", entityClass.getName());
         return tableInfo;
     }
 
+    /**
+     * 获取外层查询字段的表名限定列名。
+     *
+     * @param column 外层查询字段
+     * @return 表名限定列名
+     */
     private String qualifiedColumnName(SFunction<?, ?> column) {
         Class<?> columnEntityClass = LambdaUtils.extract(column).getInstantiatedClass();
         TableInfo tableInfo = TableInfoHelper.getTableInfo(columnEntityClass);
@@ -434,6 +521,12 @@ public final class SubQuery<T> {
         return tableInfo.getTableName() + StringPool.DOT + columnName(column);
     }
 
+    /**
+     * 从 Lambda 字段引用解析数据库列名。
+     *
+     * @param column 字段引用
+     * @return 数据库列名
+     */
     private static String columnName(SFunction<?, ?> column) {
         LambdaMeta meta = LambdaUtils.extract(column);
         String fieldName = PropertyNamer.methodToProperty(meta.getImplMethodName());

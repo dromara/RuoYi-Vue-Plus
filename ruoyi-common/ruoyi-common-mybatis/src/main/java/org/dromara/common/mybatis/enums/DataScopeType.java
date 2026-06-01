@@ -55,6 +55,9 @@ public enum DataScopeType {
      */
     DEPT_AND_CHILD_OR_SELF("6", " #{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )} ) OR #{#userName} = #{#user.userId} ", " 1 = 0 ");
 
+    /**
+     * 数据权限类型编码。
+     */
     private final String code;
 
     /**

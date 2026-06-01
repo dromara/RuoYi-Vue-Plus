@@ -83,6 +83,11 @@ public class BaseException extends RuntimeException {
         this(null, null, null, defaultMessage);
     }
 
+    /**
+     * 获取国际化后的错误消息。
+     *
+     * @return 错误消息
+     */
     @Override
     public String getMessage() {
         String message = null;

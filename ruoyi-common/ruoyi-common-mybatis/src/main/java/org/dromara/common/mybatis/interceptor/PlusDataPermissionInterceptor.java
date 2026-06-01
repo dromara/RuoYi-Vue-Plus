@@ -35,6 +35,9 @@ import java.util.List;
 @Slf4j
 public class PlusDataPermissionInterceptor extends BaseMultiTableInnerInterceptor implements InnerInterceptor {
 
+    /**
+     * 数据权限 SQL 处理器。
+     */
     private final PlusDataPermissionHandler dataPermissionHandler = new PlusDataPermissionHandler();
 
     /**
@@ -169,4 +172,3 @@ public class PlusDataPermissionInterceptor extends BaseMultiTableInnerIntercepto
         return handler.getSqlSegment(table, where, whereSegment);
     }
 }
-

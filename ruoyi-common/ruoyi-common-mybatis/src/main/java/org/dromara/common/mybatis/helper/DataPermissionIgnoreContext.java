@@ -17,6 +17,9 @@ import java.util.Deque;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class DataPermissionIgnoreContext {
 
+    /**
+     * 数据权限忽略状态栈，用于支持嵌套忽略并恢复进入前状态。
+     */
     private static final ThreadLocal<Deque<Boolean>> DATA_PERMISSION_STACK = ThreadLocal.withInitial(ArrayDeque::new);
 
     /**
@@ -53,6 +56,11 @@ final class DataPermissionIgnoreContext {
         }
     }
 
+    /**
+     * 获取 MyBatis-Plus 当前线程中的拦截器忽略策略。
+     *
+     * @return 当前忽略策略，未设置时返回 null
+     */
     private static IgnoreStrategy getIgnoreStrategy() {
         Object ignoreStrategyLocal = ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
         if (ignoreStrategyLocal instanceof ThreadLocal<?> ignoreStrategyThreadLocal
@@ -62,6 +70,12 @@ final class DataPermissionIgnoreContext {
         return null;
     }
 
+    /**
+     * 判断当前忽略策略是否只忽略了数据权限插件。
+     *
+     * @param ignoreStrategy 忽略策略
+     * @return true 仅忽略数据权限 false 还忽略了其他插件能力
+     */
     private static boolean isOnlyDataPermissionIgnored(IgnoreStrategy ignoreStrategy) {
         return !Boolean.TRUE.equals(ignoreStrategy.getDynamicTableName())
             && !Boolean.TRUE.equals(ignoreStrategy.getBlockAttack())

@@ -66,6 +66,9 @@ public enum BusinessStatusEnum {
      */
     private final String desc;
 
+    /**
+     * 业务状态枚举缓存。
+     */
     private static final Map<String, BusinessStatusEnum> STATUS_MAP = Arrays.stream(BusinessStatusEnum.values())
         .collect(Collectors.toConcurrentMap(BusinessStatusEnum::getStatus, Function.identity()));
 

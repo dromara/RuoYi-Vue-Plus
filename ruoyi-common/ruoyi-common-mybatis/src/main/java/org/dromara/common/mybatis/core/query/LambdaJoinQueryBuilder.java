@@ -916,12 +916,28 @@ public final class LambdaJoinQueryBuilder<T> {
         return wrapper;
     }
 
+    /**
+     * 构建使用占位参数模式的子查询。
+     *
+     * @param entityClass 子查询实体类型
+     * @param consumer    子查询构造逻辑
+     * @param <Q>         子查询实体类型
+     * @return 子查询构造器
+     */
     private <Q> SubQuery<Q> buildPlaceholderSubQuery(Class<Q> entityClass, Consumer<SubQuery<Q>> consumer) {
         SubQuery<Q> subQuery = SubQuery.ofPlaceholders(entityClass);
         consumer.accept(subQuery);
         return subQuery;
     }
 
+    /**
+     * 解析带表别名的数据库列名。
+     *
+     * @param alias  表别名
+     * @param column 字段引用
+     * @param <S>    字段所属实体类型
+     * @return 表别名限定列名
+     */
     private <S> String qualifiedColumn(String alias, SFunction<S, ?> column) {
         return AggregateSelectUtils.checkAlias(alias) + StringPool.DOT + ColumnCache.getMapField(LambdaUtils.getEntityClass(column))
             .get(LambdaUtils.getName(column)).getColumn();

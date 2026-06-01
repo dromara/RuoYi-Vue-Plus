@@ -38,6 +38,9 @@ public class TestSensitiveController extends BaseController {
         return R.ok(testSensitive);
     }
 
+    /**
+     * 脱敏测试对象。
+     */
     @Data
     static class TestSensitive {
 

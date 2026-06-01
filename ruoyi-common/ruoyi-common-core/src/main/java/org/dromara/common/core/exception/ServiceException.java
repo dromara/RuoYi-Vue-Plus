@@ -78,6 +78,11 @@ public final class ServiceException extends RuntimeException {
         this.message = StrFormatter.format(message, args);
     }
 
+    /**
+     * 获取错误提示。
+     *
+     * @return 错误提示
+     */
     @Override
     public String getMessage() {
         return message;

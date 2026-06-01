@@ -886,9 +886,23 @@ public final class ExcelBuilder<T> {
             }
         }
 
+        /**
+         * 模板写入模式。
+         */
         private enum TemplateMode {
+            /**
+             * 单列表模板。
+             */
             LIST,
+
+            /**
+             * 多列表模板。
+             */
             MULTI_LIST,
+
+            /**
+             * 多 sheet 模板。
+             */
             MULTI_SHEET
         }
     }

@@ -168,6 +168,15 @@ public class EncryptorManager {
         return fieldSet;
     }
 
+    /**
+     * 加密器缓存键。
+     *
+     * @param algorithm 加密算法
+     * @param encode 编码方式
+     * @param password 密码
+     * @param publicKey 公钥
+     * @param privateKey 私钥
+     */
     private record EncryptorCacheKey(
         AlgorithmType algorithm,
         EncodeType encode,
@@ -176,6 +185,12 @@ public class EncryptorManager {
         String privateKey
     ) {
 
+        /**
+         * 从加密上下文构建缓存键。
+         *
+         * @param encryptContext 加密上下文
+         * @return 加密器缓存键
+         */
         private static EncryptorCacheKey of(EncryptContext encryptContext) {
             return new EncryptorCacheKey(
                 encryptContext.getAlgorithm(),

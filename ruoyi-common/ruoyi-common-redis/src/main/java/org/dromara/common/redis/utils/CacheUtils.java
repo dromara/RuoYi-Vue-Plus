@@ -65,7 +65,13 @@ public class CacheUtils {
         return cache;
     }
 
+    /**
+     * 延迟持有 Spring Cache 管理器。
+     */
     private static class CacheManagerHolder {
+        /**
+         * Spring Cache 管理器。
+         */
         private static final CacheManager CACHE_MANAGER = SpringUtils.getBean(CacheManager.class);
     }
 

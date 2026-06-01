@@ -32,5 +32,8 @@ public enum PushTypeEnum {
      */
     CUSTOM("custom");
 
+    /**
+     * 消息类型标识。
+     */
     private final String type;
 }

@@ -32,8 +32,16 @@ public enum SqlAggregateFunction {
      */
     COUNT("COUNT");
 
+    /**
+     * 聚合函数名称。
+     */
     private final String name;
 
+    /**
+     * 构造 SQL 聚合函数。
+     *
+     * @param name 聚合函数名称
+     */
     SqlAggregateFunction(String name) {
         this.name = name;
     }

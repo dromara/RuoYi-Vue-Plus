@@ -51,7 +51,12 @@ public class PlusDataPermissionHandler {
      * spel 解析器
      */
     private final ExpressionParser parser = new SpelExpressionParser();
+
+    /**
+     * SpEL 模板解析上下文。
+     */
     private final ParserContext parserContext = new TemplateParserContext();
+
     /**
      * bean解析器 用于处理 spel 表达式中对 bean 的调用
      */
@@ -189,6 +194,11 @@ public class PlusDataPermissionHandler {
         return currentUser;
     }
 
+    /**
+     * 获取当前请求已解析的数据权限访问控制对象。
+     *
+     * @return 数据权限访问控制对象
+     */
     private DataPermissionAccess currentAccess() {
         DataPermissionAccess access = DataPermissionHelper.getAccess();
         if (access != null) {
@@ -199,6 +209,13 @@ public class PlusDataPermissionHandler {
         return resolvedAccess;
     }
 
+    /**
+     * 根据当前接口权限约束筛选参与数据权限计算的角色。
+     *
+     * @param user   当前登录用户
+     * @param access 当前接口访问约束
+     * @return 参与数据权限计算的角色集合
+     */
     private List<RoleDTO> scopeRoles(LoginUser user, DataPermissionAccess access) {
         List<RoleDTO> roles = user.getRoles();
         if (!access.constrained()) {
@@ -232,6 +249,11 @@ public class PlusDataPermissionHandler {
         return new ArrayList<>(roleMap.values());
     }
 
+    /**
+     * 从当前请求处理器上解析接口权限和角色约束。
+     *
+     * @return 数据权限访问控制对象
+     */
     private DataPermissionAccess resolveAccess() {
         HttpServletRequest request = ServletUtils.getRequest();
         if (request == null) {
@@ -258,6 +280,14 @@ public class PlusDataPermissionHandler {
         return new DataPermissionAccess(Set.copyOf(perms), Set.copyOf(roleKeys));
     }
 
+    /**
+     * 优先从方法、再从类上查找指定注解。
+     *
+     * @param handlerMethod 当前请求处理方法
+     * @param annotationType 注解类型
+     * @param <A>            注解类型
+     * @return 注解对象，未配置时返回 null
+     */
     private <A extends Annotation> A findAnnotation(HandlerMethod handlerMethod, Class<A> annotationType) {
         A annotation = AnnotationUtil.getAnnotation(handlerMethod.getMethod(), annotationType);
         if (annotation != null) {
@@ -266,6 +296,12 @@ public class PlusDataPermissionHandler {
         return AnnotationUtil.getAnnotation(handlerMethod.getBeanType(), annotationType);
     }
 
+    /**
+     * 将注解中的字符串数组转换为去空后的集合。
+     *
+     * @param values 注解值数组
+     * @return 字符串集合
+     */
     private Set<String> toSet(String[] values) {
         if (values == null || values.length == 0) {
             return Set.of();
@@ -299,8 +335,17 @@ public class PlusDataPermissionHandler {
     @AllArgsConstructor
     private static class NullSafeStandardEvaluationContext extends StandardEvaluationContext {
 
+        /**
+         * 变量值为空时返回的默认值。
+         */
         private final Object defaultValue;
 
+        /**
+         * 查找 SpEL 变量，变量为空时返回默认值。
+         *
+         * @param name 变量名
+         * @return 变量值或默认值
+         */
         @Override
         public Object lookupVariable(String name) {
             Object obj = super.lookupVariable(name);
@@ -319,19 +364,49 @@ public class PlusDataPermissionHandler {
     @AllArgsConstructor
     private static class NullSafePropertyAccessor implements PropertyAccessor {
 
+        /**
+         * 原始属性访问器。
+         */
         private final PropertyAccessor delegate;
+
+        /**
+         * 属性值为空时返回的默认值。
+         */
         private final Object defaultValue;
 
+        /**
+         * 获取当前访问器支持的目标类型。
+         *
+         * @return 目标类型数组
+         */
         @Override
         public Class<?>[] getSpecificTargetClasses() {
             return delegate.getSpecificTargetClasses();
         }
 
+        /**
+         * 判断指定属性是否可读。
+         *
+         * @param context 表达式上下文
+         * @param target  目标对象
+         * @param name    属性名
+         * @return true 可读 false 不可读
+         * @throws AccessException 属性访问异常
+         */
         @Override
         public boolean canRead(EvaluationContext context, Object target, String name) throws AccessException {
             return delegate.canRead(context, target, name);
         }
 
+        /**
+         * 读取属性值，属性值为空时返回默认值。
+         *
+         * @param context 表达式上下文
+         * @param target  目标对象
+         * @param name    属性名
+         * @return 属性值
+         * @throws AccessException 属性访问异常
+         */
         @Override
         public TypedValue read(EvaluationContext context, Object target, String name) throws AccessException {
             TypedValue value = delegate.read(context, target, name);
@@ -342,11 +417,29 @@ public class PlusDataPermissionHandler {
             return value;
         }
 
+        /**
+         * 判断指定属性是否可写。
+         *
+         * @param context 表达式上下文
+         * @param target  目标对象
+         * @param name    属性名
+         * @return true 可写 false 不可写
+         * @throws AccessException 属性访问异常
+         */
         @Override
         public boolean canWrite(EvaluationContext context, Object target, String name) throws AccessException {
             return delegate.canWrite(context, target, name);
         }
 
+        /**
+         * 写入属性值。
+         *
+         * @param context  表达式上下文
+         * @param target   目标对象
+         * @param name     属性名
+         * @param newValue 新属性值
+         * @throws AccessException 属性访问异常
+         */
         @Override
         public void write(EvaluationContext context, Object target, String name, Object newValue) throws AccessException {
             delegate.write(context, target, name, newValue);

@@ -33,9 +33,21 @@ import java.util.function.Function;
 @SuppressWarnings("unchecked")
 public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
 
+    /**
+     * Mapper 日志对象。
+     */
     Log log = LogFactory.getLog(BaseMapperPlus.class);
 
+    /**
+     * Mapper 泛型类型缓存，避免重复解析实体与 VO 类型。
+     */
     ClassValue<Class<?>[]> TYPE_ARGUMENT_CACHE = new ClassValue<>() {
+        /**
+         * 解析指定 Mapper 类型的实体与 VO 泛型。
+         *
+         * @param type Mapper 类型
+         * @return 泛型类型数组
+         */
         @Override
         protected Class<?>[] computeValue(Class<?> type) {
             return GenericTypeUtils.resolveTypeArguments(type, BaseMapperPlus.class);

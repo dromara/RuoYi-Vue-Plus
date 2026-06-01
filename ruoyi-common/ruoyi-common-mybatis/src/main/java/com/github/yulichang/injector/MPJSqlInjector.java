@@ -37,17 +37,36 @@ import java.util.function.Supplier;
 @Getter
 public class MPJSqlInjector extends DefaultSqlInjector {
 
+    /**
+     * 原始 SQL 注入器，用于兼容项目自定义注入逻辑。
+     */
     private AbstractSqlInjector sqlInjector;
 
+    /**
+     * 构造 MPJ SQL 注入器。
+     */
     public MPJSqlInjector() {
     }
 
+    /**
+     * 构造带原始注入器的 MPJ SQL 注入器。
+     *
+     * @param sqlInjector 原始 SQL 注入器
+     */
     public MPJSqlInjector(ISqlInjector sqlInjector) {
         if (Objects.nonNull(sqlInjector) && sqlInjector instanceof AbstractSqlInjector) {
             this.sqlInjector = (AbstractSqlInjector) sqlInjector;
         }
     }
 
+    /**
+     * 获取 Mapper 可用的注入方法列表。
+     *
+     * @param configuration MyBatis 配置
+     * @param mapperClass   Mapper 类型
+     * @param tableInfo     表信息
+     * @return 注入方法列表
+     */
     @Override
     public List<AbstractMethod> getMethodList(Configuration configuration, Class<?> mapperClass, TableInfo tableInfo) {
         if (!isJoinMapper(mapperClass)) {
@@ -62,6 +81,12 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         return methodFilter(super.getMethodList(configuration, mapperClass, tableInfo));
     }
 
+    /**
+     * 过滤并追加 MPJ 需要的 SQL 注入方法。
+     *
+     * @param list 原始注入方法列表
+     * @return 过滤后的注入方法列表
+     */
     private List<AbstractMethod> methodFilter(List<AbstractMethod> list) {
         String packageStr = SelectList.class.getPackage().getName();
         List<String> methodList = Arrays.asList(
@@ -81,6 +106,11 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         return list;
     }
 
+    /**
+     * 获取 MPJ 联表操作注入方法。
+     *
+     * @return 联表操作注入方法列表
+     */
     private List<AbstractMethod> getJoinMethod() {
         List<AbstractMethod> list = new ArrayList<>();
         if (VersionUtils.compare(VersionUtils.getVersion(), "3.5.0") >= 0) {
@@ -103,6 +133,11 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         return list;
     }
 
+    /**
+     * 获取 MPJ 覆盖 MyBatis-Plus 默认 Wrapper 的注入方法。
+     *
+     * @return Wrapper 注入方法列表
+     */
     private List<AbstractMethod> getWrapperMethod() {
         List<AbstractMethod> list = new ArrayList<>();
         list.add(new com.github.yulichang.method.mp.Delete());
@@ -117,6 +152,12 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         return list;
     }
 
+    /**
+     * 将新增注入方法追加到原始列表中，已存在同名方法时不重复追加。
+     *
+     * @param source  原始方法列表
+     * @param addList 待追加方法列表
+     */
     private void addAll(List<AbstractMethod> source, List<AbstractMethod> addList) {
         for (AbstractMethod method : addList) {
             if (source.stream().noneMatch(m -> m.getClass().getSimpleName().equals(method.getClass().getSimpleName()))) {
@@ -125,6 +166,12 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         }
     }
 
+    /**
+     * 初始化 Mapper 注入信息，并为 JoinMapper 注册 MPJ 表映射缓存。
+     *
+     * @param builderAssistant Mapper 构建助手
+     * @param mapperClass      Mapper 类型
+     */
     @Override
     public void inspectInject(MapperBuilderAssistant builderAssistant, Class<?> mapperClass) {
         super.inspectInject(builderAssistant, mapperClass);
@@ -172,6 +219,12 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         return target == null ? null : (Class<?>) target.getActualTypeArguments()[0];
     }
 
+    /**
+     * 判断 Mapper 是否继承 MPJ JoinMapper。
+     *
+     * @param mapperClass Mapper 类型
+     * @return true 是 JoinMapper false 不是 JoinMapper
+     */
     private boolean isJoinMapper(Class<?> mapperClass) {
         return JoinMapper.class.isAssignableFrom(mapperClass);
     }

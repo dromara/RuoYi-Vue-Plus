@@ -14,6 +14,9 @@ import org.dromara.common.core.utils.SpringUtils;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class IdGeneratorUtil {
 
+    /**
+     * MyBatis-Plus 主键生成器。
+     */
     private static final IdentifierGenerator GENERATOR = SpringUtils.getBean(IdentifierGenerator.class);
 
     /**

@@ -47,6 +47,9 @@ public enum TaskOperationEnum {
      */
     private final String desc;
 
+    /**
+     * 操作编码缓存。
+     */
     private static final Map<String, TaskOperationEnum> CODE_MAP = Arrays.stream(values())
         .collect(Collectors.toConcurrentMap(TaskOperationEnum::getCode, Function.identity()));
 

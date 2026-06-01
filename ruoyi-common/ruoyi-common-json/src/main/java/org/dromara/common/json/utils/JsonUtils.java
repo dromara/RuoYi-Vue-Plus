@@ -22,6 +22,9 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JsonUtils {
 
+    /**
+     * 全局 JSON 映射器。
+     */
     private static final JsonMapper JSON_MAPPER = SpringUtils.getBean(JsonMapper.class);
 
     /**
@@ -174,6 +177,12 @@ public class JsonUtils {
         return node != null && node.isArray();
     }
 
+    /**
+     * 安静读取 JSON 树，解析失败时返回 null。
+     *
+     * @param str JSON 字符串
+     * @return JSON 节点，解析失败或空字符串时返回 null
+     */
     private static JsonNode readTreeQuietly(String str) {
         if (StringUtils.isBlank(str)) {
             return null;

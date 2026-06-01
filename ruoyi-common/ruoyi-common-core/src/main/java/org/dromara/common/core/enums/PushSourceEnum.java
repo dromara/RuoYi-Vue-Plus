@@ -37,5 +37,8 @@ public enum PushSourceEnum {
      */
     CLIENT("client");
 
+    /**
+     * 消息来源标识。
+     */
     private final String source;
 }

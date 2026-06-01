@@ -27,7 +27,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DataBaseHelper {
 
+    /**
+     * 动态数据源路由对象。
+     */
     private static final DynamicRoutingDataSource DS = SpringUtils.getBean(DynamicRoutingDataSource.class);
+
+    /**
+     * 数据源对应数据库类型缓存。
+     */
     private static final Map<String, DataBaseType> DB_TYPE_CACHE = new ConcurrentHashMap<>();
 
     /**

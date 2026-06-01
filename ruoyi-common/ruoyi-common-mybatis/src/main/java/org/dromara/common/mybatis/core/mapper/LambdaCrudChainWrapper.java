@@ -40,8 +40,19 @@ public class LambdaCrudChainWrapper<T, V> extends AbstractLambdaWrapper<T, Lambd
     Update<LambdaCrudChainWrapper<T, V>, SFunction<T, ?>>,
     LambdaQueryCondition<T, LambdaCrudChainWrapper<T, V>> {
 
+    /**
+     * 当前链式操作绑定的 Mapper。
+     */
     private final BaseMapperPlus<T, V> crudMapper;
+
+    /**
+     * 更新 SET 片段集合。
+     */
     private final List<String> sqlSet;
+
+    /**
+     * 查询字段 SQL 片段。
+     */
     private SharedString sqlSelect = new SharedString();
 
     /**

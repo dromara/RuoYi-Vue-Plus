@@ -42,6 +42,9 @@ public enum MessageTypeEnum {
      */
     private final String desc;
 
+    /**
+     * 消息类型编码缓存。
+     */
     private static final Map<String, MessageTypeEnum> MESSAGE_TYPE_ENUM_MAP = Arrays.stream(values())
         .collect(Collectors.toConcurrentMap(MessageTypeEnum::getCode, Function.identity()));
 
@@ -56,4 +59,3 @@ public enum MessageTypeEnum {
     }
 
 }
-

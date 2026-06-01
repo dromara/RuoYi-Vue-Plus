@@ -58,12 +58,21 @@ public class TestI18nController {
         return R.ok(bo);
     }
 
+    /**
+     * 国际化 Bean 校验测试对象。
+     */
     @Data
     public static class TestI18nBo {
 
+        /**
+         * 名称。
+         */
         @NotBlank(message = "{not.null}")
         private String name;
 
+        /**
+         * 年龄。
+         */
         @NotNull(message = "{not.null}")
         @Range(min = 0, max = 100, message = "{length.not.valid}")
         private Integer age;
