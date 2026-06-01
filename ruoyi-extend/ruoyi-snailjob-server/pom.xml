@@ -12,6 +12,7 @@
     <artifactId>ruoyi-snailjob-server</artifactId>
 
     <dependencies>
+        <!-- SnailJob 服务端 -->
         <dependency>
             <groupId>com.aizuda</groupId>
             <artifactId>snail-job-server-starter</artifactId>
@@ -24,12 +25,14 @@
             </exclusions>
         </dependency>
 
+        <!-- Scala 运行库 -->
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>2.13.9</version>
         </dependency>
 
+        <!-- Spring Boot Admin 客户端 -->
         <dependency>
             <groupId>de.codecentric</groupId>
             <artifactId>spring-boot-admin-starter-client</artifactId>

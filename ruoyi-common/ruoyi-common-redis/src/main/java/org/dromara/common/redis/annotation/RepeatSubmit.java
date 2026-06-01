@@ -19,6 +19,9 @@ public @interface RepeatSubmit {
      */
     int interval() default 5000;
 
+    /**
+     * 重复提交间隔时间单位。
+     */
     TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
 
     /**

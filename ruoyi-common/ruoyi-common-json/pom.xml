@@ -16,11 +16,13 @@
     </description>
 
     <dependencies>
+        <!-- 核心模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
+        <!-- Jackson 序列化 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jackson</artifactId>

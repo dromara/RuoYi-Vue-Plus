@@ -34,6 +34,7 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- AOP 切面 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aspectj</artifactId>
@@ -51,21 +52,25 @@
             <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
 
+        <!-- Hutool 核心工具 -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-core</artifactId>
         </dependency>
 
+        <!-- Hutool HTTP 工具 -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-http</artifactId>
         </dependency>
 
+        <!-- Hutool 扩展工具 -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-extra</artifactId>
         </dependency>
 
+        <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -77,12 +82,14 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>
 
+        <!-- Spring Boot 配置迁移 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-properties-migrator</artifactId>
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Mapstruct Plus -->
         <dependency>
             <groupId>io.github.linpeilie</groupId>
             <artifactId>mapstruct-plus-spring-boot-starter</artifactId>

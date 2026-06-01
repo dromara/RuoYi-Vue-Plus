@@ -33,8 +33,14 @@ public @interface DictPattern {
      */
     String message() default "字典值无效";
 
+    /**
+     * Bean Validation 分组。
+     */
     Class<?>[] groups() default {};
 
+    /**
+     * Bean Validation 负载信息。
+     */
     Class<? extends Payload>[] payload() default {};
 
 }

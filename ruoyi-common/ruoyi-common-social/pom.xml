@@ -16,16 +16,19 @@
     </description>
 
     <dependencies>
+        <!-- 授权认证 -->
         <dependency>
             <groupId>me.zhyd.oauth</groupId>
             <artifactId>JustAuth</artifactId>
         </dependency>
 
+        <!-- 序列化模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-json</artifactId>
         </dependency>
 
+        <!-- 缓存服务 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-redis</artifactId>

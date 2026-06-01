@@ -17,16 +17,19 @@
 
     <dependencies>
 
+        <!-- satoken -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-satoken</artifactId>
         </dependency>
 
+        <!-- 序列化模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-json</artifactId>
         </dependency>
 
+        <!-- api模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-api</artifactId>

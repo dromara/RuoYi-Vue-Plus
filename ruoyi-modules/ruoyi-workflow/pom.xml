@@ -18,63 +18,84 @@
 
     <dependencies>
 
+        <!-- 消息推送模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-push</artifactId>
         </dependency>
 
+        <!-- 接口模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-doc</artifactId>
         </dependency>
 
+        <!-- 邮件服务 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-mail</artifactId>
         </dependency>
 
+        <!-- 短信模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-sms</artifactId>
         </dependency>
 
+        <!-- 数据库服务 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-mybatis</artifactId>
         </dependency>
+
+        <!-- web服务 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-web</artifactId>
         </dependency>
+
+        <!-- 日志记录 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-log</artifactId>
         </dependency>
+
+        <!-- excel -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-excel</artifactId>
         </dependency>
+
+        <!-- 翻译模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-translation</artifactId>
         </dependency>
+
+        <!-- 安全模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-security</artifactId>
         </dependency>
+
+        <!-- api模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-api</artifactId>
         </dependency>
+
+        <!-- Warm-Flow 工作流引擎 -->
         <dependency>
             <groupId>org.dromara.warm</groupId>
             <artifactId>warm-flow-mybatis-plus-sb3-starter</artifactId>
         </dependency>
+
+        <!-- Warm-Flow UI 插件 -->
         <dependency>
             <groupId>org.dromara.warm</groupId>
             <artifactId>warm-flow-plugin-ui-sb-web</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>
-

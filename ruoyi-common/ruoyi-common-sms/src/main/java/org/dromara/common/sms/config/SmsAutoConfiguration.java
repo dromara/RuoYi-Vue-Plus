@@ -16,6 +16,11 @@ import org.springframework.context.annotation.Primary;
 @AutoConfiguration(after = {DataRedisAutoConfiguration.class})
 public class SmsAutoConfiguration {
 
+    /**
+     * 创建 sms4j 使用的短信缓存访问对象。
+     *
+     * @return 短信缓存访问对象
+     */
     @Primary
     @Bean
     public SmsDao smsDao() {

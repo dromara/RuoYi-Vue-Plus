@@ -17,6 +17,7 @@
 
     <dependencies>
 
+        <!-- Spring Boot 自动配置 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
@@ -27,16 +28,19 @@
             <groupId>com.aizuda</groupId>
             <artifactId>snail-job-client-starter</artifactId>
         </dependency>
+        <!-- SnailJob 任务核心 -->
         <dependency>
             <groupId>com.aizuda</groupId>
             <artifactId>snail-job-client-job-core</artifactId>
         </dependency>
 
+        <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
 
+        <!-- 核心模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-core</artifactId>

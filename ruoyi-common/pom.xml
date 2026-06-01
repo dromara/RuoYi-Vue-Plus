@@ -16,29 +16,53 @@
     </description>
 
     <modules>
+        <!-- common依赖项 -->
         <module>ruoyi-common-bom</module>
+        <!-- 授权认证 -->
         <module>ruoyi-common-social</module>
+        <!-- 核心模块 -->
         <module>ruoyi-common-core</module>
+        <!-- 接口模块 -->
         <module>ruoyi-common-doc</module>
+        <!-- excel -->
         <module>ruoyi-common-excel</module>
+        <!-- 调度模块 -->
         <module>ruoyi-common-job</module>
+        <!-- 日志记录 -->
         <module>ruoyi-common-log</module>
+        <!-- 邮件服务 -->
         <module>ruoyi-common-mail</module>
+        <!-- 数据库服务 -->
         <module>ruoyi-common-mybatis</module>
+        <!-- OSS -->
         <module>ruoyi-common-oss</module>
+        <!-- 缓存服务 -->
         <module>ruoyi-common-redis</module>
+        <!-- satoken -->
         <module>ruoyi-common-satoken</module>
+        <!-- 安全模块 -->
         <module>ruoyi-common-security</module>
+        <!-- 短信模块 -->
         <module>ruoyi-common-sms</module>
+        <!-- ES搜索引擎服务 -->
         <module>ruoyi-common-elasticsearch</module>
+        <!-- web服务 -->
         <module>ruoyi-common-web</module>
+        <!-- 翻译模块 -->
         <module>ruoyi-common-translation</module>
+        <!-- 脱敏模块 -->
         <module>ruoyi-common-sensitive</module>
+        <!-- 序列化模块 -->
         <module>ruoyi-common-json</module>
+        <!-- 数据库加解密模块 -->
         <module>ruoyi-common-encrypt</module>
+        <!-- 消息推送模块 -->
         <module>ruoyi-common-push</module>
+        <!-- mqtt模块 -->
         <module>ruoyi-common-mqtt</module>
+        <!-- ai模块 -->
         <module>ruoyi-common-ai</module>
+        <!-- mcp模块 -->
         <module>ruoyi-common-mcp</module>
     </modules>
 

@@ -16,11 +16,17 @@
     </description>
 
     <modules>
+        <!-- demo模块 -->
         <module>ruoyi-demo</module>
+        <!-- 代码生成模块 -->
         <module>ruoyi-gen</module>
+        <!-- 调度任务模块 -->
         <module>ruoyi-job</module>
+        <!-- 系统模块 -->
         <module>ruoyi-system</module>
+        <!-- 工作流模块 -->
         <module>ruoyi-workflow</module>
+        <!-- AI业务模块 -->
         <module>ruoyi-ai</module>
     </modules>
 

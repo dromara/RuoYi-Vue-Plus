@@ -23,6 +23,12 @@ public class TestBroadcastJob {
     @Value("${snail-job.port}")
     private int clientPort;
 
+    /**
+     * 执行广播任务示例，随机模拟成功或失败。
+     *
+     * @param jobArgs 任务执行参数
+     * @return 执行结果
+     */
     public ExecuteResult jobExecute(JobArgs jobArgs) {
         int randomInt = RandomUtil.randomInt(100);
         log.info("随机数: {}", randomInt);

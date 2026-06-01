@@ -36,22 +36,45 @@ public class MqttController {
     @Autowired
     private MqttClientTemplate client;
 
+    /**
+     * 发布一条 MQTT 测试消息。
+     *
+     * @return 是否发送成功
+     */
     @GetMapping("/send")
     public boolean send() {
         client.publish("/test/client", "测试测试".getBytes(StandardCharsets.UTF_8));
         return true;
     }
 
+    /**
+     * 订阅 QoS0 测试主题并打印原始消息。
+     *
+     * @param topic 消息主题
+     * @param payload 消息内容
+     */
     @MqttClientSubscribe("/test/#")
     public void subQos0(String topic, byte[] payload) {
         log.info("topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
     }
 
+    /**
+     * 订阅 QoS1 测试主题并打印原始消息。
+     *
+     * @param topic 消息主题
+     * @param payload 消息内容
+     */
     @MqttClientSubscribe(value = "/qos1/#", qos = MqttQoS.QOS1)
     public void subQos1(String topic, byte[] payload) {
         log.info("topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
     }
 
+    /**
+     * 订阅带产品和设备占位符的注册主题。
+     *
+     * @param topic 消息主题
+     * @param payload 消息内容
+     */
     @MqttClientSubscribe("/sys/${productKey}/${deviceName}/thing/sub/register")
     public void thingSubRegister(String topic, byte[] payload) {
         // 1.3.8 开始支持，@MqttClientSubscribe 注解支持 ${} 变量替换，会默认替换成 +
@@ -59,6 +82,13 @@ public class MqttController {
         log.info("topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
     }
 
+    /**
+     * 订阅 JSON 测试主题并演示自定义反序列化。
+     *
+     * @param topic 消息主题
+     * @param message MQTT 原始消息
+     * @param data 反序列化后的演示数据
+     */
     @MqttClientSubscribe(
         value = "/test/json",
         deserialize = MqttJsonDeserializer.class // 2.4.5 开始支持 自定义序列化，默认 json 序列化

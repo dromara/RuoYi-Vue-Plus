@@ -14,6 +14,13 @@ import java.util.List;
 @AutoConfiguration
 public class JsonEnhancementConfig {
 
+    /**
+     * 创建 JSON 字段增强处理器入口。
+     *
+     * @param jsonMapper JSON 映射器
+     * @param processors 字段处理器集合
+     * @return JSON 值增强器
+     */
     @Bean
     public JsonValueEnhancer jsonValueEnhancer(JsonMapper jsonMapper, List<JsonFieldProcessor> processors) {
         return new JsonValueEnhancer(jsonMapper, processors);

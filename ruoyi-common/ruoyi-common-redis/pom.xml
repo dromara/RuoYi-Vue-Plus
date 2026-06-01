@@ -22,6 +22,7 @@
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
+        <!-- 序列化模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-json</artifactId>
@@ -33,32 +34,38 @@
             <artifactId>redisson-spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- Redisson 缓存 -->
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-cache</artifactId>
             <version>${redisson.version}</version>
         </dependency>
 
+        <!-- 分布式锁 -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- 本地缓存 -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
         </dependency>
 
+        <!-- Jackson Databind -->
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
+        <!-- Hutool 加密工具 -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-crypto</artifactId>
         </dependency>
 
+        <!-- Sa-Token 核心 -->
         <dependency>
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-core</artifactId>

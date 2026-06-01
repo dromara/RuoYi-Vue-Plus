@@ -12,12 +12,14 @@
     <artifactId>ruoyi-snailai-server</artifactId>
 
     <dependencies>
+        <!-- Snail AI 服务端 -->
         <dependency>
             <groupId>com.aizuda</groupId>
             <artifactId>snail-ai-starter</artifactId>
             <version>${snailai.version}</version>
         </dependency>
 
+        <!-- Spring Boot Admin 客户端 -->
         <dependency>
             <groupId>de.codecentric</groupId>
             <artifactId>spring-boot-admin-starter-client</artifactId>

@@ -17,16 +17,19 @@
 
     <dependencies>
 
+        <!-- 核心模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
+        <!-- Snail AI Agent 启动器 -->
         <dependency>
             <groupId>com.aizuda</groupId>
             <artifactId>snail-ai-agent-starter</artifactId>
         </dependency>
 
+        <!-- Snail AI OpenAPI 启动器 -->
         <dependency>
             <groupId>com.aizuda</groupId>
             <artifactId>snail-ai-openapi-starter</artifactId>

@@ -17,6 +17,12 @@ import org.springframework.stereotype.Component;
 @JobExecutor(name = "testStaticShardingJob")
 public class TestStaticShardingJob {
 
+    /**
+     * 执行静态分片任务示例。
+     *
+     * @param jobArgs 任务执行参数
+     * @return 执行结果
+     */
     public ExecuteResult jobExecute(JobArgs jobArgs) {
         String jobParams = Convert.toStr(jobArgs.getJobParams());
         SnailJobLog.LOCAL.info("开始执行分片任务,参数:{}", jobParams);

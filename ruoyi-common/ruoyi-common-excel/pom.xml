@@ -16,11 +16,13 @@
     </description>
 
     <dependencies>
+        <!-- 序列化模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-json</artifactId>
         </dependency>
 
+        <!-- excel -->
         <dependency>
             <groupId>org.apache.fesod</groupId>
             <artifactId>fesod-sheet</artifactId>

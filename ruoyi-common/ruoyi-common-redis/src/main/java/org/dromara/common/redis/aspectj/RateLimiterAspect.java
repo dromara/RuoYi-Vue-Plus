@@ -50,6 +50,12 @@ public class RateLimiterAspect {
     private final ParameterNameDiscoverer pnd = new DefaultParameterNameDiscoverer();
 
 
+    /**
+     * 在限流注解方法执行前扣减令牌，令牌不足时阻断请求。
+     *
+     * @param point 切点信息
+     * @param rateLimiter 限流注解配置
+     */
     @Before("@annotation(rateLimiter)")
     public void doBefore(JoinPoint point, RateLimiter rateLimiter) {
         int time = rateLimiter.time();

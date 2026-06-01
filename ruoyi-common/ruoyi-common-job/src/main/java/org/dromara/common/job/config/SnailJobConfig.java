@@ -24,6 +24,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableSnailJob
 public class SnailJobConfig {
 
+    /**
+     * Snail Job 客户端启动时挂载远程日志 appender。
+     *
+     * @param event 客户端启动事件
+     */
     @EventListener(SnailClientStartingEvent.class)
     public void onStarting(SnailClientStartingEvent event) {
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();

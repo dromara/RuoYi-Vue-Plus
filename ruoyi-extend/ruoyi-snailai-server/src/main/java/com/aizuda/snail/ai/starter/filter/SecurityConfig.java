@@ -18,6 +18,11 @@ public class SecurityConfig {
     @Value("${spring.boot.admin.client.password}")
     private String password;
 
+    /**
+     * 注册 Actuator Basic Auth 过滤器。
+     *
+     * @return Actuator 过滤器注册对象
+     */
     @Bean
     public FilterRegistrationBean<ActuatorAuthFilter> actuatorFilterRegistrationBean() {
         FilterRegistrationBean<ActuatorAuthFilter> registrationBean = new FilterRegistrationBean<>();

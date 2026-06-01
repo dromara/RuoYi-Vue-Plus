@@ -17,10 +17,19 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = {XssValidator.class})
 public @interface Xss {
 
+    /**
+     * 校验失败时返回的错误消息。
+     */
     String message() default "不允许任何脚本运行";
 
+    /**
+     * Bean Validation 分组。
+     */
     Class<?>[] groups() default {};
 
+    /**
+     * Bean Validation 负载信息。
+     */
     Class<? extends Payload>[] payload() default {};
 
 }

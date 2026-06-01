@@ -32,6 +32,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @PropertySource(value = "classpath:common-mybatis.yml", factory = YmlPropertySourceFactory.class)
 public class MybatisPlusConfig {
 
+    /**
+     * 组装 MyBatis-Plus 核心拦截器链。
+     *
+     * @return MyBatis-Plus 拦截器
+     */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();

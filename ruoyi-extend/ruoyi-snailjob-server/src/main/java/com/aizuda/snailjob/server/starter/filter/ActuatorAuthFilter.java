@@ -8,11 +8,22 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * Actuator Basic Auth 认证过滤器。
+ *
+ * @author Lion Li
+ */
 public class ActuatorAuthFilter implements Filter {
 
     private final String username;
     private final String password;
 
+    /**
+     * 创建 Actuator 认证过滤器。
+     *
+     * @param username 认证用户名
+     * @param password 认证密码
+     */
     public ActuatorAuthFilter(String username, String password) {
         this.username = username;
         this.password = password;

@@ -12,8 +12,11 @@
     <packaging>pom</packaging>
 
     <modules>
+        <!-- 监控服务 -->
         <module>ruoyi-monitor-admin</module>
+        <!-- Snail AI 服务端 -->
         <module>ruoyi-snailai-server</module>
+        <!-- SnailJob 服务端 -->
         <module>ruoyi-snailjob-server</module>
     </modules>
 

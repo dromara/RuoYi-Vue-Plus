@@ -16,6 +16,7 @@
     </description>
 
     <dependencies>
+        <!-- Easy-Es 搜索引擎 -->
         <dependency>
             <groupId>org.dromara.easy-es</groupId>
             <artifactId>easy-es-boot-starter</artifactId>

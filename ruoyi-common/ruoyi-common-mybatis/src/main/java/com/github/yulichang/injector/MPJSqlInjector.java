@@ -143,6 +143,12 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         TableHelper.init(modelClass, supplier.get());
     }
 
+    /**
+     * 兼容旧版泛型解析逻辑，提取 Mapper 绑定的实体类型。
+     *
+     * @param mapperClass Mapper 类型
+     * @return Mapper 泛型中的实体类型，无法解析时返回 null
+     */
     @SuppressWarnings("IfStatementWithIdenticalBranches")
     protected Class<?> extractModelClassOld(Class<?> mapperClass) {
         Type[] types = mapperClass.getGenericInterfaces();

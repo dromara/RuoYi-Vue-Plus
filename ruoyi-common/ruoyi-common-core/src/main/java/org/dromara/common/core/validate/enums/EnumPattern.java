@@ -32,16 +32,32 @@ public @interface EnumPattern {
      */
     String fieldName();
 
+    /**
+     * 校验失败时返回的错误消息。
+     */
     String message() default "输入值不在枚举范围内";
 
+    /**
+     * Bean Validation 分组。
+     */
     Class<?>[] groups() default {};
 
+    /**
+     * Bean Validation 负载信息。
+     */
     Class<? extends Payload>[] payload() default {};
 
+    /**
+     * 支持在同一元素上重复声明多个枚举校验规则。
+     */
     @Documented
     @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
     @Retention(RUNTIME)
     @interface List {
+
+        /**
+         * 重复声明的枚举校验规则集合。
+         */
         EnumPattern[] value();
     }
 

@@ -26,8 +26,14 @@ public @interface JsonPattern {
      */
     String message() default "不是有效的 JSON 格式";
 
+    /**
+     * Bean Validation 分组。
+     */
     Class<?>[] groups() default {};
 
+    /**
+     * Bean Validation 负载信息。
+     */
     Class<? extends Payload>[] payload() default {};
 
 }

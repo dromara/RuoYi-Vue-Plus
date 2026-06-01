@@ -28,6 +28,13 @@ import java.util.stream.IntStream;
 @JobExecutor(name = "testMapReduceAnnotation1")
 public class TestMapReduceAnnotation1 {
 
+    /**
+     * 根 Map 任务，将示例数据拆分为多个分片任务。
+     *
+     * @param mapArgs Map 任务参数
+     * @param mapHandler 分片调度处理器
+     * @return 分片调度结果
+     */
     @MapExecutor
     public ExecuteResult rootMapExecute(MapArgs mapArgs, MapHandler mapHandler) {
         int partitionSize = 50;
@@ -40,6 +47,12 @@ public class TestMapReduceAnnotation1 {
         return mapHandler.doMap(partition, "doCalc");
     }
 
+    /**
+     * 执行单个分片的累加计算。
+     *
+     * @param mapArgs 分片任务参数
+     * @return 分片计算结果
+     */
     @MapExecutor(taskName = "doCalc")
     public ExecuteResult doCalc(MapArgs mapArgs) {
         List<Integer> sourceList = (List<Integer>) mapArgs.getMapResult();
@@ -51,6 +64,12 @@ public class TestMapReduceAnnotation1 {
         return ExecuteResult.success(partitionTotal);
     }
 
+    /**
+     * 汇总所有 Map 分片的计算结果。
+     *
+     * @param reduceArgs Reduce 任务参数
+     * @return 汇总结果
+     */
     @ReduceExecutor
     public ExecuteResult reduceExecute(ReduceArgs reduceArgs) {
         int reduceTotal = reduceArgs.getMapResult().stream().mapToInt(i -> Integer.parseInt((String) i)).sum();

@@ -22,6 +22,13 @@ import java.math.BigDecimal;
 @JobExecutor(name = "alipayBillTask")
 public class AlipayBillTask {
 
+    /**
+     * 执行支付宝账单模拟任务，并将结果写入工作流上下文。
+     *
+     * @param jobArgs 任务执行参数
+     * @return 执行结果
+     * @throws InterruptedException 任务被中断时抛出
+     */
     public ExecuteResult jobExecute(JobArgs jobArgs) throws InterruptedException {
         // 设置清算日期
         String settlementDate = (String) jobArgs.getWfContext().get("settlementDate");

@@ -6,6 +6,11 @@ import org.dromara.common.encrypt.enums.AlgorithmType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * 测试加密字段实体。
+ *
+ * @author Lion Li
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("test_demo")

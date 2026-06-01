@@ -22,6 +22,13 @@ import java.math.BigDecimal;
 @JobExecutor(name = "wechatBillTask")
 public class WechatBillTask {
 
+    /**
+     * 执行微信账单模拟任务，并将结果写入工作流上下文。
+     *
+     * @param jobArgs 任务执行参数
+     * @return 执行结果
+     * @throws InterruptedException 任务被中断时抛出
+     */
     public ExecuteResult jobExecute(JobArgs jobArgs) throws InterruptedException {
         // 从上下文中获得清算日期并设置，如果上下文中清算日期
         // 是sysdate设置为当前日期；否则取管理页面设置的值

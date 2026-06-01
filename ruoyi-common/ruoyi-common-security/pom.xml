@@ -16,6 +16,7 @@
     </description>
 
     <dependencies>
+        <!-- satoken -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-satoken</artifactId>

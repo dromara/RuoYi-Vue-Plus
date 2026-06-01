@@ -16,16 +16,19 @@
     </description>
 
     <dependencies>
+        <!-- 核心模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
+        <!-- 序列化模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-json</artifactId>
         </dependency>
 
+        <!-- mqtt客户端 -->
         <dependency>
             <groupId>org.dromara.mica-mqtt</groupId>
             <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>

@@ -50,36 +50,43 @@
             <artifactId>ruoyi-common-doc</artifactId>
         </dependency>
 
+        <!-- 授权认证 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-social</artifactId>
         </dependency>
 
+        <!-- 邮件服务 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-mail</artifactId>
         </dependency>
 
+        <!-- mcp模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-mcp</artifactId>
         </dependency>
 
+        <!-- api模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-api</artifactId>
         </dependency>
 
+        <!-- 系统模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-system</artifactId>
         </dependency>
 
+        <!-- 调度任务模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-job</artifactId>
         </dependency>
 
+        <!-- AI业务模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-ai</artifactId>
@@ -97,11 +104,13 @@
             <artifactId>ruoyi-workflow</artifactId>
         </dependency>
 
+        <!-- Spring Boot Admin 客户端 -->
         <dependency>
             <groupId>de.codecentric</groupId>
             <artifactId>spring-boot-admin-starter-client</artifactId>
         </dependency>
 
+        <!-- 单元测试 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

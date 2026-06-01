@@ -16,6 +16,7 @@
     </description>
 
     <dependencies>
+        <!-- 序列化模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-json</artifactId>

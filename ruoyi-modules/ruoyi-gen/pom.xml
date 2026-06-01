@@ -22,21 +22,25 @@
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
+        <!-- 接口模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-doc</artifactId>
         </dependency>
 
+        <!-- 数据库服务 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-mybatis</artifactId>
         </dependency>
 
+        <!-- web服务 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-web</artifactId>
         </dependency>
 
+        <!-- 日志记录 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-log</artifactId>
@@ -48,12 +52,14 @@
             <artifactId>velocity-engine-core</artifactId>
         </dependency>
 
+        <!-- AnyLine Spring JDBC 环境 -->
         <dependency>
             <groupId>org.anyline</groupId>
             <artifactId>anyline-environment-spring-data-jdbc</artifactId>
             <version>${anyline.version}</version>
         </dependency>
 
+        <!-- AnyLine MySQL 驱动 -->
         <dependency>
             <groupId>org.anyline</groupId>
             <artifactId>anyline-data-jdbc-mysql</artifactId>

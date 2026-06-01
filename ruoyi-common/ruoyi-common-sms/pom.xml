@@ -17,6 +17,7 @@
 
     <dependencies>
 
+        <!-- 短信模块 -->
         <dependency>
             <groupId>org.dromara.sms4j</groupId>
             <artifactId>sms4j-spring-boot-starter</artifactId>

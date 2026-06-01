@@ -17,22 +17,27 @@
 
     <dependencies>
 
+        <!-- 核心模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
+        <!-- api模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-api</artifactId>
         </dependency>
+        <!-- ai模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-ai</artifactId>
         </dependency>
+        <!-- satoken -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-satoken</artifactId>
         </dependency>
+        <!-- web服务 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-web</artifactId>

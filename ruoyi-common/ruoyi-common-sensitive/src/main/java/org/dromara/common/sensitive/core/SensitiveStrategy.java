@@ -105,8 +105,16 @@ public enum SensitiveStrategy {
 
     //可自行添加其他脱敏策略
 
+    /**
+     * 当前策略对应的脱敏函数。
+     */
     private final Function<String, String> desensitizer;
 
+    /**
+     * 获取当前策略对应的脱敏函数。
+     *
+     * @return 脱敏函数
+     */
     public Function<String, String> desensitizer() {
         return desensitizer;
     }

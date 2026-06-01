@@ -13,6 +13,11 @@ import org.springframework.data.redis.connection.RedisConfiguration;
 @AutoConfiguration(after = RedisConfiguration.class)
 public class IdempotentConfig {
 
+    /**
+     * 创建重复提交切面。
+     *
+     * @return 重复提交切面
+     */
     @Bean
     public RepeatSubmitAspect repeatSubmitAspect() {
         return new RepeatSubmitAspect();

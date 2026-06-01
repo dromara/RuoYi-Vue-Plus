@@ -155,18 +155,21 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- 接口文档 -->
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
 
+            <!-- JavaDoc 运行时读取 -->
             <dependency>
                 <groupId>com.github.therapi</groupId>
                 <artifactId>therapi-runtime-javadoc</artifactId>
                 <version>${therapi-javadoc.version}</version>
             </dependency>
 
+            <!-- lombok -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
@@ -194,30 +197,35 @@
                 <version>${dynamic-ds.version}</version>
             </dependency>
 
+            <!-- MyBatis 核心 -->
             <dependency>
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis</artifactId>
                 <version>${mybatis.version}</version>
             </dependency>
 
+            <!-- MyBatis Plus 启动器 -->
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
+            <!-- MyBatis Plus JSqlParser 支持 -->
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-jsqlparser</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
+            <!-- MyBatis Plus 注解 -->
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-annotation</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
+            <!-- MyBatis Plus Join -->
             <dependency>
                 <groupId>com.github.yulichang</groupId>
                 <artifactId>mybatis-plus-join-boot-starter</artifactId>
@@ -256,11 +264,13 @@
                 <version>${sms4j.version}</version>
             </dependency>
 
+            <!-- Spring Boot Admin 服务端 -->
             <dependency>
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-server</artifactId>
                 <version>${spring-boot-admin.version}</version>
             </dependency>
+            <!-- Spring Boot Admin 客户端 -->
             <dependency>
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-client</artifactId>
@@ -274,6 +284,7 @@
                 <version>${redisson.version}</version>
             </dependency>
 
+            <!-- 分布式锁 -->
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
@@ -286,23 +297,27 @@
                 <artifactId>snail-job-client-starter</artifactId>
                 <version>${snailjob.version}</version>
             </dependency>
+            <!-- SnailJob 重试核心 -->
             <dependency>
                 <groupId>com.aizuda</groupId>
                 <artifactId>snail-job-client-retry-core</artifactId>
                 <version>${snailjob.version}</version>
             </dependency>
+            <!-- SnailJob 任务核心 -->
             <dependency>
                 <groupId>com.aizuda</groupId>
                 <artifactId>snail-job-client-job-core</artifactId>
                 <version>${snailjob.version}</version>
             </dependency>
 
+            <!-- Snail AI Agent 启动器 -->
             <dependency>
                 <groupId>com.aizuda</groupId>
                 <artifactId>snail-ai-agent-starter</artifactId>
                 <version>${snailai.version}</version>
             </dependency>
 
+            <!-- Snail AI OpenAPI 启动器 -->
             <dependency>
                 <groupId>com.aizuda</groupId>
                 <artifactId>snail-ai-openapi-starter</artifactId>
@@ -316,6 +331,7 @@
                 <version>${bouncycastle.version}</version>
             </dependency>
 
+            <!-- Mapstruct Plus -->
             <dependency>
                 <groupId>io.github.linpeilie</groupId>
                 <artifactId>mapstruct-plus-spring-boot-starter</artifactId>
@@ -328,30 +344,35 @@
                 <artifactId>warm-flow-mybatis-plus-sb3-starter</artifactId>
                 <version>${warm-flow.version}</version>
             </dependency>
+            <!-- Warm-Flow UI 插件 -->
             <dependency>
                 <groupId>org.dromara.warm</groupId>
                 <artifactId>warm-flow-plugin-ui-sb-web</artifactId>
                 <version>${warm-flow.version}</version>
             </dependency>
 
+            <!-- mqtt客户端 -->
             <dependency>
                 <groupId>org.dromara.mica-mqtt</groupId>
                 <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
                 <version>${mica-mqtt.version}</version>
             </dependency>
 
+            <!-- Easy-Es 搜索引擎 -->
             <dependency>
                 <groupId>org.dromara.easy-es</groupId>
                 <artifactId>easy-es-boot-starter</artifactId>
                 <version>${easy-es.version}</version>
             </dependency>
 
+            <!-- Elasticsearch Java 客户端 -->
             <dependency>
                 <groupId>co.elastic.clients</groupId>
                 <artifactId>elasticsearch-java</artifactId>
                 <version>${elasticsearch-client.version}</version>
             </dependency>
 
+            <!-- Elasticsearch REST 客户端 -->
             <dependency>
                 <groupId>org.elasticsearch.client</groupId>
                 <artifactId>elasticsearch-rest-client</artifactId>
@@ -372,36 +393,42 @@
                 <version>${ip2region.version}</version>
             </dependency>
 
+            <!-- fastjson -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
             </dependency>
 
+            <!-- 系统模块 -->
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-system</artifactId>
                 <version>${revision}</version>
             </dependency>
 
+            <!-- 调度任务模块 -->
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-job</artifactId>
                 <version>${revision}</version>
             </dependency>
 
+            <!-- AI业务模块 -->
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-ai</artifactId>
                 <version>${revision}</version>
             </dependency>
 
+            <!-- 代码生成模块 -->
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-gen</artifactId>
                 <version>${revision}</version>
             </dependency>
 
+            <!-- demo模块 -->
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-demo</artifactId>
@@ -426,10 +453,15 @@
     </dependencyManagement>
 
     <modules>
+        <!-- web服务入口 -->
         <module>ruoyi-admin</module>
+        <!-- common 通用模块 -->
         <module>ruoyi-common</module>
+        <!-- 扩展模块 -->
         <module>ruoyi-extend</module>
+        <!-- 业务模块 -->
         <module>ruoyi-modules</module>
+        <!-- api模块 -->
         <module>ruoyi-api</module>
     </modules>
     <packaging>pom</packaging>

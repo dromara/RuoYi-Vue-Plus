@@ -16,6 +16,7 @@
     </description>
 
     <dependencies>
+        <!-- 序列化模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-json</artifactId>
@@ -38,16 +39,19 @@
             <artifactId>spring-boot-starter-jetty</artifactId>
         </dependency>
 
+        <!-- 监控端点 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- 图形验证码 -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-captcha</artifactId>
         </dependency>
 
+        <!-- Hutool 加密工具 -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-crypto</artifactId>

@@ -16,16 +16,19 @@
     </description>
 
     <dependencies>
+        <!-- 核心模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
+        <!-- satoken -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-satoken</artifactId>
         </dependency>
 
+        <!-- api模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-api</artifactId>
@@ -37,16 +40,19 @@
             <artifactId>dynamic-datasource-spring-boot4-starter</artifactId>
         </dependency>
 
+        <!-- MyBatis Plus 启动器 -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
         </dependency>
 
+        <!-- MyBatis Plus JSqlParser 支持 -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>
         </dependency>
 
+        <!-- MyBatis Plus Join -->
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-boot-starter</artifactId>

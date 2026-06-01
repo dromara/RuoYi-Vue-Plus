@@ -26,6 +26,13 @@ import java.util.stream.IntStream;
 @JobExecutor(name = "testMapJobAnnotation")
 public class TestMapJobAnnotation {
 
+    /**
+     * 根 Map 任务，将示例数据拆分为多个分片任务。
+     *
+     * @param mapArgs Map 任务参数
+     * @param mapHandler 分片调度处理器
+     * @return 分片调度结果
+     */
     @MapExecutor
     public ExecuteResult doJobMapExecute(MapArgs mapArgs, MapHandler mapHandler) {
         // 生成1~200数值并分片
@@ -39,6 +46,12 @@ public class TestMapJobAnnotation {
         return mapHandler.doMap(partition, "doCalc");
     }
 
+    /**
+     * 执行单个分片的累加计算。
+     *
+     * @param mapArgs 分片任务参数
+     * @return 分片计算结果
+     */
     @MapExecutor(taskName = "doCalc")
     public ExecuteResult doCalc(MapArgs mapArgs) {
         List<Integer> sourceList = (List<Integer>) mapArgs.getMapResult();

@@ -16,15 +16,18 @@
     </description>
 
     <dependencies>
+        <!-- 核心模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
+        <!-- 邮件接口 -->
         <dependency>
             <groupId>jakarta.mail</groupId>
             <artifactId>jakarta.mail-api</artifactId>
         </dependency>
+        <!-- 邮件实现 -->
         <dependency>
             <groupId>org.eclipse.angus</groupId>
             <artifactId>jakarta.mail</artifactId>

@@ -31,11 +31,22 @@ import java.util.concurrent.TimeUnit;
 @ConditionalOnProperty(value = "mqtt.client.enabled", havingValue = "true")
 public class MqttAutoConfiguration {
 
+    /**
+     * 创建 MQTT 客户端连接监听器。
+     *
+     * @param mqttClientCreator MQTT 客户端创建器
+     * @return MQTT 客户端连接监听器
+     */
     @Bean
     public MqttClientConnectListener mqttClientConnectListener(MqttClientCreator mqttClientCreator) {
         return new MqttClientConnectListener(mqttClientCreator);
     }
 
+    /**
+     * 创建 MQTT 全局消息监听器。
+     *
+     * @return MQTT 全局消息监听器
+     */
     @Bean
     public MqttClientGlobalMessageListener mqttClientGlobalMessageListener() {
         return new MqttClientGlobalMessageListener();

@@ -16,26 +16,31 @@
     </description>
 
     <dependencies>
+        <!-- 核心模块 -->
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
+        <!-- Web 服务器抽象 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-web-server</artifactId>
         </dependency>
 
+        <!-- 接口文档 -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
         </dependency>
 
+        <!-- JavaDoc 运行时读取 -->
         <dependency>
             <groupId>com.github.therapi</groupId>
             <artifactId>therapi-runtime-javadoc</artifactId>
         </dependency>
 
+        <!-- Jackson Kotlin 模块 -->
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
