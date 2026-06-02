@@ -11,7 +11,6 @@ import org.dromara.common.oss.model.GetObjectResult;
 import org.dromara.common.oss.model.HandleAsyncResult;
 import org.dromara.common.oss.model.Options;
 import org.dromara.common.oss.model.PutObjectResult;
-import org.jspecify.annotations.NullMarked;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
@@ -426,9 +425,25 @@ public abstract class AbstractOssClientImpl implements OssClient {
      */
     @Override
     public PutObjectResult bucketUpload(String bucket, String key, InputStream in, long contentLength, Options options) {
-        options.setLength(contentLength);
-        AsyncRequestBody body = AsyncRequestBody.fromInputStream(in, contentLength, asyncExecutor);
-        return bucketUpload(bucket, key, body, options);
+        Path tempFile = null;
+        try {
+            tempFile = Files.createTempFile("ruoyi-oss-upload-", ".tmp");
+            try (OutputStream out = Files.newOutputStream(tempFile)) {
+                in.transferTo(out);
+            }
+            options.setLength(Files.size(tempFile));
+            return bucketUpload(bucket, key, tempFile, options);
+        } catch (Exception e) {
+            throw toStorageException(e);
+        } finally {
+            if (tempFile != null) {
+                try {
+                    Files.deleteIfExists(tempFile);
+                } catch (IOException ignored) {
+                    // 临时文件清理失败不影响上传结果。
+                }
+            }
+        }
     }
 
     /**
@@ -456,11 +471,9 @@ public abstract class AbstractOssClientImpl implements OssClient {
      */
     @Override
     public PutObjectResult bucketUpload(String bucket, String key, byte[] data, Options options) {
-        try (ByteArrayInputStream in = new ByteArrayInputStream(data)) {
-            return bucketUpload(bucket, key, in, data.length, options);
-        } catch (Exception e) {
-            throw toStorageException(e);
-        }
+        options.setLength((long) data.length);
+        AsyncRequestBody body = AsyncRequestBody.fromBytes(data);
+        return bucketUpload(bucket, key, body, options);
     }
 
     /**
@@ -485,7 +498,6 @@ public abstract class AbstractOssClientImpl implements OssClient {
      * @param options 上传选项
      * @return 上传结果
      */
-    @NullMarked
     private PutObjectResult bucketUpload(String bucket, String key, AsyncRequestBody body, Options options) {
         // 优先使用body中的内容大小，如果不存在，再获取可选项中的
         Long contentLength = body.contentLength().orElse(options.getLength());
@@ -503,7 +515,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
                 .metadata(metadata);
         }, transferListeners);
         if (result.isFailure()) {
-            throw S3StorageException.form(result.error());
+            throw toStorageException(result.error());
         }
         Optional<PutObjectResponse> opt = result.getResult();
         if (opt.isEmpty()) {
