@@ -55,10 +55,6 @@ public class DefaultOssClientImpl extends AbstractOssClientImpl {
 
         // 创建 AWS 认证信息
         StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
-        S3Configuration s3Configuration = S3Configuration.builder()
-            .chunkedEncodingEnabled(false)
-            .pathStyleAccessEnabled(usePathStyleAccess)
-            .build();
 
         // 创建AWS基于 Netty 的 S3 客户端
         this.s3AsyncClient = S3AsyncClient.builder()
@@ -66,7 +62,7 @@ public class DefaultOssClientImpl extends AbstractOssClientImpl {
             .endpointOverride(URI.create(endpointUrl))
             .region(region)
             .forcePathStyle(usePathStyleAccess)
-            .serviceConfiguration(s3Configuration)
+            .serviceConfiguration(S3Configuration.builder().build())
             .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED)
             .responseChecksumValidation(ResponseChecksumValidation.WHEN_REQUIRED)
             .httpClient(
@@ -87,7 +83,9 @@ public class DefaultOssClientImpl extends AbstractOssClientImpl {
             .region(region)
             .credentialsProvider(credentialsProvider)
             .endpointOverride(URI.create(domainUrl))
-            .serviceConfiguration(s3Configuration)
+            .serviceConfiguration(S3Configuration.builder()
+                .pathStyleAccessEnabled(usePathStyleAccess)
+                .build())
             .build();
 
         // 创建异步调度器对象
