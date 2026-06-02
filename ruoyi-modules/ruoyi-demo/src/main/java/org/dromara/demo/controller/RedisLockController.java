@@ -5,8 +5,8 @@ import com.baomidou.lock.LockInfo;
 import com.baomidou.lock.LockTemplate;
 import com.baomidou.lock.annotation.Lock4j;
 import com.baomidou.lock.executor.RedissonLockExecutor;
-import org.dromara.common.core.domain.R;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +37,7 @@ public class RedisLockController {
         System.out.println("start:" + key + ",time:" + LocalTime.now());
         ThreadUtil.sleep(10000);
         System.out.println("end :" + key + ",time:" + LocalTime.now());
-        return R.ok("操作成功", value);
+        return R.data(value);
     }
 
     /**
@@ -58,7 +58,7 @@ public class RedisLockController {
             lockTemplate.releaseLock(lockInfo);
         }
         //结束
-        return R.ok("操作成功", value);
+        return R.data(value);
     }
 
 }

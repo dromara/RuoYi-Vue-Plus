@@ -36,7 +36,7 @@ public class SysConfigController extends BaseController {
     /**
      * 分页查询参数配置列表。
      *
-     * @param config 查询条件
+     * @param config    查询条件
      * @param pageQuery 分页参数
      * @return 参数配置分页结果
      */
@@ -49,7 +49,7 @@ public class SysConfigController extends BaseController {
     /**
      * 导出参数配置列表。
      *
-     * @param config 查询条件
+     * @param config   查询条件
      * @param response HTTP 响应
      */
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
@@ -80,7 +80,7 @@ public class SysConfigController extends BaseController {
      */
     @GetMapping(value = "/configKey/{configKey}")
     public R<String> getConfigKey(@PathVariable String configKey) {
-        return R.ok("操作成功", configService.selectConfigByKey(configKey));
+        return R.data(configService.selectConfigByKey(configKey));
     }
 
     /**

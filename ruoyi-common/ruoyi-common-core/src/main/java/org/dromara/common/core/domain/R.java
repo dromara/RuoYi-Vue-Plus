@@ -60,6 +60,17 @@ public class R<T> implements Serializable {
     }
 
     /**
+     * 构建成功响应结果（明确指定业务数据）
+     *
+     * @param data 业务数据
+     * @param <T>  响应数据的泛型类型
+     * @return 成功响应结果对象
+     */
+    public static <T> R<T> data(T data) {
+        return restResult(data, SUCCESS, "操作成功");
+    }
+
+    /**
      * 构建成功响应结果（自定义提示信息）
      *
      * @param msg 自定义提示信息
