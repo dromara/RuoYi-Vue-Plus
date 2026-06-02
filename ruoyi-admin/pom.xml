@@ -17,6 +17,30 @@
 
     <dependencies>
 
+        <!-- ruoyi-admin 同时引入 SnailJob Client 与 SnailAI Agent，SnailAI Agent 0.0.3 需要 protobuf 4.x -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+
+        <!-- 局部提升 ruoyi-admin 的 gRPC 运行时，避免被 SnailJob Client 的 1.76.0 抢先选中 -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>1.81.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>1.81.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>1.81.0</version>
+        </dependency>
+
         <!-- Mysql驱动包 -->
         <dependency>
             <groupId>com.mysql</groupId>

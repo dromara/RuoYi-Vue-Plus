@@ -20,7 +20,6 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.api.model.LoginUser;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -42,8 +41,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RestController
 @RequestMapping("/snail-ai")
 @RequiredArgsConstructor
-@ConditionalOnBean({OpenApiAgentClient.class, OpenApiChatClient.class,
-    OpenApiConversationClient.class, OpenApiUserClient.class})
 public class SnailAiController extends BaseController {
 
     /**

@@ -345,7 +345,7 @@ spring.ai.mcp:
 --- # MCP 客户端配置
 spring.ai.mcp:
   client:
-    # 需要接入外部 MCP Server 时再打开，并配置 streamable-http/sse/stdio connections
+    # 需要接入外部 MCP Server 时再打开，并配置 streamable-http/stdio connections
     enabled: false
     name: ${spring.application.name}-mcp-client
     version: ${project.version}
@@ -359,11 +359,6 @@ spring.ai.mcp:
           url: http://localhost:9001
         crm:
           url: http://localhost:9002
-    # SSE 多服务端示例
-    sse:
-      connections:
-        search:
-          url: http://localhost:9003
     # STDIO 多服务端示例
     stdio:
       connections:

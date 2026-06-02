@@ -8,7 +8,7 @@
 -- ============================================================
 
 -- Knowledge Base
-CREATE TABLE snail_ai_rag
+CREATE TABLE sai_rag
 (
     id                        BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name                      VARCHAR(255) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE snail_ai_rag
   COLLATE = utf8mb4_unicode_ci;
 
 -- RAG Documents
-CREATE TABLE snail_ai_rag_document
+CREATE TABLE sai_rag_document
 (
     id           BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     rag_id       BIGINT NOT NULL,
@@ -49,20 +49,20 @@ CREATE TABLE snail_ai_rag_document
     error_msg    TEXT,
     chunk_count  INT         DEFAULT 0,
     content_hash VARCHAR(64) DEFAULT NULL COMMENT '文件内容SHA-256哈希，用于去重',
-    resource_id  BIGINT      DEFAULT NULL COMMENT '关联资源库 snail_ai_resource.id',
+    resource_id  BIGINT      DEFAULT NULL COMMENT '关联资源库 sai_resource.id',
     create_dt    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     update_dt    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-CREATE INDEX idx_rag_doc_rag ON snail_ai_rag_document (rag_id);
-CREATE INDEX idx_rag_content_hash ON snail_ai_rag_document (rag_id, content_hash);
-CREATE INDEX idx_rag_name ON snail_ai_rag_document (rag_id, name);
-CREATE INDEX idx_rag_doc_resource ON snail_ai_rag_document (resource_id);
+CREATE INDEX idx_rag_doc_rag ON sai_rag_document (rag_id);
+CREATE INDEX idx_rag_content_hash ON sai_rag_document (rag_id, content_hash);
+CREATE INDEX idx_rag_name ON sai_rag_document (rag_id, name);
+CREATE INDEX idx_rag_doc_resource ON sai_rag_document (resource_id);
 
 -- RAG Chunks
-CREATE TABLE snail_ai_rag_chunk
+CREATE TABLE sai_rag_chunk
 (
     id              BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     rag_id          BIGINT NOT NULL,
@@ -79,32 +79,33 @@ CREATE TABLE snail_ai_rag_chunk
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-CREATE INDEX idx_rag_chunk_rag ON snail_ai_rag_chunk (rag_id);
-CREATE INDEX idx_rag_chunk_document ON snail_ai_rag_chunk (document_id);
-CREATE INDEX idx_chunk_rag_hash ON snail_ai_rag_chunk (rag_id, content_hash);
+CREATE INDEX idx_rag_chunk_rag ON sai_rag_chunk (rag_id);
+CREATE INDEX idx_rag_chunk_document ON sai_rag_chunk (document_id);
+CREATE INDEX idx_chunk_rag_hash ON sai_rag_chunk (rag_id, content_hash);
 
-CREATE TABLE snail_ai_user
+CREATE TABLE sai_user
 (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
     role           INT,
     totals         INT,
     username       VARCHAR(255),
     email          VARCHAR(64),
-    password       VARCHAR(64) NOT NULL,
+    password       VARCHAR(255) NOT NULL,
     create_dt      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_dt      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uk_username (username)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-INSERT INTO snail_ai_user (id, role, username, email, password, create_dt, update_dt)
-VALUES (1, 2, 'admin', '',  '094c883e17947ff795de8b22279d81c2600dfe85e2dba3fbf562423e883b07ca',
+-- 默认管理员：admin / admin123
+INSERT INTO sai_user (id, role, username, email, password, create_dt, update_dt)
+VALUES (1, 2, 'admin', '',  'pbkdf2$120000$c25haWwtYWktYWRtaW4tMQ==$kakglT/wYKOgv/77Ah1stie58d/JbY2nGgq5DwgUBw4=',
         '2026-02-11 13:56:48.210429', '2026-02-11 13:56:48.210429');
 
 -- ============================================
 -- 1. AI 模型提供商表
 -- ============================================
-CREATE TABLE IF NOT EXISTS snail_ai_model_provider
+CREATE TABLE IF NOT EXISTS sai_model_provider
 (
     id            BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     provider_name VARCHAR(255) NOT NULL COMMENT '提供商名称',
@@ -120,13 +121,13 @@ CREATE TABLE IF NOT EXISTS snail_ai_model_provider
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = 'AI模型提供商表';
 
-CREATE INDEX idx_provider_key ON snail_ai_model_provider (provider_key);
-CREATE INDEX idx_is_enabled ON snail_ai_model_provider (is_enabled);
+CREATE INDEX idx_provider_key ON sai_model_provider (provider_key);
+CREATE INDEX idx_is_enabled ON sai_model_provider (is_enabled);
 
 -- ============================================
 -- 2. AI模型配置表
 -- ============================================
-CREATE TABLE IF NOT EXISTS snail_ai_model_config
+CREATE TABLE IF NOT EXISTS sai_model_config
 (
     id           BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     provider_id  BIGINT       NOT NULL COMMENT '提供商ID',
@@ -148,17 +149,17 @@ CREATE TABLE IF NOT EXISTS snail_ai_model_config
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = 'AI模型配置表';
 
-CREATE INDEX idx_provider_model_type ON snail_ai_model_config (provider_id, model_type);
-CREATE INDEX idx_model_type_enabled ON snail_ai_model_config (model_type, is_enabled);
-CREATE INDEX idx_owner_id ON snail_ai_model_config (owner_id);
-CREATE INDEX idx_is_default ON snail_ai_model_config (is_default);
-CREATE INDEX idx_scope ON snail_ai_model_config (scope);
-CREATE INDEX idx_model_key ON snail_ai_model_config (model_key);
+CREATE INDEX idx_provider_model_type ON sai_model_config (provider_id, model_type);
+CREATE INDEX idx_model_type_enabled ON sai_model_config (model_type, is_enabled);
+CREATE INDEX idx_owner_id ON sai_model_config (owner_id);
+CREATE INDEX idx_is_default ON sai_model_config (is_default);
+CREATE INDEX idx_scope ON sai_model_config (scope);
+CREATE INDEX idx_model_key ON sai_model_config (model_key);
 
 -- ============================================
 -- 3. 模型使用统计表
 -- ============================================
-CREATE TABLE IF NOT EXISTS snail_ai_model_usage_stat
+CREATE TABLE IF NOT EXISTS sai_model_usage_stat
 (
     id                BIGINT    NOT NULL AUTO_INCREMENT PRIMARY KEY,
     model_id          BIGINT    NOT NULL COMMENT '模型ID',
@@ -178,15 +179,15 @@ CREATE TABLE IF NOT EXISTS snail_ai_model_usage_stat
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = '模型使用统计表';
 
-CREATE INDEX idx_model_id ON snail_ai_model_usage_stat (model_id);
-CREATE INDEX idx_user_id ON snail_ai_model_usage_stat (user_id);
-CREATE INDEX idx_last_used_dt ON snail_ai_model_usage_stat (last_used_dt);
+CREATE INDEX idx_model_id ON sai_model_usage_stat (model_id);
+CREATE INDEX idx_user_id ON sai_model_usage_stat (user_id);
+CREATE INDEX idx_last_used_dt ON sai_model_usage_stat (last_used_dt);
 
 -- ============================================
 -- 初始化数据 (可选)
 -- ============================================
 -- 插入常见的AI提供商（重复 provider_key 则忽略）
-INSERT IGNORE INTO snail_ai_model_provider (provider_name, provider_key, description, is_enabled)
+INSERT IGNORE INTO sai_model_provider (provider_name, provider_key, description, is_enabled)
 VALUES ('OpenAI', 'openai', 'OpenAI官方模型 (GPT-4, GPT-3.5等)', 1),
        ('Claude', 'claude', 'Anthropic Claude模型', 1),
        ('Ollama', 'ollama', '本地开源模型 (Llama, Mistral等)', 1),
@@ -200,7 +201,7 @@ VALUES ('OpenAI', 'openai', 'OpenAI官方模型 (GPT-4, GPT-3.5等)', 1),
 -- ============================================
 
 -- 智能体主表
-CREATE TABLE IF NOT EXISTS snail_ai_agent
+CREATE TABLE IF NOT EXISTS sai_agent
 (
     id                      BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name                    VARCHAR(255) NOT NULL COMMENT '智能体名称',
@@ -229,11 +230,11 @@ CREATE TABLE IF NOT EXISTS snail_ai_agent
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = '智能体表';
 
-CREATE INDEX idx_agent_creator ON snail_ai_agent (creator_id);
-CREATE INDEX idx_agent_featured ON snail_ai_agent (is_featured);
+CREATE INDEX idx_agent_creator ON sai_agent (creator_id);
+CREATE INDEX idx_agent_featured ON sai_agent (is_featured);
 
 -- 智能体对话表
-CREATE TABLE IF NOT EXISTS snail_ai_agent_conversation
+CREATE TABLE IF NOT EXISTS sai_agent_conversation
 (
     id              BIGINT      NOT NULL AUTO_INCREMENT PRIMARY KEY,
     agent_id        BIGINT      NOT NULL COMMENT '智能体ID',
@@ -247,11 +248,11 @@ CREATE TABLE IF NOT EXISTS snail_ai_agent_conversation
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = '智能体对话表';
 
-CREATE INDEX idx_agent_conv_agent ON snail_ai_agent_conversation (agent_id);
-CREATE INDEX idx_agent_conv_user ON snail_ai_agent_conversation (user_id);
+CREATE INDEX idx_agent_conv_agent ON sai_agent_conversation (agent_id);
+CREATE INDEX idx_agent_conv_user ON sai_agent_conversation (user_id);
 
 -- 智能体对话消息记录表
-CREATE TABLE IF NOT EXISTS snail_ai_agent_conversation_record
+CREATE TABLE IF NOT EXISTS sai_agent_conversation_record
 (
     id              BIGINT      NOT NULL AUTO_INCREMENT PRIMARY KEY,
     agent_id        BIGINT      NOT NULL COMMENT '智能体ID',
@@ -267,10 +268,10 @@ CREATE TABLE IF NOT EXISTS snail_ai_agent_conversation_record
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = '智能体对话消息记录';
 
-CREATE INDEX idx_agent_rec_conv ON snail_ai_agent_conversation_record (conversation_id);
+CREATE INDEX idx_agent_rec_conv ON sai_agent_conversation_record (conversation_id);
 
 -- 智能体使用统计表
-CREATE TABLE IF NOT EXISTS snail_ai_agent_usage_stat
+CREATE TABLE IF NOT EXISTS sai_agent_usage_stat
 (
     id                 BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     agent_id           BIGINT NOT NULL COMMENT '智能体ID',
@@ -287,15 +288,15 @@ CREATE TABLE IF NOT EXISTS snail_ai_agent_usage_stat
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = '智能体使用统计';
 
-CREATE INDEX idx_usage_agent ON snail_ai_agent_usage_stat (agent_id);
-CREATE INDEX idx_usage_date ON snail_ai_agent_usage_stat (stat_date);
+CREATE INDEX idx_usage_agent ON sai_agent_usage_stat (agent_id);
+CREATE INDEX idx_usage_date ON sai_agent_usage_stat (stat_date);
 
 -- ============================================
 -- MCP 服务管理
 -- ============================================
 
 -- MCP 服务配置表
-CREATE TABLE IF NOT EXISTS snail_ai_mcp_server
+CREATE TABLE IF NOT EXISTS sai_mcp_server
 (
     id               BIGINT        NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name             VARCHAR(255)  NOT NULL COMMENT 'MCP服务名称',
@@ -319,11 +320,11 @@ CREATE TABLE IF NOT EXISTS snail_ai_mcp_server
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = 'MCP服务配置表';
 
-CREATE INDEX idx_mcp_server_creator ON snail_ai_mcp_server (creator_id);
-CREATE INDEX idx_mcp_server_status ON snail_ai_mcp_server (status);
+CREATE INDEX idx_mcp_server_creator ON sai_mcp_server (creator_id);
+CREATE INDEX idx_mcp_server_status ON sai_mcp_server (status);
 
 -- 智能体与MCP服务关联表(多对多)
-CREATE TABLE IF NOT EXISTS snail_ai_agent_mcp_server
+CREATE TABLE IF NOT EXISTS sai_agent_mcp_server
 (
     id            BIGINT    NOT NULL AUTO_INCREMENT PRIMARY KEY,
     agent_id      BIGINT    NOT NULL COMMENT '智能体ID',
@@ -334,11 +335,11 @@ CREATE TABLE IF NOT EXISTS snail_ai_agent_mcp_server
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = '智能体MCP服务关联表';
 
-CREATE INDEX idx_agent_mcp_agent ON snail_ai_agent_mcp_server (agent_id);
-CREATE INDEX idx_agent_mcp_server ON snail_ai_agent_mcp_server (mcp_server_id);
+CREATE INDEX idx_agent_mcp_agent ON sai_agent_mcp_server (agent_id);
+CREATE INDEX idx_agent_mcp_server ON sai_agent_mcp_server (mcp_server_id);
 
 -- 用户订阅的智能体（多对多）
-CREATE TABLE IF NOT EXISTS snail_ai_user_agent
+CREATE TABLE IF NOT EXISTS sai_user_agent
 (
     id         BIGINT    NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id    BIGINT    NOT NULL COMMENT '用户ID',
@@ -349,14 +350,14 @@ CREATE TABLE IF NOT EXISTS snail_ai_user_agent
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = '用户订阅的智能体';
 
-CREATE INDEX idx_user_agent_user ON snail_ai_user_agent (user_id);
+CREATE INDEX idx_user_agent_user ON sai_user_agent (user_id);
 
 -- ============================================
 -- Skill 技能包管理
 -- ============================================
 
 -- Skill 技能包表
-CREATE TABLE IF NOT EXISTS snail_ai_skill
+CREATE TABLE IF NOT EXISTS sai_skill
 (
     id            BIGINT        NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name          VARCHAR(255)  NOT NULL COMMENT 'Skill名称(从SKILL.md解析)',
@@ -375,10 +376,10 @@ CREATE TABLE IF NOT EXISTS snail_ai_skill
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = 'Skill技能包表';
 
-CREATE INDEX idx_skill_creator ON snail_ai_skill (creator_id);
+CREATE INDEX idx_skill_creator ON sai_skill (creator_id);
 
 -- Skill 支撑文件内容表
-CREATE TABLE IF NOT EXISTS snail_ai_skill_file
+CREATE TABLE IF NOT EXISTS sai_skill_file
 (
     id         BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     skill_id   BIGINT       NOT NULL COMMENT 'Skill ID',
@@ -395,7 +396,7 @@ CREATE TABLE IF NOT EXISTS snail_ai_skill_file
     COLLATE = utf8mb4_unicode_ci COMMENT = 'Skill支撑文件内容表';
 
 -- 智能体与Skill关联表(多对多)
-CREATE TABLE IF NOT EXISTS snail_ai_agent_skill
+CREATE TABLE IF NOT EXISTS sai_agent_skill
 (
     id         BIGINT    NOT NULL AUTO_INCREMENT PRIMARY KEY,
     agent_id   BIGINT    NOT NULL COMMENT '智能体ID',
@@ -406,11 +407,11 @@ CREATE TABLE IF NOT EXISTS snail_ai_agent_skill
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = '智能体Skill关联表';
 
-CREATE INDEX idx_agent_skill_agent ON snail_ai_agent_skill (agent_id);
-CREATE INDEX idx_agent_skill_skill ON snail_ai_agent_skill (skill_id);
+CREATE INDEX idx_agent_skill_agent ON sai_agent_skill (agent_id);
+CREATE INDEX idx_agent_skill_skill ON sai_agent_skill (skill_id);
 
 -- ============================================================
-CREATE TABLE IF NOT EXISTS snail_ai_store_instance
+CREATE TABLE IF NOT EXISTS sai_store_instance
 (
     id         BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name       VARCHAR(128) NOT NULL COMMENT '实例名称',
@@ -425,17 +426,17 @@ CREATE TABLE IF NOT EXISTS snail_ai_store_instance
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = '存储实例';
 
-CREATE INDEX idx_store_instance_category ON snail_ai_store_instance (category);
-CREATE INDEX idx_store_instance_type ON snail_ai_store_instance (type);
+CREATE INDEX idx_store_instance_category ON sai_store_instance (category);
+CREATE INDEX idx_store_instance_type ON sai_store_instance (type);
 
 -- ============================================================
 -- 记忆系统（配置 / 主表 / 历史 / 摘要 / 统计 / 提取进度）
--- 依赖：snail_ai_store_instance（conversation_memory 外键）
+-- 依赖：sai_store_instance（sai_memory_conversation 外键）
 -- ============================================================
 
 -- 客户端应用
 -- ----------------------------
-CREATE TABLE IF NOT EXISTS snail_ai_app
+CREATE TABLE IF NOT EXISTS sai_app
 (
     id             BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     app_id         VARCHAR(128) NOT NULL COMMENT '应用唯一标识',
@@ -451,12 +452,10 @@ CREATE TABLE IF NOT EXISTS snail_ai_app
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = '客户端应用';
 
-INSERT INTO snail_ai_app VALUES (1, '1', 'demo', '', 'SAI_7c557fc05a304b0482a65ca67afdb0b8', 'LEAST_LOAD', 1, '2026-05-26 12:31:17', '2026-05-26 12:31:17');
-
 -- ----------------------------
 -- AI客户端实例节点
 -- ----------------------------
-CREATE TABLE IF NOT EXISTS snail_ai_client_node
+CREATE TABLE IF NOT EXISTS sai_client_node
 (
     id                  BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     app_id              VARCHAR(128) NOT NULL COMMENT '所属应用ID',
@@ -477,12 +476,12 @@ CREATE TABLE IF NOT EXISTS snail_ai_client_node
     COLLATE = utf8mb4_unicode_ci COMMENT = 'AI客户端实例节点';
 
 -- OpenAPI 外部用户映射表
-CREATE TABLE snail_ai_openapi_user
+CREATE TABLE sai_openapi_user
 (
     id               BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    app_id           VARCHAR(128) NOT NULL COMMENT '关联 snail_ai_app.app_id',
+    app_id           VARCHAR(128) NOT NULL COMMENT '关联 sai_app.app_id',
     open_id          VARCHAR(64)  NOT NULL COMMENT '平台分配的唯一标识（UUID）',
-    platform_user_id BIGINT       NOT NULL COMMENT '关联 snail_ai_user.id，注册时自动创建',
+    platform_user_id BIGINT       NOT NULL COMMENT '关联 sai_user.id，注册时自动创建',
     external_id      VARCHAR(256) DEFAULT NULL COMMENT '外部系统的用户标识（可选，幂等用）',
     nickname         VARCHAR(128) DEFAULT NULL COMMENT '外部用户昵称',
     create_dt        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
@@ -497,7 +496,7 @@ CREATE TABLE snail_ai_openapi_user
 -- ----------------------------
 -- 通用资源存储
 -- ----------------------------
-CREATE TABLE IF NOT EXISTS snail_ai_resource
+CREATE TABLE IF NOT EXISTS sai_resource
 (
     id            BIGINT        NOT NULL AUTO_INCREMENT PRIMARY KEY,
     storage_key   VARCHAR(512)  NOT NULL COMMENT '存储键（相对路径或对象Key）',
