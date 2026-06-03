@@ -267,10 +267,9 @@ public interface GenConstants {
     String JAVA_CONTROLLER_TEMPLATE_PATH = "vm/java/controller.java.vm";
     // MyBatis MapperXML 模板
     String XML_MAPPER_TEMPLATE_PATH = "vm/xml/mapper.xml.vm";
-    // 前端接口源码模板
-    String TS_API_TEMPLATE_PATH = "vm/ts/api.ts.vm";
-    String TS_TYPES_TEMPLATE_PATH = "vm/ts/types.ts.vm";
-    // 前端页面源码模板
+    // 前端源码模板
+    String TS_API_TEMPLATE_PATH = "vm/vue/api.ts.vm";
+    String TS_TYPES_TEMPLATE_PATH = "vm/vue/types.ts.vm";
     String VUE_INDEX_TEMPLATE_PATH = "vm/vue/index.vue.vm";
     String VUE_INDEX_TREE_TEMPLATE_PATH = "vm/vue/index-tree.vue.vm";
     // 数据库SQL模板

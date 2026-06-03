@@ -2,7 +2,6 @@
 
 ## 优先参考的代码来源
 
-- `ruoyi-modules/ruoyi-gen/src/main/resources/vm/ts/*.vm`
 - `ruoyi-modules/ruoyi-gen/src/main/resources/vm/vue/*.vm`
 - 前端工程中与目标模块最接近的现有页面
 

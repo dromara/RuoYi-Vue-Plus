@@ -24,8 +24,6 @@ import org.dromara.gen.util.template.PathNamedTemplate;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static org.dromara.gen.constant.GenConstants.TS_TYPES_TEMPLATE_PATH;
-
 /**
  * 模板引擎工具
  */
@@ -199,9 +197,9 @@ public class TemplateEngineUtils {
         templates.add(TEMPLATE_MAPPER.get(GenConstants.JAVA_CONTROLLER_TEMPLATE_PATH));
         // MyBatis MapperXML 模板
         templates.add(TEMPLATE_MAPPER.get(GenConstants.XML_MAPPER_TEMPLATE_PATH));
-        // 前端接口源码模板
+        // 前端 API 与类型模板
         templates.add(TEMPLATE_MAPPER.get(GenConstants.TS_API_TEMPLATE_PATH));
-        templates.add(TEMPLATE_MAPPER.get(TS_TYPES_TEMPLATE_PATH));
+        templates.add(TEMPLATE_MAPPER.get(GenConstants.TS_TYPES_TEMPLATE_PATH));
         // 数据库模板
         DataBaseType dataBaseType = DataBaseHelper.getDataBaseType(dsName);
         if (dataBaseType.isOracle()) {
@@ -214,7 +212,7 @@ public class TemplateEngineUtils {
             // 默认使用MySQL模板
             templates.add(TEMPLATE_MAPPER.get(GenConstants.SQL_MYSQL_TEMPLATE_PATH));
         }
-        // 前端页面源码模板
+        // 前端页面模板
         if (GenConstants.TPL_CRUD.equals(tplCategory)) {
             templates.add(TEMPLATE_MAPPER.get(GenConstants.VUE_INDEX_TEMPLATE_PATH));
         } else if (GenConstants.TPL_TREE.equals(tplCategory)) {
