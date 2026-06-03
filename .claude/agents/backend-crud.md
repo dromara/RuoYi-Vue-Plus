@@ -33,8 +33,8 @@ description: 标准后端 CRUD 专家。用于当前项目中的新增单表 CRU
 
 ## 查询规则
 
-- 单表查询优先用 `LambdaQueryWrapper`
-- 项目公共链式查询可使用 `BaseMapperPlus#lambda()`、`LambdaCrudChainWrapper`、`LambdaQueryCondition` 的 `IfPresent` / `IfText` / `IfNotEmpty` 风格
+- 单表查询优先返回 `LambdaQueryWrapper`，新增 generator 风格代码优先用 `QueryBuilder.lambda(Entity.class).build()`
+- 项目公共链式查询可使用 `QueryBuilder.lambda(...)`、`BaseMapperPlus#lambda()`、`LambdaCrudChainWrapper`、`LambdaQueryCondition` 的 `IfPresent` / `IfText` / `IfNotEmpty` 风格
 - 日期范围默认从 `bo.getParams()` 中读取 begin/end
 - 分页优先返回 `PageResult<Vo>`
 - BO 转实体使用 `MapstructUtils.convert(bo, Entity.class)`

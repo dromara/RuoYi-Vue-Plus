@@ -5,6 +5,7 @@
 - `ruoyi-modules/ruoyi-gen/src/main/resources/vm/java/*.vm`
 - `ruoyi-modules/ruoyi-demo/...`
 - `ruoyi-modules/ruoyi-system/...`
+- `ruoyi-modules/ruoyi-workflow/...`
 - `ruoyi-common/ruoyi-common-mybatis/...`
 
 ## 决策顺序
@@ -62,7 +63,7 @@
 - 默认形式是 `interface XxxMapper extends BaseMapperPlus<Xxx, XxxVo>`。
 - 不要为简单的 entity 转 vo 手写重复代码，优先依赖 `BaseMapperPlus`。
 - 模块已经使用 `@DataPermission` 时，在重写方法和自定义查询上继续保留。
-- 复杂模块里 mapper 可能同时继承 `MPJBaseMapper<Entity>` 并使用 `JoinWrappers.lambda(...)`，遇到这种风格要延续，不要换一种写法。
+- 复杂模块里 mapper 可能同时继承 `MPJBaseMapper<Entity>` 并使用 `QueryBuilder.lambdaJoin(...)` 构造 MPJ 查询，遇到这种风格要延续，不要换一种写法。
 - 只有在 `selectVoList/selectVoPage` 不够用时，才补 XML 或自定义 mapper 方法。
 - Mapper 默认方法可以承载短小的 wrapper 查询；涉及复杂业务编排、缓存、事务或跨 mapper 写入时放到 service。
 - `ruoyi-system` 的用户、角色、菜单、部门等模块常带数据权限、MPJ 联表、角色状态过滤，修改前先读对应 mapper/service。
@@ -93,8 +94,8 @@
 - 如果去掉前缀会产生歧义或命名冲突，保留必要前缀。
 - 读操作通常返回 `Vo`、`List<Vo>` 或 `PageResult<Vo>`。
 - BO 转实体用 `MapstructUtils.convert(bo, Entity.class)`。
-- 查询条件优先用 `LambdaQueryWrapper` 和 `Wrappers.lambdaQuery()`。
-- 在 wrapper 条件里直接写 `StringUtils.isNotBlank(...)` 和 null 判断。
+- 查询条件优先返回 `LambdaQueryWrapper`；新增 generator 风格代码优先用 `QueryBuilder.lambda(Entity.class)`，老模块已有 `Wrappers.lambdaQuery()` 时可继续保持。
+- 字符串和空值条件优先用 `eqIfText`、`likeIfText`、`eqIfPresent`、`inIfNotEmpty`、`betweenParams` 等项目扩展；老代码已有直接 `StringUtils.isNotBlank(...)` 和 null 判断时可增量保持。
 - 分页查询优先采用：
   `Page<Vo> result = entityMapper.selectVoPage(pageQuery.build(), lqw);`
   `return PageResult.build(result.getRecords(), result.getTotal());`
@@ -119,10 +120,10 @@
 
 ### 查询逻辑建议
 
-- 单表查询优先使用 `LambdaQueryWrapper`。
-- 条件判断直接放在 wrapper 上，不要额外写大量 if 套壳。
-- 日期范围统一从 `bo.getParams()` 取 begin/end。
-- 复杂联表查询优先查同模块是否已有 MPJ 风格可复用。
+- 单表查询优先返回 `LambdaQueryWrapper`，生成器风格优先通过 `QueryBuilder.lambda(Entity.class).build()` 构造。
+- 条件判断直接放在 wrapper 链式条件上，不要额外写大量 if 套壳。
+- 日期范围统一从 `bo.getParams()` 取 begin/end；生成器默认使用 `betweenParams(Entity::getField, params, "beginField", "endField")`。
+- 复杂联表查询优先查同模块是否已有 MPJ 风格可复用；新写法优先用 `QueryBuilder.lambdaJoin("u", Entity.class)`。
 
 ### 写入逻辑建议
 
@@ -136,6 +137,7 @@
 - 类上通常带 `@Validated`、`@RestController`、`@RequiredArgsConstructor`、`@RequestMapping`。
 - 返回值使用 `R<T>` 或 `R<Void>`。
 - 标准 CRUD 接口通常是：`GET /list`、`POST /export`、`GET /{id}`、`POST`、`PUT`、`DELETE /{ids}`。
+- 树表接口通常不分页，`list` 返回 `R<List<Vo>>`；导出路由以目标模块或 generator 模板为准，旧 demo 树表存在 `GET /export`，新版生成器通常是 `POST /export`。
 - `@SaCheckPermission` 权限格式遵循 `${module}:${business}:${action}`。
 - 写操作、导入导出接口通常加 `@Log(title = "...", businessType = BusinessType.X)`。
 - 附近接口已有防重时，写接口继续使用 `@RepeatSubmit`。
@@ -166,14 +168,15 @@
 - 优先使用项目工具类：`MapstructUtils`、`StringUtils`、`StreamUtils`、`ValidatorUtils`、`SpringUtils`、`RedisUtils`。
 - 数组转列表按附近代码习惯使用 `List.of(ids)` 或 `Arrays.asList(ids)`。
 - 日期范围查询通常从 `bo.getParams()` 中读取 `beginTime`、`endTime` 或 `beginFieldName`、`endFieldName`。
+- 构建查询优先识别 `QueryBuilder.lambda(...)`、`QueryBuilder.lambdaJoin(...)`、`BaseMapperPlus#lambda()` 三类入口，不要退回临时手写 SQL 或自造 wrapper。
 
 ## common-mybatis 规则
 
-- 链式查询能力优先沿用 `BaseMapperPlus#lambda()`、`LambdaCrudChainWrapper`、`LambdaQueryBuilder`、`LambdaQueryCondition`。
-- 条件辅助方法使用项目已有命名：`eqIfPresent`、`eqIfText`、`likeIfText`、`betweenIfPresent`、`inIfNotEmpty`、`findInSetIfPresent`。
+- 链式查询能力优先沿用 `QueryBuilder.lambda(...)`、`QueryBuilder.lambdaJoin(...)`、`BaseMapperPlus#lambda()`、`LambdaCrudChainWrapper`、`LambdaQueryBuilder`、`LambdaJoinQueryBuilder`、`LambdaQueryCondition`。
+- 条件辅助方法使用项目已有命名：`eqIfPresent`、`eqIfText`、`neIfPresent`、`likeIfText`、`betweenIfPresent`、`betweenParams`、`inIfNotEmpty`、`findInSetIfPresent`。
 - 新增 wrapper 方法时保持链式返回 `this` / `typedThis`，不要返回底层 `LambdaQueryWrapper` 破坏调用链。
 - `LambdaCrudChainWrapper` 既承担查询又承担更新 set 片段，新增能力时要同时考虑 `getSqlSelect`、`getSqlSet`、`clear`、`instance` 的状态复制和清理。
-- MPJ 联表查询沿用别名风格，例如 `JoinWrappers.lambda("u", SysUser.class)`、`.leftJoin(..., "d", ...)`、`.eq("u", Entity::getField, value)`。
+- MPJ 联表查询沿用别名风格，例如 `QueryBuilder.lambdaJoin("u", SysUser.class)`、`.leftJoin(..., "d", ...)`、`.eq("u", Entity::getField, value)`。
 - 数据权限注解使用 `@DataPermission` + `@DataColumn`，列名需和实际 SQL 别名一致，例如 `d.dept_id`、`u.create_by`。
 
 ## translation / JSON 增强规则
@@ -187,8 +190,8 @@
 
 ## 缓存与异步/监听规则
 
-- 已有 service 使用 `@Cacheable`、`@CacheEvict`、`@Caching` 时，新增写操作要同步考虑缓存失效。
-- 部门、字典、OSS 配置等模块已有缓存初始化或失效逻辑，不要只改数据库不处理缓存。
+- 已有 service 使用 `@Cacheable`、`@CachePut`、`@CacheEvict`、`@Caching` 或 `CacheUtils.evict/clear` 时，新增写操作要同步考虑缓存失效。
+- 部门、字典、OSS 配置等模块已有缓存初始化或失效逻辑，不要只改数据库不处理缓存；字典这类模块常同时维护 `CacheNames.SYS_DICT` 与 `CacheNames.SYS_DICT_TYPE`。
 - Excel 导入监听器实现 `ExcelListener` 时，保留 `getExcelResult()` 的回执语义和错误聚合方式。
 - 定时任务、MQTT、SSE、异步回调等框架方法一般按接口覆写语义实现，除非业务不直观，不要添加冗长注释。
 

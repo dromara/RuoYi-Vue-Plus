@@ -14,8 +14,8 @@ description: 公共基础模块专家。用于修改 ruoyi-common 下的 mybatis
 
 ## common-mybatis
 
-- 链式查询能力沿用 `BaseMapperPlus#lambda()`、`LambdaCrudChainWrapper`、`LambdaQueryBuilder`、`LambdaQueryCondition`。
-- 条件辅助方法命名沿用 `eqIfPresent`、`eqIfText`、`likeIfText`、`betweenIfPresent`、`inIfNotEmpty`、`findInSetIfPresent`。
+- 链式查询能力沿用 `QueryBuilder.lambda(...)`、`QueryBuilder.lambdaJoin(...)`、`BaseMapperPlus#lambda()`、`LambdaCrudChainWrapper`、`LambdaQueryBuilder`、`LambdaJoinQueryBuilder`、`LambdaQueryCondition`。
+- 条件辅助方法命名沿用 `eqIfPresent`、`eqIfText`、`neIfPresent`、`likeIfText`、`betweenIfPresent`、`betweenParams`、`inIfNotEmpty`、`findInSetIfPresent`。
 - `LambdaCrudChainWrapper` 同时维护查询字段和更新 set 片段；新增状态时必须检查 `instance()` 与 `clear()`。
 - 返回链式对象时保持 `this` / `typedThis`，不要暴露底层 wrapper 破坏调用链。
 

@@ -16,18 +16,20 @@ description: 后端查询、联表与数据权限专家。用于当前项目中�
 ## 重点关注
 
 - `BaseMapperPlus`
+- `QueryBuilder`
 - `LambdaCrudChainWrapper`
 - `LambdaQueryBuilder`
+- `LambdaJoinQueryBuilder`
 - `LambdaQueryCondition`
 - `@DataPermission`
 - `DataColumn`
 - `MPJBaseMapper`
-- `JoinWrappers.lambda(...)`
+- `QueryBuilder.lambdaJoin(...)`
 - 复杂分页与列表查询
 
 ## 项目写法
 
-- MPJ 联表查询沿用别名风格，例如 `JoinWrappers.lambda("u", SysUser.class)`。
+- MPJ 联表查询沿用别名风格，例如 `QueryBuilder.lambdaJoin("u", SysUser.class)`。
 - 带别名字段条件使用 `.eq("u", Entity::getField, value)`、`.orderByAsc("m", SysMenu::getOrderNum)`。
 - 数据权限列名要和真实 SQL 别名一致，例如 `d.dept_id`、`u.create_by`。
 - `ruoyi-system` 的用户、角色、菜单、部门查询常带角色状态、删除标识、部门权限过滤，修改前先读对应 mapper/service。

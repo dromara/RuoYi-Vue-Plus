@@ -6,12 +6,13 @@
 - `ruoyi-modules/ruoyi-gen/src/main/resources/vm/vue/*.vm`
 - 前端工程中与目标模块最接近的现有页面
 
-如果任务涉及前端，先看仓库里实际使用的前端目录和同类页面，不要直接套通用 Vue 习惯。
+当前 boot4 仓库通常只含后端与 generator 前端模板；如果前端工程不在当前 root，先以 generator 模板约定为准，再对照用户提供的前端目录或相邻仓库。
 
 ## API 文件规则
 
 - 从 `@/utils/request` 引入 `request`。
-- 从 `axios` 引入 `AxiosPromise`。
+- 从 `@/utils/api-types` 引入 `AxiosPromise`。
+- 从 `@/api/types` 引入 `PageResult`。
 - 从 `@/api/<module>/<business>/types` 引入本模块类型。
 - 列表接口通常返回 `AxiosPromise<PageResult<Vo>>`。
 - 常规接口命名和路由保持：
@@ -36,24 +37,24 @@
 
 - 使用 `<script setup lang="ts">`。
 - 常见 import 来自本模块 API 和本地 `types`。
-- 通过 `getCurrentInstance()` 取 `proxy`，使用项目注入的公共工具。
-- 字典通常通过 `proxy?.useDict(...)` 获取，再用 `toRefs` 解构。
+- 新版生成器优先使用 hooks：`useLoading`、`useSearchToggle`、`useSearchReset`、`useTableSelection`、`useFormDialog`，日期范围使用 `useDateRangeQuery`。
+- 字典通常通过 `toRefs<any>(useDict(...))` 解构。
 - 常见状态包括：列表数组、`loading`、`buttonLoading`、`showSearch`、`ids`、`single`、`multiple`、`total`。
-- 查询和表单状态通常放在 `reactive<PageData<Form, Query>>({...})` 中。
-- 弹窗状态通常使用 `dialog.visible` 和 `dialog.title`。
+- 查询和表单状态通常放在 `reactive<PageData<Form, Query>>({...})` 中，并通过 `toRefs(data)` 暴露。
+- 弹窗状态优先由 `useFormDialog` 返回的 `dialog`、`openDialog`、`showDialog`、`closeDialog` 管理。
 - 表单引用通常命名为 `queryFormRef` 和 `<business>FormRef`。
 
 ## 页面行为规则
 
-- `getList` 负责设置 loading、处理日期范围参数、调用列表接口、回填 `rows` 和 `total`。
+- `getList` 负责通过 `withLoading` 设置 loading、处理日期范围参数、调用列表接口、回填 `rows` 和 `total`。
 - `handleQuery` 通常先把 `pageNum` 重置为 `1`，再重新查询。
-- `resetQuery` 负责清空日期范围和查询表单，然后重新加载。
-- `handleSelectionChange` 更新 `ids`、`single`、`multiple`。
-- `handleAdd` 先重置表单，再打开弹窗。
-- `handleUpdate` 先查详情，再把数据赋值到表单。
+- `resetQuery` 优先使用 `useSearchReset`，通过 `resetExtras` 清空日期范围，再重新加载。
+- `handleSelectionChange` 优先使用 `useTableSelection` 返回的方法，更新 `ids`、`single`、`multiple`。
+- `handleAdd` 先重置表单，再通过 `openDialog` 打开弹窗。
+- `handleUpdate` 先重置并查详情，再 `Object.assign(form.value, res.data)`，最后通过 `showDialog` 打开弹窗。
 - `submitForm` 校验表单、切换 `buttonLoading`、根据主键判断调用新增还是更新、提示成功并刷新列表。
-- `handleDelete` 使用 `proxy?.$modal.confirm(...)` 确认，再调用删除接口并刷新。
-- `handleExport` 使用 `proxy?.download(...)`。
+- `handleDelete` 使用 `modal.confirm(...)` 确认，再调用删除接口并刷新。
+- `handleExport` 使用 `download as requestDownload` 从 `@/utils/request` 导出的下载方法。
 
 ## 模板结构规则
 
@@ -61,7 +62,7 @@
 - 保留 `v-hasPermi="['module:business:add']"` 这类权限指令。
 - 继续使用仓库已有组件：`right-toolbar`、`pagination`、`dict-tag`、`image-preview`、`image-upload`、`file-upload`、`editor`。
 - 已有页面对时间列使用 `parseTime` 时，新页面保持一致。
-- BETWEEN 日期查询继续使用 `el-date-picker` 加 `proxy?.addDateRange(...)`。
+- BETWEEN 日期查询继续使用 `el-date-picker`，脚本侧通过 `useDateRangeQuery` 生成 `dateRangeXxx`、`applyXxxDateRange`、`resetXxxDateRange`。
 
 ## 避免事项
 
