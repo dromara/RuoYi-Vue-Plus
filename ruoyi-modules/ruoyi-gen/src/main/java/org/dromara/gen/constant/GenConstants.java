@@ -284,7 +284,7 @@ public interface GenConstants {
     String SQL_MYSQL_TEMPLATE_PATH = "vm/sql/mysql.sql.vm";
 
     /**
-     * 所有模板路径集合
+     * 固定模板路径集合，前端模板按 frontendType 动态解析。
      */
     Set<String> TEMPLATE_PATHS = CollUtil.newHashSet(
         JAVA_DOMAIN_TEMPLATE_PATH
@@ -295,14 +295,6 @@ public interface GenConstants {
         , JAVA_SERVICE_IMPL_TEMPLATE_PATH
         , JAVA_CONTROLLER_TEMPLATE_PATH
         , XML_MAPPER_TEMPLATE_PATH
-        , "vm/vue/api.ts.vm"
-        , "vm/vue/types.ts.vm"
-        , "vm/vue/index.vue.vm"
-        , "vm/vue/index-tree.vue.vm"
-        , "vm/react/api.ts.vm"
-        , "vm/react/types.ts.vm"
-        , "vm/react/index.tsx.vm"
-        , "vm/react/index-tree.tsx.vm"
         , SQL_ORACLE_TEMPLATE_PATH
         , SQL_POSTGRES_TEMPLATE_PATH
         , SQL_SQLSERVER_TEMPLATE_PATH
