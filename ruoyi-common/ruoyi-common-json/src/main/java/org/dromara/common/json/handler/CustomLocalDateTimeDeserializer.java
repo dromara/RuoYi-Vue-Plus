@@ -1,51 +1,19 @@
 package org.dromara.common.json.handler;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ValueDeserializer;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.List;
 
 /**
- * 自定义 LocalDateTime 类型反序列化处理器（支持多种格式，无第三方依赖）
+ * 自定义 LocalDateTime 类型反序列化处理器
  *
  * @author AprilWind
  */
 public class CustomLocalDateTimeDeserializer extends ValueDeserializer<LocalDateTime> {
-
-    /**
-     * 秒级时间戳长度。
-     */
-    private static final int SECOND_TIMESTAMP_LENGTH = 10;
-
-    /**
-     * 毫秒级时间戳长度。
-     */
-    private static final int MILLIS_TIMESTAMP_LENGTH = 13;
-
-    /** 支持时间的格式列表（直接解析为 LocalDateTime） */
-    private static final List<DateTimeFormatter> DATETIME_FORMATTERS = List.of(
-        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
-        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"),
-        DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"),
-        DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"),
-        DateTimeFormatter.ofPattern("yyyyMMddHHmmss"),
-        DateTimeFormatter.ofPattern("yyyyMMdd HHmmss"),
-        DateTimeFormatter.ISO_LOCAL_DATE_TIME
-    );
-
-    /** 仅日期的格式列表（解析为 LocalDate，再补零时转 LocalDateTime） */
-    private static final List<DateTimeFormatter> DATE_ONLY_FORMATTERS = List.of(
-        DateTimeFormatter.ISO_LOCAL_DATE,
-        DateTimeFormatter.ofPattern("yyyy/MM/dd"),
-        DateTimeFormatter.BASIC_ISO_DATE
-    );
 
     /**
      * 反序列化逻辑：将字符串转换为 LocalDateTime 对象
@@ -60,60 +28,8 @@ public class CustomLocalDateTimeDeserializer extends ValueDeserializer<LocalDate
         if (text == null || text.isBlank()) {
             return null;
         }
-        text = text.trim();
-
-        // 纯数字：支持秒级与毫秒级时间戳
-        LocalDateTime timestamp = parseTimestamp(text);
-        if (timestamp != null) {
-            return timestamp;
-        }
-
-        // 尝试带时间的格式
-        for (DateTimeFormatter formatter : DATETIME_FORMATTERS) {
-            try {
-                return LocalDateTime.parse(text, formatter);
-            } catch (DateTimeParseException ignored) {
-            }
-        }
-
-        // 尝试仅日期的格式，补零时
-        for (DateTimeFormatter formatter : DATE_ONLY_FORMATTERS) {
-            try {
-                return LocalDate.parse(text, formatter).atStartOfDay();
-            } catch (DateTimeParseException ignored) {
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * 解析秒级或毫秒级时间戳。
-     *
-     * @param text 待解析文本
-     * @return LocalDateTime，非时间戳时返回 null
-     */
-    private LocalDateTime parseTimestamp(String text) {
-        int startIndex = text.startsWith("-") ? 1 : 0;
-        if (startIndex == text.length()) {
-            return null;
-        }
-        for (int i = startIndex; i < text.length(); i++) {
-            if (!Character.isDigit(text.charAt(i))) {
-                return null;
-            }
-        }
-        int digitLength = text.length() - startIndex;
-        long timestamp = Long.parseLong(text);
-        Instant instant;
-        if (digitLength == SECOND_TIMESTAMP_LENGTH) {
-            instant = Instant.ofEpochSecond(timestamp);
-        } else if (digitLength == MILLIS_TIMESTAMP_LENGTH) {
-            instant = Instant.ofEpochMilli(timestamp);
-        } else {
-            return null;
-        }
-        return instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+        DateTime parse = DateUtil.parse(text.trim());
+        return parse.toLocalDateTime();
     }
 
 }
