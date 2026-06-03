@@ -62,6 +62,11 @@ public class GenTable extends BaseEntity {
     private String tplCategory;
 
     /**
+     * 前端模板类型，对应 vm 下的模板目录
+     */
+    private String frontendType;
+
+    /**
      * 生成包路径
      */
     @NotBlank(message = "生成包路径不能为空")

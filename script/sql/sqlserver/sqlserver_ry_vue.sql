@@ -216,10 +216,9 @@ CREATE TABLE gen_table
     data_name         nvarchar(200) DEFAULT ''       NULL,
     table_name        nvarchar(200) DEFAULT ''       NULL,
     table_comment     nvarchar(500) DEFAULT ''       NULL,
-    sub_table_name    nvarchar(64)                   NULL,
-    sub_table_fk_name nvarchar(64)                   NULL,
     class_name        nvarchar(100) DEFAULT ''       NULL,
     tpl_category      nvarchar(200) DEFAULT ('crud') NULL,
+    frontend_type     nvarchar(50)  DEFAULT ('vue')  NULL,
     package_name      nvarchar(100)                  NULL,
     module_name       nvarchar(30)                   NULL,
     business_name     nvarchar(30)                   NULL,
@@ -266,18 +265,6 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'table_comment'
 GO
 EXEC sys.sp_addextendedproperty
-    'MS_Description', N'关联子表的表名' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'gen_table',
-    'COLUMN', N'sub_table_name'
-GO
-EXEC sys.sp_addextendedproperty
-    'MS_Description', N'子表关联的外键名' ,
-    'SCHEMA', N'dbo',
-    'TABLE', N'gen_table',
-    'COLUMN', N'sub_table_fk_name'
-GO
-EXEC sys.sp_addextendedproperty
     'MS_Description', N'实体类名称' ,
     'SCHEMA', N'dbo',
     'TABLE', N'gen_table',
@@ -288,6 +275,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'gen_table',
     'COLUMN', N'tpl_category'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'前端模板类型，对应 vm 下的模板目录' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'gen_table',
+    'COLUMN', N'frontend_type'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'生成包路径' ,

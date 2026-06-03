@@ -453,7 +453,7 @@ public class GenTableServiceImpl implements IGenTableService {
         table.setMenuIds(menuIds);
         setPkColumn(table);
         Dict context = TemplateEngineUtils.buildContext(table);
-        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory(), table.getDataName());
+        List<PathNamedTemplate> templates = TemplateEngineUtils.getTemplateList(table.getTplCategory(), table.getDataName(), table.getFrontendType());
         return new RenderContext(table, context, templates);
     }
 
