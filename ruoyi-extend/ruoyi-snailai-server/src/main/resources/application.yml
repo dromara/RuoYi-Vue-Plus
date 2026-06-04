@@ -4,6 +4,10 @@ server:
     context-path: /snail-ai
 
 spring:
+  application:
+    name: ruoyi-snailai-server
+  profiles:
+    active: @profiles.active@
   servlet:
     multipart:
       enabled: true
@@ -14,8 +18,7 @@ spring:
   web:
     resources:
       static-locations: classpath:admin/
-  profiles:
-    active: @profiles.active@
+
 snail-ai:
   server:
     grpc-port: 18888
