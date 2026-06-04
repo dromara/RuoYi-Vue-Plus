@@ -1,7 +1,5 @@
 # 贝尔实验室 Spring 官方推荐镜像 JDK下载地址 https://bell-sw.com/pages/downloads/
-FROM bellsoft/liberica-openjdk-rocky:17.0.16-cds
-#FROM bellsoft/liberica-openjdk-rocky:21.0.8-cds
-#FROM findepi/graalvm:java17-native
+FROM bellsoft/liberica-openjdk-rocky:21.0.11-cds
 
 LABEL maintainer="Lion Li"
 
@@ -28,4 +26,3 @@ ENTRYPOINT java -Djava.security.egd=file:/dev/./urandom -Dserver.port=${SERVER_P
            #-javaagent:/ruoyi/skywalking/agent/skywalking-agent.jar \
            -XX:+HeapDumpOnOutOfMemoryError -XX:+UseZGC ${JAVA_OPTS} \
            -jar app.jar
-

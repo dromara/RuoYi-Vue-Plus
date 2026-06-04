@@ -1,6 +1,5 @@
 # 贝尔实验室 Spring 官方推荐镜像 JDK下载地址 https://bell-sw.com/pages/downloads/
-FROM bellsoft/liberica-openjdk-rocky:21.0.8-cds
-#FROM findepi/graalvm:java21-native
+FROM bellsoft/liberica-openjdk-rocky:21.0.11-cds
 
 LABEL maintainer="Lion Li"
 
