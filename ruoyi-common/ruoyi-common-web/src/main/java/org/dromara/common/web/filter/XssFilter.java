@@ -1,13 +1,13 @@
 package org.dromara.common.web.filter;
 
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.web.config.properties.XssProperties;
 import org.springframework.http.HttpMethod;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +42,10 @@ public class XssFilter implements Filter {
     /**
      * 对请求执行 XSS 包装处理，命中排除规则时直接放行。
      *
-     * @param request 原始请求
+     * @param request  原始请求
      * @param response 当前响应
-     * @param chain 过滤器链
-     * @throws IOException IO 异常
+     * @param chain    过滤器链
+     * @throws IOException      IO 异常
      * @throws ServletException Servlet 异常
      */
     @Override
@@ -64,7 +64,7 @@ public class XssFilter implements Filter {
     /**
      * 判断当前请求是否需要跳过 XSS 过滤。
      *
-     * @param request 当前请求
+     * @param request  当前请求
      * @param response 当前响应
      * @return true 表示跳过过滤
      */

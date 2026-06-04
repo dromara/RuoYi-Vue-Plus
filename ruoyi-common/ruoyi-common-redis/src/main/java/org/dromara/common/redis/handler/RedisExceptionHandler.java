@@ -20,7 +20,7 @@ public class RedisExceptionHandler {
     /**
      * 处理 Lock4j 分布式锁获取失败异常。
      *
-     * @param e 异常信息
+     * @param e       异常信息
      * @param request 当前请求
      * @return 统一失败响应
      */

@@ -37,7 +37,7 @@ public class SseEmitterSessionManager implements PushSessionManager {
      * 构造 SSE 会话管理器并启动心跳检测。
      *
      * @param scheduledExecutorService 定时任务线程池
-     * @param messageProperties 消息推送配置
+     * @param messageProperties        消息推送配置
      */
     public SseEmitterSessionManager(ScheduledExecutorService scheduledExecutorService, MessageProperties messageProperties) {
         this.messageProperties = messageProperties;
@@ -218,7 +218,7 @@ public class SseEmitterSessionManager implements PushSessionManager {
     /**
      * 向指定用户的全部本地 SSE 会话发送统一 JSON 消息。
      *
-     * @param userId        要发送消息的用户id
+     * @param userId  要发送消息的用户id
      * @param pushDTO 要发送的消息内容
      */
     public void sendMessage(Long userId, PushDTO pushDTO) {

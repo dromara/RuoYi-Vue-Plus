@@ -133,9 +133,9 @@ public interface OssClient extends AutoCloseable {
     /**
      * 将本地路径对应的文件上传到指定存储桶。
      *
-     * @param bucket 存储桶名称
-     * @param key    对象键
-     * @param path   文件路径
+     * @param bucket  存储桶名称
+     * @param key     对象键
+     * @param path    文件路径
      * @param options 可选项
      * @return 上传结果
      */
@@ -154,9 +154,9 @@ public interface OssClient extends AutoCloseable {
     /**
      * 将文件上传到指定存储桶。
      *
-     * @param bucket 存储桶名称
-     * @param key    对象键
-     * @param file   文件对象
+     * @param bucket  存储桶名称
+     * @param key     对象键
+     * @param file    文件对象
      * @param options 可选项
      * @return 上传结果
      */
@@ -175,9 +175,9 @@ public interface OssClient extends AutoCloseable {
     /**
      * 将随机访问文件上传到指定存储桶。
      *
-     * @param bucket 存储桶名称
-     * @param key    对象键
-     * @param file   随机访问文件
+     * @param bucket  存储桶名称
+     * @param key     对象键
+     * @param file    随机访问文件
      * @param options 可选项
      * @return 上传结果
      */
@@ -200,7 +200,7 @@ public interface OssClient extends AutoCloseable {
      * @param key           对象键
      * @param channel       数据通道
      * @param contentLength 内容长度
-     * @param options 可选项
+     * @param options       可选项
      * @return 上传结果
      */
     PutObjectResult bucketUpload(String bucket, String key, ReadableByteChannel channel, long contentLength, Options options);
@@ -223,7 +223,7 @@ public interface OssClient extends AutoCloseable {
      * @param key           对象键
      * @param in            输入流
      * @param contentLength 内容长度
-     * @param options 可选项
+     * @param options       可选项
      * @return 上传结果
      */
     PutObjectResult bucketUpload(String bucket, String key, InputStream in, long contentLength, Options options);
@@ -242,9 +242,9 @@ public interface OssClient extends AutoCloseable {
     /**
      * 将字节数组上传到指定存储桶。
      *
-     * @param bucket 存储桶名称
-     * @param key    对象键
-     * @param data   字节数组
+     * @param bucket  存储桶名称
+     * @param key     对象键
+     * @param data    字节数组
      * @param options 可选项
      * @return 上传结果
      */
@@ -374,8 +374,8 @@ public interface OssClient extends AutoCloseable {
     /**
      * 将本地路径对应的文件上传到默认存储桶。
      *
-     * @param key  对象键
-     * @param path 文件路径
+     * @param key     对象键
+     * @param path    文件路径
      * @param options 可选项
      * @return 上传结果
      */
@@ -393,8 +393,8 @@ public interface OssClient extends AutoCloseable {
     /**
      * 将文件上传到默认存储桶。
      *
-     * @param key  对象键
-     * @param file 文件对象
+     * @param key     对象键
+     * @param file    文件对象
      * @param options 可选项
      * @return 上传结果
      */
@@ -412,8 +412,8 @@ public interface OssClient extends AutoCloseable {
     /**
      * 将随机访问文件上传到默认存储桶。
      *
-     * @param key  对象键
-     * @param file 随机访问文件
+     * @param key     对象键
+     * @param file    随机访问文件
      * @param options 可选项
      * @return 上传结果
      */
@@ -431,10 +431,10 @@ public interface OssClient extends AutoCloseable {
     /**
      * 将可读通道中的数据上传到默认存储桶。
      *
-     * @param key    对象键
-     * @param channel            数据通道
+     * @param key           对象键
+     * @param channel       数据通道
      * @param contentLength 内容长度
-     * @param options 可选项
+     * @param options       可选项
      * @return 上传结果
      */
     PutObjectResult upload(String key, ReadableByteChannel channel, long contentLength, Options options);
@@ -452,10 +452,10 @@ public interface OssClient extends AutoCloseable {
     /**
      * 将输入流中的数据上传到默认存储桶。
      *
-     * @param key    对象键
+     * @param key           对象键
      * @param in            输入流
      * @param contentLength 内容长度
-     * @param options 可选项
+     * @param options       可选项
      * @return 上传结果
      */
     PutObjectResult upload(String key, InputStream in, long contentLength, Options options);
@@ -473,8 +473,8 @@ public interface OssClient extends AutoCloseable {
     /**
      * 将字节数组上传到默认存储桶。
      *
-     * @param key    对象键
-     * @param data   字节数组
+     * @param key     对象键
+     * @param data    字节数组
      * @param options 可选项
      * @return 上传结果
      */

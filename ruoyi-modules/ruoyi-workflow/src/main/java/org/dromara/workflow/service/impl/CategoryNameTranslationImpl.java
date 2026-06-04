@@ -32,7 +32,7 @@ public class CategoryNameTranslationImpl implements TranslationInterface<String>
     /**
      * 将流程分类 ID 翻译为分类名称。
      *
-     * @param key 流程分类 ID
+     * @param key   流程分类 ID
      * @param other 额外参数
      * @return 流程分类名称
      */
@@ -44,7 +44,7 @@ public class CategoryNameTranslationImpl implements TranslationInterface<String>
     /**
      * 批量将流程分类 ID 翻译为分类名称。
      *
-     * @param keys 流程分类 ID 集合
+     * @param keys  流程分类 ID 集合
      * @param other 额外参数
      * @return 流程分类 ID 与分类名称映射
      */
@@ -65,7 +65,7 @@ public class CategoryNameTranslationImpl implements TranslationInterface<String>
     /**
      * 根据原始键构建流程分类名称翻译值。
      *
-     * @param source 原始键
+     * @param source        原始键
      * @param categoryNames 流程分类 ID 与分类名称映射
      * @return 流程分类名称
      */

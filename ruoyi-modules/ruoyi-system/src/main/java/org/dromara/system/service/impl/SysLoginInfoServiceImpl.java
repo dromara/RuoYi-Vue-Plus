@@ -14,8 +14,8 @@ import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ip.AddressUtils;
 import org.dromara.common.log.event.LoginInfoEvent;
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.mapper.LambdaCrudChainWrapper;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.SysLoginInfo;
 import org.dromara.system.domain.bo.SysLoginInfoBo;
@@ -66,14 +66,13 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
         }
 
         String address = AddressUtils.getRealAddressByIP(ip);
-        StringBuilder s = new StringBuilder();
-        s.append(getBlock(ip));
-        s.append(address);
-        s.append(getBlock(loginInfoEvent.getUsername()));
-        s.append(getBlock(loginInfoEvent.getStatus()));
-        s.append(getBlock(loginInfoEvent.getMessage()));
+        String s = getBlock(ip) +
+            address +
+            getBlock(loginInfoEvent.getUsername()) +
+            getBlock(loginInfoEvent.getStatus()) +
+            getBlock(loginInfoEvent.getMessage());
         // 打印信息到日志
-        log.info(s.toString(), loginInfoEvent.getArgs());
+        log.info(s, loginInfoEvent.getArgs());
         // 获取客户端操作系统
         String os = userAgent.getOs().getName();
         // 获取客户端浏览器
@@ -110,14 +109,14 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
         if (msg == null) {
             msg = "";
         }
-        return "[" + msg.toString() + "]";
+        return "[" + msg + "]";
     }
 
     /**
      * 分页查询登录日志列表
      *
      * @param loginInfo 查询条件
-     * @param pageQuery  分页参数
+     * @param pageQuery 分页参数
      * @return 登录日志分页列表
      */
     @Override

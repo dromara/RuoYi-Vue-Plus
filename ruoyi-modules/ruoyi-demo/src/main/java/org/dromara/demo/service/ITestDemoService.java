@@ -1,7 +1,7 @@
 package org.dromara.demo.service;
 
-import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.demo.domain.TestDemo;
 import org.dromara.demo.domain.bo.TestDemoBo;
 import org.dromara.demo.domain.vo.TestDemoVo;
@@ -28,7 +28,7 @@ public interface ITestDemoService {
     /**
      * 分页查询测试单表列表。
      *
-     * @param bo 查询条件
+     * @param bo        查询条件
      * @param pageQuery 分页参数
      * @return 分页结果
      */
@@ -37,7 +37,7 @@ public interface ITestDemoService {
     /**
      * 按自定义 SQL 分页查询测试单表列表。
      *
-     * @param bo 查询条件
+     * @param bo        查询条件
      * @param pageQuery 分页参数
      * @return 分页结果
      */

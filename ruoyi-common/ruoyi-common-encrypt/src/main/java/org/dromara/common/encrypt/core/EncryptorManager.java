@@ -171,10 +171,10 @@ public class EncryptorManager {
     /**
      * 加密器缓存键。
      *
-     * @param algorithm 加密算法
-     * @param encode 编码方式
-     * @param password 密码
-     * @param publicKey 公钥
+     * @param algorithm  加密算法
+     * @param encode     编码方式
+     * @param password   密码
+     * @param publicKey  公钥
      * @param privateKey 私钥
      */
     private record EncryptorCacheKey(

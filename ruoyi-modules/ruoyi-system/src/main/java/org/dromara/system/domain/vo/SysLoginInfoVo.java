@@ -13,7 +13,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
-
 /**
  * 系统访问记录视图对象 sys_login_info
  *

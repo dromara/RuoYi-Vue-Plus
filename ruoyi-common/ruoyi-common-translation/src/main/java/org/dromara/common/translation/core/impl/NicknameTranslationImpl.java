@@ -25,7 +25,7 @@ public class NicknameTranslationImpl implements TranslationInterface<String> {
     /**
      * 将用户 ID 或 ID 集合翻译为用户昵称。
      *
-     * @param key 用户 ID 或逗号分隔的 ID 字符串
+     * @param key   用户 ID 或逗号分隔的 ID 字符串
      * @param other 额外参数
      * @return 用户昵称
      */
@@ -42,7 +42,7 @@ public class NicknameTranslationImpl implements TranslationInterface<String> {
     /**
      * 批量将用户 ID 翻译为用户昵称。
      *
-     * @param keys 用户 ID 集合
+     * @param keys  用户 ID 集合
      * @param other 额外参数
      * @return 用户 ID 与用户昵称映射
      */
@@ -63,7 +63,7 @@ public class NicknameTranslationImpl implements TranslationInterface<String> {
     /**
      * 根据原始键构建用户昵称翻译值。
      *
-     * @param source 原始键
+     * @param source    原始键
      * @param userNames 用户 ID 与用户昵称映射
      * @return 用户昵称
      */

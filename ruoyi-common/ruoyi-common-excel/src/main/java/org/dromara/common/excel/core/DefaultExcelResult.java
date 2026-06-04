@@ -37,7 +37,7 @@ public class DefaultExcelResult<T> implements ExcelResult<T> {
     /**
      * 创建导入结果。
      *
-     * @param list 成功数据列表
+     * @param list      成功数据列表
      * @param errorList 错误信息列表
      */
     public DefaultExcelResult(List<T> list, List<String> errorList) {

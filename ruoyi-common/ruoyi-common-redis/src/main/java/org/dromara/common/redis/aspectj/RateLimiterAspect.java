@@ -100,11 +100,11 @@ public class RateLimiterAspect {
             Method targetMethod = signature.getMethod();
             Object[] args = point.getArgs();
             MethodBasedEvaluationContext context =
-                    new MethodBasedEvaluationContext(null, targetMethod, args, pnd);
+                new MethodBasedEvaluationContext(null, targetMethod, args, pnd);
             context.setBeanResolver(new BeanFactoryResolver(SpringUtils.getBeanFactory()));
             Expression expression;
             if (StringUtils.startsWith(key, parserContext.getExpressionPrefix())
-                    && StringUtils.endsWith(key, parserContext.getExpressionSuffix())) {
+                && StringUtils.endsWith(key, parserContext.getExpressionSuffix())) {
                 expression = parser.parseExpression(key, parserContext);
             } else {
                 expression = parser.parseExpression(key);

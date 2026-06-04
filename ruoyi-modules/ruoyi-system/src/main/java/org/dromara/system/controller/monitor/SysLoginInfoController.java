@@ -52,7 +52,7 @@ public class SysLoginInfoController extends BaseController {
      * 导出系统访问记录列表。
      *
      * @param loginInfo 查询条件
-     * @param response HTTP 响应
+     * @param response  HTTP 响应
      */
     @Log(title = "登录日志", businessType = BusinessType.EXPORT)
     @SaCheckPermission("monitor:logininfo:export")

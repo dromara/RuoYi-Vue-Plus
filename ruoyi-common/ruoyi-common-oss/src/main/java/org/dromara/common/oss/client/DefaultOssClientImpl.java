@@ -29,7 +29,7 @@ public class DefaultOssClientImpl extends AbstractOssClientImpl {
      * 构造默认 S3 存储客户端。
      *
      * @param clientId 客户端 ID
-     * @param config S3 存储客户端配置
+     * @param config   S3 存储客户端配置
      */
     public DefaultOssClientImpl(String clientId, OssClientConfig config) {
         super(clientId, config);

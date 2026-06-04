@@ -51,7 +51,7 @@ public interface IAuthStrategy {
     /**
      * 按客户端配置构建统一登录参数，并预留自定义扩展入口。
      *
-     * @param client 客户端配置
+     * @param client     客户端配置
      * @param customizer 自定义扩展逻辑
      * @return Sa-Token 登录参数
      */

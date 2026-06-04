@@ -61,16 +61,16 @@ public class MimeTypeUtils {
      * 默认允许上传的文件扩展名数组
      */
     public static final String[] DEFAULT_ALLOWED_EXTENSION = {
-            // 图片
-            "bmp", "gif", "jpg", "jpeg", "png",
-            // word excel powerpoint
-            "doc", "docx", "xls", "xlsx", "ppt", "pptx", "html", "htm", "txt",
-            // 压缩文件
-            "rar", "zip", "gz", "bz2",
-            // 视频格式
-            "mp4", "avi", "rmvb",
-            // pdf
-            "pdf"
+        // 图片
+        "bmp", "gif", "jpg", "jpeg", "png",
+        // word excel powerpoint
+        "doc", "docx", "xls", "xlsx", "ppt", "pptx", "html", "htm", "txt",
+        // 压缩文件
+        "rar", "zip", "gz", "bz2",
+        // 视频格式
+        "mp4", "avi", "rmvb",
+        // pdf
+        "pdf"
     };
 
     /**

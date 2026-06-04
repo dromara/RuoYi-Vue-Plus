@@ -11,8 +11,8 @@ import java.util.Optional;
  * @author 秋辞未寒
  */
 public record HandleAsyncResult<T>(
-        T result,
-        Throwable error
+    T result,
+    Throwable error
 ) {
 
     /**

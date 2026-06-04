@@ -40,7 +40,7 @@ public class SysOssConfigController extends BaseController {
     /**
      * 分页查询对象存储配置列表。
      *
-     * @param bo 查询条件
+     * @param bo        查询条件
      * @param pageQuery 分页参数
      * @return 配置分页数据
      */

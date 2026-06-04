@@ -86,7 +86,7 @@ public class NetUtils extends NetUtil {
     /**
      * 匹配 IP 规则，支持精确值、通配符与 CIDR。
      *
-     * @param rule IP 规则
+     * @param rule     IP 规则
      * @param clientIp 客户端 IP
      * @return 是否匹配
      */
@@ -114,7 +114,7 @@ public class NetUtils extends NetUtil {
     /**
      * 匹配 CIDR 网段。
      *
-     * @param cidr CIDR 规则
+     * @param cidr     CIDR 规则
      * @param clientIp 客户端 IP
      * @return 是否命中
      */

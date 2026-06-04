@@ -40,7 +40,7 @@ public class SysClientController extends BaseController {
     /**
      * 分页查询客户端管理列表。
      *
-     * @param bo 查询条件
+     * @param bo        查询条件
      * @param pageQuery 分页参数
      * @return 客户端分页数据
      */
@@ -53,7 +53,7 @@ public class SysClientController extends BaseController {
     /**
      * 导出客户端管理列表，便于离线审计与配置核查。
      *
-     * @param bo 查询条件
+     * @param bo       查询条件
      * @param response 响应流
      */
     @SaCheckPermission("system:client:export")

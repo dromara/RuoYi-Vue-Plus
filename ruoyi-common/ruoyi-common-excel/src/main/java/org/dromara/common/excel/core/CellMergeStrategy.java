@@ -38,7 +38,7 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements SheetWri
     /**
      * 根据数据列表创建单元格合并策略。
      *
-     * @param list 数据列表
+     * @param list     数据列表
      * @param hasTitle 是否存在标题行
      */
     public CellMergeStrategy(List<?> list, boolean hasTitle) {
@@ -48,7 +48,7 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements SheetWri
     /**
      * 根据数据列表和起始行创建单元格合并策略。
      *
-     * @param list 数据列表
+     * @param list     数据列表
      * @param hasTitle 是否存在标题行
      * @param rowIndex 起始行索引
      */
@@ -59,9 +59,9 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements SheetWri
     /**
      * 写入单元格时清理合并区域非首行内容。
      *
-     * @param sheet 工作表
-     * @param cell 当前单元格
-     * @param head 表头
+     * @param sheet            工作表
+     * @param cell             当前单元格
+     * @param head             表头
      * @param relativeRowIndex 相对行索引
      */
     @Override
@@ -83,7 +83,7 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements SheetWri
      * 工作表创建后写入合并区域。
      *
      * @param writeWorkbookHolder 工作簿上下文
-     * @param writeSheetHolder 工作表上下文
+     * @param writeSheetHolder    工作表上下文
      */
     @Override
     public void afterSheetCreate(final WriteWorkbookHolder writeWorkbookHolder, final WriteSheetHolder writeSheetHolder) {

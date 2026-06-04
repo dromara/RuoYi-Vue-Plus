@@ -80,7 +80,7 @@ public final class AggregateSelectUtils {
      */
     public static String checkAlias(String alias) {
         Assert.isTrue(StringUtils.isNotBlank(alias) && ALIAS_PATTERN.matcher(alias).matches(),
-                "查询别名只能包含字母、数字、下划线且不能以数字开头: %s", alias);
+            "查询别名只能包含字母、数字、下划线且不能以数字开头: %s", alias);
         return alias;
     }
 

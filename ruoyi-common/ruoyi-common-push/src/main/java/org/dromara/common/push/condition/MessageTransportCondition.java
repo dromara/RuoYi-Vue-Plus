@@ -19,7 +19,7 @@ public class MessageTransportCondition implements Condition {
     /**
      * 判断当前消息推送配置是否匹配注解声明的传输方式。
      *
-     * @param context 条件上下文
+     * @param context  条件上下文
      * @param metadata 注解元数据
      * @return 是否匹配
      */

@@ -20,17 +20,17 @@ public enum AccessPolicy {
     /**
      * 私有
      */
-    PRIVATE(0,BucketCannedACL.PRIVATE, ObjectCannedACL.PRIVATE),
+    PRIVATE(0, BucketCannedACL.PRIVATE, ObjectCannedACL.PRIVATE),
 
     /**
      * 公有读写
      */
-    PUBLIC_READ_WRITE(1,BucketCannedACL.PUBLIC_READ_WRITE, ObjectCannedACL.PUBLIC_READ_WRITE),
+    PUBLIC_READ_WRITE(1, BucketCannedACL.PUBLIC_READ_WRITE, ObjectCannedACL.PUBLIC_READ_WRITE),
 
     /**
      * 公有只读
      */
-    PUBLIC_READ(2,BucketCannedACL.PUBLIC_READ, ObjectCannedACL.PUBLIC_READ);
+    PUBLIC_READ(2, BucketCannedACL.PUBLIC_READ, ObjectCannedACL.PUBLIC_READ);
 
     /**
      * 访问策略类型

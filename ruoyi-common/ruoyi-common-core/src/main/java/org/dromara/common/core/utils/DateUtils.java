@@ -27,9 +27,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * 日期解析格式集合。
      */
     private static final String[] PARSE_PATTERNS = {
-            "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM",
-            "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM",
-            "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"
+        "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM",
+        "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM",
+        "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"
     };
 
     /**
@@ -411,7 +411,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         // 本周
         if (DateUtil.isSameWeek(date, now, true)) {
             return DateUtil.dayOfWeekEnum(date).toChinese("周")
-                    + " " + DateUtil.format(date, "HH:mm");
+                + " " + DateUtil.format(date, "HH:mm");
         }
 
         // 今年内其它时间

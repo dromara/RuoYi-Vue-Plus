@@ -28,25 +28,25 @@ public class SysSocialBo implements Serializable {
     /**
      * 主键
      */
-    @NotNull(message = "主键不能为空", groups = { EditGroup.class })
+    @NotNull(message = "主键不能为空", groups = {EditGroup.class})
     private Long id;
 
     /**
      * 认证唯一ID
      */
-    @NotBlank(message = "认证唯一ID不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "认证唯一ID不能为空", groups = {AddGroup.class, EditGroup.class})
     private String authId;
 
     /**
      * 用户来源
      */
-    @NotBlank(message = "用户来源不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "用户来源不能为空", groups = {AddGroup.class, EditGroup.class})
     private String source;
 
     /**
      * 用户的授权令牌
      */
-    @NotBlank(message = "用户的授权令牌不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "用户的授权令牌不能为空", groups = {AddGroup.class, EditGroup.class})
     private String accessToken;
 
     /**
@@ -67,7 +67,7 @@ public class SysSocialBo implements Serializable {
     /**
      * 用户的 ID
      */
-    @NotBlank(message = "用户的ID不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "用户的ID不能为空", groups = {AddGroup.class, EditGroup.class})
     private Long userId;
 
     /**

@@ -25,23 +25,28 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @SuppressWarnings("unused")
 public class DropDownOptions {
+
     /**
      * 一级下拉所在列index，从0开始算
      */
     private int index = 0;
+
     /**
      * 二级下拉所在的index，从0开始算，不能与一级相同
      */
     private int nextIndex = 0;
+
     /**
      * 一级下拉所包含的数据
      */
     private List<String> options = new ArrayList<>();
+
     /**
      * 二级下拉所包含的数据Map
      * <p>以每一个一级选项值为Key，每个一级选项对应的二级数据为Value</p>
      */
     private Map<String, List<String>> nextOptions = new HashMap<>();
+
     /**
      * 分隔符
      */

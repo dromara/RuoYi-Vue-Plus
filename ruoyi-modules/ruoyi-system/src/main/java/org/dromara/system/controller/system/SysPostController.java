@@ -43,7 +43,7 @@ public class SysPostController extends BaseController {
     /**
      * 分页查询岗位列表。
      *
-     * @param post 查询条件
+     * @param post      查询条件
      * @param pageQuery 分页参数
      * @return 岗位分页结果
      */
@@ -56,7 +56,7 @@ public class SysPostController extends BaseController {
     /**
      * 导出岗位列表。
      *
-     * @param post 查询条件
+     * @param post     查询条件
      * @param response HTTP 响应
      */
     @Log(title = "岗位管理", businessType = BusinessType.EXPORT)

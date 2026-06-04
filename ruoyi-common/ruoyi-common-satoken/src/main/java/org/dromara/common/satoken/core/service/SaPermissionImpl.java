@@ -9,8 +9,8 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.model.LoginUser;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -24,7 +24,7 @@ public class SaPermissionImpl implements StpInterface {
     /**
      * 获取指定登录对象的菜单权限列表。
      *
-     * @param loginId 登录ID
+     * @param loginId   登录ID
      * @param loginType 登录类型
      * @return 菜单权限列表
      */
@@ -36,7 +36,7 @@ public class SaPermissionImpl implements StpInterface {
     /**
      * 获取指定登录对象的角色权限列表。
      *
-     * @param loginId 登录ID
+     * @param loginId   登录ID
      * @param loginType 登录类型
      * @return 角色权限列表
      */
@@ -48,8 +48,8 @@ public class SaPermissionImpl implements StpInterface {
     /**
      * 解析当前登录对象的权限列表。
      *
-     * @param loginId 登录ID
-     * @param localPermissionExtractor 当前登录用户权限提取器
+     * @param loginId                   登录ID
+     * @param localPermissionExtractor  当前登录用户权限提取器
      * @param remotePermissionExtractor 远程权限提取器
      * @return 权限列表
      */

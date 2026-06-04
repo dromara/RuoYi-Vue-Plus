@@ -61,7 +61,7 @@ public class SmsController {
      * @param phone 手机号
      */
     @GetMapping("/addBlacklist")
-    public R<Object> addBlacklist(String phone){
+    public R<Object> addBlacklist(String phone) {
         SmsBlend smsBlend = SmsFactory.getSmsBlend("config1");
         smsBlend.joinInBlacklist(phone);
         return R.ok();
@@ -73,7 +73,7 @@ public class SmsController {
      * @param phone 手机号
      */
     @GetMapping("/removeBlacklist")
-    public R<Object> removeBlacklist(String phone){
+    public R<Object> removeBlacklist(String phone) {
         SmsBlend smsBlend = SmsFactory.getSmsBlend("config1");
         smsBlend.removeFromBlacklist(phone);
         return R.ok();

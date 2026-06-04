@@ -45,7 +45,7 @@ public class TestDemoServiceImpl implements ITestDemoService {
     /**
      * 分页查询测试单表列表。
      *
-     * @param bo 查询条件
+     * @param bo        查询条件
      * @param pageQuery 分页参数
      * @return 分页结果
      */
@@ -59,7 +59,7 @@ public class TestDemoServiceImpl implements ITestDemoService {
     /**
      * 通过自定义 SQL 分页查询测试单表列表。
      *
-     * @param bo 查询条件
+     * @param bo        查询条件
      * @param pageQuery 分页参数
      * @return 分页结果
      */
@@ -139,7 +139,7 @@ public class TestDemoServiceImpl implements ITestDemoService {
     /**
      * 按主键集合删除测试单表数据，并按需执行删除前校验。
      *
-     * @param ids 主键集合
+     * @param ids     主键集合
      * @param isValid 是否执行删除校验
      * @return 是否删除成功
      */

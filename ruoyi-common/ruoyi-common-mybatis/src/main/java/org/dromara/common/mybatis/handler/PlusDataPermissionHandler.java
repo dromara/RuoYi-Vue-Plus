@@ -65,8 +65,8 @@ public class PlusDataPermissionHandler {
     /**
      * 获取数据过滤条件的 SQL 片段
      *
-     * @param where             原始的查询条件表达式
-     * @param isSelect          是否为查询语句
+     * @param where    原始的查询条件表达式
+     * @param isSelect 是否为查询语句
      * @return 数据过滤条件的 SQL 片段
      */
     public Expression getSqlSegment(Expression where, boolean isSelect) {
@@ -283,7 +283,7 @@ public class PlusDataPermissionHandler {
     /**
      * 优先从方法、再从类上查找指定注解。
      *
-     * @param handlerMethod 当前请求处理方法
+     * @param handlerMethod  当前请求处理方法
      * @param annotationType 注解类型
      * @param <A>            注解类型
      * @return 注解对象，未配置时返回 null

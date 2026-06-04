@@ -19,7 +19,7 @@ public class MqttClientGlobalMessageListener implements IMqttClientGlobalMessage
      * 接收并记录全局 MQTT 消息。
      *
      * @param context 通道上下文
-     * @param topic 主题
+     * @param topic   主题
      * @param message MQTT 消息对象
      * @param payload 消息载荷
      */

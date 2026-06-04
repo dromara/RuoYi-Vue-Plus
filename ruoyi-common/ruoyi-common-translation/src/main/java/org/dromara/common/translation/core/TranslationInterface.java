@@ -7,13 +7,7 @@ import org.dromara.common.translation.annotation.TranslationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -37,7 +31,7 @@ public interface TranslationInterface<T> {
     /**
      * 批量翻译。
      *
-     * @param keys 需要被翻译的键集合
+     * @param keys  需要被翻译的键集合
      * @param other 其他参数
      * @return 翻译结果映射
      */
@@ -88,8 +82,8 @@ public interface TranslationInterface<T> {
      *
      * @param ids    原始 ID 字符串
      * @param mapper ID 到值的映射函数
+     * @param <E>    值类型
      * @return 拼接后的结果字符串
-     * @param <E> 值类型
      */
     default <E> String joinMappedValues(String ids, Function<Long, E> mapper) {
         return StreamUtils.join(parseLongIds(ids), id -> {

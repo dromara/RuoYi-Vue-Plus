@@ -31,15 +31,15 @@ public abstract class AbstractAuthWeChatEnterpriseRequest extends AuthDefaultReq
      * @param source 授权来源
      */
     public AbstractAuthWeChatEnterpriseRequest(AuthConfig config, AuthSource source) {
-        super(config,source);
+        super(config, source);
     }
 
 
     /**
      * 创建企业微信认证请求。
      *
-     * @param config 授权配置
-     * @param source 授权来源
+     * @param config         授权配置
+     * @param source         授权来源
      * @param authStateCache 授权状态缓存
      */
     public AbstractAuthWeChatEnterpriseRequest(AuthConfig config, AuthSource source, AuthStateCache authStateCache) {

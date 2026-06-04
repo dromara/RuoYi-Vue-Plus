@@ -82,9 +82,9 @@ public class MyBatisDataSourceMonitor implements DataSourceMonitor {
      */
     @Override
     public String key(DataRuntime runtime, Object datasource) {
-        if(datasource instanceof JdbcTemplate jdbc){
+        if (datasource instanceof JdbcTemplate jdbc) {
             DataSource ds = jdbc.getDataSource();
-            if(ds instanceof DynamicRoutingDataSource){
+            if (ds instanceof DynamicRoutingDataSource) {
                 return DynamicDataSourceContextHolder.peek();
             }
         }

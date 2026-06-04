@@ -82,76 +82,84 @@ public abstract class AbstractMetadataJavadocResolver<M> implements JavadocResol
 
     /**
      * 执行解析并返回解析到的 Javadoc 内容
+     *
      * @param handlerMethod 处理器方法
-     * @param operation Swagger Operation实例
-     * @param metadata 元信息
+     * @param operation     Swagger Operation实例
+     * @param metadata      元信息
      * @return 解析到的 Javadoc 内容
      */
     public abstract String resolve(HandlerMethod handlerMethod, Operation operation, M metadata);
 
     /**
      * 检查处理器方法所属的类上是否存在注解
-     * @param handlerMethod 处理器方法
+     *
+     * @param handlerMethod   处理器方法
      * @param annotationClass 注解类
      * @return 是否存在注解
      */
-    public boolean hasClassAnnotation(HandlerMethod handlerMethod,Class<? extends Annotation> annotationClass){
+    public boolean hasClassAnnotation(HandlerMethod handlerMethod, Class<? extends Annotation> annotationClass) {
         return AnnotationUtil.hasAnnotation(handlerMethod.getBeanType(), annotationClass);
     }
 
     /**
      * 检查处理器方法所属的类上是否存在注解
-     * @param handlerMethod 处理器方法
+     *
+     * @param handlerMethod      处理器方法
      * @param annotationTypeName 注解类名称
      * @return 是否存在注解
      */
-    public boolean hasClassAnnotation(HandlerMethod handlerMethod, String annotationTypeName){
+    public boolean hasClassAnnotation(HandlerMethod handlerMethod, String annotationTypeName) {
         return AnnotationUtil.hasAnnotation(handlerMethod.getBeanType(), annotationTypeName);
     }
 
     /**
      * 检查处理器方法上是否存在注解
-     * @param handlerMethod 处理器方法
+     *
+     * @param handlerMethod   处理器方法
      * @param annotationClass 注解类
      * @return 是否存在注解
      */
-    public boolean hasMethodAnnotation(HandlerMethod handlerMethod,Class<? extends Annotation> annotationClass){
+    public boolean hasMethodAnnotation(HandlerMethod handlerMethod, Class<? extends Annotation> annotationClass) {
         return AnnotationUtil.hasAnnotation(handlerMethod.getMethod(), annotationClass);
     }
 
     /**
      * 检查处理器方法上是否存在注解
-     * @param handlerMethod 处理器方法
+     *
+     * @param handlerMethod      处理器方法
      * @param annotationTypeName 注解类名称
      * @return 是否存在注解
      */
-    public boolean hasMethodAnnotation(HandlerMethod handlerMethod, String annotationTypeName){
+    public boolean hasMethodAnnotation(HandlerMethod handlerMethod, String annotationTypeName) {
         return AnnotationUtil.hasAnnotation(handlerMethod.getMethod(), annotationTypeName);
     }
 
     /**
      * 检查处理器方法上是否存在注解
-     * @param handlerMethod 处理器方法
+     *
+     * @param handlerMethod   处理器方法
      * @param annotationClass 注解类
      * @return 是否存在注解
      */
-    public boolean hasAnnotation(HandlerMethod handlerMethod,Class<? extends Annotation> annotationClass){
+    public boolean hasAnnotation(HandlerMethod handlerMethod, Class<? extends Annotation> annotationClass) {
         return this.hasClassAnnotation(handlerMethod, annotationClass) || this.hasMethodAnnotation(handlerMethod, annotationClass);
     }
 
     /**
      * 检查处理器方法上是否存在注解
-     * @param handlerMethod 处理器方法
+     *
+     * @param handlerMethod      处理器方法
      * @param annotationTypeName 注解类名称
      * @return 是否存在注解
      */
-    public boolean hasAnnotation(HandlerMethod handlerMethod, String annotationTypeName){
+    public boolean hasAnnotation(HandlerMethod handlerMethod, String annotationTypeName) {
         return this.hasClassAnnotation(handlerMethod, annotationTypeName) || this.hasMethodAnnotation(handlerMethod, annotationTypeName);
     }
 
     /**
      * 获取处理器方法所属类上的注解的值
-     * @param handlerMethod 处理器方法
+     *
+     * @param handlerMethod   处理器方法
      * @param annotationClass 注解类
      * @return 注解的值
      */
@@ -161,7 +169,8 @@ public abstract class AbstractMetadataJavadocResolver<M> implements JavadocResol
 
     /**
      * 获取处理器方法所属类上的注解的值
-     * @param handlerMethod 处理器方法
+     *
+     * @param handlerMethod       处理器方法
      * @param annotationClassName 注解类名称
      * @return 注解的值
      */
@@ -173,7 +182,8 @@ public abstract class AbstractMetadataJavadocResolver<M> implements JavadocResol
 
     /**
      * 获取处理器方法上的注解的值
-     * @param handlerMethod 处理器方法
+     *
+     * @param handlerMethod   处理器方法
      * @param annotationClass 注解类
      * @return 注解的值
      */
@@ -183,7 +193,8 @@ public abstract class AbstractMetadataJavadocResolver<M> implements JavadocResol
 
     /**
      * 获取处理器方法所属类上的注解的值
-     * @param handlerMethod 处理器方法
+     *
+     * @param handlerMethod       处理器方法
      * @param annotationClassName 注解类名称
      * @return 注解的值
      */

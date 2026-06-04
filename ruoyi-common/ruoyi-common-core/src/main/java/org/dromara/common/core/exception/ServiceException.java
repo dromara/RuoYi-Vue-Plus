@@ -50,7 +50,7 @@ public final class ServiceException extends RuntimeException {
      * 使用错误消息和错误码构造业务异常。
      *
      * @param message 错误消息
-     * @param code 错误码
+     * @param code    错误码
      */
     public ServiceException(String message, Integer code) {
         this.message = message;
@@ -61,7 +61,7 @@ public final class ServiceException extends RuntimeException {
      * 使用错误消息和根因构造业务异常。
      *
      * @param message 错误消息
-     * @param cause 根因
+     * @param cause   根因
      */
     public ServiceException(String message, Throwable cause) {
         super(cause);
@@ -72,7 +72,7 @@ public final class ServiceException extends RuntimeException {
      * 使用占位符参数格式化错误消息。
      *
      * @param message 模板消息
-     * @param args 参数
+     * @param args    参数
      */
     public ServiceException(String message, Object... args) {
         this.message = StrFormatter.format(message, args);

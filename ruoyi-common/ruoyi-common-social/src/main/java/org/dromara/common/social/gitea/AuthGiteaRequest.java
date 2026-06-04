@@ -35,7 +35,7 @@ public class AuthGiteaRequest extends AuthDefaultRequest {
     /**
      * 创建 Gitea 认证请求。
      *
-     * @param config 授权配置
+     * @param config         授权配置
      * @param authStateCache 授权状态缓存
      */
     public AuthGiteaRequest(AuthConfig config, AuthStateCache authStateCache) {
@@ -61,12 +61,12 @@ public class AuthGiteaRequest extends AuthDefaultRequest {
             throw new AuthException(object.getStr("message"));
         }
         return AuthToken.builder()
-                .accessToken(object.getStr("access_token"))
-                .refreshToken(object.getStr("refresh_token"))
-                .idToken(object.getStr("id_token"))
-                .tokenType(object.getStr("token_type"))
-                .scope(object.getStr("scope"))
-                .build();
+            .accessToken(object.getStr("access_token"))
+            .refreshToken(object.getStr("refresh_token"))
+            .idToken(object.getStr("id_token"))
+            .tokenType(object.getStr("token_type"))
+            .scope(object.getStr("scope"))
+            .build();
     }
 
     /**
@@ -78,11 +78,11 @@ public class AuthGiteaRequest extends AuthDefaultRequest {
     @Override
     protected String doPostAuthorizationCode(String code) {
         HttpRequest request = HttpRequest.post(source.accessToken())
-                .form("client_id", config.getClientId())
-                .form("client_secret", config.getClientSecret())
-                .form("grant_type", "authorization_code")
-                .form("code", code)
-                .form("redirect_uri", config.getRedirectUri());
+            .form("client_id", config.getClientId())
+            .form("client_secret", config.getClientSecret())
+            .form("grant_type", "authorization_code")
+            .form("code", code)
+            .form("redirect_uri", config.getRedirectUri());
         HttpResponse response = request.execute();
         return response.body();
     }
@@ -106,14 +106,14 @@ public class AuthGiteaRequest extends AuthDefaultRequest {
             throw new AuthException(object.getStr("message"));
         }
         return AuthUser.builder()
-                .uuid(object.getStr("sub"))
-                .username(object.getStr("name"))
-                .nickname(object.getStr("preferred_username"))
-                .avatar(object.getStr("picture"))
-                .email(object.getStr("email"))
-                .token(authToken)
-                .source(source.toString())
-                .build();
+            .uuid(object.getStr("sub"))
+            .username(object.getStr("name"))
+            .nickname(object.getStr("preferred_username"))
+            .avatar(object.getStr("picture"))
+            .email(object.getStr("email"))
+            .token(authToken)
+            .source(source.toString())
+            .build();
     }
 
 }

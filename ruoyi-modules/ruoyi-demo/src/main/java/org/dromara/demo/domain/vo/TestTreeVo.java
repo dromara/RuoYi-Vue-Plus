@@ -1,10 +1,10 @@
 package org.dromara.demo.domain.vo;
 
+import io.github.linpeilie.annotations.AutoMapper;
+import lombok.Data;
 import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
 import org.apache.fesod.sheet.annotation.ExcelProperty;
 import org.dromara.demo.domain.TestTree;
-import io.github.linpeilie.annotations.AutoMapper;
-import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;

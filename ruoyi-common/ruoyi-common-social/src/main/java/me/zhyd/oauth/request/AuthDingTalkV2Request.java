@@ -38,7 +38,7 @@ public class AuthDingTalkV2Request extends AuthDefaultRequest {
     /**
      * 创建钉钉 V2 认证请求。
      *
-     * @param config 授权配置
+     * @param config         授权配置
      * @param authStateCache 授权状态缓存
      */
     public AuthDingTalkV2Request(AuthConfig config, AuthStateCache authStateCache) {

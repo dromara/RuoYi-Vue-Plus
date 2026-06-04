@@ -354,7 +354,7 @@ public class JsonValueEnhancer {
      * JSON 属性元数据。
      *
      * @param propertyName 属性名称
-     * @param member Jackson 属性成员
+     * @param member       Jackson 属性成员
      */
     private record PropertyMetadata(String propertyName, AnnotatedMember member) {
 

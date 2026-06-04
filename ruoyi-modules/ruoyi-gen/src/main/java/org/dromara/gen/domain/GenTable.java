@@ -3,13 +3,13 @@ package org.dromara.gen.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
-import org.dromara.gen.constant.GenConstants;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.mybatis.core.domain.BaseEntity;
+import org.dromara.gen.constant.GenConstants;
 
 import java.util.HashMap;
 import java.util.List;

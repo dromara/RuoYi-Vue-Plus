@@ -49,7 +49,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
      * @return 流程spel表达式定义
      */
     @Override
-    public FlowSpelVo queryById(Long id){
+    public FlowSpelVo queryById(Long id) {
         return spelMapper.selectVoById(id);
     }
 
@@ -132,7 +132,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
      *
      * @param entity 待保存的 SpEL 表达式实体
      */
-    private void validEntityBeforeSave(FlowSpel entity){
+    private void validEntityBeforeSave(FlowSpel entity) {
         if (StringUtils.isNotBlank(entity.getViewSpel())) {
             boolean exists = spelMapper.lambda()
                 .eq(FlowSpel::getViewSpel, entity.getViewSpel())
@@ -153,7 +153,7 @@ public class FlwSpelServiceImpl implements IFlwSpelService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if (isValid){
+        if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return spelMapper.deleteByIds(ids) > 0;

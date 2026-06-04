@@ -163,7 +163,7 @@ public class RepeatSubmitAspect {
             }
         }
         return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse
-                || o instanceof BindingResult;
+            || o instanceof BindingResult;
     }
 
 }

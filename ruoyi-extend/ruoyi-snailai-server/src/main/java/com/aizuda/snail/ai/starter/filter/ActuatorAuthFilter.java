@@ -1,11 +1,6 @@
 package com.aizuda.snail.ai.starter.filter;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -43,10 +38,10 @@ public class ActuatorAuthFilter implements Filter {
     /**
      * 校验 Actuator Basic Auth 请求。
      *
-     * @param servletRequest 原始请求
+     * @param servletRequest  原始请求
      * @param servletResponse 原始响应
-     * @param filterChain 过滤器链
-     * @throws IOException IO 异常
+     * @param filterChain     过滤器链
+     * @throws IOException      IO 异常
      * @throws ServletException Servlet 异常
      */
     @Override

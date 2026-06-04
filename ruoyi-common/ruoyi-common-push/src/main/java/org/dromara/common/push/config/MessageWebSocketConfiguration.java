@@ -1,10 +1,10 @@
 package org.dromara.common.push.config;
 
 import org.dromara.common.push.annotation.ConditionalOnMessageTransport;
-import org.dromara.common.push.listener.MessageTopicListener;
 import org.dromara.common.push.core.WebSocketSessionManager;
 import org.dromara.common.push.handler.PlusWebSocketHandler;
 import org.dromara.common.push.interceptor.PlusWebSocketInterceptor;
+import org.dromara.common.push.listener.MessageTopicListener;
 import org.dromara.common.push.properties.MessageProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;

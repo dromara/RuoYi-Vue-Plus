@@ -173,8 +173,8 @@ public class PlusSpringCacheManager implements CacheManager {
      * 解析缓存配置，支持从模板配置复制并叠加缓存名称中的扩展参数。
      *
      * @param cacheName 完整缓存名称
-     * @param name 基础缓存名称
-     * @param array 缓存名称拆分参数
+     * @param name      基础缓存名称
+     * @param array     缓存名称拆分参数
      * @return 缓存配置
      */
     private CacheConfig resolveCacheConfig(String cacheName, String name, String[] array) {
@@ -239,9 +239,9 @@ public class PlusSpringCacheManager implements CacheManager {
     /**
      * 创建普通 Map 类型缓存。
      *
-     * @param name 缓存名称
+     * @param name   缓存名称
      * @param config 缓存配置
-     * @param local 是否启用本地一级缓存
+     * @param local  是否启用本地一级缓存
      * @return 缓存实例
      */
     private Cache createMap(String cacheName, String name, CacheConfig config, int local) {
@@ -264,9 +264,9 @@ public class PlusSpringCacheManager implements CacheManager {
     /**
      * 创建带过期策略的 MapCache 类型缓存。
      *
-     * @param name 缓存名称
+     * @param name   缓存名称
      * @param config 缓存配置
-     * @param local 是否启用本地一级缓存
+     * @param local  是否启用本地一级缓存
      * @return 缓存实例
      */
     private Cache createMapCache(String cacheName, String name, CacheConfig config, int local) {

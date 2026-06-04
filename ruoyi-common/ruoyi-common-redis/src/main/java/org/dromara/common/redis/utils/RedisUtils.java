@@ -561,32 +561,33 @@ public class RedisUtils {
 
     /**
      * 获得缓存的基本对象列表(全局匹配忽略租户 自行拼接租户id)
-     * <P>
+     * <p>
      * limit-设置扫描的限制数量(默认为0,查询全部)
      * pattern-设置键的匹配模式(默认为null)
      * chunkSize-设置每次扫描的块大小(默认为0,本方法设置为1000)
      * type-设置键的类型(默认为null,查询全部类型)
      * </P>
-     * @see KeysScanOptions
+     *
      * @param pattern 字符串前缀
      * @return 对象列表
+     * @see KeysScanOptions
      */
     public static Collection<String> keys(final String pattern) {
-        return  keys(KeysScanOptions.defaults().pattern(pattern).chunkSize(1000));
+        return keys(KeysScanOptions.defaults().pattern(pattern).chunkSize(1000));
     }
 
     /**
      * 通过扫描参数获取缓存的基本对象列表
      *
      * @param keysScanOptions 扫描参数
-     * <P>
-     * limit-设置扫描的限制数量(默认为0,查询全部)
-     * pattern-设置键的匹配模式(默认为null)
-     * chunkSize-设置每次扫描的块大小(默认为0)
-     * type-设置键的类型(默认为null,查询全部类型)
-     * </P>
-     * @see KeysScanOptions
+     *                        <p>
+     *                        limit-设置扫描的限制数量(默认为0,查询全部)
+     *                        pattern-设置键的匹配模式(默认为null)
+     *                        chunkSize-设置每次扫描的块大小(默认为0)
+     *                        type-设置键的类型(默认为null,查询全部类型)
+     *                        </P>
      * @return 对象列表
+     * @see KeysScanOptions
      */
     public static Collection<String> keys(final KeysScanOptions keysScanOptions) {
         Stream<String> keysStream = CLIENT.getKeys().getKeysStream(keysScanOptions);

@@ -26,7 +26,7 @@ public interface TestDemoMapper extends BaseMapperPlus<TestDemo, TestDemoVo> {
     /**
      * 自定义分页查询演示数据。
      *
-     * @param page 分页对象
+     * @param page    分页对象
      * @param wrapper 查询条件
      * @return 分页结果
      */
@@ -39,7 +39,7 @@ public interface TestDemoMapper extends BaseMapperPlus<TestDemo, TestDemoVo> {
     /**
      * 分页查询演示 VO 列表并应用数据权限。
      *
-     * @param page 分页对象
+     * @param page    分页对象
      * @param wrapper 查询条件
      * @return 分页结果
      */

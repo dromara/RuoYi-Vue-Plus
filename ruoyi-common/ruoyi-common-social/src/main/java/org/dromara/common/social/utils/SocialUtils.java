@@ -19,16 +19,16 @@ import org.dromara.common.social.topiam.AuthTopIamRequest;
  *
  * @author thiszhc
  */
-public class SocialUtils  {
+public class SocialUtils {
 
     private static final AuthRedisStateCache STATE_CACHE = SpringUtils.getBean(AuthRedisStateCache.class);
 
     /**
      * 执行第三方登录授权回调。
      *
-     * @param source 社交平台类型
-     * @param code 授权码
-     * @param state 状态值
+     * @param source           社交平台类型
+     * @param code             授权码
+     * @param state            状态值
      * @param socialProperties 社交平台配置
      * @return 授权响应
      * @throws AuthException 授权异常
@@ -45,14 +45,14 @@ public class SocialUtils  {
     /**
      * 根据平台类型构建授权请求实例。
      *
-     * @param source 社交平台类型
+     * @param source           社交平台类型
      * @param socialProperties 社交平台配置
      * @return 授权请求
      * @throws AuthException 授权异常
      */
     public static AuthRequest getAuthRequest(String source, SocialProperties socialProperties) throws AuthException {
         SocialLoginConfigProperties obj = socialProperties.getType().get(source);
-         if (ObjectUtil.isNull(obj)) {
+        if (ObjectUtil.isNull(obj)) {
             throw new AuthException("不支持的第三方登录类型");
         }
         AuthConfig.AuthConfigBuilder builder = AuthConfig.builder()
@@ -69,7 +69,8 @@ public class SocialUtils  {
             case "coding" -> new AuthCodingRequest(builder.build(), STATE_CACHE);
             case "oschina" -> new AuthOschinaRequest(builder.build(), STATE_CACHE);
             // 支付宝在创建回调地址时，不允许使用localhost或者127.0.0.1，所以这儿的回调地址使用的局域网内的ip
-            case "alipay_wallet" -> new AuthAlipayRequest(builder.build(), socialProperties.getType().get("alipay_wallet").getAlipayPublicKey(), STATE_CACHE);
+            case "alipay_wallet" ->
+                new AuthAlipayRequest(builder.build(), socialProperties.getType().get("alipay_wallet").getAlipayPublicKey(), STATE_CACHE);
             case "qq" -> new AuthQqRequest(builder.build(), STATE_CACHE);
             case "wechat_open" -> new AuthWeChatOpenRequest(builder.build(), STATE_CACHE);
             case "taobao" -> new AuthTaobaoRequest(builder.build(), STATE_CACHE);
@@ -77,9 +78,11 @@ public class SocialUtils  {
             case "linkedin" -> new AuthLinkedinRequest(builder.build(), STATE_CACHE);
             case "microsoft" -> new AuthMicrosoftRequest(builder.tenantId(obj.getTenantId()).build(), STATE_CACHE);
             case "renren" -> new AuthRenrenRequest(builder.build(), STATE_CACHE);
-            case "stack_overflow" -> new AuthStackOverflowRequest(builder.stackOverflowKey(obj.getStackOverflowKey()).build(), STATE_CACHE);
+            case "stack_overflow" ->
+                new AuthStackOverflowRequest(builder.stackOverflowKey(obj.getStackOverflowKey()).build(), STATE_CACHE);
             case "huawei" -> new AuthHuaweiV3Request(builder.build(), STATE_CACHE);
-            case "wechat_enterprise" -> new AuthWeChatEnterpriseQrcodeV2Request(builder.agentId(obj.getAgentId()).build(), STATE_CACHE);
+            case "wechat_enterprise" ->
+                new AuthWeChatEnterpriseQrcodeV2Request(builder.agentId(obj.getAgentId()).build(), STATE_CACHE);
             case "gitlab" -> new AuthGitlabRequest(builder.build(), STATE_CACHE);
             case "wechat_mp" -> new AuthWeChatMpRequest(builder.build(), STATE_CACHE);
             case "aliyun" -> new AuthAliyunRequest(builder.build(), STATE_CACHE);

@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
-
 /**
  * 通知公告视图对象 sys_notice
  *

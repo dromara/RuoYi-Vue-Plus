@@ -1,10 +1,10 @@
 package org.dromara.common.web.filter;
 
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dromara.common.core.utils.StringUtils;
 import org.springframework.http.MediaType;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
@@ -28,10 +28,10 @@ public class RepeatableFilter implements Filter {
     /**
      * 为 JSON 请求创建可重复读取的包装器，便于日志、验签等场景多次读取请求体。
      *
-     * @param request 原始请求
+     * @param request  原始请求
      * @param response 当前响应
-     * @param chain 过滤器链
-     * @throws IOException IO 异常
+     * @param chain    过滤器链
+     * @throws IOException      IO 异常
      * @throws ServletException Servlet 异常
      */
     @Override

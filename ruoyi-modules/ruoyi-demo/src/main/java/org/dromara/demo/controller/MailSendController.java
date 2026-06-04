@@ -39,9 +39,9 @@ public class MailSendController {
     /**
      * 发送邮件（带附件）
      *
-     * @param to       接收人
-     * @param subject  标题
-     * @param text     内容
+     * @param to      接收人
+     * @param subject 标题
+     * @param text    内容
      */
     @GetMapping("/sendMessageWithAttachment")
     public R<Void> sendMessageWithAttachment(String to, String subject, String text) {
@@ -53,9 +53,9 @@ public class MailSendController {
     /**
      * 发送邮件（多附件）
      *
-     * @param to       接收人
-     * @param subject  标题
-     * @param text     内容
+     * @param to      接收人
+     * @param subject 标题
+     * @param text    内容
      */
     @GetMapping("/sendMessageWithAttachments")
     public R<Void> sendMessageWithAttachments(String to, String subject, String text) {

@@ -48,8 +48,8 @@ public class SocialAuthStrategy implements IAuthStrategy {
     /**
      * 执行第三方授权登录，并校验授权账号与系统账号的绑定关系。
      *
-     * @param body     登录信息
-     * @param client   客户端信息
+     * @param body   登录信息
+     * @param client 客户端信息
      * @return 登录结果
      */
     @Override
@@ -57,8 +57,8 @@ public class SocialAuthStrategy implements IAuthStrategy {
         SocialLoginBody loginBody = JsonUtils.parseObject(body, SocialLoginBody.class);
         ValidatorUtils.validate(loginBody);
         AuthResponse<AuthUser> response = SocialUtils.loginAuth(
-                loginBody.getSource(), loginBody.getSocialCode(),
-                loginBody.getSocialState(), socialProperties);
+            loginBody.getSource(), loginBody.getSocialCode(),
+            loginBody.getSocialState(), socialProperties);
         if (!response.ok()) {
             throw new ServiceException(response.getMsg());
         }

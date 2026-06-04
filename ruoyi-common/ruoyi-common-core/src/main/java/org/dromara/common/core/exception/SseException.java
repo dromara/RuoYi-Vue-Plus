@@ -49,7 +49,7 @@ public final class SseException extends RuntimeException {
      * 使用错误消息和错误码构造 SSE 异常。
      *
      * @param message 错误消息
-     * @param code 错误码
+     * @param code    错误码
      */
     public SseException(String message, Integer code) {
         this.message = message;

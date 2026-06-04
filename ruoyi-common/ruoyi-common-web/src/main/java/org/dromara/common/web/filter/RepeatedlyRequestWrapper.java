@@ -1,13 +1,12 @@
 package org.dromara.common.web.filter;
 
 import cn.hutool.core.io.IoUtil;
-import org.dromara.common.core.constant.Constants;
-
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
+import org.dromara.common.core.constant.Constants;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -29,7 +28,7 @@ public class RepeatedlyRequestWrapper extends HttpServletRequestWrapper {
     /**
      * 读取原始请求体并缓存到内存，统一设置请求与响应编码。
      *
-     * @param request 原始请求
+     * @param request  原始请求
      * @param response 当前响应
      * @throws IOException 读取请求体异常
      */

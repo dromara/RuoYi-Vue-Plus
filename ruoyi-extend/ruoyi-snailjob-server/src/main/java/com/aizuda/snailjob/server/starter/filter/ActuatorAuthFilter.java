@@ -38,10 +38,10 @@ public class ActuatorAuthFilter implements Filter {
     /**
      * 校验 Actuator Basic Auth 请求。
      *
-     * @param servletRequest 原始请求
+     * @param servletRequest  原始请求
      * @param servletResponse 原始响应
-     * @param filterChain 过滤器链
-     * @throws IOException IO 异常
+     * @param filterChain     过滤器链
+     * @throws IOException      IO 异常
      * @throws ServletException Servlet 异常
      */
     @Override

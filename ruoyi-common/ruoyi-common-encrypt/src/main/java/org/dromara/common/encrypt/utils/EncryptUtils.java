@@ -259,9 +259,9 @@ public class EncryptUtils {
     /**
      * SM2公钥验签（Hex编码）
      *
-     * @param dataHex    原文数据（Hex编码）
-     * @param signHex    签名值（Hex编码）
-     * @param publicKey  公钥
+     * @param dataHex   原文数据（Hex编码）
+     * @param signHex   签名值（Hex编码）
+     * @param publicKey 公钥
      * @return true-验签成功，false-验签失败
      */
     public static boolean verifySm2SignHex(String dataHex, String signHex, String publicKey) {

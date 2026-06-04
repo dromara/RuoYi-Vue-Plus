@@ -106,14 +106,14 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
         Map<TaskAssigneeEnum, Map<String, String>> nameMap = this.getNamesByTypes(typeIdMap);
         // 组装返回结果，保持原始顺序
         return parsedMap.entrySet().stream()
-                .map(entry -> {
-                    String storageId = entry.getKey();
-                    Pair<TaskAssigneeEnum, String> parsed = entry.getValue();
-                    String handlerName = (parsed == null) ? null
-                            : nameMap.getOrDefault(parsed.getKey(), Collections.emptyMap())
-                            .get(parsed.getValue());
-                    return new HandlerFeedBackVo(storageId, handlerName);
-                }).toList();
+            .map(entry -> {
+                String storageId = entry.getKey();
+                Pair<TaskAssigneeEnum, String> parsed = entry.getValue();
+                String handlerName = (parsed == null) ? null
+                    : nameMap.getOrDefault(parsed.getKey(), Collections.emptyMap())
+                    .get(parsed.getValue());
+                return new HandlerFeedBackVo(storageId, handlerName);
+            }).toList();
     }
 
     /**
@@ -171,9 +171,9 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
      */
     private TreeFunDto<DeptDTO> buildDeptTree(List<DeptDTO> depts) {
         return new TreeFunDto<>(depts)
-                .setId(dept -> Convert.toStr(dept.getDeptId()))
-                .setName(DeptDTO::getDeptName)
-                .setParentId(dept -> Convert.toStr(dept.getParentId()));
+            .setId(dept -> Convert.toStr(dept.getDeptId()))
+            .setName(DeptDTO::getDeptName)
+            .setParentId(dept -> Convert.toStr(dept.getParentId()));
     }
 
     /**
@@ -185,11 +185,11 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
      */
     private HandlerFunDto<TaskAssigneeDTO.TaskHandler> buildHandlerData(TaskAssigneeDTO dto, TaskAssigneeEnum type) {
         return new HandlerFunDto<>(dto.getList(), dto.getTotal())
-                .setStorageId(assignee -> type.getCode() + assignee.getStorageId())
-                .setHandlerCode(assignee -> StringUtils.blankToDefault(assignee.getHandlerCode(), "无"))
-                .setHandlerName(assignee -> StringUtils.blankToDefault(assignee.getHandlerName(), "无"))
-                .setGroupName(assignee -> this.getGroupName(type, assignee.getGroupName()))
-                .setCreateTime(assignee -> DateUtils.formatDateTime(assignee.getCreateTime()));
+            .setStorageId(assignee -> type.getCode() + assignee.getStorageId())
+            .setHandlerCode(assignee -> StringUtils.blankToDefault(assignee.getHandlerCode(), "无"))
+            .setHandlerName(assignee -> StringUtils.blankToDefault(assignee.getHandlerName(), "无"))
+            .setGroupName(assignee -> this.getGroupName(type, assignee.getGroupName()))
+            .setCreateTime(assignee -> DateUtils.formatDateTime(assignee.getCreateTime()));
     }
 
     /**
@@ -213,8 +213,8 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
             }
         }
         return this.getUsersByTypes(typeIdMap).stream()
-                .distinct()
-                .toList();
+            .distinct()
+            .toList();
     }
 
     /**
@@ -225,10 +225,10 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
      */
     private List<UserDTO> getUsersByTypes(Map<TaskAssigneeEnum, List<String>> typeIdMap) {
         return typeIdMap.entrySet().stream()
-                .map(entry -> this.getUsersByType(entry.getKey(), entry.getValue()))
-                .filter(CollUtil::isNotEmpty)
-                .flatMap(Collection::stream)
-                .toList();
+            .map(entry -> this.getUsersByType(entry.getKey(), entry.getValue()))
+            .filter(CollUtil::isNotEmpty)
+            .flatMap(Collection::stream)
+            .toList();
     }
 
     /**
@@ -291,11 +291,11 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
             return Collections.emptyMap();
         }
         return rawMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        e -> Convert.toStr(e.getKey()),
-                        Map.Entry::getValue
-                ));
+            .stream()
+            .collect(Collectors.toMap(
+                e -> Convert.toStr(e.getKey()),
+                Map.Entry::getValue
+            ));
     }
 
     /**

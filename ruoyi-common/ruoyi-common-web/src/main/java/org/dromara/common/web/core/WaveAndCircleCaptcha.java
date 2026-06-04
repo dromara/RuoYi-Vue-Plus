@@ -26,7 +26,7 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
     /**
      * 构造默认长度为 4 的验证码。
      *
-     * @param width 图片宽度
+     * @param width  图片宽度
      * @param height 图片高度
      */
     public WaveAndCircleCaptcha(int width, int height) {
@@ -36,8 +36,8 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
     /**
      * 构造指定验证码长度的验证码对象。
      *
-     * @param width 图片宽度
-     * @param height 图片高度
+     * @param width     图片宽度
+     * @param height    图片高度
      * @param codeCount 验证码字符数
      */
     public WaveAndCircleCaptcha(int width, int height, int codeCount) {
@@ -47,9 +47,9 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
     /**
      * 构造指定字符数与干扰数的验证码对象。
      *
-     * @param width 图片宽度
-     * @param height 图片高度
-     * @param codeCount 验证码字符数
+     * @param width          图片宽度
+     * @param height         图片高度
+     * @param codeCount      验证码字符数
      * @param interfereCount 干扰元素数量
      */
     public WaveAndCircleCaptcha(int width, int height, int codeCount, int interfereCount) {
@@ -59,9 +59,9 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
     /**
      * 使用指定验证码生成器构造验证码对象。
      *
-     * @param width 图片宽度
-     * @param height 图片高度
-     * @param generator 验证码生成器
+     * @param width          图片宽度
+     * @param height         图片高度
+     * @param generator      验证码生成器
      * @param interfereCount 干扰元素数量
      */
     public WaveAndCircleCaptcha(int width, int height, CodeGenerator generator, int interfereCount) {
@@ -71,11 +71,11 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
     /**
      * 构造带字体缩放比例的验证码对象。
      *
-     * @param width 图片宽度
-     * @param height 图片高度
-     * @param codeCount 验证码字符数
+     * @param width          图片宽度
+     * @param height         图片高度
+     * @param codeCount      验证码字符数
      * @param interfereCount 干扰元素数量
-     * @param size 字体相对尺寸
+     * @param size           字体相对尺寸
      */
     public WaveAndCircleCaptcha(int width, int height, int codeCount, int interfereCount, float size) {
         super(width, height, new RandomGenerator(codeCount), interfereCount, size);
@@ -111,7 +111,7 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
     /**
      * 绘制验证码文本并开启文字抗锯齿。
      *
-     * @param g 图形上下文
+     * @param g    图形上下文
      * @param code 验证码文本
      */
     private void drawString(Graphics2D g, String code) {
@@ -155,7 +155,7 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
     /**
      * 绘制平滑波浪线干扰轨迹。
      *
-     * @param g 图形上下文
+     * @param g      图形上下文
      * @param random 随机数生成器
      */
     private void drawSmoothWave(Graphics2D g, ThreadLocalRandom random) {
@@ -185,8 +185,8 @@ public class WaveAndCircleCaptcha extends AbstractCaptcha {
     /**
      * 生成指定 RGB 范围内的随机颜色。
      *
-     * @param min 最小颜色值
-     * @param max 最大颜色值
+     * @param min    最小颜色值
+     * @param max    最大颜色值
      * @param random 随机数生成器
      * @return 随机颜色
      */

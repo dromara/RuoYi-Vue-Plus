@@ -162,8 +162,8 @@ public class SysProfileController extends BaseController {
      * @param newPassword 新密码
      */
     public record SysUserPasswordBo(
-            @NotBlank(message = "旧密码不能为空") String oldPassword,
-            @NotBlank(message = "新密码不能为空") String newPassword) {
+        @NotBlank(message = "旧密码不能为空") String oldPassword,
+        @NotBlank(message = "新密码不能为空") String newPassword) {
     }
 
 }

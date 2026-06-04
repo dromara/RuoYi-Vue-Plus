@@ -1,10 +1,10 @@
 package org.dromara.demo.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
-import org.apache.fesod.sheet.write.metadata.WriteSheet;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.apache.fesod.sheet.write.metadata.WriteSheet;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -115,7 +115,7 @@ public class ExportExcelServiceImpl implements IExportExcelService {
      * 构建下拉框显示值。
      *
      * @param cityDataList 城市演示数据列表
-     * @param id 选项 id
+     * @param id           选项 id
      * @return 下拉框显示值
      */
     private String buildOptions(List<DemoCityData> cityDataList, Integer id) {

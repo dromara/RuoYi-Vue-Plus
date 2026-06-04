@@ -27,10 +27,10 @@ public interface FlwHisTaskMapper extends BaseMapperPlus<FlowHisTask, FlowHisTas
     /**
      * 分页查询已办任务列表。
      *
-     * @param page 分页对象
-     * @param bo 查询条件
+     * @param page        分页对象
+     * @param bo          查询条件
      * @param categoryIds 流程分类 ID 集合
-     * @param userId 当前用户 ID
+     * @param userId      当前用户 ID
      * @return 已办任务分页结果
      */
     default Page<FlowHisTaskVo> getListFinishTask(Page<FlowHisTaskVo> page, FlowTaskBo bo, List<String> categoryIds, String userId) {

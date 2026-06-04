@@ -12,7 +12,7 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 
 /**
- *  @author 长春叭哥 2023年03月26日
+ * @author 长春叭哥 2023年03月26日
  */
 public class AuthMaxKeyRequest extends AuthDefaultRequest {
 
@@ -31,7 +31,7 @@ public class AuthMaxKeyRequest extends AuthDefaultRequest {
     /**
      * 创建 MaxKey 认证请求。
      *
-     * @param config 授权配置
+     * @param config         授权配置
      * @param authStateCache 授权状态缓存
      */
     public AuthMaxKeyRequest(AuthConfig config, AuthStateCache authStateCache) {

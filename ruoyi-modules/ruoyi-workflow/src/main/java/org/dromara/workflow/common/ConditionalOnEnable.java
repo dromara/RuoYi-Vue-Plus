@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  * @author Lion Li
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
+@Target({ElementType.TYPE, ElementType.METHOD})
 @ConditionalOnProperty(value = "warm-flow.enabled", havingValue = "true")
 public @interface ConditionalOnEnable {
 }

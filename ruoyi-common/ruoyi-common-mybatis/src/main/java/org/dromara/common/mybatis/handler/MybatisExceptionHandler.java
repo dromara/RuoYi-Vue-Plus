@@ -23,7 +23,7 @@ public class MybatisExceptionHandler {
     /**
      * 处理主键或唯一索引冲突异常。
      *
-     * @param e 异常信息
+     * @param e       异常信息
      * @param request 当前请求
      * @return 统一失败响应
      */
@@ -37,7 +37,7 @@ public class MybatisExceptionHandler {
     /**
      * 处理 MyBatis 系统异常。
      *
-     * @param e 异常信息
+     * @param e       异常信息
      * @param request 当前请求
      * @return 统一失败响应
      */

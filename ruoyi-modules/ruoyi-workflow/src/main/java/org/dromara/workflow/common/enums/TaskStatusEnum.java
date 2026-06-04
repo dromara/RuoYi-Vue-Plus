@@ -78,20 +78,18 @@ public enum TaskStatusEnum {
     TIMEOUT("timeout", "超时");
 
     /**
-     * 状态
-     */
-    private final String status;
-
-    /**
-     * 状态描述。
-     */
-    private final String desc;
-
-    /**
      * 状态编码与描述缓存。
      */
     private static final Map<String, String> STATUS_DESC_MAP = Arrays.stream(values())
         .collect(Collectors.toConcurrentMap(TaskStatusEnum::getStatus, TaskStatusEnum::getDesc));
+    /**
+     * 状态
+     */
+    private final String status;
+    /**
+     * 状态描述。
+     */
+    private final String desc;
 
     /**
      * 根据状态编码获取任务业务状态描述。

@@ -32,7 +32,7 @@ public class CustomNotifier extends AbstractEventNotifier {
     /**
      * 处理实例事件并记录状态变化日志。
      *
-     * @param event 实例事件
+     * @param event    实例事件
      * @param instance 当前实例
      * @return Reactor 执行结果
      */

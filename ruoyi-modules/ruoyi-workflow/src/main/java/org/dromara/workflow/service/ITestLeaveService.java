@@ -27,7 +27,7 @@ public interface ITestLeaveService {
     /**
      * 分页查询请假列表。
      *
-     * @param bo 查询条件
+     * @param bo        查询条件
      * @param pageQuery 分页参数
      * @return 请假分页数据
      */

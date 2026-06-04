@@ -27,7 +27,7 @@ public class UserNameTranslationImpl implements TranslationInterface<String> {
     /**
      * 将用户 ID 翻译为用户名。
      *
-     * @param key 用户 ID
+     * @param key   用户 ID
      * @param other 额外参数
      * @return 用户名
      */
@@ -39,7 +39,7 @@ public class UserNameTranslationImpl implements TranslationInterface<String> {
     /**
      * 批量将用户 ID 翻译为用户名。
      *
-     * @param keys 用户 ID 集合
+     * @param keys  用户 ID 集合
      * @param other 额外参数
      * @return 用户 ID 与用户名映射
      */
@@ -60,7 +60,7 @@ public class UserNameTranslationImpl implements TranslationInterface<String> {
     /**
      * 根据原始键构建用户名翻译值。
      *
-     * @param source 原始键
+     * @param source    原始键
      * @param userNames 用户 ID 与用户名映射
      * @return 用户名
      */

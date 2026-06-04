@@ -62,7 +62,7 @@ public interface ISysOssService {
     /**
      * 文件下载方法，支持一次性下载完整文件
      *
-     * @param ossId    OSS对象ID
+     * @param ossId OSS对象ID
      */
     ResponseEntity<byte[]> download(Long ossId);
 

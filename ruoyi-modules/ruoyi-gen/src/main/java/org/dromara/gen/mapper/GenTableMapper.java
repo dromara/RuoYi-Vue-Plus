@@ -20,7 +20,6 @@ public interface GenTableMapper extends BaseMapperPlus<GenTable, GenTable> {
      *
      * @param dataName 数据源名称，用于选择不同的数据源
      * @return 当前数据库中的表名列表
-     *
      * @DS("") 使用默认数据源执行查询操作
      */
     @DS("")

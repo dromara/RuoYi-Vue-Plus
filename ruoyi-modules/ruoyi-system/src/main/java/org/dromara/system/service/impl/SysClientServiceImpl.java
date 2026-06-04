@@ -213,8 +213,8 @@ public class SysClientServiceImpl implements ISysClientService {
     /**
      * 统一处理白名单与路径规则的入库格式。
      *
-     * @param rawValue 原始字符串
-     * @param listValue 列表值
+     * @param rawValue   原始字符串
+     * @param listValue  列表值
      * @param normalizer 单条规则归一化器
      * @return 逗号拼接后的规则串
      */
@@ -234,7 +234,7 @@ public class SysClientServiceImpl implements ISysClientService {
     /**
      * 将规则串转换为列表。
      *
-     * @param value 规则串
+     * @param value      规则串
      * @param normalizer 单条规则归一化器
      * @return 规则列表
      */

@@ -10,10 +10,10 @@ package org.dromara.common.oss.model;
  * @author 秋辞未寒
  */
 public record PutObjectResult(
-        String url,
-        String key,
-        String eTag,
-        long size
+    String url,
+    String key,
+    String eTag,
+    long size
 ) {
 
     /**

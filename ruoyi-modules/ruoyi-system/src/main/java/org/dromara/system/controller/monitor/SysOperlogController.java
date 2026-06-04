@@ -35,7 +35,7 @@ public class SysOperlogController extends BaseController {
     /**
      * 分页查询操作日志记录。
      *
-     * @param operLog 查询条件
+     * @param operLog   查询条件
      * @param pageQuery 分页参数
      * @return 操作日志分页结果
      */
@@ -48,7 +48,7 @@ public class SysOperlogController extends BaseController {
     /**
      * 导出操作日志记录列表。
      *
-     * @param operLog 查询条件
+     * @param operLog  查询条件
      * @param response HTTP 响应
      */
     @Log(title = "操作日志", businessType = BusinessType.EXPORT)

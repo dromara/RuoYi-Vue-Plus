@@ -29,7 +29,7 @@ public class WebSocketController {
     /**
      * 发布消息
      *
-     * @param userId 目标用户
+     * @param userId  目标用户
      * @param message 发送内容
      */
     @GetMapping("/send")

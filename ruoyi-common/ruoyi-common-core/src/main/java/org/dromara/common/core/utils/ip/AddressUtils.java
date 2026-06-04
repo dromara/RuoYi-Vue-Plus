@@ -29,7 +29,7 @@ public class AddressUtils {
      */
     public static String getRealAddressByIP(String ip) {
         // 处理空串并过滤HTML标签
-        ip = HtmlUtil.cleanHtmlTag(StringUtils.blankToDefault(ip,""));
+        ip = HtmlUtil.cleanHtmlTag(StringUtils.blankToDefault(ip, ""));
         // 判断是否为IPv4
         boolean isIPv4 = NetUtils.isIPv4(ip);
         // 判断是否为IPv6

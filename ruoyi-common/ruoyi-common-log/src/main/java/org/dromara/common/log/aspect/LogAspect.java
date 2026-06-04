@@ -9,9 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
@@ -58,7 +58,7 @@ public class LogAspect {
     /**
      * 执行目标方法并记录操作日志。
      *
-     * @param joinPoint 切点
+     * @param joinPoint     切点
      * @param controllerLog 日志注解
      * @return 目标方法返回值
      * @throws Throwable 目标方法异常
@@ -80,11 +80,11 @@ public class LogAspect {
     /**
      * 组装并发布操作日志事件。
      *
-     * @param joinPoint 切点
+     * @param joinPoint     切点
      * @param controllerLog 日志注解
-     * @param e 异常信息
-     * @param jsonResult 返回结果
-     * @param stopWatch 耗时统计
+     * @param e             异常信息
+     * @param jsonResult    返回结果
+     * @param stopWatch     耗时统计
      */
     protected void handleLog(final JoinPoint joinPoint, Log controllerLog, final Exception e, Object jsonResult, StopWatch stopWatch) {
         try {
@@ -138,9 +138,9 @@ public class LogAspect {
     /**
      * 获取注解中对方法的描述信息 用于Controller层注解
      *
-     * @param joinPoint 切点
-     * @param log     日志
-     * @param operLog 操作日志
+     * @param joinPoint  切点
+     * @param log        日志
+     * @param operLog    操作日志
      * @param jsonResult 返回结果
      * @throws Exception 异常
      */
@@ -165,8 +165,8 @@ public class LogAspect {
     /**
      * 获取请求的参数，放到log中
      *
-     * @param joinPoint 切点
-     * @param operLog 操作日志
+     * @param joinPoint         切点
+     * @param operLog           操作日志
      * @param excludeParamNames 排除参数名
      * @throws Exception 异常
      */
@@ -186,7 +186,7 @@ public class LogAspect {
     /**
      * 将方法参数序列化为日志字符串。
      *
-     * @param paramsArray 参数数组
+     * @param paramsArray       参数数组
      * @param excludeParamNames 排除字段名
      * @return 参数字符串
      */
@@ -207,7 +207,7 @@ public class LogAspect {
     /**
      * 序列化单个方法参数，并移除排除字段。
      *
-     * @param arg 参数对象
+     * @param arg     参数对象
      * @param exclude 排除字段名
      * @return 参数日志字符串
      */
@@ -234,7 +234,7 @@ public class LogAspect {
     /**
      * 将参数转为已排除指定字段的字典。
      *
-     * @param value 参数值
+     * @param value   参数值
      * @param exclude 排除字段名
      * @return 已过滤字段的字典
      */
@@ -250,7 +250,7 @@ public class LogAspect {
     /**
      * 限制日志字段长度。
      *
-     * @param value 原始字符串
+     * @param value     原始字符串
      * @param maxLength 最大长度
      * @return 截断后的字符串
      */
@@ -303,6 +303,6 @@ public class LogAspect {
      */
     private boolean isFilterValue(Object value) {
         return value instanceof MultipartFile || value instanceof HttpServletRequest || value instanceof HttpServletResponse
-               || value instanceof BindingResult;
+            || value instanceof BindingResult;
     }
 }

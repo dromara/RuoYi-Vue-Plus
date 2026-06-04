@@ -25,7 +25,7 @@ public interface JavadocResolver extends Comparable<JavadocResolver>, Ordered {
      * 执行解析并返回解析到的 Javadoc 内容
      *
      * @param handlerMethod 处理器方法
-     * @param operation Swagger Operation实例
+     * @param operation     Swagger Operation实例
      * @return 解析到的 Javadoc 内容
      */
     String resolve(HandlerMethod handlerMethod, Operation operation);

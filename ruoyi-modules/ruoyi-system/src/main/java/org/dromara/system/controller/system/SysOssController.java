@@ -40,7 +40,7 @@ public class SysOssController extends BaseController {
     /**
      * 分页查询 OSS 对象存储列表。
      *
-     * @param bo 查询条件
+     * @param bo        查询条件
      * @param pageQuery 分页参数
      * @return OSS 分页结果
      */
@@ -108,9 +108,9 @@ public class SysOssController extends BaseController {
     /**
      * OSS 上传响应对象。
      *
-     * @param url 文件访问地址
+     * @param url      文件访问地址
      * @param fileName 原始文件名
-     * @param ossId OSS 对象 ID
+     * @param ossId    OSS 对象 ID
      */
     public record SysOssUploadVo(String url, String fileName, String ossId) {
     }

@@ -43,9 +43,9 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
     /**
      * 请求进入控制器前记录入参并启动耗时统计。
      *
-     * @param request 当前请求
+     * @param request  当前请求
      * @param response 当前响应
-     * @param handler 目标处理器
+     * @param handler  目标处理器
      * @return 始终返回 true，继续后续处理流程
      * @throws Exception 读取请求体或解析 JSON 失败时抛出
      */
@@ -84,7 +84,7 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
     /**
      * 递归移除 JSON 节点中的敏感字段，避免在日志中输出密码等敏感信息。
      *
-     * @param node 当前 JSON 节点
+     * @param node              当前 JSON 节点
      * @param excludeProperties 需要排除的字段名集合
      */
     private void removeSensitiveFields(JsonNode node, String[] excludeProperties) {
@@ -142,10 +142,10 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
     /**
      * 请求完成后输出最终耗时，并清理线程内缓存的计时器。
      *
-     * @param request 当前请求
+     * @param request  当前请求
      * @param response 当前响应
-     * @param handler 目标处理器
-     * @param ex 请求处理过程中的异常
+     * @param handler  目标处理器
+     * @param ex       请求处理过程中的异常
      * @throws Exception 拦截器链路抛出的异常
      */
     @Override

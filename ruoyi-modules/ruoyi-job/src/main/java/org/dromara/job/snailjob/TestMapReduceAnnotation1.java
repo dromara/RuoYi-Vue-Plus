@@ -31,7 +31,7 @@ public class TestMapReduceAnnotation1 {
     /**
      * 根 Map 任务，将示例数据拆分为多个分片任务。
      *
-     * @param mapArgs Map 任务参数
+     * @param mapArgs    Map 任务参数
      * @param mapHandler 分片调度处理器
      * @return 分片调度结果
      */

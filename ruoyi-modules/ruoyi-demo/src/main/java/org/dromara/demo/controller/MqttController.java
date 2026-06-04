@@ -50,7 +50,7 @@ public class MqttController {
     /**
      * 订阅 QoS0 测试主题并打印原始消息。
      *
-     * @param topic 消息主题
+     * @param topic   消息主题
      * @param payload 消息内容
      */
     @MqttClientSubscribe("/test/#")
@@ -61,7 +61,7 @@ public class MqttController {
     /**
      * 订阅 QoS1 测试主题并打印原始消息。
      *
-     * @param topic 消息主题
+     * @param topic   消息主题
      * @param payload 消息内容
      */
     @MqttClientSubscribe(value = "/qos1/#", qos = MqttQoS.QOS1)
@@ -72,7 +72,7 @@ public class MqttController {
     /**
      * 订阅带产品和设备占位符的注册主题。
      *
-     * @param topic 消息主题
+     * @param topic   消息主题
      * @param payload 消息内容
      */
     @MqttClientSubscribe("/sys/${productKey}/${deviceName}/thing/sub/register")
@@ -85,9 +85,9 @@ public class MqttController {
     /**
      * 订阅 JSON 测试主题并演示自定义反序列化。
      *
-     * @param topic 消息主题
+     * @param topic   消息主题
      * @param message MQTT 原始消息
-     * @param data 反序列化后的演示数据
+     * @param data    反序列化后的演示数据
      */
     @MqttClientSubscribe(
         value = "/test/json",

@@ -41,7 +41,7 @@ public class SysNoticeController extends BaseController {
     /**
      * 分页查询通知公告列表。
      *
-     * @param notice 查询条件
+     * @param notice    查询条件
      * @param pageQuery 分页参数
      * @return 公告分页结果
      */

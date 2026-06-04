@@ -44,8 +44,8 @@ public class ExcelBigNumberConvert implements Converter<Long> {
     /**
      * 将 Excel 单元格数据转换为 Long。
      *
-     * @param cellData 单元格数据
-     * @param contentProperty 内容属性
+     * @param cellData            单元格数据
+     * @param contentProperty     内容属性
      * @param globalConfiguration 全局配置
      * @return Long 值
      */
@@ -57,8 +57,8 @@ public class ExcelBigNumberConvert implements Converter<Long> {
     /**
      * 将 Long 转换为 Excel 单元格数据，超长数字按字符串写出。
      *
-     * @param object Java 值
-     * @param contentProperty 内容属性
+     * @param object              Java 值
+     * @param contentProperty     内容属性
      * @param globalConfiguration 全局配置
      * @return Excel 写入数据
      */

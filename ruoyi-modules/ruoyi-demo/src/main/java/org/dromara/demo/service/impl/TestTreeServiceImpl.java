@@ -39,13 +39,13 @@ public class TestTreeServiceImpl implements ITestTreeService {
         return treeMapper.selectVoById(id);
     }
 
-    // @DS("slave") // 切换从库查询
     /**
      * 查询符合条件的测试树表列表。
      *
      * @param bo 查询条件
      * @return 结果列表
      */
+    // @DS("slave") // 切换从库查询
     @Override
     public List<TestTreeVo> queryList(TestTreeBo bo) {
         LambdaQueryWrapper<TestTree> lqw = buildQueryWrapper(bo);
@@ -109,7 +109,7 @@ public class TestTreeServiceImpl implements ITestTreeService {
     /**
      * 按主键集合删除测试树表数据，并按需执行删除前校验。
      *
-     * @param ids 主键集合
+     * @param ids     主键集合
      * @param isValid 是否执行删除校验
      * @return 是否删除成功
      */

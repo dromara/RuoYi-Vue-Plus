@@ -1,11 +1,11 @@
 package org.dromara.common.core.exception.base;
 
 import lombok.AllArgsConstructor;
-import org.dromara.common.core.utils.MessageUtils;
-import org.dromara.common.core.utils.StringUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.utils.MessageUtils;
+import org.dromara.common.core.utils.StringUtils;
 
 import java.io.Serial;
 
@@ -47,8 +47,8 @@ public class BaseException extends RuntimeException {
      * 使用模块、错误码和参数构造异常。
      *
      * @param module 所属模块
-     * @param code 错误码
-     * @param args 参数
+     * @param code   错误码
+     * @param args   参数
      */
     public BaseException(String module, String code, Object[] args) {
         this(module, code, args, null);
@@ -57,7 +57,7 @@ public class BaseException extends RuntimeException {
     /**
      * 使用模块和默认消息构造异常。
      *
-     * @param module 所属模块
+     * @param module         所属模块
      * @param defaultMessage 默认消息
      */
     public BaseException(String module, String defaultMessage) {

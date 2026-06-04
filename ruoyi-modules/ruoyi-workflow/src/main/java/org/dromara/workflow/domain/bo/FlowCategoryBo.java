@@ -27,7 +27,7 @@ public class FlowCategoryBo implements Serializable {
     /**
      * 流程分类ID
      */
-    @NotNull(message = "流程分类ID不能为空", groups = { EditGroup.class })
+    @NotNull(message = "流程分类ID不能为空", groups = {EditGroup.class})
     private Long categoryId;
 
     /**

@@ -106,17 +106,17 @@ public class SaTokenAnnotationMetadataJavadocResolver extends AbstractMetadataJa
      * @param order 顺序值
      */
     public SaTokenAnnotationMetadataJavadocResolver(int order) {
-        this(DEFAULT_METADATA_PROVIDER,order);
+        this(DEFAULT_METADATA_PROVIDER, order);
     }
 
     /**
      * 使用自定义元数据提供者和顺序创建解析器。
      *
      * @param metadataProvider 元数据提供者
-     * @param order 顺序值
+     * @param order            顺序值
      */
     public SaTokenAnnotationMetadataJavadocResolver(Supplier<SaTokenSecurityMetadata> metadataProvider, int order) {
-        super(metadataProvider,order);
+        super(metadataProvider, order);
     }
 
     /**
@@ -134,14 +134,14 @@ public class SaTokenAnnotationMetadataJavadocResolver extends AbstractMetadataJa
      * 解析 Sa-Token 注解并转换为文档说明。
      *
      * @param handlerMethod Handler 方法
-     * @param operation OpenAPI 操作对象
-     * @param metadata 权限元数据
+     * @param operation     OpenAPI 操作对象
+     * @param metadata      权限元数据
      * @return Markdown 描述
      */
     @Override
     public String resolve(HandlerMethod handlerMethod, Operation operation, SaTokenSecurityMetadata metadata) {
         // 检查是否忽略校验
-        if(hasAnnotation(handlerMethod, SA_IGNORE_CLASS_NAME)){
+        if (hasAnnotation(handlerMethod, SA_IGNORE_CLASS_NAME)) {
             metadata.setIgnore(true);
             return metadata.toMarkdownString();
         }
@@ -176,10 +176,10 @@ public class SaTokenAnnotationMetadataJavadocResolver extends AbstractMetadataJa
     private void resolvePermissionAnnotation(SaTokenSecurityMetadata metadata, Map<String, Object> annotationValueMap) {
         try {
             // 反射获取注解属性
-            Object value = annotationValueMap.get( "value");
-            Object mode = annotationValueMap.get( "mode");
-            Object type = annotationValueMap.get( "type");
-            Object orRole = annotationValueMap.get( "orRole");
+            Object value = annotationValueMap.get("value");
+            Object mode = annotationValueMap.get("mode");
+            Object type = annotationValueMap.get("type");
+            Object orRole = annotationValueMap.get("orRole");
 
             String[] values = Convert.toStrArray(value);
             String modeStr = mode != null ? mode.toString() : "AND";

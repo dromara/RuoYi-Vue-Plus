@@ -40,7 +40,7 @@ public class SysDictDataController extends BaseController {
     /**
      * 分页查询字典数据列表。
      *
-     * @param dictData 查询条件
+     * @param dictData  查询条件
      * @param pageQuery 分页参数
      * @return 字典数据分页结果
      */

@@ -37,7 +37,7 @@ public class SysDictTypeController extends BaseController {
     /**
      * 分页查询字典类型列表。
      *
-     * @param dictType 查询条件
+     * @param dictType  查询条件
      * @param pageQuery 分页参数
      * @return 字典类型分页结果
      */

@@ -60,7 +60,7 @@ public class StreamUtils {
      * @return 找到符合条件的第一个元素，没有则返回 null
      */
     public static <E> E findFirstValue(Collection<E> collection, Predicate<E> function) {
-        return findFirst(collection,function).orElse(null);
+        return findFirst(collection, function).orElse(null);
     }
 
     /**
@@ -87,7 +87,7 @@ public class StreamUtils {
      * @return 找到符合条件的任意一个元素，没有则返回null
      */
     public static <E> E findAnyValue(Collection<E> collection, Predicate<E> function) {
-        return findAny(collection,function).orElse(null);
+        return findAny(collection, function).orElse(null);
     }
 
     /**
@@ -179,11 +179,12 @@ public class StreamUtils {
 
     /**
      * 获取 map 中的数据作为新 Map 的 value ，key 不变
-     * @param map 需要处理的map
+     *
+     * @param map  需要处理的map
      * @param take 取值函数
-     * @param <K> map中的key类型
-     * @param <E> map中的value类型
-     * @param <V> 新map中的value类型
+     * @param <K>  map中的key类型
+     * @param <E>  map中的value类型
+     * @param <V>  新map中的value类型
      * @return 新的map
      */
     public static <K, E, V> Map<K, V> toMap(Map<K, E> map, BiFunction<K, E, V> take) {

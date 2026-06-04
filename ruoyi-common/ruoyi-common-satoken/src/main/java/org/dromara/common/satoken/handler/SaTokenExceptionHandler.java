@@ -22,7 +22,7 @@ public class SaTokenExceptionHandler {
     /**
      * 处理权限码校验失败异常。
      *
-     * @param e 异常信息
+     * @param e       异常信息
      * @param request 当前请求
      * @return 统一失败响应
      */
@@ -37,7 +37,7 @@ public class SaTokenExceptionHandler {
     /**
      * 处理未登录或登录态失效异常。
      *
-     * @param e 异常信息
+     * @param e       异常信息
      * @param request 当前请求
      * @return 统一失败响应
      */

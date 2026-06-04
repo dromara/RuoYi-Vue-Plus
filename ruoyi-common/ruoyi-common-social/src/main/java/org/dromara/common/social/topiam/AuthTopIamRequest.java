@@ -45,7 +45,7 @@ public class AuthTopIamRequest extends AuthDefaultRequest {
     /**
      * 创建 TopIAM 认证请求。
      *
-     * @param config 授权配置
+     * @param config         授权配置
      * @param authStateCache 授权状态缓存
      */
     public AuthTopIamRequest(AuthConfig config, AuthStateCache authStateCache) {
@@ -123,7 +123,6 @@ public class AuthTopIamRequest extends AuthDefaultRequest {
             .add("Content-Type", "application/json")
             .add("Authorization", "Bearer " + authToken.getAccessToken()), false).getBody();
     }
-
 
     /**
      * 生成 TopIAM 授权地址。

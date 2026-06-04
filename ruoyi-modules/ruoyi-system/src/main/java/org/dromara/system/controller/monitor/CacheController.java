@@ -37,18 +37,18 @@ public class CacheController {
         try {
             Properties commandStats = connection.commands().info("commandstats");
             List<Map<String, String>> pieList = new ArrayList<>();
-        if (commandStats != null) {
-            commandStats.stringPropertyNames().forEach(key -> {
-                Map<String, String> data = new HashMap<>(2);
-                String property = commandStats.getProperty(key);
-                data.put("name", StringUtils.removeStart(key, "cmdstat_"));
-                data.put("value", StringUtils.substringBetween(property, "calls=", ",usec"));
-                pieList.add(data);
-            });
-        }
-        return R.ok(new CacheListInfoVo(
-            connection.commands().info(),
-            connection.commands().dbSize(), pieList));
+            if (commandStats != null) {
+                commandStats.stringPropertyNames().forEach(key -> {
+                    Map<String, String> data = new HashMap<>(2);
+                    String property = commandStats.getProperty(key);
+                    data.put("name", StringUtils.removeStart(key, "cmdstat_"));
+                    data.put("value", StringUtils.substringBetween(property, "calls=", ",usec"));
+                    pieList.add(data);
+                });
+            }
+            return R.ok(new CacheListInfoVo(
+                connection.commands().info(),
+                connection.commands().dbSize(), pieList));
         } finally {
             // 归还连接给连接池
             RedisConnectionUtils.releaseConnection(connection, connectionFactory);
@@ -62,6 +62,7 @@ public class CacheController {
      * @param dbSize       数据库
      * @param commandStats 命令统计
      */
-    public record CacheListInfoVo(Properties info, Long dbSize, List<Map<String, String>> commandStats) {}
+    public record CacheListInfoVo(Properties info, Long dbSize, List<Map<String, String>> commandStats) {
+    }
 
 }

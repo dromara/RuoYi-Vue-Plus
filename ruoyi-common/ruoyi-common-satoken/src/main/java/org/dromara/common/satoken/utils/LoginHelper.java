@@ -1,9 +1,9 @@
 package org.dromara.common.satoken.utils;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
-import cn.dev33.satoken.exception.NotLoginException;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.useragent.UserAgent;
@@ -68,7 +68,7 @@ public class LoginHelper {
      * 在登录时补充当前请求上下文，避免登录态中的终端信息缺失。
      *
      * @param loginUser 登录用户
-     * @param model 登录参数
+     * @param model     登录参数
      */
     private static void fillRequestContext(LoginUser loginUser, SaLoginParameter model) {
         HttpServletRequest request = ServletUtils.getRequest();

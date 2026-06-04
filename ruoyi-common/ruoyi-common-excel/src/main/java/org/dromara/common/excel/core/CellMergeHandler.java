@@ -3,10 +3,10 @@ package org.dromara.common.excel.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import lombok.SneakyThrows;
 import org.apache.fesod.sheet.annotation.ExcelIgnore;
 import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
 import org.apache.fesod.sheet.annotation.ExcelProperty;
-import lombok.SneakyThrows;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.excel.annotation.CellMerge;
@@ -165,8 +165,8 @@ public class CellMergeHandler {
      * 判断当前行是否满足依赖字段合并条件。
      *
      * @param currentRow 当前行数据
-     * @param preRow 上一行数据
-     * @param cellMerge 合并配置
+     * @param preRow     上一行数据
+     * @param cellMerge  合并配置
      * @return 是否允许合并
      */
     private boolean isMerge(Object currentRow, Object preRow, CellMerge cellMerge) {
@@ -198,10 +198,10 @@ public class CellMergeHandler {
     /**
      * 追加有效的合并区域。
      *
-     * @param result 合并区域结果集
+     * @param result     合并区域结果集
      * @param repeatCell 连续重复单元格信息
-     * @param endIndex 结束行索引
-     * @param colNum 列索引
+     * @param endIndex   结束行索引
+     * @param colNum     列索引
      */
     private void appendMergeResult(List<CellRangeAddress> result, RepeatCell repeatCell, int endIndex, int colNum) {
         if (repeatCell == null || endIndex <= repeatCell.current()) {
@@ -217,7 +217,7 @@ public class CellMergeHandler {
         /**
          * 创建连续重复单元格信息。
          *
-         * @param value 单元格值
+         * @param value   单元格值
          * @param current 当前行索引
          * @return 连续重复单元格信息
          */
@@ -233,7 +233,7 @@ public class CellMergeHandler {
         /**
          * 创建字段列索引和合并注解信息。
          *
-         * @param colIndex 列索引
+         * @param colIndex  列索引
          * @param cellMerge 合并注解
          * @return 字段列索引和合并注解信息
          */
