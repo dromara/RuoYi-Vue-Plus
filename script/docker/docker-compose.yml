@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.0.42
+    image: mysql:8.4.9
     container_name: mysql
     environment:
       # 时区上海
@@ -17,8 +17,6 @@ services:
       # 配置挂载
       - /docker/mysql/conf/:/etc/mysql/conf.d/
     command:
-      # 将mysql8.0默认密码策略 修改为 原先 策略 (mysql8.0对其默认策略做了更改 会导致密码无法匹配)
-      --default-authentication-plugin=mysql_native_password
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_general_ci
       --explicit_defaults_for_timestamp=true
@@ -27,7 +25,7 @@ services:
     network_mode: "host"
 
   nginx-web:
-    image: nginx:1.23.4
+    image: nginx:1.31.1
     container_name: nginx-web
     environment:
       # 时区上海
@@ -48,7 +46,7 @@ services:
     network_mode: "host"
 
   redis:
-    image: redis:7.2.8
+    image: redis:8.6.3
     container_name: redis
     ports:
       - "6379:6379"
@@ -66,7 +64,7 @@ services:
 
   minio:
     # pgsty 开源社区 fork 重新维护的最新版 minio
-    image: pgsty/minio:RELEASE.2026-02-14T12-00-00Z
+    image: pgsty/minio:RELEASE.2026-04-17T00-00-00Z
     container_name: minio
     ports:
       # api 端口
