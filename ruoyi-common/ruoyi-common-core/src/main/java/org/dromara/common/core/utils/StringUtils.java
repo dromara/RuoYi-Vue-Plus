@@ -4,8 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.Strings;
 import org.springframework.util.AntPathMatcher;
 
@@ -19,7 +17,6 @@ import java.util.stream.Collectors;
  *
  * @author Lion Li
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
     public static final String SEPARATOR = ",";
@@ -27,6 +24,10 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     public static final String SLASH = "/";
 
     private static final AntPathMatcher ANT_PATH_MATCHER = new AntPathMatcher();
+
+    @Deprecated
+    private StringUtils() {
+    }
 
     /**
      * 获取参数不为空值
