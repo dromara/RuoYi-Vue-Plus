@@ -124,7 +124,7 @@ public class SysProfileController extends BaseController {
     public R<AvatarVo> avatar(@RequestPart("avatarfile") MultipartFile avatarfile) {
         if (ObjectUtil.isNotNull(avatarfile) && !avatarfile.isEmpty()) {
             String extension = FileUtil.extName(avatarfile.getOriginalFilename());
-            if (!StringUtils.equalsAnyIgnoreCase(extension, MimeTypeUtils.IMAGE_EXTENSION)) {
+            if (!MimeTypeUtils.isImage(extension)) {
                 return R.fail("文件格式不正确，请上传" + Arrays.toString(MimeTypeUtils.IMAGE_EXTENSION) + "格式");
             }
             SysOssVo oss = ossService.upload(avatarfile);
@@ -142,7 +142,8 @@ public class SysProfileController extends BaseController {
      *
      * @param imgUrl 头像地址
      */
-    public record AvatarVo(String imgUrl) {}
+    public record AvatarVo(String imgUrl) {
+    }
 
     /**
      * 用户个人信息
@@ -151,7 +152,8 @@ public class SysProfileController extends BaseController {
      * @param roleGroup 用户所属角色组
      * @param postGroup 用户所属岗位组
      */
-    public record ProfileVo(ProfileUserVo user, String roleGroup, String postGroup) {}
+    public record ProfileVo(ProfileUserVo user, String roleGroup, String postGroup) {
+    }
 
     /**
      * 用户密码修改
@@ -160,8 +162,8 @@ public class SysProfileController extends BaseController {
      * @param newPassword 新密码
      */
     public record SysUserPasswordBo(
-        @NotBlank(message = "旧密码不能为空") String oldPassword,
-        @NotBlank(message = "新密码不能为空") String newPassword) {
+            @NotBlank(message = "旧密码不能为空") String oldPassword,
+            @NotBlank(message = "新密码不能为空") String newPassword) {
     }
 
 }

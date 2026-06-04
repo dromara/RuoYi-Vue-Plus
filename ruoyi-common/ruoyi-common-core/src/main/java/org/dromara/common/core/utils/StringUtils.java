@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.Strings;
 import org.springframework.util.AntPathMatcher;
 
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
  *
  * @author Lion Li
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
     public static final String SEPARATOR = ",";
@@ -24,10 +27,6 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     public static final String SLASH = "/";
 
     private static final AntPathMatcher ANT_PATH_MATCHER = new AntPathMatcher();
-
-    @Deprecated
-    private StringUtils() {
-    }
 
     /**
      * 获取参数不为空值
@@ -318,11 +317,11 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             return new ArrayList<>(0);
         }
         return StrUtil.split(str, separator)
-            .stream()
-            .filter(Objects::nonNull)
-            .map(mapper)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+                .stream()
+                .filter(Objects::nonNull)
+                .map(mapper)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -363,6 +362,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             return input;
         }
     }
+
     /**
      * 将可迭代对象中的元素使用逗号拼接成字符串
      *
@@ -397,7 +397,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     /**
      * 判断字符串是否在指定的字符串列表中
      *
-     * @param string       字符串
+     * @param string        字符串
      * @param searchStrings 字符串列表
      * @return 是否在列表中
      */
@@ -408,7 +408,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     /**
      * 忽略大小写判断字符串是否在指定的字符串列表中
      *
-     * @param string       字符串
+     * @param string        字符串
      * @param searchStrings 字符串列表
      * @return 是否在列表中
      */
@@ -499,8 +499,8 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     /**
      * 移除字符串中的指定字符序列。
      *
-     * @param str       要处理的字符串，不能为null
-     * @param remove    要移除的字符序列，不能为null
+     * @param str    要处理的字符串，不能为null
+     * @param remove 要移除的字符序列，不能为null
      * @return 处理后的字符串
      */
     public static String remove(final String str, final String remove) {

@@ -2,6 +2,8 @@ package org.dromara.common.core.utils;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.dromara.common.core.enums.FormatsType;
 import org.dromara.common.core.exception.ServiceException;
@@ -19,21 +21,16 @@ import java.util.concurrent.TimeUnit;
  *
  * @author ruoyi
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     /**
      * 日期解析格式集合。
      */
     private static final String[] PARSE_PATTERNS = {
-        "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM",
-        "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM",
-        "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"};
-
-    /**
-     * 工具类不允许实例化。
-     */
-    @Deprecated
-    private DateUtils() {
-    }
+            "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM",
+            "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM",
+            "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"
+    };
 
     /**
      * 获取当前日期和时间
@@ -414,7 +411,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         // 本周
         if (DateUtil.isSameWeek(date, now, true)) {
             return DateUtil.dayOfWeekEnum(date).toChinese("周")
-                + " " + DateUtil.format(date, "HH:mm");
+                    + " " + DateUtil.format(date, "HH:mm");
         }
 
         // 今年内其它时间

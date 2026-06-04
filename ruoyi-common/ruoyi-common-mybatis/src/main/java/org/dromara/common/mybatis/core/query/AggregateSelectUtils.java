@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.LambdaMeta;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
 import java.util.regex.Pattern;
@@ -14,18 +16,13 @@ import java.util.regex.Pattern;
  *
  * @author Lion Li
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AggregateSelectUtils {
 
     /**
      * 查询别名合法性匹配规则。
      */
     private static final Pattern ALIAS_PATTERN = Pattern.compile("[A-Za-z_][A-Za-z0-9_]*");
-
-    /**
-     * 工具类不允许实例化。
-     */
-    private AggregateSelectUtils() {
-    }
 
     /**
      * 追加查询字段 SQL。
@@ -83,7 +80,7 @@ public final class AggregateSelectUtils {
      */
     public static String checkAlias(String alias) {
         Assert.isTrue(StringUtils.isNotBlank(alias) && ALIAS_PATTERN.matcher(alias).matches(),
-            "查询别名只能包含字母、数字、下划线且不能以数字开头: %s", alias);
+                "查询别名只能包含字母、数字、下划线且不能以数字开头: %s", alias);
         return alias;
     }
 

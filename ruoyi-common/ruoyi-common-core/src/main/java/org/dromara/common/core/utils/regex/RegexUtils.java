@@ -2,6 +2,8 @@ package org.dromara.common.core.utils.regex;
 
 
 import cn.hutool.core.util.ReUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.RegexConstants;
 
 /**
@@ -9,6 +11,7 @@ import org.dromara.common.core.constant.RegexConstants;
  *
  * @author AprilWind
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RegexUtils extends ReUtil {
 
     /**

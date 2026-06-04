@@ -1,6 +1,8 @@
 package org.dromara.common.core.utils.ip;
 
 import cn.hutool.core.io.resource.ResourceUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
@@ -19,6 +21,7 @@ import java.time.Duration;
  * @author 秋辞未寒
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RegionUtils {
 
     // 默认IPv4地址库文件路径
@@ -52,12 +55,12 @@ public class RegionUtils {
 
             // IPv4配置
             Config v4Config = Config.custom()
-                .setCachePolicy(Config.BufferCache)
-                //.setXdbFile(v4TempXdb)
-                .setXdbInputStream(v4InputStream)
-                //
-                .setCacheSliceBytes(DEFAULT_CACHE_SLICE_BYTES)
-                .asV4();
+                    .setCachePolicy(Config.BufferCache)
+                    //.setXdbFile(v4TempXdb)
+                    .setXdbInputStream(v4InputStream)
+                    //
+                    .setCacheSliceBytes(DEFAULT_CACHE_SLICE_BYTES)
+                    .asV4();
 
             // IPv6配置
             Config v6Config = null;
@@ -66,11 +69,11 @@ public class RegionUtils {
                 log.warn("未加载 IPv6 地址库：未在类路径下找到文件 {}。当前仅启用 IPv4 查询。如需启用 IPv6，请将 ip2region_v6.xdb 放置到 resources 目录", DEFAULT_IPV6_XDB_PATH);
             } else {
                 v6Config = Config.custom()
-                    .setCachePolicy(Config.BufferCache)
-                    //.setXdbFile(v6TempXdb)
-                    .setXdbInputStream(v6XdbInputStream)
-                    .setCacheSliceBytes(DEFAULT_CACHE_SLICE_BYTES)
-                    .asV6();
+                        .setCachePolicy(Config.BufferCache)
+                        //.setXdbFile(v6TempXdb)
+                        .setXdbInputStream(v6XdbInputStream)
+                        .setCacheSliceBytes(DEFAULT_CACHE_SLICE_BYTES)
+                        .asV6();
             }
 
             // 初始化Ip2Region实例
