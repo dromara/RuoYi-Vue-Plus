@@ -22,8 +22,7 @@
 
 > 系统演示: [传送门](https://plus-doc.dromara.org/#/common/demo_system)
 
->
-官方前端项目地址: [gitee](https://gitee.com/JavaLionLi/plus-ui) - [github](https://github.com/CrazyLionCat/plus-ui) - [gitcode](https://gitcode.com/dromara/plus-ui)<br>
+> 官方前端项目地址: [gitee](https://gitee.com/JavaLionLi/plus-ui) - [github](https://github.com/CrazyLionCat/plus-ui) - [gitcode](https://gitcode.com/dromara/plus-ui)<br>
 > 成员前端项目地址: 基于vben5 [ruoyi-plus-vben5](https://github.com/imdap/ruoyi-plus-vben5)<br>
 > 成员前端项目地址: 基于soybean [ruoyi-plus-soybean](https://gitee.com/xlsea/ruoyi-plus-soybean)<br>
 > 成员项目地址: 删除多租户与工作流 [RuoYi-Vue-Plus-Single](https://gitee.com/ColorDreams/RuoYi-Vue-Plus-Single)<br>
@@ -123,7 +122,7 @@ Topiam IAM/IDaaS身份管理平台 - https://www.topiam.cn/ <br>
 
 使用框架前请仔细阅读文档重点注意事项
 <br>
-> [初始化项目 必看](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init)
+>[初始化项目 必看](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init)
 >> [https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init)
 >
 >[专栏与视频 入门必看](https://plus-doc.dromara.org/#/common/column)
