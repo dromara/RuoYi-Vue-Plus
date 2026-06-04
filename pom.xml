@@ -10,7 +10,7 @@
 
     <name>RuoYi-Vue-Plus</name>
     <url>https://gitee.com/dromara/RuoYi-Vue-Plus</url>
-    <description>Dromara RuoYi-Vue-Plus多租户管理系统</description>
+    <description>Dromara RuoYi-Vue-Plus管理系统</description>
 
     <properties>
         <revision>5.5.3</revision>
@@ -593,5 +593,3 @@
     </pluginRepositories>
 
 </project>
-
-

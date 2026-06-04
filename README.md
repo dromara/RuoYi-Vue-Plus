@@ -2,6 +2,7 @@
 <div style="height: 10px; clear: both;"></div>
 
 - - -
+
 ## 平台简介
 
 [![码云Gitee](https://gitee.com/dromara/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/dromara/RuoYi-Vue-Plus)
@@ -14,14 +15,15 @@
 [![JDK-21](https://img.shields.io/badge/JDK-21-green.svg)]()
 [![JDK-25](https://img.shields.io/badge/JDK-25-green.svg)]()
 
-> Dromara RuoYi-Vue-Plus 是重写 RuoYi-Vue 针对 `分布式集群与多租户` 场景全方位升级(不兼容原框架)
+> Dromara RuoYi-Vue-Plus 是重写 RuoYi-Vue 针对 `分布式集群` 场景全方位升级(不兼容原框架)
 
 > 项目代码、文档 均开源免费可商用 遵循开源协议在项目中保留开源协议文件即可<br>
-活到老写到老 为兴趣而开源 为学习而开源 为让大家真正可以学到技术而开源
+> 活到老写到老 为兴趣而开源 为学习而开源 为让大家真正可以学到技术而开源
 
 > 系统演示: [传送门](https://plus-doc.dromara.org/#/common/demo_system)
 
-> 官方前端项目地址: [gitee](https://gitee.com/JavaLionLi/plus-ui) - [github](https://github.com/CrazyLionCat/plus-ui) - [gitcode](https://gitcode.com/dromara/plus-ui)<br>
+>
+官方前端项目地址: [gitee](https://gitee.com/JavaLionLi/plus-ui) - [github](https://github.com/CrazyLionCat/plus-ui) - [gitcode](https://gitcode.com/dromara/plus-ui)<br>
 > 成员前端项目地址: 基于vben5 [ruoyi-plus-vben5](https://github.com/imdap/ruoyi-plus-vben5)<br>
 > 成员前端项目地址: 基于soybean [ruoyi-plus-soybean](https://gitee.com/xlsea/ruoyi-plus-soybean)<br>
 > 成员项目地址: 删除多租户与工作流 [RuoYi-Vue-Plus-Single](https://gitee.com/ColorDreams/RuoYi-Vue-Plus-Single)<br>
@@ -56,7 +58,7 @@ Topiam IAM/IDaaS身份管理平台 - https://www.topiam.cn/ <br>
 | 缓存数据库       | 支持 Redis >= 6 支持大部分新功能特性 如 分布式限流、分布式队列                                                                            | Redis 简单 get set 支持                                                                |
 | Redis客户端    | 采用 Redisson Redis官方推荐 基于Netty的客户端工具<br/>支持Redis 90%以上的命令 底层优化规避很多不正确的用法 例如: keys被转换为scan<br/>支持单机、哨兵、单主集群、多主集群等模式 | Lettuce + RedisTemplate 支持模式少 工具使用繁琐<br/>连接池采用 common-pool Bug多经常性出问题              |
 | 缓存注解        | 采用 Spring-Cache 注解 对其扩展了实现支持了更多功能<br/>例如 过期时间 最大空闲时间 组最大长度等 只需一个注解即可完成数据自动缓存                                      | 需手动编写Redis代码逻辑                                                                     |
-| ORM框架       | 采用 Mybatis-Plus 基于对象几乎不用写SQL全java操作 功能强大插件众多<br/>例如多租户插件 分页插件 乐观锁插件等等                                             | 采用 Mybatis 基于XML需要手写SQL                                                            |
+| ORM框架       | 采用 Mybatis-Plus 基于对象几乎不用写SQL全java操作 功能强大插件众多<br/>例如分页插件 乐观锁插件等等                                                   | 采用 Mybatis 基于XML需要手写SQL                                                            |
 | SQL监控       | 采用 p6spy 可输出完整SQL与执行时间监控                                                                                          | log输出 需手动拼接sql与参数无法快速查看调试问题                                                        |
 | 数据分页        | 采用 Mybatis-Plus 分页插件<br/>框架对其进行了扩展 对象化分页对象 支持多种方式传参 支持前端多排序 复杂排序                                                  | 采用 PageHelper 仅支持单查询分页 参数只能从param传 只能单排序 功能扩展性差 体验不好                               |
 | 数据权限        | 采用 Mybatis-Plus 插件 自行分析拼接SQL 无感式过滤<br/>只需为Mapper设置好注解条件 支持多种自定义 不限于部门角色                                           | 采用 注解+aop 实现 基于部门角色 生成的sql兼容性差 不支持其他业务扩展<br/>生成sql后需手动拼接到具体业务sql上 对于多个Mapper查询不起作用 |
@@ -92,7 +94,6 @@ Topiam IAM/IDaaS身份管理平台 - https://www.topiam.cn/ <br>
 | 代码单例测试      | 提供单例测试 使用方式编写方法与maven多环境单测插件                                                                                      | 只提供基础功能 其他需自行编写扩展                                                                  |
 | Demo案例      | 提供框架功能的实际使用案例 单独一个模块提供了很多很全                                                                                       | 无                                                                                  |
 
-
 ## 本框架与RuoYi的业务差异
 
 | 业务     | 功能说明                                                                 | 本框架 | RuoYi            |
@@ -122,20 +123,20 @@ Topiam IAM/IDaaS身份管理平台 - https://www.topiam.cn/ <br>
 
 使用框架前请仔细阅读文档重点注意事项
 <br>
->[初始化项目 必看](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init)
->>[https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init)
+> [初始化项目 必看](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init)
+>> [https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init)
 >
 >[专栏与视频 入门必看](https://plus-doc.dromara.org/#/common/column)
->>[https://plus-doc.dromara.org/#/common/column](https://plus-doc.dromara.org/#/common/column)
+>> [https://plus-doc.dromara.org/#/common/column](https://plus-doc.dromara.org/#/common/column)
 >
 >[部署项目 必看](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy)
->>[https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy)
+>> [https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy)
 >
 >[如何加群](https://plus-doc.dromara.org/#/common/add_group)
->>[https://plus-doc.dromara.org/#/common/add_group](https://plus-doc.dromara.org/#/common/add_group)
+>> [https://plus-doc.dromara.org/#/common/add_group](https://plus-doc.dromara.org/#/common/add_group)
 >
 >[参考文档 Wiki](https://plus-doc.dromara.org)
->>[https://plus-doc.dromara.org](https://plus-doc.dromara.org)
+>> [https://plus-doc.dromara.org](https://plus-doc.dromara.org)
 
 ## 软件架构图
 
@@ -146,6 +147,7 @@ Topiam IAM/IDaaS身份管理平台 - https://www.topiam.cn/ <br>
 [参与贡献的方式 https://plus-doc.dromara.org/#/common/contribution](https://plus-doc.dromara.org/#/common/contribution)
 
 ## 捐献作者
+
 作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  
 <img src="https://foruda.gitee.com/images/1678975784848381069/d8661ed9_1766278.png" width="300px" height="450px" />
 <img src="https://foruda.gitee.com/images/1678975801230205215/6f96229d_1766278.png" width="300px" height="450px" />
@@ -167,15 +169,3 @@ Topiam IAM/IDaaS身份管理平台 - https://www.topiam.cn/ <br>
 | ![输入图片说明](https://foruda.gitee.com/images/1780299491233431530/d88bfa35_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299513358913413/f2f90032_1766278.png "屏幕截图") |
 | ![输入图片说明](https://foruda.gitee.com/images/1780299527419238776/549cb852_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299553918371792/43bd3bff_1766278.png "屏幕截图") |
 | ![输入图片说明](https://foruda.gitee.com/images/1780299586662735625/1107a3ee_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299613342135530/526d7859_1766278.png "屏幕截图") |
-
-
-
-
-
-
-
-
-
-
-
-
