@@ -546,7 +546,7 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
         }
         // 角色关联的在线用户量过大会导致redis阻塞卡顿 谨慎操作
         keys.parallelStream().forEach(key -> {
-            String token = StringUtils.substringAfterLast(key, ":");
+            String token = StringUtils.substringAfterLast(key, StringUtils.COLON);
             // 如果已经过期则跳过
             if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
                 return;
@@ -582,7 +582,7 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
         }
         // 角色关联的在线用户量过大会导致redis阻塞卡顿 谨慎操作
         keys.parallelStream().forEach(key -> {
-            String token = StringUtils.substringAfterLast(key, ":");
+            String token = StringUtils.substringAfterLast(key, StringUtils.COLON);
             // 如果已经过期则跳过
             if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
                 return;

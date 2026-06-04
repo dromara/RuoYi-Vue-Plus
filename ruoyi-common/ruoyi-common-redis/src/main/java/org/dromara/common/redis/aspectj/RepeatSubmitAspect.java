@@ -62,7 +62,7 @@ public class RepeatSubmitAspect {
         // 唯一值（没有消息头则使用请求地址）
         String submitKey = StringUtils.trimToEmpty(request.getHeader(SaManager.getConfig().getTokenName()));
 
-        submitKey = SecureUtil.md5(submitKey + ":" + nowParams);
+        submitKey = SecureUtil.md5(submitKey + StringUtils.COLON + nowParams);
         // 唯一标识（指定key + url + 消息头）
         String cacheRepeatKey = GlobalConstants.REPEAT_SUBMIT_KEY + url + submitKey;
         if (RedisUtils.setObjectIfAbsent(cacheRepeatKey, "", Duration.ofMillis(interval))) {
@@ -163,7 +163,7 @@ public class RepeatSubmitAspect {
             }
         }
         return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse
-            || o instanceof BindingResult;
+                || o instanceof BindingResult;
     }
 
 }

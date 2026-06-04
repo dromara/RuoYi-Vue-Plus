@@ -48,7 +48,7 @@ public class SysUserOnlineController extends BaseController {
         // 获取所有未过期的 token
         Collection<String> keys = RedisUtils.keys(CacheNames.ONLINE_TOKEN_KEY + "*");
         List<Supplier<UserOnlineDTO>> suppliers = keys.stream().map(key -> (Supplier<UserOnlineDTO>) () -> {
-            String token = StringUtils.substringAfterLast(key, ":");
+            String token = StringUtils.substringAfterLast(key, StringUtils.COLON);
             // 如果已经过期则跳过
             if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
                 return null;

@@ -21,7 +21,7 @@ public class KeyPrefixHandler implements NameMapper {
      */
     public KeyPrefixHandler(String keyPrefix) {
         //前缀为空 则返回空前缀
-        this.keyPrefix = StringUtils.isBlank(keyPrefix) ? "" : keyPrefix + ":";
+        this.keyPrefix = StringUtils.isBlank(keyPrefix) ? "" : keyPrefix + StringUtils.COLON;
     }
 
     /**

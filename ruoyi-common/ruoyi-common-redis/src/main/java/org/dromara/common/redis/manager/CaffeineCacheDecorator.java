@@ -1,5 +1,6 @@
 package org.dromara.common.redis.manager;
 
+import org.dromara.common.core.utils.StringUtils;
 import org.springframework.cache.Cache;
 
 import java.util.concurrent.Callable;
@@ -55,7 +56,7 @@ public class CaffeineCacheDecorator implements Cache {
      * @return 唯一键
      */
     public String getUniqueKey(Object key) {
-        return name + ":" + key;
+        return name + StringUtils.COLON + key;
     }
 
     /**
@@ -175,7 +176,7 @@ public class CaffeineCacheDecorator implements Cache {
      * 清理当前缓存命名空间下的本地一级缓存。
      */
     private void clearLocalCache() {
-        String prefix = name + ":";
+        String prefix = name + StringUtils.COLON;
         caffeine.asMap().keySet().removeIf(key -> key instanceof String cacheKey && cacheKey.startsWith(prefix));
     }
 

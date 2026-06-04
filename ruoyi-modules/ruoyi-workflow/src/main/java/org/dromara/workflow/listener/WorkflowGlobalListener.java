@@ -34,7 +34,6 @@ import org.dromara.workflow.service.IFlwNodeExtService;
 import org.dromara.workflow.service.IFlwTaskService;
 import org.springframework.stereotype.Component;
 
-import java.io.Serial;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,10 +49,6 @@ import java.util.Set;
 @Slf4j
 @RequiredArgsConstructor
 public class WorkflowGlobalListener implements GlobalListener {
-
-    private static final String NODE_KEY_SEPARATOR = ":";
-    @Serial
-    private static final long serialVersionUID = -5133036757491932497L;
 
     private final IFlwTaskService flwTaskService;
     private final IFlwInstanceService flwInstanceService;
@@ -145,7 +140,7 @@ public class WorkflowGlobalListener implements GlobalListener {
      * @param taskStatus 任务状态
      */
     private void processTaskPermission(Map<String, Object> variable, Task flowTask, String taskStatus) {
-        String nodeKey = taskStatus + NODE_KEY_SEPARATOR + flowTask.getNodeCode();
+        String nodeKey = taskStatus + StringUtils.COLON + flowTask.getNodeCode();
 
         // 检查是否存在状态相关的变量
         if (!variable.containsKey(nodeKey)) {
@@ -212,7 +207,7 @@ public class WorkflowGlobalListener implements GlobalListener {
             }
             if (!BusinessStatusEnum.initialState(instance.getFlowStatus())) {
                 if (task != null && CollUtil.isNotEmpty(nextTasks) && nextTasks.size() == 1
-                    && flwCommonService.applyNodeCode(definition.getId()).equals(nextTasks.get(0).getNodeCode())) {
+                        && flwCommonService.applyNodeCode(definition.getId()).equals(nextTasks.get(0).getNodeCode())) {
                     // 如果为画线指定驳回 线条指定为驳回 驳回得节点为申请人节点 则修改流程状态为退回
                     flowProcessEventHandler.processHandler(definition.getFlowCode(), instance, BusinessStatusEnum.BACK.getStatus(), params, false);
                     notifyInitiatorIfNeeded(definition, instance, BusinessStatusEnum.BACK.getStatus(), variable);
@@ -255,10 +250,10 @@ public class WorkflowGlobalListener implements GlobalListener {
             }
         }
         FlowEngine.insService().removeVariables(instance.getId(),
-            FlowConstant.FLOW_COPY_LIST,
-            FlowConstant.MESSAGE_TYPE,
-            FlowConstant.MESSAGE_NOTICE,
-            FlowConstant.SUBMIT
+                FlowConstant.FLOW_COPY_LIST,
+                FlowConstant.MESSAGE_TYPE,
+                FlowConstant.MESSAGE_NOTICE,
+                FlowConstant.SUBMIT
         );
     }
 

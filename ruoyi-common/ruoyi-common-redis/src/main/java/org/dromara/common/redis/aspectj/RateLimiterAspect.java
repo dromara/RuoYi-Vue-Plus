@@ -53,7 +53,7 @@ public class RateLimiterAspect {
     /**
      * 在限流注解方法执行前扣减令牌，令牌不足时阻断请求。
      *
-     * @param point 切点信息
+     * @param point       切点信息
      * @param rateLimiter 限流注解配置
      */
     @Before("@annotation(rateLimiter)")
@@ -89,7 +89,7 @@ public class RateLimiterAspect {
      * 组装限流缓存键。
      *
      * @param rateLimiter 限流注解配置
-     * @param point 切点信息
+     * @param point       切点信息
      * @return 限流缓存键
      */
     private String getCombineKey(RateLimiter rateLimiter, JoinPoint point) {
@@ -100,11 +100,11 @@ public class RateLimiterAspect {
             Method targetMethod = signature.getMethod();
             Object[] args = point.getArgs();
             MethodBasedEvaluationContext context =
-                new MethodBasedEvaluationContext(null, targetMethod, args, pnd);
+                    new MethodBasedEvaluationContext(null, targetMethod, args, pnd);
             context.setBeanResolver(new BeanFactoryResolver(SpringUtils.getBeanFactory()));
             Expression expression;
             if (StringUtils.startsWith(key, parserContext.getExpressionPrefix())
-                && StringUtils.endsWith(key, parserContext.getExpressionSuffix())) {
+                    && StringUtils.endsWith(key, parserContext.getExpressionSuffix())) {
                 expression = parser.parseExpression(key, parserContext);
             } else {
                 expression = parser.parseExpression(key);
@@ -112,13 +112,13 @@ public class RateLimiterAspect {
             key = expression.getValue(context, String.class);
         }
         StringBuilder stringBuffer = new StringBuilder(GlobalConstants.RATE_LIMIT_KEY);
-        stringBuffer.append(ServletUtils.getRequest().getRequestURI()).append(":");
+        stringBuffer.append(ServletUtils.getRequest().getRequestURI()).append(StringUtils.COLON);
         if (rateLimiter.limitType() == LimitType.IP) {
             // 获取请求ip
-            stringBuffer.append(ServletUtils.getClientIP()).append(":");
+            stringBuffer.append(ServletUtils.getClientIP()).append(StringUtils.COLON);
         } else if (rateLimiter.limitType() == LimitType.CLUSTER) {
             // 获取客户端实例id
-            stringBuffer.append(RedisUtils.getClient().getId()).append(":");
+            stringBuffer.append(RedisUtils.getClient().getId()).append(StringUtils.COLON);
         }
         return stringBuffer.append(key).toString();
     }
