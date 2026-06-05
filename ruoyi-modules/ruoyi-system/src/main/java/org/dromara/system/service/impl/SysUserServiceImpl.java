@@ -386,26 +386,12 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     public int updateUserProfile(SysUserBo user) {
         return userMapper.lambda()
             .setIfPresent(SysUser::getNickName, user.getNickName())
-            .set(SysUser::getPhoneNumber, user.getPhoneNumber())
-            .set(SysUser::getEmail, user.getEmail())
-            .set(SysUser::getGender, user.getGender())
+            .setIfPresent(SysUser::getAvatar, user.getAvatar())
+            .setIfPresent(SysUser::getPhoneNumber, user.getPhoneNumber())
+            .setIfPresent(SysUser::getEmail, user.getEmail())
+            .setIfPresent(SysUser::getGender, user.getGender())
             .eq(SysUser::getUserId, user.getUserId())
             .updateCount();
-    }
-
-    /**
-     * 修改用户头像
-     *
-     * @param userId 用户ID
-     * @param avatar 头像地址
-     * @return 结果
-     */
-    @Override
-    public boolean updateUserAvatar(Long userId, Long avatar) {
-        return userMapper.lambda()
-            .set(SysUser::getAvatar, avatar)
-            .eq(SysUser::getUserId, userId)
-            .update();
     }
 
     /**

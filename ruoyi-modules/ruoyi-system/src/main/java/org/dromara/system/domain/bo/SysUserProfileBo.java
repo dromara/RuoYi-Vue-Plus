@@ -53,4 +53,9 @@ public class SysUserProfileBo implements Serializable {
      */
     private String gender;
 
+    /**
+     * 头像 OSS ID
+     */
+    private Long avatar;
+
 }

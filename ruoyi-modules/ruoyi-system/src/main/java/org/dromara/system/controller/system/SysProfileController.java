@@ -1,14 +1,11 @@
 package org.dromara.system.controller.system;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.core.utils.file.MimeTypeUtils;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
@@ -19,16 +16,10 @@ import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysUserBo;
 import org.dromara.system.domain.bo.SysUserProfileBo;
 import org.dromara.system.domain.vo.ProfileUserVo;
-import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.domain.vo.SysUserVo;
-import org.dromara.system.service.ISysOssService;
 import org.dromara.system.service.ISysUserService;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Arrays;
 
 /**
  * 个人信息 业务处理
@@ -42,7 +33,6 @@ import java.util.Arrays;
 public class SysProfileController extends BaseController {
 
     private final ISysUserService userService;
-    private final ISysOssService ossService;
 
     /**
      * 获取当前登录用户的个人中心信息。
@@ -110,39 +100,6 @@ public class SysProfileController extends BaseController {
             return R.ok();
         }
         return R.fail("修改密码异常，请联系管理员");
-    }
-
-    /**
-     * 头像上传
-     *
-     * @param avatarfile 用户头像
-     * @return 头像上传结果
-     */
-    @RepeatSubmit
-    @Log(title = "用户头像", businessType = BusinessType.UPDATE)
-    @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public R<AvatarVo> avatar(@RequestPart("avatarfile") MultipartFile avatarfile) {
-        if (ObjectUtil.isNotNull(avatarfile) && !avatarfile.isEmpty()) {
-            String extension = FileUtil.extName(avatarfile.getOriginalFilename());
-            if (!MimeTypeUtils.isImage(extension)) {
-                return R.fail("文件格式不正确，请上传" + Arrays.toString(MimeTypeUtils.IMAGE_EXTENSION) + "格式");
-            }
-            SysOssVo oss = ossService.upload(avatarfile);
-            String avatar = oss.getUrl();
-            boolean updateSuccess = DataPermissionHelper.ignore(() -> userService.updateUserAvatar(LoginHelper.getUserId(), oss.getOssId()));
-            if (updateSuccess) {
-                return R.ok(new AvatarVo(avatar));
-            }
-        }
-        return R.fail("上传图片异常，请联系管理员");
-    }
-
-    /**
-     * 用户头像信息
-     *
-     * @param imgUrl 头像地址
-     */
-    public record AvatarVo(String imgUrl) {
     }
 
     /**

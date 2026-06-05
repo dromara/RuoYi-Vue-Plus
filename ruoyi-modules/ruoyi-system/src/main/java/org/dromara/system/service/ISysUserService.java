@@ -189,15 +189,6 @@ public interface ISysUserService {
     int updateUserProfile(SysUserBo user);
 
     /**
-     * 修改用户头像
-     *
-     * @param userId 用户ID
-     * @param avatar 头像地址
-     * @return 是否修改成功
-     */
-    boolean updateUserAvatar(Long userId, Long avatar);
-
-    /**
      * 重置用户密码
      *
      * @param userId   用户ID

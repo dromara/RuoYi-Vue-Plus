@@ -78,6 +78,11 @@ public class SysUserBo implements Serializable {
     private String gender;
 
     /**
+     * 头像 OSS ID
+     */
+    private Long avatar;
+
+    /**
      * 密码
      */
     private String password;
