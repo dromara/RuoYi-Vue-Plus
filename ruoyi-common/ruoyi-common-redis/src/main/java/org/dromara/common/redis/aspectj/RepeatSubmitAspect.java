@@ -24,6 +24,7 @@ import org.dromara.common.redis.utils.RedisUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Array;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
@@ -150,16 +151,30 @@ public class RepeatSubmitAspect {
     public boolean isFilterObject(final Object o) {
         Class<?> clazz = o.getClass();
         if (clazz.isArray()) {
-            return MultipartFile.class.isAssignableFrom(clazz.getComponentType());
+            if (MultipartFile.class.isAssignableFrom(clazz.getComponentType())) {
+                return true;
+            }
+            int length = Array.getLength(o);
+            for (int i = 0; i < length; i++) {
+                Object value = Array.get(o, i);
+                if (ObjectUtil.isNotNull(value) && isFilterObject(value)) {
+                    return true;
+                }
+            }
+            return false;
         } else if (Collection.class.isAssignableFrom(clazz)) {
             Collection collection = (Collection) o;
             for (Object value : collection) {
-                return value instanceof MultipartFile;
+                if (ObjectUtil.isNotNull(value) && isFilterObject(value)) {
+                    return true;
+                }
             }
         } else if (Map.class.isAssignableFrom(clazz)) {
             Map map = (Map) o;
             for (Object value : map.values()) {
-                return value instanceof MultipartFile;
+                if (ObjectUtil.isNotNull(value) && isFilterObject(value)) {
+                    return true;
+                }
             }
         }
         return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse

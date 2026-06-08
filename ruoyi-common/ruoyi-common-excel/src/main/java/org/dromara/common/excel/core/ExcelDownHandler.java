@@ -202,6 +202,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
         if (CollUtil.isEmpty(firstOptions)) {
             return;
         }
+        validateLinkedOptionNames(firstOptions);
         Map<String, List<String>> secoundOptionsMap = new HashMap<>();
         options.getNextOptions().forEach((k, v) -> secoundOptionsMap.put(k, new ArrayList<>(v)));
 
@@ -311,6 +312,19 @@ public class ExcelDownHandler implements SheetWriteHandler {
         });
 
         currentLinkedOptionsSheetIndex++;
+    }
+
+    /**
+     * 校验级联下拉一级选项可作为 Excel 名称，且不能重复。
+     */
+    private void validateLinkedOptionNames(List<String> firstOptions) {
+        Set<String> names = new HashSet<>();
+        for (String firstOption : firstOptions) {
+            DropDownOptions.validateOptionValue(firstOption);
+            if (!names.add(firstOption)) {
+                throw new ServiceException("级联下拉一级选项重复：" + firstOption);
+            }
+        }
     }
 
     /**

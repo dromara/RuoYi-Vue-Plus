@@ -58,7 +58,7 @@ public class CaptchaController {
      * @param phoneNumber 用户手机号
      * @return 操作结果
      */
-    @RateLimiter(key = "#phonenumber", time = 60, count = 1)
+    @RateLimiter(key = "#phoneNumber", time = 60, count = 1)
     @GetMapping("/resource/sms/code")
     public R<Void> smsCode(@NotBlank(message = "{user.phonenumber.not.blank}") String phoneNumber) {
         if (!RegexValidator.isMobile(phoneNumber)) {
@@ -66,7 +66,6 @@ public class CaptchaController {
         }
         String key = GlobalConstants.CAPTCHA_CODE_KEY + phoneNumber;
         String code = RandomUtil.randomNumbers(4);
-        RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         // 验证码模板id 自行处理 (查数据库或写死均可)
         String templateId = "";
         LinkedHashMap<String, String> map = new LinkedHashMap<>(1);
@@ -75,8 +74,10 @@ public class CaptchaController {
         SmsResponse smsResponse = smsBlend.sendMessage(phoneNumber, templateId, map);
         if (!smsResponse.isSuccess()) {
             log.error("验证码短信发送异常 => {}", smsResponse);
-            return R.fail(smsResponse.getData().toString());
+            Object data = smsResponse.getData();
+            return R.fail(data == null ? "验证码短信发送失败" : data.toString());
         }
+        RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         return R.ok();
     }
 
@@ -107,13 +108,13 @@ public class CaptchaController {
     public void emailCodeImpl(String email) {
         String key = GlobalConstants.CAPTCHA_CODE_KEY + email;
         String code = RandomUtil.randomNumbers(4);
-        RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         try {
             MailBuilder.of()
                 .to(email)
                 .subject("登录验证码")
                 .text("您本次验证码为：" + code + "，有效性为" + Constants.CAPTCHA_EXPIRATION + "分钟，请尽快填写。")
                 .send();
+            RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         } catch (Exception e) {
             log.error("验证码短信发送异常 => {}", e.getMessage());
             throw new ServiceException(e.getMessage());

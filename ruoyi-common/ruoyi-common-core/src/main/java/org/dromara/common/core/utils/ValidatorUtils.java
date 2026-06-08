@@ -26,6 +26,9 @@ public class ValidatorUtils {
      * @throws ConstraintViolationException 如果校验不通过，则抛出参数校验异常
      */
     public static <T> void validate(T object, Class<?>... groups) {
+        if (object == null) {
+            throw new RuntimeException("请求参数不能为空");
+        }
         Set<ConstraintViolation<T>> validate = VALID.validate(object, groups);
         if (!validate.isEmpty()) {
             throw new ConstraintViolationException("参数校验异常", validate);
