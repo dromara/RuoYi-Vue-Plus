@@ -27,10 +27,7 @@ import org.dromara.workflow.common.constant.FlowConstant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -74,10 +71,12 @@ public class FlwChartExtServiceImpl implements ChartExtService {
         Map<String, List<FlowHisTask>> groupedByNode = StreamUtils.groupByKey(flowHisTasks, FlowHisTask::getNodeCode);
 
         // 批量查询所有审批人的用户信息
-        List<UserDTO> userDTOList = userService.selectListByIds(StreamUtils.toList(flowHisTasks, e -> Convert.toLong(e.getApprover())));
+        List<UserDTO> userDTOList = userService.selectListByIds(StreamUtils.toSet(flowHisTasks, e -> Convert.toLong(e.getApprover())));
 
         // 将查询到的用户列表转换为以用户ID为key的映射
         Map<Long, UserDTO> userMap = StreamUtils.toIdentityMap(userDTOList, UserDTO::getUserId);
+        Set<Long> deptIds = StreamUtils.toSet(userDTOList, UserDTO::getDeptId);
+        Map<Long, String> deptNameMap = deptService.selectDeptNamesByIds(deptIds);
 
         Map<String, String> dictType = dictService.getAllDictByDictType(FlowConstant.WF_TASK_STATUS);
 
@@ -100,7 +99,7 @@ public class FlwChartExtServiceImpl implements ChartExtService {
                 ));
 
             // 处理当前节点的扩展信息
-            this.processNodeExtInfo(nodeJson, latestPerApprover, userMap, dictType);
+            this.processNodeExtInfo(nodeJson, latestPerApprover, userMap, deptNameMap, dictType);
         }
     }
 
@@ -168,9 +167,11 @@ public class FlwChartExtServiceImpl implements ChartExtService {
      * @param nodeJson 当前流程节点对象，包含节点基础信息和提示内容容器
      * @param taskList 当前节点关联的历史审批任务列表，用于生成提示信息
      * @param userMap  用户信息映射表，key 为用户ID，value 为用户DTO对象，用于获取审批人信息
+     * @param deptNameMap 部门名称映射表，key 为部门ID，value 为部门名称
      * @param dictType 数据字典映射表，key 为字典项编码，value 为对应显示值，用于翻译审批状态等
      */
-    private void processNodeExtInfo(NodeJson nodeJson, List<FlowHisTask> taskList, Map<Long, UserDTO> userMap, Map<String, String> dictType) {
+    private void processNodeExtInfo(NodeJson nodeJson, List<FlowHisTask> taskList, Map<Long, UserDTO> userMap,
+                                    Map<Long, String> deptNameMap, Map<String, String> dictType) {
 
         // 获取节点提示内容对象中的 info 列表，用于追加提示项
         List<PromptContent.InfoItem> info = nodeJson.getPromptContent().getInfo();
@@ -182,8 +183,7 @@ public class FlwChartExtServiceImpl implements ChartExtService {
                 continue;
             }
 
-            // 查询用户所属部门名称
-            String deptName = deptService.selectDeptNameByIds(Convert.toStr(userDTO.getDeptId()));
+            String deptName = deptNameMap.getOrDefault(userDTO.getDeptId(), StringUtils.EMPTY);
 
             // 添加标题项，如：👤 张三（市场部）
             info.add(new PromptContent.InfoItem()

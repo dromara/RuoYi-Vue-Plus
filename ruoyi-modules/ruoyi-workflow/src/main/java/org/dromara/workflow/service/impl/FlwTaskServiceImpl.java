@@ -338,10 +338,14 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             return;
         }
         // 添加抄送人记录
-        FlowHisTask flowHisTask = flowHisTaskMapper.selectList(
+        List<FlowHisTask> flowHisTasks = flowHisTaskMapper.selectList(
             QueryBuilder.lambda(FlowHisTask.class)
                 .eq(FlowHisTask::getTaskId, task.getId())
-                .build()).get(0);
+                .build());
+        if (CollUtil.isEmpty(flowHisTasks)) {
+            throw new ServiceException("流程历史任务不存在，无法添加抄送记录");
+        }
+        FlowHisTask flowHisTask = flowHisTasks.get(0);
         FlowNode flowNode = new FlowNode();
         flowNode.setNodeCode(flowHisTask.getTargetNodeCode());
         flowNode.setNodeName(flowHisTask.getTargetNodeName());
@@ -897,7 +901,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (CollUtil.isEmpty(userList)) {
             return Collections.emptyList();
         }
-        return userService.selectListByIds(StreamUtils.toList(userList, e -> Convert.toLong(e.getProcessedBy())));
+        return userService.selectListByIds(StreamUtils.toSet(userList, e -> Convert.toLong(e.getProcessedBy())));
     }
 
     /**
