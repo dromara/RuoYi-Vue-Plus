@@ -50,3 +50,6 @@ nbdist/
 !*/build/*.xml
 
 .flattened-pom.xml
+
+application-local.yml
+application-ga.yml
