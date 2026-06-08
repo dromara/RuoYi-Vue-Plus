@@ -618,7 +618,7 @@ const { resetQuery } = useSearchReset({
 });
 
 /** 新增按钮操作 */
-const handleAdd = (row?: ${BusinessName}VO) => {
+const handleAdd = (row?: Partial<${BusinessName}VO>) => {
   openDialog('添加${functionName}');
   getTreeselect();
   if (row != null && row.${treeCode}) {
@@ -629,7 +629,7 @@ const handleAdd = (row?: ${BusinessName}VO) => {
 };
 
 /** 修改按钮操作 */
-const handleUpdate = async (row: ${BusinessName}VO) => {
+const handleUpdate = async (row: Partial<${BusinessName}VO>) => {
   reset();
   await getTreeselect(row.${treeCode});
   if (row != null) {
@@ -668,7 +668,7 @@ const submitForm = () => {
 };
 
 /** 删除按钮操作 */
-const handleDelete = async (row: ${BusinessName}VO) => {
+const handleDelete = async (row: Partial<${BusinessName}VO>) => {
   await modal.confirm('是否确认删除${functionName}编号为"' + row.${pkColumn.javaField} + '"的数据项？');
   setLoading(true);
   await del${BusinessName}(row.${pkColumn.javaField}).finally(() => setLoading(false));
@@ -687,7 +687,7 @@ const filterTreeOptions = (options: ${BusinessName}Option[], excludeId: string |
 
 #if($enableStatus)
 /** 状态修改 */
-const handleStatusChange = async (row: ${BusinessName}VO) => {
+const handleStatusChange = async (row: Partial<${BusinessName}VO>) => {
   const text = row.${statusField} === ${statusField}ActiveValue ? '启用' : '停用';
   try {
     await modal.confirm('确认要"' + text + '"吗?');
@@ -701,7 +701,7 @@ const handleStatusChange = async (row: ${BusinessName}VO) => {
 
 #if($enableSort)
 /** 排序调整 */
-const handleSortChange = async (row: ${BusinessName}VO) => {
+const handleSortChange = async (row: Partial<${BusinessName}VO>) => {
   try {
     await update${BusinessName}Sort(row.${pkColumn.javaField}, row.${sortField});
     modal.msgSuccess('排序更新成功');

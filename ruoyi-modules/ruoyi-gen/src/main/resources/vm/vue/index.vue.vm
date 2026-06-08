@@ -561,7 +561,7 @@ const handleAdd = () => {
 };
 
 /** 修改按钮操作 */
-const handleUpdate = async (row?: ${BusinessName}VO) => {
+const handleUpdate = async (row?: Partial<${BusinessName}VO>) => {
   reset();
   const _${pkColumn.javaField} = row?.${pkColumn.javaField} || ids.value[0];
   const res = await get${BusinessName}(_${pkColumn.javaField});
@@ -597,7 +597,7 @@ const submitForm = () => {
 };
 
 /** 删除按钮操作 */
-const handleDelete = async (row?: ${BusinessName}VO) => {
+const handleDelete = async (row?: Partial<${BusinessName}VO>) => {
   const _${pkColumn.javaField}s = row?.${pkColumn.javaField} || ids.value;
   await modal.confirm('是否确认删除${functionName}编号为"' + _${pkColumn.javaField}s + '"的数据项？');
   await del${BusinessName}(_${pkColumn.javaField}s);
@@ -620,7 +620,7 @@ const handleExport = () => {
 
 #if($enableStatus)
 /** 状态修改 */
-const handleStatusChange = async (row: ${BusinessName}VO) => {
+const handleStatusChange = async (row: Partial<${BusinessName}VO>) => {
   const text = row.${statusField} === ${statusField}ActiveValue ? '启用' : '停用';
   try {
     await modal.confirm('确认要"' + text + '"吗?');
@@ -634,7 +634,7 @@ const handleStatusChange = async (row: ${BusinessName}VO) => {
 
 #if($enableSort)
 /** 排序调整 */
-const handleSortChange = async (row: ${BusinessName}VO) => {
+const handleSortChange = async (row: Partial<${BusinessName}VO>) => {
   try {
     await update${BusinessName}Sort(row.${pkColumn.javaField}, row.${sortField});
     modal.msgSuccess('排序更新成功');
