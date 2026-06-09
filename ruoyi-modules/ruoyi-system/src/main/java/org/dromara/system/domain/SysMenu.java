@@ -10,7 +10,6 @@ import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +24,6 @@ import java.util.List;
 @TableName("sys_menu")
 public class SysMenu extends BaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 6967394714839655267L;
     /**
      * 菜单ID
      */
