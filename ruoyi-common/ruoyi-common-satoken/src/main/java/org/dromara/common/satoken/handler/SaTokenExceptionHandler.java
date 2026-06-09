@@ -52,6 +52,7 @@ public class SaTokenExceptionHandler {
             case NotLoginException.KICK_OUT -> "账号已被管理员强制下线";
             case NotLoginException.TOKEN_FREEZE -> "账号已被冻结，请联系管理员处理";
             case NotLoginException.NO_PREFIX -> "登录格式异常，请重新登录";
+            case "-100" -> "客户端ID与Token不匹配";
             default -> "登录状态异常，请重新登录";
         };
         log.error("请求地址'{}',{}", requestURI, msg);
