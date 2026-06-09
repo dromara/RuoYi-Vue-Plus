@@ -103,7 +103,8 @@ services:
       # 时区上海
       TZ: Asia/Shanghai
       SERVER_PORT: 8080
-      SNAIL_PORT: 28080
+      SNAIL_JOB_PORT: 28080
+      SNAIL_AI_PORT: 38080
     volumes:
       # 配置文件
       - /docker/server1/logs/:/ruoyi/server/logs/
@@ -119,7 +120,8 @@ services:
       # 时区上海
       TZ: Asia/Shanghai
       SERVER_PORT: 8081
-      SNAIL_PORT: 28081
+      SNAIL_JOB_PORT: 28081
+      SNAIL_AI_PORT: 38081
     volumes:
       # 配置文件
       - /docker/server2/logs/:/ruoyi/server/logs/
@@ -151,5 +153,19 @@ services:
       - "17888:17888"
     volumes:
       - /docker/snailjob/logs/:/ruoyi/snailjob/logs
+    privileged: true
+    network_mode: "host"
+
+  ruoyi-snailai-server:
+    image: ruoyi/ruoyi-snailai-server:5.5.3
+    container_name: ruoyi-snailai-server
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+    ports:
+      - "8900:8900"
+      - "18888:18888"
+    volumes:
+      - /docker/snailai/logs/:/ruoyi/snailai/logs
     privileged: true
     network_mode: "host"
