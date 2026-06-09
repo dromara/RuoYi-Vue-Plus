@@ -56,7 +56,7 @@ public class SaTokenExceptionHandler {
             default -> "登录状态异常，请重新登录";
         };
         log.error("请求地址'{}',{}", requestURI, msg);
-        return R.fail(HttpStatus.HTTP_UNAUTHORIZED, msg);
+        return R.fail(HttpStatus.HTTP_UNAUTHORIZED, "认证失败，无法访问系统资源");
     }
 
 }
