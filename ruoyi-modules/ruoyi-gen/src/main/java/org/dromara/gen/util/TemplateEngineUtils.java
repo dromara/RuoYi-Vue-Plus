@@ -49,7 +49,7 @@ public class TemplateEngineUtils {
     /**
      * 默认上级菜单，系统工具
      */
-    private static final String DEFAULT_PARENT_MENU_ID = "3";
+    private static final String DEFAULT_PARENT_MENU_ID = "1761400000000000003";
 
     // 模板引擎
     private static final TemplateEngine TEMPLATE_ENGINE;

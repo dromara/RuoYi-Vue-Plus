@@ -615,39 +615,40 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     public void setTableFromOptions(GenTable genTable) {
         Dict paramsObj = JsonUtils.parseMap(genTable.getOptions());
-        if (ObjectUtil.isNotNull(paramsObj)) {
-            String treeCode = paramsObj.getStr(GenConstants.TREE_CODE);
-            String treeParentCode = paramsObj.getStr(GenConstants.TREE_PARENT_CODE);
-            String treeName = paramsObj.getStr(GenConstants.TREE_NAME);
-            Long parentMenuId = paramsObj.getLong(GenConstants.PARENT_MENU_ID);
-            String parentMenuName = paramsObj.getStr(GenConstants.PARENT_MENU_NAME);
-            Boolean enableExport = Convert.toBool(paramsObj.get(GenConstants.ENABLE_EXPORT), true);
-            Boolean enableStatus = Convert.toBool(paramsObj.get(GenConstants.ENABLE_STATUS), false);
-            String statusField = paramsObj.getStr(GenConstants.STATUS_FIELD);
-            Boolean enableUnique = Convert.toBool(paramsObj.get(GenConstants.ENABLE_UNIQUE), false);
-            List<String> uniqueFields = Convert.toList(String.class, paramsObj.get(GenConstants.UNIQUE_FIELDS));
-            Boolean enableSort = Convert.toBool(paramsObj.get(GenConstants.ENABLE_SORT), false);
-            String sortField = paramsObj.getStr(GenConstants.SORT_FIELD);
-            String treeRootValue = paramsObj.getStr(GenConstants.TREE_ROOT_VALUE);
-            String treeAncestorsField = paramsObj.getStr(GenConstants.TREE_ANCESTORS);
-            String treeOrderField = paramsObj.getStr(GenConstants.TREE_ORDER_FIELD);
-
-            genTable.setTreeCode(treeCode);
-            genTable.setTreeParentCode(treeParentCode);
-            genTable.setTreeName(treeName);
-            genTable.setParentMenuId(parentMenuId);
-            genTable.setParentMenuName(parentMenuName);
-            genTable.setEnableExport(enableExport);
-            genTable.setEnableStatus(enableStatus);
-            genTable.setStatusField(statusField);
-            genTable.setEnableUnique(enableUnique);
-            genTable.setUniqueFields(uniqueFields);
-            genTable.setEnableSort(enableSort);
-            genTable.setSortField(sortField);
-            genTable.setTreeRootValue(treeRootValue);
-            genTable.setTreeAncestorsField(treeAncestorsField);
-            genTable.setTreeOrderField(treeOrderField);
+        if (ObjectUtil.isNull(paramsObj)) {
+            paramsObj = new Dict();
         }
+        String treeCode = paramsObj.getStr(GenConstants.TREE_CODE);
+        String treeParentCode = paramsObj.getStr(GenConstants.TREE_PARENT_CODE);
+        String treeName = paramsObj.getStr(GenConstants.TREE_NAME);
+        Long parentMenuId = Convert.toLong(TemplateEngineUtils.getParentMenuId(paramsObj));
+        String parentMenuName = paramsObj.getStr(GenConstants.PARENT_MENU_NAME);
+        Boolean enableExport = Convert.toBool(paramsObj.get(GenConstants.ENABLE_EXPORT), true);
+        Boolean enableStatus = Convert.toBool(paramsObj.get(GenConstants.ENABLE_STATUS), false);
+        String statusField = paramsObj.getStr(GenConstants.STATUS_FIELD);
+        Boolean enableUnique = Convert.toBool(paramsObj.get(GenConstants.ENABLE_UNIQUE), false);
+        List<String> uniqueFields = Convert.toList(String.class, paramsObj.get(GenConstants.UNIQUE_FIELDS));
+        Boolean enableSort = Convert.toBool(paramsObj.get(GenConstants.ENABLE_SORT), false);
+        String sortField = paramsObj.getStr(GenConstants.SORT_FIELD);
+        String treeRootValue = paramsObj.getStr(GenConstants.TREE_ROOT_VALUE);
+        String treeAncestorsField = paramsObj.getStr(GenConstants.TREE_ANCESTORS);
+        String treeOrderField = paramsObj.getStr(GenConstants.TREE_ORDER_FIELD);
+
+        genTable.setTreeCode(treeCode);
+        genTable.setTreeParentCode(treeParentCode);
+        genTable.setTreeName(treeName);
+        genTable.setParentMenuId(parentMenuId);
+        genTable.setParentMenuName(parentMenuName);
+        genTable.setEnableExport(enableExport);
+        genTable.setEnableStatus(enableStatus);
+        genTable.setStatusField(statusField);
+        genTable.setEnableUnique(enableUnique);
+        genTable.setUniqueFields(uniqueFields);
+        genTable.setEnableSort(enableSort);
+        genTable.setSortField(sortField);
+        genTable.setTreeRootValue(treeRootValue);
+        genTable.setTreeAncestorsField(treeAncestorsField);
+        genTable.setTreeOrderField(treeOrderField);
     }
 
 }
