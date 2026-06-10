@@ -60,7 +60,7 @@ public record HandleAsyncResult<T>(
      * @return 异步处理结果
      */
     public static <T> HandleAsyncResult<T> of(T result, Throwable error) {
-        return new HandleAsyncResult<T>(result, error);
+        return new HandleAsyncResult<>(result, error);
     }
 
     /**
@@ -71,7 +71,7 @@ public record HandleAsyncResult<T>(
      * @return 异步处理结果
      */
     public static <T> HandleAsyncResult<T> success(T result) {
-        return new HandleAsyncResult<T>(result, null);
+        return new HandleAsyncResult<>(result, null);
     }
 
     /**
@@ -82,6 +82,6 @@ public record HandleAsyncResult<T>(
      * @return 异步处理结果
      */
     public static <T> HandleAsyncResult<T> failure(Throwable error) {
-        return new HandleAsyncResult<T>(null, error);
+        return new HandleAsyncResult<>(null, error);
     }
 }

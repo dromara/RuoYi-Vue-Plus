@@ -98,9 +98,8 @@ public class ThreadPoolConfig {
      * @param t 任务执行过程中抛出的异常
      */
     public static void printException(Runnable r, Throwable t) {
-        if (t == null && r instanceof Future<?>) {
+        if (t == null && r instanceof Future<?> future) {
             try {
-                Future<?> future = (Future<?>) r;
                 if (future.isDone()) {
                     future.get();
                 }

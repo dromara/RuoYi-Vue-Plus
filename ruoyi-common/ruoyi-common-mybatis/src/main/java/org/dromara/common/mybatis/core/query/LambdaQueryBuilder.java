@@ -400,6 +400,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param value     条件值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> eq(boolean condition, SFunction<T, ?> column, Object value) {
         wrapper.eq(condition, column, value);
         return this;
@@ -425,6 +426,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param value     条件值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> ne(boolean condition, SFunction<T, ?> column, Object value) {
         wrapper.ne(condition, column, value);
         return this;
@@ -450,6 +452,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param value     条件值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> gt(boolean condition, SFunction<T, ?> column, Object value) {
         wrapper.gt(condition, column, value);
         return this;
@@ -475,6 +478,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param value     条件值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> ge(boolean condition, SFunction<T, ?> column, Object value) {
         wrapper.ge(condition, column, value);
         return this;
@@ -500,6 +504,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param value     条件值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> lt(boolean condition, SFunction<T, ?> column, Object value) {
         wrapper.lt(condition, column, value);
         return this;
@@ -525,6 +530,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param value     条件值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> le(boolean condition, SFunction<T, ?> column, Object value) {
         wrapper.le(condition, column, value);
         return this;
@@ -550,6 +556,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param value     条件值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> like(boolean condition, SFunction<T, ?> column, Object value) {
         wrapper.like(condition, column, value);
         return this;
@@ -575,6 +582,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param value     条件值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> notLike(boolean condition, SFunction<T, ?> column, Object value) {
         wrapper.notLike(condition, column, value);
         return this;
@@ -600,6 +608,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param value     条件值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> likeLeft(boolean condition, SFunction<T, ?> column, Object value) {
         wrapper.likeLeft(condition, column, value);
         return this;
@@ -625,6 +634,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param value     条件值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> likeRight(boolean condition, SFunction<T, ?> column, Object value) {
         wrapper.likeRight(condition, column, value);
         return this;
@@ -652,6 +662,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param end       结束值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> between(boolean condition, SFunction<T, ?> column, Object begin, Object end) {
         wrapper.between(condition, column, begin, end);
         return this;
@@ -679,6 +690,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param end       结束值
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> notBetween(boolean condition, SFunction<T, ?> column, Object begin, Object end) {
         wrapper.notBetween(condition, column, begin, end);
         return this;
@@ -718,7 +730,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @return 当前查询构造辅助对象
      */
     public LambdaQueryBuilder<T> allEq(BiPredicate<SFunction<T, ?>, Object> filter, Map<?, ?> params, boolean null2IsNull) {
-        wrapper.allEq(true, (BiPredicate) filter, (Map) params, null2IsNull);
+        wrapper.allEq(true, filter, (Map) params, null2IsNull);
         return this;
     }
 
@@ -732,7 +744,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @return 当前查询构造辅助对象
      */
     public LambdaQueryBuilder<T> allEq(boolean condition, BiPredicate<SFunction<T, ?>, Object> filter, Map<?, ?> params, boolean null2IsNull) {
-        wrapper.allEq(condition, (BiPredicate) filter, (Map) params, null2IsNull);
+        wrapper.allEq(condition, filter, (Map) params, null2IsNull);
         return this;
     }
 
@@ -802,6 +814,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param values    条件值集合
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> in(boolean condition, SFunction<T, ?> column, Collection<?> values) {
         wrapper.in(condition, column, values);
         return this;
@@ -827,6 +840,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param values    条件值数组
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> in(boolean condition, SFunction<T, ?> column, Object... values) {
         wrapper.in(condition, column, values);
         return this;
@@ -852,6 +866,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param values    条件值集合
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> notIn(boolean condition, SFunction<T, ?> column, Collection<?> values) {
         wrapper.notIn(condition, column, values);
         return this;
@@ -877,6 +892,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param values    条件值数组
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> notIn(boolean condition, SFunction<T, ?> column, Object... values) {
         wrapper.notIn(condition, column, values);
         return this;
@@ -1219,6 +1235,7 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      * @param values    SQL 片段参数
      * @return 当前查询构造辅助对象
      */
+    @Override
     public LambdaQueryBuilder<T> apply(boolean condition, String applySql, Object... values) {
         wrapper.apply(condition, applySql, values);
         return this;
@@ -1368,7 +1385,6 @@ public final class LambdaQueryBuilder<T> implements LambdaQueryCondition<T, Lamb
      *
      * @return 聚合查询包装器
      */
-    @SuppressWarnings("unchecked")
     private AggregateLambdaQueryWrapper<T> aggregateWrapper() {
         return (AggregateLambdaQueryWrapper<T>) wrapper;
     }

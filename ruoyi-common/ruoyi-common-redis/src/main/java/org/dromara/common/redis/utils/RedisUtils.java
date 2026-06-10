@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  * @version 3.1.0 新增
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@SuppressWarnings(value = {"unchecked", "rawtypes"})
+@SuppressWarnings(value = {"rawtypes"})
 public class RedisUtils {
 
     private static final RedissonClient CLIENT = SpringUtils.getBean(RedissonClient.class);
@@ -280,9 +280,7 @@ public class RedisUtils {
             return;
         }
         RBatch batch = CLIENT.createBatch();
-        collection.forEach(t -> {
-            batch.getBucket(t.toString()).deleteAsync();
-        });
+        collection.forEach(t -> batch.getBucket(t.toString()).deleteAsync());
         batch.execute();
     }
 

@@ -54,7 +54,7 @@ public class SysDeptController extends BaseController {
      */
     @SaCheckPermission("system:dept:list")
     @GetMapping("/list/exclude/{deptId}")
-    public R<List<SysDeptVo>> excludeChild(@PathVariable(value = "deptId", required = false) Long deptId) {
+    public R<List<SysDeptVo>> excludeChild(@PathVariable(value = "deptId") Long deptId) {
         List<SysDeptVo> depts = deptService.selectDeptList(new SysDeptBo());
         depts.removeIf(d -> d.getDeptId().equals(deptId)
             || StringUtils.splitList(d.getAncestors()).contains(Convert.toStr(deptId)));

@@ -33,7 +33,6 @@ public class SocialUtils {
      * @return 授权响应
      * @throws AuthException 授权异常
      */
-    @SuppressWarnings("unchecked")
     public static AuthResponse<AuthUser> loginAuth(String source, String code, String state, SocialProperties socialProperties) throws AuthException {
         AuthRequest authRequest = getAuthRequest(source, socialProperties);
         AuthCallback callback = new AuthCallback();
@@ -93,4 +92,3 @@ public class SocialUtils {
         };
     }
 }
-

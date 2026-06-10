@@ -12,7 +12,6 @@ import java.lang.reflect.Method;
  *
  * @author Lion Li
  */
-@SuppressWarnings("rawtypes")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReflectUtils extends ReflectUtil {
 
