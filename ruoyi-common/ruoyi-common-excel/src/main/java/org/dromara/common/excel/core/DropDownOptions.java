@@ -154,7 +154,7 @@ public class DropDownOptions {
         sonList.forEach(everySon -> {
             if (parentGroupByIdMap.containsKey(sonHowToGetParentIdFunction.apply(everySon))) {
                 // 找到对应的上级
-                T parentObj = parentGroupByIdMap.get(sonHowToGetParentIdFunction.apply(everySon)).get(0);
+                T parentObj = parentGroupByIdMap.get(sonHowToGetParentIdFunction.apply(everySon)).getFirst();
                 // 提取名称和ID作为Key
                 String key = howToBuildEveryOption.apply(parentObj);
                 // Key对应的Value

@@ -603,7 +603,7 @@ public class GenTableServiceImpl implements IGenTableService {
             }
         }
         if (ObjectUtil.isNull(table.getPkColumn())) {
-            table.setPkColumn(table.getColumns().get(0));
+            table.setPkColumn(table.getColumns().getFirst());
         }
 
     }

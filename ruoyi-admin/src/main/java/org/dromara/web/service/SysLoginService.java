@@ -97,7 +97,7 @@ public class SysLoginService {
             sysSocialService.insertByBo(bo);
         } else {
             // 更新用户信息
-            bo.setId(list.get(0).getId());
+            bo.setId(list.getFirst().getId());
             sysSocialService.updateByBo(bo);
             // 如果要绑定的平台账号已经被绑定过了 是否抛异常自行决断
             // throw new ServiceException("此平台账号已经被绑定!");

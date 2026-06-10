@@ -133,7 +133,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             }
             taskService.mergeVariable(flowInstance, variables);
             insService.updateById(flowInstance);
-            StartProcessReturnDTO dto = new StartProcessReturnDTO(taskList.get(0).getInstanceId(), taskList.get(0).getId());
+            StartProcessReturnDTO dto = new StartProcessReturnDTO(taskList.getFirst().getInstanceId(), taskList.getFirst().getId());
             // 保存流程实例业务信息
             this.buildFlowInstanceBizExt(flowInstance, bizExt);
             return dto;
@@ -164,7 +164,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (taskList.size() > 1) {
             throw new ServiceException("请检查流程第一个环节是否为申请人！");
         }
-        return new StartProcessReturnDTO(instance.getId(), taskList.get(0).getId());
+        return new StartProcessReturnDTO(instance.getId(), taskList.getFirst().getId());
     }
 
     /**
@@ -345,7 +345,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (CollUtil.isEmpty(flowHisTasks)) {
             throw new ServiceException("流程历史任务不存在，无法添加抄送记录");
         }
-        FlowHisTask flowHisTask = flowHisTasks.get(0);
+        FlowHisTask flowHisTask = flowHisTasks.getFirst();
         FlowNode flowNode = new FlowNode();
         flowNode.setNodeCode(flowHisTask.getTargetNodeCode());
         flowNode.setNodeName(flowHisTask.getTargetNodeName());
@@ -544,7 +544,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             return nodeCodes;
         }
         //判断是否配置了固定驳回节点
-        Node node = nodeCodes.get(0);
+        Node node = nodeCodes.getFirst();
         if (StringUtils.isNotBlank(node.getAnyNodeSkip())) {
             return nodeService.getByNodeCodes(Collections.singletonList(node.getAnyNodeSkip()), task.getDefinitionId());
         }

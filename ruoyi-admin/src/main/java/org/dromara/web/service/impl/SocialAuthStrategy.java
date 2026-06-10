@@ -68,7 +68,7 @@ public class SocialAuthStrategy implements IAuthStrategy {
         if (CollUtil.isEmpty(list)) {
             throw new ServiceException("你还没有绑定第三方账号，绑定后才可以登录！");
         }
-        SysUserVo user = loadUser(list.get(0).getUserId());
+        SysUserVo user = loadUser(list.getFirst().getUserId());
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         LoginUser loginUser = loginService.buildLoginUser(user);
         loginUser.setClientKey(client.getClientKey());

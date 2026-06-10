@@ -122,7 +122,7 @@ public class ExportExcelServiceImpl implements IExportExcelService {
         Map<Integer, List<DemoCityData>> groupByIdMap =
             StreamUtils.groupByKey(cityDataList, DemoCityData::getId);
         if (groupByIdMap.containsKey(id)) {
-            DemoCityData demoCityData = groupByIdMap.get(id).get(0);
+            DemoCityData demoCityData = groupByIdMap.get(id).getFirst();
             return DropDownOptions.createOptionValue(demoCityData.getName(), demoCityData.getId());
         } else {
             return StringUtils.EMPTY;
@@ -216,7 +216,7 @@ public class ExportExcelServiceImpl implements IExportExcelService {
 
         sonList.forEach(everySon -> {
             if (parentGroupByIdMap.containsKey(everySon.getPid())) {
-                everySon.setPData(parentGroupByIdMap.get(everySon.getPid()).get(0));
+                everySon.setPData(parentGroupByIdMap.get(everySon.getPid()).getFirst());
             }
         });
     }

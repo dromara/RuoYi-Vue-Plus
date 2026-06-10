@@ -64,7 +64,7 @@ public class TreeBuildUtils extends TreeUtil {
         if (CollUtil.isEmpty(list)) {
             return CollUtil.newArrayList();
         }
-        K k = ReflectUtils.invokeGetter(list.get(0), "parentId");
+        K k = ReflectUtils.invokeGetter(list.getFirst(), "parentId");
         return TreeUtil.build(list, k, DEFAULT_CONFIG, nodeParser);
     }
 

@@ -282,10 +282,10 @@ public class ExcelDownHandler implements SheetWriteHandler {
                     continue;
                 }
                 // 取第一个
-                String str = data.get(0);
+                String str = data.getFirst();
                 rowData.add(str);
                 // 通过移除的方式避免重复
-                data.remove(0);
+                data.removeFirst();
                 // 设置可以继续
                 flag = true;
             }

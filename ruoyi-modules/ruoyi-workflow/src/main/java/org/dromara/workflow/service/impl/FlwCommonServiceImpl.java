@@ -189,6 +189,6 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
         if (CollUtil.isEmpty(firstBetweenNode)) {
             throw new ServiceException("流程定义缺少申请人节点，请检查流程定义配置");
         }
-        return firstBetweenNode.get(0).getNodeCode();
+        return firstBetweenNode.getFirst().getNodeCode();
     }
 }

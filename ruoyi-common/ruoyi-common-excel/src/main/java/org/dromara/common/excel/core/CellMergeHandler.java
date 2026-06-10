@@ -66,7 +66,7 @@ public class CellMergeHandler {
         }
 
         // 获取有合并注解的字段
-        Map<Field, FieldColumnIndex> mergeFields = getFieldColumnIndexMap(rows.get(0).getClass());
+        Map<Field, FieldColumnIndex> mergeFields = getFieldColumnIndexMap(rows.getFirst().getClass());
         // 如果没有需要合并的字段则返回空集
         if (CollUtil.isEmpty(mergeFields)) {
             return Collections.emptyList();

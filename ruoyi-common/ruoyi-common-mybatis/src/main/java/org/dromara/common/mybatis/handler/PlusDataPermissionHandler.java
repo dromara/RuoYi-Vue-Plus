@@ -112,7 +112,7 @@ public class PlusDataPermissionHandler {
         }
         Object defaultValue = "-1";
         NullSafeStandardEvaluationContext context = new NullSafeStandardEvaluationContext(defaultValue);
-        context.addPropertyAccessor(new NullSafePropertyAccessor(context.getPropertyAccessors().get(0), defaultValue));
+        context.addPropertyAccessor(new NullSafePropertyAccessor(context.getPropertyAccessors().getFirst(), defaultValue));
         context.setBeanResolver(beanResolver);
         DataPermissionHelper.getContext().forEach(context::setVariable);
         Set<String> conditions = new HashSet<>();
