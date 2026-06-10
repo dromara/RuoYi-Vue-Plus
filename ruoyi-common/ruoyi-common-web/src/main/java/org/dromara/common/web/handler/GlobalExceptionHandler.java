@@ -1,6 +1,7 @@
 package org.dromara.common.web.handler;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpStatus;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -151,8 +152,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public R<Void> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',发生未知异常.", requestURI, e);
-        return R.fail("发生未知异常，请联系管理员");
+        String errorId = RandomUtil.randomNumbers(8);
+        log.error("请求地址'{}',发生未知异常, 错误编号: {}", requestURI, errorId, e);
+        return R.fail("发生未知异常，请联系管理员 [错误编号: " + errorId + "]");
     }
 
     /**
@@ -161,8 +163,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public R<Void> handleException(Exception e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',发生系统异常.", requestURI, e);
-        return R.fail("发生系统异常，请联系管理员");
+        String errorId = RandomUtil.randomNumbers(8);
+        log.error("请求地址'{}',发生系统异常, 错误编号: {}", requestURI, errorId, e);
+        return R.fail("发生系统异常，请联系管理员 [错误编号: " + errorId + "]");
     }
 
     /**
