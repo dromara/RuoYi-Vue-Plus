@@ -2,6 +2,7 @@ package org.dromara.system.service;
 
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.system.domain.SysOssExt;
 import org.dromara.system.domain.bo.SysOssBo;
 import org.dromara.system.domain.vo.SysOssVo;
 import org.springframework.http.ResponseEntity;
@@ -47,17 +48,19 @@ public interface ISysOssService {
      * 上传 MultipartFile 到对象存储服务，并保存文件信息到数据库
      *
      * @param file 要上传的 MultipartFile 对象
+     * @param ossExt 扩展信息
      * @return 上传成功后的 SysOssVo 对象，包含文件信息
      */
-    SysOssVo upload(MultipartFile file);
+    SysOssVo upload(MultipartFile file, SysOssExt ossExt);
 
     /**
      * 上传文件到对象存储服务，并保存文件信息到数据库
      *
      * @param file 要上传的文件对象
+     * @param ossExt 扩展信息
      * @return 上传成功后的 SysOssVo 对象，包含文件信息
      */
-    SysOssVo upload(File file);
+    SysOssVo upload(File file, SysOssExt ossExt);
 
     /**
      * 文件下载方法，支持一次性下载完整文件

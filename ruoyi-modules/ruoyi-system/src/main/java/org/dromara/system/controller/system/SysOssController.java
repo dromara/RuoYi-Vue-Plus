@@ -7,10 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.QueryGroup;
+import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.web.core.BaseController;
+import org.dromara.system.domain.SysOssExt;
 import org.dromara.system.domain.bo.SysOssBo;
 import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.service.ISysOssService;
@@ -73,8 +75,8 @@ public class SysOssController extends BaseController {
     @SaCheckPermission("system:oss:upload")
     @Log(title = "OSS对象存储", businessType = BusinessType.INSERT)
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public R<SysOssUploadVo> upload(@RequestPart("file") MultipartFile file) {
-        SysOssVo oss = ossService.upload(file);
+    public R<SysOssUploadVo> upload(@RequestPart("file") MultipartFile file, @RequestParam(value = "ossExt", required = false) String ossExtJson) {
+        SysOssVo oss = ossService.upload(file, JsonUtils.parseObject(ossExtJson, SysOssExt.class));
         SysOssUploadVo uploadVo = new SysOssUploadVo(oss.getUrl(), oss.getOriginalName(), oss.getOssId().toString());
         return R.ok(uploadVo);
     }

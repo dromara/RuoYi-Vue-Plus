@@ -230,7 +230,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      * @throws ServiceException 如果上传过程中发生异常，则抛出 ServiceException 异常
      */
     @Override
-    public SysOssVo upload(MultipartFile file) {
+    public SysOssVo upload(MultipartFile file, SysOssExt ossExt) {
         if (ObjectUtil.isNull(file) || file.isEmpty()) {
             throw new ServiceException("上传文件不能为空");
         }
@@ -240,11 +240,11 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         String pathKey = instance.buildPathKey(originalfileName);
         try (InputStream inputStream = file.getInputStream()) {
             PutObjectResult result = instance.upload(pathKey, inputStream, file.getSize(), Options.builder().setContentType(file.getContentType()));
-            SysOssExt ext1 = new SysOssExt();
-            ext1.setFileSize(file.getSize());
-            ext1.setContentType(file.getContentType());
+            ossExt = ossExt == null ? new SysOssExt() : ossExt;
+            ossExt.setFileSize(file.getSize());
+            ossExt.setContentType(file.getContentType());
             // 保存文件信息
-            return buildResultEntity(originalfileName, suffix, instance.clientId(), result, ext1);
+            return buildResultEntity(originalfileName, suffix, instance.clientId(), result, ossExt);
         } catch (IOException e) {
             throw new ServiceException(e.getMessage());
         }
@@ -257,7 +257,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      * @return 上传成功后的 SysOssVo 对象，包含文件信息
      */
     @Override
-    public SysOssVo upload(File file) {
+    public SysOssVo upload(File file, SysOssExt ossExt) {
         if (ObjectUtil.isNull(file) || !file.isFile() || file.length() <= 0) {
             throw new ServiceException("上传文件不能为空");
         }
@@ -266,7 +266,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         OssClient instance = OssFactory.instance();
         String pathKey = instance.buildPathKey(originalfileName);
         PutObjectResult result = instance.upload(pathKey, file, Options.builder().setContentType(FileUtils.getMimeType(file.toPath())));
-        SysOssExt ext1 = new SysOssExt();
+        SysOssExt ext1 = ossExt == null ? new SysOssExt() : ossExt;
         ext1.setFileSize(result.size());
         // 保存文件信息
         return buildResultEntity(originalfileName, suffix, instance.clientId(), result, ext1);
