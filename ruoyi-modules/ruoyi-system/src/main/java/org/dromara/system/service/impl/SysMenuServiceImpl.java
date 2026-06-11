@@ -314,9 +314,24 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int updateMenu(SysMenuBo bo) {
         SysMenu menu = MapstructUtils.convert(bo, SysMenu.class);
-        return baseMapper.updateById(menu);
+        if (menu == null) {
+            return 0;
+        }
+        // 获取修改前的菜单信息
+        SysMenu oldMenu = baseMapper.selectById(menu.getMenuId());
+
+        // 执行更新
+        int result = baseMapper.updateById(menu);
+
+        // 如果parentId发生变化，自动同步角色菜单关联
+        if (result > 0 && oldMenu != null && !oldMenu.getParentId().equals(menu.getParentId())) {
+            syncRoleMenuForParentChange(menu.getMenuId(), menu.getParentId());
+        }
+
+        return result;
     }
 
     /**
@@ -435,6 +450,100 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 recursionFn(list, tChild);
             }
         }
+    }
+
+    /**
+     * 当菜单父级变化时，同步角色菜单关联
+     * 为已分配该菜单的角色自动添加新父菜单及所有祖先菜单的关联
+     *
+     * @param menuId      菜单ID
+     * @param newParentId 新的父菜单ID
+     */
+    private void syncRoleMenuForParentChange(Long menuId, Long newParentId) {
+        // 1. 查询哪些角色已经分配了这个菜单
+        List<SysRoleMenu> roleMenus = roleMenuMapper.selectList(
+            new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getMenuId, menuId)
+        );
+
+        if (CollUtil.isEmpty(roleMenus)) {
+            return;
+        }
+
+        // 2. 获取新父菜单及其所有祖先菜单ID列表
+        List<Long> parentMenuIds = getAllParentMenuIds(newParentId);
+
+        if (CollUtil.isEmpty(parentMenuIds)) {
+            return;
+        }
+
+        // 3. 批量查询已存在的关联关系，避免N+1问题
+        // 收集所有需要检查的roleId（去重）
+        List<Long> roleIds = roleMenus.stream()
+            .map(SysRoleMenu::getRoleId)
+            .distinct()
+            .toList();
+
+        // 一次性查询这些角色和父菜单的所有已存在关联
+        List<SysRoleMenu> existingRelations = roleMenuMapper.selectList(
+            new LambdaQueryWrapper<SysRoleMenu>()
+                .in(SysRoleMenu::getRoleId, roleIds)
+                .in(SysRoleMenu::getMenuId, parentMenuIds)
+        );
+
+        // 将已存在的关联转换为Set，方便快速查找
+        Set<String> existingSet = StreamUtils.toSet(existingRelations,
+            rm -> rm.getRoleId() + ":" + rm.getMenuId());
+
+        // 4. 构建需要新增的关联关系
+        List<SysRoleMenu> newRoleMenus = new ArrayList<>();
+        for (SysRoleMenu roleMenu : roleMenus) {
+            for (Long parentMenuId : parentMenuIds) {
+                String key = roleMenu.getRoleId() + ":" + parentMenuId;
+                // 如果不存在该关联，则添加到新增列表
+                if (!existingSet.contains(key)) {
+                    SysRoleMenu newRoleMenu = new SysRoleMenu();
+                    newRoleMenu.setRoleId(roleMenu.getRoleId());
+                    newRoleMenu.setMenuId(parentMenuId);
+                    newRoleMenus.add(newRoleMenu);
+                }
+            }
+        }
+
+        // 5. 批量插入新的关联关系
+        if (CollUtil.isNotEmpty(newRoleMenus)) {
+            roleMenuMapper.insertBatch(newRoleMenus);
+            log.info("菜单[{}]父级变更，自动为{}个角色添加了{}个父菜单关联", menuId, roleMenus.size(), newRoleMenus.size());
+        }
+    }
+
+    /**
+     * 获取菜单的所有父菜单ID列表（包括自己）
+     *
+     * @param menuId 菜单ID
+     * @return 父菜单ID列表
+     */
+    private List<Long> getAllParentMenuIds(Long menuId) {
+        List<Long> parentIds = new ArrayList<>();
+        if (menuId == null || Constants.TOP_PARENT_ID.equals(menuId)) {
+            return parentIds;
+        }
+
+        // 先添加自己
+        parentIds.add(menuId);
+
+        // 递归查找所有父菜单
+        Long currentId = menuId;
+        while (true) {
+            SysMenuVo menu = baseMapper.selectVoById(currentId);
+            if (menu == null || Constants.TOP_PARENT_ID.equals(menu.getParentId())) {
+                break;
+            }
+
+            currentId = menu.getParentId();
+            parentIds.add(currentId);
+        }
+
+        return parentIds;
     }
 
 }
