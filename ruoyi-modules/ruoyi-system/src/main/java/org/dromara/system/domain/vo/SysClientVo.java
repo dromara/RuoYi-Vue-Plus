@@ -54,12 +54,12 @@ public class SysClientVo implements Serializable {
     /**
      * 授权类型
      */
-    @ExcelProperty(value = "授权类型")
     private List<String> grantTypeList;
 
     /**
      * 授权类型
      */
+    @ExcelProperty(value = "授权类型")
     private String grantType;
 
     /**
