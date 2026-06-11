@@ -34,7 +34,7 @@ public class WechatBillTask {
         // 是sysdate设置为当前日期；否则取管理页面设置的值
         String settlementDate = (String) jobArgs.getWfContext().get("settlementDate");
         if (StringUtils.equals(settlementDate, "sysdate")) {
-            settlementDate = DateUtils.getDate();
+            settlementDate = DateUtils.now();
         }
         BillDTO billDTO = new BillDTO(123456789L, "wechat", settlementDate, new BigDecimal("1234.56"));
         // 把billDTO对象放入上下文进行传递

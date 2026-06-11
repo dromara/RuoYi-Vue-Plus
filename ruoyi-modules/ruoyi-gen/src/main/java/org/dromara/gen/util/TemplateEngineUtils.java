@@ -102,7 +102,7 @@ public class TemplateEngineUtils {
         context.put("basePackage", getPackagePrefix(packageName));
         context.put("packageName", packageName);
         context.put("author", genTable.getFunctionAuthor());
-        context.put("datetime", DateUtils.getDate());
+        context.put("datetime", DateUtils.now());
         context.put("pkColumn", genTable.getPkColumn());
         context.put("importList", getImportList(genTable));
         context.put("permissionPrefix", getPermissionPrefix(moduleName, businessName));

@@ -239,7 +239,7 @@ public class FlowHisTaskVo implements Serializable {
     private void updateRunDuration() {
         // 如果创建时间和更新时间均不为空，计算它们之间的时长
         if (this.updateTime != null && this.createTime != null) {
-            this.runDuration = DateUtils.getTimeDifference(this.updateTime, this.createTime);
+            this.runDuration = DateUtils.formatBetweenBySecond(this.updateTime, this.createTime);
         }
     }
 

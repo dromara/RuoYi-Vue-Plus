@@ -164,11 +164,11 @@ public class FlwChartExtServiceImpl implements ChartExtService {
     /**
      * 处理节点的扩展信息，构建用于流程图悬浮提示的内容
      *
-     * @param nodeJson 当前流程节点对象，包含节点基础信息和提示内容容器
-     * @param taskList 当前节点关联的历史审批任务列表，用于生成提示信息
-     * @param userMap  用户信息映射表，key 为用户ID，value 为用户DTO对象，用于获取审批人信息
+     * @param nodeJson    当前流程节点对象，包含节点基础信息和提示内容容器
+     * @param taskList    当前节点关联的历史审批任务列表，用于生成提示信息
+     * @param userMap     用户信息映射表，key 为用户ID，value 为用户DTO对象，用于获取审批人信息
      * @param deptNameMap 部门名称映射表，key 为部门ID，value 为部门名称
-     * @param dictType 数据字典映射表，key 为字典项编码，value 为对应显示值，用于翻译审批状态等
+     * @param dictType    数据字典映射表，key 为字典项编码，value 为对应显示值，用于翻译审批状态等
      */
     private void processNodeExtInfo(NodeJson nodeJson, List<FlowHisTask> taskList, Map<Long, UserDTO> userMap,
                                     Map<Long, String> deptNameMap, Map<String, String> dictType) {
@@ -202,7 +202,7 @@ public class FlwChartExtServiceImpl implements ChartExtService {
             // 添加具体信息项：账号、耗时、时间
             info.add(buildInfoItem("用户账号", userDTO.getUserName()));
             info.add(buildInfoItem("审批状态", dictType.get(task.getFlowStatus())));
-            info.add(buildInfoItem("审批耗时", DateUtils.getTimeDifference(task.getUpdateTime(), task.getCreateTime())));
+            info.add(buildInfoItem("审批耗时", DateUtils.formatBetweenBySecond(task.getUpdateTime(), task.getCreateTime())));
             info.add(buildInfoItem("办理时间", DateUtils.formatDateTime(task.getUpdateTime())));
         }
     }

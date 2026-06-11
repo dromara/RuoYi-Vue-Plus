@@ -1,7 +1,7 @@
 package org.dromara.common.web.config;
 
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
+import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.ObjectUtils;
 import org.dromara.common.json.enhance.JsonValueEnhancer;
 import org.dromara.common.web.advice.ResponseEnhancementAdvice;
@@ -50,14 +50,14 @@ public class ResourcesConfig implements WebMvcConfigurer {
     public void addFormatters(FormatterRegistry registry) {
         // 全局日期格式转换配置
         registry.addConverter(String.class, Date.class, source -> {
-            DateTime parse = DateUtil.parse(source);
+            DateTime parse = DateUtils.parse(source);
             if (ObjectUtils.isNull(parse)) {
                 return null;
             }
             return parse.toJdkDate();
         });
         registry.addConverter(String.class, LocalDateTime.class, source -> {
-            DateTime parse = DateUtil.parse(source);
+            DateTime parse = DateUtils.parse(source);
             if (ObjectUtils.isNull(parse)) {
                 return null;
             }

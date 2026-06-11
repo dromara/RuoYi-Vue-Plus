@@ -33,7 +33,7 @@ public class AlipayBillTask {
         // 设置清算日期
         String settlementDate = (String) jobArgs.getWfContext().get("settlementDate");
         if (StringUtils.equals(settlementDate, "sysdate")) {
-            settlementDate = DateUtils.getDate();
+            settlementDate = DateUtils.now();
         }
         BillDTO billDTO = new BillDTO(23456789L, "alipay", settlementDate, new BigDecimal("2345.67"));
         // 把billDTO对象放入上下文进行传递
