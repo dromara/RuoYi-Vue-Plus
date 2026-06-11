@@ -1,9 +1,9 @@
 package org.dromara.common.mqtt.listener;
 
 import lombok.extern.slf4j.Slf4j;
+import net.dreamlu.mica.net.core.ChannelContext;
 import org.dromara.mica.mqtt.core.client.IMqttClientConnectListener;
 import org.dromara.mica.mqtt.core.client.MqttClientCreator;
-import org.tio.core.ChannelContext;
 
 /**
  * 客户端连接状态监听

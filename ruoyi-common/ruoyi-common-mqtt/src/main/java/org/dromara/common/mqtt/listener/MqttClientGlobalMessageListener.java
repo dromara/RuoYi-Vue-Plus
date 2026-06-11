@@ -1,9 +1,9 @@
 package org.dromara.common.mqtt.listener;
 
 import lombok.extern.slf4j.Slf4j;
+import net.dreamlu.mica.net.core.ChannelContext;
 import org.dromara.mica.mqtt.codec.message.MqttPublishMessage;
 import org.dromara.mica.mqtt.core.client.IMqttClientGlobalMessageListener;
-import org.tio.core.ChannelContext;
 
 import java.nio.charset.StandardCharsets;
 

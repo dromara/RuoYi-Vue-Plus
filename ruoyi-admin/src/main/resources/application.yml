@@ -263,8 +263,8 @@ mqtt.client:
   timeout: 5
   # 重连时间，默认 5000 毫秒
   re-interval: 5000
-  # mqtt 协议版本，可选 MQTT_3_1、mqtt_3_1_1、mqtt_5，默认：mqtt_3_1_1
-  version: mqtt_3_1_1
+  # mqtt 协议版本，可选 MQTT_3_1、mqtt_3_1_1、mqtt_5，默认：mqtt_5
+  version: mqtt_5
   # 接收数据的 buffer size，默认：8k
   read-buffer-size: 8KB
   # 消息解析最大 bytes 长度，默认：10M

@@ -1,5 +1,8 @@
 package org.dromara.common.mqtt.config;
 
+import net.dreamlu.mica.net.utils.thread.ThreadUtils;
+import net.dreamlu.mica.net.utils.thread.pool.SynThreadPoolExecutor;
+import net.dreamlu.mica.net.utils.thread.pool.TioCallerRunsPolicy;
 import org.dromara.common.mqtt.listener.MqttClientConnectListener;
 import org.dromara.common.mqtt.listener.MqttClientGlobalMessageListener;
 import org.dromara.mica.mqtt.core.client.MqttClientCreator;
@@ -8,9 +11,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
-import org.tio.utils.thread.ThreadUtils;
-import org.tio.utils.thread.pool.SynThreadPoolExecutor;
-import org.tio.utils.thread.pool.TioCallerRunsPolicy;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;

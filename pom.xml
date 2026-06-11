@@ -14,22 +14,22 @@
 
     <properties>
         <revision>5.5.3</revision>
-        <spring-boot.version>4.0.6</spring-boot.version>
+        <spring-boot.version>4.1.0</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
         <mybatis.version>3.5.19</mybatis.version>
-        <springdoc.version>3.0.2</springdoc.version>
+        <springdoc.version>3.0.3</springdoc.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
-        <fesod.version>2.0.1-incubating</fesod.version>
+        <fesod.version>2.0.2-incubating</fesod.version>
         <velocity.version>2.4.1</velocity.version>
         <satoken.version>1.45.0</satoken.version>
         <mybatis-plus.version>3.5.16</mybatis-plus.version>
         <mybatis-plus-join.version>1.5.6</mybatis-plus-join.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.8.44</hutool.version>
+        <hutool.version>5.8.46</hutool.version>
         <spring-boot-admin.version>4.0.4</spring-boot-admin.version>
-        <redisson.version>4.4.0</redisson.version>
+        <redisson.version>4.5.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.5.0</dynamic-ds.version>
         <snailjob.version>2.0.0</snailjob.version>
@@ -52,7 +52,7 @@
         <!-- 工作流配置 -->
         <warm-flow.version>1.8.7</warm-flow.version>
         <!-- mqtt客户端 -->
-        <mica-mqtt.version>2.5.12</mica-mqtt.version>
+        <mica-mqtt.version>2.6.5</mica-mqtt.version>
         <easy-es.version>3.0.2</easy-es.version>
         <elasticsearch-client.version>7.17.28</elasticsearch-client.version>
         <!-- Spring AI 2.0 预览版，正式版发布后仅需调整此版本号 -->
@@ -66,7 +66,7 @@
         <!-- 统一版本号管理：Maven3.X需要，Maven4.0之后已原生支持 -->
         <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
         <!-- 打包默认跳过测试 -->
-        <skipTests>true</skipTests>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
 
     <profiles>
