@@ -2,7 +2,6 @@ package org.dromara.common.web.interceptor;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,13 +15,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.servlet.HandlerInterceptor;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.ObjectNode;
 
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Web 调用时间统计拦截器，同时记录请求参数并对敏感字段做脱敏处理。
@@ -82,36 +77,6 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
     }
 
     /**
-     * 递归移除 JSON 节点中的敏感字段，避免在日志中输出密码等敏感信息。
-     *
-     * @param node              当前 JSON 节点
-     * @param excludeProperties 需要排除的字段名集合
-     */
-    private void removeSensitiveFields(JsonNode node, String[] excludeProperties) {
-        if (node == null) {
-            return;
-        }
-        if (node.isObject()) {
-            ObjectNode objectNode = (ObjectNode) node;
-            // 收集要删除的字段名（避免 ConcurrentModification）
-            Set<String> fieldsToRemove = new HashSet<>();
-            objectNode.propertyNames().forEach(fieldName -> {
-                if (ArrayUtil.contains(excludeProperties, fieldName)) {
-                    fieldsToRemove.add(fieldName);
-                }
-            });
-            fieldsToRemove.forEach(objectNode::remove);
-            // 递归处理子节点
-            objectNode.values().forEach(child -> removeSensitiveFields(child, excludeProperties));
-        } else if (node.isArray()) {
-            ArrayNode arrayNode = (ArrayNode) node;
-            for (JsonNode child : arrayNode) {
-                removeSensitiveFields(child, excludeProperties);
-            }
-        }
-    }
-
-    /**
      * 清洗 JSON 请求参数日志，解析失败时不影响主请求。
      *
      * @param jsonParam 原始 JSON 字符串
@@ -121,7 +86,7 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
         try {
             JsonMapper jsonMapper = JsonUtils.getJsonMapper();
             JsonNode rootNode = jsonMapper.readTree(jsonParam);
-            removeSensitiveFields(rootNode, SystemConstants.EXCLUDE_PROPERTIES);
+            JsonUtils.removeFields(rootNode, SystemConstants.EXCLUDE_PROPERTIES);
             return rootNode.toString();
         } catch (Exception e) {
             log.debug("[PLUS]请求参数 JSON 解析失败，跳过结构化脱敏: {}", e.getMessage());

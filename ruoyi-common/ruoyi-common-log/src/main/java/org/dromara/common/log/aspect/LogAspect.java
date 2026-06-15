@@ -1,6 +1,5 @@
 package org.dromara.common.log.aspect;
 
-import cn.hutool.core.lang.Dict;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -212,39 +211,7 @@ public class LogAspect {
      * @return 参数日志字符串
      */
     private String serializeArg(Object arg, String[] exclude) {
-        if (arg instanceof Collection<?> collection) {
-            List<Dict> list = new ArrayList<>(collection.size());
-            for (Object item : collection) {
-                Dict dict = toFilteredDict(item, exclude);
-                if (MapUtil.isNotEmpty(dict)) {
-                    list.add(dict);
-                }
-            }
-            return JsonUtils.toJsonString(list);
-        }
-        String str = JsonUtils.toJsonString(arg);
-        Dict dict = JsonUtils.parseMap(str);
-        if (MapUtil.isNotEmpty(dict)) {
-            MapUtil.removeAny(dict, exclude);
-            return JsonUtils.toJsonString(dict);
-        }
-        return str;
-    }
-
-    /**
-     * 将参数转为已排除指定字段的字典。
-     *
-     * @param value   参数值
-     * @param exclude 排除字段名
-     * @return 已过滤字段的字典
-     */
-    private Dict toFilteredDict(Object value, String[] exclude) {
-        String str = JsonUtils.toJsonString(value);
-        Dict dict = JsonUtils.parseMap(str);
-        if (MapUtil.isNotEmpty(dict)) {
-            MapUtil.removeAny(dict, exclude);
-        }
-        return dict;
+        return JsonUtils.toJsonStringExcludeFields(arg, exclude);
     }
 
     /**
