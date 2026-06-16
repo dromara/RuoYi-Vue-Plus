@@ -125,6 +125,7 @@ create table sys_post
     post_name     varchar(50)     not null                   comment '岗位名称',
     post_sort     int(4)          not null                   comment '显示顺序',
     status        char(1)         not null                   comment '状态（0正常 1停用）',
+    del_flag      char(1)         default '0'                comment '删除标志（0代表存在 1代表删除）',
     create_dept   bigint(20)      default null               comment '创建部门',
     create_by     bigint(20)      default null               comment '创建者',
     create_time   datetime                                   comment '创建时间',
@@ -138,10 +139,10 @@ create table sys_post
 -- ----------------------------
 -- 初始化-岗位信息表数据
 -- ----------------------------
-insert into sys_post values(1761200000000000001, 1761000000000000103, 'ceo', null, '董事长', 1, '0', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
-insert into sys_post values(1761200000000000002, 1761000000000000100, 'se', null, '项目经理', 2, '0', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
-insert into sys_post values(1761200000000000003, 1761000000000000100, 'hr', null, '人力资源', 3, '0', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
-insert into sys_post values(1761200000000000004, 1761000000000000100, 'user', null, '普通员工', 4, '0', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
+insert into sys_post values(1761200000000000001, 1761000000000000103, 'ceo', null, '董事长', 1, '0', '0', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
+insert into sys_post values(1761200000000000002, 1761000000000000100, 'se', null, '项目经理', 2, '0', '0', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
+insert into sys_post values(1761200000000000003, 1761000000000000100, 'hr', null, '人力资源', 3, '0', '0', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
+insert into sys_post values(1761200000000000004, 1761000000000000100, 'user', null, '普通员工', 4, '0', '0', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
 
 
 -- ----------------------------
