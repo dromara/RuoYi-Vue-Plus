@@ -25,11 +25,11 @@
         <velocity.version>2.4.1</velocity.version>
         <satoken.version>1.45.0</satoken.version>
         <mybatis-plus.version>3.5.16</mybatis-plus.version>
-        <mybatis-plus-join.version>1.5.6</mybatis-plus-join.version>
+        <mybatis-plus-join.version>1.5.7</mybatis-plus-join.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.46</hutool.version>
-        <spring-boot-admin.version>4.0.4</spring-boot-admin.version>
-        <redisson.version>4.5.0</redisson.version>
+        <spring-boot-admin.version>4.1.0</spring-boot-admin.version>
+        <redisson.version>4.6.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.5.0</dynamic-ds.version>
         <snailjob.version>2.0.0</snailjob.version>
