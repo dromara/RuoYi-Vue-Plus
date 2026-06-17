@@ -34,7 +34,7 @@
         <dynamic-ds.version>4.5.0</dynamic-ds.version>
         <snailjob.version>2.0.0</snailjob.version>
         <snailai.version>0.0.5</snailai.version>
-        <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
+        <mapstruct-plus.version>1.5.1</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.42</lombok.version>
         <bouncycastle.version>1.84</bouncycastle.version>
@@ -50,12 +50,13 @@
         <!-- 面向运行时的D-ORM依赖 -->
         <anyline.version>8.7.3-20260306</anyline.version>
         <!-- 工作流配置 -->
-        <warm-flow.version>1.8.7</warm-flow.version>
+        <warm-flow.version>1.8.8</warm-flow.version>
         <!-- mqtt客户端 -->
-        <mica-mqtt.version>2.6.5</mica-mqtt.version>
+        <mica-mqtt.version>2.6.6</mica-mqtt.version>
         <easy-es.version>3.0.2</easy-es.version>
         <elasticsearch-client.version>7.17.28</elasticsearch-client.version>
         <spring-ai.version>2.0.0</spring-ai.version>
+        <fory.version>1.2.0</fory.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
@@ -288,6 +289,12 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
                 <version>${lock4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.fory</groupId>
+                <artifactId>fory-core</artifactId>
+                <version>${fory.version}</version>
             </dependency>
 
             <!-- SnailJob Client -->

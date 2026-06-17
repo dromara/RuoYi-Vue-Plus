@@ -75,7 +75,6 @@
         <dependency>
             <groupId>org.apache.fory</groupId>
             <artifactId>fory-core</artifactId>
-            <version>0.13.1</version>
         </dependency>
 
     </dependencies>
