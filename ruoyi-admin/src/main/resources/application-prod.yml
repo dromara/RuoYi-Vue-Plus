@@ -35,8 +35,6 @@ snail-job:
 snail-ai:
   # 启用客户端模式
   enabled: false
-  # 聊天发送模式: stream(流式) / sync(同步)
-  chat-mode: stream
   # ==================== Server 连接 ====================
   # Server 端 gRPC 地址（即 snail-ai-starter 的 snail-ai.server.grpc-port）
   server:
@@ -47,7 +45,7 @@ snail-ai:
   # 应用 ID（在 Server「应用管理」页面创建后获取）
   app-id: 1
   # 认证令牌（在 Server「应用管理」页面创建时自动生成）
-  token: SAI_7c557fc05a304b0482a65ca67afdb0b8
+  token: SAI_566a6bfbc26e4998b4841cc927d50c5d
   port: 18889
   # Skill 文件临时目录
   skill-temp-dir: /tmp/snail-ai-agent/skills

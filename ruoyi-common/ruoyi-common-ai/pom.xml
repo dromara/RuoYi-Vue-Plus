@@ -23,10 +23,16 @@
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
-        <!-- Snail AI Agent 启动器 -->
+        <!-- Snail AI Agent 聊天室 -->
         <dependency>
             <groupId>com.aizuda</groupId>
-            <artifactId>snail-ai-agent-starter</artifactId>
+            <artifactId>snail-ai-agent-chat-starter</artifactId>
+        </dependency>
+
+        <!-- Snail AI Agent 执行器 -->
+        <dependency>
+            <groupId>com.aizuda</groupId>
+            <artifactId>snail-ai-agent-executor-starter</artifactId>
         </dependency>
 
         <!-- Snail AI OpenAPI 启动器 -->

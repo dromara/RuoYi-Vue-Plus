@@ -1416,6 +1416,8 @@ insert into sys_menu values(1761400000000000118, N'文件管理', 17614000000000
 GO
 insert into sys_menu values(1761400000000000120, N'任务调度中心', 1761400000000000002, 5, N'snailjob', N'monitor/snailjob/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:snailjob:list', N'job', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'SnailJob控制台菜单');
 GO
+insert into sys_menu values(1761400000000000121, N'AI控制台', 1761400000000000002, 7, N'snailai', N'monitor/snailai/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:snailai:list', N'checkbox', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'AI控制台菜单');
+GO
 insert into sys_menu values(1761400000000000500, N'操作日志', 1761400000000000108, 1, N'operlog', N'monitor/operlog/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:operlog:list', N'form', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'操作日志菜单');
 GO
 insert into sys_menu values(1761400000000000501, N'登录日志', 1761400000000000108, 2, N'logininfo', N'monitor/logininfo/index', N'', N'N', N'Y', N'C', N'0', N'0', N'monitor:logininfo:list', N'logininfo', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'登录日志菜单');

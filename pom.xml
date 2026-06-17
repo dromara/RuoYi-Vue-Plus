@@ -33,7 +33,7 @@
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.5.0</dynamic-ds.version>
         <snailjob.version>2.0.0</snailjob.version>
-        <snailai.version>0.0.4</snailai.version>
+        <snailai.version>0.0.5</snailai.version>
         <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.42</lombok.version>
@@ -55,8 +55,7 @@
         <mica-mqtt.version>2.6.5</mica-mqtt.version>
         <easy-es.version>3.0.2</easy-es.version>
         <elasticsearch-client.version>7.17.28</elasticsearch-client.version>
-        <!-- Spring AI 2.0 预览版，正式版发布后仅需调整此版本号 -->
-        <spring-ai.version>2.0.0-M8</spring-ai.version>
+        <spring-ai.version>2.0.0</spring-ai.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
@@ -310,10 +309,17 @@
                 <version>${snailjob.version}</version>
             </dependency>
 
-            <!-- Snail AI Agent 启动器 -->
+            <!-- Snail AI Agent 聊天室 -->
             <dependency>
                 <groupId>com.aizuda</groupId>
-                <artifactId>snail-ai-agent-starter</artifactId>
+                <artifactId>snail-ai-agent-chat-starter</artifactId>
+                <version>${snailai.version}</version>
+            </dependency>
+
+            <!-- Snail AI Agent 执行器 -->
+            <dependency>
+                <groupId>com.aizuda</groupId>
+                <artifactId>snail-ai-agent-executor-starter</artifactId>
                 <version>${snailai.version}</version>
             </dependency>
 
