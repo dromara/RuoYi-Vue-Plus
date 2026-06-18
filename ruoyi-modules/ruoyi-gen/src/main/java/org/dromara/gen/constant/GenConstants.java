@@ -81,7 +81,7 @@ public interface GenConstants {
     String SORT_FIELD = "sortField";
 
     /**
-     * 默认前端模板类型，对应 vm/vue 目录。
+     * 默认前端模板类型，对应模板根目录下的 vue 目录。
      */
     String FRONTEND_TYPE_VUE = "vue";
 
@@ -262,26 +262,34 @@ public interface GenConstants {
      */
     String REQUIRE = "1";
 
+    // 模板根路径与后缀
+    String TEMPLATE_ROOT_PATH = "fm";
+    String TEMPLATE_FILE_SUFFIX = ".ftl";
+    String TEMPLATE_RESOURCE_PREFIX = "classpath*:";
+    String TEMPLATE_PAGE_PATTERN_SUFFIX = ".*" + TEMPLATE_FILE_SUFFIX;
     // 后端源码模板
-    String JAVA_DOMAIN_TEMPLATE_PATH = "vm/java/domain.java.vm";
-    String JAVA_VO_TEMPLATE_PATH = "vm/java/vo.java.vm";
-    String JAVA_BO_TEMPLATE_PATH = "vm/java/bo.java.vm";
-    String JAVA_MAPPER_TEMPLATE_PATH = "vm/java/mapper.java.vm";
-    String JAVA_SERVICE_TEMPLATE_PATH = "vm/java/service.java.vm";
-    String JAVA_SERVICE_IMPL_TEMPLATE_PATH = "vm/java/serviceImpl.java.vm";
-    String JAVA_CONTROLLER_TEMPLATE_PATH = "vm/java/controller.java.vm";
+    String JAVA_TEMPLATE_ROOT_PATH = TEMPLATE_ROOT_PATH + "/java";
+    String JAVA_DOMAIN_TEMPLATE_PATH = JAVA_TEMPLATE_ROOT_PATH + "/domain.java" + TEMPLATE_FILE_SUFFIX;
+    String JAVA_VO_TEMPLATE_PATH = JAVA_TEMPLATE_ROOT_PATH + "/vo.java" + TEMPLATE_FILE_SUFFIX;
+    String JAVA_BO_TEMPLATE_PATH = JAVA_TEMPLATE_ROOT_PATH + "/bo.java" + TEMPLATE_FILE_SUFFIX;
+    String JAVA_MAPPER_TEMPLATE_PATH = JAVA_TEMPLATE_ROOT_PATH + "/mapper.java" + TEMPLATE_FILE_SUFFIX;
+    String JAVA_SERVICE_TEMPLATE_PATH = JAVA_TEMPLATE_ROOT_PATH + "/service.java" + TEMPLATE_FILE_SUFFIX;
+    String JAVA_SERVICE_IMPL_TEMPLATE_PATH = JAVA_TEMPLATE_ROOT_PATH + "/serviceImpl.java" + TEMPLATE_FILE_SUFFIX;
+    String JAVA_CONTROLLER_TEMPLATE_PATH = JAVA_TEMPLATE_ROOT_PATH + "/controller.java" + TEMPLATE_FILE_SUFFIX;
     // MyBatis MapperXML 模板
-    String XML_MAPPER_TEMPLATE_PATH = "vm/xml/mapper.xml.vm";
+    String XML_TEMPLATE_ROOT_PATH = TEMPLATE_ROOT_PATH + "/xml";
+    String XML_MAPPER_TEMPLATE_PATH = XML_TEMPLATE_ROOT_PATH + "/mapper.xml" + TEMPLATE_FILE_SUFFIX;
     // 前端源码模板
-    String FRONTEND_API_TEMPLATE_NAME = "api.ts.vm";
-    String FRONTEND_TYPES_TEMPLATE_NAME = "types.ts.vm";
+    String FRONTEND_API_TEMPLATE_NAME = "api.ts" + TEMPLATE_FILE_SUFFIX;
+    String FRONTEND_TYPES_TEMPLATE_NAME = "types.ts" + TEMPLATE_FILE_SUFFIX;
     String FRONTEND_INDEX_TEMPLATE_PREFIX = "index";
     String FRONTEND_INDEX_TREE_TEMPLATE_PREFIX = "index-tree";
     // 数据库SQL模板
-    String SQL_ORACLE_TEMPLATE_PATH = "vm/sql/oracle.sql.vm";
-    String SQL_POSTGRES_TEMPLATE_PATH = "vm/sql/postgres.sql.vm";
-    String SQL_SQLSERVER_TEMPLATE_PATH = "vm/sql/sqlserver.sql.vm";
-    String SQL_MYSQL_TEMPLATE_PATH = "vm/sql/mysql.sql.vm";
+    String SQL_TEMPLATE_ROOT_PATH = TEMPLATE_ROOT_PATH + "/sql";
+    String SQL_ORACLE_TEMPLATE_PATH = SQL_TEMPLATE_ROOT_PATH + "/oracle.sql" + TEMPLATE_FILE_SUFFIX;
+    String SQL_POSTGRES_TEMPLATE_PATH = SQL_TEMPLATE_ROOT_PATH + "/postgres.sql" + TEMPLATE_FILE_SUFFIX;
+    String SQL_SQLSERVER_TEMPLATE_PATH = SQL_TEMPLATE_ROOT_PATH + "/sqlserver.sql" + TEMPLATE_FILE_SUFFIX;
+    String SQL_MYSQL_TEMPLATE_PATH = SQL_TEMPLATE_ROOT_PATH + "/mysql.sql" + TEMPLATE_FILE_SUFFIX;
 
     /**
      * 固定模板路径集合，前端模板按 frontendType 动态解析。

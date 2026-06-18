@@ -62,7 +62,7 @@ public class GenTable extends BaseEntity {
     private String tplCategory;
 
     /**
-     * 前端模板类型，对应 vm 下的模板目录
+     * 前端模板类型，对应 fm 下的模板目录
      */
     private String frontendType;
 

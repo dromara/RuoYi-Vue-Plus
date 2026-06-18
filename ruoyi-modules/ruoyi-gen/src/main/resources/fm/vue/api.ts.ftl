@@ -52,13 +52,13 @@ export const update${BusinessName} = (data: ${BusinessName}Form) => {
   });
 };
 
-#if($enableStatus)
+<#if enableStatus>
 /**
  * 修改${functionName}状态
  * @param ${pkColumn.javaField}
  * @param status
  */
-export const change${BusinessName}Status = (${pkColumn.javaField}: string | number, status: #if($statusColumn.javaType == 'String')string#else number#end) => {
+export const change${BusinessName}Status = (${pkColumn.javaField}: string | number, status: <#if statusColumn.javaType == 'Boolean'>boolean<#elseif statusColumn.javaType == 'String'>string<#else> number</#if>) => {
   return request({
     url: '/${moduleName}/${businessName}/changeStatus',
     method: 'put',
@@ -68,15 +68,15 @@ export const change${BusinessName}Status = (${pkColumn.javaField}: string | numb
     }
   });
 };
-#end
+</#if>
 
-#if($enableSort)
+<#if enableSort>
 /**
  * 调整${functionName}排序
  * @param ${pkColumn.javaField}
  * @param sortValue
  */
-export const update${BusinessName}Sort = (${pkColumn.javaField}: string | number, sortValue: #if($sortColumn.javaType == 'String' || $sortColumn.javaType == 'LocalDateTime')string#else number#end) => {
+export const update${BusinessName}Sort = (${pkColumn.javaField}: string | number, sortValue: <#if sortColumn.javaType == 'String' || sortColumn.javaType == 'LocalDateTime'>string<#else> number</#if>) => {
   return request({
     url: '/${moduleName}/${businessName}/updateSort',
     method: 'put',
@@ -86,7 +86,7 @@ export const update${BusinessName}Sort = (${pkColumn.javaField}: string | number
     }
   });
 };
-#end
+</#if>
 
 /**
  * 删除${functionName}
@@ -98,3 +98,6 @@ export const del${BusinessName} = (${pkColumn.javaField}: string | number | Arra
     method: 'delete'
   });
 };
+
+
+

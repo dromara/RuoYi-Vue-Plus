@@ -3,15 +3,15 @@ package ${packageName}.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
-#if($table.crud)
+<#if table.crud>
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-#end
+</#if>
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-#if($enableUnique)
+<#if enableUnique>
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-#end
+</#if>
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +21,9 @@ import ${packageName}.domain.vo.${ClassName}Vo;
 import ${packageName}.domain.${ClassName};
 import ${packageName}.mapper.${ClassName}Mapper;
 import ${packageName}.service.I${ClassName}Service;
-#if($table.tree)
+<#if table.tree>
 import org.dromara.common.core.exception.ServiceException;
-#end
+</#if>
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,20 +43,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 
     private final ${ClassName}Mapper ${className}Mapper;
 
-#set($TreeParentCap = "")
-#if("" != $treeParentCode)
-#set($TreeParentCap = $treeParentCode.substring(0,1).toUpperCase() + $treeParentCode.substring(1))
-#end
-#set($TreeAncestorsCap = "")
-#if("" != $treeAncestorsField)
-#set($TreeAncestorsCap = $treeAncestorsField.substring(0,1).toUpperCase() + $treeAncestorsField.substring(1))
-#end
-#set($TreeOrderCap = "")
-#if("" != $treeOrderField)
-#set($TreeOrderCap = $treeOrderField.substring(0,1).toUpperCase() + $treeOrderField.substring(1))
-#end
-
-    /**
+/**
      * 查询${functionName}
      *
      * @param ${pkColumn.javaField} 主键
@@ -67,7 +54,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         return ${className}Mapper.selectVoById(${pkColumn.javaField});
     }
 
-#if($table.crud)
+<#if table.crud>
     /**
      * 分页查询${functionName}列表
      *
@@ -81,7 +68,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         Page<${ClassName}Vo> result = ${className}Mapper.selectVoPage(pageQuery.build(), lqw);
         return PageResult.build(result.getRecords(), result.getTotal());
     }
-#end
+</#if>
 
     /**
      * 查询符合条件的${functionName}列表
@@ -95,7 +82,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         return ${className}Mapper.selectVoList(lqw);
     }
 
-#if($enableUnique)
+<#if enableUnique>
     /**
      * 校验${functionName}是否满足组合唯一约束
      *
@@ -105,84 +92,78 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     @Override
     public boolean checkUnique(${ClassName}Bo bo) {
         boolean hasUniqueValue = true;
-#foreach($column in $uniqueColumns)
-#if($column.javaType == 'String')
+<#list uniqueColumns as column>
+<#if column.javaType == 'String'>
         hasUniqueValue = hasUniqueValue && StringUtils.isNotBlank(bo.get${column.capJavaField}());
-#else
+<#else>
         hasUniqueValue = hasUniqueValue && bo.get${column.capJavaField}() != null;
-#end
-#end
+</#if>
+</#list>
         if (!hasUniqueValue) {
             return true;
         }
         LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery();
-#foreach($column in $uniqueColumns)
+<#list uniqueColumns as column>
         lqw.eq(${ClassName}::get${column.capJavaField}, bo.get${column.capJavaField}());
-#end
+</#list>
         lqw.ne(bo.get${pkColumn.capJavaField}() != null, ${ClassName}::get${pkColumn.capJavaField}, bo.get${pkColumn.capJavaField}());
         return !${className}Mapper.exists(lqw);
     }
-#end
+</#if>
 
     private LambdaQueryWrapper<${ClassName}> buildQueryWrapper(${ClassName}Bo bo) {
-#set($hasBetween = false)
-#foreach ($column in $columns)
-#if($column.query && $column.queryType == 'BETWEEN')
-    #set($hasBetween = true)
-#end
-#end
-#if($hasBetween)
+<#if hasBetween>
         Map<String, Object> params = bo.getParams();
-#end
+</#if>
         return QueryBuilder.lambda(${ClassName}.class)
-#foreach($column in $columns)
-#if($column.query)
-#set($queryType=$column.queryType)
-#set($javaType=$column.javaType)
-#set($AttrName=$column.capJavaField)
-#set($mpMethod=$column.queryType.toLowerCase())
-#if($queryType != 'BETWEEN')
-#if($javaType == 'String')
-#set($condition='StringUtils.isNotBlank(bo.get'+$AttrName+'())')
-#if($queryType == 'LIKE')
-            .likeIfText(${ClassName}::get$AttrName, bo.get$AttrName())
-#elseif($queryType == 'EQ')
-            .eqIfText(${ClassName}::get$AttrName, bo.get$AttrName())
-#elseif($queryType == 'NE')
-            .neIfText(${ClassName}::get$AttrName, bo.get$AttrName())
-#else
-            .$mpMethod($condition, ${ClassName}::get$AttrName, bo.get$AttrName())
-#end
-#else
-#set($condition='bo.get'+$AttrName+'() != null')
-#if($queryType == 'EQ')
-            .eqIfPresent(${ClassName}::get$AttrName, bo.get$AttrName())
-#elseif($queryType == 'NE')
-            .neIfPresent(${ClassName}::get$AttrName, bo.get$AttrName())
-#elseif($queryType == 'GT')
-            .gtIfPresent(${ClassName}::get$AttrName, bo.get$AttrName())
-#elseif($queryType == 'LT')
-            .ltIfPresent(${ClassName}::get$AttrName, bo.get$AttrName())
-#else
-            .$mpMethod($condition, ${ClassName}::get$AttrName, bo.get$AttrName())
-#end
-#end
-#else
-            .betweenParams(${ClassName}::get$AttrName, params, "begin$AttrName", "end$AttrName")
-#end
-#end
-#end
-#if($table.tree && "" != $treeAncestorsField)
-            .orderByAsc(${ClassName}::get${TreeAncestorsCap})
-#end
-#if($table.tree && "" != $treeParentCode)
-            .orderByAsc(${ClassName}::get${TreeParentCap})
-#end
-#if($table.tree && "" != $treeOrderField)
-            .orderByAsc(${ClassName}::get${TreeOrderCap})
-#elseif($enableSort)
+<#list columns as column>
+<#if column.query>
+<#assign queryType = column.queryType>
+<#assign javaType = column.javaType>
+<#assign AttrName = column.capJavaField>
+<#assign mpMethod = column.queryType?lower_case>
+<#if queryType != 'BETWEEN'>
+<#if javaType == 'String'>
+<#assign condition = 'StringUtils.isNotBlank(bo.get'+AttrName+'())'>
+<#if queryType == 'LIKE'>
+            .likeIfText(${ClassName}::get${column.capJavaField}, bo.get${column.capJavaField}())
+<#elseif queryType == 'EQ'>
+            .eqIfText(${ClassName}::get${column.capJavaField}, bo.get${column.capJavaField}())
+<#elseif queryType == 'NE'>
+            .neIfText(${ClassName}::get${column.capJavaField}, bo.get${column.capJavaField}())
+<#else>
+            .${mpMethod}(${condition}, ${ClassName}::get${column.capJavaField}, bo.get${column.capJavaField}())
+</#if>
+<#else>
+<#assign condition = 'bo.get'+AttrName+'() != null'>
+<#if queryType == 'EQ'>
+            .eqIfPresent(${ClassName}::get${column.capJavaField}, bo.get${column.capJavaField}())
+<#elseif queryType == 'NE'>
+            .neIfPresent(${ClassName}::get${column.capJavaField}, bo.get${column.capJavaField}())
+<#elseif queryType == 'GT'>
+            .gtIfPresent(${ClassName}::get${column.capJavaField}, bo.get${column.capJavaField}())
+<#elseif queryType == 'LT'>
+            .ltIfPresent(${ClassName}::get${column.capJavaField}, bo.get${column.capJavaField}())
+<#else>
+            .${mpMethod}(${condition}, ${ClassName}::get${column.capJavaField}, bo.get${column.capJavaField}())
+</#if>
+</#if>
+<#else>
+            .betweenParams(${ClassName}::get${column.capJavaField}, params, "begin${column.capJavaField}", "end${column.capJavaField}")
+</#if>
+</#if>
+</#list>
+<#if table.tree && "" != treeAncestorsField>
+            .orderByAsc(${ClassName}::get${treeAncestorsCap})
+</#if>
+<#if table.tree && "" != treeParentCode>
+            .orderByAsc(${ClassName}::get${treeParentCap})
+</#if>
+<#if table.tree && "" != treeOrderField>
+            .orderByAsc(${ClassName}::get${treeOrderCap})
+<#elseif enableSort>
             .orderByAsc(${ClassName}::get${sortColumn.capJavaField})
-#end
+</#if>
             .orderByAsc(${ClassName}::get${pkColumn.capJavaField})
             .build();
     }
@@ -196,9 +177,9 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     @Override
     public Boolean insertByBo(${ClassName}Bo bo) {
         ${ClassName} add = MapstructUtils.convert(bo, ${ClassName}.class);
-#if($table.tree)
+<#if table.tree>
         fillTreeMetaBeforeSave(add, false);
-#end
+</#if>
         validEntityBeforeSave(add);
         boolean flag = ${className}Mapper.insert(add) > 0;
         if (flag) {
@@ -216,14 +197,14 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     @Override
     public Boolean updateByBo(${ClassName}Bo bo) {
         ${ClassName} update = MapstructUtils.convert(bo, ${ClassName}.class);
-#if($table.tree)
+<#if table.tree>
         fillTreeMetaBeforeSave(update, true);
-#end
+</#if>
         validEntityBeforeSave(update);
         return ${className}Mapper.updateById(update) > 0;
     }
 
-#if($enableStatus)
+<#if enableStatus>
     /**
      * 修改${functionName}状态
      *
@@ -238,9 +219,9 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
             .eq(${ClassName}::get${pkColumn.capJavaField}, ${pkColumn.javaField})
             .update();
     }
-#end
+</#if>
 
-#if($enableSort)
+<#if enableSort>
     /**
      * 调整${functionName}排序
      *
@@ -255,7 +236,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
             .eq(${ClassName}::get${pkColumn.capJavaField}, ${pkColumn.javaField})
             .update();
     }
-#end
+</#if>
 
     /**
      * 保存前的数据校验
@@ -264,51 +245,51 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         // 可在此扩展通用业务校验
     }
 
-#if($table.tree)
+<#if table.tree>
     private void fillTreeMetaBeforeSave(${ClassName} entity, boolean updateMode) {
-#if("" != $treeParentCode)
-        if (entity.get${TreeParentCap}() == null) {
-            entity.set${TreeParentCap}(${treeRootValueJavaLiteral});
+<#if "" != treeParentCode>
+        if (entity.get${treeParentCap}() == null) {
+            entity.set${treeParentCap}(${treeRootValueJavaLiteral});
         }
-        if (ObjectUtil.equal(entity.get${pkColumn.capJavaField}(), entity.get${TreeParentCap}())) {
+        if (ObjectUtil.equal(entity.get${pkColumn.capJavaField}(), entity.get${treeParentCap}())) {
             throw new ServiceException("${functionName}父节点不能选择自身");
         }
-#if("" != $treeAncestorsField)
+<#if "" != treeAncestorsField>
         ${ClassName} parent = null;
-        if (!ObjectUtil.equal(entity.get${TreeParentCap}(), ${treeRootValueJavaLiteral})) {
-            parent = ${className}Mapper.selectById(entity.get${TreeParentCap}());
+        if (!ObjectUtil.equal(entity.get${treeParentCap}(), ${treeRootValueJavaLiteral})) {
+            parent = ${className}Mapper.selectById(entity.get${treeParentCap}());
             if (ObjectUtil.isNull(parent)) {
                 throw new ServiceException("${functionName}父节点不存在");
             }
         }
         if (updateMode && entity.get${pkColumn.capJavaField}() != null && ObjectUtil.isNotNull(parent)
-            && containsAncestor(parent.get${TreeAncestorsCap}(), entity.get${pkColumn.capJavaField}())) {
+            && containsAncestor(parent.get${treeAncestorsCap}(), entity.get${pkColumn.capJavaField}())) {
             throw new ServiceException("不能选择当前节点或其子节点作为父节点");
         }
-        String newAncestors = resolveAncestors(entity.get${TreeParentCap}(), parent);
+        String newAncestors = resolveAncestors(entity.get${treeParentCap}(), parent);
         if (updateMode && entity.get${pkColumn.capJavaField}() != null) {
             ${ClassName} oldEntity = ${className}Mapper.selectById(entity.get${pkColumn.capJavaField}());
             if (ObjectUtil.isNull(oldEntity)) {
                 throw new ServiceException("${functionName}不存在，无法修改");
             }
-            String oldAncestors = oldEntity.get${TreeAncestorsCap}();
-            entity.set${TreeAncestorsCap}(newAncestors);
+            String oldAncestors = oldEntity.get${treeAncestorsCap}();
+            entity.set${treeAncestorsCap}(newAncestors);
             if (!StringUtils.equals(oldAncestors, newAncestors)) {
                 updateChildrenAncestors(entity.get${pkColumn.capJavaField}(), newAncestors, oldAncestors);
             }
         } else {
-            entity.set${TreeAncestorsCap}(newAncestors);
+            entity.set${treeAncestorsCap}(newAncestors);
         }
-#end
-#end
+</#if>
+</#if>
     }
-#if("" != $treeAncestorsField)
+<#if "" != treeAncestorsField>
 
     private String resolveAncestors(${treeParentColumn.javaType} parentId, ${ClassName} parent) {
         if (ObjectUtil.equal(parentId, ${treeRootValueJavaLiteral})) {
             return "${treeRootValue}";
         }
-        String parentAncestors = parent.get${TreeAncestorsCap}();
+        String parentAncestors = parent.get${treeAncestorsCap}();
         if (StringUtils.isBlank(parentAncestors)) {
             return String.valueOf(parentId);
         }
@@ -317,18 +298,18 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 
     private void updateChildrenAncestors(${pkColumn.javaType} currentId, String newAncestors, String oldAncestors) {
         List<${ClassName}> children = ${className}Mapper.lambda()
-            .select(${ClassName}::get${pkColumn.capJavaField}, ${ClassName}::get${TreeAncestorsCap})
-            .findInSet(currentId, ${ClassName}::get${TreeAncestorsCap})
+            .select(${ClassName}::get${pkColumn.capJavaField}, ${ClassName}::get${treeAncestorsCap})
+            .findInSet(currentId, ${ClassName}::get${treeAncestorsCap})
             .list();
         List<${ClassName}> updateList = new ArrayList<>();
         for (${ClassName} child : children) {
-            String ancestors = child.get${TreeAncestorsCap}();
+            String ancestors = child.get${treeAncestorsCap}();
             if (StringUtils.isBlank(ancestors)) {
                 continue;
             }
             ${ClassName} update = new ${ClassName}();
             update.set${pkColumn.capJavaField}(child.get${pkColumn.capJavaField}());
-            update.set${TreeAncestorsCap}(StringUtils.replaceOnce(ancestors, oldAncestors, newAncestors));
+            update.set${treeAncestorsCap}(StringUtils.replaceOnce(ancestors, oldAncestors, newAncestors));
             updateList.add(update);
         }
         if (!updateList.isEmpty()) {
@@ -344,8 +325,8 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         }
         return false;
     }
-#end
-#end
+</#if>
+</#if>
 
     /**
      * 校验并批量删除${functionName}信息
@@ -362,3 +343,5 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         return ${className}Mapper.deleteByIds(ids) > 0;
     }
 }
+
+

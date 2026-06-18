@@ -32,7 +32,7 @@ description: 在仓库内按代码生成器模板、项目 reference 文档和�
 
 1. 先判断任务类型，并按“文档读取规则”读取当前任务需要的 reference。
 2. 确认目标模块，优先复用同模块中最近似功能的写法。
-3. 新增标准 CRUD 代码前，先读取 `ruoyi-modules/ruoyi-gen/src/main/resources/vm/` 下的模板。
+3. 新增标准 CRUD 代码前，先读取 `ruoyi-modules/ruoyi-gen/src/main/resources/fm/` 下的 FreeMarker 模板。
 4. 命名和分层保持与仓库一致：
    `domain` entity、`domain.bo`、`domain.vo`、`mapper`、`service`、`service.impl`、`controller`。
 5. 优先在生成器结构上扩展，不要自行发明新的分层。
@@ -108,14 +108,14 @@ Vue 3、TypeScript API 文件、生成式列表页、表单状态、字典和日
 
 标准生成器模板通常对应：
 
-- `vm/java/domain.java.vm` -> entity
-- `vm/java/bo.java.vm` -> bo
-- `vm/java/vo.java.vm` -> vo
-- `vm/java/mapper.java.vm` -> mapper
-- `vm/java/service.java.vm` -> service interface
-- `vm/java/serviceImpl.java.vm` -> service impl
-- `vm/java/controller.java.vm` -> controller
-- `vm/xml/mapper.xml.vm` -> 自定义 XML mapper 起点
+- `fm/java/domain.java.ftl` -> entity
+- `fm/java/bo.java.ftl` -> bo
+- `fm/java/vo.java.ftl` -> vo
+- `fm/java/mapper.java.ftl` -> mapper
+- `fm/java/service.java.ftl` -> service interface
+- `fm/java/serviceImpl.java.ftl` -> service impl
+- `fm/java/controller.java.ftl` -> controller
+- `fm/xml/mapper.xml.ftl` -> 自定义 XML mapper 起点
 
 ## 任务分型
 

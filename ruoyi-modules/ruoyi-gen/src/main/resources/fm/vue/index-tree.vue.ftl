@@ -8,70 +8,62 @@
           </div>
         </template>
         <el-form ref="queryFormRef" :model="queryParams" :inline="true" class="query-form">
-#foreach($column in $columns)
-#if($column.query)
-#set($dictType=$column.dictType)
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
-#else
-#set($comment=$column.columnComment)
-#end
-#if($column.htmlType == "input" || $column.htmlType == "textarea")
-            <el-form-item label="${comment}" prop="${column.javaField}">
-              <el-input v-model="queryParams.${column.javaField}" placeholder="请输入${comment}" clearable @keyup.enter="handleQuery" />
+<#list columns as column>
+<#if column.query>
+<#if column.htmlType == "input" || column.htmlType == "textarea">
+            <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+              <el-input v-model="queryParams.${column.javaField}" placeholder="请输入${column.columnLabel}" clearable @keyup.enter="handleQuery" />
             </el-form-item>
-#elseif($column.htmlType == "inputNumber")
-            <el-form-item label="${comment}" prop="${column.javaField}">
+<#elseif column.htmlType == "inputNumber">
+            <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
               <el-input-number v-model="queryParams.${column.javaField}" controls-position="right" />
             </el-form-item>
-#elseif(($column.htmlType == "select" || $column.htmlType == "radio") && "" != $dictType)
-            <el-form-item label="${comment}" prop="${column.javaField}">
-              <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${comment}" clearable>
-                <el-option v-for="dict in ${dictType}" :key="dict.value" :label="dict.label" :value="dict.value"/>
+<#elseif (column.htmlType == "select" || column.htmlType == "radio") && column.dictType?has_content>
+            <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+              <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${column.columnLabel}" clearable>
+                <el-option v-for="dict in ${column.dictType}" :key="dict.value" :label="dict.label" :value="dict.value"/>
               </el-select>
             </el-form-item>
-#elseif($column.htmlType == "switch" && "" != $dictType)
-            <el-form-item label="${comment}" prop="${column.javaField}">
-              <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${comment}" clearable>
-                <el-option v-for="dict in ${dictType}" :key="dict.value" :label="dict.label" :value="dict.value"/>
+<#elseif column.htmlType == "switch" && column.dictType?has_content>
+            <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+              <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${column.columnLabel}" clearable>
+                <el-option v-for="dict in ${column.dictType}" :key="dict.value" :label="dict.label" :value="dict.value"/>
               </el-select>
             </el-form-item>
-#elseif($column.htmlType == "switch")
-            <el-form-item label="${comment}" prop="${column.javaField}">
-              <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${comment}" clearable>
-#if($column.javaType == "Boolean")
+<#elseif column.htmlType == "switch">
+            <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+              <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${column.columnLabel}" clearable>
+<#if column.javaType == "Boolean">
                 <el-option label="是" :value="true" />
                 <el-option label="否" :value="false" />
-#elseif($column.javaType == "Integer" || $column.javaType == "Long")
+<#elseif column.javaType == "Integer" || column.javaType == "Long">
                 <el-option label="开启" :value="0" />
                 <el-option label="关闭" :value="1" />
-#else
+<#else>
                 <el-option label="开启" value="0" />
                 <el-option label="关闭" value="1" />
-#end
+</#if>
               </el-select>
             </el-form-item>
-#elseif(($column.htmlType == "select" || $column.htmlType == "radio") && $dictType)
-            <el-form-item label="${comment}" prop="${column.javaField}">
-              <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${comment}" clearable>
+<#elseif (column.htmlType == "select" || column.htmlType == "radio") && column.dictType?has_content>
+            <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+              <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${column.columnLabel}" clearable>
                 <el-option label="请选择字典生成" value="" />
               </el-select>
             </el-form-item>
-#elseif($column.htmlType == "datetime" && $column.queryType != "BETWEEN")
-            <el-form-item label="${comment}" prop="${column.javaField}">
+<#elseif column.htmlType == "datetime" && column.queryType != "BETWEEN">
+            <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
               <el-date-picker clearable
                 v-model="queryParams.${column.javaField}"
                 type="date"
                 value-format="YYYY-MM-DD"
-                placeholder="选择${comment}"
+                placeholder="选择${column.columnLabel}"
               />
             </el-form-item>
-#elseif($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-            <el-form-item label="${comment}" style="width: 308px">
+<#elseif column.htmlType == "datetime" && column.queryType == "BETWEEN">
+            <el-form-item label="${column.columnLabel}" style="width: 308px">
               <el-date-picker
-                v-model="dateRange${AttrName}"
+                v-model="dateRange${column.capJavaField}"
                 value-format="YYYY-MM-DD HH:mm:ss"
                 type="daterange"
                 range-separator="-"
@@ -80,9 +72,9 @@
                 :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 1, 1, 23, 59, 59)]"
               />
             </el-form-item>
-#end
-#end
-#end
+</#if>
+</#if>
+</#list>
             <el-form-item>
               <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
               <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -100,9 +92,9 @@
           <div class="toolbar-actions">
             <el-button type="primary" plain icon="Plus" @click="handleAdd()" v-hasPermi="['${moduleName}:${businessName}:add']">新增</el-button>
             <el-button type="info" plain icon="Sort" @click="handleToggleExpandAll">展开/折叠</el-button>
-#if($enableExport)
+<#if enableExport>
             <el-button type="warning" plain icon="Download" @click="handleExport" v-hasPermi="['${moduleName}:${businessName}:export']">导出</el-button>
-#end
+</#if>
             <right-toolbar v-model:show-search="showSearch" :search="false" @query-table="getList"></right-toolbar>
           </div>
         </div>
@@ -117,122 +109,115 @@
         :default-expand-all="isExpandAll"
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       >
-#set($firstTreeListField = "")
-#foreach($tempColumn in $columns)
-#if(!$tempColumn.pk && $tempColumn.list && "" != $tempColumn.javaField && $firstTreeListField == "")
-#set($firstTreeListField = $tempColumn.javaField)
-#end
-#end
-#foreach($column in $columns)
-#set($javaField=$column.javaField)
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
-#else
-#set($comment=$column.columnComment)
-#end
-#if($column.pk)
-#elseif($enableStatus && $statusField == $javaField)
-#if($javaField == $firstTreeListField)
-        <el-table-column label="${comment}" prop="${javaField}">
-#else
-        <el-table-column label="${comment}" align="center" prop="${javaField}">
-#end
+<#assign firstTreeListField = "">
+<#list columns as tempColumn>
+<#if !tempColumn.pk && tempColumn.list && "" != tempColumn.javaField && firstTreeListField == "">
+<#assign firstTreeListField = tempColumn.javaField>
+</#if>
+</#list>
+<#list columns as column>
+<#if column.pk>
+<#elseif enableStatus && statusField == column.javaField>
+<#if column.javaField == firstTreeListField>
+        <el-table-column label="${column.columnLabel}" prop="${column.javaField}">
+<#else>
+        <el-table-column label="${column.columnLabel}" align="center" prop="${column.javaField}">
+</#if>
           <template #default="scope">
             <el-switch
-              v-model="scope.row.${javaField}"
+              v-model="scope.row.${column.javaField}"
               :active-value="${statusField}ActiveValue"
               :inactive-value="${statusField}InactiveValue"
               @change="handleStatusChange(scope.row)"
             />
           </template>
         </el-table-column>
-#elseif($enableSort && $sortField == $javaField)
-#if($javaField == $firstTreeListField)
-        <el-table-column label="${comment}" prop="${javaField}" width="160">
-#else
-        <el-table-column label="${comment}" align="center" prop="${javaField}" width="160">
-#end
+<#elseif enableSort && sortField == column.javaField>
+<#if column.javaField == firstTreeListField>
+        <el-table-column label="${column.columnLabel}" prop="${column.javaField}" width="160">
+<#else>
+        <el-table-column label="${column.columnLabel}" align="center" prop="${column.javaField}" width="160">
+</#if>
           <template #default="scope">
-#if($column.javaType == "LocalDateTime")
+<#if column.javaType == "LocalDateTime">
             <el-date-picker
-              v-model="scope.row.${javaField}"
+              v-model="scope.row.${column.javaField}"
               type="datetime"
               value-format="YYYY-MM-DD HH:mm:ss"
-              placeholder="选择${comment}"
+              placeholder="选择${column.columnLabel}"
               @change="handleSortChange(scope.row)"
             />
-#else
-            <el-input-number v-model="scope.row.${javaField}" controls-position="right" :min="0" @change="handleSortChange(scope.row)" />
-#end
+<#else>
+            <el-input-number v-model="scope.row.${column.javaField}" controls-position="right" :min="0" @change="handleSortChange(scope.row)" />
+</#if>
           </template>
         </el-table-column>
-#elseif($column.list && $column.htmlType == "switch")
-#if($javaField == $firstTreeListField)
-        <el-table-column label="${comment}" prop="${javaField}" width="120">
-#else
-        <el-table-column label="${comment}" align="center" prop="${javaField}" width="120">
-#end
+<#elseif column.list && column.htmlType == "switch">
+<#if column.javaField == firstTreeListField>
+        <el-table-column label="${column.columnLabel}" prop="${column.javaField}" width="120">
+<#else>
+        <el-table-column label="${column.columnLabel}" align="center" prop="${column.javaField}" width="120">
+</#if>
           <template #default="scope">
             <el-switch
-              v-model="scope.row.${javaField}"
-#if($column.javaType == "Boolean")
+              v-model="scope.row.${column.javaField}"
+<#if column.javaType == "Boolean">
               :active-value="true"
               :inactive-value="false"
-#elseif($column.javaType == "Integer" || $column.javaType == "Long")
+<#elseif column.javaType == "Integer" || column.javaType == "Long">
               :active-value="0"
               :inactive-value="1"
-#else
+<#else>
               active-value="0"
               inactive-value="1"
-#end
+</#if>
               disabled
             />
           </template>
         </el-table-column>
-#elseif($column.list && $column.htmlType == "datetime")
-#if($javaField == $firstTreeListField)
-        <el-table-column label="${comment}" prop="${javaField}" width="180">
-#else
-        <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
-#end
+<#elseif column.list && column.htmlType == "datetime">
+<#if column.javaField == firstTreeListField>
+        <el-table-column label="${column.columnLabel}" prop="${column.javaField}" width="180">
+<#else>
+        <el-table-column label="${column.columnLabel}" align="center" prop="${column.javaField}" width="180">
+</#if>
           <template #default="scope">
-            <span>{{ parseTime(scope.row.${javaField}, '{y}-{m}-{d}') }}</span>
+            <span>{{ parseTime(scope.row.${column.javaField}, '{y}-{m}-{d}') }}</span>
           </template>
         </el-table-column>
-#elseif($column.list && $column.htmlType == "imageUpload")
-#if($javaField == $firstTreeListField)
-        <el-table-column label="${comment}" prop="${javaField}Url" width="100">
-#else
-        <el-table-column label="${comment}" align="center" prop="${javaField}Url" width="100">
-#end
+<#elseif column.list && column.htmlType == "imageUpload">
+<#if column.javaField == firstTreeListField>
+        <el-table-column label="${column.columnLabel}" prop="${column.javaField}Url" width="100">
+<#else>
+        <el-table-column label="${column.columnLabel}" align="center" prop="${column.javaField}Url" width="100">
+</#if>
           <template #default="scope">
-            <image-preview :src="scope.row.${javaField}Url" :width="50" :height="50"/>
+            <image-preview :src="scope.row.${column.javaField}Url" :width="50" :height="50"/>
           </template>
         </el-table-column>
-#elseif($column.list && $column.dictColumn)
-#if($javaField == $firstTreeListField)
-        <el-table-column label="${comment}" prop="${javaField}">
-#else
-        <el-table-column label="${comment}" align="center" prop="${javaField}">
-#end
+<#elseif column.list && column.dictColumn>
+<#if column.javaField == firstTreeListField>
+        <el-table-column label="${column.columnLabel}" prop="${column.javaField}">
+<#else>
+        <el-table-column label="${column.columnLabel}" align="center" prop="${column.javaField}">
+</#if>
           <template #default="scope">
-#if($column.htmlType == "checkbox")
-            <dict-tag :options="${column.dictType}" :value="scope.row.${javaField} ? scope.row.${javaField}.split(',') : []"/>
-#else
-            <dict-tag :options="${column.dictType}" :value="scope.row.${javaField}"/>
-#end
+<#if column.htmlType == "checkbox">
+            <dict-tag :options="${column.dictType}" :value="scope.row.${column.javaField} ? scope.row.${column.javaField}.split(',') : []"/>
+<#else>
+            <dict-tag :options="${column.dictType}" :value="scope.row.${column.javaField}"/>
+</#if>
           </template>
         </el-table-column>
-#elseif($column.list && "" != $javaField)
-#if($javaField == $firstTreeListField)
-        <el-table-column label="${comment}" prop="${javaField}" />
-#else
-        <el-table-column label="${comment}" align="center" prop="${javaField}" />
-#end
-#end
-#end
-#if($enableStatus && !$statusColumn.list)
+<#elseif column.list && "" != column.javaField>
+<#if column.javaField == firstTreeListField>
+        <el-table-column label="${column.columnLabel}" prop="${column.javaField}" />
+<#else>
+        <el-table-column label="${column.columnLabel}" align="center" prop="${column.javaField}" />
+</#if>
+</#if>
+</#list>
+<#if enableStatus && !statusColumn.list>
         <el-table-column label="${statusColumn.columnComment}" align="center" prop="${statusField}">
           <template #default="scope">
             <el-switch
@@ -243,11 +228,11 @@
             />
           </template>
         </el-table-column>
-#end
-#if($enableSort && !$sortColumn.list)
+</#if>
+<#if enableSort && !sortColumn.list>
         <el-table-column label="${sortColumn.columnComment}" align="center" prop="${sortField}" width="160">
           <template #default="scope">
-#if($sortColumn.javaType == "LocalDateTime")
+<#if sortColumn.javaType == "LocalDateTime">
             <el-date-picker
               v-model="scope.row.${sortField}"
               type="datetime"
@@ -255,12 +240,12 @@
               placeholder="选择${sortColumn.columnComment}"
               @change="handleSortChange(scope.row)"
             />
-#else
+<#else>
             <el-input-number v-model="scope.row.${sortField}" controls-position="right" :min="0" @change="handleSortChange(scope.row)" />
-#end
+</#if>
           </template>
         </el-table-column>
-#end
+</#if>
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
           <template #default="scope">
             <el-tooltip content="修改" placement="top">
@@ -279,137 +264,129 @@
     <!-- 添加或修改${functionName}对话框 -->
     <el-dialog :title="dialog.title" v-model="dialog.visible" width="500px" append-to-body>
       <el-form ref="${businessName}FormRef" :model="form" :rules="rules" label-width="80px">
-#foreach($column in $columns)
-#set($field=$column.javaField)
-#if(($column.insert || $column.edit) && !$column.pk)
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
-#else
-#set($comment=$column.columnComment)
-#end
-#set($dictType=$column.dictType)
-#if("" != $treeParentCode && $column.javaField == $treeParentCode)
-        <el-form-item label="${comment}" prop="${treeParentCode}">
+<#list columns as column>
+<#if (column.insert || column.edit) && !column.pk>
+<#if "" != treeParentCode && column.javaField == treeParentCode>
+        <el-form-item label="${column.columnLabel}" prop="${treeParentCode}">
           <el-tree-select
             v-model="form.${treeParentCode}"
             :data="${businessName}Options"
             :props="{ value: '${treeCode}', label: '${treeName}', children: 'children' } as any"
             value-key="${treeCode}"
-            placeholder="请选择${comment}"
+            placeholder="请选择${column.columnLabel}"
             check-strictly
           />
         </el-form-item>
-#elseif($column.htmlType == "input")
-        <el-form-item label="${comment}" prop="${field}">
-          <el-input v-model="form.${field}" placeholder="请输入${comment}" />
+<#elseif column.htmlType == "input">
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+          <el-input v-model="form.${column.javaField}" placeholder="请输入${column.columnLabel}" />
         </el-form-item>
-#elseif($column.htmlType == "inputNumber")
-        <el-form-item label="${comment}" prop="${field}">
-          <el-input-number v-model="form.${field}" controls-position="right" />
+<#elseif column.htmlType == "inputNumber">
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+          <el-input-number v-model="form.${column.javaField}" controls-position="right" />
         </el-form-item>
-#elseif($column.htmlType == "imageUpload")
-        <el-form-item label="${comment}" prop="${field}">
-          <image-upload v-model="form.${field}"/>
+<#elseif column.htmlType == "imageUpload">
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+          <image-upload v-model="form.${column.javaField}"/>
         </el-form-item>
-#elseif($column.htmlType == "fileUpload")
-        <el-form-item label="${comment}" prop="${field}">
-          <file-upload v-model="form.${field}"/>
+<#elseif column.htmlType == "fileUpload">
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+          <file-upload v-model="form.${column.javaField}"/>
         </el-form-item>
-#elseif($column.htmlType == "editor")
-        <el-form-item label="${comment}">
-          <editor v-model="form.${field}" :min-height="192"/>
+<#elseif column.htmlType == "editor">
+        <el-form-item label="${column.columnLabel}">
+          <editor v-model="form.${column.javaField}" :min-height="192"/>
         </el-form-item>
-#elseif($column.htmlType == "select" && "" != $dictType)
-        <el-form-item label="${comment}" prop="${field}">
-          <el-select v-model="form.${field}" placeholder="请选择${comment}">
+<#elseif column.htmlType == "select" && column.dictType?has_content>
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+          <el-select v-model="form.${column.javaField}" placeholder="请选择${column.columnLabel}">
             <el-option
-              v-for="dict in ${dictType}"
+              v-for="dict in ${column.dictType}"
               :key="dict.value"
               :label="dict.label"
-#if($column.javaType == "Integer" || $column.javaType == "Long")
+<#if column.javaType == "Integer" || column.javaType == "Long">
               :value="parseInt(dict.value)"
-#else
+<#else>
               :value="dict.value"
-#end
+</#if>
             ></el-option>
           </el-select>
         </el-form-item>
-#elseif($column.htmlType == "select" && $dictType)
-        <el-form-item label="${comment}" prop="${field}">
-          <el-select v-model="form.${field}" placeholder="请选择${comment}">
+<#elseif column.htmlType == "select" && column.dictType?has_content>
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+          <el-select v-model="form.${column.javaField}" placeholder="请选择${column.columnLabel}">
             <el-option label="请选择字典生成" value="" />
           </el-select>
         </el-form-item>
-#elseif($column.htmlType == "checkbox" && "" != $dictType)
-        <el-form-item label="${comment}" prop="${field}">
-          <el-checkbox-group v-model="form.${field}">
+<#elseif column.htmlType == "checkbox" && column.dictType?has_content>
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+          <el-checkbox-group v-model="form.${column.javaField}">
             <el-checkbox
-              v-for="dict in ${dictType}"
+              v-for="dict in ${column.dictType}"
               :key="dict.value"
               :label="dict.value">
               {{dict.label}}
             </el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-#elseif($column.htmlType == "checkbox" && $dictType)
-        <el-form-item label="${comment}" prop="${field}">
-          <el-checkbox-group v-model="form.${field}">
+<#elseif column.htmlType == "checkbox" && column.dictType?has_content>
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+          <el-checkbox-group v-model="form.${column.javaField}">
             <el-checkbox>请选择字典生成</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-#elseif($column.htmlType == "radio" && "" != $dictType)
-        <el-form-item label="${comment}" prop="${field}">
-          <el-radio-group v-model="form.${field}">
+<#elseif column.htmlType == "radio" && column.dictType?has_content>
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+          <el-radio-group v-model="form.${column.javaField}">
             <el-radio
-              v-for="dict in ${dictType}"
+              v-for="dict in ${column.dictType}"
               :key="dict.value"
-#if($column.javaType == "Integer" || $column.javaType == "Long")
+<#if column.javaType == "Integer" || column.javaType == "Long">
               :value="parseInt(dict.value)"
-#else
+<#else>
               :value="dict.value"
-#end
+</#if>
             >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
-#elseif($column.htmlType == "radio" && $dictType)
-        <el-form-item label="${comment}" prop="${field}">
-          <el-radio-group v-model="form.${field}">
+<#elseif column.htmlType == "radio" && column.dictType?has_content>
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+          <el-radio-group v-model="form.${column.javaField}">
             <el-radio value="1">请选择字典生成</el-radio>
           </el-radio-group>
         </el-form-item>
-#elseif($column.htmlType == "switch")
-        <el-form-item label="${comment}" prop="${field}">
+<#elseif column.htmlType == "switch">
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
           <el-switch
-            v-model="form.${field}"
-#if($column.javaType == "Boolean")
+            v-model="form.${column.javaField}"
+<#if column.javaType == "Boolean">
             :active-value="true"
             :inactive-value="false"
-#elseif($column.javaType == "Integer" || $column.javaType == "Long")
+<#elseif column.javaType == "Integer" || column.javaType == "Long">
             :active-value="0"
             :inactive-value="1"
-#else
+<#else>
             active-value="0"
             inactive-value="1"
-#end
+</#if>
           />
         </el-form-item>
-#elseif($column.htmlType == "datetime")
-        <el-form-item label="${comment}" prop="${field}">
+<#elseif column.htmlType == "datetime">
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
           <el-date-picker clearable
-            v-model="form.${field}"
+            v-model="form.${column.javaField}"
             type="datetime"
             value-format="YYYY-MM-DD HH:mm:ss"
-            placeholder="选择${comment}"
+            placeholder="选择${column.columnLabel}"
           />
         </el-form-item>
-#elseif($column.htmlType == "textarea")
-        <el-form-item label="${comment}" prop="${field}">
-          <el-input v-model="form.${field}" type="textarea" placeholder="请输入内容" />
+<#elseif column.htmlType == "textarea">
+        <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
+          <el-input v-model="form.${column.javaField}" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-#end
-#end
-#end
+</#if>
+</#if>
+</#list>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -421,56 +398,49 @@
   </div>
 </template>
 
-#set($needAddDateRange = false)
-#foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-#set($needAddDateRange = true)
-#end
-#end
 <script setup name="${BusinessName}" lang="ts">
 import {
   add${BusinessName},
-#if($enableStatus)
+<#if enableStatus>
   change${BusinessName}Status,
-#end
+</#if>
   del${BusinessName},
   get${BusinessName},
   list${BusinessName},
-#if($enableSort)
+<#if enableSort>
   update${BusinessName}Sort,
-#end
+</#if>
   update${BusinessName}
 } from '@/api/${moduleName}/${businessName}';
 import { ${BusinessName}Form, ${BusinessName}Query, ${BusinessName}VO } from '@/api/${moduleName}/${businessName}/types';
 import { useLoading } from '@/hooks/async/useLoading';
 import { useFormDialog } from '@/hooks/dialog/useFormDialog';
-#if($needAddDateRange)
+<#if needAddDateRange>
 import { useDateRangeQuery } from '@/hooks/form/useDateRangeQuery';
-#end
+</#if>
 import { useSearchReset } from '@/hooks/form/useSearchReset';
 import { useSearchToggle } from '@/hooks/form/useSearchToggle';
 import { useTreeTableExpand } from '@/hooks/tree/useTreeTableExpand';
-#if(${dicts} != '')
+<#if needDict>
 import { useDict } from '@/utils/dict';
-#end
+</#if>
 import modal from '@/plugins/modal';
 import { handleTree } from '@/utils/ruoyi';
-#if($enableExport)
+<#if enableExport>
 import { download as requestDownload } from '@/utils/request';
-#end
+</#if>
 
-#if(${dicts} != '')
-#set($dictsNoSymbol=$dicts.replace("'", ""))
+<#if needDict>
 const { ${dictsNoSymbol} } = toRefs<any>(useDict(${dicts}));
-#end
+</#if>
 
-#if($enableStatus)
-const ${statusField}ActiveValue = #if($statusColumn.javaType == "Boolean")true#elseif($statusColumn.javaType == "Integer" || $statusColumn.javaType == "Long")0#else'0'#end;
-const ${statusField}InactiveValue = #if($statusColumn.javaType == "Boolean")false#elseif($statusColumn.javaType == "Integer" || $statusColumn.javaType == "Long")1#else'1'#end;
-#end
+<#if enableStatus>
+const ${statusField}ActiveValue = <#if statusColumn.javaType == "Boolean">true<#elseif statusColumn.javaType == "Integer" || statusColumn.javaType == "Long">0<#else>'0'</#if>;
+const ${statusField}InactiveValue = <#if statusColumn.javaType == "Boolean">false<#elseif statusColumn.javaType == "Integer" || statusColumn.javaType == "Long">1<#else>'1'</#if>;
+</#if>
 
 type ${BusinessName}Option = {
-  ${treeCode}: #if($treeParentColumn.javaType == 'String')string#else number#end;
+  ${treeCode}: <#if treeParentColumn.javaType == 'String'>string<#else> number</#if>;
   ${treeName}: string;
   children?: ${BusinessName}Option[];
 };
@@ -490,65 +460,58 @@ const { isExpandAll, handleToggleExpandAll } = useTreeTableExpand<${BusinessName
   data: ${businessName}List
 });
 
-#foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+<#list columns as column>
+<#if column.htmlType == "datetime" && column.queryType == "BETWEEN">
 const {
-  dateRange: dateRange${AttrName},
-  applyDateRange: apply${AttrName}DateRange,
-  resetDateRange: reset${AttrName}DateRange
-} = useDateRangeQuery('${AttrName}');
-#end
-#end
+  dateRange: dateRange${column.capJavaField},
+  applyDateRange: apply${column.capJavaField}DateRange,
+  resetDateRange: reset${column.capJavaField}DateRange
+} = useDateRangeQuery('${column.capJavaField}');
+</#if>
+</#list>
 
 const initFormData: ${BusinessName}Form = {
-#foreach ($column in $columns)
-#if($column.insert || $column.edit)
-#if($column.htmlType == "checkbox")
-    $column.javaField: []#if($foreach.count != $columns.size()),#end
-#else
-    $column.javaField: undefined#if($foreach.count != $columns.size()),#end
-#end
-#end
-#end
+<#list columns as column>
+<#if column.insert || column.edit>
+<#if column.htmlType == "checkbox">
+    ${column.javaField}: [],
+<#else>
+    ${column.javaField}: undefined,
+</#if>
+</#if>
+</#list>
 }
 
 const data = reactive<PageData<${BusinessName}Form, ${BusinessName}Query>>({
   form: {...initFormData},
   queryParams: {
-#foreach ($column in $columns)
-#if($column.query)
-#if($column.htmlType != "datetime" || $column.queryType != "BETWEEN")
-    $column.javaField: undefined,
-#end
-#end
-#end
+<#list columns as column>
+<#if column.query>
+<#if column.htmlType != "datetime" || column.queryType != "BETWEEN">
+    ${column.javaField}: undefined,
+</#if>
+</#if>
+</#list>
     params: {
-#foreach ($column in $columns)
-#if($column.query)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-      $column.javaField: undefined#if($foreach.count != $columns.size()),#end
-#end
-#end
-#end
+<#list columns as column>
+<#if column.query>
+<#if column.htmlType == "datetime" && column.queryType == "BETWEEN">
+      ${column.javaField}: undefined,
+</#if>
+</#if>
+</#list>
     }
   },
   rules: {
-#foreach ($column in $columns)
-#if($column.insert || $column.edit)
-#if($column.required)
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
-#else
-#set($comment=$column.columnComment)
-#end
-    $column.javaField: [
-      { required: true, message: "$comment不能为空", trigger: #if($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "switch" || $column.htmlType == "inputNumber")"change"#else"blur"#end }
-    ]#if($foreach.count != $columns.size()),#end
-#end
-#end
-#end
+<#list columns as column>
+<#if column.insert || column.edit>
+<#if column.required>
+${column.javaField}: [
+      { required: true, message: "${column.columnLabel}不能为空", trigger: <#if column.htmlType == "select" || column.htmlType == "radio" || column.htmlType == "switch" || column.htmlType == "inputNumber">"change"<#else>"blur"</#if> }
+    ],
+</#if>
+</#if>
+</#list>
   }
 });
 
@@ -562,18 +525,17 @@ const { dialog, resetForm: reset, openDialog, showDialog, closeDialog } = useFor
 /** 查询${functionName}列表 */
 const getList = async () => {
   await withLoading(async () => {
-#if($needAddDateRange)
+<#if needAddDateRange>
     let params = queryParams.value;
-#foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-    params = apply${AttrName}DateRange(params);
-#end
-#end
+<#list columns as column>
+<#if column.htmlType == "datetime" && column.queryType == "BETWEEN">
+params = apply${column.capJavaField}DateRange(params);
+</#if>
+</#list>
     const res = await list${BusinessName}(params);
-#else
+<#else>
     const res = await list${BusinessName}(queryParams.value);
-#end
+</#if>
     const data = handleTree<${BusinessName}VO>(res.data, '${treeCode}', '${treeParentCode}');
     if (data) {
       ${businessName}List.value = data;
@@ -605,12 +567,11 @@ const { resetQuery } = useSearchReset({
   queryFormRef,
   queryParams,
   resetExtras: () => {
-#foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-    reset${AttrName}DateRange();
-#end
-#end
+<#list columns as column>
+<#if column.htmlType == "datetime" && column.queryType == "BETWEEN">
+reset${column.capJavaField}DateRange();
+</#if>
+</#list>
   },
   afterReset: () => {
     handleQuery();
@@ -637,11 +598,11 @@ const handleUpdate = async (row: Partial<${BusinessName}VO>) => {
   }
   const res = await get${BusinessName}(row.${pkColumn.javaField});
   Object.assign(form.value, res.data);
-#foreach ($column in $columns)
-  #if($column.htmlType == "checkbox")
-  form.value.$column.javaField = form.value.${column.javaField}.split(",");
-  #end
-#end
+<#list columns as column>
+  <#if column.htmlType == "checkbox">
+  form.value.${column.javaField} = form.value.${column.javaField}.split(",");
+  </#if>
+</#list>
   showDialog('修改${functionName}');
 };
 
@@ -650,11 +611,11 @@ const submitForm = () => {
   ${businessName}FormRef.value?.validate(async (valid: boolean) => {
     if (valid) {
       buttonLoading.value = true;
-#foreach ($column in $columns)
-#if($column.htmlType == "checkbox")
-      form.value.$column.javaField = form.value.${column.javaField}.join(",");
-#end
-#end
+<#list columns as column>
+<#if column.htmlType == "checkbox">
+      form.value.${column.javaField} = form.value.${column.javaField}.join(",");
+</#if>
+</#list>
       if (form.value.${pkColumn.javaField}) {
         await update${BusinessName}(form.value).finally(() => (buttonLoading.value = false));
       } else {
@@ -685,7 +646,7 @@ const filterTreeOptions = (options: ${BusinessName}Option[], excludeId: string |
     }));
 };
 
-#if($enableStatus)
+<#if enableStatus>
 /** 状态修改 */
 const handleStatusChange = async (row: Partial<${BusinessName}VO>) => {
   const text = row.${statusField} === ${statusField}ActiveValue ? '启用' : '停用';
@@ -697,9 +658,9 @@ const handleStatusChange = async (row: Partial<${BusinessName}VO>) => {
     row.${statusField} = row.${statusField} === ${statusField}ActiveValue ? ${statusField}InactiveValue : ${statusField}ActiveValue;
   }
 };
-#end
+</#if>
 
-#if($enableSort)
+<#if enableSort>
 /** 排序调整 */
 const handleSortChange = async (row: Partial<${BusinessName}VO>) => {
   try {
@@ -709,9 +670,9 @@ const handleSortChange = async (row: Partial<${BusinessName}VO>) => {
     await getList();
   }
 };
-#end
+</#if>
 
-#if($enableExport)
+<#if enableExport>
 /** 导出按钮操作 */
 const handleExport = () => {
   requestDownload(
@@ -719,12 +680,13 @@ const handleExport = () => {
     {
       ...queryParams.value
     },
-    `${businessName}_#[[${new Date().getTime()}]]#.xlsx`
+    `${businessName}_${r'${new Date().getTime()}'}.xlsx`
   );
 };
-#end
+</#if>
 
 onMounted(() => {
   getList();
 });
 </script>
+

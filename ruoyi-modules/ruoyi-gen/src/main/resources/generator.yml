@@ -13,4 +13,4 @@ gen:
     # 模版加载模式
     resourceMode: CLASSPATH
     # 模板加载路径
-    # path: vm
+    # path: fm

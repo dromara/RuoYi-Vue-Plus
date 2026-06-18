@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
+import cn.hutool.extra.template.engine.freemarker.FreemarkerEngine;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +60,7 @@ public class TemplateEngineUtils {
     static {
         // 模板引擎初始化
         GenProperties properties = SpringUtils.getBean(GenProperties.class);
+        properties.getTemplateConfig().setCustomEngine(FreemarkerEngine.class);
         TEMPLATE_ENGINE = TemplateUtil.createEngine(properties.getTemplateConfig());
         TEMPLATE_MAPPER = PathNamedTemplate.form(TEMPLATE_ENGINE, GenConstants.TEMPLATE_PATHS);
     }
@@ -104,11 +106,14 @@ public class TemplateEngineUtils {
         context.put("author", genTable.getFunctionAuthor());
         context.put("datetime", DateUtils.now());
         context.put("pkColumn", genTable.getPkColumn());
+        String dicts = getDicts(genTable);
         context.put("importList", getImportList(genTable));
         context.put("permissionPrefix", getPermissionPrefix(moduleName, businessName));
         context.put("columns", genTable.getColumns());
         context.put("table", genTable);
-        context.put("dicts", getDicts(genTable));
+        context.put("dicts", dicts);
+        context.put("dictsNoSymbol", StringUtils.replace(dicts, "'", StringUtils.EMPTY));
+        setColumnFeatureContext(context, genTable, dicts);
         // 向模板上下文写入菜单相关变量
         String options = genTable.getOptions();
         Dict paramsObj = JsonUtils.parseMap(options);
@@ -133,6 +138,8 @@ public class TemplateEngineUtils {
         context.put("enableSort", enableSort && ObjectUtil.isNotNull(sortColumn));
         context.put("sortColumn", sortColumn);
         context.put("sortField", ObjectUtil.isNotNull(sortColumn) ? sortColumn.getJavaField() : StringUtils.EMPTY);
+        context.put("statusActiveValue", ObjectUtil.isNotNull(statusColumn) ? statusColumn.getSwitchActiveValue() : StringUtils.EMPTY);
+        context.put("statusInactiveValue", ObjectUtil.isNotNull(statusColumn) ? statusColumn.getSwitchInactiveValue() : StringUtils.EMPTY);
 
         // 向树形模板上下文写入树字段相关变量
         if (GenConstants.TPL_TREE.equals(tplCategory)) {
@@ -140,6 +147,71 @@ public class TemplateEngineUtils {
         }
 
         return context;
+    }
+
+    /**
+     * 写入模板中常用的列派生开关，避免在模板内反复扫描和处理。
+     *
+     * @param context  模板上下文
+     * @param genTable 代码生成业务表对象
+     * @param dicts    字典类型表达式
+     */
+    private static void setColumnFeatureContext(Dict context, GenTable genTable, String dicts) {
+        boolean hasBetween = false;
+        boolean needImagePreview = false;
+        boolean needImageUpload = false;
+        boolean needFileUpload = false;
+        boolean needEditor = false;
+        boolean needCheckbox = false;
+        boolean needSelect = false;
+        boolean needTextArea = false;
+        boolean needDigit = false;
+        boolean needDateField = false;
+        boolean needSwitchField = false;
+        String firstTreeListField = StringUtils.EMPTY;
+        for (GenTableColumn column : genTable.getColumns()) {
+            boolean writable = column.isInsert() || column.isEdit();
+            hasBetween = hasBetween || column.isQuery() && StringUtils.equals(column.getQueryType(), GenConstants.QUERY_BETWEEN);
+            needImagePreview = needImagePreview || column.isList() && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_IMAGE_UPLOAD);
+            needImageUpload = needImageUpload || writable && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_IMAGE_UPLOAD);
+            needFileUpload = needFileUpload || writable && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_FILE_UPLOAD);
+            needEditor = needEditor || writable && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_EDITOR);
+            needCheckbox = needCheckbox || writable && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_CHECKBOX);
+            needSelect = needSelect || (writable || column.isQuery()) && StringUtils.equalsAny(column.getHtmlType(),
+                GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_SWITCH);
+            needTextArea = needTextArea || writable && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_TEXTAREA);
+            needDigit = needDigit || writable && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_INPUT_NUMBER);
+            needDateField = needDateField || writable && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_DATETIME);
+            needSwitchField = needSwitchField || (writable || column.isList()) && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_SWITCH);
+            if (StringUtils.isBlank(firstTreeListField) && column.isList()) {
+                firstTreeListField = column.getJavaField();
+            }
+        }
+        boolean needDateRange = hasDateRangeQuery(genTable);
+        context.put("hasBetween", hasBetween);
+        context.put("needAddDateRange", needDateRange);
+        context.put("needDateRange", needDateRange);
+        context.put("needDict", StringUtils.isNotBlank(dicts));
+        context.put("needImagePreview", needImagePreview);
+        context.put("needImageUpload", needImageUpload);
+        context.put("needFileUpload", needFileUpload);
+        context.put("needEditor", needEditor);
+        context.put("needCheckbox", needCheckbox);
+        context.put("needSelect", needSelect);
+        context.put("needTextArea", needTextArea);
+        context.put("needDigit", needDigit);
+        context.put("needDateField", needDateField);
+        context.put("needSwitchField", needSwitchField);
+        context.put("firstTreeListField", firstTreeListField);
+    }
+
+    private static boolean hasDateRangeQuery(GenTable genTable) {
+        for (GenTableColumn column : genTable.getColumns()) {
+            if (column.isDateRangeQuery()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -168,6 +240,9 @@ public class TemplateEngineUtils {
         context.put("treeRootValue", treeRootValue);
         context.put("treeRootValueJavaLiteral", getJavaLiteral(treeParentColumn, treeRootValue));
         context.put("treeRootValueTsLiteral", getTsLiteral(treeParentColumn, treeRootValue));
+        context.put("treeParentCap", StringUtils.capitalize(treeParentCode));
+        context.put("treeAncestorsCap", StringUtils.capitalize(ObjectUtil.isNotNull(treeAncestorsColumn) ? treeAncestorsColumn.getJavaField() : StringUtils.EMPTY));
+        context.put("treeOrderCap", StringUtils.capitalize(ObjectUtil.isNotNull(treeOrderColumn) ? treeOrderColumn.getJavaField() : StringUtils.EMPTY));
         String expandTreeName = paramsObj.getStr(GenConstants.TREE_NAME);
         int expandColumn = 0;
         for (GenTableColumn column : genTable.getColumns()) {
@@ -241,7 +316,7 @@ public class TemplateEngineUtils {
     }
 
     /**
-     * 获取模板，支持按前端模板类型动态加载 vm/{frontendType} 下的模板。
+     * 获取模板，支持按前端模板类型动态加载模板根目录下的模板。
      *
      * @param templatePath 模板路径
      * @return 带路径名的模板
@@ -278,27 +353,27 @@ public class TemplateEngineUtils {
         String frontendPath = getFrontendPath(genTable.getFrontendType());
         // templatePath
         // genFilePathFormat
-        if (template.contains("domain.java.vm")) {
+        if (template.contains("domain.java.")) {
             fileName = StringUtils.format("{}/domain/{}.java", javaPath, className);
-        } else if (template.contains("vo.java.vm")) {
+        } else if (template.contains("vo.java.")) {
             fileName = StringUtils.format("{}/domain/vo/{}Vo.java", javaPath, className);
-        } else if (template.contains("bo.java.vm")) {
+        } else if (template.contains("bo.java.")) {
             fileName = StringUtils.format("{}/domain/bo/{}Bo.java", javaPath, className);
-        } else if (template.contains("mapper.java.vm")) {
+        } else if (template.contains("mapper.java.")) {
             fileName = StringUtils.format("{}/mapper/{}Mapper.java", javaPath, className);
-        } else if (template.contains("service.java.vm")) {
+        } else if (template.contains("service.java.")) {
             fileName = StringUtils.format("{}/service/I{}Service.java", javaPath, className);
-        } else if (template.contains("serviceImpl.java.vm")) {
+        } else if (template.contains("serviceImpl.java.")) {
             fileName = StringUtils.format("{}/service/impl/{}ServiceImpl.java", javaPath, className);
-        } else if (template.contains("controller.java.vm")) {
+        } else if (template.contains("controller.java.")) {
             fileName = StringUtils.format("{}/controller/{}Controller.java", javaPath, className);
-        } else if (template.contains("mapper.xml.vm")) {
+        } else if (template.contains("mapper.xml.")) {
             fileName = StringUtils.format("{}/{}Mapper.xml", mybatisPath, className);
-        } else if (template.contains("sql.vm")) {
+        } else if (template.contains("sql.")) {
             fileName = businessName + "Menu.sql";
-        } else if (template.contains("api.ts.vm")) {
+        } else if (template.contains("api.ts.")) {
             fileName = StringUtils.format("{}/api/{}/{}/index.ts", frontendPath, moduleName, businessName);
-        } else if (template.contains("types.ts.vm")) {
+        } else if (template.contains("types.ts.")) {
             fileName = StringUtils.format("{}/api/{}/{}/types.ts", frontendPath, moduleName, businessName);
         } else if (isFrontendPageTemplate(template, GenConstants.FRONTEND_INDEX_TEMPLATE_PREFIX)) {
             fileName = StringUtils.format("{}/views/{}/{}/index.{}", frontendPath, moduleName, businessName,
@@ -329,7 +404,9 @@ public class TemplateEngineUtils {
      */
     private static String getFrontendPageExtension(String template, String templatePrefix) {
         String fileName = getTemplateFileName(template);
-        return fileName.substring((templatePrefix + ".").length(), fileName.length() - ".vm".length());
+        int suffixIndex = fileName.lastIndexOf('.');
+        String withoutTemplateSuffix = suffixIndex >= 0 ? fileName.substring(0, suffixIndex) : fileName;
+        return withoutTemplateSuffix.substring((templatePrefix + ".").length());
     }
 
     private static String getFrontendApiTemplatePath(String frontendType) {
@@ -363,7 +440,7 @@ public class TemplateEngineUtils {
     }
 
     private static String getFrontendTemplatePath(String frontendType, String templateName) {
-        return StringUtils.format("vm/{}/{}", resolveFrontendType(frontendType), templateName);
+        return StringUtils.format("{}/{}/{}", GenConstants.TEMPLATE_ROOT_PATH, resolveFrontendType(frontendType), templateName);
     }
 
     /**
@@ -375,27 +452,33 @@ public class TemplateEngineUtils {
      */
     private static String getFrontendPageTemplatePath(String frontendType, String templatePrefix) {
         String type = resolveFrontendType(frontendType);
-        String pattern = StringUtils.format("classpath*:vm/{}/{}.*.vm", type, templatePrefix);
+        String templatePathPattern = getFrontendPageTemplatePathPattern(type, templatePrefix);
+        String resourcePattern = GenConstants.TEMPLATE_RESOURCE_PREFIX + templatePathPattern;
         try {
-            Resource[] resources = RESOURCE_PATTERN_RESOLVER.getResources(pattern);
+            Resource[] resources = RESOURCE_PATTERN_RESOLVER.getResources(resourcePattern);
             if (resources.length == 0) {
-                throw new ServiceException(StringUtils.format("未找到前端模板: vm/{}/{}.*.vm", type, templatePrefix));
+                throw new ServiceException(StringUtils.format("未找到前端模板: {}", templatePathPattern));
             }
             return Arrays.stream(resources)
                 .map(Resource::getFilename)
                 .filter(StringUtils::isNotBlank)
                 .sorted()
                 .findFirst()
-                .map(fileName -> StringUtils.format("vm/{}/{}", type, fileName))
-                .orElseThrow(() -> new ServiceException(StringUtils.format("未找到前端模板: vm/{}/{}.*.vm", type, templatePrefix)));
+                .map(fileName -> StringUtils.format("{}/{}/{}", GenConstants.TEMPLATE_ROOT_PATH, type, fileName))
+                .orElseThrow(() -> new ServiceException(StringUtils.format("未找到前端模板: {}", templatePathPattern)));
         } catch (IOException e) {
-            throw new ServiceException(StringUtils.format("读取前端模板失败: vm/{}/{}.*.vm", type, templatePrefix), e);
+            throw new ServiceException(StringUtils.format("读取前端模板失败: {}", templatePathPattern), e);
         }
+    }
+
+    private static String getFrontendPageTemplatePathPattern(String frontendType, String templatePrefix) {
+        return StringUtils.format("{}/{}/{}{}", GenConstants.TEMPLATE_ROOT_PATH, frontendType,
+            templatePrefix, GenConstants.TEMPLATE_PAGE_PATTERN_SUFFIX);
     }
 
     private static boolean isFrontendPageTemplate(String template, String templatePrefix) {
         String fileName = getTemplateFileName(template);
-        return fileName.startsWith(templatePrefix + ".") && fileName.endsWith(".vm");
+        return fileName.startsWith(templatePrefix + ".") && fileName.endsWith(GenConstants.TEMPLATE_FILE_SUFFIX);
     }
 
     private static String getTemplateFileName(String template) {
@@ -429,10 +512,6 @@ public class TemplateEngineUtils {
                 importList.add("com.fasterxml.jackson.annotation.JsonFormat");
             } else if (!column.isSuperColumn() && GenConstants.TYPE_BIGDECIMAL.equals(column.getJavaType())) {
                 importList.add("java.math.BigDecimal");
-            }
-            if (!column.isSuperColumn() && GenConstants.QUERY_BETWEEN.equals(column.getQueryType())) {
-                importList.add("java.util.HashMap");
-                importList.add("java.util.Map");
             }
         }
         return importList;

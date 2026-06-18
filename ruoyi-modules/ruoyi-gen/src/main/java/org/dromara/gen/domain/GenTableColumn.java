@@ -133,6 +133,80 @@ public class GenTableColumn extends BaseEntity {
     }
 
     /**
+     * 获取适合界面展示的字段注释，去除括号内的枚举说明。
+     *
+     * @return 字段展示名称
+     */
+    public String getColumnLabel() {
+        int index = StringUtils.indexOf(this.columnComment, "（");
+        if (index != StringUtils.INDEX_NOT_FOUND) {
+            return StringUtils.substring(this.columnComment, 0, index);
+        }
+        return this.columnComment;
+    }
+
+    /**
+     * 获取 TypeScript 字段类型。
+     *
+     * @return TypeScript 类型
+     */
+    public String getTsType() {
+        if (StringUtils.containsAny(this.javaField, "id", "Id")) {
+            return "string | number";
+        }
+        if (StringUtils.equalsAny(this.javaType,
+            GenConstants.TYPE_LONG, GenConstants.TYPE_INTEGER, GenConstants.TYPE_DOUBLE,
+            "Float", GenConstants.TYPE_BIGDECIMAL)) {
+            return "number";
+        }
+        if (StringUtils.equals(this.javaType, GenConstants.TYPE_BOOLEAN)) {
+            return "boolean";
+        }
+        return "string";
+    }
+
+    /**
+     * 获取开关启用值的前端字面量。
+     *
+     * @return 前端字面量
+     */
+    public String getSwitchActiveValue() {
+        if (StringUtils.equals(this.javaType, GenConstants.TYPE_BOOLEAN)) {
+            return "true";
+        }
+        if (StringUtils.equalsAny(this.javaType, GenConstants.TYPE_INTEGER, GenConstants.TYPE_LONG)) {
+            return "0";
+        }
+        return "'0'";
+    }
+
+    /**
+     * 获取开关停用值的前端字面量。
+     *
+     * @return 前端字面量
+     */
+    public String getSwitchInactiveValue() {
+        if (StringUtils.equals(this.javaType, GenConstants.TYPE_BOOLEAN)) {
+            return "false";
+        }
+        if (StringUtils.equalsAny(this.javaType, GenConstants.TYPE_INTEGER, GenConstants.TYPE_LONG)) {
+            return "1";
+        }
+        return "'1'";
+    }
+
+    /**
+     * 是否为日期范围查询字段。
+     *
+     * @return 日期范围查询字段返回 {@code true}
+     */
+    public boolean isDateRangeQuery() {
+        return isQuery()
+            && StringUtils.equals(this.htmlType, GenConstants.HTML_DATETIME)
+            && StringUtils.equals(this.queryType, GenConstants.QUERY_BETWEEN);
+    }
+
+    /**
      * 判断当前列是否为主键列。
      *
      * @return 主键列返回 {@code true}

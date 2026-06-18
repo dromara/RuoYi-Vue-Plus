@@ -1,8 +1,8 @@
 package ${packageName}.domain.vo;
 
-#foreach ($import in $importList)
+<#list importList as import>
 import ${import};
-#end
+</#list>
 import ${packageName}.domain.${ClassName};
 import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
 import org.apache.fesod.sheet.annotation.ExcelProperty;
@@ -33,36 +33,33 @@ public class ${ClassName}Vo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-#foreach ($column in $columns)
-#if($column.list)
+<#list columns as column>
+<#if column.list>
     /**
-     * $column.columnComment
+     * ${column.columnComment}
      */
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
-#else
-#set($comment=$column.columnComment)
-#end
-#if(${column.dictType} && ${column.dictType} != '')
-    @ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
+<#assign parentheseIndex = column.columnComment?index_of("（")>
+<#if column.dictType?has_content>
+    @ExcelProperty(value = "${column.columnLabel}", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "${column.dictType}")
-#elseif($parentheseIndex != -1)
-    @ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "$column.readConverterExp()")
-#else
-    @ExcelProperty(value = "${comment}")
-#end
-    private $column.javaType $column.javaField;
+<#elseif parentheseIndex != -1>
+    @ExcelProperty(value = "${column.columnLabel}", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(readConverterExp = "${column.readConverterExp}()")
+<#else>
+    @ExcelProperty(value = "${column.columnLabel}")
+</#if>
+    private ${column.javaType} ${column.javaField};
 
-#if($column.htmlType == "imageUpload")
+<#if column.htmlType == "imageUpload">
     /**
      * ${column.columnComment}Url
      */
     @Translation(type = TransConstant.OSS_ID_TO_URL, mapper = "${column.javaField}")
     private String ${column.javaField}Url;
-#end
-#end
-#end
+</#if>
+</#if>
+</#list>
 
 }
+
+

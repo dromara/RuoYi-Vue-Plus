@@ -14,7 +14,7 @@
 
     <properties>
         <!-- 项目基础配置 -->
-        <revision>5.5.3</revision>
+        <revision>6.0.0</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
@@ -52,7 +52,6 @@
         <lombok.version>1.18.42</lombok.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
         <fesod.version>2.0.2-incubating</fesod.version>
-        <velocity.version>2.4.1</velocity.version>
         <fory.version>1.2.0</fory.version>
 
         <!-- 三方集成与业务扩展相关依赖版本 -->
@@ -190,13 +189,6 @@
                 <groupId>org.apache.fesod</groupId>
                 <artifactId>fesod-sheet</artifactId>
                 <version>${fesod.version}</version>
-            </dependency>
-
-            <!-- velocity代码生成使用模板 -->
-            <dependency>
-                <groupId>org.apache.velocity</groupId>
-                <artifactId>velocity-engine-core</artifactId>
-                <version>${velocity.version}</version>
             </dependency>
 
             <!-- dynamic-datasource 多数据源-->

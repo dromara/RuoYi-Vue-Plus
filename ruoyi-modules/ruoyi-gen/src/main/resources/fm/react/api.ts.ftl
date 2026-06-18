@@ -1,4 +1,4 @@
-import type { #if(!$table.tree)PageResult, #end R } from '@/api/types';
+import type { <#if !table.tree>PageResult, </#if> R } from '@/api/types';
 import request from '@/api/request';
 import type { ${BusinessName}Form, ${BusinessName}Query, ${BusinessName}VO } from './types';
 
@@ -6,7 +6,7 @@ import type { ${BusinessName}Form, ${BusinessName}Query, ${BusinessName}VO } fro
  * 查询${functionName}列表
  */
 export function list${BusinessName}(query?: ${BusinessName}Query) {
-  return request<R<#if($table.tree)${BusinessName}VO[]#else PageResult<${BusinessName}VO>#end>>({
+  return request<R<<#if table.tree>${BusinessName}VO[]<#else> PageResult<${BusinessName}VO></#if>>>({
     url: '/${moduleName}/${businessName}/list',
     method: 'get',
     params: query
@@ -45,13 +45,13 @@ export function update${BusinessName}(data: ${BusinessName}Form) {
   });
 }
 
-#if($enableStatus)
+<#if enableStatus>
 /**
  * 修改${functionName}状态
  */
 export function change${BusinessName}Status(
   ${pkColumn.javaField}: string | number,
-  ${statusField}: #if($statusColumn.javaType == 'Boolean')boolean#elseif($statusColumn.javaType == 'Integer' || $statusColumn.javaType == 'Long')number#else string#end
+  ${statusField}: <#if statusColumn.javaType == 'Boolean'>boolean<#elseif statusColumn.javaType == 'Integer' || statusColumn.javaType == 'Long'>number<#else> string</#if>
 ) {
   return request<R>({
     url: '/${moduleName}/${businessName}/changeStatus',
@@ -63,14 +63,14 @@ export function change${BusinessName}Status(
   });
 }
 
-#end
-#if($enableSort)
+</#if>
+<#if enableSort>
 /**
  * 调整${functionName}排序
  */
 export function update${BusinessName}Sort(
   ${pkColumn.javaField}: string | number,
-  ${sortField}: #if($sortColumn.javaType == 'LocalDateTime' || $sortColumn.javaType == 'String')string#else number#end
+  ${sortField}: <#if sortColumn.javaType == 'LocalDateTime' || sortColumn.javaType == 'String'>string<#else> number</#if>
 ) {
   return request<R>({
     url: '/${moduleName}/${businessName}/updateSort',
@@ -82,7 +82,7 @@ export function update${BusinessName}Sort(
   });
 }
 
-#end
+</#if>
 /**
  * 删除${functionName}
  */
@@ -92,3 +92,7 @@ export function del${BusinessName}(${pkColumn.javaField}: string | number | Arra
     method: 'delete'
   });
 }
+
+
+
+

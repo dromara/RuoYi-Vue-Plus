@@ -2,18 +2,18 @@
 
 ## 优先参考的代码来源
 
-- `ruoyi-modules/ruoyi-gen/src/main/resources/vm/<frontendType>/*.vm`
-- 默认 Vue 模板在 `vm/vue`，React 模板在 `vm/react`
+- `ruoyi-modules/ruoyi-gen/src/main/resources/fm/<frontendType>/*.ftl`
+- 默认 Vue 模板在 `fm/vue`，React 模板在 `fm/react`
 - 前端工程中与目标模块最接近的现有页面
 
 当前 boot4 仓库通常只含后端与 generator 前端模板；如果前端工程不在当前 root，先以 generator 模板约定为准，再对照用户提供的前端目录或相邻仓库。
 
 ## 前端模板选择规则
 
-- `gen_table.frontend_type` 存字符串，值直接对应 `vm` 下的模板目录，例如 `vue`、`react`。
-- 生成器按 `vm/<frontendType>/api.ts.vm`、`types.ts.vm`、`index.*.vm`、`index-tree.*.vm` 查找模板。
-- 页面输出后缀由页面模板文件名决定：`index.vue.vm` 输出 `index.vue`，`index.tsx.vm` 输出 `index.tsx`。
-- 新增其他前端时优先只新增 `vm/<frontendType>` 目录和对应 VM 文件，不在 Java 代码里增加数字枚举或硬编码分支。
+- `gen_table.frontend_type` 存字符串，值直接对应 `fm` 下的模板目录，例如 `vue`、`react`。
+- 生成器按 `fm/<frontendType>/api.ts.ftl`、`types.ts.ftl`、`index.*.ftl`、`index-tree.*.ftl` 查找模板。
+- 页面输出后缀由页面模板文件名决定：`index.vue.ftl` 输出 `index.vue`，`index.tsx.ftl` 输出 `index.tsx`。
+- 新增其他前端时优先只新增 `fm/<frontendType>` 目录和对应 FTL 文件，不在 Java 代码里增加数字枚举或硬编码分支。
 
 ## API 文件规则
 

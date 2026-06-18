@@ -46,10 +46,10 @@
             <artifactId>ruoyi-common-log</artifactId>
         </dependency>
 
-        <!--velocity代码生成使用模板 -->
+        <!-- FreeMarker代码生成模板 -->
         <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity-engine-core</artifactId>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
         </dependency>
 
         <!-- AnyLine Spring JDBC 环境 -->

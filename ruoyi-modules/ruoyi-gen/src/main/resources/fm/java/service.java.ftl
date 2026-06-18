@@ -2,10 +2,10 @@ package ${packageName}.service;
 
 import ${packageName}.domain.vo.${ClassName}Vo;
 import ${packageName}.domain.bo.${ClassName}Bo;
-#if($table.crud)
+<#if table.crud>
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.core.page.PageQuery;
-#end
+</#if>
 
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +26,7 @@ public interface I${ClassName}Service {
      */
     ${ClassName}Vo queryById(${pkColumn.javaType} ${pkColumn.javaField});
 
-#if($table.crud)
+<#if table.crud>
     /**
      * 分页查询${functionName}列表
      *
@@ -35,7 +35,7 @@ public interface I${ClassName}Service {
      * @return ${functionName}分页列表
      */
     PageResult<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery);
-#end
+</#if>
 
     /**
      * 查询符合条件的${functionName}列表
@@ -45,7 +45,7 @@ public interface I${ClassName}Service {
      */
     List<${ClassName}Vo> queryList(${ClassName}Bo bo);
 
-#if($enableUnique)
+<#if enableUnique>
     /**
      * 校验${functionName}是否满足组合唯一约束
      *
@@ -53,7 +53,7 @@ public interface I${ClassName}Service {
      * @return 是否唯一
      */
     boolean checkUnique(${ClassName}Bo bo);
-#end
+</#if>
 
     /**
      * 新增${functionName}
@@ -71,7 +71,7 @@ public interface I${ClassName}Service {
      */
     Boolean updateByBo(${ClassName}Bo bo);
 
-#if($enableStatus)
+<#if enableStatus>
     /**
      * 修改${functionName}状态
      *
@@ -80,9 +80,9 @@ public interface I${ClassName}Service {
      * @return 是否修改成功
      */
     Boolean updateStatus(${pkColumn.javaType} ${pkColumn.javaField}, ${statusColumn.javaType} status);
-#end
+</#if>
 
-#if($enableSort)
+<#if enableSort>
     /**
      * 调整${functionName}排序
      *
@@ -91,7 +91,7 @@ public interface I${ClassName}Service {
      * @return 是否修改成功
      */
     Boolean updateSort(${pkColumn.javaType} ${pkColumn.javaField}, ${sortColumn.javaType} sortValue);
-#end
+</#if>
 
     /**
      * 校验并批量删除${functionName}信息
@@ -102,3 +102,6 @@ public interface I${ClassName}Service {
      */
     Boolean deleteWithValidByIds(Collection<${pkColumn.javaType}> ids, Boolean isValid);
 }
+
+
+

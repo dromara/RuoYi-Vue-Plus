@@ -13,3 +13,6 @@ import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 public interface ${ClassName}Mapper extends BaseMapperPlus<${ClassName}, ${ClassName}Vo> {
 
 }
+
+
+

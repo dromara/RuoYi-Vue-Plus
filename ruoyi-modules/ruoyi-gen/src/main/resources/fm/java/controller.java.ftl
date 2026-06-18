@@ -3,9 +3,9 @@ package ${packageName}.controller;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
-#if($enableExport)
+<#if enableExport>
 import jakarta.servlet.http.HttpServletResponse;
-#end
+</#if>
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +18,16 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.log.enums.BusinessType;
-#if($enableExport)
+<#if enableExport>
 import org.dromara.common.excel.utils.ExcelBuilder;
-#end
+</#if>
 import ${packageName}.domain.vo.${ClassName}Vo;
 import ${packageName}.domain.bo.${ClassName}Bo;
 import ${packageName}.service.I${ClassName}Service;
-#if($table.crud)
+<#if table.crud>
 import org.dromara.common.core.domain.PageResult;
-#elseif($table.tree)
-#end
+<#elseif table.tree>
+</#if>
 
 /**
  * ${functionName}
@@ -48,21 +48,21 @@ public class ${ClassName}Controller extends BaseController {
      */
     @SaCheckPermission("${permissionPrefix}:list")
     @GetMapping("/list")
-#if($table.crud)
+<#if table.crud>
     public R<PageResult<${ClassName}Vo>> list(${ClassName}Bo bo, PageQuery pageQuery) {
         return R.ok(${className}Service.queryPageList(bo, pageQuery));
     }
-#elseif($table.tree)
+<#elseif table.tree>
     public R<List<${ClassName}Vo>> list(${ClassName}Bo bo) {
         List<${ClassName}Vo> list = ${className}Service.queryList(bo);
         return R.ok(list);
     }
-#end
+</#if>
 
     /**
      * 导出${functionName}列表
      */
-#if($enableExport)
+<#if enableExport>
     @SaCheckPermission("${permissionPrefix}:export")
     @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
@@ -70,7 +70,7 @@ public class ${ClassName}Controller extends BaseController {
         List<${ClassName}Vo> list = ${className}Service.queryList(bo);
         ExcelBuilder.of(list, ${ClassName}Vo.class).sheetName("${functionName}").toResponse(response);
     }
-#end
+</#if>
 
     /**
      * 获取${functionName}详细信息
@@ -92,11 +92,11 @@ public class ${ClassName}Controller extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody ${ClassName}Bo bo) {
-#if($enableUnique)
+<#if enableUnique>
         if (!${className}Service.checkUnique(bo)) {
             return R.fail("新增${functionName}失败，组合唯一字段已存在");
         }
-#end
+</#if>
         return toAjax(${className}Service.insertByBo(bo));
     }
 
@@ -108,15 +108,15 @@ public class ${ClassName}Controller extends BaseController {
     @RepeatSubmit()
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody ${ClassName}Bo bo) {
-#if($enableUnique)
+<#if enableUnique>
         if (!${className}Service.checkUnique(bo)) {
             return R.fail("修改${functionName}失败，组合唯一字段已存在");
         }
-#end
+</#if>
         return toAjax(${className}Service.updateByBo(bo));
     }
 
-#if($enableStatus)
+<#if enableStatus>
     /**
      * 修改${functionName}状态
      */
@@ -126,9 +126,9 @@ public class ${ClassName}Controller extends BaseController {
     public R<Void> changeStatus(@RequestBody ${ClassName}Bo bo) {
         return toAjax(${className}Service.updateStatus(bo.get${pkColumn.capJavaField}(), bo.get${statusColumn.capJavaField}()));
     }
-#end
+</#if>
 
-#if($enableSort)
+<#if enableSort>
     /**
      * 调整${functionName}排序
      */
@@ -138,7 +138,7 @@ public class ${ClassName}Controller extends BaseController {
     public R<Void> updateSort(@RequestBody ${ClassName}Bo bo) {
         return toAjax(${className}Service.updateSort(bo.get${pkColumn.capJavaField}(), bo.get${sortColumn.capJavaField}()));
     }
-#end
+</#if>
 
     /**
      * 删除${functionName}
@@ -153,3 +153,5 @@ public class ${ClassName}Controller extends BaseController {
         return toAjax(${className}Service.deleteWithValidByIds(List.of(${pkColumn.javaField}s), true));
     }
 }
+
+

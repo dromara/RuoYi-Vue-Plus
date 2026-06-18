@@ -2,7 +2,7 @@
 
 ## 优先参考的代码来源
 
-- `ruoyi-modules/ruoyi-gen/src/main/resources/vm/java/*.vm`
+- `ruoyi-modules/ruoyi-gen/src/main/resources/fm/java/*.ftl`
 - `ruoyi-modules/ruoyi-demo/...`
 - `ruoyi-modules/ruoyi-system/...`
 - `ruoyi-modules/ruoyi-workflow/...`

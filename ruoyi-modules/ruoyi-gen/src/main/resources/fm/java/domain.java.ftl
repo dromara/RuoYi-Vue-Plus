@@ -4,9 +4,9 @@ import org.dromara.common.mybatis.core.domain.BaseEntity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-#foreach ($import in $importList)
+<#list importList as import>
 import ${import};
-#end
+</#list>
 
 import java.io.Serial;
 
@@ -16,34 +16,35 @@ import java.io.Serial;
  * @author ${author}
  * @date ${datetime}
  */
-#set($Entity="BaseEntity")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("${tableName}")
-public class ${ClassName} extends ${Entity} {
+public class ${ClassName} extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-#foreach ($column in $columns)
-#if(!$table.isSuperColumn($column.javaField))
+<#list columns as column>
+<#if !table.isSuperColumn(column.javaField)>
     /**
-     * $column.columnComment
+     * ${column.columnComment}
      */
-#if($column.javaField=='delFlag')
+<#if column.javaField=='delFlag'>
     @TableLogic
-#end
-#if($column.javaField=='version')
+</#if>
+<#if column.javaField=='version'>
     @Version
-#end
-#if($column.isPk==1)
-    @TableId(value = "$column.columnName")
-#elseif($column.needTableField)
-    @TableField(value = "$column.columnName")
-#end
-    private $column.javaType $column.javaField;
+</#if>
+<#if column.pk>
+    @TableId(value = "${column.columnName}")
+<#elseif column.needTableField>
+    @TableField(value = "${column.columnName}")
+</#if>
+    private ${column.javaType} ${column.javaField};
 
-#end
-#end
+</#if>
+</#list>
 
 }
+
+
