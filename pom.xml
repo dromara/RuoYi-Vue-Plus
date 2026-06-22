@@ -43,7 +43,7 @@
         <redisson.version>4.6.1</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <snailjob.version>2.0.0</snailjob.version>
-        <snailai.version>0.0.5</snailai.version>
+        <snailai.version>0.0.6</snailai.version>
 
         <!-- 通用工具、编译增强与代码生成相关依赖版本 -->
         <hutool.version>5.8.46</hutool.version>

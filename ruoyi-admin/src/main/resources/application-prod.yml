@@ -49,6 +49,20 @@ snail-ai:
   port: 18889
   # Skill 文件临时目录
   skill-temp-dir: /tmp/snail-ai-agent/skills
+  # ==================== Chat 嵌入模式配置 ====================
+  chat.ui.embed:
+    # 启用嵌入模式
+    enabled: true
+    # 嵌入模式下隐藏顶部栏
+    show-header: false
+    # 嵌入模式下隐藏侧边栏用户信息
+    show-sidebar-user: false
+    # 嵌入模式下隐藏智能体市场入口
+    show-agent-market: false
+    # 嵌入模式下使用紧凑输入框
+    compact-input: true
+    # 是否锁定当前智能体
+    lock-agent: false
   # ==================== OpenAPI Client 配置 ====================
   open-api:
     # 启用 OpenAPI Client
