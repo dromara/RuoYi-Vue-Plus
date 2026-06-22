@@ -1581,7 +1581,9 @@ INSERT sys_menu VALUES (1761400000000011629, N'我发起的', 176140000000001161
 GO
 INSERT sys_menu VALUES (1761400000000011630, N'流程监控', 1761400000000011616, 4, N'processMonitor', NULL, N'', N'N', N'Y', N'M', N'0', N'0', N'', N'monitor', N'', N'', 1761000000000000103, 1761100000000000001, GETDATE(), NULL, NULL, N'');
 GO
-INSERT sys_menu VALUES (1761400000000011631, N'待办任务', 1761400000000011630, 2, N'allTaskWaiting', N'workflow/task/allTaskWaiting', N'', N'N', N'N', N'C', N'0', N'0', N'', N'waiting', N'', N'', 1761000000000000103, 1761100000000000001, GETDATE(), NULL, NULL, N'');
+INSERT sys_menu VALUES (1761400000000011631, N'待办任务', 1761400000000011630, 2, N'allTaskWaiting', N'workflow/task/allTaskWaiting', N'', N'N', N'N', N'C', N'0', N'0', N'workflow:task:list', N'waiting', N'', N'', 1761000000000000103, 1761100000000000001, GETDATE(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (1761400000000011660, N'待办任务修改', 1761400000000011631, 1, N'#', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'workflow:task:edit', N'#', N'', N'', 1761000000000000103, 1761100000000000001, GETDATE(), NULL, NULL, N'');
 GO
 INSERT sys_menu VALUES (1761400000000011700, N'流程设计', 1761400000000011616, 5, N'design/index', N'workflow/processDefinition/design', N'', N'N', N'N', N'C', N'1', N'0', N'workflow:leave:edit', N'#', N'/workflow/processDefinition', N'', 1761000000000000103, 1761100000000000001, GETDATE(), NULL, NULL, N'');
 GO
