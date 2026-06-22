@@ -14,7 +14,7 @@
     </description>
 
     <properties>
-        <revision>5.5.3</revision>
+        <revision>6.0.0-BETA</revision>
     </properties>
 
     <dependencyManagement>
