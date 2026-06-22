@@ -12,7 +12,7 @@ import org.dromara.common.doc.core.customizer.JavadocOperationCustomizer;
 import org.dromara.common.doc.core.resolver.JavadocResolver;
 import org.dromara.common.doc.core.resolver.SaTokenAnnotationMetadataJavadocResolver;
 import org.springdoc.core.configuration.SpringDocConfiguration;
-import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.customizers.GlobalOpenApiCustomizer;
 import org.springdoc.core.providers.JavadocProvider;
 import org.springdoc.core.utils.PropertyResolverUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -108,7 +108,7 @@ public class SpringDocConfig {
      * 对已经生成好的 OpenApi 进行自定义操作
      */
     @Bean
-    public OpenApiCustomizer openApiCustomizer() {
+    public GlobalOpenApiCustomizer openApiCustomizer() {
         String contextPath = serverProperties.getServlet().getContextPath();
         String finalContextPath;
         if (StringUtils.isBlank(contextPath) || "/".equals(contextPath)) {

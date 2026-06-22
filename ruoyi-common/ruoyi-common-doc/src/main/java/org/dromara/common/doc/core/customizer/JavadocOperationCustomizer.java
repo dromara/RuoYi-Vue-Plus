@@ -4,7 +4,7 @@ import io.swagger.v3.oas.models.Operation;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.common.doc.core.resolver.JavadocResolver;
-import org.springdoc.core.customizers.OperationCustomizer;
+import org.springdoc.core.customizers.GlobalOperationCustomizer;
 import org.springdoc.core.providers.JavadocProvider;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.method.HandlerMethod;
@@ -18,7 +18,7 @@ import java.util.Optional;
  * @author Lion Li
  */
 @RequiredArgsConstructor
-public class JavadocOperationCustomizer implements OperationCustomizer {
+public class JavadocOperationCustomizer implements GlobalOperationCustomizer {
 
     /**
      * JavaDoc 提供器。

@@ -8,8 +8,8 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springdoc.core.customizers.OpenApiCustomizer;
-import org.springdoc.core.customizers.OperationCustomizer;
+import org.springdoc.core.customizers.GlobalOpenApiCustomizer;
+import org.springdoc.core.customizers.GlobalOperationCustomizer;
 import org.springdoc.core.providers.JavadocProvider;
 import org.springdoc.core.service.OpenAPIService;
 import org.springdoc.core.utils.PropertyResolverUtils;
@@ -29,7 +29,7 @@ import java.util.stream.Stream;
  * @author Lion Li
  */
 @RequiredArgsConstructor
-public class ClassTagOperationCustomizer implements OperationCustomizer, OpenApiCustomizer {
+public class ClassTagOperationCustomizer implements GlobalOperationCustomizer, GlobalOpenApiCustomizer {
 
     /**
      * JavaDoc 提供器。
