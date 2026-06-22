@@ -25,12 +25,15 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.UserService;
 import org.dromara.system.api.domain.UserDTO;
 import org.dromara.warm.flow.core.FlowEngine;
+import org.dromara.warm.flow.core.constant.ExceptionCons;
+import org.dromara.warm.flow.core.dto.FlowCombine;
 import org.dromara.warm.flow.core.dto.FlowParams;
 import org.dromara.warm.flow.core.entity.*;
 import org.dromara.warm.flow.core.enums.CooperateType;
 import org.dromara.warm.flow.core.enums.NodeType;
 import org.dromara.warm.flow.core.enums.SkipType;
 import org.dromara.warm.flow.core.enums.UserType;
+import org.dromara.warm.flow.core.exception.FlowException;
 import org.dromara.warm.flow.core.service.*;
 import org.dromara.warm.flow.core.utils.ExpressionUtil;
 import org.dromara.warm.flow.core.utils.MapUtil;
@@ -549,16 +552,30 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             return nodeService.getByNodeCodes(Collections.singletonList(node.getAnyNodeSkip()), task.getDefinitionId());
         }
         //获取可驳回的前置节点
-        List<Node> nodes = nodeService.previousNodeList(task.getDefinitionId(), nowNodeCode);
+        Long definitionId = task.getDefinitionId();
+        FlowCombine flowCombine = defService.getFlowCombineNoDef(definitionId);
+        Map<String, Node> nodeMap = getPreviousNodeMap(nowNodeCode, flowCombine);
         List<HisTask> hisTaskList = hisTaskService.getByInsId(task.getInstanceId());
 
-        Map<String, Node> nodeMap = StreamUtils.toIdentityMap(nodes, Node::getNodeCode);
+        Set<String> reachableNodeCodes = new HashSet<>();
+        if (CollUtil.isNotEmpty(hisTaskList)) {
+            Instance instance = insService.getById(task.getInstanceId());
+            if (ObjectUtil.isNull(instance)) {
+                throw new ServiceException("流程实例不存在");
+            }
+            collectReachableNodeCodes(reachableNodeCodes, instance, flowCombine);
+            if (!reachableNodeCodes.contains(nowNodeCode)) {
+                reachableNodeCodes.clear();
+            }
+        }
+
         Set<String> added = new HashSet<>();
         List<Node> backNodeList = new ArrayList<>();
         for (HisTask hisTask : hisTaskList) {
             Node nodeValue = nodeMap.get(hisTask.getNodeCode());
             if (nodeValue != null
                 && NodeType.BETWEEN.getKey().equals(nodeValue.getNodeType())
+                && (CollUtil.isEmpty(reachableNodeCodes) || reachableNodeCodes.contains(nodeValue.getNodeCode()))
                 && added.add(nodeValue.getNodeCode())) {
                 backNodeList.add(nodeValue);
             }
@@ -567,7 +584,78 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             Collections.reverse(backNodeList);
             return backNodeList;
         }
-        return nodes;
+        if (CollUtil.isNotEmpty(hisTaskList)) {
+            return Collections.emptyList();
+        }
+        return StreamUtils.filter(nodeMap.values(), e -> NodeType.BETWEEN.getKey().equals(e.getNodeType()));
+    }
+
+    private Map<String, Node> getPreviousNodeMap(String nodeCode, FlowCombine flowCombine) {
+        if (ObjectUtil.isNull(flowCombine) || CollUtil.isEmpty(flowCombine.getAllNodes()) || CollUtil.isEmpty(flowCombine.getAllSkips())) {
+            return Collections.emptyMap();
+        }
+        Map<String, Node> allNodeMap = StreamUtils.toIdentityMap(flowCombine.getAllNodes(), Node::getNodeCode);
+        Map<String, List<Skip>> previousSkipMap = new HashMap<>();
+        for (Skip skip : flowCombine.getAllSkips()) {
+            previousSkipMap.computeIfAbsent(skip.getNextNodeCode(), k -> new ArrayList<>()).add(skip);
+        }
+
+        Map<String, Node> previousNodeMap = new LinkedHashMap<>();
+        Set<String> visitedNodeCodes = new HashSet<>();
+        Deque<String> nodeQueue = new ArrayDeque<>();
+        visitedNodeCodes.add(nodeCode);
+        nodeQueue.add(nodeCode);
+        while (CollUtil.isNotEmpty(nodeQueue)) {
+            String currentNodeCode = nodeQueue.poll();
+            List<Skip> previousSkips = previousSkipMap.get(currentNodeCode);
+            if (CollUtil.isEmpty(previousSkips)) {
+                continue;
+            }
+            for (Skip previousSkip : previousSkips) {
+                String previousNodeCode = previousSkip.getNowNodeCode();
+                if (!visitedNodeCodes.add(previousNodeCode)) {
+                    continue;
+                }
+                Node previousNode = allNodeMap.get(previousNodeCode);
+                if (ObjectUtil.isNull(previousNode)) {
+                    continue;
+                }
+                previousNodeMap.put(previousNodeCode, previousNode);
+                nodeQueue.add(previousNodeCode);
+            }
+        }
+        return previousNodeMap;
+    }
+
+    private void collectReachableNodeCodes(Set<String> nodeCodes, Instance instance, FlowCombine flowCombine) {
+        if (ObjectUtil.isNull(flowCombine) || CollUtil.isEmpty(flowCombine.getAllNodes())) {
+            return;
+        }
+        Deque<Node> nodeQueue = new ArrayDeque<>();
+        flowCombine.getAllNodes().stream()
+            .filter(e -> NodeType.START.getKey().equals(e.getNodeType()))
+            .findFirst()
+            .ifPresent(nodeQueue::add);
+
+        while (CollUtil.isNotEmpty(nodeQueue)) {
+            Node currentNode = nodeQueue.poll();
+            if (ObjectUtil.isNull(currentNode) || !nodeCodes.add(currentNode.getNodeCode())) {
+                continue;
+            }
+
+            try {
+                List<Node> nextNodes = nodeService.getNextNodeList(currentNode, null, SkipType.PASS.getKey(),
+                    instance.getVariableMap(), null, flowCombine);
+                if (CollUtil.isNotEmpty(nextNodes)) {
+                    nodeQueue.addAll(nextNodes);
+                }
+            } catch (FlowException e) {
+                // 条件变量缺失时跳过当前分支，其他引擎异常继续抛出。
+                if (!ExceptionCons.NULL_CONDITION_VALUE.equals(e.getMessage())) {
+                    throw e;
+                }
+            }
+        }
     }
 
     /**
