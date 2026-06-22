@@ -802,7 +802,7 @@ VALUES ('OpenAI', 'openai', 'OpenAI官方模型 (GPT-4, GPT-3.5等)', TRUE),
        ('智谱AI', 'zhipu', '智谱AI OpenAI 兼容模型 (GLM等)', TRUE)
 ON CONFLICT (provider_key) DO NOTHING;
 
-INSERT INTO sai_model_config VALUES (1, 5, 'glm-5.1', 'glm-5.1', 'CHAT', 'openai-compatible', '', 'xxx', 'https://dashscope.aliyuncs.com/compatible-mode/v1', '{"frequencyPenalty":0.0,"maxTokens":20000,"presencePenalty":0.0,"stopSequences":[],"stream":true,"temperature":0.7,"timeoutMs":300000,"topK":1,"topP":1.0}', NULL, 'GLOBAL', TRUE, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+INSERT INTO sai_model_config VALUES (1, 5, 'glm-5.1', 'glm-5.1', 'CHAT', 'openai-compatible', '', '', 'https://dashscope.aliyuncs.com/compatible-mode/v1', '{"frequencyPenalty":0.0,"maxTokens":20000,"presencePenalty":0.0,"stopSequences":[],"stream":true,"temperature":0.7,"timeoutMs":300000,"topK":1,"topP":1.0}', NULL, 'GLOBAL', TRUE, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (id) DO NOTHING;
 
 SELECT setval(pg_get_serial_sequence('sai_model_config', 'id'), COALESCE((SELECT MAX(id) FROM sai_model_config), 1), TRUE);
