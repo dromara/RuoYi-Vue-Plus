@@ -8,9 +8,3 @@ gen:
   autoRemovePre: false
   # 表前缀（生成类名不会包含表前缀，多个用逗号分隔）
   tablePrefix: sys_
-  # 模板配置
-  templateConfig:
-    # 模版加载模式
-    resourceMode: CLASSPATH
-    # 模板加载路径
-    # path: fm

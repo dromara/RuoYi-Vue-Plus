@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
 import cn.hutool.extra.template.engine.freemarker.FreemarkerEngine;
@@ -12,12 +13,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.DateUtils;
-import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.enums.DataBaseType;
 import org.dromara.common.mybatis.helper.DataBaseHelper;
-import org.dromara.gen.config.properties.GenProperties;
 import org.dromara.gen.constant.GenConstants;
 import org.dromara.gen.domain.GenTable;
 import org.dromara.gen.domain.GenTableColumn;
@@ -27,6 +26,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -59,9 +59,9 @@ public class TemplateEngineUtils {
 
     static {
         // 模板引擎初始化
-        GenProperties properties = SpringUtils.getBean(GenProperties.class);
-        properties.getTemplateConfig().setCustomEngine(FreemarkerEngine.class);
-        TEMPLATE_ENGINE = TemplateUtil.createEngine(properties.getTemplateConfig());
+        TemplateConfig templateConfig = new TemplateConfig(StandardCharsets.UTF_8, StringUtils.EMPTY, TemplateConfig.ResourceMode.CLASSPATH);
+        templateConfig.setCustomEngine(FreemarkerEngine.class);
+        TEMPLATE_ENGINE = TemplateUtil.createEngine(templateConfig);
         TEMPLATE_MAPPER = PathNamedTemplate.form(TEMPLATE_ENGINE, GenConstants.TEMPLATE_PATHS);
     }
 
