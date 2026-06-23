@@ -651,7 +651,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
                 }
             } catch (FlowException e) {
                 // 条件变量缺失时跳过当前分支，其他引擎异常继续抛出。
-                if (!ExceptionCons.NULL_CONDITION_VALUE.equals(e.getMessage())) {
+                if (!StringUtils.containsAny(e.getMessage(), ExceptionCons.NULL_CONDITION_VALUE, ExceptionCons.NULL_SKIP_TYPE)) {
                     throw e;
                 }
             }
