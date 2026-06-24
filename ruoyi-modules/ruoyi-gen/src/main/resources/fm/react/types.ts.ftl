@@ -52,6 +52,3 @@ export interface ${BusinessName}Query<#if !table.tree> extends PageQuery</#if> {
    */
   params?: Record<string, unknown>;
 }
-
-
-

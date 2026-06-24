@@ -45,7 +45,7 @@
 </#if>
               </el-select>
             </el-form-item>
-<#elseif (column.htmlType == "select" || column.htmlType == "radio") && column.dictType?has_content>
+<#elseif (column.htmlType == "select" || column.htmlType == "radio") && !(column.dictType?has_content)>
             <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
               <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${column.columnLabel}" clearable >
                 <el-option label="请选择字典生成" value="" />
@@ -233,7 +233,8 @@
     <el-dialog :title="dialog.title" v-model="dialog.visible" width="500px" append-to-body>
       <el-form ref="${businessName}FormRef" :model="form" :rules="rules" label-width="80px">
 <#list columns as column>
-<#if (column.insert || column.edit) && !column.pk><#if column.htmlType == "input">
+<#if (column.insert || column.edit) && !column.pk>
+<#if column.htmlType == "input">
         <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
           <el-input v-model="form.${column.javaField}" placeholder="请输入${column.columnLabel}" />
         </el-form-item>
@@ -268,7 +269,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-<#elseif column.htmlType == "select" && column.dictType?has_content>
+<#elseif column.htmlType == "select" && !(column.dictType?has_content)>
         <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
           <el-select v-model="form.${column.javaField}" placeholder="请选择${column.columnLabel}">
             <el-option label="请选择字典生成" value="" />
@@ -285,7 +286,7 @@
             </el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-<#elseif column.htmlType == "checkbox" && column.dictType?has_content>
+<#elseif column.htmlType == "checkbox" && !(column.dictType?has_content)>
         <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
           <el-checkbox-group v-model="form.${column.javaField}">
             <el-checkbox>请选择字典生成</el-checkbox>
@@ -305,7 +306,7 @@
             >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
-<#elseif column.htmlType == "radio" && column.dictType?has_content>
+<#elseif column.htmlType == "radio" && !(column.dictType?has_content)>
         <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
           <el-radio-group v-model="form.${column.javaField}">
             <el-radio value="1">请选择字典生成</el-radio>
@@ -568,8 +569,8 @@ const handleDelete = async (row?: Partial<${BusinessName}VO>) => {
   await getList();
 };
 
-/** 导出按钮操作 */
 <#if enableExport>
+/** 导出按钮操作 */
 const handleExport = () => {
   requestDownload(
     '${moduleName}/${businessName}/export',

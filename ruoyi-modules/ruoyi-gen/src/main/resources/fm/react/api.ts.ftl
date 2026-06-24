@@ -92,7 +92,3 @@ export function del${BusinessName}(${pkColumn.javaField}: string | number | Arra
     method: 'delete'
   });
 }
-
-
-
-

@@ -1,5 +1,3 @@
-import type { BaseEntity<#if !table.tree>, PageQuery</#if> } from '@/api/types';
-
 export interface ${BusinessName}VO {
 <#list columns as column>
 <#if column.list>

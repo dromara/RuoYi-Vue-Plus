@@ -359,7 +359,6 @@ query = apply${column.capJavaField}DateRange(query, params.${column.javaField}Ra
         <ProFormText name="${pkColumn.javaField}" hidden />
 <#list columns as column>
 <#if (column.insert || column.edit) && !column.pk>
-<#assign field = column.javaField>
 <#if column.htmlType == "input">
         <ProFormText name="${column.javaField}" label="${column.columnLabel}" <#if column.required>rules={[{ required: true, message: '${column.columnLabel}不能为空' }]}</#if> />
 <#elseif column.htmlType == "textarea">
@@ -403,7 +402,3 @@ query = apply${column.capJavaField}DateRange(query, params.${column.javaField}Ra
     </PageContainer>
   );
 }
-
-
-
-
