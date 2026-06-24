@@ -168,6 +168,7 @@ public class TemplateEngineUtils {
         boolean needDigit = false;
         boolean needDateField = false;
         boolean needSwitchField = false;
+        boolean needParseTime = false;
         String firstTreeListField = StringUtils.EMPTY;
         for (GenTableColumn column : genTable.getColumns()) {
             boolean writable = column.isInsert() || column.isEdit();
@@ -183,6 +184,7 @@ public class TemplateEngineUtils {
             needDigit = needDigit || writable && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_INPUT_NUMBER);
             needDateField = needDateField || writable && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_DATETIME);
             needSwitchField = needSwitchField || (writable || column.isList()) && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_SWITCH);
+            needParseTime = needParseTime || column.isList() && StringUtils.equals(column.getHtmlType(), GenConstants.HTML_DATETIME);
             if (StringUtils.isBlank(firstTreeListField) && column.isList()) {
                 firstTreeListField = column.getJavaField();
             }
@@ -202,6 +204,7 @@ public class TemplateEngineUtils {
         context.put("needDigit", needDigit);
         context.put("needDateField", needDateField);
         context.put("needSwitchField", needSwitchField);
+        context.put("needParseTime", needParseTime);
         context.put("firstTreeListField", firstTreeListField);
     }
 

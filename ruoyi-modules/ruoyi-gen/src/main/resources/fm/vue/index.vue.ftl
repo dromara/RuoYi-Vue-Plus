@@ -60,7 +60,7 @@
                 placeholder="请选择${column.columnLabel}"
               />
             </el-form-item>
-<#elseif column.htmlType == "datetime" && column.queryType == "BETWEEN">
+<#elseif column.htmlType == "datetime" && column.queryType == "BETWEEN" && column.query>
             <el-form-item label="${column.columnLabel}" style="width: 308px">
               <el-date-picker
                 v-model="dateRange${column.capJavaField}"
@@ -233,7 +233,7 @@
     <el-dialog :title="dialog.title" v-model="dialog.visible" width="500px" append-to-body>
       <el-form ref="${businessName}FormRef" :model="form" :rules="rules" label-width="80px">
 <#list columns as column>
-<#if (column.insert || column.edit) && !column.pk>`n<#if column.htmlType == "input">
+<#if (column.insert || column.edit) && !column.pk><#if column.htmlType == "input">
         <el-form-item label="${column.columnLabel}" prop="${column.javaField}">
           <el-input v-model="form.${column.javaField}" placeholder="请输入${column.columnLabel}" />
         </el-form-item>
@@ -380,6 +380,9 @@ import { useTableSelection } from '@/hooks/table/useTableSelection';
 <#if needDict>
 import { useDict } from '@/utils/dict';
 </#if>
+<#if needParseTime>
+import { parseTime } from '@/utils/ruoyi';
+</#if>
 import modal from '@/plugins/modal';
 <#if enableExport>
 import { download as requestDownload } from '@/utils/request';
@@ -400,7 +403,7 @@ const { loading, withLoading } = useLoading(true);
 const { showSearch } = useSearchToggle();
 const total = ref(0);
 <#list columns as column>
-<#if column.htmlType == "datetime" && column.queryType == "BETWEEN">
+<#if column.htmlType == "datetime" && column.queryType == "BETWEEN" && column.query>
 const {
   dateRange: dateRange${column.capJavaField},
   applyDateRange: apply${column.capJavaField}DateRange,
@@ -472,7 +475,7 @@ const getList = async () => {
 <#if needAddDateRange>
     let params = queryParams.value;
 <#list columns as column>
-<#if column.htmlType == "datetime" && column.queryType == "BETWEEN">
+<#if column.htmlType == "datetime" && column.queryType == "BETWEEN" && column.query>
 params = apply${column.capJavaField}DateRange(params);
 </#if>
 </#list>
@@ -505,7 +508,7 @@ const { resetQuery } = useSearchReset({
   initialPageSize: 10,
   resetExtras: () => {
 <#list columns as column>
-<#if column.htmlType == "datetime" && column.queryType == "BETWEEN">
+<#if column.htmlType == "datetime" && column.queryType == "BETWEEN" && column.query>
 reset${column.capJavaField}DateRange();
 </#if>
 </#list>
