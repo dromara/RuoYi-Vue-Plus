@@ -62,6 +62,10 @@ public class TemplateEngineUtils {
         TemplateConfig templateConfig = new TemplateConfig(StandardCharsets.UTF_8, StringUtils.EMPTY, TemplateConfig.ResourceMode.CLASSPATH);
         templateConfig.setCustomEngine(FreemarkerEngine.class);
         TEMPLATE_ENGINE = TemplateUtil.createEngine(templateConfig);
+        // 禁用数字千分位格式化 避免 Long 类型的 ID 渲染是被加上逗号
+        if (TEMPLATE_ENGINE instanceof FreemarkerEngine freemarkerEngine) {
+            freemarkerEngine.getConfiguration().setNumberFormat("computer");
+        }
         TEMPLATE_MAPPER = PathNamedTemplate.form(TEMPLATE_ENGINE, GenConstants.TEMPLATE_PATHS);
     }
 
