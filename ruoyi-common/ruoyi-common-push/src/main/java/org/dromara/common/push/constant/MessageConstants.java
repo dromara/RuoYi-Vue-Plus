@@ -31,4 +31,9 @@ public interface MessageConstants {
      * 心跳响应标识
      */
     String PONG = "pong";
+
+    /**
+     * 同一 token 的新连接替换旧连接时发送给旧连接的控制消息。
+     */
+    String KICKED = "kicked";
 }

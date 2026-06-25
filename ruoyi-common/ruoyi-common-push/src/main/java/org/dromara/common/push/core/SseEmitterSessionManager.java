@@ -65,6 +65,7 @@ public class SseEmitterSessionManager implements PushSessionManager {
         // 关闭已存在的SseEmitter，防止超过最大连接数
         SseEmitter oldEmitter = emitters.remove(token);
         if (oldEmitter != null) {
+            sendKickedMessage(oldEmitter);
             oldEmitter.complete();
         }
 
@@ -101,6 +102,21 @@ public class SseEmitterSessionManager implements PushSessionManager {
             emitters.remove(token);
         }
         return emitter;
+    }
+
+    /**
+     * 通知旧连接已被同 token 新连接替换。
+     *
+     * @param emitter 旧 SSE 连接
+     */
+    private void sendKickedMessage(SseEmitter emitter) {
+        try {
+            emitter.send(SseEmitter.event()
+                .name("message")
+                .data(MessageConstants.KICKED));
+        } catch (Exception ignore) {
+            // 旧连接可能已断开，忽略通知失败
+        }
     }
 
     /**

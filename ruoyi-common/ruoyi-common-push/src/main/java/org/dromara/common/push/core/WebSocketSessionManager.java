@@ -5,6 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.ThreadUtils;
 import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.common.push.constant.MessageConstants;
 import org.dromara.common.push.dto.PushDTO;
 import org.dromara.common.push.properties.MessageProperties;
 import org.dromara.common.redis.utils.RedisUtils;
@@ -61,6 +62,7 @@ public class WebSocketSessionManager implements PushSessionManager {
         Map<String, WebSocketSession> sessions = USER_TOKEN_SESSIONS.computeIfAbsent(userId, key -> new ConcurrentHashMap<>());
         // 移除并关闭旧的同token会话，避免重复连接
         WebSocketSession oldSession = sessions.remove(token);
+        sendKickedMessage(oldSession);
         closeSession(oldSession, CloseStatus.NORMAL);
         // 存储新会话
         sessions.put(token, session);
@@ -127,6 +129,18 @@ public class WebSocketSessionManager implements PushSessionManager {
         });
         // 批量清理无会话用户
         toRemoveUsers.forEach(USER_TOKEN_SESSIONS::remove);
+    }
+
+    /**
+     * 通知旧连接已被同 token 新连接替换。
+     *
+     * @param session 旧 WebSocket 会话
+     */
+    private void sendKickedMessage(WebSocketSession session) {
+        if (session == null || !session.isOpen()) {
+            return;
+        }
+        sendMessage(session, MessageConstants.KICKED);
     }
 
     /**
