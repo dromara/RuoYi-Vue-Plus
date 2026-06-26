@@ -11,6 +11,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.api.model.LoginUser;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/snail-ai")
 @RequiredArgsConstructor
+@ConditionalOnBean(OpenApiUserClient.class)
 public class SnailAiController extends BaseController {
 
     /**
