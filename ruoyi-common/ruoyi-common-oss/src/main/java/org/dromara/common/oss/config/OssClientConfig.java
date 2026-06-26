@@ -1,6 +1,5 @@
 package org.dromara.common.oss.config;
 
-import cn.hutool.http.HttpUtil;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -196,8 +195,8 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
     public String getDomainUrl() {
         return domain()
             // 如果已经配置了自定义域名，则优先使用域名
-            // 检查携带协议头
-            .filter(OssClientConfig::hasHttpHeader)
+            .filter(StringUtils::isNotBlank)
+            .map(domain -> BucketUrlUtil.rebuildUrlHeader(useHttps, domain.trim()))
             // 否则使用站点
             .orElseGet(this::getEndpointUrl);
     }
@@ -274,7 +273,8 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
      */
     private String getAccessBaseUrl() {
         return domain()
-            .filter(OssClientConfig::hasHttpHeader)
+            .filter(StringUtils::isNotBlank)
+            .map(String::trim)
             .orElseGet(this::getEndpoint);
     }
 
@@ -287,16 +287,6 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
         return endpoint()
             .filter(s -> !s.isBlank())
             .orElseThrow(() -> S3StorageException.form("endpoint is not configured."));
-    }
-
-    /**
-     * 判断 URL 是否包含 HTTP 协议头。
-     *
-     * @param url URL
-     * @return 是否包含 HTTP 协议头
-     */
-    private static boolean hasHttpHeader(String url) {
-        return HttpUtil.isHttp(url) || HttpUtil.isHttps(url);
     }
 
     /**
