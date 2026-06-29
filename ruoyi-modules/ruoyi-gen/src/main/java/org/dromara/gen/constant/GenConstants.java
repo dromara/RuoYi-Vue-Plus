@@ -86,6 +86,11 @@ public interface GenConstants {
     String FRONTEND_TYPE_VUE = "vue";
 
     /**
+     * React 前端模板类型，对应模板根目录下的 react 目录。
+     */
+    String FRONTEND_TYPE_REACT = "react";
+
+    /**
      * 树根节点值
      */
     String TREE_ROOT_VALUE = "treeRootValue";

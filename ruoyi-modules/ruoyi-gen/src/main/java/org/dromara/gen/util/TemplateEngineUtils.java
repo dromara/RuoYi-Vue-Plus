@@ -358,6 +358,7 @@ public class TemplateEngineUtils {
         String javaPath = PROJECT_PATH + "/" + StringUtils.replace(packageName, ".", "/");
         String mybatisPath = MYBATIS_PATH + "/" + moduleName;
         String frontendPath = getFrontendPath(genTable.getFrontendType());
+        String frontendPagePath = getFrontendPagePath(genTable.getFrontendType());
         // templatePath
         // genFilePathFormat
         if (template.contains("domain.java.")) {
@@ -383,10 +384,10 @@ public class TemplateEngineUtils {
         } else if (template.contains("types.ts.")) {
             fileName = StringUtils.format("{}/api/{}/{}/types.ts", frontendPath, moduleName, businessName);
         } else if (isFrontendPageTemplate(template, GenConstants.FRONTEND_INDEX_TEMPLATE_PREFIX)) {
-            fileName = StringUtils.format("{}/views/{}/{}/index.{}", frontendPath, moduleName, businessName,
+            fileName = StringUtils.format("{}/{}/{}/{}/index.{}", frontendPath, frontendPagePath, moduleName, businessName,
                 getFrontendPageExtension(template, GenConstants.FRONTEND_INDEX_TEMPLATE_PREFIX));
         } else if (isFrontendPageTemplate(template, GenConstants.FRONTEND_INDEX_TREE_TEMPLATE_PREFIX)) {
-            fileName = StringUtils.format("{}/views/{}/{}/index.{}", frontendPath, moduleName, businessName,
+            fileName = StringUtils.format("{}/{}/{}/{}/index.{}", frontendPath, frontendPagePath, moduleName, businessName,
                 getFrontendPageExtension(template, GenConstants.FRONTEND_INDEX_TREE_TEMPLATE_PREFIX));
         }
         return fileName;
@@ -400,6 +401,16 @@ public class TemplateEngineUtils {
      */
     private static String getFrontendPath(String frontendType) {
         return resolveFrontendType(frontendType);
+    }
+
+    /**
+     * 获取前端页面输出目录。
+     *
+     * @param frontendType 前端模板类型
+     * @return 页面输出目录
+     */
+    private static String getFrontendPagePath(String frontendType) {
+        return GenConstants.FRONTEND_TYPE_REACT.equals(resolveFrontendType(frontendType)) ? "pages" : "views";
     }
 
     /**
