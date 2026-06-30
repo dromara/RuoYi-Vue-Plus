@@ -64,6 +64,7 @@ import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 <#if enableExport>
 import { useTableExport } from '@/hooks/useTableExport';
 </#if>
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
 <#if needDict>
@@ -90,6 +91,7 @@ const ${statusField}InactiveValue = <#if statusColumn.javaType == "Boolean">fals
 </#if>
 export default function ${BusinessName}Page() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1000);
   const [form] = Form.useForm<${BusinessName}Form>();
   const userInfo = useUserStore(state => state.userInfo);
 <#if needDict>
@@ -292,7 +294,7 @@ const { applyDateRange: apply${column.capJavaField}DateRange } = useDateRangeQue
         actionRef={actionRef}
         rowKey="${pkColumn.javaField}"
         columns={columns}
-        scroll={{ x: 1000 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         pagination={{ defaultPageSize: 10, showSizeChanger: true }}
         rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}
