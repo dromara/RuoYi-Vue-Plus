@@ -182,7 +182,7 @@ springdoc:
     - group: 3.系统模块
       packages-to-scan: org.dromara.system
     - group: 4.代码生成模块
-      packages-to-scan: org.dromara.generator
+      packages-to-scan: org.dromara.gen
     - group: 5.工作流模块
       packages-to-scan: org.dromara.workflow
 
