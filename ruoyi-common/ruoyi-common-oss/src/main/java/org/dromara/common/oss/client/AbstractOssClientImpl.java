@@ -15,6 +15,14 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.core.async.ResponsePublisher;
+import software.amazon.awssdk.http.SdkHttpFullRequest;
+import software.amazon.awssdk.http.SdkHttpMethod;
+import software.amazon.awssdk.http.auth.aws.signer.AwsV4FamilyHttpSigner;
+import software.amazon.awssdk.http.auth.aws.signer.AwsV4HttpSigner;
+import software.amazon.awssdk.http.auth.spi.signer.HttpSigner;
+import software.amazon.awssdk.http.auth.spi.signer.SignRequest;
+import software.amazon.awssdk.identity.spi.AwsCredentialsIdentity;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
@@ -25,6 +33,7 @@ import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.CompletedUpload;
 import software.amazon.awssdk.transfer.s3.model.DownloadRequest;
 import software.amazon.awssdk.transfer.s3.progress.TransferListener;
+import software.amazon.awssdk.utils.http.SdkHttpUtils;
 
 import java.io.*;
 import java.nio.channels.Channels;
@@ -33,8 +42,11 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZoneOffset;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
@@ -716,6 +728,9 @@ public abstract class AbstractOssClientImpl implements OssClient {
      */
     @Override
     public String bucketPresignGetUrl(String bucket, String key, Duration expiredTime) {
+        if (useBucketBoundDomain(bucket)) {
+            return bucketBoundDomainPresignUrl(SdkHttpMethod.GET, key, expiredTime, Collections.emptyMap());
+        }
         try {
             return s3Presigner.presignGetObject(getObjectPresignRequestBuilder -> {
                     getObjectPresignRequestBuilder.signatureDuration(expiredTime)
@@ -739,6 +754,9 @@ public abstract class AbstractOssClientImpl implements OssClient {
      */
     @Override
     public String bucketPresignPutUrl(String bucket, String key, Duration expiredTime, Map<String, String> metadata) {
+        if (useBucketBoundDomain(bucket)) {
+            return bucketBoundDomainPresignUrl(SdkHttpMethod.PUT, key, expiredTime, metadata);
+        }
         try {
             return s3Presigner.presignPutObject(putObjectPresignRequestBuilder -> {
                     putObjectPresignRequestBuilder.signatureDuration(expiredTime)
@@ -749,6 +767,94 @@ public abstract class AbstractOssClientImpl implements OssClient {
         } catch (Exception e) {
             throw toStorageException(e);
         }
+    }
+
+    /**
+     * 是否使用已绑定默认桶的自定义域名生成无桶名预签名 URL。
+     *
+     * @param bucket 存储桶名称
+     * @return 是否使用自定义域名签名
+     */
+    private boolean useBucketBoundDomain(String bucket) {
+        return config.domain()
+            .filter(StringUtils::isNotBlank)
+            .isPresent() && config.bucket()
+            .filter(defaultBucket -> Objects.equals(defaultBucket, bucket))
+            .isPresent();
+    }
+
+    /**
+     * 使用绑定默认桶的自定义域名生成预签名 URL，避免 S3 SDK 自动拼接桶名。
+     *
+     * @param method      HTTP 方法
+     * @param key         对象键
+     * @param expiredTime 过期时间
+     * @param metadata    对象元数据
+     * @return 预签名 URL
+     */
+    private String bucketBoundDomainPresignUrl(SdkHttpMethod method, String key, Duration expiredTime, Map<String, String> metadata) {
+        try {
+            URI domainUri = URI.create(config.getDomainUrl());
+            SdkHttpFullRequest.Builder requestBuilder = SdkHttpFullRequest.builder()
+                .method(method)
+                .uri(domainUri)
+                .encodedPath(bucketBoundDomainPath(domainUri, key));
+            if (metadata != null) {
+                metadata.forEach((metadataKey, metadataValue) -> {
+                    if (StringUtils.isNotBlank(metadataKey)) {
+                        requestBuilder.putHeader("x-amz-meta-" + metadataKey, String.valueOf(metadataValue));
+                    }
+                });
+            }
+            AwsCredentialsIdentity credentials = AwsCredentialsIdentity.create(
+                config.accessKey()
+                    .filter(StringUtils::isNotBlank)
+                    .orElseThrow(() -> S3StorageException.form("accessKey is not configured.")),
+                config.secretKey()
+                    .filter(StringUtils::isNotBlank)
+                    .orElseThrow(() -> S3StorageException.form("secretKey is not configured."))
+            );
+            Clock signingClock = Clock.fixed(Instant.now(), ZoneOffset.UTC);
+            return AwsV4HttpSigner.create()
+                .sign(SignRequest.builder(credentials)
+                    .request(requestBuilder.build())
+                    .putProperty(AwsV4HttpSigner.REGION_NAME, config.region().orElse(Region.US_EAST_1).id())
+                    .putProperty(AwsV4FamilyHttpSigner.SERVICE_SIGNING_NAME, "s3")
+                    .putProperty(AwsV4FamilyHttpSigner.AUTH_LOCATION, AwsV4FamilyHttpSigner.AuthLocation.QUERY_STRING)
+                    .putProperty(AwsV4FamilyHttpSigner.PAYLOAD_SIGNING_ENABLED, false)
+                    .putProperty(AwsV4FamilyHttpSigner.EXPIRATION_DURATION, expiredTime)
+                    .putProperty(HttpSigner.SIGNING_CLOCK, signingClock)
+                    .putProperty(AwsV4FamilyHttpSigner.DOUBLE_URL_ENCODE, false)
+                    .putProperty(AwsV4FamilyHttpSigner.NORMALIZE_PATH, false)
+                    .build())
+                .request()
+                .getUri()
+                .toString();
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 构建绑定桶域名下的对象访问路径。
+     *
+     * @param domainUri 自定义域名 URI
+     * @param key       对象键
+     * @return 编码后的访问路径
+     */
+    private String bucketBoundDomainPath(URI domainUri, String key) {
+        String basePath = Optional.ofNullable(domainUri.getRawPath())
+            .filter(StringUtils::isNotBlank)
+            .filter(path -> !"/".equals(path))
+            .orElse("");
+        String objectPath = SdkHttpUtils.urlEncodeIgnoreSlashes(key);
+        if (!basePath.startsWith("/")) {
+            basePath = "/" + basePath;
+        }
+        if (!basePath.endsWith("/")) {
+            basePath = basePath + "/";
+        }
+        return basePath + objectPath;
     }
 
     /**
