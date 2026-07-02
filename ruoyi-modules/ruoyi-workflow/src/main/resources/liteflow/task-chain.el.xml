@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow>
+    <!--
+        启动流程链路：
+        1. 初始化请求并查询已有实例
+        2. 已存在实例时走续提交并返回当前任务
+        3. 不存在实例时加载流程定义并补齐变量
+        4. 新启动实例、保存业务扩展并构建返回结果
+    -->
+    <chain name="startProcessChain">
+        THEN(
+            startPrepareRequest,
+            IF(
+                startExists,
+                startResume,
+                THEN(
+                    startPrepareInstance,
+                    startExecute
+                )
+            )
+        );
+    </chain>
+
+    <!--
+        办理任务链路：
+        1. 加载任务实例、补齐变量并解析办理人
+        2. 构建参数并执行当前任务跳转
+        3. 开启自动审批时继续办理当前处理人的后续任务
+    -->
+    <chain name="completeTaskChain">
+        THEN(
+            completePrepare,
+            completeExecute,
+            IF(
+                completeNeedAutoPass,
+                completeAutoPass,
+                noop
+            )
+        );
+    </chain>
+
+    <!--
+        任务操作链路：
+        1. 解析操作类型、校验入参并构建参数
+        2. 加载任务节点并校验操作约束
+        3. 执行任务操作
+        4. 操作成功且配置消息类型时发送通知
+    -->
+    <chain name="taskOperationChain">
+        THEN(
+            taskOpPrepare,
+            taskOpLoad,
+            taskOpExecute,
+            IF(
+                taskOpNeedNotify,
+                taskOpNotify,
+                noop
+            )
+        );
+    </chain>
+</flow>

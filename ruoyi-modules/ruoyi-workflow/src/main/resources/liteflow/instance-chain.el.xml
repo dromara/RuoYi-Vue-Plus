@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow>
+    <!--
+        删除流程实例链路：
+        1. 按业务 id 或实例 id 加载待删除实例
+        2. 存在待删除实例时校验权限并发布业务删除事件
+        3. 按运行实例或历史实例模式执行删除；不存在实例时直接返回 false
+    -->
+    <chain name="deleteInstanceChain">
+        THEN(
+            instanceDeleteLoad,
+            IF(
+                instanceDeleteExists,
+                THEN(
+                    instanceDeleteEvent,
+                    instanceDeleteExecute
+                ),
+                noop
+            )
+        );
+    </chain>
+</flow>

@@ -245,6 +245,15 @@ warm-flow:
   # 默认Authorization，如果有多个token，用逗号分隔
   token-name: ${sa-token.token-name},clientid
 
+--- # LiteFlow 业务规则编排
+liteflow:
+  # 跟随工作流模块开关，避免禁用工作流时仍加载任务办理链
+  enable: ${warm-flow.enabled:true}
+  # 工作流模块用于编排任务办理链路
+  rule-source: classpath:liteflow/*.el.xml
+  # 开启虚拟线程
+  enable-virtual-thread: true
+
 --- # mqtt 配置
 # 具体配置还需查看文档
 # https://mica-mqtt.dreamlu.net/guide/spring/client.html

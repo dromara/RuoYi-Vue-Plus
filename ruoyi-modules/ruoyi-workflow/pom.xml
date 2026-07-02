@@ -96,6 +96,12 @@
             <artifactId>warm-flow-plugin-ui-sb-web</artifactId>
         </dependency>
 
+        <!-- LiteFlow 规则编排 -->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-common-liteflow</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
