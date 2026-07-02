@@ -3,7 +3,6 @@ package org.dromara.workflow.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.lock.annotation.Lock4j;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -14,10 +13,7 @@ import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.core.utils.ValidatorUtils;
-import org.dromara.common.core.validate.AddGroup;
-import org.dromara.common.core.validate.EditGroup;
-import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.common.liteflow.utils.LiteFlowUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.mybatis.utils.IdGeneratorUtil;
@@ -29,7 +25,6 @@ import org.dromara.warm.flow.core.constant.ExceptionCons;
 import org.dromara.warm.flow.core.dto.FlowCombine;
 import org.dromara.warm.flow.core.dto.FlowParams;
 import org.dromara.warm.flow.core.entity.*;
-import org.dromara.warm.flow.core.enums.CooperateType;
 import org.dromara.warm.flow.core.enums.NodeType;
 import org.dromara.warm.flow.core.enums.SkipType;
 import org.dromara.warm.flow.core.enums.UserType;
@@ -37,25 +32,27 @@ import org.dromara.warm.flow.core.exception.FlowException;
 import org.dromara.warm.flow.core.service.*;
 import org.dromara.warm.flow.core.utils.ExpressionUtil;
 import org.dromara.warm.flow.core.utils.MapUtil;
-import org.dromara.warm.flow.orm.entity.*;
+import org.dromara.warm.flow.orm.entity.FlowHisTask;
+import org.dromara.warm.flow.orm.entity.FlowNode;
+import org.dromara.warm.flow.orm.entity.FlowTask;
+import org.dromara.warm.flow.orm.entity.FlowUser;
 import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
-import org.dromara.warm.flow.orm.mapper.FlowInstanceMapper;
 import org.dromara.warm.flow.orm.mapper.FlowNodeMapper;
 import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
 import org.dromara.workflow.api.domain.StartProcessReturnDTO;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskAssigneeType;
-import org.dromara.workflow.common.enums.TaskOperationEnum;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
-import org.dromara.workflow.domain.FlowInstanceBizExt;
 import org.dromara.workflow.domain.bo.*;
+import org.dromara.workflow.domain.context.CompleteTaskContext;
+import org.dromara.workflow.domain.context.StartProcessContext;
+import org.dromara.workflow.domain.context.TaskOperationContext;
 import org.dromara.workflow.domain.vo.FlowCopyVo;
 import org.dromara.workflow.domain.vo.FlowHisTaskVo;
 import org.dromara.workflow.domain.vo.FlowTaskVo;
 import org.dromara.workflow.domain.vo.NodeExtVo;
 import org.dromara.workflow.mapper.FlwCategoryMapper;
 import org.dromara.workflow.mapper.FlwHisTaskMapper;
-import org.dromara.workflow.mapper.FlwInstanceBizExtMapper;
 import org.dromara.workflow.mapper.FlwTaskMapper;
 import org.dromara.workflow.service.IFlwCommonService;
 import org.dromara.workflow.service.IFlwNodeExtService;
@@ -79,12 +76,15 @@ import static org.dromara.workflow.common.constant.FlowConstant.*;
 @Service
 public class FlwTaskServiceImpl implements IFlwTaskService {
 
+    private static final String START_PROCESS_CHAIN = "startProcessChain";
+    private static final String COMPLETE_TASK_CHAIN = "completeTaskChain";
+    private static final String TASK_OPERATION_CHAIN = "taskOperationChain";
+
     private final TaskService taskService;
     private final InsService insService;
     private final DefService defService;
     private final HisTaskService hisTaskService;
     private final NodeService nodeService;
-    private final FlowInstanceMapper flowInstanceMapper;
     private final FlowTaskMapper flowTaskMapper;
     private final FlowHisTaskMapper flowHisTaskMapper;
     private final UserService userService;
@@ -95,7 +95,6 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     private final IFlwTaskAssigneeService flwTaskAssigneeService;
     private final IFlwCommonService flwCommonService;
     private final IFlwNodeExtService flwNodeExtService;
-    private final FlwInstanceBizExtMapper flwInstanceBizExtMapper;
 
     /**
      * 启动任务
@@ -107,95 +106,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     @Transactional(rollbackFor = Exception.class)
     @Lock4j(keys = {"#startProcessBo.flowCode + #startProcessBo.businessId"})
     public StartProcessReturnDTO startWorkFlow(StartProcessBo startProcessBo) {
-        String businessId = startProcessBo.getBusinessId();
-        if (StringUtils.isBlank(businessId)) {
-            throw new ServiceException("启动工作流时必须包含业务ID");
-        }
-
-        // 启动流程实例（提交申请）
-        Map<String, Object> variables = startProcessBo.getVariables();
-        // 流程发起人
-        variables.put(INITIATOR, LoginHelper.getUserIdStr());
-        // 发起人部门id
-        variables.put(INITIATOR_DEPT_ID, LoginHelper.getDeptId());
-        // 业务id
-        variables.put(BUSINESS_ID, businessId);
-        FlowInstanceBizExt bizExt = startProcessBo.getBizExt();
-
-        // 获取已有流程实例
-        FlowInstance flowInstance = flowInstanceMapper.selectOne(QueryBuilder.lambda(FlowInstance.class)
-            .eq(FlowInstance::getBusinessId, businessId)
-            .build());
-
-        if (ObjectUtil.isNotNull(flowInstance)) {
-            // 已存在流程
-            BusinessStatusEnum.checkStartStatus(flowInstance.getFlowStatus());
-            List<Task> taskList = taskService.list(new FlowTask().setInstanceId(flowInstance.getId()));
-            if (CollUtil.isEmpty(taskList)) {
-                throw new ServiceException("流程实例缺少任务，请检查流程定义配置");
-            }
-            taskService.mergeVariable(flowInstance, variables);
-            insService.updateById(flowInstance);
-            StartProcessReturnDTO dto = new StartProcessReturnDTO(taskList.getFirst().getInstanceId(), taskList.getFirst().getId());
-            // 保存流程实例业务信息
-            this.buildFlowInstanceBizExt(flowInstance, bizExt);
-            return dto;
-        }
-
-        // 将流程定义内的扩展参数设置到变量中
-        Definition definition = FlowEngine.defService().getPublishByFlowCode(startProcessBo.getFlowCode());
-        if (ObjectUtil.isNull(definition)) {
-            throw new ServiceException("流程【" + startProcessBo.getFlowCode() + "】未发布，请先在流程设计器中发布流程定义");
-        }
-        Dict dict = JsonUtils.parseMap(definition.getExt());
-        boolean autoPass = !ObjectUtil.isNull(dict) && dict.getBool(AUTO_PASS);
-        variables.put(AUTO_PASS, autoPass);
-        variables.put(BUSINESS_CODE, this.generateBusinessCode(bizExt));
-        FlowParams flowParams = FlowParams.build()
-            .handler(startProcessBo.getHandler())
-            .flowCode(startProcessBo.getFlowCode())
-            .variable(startProcessBo.getVariables())
-            .flowStatus(BusinessStatusEnum.DRAFT.getStatus());
-        Instance instance = insService.start(businessId, flowParams);
-        // 保存流程实例业务信息
-        this.buildFlowInstanceBizExt(instance, bizExt);
-        // 申请人执行流程
-        List<Task> taskList = taskService.list(new FlowTask().setInstanceId(instance.getId()));
-        if (CollUtil.isEmpty(taskList)) {
-            throw new ServiceException("流程启动失败，未生成任务");
-        }
-        if (taskList.size() > 1) {
-            throw new ServiceException("请检查流程第一个环节是否为申请人！");
-        }
-        return new StartProcessReturnDTO(instance.getId(), taskList.getFirst().getId());
-    }
-
-    /**
-     * 生成业务编号，如果已有则直接返回已有值
-     *
-     * @param bizExt 流程业务扩展信息
-     * @return 可用于流程实例展示的业务编号
-     */
-    private String generateBusinessCode(FlowInstanceBizExt bizExt) {
-        if (StringUtils.isBlank(bizExt.getBusinessCode())) {
-            // TODO: 按照自己业务规则生成编号
-            String businessCode = Convert.toStr(System.currentTimeMillis());
-            bizExt.setBusinessCode(businessCode);
-            return businessCode;
-        }
-        return bizExt.getBusinessCode();
-    }
-
-    /**
-     * 构建流程实例业务信息
-     *
-     * @param instance 流程实例
-     * @param bizExt   流程业务扩展信息
-     */
-    private void buildFlowInstanceBizExt(Instance instance, FlowInstanceBizExt bizExt) {
-        bizExt.setInstanceId(instance.getId());
-        bizExt.setBusinessId(instance.getBusinessId());
-        flwInstanceBizExtMapper.saveOrUpdateByInstanceId(bizExt);
+        StartProcessContext context = new StartProcessContext(startProcessBo);
+        LiteFlowUtils.execute(START_PROCESS_CHAIN, context);
+        return context.getStartProcessReturn();
     }
 
     /**
@@ -208,125 +121,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     @Transactional(rollbackFor = Exception.class)
     @Lock4j(keys = {"#completeTaskBo.taskId"})
     public boolean completeTask(CompleteTaskBo completeTaskBo) {
-        // 获取任务ID并查询对应的流程任务和实例信息
-        Long taskId = completeTaskBo.getTaskId();
-        List<String> messageType = completeTaskBo.getMessageType();
-        String notice = completeTaskBo.getNotice();
-        // 获取抄送人
-        List<FlowCopyBo> flowCopyList = completeTaskBo.getFlowCopyList();
-        // 设置抄送人
-        Map<String, Object> variables = completeTaskBo.getVariables();
-        variables.put(FLOW_COPY_LIST, flowCopyList);
-        // 消息类型
-        variables.put(MESSAGE_TYPE, messageType);
-        // 消息通知
-        variables.put(MESSAGE_NOTICE, notice);
-
-
-        FlowTask flowTask = flowTaskMapper.selectById(taskId);
-        if (ObjectUtil.isNull(flowTask)) {
-            throw new ServiceException("流程任务不存在或任务已审批！");
-        }
-        Instance ins = insService.getById(flowTask.getInstanceId());
-        if (ObjectUtil.isNull(ins)) {
-            throw new ServiceException("流程实例不存在");
-        }
-        // 检查流程状态是否为草稿、已撤销或已退回状态，若是则执行流程提交监听
-        if (BusinessStatusEnum.isDraftOrCancelOrBack(ins.getFlowStatus())) {
-            variables.put(SUBMIT, true);
-        }
-        Map<String, Object> insVariableMap = ins.getVariableMap();
-        // 设置弹窗处理人
-        Map<String, Object> assigneeMap = setPopAssigneeMap(completeTaskBo.getAssigneeMap(), insVariableMap);
-        if (CollUtil.isNotEmpty(assigneeMap)) {
-            variables.putAll(assigneeMap);
-        }
-        // 构建流程参数，包括变量、跳转类型、消息、处理人、权限等信息
-        FlowParams flowParams = FlowParams.build()
-            .handler(completeTaskBo.getHandler())
-            .variable(variables)
-            .ignore(Convert.toBool(variables.getOrDefault(VAR_IGNORE, false)))
-            .ignoreDepute(Convert.toBool(variables.getOrDefault(VAR_IGNORE_DEPUTE, false)))
-            .ignoreCooperate(Convert.toBool(variables.getOrDefault(VAR_IGNORE_COOPERATE, false)))
-            .skipType(SkipType.PASS.getKey())
-            .message(completeTaskBo.getMessage())
-            .flowStatus(BusinessStatusEnum.WAITING.getStatus())
-            .hisStatus(TaskStatusEnum.PASS.getStatus())
-            .hisTaskExt(completeTaskBo.getFileId());
-        Boolean autoPass = Convert.toBool(insVariableMap.getOrDefault(AUTO_PASS, false));
-        skipTask(taskId, flowParams, flowTask.getInstanceId(), autoPass);
+        // 办理任务的业务编排交给 LiteFlow 链路，当前方法只保留事务、锁和异常透传边界。
+        LiteFlowUtils.execute(COMPLETE_TASK_CHAIN, new CompleteTaskContext(completeTaskBo));
         return true;
-    }
-
-    /**
-     * 流程办理
-     *
-     * @param taskId     任务ID
-     * @param flowParams 参数
-     * @param instanceId 实例ID
-     * @param autoPass   自动审批
-     */
-    private void skipTask(Long taskId, FlowParams flowParams, Long instanceId, Boolean autoPass) {
-        // 执行任务跳转，并根据返回的处理人设置下一步处理人
-        taskService.skip(taskId, flowParams);
-        List<FlowTask> flowTaskList = selectByInstId(instanceId);
-        if (CollUtil.isEmpty(flowTaskList)) {
-            return;
-        }
-        List<User> userList = FlowEngine.userService()
-            .getByAssociateds(StreamUtils.toList(flowTaskList, FlowTask::getId));
-        if (CollUtil.isEmpty(userList)) {
-            return;
-        }
-        for (FlowTask task : flowTaskList) {
-            if (!task.getId().equals(taskId) && autoPass) {
-                List<User> users = StreamUtils.filter(userList, e -> ObjectUtil.equals(task.getId(), e.getAssociated()) && ObjectUtil.equal(e.getProcessedBy(), LoginHelper.getUserIdStr()));
-                if (CollUtil.isEmpty(users)) {
-                    continue;
-                }
-                flowParams.
-                    message("流程引擎自动审批！").
-                    variable(Map.of(
-                        SUBMIT, false,
-                        FLOW_COPY_LIST, Collections.emptyList(),
-                        MESSAGE_NOTICE, StringUtils.EMPTY));
-                skipTask(task.getId(), flowParams, instanceId, true);
-            }
-        }
-    }
-
-    /**
-     * 设置弹窗处理人
-     *
-     * @param assigneeMap  处理人
-     * @param variablesMap 变量
-     * @return 追加流程状态前缀后的处理人变量映射
-     */
-    private Map<String, Object> setPopAssigneeMap(Map<String, Object> assigneeMap, Map<String, Object> variablesMap) {
-        Map<String, Object> map = new HashMap<>();
-        if (CollUtil.isEmpty(assigneeMap)) {
-            return map;
-        }
-        for (Map.Entry<String, Object> entry : assigneeMap.entrySet()) {
-            if (variablesMap.containsKey(entry.getKey())) {
-                String userIds = variablesMap.get(entry.getKey()).toString();
-                if (StringUtils.isNotBlank(userIds)) {
-                    Set<String> hashSet = new HashSet<>();
-                    //弹窗传入的选人
-                    List<String> popUserIds = StringUtils.str2List(entry.getValue().toString(), StringUtils.SEPARATOR, true, true);
-                    //已有的选人
-                    List<String> variableUserIds = StringUtils.str2List(userIds, StringUtils.SEPARATOR, true, true);
-                    hashSet.addAll(popUserIds);
-                    hashSet.addAll(variableUserIds);
-                    map.put(TaskStatusEnum.PASS.getStatus() + StringUtils.COLON + entry.getKey(), StringUtils.joinComma(hashSet));
-                    map.put(TaskStatusEnum.BACK.getStatus() + StringUtils.COLON + entry.getKey(), StringUtils.joinComma(hashSet));
-                }
-            } else {
-                map.put(TaskStatusEnum.PASS.getStatus() + StringUtils.COLON + entry.getKey(), entry.getValue());
-                map.put(TaskStatusEnum.BACK.getStatus() + StringUtils.COLON + entry.getKey(), entry.getValue());
-            }
-        }
-        return map;
     }
 
     /**
@@ -507,9 +304,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         String applyNodeCode = flwCommonService.applyNodeCode(definitionId);
 
         Map<String, Object> variable = new HashMap<>();
-        // 消息类型
         variable.put(MESSAGE_TYPE, messageType);
-        // 消息通知
         variable.put(MESSAGE_NOTICE, notice);
 
         FlowParams flowParams = FlowParams.build()
@@ -863,90 +658,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean taskOperation(TaskOperationBo bo, String taskOperation) {
-        TaskOperationEnum op = TaskOperationEnum.getByCode(taskOperation);
-        if (op == null) {
-            log.error("Invalid operation type:{} ", taskOperation);
-            throw new ServiceException("Invalid operation type " + taskOperation);
-        }
-
-        FlowParams flowParams = FlowParams.build().message(bo.getMessage());
-        if (LoginHelper.isSuperAdmin()) {
-            flowParams.ignore(true);
-        }
-
-        // 根据操作类型构建 FlowParams
-        switch (op) {
-            case DELEGATE_TASK, TRANSFER_TASK -> {
-                ValidatorUtils.validate(bo, AddGroup.class);
-                flowParams.addHandlers(Collections.singletonList(bo.getUserId()));
-            }
-            case ADD_SIGNATURE -> {
-                ValidatorUtils.validate(bo, EditGroup.class);
-                flowParams.addHandlers(bo.getUserIds());
-            }
-            case REDUCTION_SIGNATURE -> {
-                ValidatorUtils.validate(bo, EditGroup.class);
-                flowParams.reductionHandlers(bo.getUserIds());
-            }
-        }
-
-        Long taskId = bo.getTaskId();
-        Task task = taskService.getById(taskId);
-        if (ObjectUtil.isNull(task)) {
-            throw new ServiceException("任务不存在！");
-        }
-        FlowNode flowNode = getByNodeCode(task.getNodeCode(), task.getDefinitionId());
-        if (ObjectUtil.isNull(flowNode)) {
-            throw new ServiceException("流程节点不存在");
-        }
-        if (op == TaskOperationEnum.ADD_SIGNATURE || op == TaskOperationEnum.REDUCTION_SIGNATURE) {
-            if (CooperateType.isOrSign(flowNode.getNodeRatio())) {
-                throw new ServiceException(task.getNodeName() + "不是会签或票签节点！");
-            }
-        }
-
-        // 设置任务状态并执行对应的任务操作
-        boolean result = false;
-        switch (op) {
-            case DELEGATE_TASK -> {
-                flowParams.hisStatus(TaskStatusEnum.DEPUTE.getStatus());
-                result = taskService.depute(taskId, flowParams);
-            }
-            case TRANSFER_TASK -> {
-                flowParams.hisStatus(TaskStatusEnum.TRANSFER.getStatus());
-                result = taskService.transfer(taskId, flowParams);
-            }
-            case ADD_SIGNATURE -> {
-                flowParams.hisStatus(TaskStatusEnum.SIGN.getStatus());
-                result = taskService.addSignature(taskId, flowParams);
-            }
-            case REDUCTION_SIGNATURE -> {
-                flowParams.hisStatus(TaskStatusEnum.SIGN_OFF.getStatus());
-                result = taskService.reductionSignature(taskId, flowParams);
-            }
-        }
-
-        // 操作执行成功后再发送消息
-        if (result && CollUtil.isNotEmpty(bo.getMessageType())) {
-            List<Long> userIdList = new ArrayList<>();
-            if (StringUtils.isNotBlank(bo.getUserId())) {
-                userIdList.add(Convert.toLong(bo.getUserId()));
-            }
-            if (CollUtil.isNotEmpty(bo.getUserIds())) {
-                userIdList.addAll(StreamUtils.toList(bo.getUserIds(), Convert::toLong));
-            }
-            if (CollUtil.isNotEmpty(userIdList)) {
-                // 转办、委托、加减签等运行时操作，消息接收人统一从“我的待办”进入处理。
-                flwCommonService.sendMessage(
-                    bo.getMessageType(),
-                    StringUtils.isNotBlank(bo.getMessage()) ? bo.getMessage() : "单据「" + op.getDesc() + "」通知",
-                    "单据「" + op.getDesc() + "」提醒",
-                    userService.selectListByIds(userIdList),
-                    PATH_TASK_WAITING
-                );
-            }
-        }
-        return result;
+        TaskOperationContext context = new TaskOperationContext(bo, taskOperation);
+        LiteFlowUtils.execute(TASK_OPERATION_CHAIN, context);
+        return context.isResult();
     }
 
     /**
