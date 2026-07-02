@@ -143,6 +143,10 @@
                     <artifactId>ruoyi-gen</artifactId>
                 </dependency>
             </dependencies>
+            <activation>
+                <!-- 默认激活 -->
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
     </profiles>
 
