@@ -63,6 +63,7 @@
         <sms4j.version>3.3.5</sms4j.version>
         <!-- 工作流配置 -->
         <warm-flow.version>1.8.8</warm-flow.version>
+        <liteflow.version>2.16.0</liteflow.version>
         <!-- mqtt客户端 -->
         <mica-mqtt.version>2.6.6</mica-mqtt.version>
 
@@ -356,6 +357,13 @@
                 <groupId>org.dromara.warm</groupId>
                 <artifactId>warm-flow-plugin-ui-sb-web</artifactId>
                 <version>${warm-flow.version}</version>
+            </dependency>
+
+            <!-- LiteFlow 规则编排引擎 -->
+            <dependency>
+                <groupId>com.yomahub</groupId>
+                <artifactId>liteflow-spring-boot-starter</artifactId>
+                <version>${liteflow.version}</version>
             </dependency>
 
             <!-- mqtt客户端 -->
