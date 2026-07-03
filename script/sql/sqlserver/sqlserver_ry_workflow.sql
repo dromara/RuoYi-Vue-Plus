@@ -1076,7 +1076,6 @@ GO
 
 CREATE TABLE flow_category (
     category_id bigint NOT NULL,
-    tenant_id nvarchar(20) DEFAULT('000000') NULL,
     parent_id bigint  DEFAULT(0) NULL,
     ancestors nvarchar(500) DEFAULT('') NULL,
     category_name nvarchar(30) NOT NULL,
@@ -1099,13 +1098,6 @@ EXEC sp_addextendedproperty
 'SCHEMA', N'dbo',
 'TABLE', N'flow_category',
 'COLUMN', N'category_id'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'租户编号',
-'SCHEMA', N'dbo',
-'TABLE', N'flow_category',
-'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
@@ -1329,7 +1321,6 @@ GO
 
 CREATE TABLE flow_instance_biz_ext (
    id             BIGINT         NOT NULL,
-   tenant_id      VARCHAR(20)    DEFAULT ('000000'),
    create_dept    BIGINT,
    create_by      BIGINT,
    create_time    DATETIME,
@@ -1356,13 +1347,6 @@ EXEC sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'flow_instance_biz_ext',
     'COLUMN', N'id'
-GO
-
-EXEC sp_addextendedproperty
-    'MS_Description', N'租户编号',
-    'SCHEMA', N'dbo',
-    'TABLE', N'flow_instance_biz_ext',
-    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
@@ -1437,7 +1421,6 @@ GO
 
 CREATE TABLE test_leave (
     id bigint NOT NULL,
-    tenant_id nvarchar(20) DEFAULT('000000') NULL,
     apply_code nvarchar(50)  NOT NULL,
     leave_type nvarchar(255) NOT NULL,
     start_date datetime2(7) NOT NULL,
@@ -1462,13 +1445,6 @@ EXEC sp_addextendedproperty
 'SCHEMA', N'dbo',
 'TABLE', N'test_leave',
 'COLUMN', N'id'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'租户编号',
-'SCHEMA', N'dbo',
-'TABLE', N'test_leave',
-'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
