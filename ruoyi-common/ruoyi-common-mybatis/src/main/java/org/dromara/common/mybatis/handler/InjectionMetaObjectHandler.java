@@ -12,6 +12,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.model.LoginUser;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * MP注入处理器
@@ -61,6 +62,9 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
                 LocalDateTime date = LocalDateTime.now();
                 this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, date);
                 this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, date);
+                Date legacyDate = new Date();
+                this.strictInsertFill(metaObject, "createTime", Date.class, legacyDate);
+                this.strictInsertFill(metaObject, "updateTime", Date.class, legacyDate);
             }
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_INTERNAL_ERROR);
@@ -86,6 +90,7 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
                 baseEntity.setUpdateBy(userId);
             } else {
                 this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+                this.strictUpdateFill(metaObject, "updateTime", Date.class, new Date());
             }
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_INTERNAL_ERROR);
