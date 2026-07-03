@@ -197,8 +197,9 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
+        boolean deleted = leaveMapper.deleteByIds(ids) > 0;
         workflowService.deleteInstance(StreamUtils.toList(ids, Convert::toStr));
-        return leaveMapper.deleteByIds(ids) > 0;
+        return deleted;
     }
 
     /**
