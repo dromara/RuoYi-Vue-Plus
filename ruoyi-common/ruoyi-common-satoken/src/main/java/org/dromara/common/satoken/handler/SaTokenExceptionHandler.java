@@ -46,10 +46,10 @@ public class SaTokenExceptionHandler {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI, e.getMessage());
         String msg = switch (e.getType()) {
-            case NotLoginException.TOKEN_TIMEOUT -> "登录已过期，请重新登录";
+            case NotLoginException.TOKEN_TIMEOUT,
+                 NotLoginException.TOKEN_FREEZE -> "登录已过期，请重新登录";
             case NotLoginException.BE_REPLACED -> "当前账号已在其他设备登录，您已被强制下线";
             case NotLoginException.KICK_OUT -> "账号已被管理员强制下线";
-            case NotLoginException.TOKEN_FREEZE -> "账号已被冻结，请联系管理员处理";
             default -> "登录状态异常，请重新登录";
         };
         return R.fail(HttpStatus.HTTP_UNAUTHORIZED, msg);
