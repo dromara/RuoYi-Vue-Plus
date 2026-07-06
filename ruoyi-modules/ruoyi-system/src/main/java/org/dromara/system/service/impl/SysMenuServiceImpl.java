@@ -123,8 +123,11 @@ public class SysMenuServiceImpl implements ISysMenuService {
         } else {
             menus = menuMapper.selectMenuTreeByUserId(userId);
         }
+        if (CollUtil.isEmpty(menus)) {
+            return CollUtil.newArrayList();
+        }
 
-        return TreeBuildUtils.build(menus, Constants.TOP_PARENT_ID, SysMenu::getParentId, (menu, nodeTreeMaps) -> {
+        List<SysMenu> menuTree = TreeBuildUtils.build(menus, Constants.TOP_PARENT_ID, SysMenu::getParentId, (menu, nodeTreeMaps) -> {
             // 将当前节点的菜单ID用作父节点ID
             Long menuParentId = menu.getMenuId();
             // 从动态规划表中取出子节点列表
@@ -134,6 +137,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
             // 如果存在根节点指向尾节点的情况，则会出现环形依赖。但在菜单表中基本不会出现这种情况...
             menu.setChildren(childMenus);
         });
+        return CollUtil.isEmpty(menuTree) ? CollUtil.newArrayList() : menuTree;
     }
 
     /**
@@ -157,6 +161,9 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public List<RouterVo> buildMenus(List<SysMenu> menus) {
+        if (CollUtil.isEmpty(menus)) {
+            return CollUtil.newArrayList();
+        }
         List<RouterVo> routers = new LinkedList<>();
         for (SysMenu menu : menus) {
             String name = menu.getRouteName() + menu.getMenuId();
