@@ -61,4 +61,4 @@ description: 标准后端 CRUD 专家。用于当前项目中的新增单表 CRU
 - BO / VO / Entity 是否职责分离
 - 导出、分页、删除前校验是否齐全
 - 是否只是 generator 裸产物，如果是要继续补齐项目约定
-- 前端 `api/types/index.vue` 如需同步，接口路径、返回结构、日期范围参数要与后端一致
+- 前端 `api/types` 和 Vue `index.vue` 或 React `index.tsx` 如需同步，接口路径、返回结构、日期范围参数要与后端一致

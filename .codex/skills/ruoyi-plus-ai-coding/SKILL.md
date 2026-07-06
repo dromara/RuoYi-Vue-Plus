@@ -1,6 +1,6 @@
 ---
 name: ruoyi-plus-ai-coding
-description: 在仓库内按代码生成器模板、项目 reference 文档和既有约定生成或修改代码。用于新增或修改 CRUD 模块、controller/service/mapper/BO/VO/entity、MyBatis-Plus/MPJ 查询、数据权限、缓存、翻译/JSON 增强、公共 common 模块能力、JavaDoc 注释，以及与后端接口配套的 Vue 3 + TypeScript 页面、types 和 api 文件；触发后应先按任务类型读取对应 references，再阅读目标模块真实代码和 generator 模板。
+description: 在仓库内按代码生成器模板、项目 reference 文档和既有约定生成或修改代码。用于新增或修改 CRUD 模块、controller/service/mapper/BO/VO/entity、MyBatis-Plus/MPJ 查询、数据权限、缓存、翻译/JSON 增强、公共 common 模块能力、JavaDoc 注释，以及与后端接口配套的 Vue 或 React 前端页面、types 和 api 文件；触发后应先按任务类型读取对应 references，再阅读目标模块真实代码和 generator 模板。
 ---
 
 # RuoYi Plus AI 编码规范
@@ -17,7 +17,7 @@ description: 在仓库内按代码生成器模板、项目 reference 文档和�
 - 修改 `ruoyi-common` 公共能力，例如 mybatis 查询构造器、translation、json enhance、excel、oss、redis、web 配置。
 - 补充或修正 JavaDoc 注释，尤其是公共 API、接口、BO/VO/Entity 字段、Mapper 默认方法、Service/Controller 方法。
 - 在系统、监控、工作流、demo 等模块内按现有约定扩展业务代码。
-- 为后端新增接口同步补前端 `api/types/index.vue` 骨架。
+- 为后端新增接口同步补前端 `api/types` 和 Vue `index.vue` 或 React `index.tsx` 页面骨架。
 
 ## 不适用场景
 
@@ -45,7 +45,7 @@ description: 在仓库内按代码生成器模板、项目 reference 文档和�
 使用本 skill 时，先按任务类型读取适用 reference，不一次性展开所有文档：
 
 - 后端 Java、Mapper、Service、Controller、BO、VO、Entity、权限、查询、公共模块或 JavaDoc 任务，先读 [references/backend.md](references/backend.md)。
-- 前端 Vue、TypeScript、api、types 或页面任务，先读 [references/frontend.md](references/frontend.md)。
+- 前端 Vue、React、TypeScript、api、types 或页面任务，先读 [references/frontend.md](references/frontend.md)。
 - 不确定任务边界、需要标准调用方式或需要对照典型场景时，再读 [references/examples.md](references/examples.md)。
 
 reference 用来约束实现方式和自检范围；发生冲突时，仍以当前模块真实代码和实际调用点为准。
@@ -71,7 +71,7 @@ Java、MyBatis-Plus、BO/VO/entity、controller、mapper、service 的具体规�
 
 ## 前端规则
 
-Vue 3、TypeScript API 文件、生成式列表页、表单状态、字典和日期范围约定见 [references/frontend.md](references/frontend.md)。
+Vue 3、React、TypeScript API 文件、生成式列表页、表单状态、字典和日期范围约定见 [references/frontend.md](references/frontend.md)。
 
 ## 使用案例
 
@@ -163,7 +163,7 @@ Vue 3、TypeScript API 文件、生成式列表页、表单状态、字典和日
 - BO 使用 `@AutoMapper(target = Entity.class, reverseConvertGenerate = false)`。
 - VO 使用 `@AutoMapper(target = Entity.class)`。
 - 前端 API 路径与后端路由完全对应。
-- 前端列表页继续使用仓库里的 `proxy?.addDateRange`、`proxy?.$modal`、`proxy?.download`、`useDict`、`pagination` 等工具。
+- 前端列表页继续使用对应前端工程已有工具：Vue 侧如 `proxy?.addDateRange`、`proxy?.$modal`、`proxy?.download`、`useDict`、`pagination`；React 侧如 `ProTable`、`ModalForm`、`useTableSelection`、`useDateRangeQuery`、`useTableExport`。
 
 ## 推荐提问方式
 

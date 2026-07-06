@@ -62,13 +62,13 @@
 ### 用户提问示例
 
 ```text
-使用 $ruoyi-plus-ai-coding 为 monitor/cache 新增一个导出接口，并同步补齐前端 api/types 调用骨架。
+使用 $ruoyi-plus-ai-coding 为 monitor/cache 新增一个导出接口，并同步补齐 Vue 或 React 前端 api/types 调用骨架。
 ```
 
 ### 期望执行方式
 
 - 先补后端 `controller/service`。
-- 再根据后端路由补前端 `src/api` 或 generator 风格的前端骨架。
+- 再根据后端路由和目标前端类型补 `src/api` 或 generator 风格的前端骨架。
 - 保证导出接口路径和前端下载调用一致。
 
 ## 案例 6：推荐的高质量任务描述
