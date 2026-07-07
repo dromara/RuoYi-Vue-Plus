@@ -28,7 +28,7 @@ public class TaskOpPrepareComponent extends NodeComponent {
 
     @Override
     public void process() {
-        TaskOperationContext context = getRequestData();
+        TaskOperationContext context = getContextBean(TaskOperationContext.class);
         TaskOperationEnum op = TaskOperationEnum.getByCode(context.getTaskOperation());
         if (op == null) {
             log.error("Invalid operation type:{} ", context.getTaskOperation());

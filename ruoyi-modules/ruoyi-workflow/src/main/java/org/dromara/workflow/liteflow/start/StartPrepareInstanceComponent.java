@@ -28,7 +28,7 @@ public class StartPrepareInstanceComponent extends NodeComponent {
 
     @Override
     public void process() {
-        StartProcessContext context = getRequestData();
+        StartProcessContext context = getContextBean(StartProcessContext.class);
         Definition definition = FlowEngine.defService().getPublishByFlowCode(context.getStartProcessBo().getFlowCode());
         if (ObjectUtil.isNull(definition)) {
             throw new ServiceException("流程【" + context.getStartProcessBo().getFlowCode() + "】未发布，请先在流程设计器中发布流程定义");

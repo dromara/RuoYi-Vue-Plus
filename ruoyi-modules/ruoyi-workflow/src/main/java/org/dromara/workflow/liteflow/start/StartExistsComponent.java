@@ -17,7 +17,7 @@ public class StartExistsComponent extends NodeBooleanComponent {
 
     @Override
     public boolean processBoolean() {
-        StartProcessContext context = getRequestData();
+        StartProcessContext context = getContextBean(StartProcessContext.class);
         return ObjectUtil.isNotNull(context.getExistingInstance());
     }
 

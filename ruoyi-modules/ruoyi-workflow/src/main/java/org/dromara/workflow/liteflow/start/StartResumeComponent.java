@@ -34,7 +34,7 @@ public class StartResumeComponent extends NodeComponent {
 
     @Override
     public void process() {
-        StartProcessContext context = getRequestData();
+        StartProcessContext context = getContextBean(StartProcessContext.class);
         BusinessStatusEnum.checkStartStatus(context.getExistingInstance().getFlowStatus());
         List<Task> taskList = taskService.list(new FlowTask().setInstanceId(context.getExistingInstance().getId()));
         if (CollUtil.isEmpty(taskList)) {

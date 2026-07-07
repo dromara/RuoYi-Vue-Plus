@@ -17,7 +17,7 @@ public class TaskOpNeedNotifyComponent extends NodeBooleanComponent {
 
     @Override
     public boolean processBoolean() {
-        TaskOperationContext context = getRequestData();
+        TaskOperationContext context = getContextBean(TaskOperationContext.class);
         return context.isResult() && CollUtil.isNotEmpty(context.getTaskOperationBo().getMessageType());
     }
 

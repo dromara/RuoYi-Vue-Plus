@@ -32,7 +32,7 @@ public class TaskOpNotifyComponent extends NodeComponent {
 
     @Override
     public void process() {
-        TaskOperationContext context = getRequestData();
+        TaskOperationContext context = getContextBean(TaskOperationContext.class);
         TaskOperationBo bo = context.getTaskOperationBo();
         List<Long> userIdList = new ArrayList<>();
         if (StringUtils.isNotBlank(bo.getUserId())) {

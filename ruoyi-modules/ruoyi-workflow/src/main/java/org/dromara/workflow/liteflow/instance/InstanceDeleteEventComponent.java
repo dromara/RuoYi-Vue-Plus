@@ -34,7 +34,7 @@ public class InstanceDeleteEventComponent extends NodeComponent {
 
     @Override
     public void process() {
-        InstanceDeleteContext context = getRequestData();
+        InstanceDeleteContext context = getContextBean(InstanceDeleteContext.class);
         String userId = LoginHelper.getUserIdStr();
         context.getFlowInstances().forEach(flowInstance -> {
             if (!LoginHelper.isSuperAdmin() && !flowInstance.getCreateBy().equals(userId)) {

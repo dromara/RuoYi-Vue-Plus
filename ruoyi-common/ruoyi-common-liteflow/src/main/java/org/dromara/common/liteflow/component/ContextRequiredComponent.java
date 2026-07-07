@@ -14,7 +14,7 @@ public class ContextRequiredComponent extends NodeComponent {
 
     @Override
     public void process() {
-        if (getRequestData() == null) {
+        if (getFirstContextBean() == null) {
             throw new ServiceException("LiteFlow 上下文不能为空");
         }
     }

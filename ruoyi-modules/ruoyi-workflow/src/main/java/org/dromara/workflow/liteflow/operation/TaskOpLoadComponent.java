@@ -30,7 +30,7 @@ public class TaskOpLoadComponent extends NodeComponent {
 
     @Override
     public void process() {
-        TaskOperationContext context = getRequestData();
+        TaskOperationContext context = getContextBean(TaskOperationContext.class);
         Task task = taskService.getById(context.getTaskOperationBo().getTaskId());
         if (ObjectUtil.isNull(task)) {
             throw new ServiceException("任务不存在！");

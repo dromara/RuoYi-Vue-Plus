@@ -41,7 +41,7 @@ public class CompletePrepareComponent extends NodeComponent {
 
     @Override
     public void process() {
-        CompleteTaskContext context = getRequestData();
+        CompleteTaskContext context = getContextBean(CompleteTaskContext.class);
         CompleteTaskBo completeTaskBo = context.getCompleteTaskBo();
         FlowTask flowTask = flowTaskMapper.selectById(completeTaskBo.getTaskId());
         if (ObjectUtil.isNull(flowTask)) {

@@ -41,7 +41,7 @@ public class CompleteAutoPassComponent extends NodeComponent {
 
     @Override
     public void process() {
-        CompleteTaskContext context = getRequestData();
+        CompleteTaskContext context = getContextBean(CompleteTaskContext.class);
         FlowTask flowTask = context.getFlowTask();
         autoPass(flowTask.getId(), context.getFlowParams(), flowTask.getInstanceId());
     }

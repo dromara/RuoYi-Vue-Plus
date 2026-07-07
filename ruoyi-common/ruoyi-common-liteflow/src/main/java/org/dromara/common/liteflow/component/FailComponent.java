@@ -27,8 +27,8 @@ public class FailComponent extends NodeComponent {
      * @return 失败提示
      */
     private String getFailMessage() {
-        Object requestData = getRequestData();
-        if (requestData instanceof FailMessageProvider provider) {
+        Object context = getFirstContextBean();
+        if (context instanceof FailMessageProvider provider) {
             String message = provider.getFailMessage();
             if (StringUtils.isNotBlank(message)) {
                 return message;

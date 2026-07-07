@@ -30,7 +30,7 @@ public class InstanceDeleteLoadComponent extends NodeComponent {
 
     @Override
     public void process() {
-        InstanceDeleteContext context = getRequestData();
+        InstanceDeleteContext context = getContextBean(InstanceDeleteContext.class);
         List<FlowInstance> flowInstances;
         if (CollUtil.isNotEmpty(context.getBusinessIds())) {
             flowInstances = flowInstanceMapper.selectList(QueryBuilder.lambda(FlowInstance.class)

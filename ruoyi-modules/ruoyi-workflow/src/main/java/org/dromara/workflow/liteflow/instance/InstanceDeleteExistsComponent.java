@@ -17,7 +17,7 @@ public class InstanceDeleteExistsComponent extends NodeBooleanComponent {
 
     @Override
     public boolean processBoolean() {
-        InstanceDeleteContext context = getRequestData();
+        InstanceDeleteContext context = getContextBean(InstanceDeleteContext.class);
         return CollUtil.isNotEmpty(context.getFlowInstances());
     }
 

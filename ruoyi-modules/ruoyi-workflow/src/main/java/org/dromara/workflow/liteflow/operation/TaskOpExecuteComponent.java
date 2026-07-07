@@ -22,7 +22,7 @@ public class TaskOpExecuteComponent extends NodeComponent {
 
     @Override
     public void process() {
-        TaskOperationContext context = getRequestData();
+        TaskOperationContext context = getContextBean(TaskOperationContext.class);
         Long taskId = context.getTaskOperationBo().getTaskId();
         boolean result = false;
         switch (context.getOperation()) {

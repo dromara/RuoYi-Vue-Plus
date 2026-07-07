@@ -31,7 +31,7 @@ public class CompleteExecuteComponent extends NodeComponent {
 
     @Override
     public void process() {
-        CompleteTaskContext context = getRequestData();
+        CompleteTaskContext context = getContextBean(CompleteTaskContext.class);
         CompleteTaskBo completeTaskBo = context.getCompleteTaskBo();
         Map<String, Object> variables = completeTaskBo.getVariables();
         FlowParams flowParams = FlowParams.build()

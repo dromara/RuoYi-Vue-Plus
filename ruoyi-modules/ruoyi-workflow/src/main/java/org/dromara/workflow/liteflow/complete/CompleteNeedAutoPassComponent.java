@@ -16,7 +16,7 @@ public class CompleteNeedAutoPassComponent extends NodeBooleanComponent {
 
     @Override
     public boolean processBoolean() {
-        CompleteTaskContext context = getRequestData();
+        CompleteTaskContext context = getContextBean(CompleteTaskContext.class);
         return Boolean.TRUE.equals(context.getAutoPass());
     }
 

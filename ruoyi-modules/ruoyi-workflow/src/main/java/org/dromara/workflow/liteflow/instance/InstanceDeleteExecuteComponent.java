@@ -30,7 +30,7 @@ public class InstanceDeleteExecuteComponent extends NodeComponent {
 
     @Override
     public void process() {
-        InstanceDeleteContext context = getRequestData();
+        InstanceDeleteContext context = getContextBean(InstanceDeleteContext.class);
         if (!context.isHistory()) {
             context.setResult(insService.remove(context.getDeleteInstanceIds()));
             return;

@@ -36,7 +36,7 @@ public class StartExecuteComponent extends NodeComponent {
 
     @Override
     public void process() {
-        StartProcessContext context = getRequestData();
+        StartProcessContext context = getContextBean(StartProcessContext.class);
         FlowParams flowParams = FlowParams.build()
             .handler(context.getStartProcessBo().getHandler())
             .flowCode(context.getStartProcessBo().getFlowCode())

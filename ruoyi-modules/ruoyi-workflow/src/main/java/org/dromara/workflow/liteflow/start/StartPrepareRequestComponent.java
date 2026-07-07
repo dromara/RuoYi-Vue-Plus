@@ -30,7 +30,7 @@ public class StartPrepareRequestComponent extends NodeComponent {
 
     @Override
     public void process() {
-        StartProcessContext context = getRequestData();
+        StartProcessContext context = getContextBean(StartProcessContext.class);
         String businessId = context.getStartProcessBo().getBusinessId();
         if (StringUtils.isBlank(businessId)) {
             throw new ServiceException("启动工作流时必须包含业务ID");
