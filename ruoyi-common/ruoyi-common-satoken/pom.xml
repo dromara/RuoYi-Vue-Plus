@@ -11,6 +11,10 @@
 
     <artifactId>ruoyi-common-satoken</artifactId>
 
+    <description>
+        ruoyi-common-satoken 权限认证
+    </description>
+
     <dependencies>
 
         <!-- 核心模块 -->

@@ -14,7 +14,6 @@ import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
 import org.dromara.workflow.domain.bo.CompleteTaskBo;
 import org.dromara.workflow.domain.bo.StartProcessBo;
-import org.dromara.workflow.service.IFlwDefinitionService;
 import org.dromara.workflow.service.IFlwInstanceService;
 import org.dromara.workflow.service.IFlwTaskService;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,6 @@ import java.util.Map;
 public class WorkflowServiceImpl implements WorkflowService {
 
     private final IFlwInstanceService flwInstanceService;
-    private final IFlwDefinitionService flwDefinitionService;
     private final IFlwTaskService flwTaskService;
 
     /**
