@@ -718,7 +718,16 @@ public class TemplateEngineUtils {
         if (StringUtils.equals(column.getJavaType(), GenConstants.TYPE_LONG)) {
             return value + "L";
         }
-        if (StringUtils.equalsAny(column.getJavaType(), GenConstants.TYPE_INTEGER, GenConstants.TYPE_DOUBLE, GenConstants.TYPE_BIGDECIMAL)) {
+        if (StringUtils.equals(column.getJavaType(), GenConstants.TYPE_FLOAT)) {
+            return value + "F";
+        }
+        if (StringUtils.equals(column.getJavaType(), GenConstants.TYPE_DOUBLE)) {
+            return value + "D";
+        }
+        if (StringUtils.equals(column.getJavaType(), GenConstants.TYPE_BIGDECIMAL)) {
+            return "new java.math.BigDecimal(\"" + value + "\")";
+        }
+        if (StringUtils.equals(column.getJavaType(), GenConstants.TYPE_INTEGER)) {
             return value;
         }
         return "\"" + value + "\"";
@@ -735,7 +744,8 @@ public class TemplateEngineUtils {
         if (ObjectUtil.isNull(column) || StringUtils.isBlank(value)) {
             return "undefined";
         }
-        if (StringUtils.equalsAny(column.getJavaType(), GenConstants.TYPE_LONG, GenConstants.TYPE_INTEGER, GenConstants.TYPE_DOUBLE, GenConstants.TYPE_BIGDECIMAL)) {
+        if (StringUtils.equalsAny(column.getJavaType(), GenConstants.TYPE_LONG, GenConstants.TYPE_INTEGER,
+            GenConstants.TYPE_DOUBLE, GenConstants.TYPE_FLOAT, GenConstants.TYPE_BIGDECIMAL)) {
             return value;
         }
         return "'" + value + "'";

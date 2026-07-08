@@ -156,7 +156,7 @@ public class GenTableColumn extends BaseEntity {
         }
         if (StringUtils.equalsAny(this.javaType,
             GenConstants.TYPE_LONG, GenConstants.TYPE_INTEGER, GenConstants.TYPE_DOUBLE,
-            "Float", GenConstants.TYPE_BIGDECIMAL)) {
+            GenConstants.TYPE_FLOAT, GenConstants.TYPE_BIGDECIMAL)) {
             return "number";
         }
         if (StringUtils.equals(this.javaType, GenConstants.TYPE_BOOLEAN)) {
@@ -174,7 +174,7 @@ public class GenTableColumn extends BaseEntity {
         if (StringUtils.equals(this.javaType, GenConstants.TYPE_BOOLEAN)) {
             return "true";
         }
-        if (StringUtils.equalsAny(this.javaType, GenConstants.TYPE_INTEGER, GenConstants.TYPE_LONG)) {
+        if (isNumberType()) {
             return "0";
         }
         return "'0'";
@@ -189,10 +189,21 @@ public class GenTableColumn extends BaseEntity {
         if (StringUtils.equals(this.javaType, GenConstants.TYPE_BOOLEAN)) {
             return "false";
         }
-        if (StringUtils.equalsAny(this.javaType, GenConstants.TYPE_INTEGER, GenConstants.TYPE_LONG)) {
+        if (isNumberType()) {
             return "1";
         }
         return "'1'";
+    }
+
+    /**
+     * 判断当前字段是否为数值类型。
+     *
+     * @return 数值类型返回 {@code true}
+     */
+    public boolean isNumberType() {
+        return StringUtils.equalsAny(this.javaType,
+            GenConstants.TYPE_INTEGER, GenConstants.TYPE_LONG, GenConstants.TYPE_DOUBLE,
+            GenConstants.TYPE_FLOAT, GenConstants.TYPE_BIGDECIMAL);
     }
 
     /**
