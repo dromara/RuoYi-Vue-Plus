@@ -525,14 +525,24 @@ public class TemplateEngineUtils {
         List<GenTableColumn> columns = genTable.getColumns();
         HashSet<String> importList = new HashSet<>();
         for (GenTableColumn column : columns) {
-            if (!column.isSuperColumn() && GenConstants.TYPE_DATE.equals(column.getJavaType())) {
+            if (needImportColumn(column) && GenConstants.TYPE_DATE.equals(column.getJavaType())) {
                 importList.add("java.time.LocalDateTime");
                 importList.add("com.fasterxml.jackson.annotation.JsonFormat");
-            } else if (!column.isSuperColumn() && GenConstants.TYPE_BIGDECIMAL.equals(column.getJavaType())) {
+            } else if (needImportColumn(column) && GenConstants.TYPE_BIGDECIMAL.equals(column.getJavaType())) {
                 importList.add("java.math.BigDecimal");
             }
         }
         return importList;
+    }
+
+    /**
+     * 判断列是否需要生成类型导入。
+     *
+     * @param column 列对象
+     * @return 需要生成类型导入返回 {@code true}
+     */
+    private static boolean needImportColumn(GenTableColumn column) {
+        return !column.isSuperColumn() || column.isQuery();
     }
 
     /**

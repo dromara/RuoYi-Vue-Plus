@@ -30,7 +30,7 @@ public class ${ClassName}Bo implements Serializable {
     private static final long serialVersionUID = 1L;
 
 <#list columns as column>
-<#if !table.isSuperColumn(column.javaField) && (column.query || column.insert || column.edit)>
+<#if column.query || (!table.isSuperColumn(column.javaField) && (column.insert || column.edit))>
     /**
      * ${column.columnComment}
      */
@@ -41,7 +41,7 @@ public class ${ClassName}Bo implements Serializable {
 <#elseif column.edit>
 <#assign Group = "EditGroup.class">
 </#if>
-<#if column.required>
+<#if column.required && !table.isSuperColumn(column.javaField) && (column.insert || column.edit)>
 <#if column.javaType == 'String'>
     @NotBlank(message = "${column.columnComment}不能为空", groups = { ${Group} })
 <#else>
@@ -60,4 +60,3 @@ public class ${ClassName}Bo implements Serializable {
 </#if>
 
 }
-
