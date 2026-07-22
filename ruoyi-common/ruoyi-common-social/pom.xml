@@ -18,8 +18,15 @@
     <dependencies>
         <!-- 授权认证 -->
         <dependency>
-            <groupId>me.zhyd.oauth</groupId>
+            <groupId>cn.herodotus.opensteward</groupId>
             <artifactId>JustAuth</artifactId>
+        </dependency>
+
+        <!-- 仅供 justauth 内部解析参数使用 -->
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>2.0.60</version>
         </dependency>
 
         <!-- 序列化模块 -->

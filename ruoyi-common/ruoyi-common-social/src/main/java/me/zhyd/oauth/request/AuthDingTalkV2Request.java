@@ -1,17 +1,17 @@
 package me.zhyd.oauth.request;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.xkcoding.http.support.HttpHeader;
 import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.config.AuthDefaultSource;
+import me.zhyd.oauth.constant.Keys;
 import me.zhyd.oauth.enums.scope.AuthDingTalkScope;
 import me.zhyd.oauth.exception.AuthException;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthToken;
 import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.utils.AuthScopeUtils;
-import me.zhyd.oauth.utils.GlobalAuthUtils;
 import me.zhyd.oauth.utils.HttpUtils;
 import me.zhyd.oauth.utils.UrlBuilder;
 
@@ -54,16 +54,16 @@ public class AuthDingTalkV2Request extends AuthDefaultRequest {
     @Override
     public String authorize(String state) {
         return UrlBuilder.fromBaseUrl(source.authorize())
-            .queryParam("response_type", "code")
-            .queryParam("client_id", config.getClientId())
-            .queryParam("scope", this.getScopes(",", true, AuthScopeUtils.getDefaultScopes(AuthDingTalkScope.values())))
-            .queryParam("redirect_uri", GlobalAuthUtils.urlEncode(config.getRedirectUri()))
+            .queryParam(Keys.OAUTH2_RESPONSE_TYPE, Keys.OAUTH2_CODE)
+            .queryParam(Keys.OAUTH2_CLIENT_ID, config.getClientId())
+            .queryParam(Keys.OAUTH2_SCOPE, this.getScopes(",", true, AuthScopeUtils.getDefaultScopes(AuthDingTalkScope.values())))
+            .queryParam(Keys.OAUTH2_REDIRECT_URI, config.getRedirectUri())
             .queryParam("prompt", "consent")
             .queryParam("org_type", config.getDingTalkOrgType())
             .queryParam("corpId", config.getDingTalkCorpId())
             .queryParam("exclusiveLogin", config.isDingTalkExclusiveLogin())
             .queryParam("exclusiveCorpId", config.getDingTalkExclusiveCorpId())
-            .queryParam("state", getRealState(state))
+            .queryParam(Keys.OAUTH2_STATE, getRealState(state))
             .build();
     }
 
@@ -76,10 +76,10 @@ public class AuthDingTalkV2Request extends AuthDefaultRequest {
     @Override
     public AuthToken getAccessToken(AuthCallback authCallback) {
         Map<String, String> params = new HashMap<>();
-        params.put("grantType", "authorization_code");
+        params.put("grantType", Keys.OAUTH2_GRANT_TYPE__AUTHORIZATION_CODE);
         params.put("clientId", config.getClientId());
         params.put("clientSecret", config.getClientSecret());
-        params.put("code", authCallback.getCode());
+        params.put(Keys.OAUTH2_CODE, authCallback.getCode());
         String response = new HttpUtils(config.getHttpConfig()).post(this.source.accessToken(), JSONObject.toJSONString(params)).getBody();
         JSONObject accessTokenObject = JSONObject.parseObject(response);
         if (!accessTokenObject.containsKey("accessToken")) {
@@ -129,10 +129,10 @@ public class AuthDingTalkV2Request extends AuthDefaultRequest {
      */
     protected String accessTokenUrl(String code) {
         return UrlBuilder.fromBaseUrl(source.accessToken())
-            .queryParam("code", code)
+            .queryParam(Keys.OAUTH2_CODE, code)
             .queryParam("clientId", config.getClientId())
             .queryParam("clientSecret", config.getClientSecret())
-            .queryParam("grantType", "authorization_code")
+            .queryParam("grantType", Keys.OAUTH2_GRANT_TYPE__AUTHORIZATION_CODE)
             .build();
     }
 }

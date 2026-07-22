@@ -1,9 +1,10 @@
 package me.zhyd.oauth.request;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.config.AuthSource;
+import me.zhyd.oauth.constant.Keys;
 import me.zhyd.oauth.enums.AuthResponseStatus;
 import me.zhyd.oauth.enums.AuthUserGender;
 import me.zhyd.oauth.exception.AuthException;
@@ -59,8 +60,8 @@ public abstract class AbstractAuthWeChatEnterpriseRequest extends AuthDefaultReq
         JSONObject object = this.checkResponse(response);
 
         return AuthToken.builder()
-            .accessToken(object.getString("access_token"))
-            .expireIn(object.getIntValue("expires_in"))
+            .accessToken(object.getString(Keys.OAUTH2_ACCESS_TOKEN))
+            .expireIn(object.getIntValue(Keys.OAUTH2_EXPIRES_IN))
             .code(authCallback.getCode())
             .build();
     }
@@ -87,13 +88,13 @@ public abstract class AbstractAuthWeChatEnterpriseRequest extends AuthDefaultReq
 
         return AuthUser.builder()
             .rawUserInfo(userDetail)
-            .username(userDetail.getString("name"))
+            .username(userDetail.getString(Keys.NAME))
             .nickname(userDetail.getString("alias"))
-            .avatar(userDetail.getString("avatar"))
-            .location(userDetail.getString("address"))
-            .email(userDetail.getString("email"))
+            .avatar(userDetail.getString(Keys.AVATAR))
+            .location(userDetail.getString(Keys.OAUTH2_SCOPE__ADDRESS))
+            .email(userDetail.getString(Keys.OAUTH2_SCOPE__EMAIL))
             .uuid(userId)
-            .gender(AuthUserGender.getWechatRealGender(userDetail.getString("gender")))
+            .gender(AuthUserGender.getWechatRealGender(userDetail.getString(Keys.GENDER)))
             .token(authToken)
             .source(source.toString())
             .build();
@@ -108,8 +109,8 @@ public abstract class AbstractAuthWeChatEnterpriseRequest extends AuthDefaultReq
     private JSONObject checkResponse(String response) {
         JSONObject object = JSONObject.parseObject(response);
 
-        if (object.containsKey("errcode") && object.getIntValue("errcode") != 0) {
-            throw new AuthException(object.getString("errmsg"), source);
+        if (object.containsKey(Keys.VARIANT__ERRCODE) && object.getIntValue(Keys.VARIANT__ERRCODE) != 0) {
+            throw new AuthException(object.getString(Keys.VARIANT__ERRMSG), source);
         }
 
         return object;
@@ -139,8 +140,8 @@ public abstract class AbstractAuthWeChatEnterpriseRequest extends AuthDefaultReq
     @Override
     protected String userInfoUrl(AuthToken authToken) {
         return UrlBuilder.fromBaseUrl(source.userInfo())
-            .queryParam("access_token", authToken.getAccessToken())
-            .queryParam("code", authToken.getCode())
+            .queryParam(Keys.OAUTH2_ACCESS_TOKEN, authToken.getAccessToken())
+            .queryParam(Keys.OAUTH2_CODE, authToken.getCode())
             .build();
     }
 
@@ -155,8 +156,8 @@ public abstract class AbstractAuthWeChatEnterpriseRequest extends AuthDefaultReq
     private JSONObject getUserDetail(String accessToken, String userId, String userTicket) {
         // 用户基础信息
         String userInfoUrl = UrlBuilder.fromBaseUrl("https://qyapi.weixin.qq.com/cgi-bin/user/get")
-            .queryParam("access_token", accessToken)
-            .queryParam("userid", userId)
+            .queryParam(Keys.OAUTH2_ACCESS_TOKEN, accessToken)
+            .queryParam(Keys.USERID, userId)
             .build();
         String userInfoResponse = new HttpUtils(config.getHttpConfig()).get(userInfoUrl).getBody();
         JSONObject userInfo = checkResponse(userInfoResponse);
@@ -164,7 +165,7 @@ public abstract class AbstractAuthWeChatEnterpriseRequest extends AuthDefaultReq
         // 用户敏感信息
         if (StringUtils.isNotEmpty(userTicket)) {
             String userDetailUrl = UrlBuilder.fromBaseUrl("https://qyapi.weixin.qq.com/cgi-bin/auth/getuserdetail")
-                .queryParam("access_token", accessToken)
+                .queryParam(Keys.OAUTH2_ACCESS_TOKEN, accessToken)
                 .build();
             JSONObject param = new JSONObject();
             param.put("user_ticket", userTicket);
