@@ -35,6 +35,24 @@ snail-ai:
       access-key: minioadmin
       secret-key: minioadmin
       bucket: snail-ai
+  # RAG 文档解析与图片 OCR 配置
+  rag:
+    docling:
+      enabled: ${SNAIL_AI_RAG_DOCLING_ENABLED:true}
+      url: ${SNAIL_AI_RAG_DOCLING_URL:http://127.0.0.1:5100}
+      timeout-seconds: ${SNAIL_AI_RAG_DOCLING_TIMEOUT_SECONDS:300}
+      concurrency: ${SNAIL_AI_RAG_DOCLING_CONCURRENCY:3}
+      health-timeout-millis: ${SNAIL_AI_RAG_DOCLING_HEALTH_TIMEOUT_MILLIS:3000}
+      poll-interval-millis: ${SNAIL_AI_RAG_DOCLING_POLL_INTERVAL_MILLIS:3000}
+      status-timeout-millis: ${SNAIL_AI_RAG_DOCLING_STATUS_TIMEOUT_MILLIS:10000}
+      result-timeout-millis: ${SNAIL_AI_RAG_DOCLING_RESULT_TIMEOUT_MILLIS:30000}
+      max-image-count: ${SNAIL_AI_RAG_DOCLING_MAX_IMAGE_COUNT:100}
+      max-image-bytes: ${SNAIL_AI_RAG_DOCLING_MAX_IMAGE_BYTES:10485760}
+      paddle-ocr-enabled: ${SNAIL_AI_RAG_DOCLING_PADDLE_OCR_ENABLED:true}
+      paddle-ocr-url: ${SNAIL_AI_RAG_DOCLING_PADDLE_OCR_URL:http://127.0.0.1:8866/ocr}
+      paddle-ocr-timeout-millis: ${SNAIL_AI_RAG_DOCLING_PADDLE_OCR_TIMEOUT_MILLIS:180000}
+      paddle-ocr-batch-size: ${SNAIL_AI_RAG_DOCLING_PADDLE_OCR_BATCH_SIZE:5}
+      vision-ocr-fallback-enabled: ${SNAIL_AI_RAG_DOCLING_VISION_OCR_FALLBACK_ENABLED:false}
   # 短期记忆配置
   memory:
     short-term:

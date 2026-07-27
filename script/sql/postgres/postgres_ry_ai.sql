@@ -318,6 +318,7 @@ CREATE TABLE IF NOT EXISTS sai_agent_conversation_record
     role VARCHAR(16) DEFAULT 'user',
     content TEXT,
     thinking TEXT,
+    metadata TEXT DEFAULT NULL,
     status INT DEFAULT 1,
     input_tokens INT DEFAULT 0,
     output_tokens INT DEFAULT 0,
@@ -332,6 +333,7 @@ COMMENT ON COLUMN sai_agent_conversation_record.user_id IS '用户ID';
 COMMENT ON COLUMN sai_agent_conversation_record.role IS 'user/assistant';
 COMMENT ON COLUMN sai_agent_conversation_record.content IS '消息内容';
 COMMENT ON COLUMN sai_agent_conversation_record.thinking IS '思考过程（仅assistant）';
+COMMENT ON COLUMN sai_agent_conversation_record.metadata IS '消息扩展元数据JSON';
 COMMENT ON COLUMN sai_agent_conversation_record.status IS '1=成功,2=失败,3=进行中';
 COMMENT ON COLUMN sai_agent_conversation_record.input_tokens IS '输入Token数（prompt）';
 COMMENT ON COLUMN sai_agent_conversation_record.output_tokens IS '输出Token数（completion）';
@@ -438,6 +440,13 @@ CREATE TABLE sai_rag_document
     status SMALLINT DEFAULT 0,
     error_msg TEXT,
     chunk_count INT DEFAULT 0,
+    page_count INT DEFAULT 0,
+    element_count INT DEFAULT 0,
+    table_count INT DEFAULT 0,
+    image_count INT DEFAULT 0,
+    parse_time INT DEFAULT 0,
+    md_content TEXT DEFAULT NULL,
+    doc_metadata TEXT DEFAULT NULL,
     content_hash VARCHAR(64) DEFAULT NULL,
     resource_id BIGINT DEFAULT NULL,
     create_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -458,6 +467,39 @@ CREATE INDEX idx_rag_content_hash ON sai_rag_document (rag_id, content_hash);
 CREATE INDEX idx_rag_name ON sai_rag_document (rag_id, name);
 CREATE INDEX idx_rag_doc_resource ON sai_rag_document (resource_id);
 
+CREATE TABLE sai_rag_document_image
+(
+    id BIGSERIAL PRIMARY KEY,
+    rag_id BIGINT NOT NULL,
+    document_id BIGINT NOT NULL,
+    chunk_id BIGINT DEFAULT NULL,
+    resource_id BIGINT DEFAULT NULL,
+    image_index INT,
+    image_url VARCHAR(1024),
+    caption TEXT,
+    figure_no VARCHAR(64),
+    figure_title VARCHAR(512),
+    section_title VARCHAR(512),
+    source_page INT,
+    document_name VARCHAR(255),
+    ocr_text TEXT,
+    create_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+COMMENT ON TABLE sai_rag_document_image IS 'RAG document parsed image table';
+COMMENT ON COLUMN sai_rag_document_image.resource_id IS 'Linked resource id in sai_resource';
+
+CREATE TRIGGER trigger_sai_rag_document_image_update
+    BEFORE UPDATE ON sai_rag_document_image
+    FOR EACH ROW
+    EXECUTE FUNCTION update_timestamp();
+
+CREATE INDEX idx_rag_doc_image_rag ON sai_rag_document_image (rag_id);
+CREATE INDEX idx_rag_doc_image_document ON sai_rag_document_image (document_id);
+CREATE INDEX idx_rag_doc_image_chunk ON sai_rag_document_image (chunk_id);
+CREATE INDEX idx_rag_doc_image_resource ON sai_rag_document_image (resource_id);
+
 -- 4.3 RAG 分块表
 CREATE TABLE sai_rag_chunk
 (
@@ -470,11 +512,13 @@ CREATE TABLE sai_rag_chunk
     token_count INT,
     vector_id VARCHAR(128),
     content_hash VARCHAR(64) DEFAULT NULL,
+    source_type VARCHAR(20) NOT NULL DEFAULT 'TEXT',
     create_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 COMMENT ON COLUMN sai_rag_chunk.content_hash IS 'chunk内容SHA-256，用于向量去重';
+COMMENT ON COLUMN sai_rag_chunk.source_type IS 'chunk来源类型：TEXT文本、IMAGE图片';
 
 CREATE TRIGGER trigger_sai_rag_chunk_update
     BEFORE UPDATE ON sai_rag_chunk
@@ -484,6 +528,7 @@ CREATE TRIGGER trigger_sai_rag_chunk_update
 CREATE INDEX idx_rag_chunk_rag ON sai_rag_chunk (rag_id);
 CREATE INDEX idx_rag_chunk_document ON sai_rag_chunk (document_id);
 CREATE INDEX idx_chunk_rag_hash ON sai_rag_chunk (rag_id, content_hash);
+CREATE INDEX idx_chunk_rag_source_type ON sai_rag_chunk (rag_id, source_type);
 
 -- ============================================================
 -- 五、MCP 服务管理
@@ -501,11 +546,8 @@ CREATE TABLE IF NOT EXISTS sai_mcp_server
     command VARCHAR(1024),
     args TEXT,
     env_vars TEXT,
-    version VARCHAR(32) DEFAULT '1.0.0',
-    auth_type SMALLINT DEFAULT 0,
-    auth_config TEXT,
-    status SMALLINT DEFAULT 0,
-    capabilities TEXT,
+    timeout BIGINT DEFAULT 60000,
+    headers TEXT,
     last_connect_dt TIMESTAMP NULL,
     creator_id BIGINT,
     create_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -521,11 +563,8 @@ COMMENT ON COLUMN sai_mcp_server.endpoint IS '端点路径(SSE/Streamable HTTP�
 COMMENT ON COLUMN sai_mcp_server.command IS 'Stdio命令(Stdio时必填)';
 COMMENT ON COLUMN sai_mcp_server.args IS 'Stdio命令参数(JSON数组)';
 COMMENT ON COLUMN sai_mcp_server.env_vars IS 'Stdio环境变量(JSON对象)';
-COMMENT ON COLUMN sai_mcp_server.version IS '版本';
-COMMENT ON COLUMN sai_mcp_server.auth_type IS '认证方式: 0-无需认证 1-API Key 2-OAuth 3-Basic Auth';
-COMMENT ON COLUMN sai_mcp_server.auth_config IS '认证配置(JSON)';
-COMMENT ON COLUMN sai_mcp_server.status IS '状态: 0-未连接 1-已连接 2-异常';
-COMMENT ON COLUMN sai_mcp_server.capabilities IS '能力列表(JSON数组)';
+COMMENT ON COLUMN sai_mcp_server.timeout IS '超时时间(毫秒)';
+COMMENT ON COLUMN sai_mcp_server.headers IS '请求头(JSON对象)';
 COMMENT ON COLUMN sai_mcp_server.last_connect_dt IS '最后连接时间';
 COMMENT ON COLUMN sai_mcp_server.creator_id IS '创建者用户ID';
 
@@ -535,7 +574,6 @@ CREATE TRIGGER trigger_sai_mcp_server_update
     EXECUTE FUNCTION update_timestamp();
 
 CREATE INDEX idx_mcp_server_creator ON sai_mcp_server (creator_id);
-CREATE INDEX idx_mcp_server_status ON sai_mcp_server (status);
 
 -- 5.2 智能体与MCP服务关联表（多对多）
 CREATE TABLE IF NOT EXISTS sai_agent_mcp_server

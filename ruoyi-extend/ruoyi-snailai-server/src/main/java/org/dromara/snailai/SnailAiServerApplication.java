@@ -17,7 +17,7 @@ public class SnailAiServerApplication {
      * @param args 启动参数
      */
     public static void main(String[] args) {
-        com.aizuda.snail.ai.starter.SnailAiSpringbootApplication.main(args);
+        com.aizuda.snail.ai.starter.SnailAiApplication.main(args);
     }
 
 }

@@ -162,6 +162,11 @@ services:
     environment:
       # 时区上海
       TZ: Asia/Shanghai
+      # Docling 与 PaddleOCR 服务需单独部署；host 网络模式下默认通过宿主机端口访问
+      SNAIL_AI_RAG_DOCLING_ENABLED: ${SNAIL_AI_RAG_DOCLING_ENABLED:-true}
+      SNAIL_AI_RAG_DOCLING_URL: ${SNAIL_AI_RAG_DOCLING_URL:-http://127.0.0.1:5100}
+      SNAIL_AI_RAG_DOCLING_PADDLE_OCR_ENABLED: ${SNAIL_AI_RAG_DOCLING_PADDLE_OCR_ENABLED:-true}
+      SNAIL_AI_RAG_DOCLING_PADDLE_OCR_URL: ${SNAIL_AI_RAG_DOCLING_PADDLE_OCR_URL:-http://127.0.0.1:8866/ocr}
     ports:
       - "8900:8900"
       - "18888:18888"
