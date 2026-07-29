@@ -58,7 +58,7 @@ snail-ai:
     # 嵌入模式下隐藏侧边栏用户信息
     show-sidebar-user: false
     # 嵌入模式下隐藏智能体市场入口
-    show-agent-market: false
+    show-agent-market: true
     # 嵌入模式下使用紧凑输入框
     compact-input: true
     # 是否锁定当前智能体
