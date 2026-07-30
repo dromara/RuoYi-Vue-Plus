@@ -46,7 +46,7 @@ snail-ai:
   app-id: 1
   # 认证令牌（在 Server「应用管理」页面创建时自动生成）
   token: SAI_566a6bfbc26e4998b4841cc927d50c5d
-  port: 18889
+  port: 3${server.port}
   # Skill 文件临时目录
   skill-temp-dir: /tmp/snail-ai-agent/skills
   # ==================== Chat 嵌入模式配置 ====================
