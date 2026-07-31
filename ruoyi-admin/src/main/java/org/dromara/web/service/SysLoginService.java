@@ -7,6 +7,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.lock.annotation.Lock4j;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthUser;
@@ -136,7 +137,12 @@ public class SysLoginService {
         loginInfoEvent.setUsername(username);
         loginInfoEvent.setStatus(status);
         loginInfoEvent.setMessage(message);
-        loginInfoEvent.setRequest(ServletUtils.getRequest());
+        HttpServletRequest request = ServletUtils.getRequest();
+        if (request != null) {
+            loginInfoEvent.setIp(ServletUtils.getClientIP(request));
+            loginInfoEvent.setUserAgent(request.getHeader("User-Agent"));
+            loginInfoEvent.setClientId(request.getHeader(LoginHelper.CLIENT_KEY));
+        }
         SpringUtils.context().publishEvent(loginInfoEvent);
     }
 

@@ -4,19 +4,16 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ip.AddressUtils;
 import org.dromara.common.log.event.LoginInfoEvent;
 import org.dromara.common.mybatis.core.mapper.LambdaCrudChainWrapper;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.SysLoginInfo;
 import org.dromara.system.domain.bo.SysLoginInfoBo;
 import org.dromara.system.domain.vo.SysClientVo;
@@ -55,11 +52,10 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
     @Async
     @EventListener
     public void recordLoginInfo(LoginInfoEvent loginInfoEvent) {
-        HttpServletRequest request = loginInfoEvent.getRequest();
-        UserAgent userAgent = UserAgentUtil.parse(request.getHeader("User-Agent"));
-        String ip = ServletUtils.getClientIP(request);
+        UserAgent userAgent = UserAgentUtil.parse(loginInfoEvent.getUserAgent());
+        String ip = loginInfoEvent.getIp();
         // 客户端信息
-        String clientId = request.getHeader(LoginHelper.CLIENT_KEY);
+        String clientId = loginInfoEvent.getClientId();
         SysClientVo client = null;
         if (StringUtils.isNotBlank(clientId)) {
             client = clientService.queryByClientId(clientId);

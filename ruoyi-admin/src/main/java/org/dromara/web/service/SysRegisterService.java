@@ -1,6 +1,7 @@
 package org.dromara.web.service;
 
 import cn.hutool.crypto.digest.BCrypt;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
@@ -14,6 +15,7 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.log.event.LoginInfoEvent;
 import org.dromara.common.redis.utils.RedisUtils;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.config.properties.CaptchaProperties;
 import org.dromara.system.api.model.RegisterBody;
 import org.dromara.system.domain.SysUser;
@@ -103,7 +105,12 @@ public class SysRegisterService {
         loginInfoEvent.setUsername(username);
         loginInfoEvent.setStatus(status);
         loginInfoEvent.setMessage(message);
-        loginInfoEvent.setRequest(ServletUtils.getRequest());
+        HttpServletRequest request = ServletUtils.getRequest();
+        if (request != null) {
+            loginInfoEvent.setIp(ServletUtils.getClientIP(request));
+            loginInfoEvent.setUserAgent(request.getHeader("User-Agent"));
+            loginInfoEvent.setClientId(request.getHeader(LoginHelper.CLIENT_KEY));
+        }
         SpringUtils.context().publishEvent(loginInfoEvent);
     }
 
