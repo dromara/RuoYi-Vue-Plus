@@ -12,6 +12,7 @@ import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthToken;
 import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.utils.AuthScopeUtils;
+import me.zhyd.oauth.utils.GlobalAuthUtils;
 import me.zhyd.oauth.utils.HttpUtils;
 import me.zhyd.oauth.utils.UrlBuilder;
 
@@ -57,7 +58,7 @@ public class AuthDingTalkV2Request extends AuthDefaultRequest {
             .queryParam(Keys.OAUTH2_RESPONSE_TYPE, Keys.OAUTH2_CODE)
             .queryParam(Keys.OAUTH2_CLIENT_ID, config.getClientId())
             .queryParam(Keys.OAUTH2_SCOPE, this.getScopes(",", true, AuthScopeUtils.getDefaultScopes(AuthDingTalkScope.values())))
-            .queryParam(Keys.OAUTH2_REDIRECT_URI, config.getRedirectUri())
+            .queryParam(Keys.OAUTH2_REDIRECT_URI, GlobalAuthUtils.urlEncode(config.getRedirectUri()))
             .queryParam("prompt", "consent")
             .queryParam("org_type", config.getDingTalkOrgType())
             .queryParam("corpId", config.getDingTalkCorpId())
