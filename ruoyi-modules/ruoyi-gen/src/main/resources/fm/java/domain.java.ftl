@@ -46,5 +46,3 @@ public class ${ClassName} extends BaseEntity {
 </#list>
 
 }
-
-

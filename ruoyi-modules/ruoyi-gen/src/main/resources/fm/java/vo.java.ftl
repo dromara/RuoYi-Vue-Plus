@@ -17,8 +17,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-
-
 /**
  * ${functionName}视图对象 ${tableName}
  *
@@ -61,5 +59,3 @@ public class ${ClassName}Vo implements Serializable {
 </#list>
 
 }
-
-

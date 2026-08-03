@@ -14,10 +14,7 @@ values(${table.menuIds[3]}, '${functionName}修改', ${table.menuIds[0]}, 3,  '#
 
 insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
 values(${table.menuIds[4]}, '${functionName}删除', ${table.menuIds[0]}, 4,  '#', '', 'N', 'Y', 'F', '0', '0', '${permissionPrefix}:remove',       '#', 1761000000000000103, 1761100000000000001, now(), null, null, '');
-
+<#if enableExport>
 insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
 values(${table.menuIds[5]}, '${functionName}导出', ${table.menuIds[0]}, 5,  '#', '', 'N', 'Y', 'F', '0', '0', '${permissionPrefix}:export',       '#', 1761000000000000103, 1761100000000000001, now(), null, null, '');
-
-
-
-
+</#if>

@@ -101,7 +101,5 @@ public interface I${ClassName}Service {
      * @return 是否删除成功
      */
     Boolean deleteWithValidByIds(Collection<${pkColumn.javaType}> ids, Boolean isValid);
+
 }
-
-
-

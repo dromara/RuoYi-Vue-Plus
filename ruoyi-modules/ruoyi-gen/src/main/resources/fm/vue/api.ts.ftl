@@ -10,7 +10,6 @@ import request from '@/utils/request';
  * @param query
  * @returns {*}
  */
-
 export const list${BusinessName} = (query?: ${BusinessName}Query): AxiosPromise<<#if table.tree>${BusinessName}VO[]<#else>PageResult<${BusinessName}VO></#if>> => {
   return request({
     url: '/${moduleName}/${businessName}/list',
@@ -100,5 +99,3 @@ export const del${BusinessName} = (${pkColumn.javaField}: string | number | Arra
     method: 'delete'
   });
 };
-
-

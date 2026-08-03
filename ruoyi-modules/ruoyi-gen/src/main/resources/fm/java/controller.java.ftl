@@ -59,10 +59,10 @@ public class ${ClassName}Controller extends BaseController {
     }
 </#if>
 
+<#if enableExport>
     /**
      * 导出${functionName}列表
      */
-<#if enableExport>
     @SaCheckPermission("${permissionPrefix}:export")
     @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
@@ -153,5 +153,3 @@ public class ${ClassName}Controller extends BaseController {
         return toAjax(${className}Service.deleteWithValidByIds(List.of(${pkColumn.javaField}s), true));
     }
 }
-
-

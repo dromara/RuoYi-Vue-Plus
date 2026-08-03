@@ -43,7 +43,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
 
     private final ${ClassName}Mapper ${className}Mapper;
 
-/**
+    /**
      * 查询${functionName}
      *
      * @param ${pkColumn.javaField} 主键
@@ -342,6 +342,5 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         }
         return ${className}Mapper.deleteByIds(ids) > 0;
     }
+
 }
-
-
