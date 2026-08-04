@@ -10,9 +10,6 @@ import me.zhyd.oauth.request.*;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
-import org.dromara.common.social.gitea.AuthGiteaRequest;
-import org.dromara.common.social.maxkey.AuthMaxKeyRequest;
-import org.dromara.common.social.topiam.AuthTopIamRequest;
 
 /**
  * 认证授权工具类
@@ -58,6 +55,7 @@ public class SocialUtils {
             .clientId(obj.getClientId())
             .clientSecret(obj.getClientSecret())
             .redirectUri(obj.getRedirectUri())
+            .serverUrl(obj.getServerUrl())
             .scopes(obj.getScopes());
         return switch (source.toLowerCase()) {
             case "dingtalk" -> new AuthDingTalkV2Request(builder.build(), STATE_CACHE);

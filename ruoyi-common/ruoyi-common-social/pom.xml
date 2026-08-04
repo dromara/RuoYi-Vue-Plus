@@ -18,21 +18,8 @@
     <dependencies>
         <!-- 授权认证 -->
         <dependency>
-            <groupId>cn.herodotus.opensteward</groupId>
+            <groupId>io.github.windtool</groupId>
             <artifactId>JustAuth</artifactId>
-        </dependency>
-
-        <!-- 仅供 justauth 内部解析参数使用 -->
-        <dependency>
-            <groupId>com.alibaba.fastjson2</groupId>
-            <artifactId>fastjson2</artifactId>
-            <version>2.0.60</version>
-        </dependency>
-
-        <!-- 序列化模块 -->
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-json</artifactId>
         </dependency>
 
         <!-- 缓存服务 -->
