@@ -22,7 +22,8 @@
 
 > 系统演示: [传送门](https://plus-doc.dromara.org/#/common/demo_system)
 
-> 官方前端项目地址: [gitee](https://gitee.com/JavaLionLi/plus-ui) - [github](https://github.com/CrazyLionCat/plus-ui) - [gitcode](https://gitcode.com/dromara/plus-ui)<br>
+> 官方前端项目地址: 基于 Vue + ElementPlus 版本前端项目 [gitee](https://gitee.com/JavaLionLi/plus-ui) - [github](https://github.com/CrazyLionCat/plus-ui) - [gitcode](https://gitcode.com/dromara/plus-ui)<br>
+> 官方前端项目地址: 基于 React + Ant Design 版本前端项目 [plus-ui-react](https://gitee.com/JavaLionLi/plus-ui/tree/6.X-React/)
 > 成员前端项目地址: 基于vben5 [ruoyi-plus-vben5](https://github.com/imdap/ruoyi-plus-vben5)<br>
 > 成员前端项目地址: 基于soybean [ruoyi-plus-soybean](https://gitee.com/xlsea/ruoyi-plus-soybean)<br>
 > 成员项目地址: 删除多租户与工作流 [RuoYi-Vue-Plus-Single](https://gitee.com/ColorDreams/RuoYi-Vue-Plus-Single)<br>
