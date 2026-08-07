@@ -425,7 +425,7 @@ import { useTreeTableExpand } from '@/hooks/tree/useTreeTableExpand';
 import { useDict } from '@/utils/dict';
 </#if>
 import modal from '@/plugins/modal';
-import { handleTree } from '@/utils/ruoyi';
+import { handleTree<#if needParseTime>, parseTime</#if> } from '@/utils/ruoyi';
 <#if enableExport>
 import { download as requestDownload } from '@/utils/request';
 </#if>
