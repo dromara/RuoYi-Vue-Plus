@@ -349,7 +349,7 @@
             <!-- Warm-Flow国产工作流引擎, 在线文档：http://warm-flow.cn/ -->
             <dependency>
                 <groupId>org.dromara.warm</groupId>
-                <artifactId>warm-flow-mybatis-plus-sb3-starter</artifactId>
+                <artifactId>warm-flow-mybatis-plus-sb4-starter</artifactId>
                 <version>${warm-flow.version}</version>
             </dependency>
             <!-- Warm-Flow UI 插件 -->

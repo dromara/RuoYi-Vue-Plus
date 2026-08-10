@@ -87,7 +87,7 @@
         <!-- Warm-Flow 工作流引擎 -->
         <dependency>
             <groupId>org.dromara.warm</groupId>
-            <artifactId>warm-flow-mybatis-plus-sb3-starter</artifactId>
+            <artifactId>warm-flow-mybatis-plus-sb4-starter</artifactId>
         </dependency>
 
         <!-- Warm-Flow UI 插件 -->
