@@ -63,7 +63,7 @@
         <sms4j.version>3.3.5</sms4j.version>
         <!-- 工作流配置 -->
         <warm-flow.version>1.8.9</warm-flow.version>
-        <liteflow.version>2.16.0</liteflow.version>
+        <liteflow.version>2.16.1.2</liteflow.version>
         <!-- mqtt客户端 -->
         <mica-mqtt.version>2.6.8</mica-mqtt.version>
 
