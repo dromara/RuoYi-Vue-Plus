@@ -249,6 +249,9 @@ warm-flow:
 liteflow:
   # 跟随工作流模块开关，避免禁用工作流时仍加载任务办理链
   enable: ${warm-flow.enabled:true}
+  metrics:
+    # 指标自动配置使用独立开关，需同步关闭以避免初始化未启用的 LiteFlow
+    enabled: ${liteflow.enable:true}
   # 工作流模块用于编排任务办理链路
   rule-source: classpath:liteflow/*.el.xml
   # 开启虚拟线程
