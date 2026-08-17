@@ -8,6 +8,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.StringValue;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.sql.SqlUtil;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.tenant.properties.TenantProperties;
 
@@ -32,7 +33,7 @@ public class PlusTenantLineHandler implements TenantLineHandler {
             return new NullValue();
         }
         // 返回固定租户
-        return new StringValue(tenantId);
+        return new StringValue(SqlUtil.escapeOrderBySql(tenantId));
     }
 
     @Override
