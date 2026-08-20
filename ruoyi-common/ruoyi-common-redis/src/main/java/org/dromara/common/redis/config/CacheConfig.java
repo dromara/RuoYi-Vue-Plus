@@ -38,8 +38,8 @@ public class CacheConfig {
      * 自定义缓存管理器 整合spring-cache
      */
     @Bean
-    public CacheManager cacheManager() {
-        return new PlusSpringCacheManager();
+    public CacheManager cacheManager(Cache<Object, Object> caffeine) {
+        return new PlusSpringCacheManager(caffeine);
     }
 
 }
