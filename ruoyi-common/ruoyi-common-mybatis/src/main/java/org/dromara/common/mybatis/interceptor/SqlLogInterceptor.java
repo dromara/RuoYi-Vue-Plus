@@ -24,13 +24,12 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.TemporalAccessor;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 完整 SQL 日志拦截器。
@@ -70,11 +69,6 @@ public class SqlLogInterceptor implements Interceptor {
      * 时间格式。
      */
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-    /**
-     * 控制台输出锁，避免多线程 SQL 日志互相穿插。
-     */
-    private static final ReentrantLock CONSOLE_LOCK = new ReentrantLock();
 
     /**
      * SQL 日志配置。
@@ -340,13 +334,7 @@ public class SqlLogInterceptor implements Interceptor {
      * @param message 日志内容
      */
     private void printConsole(String message) {
-        CONSOLE_LOCK.lock();
-        try {
-            System.err.println(message);
-            System.err.println();
-        } finally {
-            CONSOLE_LOCK.unlock();
-        }
+        System.err.print(message + System.lineSeparator() + System.lineSeparator());
     }
 
     /**
