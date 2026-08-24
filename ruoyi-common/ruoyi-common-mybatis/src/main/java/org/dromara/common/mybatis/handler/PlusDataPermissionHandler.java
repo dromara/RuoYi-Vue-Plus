@@ -71,13 +71,17 @@ public class PlusDataPermissionHandler {
      */
     public Expression getSqlSegment(Expression where, boolean isSelect) {
         try {
+            DataPermission dataPermission = getDataPermission();
+            if (dataPermission == null) {
+                throw new ServiceException("数据权限上下文缺失，请检查 @DataPermission 注解处理生命周期");
+            }
             LoginUser currentUser = currentUser();
             // 如果是超级管理员或租户管理员，则不过滤数据
             if (LoginHelper.isSuperAdmin()) {
                 return where;
             }
             // 构造数据过滤条件的 SQL 片段
-            String dataFilterSql = buildDataFilter(getDataPermission(), currentUser, isSelect);
+            String dataFilterSql = buildDataFilter(dataPermission, currentUser, isSelect);
             if (StringUtils.isBlank(dataFilterSql)) {
                 return where;
             }
@@ -91,8 +95,6 @@ public class PlusDataPermissionHandler {
             }
         } catch (JSQLParserException e) {
             throw new ServiceException("数据权限解析异常 => " + e.getMessage());
-        } finally {
-            DataPermissionHelper.removePermission();
         }
     }
 
