@@ -1,5 +1,7 @@
 package org.dromara.workflow.service.impl;
 
+import cn.dev33.satoken.exception.NotPermissionException;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
@@ -79,6 +81,12 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     private static final String START_PROCESS_CHAIN = "startProcessChain";
     private static final String COMPLETE_TASK_CHAIN = "completeTaskChain";
     private static final String TASK_OPERATION_CHAIN = "taskOperationChain";
+    private static final Set<String> TASK_READ_ASSIGNEE_TYPES = Set.of(
+        TaskAssigneeType.APPROVER.getCode(),
+        TaskAssigneeType.TRANSFER.getCode(),
+        TaskAssigneeType.DELEGATE.getCode(),
+        TaskAssigneeType.COPY.getCode()
+    );
 
     private final TaskService taskService;
     private final InsService insService;
@@ -504,6 +512,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (ObjectUtil.isNull(task)) {
             return null;
         }
+        checkTaskReadAccess(task);
         FlowTaskVo flowTaskVo = BeanUtil.toBean(task, FlowTaskVo.class);
         Instance instance = insService.getById(task.getInstanceId());
         if (ObjectUtil.isNull(instance)) {
@@ -698,12 +707,60 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public List<UserDTO> currentTaskAllUser(List<Long> taskIds) {
+        if (CollUtil.isEmpty(taskIds)) {
+            return Collections.emptyList();
+        }
+        List<Long> validTaskIds = new ArrayList<>();
+        for (Long taskId : taskIds) {
+            if (ObjectUtil.isNull(taskId)) {
+                continue;
+            }
+            Task task = taskService.getById(taskId);
+            if (ObjectUtil.isNotNull(task)) {
+                checkTaskReadAccess(task);
+                validTaskIds.add(taskId);
+            }
+        }
+        if (CollUtil.isEmpty(validTaskIds)) {
+            return Collections.emptyList();
+        }
         // 获取与当前任务关联的用户列表
-        List<User> userList = FlowEngine.userService().getByAssociateds(taskIds);
+        List<User> userList = FlowEngine.userService().getByAssociateds(validTaskIds);
         if (CollUtil.isEmpty(userList)) {
             return Collections.emptyList();
         }
         return userService.selectListByIds(StreamUtils.toSet(userList, e -> Convert.toLong(e.getProcessedBy())));
+    }
+
+    /**
+     * 校验当前登录用户是否可以读取任务信息。
+     *
+     * <p>任务读取接口同时服务于普通审批和流程监控，不能只依赖管理菜单权限。
+     * 普通用户必须是任务办理关系人、流程发起人或抄送接收人；监控/管理角色
+     * 通过任务列表或编辑权限进入管理读取范围。</p>
+     *
+     * @param task 当前任务
+     */
+    private void checkTaskReadAccess(Task task) {
+        if (LoginHelper.isSuperAdmin()
+            || StpUtil.hasPermission("workflow:task:list")
+            || StpUtil.hasPermission("workflow:task:edit")) {
+            return;
+        }
+        String userId = LoginHelper.getUserIdStr();
+        List<User> associatedUsers = FlowEngine.userService().getByAssociateds(List.of(task.getId()));
+        boolean taskAssignee = CollUtil.isNotEmpty(associatedUsers)
+            && associatedUsers.stream()
+            .anyMatch(user -> Objects.equals(userId, user.getProcessedBy())
+                && TASK_READ_ASSIGNEE_TYPES.contains(Convert.toStr(user.getType())));
+        if (taskAssignee) {
+            return;
+        }
+        Instance instance = insService.getById(task.getInstanceId());
+        if (ObjectUtil.isNotNull(instance) && Objects.equals(instance.getCreateBy(), userId)) {
+            return;
+        }
+        throw new NotPermissionException("无权访问该流程任务");
     }
 
     /**
