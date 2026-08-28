@@ -89,7 +89,9 @@ public class WorkflowGlobalListener implements GlobalListener {
                     bo.setNickName(nickNameMap.getOrDefault(id, StringUtils.EMPTY));
                     return bo;
                 });
-                variable.put(FlowConstant.FLOW_COPY_LIST, list);
+                // 节点配置的抄送人作为默认值：本次办理已传抄送人（含删除后的空名单）时不再覆盖，
+                // 否则待办审批界面中用户对抄送人的删除/修改会被节点配置顶掉
+                variable.putIfAbsent(FlowConstant.FLOW_COPY_LIST, list);
             }
             if (CollUtil.isNotEmpty(nodeExt.getVariables())) {
                 variable.putAll(nodeExt.getVariables());
