@@ -220,9 +220,35 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
      * @return 桶URL地址
      */
     public String getBucketUrl(String bucket) {
-        String url = getAccessBaseUrl();
+        // 云厂商的自定义域名通常是桶绑定的 CDN/映射域名，域名本身已经包含桶信息，不能再拼接桶名。
+        // 自定义域名仅对默认桶生效；其它桶仍使用访问站点生成标准 S3 地址。
+        if (!usePathStyleAccess && isDefaultBucket(bucket) && hasCustomDomain()) {
+            return getDomainUrl();
+        }
+        String url = (!usePathStyleAccess && hasCustomDomain() && !isDefaultBucket(bucket))
+            ? getEndpoint()
+            : getAccessBaseUrl();
         // 根据是否使用路径风格配置项决定存储桶的URL风格
         return usePathStyleAccess ? BucketUrlUtil.getPathStyleBucketUrl(useHttps, url, bucket) : BucketUrlUtil.getSiteStyleBucketUrl(useHttps, url, bucket);
+    }
+
+    /**
+     * 判断是否配置了自定义域名。
+     *
+     * @return 是否配置了非空自定义域名
+     */
+    private boolean hasCustomDomain() {
+        return domain().filter(StringUtils::isNotBlank).isPresent();
+    }
+
+    /**
+     * 判断指定桶是否为当前客户端配置的默认桶。
+     *
+     * @param bucket 存储桶名称
+     * @return 是否为默认桶
+     */
+    private boolean isDefaultBucket(String bucket) {
+        return bucket().filter(defaultBucket -> defaultBucket.equals(bucket)).isPresent();
     }
 
     /**
