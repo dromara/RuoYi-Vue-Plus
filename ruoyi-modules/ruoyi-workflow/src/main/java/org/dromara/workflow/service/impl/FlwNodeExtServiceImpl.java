@@ -258,11 +258,11 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
 
             } else if (VariablesEnum.class.getSimpleName().equals(code)) {
                 // 解析自定义参数
-                // 将 key=value 字符串拆分为 Map
+                // 将 key=value 字符串拆分为 Map（配置中出现重复 key 时保留先出现的，避免 Duplicate key 异常）
                 Map<String, String> variables = StringUtils.str2List(value, StringUtils.SEPARATOR, true, true).stream()
                     .map(s -> StringUtils.split(s, "="))
                     .filter(arr -> arr.length == 2)
-                    .collect(Collectors.toMap(arr -> arr[0], arr -> arr[1]));
+                    .collect(Collectors.toMap(arr -> arr[0], arr -> arr[1], (l, r) -> l));
 
                 nodeExtVo.setVariables(variables);
             } else {
