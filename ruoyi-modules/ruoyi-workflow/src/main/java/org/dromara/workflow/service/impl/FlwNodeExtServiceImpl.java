@@ -262,8 +262,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
                 Map<String, String> variables = StringUtils.str2List(value, StringUtils.SEPARATOR, true, true).stream()
                     .map(s -> StringUtils.split(s, "="))
                     .filter(arr -> arr.length == 2)
-                    .collect(Collectors.toMap(arr -> arr[0], arr -> arr[1]));
-
+                    .collect(Collectors.toMap(arr -> arr[0], arr -> arr[1], (l, r) -> l));
                 nodeExtVo.setVariables(variables);
             } else {
                 // 未知扩展类型，记录日志
