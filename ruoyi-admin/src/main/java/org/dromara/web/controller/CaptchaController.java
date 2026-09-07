@@ -102,7 +102,7 @@ public class CaptchaController {
         try {
             MailUtils.sendText(email, "登录验证码", "您本次验证码为：" + code + "，有效性为" + Constants.CAPTCHA_EXPIRATION + "分钟，请尽快填写。");
         } catch (Exception e) {
-            log.error("验证码短信发送异常 => {}", e.getMessage());
+            log.error("验证码邮件发送异常 => {}", e.getMessage());
             throw new ServiceException(e.getMessage());
         }
     }
