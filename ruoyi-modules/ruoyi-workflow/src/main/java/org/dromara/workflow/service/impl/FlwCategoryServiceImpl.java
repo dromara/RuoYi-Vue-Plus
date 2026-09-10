@@ -5,10 +5,10 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.*;
+import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.warm.flow.core.service.DefService;
 import org.dromara.warm.flow.orm.entity.FlowDefinition;
 import org.dromara.warm.flow.ui.service.CategoryService;
@@ -185,15 +185,12 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @return 查询条件包装器
      */
     private LambdaQueryWrapper<FlowCategory> buildQueryWrapper(FlowCategoryBo bo) {
-        LambdaQueryWrapper<FlowCategory> lqw = Wrappers.lambdaQuery();
-        lqw.eq(ObjectUtil.isNotNull(bo.getCategoryId()), FlowCategory::getCategoryId, bo.getCategoryId());
-        lqw.eq(ObjectUtil.isNotNull(bo.getParentId()), FlowCategory::getParentId, bo.getParentId());
-        lqw.like(StringUtils.isNotBlank(bo.getCategoryName()), FlowCategory::getCategoryName, bo.getCategoryName());
-        lqw.orderByAsc(FlowCategory::getAncestors);
-        lqw.orderByAsc(FlowCategory::getParentId);
-        lqw.orderByAsc(FlowCategory::getOrderNum);
-        lqw.orderByAsc(FlowCategory::getCategoryId);
-        return lqw;
+        return QueryBuilder.lambda(FlowCategory.class)
+            .eqIfPresent(FlowCategory::getCategoryId, bo.getCategoryId())
+            .eqIfPresent(FlowCategory::getParentId, bo.getParentId())
+            .likeIfText(FlowCategory::getCategoryName, bo.getCategoryName())
+            .orderByAsc(FlowCategory::getAncestors, FlowCategory::getParentId, FlowCategory::getOrderNum, FlowCategory::getCategoryId)
+            .build();
     }
 
     /**
