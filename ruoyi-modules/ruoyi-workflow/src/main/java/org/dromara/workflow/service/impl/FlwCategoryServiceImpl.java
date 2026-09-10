@@ -7,7 +7,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
-import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.*;
 import org.dromara.warm.flow.core.service.DefService;
@@ -187,7 +186,6 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      */
     private LambdaQueryWrapper<FlowCategory> buildQueryWrapper(FlowCategoryBo bo) {
         LambdaQueryWrapper<FlowCategory> lqw = Wrappers.lambdaQuery();
-        lqw.eq(FlowCategory::getDelFlag, SystemConstants.NORMAL);
         lqw.eq(ObjectUtil.isNotNull(bo.getCategoryId()), FlowCategory::getCategoryId, bo.getCategoryId());
         lqw.eq(ObjectUtil.isNotNull(bo.getParentId()), FlowCategory::getParentId, bo.getParentId());
         lqw.like(StringUtils.isNotBlank(bo.getCategoryName()), FlowCategory::getCategoryName, bo.getCategoryName());

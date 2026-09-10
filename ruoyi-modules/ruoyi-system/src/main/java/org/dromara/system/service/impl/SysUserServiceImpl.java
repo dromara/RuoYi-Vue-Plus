@@ -88,7 +88,6 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     private Wrapper<SysUser> buildQueryWrapper(SysUserBo user) {
         Map<String, Object> params = user.getParams();
         LambdaQueryWrapper<SysUser> wrapper = QueryBuilder.lambda(SysUser.class)
-            .eq(SysUser::getDelFlag, SystemConstants.NORMAL)
             .eqIfPresent(SysUser::getUserId, user.getUserId())
             .in(StringUtils.isNotBlank(user.getUserIds()), SysUser::getUserId, StringUtils.splitTo(user.getUserIds(), Convert::toLong))
             .likeIfText(SysUser::getUserName, user.getUserName())
