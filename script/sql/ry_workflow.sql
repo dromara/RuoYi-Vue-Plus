@@ -39,7 +39,6 @@ CREATE TABLE `flow_node`
     `listener_path`   varchar(400)  DEFAULT NULL COMMENT '监听器路径',
     `form_custom`     char(1)       DEFAULT 'N' COMMENT '审批表单是否自定义（Y是 N否）',
     `form_path`       varchar(100)  DEFAULT NULL COMMENT '审批表单路径',
-    `version`         varchar(20)     NOT NULL COMMENT '版本',
     `create_time`     datetime      DEFAULT NULL COMMENT '创建时间',
     `create_by`       varchar(64)          DEFAULT '' COMMENT '创建人',
     `update_time`     datetime      DEFAULT NULL COMMENT '更新时间',

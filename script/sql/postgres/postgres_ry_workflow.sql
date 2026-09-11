@@ -56,7 +56,6 @@ CREATE TABLE flow_node
     listener_path   varchar(400)  NULL,
     form_custom     bpchar(1)     NULL DEFAULT 'N':: character varying,
     form_path       varchar(100)  NULL,
-    "version"       varchar(20)   NOT NULL,
     create_time     timestamp    NULL,
     create_by       varchar(64)  NULL DEFAULT '':: character varying,
     update_time     timestamp    NULL,
@@ -80,7 +79,6 @@ COMMENT ON COLUMN flow_node.listener_type IS '监听器类型';
 COMMENT ON COLUMN flow_node.listener_path IS '监听器路径';
 COMMENT ON COLUMN flow_node.form_custom IS '审批表单是否自定义（Y是 N否）';
 COMMENT ON COLUMN flow_node.form_path IS '审批表单路径';
-COMMENT ON COLUMN flow_node."version" IS '版本';
 COMMENT ON COLUMN flow_node.create_time IS '创建时间';
 COMMENT ON COLUMN flow_node.create_by IS '创建人';
 COMMENT ON COLUMN flow_node.update_time IS '更新时间';

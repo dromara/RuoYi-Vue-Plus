@@ -66,7 +66,7 @@ public class FlowConfigUtil {
         Set<String> nodeCodeSet = new HashSet<>();
         // 遍历一个流程中的各个节点
         for (FlowNode node : nodeList) {
-            initNodeAndCondition(node, definition.getId(), definition.getVersion());
+            initNodeAndCondition(node, definition.getId());
             startNum = checkStartAndSame(node, startNum, flowName, nodeCodeSet);
             allNodes.add(node);
             allSkips.addAll(node.getSkipList());
@@ -136,9 +136,8 @@ public class FlowConfigUtil {
      *
      * @param node         node
      * @param definitionId definitionId
-     * @param version      version
      */
-    public static void initNodeAndCondition(FlowNode node, Long definitionId, String version) {
+    public static void initNodeAndCondition(FlowNode node, Long definitionId) {
         String nodeName = node.getNodeName();
         String nodeCode = node.getNodeCode();
         List<FlowSkip> skipList = node.getSkipList();
@@ -147,7 +146,6 @@ public class FlowConfigUtil {
         }
         AssertUtil.isEmpty(nodeCode, "[" + nodeName + "]" + ExceptionCons.LOST_NODE_CODE);
 
-        node.setVersion(version);
         node.setDefinitionId(definitionId);
 
         // 中间节点的集合， 跳转类型和目标节点不能重复

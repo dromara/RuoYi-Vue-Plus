@@ -99,13 +99,6 @@ public class FlowNode implements RootEntity {
      */
     private String coordinate;
     /**
-     * 版本
-     *
-     * @deprecated 下个版本废弃
-     */
-    @Deprecated
-    private String version;
-    /**
      * 任意结点跳转
      */
     private String anyNodeSkip;
@@ -146,7 +139,6 @@ public class FlowNode implements RootEntity {
             .setNodeRatio(this.getNodeRatio())
             .setPermissionFlag(this.getPermissionFlag())
             .setCoordinate(this.getCoordinate())
-            .setVersion(this.getVersion())
             .setAnyNodeSkip(this.getAnyNodeSkip())
             .setListenerType(this.getListenerType())
             .setListenerPath(this.getListenerPath())

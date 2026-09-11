@@ -173,7 +173,6 @@ CREATE TABLE flow_node (
     listener_path nvarchar(400) NULL,
     form_custom nchar(1) DEFAULT('N') NULL,
     form_path nvarchar(100) NULL,
-    version nvarchar(20) NOT NULL,
     create_time datetime2(7)  NULL,
     create_by nvarchar(64) NULL,
     update_time datetime2(7)  NULL,
@@ -276,13 +275,6 @@ EXEC sp_addextendedproperty
 'SCHEMA', N'dbo',
 'TABLE', N'flow_node',
 'COLUMN', N'form_path'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'版本',
-'SCHEMA', N'dbo',
-'TABLE', N'flow_node',
-'COLUMN', N'version'
 GO
 
 EXEC sp_addextendedproperty

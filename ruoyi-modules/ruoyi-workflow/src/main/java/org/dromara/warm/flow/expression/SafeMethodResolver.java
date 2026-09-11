@@ -6,8 +6,6 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.MethodResolver;
 import org.springframework.expression.spel.support.DataBindingMethodResolver;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -35,10 +33,9 @@ public class SafeMethodResolver implements MethodResolver {
         "getDeclaredMethod"
     );
 
-    @Nullable
     @Override
-    public MethodExecutor resolve(@NonNull EvaluationContext context, @NonNull Object targetObject
-        , @NonNull String name, @NonNull List<TypeDescriptor> argumentTypes) throws AccessException {
+    public MethodExecutor resolve(EvaluationContext context, Object targetObject
+        , String name, List<TypeDescriptor> argumentTypes) throws AccessException {
         if (DANGEROUS_METHODS.contains(name)) {
             throw new AccessException("不允许调用方法：" + name);
         }

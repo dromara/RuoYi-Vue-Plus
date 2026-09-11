@@ -21,7 +21,6 @@ import org.dromara.warm.flow.exception.FlowException;
 
 import org.springframework.expression.TypeLocator;
 import org.springframework.expression.spel.support.StandardTypeLocator;
-import org.springframework.lang.NonNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -83,7 +82,7 @@ public class SafeTypeLocator implements TypeLocator {
     }
 
     @Override
-    public Class<?> findType(@NonNull String typeName) {
+    public Class<?> findType(String typeName) {
         if (StrUtil.isEmpty(typeName)) {
             throw new FlowException("Type name cannot be null or empty");
         }

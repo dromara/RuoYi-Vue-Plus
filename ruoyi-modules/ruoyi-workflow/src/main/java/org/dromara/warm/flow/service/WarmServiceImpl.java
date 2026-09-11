@@ -46,7 +46,7 @@ public abstract class WarmServiceImpl<T extends RootEntity> implements IWarmServ
 
     @Override
     public List<T> getByIds(Collection<? extends Serializable> ids) {
-        return getMapper().selectBatchIds(ids);
+        return getMapper().selectByIds(ids);
     }
 
     @Override
@@ -89,7 +89,7 @@ public abstract class WarmServiceImpl<T extends RootEntity> implements IWarmServ
 
     @Override
     public boolean removeByIds(Collection<? extends Serializable> ids) {
-        return SqlHelper.retBool(getMapper().deleteBatchIds(ids));
+        return SqlHelper.retBool(getMapper().deleteByIds(ids));
     }
 
     @Override
