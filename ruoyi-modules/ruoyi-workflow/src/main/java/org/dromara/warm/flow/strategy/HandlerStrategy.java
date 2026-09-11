@@ -55,7 +55,7 @@ public interface HandlerStrategy extends ExpressionStrategy<List<String>> {
             return StreamUtils.toList((List<?>) o, Object::toString);
         }
         if (o instanceof Object[]) {
-            return Arrays.stream((Object[]) o).map(Object::toString).collect(Collectors.toList());
+            return Arrays.stream((Object[]) o).map(Object::toString).toList();
         }
         return Collections.singletonList(o.toString());
     }

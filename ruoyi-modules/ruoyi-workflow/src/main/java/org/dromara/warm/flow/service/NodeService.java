@@ -351,11 +351,7 @@ public class NodeService extends WarmServiceImpl<FlowNode> {
      * @since 2024/8/21 11:32
      */
     private FlowSkip getSkipByCheck(List<FlowSkip> skips, String skipType) {
-        return Optional.ofNullable(skips)
-            .orElse(Collections.emptyList())
-            .stream()
-            .filter(t -> StrUtil.isEmpty(t.getSkipType()) || skipType.equals(t.getSkipType()))
-            .findFirst()
+        return StreamUtils.findFirst(skips, t -> StrUtil.isEmpty(t.getSkipType()) || skipType.equals(t.getSkipType()))
             .orElseThrow(() -> new FlowException(ExceptionCons.NULL_SKIP_TYPE));
     }
 

@@ -33,7 +33,6 @@ import org.dromara.warm.flow.entity.FlowSkip;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 流程定义json对象
@@ -283,7 +282,7 @@ public class DefJson {
             .map(FlowNode::getSkipList)
             .filter(Objects::nonNull)
             .flatMap(List::stream)
-            .collect(Collectors.toList());
+            .toList();
 
         flowCombine.setAllSkips(skipList);
         return flowCombine;

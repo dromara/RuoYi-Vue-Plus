@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.dto;
+import java.io.Serial;
 
 
 import lombok.Getter;
@@ -28,6 +29,8 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class FlowDto implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * ID

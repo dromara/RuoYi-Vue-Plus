@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.ui.vo;
+import java.io.Serial;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class Dict implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

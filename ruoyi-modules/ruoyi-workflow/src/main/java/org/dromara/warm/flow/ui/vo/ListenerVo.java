@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.ui.vo;
+import java.io.Serial;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ListenerVo implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.dto;
+import java.io.Serial;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,6 +38,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Tree implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

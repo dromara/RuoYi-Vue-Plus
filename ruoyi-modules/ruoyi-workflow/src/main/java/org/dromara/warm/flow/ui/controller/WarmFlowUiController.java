@@ -15,7 +15,7 @@
  */
 package org.dromara.warm.flow.ui.controller;
 
-import org.dromara.warm.flow.dto.ApiResult;
+import org.dromara.common.core.domain.R;
 import org.dromara.warm.flow.ui.service.WarmFlowService;
 import org.dromara.warm.flow.ui.vo.WarmFlowVo;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,10 +34,10 @@ public class WarmFlowUiController {
     /**
      * 返回流程定义的配置
      *
-     * @return ApiResult<WarmFlowVo>
+     * @return R<WarmFlowVo>
      */
     @GetMapping("/config")
-    public ApiResult<WarmFlowVo> config() {
+    public R<WarmFlowVo> config() {
         return WarmFlowService.config();
     }
 

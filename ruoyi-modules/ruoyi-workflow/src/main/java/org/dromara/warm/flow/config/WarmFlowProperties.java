@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.config;
+import java.io.Serial;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,8 @@ import java.util.List;
 @Setter
 @ConfigurationProperties("warm-flow")
 public class WarmFlowProperties implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 开关
@@ -43,11 +46,6 @@ public class WarmFlowProperties implements Serializable {
      * 框架类型: springboot、solon
      */
     private FrameworkType framework;
-
-    /**
-     * 启动banner
-     */
-    private boolean banner = true;
 
     /**
      * 数据填充处理类路径
@@ -101,7 +99,7 @@ public class WarmFlowProperties implements Serializable {
      */
     private boolean topTextShow = true;
 
-    public void init() {;
+    public void init() {
 
         // 设置数据填充处理类
         FlowEngine.initDataFillHandler(this.getDataFillHandlerPath());
@@ -112,25 +110,8 @@ public class WarmFlowProperties implements Serializable {
         // 设置全局监听器
         FlowEngine.initGlobalListener(this.getGlobalListenerPath());
 
-        // 打印banner图
-        printBanner();
-
         // 初始化流程状态对应的自定义三原色
         ChartStatus.initCustomColor(this.getChartStatusColor(), this.getChartStatusColorClassics(), this.getChartStatusColorMimic());
-    }
-
-    private void printBanner() {
-        if (this.isBanner()) {
-            System.out.println("\n" +
-                "   ▄     ▄                             ▄▄▄▄▄▄   ▄                     \n" +
-                "   █  █  █  ▄▄▄    ▄ ▄▄  ▄▄▄▄▄         █        █     ▄▄▄  ▄     ▄    \n" +
-                "   ▀ █▀█ █ ▀   █   █▀  ▀ █ █ █  ▄▄▄▄▄  █▄▄▄▄▄   █    █▀ ▀█ ▀▄ ▄ ▄▀    \n" +
-                "    ██ ██▀ ▄▀▀▀█   █     █ █ █         █        █    █   █  █▄█▄█     \n" +
-                "    █   █  ▀▄▄▀█   █     █ █ █         █        █▄▄  ▀█▄█▀   █ █      \n" +
-                "\n" +
-                "\033[32m   :: Warm-Flow ::     (v" + WarmFlowProperties.class.getPackage()
-                .getImplementationVersion() + ")\033[0m\n");
-        }
     }
 
 }

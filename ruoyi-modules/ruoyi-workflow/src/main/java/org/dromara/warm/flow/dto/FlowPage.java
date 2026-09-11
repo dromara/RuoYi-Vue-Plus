@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.dto;
+import java.io.Serial;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class FlowPage<T> implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

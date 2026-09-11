@@ -36,7 +36,7 @@ public class TreeUtil {
      */
     public static List<Tree> buildTree(List<Tree> trees) {
         List<Tree> returnList = new ArrayList<>();
-        List<String> tempList = trees.stream().map(Tree::getId).collect(Collectors.toList());
+        List<String> tempList = trees.stream().map(Tree::getId).toList();
         for (Tree dept : trees) {
             // 如果是顶级节点, 遍历该父节点的所有子节点
             if (!tempList.contains(dept.getParentId())) {

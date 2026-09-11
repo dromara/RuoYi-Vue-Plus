@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 import org.dromara.warm.flow.entity.FlowInstance;
@@ -202,11 +201,8 @@ public class InsService extends WarmServiceImpl<FlowInstance> {
 
         List<Long> taskIds = new ArrayList<>();
         instanceIds.forEach(instanceId -> taskIds.addAll(
-            FlowEngine.taskService()
-                .list(new FlowTask().setInstanceId(instanceId))
-                .stream()
-                .map(FlowTask::getId)
-                .collect(Collectors.toList())));
+            StreamUtils.toList(FlowEngine.taskService()
+                .list(new FlowTask().setInstanceId(instanceId)), FlowTask::getId)));
 
         if (CollUtil.isNotEmpty(taskIds)) {
             FlowEngine.userService().deleteByTaskIds(taskIds);

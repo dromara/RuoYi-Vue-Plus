@@ -155,8 +155,7 @@ public class DefService extends WarmServiceImpl<FlowDefinition> {
         List<FlowNode> nodeList = FlowEngine.nodeService().getByDefId(id);
         definition.setNodeList(nodeList);
         List<FlowSkip> skips = FlowEngine.skipService().getByDefId(id);
-        Map<String, List<FlowSkip>> flowSkipMap = skips.stream()
-            .collect(Collectors.groupingBy(FlowSkip::getNowNodeCode));
+        Map<String, List<FlowSkip>> flowSkipMap = StreamUtils.groupByKey(skips, FlowSkip::getNowNodeCode);
         nodeList.forEach(flowNode -> flowNode.setSkipList(flowSkipMap.get(flowNode.getNodeCode())));
         return definition;
     }
@@ -254,8 +253,8 @@ public class DefService extends WarmServiceImpl<FlowDefinition> {
         FlowDefinition definition = sourceDef.copy();
         definition.setVersion(getNewVersion(definition));
 
-        List<FlowNode> nodeList = FlowEngine.nodeService().getByDefId(id).stream().map(FlowNode::copy).collect(Collectors.toList());
-        List<FlowSkip> skipList = FlowEngine.skipService().getByDefId(id).stream().map(FlowSkip::copy).collect(Collectors.toList());
+        List<FlowNode> nodeList = StreamUtils.toList(FlowEngine.nodeService().getByDefId(id), FlowNode::copy);
+        List<FlowSkip> skipList = StreamUtils.toList(FlowEngine.skipService().getByDefId(id), FlowSkip::copy);
         FlowEngine.dataFillHandler().idFill(definition);
 
         nodeList.forEach(node -> node.setDefinitionId(definition.getId()).setVersion(definition.getVersion()));

@@ -15,7 +15,7 @@
  */
 package org.dromara.warm.flow.ui.controller;
 
-import org.dromara.warm.flow.dto.ApiResult;
+import org.dromara.common.core.domain.R;
 import org.dromara.warm.flow.dto.DefJson;
 import org.dromara.warm.flow.dto.FlowDto;
 import org.dromara.warm.flow.entity.FlowInstance;
@@ -42,14 +42,14 @@ public class WarmFlowController {
      * 保存流程json字符串
      *
      * @param defJson 流程数据集合
-     * @return ApiResult<Void>
+     * @return R<Void>
      * @throws Exception 异常
      * @author xiarg
      * @since 2024/10/29 16:31
      */
     @PostMapping("/save-json")
     @Transactional(rollbackFor = Exception.class)
-    public ApiResult<Void> saveJson(@RequestBody DefJson defJson, @RequestHeader("onlyNodeSkip") boolean onlyNodeSkip) throws Exception {
+    public R<Void> saveJson(@RequestBody DefJson defJson, @RequestHeader("onlyNodeSkip") boolean onlyNodeSkip) throws Exception {
         return WarmFlowService.saveJson(defJson, onlyNodeSkip);
     }
 
@@ -57,12 +57,12 @@ public class WarmFlowController {
      * 获取流程定义数据(包含节点和跳转)
      *
      * @param id 流程定义id
-     * @return ApiResult<DefVo>
+     * @return R<DefVo>
      * @author xiarg
      * @since 2024/10/29 16:31
      */
     @GetMapping(value = {"/query-def", "/query-def/{id}"})
-    public ApiResult<DefJson> queryDef(@PathVariable(value = "id", required = false) Long id) {
+    public R<DefJson> queryDef(@PathVariable(value = "id", required = false) Long id) {
         return WarmFlowService.queryDef(id);
     }
 
@@ -70,10 +70,10 @@ public class WarmFlowController {
      * 获取流程图
      *
      * @param id 流程实例id
-     * @return ApiResult<DefJson>
+     * @return R<DefJson>
      */
     @GetMapping("/query-flow-chart/{id}")
-    public ApiResult<DefJson> queryFlowChart(@PathVariable("id") Long id) {
+    public R<DefJson> queryFlowChart(@PathVariable("id") Long id) {
         return WarmFlowService.queryFlowChart(id);
     }
 
@@ -83,7 +83,7 @@ public class WarmFlowController {
      * @return List<String>
      */
     @GetMapping("/handler-type")
-    public ApiResult<List<String>> handlerType() {
+    public R<List<String>> handlerType() {
         return WarmFlowService.handlerType();
     }
 
@@ -93,7 +93,7 @@ public class WarmFlowController {
      * @return HandlerSelectVo
      */
     @GetMapping("/handler-result")
-    public ApiResult<HandlerSelectVo> handlerResult(HandlerQuery query) {
+    public R<HandlerSelectVo> handlerResult(HandlerQuery query) {
         return WarmFlowService.handlerResult(query);
     }
 
@@ -103,7 +103,7 @@ public class WarmFlowController {
      * @return HandlerSelectVo
      */
     @GetMapping("/handler-feedback")
-    public ApiResult<List<HandlerFeedBackVo>> handlerFeedback(HandlerFeedBackDto handlerFeedBackDto) {
+    public R<List<HandlerFeedBackVo>> handlerFeedback(HandlerFeedBackDto handlerFeedBackDto) {
         return WarmFlowService.handlerFeedback(handlerFeedBackDto);
     }
 
@@ -113,7 +113,7 @@ public class WarmFlowController {
      * @return List<Dict>
      */
     @GetMapping("/handler-dict")
-    public ApiResult<List<Dict>> handlerDict() {
+    public R<List<Dict>> handlerDict() {
         return WarmFlowService.handlerDict();
     }
 
@@ -121,12 +121,12 @@ public class WarmFlowController {
      * 根据任务id获取待办任务表单及数据
      *
      * @param taskId 当前任务id
-     * @return {@link ApiResult< FlowDto >}
+     * @return {@link R< FlowDto >}
      * @author liangli
      * @date 2024/8/21 17:08
      **/
     @GetMapping(value = "/execute/load/{taskId}")
-    public ApiResult<FlowDto> load(@PathVariable("taskId") Long taskId) {
+    public R<FlowDto> load(@PathVariable("taskId") Long taskId) {
         return WarmFlowService.load(taskId);
     }
 
@@ -137,7 +137,7 @@ public class WarmFlowController {
      * @return
      */
     @GetMapping(value = "/execute/hisLoad/{taskId}")
-    public ApiResult<FlowDto> hisLoad(@PathVariable("taskId") Long hisTaskId) {
+    public R<FlowDto> hisLoad(@PathVariable("taskId") Long hisTaskId) {
         return WarmFlowService.hisLoad(hisTaskId);
     }
 
@@ -153,7 +153,7 @@ public class WarmFlowController {
      */
     @Transactional(rollbackFor = Exception.class)
     @PostMapping(value = "/execute/handle")
-    public ApiResult<FlowInstance> handle(@RequestBody Map<String, Object> formData, @RequestParam("taskId") Long taskId
+    public R<FlowInstance> handle(@RequestBody Map<String, Object> formData, @RequestParam("taskId") Long taskId
         , @RequestParam("skipType") String skipType, @RequestParam("message") String message
         , @RequestParam(value = "nodeCode", required = false) String nodeCode) {
         return WarmFlowService.handle(formData, taskId, skipType, message, nodeCode);
@@ -165,7 +165,7 @@ public class WarmFlowController {
      * @return List<NodeExt>
      */
     @GetMapping("/node-ext")
-    public ApiResult<List<NodeExt>> nodeExt() {
+    public R<List<NodeExt>> nodeExt() {
         return WarmFlowService.nodeExt();
     }
 
@@ -175,7 +175,7 @@ public class WarmFlowController {
      * @return List<NodeExt>
      */
     @GetMapping("/listener-list")
-    public ApiResult<List<ListenerVo>> listenerList() {
+    public R<List<ListenerVo>> listenerList() {
         return WarmFlowService.listenerList();
     }
 

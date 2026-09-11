@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.exception;
+import java.io.Serial;
 
 import lombok.Getter;
 
@@ -23,6 +24,7 @@ import lombok.Getter;
  * @author warm
  */
 public final class FlowException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

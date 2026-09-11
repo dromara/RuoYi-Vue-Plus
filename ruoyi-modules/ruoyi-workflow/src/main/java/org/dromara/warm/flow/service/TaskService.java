@@ -37,7 +37,6 @@ import org.dromara.warm.flow.utils.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 import org.dromara.warm.flow.entity.FlowTask;
@@ -159,57 +158,57 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
         // TODO min 后续考虑并发问题，待办任务和实例表不同步，可给待办任务id加锁，抽取所接口，方便后续兼容分布式锁
         // 流程开启前正确性校验
         R r = getAndCheck(task);
-        flowParams.variable(MapUtil.mergeAll(r.instance.getVariableMap(), flowParams.getVariable()));
+        flowParams.variable(MapUtil.mergeAll(r.instance().getVariableMap(), flowParams.getVariable()));
         // 非第一个记得跳转类型必传
         if (!NodeType.isStart(task.getNodeType())) {
             AssertUtil.isFalse(StrUtil.isNotEmpty(flowParams.getSkipType()), ExceptionCons.NULL_CONDITION_VALUE);
         }
         task.setUserList(FlowEngine.userService().listByAssociatedAndTypes(task.getId()));
-        FlowCombine flowCombine = FlowEngine.defService().getFlowCombineNoDef(r.definition.getId());
+        FlowCombine flowCombine = FlowEngine.defService().getFlowCombineNoDef(r.definition().getId());
 
         // 执行开始监听器
-        ListenerUtil.executeStart(new ListenerVariable(r.definition, r.instance, r.nowNode, flowParams.getVariable()
+        ListenerUtil.executeStart(new ListenerVariable(r.definition(), r.instance(), r.nowNode(), flowParams.getVariable()
             , task).setFlowParams(flowParams));
 
         // 如果是受托人在处理任务，需要处理一条委派记录，并且更新委托人，回到计划审批人,然后直接返回流程实例
         if (!flowParams.isIgnoreDepute() && handleDepute(task, flowParams)) {
-            return r.instance;
+            return r.instance();
         }
 
         // 判断当前处理人是否有权限处理
         checkAuth(task, flowParams);
 
         //或签、会签、票签逻辑处理
-        if (!flowParams.isIgnoreCooperate() && cooperate(r.nowNode, task, flowParams)) {
-            return r.instance;
+        if (!flowParams.isIgnoreCooperate() && cooperate(r.nowNode(), task, flowParams)) {
+            return r.instance();
         }
 
         // 获取后续任务节点结合
         PathWayData pathWayData = new PathWayData().setInsId(task.getInstanceId()).setSkipType(flowParams.getSkipType());
-        FlowNode nextNode = FlowEngine.nodeService().getNextNode(r.nowNode, flowParams.getNodeCode()
+        FlowNode nextNode = FlowEngine.nodeService().getNextNode(r.nowNode(), flowParams.getNodeCode()
             , flowParams.getSkipType(), pathWayData, flowCombine);
         List<FlowNode> nextNodes = FlowEngine.nodeService().getNextByCheckGateway(flowParams.getVariable()
             , nextNode, pathWayData, flowCombine);
 
         // 判断并行网关和包容网关节点只剩一个前置代办任务，才能生成新的代办任务
-        isGenerateNewTask(pathWayData, r.instance, nextNodes);
+        isGenerateNewTask(pathWayData, r.instance(), nextNodes);
         pathWayData.getTargetNodes().addAll(nextNodes);
 
         // 设置流程图元数据
-        r.instance.setDefJson(FlowEngine.chartService().skipMetadata(pathWayData));
+        r.instance().setDefJson(FlowEngine.chartService().skipMetadata(pathWayData));
 
         // 构建增待办任务和设置结束任务历史记录
-        List<FlowTask> addTasks = StreamUtils.toList(nextNodes, node -> addTask(node, r.instance, r.definition, flowParams));
+        List<FlowTask> addTasks = StreamUtils.toList(nextNodes, node -> addTask(node, r.instance(), r.definition(), flowParams));
 
         // 办理人变量替换
-        ExpressionUtil.evalVariable(addTasks, flowParams.variable(MapUtil.mergeAll(r.instance.getVariableMap(), flowParams.getVariable())));
+        ExpressionUtil.evalVariable(addTasks, flowParams.variable(MapUtil.mergeAll(r.instance().getVariableMap(), flowParams.getVariable())));
 
         // 执行分派监听器
-        ListenerUtil.executeAssignment(new ListenerVariable(r.definition, r.instance, r.nowNode, flowParams.getVariable()
+        ListenerUtil.executeAssignment(new ListenerVariable(r.definition(), r.instance(), r.nowNode(), flowParams.getVariable()
             , task, nextNodes, addTasks).setFlowParams(flowParams));
 
         // 更新流程信息
-        updateFlowInfo(task, r.instance, addTasks, flowParams, nextNodes);
+        updateFlowInfo(task, r.instance(), addTasks, flowParams, nextNodes);
 
         // 一票否决（谨慎使用），如果退回，退回指向节点后还存在其他正在执行的待办任务，转历史任务，状态都为失效,重走流程。
         if (CollUtil.isNotEmpty(nextNodes) && SkipType.isReject(flowParams.getSkipType())) {
@@ -217,13 +216,13 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
         }
 
         // 处理未完成的任务，当流程完成，还存在待办任务未完成，转历史任务，状态完成。
-        handUndoneTask(r.instance);
+        handUndoneTask(r.instance());
 
         // 执行完成和创建监听器
-        ListenerUtil.endCreateListener(new ListenerVariable(r.definition, r.instance, r.nowNode
+        ListenerUtil.endCreateListener(new ListenerVariable(r.definition(), r.instance(), r.nowNode()
             , flowParams.getVariable(), task, nextNodes, addTasks).setFlowParams(flowParams));
 
-        return r.instance;
+        return r.instance();
     }
 
     public FlowInstance revoke(Long instanceId, FlowParams flowParams) {
@@ -318,8 +317,8 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
     public FlowInstance termination(FlowTask task, FlowParams flowParams) {
         R r = getAndCheck(task);
         flowParams.skipType(SkipType.PASS.getKey());
-        flowParams.variable(MapUtil.mergeAll(r.instance.getVariableMap(), flowParams.getVariable()));
-        ListenerUtil.executeStart(new ListenerVariable(r.definition, r.instance, r.nowNode, flowParams.getVariable()
+        flowParams.variable(MapUtil.mergeAll(r.instance().getVariableMap(), flowParams.getVariable()));
+        ListenerUtil.executeStart(new ListenerVariable(r.definition(), r.instance(), r.nowNode(), flowParams.getVariable()
             , task).setFlowParams(flowParams));
 
         // 判断当前处理人是否有权限处理
@@ -327,38 +326,38 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
         checkAuth(task, flowParams);
 
         // 所有待办转历史
-        FlowNode endNode = FlowEngine.nodeService().getEndNode(r.instance.getDefinitionId());
+        FlowNode endNode = FlowEngine.nodeService().getEndNode(r.instance().getDefinitionId());
 
         // 设置流程图元数据
         PathWayData pathWayData = new PathWayData()
             .setInsId(task.getInstanceId())
             .setSkipType(flowParams.getSkipType())
-            .setPathWayNodes(Collections.singletonList(r.nowNode))
+            .setPathWayNodes(Collections.singletonList(r.nowNode()))
             .setTargetNodes(Collections.singletonList(endNode));
-        r.instance.setDefJson(FlowEngine.chartService().skipMetadata(pathWayData));
+        r.instance().setDefJson(FlowEngine.chartService().skipMetadata(pathWayData));
 
         // 流程实例完成
-        r.instance.setNodeType(endNode.getNodeType())
+        r.instance().setNodeType(endNode.getNodeType())
             .setNodeCode(endNode.getNodeCode())
             .setNodeName(endNode.getNodeName())
             .setFlowStatus(StrUtil.emptyToDefault(flowParams.getFlowStatus(), FlowStatus.TERMINATE.getKey()));
 
         // 待办任务转历史
-        flowParams.flowStatus(r.instance.getFlowStatus());
+        flowParams.flowStatus(r.instance().getFlowStatus());
         FlowHisTask insHis = FlowEngine.hisTaskService().setSkipInsHis(task, Collections.singletonList(endNode)
             , flowParams);
         FlowEngine.hisTaskService().save(insHis);
-        FlowEngine.insService().updateById(r.instance);
+        FlowEngine.insService().updateById(r.instance());
 
         // 删除流程相关办理人
         FlowEngine.userService().deleteByTaskIds(Collections.singletonList(task.getId()));
 
         // 处理未完成的任务，当流程完成，还存在待办任务未完成，转历史任务，状态完成。
-        handUndoneTask(r.instance);
+        handUndoneTask(r.instance());
         // 最后判断是否存在节点监听器，存在执行节点监听器
-        ListenerUtil.executeFinish(new ListenerVariable(r.definition, r.instance, r.nowNode, flowParams.getVariable()
+        ListenerUtil.executeFinish(new ListenerVariable(r.definition(), r.instance(), r.nowNode(), flowParams.getVariable()
             , task).setFlowParams(flowParams));
-        return r.instance;
+        return r.instance();
     }
 
     public boolean deleteByInsIds(List<Long> instanceIds) {
@@ -421,9 +420,9 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
     public boolean updateHandler(Long taskId, FlowParams flowParams) {
         // 获取待办任务
         R r = getAndCheck(taskId);
-        flowParams.variable(MapUtil.mergeAll(r.instance.getVariableMap(), flowParams.getVariable()));
+        flowParams.variable(MapUtil.mergeAll(r.instance().getVariableMap(), flowParams.getVariable()));
         // 执行开始监听器
-        ListenerUtil.executeStart(new ListenerVariable(r.definition, r.instance, r.nowNode, null, r.task));
+        ListenerUtil.executeStart(new ListenerVariable(r.definition(), r.instance(), r.nowNode(), null, r.task()));
 
         // 获取给谁的权限
         if (!flowParams.isIgnore()) {
@@ -444,7 +443,7 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
                 FlowEngine.userService().remove(new FlowUser().setAssociated(taskId)
                     .setProcessedBy(reductionHandler));
             }
-            hisTask = FlowEngine.hisTaskService().setCooperateHis(r.task, flowParams, flowParams.getReductionHandlers());
+            hisTask = FlowEngine.hisTaskService().setCooperateHis(r.task(), flowParams, flowParams.getReductionHandlers());
         }
 
         // 新增权限人
@@ -460,14 +459,14 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
             FlowEngine.userService().saveBatch(StreamUtils.toList(flowParams.getAddHandlers(), permission ->
                 FlowEngine.userService().structureUser(taskId, permission
                     , type, flowParams.getHandler())));
-            hisTask = FlowEngine.hisTaskService().setCooperateHis(r.task, flowParams, flowParams.getAddHandlers());
+            hisTask = FlowEngine.hisTaskService().setCooperateHis(r.task(), flowParams, flowParams.getAddHandlers());
         }
         if (ObjectUtil.isNotNull(hisTask)) {
             FlowEngine.hisTaskService().save(hisTask);
         }
         // 最后判断是否存在节点监听器，存在执行节点监听器
-        ListenerUtil.executeFinish(new ListenerVariable(r.definition, r.instance, r.nowNode, flowParams.getVariable()
-            , r.task));
+        ListenerUtil.executeFinish(new ListenerVariable(r.definition(), r.instance(), r.nowNode(), flowParams.getVariable()
+            , r.task()));
         return true;
     }
 
@@ -487,23 +486,23 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
         R r = getAndCheck(task);
         flowParams.flowStatus(StrUtil.emptyToDefault(flowParams.getFlowStatus(), FlowStatus.PENDING.getKey()));
         // 执行开始监听器
-        ListenerUtil.executeStart(new ListenerVariable(r.definition, r.instance, r.nowNode, flowParams.getVariable()
-            , r.task).setFlowParams(flowParams));
+        ListenerUtil.executeStart(new ListenerVariable(r.definition(), r.instance(), r.nowNode(), flowParams.getVariable()
+            , r.task()).setFlowParams(flowParams));
 
         // 判断当前处理人是否有权限处理
-        checkAuth(r.task, flowParams);
+        checkAuth(r.task(), flowParams);
 
         // 设置流程历史任务信息
-        FlowHisTask insHis = FlowEngine.hisTaskService().notSkip(r.task, flowParams);
+        FlowHisTask insHis = FlowEngine.hisTaskService().notSkip(r.task(), flowParams);
         FlowEngine.hisTaskService().save(insHis);
 
-        FlowEngine.insService().updateById(r.instance.setFlowStatus(flowParams.getFlowStatus()));
+        FlowEngine.insService().updateById(r.instance().setFlowStatus(flowParams.getFlowStatus()));
 
         // 执行任务完成监听器
-        ListenerUtil.executeFinish(new ListenerVariable(r.definition, r.instance, r.nowNode
-            , flowParams.getVariable(), r.task));
+        ListenerUtil.executeFinish(new ListenerVariable(r.definition(), r.instance(), r.nowNode()
+            , flowParams.getVariable(), r.task()));
 
-        return r.instance;
+        return r.instance();
     }
 
     public FlowTask addTask(FlowNode node, FlowInstance instance, FlowDefinition definition, FlowParams flowParams) {
@@ -544,9 +543,7 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
         mergeVariable(instance, flowParams.getVariable());
         if (CollUtil.isNotEmpty(addTasks)) {
             // 终结节点任务不算待办任务，取其中最后一个作为实例最终信息
-            List<FlowTask> endTasks = addTasks.stream()
-                .filter(addTask -> NodeType.isEnd(addTask.getNodeType()))
-                .collect(Collectors.toList());
+            List<FlowTask> endTasks = StreamUtils.filter(addTasks, addTask -> NodeType.isEnd(addTask.getNodeType()));
             addTasks.removeAll(endTasks);
             FlowTask finallyTask = CollUtil.getLast(endTasks);
             if (finallyTask == null) {
@@ -650,18 +647,10 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
         return new R(instance, definition, nowNode, task);
     }
 
-    private static class R {
-        public final FlowInstance instance;
-        public final FlowDefinition definition;
-        public final FlowNode nowNode;
-        public final FlowTask task;
-
-        public R(FlowInstance instance, FlowDefinition definition, FlowNode nowNode, FlowTask task) {
-            this.instance = instance;
-            this.definition = definition;
-            this.nowNode = nowNode;
-            this.task = task;
-        }
+    /**
+     * 办理校验后的上下文：实例、定义、当前节点、当前任务
+     */
+    private record R(FlowInstance instance, FlowDefinition definition, FlowNode nowNode, FlowTask task) {
     }
 
     private boolean handleDepute(FlowTask task, FlowParams flowParams) {
@@ -828,9 +817,8 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
         DefJson defJson = JsonUtil.strToBean(instance.getDefJson(), DefJson.class);
         Map<String, NodeJson> nodeJsonMap = StreamUtils.toMap(defJson.getNodeList(), NodeJson::getNodeCode, node -> node);
         // 途径节点中的并行/包容网关，只剩一个前置待办任务时才能生成新的代办任务
-        List<FlowNode> parallelOrInclusiveList = pathWayData.getPathWayNodes().stream()
-            .filter(t -> NodeType.isGateWayParallel(t.getNodeType()) || NodeType.isGateWayInclusive(t.getNodeType()))
-            .collect(Collectors.toList());
+        List<FlowNode> parallelOrInclusiveList = StreamUtils.filter(pathWayData.getPathWayNodes(),
+            t -> NodeType.isGateWayParallel(t.getNodeType()) || NodeType.isGateWayInclusive(t.getNodeType()));
         if (CollUtil.isEmpty(parallelOrInclusiveList)) {
             return;
         }
@@ -964,7 +952,7 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
         R r = getAndCheck(taskId);
 
         FlowDto flowDto = new FlowDto();
-        flowDto.setData(r.instance.getVariableMap().get(FlowCons.FORM_DATA));
+        flowDto.setData(r.instance().getVariableMap().get(FlowCons.FORM_DATA));
 
         return flowDto;
     }

@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.dto;
+import java.io.Serial;
 
 import org.dromara.warm.flow.json.JsonUtil;
 
@@ -35,13 +36,14 @@ import java.util.*;
  * @author warm
  * @since 2023/3/31 17:18
  */
+@Getter
 public class FlowParams implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
      * 流程编码
      */
-    @Getter
     private String flowCode;
 
     /**
@@ -52,7 +54,6 @@ public class FlowParams implements Serializable {
     /**
      * 节点编码（如果要指定跳转节点，传入）
      */
-    @Getter
     private String nodeCode;
 
     /**
@@ -63,97 +64,81 @@ public class FlowParams implements Serializable {
     /**
      * 跳转类型（PASS审批通过 REJECT退回）
      */
-    @Getter
     private String skipType;
 
     /**
      * 审批意见
      */
-    @Getter
     private String message;
 
     /**
      * 流程变量
      */
-    @Getter
     private Map<String, Object> variable = new HashMap<>();
 
     /**
      * 流程实例状态
      */
-    @Getter
     private String flowStatus;
 
     /**
      * 历史任务表状态
      */
-    @Getter
     private String hisStatus;
 
     /**
      * 流程激活状态（0挂起 1激活）
      */
-    @Getter
     private Integer activityStatus;
 
     /**
      * 协作方式(1审批 2转办 3委派 4会签 5票签 6加签 7减签)
      */
-    @Getter
     private Integer cooperateType;
 
     /**
      * 扩展字段，预留给业务系统使用
      */
-    @Getter
     private String ext;
 
     /**
      * 扩展字段，预留给业务系统使用
      */
-    @Getter
     private String hisTaskExt;
 
     /**
      * 增加办理人：加签，转办，委托
      */
-    @Getter
     private List<String> addHandlers;
 
     /**
      * 减少办理人：减签，委托
      */
-    @Getter
     private List<String> reductionHandlers;
 
     /**
      * 忽略-办理权限校验（true：忽略，false：不忽略）
      */
-    @Getter
     private boolean ignore;
 
     /**
      * 忽略-委派处理（true：忽略，false：不忽略）
      */
-    @Getter
     private boolean ignoreDepute;
 
     /**
      * 忽略-会签票签处理（true：忽略，false：不忽略）
      */
-    @Getter
     private boolean ignoreCooperate;
 
     /**
      * 执行的下个任务的办理人
      */
-    @Getter
     private String[] nextHandler;
 
     /**
      * 下个任务处理人配置类型（true-追加，false-覆盖，默认false）
      */
-    @Getter
     private boolean nextHandlerAppend;
 
     public FlowParams() {

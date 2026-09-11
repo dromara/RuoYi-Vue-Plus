@@ -27,6 +27,7 @@ import org.dromara.warm.flow.entity.FlowInstance;
 import org.dromara.warm.flow.enums.FormCustomEnum;
 import org.dromara.warm.flow.enums.ModelEnum;
 import org.dromara.warm.flow.exception.FlowException;
+import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 
@@ -49,23 +50,23 @@ public class WarmFlowService {
     /**
      * 返回流程定义的配置
      *
-     * @return ApiResult<WarmFlowVo>
+     * @return R<WarmFlowVo>
      */
-    public static ApiResult<WarmFlowVo> config() {
+    public static R<WarmFlowVo> config() {
         WarmFlowVo warmFlowVo = new WarmFlowVo();
         WarmFlowProperties warmFlow = FlowEngine.getFlowConfig();
         warmFlowVo.setFramework(warmFlow.getFramework().name());
         // 获取tokenName
         String tokenName = warmFlow.getTokenName();
         if (StrUtil.isEmpty(tokenName)) {
-            return ApiResult.fail("未配置tokenName");
+            return R.fail("未配置tokenName");
         }
         String[] tokenNames = tokenName.split(",");
         List<String> tokenNameList = Arrays.stream(tokenNames).filter(StrUtil::isNotEmpty)
-            .map(String::trim).collect(Collectors.toList());
+            .map(String::trim).toList();
         warmFlowVo.setTokenNameList(tokenNameList);
 
-        return ApiResult.ok(warmFlowVo);
+        return R.ok(warmFlowVo);
     }
 
     /**
@@ -73,25 +74,25 @@ public class WarmFlowService {
      *
      * @param defJson      流程数据集合
      * @param onlyNodeSkip 是否只保存节点和跳转
-     * @return ApiResult<Void>
+     * @return R<Void>
      * @throws Exception 异常
      * @author xiarg
      * @since 2024/10/29 16:31
      */
-    public static ApiResult<Void> saveJson(DefJson defJson, boolean onlyNodeSkip) throws Exception {
+    public static R<Void> saveJson(DefJson defJson, boolean onlyNodeSkip) throws Exception {
         FlowEngine.defService().saveDef(defJson, onlyNodeSkip);
-        return ApiResult.ok();
+        return R.ok();
     }
 
     /**
      * 获取流程定义数据(包含节点和跳转)
      *
      * @param id 流程定义id
-     * @return ApiResult<DefVo>
+     * @return R<DefVo>
      * @author xiarg
      * @since 2024/10/29 16:31
      */
-    public static ApiResult<DefJson> queryDef(Long id) {
+    public static R<DefJson> queryDef(Long id) {
         try {
             DefJson defJson;
             if (id == null) {
@@ -106,7 +107,7 @@ public class WarmFlowService {
                 List<Tree> treeList = categoryService.queryCategory();
                 defJson.setCategoryList(TreeUtil.buildTree(treeList));
             }
-            return ApiResult.ok(defJson);
+            return R.ok(defJson);
         } catch (Exception e) {
             log.error("获取流程json字符串", e);
             throw new FlowException("获取流程json字符串失败", e);
@@ -117,9 +118,9 @@ public class WarmFlowService {
      * 获取流程图
      *
      * @param id 流程实例id
-     * @return ApiResult<DefJson>
+     * @return R<DefJson>
      */
-    public static ApiResult<DefJson> queryFlowChart(Long id) {
+    public static R<DefJson> queryFlowChart(Long id) {
         try {
             FlowInstance instance = FlowEngine.insService().getById(id);
             String defJsonStr = instance.getDefJson();
@@ -137,7 +138,7 @@ public class WarmFlowService {
                 chartExtService.execute(defJson);
             }
 
-            return ApiResult.ok(defJson);
+            return R.ok(defJson);
         } catch (Exception e) {
             log.error("获取流程图", e);
             throw new FlowException("获取流程图失败", e);
@@ -149,15 +150,15 @@ public class WarmFlowService {
      *
      * @return List<String>
      */
-    public static ApiResult<List<String>> handlerType() {
+    public static R<List<String>> handlerType() {
         try {
             // 需要业务系统实现该接口
             HandlerSelectService handlerSelectService = SpringUtils.getBeanOrNull(HandlerSelectService.class);
             if (handlerSelectService == null) {
-                return ApiResult.ok(Collections.emptyList());
+                return R.ok(Collections.emptyList());
             }
             List<String> handlerType = handlerSelectService.getHandlerType();
-            return ApiResult.ok(handlerType);
+            return R.ok(handlerType);
         } catch (Exception e) {
             log.error("办理人权限设置列表tabs页签异常", e);
             throw new FlowException("办理人权限设置列表tabs页签失败", e);
@@ -169,15 +170,15 @@ public class WarmFlowService {
      *
      * @return HandlerSelectVo
      */
-    public static ApiResult<HandlerSelectVo> handlerResult(HandlerQuery query) {
+    public static R<HandlerSelectVo> handlerResult(HandlerQuery query) {
         try {
             // 需要业务系统实现该接口
             HandlerSelectService handlerSelectService = SpringUtils.getBeanOrNull(HandlerSelectService.class);
             if (handlerSelectService == null) {
-                return ApiResult.ok(new HandlerSelectVo());
+                return R.ok(new HandlerSelectVo());
             }
             HandlerSelectVo handlerSelectVo = handlerSelectService.getHandlerSelect(query);
-            return ApiResult.ok(handlerSelectVo);
+            return R.ok(handlerSelectVo);
         } catch (Exception e) {
             log.error("办理人权限设置列表结果异常", e);
             throw new FlowException("办理人权限设置列表结果失败", e);
@@ -189,17 +190,17 @@ public class WarmFlowService {
      *
      * @return HandlerSelectVo
      */
-    public static ApiResult<List<HandlerFeedBackVo>> handlerFeedback(HandlerFeedBackDto handlerFeedBackDto) {
+    public static R<List<HandlerFeedBackVo>> handlerFeedback(HandlerFeedBackDto handlerFeedBackDto) {
         try {
             // 需要业务系统实现该接口
             HandlerSelectService handlerSelectService = SpringUtils.getBeanOrNull(HandlerSelectService.class);
             if (handlerSelectService == null) {
                 List<HandlerFeedBackVo> handlerFeedBackVos = StreamUtils.toList(handlerFeedBackDto.getStorageIds(),
                     storageId -> new HandlerFeedBackVo(storageId, null));
-                return ApiResult.ok(handlerFeedBackVos);
+                return R.ok(handlerFeedBackVos);
             }
             List<HandlerFeedBackVo> handlerFeedBackVos = handlerSelectService.handlerFeedback(handlerFeedBackDto.getStorageIds());
-            return ApiResult.ok(handlerFeedBackVos);
+            return R.ok(handlerFeedBackVos);
         } catch (Exception e) {
             log.error("办理人权限名称回显", e);
             throw new FlowException("办理人权限名称回显", e);
@@ -211,7 +212,7 @@ public class WarmFlowService {
      *
      * @return List<Dict>
      */
-    public static ApiResult<List<Dict>> handlerDict() {
+    public static R<List<Dict>> handlerDict() {
         try {
             // 需要业务系统实现该接口
             HandlerDictService handlerDictService = SpringUtils.getBeanOrNull(HandlerDictService.class);
@@ -230,9 +231,9 @@ public class WarmFlowService {
                 dictList.add(dict1);
                 dictList.add(dict2);
 
-                return ApiResult.ok(dictList);
+                return R.ok(dictList);
             }
-            return ApiResult.ok(handlerDictService.getHandlerDict());
+            return R.ok(handlerDictService.getHandlerDict());
         } catch (Exception e) {
             log.error("办理人权限设置列表结果异常", e);
             throw new FlowException("办理人权限设置列表结果失败", e);
@@ -243,14 +244,14 @@ public class WarmFlowService {
      * 根据任务id获取待办任务表单及数据
      *
      * @param taskId 当前任务id
-     * @return {@link ApiResult<FlowDto>}
+     * @return {@link R<FlowDto>}
      * @author liangli
      * @date 2024/8/21 17:08
      **/
-    public static ApiResult<FlowDto> load(Long taskId) {
+    public static R<FlowDto> load(Long taskId) {
         FlowParams flowParams = FlowParams.build();
 
-        return ApiResult.ok(FlowEngine.taskService().load(taskId, flowParams));
+        return R.ok(FlowEngine.taskService().load(taskId, flowParams));
     }
 
     /**
@@ -259,10 +260,10 @@ public class WarmFlowService {
      * @param hisTaskId
      * @return
      */
-    public static ApiResult<FlowDto> hisLoad(Long hisTaskId) {
+    public static R<FlowDto> hisLoad(Long hisTaskId) {
         FlowParams flowParams = FlowParams.build();
 
-        return ApiResult.ok(FlowEngine.taskService().hisLoad(hisTaskId, flowParams));
+        return R.ok(FlowEngine.taskService().hisLoad(hisTaskId, flowParams));
     }
 
     /**
@@ -275,7 +276,7 @@ public class WarmFlowService {
      * @param nodeCode
      * @return
      */
-    public static ApiResult<FlowInstance> handle(Map<String, Object> formData, Long taskId, String skipType
+    public static R<FlowInstance> handle(Map<String, Object> formData, Long taskId, String skipType
         , String message, String nodeCode) {
         FlowParams flowParams = FlowParams.build()
             .skipType(skipType)
@@ -284,7 +285,7 @@ public class WarmFlowService {
 
         flowParams.formData(formData);
 
-        return ApiResult.ok(FlowEngine.taskService().skip(taskId, flowParams));
+        return R.ok(FlowEngine.taskService().skip(taskId, flowParams));
     }
 
     /**
@@ -292,15 +293,15 @@ public class WarmFlowService {
      *
      * @return List<NodeExt>
      */
-    public static ApiResult<List<NodeExt>> nodeExt() {
+    public static R<List<NodeExt>> nodeExt() {
         try {
             // 需要业务系统实现该接口
             NodeExtService nodeExtService = SpringUtils.getBeanOrNull(NodeExtService.class);
             if (nodeExtService == null) {
-                return ApiResult.ok(Collections.emptyList());
+                return R.ok(Collections.emptyList());
             }
             List<NodeExt> nodeExts = nodeExtService.getNodeExt();
-            return ApiResult.ok(nodeExts);
+            return R.ok(nodeExts);
         } catch (Exception e) {
             log.error("获取节点扩展属性", e);
             throw new FlowException("获取节点扩展属性失败", e);
@@ -312,15 +313,15 @@ public class WarmFlowService {
      *
      * @return List<NodeExt>
      */
-    public static ApiResult<List<ListenerVo>> listenerList() {
+    public static R<List<ListenerVo>> listenerList() {
         try {
             // 需要业务系统实现该接口
             ListenerListService listenerListService = SpringUtils.getBeanOrNull(ListenerListService.class);
             if (listenerListService == null) {
-                return ApiResult.ok(Collections.emptyList());
+                return R.ok(Collections.emptyList());
             }
             List<ListenerVo> listenerList = listenerListService.listenerList();
-            return ApiResult.ok(listenerList);
+            return R.ok(listenerList);
         } catch (Exception e) {
             log.error("获取监听器列表", e);
             throw new FlowException("获取监听器列表失败", e);

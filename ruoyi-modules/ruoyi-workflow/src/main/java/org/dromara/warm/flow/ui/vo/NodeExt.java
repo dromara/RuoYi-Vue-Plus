@@ -14,8 +14,11 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.ui.vo;
+import java.io.Serial;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -30,6 +33,7 @@ import java.util.List;
 @Getter
 @Setter
 public class NodeExt implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     private String code;
     private String name;
@@ -57,23 +61,16 @@ public class NodeExt implements Serializable {
 
     @Getter
     @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class DictItem {
         private String label;
         private String value;
         private boolean selected;
 
-        public DictItem() {
-        }
-
         public DictItem(String label, String value) {
             this.label = label;
             this.value = value;
-        }
-
-        public DictItem(String label, String value, boolean selected) {
-            this.label = label;
-            this.value = value;
-            this.selected = selected;
         }
     }
 

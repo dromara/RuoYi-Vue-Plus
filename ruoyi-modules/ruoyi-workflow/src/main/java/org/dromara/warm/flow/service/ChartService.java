@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 流程图绘制Service业务层处理
@@ -61,8 +60,9 @@ public class ChartService {
 
         Map<String, NodeJson> nodeMap = StreamUtils.toMap(nodeList, NodeJson::getNodeCode
             , node -> node.setStatus(ChartStatus.NOT_DONE.getKey()));
-        Map<String, SkipJson> skipMap = nodeList.stream().map(NodeJson::getSkipList).flatMap(List::stream)
-            .collect(Collectors.toMap(this::getSkipKey, skip -> skip.setStatus(ChartStatus.NOT_DONE.getKey())));
+        List<SkipJson> allSkips = nodeList.stream().map(NodeJson::getSkipList).flatMap(List::stream).toList();
+        Map<String, SkipJson> skipMap = StreamUtils.toMap(allSkips, this::getSkipKey
+            , skip -> skip.setStatus(ChartStatus.NOT_DONE.getKey()));
 
         pathWayData.getPathWayNodes().forEach(node -> nodeMap.get(node.getNodeCode()).setStatus(ChartStatus.DONE.getKey()));
         pathWayData.getPathWaySkips().forEach(skip -> skipMap.get(getSkipKey(skip)).setStatus(ChartStatus.DONE.getKey()));
@@ -79,7 +79,7 @@ public class ChartService {
 
         List<NodeJson> nodeList = defJson.getNodeList();
         List<SkipJson> skipList = defJson.getNodeList().stream().map(NodeJson::getSkipList)
-                .filter(Objects::nonNull).flatMap(List::stream).collect(Collectors.toList());
+                .filter(Objects::nonNull).flatMap(List::stream).toList();
         Map<String, NodeJson> nodeMap = StreamUtils.toMap(nodeList, NodeJson::getNodeCode, node -> node);
         Map<String, SkipJson> skipMap = StreamUtils.toMap(skipList, this::getSkipKey, skip -> skip);
 

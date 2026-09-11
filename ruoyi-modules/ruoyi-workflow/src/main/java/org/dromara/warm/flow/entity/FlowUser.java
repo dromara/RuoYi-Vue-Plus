@@ -57,7 +57,7 @@ public class FlowUser implements RootEntity {
     /**
      * 删除标记
      */
-    @TableLogic(value = "0", delval = "1")
+    @TableLogic
     private String delFlag;
 
     /**
