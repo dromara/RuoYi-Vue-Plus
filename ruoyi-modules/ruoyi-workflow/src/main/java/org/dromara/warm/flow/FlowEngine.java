@@ -15,20 +15,18 @@
  */
 package org.dromara.warm.flow;
 
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
-
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.warm.flow.config.WarmFlowProperties;
 import org.dromara.warm.flow.handler.DataFillHandler;
 import org.dromara.warm.flow.handler.PermissionHandler;
-import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.warm.flow.listener.GlobalListener;
 import org.dromara.warm.flow.service.*;
-import cn.hutool.core.util.ClassUtil;
-
-
 
 import java.lang.reflect.Constructor;
 import java.util.function.Supplier;
+
 /**
  * 流程引擎，通过静态方法驱动流程流转
  */
@@ -129,24 +127,24 @@ public class FlowEngine {
      * @return bean
      */
     private static <T> T initBean(Class<T> tClazz, String beanPath, Supplier<T> supplier) {
-        T hander = null;
+        T handler = null;
         try {
-            if (!StrUtil.isEmpty(beanPath)) {
+            if (StrUtil.isNotBlank(beanPath)) {
                 Class<?> clazz = ClassUtil.loadClass(beanPath);
                 if (clazz != null && tClazz.isAssignableFrom(clazz)) {
                     Constructor<?> constructor = clazz.getConstructor();
-                    hander = tClazz.cast(constructor.newInstance());
+                    handler = tClazz.cast(constructor.newInstance());
                 }
             }
         } catch (Exception ignored) {
         }
-        if (hander == null) {
-            hander = SpringUtils.getBeanOrNull(tClazz);
+        if (handler == null) {
+            handler = SpringUtils.getBeanOrNull(tClazz);
         }
-        if (hander == null && supplier != null) {
-            hander = supplier.get();
+        if (handler == null && supplier != null) {
+            handler = supplier.get();
         }
-        return hander;
+        return handler;
     }
 
 }

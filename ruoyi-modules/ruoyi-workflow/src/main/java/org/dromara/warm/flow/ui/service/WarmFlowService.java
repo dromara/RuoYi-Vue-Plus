@@ -15,11 +15,10 @@
  */
 package org.dromara.warm.flow.ui.service;
 
-import org.dromara.warm.flow.json.JsonUtil;
-
 import cn.hutool.core.util.StrUtil;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.warm.flow.FlowEngine;
 import org.dromara.warm.flow.config.WarmFlowProperties;
 import org.dromara.warm.flow.dto.*;
@@ -124,7 +123,7 @@ public class WarmFlowService {
         try {
             FlowInstance instance = FlowEngine.insService().getById(id);
             String defJsonStr = instance.getDefJson();
-            DefJson defJson = JsonUtil.strToBean(defJsonStr, DefJson.class);
+            DefJson defJson = JsonUtils.parseObject(defJsonStr, DefJson.class);
             defJson.setInstance(instance);
 
             // 获取流程图三原色

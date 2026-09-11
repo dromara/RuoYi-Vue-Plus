@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.entity;
-import org.dromara.warm.flow.json.JsonUtil;
+import org.dromara.common.json.utils.JsonUtils;
+import tools.jackson.core.type.TypeReference;
 
 import org.dromara.warm.flow.entity.RootEntity;
 
@@ -24,6 +25,9 @@ import lombok.experimental.Accessors;
 import org.dromara.warm.flow.entity.FlowInstance;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 /**
  * 流程实例
  */
@@ -134,7 +138,8 @@ public class FlowInstance implements RootEntity {
     /**
      * 流程变量转 map
      */
-    public java.util.Map<String, Object> getVariableMap() {
-        return JsonUtil.strToMap(getVariable());
+    public Map<String, Object> getVariableMap() {
+        return Optional.ofNullable(JsonUtils.parseObject(getVariable(), new TypeReference<Map<String, Object>>() {
+        })).orElseGet(HashMap::new);
     }
 }

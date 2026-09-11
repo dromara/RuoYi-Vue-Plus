@@ -18,9 +18,9 @@ package org.dromara.warm.flow.config;
 import jakarta.annotation.PostConstruct;
 import org.dromara.warm.flow.FlowEngine;
 import org.dromara.warm.flow.enums.FrameworkType;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @EnableConfigurationProperties(WarmFlowProperties.class)
-@ConditionalOnProperty(value = "warm-flow.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnEnable
 public class WarmFlowInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(WarmFlowInitializer.class);

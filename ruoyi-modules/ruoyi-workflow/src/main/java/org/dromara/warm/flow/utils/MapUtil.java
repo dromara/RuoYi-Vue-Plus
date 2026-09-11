@@ -16,7 +16,6 @@
 package org.dromara.warm.flow.utils;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class MapUtil {
      * @return true：为空 false：非空
      */
     public static boolean isEmpty(Map<?, ?> map) {
-        return ObjectUtil.isNull(map) || map.isEmpty();
+        return cn.hutool.core.map.MapUtil.isEmpty(map);
     }
 
     /**
@@ -46,7 +45,7 @@ public class MapUtil {
      * @return true：非空 false：空
      */
     public static boolean isNotEmpty(Map<?, ?> map) {
-        return !isEmpty(map);
+        return cn.hutool.core.map.MapUtil.isNotEmpty(map);
     }
 
     /**

@@ -80,7 +80,7 @@ public interface FlowUserMapper extends WarmMapper<FlowUser> {
                 queryWrapper.in(FlowUser::getProcessedBy, processedBys);
             }
         }
-        queryWrapper.in(ArrayUtil.isNotEmpty(types), FlowUser::getType, types);
+        queryWrapper.in(ArrayUtil.isNotEmpty(types), FlowUser::getType, Arrays.asList(types));
         return selectList(queryWrapper);
     }
 }

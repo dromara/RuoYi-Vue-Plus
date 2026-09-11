@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.service;
-import org.dromara.warm.flow.json.JsonUtil;
+import org.dromara.common.json.utils.JsonUtils;
+import tools.jackson.core.type.TypeReference;
 
 import org.dromara.warm.flow.entity.*;
 
@@ -292,7 +293,8 @@ public class NodeService extends WarmServiceImpl<FlowNode> {
         Map<String, String> map = new HashMap<>();
         String ext = node.getExt();
         if (StrUtil.isNotEmpty(ext)) {
-            List<Map<String, Object>> extList = JsonUtil.strToList(ext);
+            List<Map<String, Object>> extList = JsonUtils.parseObject(ext, new TypeReference<List<Map<String, Object>>>() {
+            });
             if (CollUtil.isNotEmpty(extList)) {
                 for (Map<String, Object> extMap : extList) {
                     String code = ObjectUtil.defaultIfNull(extMap.get("code"), "").toString();

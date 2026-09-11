@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.service;
-import org.dromara.warm.flow.json.JsonUtil;
+import org.dromara.common.json.utils.JsonUtils;
 
 import org.dromara.warm.flow.entity.*;
 
@@ -79,7 +79,7 @@ public class DefService extends WarmServiceImpl<FlowDefinition> {
     }
 
     public FlowDefinition importJson(String defJson) {
-        return importDef(JsonUtil.strToBean(defJson, DefJson.class));
+        return importDef(JsonUtils.parseObject(defJson, DefJson.class));
     }
 
     public FlowDefinition importDef(DefJson defJson) {
@@ -147,7 +147,7 @@ public class DefService extends WarmServiceImpl<FlowDefinition> {
     }
 
     public String exportJson(Long id) {
-        return JsonUtil.objToStr(queryDesign(id).setIsPublish(null));
+        return JsonUtils.toJsonString(queryDesign(id).setIsPublish(null));
     }
 
     public FlowDefinition getAllDataDefinition(Long id) {

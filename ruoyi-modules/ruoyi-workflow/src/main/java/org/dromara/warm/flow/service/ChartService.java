@@ -15,7 +15,7 @@
  */
 package org.dromara.warm.flow.service;
 
-import org.dromara.warm.flow.json.JsonUtil;
+import org.dromara.common.json.utils.JsonUtils;
 
 import cn.hutool.core.util.ArrayUtil;
 
@@ -70,12 +70,12 @@ public class ChartService {
             NodeType.isEnd(node.getNodeType()) ? ChartStatus.DONE.getKey() : ChartStatus.TO_DO.getKey()
         ));
 
-        return JsonUtil.objToStr(defJson);
+        return JsonUtils.toJsonString(defJson);
     }
 
     public String skipMetadata(PathWayData pathWayData) {
         FlowInstance instance = FlowEngine.insService().getById(pathWayData.getInsId());
-        DefJson defJson = JsonUtil.strToBean(instance.getDefJson(), DefJson.class);
+        DefJson defJson = JsonUtils.parseObject(instance.getDefJson(), DefJson.class);
 
         List<NodeJson> nodeList = defJson.getNodeList();
         List<SkipJson> skipList = defJson.getNodeList().stream().map(NodeJson::getSkipList)
@@ -125,7 +125,7 @@ public class ChartService {
         });
 
 
-        return JsonUtil.objToStr(defJson);
+        return JsonUtils.toJsonString(defJson);
     }
 
     public List<String> getChartRgb(String modelValue) {

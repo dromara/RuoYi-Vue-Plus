@@ -15,13 +15,9 @@
  */
 package org.dromara.warm.flow.strategy;
 
-import cn.hutool.core.util.ObjectUtil;
-
-
 import org.dromara.common.core.utils.StreamUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 办理人表达式策略接口
@@ -48,15 +44,15 @@ public interface HandlerStrategy extends ExpressionStrategy<List<String>> {
     }
 
     default List<String> afterEval(Object o) {
-        if (ObjectUtil.isNull(o)) {
+        if (o == null) {
             return null;
         }
-        if (o instanceof List) {
-            return StreamUtils.toList((List<?>) o, Object::toString);
+        if (o instanceof List<?> list) {
+            return StreamUtils.toList(list, Object::toString);
         }
-        if (o instanceof Object[]) {
-            return Arrays.stream((Object[]) o).map(Object::toString).toList();
+        if (o instanceof Object[] array) {
+            return Arrays.stream(array).map(Object::toString).toList();
         }
-        return Collections.singletonList(o.toString());
+        return List.of(o.toString());
     }
 }

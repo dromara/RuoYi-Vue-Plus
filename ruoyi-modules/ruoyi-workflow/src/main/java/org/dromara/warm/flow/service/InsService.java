@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.service;
-import org.dromara.warm.flow.json.JsonUtil;
+import org.dromara.common.json.utils.JsonUtils;
 
 import org.dromara.warm.flow.entity.*;
 
@@ -187,7 +187,7 @@ public class InsService extends WarmServiceImpl<FlowInstance> {
             .setNodeName(firstBetweenNode.getNodeName())
             .setFlowStatus(StrUtil.emptyToDefault(flowParams.getFlowStatus(), FlowStatus.TOBESUBMIT.getKey()))
             .setActivityStatus(ActivityStatus.ACTIVITY.getKey())
-            .setVariable(JsonUtil.objToStr(flowParams.getVariable()))
+            .setVariable(JsonUtils.toJsonString(flowParams.getVariable()))
             .setCreateTime(now)
             .setUpdateTime(now)
             .setCreateBy(flowParams.getHandler())
@@ -236,7 +236,7 @@ public class InsService extends WarmServiceImpl<FlowInstance> {
             for (String key : keys) {
                 variableMap.remove(key);
             }
-            instance.setVariable(JsonUtil.objToStr(variableMap));
+            instance.setVariable(JsonUtils.toJsonString(variableMap));
             FlowEngine.insService().updateById(instance);
         }
     }

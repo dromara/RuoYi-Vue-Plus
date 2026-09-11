@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 package org.dromara.warm.flow.service;
-import org.dromara.warm.flow.json.JsonUtil;
+import org.dromara.common.json.utils.JsonUtils;
+import tools.jackson.core.type.TypeReference;
 
 import org.dromara.warm.flow.entity.*;
 
@@ -559,9 +560,10 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
     public void mergeVariable(FlowInstance instance, Map<String, Object> variable) {
         if (MapUtil.isNotEmpty(variable)) {
             String variableStr = instance.getVariable();
-            Map<String, Object> deserialize = JsonUtil.strToMap(variableStr);
+            Map<String, Object> deserialize = Optional.ofNullable(JsonUtils.parseObject(variableStr, new TypeReference<Map<String, Object>>() {
+            })).orElseGet(HashMap::new);
             deserialize.putAll(variable);
-            instance.setVariable(JsonUtil.objToStr(deserialize));
+            instance.setVariable(JsonUtils.toJsonString(deserialize));
         }
     }
 
@@ -814,7 +816,7 @@ public class TaskService extends WarmServiceImpl<FlowTask> {
             return;
         }
 
-        DefJson defJson = JsonUtil.strToBean(instance.getDefJson(), DefJson.class);
+        DefJson defJson = JsonUtils.parseObject(instance.getDefJson(), DefJson.class);
         Map<String, NodeJson> nodeJsonMap = StreamUtils.toMap(defJson.getNodeList(), NodeJson::getNodeCode, node -> node);
         // 途径节点中的并行/包容网关，只剩一个前置待办任务时才能生成新的代办任务
         List<FlowNode> parallelOrInclusiveList = StreamUtils.filter(pathWayData.getPathWayNodes(),

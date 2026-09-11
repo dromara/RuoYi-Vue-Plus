@@ -1,6 +1,6 @@
 package org.dromara.workflow.service.impl;
 
-import org.dromara.warm.flow.json.JsonUtil;
+import org.dromara.common.json.utils.JsonUtils;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -400,7 +400,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             return false;
         }
         variableMap.put(bo.key(), bo.value());
-        flowInstance.setVariable(JsonUtil.objToStr(variableMap));
+        flowInstance.setVariable(JsonUtils.toJsonString(variableMap));
         return flowInstanceMapper.updateById(flowInstance) > 0;
     }
 

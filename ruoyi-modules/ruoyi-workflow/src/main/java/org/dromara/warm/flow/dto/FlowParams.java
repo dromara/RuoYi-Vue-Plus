@@ -16,7 +16,7 @@
 package org.dromara.warm.flow.dto;
 import java.io.Serial;
 
-import org.dromara.warm.flow.json.JsonUtil;
+import org.dromara.common.json.utils.JsonUtils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
@@ -250,7 +250,7 @@ public class FlowParams implements Serializable {
     }
 
     public String getVariableStr() {
-        return JsonUtil.objToStr(variable);
+        return JsonUtils.toJsonString(variable);
     }
 
     public String getHandler() {
