@@ -21,7 +21,6 @@ CREATE TABLE `flow_definition`
     `update_time`     datetime                 DEFAULT NULL COMMENT '更新时间',
     `update_by`       varchar(64)          DEFAULT '' COMMENT '更新人',
     `del_flag`        char(1)                  DEFAULT '0' COMMENT '删除标志',
-    `tenant_id`       varchar(40)              DEFAULT NULL COMMENT '租户id',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT ='流程定义表';
 
@@ -47,7 +46,6 @@ CREATE TABLE `flow_node`
     `update_by`       varchar(64)          DEFAULT '' COMMENT '更新人',
     `ext`             text          COMMENT '节点扩展属性',
     `del_flag`        char(1)       DEFAULT '0' COMMENT '删除标志',
-    `tenant_id`       varchar(40)   DEFAULT NULL COMMENT '租户id',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT ='流程节点表';
 
@@ -68,7 +66,6 @@ CREATE TABLE `flow_skip`
     `update_time`    datetime     DEFAULT NULL COMMENT '更新时间',
     `update_by`       varchar(64)          DEFAULT '' COMMENT '更新人',
     `del_flag`       char(1)      DEFAULT '0' COMMENT '删除标志',
-    `tenant_id`      varchar(40)  DEFAULT NULL COMMENT '租户id',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT ='节点跳转关联表';
 
@@ -90,7 +87,6 @@ CREATE TABLE `flow_instance`
     `update_by`       varchar(64)          DEFAULT '' COMMENT '更新人',
     `ext`             varchar(500)         DEFAULT NULL COMMENT '扩展字段，预留给业务系统使用',
     `del_flag`        char(1)              DEFAULT '0' COMMENT '删除标志',
-    `tenant_id`       varchar(40)          DEFAULT NULL COMMENT '租户id',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT ='流程实例表';
 
@@ -110,7 +106,6 @@ CREATE TABLE `flow_task`
     `update_time`   datetime     DEFAULT NULL COMMENT '更新时间',
     `update_by`       varchar(64)          DEFAULT '' COMMENT '更新人',
     `del_flag`      char(1)      DEFAULT '0' COMMENT '删除标志',
-    `tenant_id`     varchar(40)  DEFAULT NULL COMMENT '租户id',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT ='待办任务表';
 
@@ -138,7 +133,6 @@ CREATE TABLE `flow_his_task`
     `create_time`      datetime                     DEFAULT NULL COMMENT '任务开始时间',
     `update_time`      datetime                     DEFAULT NULL COMMENT '审批完成时间',
     `del_flag`         char(1)                      DEFAULT '0' COMMENT '删除标志',
-    `tenant_id`        varchar(40)                  DEFAULT NULL COMMENT '租户id',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT ='历史任务记录表';
 
@@ -154,7 +148,6 @@ CREATE TABLE `flow_user`
     `update_time`  datetime    DEFAULT NULL COMMENT '更新时间',
     `update_by`       varchar(64)          DEFAULT '' COMMENT '创建人',
     `del_flag`     char(1)     DEFAULT '0' COMMENT '删除标志',
-    `tenant_id`    varchar(40) DEFAULT NULL COMMENT '租户id',
     PRIMARY KEY (`id`) USING BTREE,
     KEY `user_processed_type` (`processed_by`, `type`),
     KEY `user_associated` (`associated`) USING BTREE

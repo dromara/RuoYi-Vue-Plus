@@ -16,9 +16,9 @@ import org.dromara.common.mail.core.MailBuilder;
 import org.dromara.system.api.MessageService;
 import org.dromara.system.api.domain.PushPayloadDTO;
 import org.dromara.system.api.domain.UserDTO;
-import org.dromara.warm.flow.core.FlowEngine;
-import org.dromara.warm.flow.core.entity.Node;
-import org.dromara.warm.flow.orm.entity.FlowTask;
+import org.dromara.warm.flow.FlowEngine;
+import org.dromara.warm.flow.entity.FlowNode;
+import org.dromara.warm.flow.entity.FlowTask;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.service.IFlwCommonService;
@@ -185,7 +185,7 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
      */
     @Override
     public String applyNodeCode(Long definitionId) {
-        List<Node> firstBetweenNode = FlowEngine.nodeService().getFirstBetweenNode(definitionId, new HashMap<>());
+        List<FlowNode> firstBetweenNode = FlowEngine.nodeService().getFirstBetweenNode(definitionId, new HashMap<>());
         if (CollUtil.isEmpty(firstBetweenNode)) {
             throw new ServiceException("流程定义缺少申请人节点，请检查流程定义配置");
         }

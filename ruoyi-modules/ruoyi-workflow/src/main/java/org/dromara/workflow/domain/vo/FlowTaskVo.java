@@ -3,7 +3,7 @@ package org.dromara.workflow.domain.vo;
 import lombok.Data;
 import org.dromara.common.translation.annotation.Translation;
 import org.dromara.common.translation.constant.TransConstant;
-import org.dromara.warm.flow.core.entity.User;
+import org.dromara.warm.flow.entity.FlowUser;
 import org.dromara.workflow.common.constant.FlowConstant;
 
 import java.io.Serial;
@@ -86,7 +86,7 @@ public class FlowTaskVo implements Serializable {
     /**
      * 流程用户列表
      */
-    private List<User> userList;
+    private List<FlowUser> userList;
 
     /**
      * 审批表单是否自定义（Y是 N否）

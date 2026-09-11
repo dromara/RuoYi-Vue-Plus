@@ -7,8 +7,8 @@ import com.yomahub.liteflow.annotation.LiteflowComponent;
 import com.yomahub.liteflow.core.NodeComponent;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.warm.flow.core.FlowEngine;
-import org.dromara.warm.flow.core.entity.Definition;
+import org.dromara.warm.flow.FlowEngine;
+import org.dromara.warm.flow.entity.FlowDefinition;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
 import org.dromara.workflow.domain.context.StartProcessContext;
@@ -29,7 +29,7 @@ public class StartPrepareInstanceComponent extends NodeComponent {
     @Override
     public void process() {
         StartProcessContext context = getContextBean(StartProcessContext.class);
-        Definition definition = FlowEngine.defService().getPublishByFlowCode(context.getStartProcessBo().getFlowCode());
+        FlowDefinition definition = FlowEngine.defService().getPublishByFlowCode(context.getStartProcessBo().getFlowCode());
         if (ObjectUtil.isNull(definition)) {
             throw new ServiceException("流程【" + context.getStartProcessBo().getFlowCode() + "】未发布，请先在流程设计器中发布流程定义");
         }

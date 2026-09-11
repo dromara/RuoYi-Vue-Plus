@@ -9,12 +9,12 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.warm.flow.core.FlowEngine;
-import org.dromara.warm.flow.core.dto.FlowParams;
-import org.dromara.warm.flow.core.entity.User;
-import org.dromara.warm.flow.core.service.TaskService;
-import org.dromara.warm.flow.orm.entity.FlowTask;
-import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
+import org.dromara.warm.flow.FlowEngine;
+import org.dromara.warm.flow.dto.FlowParams;
+import org.dromara.warm.flow.entity.FlowUser;
+import org.dromara.warm.flow.service.TaskService;
+import org.dromara.warm.flow.entity.FlowTask;
+import org.dromara.warm.flow.mapper.FlowTaskMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.context.CompleteTaskContext;
 
@@ -58,7 +58,7 @@ public class CompleteAutoPassComponent extends NodeComponent {
         if (CollUtil.isEmpty(flowTaskList)) {
             return;
         }
-        List<User> userList = FlowEngine.userService()
+        List<FlowUser> userList = FlowEngine.userService()
             .getByAssociateds(StreamUtils.toList(flowTaskList, FlowTask::getId));
         if (CollUtil.isEmpty(userList)) {
             return;
@@ -68,7 +68,7 @@ public class CompleteAutoPassComponent extends NodeComponent {
                 continue;
             }
             // 自动审批只处理当前登录人仍是办理人的后续任务，避免替其他候选人或并行分支误审批。
-            List<User> users = StreamUtils.filter(userList,
+            List<FlowUser> users = StreamUtils.filter(userList,
                 e -> ObjectUtil.equals(task.getId(), e.getAssociated()) && ObjectUtil.equal(e.getProcessedBy(), LoginHelper.getUserIdStr()));
             if (CollUtil.isEmpty(users)) {
                 continue;

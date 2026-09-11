@@ -2,8 +2,8 @@ package org.dromara.workflow.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.warm.flow.core.entity.Instance;
-import org.dromara.warm.flow.core.entity.Task;
+import org.dromara.warm.flow.entity.FlowInstance;
+import org.dromara.warm.flow.entity.FlowTask;
 import org.dromara.workflow.api.event.ProcessDeleteEvent;
 import org.dromara.workflow.api.event.ProcessEvent;
 import org.dromara.workflow.api.event.ProcessTaskEvent;
@@ -32,7 +32,7 @@ public class FlowProcessEventHandler {
      * @param params   办理参数
      * @param submit   当为true时为申请人节点办理
      */
-    public void processHandler(String flowCode, Instance instance, String status, Map<String, Object> params, boolean submit) {
+    public void processHandler(String flowCode, FlowInstance instance, String status, Map<String, Object> params, boolean submit) {
         log.info("【流程事件发布】流程编码: {}, 业务ID: {}, 流程状态: {}, 节点类型: {}, 节点编码: {}, 节点名称: {}, 是否申请人节点: {}, 参数: {}",
             flowCode, instance.getBusinessId(), status, instance.getNodeType(), instance.getNodeCode(), instance.getNodeName(), submit, params);
         ProcessEvent processEvent = new ProcessEvent();
@@ -56,7 +56,7 @@ public class FlowProcessEventHandler {
      * @param nextTask 任务
      * @param params   上一个任务的办理参数
      */
-    public void processTaskHandler(String flowCode, Instance instance, Task nextTask, Map<String, Object> params) {
+    public void processTaskHandler(String flowCode, FlowInstance instance, FlowTask nextTask, Map<String, Object> params) {
         log.info("【流程任务事件发布】流程编码: {}, 业务ID: {}, 节点类型: {}, 节点编码: {}, 节点名称: {}, 任务ID: {}",
             flowCode, instance.getBusinessId(), nextTask.getNodeType(), nextTask.getNodeCode(), nextTask.getNodeName(), nextTask.getId());
         ProcessTaskEvent processTaskEvent = new ProcessTaskEvent();

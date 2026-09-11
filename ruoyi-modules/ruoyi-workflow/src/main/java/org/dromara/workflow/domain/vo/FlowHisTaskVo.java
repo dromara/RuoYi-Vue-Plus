@@ -4,7 +4,7 @@ import lombok.Data;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.translation.annotation.Translation;
 import org.dromara.common.translation.constant.TransConstant;
-import org.dromara.warm.flow.core.enums.CooperateType;
+import org.dromara.warm.flow.enums.CooperateType;
 import org.dromara.workflow.common.constant.FlowConstant;
 
 import java.io.Serial;

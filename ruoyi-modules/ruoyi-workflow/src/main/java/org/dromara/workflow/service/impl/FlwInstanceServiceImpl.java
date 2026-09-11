@@ -1,5 +1,7 @@
 package org.dromara.workflow.service.impl;
 
+import org.dromara.warm.flow.json.JsonUtil;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
@@ -19,22 +21,20 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.query.LambdaJoinQueryBuilder;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.warm.flow.core.FlowEngine;
-import org.dromara.warm.flow.core.constant.ExceptionCons;
-import org.dromara.warm.flow.core.dto.FlowParams;
-import org.dromara.warm.flow.core.entity.Definition;
-import org.dromara.warm.flow.core.entity.Instance;
-import org.dromara.warm.flow.core.entity.Task;
-import org.dromara.warm.flow.core.entity.User;
-import org.dromara.warm.flow.core.enums.NodeType;
-import org.dromara.warm.flow.core.service.DefService;
-import org.dromara.warm.flow.core.service.InsService;
-import org.dromara.warm.flow.core.service.TaskService;
-import org.dromara.warm.flow.orm.entity.FlowHisTask;
-import org.dromara.warm.flow.orm.entity.FlowInstance;
-import org.dromara.warm.flow.orm.entity.FlowTask;
-import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
-import org.dromara.warm.flow.orm.mapper.FlowInstanceMapper;
+import org.dromara.warm.flow.FlowEngine;
+import org.dromara.warm.flow.constant.ExceptionCons;
+import org.dromara.warm.flow.dto.FlowParams;
+import org.dromara.warm.flow.entity.FlowDefinition;
+import org.dromara.warm.flow.entity.FlowInstance;
+import org.dromara.warm.flow.entity.FlowTask;
+import org.dromara.warm.flow.entity.FlowUser;
+import org.dromara.warm.flow.enums.NodeType;
+import org.dromara.warm.flow.service.DefService;
+import org.dromara.warm.flow.service.InsService;
+import org.dromara.warm.flow.service.TaskService;
+import org.dromara.warm.flow.entity.FlowHisTask;
+import org.dromara.warm.flow.mapper.FlowHisTaskMapper;
+import org.dromara.warm.flow.mapper.FlowInstanceMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
@@ -119,7 +119,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_INSTANCE);
         }
         FlowInstanceVo instanceVo = BeanUtil.toBean(instance, FlowInstanceVo.class);
-        Definition definition = defService.getById(instanceVo.getDefinitionId());
+        FlowDefinition definition = defService.getById(instanceVo.getDefinitionId());
         if (ObjectUtil.isNull(definition)) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_DEF);
         }
@@ -145,21 +145,21 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
                 FlowInstance::getNodeType, FlowInstance::getNodeCode, FlowInstance::getNodeName,
                 FlowInstance::getVariable, FlowInstance::getFlowStatus, FlowInstance::getActivityStatus,
                 FlowInstance::getCreateBy, FlowInstance::getExt)
-            .select("fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowName,
-                org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowCode,
-                org.dromara.warm.flow.orm.entity.FlowDefinition::getVersion,
-                org.dromara.warm.flow.orm.entity.FlowDefinition::getFormCustom,
-                org.dromara.warm.flow.orm.entity.FlowDefinition::getFormPath,
-                org.dromara.warm.flow.orm.entity.FlowDefinition::getCategory)
+            .select("fd", org.dromara.warm.flow.entity.FlowDefinition::getFlowName,
+                org.dromara.warm.flow.entity.FlowDefinition::getFlowCode,
+                org.dromara.warm.flow.entity.FlowDefinition::getVersion,
+                org.dromara.warm.flow.entity.FlowDefinition::getFormCustom,
+                org.dromara.warm.flow.entity.FlowDefinition::getFormPath,
+                org.dromara.warm.flow.entity.FlowDefinition::getCategory)
             .select("biz", FlowInstanceBizExt::getBusinessCode, FlowInstanceBizExt::getBusinessTitle)
-            .leftJoin(org.dromara.warm.flow.orm.entity.FlowDefinition.class, "fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getId, FlowInstance::getDefinitionId)
+            .leftJoin(org.dromara.warm.flow.entity.FlowDefinition.class, "fd", org.dromara.warm.flow.entity.FlowDefinition::getId, FlowInstance::getDefinitionId)
             .leftJoin(FlowInstanceBizExt.class, "biz", FlowInstanceBizExt::getInstanceId, FlowInstance::getId);
         queryBuilder.likeIfText("fi", FlowInstance::getNodeName, flowInstanceBo.getNodeName());
-        queryBuilder.likeIfText("fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowName, flowInstanceBo.getFlowName());
-        queryBuilder.likeIfText("fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getFlowCode, flowInstanceBo.getFlowCode());
+        queryBuilder.likeIfText("fd", org.dromara.warm.flow.entity.FlowDefinition::getFlowName, flowInstanceBo.getFlowName());
+        queryBuilder.likeIfText("fd", org.dromara.warm.flow.entity.FlowDefinition::getFlowCode, flowInstanceBo.getFlowCode());
         if (StringUtils.isNotBlank(flowInstanceBo.getCategory())) {
             List<Long> categoryIds = flwCategoryMapper.selectCategoryIdsByParentId(Convert.toLong(flowInstanceBo.getCategory()));
-            queryBuilder.inIfNotEmpty("fd", org.dromara.warm.flow.orm.entity.FlowDefinition::getCategory, StreamUtils.toList(categoryIds, Convert::toStr));
+            queryBuilder.inIfNotEmpty("fd", org.dromara.warm.flow.entity.FlowDefinition::getCategory, StreamUtils.toList(categoryIds, Convert::toStr));
         }
         queryBuilder.eqIfText("fi", FlowInstance::getBusinessId, flowInstanceBo.getBusinessId());
         queryBuilder.inIfNotEmpty("fi", FlowInstance::getCreateBy, flowInstanceBo.getCreateByIds());
@@ -254,11 +254,11 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean cancelProcessApply(FlowCancelBo bo) {
-        Instance instance = selectInstByBusinessId(bo.businessId());
+        FlowInstance instance = selectInstByBusinessId(bo.businessId());
         if (instance == null) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_INSTANCE);
         }
-        Definition definition = defService.getById(instance.getDefinitionId());
+        FlowDefinition definition = defService.getById(instance.getDefinitionId());
         if (definition == null) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_DEF);
         }
@@ -312,18 +312,18 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         if (CollUtil.isNotEmpty(runningTasks)) {
             runningTaskVos = BeanUtil.copyToList(runningTasks, FlowHisTaskVo.class);
 
-            List<User> associatedUsers = FlowEngine.userService()
+            List<FlowUser> associatedUsers = FlowEngine.userService()
                 .getByAssociateds(StreamUtils.toList(runningTasks, FlowTask::getId));
-            Map<Long, List<User>> taskUserMap = StreamUtils.groupByKey(associatedUsers, User::getAssociated);
+            Map<Long, List<FlowUser>> taskUserMap = StreamUtils.groupByKey(associatedUsers, FlowUser::getAssociated);
 
             for (FlowHisTaskVo vo : runningTaskVos) {
                 vo.setFlowStatus(TaskStatusEnum.WAITING.getStatus());
                 vo.setUpdateTime(null);
                 vo.setRunDuration(null);
 
-                List<User> users = taskUserMap.get(vo.getId());
+                List<FlowUser> users = taskUserMap.get(vo.getId());
                 if (CollUtil.isNotEmpty(users)) {
-                    vo.setApprover(StreamUtils.join(users, User::getProcessedBy));
+                    vo.setApprover(StreamUtils.join(users, FlowUser::getProcessedBy));
                 }
             }
         }
@@ -400,7 +400,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             return false;
         }
         variableMap.put(bo.key(), bo.value());
-        flowInstance.setVariable(FlowEngine.jsonConvert.objToStr(variableMap));
+        flowInstance.setVariable(JsonUtil.objToStr(variableMap));
         return flowInstanceMapper.updateById(flowInstance) > 0;
     }
 
@@ -412,7 +412,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      */
     @Override
     public void setVariable(Long instanceId, Map<String, Object> variable) {
-        Instance instance = insService.getById(instanceId);
+        FlowInstance instance = insService.getById(instanceId);
         if (instance != null) {
             taskService.mergeVariable(instance, variable);
             insService.updateById(instance);
@@ -427,7 +427,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      */
     @Override
     public FlowInstance selectByTaskId(Long taskId) {
-        Task task = taskService.getById(taskId);
+        FlowTask task = taskService.getById(taskId);
         if (task == null) {
             FlowHisTask flowHisTask = flwTaskService.selectHisTaskById(taskId);
             if (flowHisTask != null) {
@@ -448,7 +448,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean processInvalid(FlowInvalidBo bo) {
-        Instance instance = insService.getById(bo.id());
+        FlowInstance instance = insService.getById(bo.id());
         if (instance != null) {
             BusinessStatusEnum.checkInvalidStatus(instance.getFlowStatus());
         }

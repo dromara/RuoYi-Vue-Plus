@@ -1,7 +1,7 @@
 package org.dromara.workflow.domain.context;
 
 import lombok.Data;
-import org.dromara.warm.flow.orm.entity.FlowInstance;
+import org.dromara.warm.flow.entity.FlowInstance;
 
 import java.util.Collection;
 import java.util.List;

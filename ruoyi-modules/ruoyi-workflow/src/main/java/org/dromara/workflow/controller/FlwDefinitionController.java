@@ -10,9 +10,8 @@ import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.web.core.BaseController;
-import org.dromara.warm.flow.core.entity.Definition;
-import org.dromara.warm.flow.core.service.DefService;
-import org.dromara.warm.flow.orm.entity.FlowDefinition;
+import org.dromara.warm.flow.entity.FlowDefinition;
+import org.dromara.warm.flow.service.DefService;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.vo.FlowDefinitionVo;
 import org.dromara.workflow.service.IFlwDefinitionService;
@@ -73,7 +72,7 @@ public class FlwDefinitionController extends BaseController {
      */
     @GetMapping(value = "/{id}")
     @SaCheckPermission("workflow:definition:query")
-    public R<Definition> getInfo(@PathVariable Long id) {
+    public R<FlowDefinition> getInfo(@PathVariable Long id) {
         return R.ok(defService.getById(id));
     }
 

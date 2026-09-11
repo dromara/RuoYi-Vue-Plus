@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.*;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
-import org.dromara.warm.flow.core.service.DefService;
-import org.dromara.warm.flow.orm.entity.FlowDefinition;
+import org.dromara.warm.flow.service.DefService;
+import org.dromara.warm.flow.entity.FlowDefinition;
 import org.dromara.warm.flow.ui.service.CategoryService;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.constant.FlowConstant;
@@ -45,7 +45,6 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @param categoryId 主键
      * @return 流程分类
      */
-    @Override
     public FlowCategoryVo queryById(Long categoryId) {
         return categoryMapper.selectVoById(categoryId);
     }
@@ -57,7 +56,6 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @return 流程分类名称
      */
     @Cacheable(cacheNames = FlowConstant.FLOW_CATEGORY_NAME, key = "#categoryId")
-    @Override
     public String selectCategoryNameById(Long categoryId) {
         if (ObjectUtil.isNull(categoryId)) {
             return null;
@@ -75,7 +73,6 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @param categoryIds 流程分类ID
      * @return 流程分类名称
      */
-    @Override
     public Map<Long, String> selectCategoryNameByIds(Set<Long> categoryIds) {
         if (CollUtil.isEmpty(categoryIds)) {
             return Collections.emptyMap();
@@ -93,7 +90,6 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @param bo 查询条件
      * @return 流程分类列表
      */
-    @Override
     public List<FlowCategoryVo> queryList(FlowCategoryBo bo) {
         LambdaQueryWrapper<FlowCategory> lqw = buildQueryWrapper(bo);
         return categoryMapper.selectVoList(lqw);
@@ -105,7 +101,6 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @param category 流程分类信息
      * @return 流程分类树信息集合
      */
-    @Override
     public List<Tree<String>> selectCategoryTreeList(FlowCategoryBo category) {
         List<FlowCategoryVo> categoryList = this.queryList(category);
         if (CollUtil.isEmpty(categoryList)) {
@@ -128,10 +123,9 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      *
      * @return 分类树结构列表
      */
-    @Override
-    public List<org.dromara.warm.flow.core.dto.Tree> queryCategory() {
+    public List<org.dromara.warm.flow.dto.Tree> queryCategory() {
         List<FlowCategoryVo> list = this.queryList(new FlowCategoryBo());
-        return StreamUtils.toList(list, category -> new org.dromara.warm.flow.core.dto.Tree()
+        return StreamUtils.toList(list, category -> new org.dromara.warm.flow.dto.Tree()
             .setId(Convert.toStr(category.getCategoryId()))
             .setName(category.getCategoryName())
             .setParentId(Convert.toStr(category.getParentId()))
@@ -144,7 +138,6 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @param category 流程分类信息
      * @return 结果
      */
-    @Override
     public boolean checkCategoryNameUnique(FlowCategoryBo category) {
         boolean exist = categoryMapper.lambda()
             .eq(FlowCategory::getCategoryName, category.getCategoryName())
@@ -160,7 +153,6 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @param categoryId 流程分类ID
      * @return 结果 true 存在 false 不存在
      */
-    @Override
     public boolean checkCategoryExistDefinition(Long categoryId) {
         FlowDefinition definition = new FlowDefinition();
         definition.setCategory(categoryId.toString());
@@ -173,7 +165,6 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @param categoryId 流程分类ID
      * @return 结果
      */
-    @Override
     public boolean hasChildByCategoryId(Long categoryId) {
         return categoryMapper.lambda().eq(FlowCategory::getParentId, categoryId).exists();
     }
@@ -199,7 +190,6 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @param bo 流程分类
      * @return 是否新增成功
      */
-    @Override
     public int insertByBo(FlowCategoryBo bo) {
         FlowCategory info = categoryMapper.selectById(bo.getParentId());
         if (ObjectUtil.isNull(info)) {
@@ -274,7 +264,6 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @return 是否删除成功
      */
     @CacheEvict(cacheNames = FlowConstant.FLOW_CATEGORY_NAME, key = "#categoryId")
-    @Override
     public int deleteWithValidById(Long categoryId) {
         return categoryMapper.deleteById(categoryId);
     }

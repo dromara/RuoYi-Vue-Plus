@@ -1,10 +1,9 @@
 package org.dromara.workflow.domain.context;
 
 import lombok.Data;
-import org.dromara.warm.flow.core.entity.Definition;
-import org.dromara.warm.flow.core.entity.Instance;
-import org.dromara.warm.flow.core.entity.Task;
-import org.dromara.warm.flow.orm.entity.FlowInstance;
+import org.dromara.warm.flow.entity.FlowDefinition;
+import org.dromara.warm.flow.entity.FlowInstance;
+import org.dromara.warm.flow.entity.FlowTask;
 import org.dromara.workflow.api.domain.StartProcessReturnDTO;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
 import org.dromara.workflow.domain.bo.StartProcessBo;
@@ -50,17 +49,17 @@ public class StartProcessContext {
     /**
      * 已发布的流程定义。
      */
-    private Definition definition;
+    private FlowDefinition definition;
 
     /**
      * 新启动的流程实例。
      */
-    private Instance instance;
+    private FlowInstance instance;
 
     /**
      * 当前流程实例下生成的任务列表。
      */
-    private List<Task> taskList;
+    private List<FlowTask> taskList;
 
     /**
      * 启动流程返回结果。

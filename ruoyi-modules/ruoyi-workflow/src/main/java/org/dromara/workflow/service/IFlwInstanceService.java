@@ -2,7 +2,7 @@ package org.dromara.workflow.service;
 
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.warm.flow.orm.entity.FlowInstance;
+import org.dromara.warm.flow.entity.FlowInstance;
 import org.dromara.workflow.domain.bo.FlowCancelBo;
 import org.dromara.workflow.domain.bo.FlowInstanceBo;
 import org.dromara.workflow.domain.bo.FlowInvalidBo;

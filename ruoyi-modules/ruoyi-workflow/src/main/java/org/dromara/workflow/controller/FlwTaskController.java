@@ -11,8 +11,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.redis.annotation.RepeatSubmit;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.api.domain.UserDTO;
-import org.dromara.warm.flow.core.entity.Node;
-import org.dromara.warm.flow.orm.entity.FlowNode;
+import org.dromara.warm.flow.entity.FlowNode;
 import org.dromara.workflow.api.domain.StartProcessReturnDTO;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.bo.*;
@@ -212,7 +211,7 @@ public class FlwTaskController extends BaseController {
      * @return 可驳回节点列表
      */
     @GetMapping("/getBackTaskNode/{taskId}/{nowNodeCode}")
-    public R<List<Node>> getBackTaskNode(@PathVariable Long taskId, @PathVariable String nowNodeCode) {
+    public R<List<FlowNode>> getBackTaskNode(@PathVariable Long taskId, @PathVariable String nowNodeCode) {
         return R.ok(flwTaskService.getBackTaskNode(taskId, nowNodeCode));
     }
 

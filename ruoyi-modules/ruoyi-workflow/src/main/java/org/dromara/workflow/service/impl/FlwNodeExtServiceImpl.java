@@ -1,4 +1,5 @@
 package org.dromara.workflow.service.impl;
+import org.dromara.warm.flow.entity.*;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
@@ -9,9 +10,9 @@ import org.dromara.common.core.domain.dto.DictTypeDTO;
 import org.dromara.common.core.service.DictService;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.warm.flow.core.FlowEngine;
-import org.dromara.warm.flow.core.utils.CollUtil;
-import org.dromara.warm.flow.core.utils.ExpressionUtil;
+import org.dromara.warm.flow.FlowEngine;
+import cn.hutool.core.collection.CollUtil;
+import org.dromara.warm.flow.utils.ExpressionUtil;
 import org.dromara.warm.flow.ui.service.NodeExtService;
 import org.dromara.warm.flow.ui.vo.NodeExt;
 import org.dromara.workflow.common.ConditionalOnEnable;
@@ -79,7 +80,6 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
      *
      * @return 节点扩展属性列表
      */
-    @Override
     public List<NodeExt> getNodeExt() {
         List<NodeExt> nodeExtList = new ArrayList<>();
         // 构建基础设置页面
@@ -190,7 +190,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
     }
 
     /**
-     * 解析扩展属性 JSON 并构建 Node 扩展属性对象
+     * 解析扩展属性 JSON 并构建 FlowNode 扩展属性对象
      * <p>
      * 根据传入的 JSON 字符串，将扩展属性分为三类：
      * 1. ButtonPermissionEnum：解析为按钮权限列表，标记每个按钮是否勾选
@@ -208,7 +208,6 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
      * @param variable 流程变量
      * @return NodeExtVo 对象，封装按钮权限列表、抄送对象集合和自定义参数 Map
      */
-    @Override
     public NodeExtVo parseNodeExt(String ext, Map<String, Object> variable) {
         NodeExtVo nodeExtVo = new NodeExtVo();
 

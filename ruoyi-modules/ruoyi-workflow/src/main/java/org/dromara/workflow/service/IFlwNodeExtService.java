@@ -1,4 +1,5 @@
 package org.dromara.workflow.service;
+import org.dromara.warm.flow.entity.*;
 
 import org.dromara.workflow.domain.vo.NodeExtVo;
 
@@ -12,7 +13,7 @@ import java.util.Map;
 public interface IFlwNodeExtService {
 
     /**
-     * 解析扩展属性 JSON 并构建 Node 扩展属性对象
+     * 解析扩展属性 JSON 并构建 FlowNode 扩展属性对象
      * <p>
      * 根据传入的 JSON 字符串，将扩展属性分为三类：
      * 1. ButtonPermissionEnum：解析为按钮权限列表，标记每个按钮是否勾选

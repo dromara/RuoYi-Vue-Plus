@@ -55,7 +55,6 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
      *
      * @return tabs页签
      */
-    @Override
     public List<String> getHandlerType() {
         return TaskAssigneeEnum.getAssigneeTypeList();
     }
@@ -66,7 +65,6 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
      * @param query 查询条件
      * @return HandlerSelectVo
      */
-    @Override
     public HandlerSelectVo getHandlerSelect(HandlerQuery query) {
         // 获取任务办理类型
         TaskAssigneeEnum type = TaskAssigneeEnum.fromDesc(query.getHandlerType());
@@ -86,7 +84,6 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
      * @param storageIds 入库主键集合
      * @return 结果
      */
-    @Override
     public List<HandlerFeedBackVo> handlerFeedback(List<String> storageIds) {
         if (CollUtil.isEmpty(storageIds)) {
             return Collections.emptyList();
@@ -200,7 +197,6 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
      * @param storageIds 多个存储标识符字符串（逗号分隔）
      * @return 合并后的用户列表，去重后返回，非法格式的标识将被跳过
      */
-    @Override
     public List<UserDTO> fetchUsersByStorageIds(String storageIds) {
         if (StringUtils.isEmpty(storageIds)) {
             return List.of();

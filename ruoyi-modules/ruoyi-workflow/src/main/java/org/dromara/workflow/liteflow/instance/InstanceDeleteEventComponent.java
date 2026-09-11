@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.warm.flow.core.entity.Definition;
-import org.dromara.warm.flow.core.entity.Instance;
-import org.dromara.warm.flow.core.service.DefService;
+import org.dromara.warm.flow.entity.FlowDefinition;
+import org.dromara.warm.flow.entity.FlowInstance;
+import org.dromara.warm.flow.service.DefService;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.context.InstanceDeleteContext;
 import org.dromara.workflow.handler.FlowProcessEventHandler;
@@ -42,13 +42,13 @@ public class InstanceDeleteEventComponent extends NodeComponent {
             }
         });
 
-        Map<Long, Definition> definitionMap = StreamUtils.toMap(
-            defService.getByIds(StreamUtils.toList(context.getFlowInstances(), Instance::getDefinitionId)),
-            Definition::getId,
+        Map<Long, FlowDefinition> definitionMap = StreamUtils.toMap(
+            defService.getByIds(StreamUtils.toList(context.getFlowInstances(), FlowInstance::getDefinitionId)),
+            FlowDefinition::getId,
             Function.identity()
         );
         context.getFlowInstances().forEach(instance -> {
-            Definition definition = definitionMap.get(instance.getDefinitionId());
+            FlowDefinition definition = definitionMap.get(instance.getDefinitionId());
             if (ObjectUtil.isNull(definition)) {
                 log.warn("实例 ID: {} 对应的流程定义信息未找到，跳过删除事件触发。", instance.getId());
                 return;

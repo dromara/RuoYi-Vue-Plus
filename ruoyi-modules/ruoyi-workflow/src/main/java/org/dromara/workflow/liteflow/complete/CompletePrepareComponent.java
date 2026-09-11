@@ -8,10 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.warm.flow.core.entity.Instance;
-import org.dromara.warm.flow.core.service.InsService;
-import org.dromara.warm.flow.orm.entity.FlowTask;
-import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
+import org.dromara.warm.flow.entity.FlowInstance;
+import org.dromara.warm.flow.service.InsService;
+import org.dromara.warm.flow.entity.FlowTask;
+import org.dromara.warm.flow.mapper.FlowTaskMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.CompleteTaskBo;
@@ -47,7 +47,7 @@ public class CompletePrepareComponent extends NodeComponent {
         if (ObjectUtil.isNull(flowTask)) {
             throw new ServiceException("流程任务不存在或任务已审批！");
         }
-        Instance instance = insService.getById(flowTask.getInstanceId());
+        FlowInstance instance = insService.getById(flowTask.getInstanceId());
         if (ObjectUtil.isNull(instance)) {
             throw new ServiceException("流程实例不存在");
         }

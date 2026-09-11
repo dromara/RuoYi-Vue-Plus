@@ -69,4 +69,18 @@ public final class SpringUtils extends SpringUtil {
         return Threading.VIRTUAL.isActive(getBean(Environment.class));
     }
 
+    /**
+     * 获取Bean 容器中不存在时返回null而非抛出异常
+     *
+     * @param clazz Bean类型
+     * @return Bean实例 不存在时返回null
+     */
+    public static <T> T getBeanOrNull(Class<T> clazz) {
+        try {
+            return getBean(clazz);
+        } catch (NoSuchBeanDefinitionException e) {
+            return null;
+        }
+    }
+
 }

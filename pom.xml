@@ -62,7 +62,6 @@
         <!-- SMS 配置 -->
         <sms4j.version>3.3.5</sms4j.version>
         <!-- 工作流配置 -->
-        <warm-flow.version>1.8.9</warm-flow.version>
         <liteflow.version>2.16.1.2</liteflow.version>
         <!-- mqtt客户端 -->
         <mica-mqtt.version>2.6.8</mica-mqtt.version>
@@ -344,19 +343,6 @@
                 <groupId>io.github.linpeilie</groupId>
                 <artifactId>mapstruct-plus-spring-boot-starter</artifactId>
                 <version>${mapstruct-plus.version}</version>
-            </dependency>
-
-            <!-- Warm-Flow国产工作流引擎, 在线文档：http://warm-flow.cn/ -->
-            <dependency>
-                <groupId>org.dromara.warm</groupId>
-                <artifactId>warm-flow-mybatis-plus-sb4-starter</artifactId>
-                <version>${warm-flow.version}</version>
-            </dependency>
-            <!-- Warm-Flow UI 插件 -->
-            <dependency>
-                <groupId>org.dromara.warm</groupId>
-                <artifactId>warm-flow-plugin-ui-sb-web</artifactId>
-                <version>${warm-flow.version}</version>
             </dependency>
 
             <!-- LiteFlow 规则编排引擎 -->

@@ -8,7 +8,7 @@ import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.warm.flow.core.dto.FlowParams;
+import org.dromara.warm.flow.dto.FlowParams;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskOperationEnum;
 import org.dromara.workflow.domain.bo.TaskOperationBo;

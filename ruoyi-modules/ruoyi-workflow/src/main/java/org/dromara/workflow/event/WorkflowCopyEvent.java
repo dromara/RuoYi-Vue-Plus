@@ -1,7 +1,7 @@
 package org.dromara.workflow.event;
 
 import cn.hutool.core.collection.CollUtil;
-import org.dromara.warm.flow.core.entity.Task;
+import org.dromara.warm.flow.entity.FlowTask;
 import org.dromara.workflow.domain.bo.FlowCopyBo;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  * @param task         当前任务
  * @param flowCopyList 抄送人列表
  */
-public record WorkflowCopyEvent(Task task, List<FlowCopyBo> flowCopyList) {
+public record WorkflowCopyEvent(FlowTask task, List<FlowCopyBo> flowCopyList) {
 
     public WorkflowCopyEvent {
         if (CollUtil.isNotEmpty(flowCopyList)) {

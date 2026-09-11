@@ -3,11 +3,9 @@ package org.dromara.workflow.service;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.system.api.domain.UserDTO;
-import org.dromara.warm.flow.core.entity.Node;
-import org.dromara.warm.flow.core.entity.Task;
-import org.dromara.warm.flow.orm.entity.FlowHisTask;
-import org.dromara.warm.flow.orm.entity.FlowNode;
-import org.dromara.warm.flow.orm.entity.FlowTask;
+import org.dromara.warm.flow.entity.FlowNode;
+import org.dromara.warm.flow.entity.FlowTask;
+import org.dromara.warm.flow.entity.FlowHisTask;
 import org.dromara.workflow.api.domain.StartProcessReturnDTO;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.FlowHisTaskVo;
@@ -45,7 +43,7 @@ public interface IFlwTaskService {
      * @param task         任务信息
      * @param flowCopyList 抄送人
      */
-    void setCopy(Task task, List<FlowCopyBo> flowCopyList);
+    void setCopy(FlowTask task, List<FlowCopyBo> flowCopyList);
 
     /**
      * 查询当前用户的待办任务
@@ -116,7 +114,7 @@ public interface IFlwTaskService {
      * @param nowNodeCode 当前节点
      * @return 结果
      */
-    List<Node> getBackTaskNode(Long taskId, String nowNodeCode);
+    List<FlowNode> getBackTaskNode(Long taskId, String nowNodeCode);
 
     /**
      * 终止任务

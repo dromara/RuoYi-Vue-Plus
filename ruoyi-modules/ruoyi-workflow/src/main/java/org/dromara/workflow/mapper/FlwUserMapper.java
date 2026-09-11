@@ -2,7 +2,7 @@ package org.dromara.workflow.mapper;
 
 import com.github.yulichang.base.MPJBaseMapper;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
-import org.dromara.warm.flow.orm.entity.FlowUser;
+import org.dromara.warm.flow.entity.FlowUser;
 
 /**
  * 任务信息Mapper接口

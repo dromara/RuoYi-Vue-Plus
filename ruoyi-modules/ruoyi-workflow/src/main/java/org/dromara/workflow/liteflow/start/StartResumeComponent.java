@@ -6,10 +6,9 @@ import com.yomahub.liteflow.core.NodeComponent;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.exception.ServiceException;
-import org.dromara.warm.flow.core.entity.Task;
-import org.dromara.warm.flow.core.service.InsService;
-import org.dromara.warm.flow.core.service.TaskService;
-import org.dromara.warm.flow.orm.entity.FlowTask;
+import org.dromara.warm.flow.entity.FlowTask;
+import org.dromara.warm.flow.service.InsService;
+import org.dromara.warm.flow.service.TaskService;
 import org.dromara.workflow.api.domain.StartProcessReturnDTO;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
@@ -36,7 +35,7 @@ public class StartResumeComponent extends NodeComponent {
     public void process() {
         StartProcessContext context = getContextBean(StartProcessContext.class);
         BusinessStatusEnum.checkStartStatus(context.getExistingInstance().getFlowStatus());
-        List<Task> taskList = taskService.list(new FlowTask().setInstanceId(context.getExistingInstance().getId()));
+        List<FlowTask> taskList = taskService.list(new FlowTask().setInstanceId(context.getExistingInstance().getId()));
         if (CollUtil.isEmpty(taskList)) {
             throw new ServiceException("流程实例缺少任务，请检查流程定义配置");
         }

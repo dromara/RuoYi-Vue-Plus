@@ -1,9 +1,9 @@
 package org.dromara.workflow.domain.context;
 
 import lombok.Data;
-import org.dromara.warm.flow.core.dto.FlowParams;
-import org.dromara.warm.flow.core.entity.Instance;
-import org.dromara.warm.flow.orm.entity.FlowTask;
+import org.dromara.warm.flow.dto.FlowParams;
+import org.dromara.warm.flow.entity.FlowInstance;
+import org.dromara.warm.flow.entity.FlowTask;
 import org.dromara.workflow.domain.bo.CompleteTaskBo;
 
 /**
@@ -29,7 +29,7 @@ public class CompleteTaskContext {
     /**
      * 当前任务所属流程实例，由校验节点加载。
      */
-    private Instance instance;
+    private FlowInstance instance;
 
     /**
      * Warm-Flow 办理参数，由参数构建节点生成并供执行、自动审批节点复用。

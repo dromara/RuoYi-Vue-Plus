@@ -1,4 +1,7 @@
 package org.dromara.workflow.service.impl;
+import org.dromara.warm.flow.entity.FlowDefinition;
+import org.dromara.warm.flow.entity.FlowInstance;
+import org.dromara.warm.flow.entity.FlowSkip;
 
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.stp.StpUtil;
@@ -22,25 +25,24 @@ import org.dromara.common.mybatis.utils.IdGeneratorUtil;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.UserService;
 import org.dromara.system.api.domain.UserDTO;
-import org.dromara.warm.flow.core.FlowEngine;
-import org.dromara.warm.flow.core.constant.ExceptionCons;
-import org.dromara.warm.flow.core.dto.FlowCombine;
-import org.dromara.warm.flow.core.dto.FlowParams;
-import org.dromara.warm.flow.core.entity.*;
-import org.dromara.warm.flow.core.enums.NodeType;
-import org.dromara.warm.flow.core.enums.SkipType;
-import org.dromara.warm.flow.core.enums.UserType;
-import org.dromara.warm.flow.core.exception.FlowException;
-import org.dromara.warm.flow.core.service.*;
-import org.dromara.warm.flow.core.utils.ExpressionUtil;
-import org.dromara.warm.flow.core.utils.MapUtil;
-import org.dromara.warm.flow.orm.entity.FlowHisTask;
-import org.dromara.warm.flow.orm.entity.FlowNode;
-import org.dromara.warm.flow.orm.entity.FlowTask;
-import org.dromara.warm.flow.orm.entity.FlowUser;
-import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
-import org.dromara.warm.flow.orm.mapper.FlowNodeMapper;
-import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
+import org.dromara.warm.flow.FlowEngine;
+import org.dromara.warm.flow.constant.ExceptionCons;
+import org.dromara.warm.flow.dto.FlowCombine;
+import org.dromara.warm.flow.dto.FlowParams;
+import org.dromara.warm.flow.enums.NodeType;
+import org.dromara.warm.flow.enums.SkipType;
+import org.dromara.warm.flow.enums.UserType;
+import org.dromara.warm.flow.exception.FlowException;
+import org.dromara.warm.flow.service.*;
+import org.dromara.warm.flow.utils.ExpressionUtil;
+import org.dromara.warm.flow.utils.MapUtil;
+import org.dromara.warm.flow.entity.FlowHisTask;
+import org.dromara.warm.flow.entity.FlowNode;
+import org.dromara.warm.flow.entity.FlowTask;
+import org.dromara.warm.flow.entity.FlowUser;
+import org.dromara.warm.flow.mapper.FlowHisTaskMapper;
+import org.dromara.warm.flow.mapper.FlowNodeMapper;
+import org.dromara.warm.flow.mapper.FlowTaskMapper;
 import org.dromara.workflow.api.domain.StartProcessReturnDTO;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskAssigneeType;
@@ -140,8 +142,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * @param task         任务信息
      * @param flowCopyList 抄送人
      */
-    @Override
-    public void setCopy(Task task, List<FlowCopyBo> flowCopyList) {
+    public void setCopy(FlowTask task, List<FlowCopyBo> flowCopyList) {
         if (CollUtil.isEmpty(flowCopyList)) {
             return;
         }
@@ -166,11 +167,11 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             .skipType(SkipType.NONE.getKey())
             .hisStatus(TaskStatusEnum.COPY.getStatus())
             .message("【抄送给】" + StreamUtils.join(flowCopyList, FlowCopyBo::getNickName));
-        HisTask hisTask = hisTaskService.setSkipHisTask(task, flowNode, flowParams);
+        FlowHisTask hisTask = hisTaskService.setSkipHisTask(task, flowNode, flowParams);
         hisTask.setCreateTime(updateTime);
         hisTask.setUpdateTime(updateTime);
         hisTaskService.save(hisTask);
-        List<User> userList = StreamUtils.toList(flowCopyList, x ->
+        List<FlowUser> userList = StreamUtils.toList(flowCopyList, x ->
             new FlowUser()
                 .setType(TaskAssigneeType.COPY.getCode())
                 .setProcessedBy(Convert.toStr(x.getUserId()))
@@ -237,12 +238,12 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (CollUtil.isEmpty(taskList)) {
             return;
         }
-        List<User> associatedUsers = FlowEngine.userService().getByAssociateds(StreamUtils.toList(taskList, FlowTaskVo::getId));
-        Map<Long, List<User>> taskUserMap = StreamUtils.groupByKey(associatedUsers, User::getAssociated);
+        List<FlowUser> associatedUsers = FlowEngine.userService().getByAssociateds(StreamUtils.toList(taskList, FlowTaskVo::getId));
+        Map<Long, List<FlowUser>> taskUserMap = StreamUtils.groupByKey(associatedUsers, FlowUser::getAssociated);
         // 组装用户数据回任务列表
         for (FlowTaskVo task : taskList) {
-            List<User> users = taskUserMap.get(task.getId());
-            task.setAssigneeIds(StreamUtils.join(users, User::getProcessedBy));
+            List<FlowUser> users = taskUserMap.get(task.getId());
+            task.setAssigneeIds(StreamUtils.join(users, FlowUser::getProcessedBy));
         }
     }
 
@@ -303,7 +304,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (ObjectUtil.isNull(task)) {
             throw new ServiceException("任务不存在！");
         }
-        Instance inst = insService.getById(task.getInstanceId());
+        FlowInstance inst = insService.getById(task.getInstanceId());
         if (ObjectUtil.isNull(inst)) {
             throw new ServiceException("流程实例不存在");
         }
@@ -334,35 +335,34 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      * @param nowNodeCode 当前节点
      * @return 当前任务允许驳回的节点列表
      */
-    @Override
-    public List<Node> getBackTaskNode(Long taskId, String nowNodeCode) {
+    public List<FlowNode> getBackTaskNode(Long taskId, String nowNodeCode) {
         FlowTask task = flowTaskMapper.selectById(taskId);
         if (ObjectUtil.isNull(task)) {
             throw new ServiceException("任务不存在！");
         }
-        List<Node> nodeCodes = nodeService.getByNodeCodes(Collections.singletonList(nowNodeCode), task.getDefinitionId());
+        List<FlowNode> nodeCodes = nodeService.getByNodeCodes(Collections.singletonList(nowNodeCode), task.getDefinitionId());
         if (!CollUtil.isNotEmpty(nodeCodes)) {
             return nodeCodes;
         }
-        List<User> userList = FlowEngine.userService()
+        List<FlowUser> userList = FlowEngine.userService()
             .getByAssociateds(Collections.singletonList(task.getId()), UserType.DEPUTE.getKey());
         if (CollUtil.isNotEmpty(userList)) {
             return nodeCodes;
         }
         //判断是否配置了固定驳回节点
-        Node node = nodeCodes.getFirst();
+        FlowNode node = nodeCodes.getFirst();
         if (StringUtils.isNotBlank(node.getAnyNodeSkip())) {
             return nodeService.getByNodeCodes(Collections.singletonList(node.getAnyNodeSkip()), task.getDefinitionId());
         }
         //获取可驳回的前置节点
         Long definitionId = task.getDefinitionId();
         FlowCombine flowCombine = defService.getFlowCombineNoDef(definitionId);
-        Map<String, Node> nodeMap = getPreviousNodeMap(nowNodeCode, flowCombine);
-        List<HisTask> hisTaskList = hisTaskService.getByInsId(task.getInstanceId());
+        Map<String, FlowNode> nodeMap = getPreviousNodeMap(nowNodeCode, flowCombine);
+        List<FlowHisTask> hisTaskList = hisTaskService.getByInsId(task.getInstanceId());
 
         Set<String> reachableNodeCodes = new HashSet<>();
         if (CollUtil.isNotEmpty(hisTaskList)) {
-            Instance instance = insService.getById(task.getInstanceId());
+            FlowInstance instance = insService.getById(task.getInstanceId());
             if (ObjectUtil.isNull(instance)) {
                 throw new ServiceException("流程实例不存在");
             }
@@ -373,9 +373,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         }
 
         Set<String> added = new HashSet<>();
-        List<Node> backNodeList = new ArrayList<>();
-        for (HisTask hisTask : hisTaskList) {
-            Node nodeValue = nodeMap.get(hisTask.getNodeCode());
+        List<FlowNode> backNodeList = new ArrayList<>();
+        for (FlowHisTask hisTask : hisTaskList) {
+            FlowNode nodeValue = nodeMap.get(hisTask.getNodeCode());
             if (nodeValue != null
                 && NodeType.BETWEEN.getKey().equals(nodeValue.getNodeType())
                 && (CollUtil.isEmpty(reachableNodeCodes) || reachableNodeCodes.contains(nodeValue.getNodeCode()))
@@ -393,33 +393,33 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         return StreamUtils.filter(nodeMap.values(), e -> NodeType.BETWEEN.getKey().equals(e.getNodeType()));
     }
 
-    private Map<String, Node> getPreviousNodeMap(String nodeCode, FlowCombine flowCombine) {
+    private Map<String, FlowNode> getPreviousNodeMap(String nodeCode, FlowCombine flowCombine) {
         if (ObjectUtil.isNull(flowCombine) || CollUtil.isEmpty(flowCombine.getAllNodes()) || CollUtil.isEmpty(flowCombine.getAllSkips())) {
             return Collections.emptyMap();
         }
-        Map<String, Node> allNodeMap = StreamUtils.toIdentityMap(flowCombine.getAllNodes(), Node::getNodeCode);
-        Map<String, List<Skip>> previousSkipMap = new HashMap<>();
-        for (Skip skip : flowCombine.getAllSkips()) {
+        Map<String, FlowNode> allNodeMap = StreamUtils.toIdentityMap(flowCombine.getAllNodes(), FlowNode::getNodeCode);
+        Map<String, List<FlowSkip>> previousSkipMap = new HashMap<>();
+        for (FlowSkip skip : flowCombine.getAllSkips()) {
             previousSkipMap.computeIfAbsent(skip.getNextNodeCode(), k -> new ArrayList<>()).add(skip);
         }
 
-        Map<String, Node> previousNodeMap = new LinkedHashMap<>();
+        Map<String, FlowNode> previousNodeMap = new LinkedHashMap<>();
         Set<String> visitedNodeCodes = new HashSet<>();
         Deque<String> nodeQueue = new ArrayDeque<>();
         visitedNodeCodes.add(nodeCode);
         nodeQueue.add(nodeCode);
         while (CollUtil.isNotEmpty(nodeQueue)) {
             String currentNodeCode = nodeQueue.poll();
-            List<Skip> previousSkips = previousSkipMap.get(currentNodeCode);
+            List<FlowSkip> previousSkips = previousSkipMap.get(currentNodeCode);
             if (CollUtil.isEmpty(previousSkips)) {
                 continue;
             }
-            for (Skip previousSkip : previousSkips) {
+            for (FlowSkip previousSkip : previousSkips) {
                 String previousNodeCode = previousSkip.getNowNodeCode();
                 if (!visitedNodeCodes.add(previousNodeCode)) {
                     continue;
                 }
-                Node previousNode = allNodeMap.get(previousNodeCode);
+                FlowNode previousNode = allNodeMap.get(previousNodeCode);
                 if (ObjectUtil.isNull(previousNode)) {
                     continue;
                 }
@@ -430,24 +430,24 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         return previousNodeMap;
     }
 
-    private void collectReachableNodeCodes(Set<String> nodeCodes, Instance instance, FlowCombine flowCombine) {
+    private void collectReachableNodeCodes(Set<String> nodeCodes, FlowInstance instance, FlowCombine flowCombine) {
         if (ObjectUtil.isNull(flowCombine) || CollUtil.isEmpty(flowCombine.getAllNodes())) {
             return;
         }
-        Deque<Node> nodeQueue = new ArrayDeque<>();
+        Deque<FlowNode> nodeQueue = new ArrayDeque<>();
         flowCombine.getAllNodes().stream()
             .filter(e -> NodeType.START.getKey().equals(e.getNodeType()))
             .findFirst()
             .ifPresent(nodeQueue::add);
 
         while (CollUtil.isNotEmpty(nodeQueue)) {
-            Node currentNode = nodeQueue.poll();
+            FlowNode currentNode = nodeQueue.poll();
             if (ObjectUtil.isNull(currentNode) || !nodeCodes.add(currentNode.getNodeCode())) {
                 continue;
             }
 
             try {
-                List<Node> nextNodes = nodeService.getNextNodeList(currentNode, null, SkipType.PASS.getKey(),
+                List<FlowNode> nextNodes = nodeService.getNextNodeList(currentNode, null, SkipType.PASS.getKey(),
                     instance.getVariableMap(), null, flowCombine);
                 if (CollUtil.isNotEmpty(nextNodes)) {
                     nodeQueue.addAll(nextNodes);
@@ -471,11 +471,11 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     @Transactional(rollbackFor = Exception.class)
     public boolean terminationTask(FlowTerminationBo bo) {
         Long taskId = bo.taskId();
-        Task task = taskService.getById(taskId);
+        FlowTask task = taskService.getById(taskId);
         if (task == null) {
             throw new ServiceException("任务不存在！");
         }
-        Instance instance = insService.getById(task.getInstanceId());
+        FlowInstance instance = insService.getById(task.getInstanceId());
         if (ObjectUtil.isNotNull(instance)) {
             BusinessStatusEnum.checkInvalidStatus(instance.getFlowStatus());
         }
@@ -508,17 +508,17 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      */
     @Override
     public FlowTaskVo selectById(Long taskId) {
-        Task task = taskService.getById(taskId);
+        FlowTask task = taskService.getById(taskId);
         if (ObjectUtil.isNull(task)) {
             return null;
         }
         checkTaskReadAccess(task);
         FlowTaskVo flowTaskVo = BeanUtil.toBean(task, FlowTaskVo.class);
-        Instance instance = insService.getById(task.getInstanceId());
+        FlowInstance instance = insService.getById(task.getInstanceId());
         if (ObjectUtil.isNull(instance)) {
             throw new ServiceException("流程实例不存在");
         }
-        Definition definition = defService.getById(task.getDefinitionId());
+        FlowDefinition definition = defService.getById(task.getDefinitionId());
         if (ObjectUtil.isNull(definition)) {
             throw new ServiceException("流程定义不存在");
         }
@@ -564,21 +564,21 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     public List<FlowNode> getNextNodeList(FlowNextNodeBo bo) {
         Long taskId = bo.getTaskId();
         Map<String, Object> variables = bo.getVariables();
-        Task task = taskService.getById(taskId);
+        FlowTask task = taskService.getById(taskId);
         if (ObjectUtil.isNull(task)) {
             throw new ServiceException("任务不存在！");
         }
-        Instance instance = insService.getById(task.getInstanceId());
+        FlowInstance instance = insService.getById(task.getInstanceId());
         if (ObjectUtil.isNull(instance)) {
             throw new ServiceException("流程实例不存在");
         }
-        Definition definition = defService.getById(task.getDefinitionId());
+        FlowDefinition definition = defService.getById(task.getDefinitionId());
         if (ObjectUtil.isNull(definition)) {
             throw new ServiceException("流程定义不存在");
         }
         Map<String, Object> mergeVariable = MapUtil.mergeAll(instance.getVariableMap(), variables);
         // 获取下一节点列表
-        List<Node> nextNodeList = nodeService.getNextNodeList(task.getDefinitionId(), task.getNodeCode(), null, SkipType.PASS.getKey(), mergeVariable);
+        List<FlowNode> nextNodeList = nodeService.getNextNodeList(task.getDefinitionId(), task.getNodeCode(), null, SkipType.PASS.getKey(), mergeVariable);
         if (CollUtil.isEmpty(nextNodeList)) {
             return new ArrayList<>();
         }
@@ -587,7 +587,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         nextFlowNodes = StreamUtils.filter(nextFlowNodes, node -> NodeType.BETWEEN.getKey().equals(node.getNodeType()));
         if (CollUtil.isNotEmpty(nextNodeList)) {
             //构建以下节点数据
-            List<Task> buildNextTaskList = StreamUtils.toList(nextNodeList, node -> taskService.addTask(node, instance, definition, FlowParams.build()));
+            List<FlowTask> buildNextTaskList = StreamUtils.toList(nextNodeList, node -> taskService.addTask(node, instance, definition, FlowParams.build()));
             //办理人变量替换
             ExpressionUtil.evalVariable(buildNextTaskList, FlowParams.build().variable(mergeVariable));
             for (FlowNode flowNode : nextFlowNodes) {
@@ -688,7 +688,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         // 批量删除现有任务的办理人记录
         if (CollUtil.isNotEmpty(flowTasks)) {
             FlowEngine.userService().deleteByTaskIds(StreamUtils.toList(flowTasks, FlowTask::getId));
-            List<User> userList = StreamUtils.toList(flowTasks, flowTask ->
+            List<FlowUser> userList = StreamUtils.toList(flowTasks, flowTask ->
                 new FlowUser()
                     .setType(TaskAssigneeType.APPROVER.getCode())
                     .setProcessedBy(userId)
@@ -715,7 +715,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             if (ObjectUtil.isNull(taskId)) {
                 continue;
             }
-            Task task = taskService.getById(taskId);
+            FlowTask task = taskService.getById(taskId);
             if (ObjectUtil.isNotNull(task)) {
                 checkTaskReadAccess(task);
                 validTaskIds.add(taskId);
@@ -725,7 +725,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             return Collections.emptyList();
         }
         // 获取与当前任务关联的用户列表
-        List<User> userList = FlowEngine.userService().getByAssociateds(validTaskIds);
+        List<FlowUser> userList = FlowEngine.userService().getByAssociateds(validTaskIds);
         if (CollUtil.isEmpty(userList)) {
             return Collections.emptyList();
         }
@@ -741,14 +741,14 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
      *
      * @param task 当前任务
      */
-    private void checkTaskReadAccess(Task task) {
+    private void checkTaskReadAccess(FlowTask task) {
         if (LoginHelper.isSuperAdmin()
             || StpUtil.hasPermission("workflow:task:list")
             || StpUtil.hasPermission("workflow:task:edit")) {
             return;
         }
         String userId = LoginHelper.getUserIdStr();
-        List<User> associatedUsers = FlowEngine.userService().getByAssociateds(List.of(task.getId()));
+        List<FlowUser> associatedUsers = FlowEngine.userService().getByAssociateds(List.of(task.getId()));
         boolean taskAssignee = CollUtil.isNotEmpty(associatedUsers)
             && associatedUsers.stream()
             .anyMatch(user -> Objects.equals(userId, user.getProcessedBy())
@@ -756,7 +756,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (taskAssignee) {
             return;
         }
-        Instance instance = insService.getById(task.getInstanceId());
+        FlowInstance instance = insService.getById(task.getInstanceId());
         if (ObjectUtil.isNotNull(instance) && Objects.equals(instance.getCreateBy(), userId)) {
             return;
         }

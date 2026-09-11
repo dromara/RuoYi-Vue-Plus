@@ -20,7 +20,6 @@ CREATE TABLE flow_definition (
     update_time datetime2(7)  NULL,
     update_by nvarchar(64) NULL,
     del_flag nchar(1) DEFAULT('0') NULL,
-    tenant_id nvarchar(40) NULL,
     CONSTRAINT PK__flow_def__3213E83FEE39AE33 PRIMARY KEY CLUSTERED (id)
     WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
     ON [PRIMARY]
@@ -155,13 +154,6 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'租户id',
-'SCHEMA', N'dbo',
-'TABLE', N'flow_definition',
-'COLUMN', N'tenant_id'
-GO
-
-EXEC sp_addextendedproperty
 'MS_Description', N'流程定义表',
 'SCHEMA', N'dbo',
 'TABLE', N'flow_definition'
@@ -188,7 +180,6 @@ CREATE TABLE flow_node (
     update_by nvarchar(64) NULL,
     ext nvarchar(max) NULL,
     del_flag nchar(1) DEFAULT('0') NULL,
-    tenant_id nvarchar(40) NULL,
     CONSTRAINT PK__flow_nod__3213E83F372470DE PRIMARY KEY CLUSTERED (id)
     WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
     ON [PRIMARY]
@@ -338,13 +329,6 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'租户id',
-'SCHEMA', N'dbo',
-'TABLE', N'flow_node',
-'COLUMN', N'tenant_id'
-GO
-
-EXEC sp_addextendedproperty
 'MS_Description', N'流程节点表',
 'SCHEMA', N'dbo',
 'TABLE', N'flow_node'
@@ -366,7 +350,6 @@ CREATE TABLE flow_skip (
     update_time datetime2(7)  NULL,
     update_by nvarchar(64) NULL,
     del_flag nchar(1) DEFAULT('0') NULL,
-    tenant_id nvarchar(40) NULL,
     CONSTRAINT PK__flow_ski__3213E83F073FEE6E PRIMARY KEY CLUSTERED (id)
     WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
     ON [PRIMARY]
@@ -480,13 +463,6 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'租户id',
-'SCHEMA', N'dbo',
-'TABLE', N'flow_skip',
-'COLUMN', N'tenant_id'
-GO
-
-EXEC sp_addextendedproperty
 'MS_Description', N'节点跳转关联表',
 'SCHEMA', N'dbo',
 'TABLE', N'flow_skip'
@@ -509,7 +485,6 @@ CREATE TABLE flow_instance (
     update_by nvarchar(64) NULL,
     ext nvarchar(500) NULL,
     del_flag nchar(1) DEFAULT('0') NULL,
-    tenant_id nvarchar(40) NULL,
     CONSTRAINT PK__flow_ins__3213E83F5190FEE1 PRIMARY KEY CLUSTERED (id)
     WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
     ON [PRIMARY]
@@ -631,13 +606,6 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'租户id',
-'SCHEMA', N'dbo',
-'TABLE', N'flow_instance',
-'COLUMN', N'tenant_id'
-GO
-
-EXEC sp_addextendedproperty
 'MS_Description', N'流程实例表',
 'SCHEMA', N'dbo',
 'TABLE', N'flow_instance'
@@ -658,7 +626,6 @@ CREATE TABLE flow_task (
     update_time datetime2(7)  NULL,
     update_by nvarchar(64) NULL,
     del_flag nchar(1) DEFAULT('0') NULL,
-    tenant_id nvarchar(40) NULL,
     CONSTRAINT PK__flow_tas__3213E83F5AE1F1BA PRIMARY KEY CLUSTERED (id)
     WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
     ON [PRIMARY]
@@ -765,13 +732,6 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'租户id',
-'SCHEMA', N'dbo',
-'TABLE', N'flow_task',
-'COLUMN', N'tenant_id'
-GO
-
-EXEC sp_addextendedproperty
 'MS_Description', N'待办任务表',
 'SCHEMA', N'dbo',
 'TABLE', N'flow_task'
@@ -800,7 +760,6 @@ CREATE TABLE flow_his_task (
     create_time datetime2(7)  NULL,
     update_time datetime2(7)  NULL,
     del_flag nchar(1) DEFAULT('0') NULL,
-    tenant_id nvarchar(40) NULL,
     CONSTRAINT PK__flow_his__3213E83F67951564 PRIMARY KEY CLUSTERED (id)
     WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
     ON [PRIMARY]
@@ -963,13 +922,6 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'租户id',
-'SCHEMA', N'dbo',
-'TABLE', N'flow_his_task',
-'COLUMN', N'tenant_id'
-GO
-
-EXEC sp_addextendedproperty
 'MS_Description', N'历史任务记录表',
 'SCHEMA', N'dbo',
 'TABLE', N'flow_his_task'
@@ -985,7 +937,6 @@ CREATE TABLE flow_user (
     update_time datetime2(7)  NULL,
     update_by nvarchar(64) NULL,
     del_flag nchar(1) DEFAULT('0') NULL,
-    tenant_id nvarchar(40) NULL,
     CONSTRAINT PK__flow_use__3213E83FFA38CA8B PRIMARY KEY CLUSTERED (id)
     WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
     ON [PRIMARY]
@@ -1059,13 +1010,6 @@ EXEC sp_addextendedproperty
 'SCHEMA', N'dbo',
 'TABLE', N'flow_user',
 'COLUMN', N'del_flag'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'租户id',
-'SCHEMA', N'dbo',
-'TABLE', N'flow_user',
-'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty

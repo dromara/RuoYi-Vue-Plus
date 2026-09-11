@@ -6,11 +6,11 @@ import com.yomahub.liteflow.core.NodeComponent;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
-import org.dromara.warm.flow.core.entity.Task;
-import org.dromara.warm.flow.core.enums.CooperateType;
-import org.dromara.warm.flow.core.service.TaskService;
-import org.dromara.warm.flow.orm.entity.FlowNode;
-import org.dromara.warm.flow.orm.mapper.FlowNodeMapper;
+import org.dromara.warm.flow.entity.FlowTask;
+import org.dromara.warm.flow.enums.CooperateType;
+import org.dromara.warm.flow.service.TaskService;
+import org.dromara.warm.flow.entity.FlowNode;
+import org.dromara.warm.flow.mapper.FlowNodeMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskOperationEnum;
 import org.dromara.workflow.domain.context.TaskOperationContext;
@@ -31,7 +31,7 @@ public class TaskOpLoadComponent extends NodeComponent {
     @Override
     public void process() {
         TaskOperationContext context = getContextBean(TaskOperationContext.class);
-        Task task = taskService.getById(context.getTaskOperationBo().getTaskId());
+        FlowTask task = taskService.getById(context.getTaskOperationBo().getTaskId());
         if (ObjectUtil.isNull(task)) {
             throw new ServiceException("任务不存在！");
         }

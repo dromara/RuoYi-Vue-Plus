@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.warm.flow.orm.entity.FlowInstance;
+import org.dromara.warm.flow.entity.FlowInstance;
 import org.dromara.workflow.api.WorkflowService;
 import org.dromara.workflow.api.domain.CompleteTaskDTO;
 import org.dromara.workflow.api.domain.StartProcessDTO;

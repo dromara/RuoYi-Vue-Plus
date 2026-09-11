@@ -3,7 +3,7 @@ package org.dromara.workflow.liteflow.operation;
 import com.yomahub.liteflow.annotation.LiteflowComponent;
 import com.yomahub.liteflow.core.NodeComponent;
 import lombok.RequiredArgsConstructor;
-import org.dromara.warm.flow.core.service.TaskService;
+import org.dromara.warm.flow.service.TaskService;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.context.TaskOperationContext;

@@ -1,9 +1,9 @@
 package org.dromara.workflow.domain.context;
 
 import lombok.Data;
-import org.dromara.warm.flow.core.dto.FlowParams;
-import org.dromara.warm.flow.core.entity.Task;
-import org.dromara.warm.flow.orm.entity.FlowNode;
+import org.dromara.warm.flow.dto.FlowParams;
+import org.dromara.warm.flow.entity.FlowTask;
+import org.dromara.warm.flow.entity.FlowNode;
 import org.dromara.workflow.common.enums.TaskOperationEnum;
 import org.dromara.workflow.domain.bo.TaskOperationBo;
 
@@ -40,7 +40,7 @@ public class TaskOperationContext {
     /**
      * 当前任务。
      */
-    private Task task;
+    private FlowTask task;
 
     /**
      * 当前任务对应的流程节点。

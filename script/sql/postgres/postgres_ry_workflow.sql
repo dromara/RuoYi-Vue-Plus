@@ -18,7 +18,6 @@ CREATE TABLE flow_definition
     update_time     timestamp    NULL,
     update_by       varchar(64)  NULL     DEFAULT '':: character varying,
     del_flag        bpchar(1)    NULL     DEFAULT '0':: character varying,
-    tenant_id       varchar(40)  NULL,
     CONSTRAINT flow_definition_pkey PRIMARY KEY (id)
 );
 COMMENT ON TABLE flow_definition IS '流程定义表';
@@ -41,7 +40,6 @@ COMMENT ON COLUMN flow_definition.create_by IS '创建人';
 COMMENT ON COLUMN flow_definition.update_time IS '更新时间';
 COMMENT ON COLUMN flow_definition.update_by IS '更新人';
 COMMENT ON COLUMN flow_definition.del_flag IS '删除标志';
-COMMENT ON COLUMN flow_definition.tenant_id IS '租户id';
 
 CREATE TABLE flow_node
 (
@@ -65,7 +63,6 @@ CREATE TABLE flow_node
     update_by       varchar(64)  NULL DEFAULT '':: character varying,
     ext             text         NULL,
     del_flag        bpchar(1)     NULL DEFAULT '0':: character varying,
-    tenant_id       varchar(40)   NULL,
     CONSTRAINT flow_node_pkey PRIMARY KEY (id)
 );
 COMMENT ON TABLE flow_node IS '流程节点表';
@@ -90,7 +87,6 @@ COMMENT ON COLUMN flow_node.update_time IS '更新时间';
 COMMENT ON COLUMN flow_node.update_by IS '更新人';
 COMMENT ON COLUMN flow_node.ext IS '节点扩展属性';
 COMMENT ON COLUMN flow_node.del_flag IS '删除标志';
-COMMENT ON COLUMN flow_node.tenant_id IS '租户id';
 
 
 CREATE TABLE flow_skip
@@ -110,7 +106,6 @@ CREATE TABLE flow_skip
     update_time    timestamp    NULL,
     update_by      varchar(64)  NULL DEFAULT '':: character varying,
     del_flag       bpchar(1)    NULL DEFAULT '0':: character varying,
-    tenant_id      varchar(40)  NULL,
     CONSTRAINT flow_skip_pkey PRIMARY KEY (id)
 );
 COMMENT ON TABLE flow_skip IS '节点跳转关联表';
@@ -130,7 +125,6 @@ COMMENT ON COLUMN flow_skip.create_by IS '创建人';
 COMMENT ON COLUMN flow_skip.update_time IS '更新时间';
 COMMENT ON COLUMN flow_skip.update_by IS '更新人';
 COMMENT ON COLUMN flow_skip.del_flag IS '删除标志';
-COMMENT ON COLUMN flow_skip.tenant_id IS '租户id';
 
 CREATE TABLE flow_instance
 (
@@ -150,7 +144,6 @@ CREATE TABLE flow_instance
     update_by       varchar(64)  NULL DEFAULT '':: character varying,
     ext             varchar(500) NULL,
     del_flag        bpchar(1)    NULL     DEFAULT '0':: character varying,
-    tenant_id       varchar(40)  NULL,
     CONSTRAINT flow_instance_pkey PRIMARY KEY (id)
 );
 COMMENT ON TABLE flow_instance IS '流程实例表';
@@ -171,7 +164,6 @@ COMMENT ON COLUMN flow_instance.update_time IS '更新时间';
 COMMENT ON COLUMN flow_instance.update_by IS '更新人';
 COMMENT ON COLUMN flow_instance.ext IS '扩展字段，预留给业务系统使用';
 COMMENT ON COLUMN flow_instance.del_flag IS '删除标志';
-COMMENT ON COLUMN flow_instance.tenant_id IS '租户id';
 
 CREATE TABLE flow_task
 (
@@ -189,7 +181,6 @@ CREATE TABLE flow_task
     update_time   timestamp    NULL,
     update_by     varchar(64)  NULL DEFAULT '':: character varying,
     del_flag      bpchar(1)    NULL DEFAULT '0':: character varying,
-    tenant_id     varchar(40)  NULL,
     CONSTRAINT flow_task_pkey PRIMARY KEY (id)
 );
 COMMENT ON TABLE flow_task IS '待办任务表';
@@ -208,7 +199,6 @@ COMMENT ON COLUMN flow_task.create_by IS '创建人';
 COMMENT ON COLUMN flow_task.update_time IS '更新时间';
 COMMENT ON COLUMN flow_task.update_by IS '更新人';
 COMMENT ON COLUMN flow_task.del_flag IS '删除标志';
-COMMENT ON COLUMN flow_task.tenant_id IS '租户id';
 
 CREATE TABLE flow_his_task
 (
@@ -234,7 +224,6 @@ CREATE TABLE flow_his_task
     create_time      timestamp    NULL,
     update_time      timestamp    NULL,
     del_flag         bpchar(1)    NULL     DEFAULT '0':: character varying,
-    tenant_id        varchar(40)  NULL,
     CONSTRAINT flow_his_task_pkey PRIMARY KEY (id)
 );
 COMMENT ON TABLE flow_his_task IS '历史任务记录表';
@@ -261,7 +250,6 @@ COMMENT ON COLUMN flow_his_task.ext IS '扩展字段，预留给业务系统使�
 COMMENT ON COLUMN flow_his_task.create_time IS '任务开始时间';
 COMMENT ON COLUMN flow_his_task.update_time IS '审批完成时间';
 COMMENT ON COLUMN flow_his_task.del_flag IS '删除标志';
-COMMENT ON COLUMN flow_his_task.tenant_id IS '租户id';
 
 CREATE TABLE flow_user
 (
@@ -274,7 +262,6 @@ CREATE TABLE flow_user
     update_time  timestamp   NULL,
     update_by    varchar(64)  NULL DEFAULT '':: character varying,
     del_flag     bpchar(1)   NULL DEFAULT '0':: character varying,
-    tenant_id    varchar(40) NULL,
     CONSTRAINT flow_user_pk PRIMARY KEY (id)
 );
 CREATE INDEX user_processed_type ON flow_user USING btree (processed_by, type);
@@ -290,7 +277,6 @@ COMMENT ON COLUMN flow_user.create_by IS '创建人';
 COMMENT ON COLUMN flow_user.update_time IS '更新时间';
 COMMENT ON COLUMN flow_user.update_by IS '更新人';
 COMMENT ON COLUMN flow_user.del_flag IS '删除标志';
-COMMENT ON COLUMN flow_user.tenant_id IS '租户id';
 
 -- ----------------------------
 -- 流程分类表

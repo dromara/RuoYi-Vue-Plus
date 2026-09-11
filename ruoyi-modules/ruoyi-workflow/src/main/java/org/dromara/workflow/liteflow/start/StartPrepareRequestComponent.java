@@ -7,8 +7,8 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.warm.flow.orm.entity.FlowInstance;
-import org.dromara.warm.flow.orm.mapper.FlowInstanceMapper;
+import org.dromara.warm.flow.entity.FlowInstance;
+import org.dromara.warm.flow.mapper.FlowInstanceMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.context.StartProcessContext;
 

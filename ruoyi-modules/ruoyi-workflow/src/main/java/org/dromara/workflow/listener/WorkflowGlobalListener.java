@@ -12,13 +12,13 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.system.api.UserService;
-import org.dromara.warm.flow.core.FlowEngine;
-import org.dromara.warm.flow.core.dto.FlowParams;
-import org.dromara.warm.flow.core.entity.Definition;
-import org.dromara.warm.flow.core.entity.Instance;
-import org.dromara.warm.flow.core.entity.Task;
-import org.dromara.warm.flow.core.listener.GlobalListener;
-import org.dromara.warm.flow.core.listener.ListenerVariable;
+import org.dromara.warm.flow.FlowEngine;
+import org.dromara.warm.flow.dto.FlowParams;
+import org.dromara.warm.flow.entity.FlowDefinition;
+import org.dromara.warm.flow.entity.FlowInstance;
+import org.dromara.warm.flow.entity.FlowTask;
+import org.dromara.warm.flow.listener.GlobalListener;
+import org.dromara.warm.flow.listener.ListenerVariable;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
@@ -109,14 +109,14 @@ public class WorkflowGlobalListener implements GlobalListener {
     @Override
     public void assignment(ListenerVariable listenerVariable) {
         Map<String, Object> variable = listenerVariable.getVariable();
-        List<Task> nextTasks = listenerVariable.getNextTasks();
+        List<FlowTask> nextTasks = listenerVariable.getNextTasks();
         FlowParams flowParams = listenerVariable.getFlowParams();
-        Definition definition = listenerVariable.getDefinition();
-        Instance instance = listenerVariable.getInstance();
+        FlowDefinition definition = listenerVariable.getDefinition();
+        FlowInstance instance = listenerVariable.getInstance();
         String applyNodeCode = flwCommonService.applyNodeCode(definition.getId());
         String hisStatus = flowParams != null ? flowParams.getHisStatus() : null;
 
-        for (Task flowTask : nextTasks) {
+        for (FlowTask flowTask : nextTasks) {
             String nodeCode = flowTask.getNodeCode();
 
             // 处理办理或退回时指定办理人的情况
@@ -140,7 +140,7 @@ public class WorkflowGlobalListener implements GlobalListener {
      * @param flowTask   流程任务
      * @param taskStatus 任务状态
      */
-    private void processTaskPermission(Map<String, Object> variable, Task flowTask, String taskStatus) {
+    private void processTaskPermission(Map<String, Object> variable, FlowTask flowTask, String taskStatus) {
         String nodeKey = taskStatus + StringUtils.COLON + flowTask.getNodeCode();
 
         // 检查是否存在状态相关的变量
@@ -178,10 +178,10 @@ public class WorkflowGlobalListener implements GlobalListener {
      */
     @Override
     public void finish(ListenerVariable listenerVariable) {
-        Instance instance = listenerVariable.getInstance();
-        Definition definition = listenerVariable.getDefinition();
-        Task task = listenerVariable.getTask();
-        List<Task> nextTasks = listenerVariable.getNextTasks();
+        FlowInstance instance = listenerVariable.getInstance();
+        FlowDefinition definition = listenerVariable.getDefinition();
+        FlowTask task = listenerVariable.getTask();
+        List<FlowTask> nextTasks = listenerVariable.getNextTasks();
         Map<String, Object> params = new HashMap<>();
         FlowParams flowParams = listenerVariable.getFlowParams();
         Map<String, Object> variable = new HashMap<>();
@@ -220,7 +220,7 @@ public class WorkflowGlobalListener implements GlobalListener {
         }
         //发布任务事件
         if (CollUtil.isNotEmpty(nextTasks)) {
-            for (Task nextTask : nextTasks) {
+            for (FlowTask nextTask : nextTasks) {
                 flowProcessEventHandler.processTaskHandler(definition.getFlowCode(), instance, nextTask, params);
             }
         }
@@ -266,7 +266,7 @@ public class WorkflowGlobalListener implements GlobalListener {
      * @param nextTasks  后续任务列表
      * @return 是否发送待办消息
      */
-    private boolean shouldSendTaskMessage(FlowParams flowParams, Definition definition, List<Task> nextTasks) {
+    private boolean shouldSendTaskMessage(FlowParams flowParams, FlowDefinition definition, List<FlowTask> nextTasks) {
         if (flowParams == null || !TaskStatusEnum.BACK.getStatus().equals(flowParams.getHisStatus())) {
             return true;
         }
@@ -286,7 +286,7 @@ public class WorkflowGlobalListener implements GlobalListener {
      * @param status     业务状态
      * @param variable   流程变量
      */
-    private void notifyInitiatorIfNeeded(Definition definition, Instance instance, String status, Map<String, Object> variable) {
+    private void notifyInitiatorIfNeeded(FlowDefinition definition, FlowInstance instance, String status, Map<String, Object> variable) {
         if (!StringUtils.equalsAny(status, BusinessStatusEnum.FINISH.getStatus(), BusinessStatusEnum.BACK.getStatus())) {
             return;
         }
@@ -308,7 +308,7 @@ public class WorkflowGlobalListener implements GlobalListener {
      * @param instance 流程实例
      * @return 流程最终状态
      */
-    private String determineFlowStatus(Instance instance) {
+    private String determineFlowStatus(FlowInstance instance) {
         String flowStatus = instance.getFlowStatus();
         if (StringUtils.isNotBlank(flowStatus) && BusinessStatusEnum.initialState(flowStatus)) {
             log.info("流程实例当前状态: {}", flowStatus);
