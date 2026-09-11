@@ -14,19 +14,81 @@ description: 在仓库内按代码生成器模板、项目 reference 文档和�
 - 新增标准 CRUD 模块。
 - 根据新表结构补齐 entity、bo、vo、mapper、service、controller。
 - 修改已有模块的查询、校验、导入导出、数据权限、事务逻辑。
-- 修改 `ruoyi-common` 公共能力，例如 mybatis 查询构造器、translation、json enhance、excel、oss、redis、web 配置。
+- 修改 `ruoyi-common` 公共能力，例如 mybatis 查询构造器、translation、json enhance、excel、oss、redis、web、encrypt、satoken 配置。
 - 补充或修正 JavaDoc 注释，尤其是公共 API、接口、BO/VO/Entity 字段、Mapper 默认方法、Service/Controller 方法。
-- 在系统、监控、工作流、demo 等模块内按现有约定扩展业务代码。
+- 在系统、监控、工作流、demo、job、ai 等模块内按现有约定扩展业务代码。
 - 为后端新增接口同步补前端 `api/types` 和 Vue `index.vue` 或 React `index.tsx` 页面骨架。
+- 扩展认证授权策略（新增 grantType、OAuth2 客户端、三方社交登录绑定）。
+- 扩展工作流编排（新增 Warm-Flow 节点、LiteFlow 链路、办理人解析、流程事件监听）。
+- 基础设施扩展（SnailJob 任务执行器、MCP Server/Client Tool、Spring 事件发布/监听、启动钩子 Runner）。
 
 ## 不适用场景
 
 下面这些任务不要机械套用本 skill 的 CRUD 规则：
 
-- 基础框架升级、Spring Boot 主版本迁移。
+- 基础框架升级、Spring Boot 主版本迁移、JDK 大版本升级。
 - 与当前分层明显不同的实验性模块。
-- 第三方中间件深度接入、基础设施改造。
+- 第三方中间件深度接入、基础设施底层改造（如替换 ORM、替换缓存中间件）。
 - 完全脱离 generator 体系的独立子系统。
+- 前端工程独立目录（plus-ui / plus-ui-react）的框架级改造。
+
+---
+
+## 项目架构速览
+
+**一级模块拓扑（Maven 多模块）**：
+
+```
+ruoyi-vue-plus (root, pom)
+├── ruoyi-admin          # Web 启动入口：认证 Controller、验证码、登录、启动类
+├── ruoyi-api            # 跨模块契约层：接口 + DTO，common 层唯一对外依赖
+├── ruoyi-common         # 通用能力层：25 个子模块，BOM 统一版本
+├── ruoyi-modules        # 业务模块：system / gen / job / demo / workflow / ai
+└── ruoyi-extend         # 扩展独立应用：monitor-admin / snailjob-server / snailai-server
+```
+
+**分层依赖方向**：`admin → modules → api → common-core ← common-*`。业务模块之间禁止直接依赖，必须通过 `ruoyi-api` 暴露接口。
+
+**25 个 common 子模块速查**：
+
+| 子模块 | 核心能力 |
+|--------|----------|
+| `common-core` | 基础常量、异常 `ServiceException`、`R<T>`、`BaseEntity`、工具类包占位 |
+| `common-json` | Jackson 序列化、`JsonFieldProcessor` 三阶段、翻译/脱敏处理器 |
+| `common-redis` | `RedisUtils`、`CacheUtils`、`QueueUtils`、Redisson 配置 |
+| `common-satoken` | Sa-Token 配置、`LoginHelper`、权限工具、Redis 二级缓存 |
+| `common-security` | 路由拦截、`@SaCheckPermission`、黑白名单 |
+| `common-mybatis` | `BaseMapperPlus`、`QueryBuilder`、`LambdaCrudChainWrapper`、`@DataPermission`、乐观锁、逻辑删除、自动填充 |
+| `common-web` | Jetty 容器、`BaseController`、全局异常、`@RepeatSubmit`、`@RateLimiter`、SSE/WebSocket 推送 |
+| `common-log` | `@Log` 注解、操作日志、登录日志事件发布 |
+| `common-oss` | OSS 抽象、S3 SDK v2、MinIO/阿里/腾讯/七牛适配、`ISysOssConfigService` |
+| `common-excel` | Fesod（EasyExcel 孵化版）、`ExcelListener`、`@ExcelProperty`/`@ExcelDictFormat` |
+| `common-encrypt` | 字段加解密 `@EncryptField`、API 传输加密 `@ApiEncrypt`/`CryptoFilter`（AES+RSA） |
+| `common-sensitive` | `@Sensitive` 脱敏策略、按角色/权限脱敏开关 |
+| `common-translation` | `@Translation`、`TranslationInterface`、`translationBatch` 批量翻译 |
+| `common-idempotent` | `@Idempotent` 幂等注解 |
+| `common-duplicate` | 防重复提交内部实现 |
+| `common-tenant` | 租户隔离支持 |
+| `common-datascope` | `@DataPermission` 内部实现 |
+| `common-bom` | 依赖版本管理（BOM） |
+| `common-i18n` | 国际化支持 |
+| `common-swagger` | SpringDoc + therapi-javadoc 零注解文档 |
+| `common-mail` | Jakarta Mail（Angus）邮件发送 |
+| `common-sms` | sms4j 多厂商短信 |
+| `common-ratelimiter` | `@RateLimiter` 令牌桶限流（IP/CLUSTER/DEFAULT） |
+| `common-push` | WebSocket 推送、`@McpSampling`/`@McpElicitation` 反向回调握手 |
+| `common-mapstruct` | `MapstructUtils`、`@AutoMapper` 对象映射 |
+
+**6 个业务模块速查**：
+
+| 模块 | 核心职责 | 优先参考文件 |
+|------|----------|--------------|
+| `ruoyi-system` | 用户/角色/部门/菜单/字典/岗位/通知/OSS/客户端/社交/消息/日志 | `ISysUserService`、`SysLoginService`、`SysPermissionHandler` |
+| `ruoyi-gen` | 代码生成器：表元数据→FreeMarker→Java/Vue/React/SQL/XML | `GenUtils`、`TemplateEngineUtils`、`fm/java/*.ftl` |
+| `ruoyi-job` | SnailJob 任务示例：9 个 `@JobExecutor` 覆盖所有调度模式 | `AlipayBillTask`（DAG）、`TestBroadcastJob`（广播） |
+| `ruoyi-demo` | 19+ 全功能教学示例：ES/邮件/MCP/MQTT/Redis/Sa-Token/SMS/Excel/i18n/脱敏/树表/WebSocket | `McpDemoServerTool`、`McpDemoClientService` |
+| `ruoyi-workflow` | Warm-Flow + LiteFlow：6 Controller/11 Service/12 `@LiteflowComponent` | `WorkflowGlobalListener`、`FlwTaskController`、`task-chain.el.xml` |
+| `ruoyi-ai` | Snail AI OpenAPI 注册入口：`/snail-ai/user/register` | `SnailAiController` |
 
 ## 执行流程
 
@@ -135,9 +197,27 @@ Vue 3、React、TypeScript API 文件、生成式列表页、表单状态、字�
 
 修改 `ruoyi-common` 下的基础能力时，优先保证二进制/API 兼容：不要轻易改公开方法签名、泛型、返回值或异常语义。新增注释和小范围能力时，先查同包现有风格，例如 `common-mybatis` 的链式 wrapper、`common-translation` 的 `TranslationInterface` 实现、`common-json` 的字段处理器。
 
-### 5. 注释修正任务
+### 5. 认证授权策略扩展
 
-只要求“加注释/完善注释”时，默认补 JavaDoc，不改实现。优先补公共 API、接口方法、字段含义、复杂私有辅助方法；覆写框架回调方法只有在当前文件已有注释风格或业务语义不直观时才补。
+**适用**：新增 `grantType`（如 password/sms/wechat/email）、OAuth2 `SysClient` 配置、`SysSocial` 三方绑定、`IAuthStrategy` 实现、`LoginHelper` 登录上下文扩展。
+**关键类**：`IAuthStrategy`（策略分发 `grantType + "AuthStrategy"`）、`LoginHelper`（`login()`/`getLoginUser()`/`isSuperAdmin()`）、`SysLoginService`（`checkLogin()` 失败次数锁定、`buildLoginUser()` 虚拟线程并行加载）、`ISysClientService`（客户端校验）、`ISysSocialService`（三方关系）。
+**约定**：策略 Bean 名 = `grantType + AuthStrategy`；登录参数统一用 `IAuthStrategy.buildLoginParameter(SysClientVo, customizer)`；失败次数默认 Redis 5 次/10 分钟；三方绑定用 `@Lock4j` 分布式锁。
+
+### 6. 工作流编排扩展
+
+**适用**：新增 Warm-Flow 节点/监听器、LiteFlow 链路定义、办理人解析器、流程抄送/消息通知扩展。
+**关键类**：`WorkflowGlobalListener`（start/assignment/finish 四回调 + `FLOW_COPY_LIST`）、`WorkflowPermissionHandler`（`permissions()` + `convertPermissions()` 角色/部门→用户ID）、`@ConditionalOnEnable`（`warm-flow.enabled` 条件装配）、`task-chain.el.xml`（`startProcessChain`/`completeTaskChain`/`taskOperationChain`）。
+**约定**：条件装配默认带 `@ConditionalOnProperty("warm-flow.enabled")`；办理人存储 ID 转用户 ID 走 `IFlwTaskAssigneeService.fetchUsersByStorageIds`；流程事件后发布内部事件，抄送/通知由 `WorkflowSideEffectListener` 消费；新增 LiteFlow 组件用 `@LiteflowComponent`，链路定义追加到 `task-chain.el.xml`/`instance-chain.el.xml`。
+
+### 7. 基础设施与事件/任务
+
+**适用**：SnailJob `@JobExecutor` 任务、MCP `@McpTool`/`@McpResource` Server Tool 或 Client 调用、Spring `ApplicationEvent` + `@TransactionalEventListener`、`ApplicationRunner` 启动钩子、WebSocket/MQTT/SSE 接入。
+**关键类**：`@JobExecutor`（SnailJob 9 种模式：注解/类继承/广播/Map/MapReduce/静态分片/DAG）、`McpDemoServerTool`/`McpDemoClientService`/`McpDemoClientHandlers`（MCP 双向演示）、`OnlineUserCleanEvent`→`OnlineUserCleanListener`（`@Async`）、`OssConfigChangeEvent`→`OssConfigChangeListener`（缓存刷新）、`SystemApplicationRunner`（初始化 OSS 配置缓存）。
+**约定**：事件用 Java 21 record + `@TransactionalEventListener(phase = AFTER_COMMIT)`；异步监听加 `@Async`；启动钩子放 `runner/` 包；SnailJob 任务优先参考 `ruoyi-job` 对应模式；MCP Server Tool 用 `@McpTool`/`@McpResource`，Client 端用 `McpClientService`；Server 反向请求 Client 用 `@McpSampling`/`@McpElicitation`。
+
+### 8. 注释修正任务
+
+只要求"加注释/完善注释"时，默认补 JavaDoc，不改实现。优先补公共 API、接口方法、字段含义、复杂私有辅助方法；覆写框架回调方法只有在当前文件已有注释风格或业务语义不直观时才补。
 
 ## 输出要求
 
@@ -164,6 +244,13 @@ Vue 3、React、TypeScript API 文件、生成式列表页、表单状态、字�
 - VO 使用 `@AutoMapper(target = Entity.class)`。
 - 前端 API 路径与后端路由完全对应。
 - 前端列表页继续使用对应前端工程已有工具：Vue 侧如 `proxy?.addDateRange`、`proxy?.$modal`、`proxy?.download`、`useDict`、`pagination`；React 侧如 `ProTable`、`ModalForm`、`useTableSelection`、`useDateRangeQuery`、`useTableExport`。
+- 跨模块调用必须走 `ruoyi-api`，业务模块之间禁止直接引入依赖。
+- 新增认证策略 Bean 名必须是 `{grantType}AuthStrategy`，否则 `IAuthStrategy` 路由失败。
+- 工作流 Bean 新增时检查 `@ConditionalOnEnable`，避免 `warm-flow.enabled=false` 时启动报错。
+- 事件监听使用 `@TransactionalEventListener(phase = AFTER_COMMIT)`，异步加 `@Async`，不要在事务内触发副作用。
+- OSS/字典/部门等写操作同步维护缓存失效（`@CacheEvict` 或 `CacheUtils.evict`），不要只改数据库。
+- 限流/幂等/防重注解按近邻接口保持一致，不要给新接口漏掉。
+- 自动填充审计字段由 `InjectionMetaObjectHandler` 处理，不要手动 set createBy/updateBy/createTime/updateTime/createDept。
 
 ## 推荐提问方式
 
@@ -179,3 +266,7 @@ Vue 3、React、TypeScript API 文件、生成式列表页、表单状态、字�
 
 - 使用 `$ruoyi-plus-ai-coding` 在 `system` 模块新增一个标准单表 CRUD，参考 `SysConfig` 与 generator 模板。
 - 使用 `$ruoyi-plus-ai-coding` 修改 `workflow/category` 的查询和导出逻辑，保持现有模块风格。
+- 使用 `$ruoyi-plus-ai-coding` 新增一个 grantType=sms 的 IAuthStrategy 策略，参考现有 PasswordAuthStrategy。
+- 使用 `$ruoyi-plus-ai-coding` 为 ruoyi-job 模块新增一个广播模式 SnailJob 任务执行器，参考 TestBroadcastJob。
+- 使用 `$ruoyi-plus-ai-coding` 新增一个 MCP Server Tool，参考 McpDemoServerTool 写法。
+- 使用 `$ruoyi-plus-ai-coding` 新增流程抄送扩展逻辑，参考 WorkflowGlobalListener 和 WorkflowSideEffectListener。
