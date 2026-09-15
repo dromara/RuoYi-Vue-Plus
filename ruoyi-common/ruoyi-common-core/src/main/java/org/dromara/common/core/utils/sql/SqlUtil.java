@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.StringUtils;
 
+import java.util.Locale;
+
 /**
  * sql操作工具类
  *
@@ -55,7 +57,7 @@ public class SqlUtil {
         }
 
         // ==================== 原有逻辑不变 ====================
-        String normalizedValue = value.replaceAll("\\p{Z}|\\s", "");
+        String normalizedValue = value.replaceAll("[\\p{Z}\\s]+", " ").toLowerCase(Locale.ROOT);
         String[] sqlKeywords = StringUtils.split(SQL_REGEX, "\\|");
         for (String sqlKeyword : sqlKeywords) {
             if (StringUtils.indexOf(normalizedValue, sqlKeyword) > -1) {

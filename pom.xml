@@ -74,7 +74,7 @@
         <!-- 统一版本号管理：Maven3.X需要，Maven4.0之后已原生支持 -->
         <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
         <!-- 打包默认跳过测试 -->
-        <maven.test.skip>true</maven.test.skip>
+        <maven.test.skip>false</maven.test.skip>
     </properties>
 
     <profiles>
@@ -112,6 +112,15 @@
             </properties>
         </profile>
     </profiles>
+
+    <dependencies>
+        <!-- 各子模块统一使用 JUnit 5、Mockito 与 Spring Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <!-- 依赖声明 -->
     <dependencyManagement>
@@ -508,8 +517,11 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
-                    <!-- 根据打包环境执行对应的@Tag测试方法 -->
-                    <groups>${profiles.active}</groups>
+                    <!--
+                    暂不启用 groups 标签筛选，确保各模块新增的无标签单元测试默认执行。
+                    需要按环境筛选 @Tag 时，可恢复下方配置并通过 -Dgroups=dev 等参数指定标签。
+                    <groups>${groups}</groups>
+                    -->
                     <!-- 排除标签 -->
                     <excludedGroups>exclude</excludedGroups>
                 </configuration>
