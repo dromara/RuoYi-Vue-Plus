@@ -79,9 +79,11 @@ public class BucketUrlUtil {
      * @return 移除HTTP/HTTPS协议头后的地址
      */
     public static String removeHttpProtocolHeader(String url) {
-        if (StringUtils.startsWithIgnoreCase(url, HTTP_PROTOCOL_HEADER) || StringUtils.startsWithIgnoreCase(url, HTTPS_PROTOCOL_HEADER)) {
-            return url.replace(HTTP_PROTOCOL_HEADER, EMPTY_STRING)
-                .replace(HTTPS_PROTOCOL_HEADER, EMPTY_STRING);
+        if (StringUtils.startsWithIgnoreCase(url, HTTPS_PROTOCOL_HEADER)) {
+            return url.substring(HTTPS_PROTOCOL_HEADER.length());
+        }
+        if (StringUtils.startsWithIgnoreCase(url, HTTP_PROTOCOL_HEADER)) {
+            return url.substring(HTTP_PROTOCOL_HEADER.length());
         }
         return url;
     }

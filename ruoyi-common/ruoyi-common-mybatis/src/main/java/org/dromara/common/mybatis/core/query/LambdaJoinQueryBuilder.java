@@ -209,7 +209,11 @@ public final class LambdaJoinQueryBuilder<T> {
      */
     public <S> LambdaJoinQueryBuilder<T> selectSub(Class<S> entityClass, Consumer<SubQuery<S>> consumer, String alias) {
         SubQuery<S> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
-        wrapper.selectFunc("(" + subQuery.build() + ")", func -> func.values(subQuery.params()),
+        wrapper.selectFunc("(" + subQuery.build() + ")", func -> {
+            // MPJ raw select functions require a non-null column argument array even when SQL has no column placeholders.
+            func.setArgs(new SFunction[0]);
+            return func.values(subQuery.params());
+        },
             AggregateSelectUtils.checkAlias(alias));
         return this;
     }
