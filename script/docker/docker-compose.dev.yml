@@ -1,0 +1,170 @@
+# AIP · dev/local 全栈 docker-compose（不替代既有 docker-compose.yml）
+#
+# 用途：本地一键拉起 MySQL + Redis + MinIO + ruoyi-admin，
+#       对齐 application-dev.yml 的连接参数与 Dockerfile.optimized 的镜像构建。
+#
+# 与既有 docker-compose.yml 的差别：
+#   - 使用 bridge 网络（容器内 hostname），而非 host 网络
+#   - 服务名作为 hostname；application-dev.yml 中 localhost 需经环境变量覆盖
+#   - 健康检查 + restart: unless-stopped
+#   - MySQL 首次启动自动执行 ../sql/ 下的 4 个建库脚本（ry_vue/ry_job/ry_workflow/ry_ai）
+#   - ruoyi-admin 通过 Dockerfile.optimized 构建的 aip-app:1.0.0 镜像运行
+#
+# 启动：docker compose -f script/docker/docker-compose.dev.yml up -d --build
+# 停止：docker compose -f script/docker/docker-compose.dev.yml down
+# 数据：-v 才会清；本文件用 named volume 保留数据
+
+services:
+
+  # -----------------------------------------------------------------
+  # MySQL 8 —— 与 application-dev.yml 中 master 数据源参数对齐
+  #   url: jdbc:mysql://localhost:3306/ry-vue  user=root  pass=root
+  #   首次启动自动执行 ../sql/ry_vue.sql / ry_job.sql / ry_workflow.sql / ry_ai.sql
+  # -----------------------------------------------------------------
+  mysql:
+    image: mysql:8.4.9
+    container_name: aip-mysql
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ry-vue
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql/
+      # 初始化脚本：仅在数据目录为空时执行一次（首次启动建库）
+      - ../sql/ry_vue.sql:/docker-entrypoint-initdb.d/01-ry_vue.sql:ro
+      - ../sql/ry_job.sql:/docker-entrypoint-initdb.d/02-ry_job.sql:ro
+      - ../sql/ry_workflow.sql:/docker-entrypoint-initdb.d/03-ry_workflow.sql:ro
+      - ../sql/ry_ai.sql:/docker-entrypoint-initdb.d/04-ry_ai.sql:ro
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+      --lower_case_table_names=1
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    networks:
+      - aip-net
+
+  # -----------------------------------------------------------------
+  # Redis 7 —— 与 application-dev.yml 中 spring.data.redis 对齐
+  #   host: localhost  port: 6379  password: ruoyi123  database: 0
+  # -----------------------------------------------------------------
+  redis:
+    image: redis:7.4-alpine
+    container_name: aip-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    environment:
+      TZ: Asia/Shanghai
+    # 启动命令：用 --requirepass 与 application-dev.yml 的 password: ruoyi123 对齐
+    command: ["redis-server", "--requirepass", "ruoyi123", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "ruoyi123", "--no-auth-warning", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - aip-net
+
+  # -----------------------------------------------------------------
+  # MinIO —— dromara/file 模块默认连接（S3 协议）
+  #   endpoint=http://minio:9000  accessKey=ruoyi  secretKey=ruoyi123
+  #   控制台端口 9001（仅供浏览器访问，不参与运行时）
+  # -----------------------------------------------------------------
+  minio:
+    image: pgsty/minio:RELEASE.2026-04-17T00-00-00Z
+    container_name: aip-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      TZ: Asia/Shanghai
+      MINIO_ROOT_USER: ruoyi
+      MINIO_ROOT_PASSWORD: ruoyi123
+      MINIO_COMPRESS: "off"
+    volumes:
+      - minio-data:/data
+    command: server --address ':9000' --console-address ':9001' /data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - aip-net
+
+  # -----------------------------------------------------------------
+  # ruoyi-admin —— 由 Dockerfile.optimized 构建的 aip-app:1.0.0 镜像
+  #   SERVER_PORT=8080  SNAIL_JOB_PORT=28080  SNAIL_AI_PORT=38080
+  #   通过 SPRING_DATASOURCE_* 与 SPRING_DATA_REDIS_* 覆盖 localhost → 服务名
+  # -----------------------------------------------------------------
+  ruoyi-admin:
+    build:
+      context: ../..                 # 04-backend-code/
+      dockerfile: ruoyi-admin/Dockerfile.optimized
+    image: aip-app:1.0.0
+    container_name: aip-ruoyi-admin
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+      - "28080:28080"
+      - "38080:38080"
+    environment:
+      TZ: Asia/Shanghai
+      SERVER_PORT: 8080
+      SNAIL_JOB_PORT: 28080
+      SNAIL_AI_PORT: 38080
+      SPRING_PROFILES_ACTIVE: dev
+      # ---- MySQL：把 application-dev.yml 里的 localhost:3306 改为 mysql ----
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_MASTER_URL: "jdbc:mysql://mysql:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true"
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_MASTER_USERNAME: root
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_MASTER_PASSWORD: root
+      # ---- Redis：把 localhost 改为 redis ----
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: ruoyi123
+      # ---- MinIO（S3 协议，覆盖 dromara/file 模块默认值）----
+      SPRING_DATA_REDIS_DATABASE: 0
+    volumes:
+      - ruoyi-logs:/ruoyi/server/logs
+      - ruoyi-temp:/ruoyi/server/temp
+    networks:
+      - aip-net
+
+# ============================== 网络 ==============================
+networks:
+  aip-net:
+    driver: bridge
+
+# ============================== 数据卷 ==============================
+volumes:
+  mysql-data:
+    driver: local
+  redis-data:
+    driver: local
+  minio-data:
+    driver: local
+  ruoyi-logs:
+    driver: local
+  ruoyi-temp:
+    driver: local
