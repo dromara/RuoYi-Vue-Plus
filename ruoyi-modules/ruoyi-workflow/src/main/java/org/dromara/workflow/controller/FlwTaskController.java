@@ -48,7 +48,7 @@ public class FlwTaskController extends BaseController {
      */
     @Log(title = "任务管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()
-    @SaCheckPermission("workflow:task:start")
+    @SaCheckPermission("workflow:task:edit")
     @PostMapping("/startWorkFlow")
     public R<StartProcessReturnDTO> startWorkFlow(@Validated(AddGroup.class) @RequestBody StartProcessBo startProcessBo) {
         StartProcessReturnDTO startProcessReturn = flwTaskService.startWorkFlow(startProcessBo);
@@ -63,7 +63,7 @@ public class FlwTaskController extends BaseController {
      */
     @Log(title = "任务管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()
-    @SaCheckPermission("workflow:task:complete")
+    @SaCheckPermission("workflow:task:edit")
     @PostMapping("/completeTask")
     public R<Void> completeTask(@Validated(AddGroup.class) @RequestBody CompleteTaskBo completeTaskBo) {
         return toAjax(flwTaskService.completeTask(completeTaskBo));
@@ -148,7 +148,7 @@ public class FlwTaskController extends BaseController {
      * @param taskId 任务id
      * @return 任务详情
      */
-    @SaCheckPermission("workflow:task:query")
+    @SaCheckPermission("workflow:task:list")
     @GetMapping("/getTask/{taskId}")
     public R<FlowTaskVo> getTask(@PathVariable Long taskId) {
         return R.ok(flwTaskService.selectById(taskId));
@@ -160,7 +160,7 @@ public class FlwTaskController extends BaseController {
      * @param bo 参数
      * @return 下一节点列表
      */
-    @SaCheckPermission("workflow:task:query")
+    @SaCheckPermission("workflow:task:list")
     @PostMapping("/getNextNodeList")
     public R<List<FlowNode>> getNextNodeList(@RequestBody FlowNextNodeBo bo) {
         return R.ok(flwTaskService.getNextNodeList(bo));
@@ -174,7 +174,7 @@ public class FlwTaskController extends BaseController {
      */
     @Log(title = "任务管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()
-    @SaCheckPermission("workflow:task:termination")
+    @SaCheckPermission("workflow:task:edit")
     @PostMapping("/terminationTask")
     public R<Boolean> terminationTask(@RequestBody FlowTerminationBo bo) {
         return R.ok(flwTaskService.terminationTask(bo));
@@ -231,7 +231,7 @@ public class FlwTaskController extends BaseController {
      * @param nowNodeCode 当前节点
      * @return 可驳回节点列表
      */
-    @SaCheckPermission("workflow:task:query")
+    @SaCheckPermission("workflow:task:list")
     @GetMapping("/getBackTaskNode/{taskId}/{nowNodeCode}")
     public R<List<Node>> getBackTaskNode(@PathVariable Long taskId, @PathVariable String nowNodeCode) {
         return R.ok(flwTaskService.getBackTaskNode(taskId, nowNodeCode));
@@ -243,7 +243,7 @@ public class FlwTaskController extends BaseController {
      * @param taskId 任务id
      * @return 办理人列表
      */
-    @SaCheckPermission("workflow:task:query")
+    @SaCheckPermission("workflow:task:list")
     @GetMapping("/currentTaskAllUser/{taskId}")
     public R<List<UserDTO>> currentTaskAllUser(@PathVariable Long taskId) {
         return R.ok(flwTaskService.currentTaskAllUser(List.of(taskId)));

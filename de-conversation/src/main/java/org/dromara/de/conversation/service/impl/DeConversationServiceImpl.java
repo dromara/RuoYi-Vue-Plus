@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
 import org.dromara.workflow.de.constants.DeVariableConstants;
 import org.dromara.workflow.de.domain.SaiAgent;
@@ -28,6 +29,7 @@ import org.dromara.de.conversation.vo.MessageVo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -55,6 +57,9 @@ public class DeConversationServiceImpl implements IDeConversationService {
     private final SaiAgentMapper agentMapper;
     private final SaiUserAgentMapper userAgentMapper;
     private final FlwInstanceMapper flwInstanceMapper;
+
+    /** 线程安全，静态复用（会话实践复盘 · 审查 INFO：避免每次调用 new） */
+    private static final ObjectMapper JSON = new ObjectMapper();
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -150,20 +155,29 @@ public class DeConversationServiceImpl implements IDeConversationService {
         //   真源：docs/AC-09-10-11集成步骤完整文档-2026-09-22.md 步骤 6；
         //   先例：DeBindingServiceImpl.updateVariable（selectById → set → updateById 旁路，
         //   D-003「是否改走底座 PUT 端点」仍待 owner，本处与其保持同一实装口径）。
-        Long instanceId = conversationMapper.findInstanceIdByBinding(conv.getAgentId());
-        if (instanceId == null) {
-            log.warn("AC-11 回写跳过：agent={} user={} 无绑定实例（de.ctx.binding 反查 0 行）",
-                conv.getAgentId(), userId);
-        } else {
-            FlowInstance instance = flwInstanceMapper.selectById(instanceId);
-            if (instance == null || instance.getVariable() == null) {
-                log.warn("AC-11 回写跳过：实例 {} 不存在或 variable 为空", instanceId);
+        // ★ S-02 修正（2026-09-22 安全审计）：反查加回 create_by=当前登录用户名过滤
+        //   （列-参数等值，参数强制力弱于列 ⇒ 无 1267）。错配/失败均降级 warn ——
+        //   assistant 消息已落库，运行态回写独立失败不回滚整事务（审查 LOW#2 处置）；
+        //   E2E 的 de.ctx.last_response 断言是本降级路径的兜底探针。
+        try {
+            Long instanceId = conversationMapper.findInstanceIdByBinding(conv.getAgentId(), LoginHelper.getUsername());
+            if (instanceId == null) {
+                log.warn("AC-11 回写跳过：agent={} user={}({}) 无本人发起的绑定实例（de.ctx.binding 反查 0 行）",
+                    conv.getAgentId(), userId, LoginHelper.getUsername());
             } else {
-                String newVariable = mergeDeCtx(instance.getVariable(), conversationId, bo);
-                instance.setVariable(newVariable);
-                flwInstanceMapper.updateById(instance);
-                log.info("AC-11 回写完成：instanceId={}, variable.len={}", instanceId, newVariable.length());
+                FlowInstance instance = flwInstanceMapper.selectById(instanceId);
+                if (instance == null || instance.getVariable() == null) {
+                    log.warn("AC-11 回写跳过：实例 {} 不存在或 variable 为空", instanceId);
+                } else {
+                    String newVariable = mergeDeCtx(instance.getVariable(), conversationId, bo);
+                    instance.setVariable(newVariable);
+                    flwInstanceMapper.updateById(instance);
+                    log.info("AC-11 回写完成：instanceId={}, variable.bytes={}",
+                        instanceId, newVariable.getBytes(StandardCharsets.UTF_8).length);
+                }
             }
+        } catch (Exception e) {
+            log.warn("AC-11 回写降级（不影响已落库 assistant 消息）：{}", e.getMessage());
         }
         log.info("完成对话 + 落库 assistant 消息: recordId={}, conversationId.len={}, tokens={}",
                 record.getId(), conversationId.length(), bo.getTokensUsed());
@@ -175,18 +189,28 @@ public class DeConversationServiceImpl implements IDeConversationService {
      * 与 DeVariableConstants.MAX_VARIABLE_LENGTH 同源）。
      */
     private String mergeDeCtx(String variableJson, String conversationId, ConversationCompleteBo bo) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            ObjectNode root = (ObjectNode) mapper.readTree(variableJson);
+            JsonNode rootNode = JSON.readTree(variableJson);
+            // 审查 LOW：根节点非 object（数组/标量）时给出显式错误而非 ClassCastException
+            if (!rootNode.isObject()) {
+                throw new ServiceException("AC-11 回写失败：variable 根节点非 JSON object（实际: " + rootNode.getNodeType() + "）");
+            }
+            ObjectNode root = (ObjectNode) rootNode;
             JsonNode deCtxNode = root.get(DeVariableConstants.VARIABLE_KEY);
+            if (deCtxNode != null && !deCtxNode.isObject()) {
+                throw new ServiceException("AC-11 回写失败：de.ctx 非 JSON object（实际: " + deCtxNode.getNodeType() + "）");
+            }
             ObjectNode deCtx = (deCtxNode instanceof ObjectNode on) ? on : root.putObject(DeVariableConstants.VARIABLE_KEY);
             deCtx.put("last_response", bo.getLastResponse() == null ? "" : bo.getLastResponse());
             deCtx.put("tokens_used", bo.getTokensUsed() == null ? 0 : bo.getTokensUsed());
             deCtx.put("conversation_id", conversationId);
             deCtx.put("finish_reason", bo.getFinishReason() == null ? "" : bo.getFinishReason());
-            String out = mapper.writeValueAsString(root);
-            if (out.length() > DeVariableConstants.MAX_VARIABLE_LENGTH) {
-                throw new ServiceException("AC-11 回写超出 variable 上限: " + out.length());
+            String out = JSON.writeValueAsString(root);
+            // ★ S-07 修正：上限按 UTF-8 字节计（列 = TEXT 65535 字节；Java length() 数
+            //   UTF-16 码元，CJK 内容约 2.2 万字符即溢出 —— 2026-09-22 安全审计 S-07）
+            if (out.getBytes(StandardCharsets.UTF_8).length > 65535) {
+                throw new ServiceException("AC-11 回写超出 variable TEXT 65535 字节上限: "
+                    + out.getBytes(StandardCharsets.UTF_8).length);
             }
             return out;
         } catch (ServiceException e) {
@@ -308,7 +332,43 @@ public class DeConversationServiceImpl implements IDeConversationService {
             sb.append("\"tokens_used\":").append(bo.getTokensUsed());
         }
         sb.append("}");
-        return sb.toString();
+        String json = sb.toString();
+        validateMetadataShape(json);
+        return json;
+    }
+
+    /**
+     * Fix #5 实装（2026-09-22 安全审计 S-06 订正）：类注释自称「metadata JSON 严格校验
+     * (depth + keys cap)」但此前代码里不存在。现按声明实装：合法 JSON object + 深度 ≤ 8 + 键数 ≤ 32。
+     */
+    private void validateMetadataShape(String json) {
+        try {
+            JsonNode node = JSON.readTree(json);
+            if (!node.isObject()) {
+                throw new ServiceException("metadata 非 JSON object");
+            }
+            if (node.size() > 32) {
+                throw new ServiceException("metadata 顶层键数超限（>32）");
+            }
+            if (depthOf(node) > 8) {
+                throw new ServiceException("metadata 深度超限（>8）");
+            }
+        } catch (ServiceException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceException("metadata 非法 JSON: " + e.getMessage());
+        }
+    }
+
+    private int depthOf(JsonNode node) {
+        if (!node.isObject() && !node.isArray()) {
+            return 0;
+        }
+        int max = 0;
+        for (JsonNode child : node) {
+            max = Math.max(max, depthOf(child));
+        }
+        return max + 1;
     }
 
     private String escapeJson(String s) {
