@@ -471,6 +471,8 @@
         <module>ruoyi-modules</module>
         <!-- api模块 -->
         <module>ruoyi-api</module>
+        <!-- 数字员工对话模块 (AC-09/10/11 · 登记 D-003) -->
+        <module>de-conversation</module>
     </modules>
     <packaging>pom</packaging>
 

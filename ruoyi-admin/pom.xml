@@ -104,6 +104,13 @@
             <artifactId>ruoyi-workflow</artifactId>
         </dependency>
 
+        <!-- 数字员工对话模块 (AC-09/10/11 · 登记 D-003) -->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>de-conversation</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!-- Spring Boot Admin 客户端 -->
         <dependency>
             <groupId>de.codecentric</groupId>
