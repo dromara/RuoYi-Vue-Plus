@@ -1,13 +1,19 @@
 package org.dromara.de.conversation.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.warm.flow.orm.entity.FlowInstance;
+import org.dromara.workflow.de.constants.DeVariableConstants;
 import org.dromara.workflow.de.domain.SaiAgent;
 import org.dromara.workflow.de.domain.SaiUserAgent;
 import org.dromara.workflow.de.mapper.SaiAgentMapper;
 import org.dromara.workflow.de.mapper.SaiUserAgentMapper;
+import org.dromara.workflow.mapper.FlwInstanceMapper;
 import org.dromara.de.conversation.bo.ConversationCompleteBo;
 import org.dromara.de.conversation.bo.ConversationCreateBo;
 import org.dromara.de.conversation.bo.LlmMessageBo;
@@ -48,6 +54,7 @@ public class DeConversationServiceImpl implements IDeConversationService {
     private final DeConversationRecordMapper recordMapper;
     private final SaiAgentMapper agentMapper;
     private final SaiUserAgentMapper userAgentMapper;
+    private final FlwInstanceMapper flwInstanceMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -137,9 +144,56 @@ public class DeConversationServiceImpl implements IDeConversationService {
         record.setCreateDt(LocalDateTime.now());
         recordMapper.insert(record);
 
-        // ★ AC-11 占位：实例运行态回写 — 须 owner 解封 R1 后调底座 flow_instance Mapper
+        // ★ AC-11 实装（2026-09-22 · OW-13 阶段 1 · R1 已解封）：
+        //   实例运行态回写 flow_instance.variable 的 de.ctx 子树（last_response / tokens_used /
+        //   conversation_id / finish_reason），合并不覆盖（v / binding / task 原样保留）。
+        //   真源：docs/AC-09-10-11集成步骤完整文档-2026-09-22.md 步骤 6；
+        //   先例：DeBindingServiceImpl.updateVariable（selectById → set → updateById 旁路，
+        //   D-003「是否改走底座 PUT 端点」仍待 owner，本处与其保持同一实装口径）。
+        Long instanceId = conversationMapper.findInstanceIdByBinding(conv.getAgentId());
+        if (instanceId == null) {
+            log.warn("AC-11 回写跳过：agent={} user={} 无绑定实例（de.ctx.binding 反查 0 行）",
+                conv.getAgentId(), userId);
+        } else {
+            FlowInstance instance = flwInstanceMapper.selectById(instanceId);
+            if (instance == null || instance.getVariable() == null) {
+                log.warn("AC-11 回写跳过：实例 {} 不存在或 variable 为空", instanceId);
+            } else {
+                String newVariable = mergeDeCtx(instance.getVariable(), conversationId, bo);
+                instance.setVariable(newVariable);
+                flwInstanceMapper.updateById(instance);
+                log.info("AC-11 回写完成：instanceId={}, variable.len={}", instanceId, newVariable.length());
+            }
+        }
         log.info("完成对话 + 落库 assistant 消息: recordId={}, conversationId.len={}, tokens={}",
                 record.getId(), conversationId.length(), bo.getTokensUsed());
+    }
+
+    /**
+     * AC-11：合并 de.ctx 完成态字段（不覆盖既有 v / binding / task 子树）。
+     * 长度上限沿用 27 号 §5.2 真值（flow_instance.variable varchar 65536，
+     * 与 DeVariableConstants.MAX_VARIABLE_LENGTH 同源）。
+     */
+    private String mergeDeCtx(String variableJson, String conversationId, ConversationCompleteBo bo) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            ObjectNode root = (ObjectNode) mapper.readTree(variableJson);
+            JsonNode deCtxNode = root.get(DeVariableConstants.VARIABLE_KEY);
+            ObjectNode deCtx = (deCtxNode instanceof ObjectNode on) ? on : root.putObject(DeVariableConstants.VARIABLE_KEY);
+            deCtx.put("last_response", bo.getLastResponse() == null ? "" : bo.getLastResponse());
+            deCtx.put("tokens_used", bo.getTokensUsed() == null ? 0 : bo.getTokensUsed());
+            deCtx.put("conversation_id", conversationId);
+            deCtx.put("finish_reason", bo.getFinishReason() == null ? "" : bo.getFinishReason());
+            String out = mapper.writeValueAsString(root);
+            if (out.length() > DeVariableConstants.MAX_VARIABLE_LENGTH) {
+                throw new ServiceException("AC-11 回写超出 variable 上限: " + out.length());
+            }
+            return out;
+        } catch (ServiceException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceException("AC-11 回写 variable 解析失败: " + e.getMessage());
+        }
     }
 
     /**
