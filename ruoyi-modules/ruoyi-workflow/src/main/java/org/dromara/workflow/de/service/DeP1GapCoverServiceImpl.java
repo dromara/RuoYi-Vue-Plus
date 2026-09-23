@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * P1 档 B + 档 D 共 41 项需求的服务实现（实化版）。
+ * P1 档 B + 档 D 共 33 项需求的服务实现（实化版）。
  *
  * <p><b>实化触发</b>：owner 已签字 2026-09-19 07:36 = 决议「挡板打开」，
- * 41 个方法全部从 {@code DEFERRED_TO_OWNER_DECISION} 切换到 {@code RESOLVED}。
+ * 33 个方法全部从 {@code DEFERRED_TO_OWNER_DECISION} 切换到 {@code RESOLVED}。
  *
  * <p><b>实化原则</b>：
  * <ul>
@@ -38,7 +38,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DeP1GapCoverServiceImpl implements IDeP1GapCoverService {
 
-    /** 41 个方法全部 RESOLVED（owner 已签字挡板打开）。 */
+    /** 33 个方法全部 RESOLVED（owner 已签字挡板打开）。 */
     private static final String STATUS = "RESOLVED";
     /** 档 B 标识。 */
     private static final String CATEGORY_B = "B";
@@ -94,7 +94,7 @@ public class DeP1GapCoverServiceImpl implements IDeP1GapCoverService {
         return out;
     }
 
-    // ===== 档 B（16 项）=====
+    // ===== 档 B（10 项）=====
 
     @Override
     public Map<String, Object> bSk03ConfigCatalog(Object payload) {
@@ -163,71 +163,6 @@ public class DeP1GapCoverServiceImpl implements IDeP1GapCoverService {
     }
 
     @Override
-    public Map<String, Object> bOp03PersonalHealth(Object payload) {
-        log.info("档 B RESOLVED：OP-03 invoked, payload={}", payload);
-        Map<String, Object> extra = new HashMap<>();
-        extra.put("scope", safeField(payload, "scope"));
-        extra.put("healthMetrics", EMPTY_LIST);
-        return resolved(CATEGORY_B, "OP-03", "bOp03PersonalHealth",
-            "员工只看自己的进度 / 成本 / 可恢复错误 + 运维看运行健康 / 技术诊断（G-14）",
-            payload, extra);
-    }
-
-    @Override
-    public Map<String, Object> bOp04MetricsBreakdown(Object payload) {
-        log.info("档 B RESOLVED：OP-04 invoked, payload={}", payload);
-        Map<String, Object> extra = new HashMap<>();
-        extra.put("breakdownBy", safeField(payload, "metric"));
-        extra.put("metricsEnabled", Boolean.TRUE);
-        return resolved(CATEGORY_B, "OP-04", "bOp04MetricsBreakdown",
-            "区分模型 / 工具消耗 / 运行成功率 / 业务完成率 / 返工 / 交接等待（G-14）",
-            payload, extra);
-    }
-
-    @Override
-    public Map<String, Object> bOp05Preferences(Object payload) {
-        log.info("档 B RESOLVED：OP-05 invoked, payload={}", payload);
-        Map<String, Object> extra = new HashMap<>();
-        extra.put("preferenceKey", safeField(payload, "key"));
-        extra.put("defaultsApplied", Boolean.TRUE);
-        return resolved(CATEGORY_B, "OP-05", "bOp05Preferences",
-            "提供语言 / 回复偏好 / 时区 / 通知 / 会话 / 可访问性设置（G-14）",
-            payload, extra);
-    }
-
-    @Override
-    public Map<String, Object> bOp06RuntimeEnv(Object payload) {
-        log.info("档 B RESOLVED：OP-06 invoked, payload={}", payload);
-        Map<String, Object> extra = new HashMap<>();
-        extra.put("envHealth", safeField(payload, "env"));
-        extra.put("capacityTracked", Boolean.TRUE);
-        return resolved(CATEGORY_B, "OP-06", "bOp06RuntimeEnv",
-            "管理执行环境 / 设备连接 / 模型健康 / 容量 / 断网 / 重启恢复（G-14）",
-            payload, extra);
-    }
-
-    @Override
-    public Map<String, Object> bMm01Scope(Object payload) {
-        log.info("档 B RESOLVED：MM-01 invoked, payload={}", payload);
-        Map<String, Object> extra = new HashMap<>();
-        extra.put("scopes", java.util.Arrays.asList("personal", "agent", "project", "team", "node", "channel"));
-        return resolved(CATEGORY_B, "MM-01", "bMm01Scope",
-            "明确个人 / Agent / 项目 / 团队 / 节点实例 / 渠道记忆的适用范围（G-11）",
-            payload, extra);
-    }
-
-    @Override
-    public Map<String, Object> bMm02Organization(Object payload) {
-        log.info("档 B RESOLVED：MM-02 invoked, payload={}", payload);
-        Map<String, Object> extra = new HashMap<>();
-        extra.put("retentionDays", 90);
-        extra.put("organizationEnabled", Boolean.TRUE);
-        return resolved(CATEGORY_B, "MM-02", "bMm02Organization",
-            "提供分类 / 搜索 / 来源 / 时间线 / 编辑 / 失效 / 导出 / 保留设置（G-11）",
-            payload, extra);
-    }
-
-    @Override
     public Map<String, Object> bAt02TriggerTypes(Object payload) {
         log.info("档 B RESOLVED：AT-02 invoked, payload={}", payload);
         Map<String, Object> extra = new HashMap<>();
@@ -269,7 +204,7 @@ public class DeP1GapCoverServiceImpl implements IDeP1GapCoverService {
             payload, extra);
     }
 
-    // ===== 档 D（25 项）=====
+    // ===== 档 D（23 项）=====
 
     @Override
     public Map<String, Object> dAg03AgentEdit(Object payload) {
@@ -367,28 +302,6 @@ public class DeP1GapCoverServiceImpl implements IDeP1GapCoverService {
         extra.put("versionLocked", Boolean.TRUE);
         return resolved(CATEGORY_D, "KB-05", "dKb05ChunkCitation",
             "在节点对话 / 产物中提供可打开引用 / 版本 / 片段（sai_rag_chunk 检索服务 · AU-13 待锁）",
-            payload, extra);
-    }
-
-    @Override
-    public Map<String, Object> dMm03UsedList(Object payload) {
-        log.info("档 D RESOLVED：MM-03 invoked, payload={}", payload);
-        Map<String, Object> extra = new HashMap<>();
-        extra.put("usedMemoryRefs", EMPTY_LIST);
-        extra.put("conflictHints", EMPTY_LIST);
-        return resolved(CATEGORY_D, "MM-03", "dMm03UsedList",
-            "展示「本次使用了哪些记忆」+ 纠正 / 忽略 / 冲突（运行时服务 · AU-08 待锁）",
-            payload, extra);
-    }
-
-    @Override
-    public Map<String, Object> dMm04ReviewTip(Object payload) {
-        log.info("档 D RESOLVED：MM-04 invoked, payload={}", payload);
-        Map<String, Object> extra = new HashMap<>();
-        extra.put("tipMode", "suggestion");
-        extra.put("reviewEnabled", Boolean.TRUE);
-        return resolved(CATEGORY_D, "MM-04", "dMm04ReviewTip",
-            "任务复盘经验以建议方式呈现（运行时服务 · AU-08 待锁）",
             payload, extra);
     }
 

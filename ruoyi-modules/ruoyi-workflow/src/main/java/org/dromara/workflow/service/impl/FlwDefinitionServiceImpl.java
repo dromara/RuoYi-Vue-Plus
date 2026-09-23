@@ -206,4 +206,61 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
         return true;
     }
 
+    /**
+     * 新增或更新流程定义。
+     *
+     * <p>D-016 偏离登记。{@code id == null} ⇒ {@code flowDefinitionMapper.insert(def)}；
+     * 否则 ⇒ {@code flowDefinitionMapper.updateById(def)}。两路复用本类已有的
+     * {@link org.dromara.warm.flow.orm.mapper.FlowDefinitionMapper} 依赖（warm-flow starter 自带，
+     * bean 名 {@code flowDefinitionMapper}；与项目自有 {@code deFlowDefinitionMapper} 不冲突，见 D-004）。
+     *
+     * <p>调用方负责保证 {@code def.flowCode} / {@code flowName} / {@code version} 必填（DDL NOT NULL）。
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean saveOrUpdate(FlowDefinition def) {
+        if (def == null) {
+            throw new ServiceException("流程定义不能为空");
+        }
+        // D-016：id 为空 ⇒ 视为新增；DDL 的 id 列无 AUTO_INCREMENT，调用方必须自填主键或由 defService.checkAndSave 上游路径生成
+        if (def.getId() == null) {
+            log.info("[flw.def.saveOrUpdate] insert flowCode={}", def.getFlowCode());
+            return flowDefinitionMapper.insert(def) > 0;
+        }
+        log.info("[flw.def.saveOrUpdate] update id={}", def.getId());
+        return flowDefinitionMapper.updateById(def) > 0;
+    }
+
+    /**
+     * 仅修改 {@code flow_definition.activity_status}。
+     *
+     * <p>D-016 偏离登记。仅携带 {@code id} 与 {@code activityStatus} 两字段的实体传给
+     * {@code updateById}：MyBatis-Plus 默认 {@code FieldStrategy.NOT_NULL} ⇒ NULL 字段不入 SET，
+     * 等价「单列更新」。返回 {@code int > 0} ⇒ 成功；不存在 id ⇒ 无更新行 ⇒ 抛 {@link ServiceException}。
+     *
+     * <p>activity_status 与 DDL 真值对照（{@code 04-backend-code/script/sql/ry_workflow.sql:15}）：
+     * 0 = 挂起；1 = 激活。非法值（如 {@code -1} / {@code 2}）由调用方校验，本方法不内嵌 whitelist。
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateActivityStatus(Long definitionId, Integer activityStatus) {
+        if (definitionId == null) {
+            throw new ServiceException("流程定义 id 不能为空");
+        }
+        if (activityStatus == null) {
+            throw new ServiceException("activityStatus 不能为空");
+        }
+        FlowDefinition patch = new FlowDefinition();
+        patch.setId(definitionId);
+        patch.setActivityStatus(activityStatus);
+        int rows = flowDefinitionMapper.updateById(patch);
+        if (rows <= 0) {
+            // D-016：id 不存在时 MyBatis-Plus 返 0（按主键删改的常规语义）⇒ 抛错而非静默返 false，
+            // 便于上层区分「无副作用成功」与「找不到记录」两种场景。
+            throw new ServiceException("流程定义不存在或状态未变更：id={}", definitionId);
+        }
+        log.info("[flw.def.updateActivityStatus] id={} activityStatus={}", definitionId, activityStatus);
+        return true;
+    }
+
 }

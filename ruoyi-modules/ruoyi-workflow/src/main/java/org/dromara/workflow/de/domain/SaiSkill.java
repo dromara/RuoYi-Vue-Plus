@@ -30,4 +30,34 @@ public class SaiSkill implements Serializable {
 
     /** 版本号（DDL:415 BIGINT DEFAULT 0；BR-05 校验核心列） */
     private Long version;
+
+    // ★ D-014（2026-09-23 SK 前端页）：按批⑥模式扩全列（列真源 DDL 实测）
+
+    /** 描述 */
+    private String description;
+
+    /** 文件名 */
+    private String fileName;
+
+    /** 文件路径 */
+    private String filePath;
+
+    /** 文件大小 */
+    private Long fileSize;
+
+    /** 技能内容（longtext） */
+    private String skillContent;
+
+    /** 存储路径 */
+    private String storagePath;
+
+    /** 是否含文件 */
+    private Integer hasFiles;
+
+    /** 创建者 */
+    private Long creatorId;
+
+    private java.util.Date createDt;
+
+    private java.util.Date updateDt;
 }

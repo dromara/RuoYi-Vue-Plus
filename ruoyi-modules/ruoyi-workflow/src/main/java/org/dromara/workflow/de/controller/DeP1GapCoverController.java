@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * P1 档 B + 档 D 共 41 项需求的 REST 端点（声明式占位）。
  *
- * <p>对应 {@code docs/P1需求实施清单-2026-09-18.md} §三（档 B 16 项）+ §五（档 D 25 项）= 41 项。
+ * <p>对应 {@code docs/P1需求实施清单-2026-09-18.md} §三（档 B 10 项）+ §五（档 D 23 项）= 33 项。
  *
  * <p><b>本 controller 是「声明式占位」，不真接任何底层服务</b>：
  * <ul>
@@ -25,28 +25,22 @@ import java.util.Map;
  *         <b>不实际接</b>权限系统；接入由 owner 裁后再做。</li>
  * </ul>
  *
- * <p><b>endpoint 清单（41 个）</b>：
+ * <p><b>endpoint 清单（33 个）</b>：
  *
  * <pre>
- * ===== 档 B（16 项 · 需新切片 P5 / P6）=====
+ * ===== 档 B（10 项 · 需新切片 P5 / P6）=====
  *   GET  /de/bp/sk-config-catalog           SK-03
  *   GET  /de/bp/cn-tool-discovery           CN-07
  *   GET  /de/bp/kb-required-vs-added        KB-06
  *   GET  /de/bp/ws-local-bridge             WS-03
  *   GET  /de/bp/ws-product-version          WS-05
  *   GET  /de/bp/sy-fact-conflict            SY-04
- *   GET  /de/bp/op-personal-health          OP-03
- *   GET  /de/bp/op-metrics-breakdown        OP-04
- *   GET  /de/bp/op-preferences              OP-05
- *   GET  /de/bp/op-runtime-env              OP-06
- *   GET  /de/bp/mm-scope                    MM-01
- *   GET  /de/bp/mm-organization             MM-02
  *   GET  /de/bp/at-trigger-types            AT-02
  *   GET  /de/bp/at-timezone                 AT-03
  *   GET  /de/bp/at-linkage                  AT-05
  *   GET  /de/bp/im-channel-binding          IM-01
  *
- * ===== 档 D（25 项 · 仓外依赖）=====
+ * ===== 档 D（23 项 · 仓外依赖）=====
  *   POST /de/bp/ag-agent-edit               AG-03
  *   POST /de/bp/sk-upload-publish           SK-04
  *   POST /de/bp/sk-node-trial               SK-05
@@ -56,8 +50,6 @@ import java.util.Map;
  *   POST /de/bp/kb-doc-process              KB-03
  *   POST /de/bp/kb-search-mode              KB-04
  *   POST /de/bp/kb-chunk-citation           KB-05
- *   POST /de/bp/mm-used-list                MM-03
- *   POST /de/bp/mm-review-tip               MM-04
  *   POST /de/bp/cv-pause-resume             CV-03
  *   POST /de/bp/cv-multi-turn               CV-04
  *   POST /de/bp/cv-tool-call-card           CV-05
@@ -87,7 +79,7 @@ public class DeP1GapCoverController extends BaseController {
 
     private final IDeP1GapCoverService deP1GapCoverService;
 
-    // ===== 档 B（16 项 · 需新切片 P5 / P6）=====
+    // ===== 档 B（10 项 · 需新切片 P5 / P6）=====
 
     /** SK-03 节点填写技能业务参数 + 多技能排序 / 依赖 / 冲突提示（G-11 残余）。 */
     @SaCheckPermission(PERM)
@@ -131,48 +123,6 @@ public class DeP1GapCoverController extends BaseController {
         return R.ok(deP1GapCoverService.bSy04FactConflict(payload));
     }
 
-    /** OP-03 员工进度 / 成本 / 可恢复错误 + 运维运行健康 / 技术诊断（G-14）。 */
-    @SaCheckPermission(PERM)
-    @GetMapping("/op-personal-health")
-    public R<Map<String, Object>> op03PersonalHealth(@RequestBody(required = false) Object payload) {
-        return R.ok(deP1GapCoverService.bOp03PersonalHealth(payload));
-    }
-
-    /** OP-04 区分模型 / 工具消耗 / 运行成功率 / 业务完成率 / 返工 / 交接等待（G-14）。 */
-    @SaCheckPermission(PERM)
-    @GetMapping("/op-metrics-breakdown")
-    public R<Map<String, Object>> op04MetricsBreakdown(@RequestBody(required = false) Object payload) {
-        return R.ok(deP1GapCoverService.bOp04MetricsBreakdown(payload));
-    }
-
-    /** OP-05 提供语言 / 回复偏好 / 时区 / 通知 / 会话 / 可访问性设置（G-14）。 */
-    @SaCheckPermission(PERM)
-    @GetMapping("/op-preferences")
-    public R<Map<String, Object>> op05Preferences(@RequestBody(required = false) Object payload) {
-        return R.ok(deP1GapCoverService.bOp05Preferences(payload));
-    }
-
-    /** OP-06 管理执行环境 / 设备连接 / 模型健康 / 容量 / 断网 / 重启恢复（G-14）。 */
-    @SaCheckPermission(PERM)
-    @GetMapping("/op-runtime-env")
-    public R<Map<String, Object>> op06RuntimeEnv(@RequestBody(required = false) Object payload) {
-        return R.ok(deP1GapCoverService.bOp06RuntimeEnv(payload));
-    }
-
-    /** MM-01 明确个人 / Agent / 项目 / 团队 / 节点实例 / 渠道记忆的适用范围（G-11）。 */
-    @SaCheckPermission(PERM)
-    @GetMapping("/mm-scope")
-    public R<Map<String, Object>> mm01Scope(@RequestBody(required = false) Object payload) {
-        return R.ok(deP1GapCoverService.bMm01Scope(payload));
-    }
-
-    /** MM-02 提供分类 / 搜索 / 来源 / 时间线 / 编辑 / 失效 / 导出 / 保留设置（G-11）。 */
-    @SaCheckPermission(PERM)
-    @GetMapping("/mm-organization")
-    public R<Map<String, Object>> mm02Organization(@RequestBody(required = false) Object payload) {
-        return R.ok(deP1GapCoverService.bMm02Organization(payload));
-    }
-
     /** AT-02 周期 / 一次性 / 事件 / API / 条件拉取统一配置输入和执行对象（G-02 残余）。 */
     @SaCheckPermission(PERM)
     @GetMapping("/at-trigger-types")
@@ -201,7 +151,7 @@ public class DeP1GapCoverController extends BaseController {
         return R.ok(deP1GapCoverService.bIm01ChannelBinding(payload));
     }
 
-    // ===== 档 D（25 项 · 仓外依赖）=====
+    // ===== 档 D（23 项 · 仓外依赖）=====
 
     /** AG-03 数字员工创建 / 编辑 / 草稿（落 sai_agent.name + sai_agent.instruction）。 */
     @SaCheckPermission(PERM)
@@ -264,20 +214,6 @@ public class DeP1GapCoverController extends BaseController {
     @PostMapping("/kb-chunk-citation")
     public R<Map<String, Object>> kb05ChunkCitation(@RequestBody(required = false) Object payload) {
         return R.ok(deP1GapCoverService.dKb05ChunkCitation(payload));
-    }
-
-    /** MM-03 展示「本次使用了哪些记忆」+ 纠正 / 忽略 / 冲突（落 sai_agent_conversation_record.metadata + flow_instance.variable）。 */
-    @SaCheckPermission(PERM)
-    @PostMapping("/mm-used-list")
-    public R<Map<String, Object>> mm03UsedList(@RequestBody(required = false) Object payload) {
-        return R.ok(deP1GapCoverService.dMm03UsedList(payload));
-    }
-
-    /** MM-04 任务复盘经验以建议方式呈现（落 sai_agent_conversation_record.content）。 */
-    @SaCheckPermission(PERM)
-    @PostMapping("/mm-review-tip")
-    public R<Map<String, Object>> mm04ReviewTip(@RequestBody(required = false) Object payload) {
-        return R.ok(deP1GapCoverService.dMm04ReviewTip(payload));
     }
 
     /** CV-03 补充信息 / 暂停 / 停止 / 继续 / 人工接管（AU-08 L3 上下文装配层 · 待锁）。 */
