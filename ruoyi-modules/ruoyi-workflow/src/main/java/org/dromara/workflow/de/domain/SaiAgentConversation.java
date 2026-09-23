@@ -41,6 +41,11 @@ public class SaiAgentConversation implements Serializable {
     /** 用户ID */
     private Long userId;
 
+    /**
+     * 锚定流程实例ID（D-009 列；workflow 模块侧映射补齐，T-3「实例内」判定用）
+     */
+    private Long instanceId;
+
     /** 对话ID（UUID） */
     private String conversationId;
 

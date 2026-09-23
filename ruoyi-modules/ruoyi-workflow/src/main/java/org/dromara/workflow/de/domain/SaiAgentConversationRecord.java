@@ -29,6 +29,11 @@ public class SaiAgentConversationRecord implements Serializable {
     /** 用户 ID（外键 sys_user.user_id） */
     private Long userId;
 
+    /**
+     * 对话ID（列在 DDL 中存在；T-3「实例内」判定经此反查对话锚定。2026-09-22 补映射）
+     */
+    private String conversationId;
+
     /** 角色 user/assistant */
     private String role;
 

@@ -50,6 +50,7 @@ public class DeSaiConvServiceImpl implements IDeSaiConvService {
      * 禁止转移属主；list/listByAgentId 对非超管强制按本人过滤（覆盖客户端过滤值）。
      */
     private final SaiAgentConversationMapper saiAgentConversationMapper;
+    private final DeAccessService deAccessService;
     private final SaiAgentConversationRecordMapper saiAgentConversationRecordMapper;
 
     @Override
@@ -168,11 +169,10 @@ public class DeSaiConvServiceImpl implements IDeSaiConvService {
         if (record == null) {
             return null;
         }
-        // S-05：record 行自带 user_id（对话属主同源），直接按行属主判
-        //（本实体不映射 conversation_id —— 2026-09-22 编译实测）
-        if (!LoginHelper.isSuperAdmin()
-            && (record.getUserId() == null || !record.getUserId().equals(LoginHelper.getUserId()))) {
-            throw new ServiceException("无权读取他人名下的对话记录（S-05 属主校验）");
+        // ★ AU-03 方案 A（2026-09-22 顺序推进批③）：S-05 属主 **OR** T-3 双条件
+        //   （任务关系 + 实例内）—— 经 DeAccessService 统一判定；超管仍全通。
+        if (!LoginHelper.isSuperAdmin() && !deAccessService.canReadConversationRecord(record)) {
+            throw new ServiceException("无权读取该对话记录（属主/T-3 双条件均不满足）");
         }
         return record;
     }
