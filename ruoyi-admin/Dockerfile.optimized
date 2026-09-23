@@ -1,0 +1,79 @@
+# Multi-stage optimized Dockerfile for ruoyi-admin (AIP backend)
+# Stage 1: build fat jar via Maven + JDK 21 toolchain
+# Stage 2: run on minimal eclipse-temurin:21-jre as non-root user with health check
+#
+# Build context: 04-backend-code/  (so ../pom.xml + ./ruoyi-admin/target/ruoyi-admin.jar resolve)
+# Build cmd   : docker build -f ruoyi-admin/Dockerfile.optimized -t aip-app:1.0.0 .
+#
+# ★ 2026-09-22 修复（drift/前端预研双源实锤）：原文件 17-jre 与 parent pom java.version=21 矛盾（pom.xml:20）——按字面构建必失败。已对齐 21。
+
+# ---------- Stage 1 : builder ----------
+FROM maven:3.9-eclipse-temurin-21 AS builder
+
+WORKDIR /build
+
+# Cache dependencies first (only re-download when pom files change)
+COPY pom.xml ./
+COPY ruoyi-admin/pom.xml           ruoyi-admin/pom.xml
+COPY ruoyi-api/pom.xml             ruoyi-api/pom.xml
+COPY ruoyi-common/pom.xml          ruoyi-common/pom.xml
+COPY ruoyi-extend/pom.xml          ruoyi-extend/pom.xml
+
+# (Best-effort offline; remove -o if m2 cache is cold)
+RUN mvn -B -ntp -q -o dependency:go-offline -DexcludeArtifactIds=ruoyi-modules || true
+
+# Now copy sources and build only the admin module (and its deps)
+COPY ruoyi-admin ruoyi-admin
+COPY ruoyi-api   ruoyi-api
+COPY ruoyi-common ruoyi-common
+COPY ruoyi-extend ruoyi-extend
+
+RUN mvn -B -ntp -o -pl ruoyi-admin -am \
+        -Dmaven.test.skip=true \
+        -Dprofiles.active=prod \
+        clean package
+
+# ---------- Stage 2 : runtime ----------
+FROM eclipse-temurin:21-jre
+
+LABEL maintainer="AIP-Workflow-Base" \
+      org.opencontainers.image.title="aip-app" \
+      org.opencontainers.image.description="AIP backend (ruoyi-admin) multi-stage runtime" \
+      org.opencontainers.image.source="https://github.com/dromara/RuoYi-Vue-Plus"
+
+# Run as non-root (uid 1000) — required by most hardened k8s PodSecurityStandards
+RUN groupadd --system --gid 1000 aip \
+    && useradd  --system --uid 1000 --gid aip --home-dir /ruoyi/server --shell /sbin/nologin aip \
+    && mkdir -p /ruoyi/server/logs /ruoyi/server/temp \
+    && chown -R aip:aip /ruoyi
+
+WORKDIR /ruoyi/server
+
+ENV SERVER_PORT=8080 \
+    SNAIL_JOB_PORT=28080 \
+    SNAIL_AI_PORT=38080 \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    JAVA_OPTS=""
+
+EXPOSE ${SERVER_PORT}
+EXPOSE ${SNAIL_JOB_PORT}
+EXPOSE ${SNAIL_AI_PORT}
+
+COPY --from=builder --chown=aip:aip /build/ruoyi-admin/target/ruoyi-admin.jar /ruoyi/server/app.jar
+
+USER aip
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD wget -qO- "http://127.0.0.1:${SERVER_PORT}/actuator/health" \
+        | grep -q '"status":"UP"' || exit 1
+
+ENTRYPOINT ["sh","-c","exec java \
+    -Djava.security.egd=file:/dev/./urandom \
+    -Dserver.port=${SERVER_PORT} \
+    -Dsnail-job.port=${SNAIL_JOB_PORT} \
+    -Dsnail-ai.port=${SNAIL_AI_PORT} \
+    -XX:+HeapDumpOnOutOfMemoryError \
+    -XX:+UseZGC \
+    ${JAVA_OPTS} \
+    -jar /ruoyi/server/app.jar"]
