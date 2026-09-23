@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.workflow.de.domain.SaiMcpServer;
 import org.dromara.workflow.de.mapper.SaiMcpServerMapper;
 import org.springframework.stereotype.Service;
 
@@ -23,19 +24,19 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class SaiMcpServerServiceImpl
-        extends ServiceImpl<SaiMcpServerMapper, Map<String, Object>>
+        extends ServiceImpl<SaiMcpServerMapper, SaiMcpServer>
         implements ISaiMcpServerService {
 
     private static final String STUB_MSG = "sai_mcp_server 接口存根，等待 owner 实现";
 
     @Override
-    public Long add(Map<String, Object> bo) {
+    public Long add(SaiMcpServer bo) {
         log.warn("[de.sai-mcp-server] add 命中存根");
         throw new UnsupportedOperationException(STUB_MSG);
     }
 
     @Override
-    public Boolean edit(Map<String, Object> bo) {
+    public Boolean edit(SaiMcpServer bo) {
         log.warn("[de.sai-mcp-server] edit 命中存根");
         throw new UnsupportedOperationException(STUB_MSG);
     }
@@ -47,25 +48,25 @@ public class SaiMcpServerServiceImpl
     }
 
     @Override
-    public Map<String, Object> getInfo(Long id) {
+    public SaiMcpServer getInfo(Long id) {
         log.warn("[de.sai-mcp-server] getInfo 命中存根");
         throw new UnsupportedOperationException(STUB_MSG);
     }
 
     @Override
-    public List<Map<String, Object>> list(Map<String, Object> bo) {
+    public List<SaiMcpServer> list(SaiMcpServer bo) {
         log.warn("[de.sai-mcp-server] list 命中存根");
         throw new UnsupportedOperationException(STUB_MSG);
     }
 
     @Override
-    public PageResult<Map<String, Object>> page(Map<String, Object> bo) {
+    public PageResult<SaiMcpServer> page(SaiMcpServer bo) {
         log.warn("[de.sai-mcp-server] page 命中存根");
         throw new UnsupportedOperationException(STUB_MSG);
     }
 
     @Override
-    public List<Map<String, Object>> listByFk(Long fkId) {
+    public List<SaiMcpServer> listByFk(Long fkId) {
         log.warn("[de.sai-mcp-server] listByFk 命中存根");
         throw new UnsupportedOperationException(STUB_MSG);
     }

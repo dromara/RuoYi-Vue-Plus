@@ -3,6 +3,7 @@ package org.dromara.workflow.de.im.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.warm.flow.core.enums.SkipType;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
 import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.workflow.de.im.domain.bo.DeImExpertConsultBo;
@@ -53,6 +54,10 @@ public class DeImServiceImpl implements IDeImService {
         his.setNodeCode(task.getNodeCode());
         his.setNodeName(task.getNodeName());
         his.setNodeType(task.getNodeType());
+        // skip_type / flow_status：DDL 均 NOT NULL（ry_workflow.sql:131/:132），不设即 SQLException。
+        // 咨询留痕无流转 → skip_type=NONE（无动作）；flow_status 取任务当时状态（flow_task.flow_status NOT NULL）。
+        his.setSkipType(SkipType.NONE.getKey());
+        his.setFlowStatus(task.getFlowStatus());
         his.setMessage("[IM-04] expert consult: taskId=" + bo.getTaskId()
             + " expertUserId=" + bo.getExpertUserId()
             + " question=" + (bo.getQuestion() == null ? "" : bo.getQuestion()));

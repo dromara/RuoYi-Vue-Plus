@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.warm.flow.core.enums.SkipType;
 import org.dromara.workflow.de.constants.DeP1Constants;
 import org.dromara.workflow.de.rs.domain.bo.DeRsConfirmBo;
 import org.dromara.workflow.de.rs.domain.bo.DeRsCrossCheckBo;
@@ -48,6 +49,8 @@ public class DeRsServiceImpl implements IDeRsService {
         his.setNodeName(task.getNodeName());
         his.setNodeType(task.getNodeType());
         his.setFlowStatus(DeP1Constants.FLOW_STATUS_FINISHED);
+        // skip_type：DDL NOT NULL 无默认（ry_workflow.sql:131），不设即 SQLException
+        his.setSkipType(mapDecisionSkipType(bo.getDecision()));
         his.setMessage("[RS-05] " + bo.getDecision() + " | " + bo.getComment());
         flwHisTaskMapper.insert(his);
         log.info("[rs.decide] taskId={} decision={}", bo.getTaskId(), bo.getDecision());
@@ -84,9 +87,39 @@ public class DeRsServiceImpl implements IDeRsService {
         his.setNodeName(task.getNodeName());
         his.setNodeType(task.getNodeType());
         his.setFlowStatus(DeP1Constants.FLOW_STATUS_FINISHED);
+        // skip_type：DDL NOT NULL 无默认（ry_workflow.sql:131），不设即 SQLException
+        his.setSkipType(mapActionSkipType(bo.getAction()));
         his.setMessage("[RS-07] " + bo.getAction() + " | " + bo.getReason());
         flwHisTaskMapper.insert(his);
         log.info("[rs.confirm] taskId={} action={}", bo.getTaskId(), bo.getAction());
         return bo.getTaskId();
+    }
+
+    /**
+     * RS-05 decision → flow_his_task.skip_type（DDL 值域 PASS/REJECT/NONE，ry_workflow.sql:131）：
+     * accept→PASS · reject→REJECT · require-more / 未知→NONE（无动作）。
+     */
+    private String mapDecisionSkipType(String decision) {
+        if ("accept".equals(decision)) {
+            return SkipType.PASS.getKey();
+        }
+        if ("reject".equals(decision)) {
+            return SkipType.REJECT.getKey();
+        }
+        return SkipType.NONE.getKey();
+    }
+
+    /**
+     * RS-07 action → flow_his_task.skip_type（DDL 值域 PASS/REJECT/NONE）：
+     * confirm→PASS · rollback/compensate→REJECT · permission-denied/cancel / 未知→NONE（无动作）。
+     */
+    private String mapActionSkipType(String action) {
+        if ("confirm".equals(action)) {
+            return SkipType.PASS.getKey();
+        }
+        if ("rollback".equals(action) || "compensate".equals(action)) {
+            return SkipType.REJECT.getKey();
+        }
+        return SkipType.NONE.getKey();
     }
 }

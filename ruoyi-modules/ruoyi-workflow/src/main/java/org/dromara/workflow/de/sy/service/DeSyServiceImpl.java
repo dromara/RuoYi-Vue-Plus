@@ -8,6 +8,7 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.workflow.de.constants.DeP1Constants;
 import org.dromara.workflow.de.constants.DeVariableConstants;
 import org.dromara.workflow.de.sy.domain.bo.DeSyCorrectionBo;
+import org.dromara.warm.flow.core.enums.SkipType;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
 import org.dromara.warm.flow.orm.entity.FlowTask;
@@ -71,6 +72,10 @@ public class DeSyServiceImpl implements IDeSyService {
         his.setNodeCode(task.getNodeCode());
         his.setNodeName(task.getNodeName());
         his.setNodeType(task.getNodeType());
+        // skip_type / flow_status：DDL 均 NOT NULL（ry_workflow.sql:131/:132），不设即 SQLException。
+        // 纠正留痕无流转 → skip_type=NONE；flow_status 取任务当时状态。
+        his.setSkipType(SkipType.NONE.getKey());
+        his.setFlowStatus(task.getFlowStatus());
         his.setMessage("[SY-06] correction: " + bo.getSummary()
             + " (conflict with: " + bo.getConflictingFact() + ")");
         flwHisTaskMapper.insert(his);

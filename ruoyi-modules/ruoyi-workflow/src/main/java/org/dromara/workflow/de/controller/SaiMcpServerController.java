@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
+import org.dromara.workflow.de.domain.SaiMcpServer;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.web.core.BaseController;
@@ -46,14 +47,14 @@ public class SaiMcpServerController extends BaseController {
     @Log(title = "sai_mcp_server", businessType = BusinessType.INSERT)
     @SaCheckPermission("workflow:de:saimcpserver:add")
     @PostMapping
-    public R<Long> add(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Long> add(@Valid @RequestBody SaiMcpServer bo) {
         return R.ok("ok", saiMcpServerService.add(bo));
     }
 
     @Log(title = "sai_mcp_server", businessType = BusinessType.UPDATE)
     @SaCheckPermission("workflow:de:saimcpserver:edit")
     @PutMapping
-    public R<Boolean> edit(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Boolean> edit(@Valid @RequestBody SaiMcpServer bo) {
         return R.ok("ok", saiMcpServerService.edit(bo));
     }
 
@@ -66,25 +67,25 @@ public class SaiMcpServerController extends BaseController {
 
     @SaCheckPermission("workflow:de:saimcpserver:query")
     @GetMapping("/{id}")
-    public R<Map<String, Object>> getInfo(@PathVariable Long id) {
+    public R<SaiMcpServer> getInfo(@PathVariable Long id) {
         return R.ok(saiMcpServerService.getInfo(id));
     }
 
     @SaCheckPermission("workflow:de:saimcpserver:list")
     @GetMapping("/list")
-    public R<List<Map<String, Object>>> list(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<List<SaiMcpServer>> list(SaiMcpServer bo) {
         return R.ok(saiMcpServerService.list(bo));
     }
 
     @SaCheckPermission("workflow:de:saimcpserver:list")
     @GetMapping("/page")
-    public R<PageResult<Map<String, Object>>> page(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<PageResult<SaiMcpServer>> page(SaiMcpServer bo) {
         return R.ok(saiMcpServerService.page(bo));
     }
 
     @SaCheckPermission("workflow:de:saimcpserver:list")
     @GetMapping("/by-fk/{fkId}")
-    public R<List<Map<String, Object>>> listByFk(@PathVariable Long fkId) {
+    public R<List<SaiMcpServer>> listByFk(@PathVariable Long fkId) {
         return R.ok(saiMcpServerService.listByFk(fkId));
     }
 }

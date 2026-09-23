@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.warm.flow.core.enums.SkipType;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
 import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.workflow.mapper.FlwHisTaskMapper;
@@ -77,6 +78,10 @@ public class DeTmServiceImpl implements IDeTmService {
         handover.setNodeCode(task.getNodeCode());
         handover.setNodeName(task.getNodeName());
         handover.setNodeType(task.getNodeType());
+        // skip_type / flow_status：DDL 均 NOT NULL（ry_workflow.sql:131/:132），不设即 SQLException。
+        // 交接留痕无流转 → skip_type=NONE；flow_status 取任务当时状态。
+        handover.setSkipType(SkipType.NONE.getKey());
+        handover.setFlowStatus(task.getFlowStatus());
         handover.setMessage("[TM-06] teamId=" + teamId + " handover package committed (versions="
             + contributionVersions.size() + ")");
         flwHisTaskMapper.insert(handover);
