@@ -78,8 +78,8 @@ public class SaiUserAgentController extends BaseController {
 
     @SaCheckPermission("workflow:de:saiuseragent:list")
     @GetMapping("/page")
-    public R<PageResult<SaiUserAgent>> page(SaiUserAgent bo) {
-        return R.ok(saiUserAgentService.page(bo));
+    public R<PageResult<SaiUserAgent>> page(SaiUserAgent bo, org.dromara.common.mybatis.core.page.PageQuery pageQuery) {
+        return R.ok(saiUserAgentService.page(bo, pageQuery));
     }
 
     @SaCheckPermission("workflow:de:saiuseragent:list")

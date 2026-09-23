@@ -32,5 +32,8 @@ public interface ISaiUserAgentService extends IService<SaiUserAgent> {
 
     PageResult<SaiUserAgent> page(SaiUserAgent bo);
 
+    /** D-010 实化重载：带分页参数（/de/sai-user-agent/page 的 pageNum/pageSize）。 */
+    PageResult<SaiUserAgent> page(SaiUserAgent bo, org.dromara.common.mybatis.core.page.PageQuery pageQuery);
+
     List<SaiUserAgent> listByFk(Long fkId);
 }
