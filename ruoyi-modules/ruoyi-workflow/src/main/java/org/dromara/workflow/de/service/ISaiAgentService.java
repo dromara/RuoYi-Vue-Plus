@@ -32,5 +32,10 @@ public interface ISaiAgentService extends IService<SaiAgent> {
 
     PageResult<SaiAgent> page(SaiAgent bo);
 
+    /**
+     * D-010 实化重载：带分页参数的查询（前端 /de/sai-agent/page 的 pageNum/pageSize）。
+     */
+    PageResult<SaiAgent> page(SaiAgent bo, org.dromara.common.mybatis.core.page.PageQuery pageQuery);
+
     List<SaiAgent> listByFk(Long fkId);
 }
