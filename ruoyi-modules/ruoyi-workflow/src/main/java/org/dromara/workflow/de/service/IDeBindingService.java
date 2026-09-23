@@ -43,6 +43,14 @@ public interface IDeBindingService {
      */
     DeBindingVo getBinding(Long instanceId);
 
+    /**
+     * D-010 补缺：绑定分页列表（GET /de/binding/list，前端 List.vue 的数据源）。
+     * 富化逻辑与 getBinding 同源（agentName / title 派生），但空行不抛错（列表语义）。
+     */
+    org.dromara.common.core.domain.PageResult<DeBindingVo> listBindings(
+            Long instanceId, String businessCode, Long agentId,
+            org.dromara.common.mybatis.core.page.PageQuery pageQuery);
+
     // ===== P1 新增方法 =====
 
     /**

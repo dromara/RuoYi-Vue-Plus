@@ -1,6 +1,11 @@
 package org.dromara.workflow.de.service;
 
 import cn.hutool.core.util.StrUtil;
+import java.util.List;
+import java.util.ArrayList;
+import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.core.domain.PageResult;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -229,6 +234,47 @@ public class DeBindingServiceImpl implements IDeBindingService {
         log.info("[de.binding] created biz_ext id={} instanceId={} userId={} agentId={} ragCount={} mode={}",
             row.getId(), bo.getInstanceId(), bo.getUserId(), bo.getAgentId(), ragCount, mode);
         return row.getId();
+    }
+
+    @Override
+    public PageResult<DeBindingVo> listBindings(
+            Long instanceId, String businessCode, Long agentId, PageQuery pageQuery) {
+        // D-010 补缺：绑定分页列表——默认只看 DE 绑定行；agentId 走 D-009 的 agent_id 索引列
+        LambdaQueryWrapper<FlowInstanceBizExt> qw = new LambdaQueryWrapper<FlowInstanceBizExt>()
+            .eq(FlowInstanceBizExt::getBusinessCode,
+                StrUtil.isNotBlank(businessCode) ? businessCode : DeBindingConstants.BINDING_DIGITAL_EMPLOYEE)
+            .eq(FlowInstanceBizExt::getDelFlag, "0");
+        if (instanceId != null) {
+            qw.eq(FlowInstanceBizExt::getInstanceId, instanceId);
+        }
+        if (agentId != null) {
+            qw.eq(FlowInstanceBizExt::getAgentId, agentId);
+        }
+        qw.orderByDesc(FlowInstanceBizExt::getInstanceId);
+        var page = flwInstanceBizExtMapper.selectPage(
+            new Page<>(pageQuery.getPageNum(), pageQuery.getPageSize()), qw);
+        List<DeBindingVo> rows = new ArrayList<>();
+        if (page.getRecords() != null) {
+            for (FlowInstanceBizExt row : page.getRecords()) {
+                DeBindingVo vo = new DeBindingVo();
+                vo.setInstanceId(row.getInstanceId());
+                vo.setBusinessCode(row.getBusinessCode());
+                vo.setAgentId(row.getBusinessId());
+                // 内联富化（与 getBinding 同源；空行不抛错）
+                if (StrUtil.isNotBlank(vo.getAgentId())) {
+                    try {
+                        Long aid = Long.parseLong(vo.getAgentId());
+                        SaiAgent agent = saiAgentMapper.selectById(aid);
+                        if (agent != null && StrUtil.isNotBlank(agent.getName())) {
+                            vo.setAgentName(agent.getName());
+                        }
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+                rows.add(vo);
+            }
+        }
+        return PageResult.build(rows, page.getTotal());
     }
 
     @Override

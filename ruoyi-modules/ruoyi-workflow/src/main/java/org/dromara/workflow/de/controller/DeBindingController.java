@@ -3,6 +3,7 @@ package org.dromara.workflow.de.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
@@ -49,6 +50,19 @@ public class DeBindingController extends BaseController {
     @PostMapping
     public R<Long> create(@Valid @RequestBody DeBindingBo bo) {
         return R.ok("绑定成功", deBindingService.createBinding(bo));
+    }
+
+    /**
+     * D-010 补缺：绑定分页列表（前端 List.vue 数据源；富化 agentName/title）。
+     */
+    @SaCheckPermission("workflow:de:binding:query")
+    @GetMapping("/list")
+    public R<PageResult<DeBindingVo>> list(
+            @RequestParam(required = false) Long instanceId,
+            @RequestParam(required = false) String businessCode,
+            @RequestParam(required = false) Long agentId,
+            org.dromara.common.mybatis.core.page.PageQuery pageQuery) {
+        return R.ok(deBindingService.listBindings(instanceId, businessCode, agentId, pageQuery));
     }
 
     /**
