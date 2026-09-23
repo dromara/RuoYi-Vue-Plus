@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.workflow.de.domain.SaiAgentConversation;
 import org.dromara.workflow.de.domain.SaiAgentConversationRecord;
 import org.dromara.workflow.de.domain.bo.SaiAgentConversationBo;
@@ -39,6 +41,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DeSaiConvServiceImpl implements IDeSaiConvService {
 
+    /**
+     * ★ S-05 修复（2026-09-22 安全审计）：本模块与 de-conversation 平行写同一张
+     * sai_agent_conversation 表，且历史上 userId 由客户端提交、edit/remove/get 无属主校验
+     * ——一旦 saiconv 权限被授给普通角色即成活的跨用户 IDOR（CWE-639）。
+     * 修复模型 = **超管全通（保留管理用途）· 非超管强制属主**：
+     * add 的 userId 一律取当前登录人（客户端值作废）；edit/remove/get 逐行验属主且
+     * 禁止转移属主；list/listByAgentId 对非超管强制按本人过滤（覆盖客户端过滤值）。
+     */
     private final SaiAgentConversationMapper saiAgentConversationMapper;
     private final SaiAgentConversationRecordMapper saiAgentConversationRecordMapper;
 
@@ -48,6 +58,8 @@ public class DeSaiConvServiceImpl implements IDeSaiConvService {
             throw new IllegalArgumentException("SaiAgentConversationBo 不能为空");
         }
         SaiAgentConversation entity = BeanUtil.copyProperties(bo, SaiAgentConversation.class);
+        // S-05：属主一律 = 创建者，客户端提交的 userId 作废（防冒名落库）
+        entity.setUserId(LoginHelper.getUserId());
         saiAgentConversationMapper.insert(entity);
         log.info("[de.sai-conv] add id={} agentId={} userId={} conversationId={}",
             entity.getId(), entity.getAgentId(), entity.getUserId(), entity.getConversationId());
@@ -59,7 +71,11 @@ public class DeSaiConvServiceImpl implements IDeSaiConvService {
         if (bo == null || bo.getId() == null) {
             throw new IllegalArgumentException("SaiAgentConversationBo.id 不能为空");
         }
+        SaiAgentConversation existing = saiAgentConversationMapper.selectById(bo.getId());
+        checkOwnedOrAdmin(existing, "edit");
         SaiAgentConversation entity = BeanUtil.copyProperties(bo, SaiAgentConversation.class);
+        // S-05：属主不可被更新转移
+        entity.setUserId(existing.getUserId());
         int rows = saiAgentConversationMapper.updateById(entity);
         log.info("[de.sai-conv] edit id={} rows={}", bo.getId(), rows);
         return rows > 0;
@@ -69,6 +85,9 @@ public class DeSaiConvServiceImpl implements IDeSaiConvService {
     public Boolean remove(Collection<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return false;
+        }
+        for (Long id : ids) {
+            checkOwnedOrAdmin(saiAgentConversationMapper.selectById(id), "remove");
         }
         int rows = saiAgentConversationMapper.deleteByIds(ids);
         log.info("[de.sai-conv] remove ids={} rows={}", ids, rows);
@@ -84,6 +103,7 @@ public class DeSaiConvServiceImpl implements IDeSaiConvService {
         if (row == null) {
             return null;
         }
+        checkOwnedOrAdmin(row, "get");
         return BeanUtil.copyProperties(row, SaiAgentConversationVo.class);
     }
 
@@ -96,7 +116,10 @@ public class DeSaiConvServiceImpl implements IDeSaiConvService {
         if (bo.getAgentId() != null) {
             wrapper.eq(SaiAgentConversation::getAgentId, bo.getAgentId());
         }
-        if (bo.getUserId() != null) {
+        if (!LoginHelper.isSuperAdmin()) {
+            // S-05：非超管一律按本人过滤（客户端 userId 过滤值作废）
+            wrapper.eq(SaiAgentConversation::getUserId, LoginHelper.getUserId());
+        } else if (bo.getUserId() != null) {
             wrapper.eq(SaiAgentConversation::getUserId, bo.getUserId());
         }
         if (StrUtil.isNotBlank(bo.getConversationId())) {
@@ -141,6 +164,30 @@ public class DeSaiConvServiceImpl implements IDeSaiConvService {
         if (recordId == null) {
             return null;
         }
-        return saiAgentConversationRecordMapper.selectById(recordId);
+        SaiAgentConversationRecord record = saiAgentConversationRecordMapper.selectById(recordId);
+        if (record == null) {
+            return null;
+        }
+        // S-05：record 行自带 user_id（对话属主同源），直接按行属主判
+        //（本实体不映射 conversation_id —— 2026-09-22 编译实测）
+        if (!LoginHelper.isSuperAdmin()
+            && (record.getUserId() == null || !record.getUserId().equals(LoginHelper.getUserId()))) {
+            throw new ServiceException("无权读取他人名下的对话记录（S-05 属主校验）");
+        }
+        return record;
+    }
+
+    /**
+     * S-05 属主校验：null 行放行（由调用方的 0 行语义处理）；超管放行；
+     * 非超管且行属主 != 当前登录人 ⇒ 拒绝。
+     */
+    private void checkOwnedOrAdmin(SaiAgentConversation row, String action) {
+        if (row == null || LoginHelper.isSuperAdmin()) {
+            return;
+        }
+        Long current = LoginHelper.getUserId();
+        if (row.getUserId() == null || !row.getUserId().equals(current)) {
+            throw new ServiceException("无权" + action + "他人名下的对话（S-05 属主校验）");
+        }
     }
 }

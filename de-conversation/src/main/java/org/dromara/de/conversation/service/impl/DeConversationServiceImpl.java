@@ -137,6 +137,12 @@ public class DeConversationServiceImpl implements IDeConversationService {
         DeConversation conv = loadConversationOwned(conversationId, userId);
 
         // Fix #4 (MEDIUM): 真落库 assistant record + 回写实例运行态
+        // ★ S-08 信任模型（2026-09-22 安全审计 · 明文声明）：本端点允许**对话属主**把
+        //   lastResponse/tokensUsed 作为 assistant 消息落库——与 /message 侧的 role 白名单
+        //   （仅 user）不对称，属 AC-11 规格（集成步骤文档步骤 6）的**有意设计**：/complete 是
+        //   收口端点，产出物由属主申报、属主可见。已知边界 = 属主可自报 token 计数与回复内容。
+        //   若未来要求 assistant 内容仅经 llm-ingest（带服务 token 的内部通道）写入，须 owner
+        //   改 AC-11 规格 + E2E 同步——本注释即该裁决的锚点。
         DeConversationRecord record = new DeConversationRecord();
         record.setAgentId(conv.getAgentId());
         record.setConversationId(conversationId);
