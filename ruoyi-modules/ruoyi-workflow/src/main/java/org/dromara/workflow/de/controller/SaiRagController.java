@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
+import org.dromara.workflow.de.domain.SaiRag;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.web.core.BaseController;
@@ -46,14 +47,14 @@ public class SaiRagController extends BaseController {
     @Log(title = "sai_rag", businessType = BusinessType.INSERT)
     @SaCheckPermission("workflow:de:sairag:add")
     @PostMapping
-    public R<Long> add(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Long> add(@Valid @RequestBody SaiRag bo) {
         return R.ok("ok", saiRagService.add(bo));
     }
 
     @Log(title = "sai_rag", businessType = BusinessType.UPDATE)
     @SaCheckPermission("workflow:de:sairag:edit")
     @PutMapping
-    public R<Boolean> edit(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Boolean> edit(@Valid @RequestBody SaiRag bo) {
         return R.ok("ok", saiRagService.edit(bo));
     }
 
@@ -66,25 +67,25 @@ public class SaiRagController extends BaseController {
 
     @SaCheckPermission("workflow:de:sairag:query")
     @GetMapping("/{id}")
-    public R<Map<String, Object>> getInfo(@PathVariable Long id) {
+    public R<SaiRag> getInfo(@PathVariable Long id) {
         return R.ok(saiRagService.getInfo(id));
     }
 
     @SaCheckPermission("workflow:de:sairag:list")
     @GetMapping("/list")
-    public R<List<Map<String, Object>>> list(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<List<SaiRag>> list(SaiRag bo) {
         return R.ok(saiRagService.list(bo));
     }
 
     @SaCheckPermission("workflow:de:sairag:list")
     @GetMapping("/page")
-    public R<PageResult<Map<String, Object>>> page(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<PageResult<SaiRag>> page(SaiRag bo, org.dromara.common.mybatis.core.page.PageQuery pageQuery) {
         return R.ok(saiRagService.page(bo));
     }
 
     @SaCheckPermission("workflow:de:sairag:list")
     @GetMapping("/by-fk/{fkId}")
-    public R<List<Map<String, Object>>> listByFk(@PathVariable Long fkId) {
+    public R<List<SaiRag>> listByFk(@PathVariable Long fkId) {
         return R.ok(saiRagService.listByFk(fkId));
     }
 }
