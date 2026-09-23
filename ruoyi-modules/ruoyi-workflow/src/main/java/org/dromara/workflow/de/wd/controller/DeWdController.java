@@ -88,18 +88,21 @@ public class DeWdController extends BaseController {
     // ===== 工作台任务视图（WD-03 / WD-05 / WD-06 · 既有）=====
 
     /** WD-03：列出「AI 执行中」任务。 GET /de/wd/in-progress?userId=xxx */
+    @SaCheckPermission("workflow:de:wd:list")
     @GetMapping("/in-progress")
     public R<List<DeWdTaskListVo>> listInProgress(@RequestParam Long userId) {
         return R.ok(deWdService.listInProgress(userId));
     }
 
     /** WD-05：工作台任务筛选。 POST /de/wd/filter */
+    @SaCheckPermission("workflow:de:wd:list")
     @PostMapping("/filter")
     public R<List<DeWdTaskListVo>> filterTasks(@Valid @RequestBody DeWdTaskFilterBo bo) {
         return R.ok(deWdService.filterTasks(bo));
     }
 
     /** WD-06：异常 / 求助 / 审核 / 资源失效 集中「需要我处理」。 GET /de/wd/action-required?userId=xxx */
+    @SaCheckPermission("workflow:de:wd:list")
     @GetMapping("/action-required")
     public R<List<DeWdTaskListVo>> listActionRequired(@RequestParam Long userId) {
         return R.ok(deWdService.listActionRequired(userId));

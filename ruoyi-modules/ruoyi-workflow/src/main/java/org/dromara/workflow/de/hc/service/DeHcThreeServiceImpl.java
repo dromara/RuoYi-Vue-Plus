@@ -189,8 +189,8 @@ public class DeHcThreeServiceImpl implements IDeHcThreeService {
             }
             String tokenBody = seg.substring(colonIdx + 1);
             if (tokenBody.contains(SEP)) {
-                throw new ServiceException("permission_flag token 含 @@：\"" + tokenBody
-                    + "\"（D-030 修复 · 防 parser differential 攻击）");
+                // ★ D-031 修复（2026-09-23 17:1x PDT · 安全 hook 第二轮）：信息泄露 —— 不回显 tokenBody
+                throw new ServiceException("token body contains consecutive @");
             }
         }
         // 190 字符业务层上限（DDL 200 字符留 10 字符余量给 race condition 写入）

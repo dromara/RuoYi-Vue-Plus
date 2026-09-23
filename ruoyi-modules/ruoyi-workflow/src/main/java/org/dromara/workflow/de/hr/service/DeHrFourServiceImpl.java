@@ -212,7 +212,8 @@ public class DeHrFourServiceImpl implements IDeHrFourService {
         }
         Long userId = userService.selectUserIdByName(username);
         if (userId == null) {
-            throw new ServiceException("username 不存在: " + username);
+            // ★ D-031 修复（2026-09-23 17:1x PDT · 安全 hook 第二轮）：信息泄露 —— 不回显 username
+            throw new ServiceException("username 不存在");
         }
     }
 
@@ -259,8 +260,8 @@ public class DeHrFourServiceImpl implements IDeHrFourService {
         }
         Long taskInstanceId = flowTask.getInstanceId();
         if (taskInstanceId == null || !taskInstanceId.equals(instanceId)) {
-            throw new ServiceException("taskId 不属于该 instance（taskId=" + taskId
-                + " taskInstanceId=" + taskInstanceId + " instanceId=" + instanceId + "）");
+            // ★ D-031 修复（2026-09-23 17:1x PDT · 安全 hook 第二轮）：信息泄露 —— 不回显 taskId / taskInstanceId / instanceId
+            throw new ServiceException("taskId 不属于该 instance");
         }
     }
 

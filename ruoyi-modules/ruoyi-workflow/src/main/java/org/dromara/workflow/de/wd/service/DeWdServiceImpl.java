@@ -90,16 +90,20 @@ public class DeWdServiceImpl implements IDeWdService {
         // ★ D-030 修复（2026-09-23 14:0x PDT）：service 层 IDOR 防御 —— 非 admin 调用方传 assigneeId
         //   ≠ 自 userId 时直接拒绝；assigneeId 是责任归属覆盖能力，本应由 admin 专用。
         //   否则 assigneeId 被忽略 = 仅按 userId 过滤（避免越权查看他人待办）。
+        // ★ D-031 修复（2026-09-23 17:1x PDT · 安全 hook 第二轮）：fall-through 分支仍允许
+        //   bo.getUserId() ≠ callerUserId ⇒ 加 userId 必为当前登录用户校验。
+        //   否则攻击者 A 可传 userId=B 越权查看 B 待办（assigneeId=null 时走 else 分支）。
         Long callerUserId = LoginHelper.getUserId();
         Long effectiveUserId;
         if (bo.getAssigneeId() != null && !Objects.equals(bo.getAssigneeId(), bo.getUserId())) {
             if (!LoginHelper.isSuperAdmin()) {
-                throw new ServiceException(
-                    "assigneeId 仅 admin 可覆盖 userId（bo.assigneeId=" + bo.getAssigneeId()
-                        + " bo.userId=" + bo.getUserId() + " caller=" + callerUserId + "）");
+                throw new ServiceException("assigneeId 仅 admin 可覆盖 userId");
             }
             effectiveUserId = bo.getAssigneeId();
         } else {
+            if (!LoginHelper.isSuperAdmin() && !Objects.equals(bo.getUserId(), callerUserId)) {
+                throw new ServiceException("userId 必须为当前登录用户");
+            }
             effectiveUserId = bo.getUserId();
         }
         List<DeWdTaskListVo> base = filterAndProject(tasks, effectiveUserId, false);
