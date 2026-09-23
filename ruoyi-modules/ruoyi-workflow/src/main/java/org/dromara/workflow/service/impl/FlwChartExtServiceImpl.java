@@ -56,6 +56,14 @@ public class FlwChartExtServiceImpl implements ChartExtService {
      */
     @Override
     public void execute(DefJson defJson) {
+        // ★ D-008（AU-07 · 2026-09-22 · OW决议自决#8）：鱼骨图下发前剥离 permissionFlag。
+        //   34 号 §四 ④：该字段承载真实 userId，活库实测（3 实例 def_json 全含 admin id）正随
+        //   query-flow-chart 下发到浏览器 = L3 泄漏面。只清内存中待序列化的 DefJson，不落库
+        //   （flow_instance.def_json 原文不动，设计器 round-trip 不受影响）；
+        //   必须在任何 return 之前执行 —— 与 tooltip 配置无关地覆盖每次 chart 下发。
+        if (defJson != null && defJson.getNodeList() != null) {
+            defJson.getNodeList().forEach(n -> n.setPermissionFlag(null));
+        }
         // 配置关闭，直接返回，不渲染悬浮窗
         if (!nodeTooltip) {
             return;

@@ -1,0 +1,16 @@
+apiVersion: v2
+name: aip-app
+description: AIP backend (ruoyi-admin) — Spring Boot 4.1 / JDK 21, multi-stage runtime
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - aip
+  - ruoyi
+  - workflow
+  - spring-boot
+home: https://github.com/dromara/RuoYi-Vue-Plus
+sources:
+  - https://github.com/dromara/RuoYi-Vue-Plus
+maintainers:
+  - name: AIP-Workflow-Base

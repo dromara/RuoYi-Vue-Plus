@@ -13,6 +13,7 @@ import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
 import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
+import org.dromara.workflow.mapper.FlwInstanceBizExtMapper;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.context.InstanceDeleteContext;
 
@@ -32,11 +33,17 @@ public class InstanceDeleteExecuteComponent extends NodeComponent {
     private final InsService insService;
     private final FlowHisTaskMapper flowHisTaskMapper;
     private final FlowTaskMapper flowTaskMapper;
+    // ★ D-008（AU-12 · 2026-09-22 · OW决议自决#7）：实例删除链补 flow_instance_biz_ext 清理
+    private final FlwInstanceBizExtMapper flwInstanceBizExtMapper;
 
     @Override
     public void process() {
         InstanceDeleteContext context = getContextBean(InstanceDeleteContext.class);
         deleteCopyUsers(context.getDeleteInstanceIds());
+        // ★ D-008（AU-12）：删除方法有定义调用点 0（FlwInstanceBizExtMapper:45/:55）——本行补唯一缺口；
+        //   放 deleteCopyUsers 后（两分支共用）+ event 组件之后（业务监听方先取绑定上下文再失绑定行）；
+        //   事务由入口方法 @Transactional 兜住（FlwInstanceServiceImpl:213/:227/:241）。
+        flwInstanceBizExtMapper.deleteByInstIds(context.getDeleteInstanceIds());
         if (!context.isHistory()) {
             context.setResult(insService.remove(context.getDeleteInstanceIds()));
             return;

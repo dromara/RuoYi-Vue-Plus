@@ -1,0 +1,127 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "aip-app.fullname" . }}
+  labels:
+    {{- include "aip-app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  strategy:
+    type: {{ .Values.strategy.type }}
+    {{- if eq .Values.strategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+    {{- end }}
+  selector:
+    matchLabels:
+      {{- include "aip-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        # Force pod restart on ConfigMap change (when used)
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "aip-app.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "aip-app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+            - name: snail-job
+              containerPort: 28080
+              protocol: TCP
+            - name: snail-ai
+              containerPort: 38080
+              protocol: TCP
+          env:
+            - name: SERVER_PORT
+              value: {{ .Values.env.SERVER_PORT | quote }}
+            - name: SNAIL_JOB_PORT
+              value: {{ .Values.env.SNAIL_JOB_PORT | quote }}
+            - name: SNAIL_AI_PORT
+              value: {{ .Values.env.SNAIL_AI_PORT | quote }}
+            - name: JAVA_OPTS
+              value: {{ .Values.env.JAVA_OPTS | quote }}
+            - name: LANG
+              value: "C.UTF-8"
+            - name: LC_ALL
+              value: "C.UTF-8"
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.livenessProbe.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds:       {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds:      {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold:    {{ .Values.livenessProbe.failureThreshold }}
+            successThreshold:    {{ .Values.livenessProbe.successThreshold }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.readinessProbe.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds:       {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds:      {{ .Values.readinessProbe.timeoutSeconds }}
+            failureThreshold:    {{ .Values.readinessProbe.failureThreshold }}
+            successThreshold:    {{ .Values.readinessProbe.successThreshold }}
+          {{- end }}
+          {{- if .Values.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.startupProbe.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+            periodSeconds:       {{ .Values.startupProbe.periodSeconds }}
+            timeoutSeconds:      {{ .Values.startupProbe.timeoutSeconds }}
+            failureThreshold:    {{ .Values.startupProbe.failureThreshold }}
+            successThreshold:    {{ .Values.startupProbe.successThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: logs
+              mountPath: /ruoyi/server/logs
+            - name: temp
+              mountPath: /ruoyi/server/temp
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: temp
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

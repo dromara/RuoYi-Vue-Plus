@@ -1,0 +1,116 @@
+# Default values for aip-app
+# Override per-env: helm install aip-app ./aip-app -f values-prod.yaml
+
+image:
+  repository: aip-app
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: ""
+
+podAnnotations: {}
+podLabels:
+  app.kubernetes.io/component: backend
+  app.kubernetes.io/part-of: aip-platform
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+  # NodePort / LoadBalancer annotations live here when needed.
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+  hosts:
+    - host: aip.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: aip-tls
+  #    hosts:
+  #      - aip.local
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1536Mi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+# Liveness / readiness / startup probes — all hit Spring Boot Actuator
+livenessProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  initialDelaySeconds: 90
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health/readiness
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+startupProbe:
+  enabled: true
+  path: /actuator/health
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 30   # 20 + 30*10 = 320s to reach liveness
+  successThreshold: 1
+
+# Application-level JAVA_OPTS / config
+env:
+  SERVER_PORT: "8080"
+  SNAIL_JOB_PORT: "28080"
+  SNAIL_AI_PORT: "38080"
+  JAVA_OPTS: "-Xms512m -Xmx1280m -XX:MaxRAMPercentage=75.0"
+
+# Rolling-update strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+# extra config: nodeSelector / tolerations / affinity
+nodeSelector: {}
+tolerations: []
+affinity: {}

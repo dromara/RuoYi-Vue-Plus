@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "aip-app.fullname" . }}
+  labels:
+    {{- include "aip-app.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      port:       {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+    - name: snail-job
+      port: 28080
+      targetPort: 28080
+      protocol: TCP
+    - name: snail-ai
+      port: 38080
+      targetPort: 38080
+      protocol: TCP
+  selector:
+    {{- include "aip-app.selectorLabels" . | nindent 4 }}
