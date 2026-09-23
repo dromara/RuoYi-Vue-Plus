@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
+import org.dromara.workflow.de.domain.SaiApp;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.web.core.BaseController;
@@ -46,14 +47,14 @@ public class SaiAppController extends BaseController {
     @Log(title = "sai_app", businessType = BusinessType.INSERT)
     @SaCheckPermission("workflow:de:saiapp:add")
     @PostMapping
-    public R<Long> add(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Long> add(@Valid @RequestBody SaiApp bo) {
         return R.ok("ok", saiAppService.add(bo));
     }
 
     @Log(title = "sai_app", businessType = BusinessType.UPDATE)
     @SaCheckPermission("workflow:de:saiapp:edit")
     @PutMapping
-    public R<Boolean> edit(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Boolean> edit(@Valid @RequestBody SaiApp bo) {
         return R.ok("ok", saiAppService.edit(bo));
     }
 
@@ -66,25 +67,25 @@ public class SaiAppController extends BaseController {
 
     @SaCheckPermission("workflow:de:saiapp:query")
     @GetMapping("/{id}")
-    public R<Map<String, Object>> getInfo(@PathVariable Long id) {
+    public R<SaiApp> getInfo(@PathVariable Long id) {
         return R.ok(saiAppService.getInfo(id));
     }
 
     @SaCheckPermission("workflow:de:saiapp:list")
     @GetMapping("/list")
-    public R<List<Map<String, Object>>> list(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<List<SaiApp>> list(SaiApp bo) {
         return R.ok(saiAppService.list(bo));
     }
 
     @SaCheckPermission("workflow:de:saiapp:list")
     @GetMapping("/page")
-    public R<PageResult<Map<String, Object>>> page(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<PageResult<SaiApp>> page(SaiApp bo) {
         return R.ok(saiAppService.page(bo));
     }
 
     @SaCheckPermission("workflow:de:saiapp:list")
     @GetMapping("/by-fk/{fkId}")
-    public R<List<Map<String, Object>>> listByFk(@PathVariable Long fkId) {
+    public R<List<SaiApp>> listByFk(@PathVariable Long fkId) {
         return R.ok(saiAppService.listByFk(fkId));
     }
 }

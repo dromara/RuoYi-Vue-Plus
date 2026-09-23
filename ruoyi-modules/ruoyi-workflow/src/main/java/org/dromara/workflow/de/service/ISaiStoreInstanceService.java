@@ -1,37 +1,27 @@
 package org.dromara.workflow.de.service;
 
-import com.baomidou.mybatisplus.spring.service.IService;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.workflow.de.domain.SaiStoreInstance;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
- * sai_store_instance 服务接口（存根）。
- *
- * <p><b>存根说明</b>：本接口为 OW-03 决议清单的接口层存根（7 端点），
- * 实现由 {@link SaiStoreInstanceServiceImpl} 全部抛出
- * {@code UnsupportedOperationException}，等待 owner 实装。
- *
- * <p><b>实体类型</b>：本表无专属 domain POJO（不实装），用 {@code Map<String, Object>}
- * 作为通用实体。
- *
- * @author AIP
+ * SaiStoreInstance 服务接口（D-010 批⑥ typed 化）。
  */
-public interface ISaiStoreInstanceService extends IService<Map<String, Object>> {
+public interface ISaiStoreInstanceService {
 
-    Long add(Map<String, Object> bo);
+    Long add(SaiStoreInstance bo);
 
-    Boolean edit(Map<String, Object> bo);
+    Boolean edit(SaiStoreInstance bo);
 
     Boolean remove(Collection<Long> ids);
 
-    Map<String, Object> getInfo(Long id);
+    SaiStoreInstance getInfo(Long id);
 
-    List<Map<String, Object>> list(Map<String, Object> bo);
+    List<SaiStoreInstance> list(SaiStoreInstance bo);
 
-    PageResult<Map<String, Object>> page(Map<String, Object> bo);
+    PageResult<SaiStoreInstance> page(SaiStoreInstance bo);
 
-    List<Map<String, Object>> listByFk(Long fkId);
+    List<SaiStoreInstance> listByFk(Long fkId);
 }

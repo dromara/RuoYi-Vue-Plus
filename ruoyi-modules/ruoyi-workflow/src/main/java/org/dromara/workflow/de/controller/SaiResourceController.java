@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
+import org.dromara.workflow.de.domain.SaiResource;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.web.core.BaseController;
@@ -46,14 +47,14 @@ public class SaiResourceController extends BaseController {
     @Log(title = "sai_resource", businessType = BusinessType.INSERT)
     @SaCheckPermission("workflow:de:sairesource:add")
     @PostMapping
-    public R<Long> add(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Long> add(@Valid @RequestBody SaiResource bo) {
         return R.ok("ok", saiResourceService.add(bo));
     }
 
     @Log(title = "sai_resource", businessType = BusinessType.UPDATE)
     @SaCheckPermission("workflow:de:sairesource:edit")
     @PutMapping
-    public R<Boolean> edit(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Boolean> edit(@Valid @RequestBody SaiResource bo) {
         return R.ok("ok", saiResourceService.edit(bo));
     }
 
@@ -66,25 +67,25 @@ public class SaiResourceController extends BaseController {
 
     @SaCheckPermission("workflow:de:sairesource:query")
     @GetMapping("/{id}")
-    public R<Map<String, Object>> getInfo(@PathVariable Long id) {
+    public R<SaiResource> getInfo(@PathVariable Long id) {
         return R.ok(saiResourceService.getInfo(id));
     }
 
     @SaCheckPermission("workflow:de:sairesource:list")
     @GetMapping("/list")
-    public R<List<Map<String, Object>>> list(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<List<SaiResource>> list(SaiResource bo) {
         return R.ok(saiResourceService.list(bo));
     }
 
     @SaCheckPermission("workflow:de:sairesource:list")
     @GetMapping("/page")
-    public R<PageResult<Map<String, Object>>> page(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<PageResult<SaiResource>> page(SaiResource bo) {
         return R.ok(saiResourceService.page(bo));
     }
 
     @SaCheckPermission("workflow:de:sairesource:list")
     @GetMapping("/by-fk/{fkId}")
-    public R<List<Map<String, Object>>> listByFk(@PathVariable Long fkId) {
+    public R<List<SaiResource>> listByFk(@PathVariable Long fkId) {
         return R.ok(saiResourceService.listByFk(fkId));
     }
 }

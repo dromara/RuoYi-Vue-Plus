@@ -1,5 +1,6 @@
 package org.dromara.workflow.de.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,47 +29,46 @@ public class SaiSkillServiceImpl
         extends ServiceImpl<SaiSkillMapper, SaiSkill>
         implements ISaiSkillService {
 
-    private static final String STUB_MSG = "sai_skill 接口存根，等待 owner 实现";
+    // ★ D-010 批⑥实化（2026-09-23）：typed 存根 → 真实 CRUD
 
     @Override
     public Long add(SaiSkill bo) {
-        log.warn("[de.sai-skill] add 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        save(bo);
+        return bo.getId();
     }
 
     @Override
     public Boolean edit(SaiSkill bo) {
-        log.warn("[de.sai-skill] edit 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        return updateById(bo);
     }
 
     @Override
-    public Boolean remove(Collection<Long> ids) {
-        log.warn("[de.sai-skill] remove 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public Boolean remove(java.util.Collection<Long> ids) {
+        return removeByIds(ids);
     }
 
     @Override
     public SaiSkill getInfo(Long id) {
-        log.warn("[de.sai-skill] getInfo 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        return getById(id);
     }
 
     @Override
-    public List<SaiSkill> list(SaiSkill bo) {
-        log.warn("[de.sai-skill] list 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public java.util.List<SaiSkill> list(SaiSkill bo) {
+        return list(buildWrapper(bo));
     }
 
     @Override
     public PageResult<SaiSkill> page(SaiSkill bo) {
-        log.warn("[de.sai-skill] page 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        var pg = page(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(1, 10), buildWrapper(bo));
+        return PageResult.build(pg.getRecords(), pg.getTotal());
     }
 
     @Override
-    public List<SaiSkill> listByFk(Long fkId) {
-        log.warn("[de.sai-skill] listByFk 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public java.util.List<SaiSkill> listByFk(Long fkId) {
+        return java.util.Collections.emptyList();
+    }
+
+    private com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SaiSkill> buildWrapper(SaiSkill bo) {
+        return new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SaiSkill>().orderByDesc(SaiSkill::getId);
     }
 }

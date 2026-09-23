@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
+import org.dromara.workflow.de.domain.SaiOpenapiUser;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.web.core.BaseController;
@@ -46,14 +47,14 @@ public class SaiOpenapiUserController extends BaseController {
     @Log(title = "sai_openapi_user", businessType = BusinessType.INSERT)
     @SaCheckPermission("workflow:de:saiopenapiuser:add")
     @PostMapping
-    public R<Long> add(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Long> add(@Valid @RequestBody SaiOpenapiUser bo) {
         return R.ok("ok", saiOpenapiUserService.add(bo));
     }
 
     @Log(title = "sai_openapi_user", businessType = BusinessType.UPDATE)
     @SaCheckPermission("workflow:de:saiopenapiuser:edit")
     @PutMapping
-    public R<Boolean> edit(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Boolean> edit(@Valid @RequestBody SaiOpenapiUser bo) {
         return R.ok("ok", saiOpenapiUserService.edit(bo));
     }
 
@@ -66,25 +67,25 @@ public class SaiOpenapiUserController extends BaseController {
 
     @SaCheckPermission("workflow:de:saiopenapiuser:query")
     @GetMapping("/{id}")
-    public R<Map<String, Object>> getInfo(@PathVariable Long id) {
+    public R<SaiOpenapiUser> getInfo(@PathVariable Long id) {
         return R.ok(saiOpenapiUserService.getInfo(id));
     }
 
     @SaCheckPermission("workflow:de:saiopenapiuser:list")
     @GetMapping("/list")
-    public R<List<Map<String, Object>>> list(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<List<SaiOpenapiUser>> list(SaiOpenapiUser bo) {
         return R.ok(saiOpenapiUserService.list(bo));
     }
 
     @SaCheckPermission("workflow:de:saiopenapiuser:list")
     @GetMapping("/page")
-    public R<PageResult<Map<String, Object>>> page(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<PageResult<SaiOpenapiUser>> page(SaiOpenapiUser bo) {
         return R.ok(saiOpenapiUserService.page(bo));
     }
 
     @SaCheckPermission("workflow:de:saiopenapiuser:list")
     @GetMapping("/by-fk/{fkId}")
-    public R<List<Map<String, Object>>> listByFk(@PathVariable Long fkId) {
+    public R<List<SaiOpenapiUser>> listByFk(@PathVariable Long fkId) {
         return R.ok(saiOpenapiUserService.listByFk(fkId));
     }
 }

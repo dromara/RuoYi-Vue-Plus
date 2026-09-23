@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
+import org.dromara.workflow.de.domain.SaiClientNode;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.web.core.BaseController;
@@ -46,14 +47,14 @@ public class SaiClientNodeController extends BaseController {
     @Log(title = "sai_client_node", businessType = BusinessType.INSERT)
     @SaCheckPermission("workflow:de:saiclientnode:add")
     @PostMapping
-    public R<Long> add(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Long> add(@Valid @RequestBody SaiClientNode bo) {
         return R.ok("ok", saiClientNodeService.add(bo));
     }
 
     @Log(title = "sai_client_node", businessType = BusinessType.UPDATE)
     @SaCheckPermission("workflow:de:saiclientnode:edit")
     @PutMapping
-    public R<Boolean> edit(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Boolean> edit(@Valid @RequestBody SaiClientNode bo) {
         return R.ok("ok", saiClientNodeService.edit(bo));
     }
 
@@ -66,25 +67,25 @@ public class SaiClientNodeController extends BaseController {
 
     @SaCheckPermission("workflow:de:saiclientnode:query")
     @GetMapping("/{id}")
-    public R<Map<String, Object>> getInfo(@PathVariable Long id) {
+    public R<SaiClientNode> getInfo(@PathVariable Long id) {
         return R.ok(saiClientNodeService.getInfo(id));
     }
 
     @SaCheckPermission("workflow:de:saiclientnode:list")
     @GetMapping("/list")
-    public R<List<Map<String, Object>>> list(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<List<SaiClientNode>> list(SaiClientNode bo) {
         return R.ok(saiClientNodeService.list(bo));
     }
 
     @SaCheckPermission("workflow:de:saiclientnode:list")
     @GetMapping("/page")
-    public R<PageResult<Map<String, Object>>> page(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<PageResult<SaiClientNode>> page(SaiClientNode bo) {
         return R.ok(saiClientNodeService.page(bo));
     }
 
     @SaCheckPermission("workflow:de:saiclientnode:list")
     @GetMapping("/by-fk/{fkId}")
-    public R<List<Map<String, Object>>> listByFk(@PathVariable Long fkId) {
+    public R<List<SaiClientNode>> listByFk(@PathVariable Long fkId) {
         return R.ok(saiClientNodeService.listByFk(fkId));
     }
 }

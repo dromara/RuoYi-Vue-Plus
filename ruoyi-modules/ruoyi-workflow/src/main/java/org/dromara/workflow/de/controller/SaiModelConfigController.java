@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
+import org.dromara.workflow.de.domain.SaiModelConfig;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.web.core.BaseController;
@@ -46,14 +47,14 @@ public class SaiModelConfigController extends BaseController {
     @Log(title = "sai_model_config", businessType = BusinessType.INSERT)
     @SaCheckPermission("workflow:de:saimodelconfig:add")
     @PostMapping
-    public R<Long> add(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Long> add(@Valid @RequestBody SaiModelConfig bo) {
         return R.ok("ok", saiModelConfigService.add(bo));
     }
 
     @Log(title = "sai_model_config", businessType = BusinessType.UPDATE)
     @SaCheckPermission("workflow:de:saimodelconfig:edit")
     @PutMapping
-    public R<Boolean> edit(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Boolean> edit(@Valid @RequestBody SaiModelConfig bo) {
         return R.ok("ok", saiModelConfigService.edit(bo));
     }
 
@@ -66,25 +67,25 @@ public class SaiModelConfigController extends BaseController {
 
     @SaCheckPermission("workflow:de:saimodelconfig:query")
     @GetMapping("/{id}")
-    public R<Map<String, Object>> getInfo(@PathVariable Long id) {
+    public R<SaiModelConfig> getInfo(@PathVariable Long id) {
         return R.ok(saiModelConfigService.getInfo(id));
     }
 
     @SaCheckPermission("workflow:de:saimodelconfig:list")
     @GetMapping("/list")
-    public R<List<Map<String, Object>>> list(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<List<SaiModelConfig>> list(SaiModelConfig bo) {
         return R.ok(saiModelConfigService.list(bo));
     }
 
     @SaCheckPermission("workflow:de:saimodelconfig:list")
     @GetMapping("/page")
-    public R<PageResult<Map<String, Object>>> page(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<PageResult<SaiModelConfig>> page(SaiModelConfig bo) {
         return R.ok(saiModelConfigService.page(bo));
     }
 
     @SaCheckPermission("workflow:de:saimodelconfig:list")
     @GetMapping("/by-fk/{fkId}")
-    public R<List<Map<String, Object>>> listByFk(@PathVariable Long fkId) {
+    public R<List<SaiModelConfig>> listByFk(@PathVariable Long fkId) {
         return R.ok(saiModelConfigService.listByFk(fkId));
     }
 }

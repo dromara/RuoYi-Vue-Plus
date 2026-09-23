@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
+import org.dromara.workflow.de.domain.SaiStoreInstance;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.web.core.BaseController;
@@ -46,14 +47,14 @@ public class SaiStoreInstanceController extends BaseController {
     @Log(title = "sai_store_instance", businessType = BusinessType.INSERT)
     @SaCheckPermission("workflow:de:saistoreinstance:add")
     @PostMapping
-    public R<Long> add(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Long> add(@Valid @RequestBody SaiStoreInstance bo) {
         return R.ok("ok", saiStoreInstanceService.add(bo));
     }
 
     @Log(title = "sai_store_instance", businessType = BusinessType.UPDATE)
     @SaCheckPermission("workflow:de:saistoreinstance:edit")
     @PutMapping
-    public R<Boolean> edit(@Valid @RequestBody Map<String, Object> bo) {
+    public R<Boolean> edit(@Valid @RequestBody SaiStoreInstance bo) {
         return R.ok("ok", saiStoreInstanceService.edit(bo));
     }
 
@@ -66,25 +67,25 @@ public class SaiStoreInstanceController extends BaseController {
 
     @SaCheckPermission("workflow:de:saistoreinstance:query")
     @GetMapping("/{id}")
-    public R<Map<String, Object>> getInfo(@PathVariable Long id) {
+    public R<SaiStoreInstance> getInfo(@PathVariable Long id) {
         return R.ok(saiStoreInstanceService.getInfo(id));
     }
 
     @SaCheckPermission("workflow:de:saistoreinstance:list")
     @GetMapping("/list")
-    public R<List<Map<String, Object>>> list(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<List<SaiStoreInstance>> list(SaiStoreInstance bo) {
         return R.ok(saiStoreInstanceService.list(bo));
     }
 
     @SaCheckPermission("workflow:de:saistoreinstance:list")
     @GetMapping("/page")
-    public R<PageResult<Map<String, Object>>> page(@RequestBody(required = false) Map<String, Object> bo) {
+    public R<PageResult<SaiStoreInstance>> page(SaiStoreInstance bo) {
         return R.ok(saiStoreInstanceService.page(bo));
     }
 
     @SaCheckPermission("workflow:de:saistoreinstance:list")
     @GetMapping("/by-fk/{fkId}")
-    public R<List<Map<String, Object>>> listByFk(@PathVariable Long fkId) {
+    public R<List<SaiStoreInstance>> listByFk(@PathVariable Long fkId) {
         return R.ok(saiStoreInstanceService.listByFk(fkId));
     }
 }

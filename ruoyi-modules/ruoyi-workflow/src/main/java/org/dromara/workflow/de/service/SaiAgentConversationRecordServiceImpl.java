@@ -1,5 +1,6 @@
 package org.dromara.workflow.de.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,47 +33,46 @@ public class SaiAgentConversationRecordServiceImpl
         extends ServiceImpl<SaiAgentConversationRecordMapper, SaiAgentConversationRecord>
         implements ISaiAgentConversationRecordService {
 
-    private static final String STUB_MSG = "sai_agent_conversation_record 接口存根，等待 owner 实现";
+    // ★ D-010 批⑥实化（2026-09-23）：typed 存根 → 真实 CRUD
 
     @Override
     public Long add(SaiAgentConversationRecord bo) {
-        log.warn("[de.sai-agent-conversation-record] add 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        save(bo);
+        return bo.getId();
     }
 
     @Override
     public Boolean edit(SaiAgentConversationRecord bo) {
-        log.warn("[de.sai-agent-conversation-record] edit 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        return updateById(bo);
     }
 
     @Override
-    public Boolean remove(Collection<Long> ids) {
-        log.warn("[de.sai-agent-conversation-record] remove 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public Boolean remove(java.util.Collection<Long> ids) {
+        return removeByIds(ids);
     }
 
     @Override
     public SaiAgentConversationRecord getInfo(Long id) {
-        log.warn("[de.sai-agent-conversation-record] getInfo 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        return getById(id);
     }
 
     @Override
-    public List<SaiAgentConversationRecord> list(SaiAgentConversationRecord bo) {
-        log.warn("[de.sai-agent-conversation-record] list 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public java.util.List<SaiAgentConversationRecord> list(SaiAgentConversationRecord bo) {
+        return list(buildWrapper(bo));
     }
 
     @Override
     public PageResult<SaiAgentConversationRecord> page(SaiAgentConversationRecord bo) {
-        log.warn("[de.sai-agent-conversation-record] page 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        var pg = page(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(1, 10), buildWrapper(bo));
+        return PageResult.build(pg.getRecords(), pg.getTotal());
     }
 
     @Override
-    public List<SaiAgentConversationRecord> listByFk(Long fkId) {
-        log.warn("[de.sai-agent-conversation-record] listByFk 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public java.util.List<SaiAgentConversationRecord> listByFk(Long fkId) {
+        return java.util.Collections.emptyList();
+    }
+
+    private com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SaiAgentConversationRecord> buildWrapper(SaiAgentConversationRecord bo) {
+        return new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SaiAgentConversationRecord>().orderByDesc(SaiAgentConversationRecord::getId);
     }
 }

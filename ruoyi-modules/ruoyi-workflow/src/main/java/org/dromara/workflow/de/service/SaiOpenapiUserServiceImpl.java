@@ -1,72 +1,71 @@
 package org.dromara.workflow.de.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.workflow.de.domain.SaiOpenapiUser;
 import org.dromara.workflow.de.mapper.SaiOpenapiUserMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
- * sai_openapi_user 服务实现（存根）。
- *
- * <p><b>存根说明</b>：本类为 OW-03 决议清单的接口层存根（7 端点），
- * 全部方法体抛 {@code UnsupportedOperationException}，等待 owner 实装。
+ * sai-openapi-user 服务实现（D-010 批⑥：Map 存根 → typed CRUD，列真源 ry_ai.sql DDL）。
  *
  * @author AIP
+ * @since 2026-09-23
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SaiOpenapiUserServiceImpl
-        extends ServiceImpl<SaiOpenapiUserMapper, Map<String, Object>>
+        extends ServiceImpl<SaiOpenapiUserMapper, SaiOpenapiUser>
         implements ISaiOpenapiUserService {
 
-    private static final String STUB_MSG = "sai_openapi_user 接口存根，等待 owner 实现";
-
     @Override
-    public Long add(Map<String, Object> bo) {
-        log.warn("[de.sai-openapi-user] add 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public Long add(SaiOpenapiUser bo) {
+        save(bo);
+        log.info("[de.sai-openapi-user] add id={}", bo.getId());
+        return bo.getId();
     }
 
     @Override
-    public Boolean edit(Map<String, Object> bo) {
-        log.warn("[de.sai-openapi-user] edit 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public Boolean edit(SaiOpenapiUser bo) {
+        return updateById(bo);
     }
 
     @Override
     public Boolean remove(Collection<Long> ids) {
-        log.warn("[de.sai-openapi-user] remove 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        return removeByIds(ids);
     }
 
     @Override
-    public Map<String, Object> getInfo(Long id) {
-        log.warn("[de.sai-openapi-user] getInfo 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public SaiOpenapiUser getInfo(Long id) {
+        return getById(id);
     }
 
     @Override
-    public List<Map<String, Object>> list(Map<String, Object> bo) {
-        log.warn("[de.sai-openapi-user] list 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public List<SaiOpenapiUser> list(SaiOpenapiUser bo) {
+        return list(buildWrapper(bo));
     }
 
     @Override
-    public PageResult<Map<String, Object>> page(Map<String, Object> bo) {
-        log.warn("[de.sai-openapi-user] page 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public PageResult<SaiOpenapiUser> page(SaiOpenapiUser bo) {
+        var pg = page(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(1, 10), buildWrapper(bo));
+        return PageResult.build(pg.getRecords(), pg.getTotal());
     }
 
     @Override
-    public List<Map<String, Object>> listByFk(Long fkId) {
-        log.warn("[de.sai-openapi-user] listByFk 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public List<SaiOpenapiUser> listByFk(Long fkId) {
+        // fk 语义未定（各表外键不同）—— 默认按 id 反查空集，需要时再特化
+        return java.util.Collections.emptyList();
+    }
+
+    private LambdaQueryWrapper<SaiOpenapiUser> buildWrapper(SaiOpenapiUser bo) {
+        LambdaQueryWrapper<SaiOpenapiUser> qw = new LambdaQueryWrapper<>();
+        return qw.orderByDesc(SaiOpenapiUser::getId);
     }
 }

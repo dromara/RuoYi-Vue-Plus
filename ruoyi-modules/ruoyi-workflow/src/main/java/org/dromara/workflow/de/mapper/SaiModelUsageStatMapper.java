@@ -1,6 +1,7 @@
 package org.dromara.workflow.de.mapper;
 
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
+import org.dromara.workflow.de.domain.SaiModelUsageStat;
 
 import java.util.Map;
 
@@ -16,5 +17,5 @@ import java.util.Map;
  *
  * @author AIP
  */
-public interface SaiModelUsageStatMapper extends BaseMapperPlus<Map<String, Object>, Map<String, Object>> {
+public interface SaiModelUsageStatMapper extends BaseMapperPlus<SaiModelUsageStat, SaiModelUsageStat> {
 }
