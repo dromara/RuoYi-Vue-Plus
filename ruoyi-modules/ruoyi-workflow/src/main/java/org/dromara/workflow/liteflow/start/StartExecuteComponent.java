@@ -1,6 +1,8 @@
 package org.dromara.workflow.liteflow.start;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import com.yomahub.liteflow.annotation.LiteflowComponent;
 import com.yomahub.liteflow.core.NodeComponent;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +63,10 @@ public class StartExecuteComponent extends NodeComponent {
         FlowInstanceBizExt bizExt = context.getBizExt();
         bizExt.setInstanceId(instance.getId());
         bizExt.setBusinessId(instance.getBusinessId());
+        // D-009/AU-10：DE 绑定行同步落 agent_id（business_id 即 agentId 字符串，回填同规则）
+        if ("digital_employee.binding".equals(bizExt.getBusinessCode()) && StrUtil.isNotBlank(bizExt.getBusinessId())) {
+            bizExt.setAgentId(Convert.toLong(bizExt.getBusinessId(), null));
+        }
         flwInstanceBizExtMapper.saveOrUpdateByInstanceId(bizExt);
     }
 

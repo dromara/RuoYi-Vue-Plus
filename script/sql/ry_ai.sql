@@ -168,6 +168,7 @@ CREATE TABLE IF NOT EXISTS sai_agent_conversation
     id              BIGINT      NOT NULL AUTO_INCREMENT PRIMARY KEY,
     agent_id        BIGINT      NOT NULL COMMENT '智能体ID',
     user_id         BIGINT      NOT NULL COMMENT '用户ID',
+    instance_id     BIGINT      NULL COMMENT '锚定流程实例ID（创建时锚定，完成时直用——S-02 正解 D-009）',
     conversation_id VARCHAR(64) NOT NULL COMMENT '对话ID(UUID)',
     title           VARCHAR(255) COMMENT '对话标题',
     create_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

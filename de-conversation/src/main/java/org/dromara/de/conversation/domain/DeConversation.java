@@ -36,6 +36,11 @@ public class DeConversation implements Serializable {
     /** 用户 ID */
     private Long userId;
 
+    /**
+     * 锚定流程实例ID（创建时锚定，完成时直用——S-02 正解 D-009，消灭「猜最新实例」）
+     */
+    private Long instanceId;
+
     /** 对话 ID (UUID) */
     private String conversationId;
 

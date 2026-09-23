@@ -1,6 +1,7 @@
 package org.dromara.workflow.mapper;
 
 import cn.hutool.core.util.ObjectUtil;
+import org.apache.ibatis.annotations.Delete;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
 
@@ -38,22 +39,23 @@ public interface FlwInstanceBizExtMapper extends BaseMapperPlus<FlowInstanceBizE
 
     /**
      * 按照流程实例ID删除单个流程实例业务扩展
+     * ★ D-009（2026-09-22 · C 组预案风险1(i) 方案）：改**物理删**——原 @TableLogic 逻辑删的行
+     *   仍占 uk_inst_biz_code 槽位，解绑（软删）→ 再 createBinding（INSERT）会撞 1062 复活冲突；
+     *   本表行随实例存亡（父亡子无意义，无审计留痕需求），物理删即 AU-12「清理」的本义。
      *
      * @param instanceId 流程实例ID
      * @return 删除的行数
      */
-    default int deleteByInstId(Long instanceId) {
-        return this.lambda().eq(FlowInstanceBizExt::getInstanceId, instanceId).deleteCount();
-    }
+    @Delete("DELETE FROM flow_instance_biz_ext WHERE instance_id = #{instanceId}")
+    int deleteByInstId(Long instanceId);
 
     /**
-     * 按照流程实例ID批量删除流程实例业务扩展
+     * 按照流程实例ID批量删除流程实例业务扩展（物理删，同上）
      *
      * @param instanceIds 流程实例ID列表
      * @return 删除的行数
      */
-    default int deleteByInstIds(Collection<Long> instanceIds) {
-        return this.lambda().in(FlowInstanceBizExt::getInstanceId, instanceIds).deleteCount();
-    }
+    @Delete("<script>DELETE FROM flow_instance_biz_ext WHERE instance_id IN <foreach collection='instanceIds' item='id' open='(' separator=',' close=')'>#{id}</foreach></script>")
+    int deleteByInstIds(Collection<Long> instanceIds);
 
 }

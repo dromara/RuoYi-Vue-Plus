@@ -230,7 +230,10 @@ create table flow_instance_biz_ext (
     del_flag       char        default '0'      null comment '删除标志（0代表存在 1代表删除）',
     instance_id    bigint                       null comment '流程实例Id',
     business_id    varchar(255)                 null comment '业务Id',
-    PRIMARY KEY (id)
+    agent_id       bigint                       null comment '数字员工Id（仅 business_code=digital_employee.binding 行填充，D-009/AU-10）',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_inst_biz_code (instance_id, business_code),
+    KEY idx_agent (agent_id)
 )  ENGINE = InnoDB COMMENT '流程实例业务扩展表';
 
 -- ----------------------------

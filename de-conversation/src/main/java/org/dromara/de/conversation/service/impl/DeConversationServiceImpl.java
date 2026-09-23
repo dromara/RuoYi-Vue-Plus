@@ -74,6 +74,7 @@ public class DeConversationServiceImpl implements IDeConversationService {
         DeConversation conv = new DeConversation();
         conv.setAgentId(bo.getAgentId());
         conv.setUserId(userId);
+        conv.setInstanceId(bo.getInstanceId());   // S-02 正解（D-009）：创建时锚定实例，完成时直用
         conv.setConversationId(UUID.randomUUID().toString());
         conv.setTitle(bo.getTitle());
         conv.setCreateDt(LocalDateTime.now());
@@ -166,7 +167,10 @@ public class DeConversationServiceImpl implements IDeConversationService {
         //   assistant 消息已落库，运行态回写独立失败不回滚整事务（审查 LOW#2 处置）；
         //   E2E 的 de.ctx.last_response 断言是本降级路径的兜底探针。
         try {
-            Long instanceId = conversationMapper.findInstanceIdByBinding(conv.getAgentId(), LoginHelper.getUsername());
+            // S-02 正解：对话锚定优先；无锚定（历史会话）才回退 biz_ext 索引反查（D-009/AU-10 等值路径）
+            Long instanceId = conv.getInstanceId() != null
+                ? conv.getInstanceId()
+                : conversationMapper.findInstanceIdByBinding(conv.getAgentId(), userId);
             if (instanceId == null) {
                 log.warn("AC-11 回写跳过：agent={} user={}({}) 无本人发起的绑定实例（de.ctx.binding 反查 0 行）",
                     conv.getAgentId(), userId, LoginHelper.getUsername());

@@ -137,6 +137,7 @@ CREATE TABLE flow_instance
     id              int8         NOT NULL,
     definition_id   int8         NOT NULL,
     business_id     varchar(40)  NOT NULL,
+    agent_id bigint NULL,
     node_type       int2         NOT NULL,
     node_code       varchar(40)  NOT NULL,
     node_name       varchar(100) NULL,
@@ -520,3 +521,7 @@ INSERT INTO sys_dict_data VALUES (1761600000000000057, 10, '加签', 'sign', 'wf
 INSERT INTO sys_dict_data VALUES (1761600000000000058, 11, '减签', 'sign_off', 'wf_task_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '减签');
 INSERT INTO sys_dict_data VALUES (1761600000000000059, 11, '超时', 'timeout', 'wf_task_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '超时');
 
+
+-- D-009/AU-10：biz_ext 唯一键 + agent 反查索引
+CREATE UNIQUE INDEX IF NOT EXISTS uk_fi_biz_ext_inst_code ON flow_instance_biz_ext (instance_id, business_code);
+CREATE INDEX IF NOT EXISTS idx_fi_biz_ext_agent ON flow_instance_biz_ext (agent_id);

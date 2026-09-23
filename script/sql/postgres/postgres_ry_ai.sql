@@ -287,6 +287,7 @@ CREATE TABLE IF NOT EXISTS sai_agent_conversation
     id BIGSERIAL PRIMARY KEY,
     agent_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
+    instance_id BIGINT NULL,
     conversation_id VARCHAR(64) NOT NULL,
     title VARCHAR(255),
     create_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -297,6 +298,7 @@ CREATE TABLE IF NOT EXISTS sai_agent_conversation
 COMMENT ON TABLE sai_agent_conversation IS '智能体对话表';
 COMMENT ON COLUMN sai_agent_conversation.agent_id IS '智能体ID';
 COMMENT ON COLUMN sai_agent_conversation.user_id IS '用户ID';
+COMMENT ON COLUMN sai_agent_conversation.instance_id IS '锚定流程实例ID（S-02 正解 D-009）';
 COMMENT ON COLUMN sai_agent_conversation.conversation_id IS '对话ID(UUID)';
 COMMENT ON COLUMN sai_agent_conversation.title IS '对话标题';
 

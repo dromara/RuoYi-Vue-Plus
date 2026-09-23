@@ -411,9 +411,12 @@ CREATE TABLE flow_instance_biz_ext (
    del_flag       CHAR(1)       DEFAULT '0',
    instance_id    NUMBER(20),
    business_id    VARCHAR2(255)
+   agent_id       NUMBER(20)
 );
 
 alter table flow_instance_biz_ext add constraint pk_fi_biz_ext primary key (id);
+create unique index uk_fi_biz_ext_inst_code on flow_instance_biz_ext (instance_id, business_code);
+create index idx_fi_biz_ext_agent on flow_instance_biz_ext (agent_id);
 
 COMMENT ON TABLE flow_instance_biz_ext IS '流程实例业务扩展表';
 COMMENT ON COLUMN flow_instance_biz_ext.id  IS '主键id';
@@ -428,6 +431,7 @@ COMMENT ON COLUMN flow_instance_biz_ext.business_title  IS '业务标题';
 COMMENT ON COLUMN flow_instance_biz_ext.del_flag  IS '删除标志（0代表存在 1代表删除）';
 COMMENT ON COLUMN flow_instance_biz_ext.instance_id  IS '流程实例Id';
 COMMENT ON COLUMN flow_instance_biz_ext.business_id  IS '业务Id';
+COMMENT ON COLUMN flow_instance_biz_ext.agent_id IS '数字员工Id（D-009/AU-10，仅绑定行填充）';
 
 -- ----------------------------
 -- 请假单信息

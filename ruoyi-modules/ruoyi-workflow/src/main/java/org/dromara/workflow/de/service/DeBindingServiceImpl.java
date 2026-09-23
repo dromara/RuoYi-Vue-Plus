@@ -216,6 +216,7 @@ public class DeBindingServiceImpl implements IDeBindingService {
         row.setInstanceId(bo.getInstanceId());
         row.setBusinessCode(DeBindingConstants.BINDING_DIGITAL_EMPLOYEE);
         row.setBusinessId(String.valueOf(bo.getAgentId()));
+        row.setAgentId(bo.getAgentId());   // D-009/AU-10：绑定行落 agent_id（索引反查用）
         row.setBusinessTitle(bo.getBusinessTitle());
 
         // BR 18 项应用层校验集中入口（2026-09-19 BR 实装补全）
