@@ -22,9 +22,14 @@ import org.dromara.workflow.mapper.FlwTaskMapper;
 import org.dromara.workflow.mapper.FlwUserMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 工作台 WD 域服务实现。
@@ -66,23 +71,41 @@ public class DeWdServiceImpl implements IDeWdService {
         if (bo.getFlowIds() != null && !bo.getFlowIds().isEmpty()) {
             qw.in(FlowTask::getDefinitionId, bo.getFlowIds());
         }
+        // ★ H2-A 修复（2026-09-23 11:2x PDT · D-022）：dueBefore 语义错位 —— 改用 bo 的值而非 new Date()
         if (bo.getDueBefore() != null && !bo.getDueBefore().isBlank()) {
-            // 仅作粗筛（避免改底座 task 表结构）：create_time 早于 dueBefore 的全部展示
-            qw.le(FlowTask::getCreateTime, new java.util.Date());
+            try {
+                Date parsedDue = Date.from(LocalDate.parse(bo.getDueBefore())
+                    .atStartOfDay(ZoneId.systemDefault()).toInstant());
+                // 仅作粗筛（避免改底座 task 表结构）：create_time 早于 dueBefore 的全部展示
+                qw.le(FlowTask::getCreateTime, parsedDue);
+            } catch (Exception e) {
+                log.warn("[wd.filterTasks] dueBefore 解析失败（应为 ISO 日期）, 忽略此条件: {}", bo.getDueBefore());
+            }
         }
         List<FlowTask> tasks = flwTaskMapper.selectList(qw.orderByDesc(FlowTask::getUpdateTime));
-        List<DeWdTaskListVo> base = filterAndProject(tasks, bo.getUserId(), false);
+        // ★ H2-C 修复（2026-09-23 11:2x PDT · D-022）：assigneeId 不与 userId 重叠时,以 assigneeId 为责任归属目标
+        // （原代码 base.clear() 会把整张表清空，违反"单条过滤、保留其他"语义）
+        Long effectiveUserId = (bo.getAssigneeId() != null) ? bo.getAssigneeId() : bo.getUserId();
+        List<DeWdTaskListVo> base = filterAndProject(tasks, effectiveUserId, false);
 
+        // ★ H2-B 修复（2026-09-23 11:2x PDT · D-022）：projectKey 应读 flow_instance.business_id（按 BO 注释），
+        // 不能误作 instanceId 字符串子串 —— projectKey="1" 会误中 instanceId=1/10/11/100
         if (bo.getProjectKey() != null && !bo.getProjectKey().isBlank()) {
-            base.removeIf(vo -> vo.getInstanceId() == null
-                || !String.valueOf(vo.getInstanceId()).contains(bo.getProjectKey()));
+            List<FlowInstance> matchedInsts = flwInstanceMapper.selectList(
+                new LambdaQueryWrapper<FlowInstance>().like(FlowInstance::getBusinessId, bo.getProjectKey())
+            );
+            if (matchedInsts.isEmpty()) {
+                return Collections.emptyList();
+            }
+            Set<Long> matchedInstIds = new HashSet<>();
+            for (FlowInstance fi : matchedInsts) {
+                matchedInstIds.add(fi.getId());
+            }
+            base.removeIf(vo -> !matchedInstIds.contains(vo.getInstanceId()));
         }
         if (bo.getAgentId() != null) {
             base.removeIf(vo -> vo.getAgentStep() == null
                 || !vo.getAgentStep().equalsIgnoreCase(bo.getAgentId().toString()));
-        }
-        if (bo.getAssigneeId() != null && !bo.getAssigneeId().equals(bo.getUserId())) {
-            base.clear(); // 当前用户不是责任人的不展示
         }
         return base;
     }
@@ -102,10 +125,12 @@ public class DeWdServiceImpl implements IDeWdService {
     }
 
     /**
-     * 通用：把 flow_task 列表投射为 VO；根据 userId 找 flow_user(type='1') 的 processed_by
+     * 通用：把 flow_task 列表投射为 VO；根据 effectiveUserId 找 flow_user(type='1') 的 processed_by
      * 是否匹配，并解析 flow_instance.variable 中的 de.ctx.task.step。
+     *
+     * @param effectiveUserId 责任归属目标 —— 默认 = 调用方的 userId；被 filterTasks 的 assigneeId 覆盖时 = assigneeId
      */
-    private List<DeWdTaskListVo> filterAndProject(List<FlowTask> tasks, Long userId, boolean actionOnly) {
+    private List<DeWdTaskListVo> filterAndProject(List<FlowTask> tasks, Long effectiveUserId, boolean actionOnly) {
         if (tasks == null || tasks.isEmpty()) {
             return Collections.emptyList();
         }
@@ -121,7 +146,7 @@ public class DeWdServiceImpl implements IDeWdService {
                     .eq(FlowUser::getAssociated, task.getId())
                     .eq(FlowUser::getType, DeP1Constants.USER_TYPE_APPROVER)
             );
-            if (u == null || !String.valueOf(userId).equals(u.getProcessedBy())) {
+            if (u == null || !String.valueOf(effectiveUserId).equals(u.getProcessedBy())) {
                 if (!actionOnly) {
                     continue;
                 }

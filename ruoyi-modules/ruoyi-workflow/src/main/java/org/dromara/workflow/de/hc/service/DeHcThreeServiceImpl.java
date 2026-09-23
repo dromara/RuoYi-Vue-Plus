@@ -10,9 +10,11 @@ import org.dromara.warm.flow.orm.entity.FlowNode;
 import org.dromara.warm.flow.orm.mapper.FlowNodeMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * HC-03 三分类位落点服务实现（2026-09-23）。
@@ -39,6 +41,27 @@ public class DeHcThreeServiceImpl implements IDeHcThreeService {
     private static final String COOPERATE_PREFIX = "cooperate:";
     private static final String DELEGATE_PREFIX = "delegate:";
     private static final String SEP = "@@";
+
+    /**
+     * H-3 安全修复（2026-09-23）：白名单正则 —— 用户输入 token 必须匹配此格式才允许拼装。
+     *
+     * <p>原 {@code buildPermissionFlag} 直接拼接 {@code copyUsers}，攻击者可注入
+     * {@code "alice@@cooperate:root"} ⇒ 解析层按 {@code @@} split 后第 2 段以
+     * {@code cooperate:} 开头 ⇒ 被识别为合法 cooperate 段 ⇒ 越权流转到 root 角色可触达的所有节点。
+     *
+     * <p>白名单 = 用户名/角色 key/部门 key 的合理字符集：
+     * <ul>
+     *   <li>字母数字</li>
+     *   <li>{@code _} {@code @} {@code -} {@code .}（用户名/邮箱/部门编号常见）</li>
+     *   <li>不含 {@code @@} {@code :} 空白（已通过 splitCsv 前置逗号分隔）</li>
+     * </ul>
+     */
+    private static final Pattern SAFE_TOKEN = Pattern.compile("^[a-zA-Z0-9_@\\-\\.]+$");
+
+    /** 最大 token 数（每个 CSV 拆分后）= 防止 DOS（巨型 list） */
+    private static final int MAX_TOKEN_COUNT = 200;
+    /** 单 token 最大长度 = 80 字符（DDL varchar(80) 余量） */
+    private static final int MAX_TOKEN_LEN = 80;
 
     private final FlowNodeMapper flowNodeMapper;
 
@@ -69,9 +92,14 @@ public class DeHcThreeServiceImpl implements IDeHcThreeService {
         }
         String flag;
         if (bo.getPermissionFlag() != null && !bo.getPermissionFlag().isBlank()) {
-            flag = bo.getPermissionFlag();
+            // H-3 修复：传入整段 permission_flag 时仍要走白名单格式校验
+            flag = sanitizeWholeFlag(bo.getPermissionFlag());
         } else {
-            flag = buildPermissionFlag(bo.getCopyUsers(), bo.getCooperateRoles(), bo.getDelegateDepts());
+            // H-3 修复：分别对 copyUsers / cooperateRoles / delegateDepts 做转义 + 白名单
+            flag = buildPermissionFlag(
+                sanitizeCsvTokens("copyUsers", bo.getCopyUsers()),
+                sanitizeCsvTokens("cooperateRoles", bo.getCooperateRoles()),
+                sanitizeCsvTokens("delegateDepts", bo.getDelegateDepts()));
         }
         node.setPermissionFlag(flag);
         // 用 LambdaUpdateWrapper 限定 id，避免 updateById 对所有列全更新
@@ -82,6 +110,77 @@ public class DeHcThreeServiceImpl implements IDeHcThreeService {
     }
 
     // ===== 内部辅助 =====
+
+    /**
+     * 清洗 CSV token 输入（H-3 修复后 · 2026-09-23）。
+     *
+     * <p>每个 token 必须匹配 {@link #SAFE_TOKEN}：
+     * <ul>
+     *   <li>含 {@code @@} / {@code :} / 空白 / 其他特殊字符 ⇒ 拒绝（抛 ServiceException）</li>
+     *   <li>超过 {@link #MAX_TOKEN_LEN} 字符 ⇒ 拒绝</li>
+     *   <li>CSV 拆分后 token 数超过 {@link #MAX_TOKEN_COUNT} ⇒ 拒绝（防 DOS）</li>
+     * </ul>
+     */
+    private String sanitizeCsvTokens(String fieldName, String csv) {
+        if (csv == null || csv.isBlank()) {
+            return null;
+        }
+        // 1) 拒绝显式的 @@（即使在单 token 内也是 H-3 攻击 payload 的载体）
+        if (csv.contains(SEP)) {
+            throw new ServiceException(fieldName + " 禁止包含分隔符 @@，请用半角逗号分隔 token");
+        }
+        // 2) 拒绝显式的 :（即使在单 token 内也是 H-3 攻击 payload 的载体）
+        if (csv.contains(":")) {
+            throw new ServiceException(fieldName + " 禁止包含冒号 :，前缀由系统拼装");
+        }
+        // 3) 拆分 + 白名单
+        String[] tokens = csv.split(",");
+        if (tokens.length > MAX_TOKEN_COUNT) {
+            throw new ServiceException(fieldName + " token 数超限（最多 " + MAX_TOKEN_COUNT + "）");
+        }
+        List<String> safe = new ArrayList<>(tokens.length);
+        for (String t : tokens) {
+            String trimmed = t.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            if (trimmed.length() > MAX_TOKEN_LEN) {
+                throw new ServiceException(fieldName + " 单 token 超长（≤" + MAX_TOKEN_LEN + " 字符）");
+            }
+            if (!SAFE_TOKEN.matcher(trimmed).matches()) {
+                throw new ServiceException(fieldName + " 含非法字符 token=\"" + trimmed
+                    + "\"（仅允许字母数字 + _ @ - .）");
+            }
+            safe.add(trimmed);
+        }
+        return String.join(",", safe);
+    }
+
+    /**
+     * 整段 permission_flag 白名单校验（H-3 修复后 · 2026-09-23）。
+     *
+     * <p>格式必须匹配 {@code ^(copy|cooperate|delegate):[a-zA-Z0-9_,@\\-\\.]+(@@(copy|cooperate|delegate):[a-zA-Z0-9_,@\\-\\.]+)*$}
+     * —— 每段必须以三个合法前缀之一开头，token 不含 {@code @@} / {@code :}。
+     */
+    private static final Pattern WHOLE_FLAG = Pattern.compile(
+        "^(copy|cooperate|delegate):[a-zA-Z0-9_@\\-\\.]+"
+        + "(@@(copy|cooperate|delegate):[a-zA-Z0-9_@\\-\\.]+)*$");
+
+    private String sanitizeWholeFlag(String flag) {
+        String trimmed = flag.trim();
+        if (trimmed.length() > 200) {
+            throw new ServiceException("permission_flag 超过 200 字符（DDL varchar(200)）");
+        }
+        if (!WHOLE_FLAG.matcher(trimmed).matches()) {
+            throw new ServiceException("permission_flag 格式非法：必须 (copy|cooperate|delegate):token"
+                + " 段以 @@ 分隔；token 仅允许字母数字 + _ @ - .；不允许空白 / 多余 : / 多余 @@");
+        }
+        // 190 字符业务层上限（DDL 200 字符留 10 字符余量给 race condition 写入）
+        if (trimmed.length() > 190) {
+            throw new ServiceException("permission_flag 业务上限 ≤190 字符（DDL 200 字符留 10 字符余量）");
+        }
+        return trimmed;
+    }
 
     private String buildPermissionFlag(String copyUsers, String cooperateRoles, String delegateDepts) {
         StringBuilder sb = new StringBuilder();
@@ -119,6 +218,11 @@ public class DeHcThreeServiceImpl implements IDeHcThreeService {
                 cooperate = splitCsv(seg.substring(COOPERATE_PREFIX.length()));
             } else if (seg.startsWith(DELEGATE_PREFIX)) {
                 delegate = splitCsv(seg.substring(DELEGATE_PREFIX.length()));
+            } else {
+                // H-3 联动修复（L-2）：拒绝未识别 prefix 的段（防止 H-3 攻击 payload 残留静默）
+                log.warn("[hc.threeCategory.parse] 未识别的 permission_flag 段：{}", seg);
+                throw new ServiceException("permission_flag 包含未识别前缀段：" + seg
+                    + "（仅允许 copy/cooperate/delegate）");
             }
         }
         vo.setCopyUsers(copy == null ? Collections.emptyList() : copy);

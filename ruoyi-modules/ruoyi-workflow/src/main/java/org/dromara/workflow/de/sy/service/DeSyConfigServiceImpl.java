@@ -119,7 +119,8 @@ public class DeSyConfigServiceImpl implements IDeSyConfigService {
         entity.setConfigName(bo.getConfigName() == null ? entity.getConfigName() : bo.getConfigName());
         entity.setConfigValue(bo.getConfigValue() == null ? entity.getConfigValue() : bo.getConfigValue());
         entity.setConfigType(bo.getConfigType() == null ? entity.getConfigType() : bo.getConfigType());
-        entity.setRemark(bo.getRemark());
+        // ★ H3 修复（2026-09-23 11:2x PDT · D-022）：null-aware，与上方 3 行同模式，保留 PUT 部分更新语义
+        entity.setRemark(bo.getRemark() == null ? entity.getRemark() : bo.getRemark());
         entity.setUpdateTime(new Date());
         int rows = deSysConfigMapper.updateById(entity);
         log.info("[sy.config.edit] configId={} rows={}", bo.getConfigId(), rows);

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.workflow.de.domain.DeSysNotice;
 import org.dromara.workflow.de.mapper.DeSysNoticeMapper;
 import org.dromara.workflow.de.nc.domain.bo.DeNcNoticeBo;
@@ -28,6 +29,17 @@ import java.util.List;
  *
  * <p><b>判别力</b>：新增/更新/删除后通过 SELECT 实测行数；列表通过 status 过滤
  * 与模糊查询验证。
+ *
+ * <p><b>H-5 安全修复（2026-09-23）</b>：
+ * <ul>
+ *   <li>{@link #add(DeNcNoticeBo)} 改用显式字段赋值（白名单）替代
+ *       {@code BeanUtils.copyProperties(bo, entity)}，避免前端 JSON 携带
+ *       {@code createBy} / {@code createTime} 等审计字段伪造身份。</li>
+ *   <li>{@code createBy} / {@code createTime} / {@code updateBy} / {@code updateTime}
+ *       全部由服务端强制重写（{@link LoginHelper#getUsername()} + {@link LoginHelper#getUserId()} + {@code new Date()}）。</li>
+ *   <li>{@link #edit(DeNcNoticeBo)} 补强：{@code updateBy} 必填（先前依赖 BO 不暴露该字段，未实测）。</li>
+ *   <li>{@link #remove(Long[])} 加属主校验：仅 admin 可跨用户删；非 admin 仅删自己创建的公告。</li>
+ * </ul>
  *
  * @author AIP
  * @since 2026-09-23
@@ -70,15 +82,22 @@ public class DeNcNoticeServiceImpl implements IDeNcNoticeService {
         if (bo.getNoticeTitle() == null || bo.getNoticeTitle().isBlank()) {
             throw new ServiceException("noticeTitle 必填");
         }
+        // H-5 修复：白名单显式赋值（替代 BeanUtils.copyProperties）
         DeSysNotice entity = new DeSysNotice();
-        BeanUtils.copyProperties(bo, entity);
-        if (entity.getStatus() == null) {
-            entity.setStatus("0");
-        }
-        entity.setCreateTime(new Date());
-        entity.setUpdateTime(entity.getCreateTime());
+        entity.setNoticeTitle(bo.getNoticeTitle());
+        entity.setNoticeType(bo.getNoticeType());
+        entity.setNoticeContent(bo.getNoticeContent());
+        entity.setStatus(bo.getStatus() == null ? "0" : bo.getStatus());
+        entity.setRemark(bo.getRemark());
+        // H-5 修复：审计字段强制服务端重写（不可从前端伪造）
+        Date now = new Date();
+        entity.setCreateTime(now);
+        entity.setUpdateTime(now);
+        entity.setCreateBy(LoginHelper.getUserId());
+        entity.setUpdateBy(LoginHelper.getUserId());
         deSysNoticeMapper.insert(entity);
-        log.info("[nc.notice.add] noticeId={} title={}", entity.getNoticeId(), entity.getNoticeTitle());
+        log.info("[nc.notice.add] noticeId={} title={} createBy={}",
+            entity.getNoticeId(), entity.getNoticeTitle(), entity.getCreateBy());
         return entity.getNoticeId();
     }
 
@@ -91,14 +110,24 @@ public class DeNcNoticeServiceImpl implements IDeNcNoticeService {
         if (entity == null) {
             throw new ServiceException("公告不存在");
         }
+        // H-5 修复：编辑前校验属主（非 admin 仅改自己创建的公告）
+        if (!LoginHelper.isSuperAdmin()) {
+            Long currentUserId = LoginHelper.getUserId();
+            if (entity.getCreateBy() == null || !currentUserId.equals(entity.getCreateBy())) {
+                throw new ServiceException("仅公告创建者或 admin 可编辑该公告");
+            }
+        }
         entity.setNoticeTitle(bo.getNoticeTitle());
         entity.setNoticeType(bo.getNoticeType());
         entity.setNoticeContent(bo.getNoticeContent());
         entity.setStatus(bo.getStatus() == null ? entity.getStatus() : bo.getStatus());
         entity.setRemark(bo.getRemark());
         entity.setUpdateTime(new Date());
+        // H-5 修复：审计字段 update_by 强制服务端重写（不可从前端伪造）
+        entity.setUpdateBy(LoginHelper.getUserId());
         int rows = deSysNoticeMapper.updateById(entity);
-        log.info("[nc.notice.edit] noticeId={} rows={}", bo.getNoticeId(), rows);
+        log.info("[nc.notice.edit] noticeId={} rows={} updateBy={}",
+            bo.getNoticeId(), rows, entity.getUpdateBy());
         return rows;
     }
 
@@ -107,8 +136,23 @@ public class DeNcNoticeServiceImpl implements IDeNcNoticeService {
         if (noticeIds == null || noticeIds.length == 0) {
             throw new ServiceException("noticeIds 必填");
         }
-        int rows = deSysNoticeMapper.deleteByIds(java.util.Arrays.asList(noticeIds));
-        log.info("[nc.notice.remove] ids={} rows={}", (Object[]) noticeIds, rows);
+        // H-5 修复：删除前校验属主（非 admin 仅删自己创建的公告）
+        int rows;
+        if (LoginHelper.isSuperAdmin()) {
+            rows = deSysNoticeMapper.deleteByIds(java.util.Arrays.asList(noticeIds));
+        } else {
+            Long currentUserId = LoginHelper.getUserId();
+            rows = deSysNoticeMapper.delete(
+                new LambdaQueryWrapper<DeSysNotice>()
+                    .in(DeSysNotice::getNoticeId, java.util.Arrays.asList(noticeIds))
+                    .eq(DeSysNotice::getCreateBy, currentUserId));
+            if (rows < noticeIds.length) {
+                log.warn("[nc.notice.remove] 部分公告删除被拒（非 admin 仅删本人）："
+                    + "requested={} deleted={}", noticeIds.length, rows);
+            }
+        }
+        log.info("[nc.notice.remove] ids={} rows={} operator={}",
+            (Object[]) noticeIds, rows, LoginHelper.getUserId());
         return rows;
     }
 

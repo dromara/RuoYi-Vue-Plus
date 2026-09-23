@@ -12,9 +12,11 @@ import org.dromara.workflow.de.sy.client.SnailJobLogHttpClient;
 import org.dromara.workflow.de.sy.domain.bo.DeSyLogQueryBo;
 import org.dromara.workflow.de.sy.domain.vo.DeSyLogVo;
 import org.dromara.workflow.de.sy.service.IDeSyLogService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -77,11 +79,20 @@ public class DeSyLogController extends BaseController {
         return R.ok();
     }
 
+    /**
+     * 清理操作日志（H-2 修复后 · 2026-09-23）。
+     *
+     * <p>权限两层校验：{@code @SaCheckPermission}（拥有 perm）→
+     * service 层 {@code LoginHelper.isSuperAdmin()}（与底座 RuoYiConfig.isAdminAllowed 对齐）。
+     *
+     * <p>必须传 {@code cutoffDate}（yyyy-MM-dd HH:mm:ss），否则
+     * service 抛 {@code ServiceException("cleanOperLog 必须传入 cutoffDate...")}。
+     */
     @Log(title = "操作日志", businessType = BusinessType.CLEAN)
     @SaCheckPermission("workflow:de:sy-log:remove")
     @DeleteMapping("/clean")
-    public R<Void> clean() {
-        logService.cleanOperLog();
+    public R<Void> clean(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date cutoffDate) {
+        logService.cleanOperLog(cutoffDate);
         return R.ok();
     }
 

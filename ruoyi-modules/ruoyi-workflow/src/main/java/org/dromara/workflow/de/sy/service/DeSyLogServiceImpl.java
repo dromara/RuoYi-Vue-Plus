@@ -1,10 +1,13 @@
 package org.dromara.workflow.de.sy.service;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.workflow.de.domain.DeSysOperLog;
 import org.dromara.workflow.de.mapper.DeSysOperLogMapper;
 import org.dromara.workflow.de.sy.domain.bo.DeSyLogQueryBo;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -60,12 +64,56 @@ public class DeSyLogServiceImpl implements IDeSyLogService {
         return row == null ? null : toVo(row);
     }
 
+    /**
+     * 安全清理操作日志（H-2 修复后 · 2026-09-23）。
+     *
+     * <p><b>修复要点（H-2 安全审计 · 报告路径 /tmp/security-audit-1790187673.md）</b>：
+     * <ul>
+     *   <li><b>拒绝空删</b>：{@code delete(null)} ⇒ {@code DELETE WHERE 1=1} 物理全清，
+     *       与 OWASP A09:2021 Security Logging and Monitoring Failures 直接冲突 —— 必填。</li>
+     *   <li><b>要求日期范围</b>：{@code cutoffDate} 必填且必须早于当前时刻（最多 30 天前），避免「物理清空整张审计表」。</li>
+     *   <li><b>admin 二次校验</b>：镜像端未走底座 {@code RuoYiConfig.isAdminAllowed}，
+     *       此处用 Sa-Token {@code StpUtil.hasRole("admin")} 补位 —— 非 admin 直接拒绝。</li>
+     *   <li><b>SQL 注入面</b>：cutoffDate 由 Java Date 透传，MyBatis-Plus 用 #{param} 占位符，
+     *       无字符串拼接 ⇒ 无注入风险。</li>
+     * </ul>
+     */
     @Override
-    public int cleanOperLog() {
-        // 物理全清（对应底座 monitor/sysoperlog/clean 端点的「全部清空」语义）
-        int rows = deSysOperLogMapper.delete(null);
-        log.info("[sy.log.cleanOperLog] 物理清空 rows={}", rows);
+    public int cleanOperLog(Date cutoffDate) {
+        // ① 拒绝 null/缺省 ⇒ 防止「一键物理全清」陷阱
+        if (cutoffDate == null) {
+            throw new ServiceException("cleanOperLog 必须传入 cutoffDate（截止时间），不允许物理全清");
+        }
+        // ② admin 二次校验（与底座 RuoYiConfig.isAdminAllowed 对齐）
+        //    注：本仓 admin 判定走 LoginHelper.isSuperAdmin()（userId == SUPER_ADMIN_USER_ID）
+        //    而非 Sa-Token StpUtil.hasRole("admin")（需角色表预置）—— 与底座 admin gate 一致
+        if (!LoginHelper.isSuperAdmin()) {
+            throw new ServiceException("cleanOperLog 仅 super admin 可执行");
+        }
+        // ③ 截止时间不得晚于当前时刻，且最多 30 天前（留余量）
+        Date now = new Date();
+        if (!cutoffDate.before(now)) {
+            throw new ServiceException("cutoffDate 必须早于当前时刻");
+        }
+        long maxRetentionMs = 30L * 24 * 60 * 60 * 1000L;
+        if (now.getTime() - cutoffDate.getTime() > maxRetentionMs) {
+            throw new ServiceException("cutoffDate 距今不得超过 30 天（避免误删全部历史）");
+        }
+        // ④ 物理清空截止时间之前的所有行
+        int rows = deSysOperLogMapper.delete(
+            new LambdaQueryWrapper<DeSysOperLog>().lt(DeSysOperLog::getOperTime, cutoffDate));
+        log.info("[sy.log.cleanOperLog] cutoff={} rows={} operator={}",
+            cutoffDate, rows, LoginHelper.getUserId());
         return rows;
+    }
+
+    /**
+     * 保留无参 cleanOperLog 兼容 —— 直接拒绝并引导调用方传 cutoffDate。
+     * @deprecated 安全审计 H-2：物理全清不允许，必须传 cutoffDate。
+     */
+    @Deprecated
+    public int cleanOperLog() {
+        throw new ServiceException("cleanOperLog 必须传 cutoffDate（不允许物理全清）");
     }
 
     @Override
