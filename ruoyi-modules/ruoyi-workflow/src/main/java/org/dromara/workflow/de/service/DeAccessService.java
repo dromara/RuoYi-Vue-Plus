@@ -49,6 +49,7 @@ public class DeAccessService {
     private final FlowUserMapper flowUserMapper;
     private final FlowHisTaskMapper flowHisTaskMapper;
     private final FlwInstanceMapper flwInstanceMapper;
+    private final ISaiObjectAclService saiObjectAclService;
 
     /**
      * T-3 判定：当前登录用户能否读该对话记录的正文。
@@ -60,6 +61,11 @@ public class DeAccessService {
         Long userId = LoginHelper.getUserId();
         // ① 属主（S-05）
         if (record.getUserId() != null && record.getUserId().equals(userId)) {
+            return true;
+        }
+        // ★ D-011（AU-03 方案 B）：对象级 ACL 命中即放行（加宽不替换）
+        if (saiObjectAclService.hasAccess("conversation_record", record.getId(), userId, "read", null)) {
+            log.info("[T3] ACL hit: record={} userId={}", record.getId(), userId);
             return true;
         }
         // ② T-3 双条件：实例内（锚定）+ 任务关系
