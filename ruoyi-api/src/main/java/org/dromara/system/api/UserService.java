@@ -22,6 +22,20 @@ public interface UserService {
     String selectUserNameById(Long userId);
 
     /**
+     * 通过用户名查询用户ID（D-030 安全修复 · 2026-09-23）。
+     *
+     * <p>原 {@code flow_user.processed_by} FK 校验在 HR-04 走的是占位符
+     * （见 {@code DeHrFourServiceImpl.assertUserExists} D-023 H-4）；
+     * 现在必须做真校验。{@code UserService.selectUserNameById} 是 userId→userName，
+     * 反向（userName→userId）原本没有 ⇒ 本节新增。SysUserServiceImpl 复用
+     * {@code selectUserByUserName}（ISysUserService 已存在）实现。
+     *
+     * @param userName 用户名
+     * @return 用户ID；不存在时返回 null
+     */
+    Long selectUserIdByName(String userName);
+
+    /**
      * 通过用户ID查询用户昵称
      *
      * @param userId 用户ID

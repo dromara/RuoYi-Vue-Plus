@@ -575,6 +575,24 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     }
 
     /**
+     * 通过用户名查询用户ID（D-030 安全修复 · 2026-09-23）。
+     *
+     * <p>复用 ISysUserService.selectUserByUserName 实现，反查 sys_user.user_name。
+     * 不存在时返回 null（与 UserService.selectUserNameById 行为对齐）。
+     *
+     * @param userName 用户名
+     * @return 用户ID；不存在时返回 null
+     */
+    @Override
+    public Long selectUserIdByName(String userName) {
+        if (userName == null || userName.isBlank()) {
+            return null;
+        }
+        SysUserVo user = selectUserByUserName(userName);
+        return user == null ? null : user.getUserId();
+    }
+
+    /**
      * 通过用户ID查询用户昵称
      *
      * @param userId 用户ID

@@ -14,8 +14,10 @@ import org.dromara.workflow.de.constants.DeP1Constants;
 import org.dromara.workflow.de.hr.domain.bo.DeHrThreeTierBo;
 import org.dromara.workflow.de.hr.domain.vo.DeHrThreeTierVo;
 import org.dromara.workflow.mapper.FlwInstanceMapper;
+import org.dromara.workflow.mapper.FlwTaskMapper;
 import org.dromara.workflow.mapper.FlwUserMapper;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
+import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.warm.flow.orm.entity.FlowUser;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +44,7 @@ public class DeHrFourServiceImpl implements IDeHrFourService {
 
     private final FlwUserMapper flwUserMapper;
     private final FlwInstanceMapper flwInstanceMapper;
+    private final FlwTaskMapper flwTaskMapper;
     private final ObjectMapper objectMapper;
     private final UserService userService;
 
@@ -192,33 +195,24 @@ public class DeHrFourServiceImpl implements IDeHrFourService {
     }
 
     /**
-     * 校验 user_name 存在于 sys_user（H-4 修复 · 2026-09-23）。
+     * 校验 user_name 存在于 sys_user（D-030 修复 · 2026-09-23）。
      *
      * <p>{@code flow_user.processed_by} DDL = {@code varchar(80)}，无 FK 约束
      * ⇒ 服务层必须先确认 user 存在。
      *
-     * <p>UserService.selectUserNameById(Long) 接受 userId，但 processed_by 是 username
-     * —— 走 username → userId 反查不可行（UserService 无该方法）。
-     * 用 {@code Map<String, UserDTO>} 缓存不能用作 hot path。
-     *
-     * <p><b>实施选择</b>：通过 ruoyi-api RemoteUserService 走 RPC 调用。
-     * 本服务运行时必须有 ruoyi-user 模块在线（admin 启动顺序保证）。
+     * <p>D-023 H-4 留下的占位符（D-023 旧版本仅调 {@code selectNicknameById(0L)} sentinel，
+     * 是 fail-soft placeholder = 不可接受）已替换为走
+     * {@link UserService#selectUserIdByName(String)} 真反查 sys_user.user_name；
+     * UserService 新方法见 {@code ruoyi-api/.../UserService.java} D-030 注释。
+     * 不存在时抛 {@link ServiceException}，阻断主流程（不再 fail-soft）。
      */
     private void assertUserExists(String username) {
-        try {
-            // 注：UserService.selectById 接受 userId；此处 username → userId 反查走
-            // ruoyi-api 的 RemoteUserService（实现为 HTTP 调用 ruoyi-user）。
-            // 简化路径：通过用户名解析（保留接口，将来扩展）
-            String nick = userService.selectNicknameById(0L); // sentinel；真实反查走 selectListByIds + 本地缓存
-            // 上面是 placeholder —— 真实校验由调用方的 LoginHelper.getUsername() + admin 路径承担
-            // 本服务不直接做 username → userId 反查（避免 RemoteUserService 重复调用）
-            if (nick == null) {
-                log.debug("[hr.threeTier.assertUserExists] username={} (placeholder; 真实校验走 LoginHelper)", username);
-            }
-        } catch (Exception e) {
-            log.warn("[hr.threeTier.assertUserExists] 远程用户服务不可达：{}", e.getMessage());
-            // fail-soft：不阻断 —— processed_by FK 校验降级为「日志记录 + 长度上限」
-            // （H-4 推荐：HR-04 admin 业务高，FK 校验由调用方业务约束保证）
+        if (username == null || username.isBlank()) {
+            return;
+        }
+        Long userId = userService.selectUserIdByName(username);
+        if (userId == null) {
+            throw new ServiceException("username 不存在: " + username);
         }
     }
 
@@ -243,21 +237,31 @@ public class DeHrFourServiceImpl implements IDeHrFourService {
     }
 
     /**
-     * taskId 归属校验（H-4 修复 · 2026-09-23）。
+     * taskId 归属校验（D-030 修复 · 2026-09-23）。
      *
      * <p>{@code flow_user.associated} 存 taskId，必须确认 taskId 属于当前 instanceId
      * —— 防止攻击者拿任意 taskId + 任意 instanceId 跨实例改写三分位。
      *
-     * <p>实现：通过 {@code flow_task.id} → {@code flow_task.instance_id} 校验。
-     * 本类未注入 FlwTaskMapper —— 直接查 flow_task DDL 会越界。
-     * 折中：仅校验 taskId ≠ null 且正整数，instance 归属由 warm-flow 引擎保证。
+     * <p>D-023 H-4 旧版本因未注入 FlwTaskMapper 仅做了 taskId 正整数校验（stub）。
+     * 本节 D-030 注入 {@link FlwTaskMapper}，真反查 {@code flow_task.instance_id}：
+     * 不存在或 instanceId 不匹配时直接抛 {@link ServiceException} 阻断主流程。
      */
     private void assertTaskBelongsToInstance(Long taskId, Long instanceId) {
         if (taskId == null || taskId <= 0) {
             throw new ServiceException("taskId 非法");
         }
-        // 注：完整的 taskId → instance_id 反查需 FlwTaskMapper，本类未注入 —— 留待 owner 接入
-        // 阶段 2/3 时补（按 D-008 §① AU-12 删除路径补齐同口径，OW 决议授权）
+        if (instanceId == null || instanceId <= 0) {
+            throw new ServiceException("instanceId 非法");
+        }
+        FlowTask flowTask = flwTaskMapper.selectById(taskId);
+        if (flowTask == null) {
+            throw new ServiceException("taskId 不存在: " + taskId);
+        }
+        Long taskInstanceId = flowTask.getInstanceId();
+        if (taskInstanceId == null || !taskInstanceId.equals(instanceId)) {
+            throw new ServiceException("taskId 不属于该 instance（taskId=" + taskId
+                + " taskInstanceId=" + taskInstanceId + " instanceId=" + instanceId + "）");
+        }
     }
 
     private String readThreeTierFromVariable(String variable) {

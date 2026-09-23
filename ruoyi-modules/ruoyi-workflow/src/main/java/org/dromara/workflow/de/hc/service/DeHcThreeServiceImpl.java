@@ -157,10 +157,15 @@ public class DeHcThreeServiceImpl implements IDeHcThreeService {
     }
 
     /**
-     * 整段 permission_flag 白名单校验（H-3 修复后 · 2026-09-23）。
+     * 整段 permission_flag 白名单校验（H-3 修复后 · 2026-09-23 · D-030 加强）。
      *
      * <p>格式必须匹配 {@code ^(copy|cooperate|delegate):[a-zA-Z0-9_,@\\-\\.]+(@@(copy|cooperate|delegate):[a-zA-Z0-9_,@\\-\\.]+)*$}
-     * —— 每段必须以三个合法前缀之一开头，token 不含 {@code @@} / {@code :}。
+     * —— 每段必须以三个合法前缀之一开头，token 不含 {@code :}。
+     *
+     * <p><b>D-030 修复</b>：正则本身无法禁止 token body 含 {@code @@}
+     * （{@code copy:user@@@@other} 整体作为单 token 命中正则 —— {@code @} 在 char class 内）。
+     * 故 post-validation 增加 {@code @@} 拒绝：拆分后逐段扫，token body 不含 {@code @@}。
+     * 攻击 payload {@code copy:user@@@@other} 直接拒绝。
      */
     private static final Pattern WHOLE_FLAG = Pattern.compile(
         "^(copy|cooperate|delegate):[a-zA-Z0-9_@\\-\\.]+"
@@ -174,6 +179,19 @@ public class DeHcThreeServiceImpl implements IDeHcThreeService {
         if (!WHOLE_FLAG.matcher(trimmed).matches()) {
             throw new ServiceException("permission_flag 格式非法：必须 (copy|cooperate|delegate):token"
                 + " 段以 @@ 分隔；token 仅允许字母数字 + _ @ - .；不允许空白 / 多余 : / 多余 @@");
+        }
+        // ★ D-030 修复：post-validation 拒 @@（正则允许 @ 在 token 内，攻击者用 @@@@ 串绕过）
+        // 拆分后逐段扫，token body 不含 @@（与 sanitizeCsvTokens 对齐 SAFE_TOKEN shape）
+        for (String seg : trimmed.split(SEP)) {
+            int colonIdx = seg.indexOf(':');
+            if (colonIdx < 0) {
+                throw new ServiceException("permission_flag 段无冒号分隔符：" + seg);
+            }
+            String tokenBody = seg.substring(colonIdx + 1);
+            if (tokenBody.contains(SEP)) {
+                throw new ServiceException("permission_flag token 含 @@：\"" + tokenBody
+                    + "\"（D-030 修复 · 防 parser differential 攻击）");
+            }
         }
         // 190 字符业务层上限（DDL 200 字符留 10 字符余量给 race condition 写入）
         if (trimmed.length() > 190) {

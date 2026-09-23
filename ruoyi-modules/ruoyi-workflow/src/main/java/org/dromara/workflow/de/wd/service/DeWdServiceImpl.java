@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.workflow.de.constants.DeP1Constants;
 import org.dromara.workflow.de.constants.DeVariableConstants;
 import org.dromara.workflow.de.domain.SaiAgent;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -85,7 +87,21 @@ public class DeWdServiceImpl implements IDeWdService {
         List<FlowTask> tasks = flwTaskMapper.selectList(qw.orderByDesc(FlowTask::getUpdateTime));
         // ★ H2-C 修复（2026-09-23 11:2x PDT · D-022）：assigneeId 不与 userId 重叠时,以 assigneeId 为责任归属目标
         // （原代码 base.clear() 会把整张表清空，违反"单条过滤、保留其他"语义）
-        Long effectiveUserId = (bo.getAssigneeId() != null) ? bo.getAssigneeId() : bo.getUserId();
+        // ★ D-030 修复（2026-09-23 14:0x PDT）：service 层 IDOR 防御 —— 非 admin 调用方传 assigneeId
+        //   ≠ 自 userId 时直接拒绝；assigneeId 是责任归属覆盖能力，本应由 admin 专用。
+        //   否则 assigneeId 被忽略 = 仅按 userId 过滤（避免越权查看他人待办）。
+        Long callerUserId = LoginHelper.getUserId();
+        Long effectiveUserId;
+        if (bo.getAssigneeId() != null && !Objects.equals(bo.getAssigneeId(), bo.getUserId())) {
+            if (!LoginHelper.isSuperAdmin()) {
+                throw new ServiceException(
+                    "assigneeId 仅 admin 可覆盖 userId（bo.assigneeId=" + bo.getAssigneeId()
+                        + " bo.userId=" + bo.getUserId() + " caller=" + callerUserId + "）");
+            }
+            effectiveUserId = bo.getAssigneeId();
+        } else {
+            effectiveUserId = bo.getUserId();
+        }
         List<DeWdTaskListVo> base = filterAndProject(tasks, effectiveUserId, false);
 
         // ★ H2-B 修复（2026-09-23 11:2x PDT · D-022）：projectKey 应读 flow_instance.business_id（按 BO 注释），
