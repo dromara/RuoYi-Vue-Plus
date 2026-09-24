@@ -628,6 +628,7 @@ public class BrComplianceServiceImpl implements IBrComplianceService {
         ack.setValidated(true);
         ack.setDescription("flow_his_task.message 已带 " + prefix + " 标记，flow_skip.skip_type="
             + bo.getSkipType() + " 合法");
+        ack.getExtras().put("operation", op);
         ack.getExtras().put("messagePrefix", prefix);
         ack.getExtras().put("resolvedSkipType", bo.getSkipType());
         ack.getExtras().put("hasHistory", hasHistory);
