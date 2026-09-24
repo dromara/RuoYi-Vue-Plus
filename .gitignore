@@ -53,3 +53,7 @@ nbdist/
 
 application-local.yml
 application-ga.yml
+
+# 工具自动生成目录（2026-09-24 收口）
+.repowise/
+logs/
