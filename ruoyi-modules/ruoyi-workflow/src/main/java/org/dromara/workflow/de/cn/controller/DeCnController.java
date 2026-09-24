@@ -1,5 +1,6 @@
 package org.dromara.workflow.de.cn.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.web.core.BaseController;
@@ -23,6 +24,7 @@ public class DeCnController extends BaseController {
     private final IDeCnService deCnService;
 
     /** CN-03 连接器业务选择器 */
+    @SaCheckPermission("workflow:de:cn:query")
     @GetMapping("/selectors")
     public R<java.util.List<Map<String, Object>>> selectors(@RequestParam(required = false) Long userId) {
         return R.ok(deCnService.selectors(userId));

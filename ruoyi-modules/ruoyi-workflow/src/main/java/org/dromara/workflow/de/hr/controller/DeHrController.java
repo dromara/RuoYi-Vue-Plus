@@ -1,6 +1,7 @@
 package org.dromara.workflow.de.hr.controller;
 
 import jakarta.validation.Valid;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.web.core.BaseController;
@@ -25,18 +26,21 @@ public class DeHrController extends BaseController {
     private final IDeHrService deHrService;
 
     /** HR-03 责任分派 */
+    @SaCheckPermission("workflow:de:hr:edit")
     @PostMapping("/assign")
     public R<Long> assign(@Valid @RequestBody DeHrAssignBo bo) {
         return R.ok("分派成功", deHrService.assign(bo));
     }
 
     /** HR-05 催办 / 延期 / 请人 / 退回 / 升级 */
+    @SaCheckPermission("workflow:de:hr:edit")
     @PostMapping("/task-action")
     public R<Long> taskAction(@Valid @RequestBody DeHrTaskActionBo bo) {
         return R.ok("动作已记录", deHrService.taskAction(bo));
     }
 
     /** HR-06 人员离岗 / 休假 / 停用 后交接 */
+    @SaCheckPermission("workflow:de:hr:edit")
     @PostMapping("/handover")
     public R<Integer> handover(@Valid @RequestBody DeHrHandoverBo bo) {
         return R.ok("交接完成", deHrService.handover(bo));

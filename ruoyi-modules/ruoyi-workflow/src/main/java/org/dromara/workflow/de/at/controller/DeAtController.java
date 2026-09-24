@@ -1,6 +1,7 @@
 package org.dromara.workflow.de.at.controller;
 
 import jakarta.validation.Valid;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.web.core.BaseController;
@@ -24,12 +25,14 @@ public class DeAtController extends BaseController {
     private final IDeAtService deAtService;
 
     /** AT-01 自动化创建 */
+    @SaCheckPermission("workflow:de:at:edit")
     @PostMapping("/create")
     public R<Long> create(@Valid @RequestBody DeAtCreateBo bo) {
         return R.ok("automation 创建已记录", deAtService.create(bo));
     }
 
     /** AT-04 自动化运行配置 */
+    @SaCheckPermission("workflow:de:at:edit")
     @PutMapping("/run-config")
     public R<Long> runConfig(@Valid @RequestBody DeAtRunConfigBo bo) {
         return R.ok("run-config 已更新", deAtService.runConfig(bo));

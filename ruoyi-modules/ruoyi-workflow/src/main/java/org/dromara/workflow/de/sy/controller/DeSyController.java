@@ -1,6 +1,7 @@
 package org.dromara.workflow.de.sy.controller;
 
 import jakarta.validation.Valid;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.web.core.BaseController;
@@ -25,30 +26,35 @@ public class DeSyController extends BaseController {
     private final IDeSyService deSyService;
 
     /** SY-05 确认状态 */
+    @SaCheckPermission("workflow:de:sy:query")
     @GetMapping("/{taskId}/ack-state")
     public R<Map<String, Object>> ackState(@PathVariable Long taskId) {
         return R.ok(deSyService.ackState(taskId));
     }
 
     /** SY-06 人类纠正产生新事实版本 */
+    @SaCheckPermission("workflow:de:sy:edit")
     @PostMapping("/correction-version")
     public R<Long> correctionVersion(@Valid @RequestBody DeSyCorrectionBo bo) {
         return R.ok("correction version 已写入", deSyService.correctionVersion(bo));
     }
 
     /** SY-07 检查点恢复 */
+    @SaCheckPermission("workflow:de:sy:edit")
     @PostMapping("/{taskId}/checkpoint-recover")
     public R<Map<String, Object>> checkpointRecover(@PathVariable Long taskId) {
         return R.ok(deSyService.checkpointRecover(taskId));
     }
 
     /** SY-08 迟到 / 撤回 / 已提交节点变更 */
+    @SaCheckPermission("workflow:de:sy:query")
     @GetMapping("/{taskId}/late-arrivals")
     public R<Map<String, Object>> lateArrivals(@PathVariable Long taskId) {
         return R.ok(deSyService.lateArrivals(taskId));
     }
 
     /** SY-09 下游验证交接包 */
+    @SaCheckPermission("workflow:de:sy:query")
     @GetMapping("/{taskId}/handover-validate")
     public R<Map<String, Object>> handoverPackageValidate(@PathVariable Long taskId) {
         return R.ok(deSyService.handoverPackageValidate(taskId));

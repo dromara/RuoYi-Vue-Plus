@@ -1,6 +1,7 @@
 package org.dromara.workflow.de.im.controller;
 
 import jakarta.validation.Valid;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.web.core.BaseController;
@@ -24,12 +25,14 @@ public class DeImController extends BaseController {
     private final IDeImService deImService;
 
     /** IM-04 真人专家咨询 */
+    @SaCheckPermission("workflow:de:im:edit")
     @PostMapping("/expert-consult")
     public R<Long> expertConsult(@Valid @RequestBody DeImExpertConsultBo bo) {
         return R.ok("专家咨询已创建", deImService.expertConsult(bo));
     }
 
     /** IM-06 连接 / 成员 / 暂停 / 授权 / 投递恢复 */
+    @SaCheckPermission("workflow:de:im:edit")
     @PostMapping("/recover")
     public R<Long> recover(@Valid @RequestBody DeImRecoverBo bo) {
         return R.ok("恢复动作已派发", deImService.recover(bo));

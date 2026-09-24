@@ -1,5 +1,6 @@
 package org.dromara.workflow.de.ag.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.web.core.BaseController;
@@ -24,12 +25,14 @@ public class DeAgController extends BaseController {
     private final IDeAgService deAgService;
 
     /** AG-04 数字员工详情页 */
+    @SaCheckPermission("workflow:de:ag:query")
     @GetMapping("/{agentId}/overview")
     public R<DeAgOverviewVo> overview(@PathVariable Long agentId) {
         return R.ok(deAgService.overview(agentId));
     }
 
     /** AG-05 我创建的 / 共享给我的 / 团队使用 */
+    @SaCheckPermission("workflow:de:ag:query")
     @GetMapping("/{agentId}/relations")
     public R<List<String>> relations(@PathVariable Long agentId, @RequestParam(required = false) Long userId) {
         return R.ok(deAgService.relations(agentId, userId));

@@ -1,6 +1,7 @@
 package org.dromara.workflow.de.nc.controller;
 
 import jakarta.validation.Valid;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.web.core.BaseController;
@@ -27,18 +28,21 @@ public class DeNcController extends BaseController {
     private final IDeNcService deNcService;
 
     /** NC-05 保存范围 */
+    @SaCheckPermission("workflow:de:nc:edit")
     @PostMapping("/scope")
     public R<Long> saveScope(@Valid @RequestBody DeNcScopeBo bo) {
         return R.ok("scope 已保存", deNcService.saveScope(bo));
     }
 
     /** NC-06 执行模式 */
+    @SaCheckPermission("workflow:de:nc:edit")
     @PutMapping("/exec-mode")
     public R<Long> setExecMode(@Valid @RequestBody DeNcExecModeBo bo) {
         return R.ok("exec-mode 已更新", deNcService.setExecMode(bo));
     }
 
     /** NC-08 更换执行者 / 资源时显示差异 */
+    @SaCheckPermission("workflow:de:nc:query")
     @PostMapping("/diff")
     @SuppressWarnings("unchecked")
     public R<Map<String, Object>> showDiff(@Valid @RequestBody DeNcDiffBo bo) {

@@ -1,5 +1,6 @@
 package org.dromara.workflow.de.kb.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.web.core.BaseController;
@@ -22,6 +23,7 @@ public class DeKbController extends BaseController {
     private final IDeKbService deKbService;
 
     /** KB-01 知识详情工作区 */
+    @SaCheckPermission("workflow:de:kb:query")
     @GetMapping("/{documentId}/workspace")
     public R<DeKbWorkspaceVo> workspace(@PathVariable Long documentId,
                                           @RequestParam(required = false) Long userId) {

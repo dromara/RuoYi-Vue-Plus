@@ -1,6 +1,7 @@
 package org.dromara.workflow.de.fl.controller;
 
 import jakarta.validation.Valid;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.web.core.BaseController;
@@ -26,24 +27,28 @@ public class DeFlController extends BaseController {
     private final IDeFlService deFlService;
 
     /** FL-01 节点可选择的执行方案目录 */
+    @SaCheckPermission("workflow:de:fl:query")
     @GetMapping("/catalog")
     public R<List<Map<String, Object>>> catalog(@RequestParam Long nodeId) {
         return R.ok(deFlService.catalog(nodeId));
     }
 
     /** FL-03 结构化执行 */
+    @SaCheckPermission("workflow:de:fl:edit")
     @PostMapping("/execute")
     public R<Long> execute(@Valid @RequestBody DeFlExecuteBo bo) {
         return R.ok("execute 已记录", deFlService.execute(bo));
     }
 
     /** FL-04 方案版本 */
+    @SaCheckPermission("workflow:de:fl:query")
     @GetMapping("/versions")
     public R<List<Map<String, Object>>> versions(@RequestParam Long nodeId) {
         return R.ok(deFlService.versions(nodeId));
     }
 
     /** FL-05 节点执行轨迹 */
+    @SaCheckPermission("workflow:de:fl:query")
     @GetMapping("/{taskId}/trace")
     public R<Map<String, Object>> trace(@PathVariable Long taskId) {
         return R.ok(deFlService.trace(taskId));
