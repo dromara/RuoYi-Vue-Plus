@@ -74,8 +74,11 @@
         <maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
         <!-- 统一版本号管理：Maven3.X需要，Maven4.0之后已原生支持 -->
         <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
-        <!-- 打包默认跳过测试 -->
-        <maven.test.skip>true</maven.test.skip>
+        <!-- ★ 2026-09-24 F-6④（D-046 偏离登记）：底座默认 true = 单测被 L1 遮蔽
+             数月（假绿通道根因之一）。翻转为默认跑测试；需要快速打包时
+             显式传 -Dmaven.test.skip=true（CI compile/package 模板均已显式化）。
+             全 reactor test-compile 实测无编译债务，dev tag 292 条全绿。 -->
+        <maven.test.skip>false</maven.test.skip>
     </properties>
 
     <profiles>

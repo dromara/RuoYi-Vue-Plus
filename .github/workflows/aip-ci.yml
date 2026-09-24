@@ -1,0 +1,147 @@
+# ==============================================================
+# 04-backend-code/.github/workflows/aip-ci.yml
+# --------------------------------------------------------------
+# AIP · 后端仓 CI（CI 下沉 · 2026-09-24 四线复核 F-6③ 产物）
+#
+# 为什么下沉：外层仓 IAP-workflow-base 的 git 不跟踪 04-backend-code
+# （独立嵌套仓，git ls-files 实证 0 文件），外层 workflow 的
+# PROJECT_ROOT=04-backend-code 永远取不到代码（F-1 假绿通道 #6）。
+# 后端 job 的真实执行上下文只能是本仓（maven reactor 根 = 本目录）。
+#
+# 阶段:
+#   1) compile        — mvn compile（跳测试执行，编主源码）
+#   2) test-compile   — mvn test-compile（测试源码编译门 · F-2 教训：
+#                        20 处编译错曾让 292 个 dev 用例被遮蔽数月）
+#   3) unit-test-dev  — mvn test @Tag(dev)（292 条真实选择面 · F-6④：
+#                        原外层 CI 用 profile=prod 只选中 3/18 类）
+#
+# 触发：push/PR 到任何分支 + 手动。本仓 remote 现为底座 fork
+# （dromara 上游 + wilson323 fork），Actions 是否启用取决于
+# 目标 remote 的设置 —— 启用前本文件即声明式合同。
+# ==============================================================
+
+name: aip-backend-ci
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+env:
+  MAVEN_OPTS: "-Xmx2g -Dfile.encoding=UTF-8"
+
+concurrency:
+  group: aip-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    name: "1/3 compile · mvn compile (-Dmaven.test.skip=true)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: cache Maven repo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.m2/wrapper
+          key: m2-${{ runner.os }}-${{ hashFiles('**/pom.xml', 'mvnw') }}
+          restore-keys: |
+            m2-${{ runner.os }}-
+
+      - name: mvn compile
+        run: |
+          set -e
+          chmod +x ./mvnw
+          ./mvnw -B -o -Dmaven.test.skip=true compile
+        # 注：离线 -o 依赖 cache 命中；首跑无 cache 时可改 -U 在线（需 NVD/中央网络）
+
+  test-compile:
+    name: "2/3 test-compile · 测试源码编译门"
+    runs-on: ubuntu-latest
+    needs: compile
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: cache Maven repo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.m2/wrapper
+          key: m2-${{ runner.os }}-${{ hashFiles('**/pom.xml', 'mvnw') }}
+          restore-keys: |
+            m2-${{ runner.os }}-
+
+      - name: mvn test-compile（全 reactor · 不允许测试源码编译失败）
+        run: |
+          set -e
+          chmod +x ./mvnw
+          ./mvnw -B -o test-compile
+
+  unit-test-dev:
+    name: "3/3 unit-test · @Tag(dev) 292 条真实选择面"
+    runs-on: ubuntu-latest
+    needs: test-compile
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: cache Maven repo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.m2/wrapper
+          key: m2-${{ runner.os }}-${{ hashFiles('**/pom.xml', 'mvnw') }}
+          restore-keys: |
+            m2-${{ runner.os }}-
+
+      # OW-07 先例：ruoyi-workflow 实化后需 install 刷新依赖，防 false negative
+      - name: install upstream modules (skipTests)
+        run: |
+          set -e
+          chmod +x ./mvnw
+          ./mvnw -B -o -pl ruoyi-modules/ruoyi-workflow -am install -DskipTests
+
+      - name: mvn test -pl ruoyi-admin -am @Tag(dev)
+        run: |
+          set -e
+          chmod +x ./mvnw
+          ./mvnw -B -o \
+            -pl ruoyi-admin -am test \
+            -Dmaven.test.skip=false \
+            -Dprofiles.active=dev
+
+      - name: upload surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports-dev
+          path: ruoyi-admin/target/surefire-reports
+          if-no-files-found: warn
+          retention-days: 14
