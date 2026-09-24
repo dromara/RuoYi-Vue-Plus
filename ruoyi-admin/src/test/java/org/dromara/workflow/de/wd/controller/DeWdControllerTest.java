@@ -4,6 +4,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.workflow.de.wd.domain.bo.DeWdTaskFilterBo;
 import org.dromara.workflow.de.wd.domain.vo.DeWdTaskListVo;
 import org.dromara.workflow.de.wd.service.IDeWdService;
+import org.dromara.workflow.service.IFlwDefinitionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -62,7 +63,7 @@ public class DeWdControllerTest {
                 return expected;
             }));
 
-        DeWdController controller = new DeWdController(stub);
+        DeWdController controller = new DeWdController(stub, stubFlwDefinition());
         R<List<DeWdTaskListVo>> resp = controller.listInProgress(USER_ID);
 
         assertNotNull(resp);
@@ -77,7 +78,7 @@ public class DeWdControllerTest {
         IDeWdService stub = stubService(builder -> builder
             .on("listInProgress", args -> Collections.emptyList()));
 
-        DeWdController controller = new DeWdController(stub);
+        DeWdController controller = new DeWdController(stub, stubFlwDefinition());
         R<List<DeWdTaskListVo>> resp = controller.listInProgress(USER_ID);
 
         assertNotNull(resp);
@@ -102,7 +103,7 @@ public class DeWdControllerTest {
                 return expected;
             }));
 
-        DeWdController controller = new DeWdController(stub);
+        DeWdController controller = new DeWdController(stub, stubFlwDefinition());
         DeWdTaskFilterBo bo = new DeWdTaskFilterBo();
         bo.setUserId(USER_ID);
         bo.setProjectKey("PRJ-1");
@@ -125,7 +126,7 @@ public class DeWdControllerTest {
                 return new ArrayList<>();
             }));
 
-        DeWdController controller = new DeWdController(stub);
+        DeWdController controller = new DeWdController(stub, stubFlwDefinition());
         DeWdTaskFilterBo bo = new DeWdTaskFilterBo();
         bo.setUserId(USER_ID);
         List<Long> flowIds = new ArrayList<>();
@@ -163,7 +164,7 @@ public class DeWdControllerTest {
                 return expected;
             }));
 
-        DeWdController controller = new DeWdController(stub);
+        DeWdController controller = new DeWdController(stub, stubFlwDefinition());
         R<List<DeWdTaskListVo>> resp = controller.listActionRequired(USER_ID);
 
         assertNotNull(resp);
@@ -178,7 +179,7 @@ public class DeWdControllerTest {
         IDeWdService stub = stubService(builder -> builder
             .on("listActionRequired", args -> Collections.emptyList()));
 
-        DeWdController controller = new DeWdController(stub);
+        DeWdController controller = new DeWdController(stub, stubFlwDefinition());
         R<List<DeWdTaskListVo>> resp = controller.listActionRequired(USER_ID);
 
         assertNotNull(resp);
@@ -208,7 +209,7 @@ public class DeWdControllerTest {
                 return new ArrayList<>();
             }));
 
-        DeWdController controller = new DeWdController(stub);
+        DeWdController controller = new DeWdController(stub, stubFlwDefinition());
         controller.listInProgress(USER_ID);
         DeWdTaskFilterBo bo = new DeWdTaskFilterBo();
         bo.setUserId(USER_ID);
@@ -228,7 +229,7 @@ public class DeWdControllerTest {
             .on("filterTasks", args -> new ArrayList<>())
             .on("listActionRequired", args -> new ArrayList<>()));
 
-        DeWdController controller = new DeWdController(stub);
+        DeWdController controller = new DeWdController(stub, stubFlwDefinition());
         assertEquals(200, controller.listInProgress(USER_ID).getCode());
         assertEquals(200, controller.filterTasks(new DeWdTaskFilterBo()).getCode());
         assertEquals(200, controller.listActionRequired(USER_ID).getCode());
@@ -270,5 +271,29 @@ public class DeWdControllerTest {
             handlers.put(methodName, fn);
             return this;
         }
+    }
+
+    /**
+     * ★ 2026-09-24 编译修复（D-016）：DeWdController 增加第二依赖 IFlwDefinitionService
+     * （WD-01/02/04 透传底座），本类只测 WD-03/05/06 三端点，不触达该依赖，
+     * 给 no-op 代理占位即可。
+     */
+    private static IFlwDefinitionService stubFlwDefinition() {
+        InvocationHandler handler = (proxy, method, args) -> {
+            String name = method.getName();
+            if ("equals".equals(name) || "hashCode".equals(name) || "toString".equals(name)) {
+                return method.invoke(proxy, args);
+            }
+            Class<?> rt = method.getReturnType();
+            if (rt == boolean.class) return false;
+            if (rt == int.class) return 0;
+            if (rt == long.class) return 0L;
+            if (rt == List.class) return Collections.emptyList();
+            return null;
+        };
+        return (IFlwDefinitionService) Proxy.newProxyInstance(
+            IFlwDefinitionService.class.getClassLoader(),
+            new Class<?>[]{IFlwDefinitionService.class},
+            handler);
     }
 }

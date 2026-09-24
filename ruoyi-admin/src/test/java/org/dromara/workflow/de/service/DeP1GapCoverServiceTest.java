@@ -158,102 +158,10 @@ public class DeP1GapCoverServiceTest {
             "sourcesTracked = true（来源始终追踪）");
     }
 
-    /** OP-03 员工进度 / 成本 / 可恢复错误 + 运维运行健康 / 技术诊断（G-14）。 */
-    @Test
-    @DisplayName("B-OP-03 bOp03PersonalHealth 返回 RESOLVED，scope/healthMetrics 空 List")
-    void bOp03PersonalHealth() {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("scope", "personal");
-
-        Map<String, Object> r = SVC.bOp03PersonalHealth(payload);
-
-        assertResolvedCommon(r, CATEGORY_B, "OP-03", "bOp03PersonalHealth", payload);
-        Map<String, Object> extra = assertExtraKeys(r, "scope", "healthMetrics");
-        assertEquals("personal", extra.get("scope"), "scope 应从 payload 透传");
-        assertEquals(0, ((List<?>) extra.get("healthMetrics")).size(),
-            "healthMetrics 初始应为空 List");
-    }
-
-    /** OP-04 区分模型 / 工具消耗 / 运行成功率 / 业务完成率 / 返工 / 交接等待（G-14）。 */
-    @Test
-    @DisplayName("B-OP-04 bOp04MetricsBreakdown 返回 RESOLVED，breakdownBy/metricsEnabled")
-    void bOp04MetricsBreakdown() {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("metric", "tool_cost");
-
-        Map<String, Object> r = SVC.bOp04MetricsBreakdown(payload);
-
-        assertResolvedCommon(r, CATEGORY_B, "OP-04", "bOp04MetricsBreakdown", payload);
-        Map<String, Object> extra = assertExtraKeys(r, "breakdownBy", "metricsEnabled");
-        assertEquals("tool_cost", extra.get("breakdownBy"), "breakdownBy 应从 payload.metric 透传");
-        assertEquals(Boolean.TRUE, extra.get("metricsEnabled"),
-            "metricsEnabled = true");
-    }
-
-    /** OP-05 提供语言 / 回复偏好 / 时区 / 通知 / 会话 / 可访问性设置（G-14）。 */
-    @Test
-    @DisplayName("B-OP-05 bOp05Preferences 返回 RESOLVED，preferenceKey/defaultsApplied")
-    void bOp05Preferences() {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("key", "lang");
-
-        Map<String, Object> r = SVC.bOp05Preferences(payload);
-
-        assertResolvedCommon(r, CATEGORY_B, "OP-05", "bOp05Preferences", payload);
-        Map<String, Object> extra = assertExtraKeys(r, "preferenceKey", "defaultsApplied");
-        assertEquals("lang", extra.get("preferenceKey"), "preferenceKey 应从 payload.key 透传");
-        assertEquals(Boolean.TRUE, extra.get("defaultsApplied"),
-            "defaultsApplied = true");
-    }
-
-    /** OP-06 管理执行环境 / 设备连接 / 模型健康 / 容量 / 断网 / 重启恢复（G-14）。 */
-    @Test
-    @DisplayName("B-OP-06 bOp06RuntimeEnv 返回 RESOLVED，envHealth/capacityTracked")
-    void bOp06RuntimeEnv() {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("env", "healthy");
-
-        Map<String, Object> r = SVC.bOp06RuntimeEnv(payload);
-
-        assertResolvedCommon(r, CATEGORY_B, "OP-06", "bOp06RuntimeEnv", payload);
-        Map<String, Object> extra = assertExtraKeys(r, "envHealth", "capacityTracked");
-        assertEquals("healthy", extra.get("envHealth"), "envHealth 应从 payload.env 透传");
-        assertEquals(Boolean.TRUE, extra.get("capacityTracked"),
-            "capacityTracked = true");
-    }
-
-    /** MM-01 明确个人 / Agent / 项目 / 团队 / 节点实例 / 渠道记忆的适用范围（G-11）。 */
-    @Test
-    @DisplayName("B-MM-01 bMm01Scope 返回 RESOLVED，scopes 含 6 项记忆适用范围")
-    void bMm01Scope() {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("audience", "operator");
-
-        Map<String, Object> r = SVC.bMm01Scope(payload);
-
-        assertResolvedCommon(r, CATEGORY_B, "MM-01", "bMm01Scope", payload);
-        Map<String, Object> extra = assertExtraKeys(r, "scopes");
-        @SuppressWarnings("unchecked")
-        List<String> scopes = (List<String>) extra.get("scopes");
-        assertEquals(Arrays.asList("personal", "agent", "project", "team", "node", "channel"),
-            scopes, "scopes 应含 6 项记忆适用范围");
-    }
-
-    /** MM-02 提供分类 / 搜索 / 来源 / 时间线 / 编辑 / 失效 / 导出 / 保留设置（G-11）。 */
-    @Test
-    @DisplayName("B-MM-02 bMm02Organization 返回 RESOLVED，retentionDays=90/organizationEnabled")
-    void bMm02Organization() {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("topic", "ops");
-
-        Map<String, Object> r = SVC.bMm02Organization(payload);
-
-        assertResolvedCommon(r, CATEGORY_B, "MM-02", "bMm02Organization", payload);
-        Map<String, Object> extra = assertExtraKeys(r, "retentionDays", "organizationEnabled");
-        assertEquals(90, extra.get("retentionDays"), "retentionDays 固定 90");
-        assertEquals(Boolean.TRUE, extra.get("organizationEnabled"),
-            "organizationEnabled = true");
-    }
+    // ★ 2026-09-24 编译修复（F-2）：原 B-OP-03/04/05/06 + B-MM-01/02 六个用例随
+    //   commit 9a67fbc0e「gap-cover 9 项裁剪（D-014）」删除了对应 Service 方法，
+    //   但漏删本测试死引用（编译错误根因）。能力已由 de/op、de/mm 真实现端点承接，
+    //   死用例直接移除，不伪造产码方法。
 
     /** AT-02 周期 / 一次性 / 事件 / API / 条件拉取统一配置输入和执行对象（G-02 残余）。 */
     @Test
@@ -480,39 +388,8 @@ public class DeP1GapCoverServiceTest {
             "versionLocked = true");
     }
 
-    /** MM-03 展示「本次使用了哪些记忆」+ 纠正 / 忽略 / 冲突。 */
-    @Test
-    @DisplayName("D-MM-03 dMm03UsedList 返回 RESOLVED，usedMemoryRefs/conflictHints 空 List")
-    void dMm03UsedList() {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("recordId", "rec-1");
-
-        Map<String, Object> r = SVC.dMm03UsedList(payload);
-
-        assertResolvedCommon(r, CATEGORY_D, "MM-03", "dMm03UsedList", payload);
-        Map<String, Object> extra = assertExtraKeys(r, "usedMemoryRefs", "conflictHints");
-        assertEquals(0, ((List<?>) extra.get("usedMemoryRefs")).size(),
-            "usedMemoryRefs 初始应为空 List");
-        assertEquals(0, ((List<?>) extra.get("conflictHints")).size(),
-            "conflictHints 初始应为空 List");
-    }
-
-    /** MM-04 任务复盘经验以建议方式呈现。 */
-    @Test
-    @DisplayName("D-MM-04 dMm04ReviewTip 返回 RESOLVED，tipMode=suggestion/reviewEnabled")
-    void dMm04ReviewTip() {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("taskId", "task-1");
-
-        Map<String, Object> r = SVC.dMm04ReviewTip(payload);
-
-        assertResolvedCommon(r, CATEGORY_D, "MM-04", "dMm04ReviewTip", payload);
-        Map<String, Object> extra = assertExtraKeys(r, "tipMode", "reviewEnabled");
-        assertEquals("suggestion", extra.get("tipMode"),
-            "tipMode 固定 suggestion");
-        assertEquals(Boolean.TRUE, extra.get("reviewEnabled"),
-            "reviewEnabled = true");
-    }
+    // ★ 2026-09-24 编译修复（F-2）：D-MM-03 / D-MM-04 两个死用例同上部注记
+    //   （方法随 9a67fbc0e D-014 裁剪删除，能力由 de/mm 真实现端点承接）。
 
     /** CV-03 补充信息 / 暂停 / 停止 / 继续 / 人工接管。 */
     @Test

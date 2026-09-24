@@ -152,15 +152,15 @@ public class DeP1GapCoverControllerTest {
     /**
      * 边界：invalid bound（payload=含变长键的 LinkedHashMap）。
      *
-     * <p>用 MM-03（档 D · sai_agent_conversation_record.metadata + flow_instance.variable 落点）
-     * 端点，payload 是含 instanceId / taskId / agentId / 嵌套 context 的 LinkedHashMap，
-     * 验证 controller 对<b>复合 Object</b>入参的透传 + 占位响应结构稳定。
+     * <p>★ 2026-09-24 编译修复（F-2）：原用 MM-03 端点，随 9a67fbc0e「gap-cover 9 项
+     * 裁剪（D-014）」被删；换绑到仍存在的 KB-03 系占位端点 kb05ChunkCitation（档 D），
+     * 本用例的判据（复合 Object 透传保真 + 占位响应结构稳定）不因此改变。
      *
      * <p>LinkedHashMap 区别于 HashMap = 保留插入顺序；变长键含边界值：
      * null 键、空字符串键、emoji 键、超长键（1001 字符）。
      */
     @Test
-    @DisplayName("N1-边界-invalid bound（LinkedHashMap 变长键）→ MM-03 占位响应稳定")
+    @DisplayName("N1-边界-invalid bound（LinkedHashMap 变长键）→ KB-05 占位响应稳定")
     void n1_edge_invalidBound_placeholderStable() {
         Map<String, Object> boundPayload = new LinkedHashMap<>();
         boundPayload.put("instanceId", NONEXISTENT_INSTANCE_ID);
@@ -182,14 +182,14 @@ public class DeP1GapCoverControllerTest {
 
         Object[] capturedPayload = new Object[1];
         IDeP1GapCoverService stubSvc = stubService(builder -> builder
-            .on("dMm03UsedList", args -> {
+            .on("dKb05ChunkCitation", args -> {
                 capturedPayload[0] = args == null ? null : args[0];
-                return makePlaceholder("D", "MM-03");
+                return makePlaceholder("D", "KB-05");
             }));
 
         DeP1GapCoverController controller = new DeP1GapCoverController(stubSvc);
 
-        R<Map<String, Object>> resp = controller.mm03UsedList(boundPayload);
+        R<Map<String, Object>> resp = controller.kb05ChunkCitation(boundPayload);
 
         assertNotNull(resp);
         assertEquals(200, resp.getCode());
@@ -197,7 +197,7 @@ public class DeP1GapCoverControllerTest {
         assertNotNull(data);
         assertEquals(STATUS_DEFERRED, data.get("status"));
         assertEquals("D", data.get("gapCategory"));
-        assertEquals("MM-03", data.get("requirementId"));
+        assertEquals("KB-05", data.get("requirementId"));
         // 透传保真：service 收到的就是同一个 LinkedHashMap（含全部边界键）
         Map<String, Object> got = (Map<String, Object>) capturedPayload[0];
         assertEquals(NONEXISTENT_INSTANCE_ID, got.get("instanceId"),

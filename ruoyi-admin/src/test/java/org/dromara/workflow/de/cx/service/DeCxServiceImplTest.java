@@ -3,8 +3,8 @@ package org.dromara.workflow.de.cx.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.workflow.de.cx.domain.vo.DeCxValidateVo;
-import org.dromara.workflow.de.domain.SysUserRole;
-import org.dromara.workflow.de.mapper.SysUserRoleMapper;
+import org.dromara.workflow.de.domain.DeSysUserRole;
+import org.dromara.workflow.de.mapper.DeSysUserRoleMapper;
 import org.dromara.workflow.mapper.FlwHisTaskMapper;
 import org.dromara.workflow.mapper.FlwInstanceMapper;
 import org.dromara.workflow.mapper.FlwTaskMapper;
@@ -335,7 +335,7 @@ public class DeCxServiceImplTest {
         FlowInstance instance;
         long flowUserCount;
         long hisTaskCount;
-        List<SysUserRole> roles;
+        List<DeSysUserRole> roles;
 
         static Fixture healthy() {
             Fixture f = new Fixture();
@@ -353,7 +353,7 @@ public class DeCxServiceImplTest {
             f.flowUserCount = 1L;   // flow_user 命中（本需求点名的分支）
             f.hisTaskCount = 0L;
 
-            SysUserRole role = new SysUserRole();
+            DeSysUserRole role = new DeSysUserRole();
             role.setUserId(USER_ID);
             role.setRoleId(7L);
             f.roles = new ArrayList<>(List.of(role));
@@ -371,7 +371,7 @@ public class DeCxServiceImplTest {
             stubMapper(FlwTaskMapper.class, id -> null, null, () -> new ArrayList<>(List.of(task))),
             stubMapper(FlowUserMapper.class, id -> null, () -> f.flowUserCount),
             stubMapper(FlwHisTaskMapper.class, id -> null, () -> f.hisTaskCount),
-            stubMapper(SysUserRoleMapper.class, id -> null, null, () -> new ArrayList<>(f.roles)),
+            stubMapper(DeSysUserRoleMapper.class, id -> null, null, () -> new ArrayList<>(f.roles)),
             new ObjectMapper()
         );
     }
