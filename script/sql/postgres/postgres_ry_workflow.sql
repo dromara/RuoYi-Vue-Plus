@@ -137,7 +137,6 @@ CREATE TABLE flow_instance
     id              int8         NOT NULL,
     definition_id   int8         NOT NULL,
     business_id     varchar(40)  NOT NULL,
-    agent_id bigint NULL,
     node_type       int2         NOT NULL,
     node_code       varchar(40)  NOT NULL,
     node_name       varchar(100) NULL,
@@ -389,6 +388,7 @@ CREATE TABLE flow_instance_biz_ext (
     del_flag       CHAR(1)       DEFAULT '0',
     instance_id    int8,
     business_id    VARCHAR(255),
+    agent_id      bigint       NULL,
     PRIMARY KEY (id)
 );
 

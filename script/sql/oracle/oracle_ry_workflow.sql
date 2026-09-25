@@ -410,7 +410,7 @@ CREATE TABLE flow_instance_biz_ext (
    business_title VARCHAR2(1000),
    del_flag       CHAR(1)       DEFAULT '0',
    instance_id    NUMBER(20),
-   business_id    VARCHAR2(255)
+   business_id    VARCHAR2(255),
    agent_id       NUMBER(20)
 );
 

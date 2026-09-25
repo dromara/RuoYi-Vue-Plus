@@ -496,7 +496,6 @@ CREATE TABLE flow_instance (
     id bigint NOT NULL,
     definition_id bigint NOT NULL,
     business_id nvarchar(40) NOT NULL,
-    agent_id bigint NULL,
     node_type tinyint NOT NULL,
     node_code nvarchar(40) NOT NULL,
     node_name nvarchar(100) NULL,
@@ -1332,6 +1331,7 @@ CREATE TABLE flow_instance_biz_ext (
    del_flag       CHAR(1)        DEFAULT ('0'),
    instance_id    BIGINT,
    business_id    VARCHAR(255),
+   agent_id      BIGINT       NULL,
    CONSTRAINT PK__fi_biz_ext__D54EE9B4AE98B9C1 PRIMARY KEY CLUSTERED (id)
    WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
    ON [PRIMARY]
