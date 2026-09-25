@@ -1,6 +1,8 @@
 package org.dromara.workflow.de.rs.service;
 
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.system.api.OssService;
+import org.dromara.system.api.domain.OssDTO;
 import org.dromara.warm.flow.core.enums.SkipType;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
 import org.dromara.warm.flow.orm.entity.FlowTask;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -36,7 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *       permission-denied/cancel/未知→NONE；</li>
  *   <li>decide/confirm：任务不存在零 insert；留痕 flowStatus=FINISHED、message 前缀
  *       [RS-05]/[RS-07]、关联字段从 task 拷贝、回显请求 taskId 非 DB id；</li>
- *   <li>crossCheck：任务不存在抛；合法即返回 true（外部真值占位，本仓不判定），不产生 insert。</li>
+ *   <li>★crossCheck（RS-06 真实比对）：逐个期望 ossId 经 OssService 回查 sys_oss，
+ *       全部解析为非空 URL 对象才 true；部分缺失/空产物/空 URL → false；
+ *       只读不产生 insert。</li>
  * </ul>
  *
  * @author AIP
@@ -175,14 +180,50 @@ class DeRsServiceImplTest {
     }
 
     @Test
-    @DisplayName("crossCheck：合法即返回 true（外部真值占位），且不产生 insert")
-    void crossCheck_returnsTrueNoInsert() {
+    @DisplayName("★crossCheck：全部期望 ossId 解析为真实对象（非空 URL）→ true")
+    void crossCheck_allResolved_passes() {
         Harness h = new Harness();
-        DeRsCrossCheckBo bo = new DeRsCrossCheckBo();
-        bo.setTaskId(TASK_ID);
-        bo.setExpected(Map.of("k", "v"));
-        assertTrue(h.service.crossCheck(bo));
-        assertEquals(0, h.inserted.size(), "交叉核验为只读占位，不得写历史");
+        h.ossRows = List.of(oss(1L, "/file/1"), oss(2L, "/file/2"));
+        DeRsCrossCheckBo bo = crossCheckBo(Map.of("1", "h1", "2", "h2"));
+        assertTrue(h.service.crossCheck(bo), "全部产物回查命中必须通过");
+        assertEquals(0, h.inserted.size(), "交叉核验只读，不得写历史");
+    }
+
+    @Test
+    @DisplayName("★crossCheck：部分 ossId 查无对象（部分成功）→ false")
+    void crossCheck_partialMissing_fails() {
+        Harness h = new Harness();
+        h.ossRows = List.of(oss(1L, "/file/1"));
+        DeRsCrossCheckBo bo = crossCheckBo(Map.of("1", "h1", "2", "h2"));
+        assertFalse(h.service.crossCheck(bo), "任一期望产物缺失必须红");
+    }
+
+    @Test
+    @DisplayName("★crossCheck：全部查无（失败）→ false")
+    void crossCheck_allMissing_fails() {
+        Harness h = new Harness();
+        h.ossRows = List.of();
+        DeRsCrossCheckBo bo = crossCheckBo(Map.of("1", "h1"));
+        assertFalse(h.service.crossCheck(bo));
+    }
+
+    @Test
+    @DisplayName("crossCheck：expected 为空（不确定，无产物可核）→ false")
+    void crossCheck_emptyExpected_fails() {
+        Harness h = new Harness();
+        DeRsCrossCheckBo bo = crossCheckBo(Map.of());
+        assertFalse(h.service.crossCheck(bo));
+        bo.setExpected(null);
+        assertFalse(h.service.crossCheck(bo));
+    }
+
+    @Test
+    @DisplayName("crossCheck：对象 URL 为空 = 回执不指向真实外部对象 → false")
+    void crossCheck_blankUrl_fails() {
+        Harness h = new Harness();
+        h.ossRows = List.of(oss(1L, "  "));
+        DeRsCrossCheckBo bo = crossCheckBo(Map.of("1", "h1"));
+        assertFalse(h.service.crossCheck(bo));
     }
 
     // ════════════════ fixtures ════════════════
@@ -193,6 +234,20 @@ class DeRsServiceImplTest {
         bo.setDecision(decision);
         bo.setComment(comment);
         return bo;
+    }
+
+    private static DeRsCrossCheckBo crossCheckBo(Map<String, String> expected) {
+        DeRsCrossCheckBo bo = new DeRsCrossCheckBo();
+        bo.setTaskId(TASK_ID);
+        bo.setExpected(expected);
+        return bo;
+    }
+
+    private static OssDTO oss(Long ossId, String url) {
+        OssDTO dto = new OssDTO();
+        dto.setOssId(ossId);
+        dto.setUrl(url);
+        return dto;
     }
 
     private static DeRsConfirmBo confirmBo(String action, String reason) {
@@ -215,11 +270,12 @@ class DeRsServiceImplTest {
         return t;
     }
 
-    /** 捕获型夹具：task 可编程返回；insert 全量记录。 */
+    /** 捕获型夹具：task / ossRows 可编程返回；insert 全量记录。 */
     private static final class Harness {
         final DeRsServiceImpl service;
         final List<FlowHisTask> inserted = new ArrayList<>();
         FlowTask task = task();
+        List<OssDTO> ossRows = List.of();
 
         Harness() {
             FlwTaskMapper taskMapper = stub(FlwTaskMapper.class, (m, a) -> {
@@ -235,7 +291,13 @@ class DeRsServiceImplTest {
                 }
                 return defaultValue(m.getReturnType());
             });
-            this.service = new DeRsServiceImpl(taskMapper, hisMapper);
+            OssService ossService = stub(OssService.class, (m, a) -> {
+                if ("selectByIds".equals(m.getName())) {
+                    return new ArrayList<>(ossRows);
+                }
+                return defaultValue(m.getReturnType());
+            });
+            this.service = new DeRsServiceImpl(taskMapper, hisMapper, ossService);
         }
 
         @SuppressWarnings("unchecked")

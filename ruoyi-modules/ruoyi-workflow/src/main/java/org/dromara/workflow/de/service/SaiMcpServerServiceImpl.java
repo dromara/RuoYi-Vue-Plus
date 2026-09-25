@@ -1,5 +1,7 @@
 package org.dromara.workflow.de.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,15 +12,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
- * sai_mcp_server 服务实现（存根）。
+ * sai_mcp_server 服务实现（typed 存根 → 真 CRUD，列真源 ry_ai.sql DDL「5.1 MCP 服务配置表」）。
  *
- * <p><b>存根说明</b>：本类为 OW-03 决议清单的接口层存根（7 端点），
- * 全部方法体抛 {@code UnsupportedOperationException}，等待 owner 实装。
+ * <p>本表无唯一键（creator_id 仅为普通索引）、无逻辑删除列。
  *
  * @author AIP
+ * @since 2026-09-25
  */
 @Slf4j
 @Service
@@ -27,47 +28,59 @@ public class SaiMcpServerServiceImpl
         extends ServiceImpl<SaiMcpServerMapper, SaiMcpServer>
         implements ISaiMcpServerService {
 
-    private static final String STUB_MSG = "sai_mcp_server 接口存根，等待 owner 实现";
-
     @Override
     public Long add(SaiMcpServer bo) {
-        log.warn("[de.sai-mcp-server] add 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        save(bo);
+        log.info("[de.sai-mcp-server] add id={}", bo.getId());
+        return bo.getId();
     }
 
     @Override
     public Boolean edit(SaiMcpServer bo) {
-        log.warn("[de.sai-mcp-server] edit 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        return updateById(bo);
     }
 
     @Override
     public Boolean remove(Collection<Long> ids) {
-        log.warn("[de.sai-mcp-server] remove 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        return removeByIds(ids);
     }
 
     @Override
     public SaiMcpServer getInfo(Long id) {
-        log.warn("[de.sai-mcp-server] getInfo 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        return getById(id);
     }
 
     @Override
     public List<SaiMcpServer> list(SaiMcpServer bo) {
-        log.warn("[de.sai-mcp-server] list 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        return list(buildWrapper(bo));
     }
 
     @Override
     public PageResult<SaiMcpServer> page(SaiMcpServer bo) {
-        log.warn("[de.sai-mcp-server] page 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        var pg = page(new Page<>(1, 10), buildWrapper(bo));
+        return PageResult.build(pg.getRecords(), pg.getTotal());
     }
 
     @Override
     public List<SaiMcpServer> listByFk(Long fkId) {
-        log.warn("[de.sai-mcp-server] listByFk 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        return list(new LambdaQueryWrapper<SaiMcpServer>()
+            .eq(SaiMcpServer::getCreatorId, fkId)
+            .orderByDesc(SaiMcpServer::getId));
+    }
+
+    private LambdaQueryWrapper<SaiMcpServer> buildWrapper(SaiMcpServer bo) {
+        LambdaQueryWrapper<SaiMcpServer> qw = new LambdaQueryWrapper<>();
+        if (bo != null) {
+            if (bo.getName() != null && !bo.getName().isBlank()) {
+                qw.like(SaiMcpServer::getName, bo.getName());
+            }
+            if (bo.getTransportType() != null) {
+                qw.eq(SaiMcpServer::getTransportType, bo.getTransportType());
+            }
+            if (bo.getCreatorId() != null) {
+                qw.eq(SaiMcpServer::getCreatorId, bo.getCreatorId());
+            }
+        }
+        return qw.orderByDesc(SaiMcpServer::getId);
     }
 }

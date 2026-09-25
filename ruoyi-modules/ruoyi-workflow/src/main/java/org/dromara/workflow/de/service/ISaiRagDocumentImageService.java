@@ -2,36 +2,29 @@ package org.dromara.workflow.de.service;
 
 import com.baomidou.mybatisplus.spring.service.IService;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.workflow.de.domain.SaiRagDocumentImage;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
- * sai_rag_document_image 服务接口（存根）。
- *
- * <p><b>存根说明</b>：本接口为 OW-03 决议清单的接口层存根（7 端点），
- * 实现由 {@link SaiRagDocumentImageServiceImpl} 全部抛出
- * {@code UnsupportedOperationException}，等待 owner 实装。
- *
- * <p><b>实体类型</b>：本表无专属 domain POJO（不实装），用 {@code Map<String, Object>}
- * 作为通用实体。
+ * sai_rag_document_image 服务接口（Map 存根 → typed，列真源 ry_ai.sql DDL）。
  *
  * @author AIP
  */
-public interface ISaiRagDocumentImageService extends IService<Map<String, Object>> {
+public interface ISaiRagDocumentImageService extends IService<SaiRagDocumentImage> {
 
-    Long add(Map<String, Object> bo);
+    Long add(SaiRagDocumentImage bo);
 
-    Boolean edit(Map<String, Object> bo);
+    Boolean edit(SaiRagDocumentImage bo);
 
     Boolean remove(Collection<Long> ids);
 
-    Map<String, Object> getInfo(Long id);
+    SaiRagDocumentImage getInfo(Long id);
 
-    List<Map<String, Object>> list(Map<String, Object> bo);
+    List<SaiRagDocumentImage> list(SaiRagDocumentImage bo);
 
-    PageResult<Map<String, Object>> page(Map<String, Object> bo);
+    PageResult<SaiRagDocumentImage> page(SaiRagDocumentImage bo);
 
-    List<Map<String, Object>> listByFk(Long fkId);
+    List<SaiRagDocumentImage> listByFk(Long fkId);
 }

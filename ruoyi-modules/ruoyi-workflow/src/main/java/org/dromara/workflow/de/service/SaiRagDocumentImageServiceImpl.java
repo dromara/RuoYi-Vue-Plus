@@ -1,72 +1,83 @@
 package org.dromara.workflow.de.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.PageResult;
+import org.dromara.workflow.de.domain.SaiRagDocumentImage;
 import org.dromara.workflow.de.mapper.SaiRagDocumentImageMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
- * sai_rag_document_image 服务实现（存根）。
+ * sai_rag_document_image 服务实现（Map 存根 → typed CRUD，列真源 ry_ai.sql DDL「4.2 RAG 文档图片表」）。
  *
- * <p><b>存根说明</b>：本类为 OW-03 决议清单的接口层存根（7 端点），
- * 全部方法体抛 {@code UnsupportedOperationException}，等待 owner 实装。
+ * <p>本表无唯一键、无逻辑删除列。
  *
  * @author AIP
+ * @since 2026-09-25
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SaiRagDocumentImageServiceImpl
-        extends ServiceImpl<SaiRagDocumentImageMapper, Map<String, Object>>
+        extends ServiceImpl<SaiRagDocumentImageMapper, SaiRagDocumentImage>
         implements ISaiRagDocumentImageService {
 
-    private static final String STUB_MSG = "sai_rag_document_image 接口存根，等待 owner 实现";
-
     @Override
-    public Long add(Map<String, Object> bo) {
-        log.warn("[de.sai-rag-document-image] add 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public Long add(SaiRagDocumentImage bo) {
+        save(bo);
+        log.info("[de.sai-rag-document-image] add id={}", bo.getId());
+        return bo.getId();
     }
 
     @Override
-    public Boolean edit(Map<String, Object> bo) {
-        log.warn("[de.sai-rag-document-image] edit 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public Boolean edit(SaiRagDocumentImage bo) {
+        return updateById(bo);
     }
 
     @Override
     public Boolean remove(Collection<Long> ids) {
-        log.warn("[de.sai-rag-document-image] remove 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+        return removeByIds(ids);
     }
 
     @Override
-    public Map<String, Object> getInfo(Long id) {
-        log.warn("[de.sai-rag-document-image] getInfo 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public SaiRagDocumentImage getInfo(Long id) {
+        return getById(id);
     }
 
     @Override
-    public List<Map<String, Object>> list(Map<String, Object> bo) {
-        log.warn("[de.sai-rag-document-image] list 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public List<SaiRagDocumentImage> list(SaiRagDocumentImage bo) {
+        return list(buildWrapper(bo));
     }
 
     @Override
-    public PageResult<Map<String, Object>> page(Map<String, Object> bo) {
-        log.warn("[de.sai-rag-document-image] page 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public PageResult<SaiRagDocumentImage> page(SaiRagDocumentImage bo) {
+        var pg = page(new Page<>(1, 10), buildWrapper(bo));
+        return PageResult.build(pg.getRecords(), pg.getTotal());
     }
 
     @Override
-    public List<Map<String, Object>> listByFk(Long fkId) {
-        log.warn("[de.sai-rag-document-image] listByFk 命中存根");
-        throw new UnsupportedOperationException(STUB_MSG);
+    public List<SaiRagDocumentImage> listByFk(Long fkId) {
+        return list(new LambdaQueryWrapper<SaiRagDocumentImage>()
+            .eq(SaiRagDocumentImage::getRagId, fkId)
+            .orderByDesc(SaiRagDocumentImage::getId));
+    }
+
+    private LambdaQueryWrapper<SaiRagDocumentImage> buildWrapper(SaiRagDocumentImage bo) {
+        LambdaQueryWrapper<SaiRagDocumentImage> qw = new LambdaQueryWrapper<>();
+        if (bo != null) {
+            if (bo.getRagId() != null) {
+                qw.eq(SaiRagDocumentImage::getRagId, bo.getRagId());
+            }
+            if (bo.getDocumentId() != null) {
+                qw.eq(SaiRagDocumentImage::getDocumentId, bo.getDocumentId());
+            }
+        }
+        return qw.orderByDesc(SaiRagDocumentImage::getId);
     }
 }

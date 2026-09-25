@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.warm.flow.core.enums.SkipType;
+import org.dromara.system.api.OssService;
+import org.dromara.system.api.domain.OssDTO;
 import org.dromara.workflow.de.constants.DeP1Constants;
 import org.dromara.workflow.de.rs.domain.bo.DeRsConfirmBo;
 import org.dromara.workflow.de.rs.domain.bo.DeRsCrossCheckBo;
@@ -15,8 +17,9 @@ import org.dromara.workflow.mapper.FlwHisTaskMapper;
 import org.dromara.workflow.mapper.FlwTaskMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * RS 域服务实现。
@@ -33,6 +36,7 @@ public class DeRsServiceImpl implements IDeRsService {
 
     private final FlwTaskMapper flwTaskMapper;
     private final FlwHisTaskMapper flwHisTaskMapper;
+    private final OssService ossService;
 
     @Override
     public Long decide(DeRsDecideBo bo) {
@@ -63,14 +67,38 @@ public class DeRsServiceImpl implements IDeRsService {
         if (task == null) {
             throw new ServiceException("任务不存在: id=" + bo.getTaskId());
         }
-        // RS-06：交叉核验占位 —— 真值需调用仓外外部系统，本仓仅返回形状
-        Map<String, Object> res = new HashMap<>();
-        res.put("taskId", bo.getTaskId());
-        res.put("expected", bo.getExpected());
-        res.put("matched", bo.getExpected() == null ? 0 : bo.getExpected().size());
-        res.put("checked", 0);
-        log.info("[rs.crossCheck] taskId={} expected={}", bo.getTaskId(), bo.getExpected());
-        return true;
+        // RS-06（29 号 :593）：回执必须指向真实外部对象及当前状态；
+        // 失败 / 不确定 / 部分成功均可表达。逐个期望 ossId 回查 sys_oss（OssService），
+        // 全部解析为真实对象（非空 URL）才通过；任一缺失 = 部分成功/失败 → false；
+        // expected 为空 = 无提交产物可核验（不确定）→ false。
+        if (bo.getExpected() == null || bo.getExpected().isEmpty()) {
+            log.info("[rs.crossCheck] taskId={} 无期望产物，核验不确定 → false", bo.getTaskId());
+            return false;
+        }
+        String joined = String.join(",", bo.getExpected().keySet());
+        List<OssDTO> actual = ossService.selectByIds(joined);
+        Set<Long> resolved = new HashSet<>();
+        if (actual != null) {
+            for (OssDTO dto : actual) {
+                if (dto.getOssId() != null && dto.getUrl() != null && !dto.getUrl().isBlank()) {
+                    resolved.add(dto.getOssId());
+                }
+            }
+        }
+        int matched = 0;
+        for (String ossId : bo.getExpected().keySet()) {
+            try {
+                if (resolved.contains(Long.parseLong(ossId))) {
+                    matched++;
+                }
+            } catch (NumberFormatException e) {
+                // 非数字 ossId 恒不可解析，计入未命中
+            }
+        }
+        boolean passed = matched == bo.getExpected().size();
+        log.info("[rs.crossCheck] taskId={} expected={} matched={} passed={}",
+            bo.getTaskId(), bo.getExpected().size(), matched, passed);
+        return passed;
     }
 
     @Override
