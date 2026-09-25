@@ -31,7 +31,7 @@ import java.util.Map;
  *       与 {@code DeP1GapCoverController} 的 {@code /de/bp/} 前缀区分避免冲突）。</li>
  *   <li>每个端点响应字段固定包含：{@code status}（PLACEHOLDER）· {@code phase}（E0..E9）·
  *       {@code landed}（真实落点表.列说明）· {@code note}（一句话说明）。</li>
- *   <li>所有端点挂占位权限 {@code workflow:de:bp:query}（{@code @SaCheckPermission}），
+ *   <li>e0 只读挂 {@code workflow:de:bp:query}，e1-e9 动作端点挂 {@code workflow:de:bp:execute}（{@code @SaCheckPermission}），
  *       <b>不实际接</b>权限系统；接入由 owner 裁后再做。</li>
  * </ul>
  *
@@ -61,6 +61,9 @@ public class DeBpController extends BaseController {
     /** 占位权限（不实际接；owner 决议后再做）。 */
     private static final String PERM = "workflow:de:bp:query";
 
+    /** D-02 权限串分离（T5 §二.7）：e1-e9 九个动作 POST 端点独立串，与只读 query 撤销面分离。 */
+    private static final String PERM_EXECUTE = "workflow:de:bp:execute";
+
     private final IDeBpService deBpService;
 
     // ===== 10 业务环节（E0—E9）=====
@@ -77,7 +80,7 @@ public class DeBpController extends BaseController {
     /**
      * E1 发起。真实落点 = {@code flow_instance}。
      */
-    @SaCheckPermission(PERM)
+    @SaCheckPermission(PERM_EXECUTE)
     @PostMapping("/e1-start")
     public R<Map<String, Object>> e1Start(@RequestBody(required = false) Object payload) {
         return R.ok(deBpService.e1Start(payload));
@@ -86,7 +89,7 @@ public class DeBpController extends BaseController {
     /**
      * E2 字节码自动生成（首任务留痕）。真实落点 = {@code flow_definition.ext}。
      */
-    @SaCheckPermission(PERM)
+    @SaCheckPermission(PERM_EXECUTE)
     @PostMapping("/e2-bytecode-gen")
     public R<Map<String, Object>> e2BytecodeGen(@RequestBody(required = false) Object payload) {
         return R.ok(deBpService.e2BytecodeGen(payload));
@@ -95,7 +98,7 @@ public class DeBpController extends BaseController {
     /**
      * E3 起草任务派发（{@code assignUser}）。真实落点 = {@code flow_user}。
      */
-    @SaCheckPermission(PERM)
+    @SaCheckPermission(PERM_EXECUTE)
     @PostMapping("/e3-assign-user")
     public R<Map<String, Object>> e3AssignUser(@RequestBody(required = false) Object payload) {
         return R.ok(deBpService.e3AssignUser(payload));
@@ -104,7 +107,7 @@ public class DeBpController extends BaseController {
     /**
      * E4 办理（{@code completeTask}）。真实落点 = {@code flow_task} / {@code flow_his_task}。
      */
-    @SaCheckPermission(PERM)
+    @SaCheckPermission(PERM_EXECUTE)
     @PostMapping("/e4-complete-task")
     public R<Map<String, Object>> e4CompleteTask(@RequestBody(required = false) Object payload) {
         return R.ok(deBpService.e4CompleteTask(payload));
@@ -113,7 +116,7 @@ public class DeBpController extends BaseController {
     /**
      * E5 驳回（{@code backProcess}）。真实落点 = {@code flow_task} / {@code flow_his_task}。
      */
-    @SaCheckPermission(PERM)
+    @SaCheckPermission(PERM_EXECUTE)
     @PostMapping("/e5-back-process")
     public R<Map<String, Object>> e5BackProcess(@RequestBody(required = false) Object payload) {
         return R.ok(deBpService.e5BackProcess(payload));
@@ -122,7 +125,7 @@ public class DeBpController extends BaseController {
     /**
      * E6 异常修复（counter + path）。真实落点 = {@code flow_task}。
      */
-    @SaCheckPermission(PERM)
+    @SaCheckPermission(PERM_EXECUTE)
     @PostMapping("/e6-abnormal-fix")
     public R<Map<String, Object>> e6AbnormalFix(@RequestBody(required = false) Object payload) {
         return R.ok(deBpService.e6AbnormalFix(payload));
@@ -132,7 +135,7 @@ public class DeBpController extends BaseController {
      * E7 归档（auto-complete）。真实落点 = {@code flow_his_task}。
      * 由 E4 副产品触发，无专门入口（监听器写 {@code flow_instance.flow_status = finish}，D-3 断点）。
      */
-    @SaCheckPermission(PERM)
+    @SaCheckPermission(PERM_EXECUTE)
     @PostMapping("/e7-archive")
     public R<Map<String, Object>> e7Archive(@RequestBody(required = false) Object payload) {
         return R.ok(deBpService.e7Archive(payload));
@@ -141,7 +144,7 @@ public class DeBpController extends BaseController {
     /**
      * E8 撤回 / 作废。真实落点 = {@code flow_task}。
      */
-    @SaCheckPermission(PERM)
+    @SaCheckPermission(PERM_EXECUTE)
     @PostMapping("/e8-revoke-or-invalid")
     public R<Map<String, Object>> e8RevokeOrInvalid(@RequestBody(required = false) Object payload) {
         return R.ok(deBpService.e8RevokeOrInvalid(payload));
@@ -150,7 +153,7 @@ public class DeBpController extends BaseController {
     /**
      * E9 交接。真实落点 = {@code flow_task} / {@code flow_user}。
      */
-    @SaCheckPermission(PERM)
+    @SaCheckPermission(PERM_EXECUTE)
     @PostMapping("/e9-transfer")
     public R<Map<String, Object>> e9Transfer(@RequestBody(required = false) Object payload) {
         return R.ok(deBpService.e9Transfer(payload));
