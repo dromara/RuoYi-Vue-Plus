@@ -191,7 +191,8 @@ public class JsonUtils {
      * @return true = 合法 JSON，false = 非法或空
      */
     public static boolean isJson(String str) {
-        return readTreeQuietly(str) != null;
+        JsonNode node = readTreeQuietly(str);
+        return node != null && (node.isObject() || node.isArray());
     }
 
     /**

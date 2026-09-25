@@ -140,7 +140,7 @@ public class DateUtils extends DateUtil {
 
         // 未来时间或非今年
         if (date.after(now) || year(date) != year(now)) {
-            return formatDateTime(now);
+            return formatDateTime(date);
         }
 
         // 今天

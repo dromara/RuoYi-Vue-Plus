@@ -57,7 +57,7 @@ public class SaPermissionImpl implements StpInterface {
                                                java.util.function.Function<LoginUser, Collection<String>> localPermissionExtractor,
                                                BiFunction<PermissionService, Long, Collection<String>> remotePermissionExtractor) {
         LoginUser loginUser = LoginHelper.getLoginUser();
-        if (ObjectUtil.isNull(loginUser) || !loginUser.getLoginId().equals(loginId)) {
+        if (ObjectUtil.isNull(loginUser) || !loginUser.getLoginId().equals(normalizeLoginId(loginId))) {
             PermissionService permissionService = getPermissionService();
             if (ObjectUtil.isNotNull(permissionService)) {
                 return new ArrayList<>(remotePermissionExtractor.apply(permissionService, resolveUserId(loginId)));
@@ -85,7 +85,22 @@ public class SaPermissionImpl implements StpInterface {
     }
 
     /**
-     * 从登录ID中提取用户ID。
+     * 将历史冒号格式的登录ID规范化为当前分隔符格式，保证与旧 token 会话比较的一致性。
+     *
+     * @param loginId 登录ID
+     * @return 规范化后的登录ID
+     */
+    private String normalizeLoginId(Object loginId) {
+        String loginIdStr = loginId.toString();
+        int separatorIndex = loginIdStr.indexOf(':');
+        if (separatorIndex < 0) {
+            return loginIdStr;
+        }
+        return loginIdStr.substring(0, separatorIndex) + LoginUser.LOGIN_ID_SEPARATOR + loginIdStr.substring(separatorIndex + 1);
+    }
+
+    /**
+     * 从登录ID中提取用户ID，兼容历史冒号格式与当前分隔符格式。
      *
      * @param loginId 登录ID
      * @return 用户ID
@@ -93,6 +108,9 @@ public class SaPermissionImpl implements StpInterface {
     private Long resolveUserId(Object loginId) {
         String loginIdStr = loginId.toString();
         int separatorIndex = loginIdStr.indexOf(':');
+        if (separatorIndex < 0) {
+            separatorIndex = loginIdStr.lastIndexOf(LoginUser.LOGIN_ID_SEPARATOR);
+        }
         if (separatorIndex < 0 || separatorIndex == loginIdStr.length() - 1) {
             throw new ServiceException("登录ID格式错误");
         }
