@@ -33,8 +33,8 @@ import java.util.List;
  *   <li>无锚定（历史会话）⇒ 无法判「实例内」⇒ 拒绝</li>
  * </ul>
  *
- * <p>方案 B（对象级 ACL 泛化位表）另见设计稿
- * {@code docs/设计包/AU-03-ACL设计稿-2026-09-22.md}——须 owner 特批 G-2「不新造表」红线后另行实施。
+ * <p>方案 B（对象级 ACL 泛化位表 {@code sai_object_acl}）owner 2026-09-24 特批 G-2 已裁入库（DDL 见
+ * {@code 04-backend-code/script/sql/ry_ai.sql} §十），四维判定实装 {@code SaiObjectAclServiceImpl.hasAccess}（D-02）。
  *
  * @author AIP
  * @since 2026-09-22
@@ -64,7 +64,8 @@ public class DeAccessService {
             return true;
         }
         // ★ D-011（AU-03 方案 B）：对象级 ACL 命中即放行（加宽不替换）
-        if (saiObjectAclService.hasAccess("conversation_record", record.getId(), userId, "read", null)) {
+        //   read 语境无子用途/无策略版本权威 ⇒ purpose/currentPolicyVer 传 null，仅命中「不限目的+最新」授权（D-02 四维 fail-closed）。
+        if (saiObjectAclService.hasAccess("conversation_record", record.getId(), userId, "read", null, null)) {
             log.info("[T3] ACL hit: record={} userId={}", record.getId(), userId);
             return true;
         }

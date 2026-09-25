@@ -104,7 +104,7 @@ public class DeContextAssemblyService {
                     SaiRagDocument doc = saiRagDocumentMapper.selectById(ragDocId);
                     if (doc == null) continue;
                     // RAG 文档的 T-4：ACL grantType="input" 命中即放行（AU-03 方案 B）
-                    if (saiObjectAclService.hasAccess("rag_document", ragDocId, userId, "input", null)) {
+                    if (saiObjectAclService.hasAccess("rag_document", ragDocId, userId, "input", null, null)) {
                         rags.add(new FilteredRag(doc.getId(), doc.getName(), doc.getContent()));
                     } else {
                         excluded++;
@@ -130,7 +130,7 @@ public class DeContextAssemblyService {
             return true;
         }
         // ACL input 授权（AU-03 方案 B 的 T-4 通道）
-        if (saiObjectAclService.hasAccess("conversation_record", record.getId(), userId, "input", null)) {
+        if (saiObjectAclService.hasAccess("conversation_record", record.getId(), userId, "input", null, null)) {
             return true;
         }
         // T-3 可见（硬蕴含：可见 ⇒ 可用——L3 默认放行 T-3 可见的记录）
