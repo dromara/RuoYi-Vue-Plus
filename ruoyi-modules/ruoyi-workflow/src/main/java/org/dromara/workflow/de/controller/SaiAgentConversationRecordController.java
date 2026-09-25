@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * sai_agent_conversation_record REST 端点（存根）。
+ * sai_agent_conversation_record REST 端点（已实装）。
  *
  * <p>本 controller 共 7 个端点（与 {@code ISaiAgentConversationRecordService} 一一对应）：
  * <ul>
@@ -30,8 +30,7 @@ import java.util.List;
  *   <li>GET /de/sai-agent-conversation-record/by-fk/{fkId} —— 按外键查询</li>
  * </ul>
  *
- * <p><b>存根说明</b>：所有调用进入服务实现层时统一抛出 {@code UnsupportedOperationException}，
- * 等待 owner 实装（OW-03 决议）。
+ * <p><b>实装状态</b>：该组端点已由服务实现层提供真实 CRUD（原 OW-03 存根已实化）。
  *
  * <p><b>与 {@code DeSaiConvController} 的关系</b>：该 controller 暴露的
  * {@code GET /de/sai-conv/record/{recordId}} 端点是单条读；

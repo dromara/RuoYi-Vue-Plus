@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * sai_model_usage_stat REST 端点（存根）。
+ * sai_model_usage_stat REST 端点（已实装）。
  *
  * <p>本 controller 共 7 个端点（与 {@code ISaiModelUsageStatService} 一一对应）：
  * <ul>
@@ -31,8 +31,7 @@ import java.util.Map;
  *   <li>GET /de/sai-model-usage-stat/by-fk/{fkId} —— 按外键查询</li>
  * </ul>
  *
- * <p><b>存根说明</b>：所有调用进入服务实现层时统一抛出 {@code UnsupportedOperationException}，
- * 等待 owner 实装（OW-03 决议）。
+ * <p><b>实装状态</b>：该组端点已由服务实现层提供真实 CRUD（原 OW-03 存根已实化）。
  *
  * @author AIP
  */

@@ -8,11 +8,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * sai_user_agent 服务接口（存根）。
+ * sai_user_agent 服务接口（已实装）。
  *
- * <p><b>存根说明</b>：本接口为 OW-03 决议清单的接口层存根（7 端点），
- * 实现由 {@link SaiUserAgentServiceImpl} 全部抛出
- * {@code UnsupportedOperationException}，等待 owner 实装。
+ * <p><b>实装状态</b>：该组端点已由服务实现层提供真实 CRUD（原 OW-03 存根已实化）。
  *
  * <p><b>实体类型</b>：{@link SaiUserAgent}（既有 domain POJO，5 列）。
  *

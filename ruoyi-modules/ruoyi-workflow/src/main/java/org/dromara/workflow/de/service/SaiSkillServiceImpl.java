@@ -13,10 +13,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * sai_skill 服务实现（存根）。
+ * sai_skill 服务实现（已实装）。
  *
- * <p><b>存根说明</b>：本类为 OW-03 决议清单的接口层存根（7 端点），
- * 全部方法体抛 {@code UnsupportedOperationException}，等待 owner 实装。
+ * <p><b>实装状态</b>：该组端点已由服务实现层提供真实 CRUD（原 OW-03 存根已实化）。
  *
  * <p><b>实体类型</b>：{@link SaiSkill}（既有 domain POJO，BR-05 校验需要的 3 列）。
  *

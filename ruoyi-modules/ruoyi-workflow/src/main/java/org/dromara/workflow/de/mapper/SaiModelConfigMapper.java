@@ -6,11 +6,9 @@ import org.dromara.workflow.de.domain.SaiModelConfig;
 import java.util.Map;
 
 /**
- * 模型配置表 sai_model_config 的 Mapper（存根）。
+ * 模型配置表 sai_model_config 的 Mapper（已实装）。
  *
- * <p><b>存根说明</b>：本类为接口层存根（OW-03 决议），方法体由
- * {@link org.dromara.workflow.de.service.SaiModelConfigServiceImpl} 抛出
- * {@code UnsupportedOperationException}，等待 owner 实装。
+ * <p><b>实装状态</b>：该组端点已由服务实现层提供真实 CRUD（原 OW-03 存根已实化）。
  *
  * <p><b>实体类型</b>：本表无专属 domain POJO（不实装），用 {@code Map<String, Object>}
  * 作为通用实体（MyBatis-Plus 兼容）。
