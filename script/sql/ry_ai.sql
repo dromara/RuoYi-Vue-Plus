@@ -545,7 +545,6 @@ CREATE TABLE IF NOT EXISTS sai_resource
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci COMMENT = '通用资源存储';
 
-
 -- ============================================================
 -- 九、初始化数据
 -- ============================================================
@@ -570,3 +569,31 @@ INSERT INTO sai_agent VALUES (1, '智测先锋专家', '智测先锋专家是一
 INSERT INTO sai_app VALUES (1, '1', '测试', '', 'SAI_566a6bfbc26e4998b4841cc927d50c5d', 'LEAST_LOAD', 1, NOW(), NOW());
 
 INSERT INTO sai_openapi_user VALUES (1, '1', '46ed53c6a20044c7bbd870848e80f92f', 1, '1', NOW(), NOW());
+
+-- ============================================================
+-- 十、对象级 ACL（AU-03 · D-011 方案 B · 2026-09-24 owner 裁定「入库 + 追认实装」）
+--   真源 = 活库 aip-base-mysql@23307/ry-vue 的 SHOW CREATE TABLE；
+--   原表列 COMMENT 在库内为双重编码乱码（UTF-8 被按 latin1 解释），此处按字段语义规范化为可读中文。
+--   此前该表仅仓外建表、schema 接地判据不覆盖 → 本条入仓后判据纳管（表数 81→82）。
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS sai_object_acl
+(
+    id           BIGINT      NOT NULL AUTO_INCREMENT,
+    object_type  VARCHAR(64) NOT NULL COMMENT '对象类型（conversation_record/rag_document 等）',
+    object_id    BIGINT      NOT NULL COMMENT '对象 ID',
+    subject_type VARCHAR(16) NOT NULL COMMENT '主体类型 user/role/dept',
+    subject_id   BIGINT      NOT NULL COMMENT '主体 ID',
+    grant_type   VARCHAR(16) NOT NULL COMMENT '授权类型 read(T-3)/input(T-4)/publish(T-5)',
+    purpose      VARCHAR(64)  DEFAULT NULL COMMENT '目的维（AU-04，空=不限）',
+    expires_at   DATETIME     DEFAULT NULL COMMENT '期限维（AU-05，空=永久）',
+    policy_ver   INT          DEFAULT NULL COMMENT '策略版本维（AU-06）',
+    create_dt    TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP,
+    update_dt    TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_acl (object_type, object_id, subject_type, subject_id, grant_type),
+    KEY idx_obj (object_type, object_id),
+    KEY idx_subj (subject_type, subject_id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT = '对象级 ACL';
