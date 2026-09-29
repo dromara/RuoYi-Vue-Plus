@@ -1,7 +1,7 @@
 interface:
-  display_name: "RuoYi Plus 编码"
-  short_description: "先读适用 reference，再按生成器与仓库约定编码"
-  default_prompt: "使用 $ruoyi-plus-ai-coding 在这个仓库里先读取适用 reference，再按生成器、公共模块和业务模块风格实现代码修改。"
+  display_name: "RuoYi-Vue-Plus 编码规范"
+  short_description: "按生成器模板、项目架构、25 个 common 子模块约定与既有真实代码风格实现后端 CRUD、认证策略、工作流编排、SnailJob 任务、MCP 工具、Spring 事件与前端页面骨架"
+  default_prompt: "使用 $ruoyi-plus-ai-coding 在这个仓库里先按任务类型读取适用 reference（backend/frontend/examples），再对齐生成器 FreeMarker 模板、common 层公共能力（BaseMapperPlus/QueryBuilder/TranslationInterface/LoginHelper/CacheUtils/@RateLimiter/@DataPermission 等）与当前模块真实代码风格，最后产出可落地的后端分层代码或前端骨架。"
 
 policy:
   allow_implicit_invocation: true
