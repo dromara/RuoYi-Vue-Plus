@@ -8,7 +8,6 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.domain.UserDTO;
-import org.dromara.warm.flow.core.dto.FlowParams;
 import org.dromara.warm.flow.core.handler.PermissionHandler;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.service.IFlwTaskAssigneeService;
@@ -32,7 +31,7 @@ public class WorkflowPermissionHandler implements PermissionHandler {
 
     /**
      * 办理人权限标识，比如用户，角色，部门等，用于校验是否有权限办理任务
-     * 后续在{@link FlowParams#getPermissionFlag}  中获取
+     * 后续在流程上下文中获取。
      * 返回当前用户权限集合
      *
      * @return 当前用户权限集合

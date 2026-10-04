@@ -13,7 +13,7 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.system.api.UserService;
 import org.dromara.warm.flow.core.FlowEngine;
-import org.dromara.warm.flow.core.dto.FlowParams;
+import org.dromara.warm.flow.core.workflow.context.WorkflowContext;
 import org.dromara.warm.flow.core.entity.Definition;
 import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.entity.Task;
@@ -110,20 +110,20 @@ public class WorkflowGlobalListener implements GlobalListener {
     public void assignment(ListenerVariable listenerVariable) {
         Map<String, Object> variable = listenerVariable.getVariable();
         List<Task> nextTasks = listenerVariable.getNextTasks();
-        FlowParams flowParams = listenerVariable.getFlowParams();
+        WorkflowContext workflowContext = listenerVariable.getContext();
         Definition definition = listenerVariable.getDefinition();
         Instance instance = listenerVariable.getInstance();
         String applyNodeCode = flwCommonService.applyNodeCode(definition.getId());
-        String hisStatus = flowParams != null ? flowParams.getHisStatus() : null;
+        String taskStatus = workflowContext != null ? workflowContext.getTaskStatus() : null;
 
         for (Task flowTask : nextTasks) {
             String nodeCode = flowTask.getNodeCode();
 
             // 处理办理或退回时指定办理人的情况
-            if (TaskStatusEnum.PASS.getStatus().equals(hisStatus)) {
-                processTaskPermission(variable, flowTask, hisStatus);
-            } else if (TaskStatusEnum.BACK.getStatus().equals(hisStatus)) {
-                processTaskPermission(variable, flowTask, hisStatus);
+            if (TaskStatusEnum.PASS.getStatus().equals(taskStatus)) {
+                processTaskPermission(variable, flowTask, taskStatus);
+            } else if (TaskStatusEnum.BACK.getStatus().equals(taskStatus)) {
+                processTaskPermission(variable, flowTask, taskStatus);
             }
 
             // 如果是申请节点，则把启动人添加到办理人
@@ -183,16 +183,16 @@ public class WorkflowGlobalListener implements GlobalListener {
         Task task = listenerVariable.getTask();
         List<Task> nextTasks = listenerVariable.getNextTasks();
         Map<String, Object> params = new HashMap<>();
-        FlowParams flowParams = listenerVariable.getFlowParams();
+        WorkflowContext workflowContext = listenerVariable.getContext();
         Map<String, Object> variable = new HashMap<>();
-        if (ObjectUtil.isNotNull(flowParams)) {
+        if (ObjectUtil.isNotNull(workflowContext)) {
             // 历史任务扩展(通常为附件)
-            params.put("hisTaskExt", flowParams.getHisTaskExt());
+            params.put("hisTaskExt", workflowContext.getExt());
             // 办理人
-            params.put("handler", flowParams.getHandler());
+            params.put("handler", workflowContext.getHandler());
             // 办理意见
-            params.put("message", flowParams.getMessage());
-            variable = flowParams.getVariable();
+            params.put("message", workflowContext.getMessage());
+            variable = workflowContext.getVariables();
         }
         //申请人提交事件
         Boolean submit = MapUtil.getBool(variable, FlowConstant.SUBMIT);
@@ -224,11 +224,11 @@ public class WorkflowGlobalListener implements GlobalListener {
                 flowProcessEventHandler.processTaskHandler(definition.getFlowCode(), instance, nextTask, params);
             }
         }
-        if (ObjectUtil.isNull(flowParams)) {
+        if (ObjectUtil.isNull(workflowContext)) {
             return;
         }
         // 只有办理或者退回的时候才执行消息通知和抄送
-        if (!TaskStatusEnum.isPassOrBack(flowParams.getHisStatus())) {
+        if (!TaskStatusEnum.isPassOrBack(workflowContext.getTaskStatus())) {
             return;
         }
         if (ObjectUtil.isNull(variable)) {
@@ -246,7 +246,7 @@ public class WorkflowGlobalListener implements GlobalListener {
             });
             String notice = MapUtil.getStr(variable, FlowConstant.MESSAGE_NOTICE);
             // 退回到申请人时只保留“已退回”结果消息，避免再追加一条“新的待办”形成重复提醒。
-            if (shouldSendTaskMessage(flowParams, definition, nextTasks)) {
+            if (shouldSendTaskMessage(workflowContext, definition, nextTasks)) {
                 SpringUtils.context().publishEvent(new WorkflowTaskMessageEvent(definition.getFlowName(), instance.getId(), messageType, notice));
             }
         }
@@ -261,13 +261,13 @@ public class WorkflowGlobalListener implements GlobalListener {
     /**
      * 判断是否需要发送后续待办消息。
      *
-     * @param flowParams 流程参数
+     * @param workflowContext 流程执行上下文
      * @param definition 流程定义
      * @param nextTasks  后续任务列表
      * @return 是否发送待办消息
      */
-    private boolean shouldSendTaskMessage(FlowParams flowParams, Definition definition, List<Task> nextTasks) {
-        if (flowParams == null || !TaskStatusEnum.BACK.getStatus().equals(flowParams.getHisStatus())) {
+    private boolean shouldSendTaskMessage(WorkflowContext workflowContext, Definition definition, List<Task> nextTasks) {
+        if (workflowContext == null || !TaskStatusEnum.BACK.getStatus().equals(workflowContext.getTaskStatus())) {
             return true;
         }
         if (CollUtil.isEmpty(nextTasks) || nextTasks.size() != 1) {

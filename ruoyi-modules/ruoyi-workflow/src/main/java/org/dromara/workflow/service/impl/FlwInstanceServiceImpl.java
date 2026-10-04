@@ -20,8 +20,11 @@ import org.dromara.common.mybatis.core.query.LambdaJoinQueryBuilder;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.FlowEngine;
+import org.dromara.warm.flow.core.workflow.command.RevokeCommand;
+import org.dromara.warm.flow.core.workflow.command.TerminateCommand;
+import org.dromara.warm.flow.core.workflow.context.OperatorContext;
 import org.dromara.warm.flow.core.constant.ExceptionCons;
-import org.dromara.warm.flow.core.dto.FlowParams;
+import org.dromara.warm.flow.core.workflow.context.WorkflowContext;
 import org.dromara.warm.flow.core.entity.Definition;
 import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.entity.Task;
@@ -267,13 +270,14 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             throw new ServiceException("权限不足，无法撤销流程!");
         }
         BusinessStatusEnum.checkCancelStatus(instance.getFlowStatus());
-        FlowParams flowParams = FlowParams.build()
-            .message(bo.message())
-            .flowStatus(BusinessStatusEnum.CANCEL.getStatus())
-            .hisStatus(BusinessStatusEnum.CANCEL.getStatus())
-            .handler(userIdStr)
-            .ignore(true);
-        taskService.revoke(instance.getId(), flowParams);
+        RevokeCommand command = new RevokeCommand();
+        command.setOperator(new OperatorContext(userIdStr));
+        command.getOperator().setIgnore(true);
+        command.setInstanceId(instance.getId());
+        command.setMessage(bo.message());
+        command.setFlowStatus(BusinessStatusEnum.CANCEL.getStatus());
+        command.setTaskStatus(BusinessStatusEnum.CANCEL.getStatus());
+        FlowEngine.workflow().revoke(command);
         return true;
     }
 
@@ -452,12 +456,14 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         if (instance != null) {
             BusinessStatusEnum.checkInvalidStatus(instance.getFlowStatus());
         }
-        FlowParams flowParams = FlowParams.build()
-            .message(bo.comment())
-            .flowStatus(BusinessStatusEnum.INVALID.getStatus())
-            .hisStatus(TaskStatusEnum.INVALID.getStatus())
-            .ignore(true);
-        taskService.terminationByInsId(bo.id(), flowParams);
+        TerminateCommand command = new TerminateCommand();
+        command.setOperator(new OperatorContext(LoginHelper.getUserIdStr()));
+        command.getOperator().setIgnore(true);
+        command.setInstanceId(bo.id());
+        command.setMessage(bo.comment());
+        command.setFlowStatus(BusinessStatusEnum.INVALID.getStatus());
+        command.setTaskStatus(TaskStatusEnum.INVALID.getStatus());
+        FlowEngine.workflow().terminate(command);
         return true;
     }
 }

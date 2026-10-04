@@ -6,14 +6,17 @@ import com.yomahub.liteflow.core.NodeComponent;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.exception.ServiceException;
-import org.dromara.warm.flow.core.dto.FlowParams;
+import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.entity.Task;
-import org.dromara.warm.flow.core.service.InsService;
 import org.dromara.warm.flow.core.service.TaskService;
+import org.dromara.warm.flow.core.workflow.command.StartCommand;
+import org.dromara.warm.flow.core.workflow.context.OperatorContext;
+import org.dromara.warm.flow.core.workflow.result.WorkflowResult;
 import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.workflow.api.domain.StartProcessReturnDTO;
 import org.dromara.workflow.common.ConditionalOnEnable;
+import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
 import org.dromara.workflow.domain.context.StartProcessContext;
 import org.dromara.workflow.mapper.FlwInstanceBizExtMapper;
@@ -30,19 +33,21 @@ import java.util.List;
 @LiteflowComponent("startExecute")
 public class StartExecuteComponent extends NodeComponent {
 
-    private final InsService insService;
     private final TaskService taskService;
     private final FlwInstanceBizExtMapper flwInstanceBizExtMapper;
 
     @Override
     public void process() {
         StartProcessContext context = getContextBean(StartProcessContext.class);
-        FlowParams flowParams = FlowParams.build()
-            .handler(context.getStartProcessBo().getHandler())
-            .flowCode(context.getStartProcessBo().getFlowCode())
-            .variable(context.getVariables())
-            .flowStatus(BusinessStatusEnum.DRAFT.getStatus());
-        Instance instance = insService.start(context.getBusinessId(), flowParams);
+        StartCommand command = new StartCommand();
+        command.setBusinessId(context.getBusinessId());
+        command.setFlowCode(context.getStartProcessBo().getFlowCode());
+        command.setOperator(new OperatorContext(context.getStartProcessBo().getHandler()));
+        command.setVariables(context.getVariables());
+        command.setFlowStatus(BusinessStatusEnum.DRAFT.getStatus());
+        command.setTaskStatus(TaskStatusEnum.PASS.getStatus());
+        WorkflowResult result = FlowEngine.workflow().start(command);
+        Instance instance = FlowEngine.insService().getById(result.getInstanceId());
         context.setInstance(instance);
         saveBizExt(context, instance);
 

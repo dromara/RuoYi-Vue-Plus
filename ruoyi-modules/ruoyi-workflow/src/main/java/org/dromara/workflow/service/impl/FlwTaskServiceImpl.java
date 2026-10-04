@@ -23,9 +23,12 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.UserService;
 import org.dromara.system.api.domain.UserDTO;
 import org.dromara.warm.flow.core.FlowEngine;
+import org.dromara.warm.flow.core.workflow.command.RejectCommand;
+import org.dromara.warm.flow.core.workflow.command.TerminateCommand;
+import org.dromara.warm.flow.core.workflow.context.OperatorContext;
 import org.dromara.warm.flow.core.constant.ExceptionCons;
 import org.dromara.warm.flow.core.dto.FlowCombine;
-import org.dromara.warm.flow.core.dto.FlowParams;
+import org.dromara.warm.flow.core.workflow.context.WorkflowContext;
 import org.dromara.warm.flow.core.entity.*;
 import org.dromara.warm.flow.core.enums.NodeType;
 import org.dromara.warm.flow.core.enums.SkipType;
@@ -161,12 +164,12 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         long taskId = IdGeneratorUtil.nextLongId();
         task.setId(taskId);
         task.setNodeName("【抄送】" + task.getNodeName());
-        Date updateTime = new Date(flowHisTask.getUpdateTime().getTime() - 1000);
-        FlowParams flowParams = FlowParams.build()
-            .skipType(SkipType.NONE.getKey())
-            .hisStatus(TaskStatusEnum.COPY.getStatus())
-            .message("【抄送给】" + StreamUtils.join(flowCopyList, FlowCopyBo::getNickName));
-        HisTask hisTask = hisTaskService.setSkipHisTask(task, flowNode, flowParams);
+        // 抄送记录展示在触发抄送的办理记录之前，历史列表按更新时间倒序排列。
+        Date updateTime = new Date(flowHisTask.getUpdateTime().getTime() + 1000);
+        WorkflowContext workflowContext = new WorkflowContext();
+        workflowContext.setTaskStatus(TaskStatusEnum.COPY.getStatus());
+        workflowContext.setMessage("【抄送给】" + StreamUtils.join(flowCopyList, FlowCopyBo::getNickName));
+        HisTask hisTask = hisTaskService.setSkipHisTask(task, flowNode, workflowContext, SkipType.NONE.getKey());
         hisTask.setCreateTime(updateTime);
         hisTask.setUpdateTime(updateTime);
         hisTaskService.save(hisTask);
@@ -315,15 +318,16 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         variable.put(MESSAGE_TYPE, messageType);
         variable.put(MESSAGE_NOTICE, notice);
 
-        FlowParams flowParams = FlowParams.build()
-            .nodeCode(bo.getNodeCode())
-            .variable(variable)
-            .message(message)
-            .skipType(SkipType.REJECT.getKey())
-            .flowStatus(applyNodeCode.equals(bo.getNodeCode()) ? TaskStatusEnum.BACK.getStatus() : TaskStatusEnum.WAITING.getStatus())
-            .hisStatus(TaskStatusEnum.BACK.getStatus())
-            .hisTaskExt(bo.getFileId());
-        taskService.skip(task.getId(), flowParams);
+        RejectCommand command = new RejectCommand();
+        command.setOperator(new OperatorContext(LoginHelper.getUserIdStr()));
+        command.setTaskId(task.getId());
+        command.setTargetNodeCode(bo.getNodeCode());
+        command.setVariables(variable);
+        command.setMessage(message);
+        command.setExt(bo.getFileId());
+        command.setFlowStatus(applyNodeCode.equals(bo.getNodeCode()) ? TaskStatusEnum.BACK.getStatus() : TaskStatusEnum.WAITING.getStatus());
+        command.setTaskStatus(TaskStatusEnum.BACK.getStatus());
+        FlowEngine.workflow().reject(command);
         return true;
     }
 
@@ -479,11 +483,13 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (ObjectUtil.isNotNull(instance)) {
             BusinessStatusEnum.checkInvalidStatus(instance.getFlowStatus());
         }
-        FlowParams flowParams = FlowParams.build()
-            .message(bo.comment())
-            .flowStatus(BusinessStatusEnum.TERMINATION.getStatus())
-            .hisStatus(TaskStatusEnum.TERMINATION.getStatus());
-        taskService.termination(taskId, flowParams);
+        TerminateCommand command = new TerminateCommand();
+        command.setOperator(new OperatorContext(LoginHelper.getUserIdStr()));
+        command.setTaskId(taskId);
+        command.setMessage(bo.comment());
+        command.setFlowStatus(BusinessStatusEnum.TERMINATION.getStatus());
+        command.setTaskStatus(TaskStatusEnum.TERMINATION.getStatus());
+        FlowEngine.workflow().terminate(command);
         return true;
     }
 
@@ -587,9 +593,10 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         nextFlowNodes = StreamUtils.filter(nextFlowNodes, node -> NodeType.BETWEEN.getKey().equals(node.getNodeType()));
         if (CollUtil.isNotEmpty(nextNodeList)) {
             //构建以下节点数据
-            List<Task> buildNextTaskList = StreamUtils.toList(nextNodeList, node -> taskService.addTask(node, instance, definition, FlowParams.build()));
+            List<Task> buildNextTaskList = StreamUtils.toList(nextNodeList, node -> taskService.addTask(node, instance
+                , definition, new WorkflowContext(), SkipType.PASS.getKey()));
             //办理人变量替换
-            ExpressionUtil.evalVariable(buildNextTaskList, FlowParams.build().variable(mergeVariable));
+            ExpressionUtil.evalVariable(buildNextTaskList, mergeVariable, null, false);
             for (FlowNode flowNode : nextFlowNodes) {
                 StreamUtils.findFirst(buildNextTaskList, t -> t.getNodeCode().equals(flowNode.getNodeCode()))
                     .ifPresent(first -> {

@@ -10,12 +10,13 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.FlowEngine;
-import org.dromara.warm.flow.core.dto.FlowParams;
+import org.dromara.warm.flow.core.workflow.command.CompleteCommand;
+import org.dromara.warm.flow.core.workflow.context.OperatorContext;
 import org.dromara.warm.flow.core.entity.User;
-import org.dromara.warm.flow.core.service.TaskService;
 import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
+import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.context.CompleteTaskContext;
 
 import java.util.Collections;
@@ -36,24 +37,22 @@ import static org.dromara.workflow.common.constant.FlowConstant.*;
 @LiteflowComponent("completeAutoPass")
 public class CompleteAutoPassComponent extends NodeComponent {
 
-    private final TaskService taskService;
     private final FlowTaskMapper flowTaskMapper;
 
     @Override
     public void process() {
         CompleteTaskContext context = getContextBean(CompleteTaskContext.class);
         FlowTask flowTask = context.getFlowTask();
-        autoPass(flowTask.getId(), context.getFlowParams(), flowTask.getInstanceId());
+        autoPass(flowTask.getId(), flowTask.getInstanceId());
     }
 
     /**
      * 递归跳过当前处理人的后续任务。
      *
      * @param taskId     本轮已处理任务 id，用于避免重复跳过同一任务
-     * @param flowParams 当前办理参数，会在自动审批时覆盖为自动审批消息和空抄送变量
      * @param instanceId 流程实例 id
      */
-    private void autoPass(Long taskId, FlowParams flowParams, Long instanceId) {
+    private void autoPass(Long taskId, Long instanceId) {
         List<FlowTask> flowTaskList = selectByInstId(instanceId);
         if (CollUtil.isEmpty(flowTaskList)) {
             return;
@@ -74,15 +73,15 @@ public class CompleteAutoPassComponent extends NodeComponent {
                 continue;
             }
             // 自动审批不继承人工办理时的抄送和消息通知，避免重复发送业务消息。
-            flowParams
-                .message("流程引擎自动审批！")
-                .variable(Map.of(
-                    SUBMIT, false,
-                    FLOW_COPY_LIST, Collections.emptyList(),
-                    MESSAGE_NOTICE, StringUtils.EMPTY));
-            taskService.skip(task.getId(), flowParams);
+            CompleteCommand command = new CompleteCommand();
+            command.setOperator(new OperatorContext(LoginHelper.getUserIdStr()));
+            command.setTaskId(task.getId());
+            command.setMessage("流程引擎自动审批！");
+            command.setVariables(Map.of(SUBMIT, false, FLOW_COPY_LIST, Collections.emptyList(), MESSAGE_NOTICE, StringUtils.EMPTY));
+            command.setTaskStatus(TaskStatusEnum.PASS.getStatus());
+            FlowEngine.workflow().complete(command);
             // 跳过后可能生成新的后续任务，继续扫描直到当前登录人不再有可自动办理任务。
-            autoPass(task.getId(), flowParams, instanceId);
+            autoPass(task.getId(), instanceId);
         }
     }
 
