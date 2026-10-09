@@ -341,8 +341,11 @@ public class GenTableServiceImpl implements IGenTableService {
     public byte[] downloadCode(Long tableId) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ZipOutputStream zip = new ZipOutputStream(outputStream);
-        writeCodeToZip(tableId, zip);
-        IoUtil.close(zip);
+        try {
+            writeCodeToZip(tableId, zip);
+        } finally {
+            IoUtil.close(zip);
+        }
         return outputStream.toByteArray();
     }
 
@@ -408,10 +411,13 @@ public class GenTableServiceImpl implements IGenTableService {
     public byte[] downloadCode(String[] tableIds) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ZipOutputStream zip = new ZipOutputStream(outputStream);
-        for (String tableId : tableIds) {
-            writeCodeToZip(Long.parseLong(tableId), zip);
+        try {
+            for (String tableId : tableIds) {
+                writeCodeToZip(Long.parseLong(tableId), zip);
+            }
+        } finally {
+            IoUtil.close(zip);
         }
-        IoUtil.close(zip);
         return outputStream.toByteArray();
     }
 
