@@ -340,11 +340,10 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public byte[] downloadCode(Long tableId) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ZipOutputStream zip = new ZipOutputStream(outputStream);
-        try {
+        try(ZipOutputStream zip = new ZipOutputStream(outputStream)) {
             writeCodeToZip(tableId, zip);
-        } finally {
-            IoUtil.close(zip);
+        } catch (IOException e) {
+            log.error("渲染模板失败，Zip输出流IO异常。", e);
         }
         return outputStream.toByteArray();
     }
@@ -410,13 +409,12 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public byte[] downloadCode(String[] tableIds) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ZipOutputStream zip = new ZipOutputStream(outputStream);
-        try {
+        try(ZipOutputStream zip = new ZipOutputStream(outputStream)) {
             for (String tableId : tableIds) {
                 writeCodeToZip(Long.parseLong(tableId), zip);
             }
-        } finally {
-            IoUtil.close(zip);
+        } catch (IOException e) {
+            log.error("渲染模板失败，Zip输出流IO异常。", e);
         }
         return outputStream.toByteArray();
     }
