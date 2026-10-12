@@ -497,7 +497,7 @@ CREATE TABLE flow_instance (
     definition_id bigint NOT NULL,
     business_id nvarchar(40) NOT NULL,
     node_type tinyint NOT NULL,
-    node_code nvarchar(40) NOT NULL,
+    node_code nvarchar(100) NOT NULL,
     node_name nvarchar(100) NULL,
     variable nvarchar(max) NULL,
     flow_status nvarchar(20) NOT NULL,

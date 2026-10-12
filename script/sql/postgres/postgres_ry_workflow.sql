@@ -138,7 +138,7 @@ CREATE TABLE flow_instance
     definition_id   int8         NOT NULL,
     business_id     varchar(40)  NOT NULL,
     node_type       int2         NOT NULL,
-    node_code       varchar(40)  NOT NULL,
+    node_code       varchar(100) NOT NULL,
     node_name       varchar(100) NULL,
     variable        text         NULL,
     flow_status     varchar(20)  NOT NULL,
