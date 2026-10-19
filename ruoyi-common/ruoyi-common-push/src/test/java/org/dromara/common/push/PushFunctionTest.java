@@ -3,13 +3,19 @@ package org.dromara.common.push;
 import org.dromara.common.push.annotation.ConditionalOnMessageTransport;
 import org.dromara.common.push.condition.MessageTransportCondition;
 import org.dromara.common.push.enums.MessageTransportEnum;
+import org.dromara.common.push.core.SseEmitterSessionManager;
+import org.dromara.common.push.properties.MessageProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.mock.env.MockEnvironment;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -51,5 +57,29 @@ class PushFunctionTest {
 
         environment.setProperty("message.enabled", "false");
         assertFalse(condition.matches(context, metadata));
+    }
+
+    @Test
+    @DisplayName("旧 SSE 回调不移除重连后的新连接")
+    @SuppressWarnings("unchecked")
+    void shouldKeepReplacementEmitterWhenOldConnectionCompletes() {
+        ScheduledExecutorService scheduler = mock(ScheduledExecutorService.class);
+        SseEmitterSessionManager manager = new SseEmitterSessionManager(scheduler, new MessageProperties());
+        Map<Long, Map<String, SseEmitter>> sessions =
+            (Map<Long, Map<String, SseEmitter>>) ReflectionTestUtils.getField(SseEmitterSessionManager.class, "USER_TOKEN_EMITTERS");
+        long userId = 999_999L;
+        String token = "replacement-test";
+        SseEmitter oldEmitter = new SseEmitter();
+        SseEmitter newEmitter = new SseEmitter();
+        sessions.put(userId, new ConcurrentHashMap<>(Map.of(token, newEmitter)));
+        try {
+            ReflectionTestUtils.invokeMethod(manager, "removeEmitter", userId, token, oldEmitter);
+            assertEquals(newEmitter, sessions.get(userId).get(token));
+
+            ReflectionTestUtils.invokeMethod(manager, "removeEmitter", userId, token, newEmitter);
+            assertFalse(sessions.containsKey(userId));
+        } finally {
+            sessions.remove(userId);
+        }
     }
 }

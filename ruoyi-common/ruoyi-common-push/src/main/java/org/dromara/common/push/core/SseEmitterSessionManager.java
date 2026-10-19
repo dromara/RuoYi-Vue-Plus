@@ -1,6 +1,5 @@
 package org.dromara.common.push.core;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.ThreadUtils;
@@ -19,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
@@ -58,50 +58,39 @@ public class SseEmitterSessionManager implements PushSessionManager {
      * @return 返回一个 SseEmitter 实例，客户端可以通过该实例接收 SSE 事件
      */
     public SseEmitter connect(Long userId, String token) {
-        // 从 USER_TOKEN_EMITTERS 中获取或创建当前用户的 SseEmitter 映射表（ConcurrentHashMap）
-        // 每个用户可以有多个 SSE 连接，通过 token 进行区分
-        Map<String, SseEmitter> emitters = USER_TOKEN_EMITTERS.computeIfAbsent(userId, k -> new ConcurrentHashMap<>());
-
-        // 关闭已存在的SseEmitter，防止超过最大连接数
-        SseEmitter oldEmitter = emitters.remove(token);
-        if (oldEmitter != null) {
-            sendKickedMessage(oldEmitter);
-            oldEmitter.complete();
-        }
-
-        // 创建一个新的 SseEmitter 实例，避免连接之后直接关闭浏览器导致连接停滞
         SseEmitter emitter = new SseEmitter(messageProperties.getSseTimeout());
+        emitter.onCompletion(() -> removeEmitter(userId, token, emitter));
+        emitter.onTimeout(() -> removeEmitter(userId, token, emitter));
+        emitter.onError(e -> removeEmitter(userId, token, emitter));
 
-        emitters.put(token, emitter);
-
-        // 当 emitter 完成、超时或发生错误时，从映射表中移除对应的 token
-        emitter.onCompletion(() -> {
-            SseEmitter remove = emitters.remove(token);
-            if (remove != null) {
-                remove.complete();
+        AtomicReference<SseEmitter> oldEmitter = new AtomicReference<>();
+        USER_TOKEN_EMITTERS.compute(userId, (id, emitters) -> {
+            if (emitters == null) {
+                emitters = new ConcurrentHashMap<>();
             }
+            oldEmitter.set(emitters.put(token, emitter));
+            return emitters;
         });
-        emitter.onTimeout(() -> {
-            SseEmitter remove = emitters.remove(token);
-            if (remove != null) {
-                remove.complete();
-            }
-        });
-        emitter.onError((e) -> {
-            SseEmitter remove = emitters.remove(token);
-            if (remove != null) {
-                remove.complete();
-            }
-        });
+        if (oldEmitter.get() != null) {
+            sendKickedMessage(oldEmitter.get());
+            oldEmitter.get().complete();
+        }
 
         try {
             // 向客户端发送一条连接成功的事件
             emitter.send(SseEmitter.event().comment("connected"));
         } catch (IOException e) {
-            // 如果发送消息失败，则从映射表中移除 emitter
-            emitters.remove(token);
+            removeEmitter(userId, token, emitter);
+            emitter.complete();
         }
         return emitter;
+    }
+
+    private void removeEmitter(Long userId, String token, SseEmitter emitter) {
+        USER_TOKEN_EMITTERS.computeIfPresent(userId, (id, emitters) -> {
+            emitters.remove(token, emitter);
+            return emitters.isEmpty() ? null : emitters;
+        });
     }
 
     /**
@@ -129,17 +118,18 @@ public class SseEmitterSessionManager implements PushSessionManager {
         if (userId == null || token == null) {
             return;
         }
-        Map<String, SseEmitter> emitters = USER_TOKEN_EMITTERS.get(userId);
-        if (MapUtil.isNotEmpty(emitters)) {
+        AtomicReference<SseEmitter> removed = new AtomicReference<>();
+        USER_TOKEN_EMITTERS.computeIfPresent(userId, (id, emitters) -> {
+            removed.set(emitters.remove(token));
+            return emitters.isEmpty() ? null : emitters;
+        });
+        SseEmitter sseEmitter = removed.get();
+        if (sseEmitter != null) {
             try {
-                SseEmitter sseEmitter = emitters.get(token);
                 sseEmitter.send(SseEmitter.event().comment("disconnected"));
-                sseEmitter.complete();
             } catch (Exception ignore) {
             }
-            emitters.remove(token);
-        } else {
-            USER_TOKEN_EMITTERS.remove(userId);
+            sseEmitter.complete();
         }
     }
 
@@ -148,15 +138,7 @@ public class SseEmitterSessionManager implements PushSessionManager {
      */
     public void sseMonitor() {
         final SseEmitter.SseEventBuilder heartbeat = SseEmitter.event().comment("heartbeat");
-        // 记录需要移除的用户ID
-        List<Long> toRemoveUsers = new ArrayList<>();
-
         USER_TOKEN_EMITTERS.forEach((userId, emitterMap) -> {
-            if (CollUtil.isEmpty(emitterMap)) {
-                toRemoveUsers.add(userId);
-                return;
-            }
-
             emitterMap.entrySet().removeIf(entry -> {
                 try {
                     entry.getValue().send(heartbeat);
@@ -171,14 +153,8 @@ public class SseEmitterSessionManager implements PushSessionManager {
                 }
             });
 
-            // 移除空连接用户
-            if (emitterMap.isEmpty()) {
-                toRemoveUsers.add(userId);
-            }
+            USER_TOKEN_EMITTERS.computeIfPresent(userId, (id, current) -> current.isEmpty() ? null : current);
         });
-
-        // 循环结束后统一清理空用户，避免并发修改异常
-        toRemoveUsers.forEach(USER_TOKEN_EMITTERS::remove);
     }
 
     /**
@@ -206,14 +182,13 @@ public class SseEmitterSessionManager implements PushSessionManager {
                         .name("message")
                         .data(message));
                 } catch (Exception e) {
-                    SseEmitter remove = emitters.remove(entry.getKey());
-                    if (remove != null) {
-                        remove.complete();
+                    if (emitters.remove(entry.getKey(), entry.getValue())) {
+                        entry.getValue().complete();
                     }
                 }
             }
         } else {
-            USER_TOKEN_EMITTERS.remove(userId);
+            USER_TOKEN_EMITTERS.computeIfPresent(userId, (id, current) -> current.isEmpty() ? null : current);
         }
     }
 
