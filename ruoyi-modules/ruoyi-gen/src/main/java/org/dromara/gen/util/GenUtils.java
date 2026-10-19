@@ -278,11 +278,8 @@ public class GenUtils {
      * @return 业务名
      */
     public static String getBusinessName(String tableName) {
-        int firstIndex = tableName.indexOf("_");
-        int nameLength = tableName.length();
-        String businessName = StringUtils.substring(tableName, firstIndex + 1, nameLength);
-        businessName = StringUtils.toCamelCase(businessName);
-        return businessName;
+        // 业务名与类名共用表前缀处理规则，仅需转为首字母小写。
+        return StringUtils.uncapitalize(convertClassName(tableName));
     }
 
     /**
