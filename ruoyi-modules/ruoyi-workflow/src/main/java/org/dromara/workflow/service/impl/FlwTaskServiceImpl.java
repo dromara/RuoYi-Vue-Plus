@@ -18,11 +18,13 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.liteflow.utils.LiteFlowUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
-import org.dromara.common.mybatis.utils.IdGeneratorUtil;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.UserService;
 import org.dromara.system.api.domain.UserDTO;
 import org.dromara.warm.flow.core.FlowEngine;
+import org.dromara.warm.flow.core.enums.FlowStatus;
+import org.dromara.warm.flow.core.enums.TaskStatus;
+import org.dromara.warm.flow.core.service.copy.CopyConfig;
 import org.dromara.warm.flow.core.workflow.command.RejectCommand;
 import org.dromara.warm.flow.core.workflow.command.TerminateCommand;
 import org.dromara.warm.flow.core.workflow.context.OperatorContext;
@@ -35,6 +37,7 @@ import org.dromara.warm.flow.core.enums.SkipType;
 import org.dromara.warm.flow.core.enums.UserType;
 import org.dromara.warm.flow.core.exception.FlowException;
 import org.dromara.warm.flow.core.service.*;
+import org.dromara.warm.flow.core.spi.PermissionHandler;
 import org.dromara.warm.flow.core.utils.ExpressionUtil;
 import org.dromara.warm.flow.core.utils.MapUtil;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
@@ -47,7 +50,6 @@ import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
 import org.dromara.workflow.api.domain.StartProcessReturnDTO;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskAssigneeType;
-import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.context.CompleteTaskContext;
 import org.dromara.workflow.domain.context.StartProcessContext;
@@ -148,44 +150,22 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (CollUtil.isEmpty(flowCopyList)) {
             return;
         }
-        // 添加抄送人记录
-        List<FlowHisTask> flowHisTasks = flowHisTaskMapper.selectList(
-            QueryBuilder.lambda(FlowHisTask.class)
-                .eq(FlowHisTask::getTaskId, task.getId())
-                .build());
-        if (CollUtil.isEmpty(flowHisTasks)) {
-            throw new ServiceException("流程历史任务不存在，无法添加抄送记录");
+        WorkflowContext context = new WorkflowContext();
+        context.setHandler(LoginHelper.getUserIdStr());
+        context.setMessage("【抄送给】" + StreamUtils.join(flowCopyList, FlowCopyBo::getNickName));
+        // 抄送留痕交给引擎：按「同一待办 + 同一人」幂等，抄送人挂在抄送历史主键上，办结后仍可补抄送。
+        HisTask copyHis = taskService.copy(task.getId()
+            , StreamUtils.toList(flowCopyList, x -> Convert.toStr(x.getUserId())), context);
+        if (ObjectUtil.isNull(copyHis)) {
+            return;
         }
-        FlowHisTask flowHisTask = flowHisTasks.getFirst();
-        FlowNode flowNode = new FlowNode();
-        flowNode.setNodeCode(flowHisTask.getTargetNodeCode());
-        flowNode.setNodeName(flowHisTask.getTargetNodeName());
-        //生成新的任务id
-        long taskId = IdGeneratorUtil.nextLongId();
-        task.setId(taskId);
-        task.setNodeName("【抄送】" + task.getNodeName());
-        // 抄送记录展示在触发抄送的办理记录之前，历史列表按更新时间倒序排列。
-        Date updateTime = new Date(flowHisTask.getUpdateTime().getTime() + 1000);
-        WorkflowContext workflowContext = new WorkflowContext();
-        workflowContext.setTaskStatus(TaskStatusEnum.COPY.getStatus());
-        workflowContext.setMessage("【抄送给】" + StreamUtils.join(flowCopyList, FlowCopyBo::getNickName));
-        HisTask hisTask = hisTaskService.setSkipHisTask(task, flowNode, workflowContext, SkipType.NONE.getKey());
-        hisTask.setCreateTime(updateTime);
-        hisTask.setUpdateTime(updateTime);
-        hisTaskService.save(hisTask);
-        List<User> userList = StreamUtils.toList(flowCopyList, x ->
-            new FlowUser()
-                .setType(TaskAssigneeType.COPY.getCode())
-                .setProcessedBy(Convert.toStr(x.getUserId()))
-                .setAssociated(taskId));
-        // 批量保存抄送人员
-        FlowEngine.userService().saveBatch(userList);
-        // 抄送消息进入“我的抄送”，不和待办列表混用。
+        // 抄送消息进入“我的抄送”，不和待办列表混用；只提醒本次真正新增的人。
         flwCommonService.sendMessage(
             List.of(org.dromara.workflow.common.enums.MessageTypeEnum.SYSTEM_MESSAGE.getCode()),
             "您收到一条新的流程抄送，请及时查看。",
             "单据抄送提醒",
-            userService.selectListByIds(StreamUtils.toList(flowCopyList, FlowCopyBo::getUserId)),
+            userService.selectListByIds(StreamUtils.toList(
+                StringUtils.str2List(copyHis.getCollaborator(), StringUtils.SEPARATOR, true, true), Convert::toLong)),
             PATH_TASK_COPY
         );
     }
@@ -325,8 +305,8 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         command.setVariables(variable);
         command.setMessage(message);
         command.setExt(bo.getFileId());
-        command.setFlowStatus(applyNodeCode.equals(bo.getNodeCode()) ? TaskStatusEnum.BACK.getStatus() : TaskStatusEnum.WAITING.getStatus());
-        command.setTaskStatus(TaskStatusEnum.BACK.getStatus());
+        command.setFlowStatus(applyNodeCode.equals(bo.getNodeCode()) ? FlowStatus.BACK.getKey() : FlowStatus.WAITING.getKey());
+        command.setTaskStatus(TaskStatus.BACK.getKey());
         FlowEngine.workflow().reject(command);
         return true;
     }
@@ -487,8 +467,6 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         command.setOperator(new OperatorContext(LoginHelper.getUserIdStr()));
         command.setTaskId(taskId);
         command.setMessage(bo.comment());
-        command.setFlowStatus(BusinessStatusEnum.TERMINATION.getStatus());
-        command.setTaskStatus(TaskStatusEnum.TERMINATION.getStatus());
         FlowEngine.workflow().terminate(command);
         return true;
     }
@@ -544,12 +522,13 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         } else {
             flowTaskVo.setButtonList(new ArrayList<>());
         }
-        if (CollUtil.isNotEmpty(nodeExtVo.getCopySettings())) {
-            List<FlowCopyVo> list = StreamUtils.toList(nodeExtVo.getCopySettings(), x -> new FlowCopyVo(Convert.toLong(x)));
-            flowTaskVo.setCopyList(list);
-        } else {
-            flowTaskVo.setCopyList(new ArrayList<>());
+        // 抄送人读引擎节点配置 node_config.copy，展开规则与流转时一致（resolveCopyHandlers）。
+        List<String> copyHandlers = CopyConfig.parse(flowNode.getNodeConfig()).getHandlers();
+        PermissionHandler permissionHandler = FlowEngine.permissionHandler();
+        if (CollUtil.isNotEmpty(copyHandlers) && ObjectUtil.isNotNull(permissionHandler)) {
+            copyHandlers = permissionHandler.resolveCopyHandlers(copyHandlers);
         }
+        flowTaskVo.setCopyList(StreamUtils.toList(copyHandlers, x -> new FlowCopyVo(Convert.toLong(x))));
         if (CollUtil.isNotEmpty(nodeExtVo.getVariables())) {
             flowTaskVo.setVarList(nodeExtVo.getVariables());
         } else {
@@ -762,6 +741,19 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
                 && TASK_READ_ASSIGNEE_TYPES.contains(Convert.toStr(user.getType())));
         if (taskAssignee) {
             return;
+        }
+        // 抄送人挂在抄送历史主键上（引擎 CopyAdvancer），不挂在待办 id 下，
+        // 所以要先按待办找到抄送历史，再按历史主键查抄送接收人。
+        List<HisTask> copyHisList = FlowEngine.hisTaskService()
+            .list(FlowEngine.newHisTask().setTaskId(task.getId()).setFlowStatus(TaskStatus.COPY.getKey()));
+        List<Long> copyHisIds = StreamUtils.toList(copyHisList, HisTask::getId);
+        if (CollUtil.isNotEmpty(copyHisIds)) {
+            boolean copyReceiver = FlowEngine.userService().getByAssociateds(copyHisIds).stream()
+                .anyMatch(user -> Objects.equals(userId, user.getProcessedBy())
+                    && UserType.COPY.getKey().equals(Convert.toStr(user.getType())));
+            if (copyReceiver) {
+                return;
+            }
         }
         Instance instance = insService.getById(task.getInstanceId());
         if (ObjectUtil.isNotNull(instance) && Objects.equals(instance.getCreateBy(), userId)) {

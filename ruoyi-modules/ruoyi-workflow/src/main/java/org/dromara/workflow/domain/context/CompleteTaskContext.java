@@ -30,9 +30,5 @@ public class CompleteTaskContext {
      */
     private Instance instance;
 
-    /**
-     * 流程实例是否开启自动审批，由参数构建节点从实例变量中解析。
-     */
-    private Boolean autoPass;
 
 }

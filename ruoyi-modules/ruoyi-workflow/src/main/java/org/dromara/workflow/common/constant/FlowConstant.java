@@ -84,11 +84,6 @@ public interface FlowConstant {
     String WF_TASK_STATUS = "wf_task_status";
 
     /**
-     * 自动通过变量标识。
-     */
-    String AUTO_PASS = "autoPass";
-
-    /**
      * 业务编码流程变量名。
      */
     String BUSINESS_CODE = "businessCode";

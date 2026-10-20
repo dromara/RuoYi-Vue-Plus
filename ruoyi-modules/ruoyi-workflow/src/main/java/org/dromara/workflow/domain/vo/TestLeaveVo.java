@@ -73,4 +73,9 @@ public class TestLeaveVo implements Serializable {
     @ExcelProperty(value = "状态")
     private String status;
 
+    /**
+     * 流程定义编码（已有流程实例时回显，供修改后重新提交沿用）
+     */
+    private String flowCode;
+
 }

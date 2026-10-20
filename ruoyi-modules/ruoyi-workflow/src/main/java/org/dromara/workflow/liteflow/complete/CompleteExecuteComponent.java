@@ -4,12 +4,11 @@ import cn.hutool.core.convert.Convert;
 import com.yomahub.liteflow.annotation.LiteflowComponent;
 import com.yomahub.liteflow.core.NodeComponent;
 import lombok.RequiredArgsConstructor;
-import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.warm.flow.core.FlowEngine;
+import org.dromara.warm.flow.core.enums.TaskStatus;
 import org.dromara.warm.flow.core.workflow.command.CompleteCommand;
 import org.dromara.warm.flow.core.workflow.context.OperatorContext;
 import org.dromara.workflow.common.ConditionalOnEnable;
-import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.CompleteTaskBo;
 import org.dromara.workflow.domain.context.CompleteTaskContext;
 
@@ -40,9 +39,9 @@ public class CompleteExecuteComponent extends NodeComponent {
         command.setVariables(variables);
         command.setMessage(completeTaskBo.getMessage());
         command.setExt(completeTaskBo.getFileId());
-        command.setFlowStatus(BusinessStatusEnum.WAITING.getStatus());
-        command.setTaskStatus(TaskStatusEnum.PASS.getStatus());
-        context.setAutoPass(Convert.toBool(context.getInstance().getVariableMap().getOrDefault(AUTO_PASS, false)));
+        // 全局监听器用 context.taskStatus 判断「通过/退回」，才决定要不要抄送与发通知；
+        // 引擎不会把解析后的状态回填进调用上下文，办理路径不显式声明 PASS 就会静默跳过抄送。
+        command.setTaskStatus(TaskStatus.PASS.getKey());
         FlowEngine.workflow().complete(command);
     }
 

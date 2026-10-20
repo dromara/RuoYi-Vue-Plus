@@ -1,7 +1,7 @@
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
-  port: 8080
+  port: 17083
   servlet:
     # 应用的访问路径
     context-path: /
@@ -243,6 +243,9 @@ warm-flow:
   node-tooltip: true
   # 默认Authorization，如果有多个token，用逗号分隔
   token-name: ${sa-token.token-name},clientid
+  # 是否开启定时/事件引擎线程（默认false）。开启后常驻扫描线程池，
+  # 已发布的「定时启动」流程定义会按配置自动发起实例
+  timer-enabled: true
 
 --- # LiteFlow 业务规则编排
 liteflow:

@@ -10,7 +10,6 @@ import org.dromara.warm.flow.core.workflow.command.RemoveSignerCommand;
 import org.dromara.warm.flow.core.workflow.command.TransferCommand;
 import org.dromara.warm.flow.core.workflow.context.OperatorContext;
 import org.dromara.workflow.common.ConditionalOnEnable;
-import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.context.TaskOperationContext;
 
 /**
@@ -37,7 +36,6 @@ public class TaskOpExecuteComponent extends NodeComponent {
                 command.setTaskId(taskId);
                 command.setTargetHandler(context.getTaskOperationBo().getUserId());
                 command.setMessage(message);
-                command.setTaskStatus(TaskStatusEnum.DEPUTE.getStatus());
                 result = FlowEngine.workflow().delegate(command).isSuccess();
             }
             case TRANSFER_TASK -> {
@@ -46,7 +44,6 @@ public class TaskOpExecuteComponent extends NodeComponent {
                 command.setTaskId(taskId);
                 command.setTargetHandler(context.getTaskOperationBo().getUserId());
                 command.setMessage(message);
-                command.setTaskStatus(TaskStatusEnum.TRANSFER.getStatus());
                 result = FlowEngine.workflow().transfer(command).isSuccess();
             }
             case ADD_SIGNATURE -> {
@@ -55,7 +52,6 @@ public class TaskOpExecuteComponent extends NodeComponent {
                 command.setTaskId(taskId);
                 command.setTargetHandlers(context.getTaskOperationBo().getUserIds());
                 command.setMessage(message);
-                command.setTaskStatus(TaskStatusEnum.SIGN.getStatus());
                 result = FlowEngine.workflow().addSigner(command).isSuccess();
             }
             case REDUCTION_SIGNATURE -> {
@@ -64,7 +60,6 @@ public class TaskOpExecuteComponent extends NodeComponent {
                 command.setTaskId(taskId);
                 command.setTargetHandlers(context.getTaskOperationBo().getUserIds());
                 command.setMessage(message);
-                command.setTaskStatus(TaskStatusEnum.SIGN_OFF.getStatus());
                 result = FlowEngine.workflow().removeSigner(command).isSuccess();
             }
         }

@@ -1,12 +1,10 @@
 package org.dromara.workflow.liteflow.start;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import com.yomahub.liteflow.annotation.LiteflowComponent;
 import com.yomahub.liteflow.core.NodeComponent;
 import org.dromara.common.core.exception.ServiceException;
-import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.entity.Definition;
 import org.dromara.workflow.common.ConditionalOnEnable;
@@ -36,9 +34,6 @@ public class StartPrepareInstanceComponent extends NodeComponent {
         context.setDefinition(definition);
 
         Map<String, Object> variables = context.getVariables();
-        Dict dict = JsonUtils.parseMap(definition.getExt());
-        boolean autoPass = !ObjectUtil.isNull(dict) && dict.getBool(AUTO_PASS);
-        variables.put(AUTO_PASS, autoPass);
         variables.put(BUSINESS_CODE, generateBusinessCode(context.getBizExt()));
     }
 

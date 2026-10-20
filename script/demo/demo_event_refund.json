@@ -1,0 +1,149 @@
+{
+  "version": "1",
+  "category": "1762300000000000100",
+  "flowCode": "demo_event_refund",
+  "flowName": "退款审批-超时升级示例",
+  "formPath": "/workflow/leaveEdit/index",
+  "nodeList": [
+    {
+      "ext": "[]",
+      "nodeCode": "start",
+      "nodeName": "开始",
+      "nodeType": 0,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "85,200;160,200",
+          "nowNodeCode": "start",
+          "nextNodeCode": "apply"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "60,200|60,200",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "apply",
+      "nodeName": "提交退款申请",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "260,200;310,200",
+          "nowNodeCode": "apply",
+          "nextNodeCode": "review"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "210,200|210,200",
+      "formCustom": "N",
+      "permissionFlag": "warmFlowInitiator"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "finance",
+      "nodeName": "财务退款",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "710,200;760,200",
+          "nowNodeCode": "finance",
+          "nextNodeCode": "msgEnd"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "660,200|660,200",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "msgEnd",
+      "nodeName": "退款结果通知",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "860,200;905,200",
+          "nowNodeCode": "msgEnd",
+          "nextNodeCode": "end"
+        }
+      ],
+      "eventName": "refund.finish",
+      "eventType": "MESSAGE_END",
+      "nodeRatio": "0",
+      "coordinate": "810,200|810,200",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "review",
+      "nodeName": "客服初审",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "360,240;360,400;460,400",
+          "nowNodeCode": "review",
+          "nextNodeCode": "supervisor"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "360,200|360,200",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000004"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "reviewBoundary",
+      "nodeName": "初审超时升级",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "410,400;460,400",
+          "nowNodeCode": "reviewBoundary",
+          "nextNodeCode": "supervisor"
+        }
+      ],
+      "eventType": "TIMER_BOUNDARY",
+      "nodeRatio": "0",
+      "coordinate": "360,400|360,400",
+      "formCustom": "N",
+      "nodeConfig": "{\"event\":{\"timerType\":\"AFTER\",\"timerValue\":\"PT2M\"}}",
+      "interrupting": 1,
+      "attachedToNodeCode": "review"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "supervisor",
+      "nodeName": "客服主管复核",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "560,400;660,400;660,240",
+          "nowNodeCode": "supervisor",
+          "nextNodeCode": "finance"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "510,400|510,400",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "end",
+      "nodeName": "结束",
+      "nodeType": 2,
+      "nodeRatio": "0",
+      "coordinate": "930,200|930,200",
+      "formCustom": "N"
+    }
+  ],
+  "formCustom": "N",
+  "modelValue": "CLASSICS"
+}

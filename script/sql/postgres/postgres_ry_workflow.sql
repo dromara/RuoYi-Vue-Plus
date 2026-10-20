@@ -13,6 +13,7 @@ CREATE TABLE flow_definition
     listener_type   varchar(100) NULL,
     listener_path   varchar(400) NULL,
     ext             varchar(500) NULL,
+    def_config      text         NULL,
     create_time     timestamp    NULL,
     create_by       varchar(64)  NULL     DEFAULT '':: character varying,
     update_time     timestamp    NULL,
@@ -36,6 +37,7 @@ COMMENT ON COLUMN flow_definition.activity_status IS '流程激活状态（0挂�
 COMMENT ON COLUMN flow_definition.listener_type IS '监听器类型';
 COMMENT ON COLUMN flow_definition.listener_path IS '监听器路径';
 COMMENT ON COLUMN flow_definition.ext IS '扩展字段，预留给业务系统使用';
+COMMENT ON COLUMN flow_definition.def_config IS '流程定义配置（自动审批等引擎配置与自定义扩展属性json）';
 COMMENT ON COLUMN flow_definition.create_time IS '创建时间';
 COMMENT ON COLUMN flow_definition.create_by IS '创建人';
 COMMENT ON COLUMN flow_definition.update_time IS '更新时间';
@@ -58,12 +60,16 @@ CREATE TABLE flow_node
     listener_path   varchar(400)  NULL,
     form_custom     bpchar(1)     NULL DEFAULT 'N':: character varying,
     form_path       varchar(100)  NULL,
-    "version"       varchar(20)   NOT NULL,
     create_time     timestamp    NULL,
     create_by       varchar(64)  NULL DEFAULT '':: character varying,
     update_time     timestamp    NULL,
     update_by       varchar(64)  NULL DEFAULT '':: character varying,
     ext             text         NULL,
+    node_config     text          NULL,
+    event_type      varchar(40)   NULL,
+    event_name      varchar(100)  NULL,
+    attached_to_node_code varchar(100) NULL,
+    interrupting    int2          NULL,
     del_flag        bpchar(1)     NULL DEFAULT '0':: character varying,
     tenant_id       varchar(40)   NULL,
     CONSTRAINT flow_node_pkey PRIMARY KEY (id)
@@ -83,12 +89,16 @@ COMMENT ON COLUMN flow_node.listener_type IS '监听器类型';
 COMMENT ON COLUMN flow_node.listener_path IS '监听器路径';
 COMMENT ON COLUMN flow_node.form_custom IS '审批表单是否自定义（Y是 N否）';
 COMMENT ON COLUMN flow_node.form_path IS '审批表单路径';
-COMMENT ON COLUMN flow_node."version" IS '版本';
 COMMENT ON COLUMN flow_node.create_time IS '创建时间';
 COMMENT ON COLUMN flow_node.create_by IS '创建人';
 COMMENT ON COLUMN flow_node.update_time IS '更新时间';
 COMMENT ON COLUMN flow_node.update_by IS '更新人';
 COMMENT ON COLUMN flow_node.ext IS '节点扩展属性';
+COMMENT ON COLUMN flow_node.node_config IS '节点配置（服务任务、事件等引擎节点配置json）';
+COMMENT ON COLUMN flow_node.event_type IS '事件类型（MESSAGE_START TIMER_START TIMER_CATCH MESSAGE_CATCH MESSAGE_THROW TIMER_BOUNDARY MESSAGE_BOUNDARY ERROR_CATCH ERROR_BOUNDARY TERMINATE_END MESSAGE_END）';
+COMMENT ON COLUMN flow_node.event_name IS '事件名称（消息事件使用）';
+COMMENT ON COLUMN flow_node.attached_to_node_code IS '边界事件附着的任务节点编码';
+COMMENT ON COLUMN flow_node.interrupting IS '边界事件是否中断型';
 COMMENT ON COLUMN flow_node.del_flag IS '删除标志';
 COMMENT ON COLUMN flow_node.tenant_id IS '租户id';
 
@@ -162,7 +172,7 @@ COMMENT ON COLUMN flow_instance.node_type IS '节点类型（0开始节点 1中�
 COMMENT ON COLUMN flow_instance.node_code IS '流程节点编码';
 COMMENT ON COLUMN flow_instance.node_name IS '流程节点名称';
 COMMENT ON COLUMN flow_instance.variable IS '任务变量';
-COMMENT ON COLUMN flow_instance.flow_status IS '流程状态（0待提交 1审批中 2审批通过 4终止 5作废 6撤销 8已完成 9已退回 10失效 11拿回）';
+COMMENT ON COLUMN flow_instance.flow_status IS '实例状态（draft待提交 waiting审批中 termination终止 invalid作废 cancel撤销 finish已完成 back已退回 restart重启）';
 COMMENT ON COLUMN flow_instance.activity_status IS '流程激活状态（0挂起 1激活）';
 COMMENT ON COLUMN flow_instance.def_json IS '流程定义json';
 COMMENT ON COLUMN flow_instance.create_time IS '创建时间';
@@ -200,7 +210,7 @@ COMMENT ON COLUMN flow_task.instance_id IS '对应flow_instance表的id';
 COMMENT ON COLUMN flow_task.node_code IS '节点编码';
 COMMENT ON COLUMN flow_task.node_name IS '节点名称';
 COMMENT ON COLUMN flow_task.node_type IS '节点类型（0开始节点 1中间节点 2结束节点 3互斥网关 4并行网关）';
-COMMENT ON COLUMN flow_task.flow_status IS '流程状态（0待提交 1审批中 2审批通过 4终止 5作废 6撤销 8已完成 9已退回 10失效 11拿回）';
+COMMENT ON COLUMN flow_task.flow_status IS '任务状态（pending待审批 pass通过 auto_pass自动审批 back退回 invalid失效 take_back拿回 copy抄送；任务结果，勿套用实例状态编码）';
 COMMENT ON COLUMN flow_task.form_custom IS '审批表单是否自定义（Y是 N否）';
 COMMENT ON COLUMN flow_task.form_path IS '审批表单路径';
 COMMENT ON COLUMN flow_task.create_time IS '创建时间';
@@ -222,15 +232,16 @@ CREATE TABLE flow_his_task
     target_node_code varchar(200) NULL,
     target_node_name varchar(200) NULL,
     approver         varchar(40)  NULL,
-    cooperate_type   int2         NOT NULL DEFAULT 0,
+    cooperate_type   varchar(20)  NOT NULL DEFAULT 'none',
     collaborator     varchar(500)  NULL,
-    skip_type        varchar(10)  NULL,
+    skip_type        varchar(10)  NOT NULL,
     flow_status      varchar(20)  NOT NULL,
     form_custom      bpchar(1)    NULL     DEFAULT 'N':: character varying,
     form_path        varchar(100) NULL,
-    ext              text         NULL,
     message          varchar(500) NULL,
     variable         text         NULL,
+    ext              text         NULL,
+    node_config      text         NULL,
     create_time      timestamp    NULL,
     update_time      timestamp    NULL,
     del_flag         bpchar(1)    NULL     DEFAULT '0':: character varying,
@@ -249,15 +260,16 @@ COMMENT ON COLUMN flow_his_task.node_type IS '开始节点类型（0开始节点
 COMMENT ON COLUMN flow_his_task.target_node_code IS '目标节点编码';
 COMMENT ON COLUMN flow_his_task.target_node_name IS '结束节点名称';
 COMMENT ON COLUMN flow_his_task.approver IS '审批者';
-COMMENT ON COLUMN flow_his_task.cooperate_type IS '协作方式(1审批 2转办 3委派 4会签 5票签 6加签 7减签)';
+COMMENT ON COLUMN flow_his_task.cooperate_type IS '协作方式（none无 transfer转办 delegate委派 add_signer加签 remove_signer减签；行为维度，抄送/会签/票签不落此列，结果见 flow_status）';
 COMMENT ON COLUMN flow_his_task.collaborator IS '协作人';
 COMMENT ON COLUMN flow_his_task.skip_type IS '流转类型（PASS通过 REJECT退回 NONE无动作）';
-COMMENT ON COLUMN flow_his_task.flow_status IS '流程状态（0待提交 1审批中 2审批通过 4终止 5作废 6撤销 8已完成 9已退回 10失效 11拿回）';
+COMMENT ON COLUMN flow_his_task.flow_status IS '任务状态（pending待审批 pass通过 auto_pass自动审批 back退回 invalid失效 take_back拿回 copy抄送；任务结果，勿套用实例状态编码，唯一例外是撤回归档写 cancel）';
 COMMENT ON COLUMN flow_his_task.form_custom IS '审批表单是否自定义（Y是 N否）';
 COMMENT ON COLUMN flow_his_task.form_path IS '审批表单路径';
 COMMENT ON COLUMN flow_his_task.message IS '审批意见';
 COMMENT ON COLUMN flow_his_task.variable IS '任务变量';
 COMMENT ON COLUMN flow_his_task.ext IS '扩展字段，预留给业务系统使用';
+COMMENT ON COLUMN flow_his_task.node_config IS '节点配置（服务任务等引擎配置与自定义扩展属性json）';
 COMMENT ON COLUMN flow_his_task.create_time IS '任务开始时间';
 COMMENT ON COLUMN flow_his_task.update_time IS '审批完成时间';
 COMMENT ON COLUMN flow_his_task.del_flag IS '删除标志';
@@ -270,7 +282,7 @@ CREATE TABLE flow_user
     processed_by varchar(80) NULL,
     associated   int8        NOT NULL,
     create_time  timestamp   NULL,
-    create_by    varchar(64)  NULL     DEFAULT '':: character varying,
+    create_by    varchar(80)  NULL:: character varying,
     update_time  timestamp   NULL,
     update_by    varchar(64)  NULL DEFAULT '':: character varying,
     del_flag     bpchar(1)   NULL DEFAULT '0':: character varying,
@@ -282,15 +294,84 @@ CREATE INDEX user_associated_idx ON FLOW_USER USING btree (associated);
 COMMENT ON TABLE flow_user IS '流程用户表';
 
 COMMENT ON COLUMN flow_user.id IS '主键id';
-COMMENT ON COLUMN flow_user."type" IS '人员类型（1待办任务的审批人权限 2待办任务的转办人权限 3待办任务的委托人权限）';
+COMMENT ON COLUMN flow_user."type" IS '人员类型（1待办任务的审批人权限 2待办任务的转办人权限 3待办任务的委托人权限 4待办任务的抄送人）';
 COMMENT ON COLUMN flow_user.processed_by IS '权限人';
-COMMENT ON COLUMN flow_user.associated IS '任务表id';
+COMMENT ON COLUMN flow_user.associated IS '关联id（待办任务id；抄送人记录为 flow_his_task.id）';
 COMMENT ON COLUMN flow_user.create_time IS '创建时间';
 COMMENT ON COLUMN flow_user.create_by IS '创建人';
 COMMENT ON COLUMN flow_user.update_time IS '更新时间';
 COMMENT ON COLUMN flow_user.update_by IS '更新人';
 COMMENT ON COLUMN flow_user.del_flag IS '删除标志';
 COMMENT ON COLUMN flow_user.tenant_id IS '租户id';
+
+-- ----------------------------
+-- 事件等待表
+-- ----------------------------
+CREATE TABLE flow_event_wait
+(
+    id                int8         NOT NULL,
+    tenant_id         varchar(40)  NULL,
+    del_flag          bpchar(1)    NULL DEFAULT '0':: character varying,
+    definition_id     int8         NULL,
+    instance_id       int8         NULL,
+    node_code         varchar(100) NULL,
+    event_type        varchar(40)  NOT NULL,
+    event_name        varchar(100) NULL,
+    attached_task_id  int8         NULL,
+    trigger_type      varchar(40)  NULL,
+    trigger_interval  varchar(100) NULL,
+    next_trigger_at   timestamp    NULL,
+    timezone          varchar(40)  NULL,
+    repeat_count      int4         NULL,
+    max_repeat_count  int4         NULL,
+    status            varchar(20)  NOT NULL,
+    retry_count       int4         NULL,
+    max_retry_count   int4         NULL,
+    retry_at          timestamp    NULL,
+    lock_owner        varchar(64)  NULL,
+    lock_until        timestamp    NULL,
+    version           int4         NULL,
+    payload           text         NULL,
+    last_error        varchar(500) NULL,
+    create_time       timestamp    NULL,
+    update_time       timestamp    NULL,
+    CONSTRAINT flow_event_wait_pkey PRIMARY KEY (id)
+);
+CREATE INDEX event_wait_status_next ON flow_event_wait USING btree (status, next_trigger_at, id);
+CREATE INDEX event_wait_status_retry ON flow_event_wait USING btree (status, retry_at, id);
+CREATE INDEX event_wait_tenant_status_next ON flow_event_wait USING btree (tenant_id, status, next_trigger_at, id);
+CREATE INDEX event_wait_tenant_status_retry ON flow_event_wait USING btree (tenant_id, status, retry_at, id);
+CREATE INDEX event_wait_instance_task ON flow_event_wait USING btree (instance_id, attached_task_id);
+CREATE INDEX event_wait_name_instance_status ON flow_event_wait USING btree (event_name, instance_id, status);
+CREATE INDEX event_wait_def_node_status ON flow_event_wait USING btree (definition_id, node_code, status);
+COMMENT ON TABLE flow_event_wait IS '事件等待表';
+
+COMMENT ON COLUMN flow_event_wait.id IS '主键id';
+COMMENT ON COLUMN flow_event_wait.tenant_id IS '租户id';
+COMMENT ON COLUMN flow_event_wait.del_flag IS '删除标志';
+COMMENT ON COLUMN flow_event_wait.definition_id IS '流程定义id（定时启动事件必须有）';
+COMMENT ON COLUMN flow_event_wait.instance_id IS '流程实例id（实例等待事件必须有）';
+COMMENT ON COLUMN flow_event_wait.node_code IS '事件节点编码（定位沿用 definition_id + node_code）';
+COMMENT ON COLUMN flow_event_wait.event_type IS '事件类型（MESSAGE_START TIMER_START TIMER_CATCH MESSAGE_CATCH MESSAGE_THROW TIMER_BOUNDARY MESSAGE_BOUNDARY ERROR_CATCH ERROR_BOUNDARY TERMINATE_END MESSAGE_END）';
+COMMENT ON COLUMN flow_event_wait.event_name IS '事件名称（消息事件使用）';
+COMMENT ON COLUMN flow_event_wait.attached_task_id IS '边界事件关联的待办任务id';
+COMMENT ON COLUMN flow_event_wait.trigger_type IS '触发策略类型（AFTER FIXED POINT_IN_TIME）';
+COMMENT ON COLUMN flow_event_wait.trigger_interval IS '触发策略原始配置';
+COMMENT ON COLUMN flow_event_wait.next_trigger_at IS '下次触发时间';
+COMMENT ON COLUMN flow_event_wait.timezone IS '定时触发使用的时区';
+COMMENT ON COLUMN flow_event_wait.repeat_count IS '已触发次数';
+COMMENT ON COLUMN flow_event_wait.max_repeat_count IS '最大触发次数';
+COMMENT ON COLUMN flow_event_wait.status IS '等待状态（WAITING RUNNING CANCELLED RETRY DEAD）';
+COMMENT ON COLUMN flow_event_wait.retry_count IS '已重试次数';
+COMMENT ON COLUMN flow_event_wait.max_retry_count IS '最大重试次数';
+COMMENT ON COLUMN flow_event_wait.retry_at IS '下次重试时间';
+COMMENT ON COLUMN flow_event_wait.lock_owner IS '抢占持有者标识';
+COMMENT ON COLUMN flow_event_wait.lock_until IS '抢占租约到期时间';
+COMMENT ON COLUMN flow_event_wait.version IS '乐观锁版本号';
+COMMENT ON COLUMN flow_event_wait.payload IS '消息事件接收的业务载荷';
+COMMENT ON COLUMN flow_event_wait.last_error IS '最近一次失败原因摘要';
+COMMENT ON COLUMN flow_event_wait.create_time IS '创建时间';
+COMMENT ON COLUMN flow_event_wait.update_time IS '更新时间';
 
 -- ----------------------------
 -- 流程分类表
@@ -505,18 +586,19 @@ INSERT INTO sys_dict_data VALUES (1761600000000000042, 4, '已完成', 'finish',
 INSERT INTO sys_dict_data VALUES (1761600000000000043, 5, '已作废', 'invalid', 'wf_business_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '已作废');
 INSERT INTO sys_dict_data VALUES (1761600000000000044, 6, '已退回', 'back', 'wf_business_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '已退回');
 INSERT INTO sys_dict_data VALUES (1761600000000000045, 7, '已终止', 'termination', 'wf_business_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '已终止');
+INSERT INTO sys_dict_data VALUES (1761600000000000063, 8, '重启', 'restart', 'wf_business_status', '', 'info', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '重启');
 INSERT INTO sys_dict_data VALUES (1761600000000000046, 1, '自定义表单', 'static', 'wf_form_type', '', 'success', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '自定义表单');
 INSERT INTO sys_dict_data VALUES (1761600000000000047, 2, '动态表单', 'dynamic', 'wf_form_type', '', 'primary', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '动态表单');
-INSERT INTO sys_dict_data VALUES (1761600000000000048, 1, '撤销', 'cancel', 'wf_task_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '撤销');
+INSERT INTO sys_dict_data VALUES (1761600000000000060, 1, '待审批', 'pending', 'wf_task_status', '', 'primary', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '待审批');
 INSERT INTO sys_dict_data VALUES (1761600000000000049, 2, '通过', 'pass', 'wf_task_status', '', 'success', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '通过');
-INSERT INTO sys_dict_data VALUES (1761600000000000050, 3, '待审核', 'waiting', 'wf_task_status', '', 'primary', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '待审核');
-INSERT INTO sys_dict_data VALUES (1761600000000000051, 4, '作废', 'invalid', 'wf_task_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '作废');
+INSERT INTO sys_dict_data VALUES (1761600000000000061, 3, '自动审批', 'auto_pass', 'wf_task_status', '', 'success', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '自动审批');
+INSERT INTO sys_dict_data VALUES (1761600000000000056, 4, '抄送', 'copy', 'wf_task_status', '', 'primary', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '抄送');
 INSERT INTO sys_dict_data VALUES (1761600000000000052, 5, '退回', 'back', 'wf_task_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '退回');
-INSERT INTO sys_dict_data VALUES (1761600000000000053, 6, '终止', 'termination', 'wf_task_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '终止');
-INSERT INTO sys_dict_data VALUES (1761600000000000054, 7, '转办', 'transfer', 'wf_task_status', '', 'primary', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '转办');
-INSERT INTO sys_dict_data VALUES (1761600000000000055, 8, '委托', 'depute', 'wf_task_status', '', 'primary', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '委托');
-INSERT INTO sys_dict_data VALUES (1761600000000000056, 9, '抄送', 'copy', 'wf_task_status', '', 'primary', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '抄送');
-INSERT INTO sys_dict_data VALUES (1761600000000000057, 10, '加签', 'sign', 'wf_task_status', '', 'primary', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '加签');
-INSERT INTO sys_dict_data VALUES (1761600000000000058, 11, '减签', 'sign_off', 'wf_task_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '减签');
-INSERT INTO sys_dict_data VALUES (1761600000000000059, 11, '超时', 'timeout', 'wf_task_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '超时');
+INSERT INTO sys_dict_data VALUES (1761600000000000062, 6, '拿回', 'take_back', 'wf_task_status', '', 'warning', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '拿回');
+INSERT INTO sys_dict_data VALUES (1761600000000000051, 7, '失效', 'invalid', 'wf_task_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '失效');
+INSERT INTO sys_dict_data VALUES (1761600000000000048, 8, '撤销', 'cancel', 'wf_task_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '撤销');
+INSERT INTO sys_dict_data VALUES (1761600000000000064, 9, '转办', 'transfer', 'wf_task_status', '', 'warning', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '转办');
+INSERT INTO sys_dict_data VALUES (1761600000000000065, 10, '委派', 'delegate', 'wf_task_status', '', 'warning', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '委派');
+INSERT INTO sys_dict_data VALUES (1761600000000000066, 11, '加签', 'add_signer', 'wf_task_status', '', 'warning', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '加签');
+INSERT INTO sys_dict_data VALUES (1761600000000000067, 12, '减签', 'remove_signer', 'wf_task_status', '', 'warning', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '减签');
 

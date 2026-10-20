@@ -1,0 +1,385 @@
+{
+  "version": "1",
+  "category": "1762300000000000100",
+  "flowCode": "demo_gateway_classic",
+  "flowName": "网关综合-经典模式示例",
+  "formPath": "/workflow/leaveEdit/index",
+  "nodeList": [
+    {
+      "ext": "[]",
+      "nodeCode": "start",
+      "nodeName": "开始",
+      "nodeType": 0,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "88,260;180,260",
+          "nowNodeCode": "start",
+          "nextNodeCode": "submit"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "60,260|60,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file,subSign,addSign,transfer,trust\"}]",
+      "nodeCode": "51ca4cb3-684b-4c3d-b474-9ec3363440bc",
+      "nodeName": "第四个",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "860,140;935,140;935,260;975,260",
+          "nowNodeCode": "51ca4cb3-684b-4c3d-b474-9ec3363440bc",
+          "nextNodeCode": "17000bff-87ab-4b6d-babc-0f3c51b48858"
+        }
+      ],
+      "nodeRatio": "100",
+      "coordinate": "810,140|810,140",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001@@1761100000000000003"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "54e21807-9501-4e49-90b9-1104f359709e",
+      "nodeName": "包容小于三",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "2180,200;2280,200;2280,260;2305,260",
+          "nowNodeCode": "54e21807-9501-4e49-90b9-1104f359709e",
+          "nextNodeCode": "ed4a73f7-5197-4362-a4c7-e6295ad211c4"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "2130,200|2130,200",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "79a20053-b41e-4f16-987d-5ac6e2a37a65",
+      "nodeName": "包容4",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "2180,500;2280,500;2280,260;2305,260",
+          "nowNodeCode": "79a20053-b41e-4f16-987d-5ac6e2a37a65",
+          "nextNodeCode": "ed4a73f7-5197-4362-a4c7-e6295ad211c4"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "2130,500|2130,500",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000004"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "86d7c888-0428-4c0f-b462-6e4563c21daf",
+      "nodeName": "并行一",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1420,140;1530,140",
+          "nowNodeCode": "86d7c888-0428-4c0f-b462-6e4563c21daf",
+          "nextNodeCode": "8d4baa8d-b2ca-4de0-96df-33e46aa12bb4"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1370,140|1370,140",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "8b46aefa-c496-48c4-ae2c-381035f69dda",
+      "nodeName": "最后一个",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "2560,260;2652,260",
+          "nowNodeCode": "8b46aefa-c496-48c4-ae2c-381035f69dda",
+          "nextNodeCode": "19c75cd4-36c3-48f7-96ad-9205f9337a2f"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "2510,260|2510,260",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file,subSign,addSign\"}]",
+      "nodeCode": "8d4baa8d-b2ca-4de0-96df-33e46aa12bb4",
+      "nodeName": "并行二",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1630,140;1700,140;1700,260;1735,260",
+          "nowNodeCode": "8d4baa8d-b2ca-4de0-96df-33e46aa12bb4",
+          "nextNodeCode": "ca78e892-b181-4d2e-afbe-21e0d1936fe5"
+        }
+      ],
+      "nodeRatio": "60",
+      "coordinate": "1580,140|1580,140",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001@@1761100000000000003@@1761100000000000004"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file,transfer,trust,addSign,subSign\"}]",
+      "nodeCode": "974a0d43-53a1-4384-8ee1-2f9665d5aa2d",
+      "nodeName": "大于三天",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "640,140;760,140",
+          "nowNodeCode": "974a0d43-53a1-4384-8ee1-2f9665d5aa2d",
+          "nextNodeCode": "51ca4cb3-684b-4c3d-b474-9ec3363440bc"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "590,140|590,140",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000003"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "b057d0fb-068d-47db-ae9e-8f4356600672",
+      "nodeName": "包容3",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "2180,350;2255,350;2255,260;2305,260",
+          "nowNodeCode": "b057d0fb-068d-47db-ae9e-8f4356600672",
+          "nextNodeCode": "ed4a73f7-5197-4362-a4c7-e6295ad211c4"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "2130,350|2130,350",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file,subSign,transfer,addSign,trust\"}]",
+      "nodeCode": "dc06e24f-b67c-4268-b2d7-dea1941ef462",
+      "nodeName": "小于三天",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "640,380;935,380;935,260;975,260",
+          "nowNodeCode": "dc06e24f-b67c-4268-b2d7-dea1941ef462",
+          "nextNodeCode": "17000bff-87ab-4b6d-babc-0f3c51b48858"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "590,380|590,380",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "f3482139-ab8e-4f18-940a-d3298346caff",
+      "nodeName": "包容day大于三",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "2180,50;2255,50;2255,260;2305,260",
+          "nowNodeCode": "f3482139-ab8e-4f18-940a-d3298346caff",
+          "nextNodeCode": "ed4a73f7-5197-4362-a4c7-e6295ad211c4"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "2130,50|2130,50",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000003"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "f6fc6c06-4d64-4ee6-8f6a-4c5212d01ccc",
+      "nodeName": "并行一同级",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1420,400;1700,400;1700,260;1735,260",
+          "nowNodeCode": "f6fc6c06-4d64-4ee6-8f6a-4c5212d01ccc",
+          "nextNodeCode": "ca78e892-b181-4d2e-afbe-21e0d1936fe5"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1370,400|1370,400",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "submit",
+      "nodeName": "申请人",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "280,260;365,260",
+          "nowNodeCode": "submit",
+          "nextNodeCode": "e9b6ac64-5deb-4af9-81f2-4b750b8b890a"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "230,260|230,260",
+      "formCustom": "N",
+      "permissionFlag": "warmFlowInitiator"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "19c75cd4-36c3-48f7-96ad-9205f9337a2f",
+      "nodeName": "结束",
+      "nodeType": 2,
+      "nodeRatio": "0",
+      "coordinate": "2680,260|2680,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "17000bff-87ab-4b6d-babc-0f3c51b48858",
+      "nodeType": 3,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1025,260;1145,260",
+          "nowNodeCode": "17000bff-87ab-4b6d-babc-0f3c51b48858",
+          "nextNodeCode": "ffa7942a-e0b4-42c8-9aa6-83ebb6208547"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1000,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "e9b6ac64-5deb-4af9-81f2-4b750b8b890a",
+      "nodeType": 3,
+      "skipList": [
+        {
+          "skipName": "day>3",
+          "skipType": "PASS",
+          "coordinate": "415,260;480,260;480,140;540,140",
+          "nowNodeCode": "e9b6ac64-5deb-4af9-81f2-4b750b8b890a",
+          "nextNodeCode": "974a0d43-53a1-4384-8ee1-2f9665d5aa2d",
+          "skipCondition": "gt@@day|3"
+        },
+        {
+          "skipType": "PASS",
+          "coordinate": "415,260;480,260;480,380;540,380",
+          "nowNodeCode": "e9b6ac64-5deb-4af9-81f2-4b750b8b890a",
+          "nextNodeCode": "dc06e24f-b67c-4268-b2d7-dea1941ef462"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "390,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "ca78e892-b181-4d2e-afbe-21e0d1936fe5",
+      "nodeType": 4,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1785,260;1905,260",
+          "nowNodeCode": "ca78e892-b181-4d2e-afbe-21e0d1936fe5",
+          "nextNodeCode": "761c8e6e-169d-48f7-be85-1b3f1c3c1646"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1760,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "ffa7942a-e0b4-42c8-9aa6-83ebb6208547",
+      "nodeType": 4,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1195,260;1265,260;1265,140;1320,140",
+          "nowNodeCode": "ffa7942a-e0b4-42c8-9aa6-83ebb6208547",
+          "nextNodeCode": "86d7c888-0428-4c0f-b462-6e4563c21daf"
+        },
+        {
+          "skipType": "PASS",
+          "coordinate": "1195,260;1265,260;1265,400;1320,400",
+          "nowNodeCode": "ffa7942a-e0b4-42c8-9aa6-83ebb6208547",
+          "nextNodeCode": "f6fc6c06-4d64-4ee6-8f6a-4c5212d01ccc"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1170,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "761c8e6e-169d-48f7-be85-1b3f1c3c1646",
+      "nodeType": 5,
+      "skipList": [
+        {
+          "skipName": "day>3",
+          "skipType": "PASS",
+          "coordinate": "1955,260;2020,260;2020,50;2080,50",
+          "nowNodeCode": "761c8e6e-169d-48f7-be85-1b3f1c3c1646",
+          "nextNodeCode": "f3482139-ab8e-4f18-940a-d3298346caff",
+          "skipCondition": "gt@@day|3"
+        },
+        {
+          "skipType": "PASS",
+          "coordinate": "1955,260;2020,260;2020,350;2080,350",
+          "nowNodeCode": "761c8e6e-169d-48f7-be85-1b3f1c3c1646",
+          "nextNodeCode": "b057d0fb-068d-47db-ae9e-8f4356600672"
+        },
+        {
+          "skipType": "PASS",
+          "coordinate": "1955,260;2045,260;2045,500;2080,500",
+          "nowNodeCode": "761c8e6e-169d-48f7-be85-1b3f1c3c1646",
+          "nextNodeCode": "79a20053-b41e-4f16-987d-5ac6e2a37a65"
+        },
+        {
+          "skipName": "day<3",
+          "skipType": "PASS",
+          "coordinate": "1955,260;2045,260;2045,200;2080,200",
+          "nowNodeCode": "761c8e6e-169d-48f7-be85-1b3f1c3c1646",
+          "nextNodeCode": "54e21807-9501-4e49-90b9-1104f359709e",
+          "skipCondition": "lt@@day|3"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1930,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "ed4a73f7-5197-4362-a4c7-e6295ad211c4",
+      "nodeType": 5,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "2355,260;2460,260",
+          "nowNodeCode": "ed4a73f7-5197-4362-a4c7-e6295ad211c4",
+          "nextNodeCode": "8b46aefa-c496-48c4-ae2c-381035f69dda"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "2330,260",
+      "formCustom": "N"
+    }
+  ],
+  "formCustom": "N",
+  "modelValue": "CLASSICS"
+}

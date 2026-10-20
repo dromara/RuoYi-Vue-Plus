@@ -7,13 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.warm.flow.core.FlowEngine;
+import org.dromara.warm.flow.core.enums.TaskStatus;
 import org.dromara.warm.flow.core.service.InsService;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
 import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
 import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
-import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.context.InstanceDeleteContext;
 
 import java.util.List;
@@ -56,23 +56,27 @@ public class InstanceDeleteExecuteComponent extends NodeComponent {
     /**
      * 删除流程实例产生的抄送人员关联。
      *
+     * <p>抄送人挂在<b>抄送历史主键</b>上（与引擎 {@code CopyAdvancer} 一致），不是待办主键。
+     * 只有本组件的历史分支需要显式清理——非历史分支走 {@code insService.remove}，
+     * 引擎级联里已按历史主键清过一遍。</p>
+     *
      * @param instanceIds 流程实例 ID 集合
      */
     private void deleteCopyUsers(List<Long> instanceIds) {
         List<FlowHisTask> copyTasks = flowHisTaskMapper.selectList(QueryBuilder.lambda(FlowHisTask.class)
             .in(FlowHisTask::getInstanceId, instanceIds)
-            .eq(FlowHisTask::getFlowStatus, TaskStatusEnum.COPY.getStatus())
+            .eq(FlowHisTask::getFlowStatus, TaskStatus.COPY.getKey())
             .build());
         if (CollUtil.isEmpty(copyTasks)) {
             return;
         }
-        List<Long> copyTaskIds = copyTasks.stream()
-            .map(FlowHisTask::getTaskId)
+        List<Long> copyHisIds = copyTasks.stream()
+            .map(FlowHisTask::getId)
             .filter(Objects::nonNull)
             .distinct()
             .toList();
-        if (CollUtil.isNotEmpty(copyTaskIds)) {
-            FlowEngine.userService().deleteByTaskIds(copyTaskIds);
+        if (CollUtil.isNotEmpty(copyHisIds)) {
+            FlowEngine.userService().deleteByTaskIds(copyHisIds);
         }
     }
 

@@ -1,0 +1,194 @@
+{
+  "version": "2",
+  "category": "1762300000000000100",
+  "flowCode": "demo_event_daily_check",
+  "flowName": "每日自动巡检-终止结束示例",
+  "formPath": "/workflow/leaveEdit/index",
+  "nodeList": [
+    {
+      "ext": "[]",
+      "nodeCode": "start",
+      "nodeName": "开始",
+      "nodeType": 0,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "88,260;190,260",
+          "nowNodeCode": "start",
+          "nextNodeCode": "timerStart"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "60,260|60,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "inspect",
+      "nodeName": "执行数据巡检",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "470,260;555,260",
+          "nowNodeCode": "inspect",
+          "nextNodeCode": "gw1"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "420,260|420,260",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "qa",
+      "nodeName": "质检复核",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "830,120;1020,120;1020,235",
+          "nowNodeCode": "qa",
+          "nextNodeCode": "gw2"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "780,120|780,120",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000003"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "risk",
+      "nodeName": "风控否决判定",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "830,400;870,400",
+          "nowNodeCode": "risk",
+          "nextNodeCode": "gwRisk"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "780,400|780,400",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000004"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "terminate",
+      "nodeName": "严重异常终止",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1070,400;1220,400;1220,288",
+          "nowNodeCode": "terminate",
+          "nextNodeCode": "end"
+        }
+      ],
+      "eventType": "TERMINATE_END",
+      "nodeRatio": "0",
+      "coordinate": "1020,400|1020,400",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "timerStart",
+      "nodeName": "每天 09:00 自动发起",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "290,260;370,260",
+          "nowNodeCode": "timerStart",
+          "nextNodeCode": "inspect"
+        }
+      ],
+      "eventType": "TIMER_START",
+      "nodeRatio": "0",
+      "coordinate": "240,260|240,260",
+      "formCustom": "N",
+      "nodeConfig": "{\"event\": {\"timerType\": \"POINT_IN_TIME\", \"timerValue\": \"[\\\"09:00\\\"]\", \"timezone\": \"Asia/Shanghai\", \"variables\": {\"veto\": 0, \"channel\": \"daily\"}}}"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "end",
+      "nodeName": "结束",
+      "nodeType": 2,
+      "nodeRatio": "0",
+      "coordinate": "1220,260|1220,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "gwRisk",
+      "nodeName": "是否严重异常",
+      "nodeType": 3,
+      "skipList": [
+        {
+          "skipName": "严重异常",
+          "skipType": "PASS",
+          "coordinate": "925,400;970,400",
+          "nowNodeCode": "gwRisk",
+          "nextNodeCode": "terminate",
+          "skipCondition": "eq@@veto|1"
+        },
+        {
+          "skipName": "无异常",
+          "skipType": "PASS",
+          "coordinate": "900,378;900,260;995,260",
+          "nowNodeCode": "gwRisk",
+          "nextNodeCode": "gw2"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "900,400",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "gw1",
+      "nodeName": "并行分支",
+      "nodeType": 4,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "605,260;700,260;700,120;730,120",
+          "nowNodeCode": "gw1",
+          "nextNodeCode": "qa"
+        },
+        {
+          "skipType": "PASS",
+          "coordinate": "605,260;700,260;700,400;730,400",
+          "nowNodeCode": "gw1",
+          "nextNodeCode": "risk"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "580,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "gw2",
+      "nodeName": "汇聚",
+      "nodeType": 4,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1045,260;1192,260",
+          "nowNodeCode": "gw2",
+          "nextNodeCode": "end"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1020,260",
+      "formCustom": "N"
+    }
+  ],
+  "formCustom": "N",
+  "modelValue": "CLASSICS"
+}

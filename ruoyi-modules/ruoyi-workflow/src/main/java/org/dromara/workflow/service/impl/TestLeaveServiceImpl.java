@@ -17,6 +17,9 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.warm.flow.core.FlowEngine;
+import org.dromara.warm.flow.core.entity.Definition;
+import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.workflow.api.WorkflowService;
 import org.dromara.workflow.api.domain.StartProcessDTO;
 import org.dromara.workflow.api.event.ProcessDeleteEvent;
@@ -28,6 +31,7 @@ import org.dromara.workflow.domain.TestLeave;
 import org.dromara.workflow.domain.bo.TestLeaveBo;
 import org.dromara.workflow.domain.vo.TestLeaveVo;
 import org.dromara.workflow.mapper.TestLeaveMapper;
+import org.dromara.workflow.service.IFlwInstanceService;
 import org.dromara.workflow.service.ITestLeaveService;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -52,6 +56,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
 
     private final TestLeaveMapper leaveMapper;
     private final WorkflowService workflowService;
+    private final IFlwInstanceService flwInstanceService;
 
     /**
      * spel条件表达：判断小于2
@@ -71,7 +76,19 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      */
     @Override
     public TestLeaveVo queryById(Long id) {
-        return leaveMapper.selectVoById(id);
+        TestLeaveVo vo = leaveMapper.selectVoById(id);
+        if (ObjectUtil.isNull(vo)) {
+            return null;
+        }
+        // 撤回 / 退回后修改再提交走的是已有实例的续提交，前端需要拿到原流程编码
+        Instance instance = flwInstanceService.selectInstByBusinessId(Convert.toStr(id));
+        if (ObjectUtil.isNotNull(instance)) {
+            Definition definition = FlowEngine.defService().getById(instance.getDefinitionId());
+            if (ObjectUtil.isNotNull(definition)) {
+                vo.setFlowCode(definition.getFlowCode());
+            }
+        }
+        return vo;
     }
 
     /**
@@ -205,14 +222,19 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     /**
      * 总体流程监听(例如: 草稿，撤销，退回，作废，终止，已完成等)
      * 正常使用只需#processEvent.flowCode=='leave1'
-     * 示例为了方便则使用startsWith匹配了全部示例key
+     * 示例流程编码已切换为引擎自带的 demo_ 前缀，故这里按 demo 匹配
      *
      * @param processEvent 参数
      */
-    @EventListener(condition = "#processEvent.flowCode.startsWith('leave')")
+    @EventListener(condition = "#processEvent.flowCode.startsWith('demo')")
     public void processHandler(ProcessEvent processEvent) {
         log.info("当前任务执行了{}", processEvent.toString());
         TestLeave testLeave = leaveMapper.selectById(Convert.toLong(processEvent.getBusinessId()));
+        if (ObjectUtil.isNull(testLeave)) {
+            // 定时启动 / 消息启动的流程带的是引擎自造 businessId（如 T2112..._1760...），
+            // 不是请假表主键，回写无从谈起；这里直接跳过，避免示例监听被无关流程的事件打爆。
+            return;
+        }
         testLeave.setStatus(processEvent.getStatus());
         // 用于例如审批附件 审批意见等 存储到业务表内 自行根据业务实现存储流程
         Map<String, Object> params = processEvent.getParams();
@@ -247,7 +269,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      *
      * @param processTaskEvent 参数
      */
-    @EventListener(condition = "#processTaskEvent.flowCode.startsWith('leave')")
+    @EventListener(condition = "#processTaskEvent.flowCode.startsWith('demo')")
     public void processTaskHandler(ProcessTaskEvent processTaskEvent) {
         log.info("当前任务创建了{}", processTaskEvent.toString());
     }
@@ -255,11 +277,11 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     /**
      * 监听删除流程事件
      * 正常使用只需#processDeleteEvent.flowCode=='leave1'
-     * 示例为了方便则使用startsWith匹配了全部示例key
+     * 示例流程编码已切换为引擎自带的 demo_ 前缀，故这里按 demo 匹配
      *
      * @param processDeleteEvent 参数
      */
-    @EventListener(condition = "#processDeleteEvent.flowCode.startsWith('leave')")
+    @EventListener(condition = "#processDeleteEvent.flowCode.startsWith('demo')")
     public void processDeleteHandler(ProcessDeleteEvent processDeleteEvent) {
         log.info("监听删除流程事件，当前任务执行了{}", processDeleteEvent.toString());
         TestLeave testLeave = leaveMapper.selectById(Convert.toLong(processDeleteEvent.getBusinessId()));

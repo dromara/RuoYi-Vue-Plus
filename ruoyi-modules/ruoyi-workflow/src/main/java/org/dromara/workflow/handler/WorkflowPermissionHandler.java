@@ -8,7 +8,7 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.domain.UserDTO;
-import org.dromara.warm.flow.core.handler.PermissionHandler;
+import org.dromara.warm.flow.core.spi.PermissionHandler;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.service.IFlwTaskAssigneeService;
 import org.springframework.stereotype.Component;
