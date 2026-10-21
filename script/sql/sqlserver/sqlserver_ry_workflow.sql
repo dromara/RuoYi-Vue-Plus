@@ -1913,6 +1913,14 @@ GO
 INSERT sys_menu VALUES (1761400000000011806, N'流程spel表达式定义导出', 1761400000000011801, 5, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:spel:export', N'#', N'', N'', 1761000000000000103, 1761100000000000001, GETDATE(), NULL, NULL, N'');
 GO
 
+-- 定时任务（事件等待记录）菜单与按钮
+INSERT sys_menu VALUES (1761400000000011901, N'定时任务', 1761400000000011630, 3, N'timer', N'workflow/timer/index', N'', N'N', N'N', N'C', N'0', N'0', N'workflow:eventWait:list', N'time', N'', N'', 1761000000000000103, 1761100000000000001, GETDATE(), NULL, NULL, N'定时任务与事件等待监控菜单');
+GO
+INSERT sys_menu VALUES (1761400000000011902, N'定时任务查询', 1761400000000011901, 1, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:eventWait:query', N'#', N'', N'', 1761000000000000103, 1761100000000000001, GETDATE(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (1761400000000011903, N'定时任务手动补发', 1761400000000011901, 2, N'#', N'', NULL, N'N', N'Y', N'F', N'0', N'0', N'workflow:eventWait:trigger', N'#', N'', N'', 1761000000000000103, 1761100000000000001, GETDATE(), NULL, NULL, N'');
+GO
+
 -- 请假测试相关按钮
 INSERT sys_menu VALUES (1761400000000011638, N'请假申请', 1761400000000000005, 1, N'leave', N'workflow/leave/index', N'', N'N', N'Y', N'C', N'0', N'0', N'workflow:leave:list', N'#', N'', N'', 1761000000000000103, 1761100000000000001, GETDATE(), NULL, NULL, N'请假申请菜单');
 GO

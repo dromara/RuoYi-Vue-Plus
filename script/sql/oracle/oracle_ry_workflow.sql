@@ -601,6 +601,11 @@ INSERT INTO sys_menu VALUES (1761400000000011804, '流程spel表达式定义修�
 INSERT INTO sys_menu VALUES (1761400000000011805, '流程spel表达式定义删除', 1761400000000011801, 4, '#', '', NULL, 'N', 'Y', 'F', '0', '0', 'workflow:spel:remove', '#', '', '', 1761000000000000103, 1761100000000000001, SYSDATE, NULL, NULL, '');
 INSERT INTO sys_menu VALUES (1761400000000011806, '流程spel表达式定义导出', 1761400000000011801, 5, '#', '', NULL, 'N', 'Y', 'F', '0', '0', 'workflow:spel:export', '#', '', '', 1761000000000000103, 1761100000000000001, SYSDATE, NULL, NULL, '');
 
+-- 定时任务（事件等待记录）菜单与按钮
+INSERT INTO sys_menu VALUES (1761400000000011901, '定时任务', 1761400000000011630, 3, 'timer', 'workflow/timer/index', '', 'N', 'N', 'C', '0', '0', 'workflow:eventWait:list', 'time', '', '', 1761000000000000103, 1761100000000000001, SYSDATE, NULL, NULL, '定时任务与事件等待监控菜单');
+INSERT INTO sys_menu VALUES (1761400000000011902, '定时任务查询', 1761400000000011901, 1, '#', '', NULL, 'N', 'Y', 'F', '0', '0', 'workflow:eventWait:query', '#', '', '', 1761000000000000103, 1761100000000000001, SYSDATE, NULL, NULL, '');
+INSERT INTO sys_menu VALUES (1761400000000011903, '定时任务手动补发', 1761400000000011901, 2, '#', '', NULL, 'N', 'Y', 'F', '0', '0', 'workflow:eventWait:trigger', '#', '', '', 1761000000000000103, 1761100000000000001, SYSDATE, NULL, NULL, '');
+
 INSERT INTO sys_menu VALUES (1761400000000011638, '请假申请', 1761400000000000005, 1, 'leave', 'workflow/leave/index', '', 'N', 'Y', 'C', '0', '0', 'workflow:leave:list', '#', '', '', 1761000000000000103, 1761100000000000001, SYSDATE, NULL, NULL, '请假申请菜单');
 INSERT INTO sys_menu VALUES (1761400000000011639, '请假申请查询', 1761400000000011638, 1, '#', '', '', 'N', 'Y', 'F', '0', '0', 'workflow:leave:query', '#', '', '', 1761000000000000103, 1761100000000000001, SYSDATE, NULL, NULL, '');
 INSERT INTO sys_menu VALUES (1761400000000011640, '请假申请新增', 1761400000000011638, 2, '#', '', '', 'N', 'Y', 'F', '0', '0', 'workflow:leave:add', '#', '', '', 1761000000000000103, 1761100000000000001, SYSDATE, NULL, NULL, '');
