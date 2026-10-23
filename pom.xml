@@ -20,17 +20,17 @@
         <java.version>21</java.version>
 
         <!-- Spring 生态依赖版本 -->
-        <spring-boot.version>4.1.1</spring-boot.version>
-        <spring-boot-admin.version>4.1.2</spring-boot-admin.version>
-        <spring-ai.version>2.0.1</spring-ai.version>
+        <spring-boot.version>4.1.2</spring-boot.version>
+        <spring-boot-admin.version>4.1.4</spring-boot-admin.version>
+        <spring-ai.version>2.0.2</spring-ai.version>
         <springdoc.version>3.1.1</springdoc.version>
 
         <!-- 数据访问与持久化相关依赖版本 -->
         <mybatis.version>3.5.19</mybatis.version>
         <mybatis-plus.version>3.5.17</mybatis-plus.version>
         <mybatis-plus-join.version>1.5.9</mybatis-plus-join.version>
-        <dynamic-ds.version>4.5.0</dynamic-ds.version>
-        <anyline.version>8.7.3-20260306</anyline.version>
+        <dynamic-ds.version>4.6.0</dynamic-ds.version>
+        <anyline.version>17.7.6-20261020</anyline.version>
         <easy-es.version>3.0.2</easy-es.version>
         <elasticsearch-client.version>7.17.28</elasticsearch-client.version>
 
@@ -40,7 +40,7 @@
         <bouncycastle.version>1.86</bouncycastle.version>
 
         <!-- 缓存、锁与任务调度相关依赖版本 -->
-        <redisson.version>4.7.0</redisson.version>
+        <redisson.version>4.8.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <snailjob.version>2.0.2</snailjob.version>
         <snailai.version>1.1.1</snailai.version>
@@ -51,8 +51,8 @@
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.48</lombok.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
-        <fesod.version>2.0.2-incubating</fesod.version>
-        <fory.version>1.7.4</fory.version>
+        <fesod.version>2.1.0-incubating</fesod.version>
+        <fory.version>1.7.7</fory.version>
 
         <!-- 三方集成与业务扩展相关依赖版本 -->
         <!-- 离线IP地址定位库 -->
@@ -63,7 +63,7 @@
         <sms4j.version>3.3.5</sms4j.version>
         <!-- 工作流配置 -->
         <warm-flow.version>2.1.0</warm-flow.version>
-        <liteflow.version>2.16.2.1</liteflow.version>
+        <liteflow.version>2.16.3.1</liteflow.version>
         <!-- mqtt客户端 -->
         <mica-mqtt.version>2.6.12</mica-mqtt.version>
 

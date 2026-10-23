@@ -252,9 +252,7 @@ liteflow:
   # 跟随工作流模块开关，避免禁用工作流时仍加载任务办理链
   enable: ${warm-flow.enabled:true}
   metrics:
-    # 临时修复：LiteFlow 2.16.2.1 的 Actuator 端点与 Spring Boot 4.1 参数名校验不兼容
-    # 待 LiteFlow 修复该问题后恢复为 ${liteflow.enable:true}
-    enabled: false
+    enabled: ${liteflow.enable:true}
   # 工作流模块用于编排任务办理链路
   rule-source: classpath:liteflow/*.el.xml
   # 开启虚拟线程
