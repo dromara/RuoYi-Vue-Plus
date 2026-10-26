@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * 完整 SQL 日志拦截器。
@@ -55,6 +56,8 @@ public class SqlLogInterceptor implements Interceptor {
      */
     private static final String BLANK_REGEX = "\\s+";
 
+    private static final Pattern SQL_STRING_LITERAL = Pattern.compile("'(?:''|[^'])*'");
+
     /**
      * 日期时间格式。
      */
@@ -75,8 +78,17 @@ public class SqlLogInterceptor implements Interceptor {
      */
     private final SqlLogProperties sqlLogProperties;
 
+    private final List<Pattern> ignoredTablePatterns;
+
     public SqlLogInterceptor(SqlLogProperties sqlLogProperties) {
         this.sqlLogProperties = sqlLogProperties;
+        this.ignoredTablePatterns = sqlLogProperties.getIgnoreTables().stream()
+            .filter(StrUtil::isNotBlank)
+            .map(String::trim)
+            .map(table -> Pattern.compile("(?i)\\b(?:FROM|JOIN|UPDATE|INTO)\\s+"
+                + "(?:[`\"\\[]?[A-Za-z_][A-Za-z0-9_]*[`\"\\]]?\\s*\\.\\s*)?"
+                + "[`\"\\[]?" + Pattern.quote(table) + "[`\"\\]]?(?=\\s|[,);]|$)"))
+            .toList();
     }
 
     @Override
@@ -104,9 +116,25 @@ public class SqlLogInterceptor implements Interceptor {
      * @param throwable       执行异常
      */
     private void printSql(MappedStatement mappedStatement, BoundSql boundSql, long elapsedTime, Throwable throwable) {
+        if (throwable == null && isIgnoredTableSql(boundSql.getSql())) {
+            return;
+        }
         String fullSql = buildFullSql(mappedStatement.getConfiguration(), boundSql);
         String message = buildLogMessage(mappedStatement, elapsedTime, fullSql, throwable);
         printChunk(message);
+    }
+
+    boolean isIgnoredTableSql(String sql) {
+        if (ignoredTablePatterns.isEmpty()) {
+            return false;
+        }
+        String statement = sql.indexOf('\'') >= 0 ? SQL_STRING_LITERAL.matcher(sql).replaceAll("''") : sql;
+        for (Pattern pattern : ignoredTablePatterns) {
+            if (pattern.matcher(statement).find()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
