@@ -1,0 +1,91 @@
+{
+  "version": "1",
+  "category": "1762300000000000103",
+  "flowCode": "demo_leave1",
+  "flowName": "请假申请-普通",
+  "formPath": "/workflow/leaveEdit/index",
+  "nodeList": [
+    {
+      "ext": "[]",
+      "nodeCode": "d5ee3ddf-3968-4379-a86f-9ceabde5faac",
+      "nodeName": "开始",
+      "nodeType": 0,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "220,200;310,200",
+          "nowNodeCode": "d5ee3ddf-3968-4379-a86f-9ceabde5faac",
+          "nextNodeCode": "dd515cdd-59f6-446f-94ca-25ca062afb42"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "200,200|200,200",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"back,termination,file,copy\"}]",
+      "nodeCode": "dd515cdd-59f6-446f-94ca-25ca062afb42",
+      "nodeName": "申请人",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "410,200;490,200",
+          "nowNodeCode": "dd515cdd-59f6-446f-94ca-25ca062afb42",
+          "nextNodeCode": "78fa8e5b-e809-44ed-978a-41092409ebcf"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "360,200|360,200",
+      "formCustom": "N",
+      "permissionFlag": "warmFlowInitiator"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"back,termination,copy,transfer,trust,file\"}]",
+      "nodeCode": "78fa8e5b-e809-44ed-978a-41092409ebcf",
+      "nodeName": "组长",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "590,200;670,200",
+          "nowNodeCode": "78fa8e5b-e809-44ed-978a-41092409ebcf",
+          "nextNodeCode": "a8abf15f-b83e-428a-86cc-033555ea9bbe"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "540,200|540,200",
+      "formCustom": "N",
+      "permissionFlag": "role:1761300000000000001"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"back,termination,copy,transfer,trust,file\"}]",
+      "nodeCode": "a8abf15f-b83e-428a-86cc-033555ea9bbe",
+      "nodeName": "部门主管",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "770,200;880,200",
+          "nowNodeCode": "a8abf15f-b83e-428a-86cc-033555ea9bbe",
+          "nextNodeCode": "8b82b7d7-8660-455e-b880-d6d22ea3eb6d"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "720,200|720,200",
+      "formCustom": "N",
+      "permissionFlag": "role:1761300000000000003@@role:1761300000000000004"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "8b82b7d7-8660-455e-b880-d6d22ea3eb6d",
+      "nodeName": "结束",
+      "nodeType": 2,
+      "nodeRatio": "0",
+      "coordinate": "900,200|900,200",
+      "formCustom": "N"
+    }
+  ],
+  "formCustom": "N",
+  "modelValue": "CLASSICS"
+}
