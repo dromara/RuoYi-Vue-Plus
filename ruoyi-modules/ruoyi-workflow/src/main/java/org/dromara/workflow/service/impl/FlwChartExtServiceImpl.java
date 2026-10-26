@@ -20,10 +20,15 @@ import org.dromara.warm.flow.core.dto.PromptContent;
 import org.dromara.warm.flow.core.enums.NodeType;
 import org.dromara.warm.flow.core.utils.MapUtil;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
+import org.dromara.warm.flow.orm.entity.FlowTask;
+import org.dromara.warm.flow.orm.entity.FlowUser;
 import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
+import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
+import org.dromara.warm.flow.orm.mapper.FlowUserMapper;
 import org.dromara.warm.flow.ui.service.ChartExtService;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.constant.FlowConstant;
+import org.dromara.workflow.common.enums.TaskAssigneeType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +50,8 @@ public class FlwChartExtServiceImpl implements ChartExtService {
     private final UserService userService;
     private final DeptService deptService;
     private final FlowHisTaskMapper flowHisTaskMapper;
+    private final FlowTaskMapper flowTaskMapper;
+    private final FlowUserMapper flowUserMapper;
     private final DictService dictService;
     @Value("${warm-flow.node-tooltip:true}")
     private boolean nodeTooltip;
@@ -61,45 +68,80 @@ public class FlwChartExtServiceImpl implements ChartExtService {
             return;
         }
 
-        // 根据流程实例ID查询所有相关的历史任务列表
-        List<FlowHisTask> flowHisTasks = this.getHisTaskGroupedByNode(defJson.getInstance().getId());
-        if (CollUtil.isEmpty(flowHisTasks)) {
+        Long instanceId = defJson.getInstance().getId();
+        List<FlowHisTask> flowHisTasks = this.getHisTaskGroupedByNode(instanceId);
+        List<FlowTask> activeTasks = flowTaskMapper.selectList(Wrappers.<FlowTask>lambdaQuery()
+            .eq(FlowTask::getInstanceId, instanceId)
+            .eq(FlowTask::getNodeType, NodeType.BETWEEN.getKey()));
+        if (CollUtil.isEmpty(flowHisTasks) && CollUtil.isEmpty(activeTasks)) {
             return;
         }
 
-        // 按节点编号（nodeCode）对历史任务进行分组
-        Map<String, List<FlowHisTask>> groupedByNode = StreamUtils.groupByKey(flowHisTasks, FlowHisTask::getNodeCode);
+        Map<String, List<FlowHisTask>> groupedByNode = CollUtil.isEmpty(flowHisTasks)
+            ? Collections.emptyMap() : StreamUtils.groupByKey(flowHisTasks, FlowHisTask::getNodeCode);
+        Map<Long, String> taskNodeCodes = activeTasks.stream()
+            .collect(Collectors.toMap(FlowTask::getId, FlowTask::getNodeCode));
+        List<FlowUser> activeUsers = taskNodeCodes.isEmpty() ? Collections.emptyList()
+            : flowUserMapper.selectList(Wrappers.<FlowUser>lambdaQuery()
+                .in(FlowUser::getAssociated, taskNodeCodes.keySet())
+                .in(FlowUser::getType, List.of(TaskAssigneeType.APPROVER.getCode(),
+                    TaskAssigneeType.TRANSFER.getCode(), TaskAssigneeType.DELEGATE.getCode())));
+        Map<String, Set<Long>> pendingUsersByNode = new HashMap<>();
+        for (FlowUser activeUser : activeUsers) {
+            Long userId = Convert.toLong(activeUser.getProcessedBy(), null);
+            String nodeCode = taskNodeCodes.get(activeUser.getAssociated());
+            if (userId != null && nodeCode != null) {
+                pendingUsersByNode.computeIfAbsent(nodeCode, key -> new LinkedHashSet<>()).add(userId);
+            }
+        }
 
-        // 批量查询所有审批人的用户信息
-        List<UserDTO> userDTOList = userService.selectListByIds(StreamUtils.toSet(flowHisTasks, e -> Convert.toLong(e.getApprover())));
+        Set<Long> userIds = new HashSet<>();
+        flowHisTasks.forEach(task -> {
+            Long approverId = Convert.toLong(task.getApprover(), null);
+            if (approverId != null) {
+                userIds.add(approverId);
+            }
+        });
+        pendingUsersByNode.values().forEach(userIds::addAll);
+        if (userIds.isEmpty()) {
+            return;
+        }
+        List<UserDTO> userDTOList = userService.selectListByIds(userIds);
 
         // 将查询到的用户列表转换为以用户ID为key的映射
         Map<Long, UserDTO> userMap = StreamUtils.toIdentityMap(userDTOList, UserDTO::getUserId);
         Set<Long> deptIds = StreamUtils.toSet(userDTOList, UserDTO::getDeptId);
-        Map<Long, String> deptNameMap = deptService.selectDeptNamesByIds(deptIds);
+        deptIds.remove(null);
+        Map<Long, String> deptNameMap = deptIds.isEmpty() ? Collections.emptyMap()
+            : deptService.selectDeptNamesByIds(deptIds);
 
-        Map<String, String> dictType = dictService.getAllDictByDictType(FlowConstant.WF_TASK_STATUS);
+        Map<String, String> dictType = flowHisTasks.isEmpty() ? Collections.emptyMap()
+            : dictService.getAllDictByDictType(FlowConstant.WF_TASK_STATUS);
 
         for (NodeJson nodeJson : defJson.getNodeList()) {
             List<FlowHisTask> taskList = groupedByNode.get(nodeJson.getNodeCode());
-            if (CollUtil.isEmpty(taskList)) {
-                continue;
+            if (CollUtil.isNotEmpty(taskList)) {
+                List<FlowHisTask> latestPerApprover = taskList.stream()
+                    .filter(task -> StringUtils.isNotBlank(task.getApprover()))
+                    .collect(Collectors.collectingAndThen(
+                        Collectors.toMap(
+                            FlowHisTask::getApprover,
+                            Function.identity(),
+                            (oldTask, newTask) -> newTask.getUpdateTime().after(oldTask.getUpdateTime()) ? newTask : oldTask,
+                            LinkedHashMap::new
+                        ),
+                        map -> new ArrayList<>(map.values())
+                    ));
+                this.processNodeExtInfo(nodeJson, latestPerApprover, userMap, deptNameMap, dictType);
             }
-
-            // 按审批人分组去重，保留最新处理记录，最终转换成 List
-            List<FlowHisTask> latestPerApprover = taskList.stream()
-                .collect(Collectors.collectingAndThen(
-                    Collectors.toMap(
-                        FlowHisTask::getApprover,
-                        Function.identity(),
-                        (oldTask, newTask) -> newTask.getUpdateTime().after(oldTask.getUpdateTime()) ? newTask : oldTask,
-                        LinkedHashMap::new
-                    ),
-                    map -> new ArrayList<>(map.values())
-                ));
-
-            // 处理当前节点的扩展信息
-            this.processNodeExtInfo(nodeJson, latestPerApprover, userMap, deptNameMap, dictType);
+            for (Long userId : pendingUsersByNode.getOrDefault(nodeJson.getNodeCode(), Collections.emptySet())) {
+                UserDTO user = userMap.get(userId);
+                if (user != null) {
+                    addUserInfo(nodeJson.getPromptContent().getInfo(), user,
+                        deptNameMap.getOrDefault(user.getDeptId(), StringUtils.EMPTY));
+                    nodeJson.getPromptContent().getInfo().add(buildInfoItem("审批状态", "待审批"));
+                }
+            }
         }
     }
 
@@ -183,10 +225,16 @@ public class FlwChartExtServiceImpl implements ChartExtService {
                 continue;
             }
 
-            String deptName = deptNameMap.getOrDefault(userDTO.getDeptId(), StringUtils.EMPTY);
+            addUserInfo(info, userDTO, deptNameMap.getOrDefault(userDTO.getDeptId(), StringUtils.EMPTY));
 
-            // 添加标题项，如：👤 张三（市场部）
-            info.add(new PromptContent.InfoItem()
+            info.add(buildInfoItem("审批状态", dictType.get(task.getFlowStatus())));
+            info.add(buildInfoItem("审批耗时", DateUtils.formatBetweenBySecond(task.getUpdateTime(), task.getCreateTime())));
+            info.add(buildInfoItem("办理时间", DateUtils.formatDateTime(task.getUpdateTime())));
+        }
+    }
+
+    private void addUserInfo(List<PromptContent.InfoItem> info, UserDTO userDTO, String deptName) {
+        info.add(new PromptContent.InfoItem()
                 .setPrefix(StringUtils.format("👥 {}（{}）", userDTO.getNickName(), deptName))
                 .setPrefixStyle(Map.of(
                     "fontWeight", "bold",
@@ -199,12 +247,7 @@ public class FlwChartExtServiceImpl implements ChartExtService {
                 ))
             );
 
-            // 添加具体信息项：账号、耗时、时间
-            info.add(buildInfoItem("用户账号", userDTO.getUserName()));
-            info.add(buildInfoItem("审批状态", dictType.get(task.getFlowStatus())));
-            info.add(buildInfoItem("审批耗时", DateUtils.formatBetweenBySecond(task.getUpdateTime(), task.getCreateTime())));
-            info.add(buildInfoItem("办理时间", DateUtils.formatDateTime(task.getUpdateTime())));
-        }
+        info.add(buildInfoItem("用户账号", userDTO.getUserName()));
     }
 
     /**

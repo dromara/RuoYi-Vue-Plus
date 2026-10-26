@@ -126,7 +126,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
         if (CollUtil.isNotEmpty(flowNodes)) {
             String applyNodeCode = flwCommonService.applyNodeCode(id);
             for (FlowNode flowNode : flowNodes) {
-                if (StringUtils.isBlank(flowNode.getPermissionFlag()) && !applyNodeCode.equals(flowNode.getNodeCode()) && NodeType.BETWEEN.getKey().equals(flowNode.getNodeType())) {
+                if (requiresAssignee(flowNode, applyNodeCode) && StringUtils.isBlank(flowNode.getPermissionFlag())) {
                     errorMsg.add(flowNode.getNodeName());
                 }
             }
@@ -135,6 +135,12 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
             }
         }
         return defService.publish(id);
+    }
+
+    static boolean requiresAssignee(FlowNode node, String applyNodeCode) {
+        return NodeType.BETWEEN.getKey().equals(node.getNodeType())
+            && !applyNodeCode.equals(node.getNodeCode())
+            && StringUtils.isBlank(node.getEventType());
     }
 
     /**
