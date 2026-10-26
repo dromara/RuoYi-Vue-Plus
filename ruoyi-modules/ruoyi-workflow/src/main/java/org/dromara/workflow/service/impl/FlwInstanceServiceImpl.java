@@ -303,15 +303,26 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      */
     @Override
     public Map<String, Object> flowHisTaskList(String businessId) {
-        FlowInstance flowInstance = this.selectInstByBusinessId(businessId);
-        if (ObjectUtil.isNull(flowInstance)) {
+        return flowHisTaskList(null, businessId);
+    }
+
+    @Override
+    public Map<String, Object> flowHisTaskList(Long instanceId, String businessId) {
+        if (instanceId == null && StringUtils.isBlank(businessId)) {
+            throw new ServiceException("流程实例 ID 和业务 ID 不能同时为空");
+        }
+        FlowInstance flowInstance = instanceId != null
+            ? this.selectInstById(instanceId)
+            : this.selectInstByBusinessId(businessId);
+        if (ObjectUtil.isNull(flowInstance)
+            || (StringUtils.isNotBlank(businessId) && !businessId.equals(flowInstance.getBusinessId()))) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_INSTANCE);
         }
-        Long instanceId = flowInstance.getId();
+        Long resolvedInstanceId = flowInstance.getId();
 
         // 先组装待审批任务（运行中的任务）
         List<FlowHisTaskVo> runningTaskVos = new ArrayList<>();
-        List<FlowTask> runningTasks = flwTaskService.selectByInstId(instanceId);
+        List<FlowTask> runningTasks = flwTaskService.selectByInstId(resolvedInstanceId);
         if (CollUtil.isNotEmpty(runningTasks)) {
             runningTaskVos = BeanUtil.copyToList(runningTasks, FlowHisTaskVo.class);
 
@@ -336,7 +347,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         List<FlowHisTaskVo> hisTaskVos = new ArrayList<>();
         List<FlowHisTask> hisTasks = flowHisTaskMapper.selectList(
             QueryBuilder.lambda(FlowHisTask.class)
-                .eq(FlowHisTask::getInstanceId, instanceId)
+                .eq(FlowHisTask::getInstanceId, resolvedInstanceId)
                 .eq(FlowHisTask::getNodeType, NodeType.BETWEEN.getKey())
                 .orderByDesc(FlowHisTask::getUpdateTime)
                 .build()
@@ -350,7 +361,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         combinedList.addAll(runningTaskVos);
         combinedList.addAll(hisTaskVos);
 
-        return Map.of("list", combinedList, "instanceId", instanceId);
+        return Map.of("list", combinedList, "instanceId", resolvedInstanceId);
     }
 
     /**
