@@ -3,9 +3,11 @@ package org.dromara.system.domain.bo;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.constant.RegexConstants;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.xss.Xss;
 import org.dromara.system.domain.SysUser;
@@ -70,6 +72,7 @@ public class SysUserBo implements Serializable {
     /**
      * 手机号码
      */
+    @Pattern(regexp = RegexConstants.MOBILE, message = "手机号格式不正确")
     private String phoneNumber;
 
     /**
