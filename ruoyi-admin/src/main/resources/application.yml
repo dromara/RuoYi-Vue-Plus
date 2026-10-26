@@ -239,6 +239,8 @@ warm-flow:
   ui: true
   # 是否显示流程图顶部文字
   top-text-show: true
+  # 流程图状态颜色：未办理、待办理、已办理（RGB）
+  chart-status-color: ["107,114,128", "245,158,11", "64,158,255"]
   # 是否渲染节点悬浮提示，默认true
   node-tooltip: true
   # 默认Authorization，如果有多个token，用逗号分隔
