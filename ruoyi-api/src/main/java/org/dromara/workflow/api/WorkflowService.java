@@ -3,6 +3,9 @@ package org.dromara.workflow.api;
 import org.dromara.workflow.api.domain.CompleteTaskDTO;
 import org.dromara.workflow.api.domain.StartProcessDTO;
 import org.dromara.workflow.api.domain.StartProcessReturnDTO;
+import org.dromara.workflow.api.domain.StartMessageEventDTO;
+import org.dromara.workflow.api.domain.StartTimerEventDTO;
+import org.dromara.workflow.api.domain.TriggerMessageEventDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -96,4 +99,48 @@ public interface WorkflowService {
      * @return 首节点办理成功返回 {@code true}
      */
     boolean startCompleteTask(StartProcessDTO startProcess);
+
+    /**
+     * 外部消息按流程编码和事件名称启动新实例。
+     *
+     * @param request 消息启动参数，业务 ID 由调用方提供
+     * @return 新建流程实例 ID
+     */
+    Long startByMessageEvent(StartMessageEventDTO request);
+
+    /**
+     * 触发实例中等待的消息捕获或消息边界事件。重复投递时引擎保持实例不变。
+     *
+     * @param request 消息事件参数
+     * @return 流程实例 ID
+     */
+    Long triggerMessageEvent(TriggerMessageEventDTO request);
+
+    /**
+     * 手动发起定时启动事件，不改变等待记录及下一次自动触发时间。
+     *
+     * @param request 定时启动参数，业务 ID 留空时生成数字雪花 ID
+     * @return 新建流程实例 ID
+     */
+    Long startByTimerEvent(StartTimerEventDTO request);
+
+    /**
+     * 从实例级错误捕获节点处理外部错误。
+     *
+     * @param instanceId 流程实例 ID
+     * @param errorCode 错误码，精确匹配优先于通配
+     * @param errorMessage 错误描述
+     * @return 错误事件已被处理时返回 true
+     */
+    boolean throwInstanceErrorEvent(Long instanceId, String errorCode, String errorMessage);
+
+    /**
+     * 从当前待办的错误边界节点处理外部错误。
+     *
+     * @param taskId 当前待办任务 ID
+     * @param errorCode 错误码，精确匹配优先于通配
+     * @param errorMessage 错误描述
+     * @return 错误事件已被处理时返回 true
+     */
+    boolean throwTaskErrorEvent(Long taskId, String errorCode, String errorMessage);
 }
