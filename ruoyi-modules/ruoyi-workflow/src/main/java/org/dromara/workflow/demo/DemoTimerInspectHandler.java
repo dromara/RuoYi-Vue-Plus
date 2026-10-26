@@ -1,5 +1,6 @@
 package org.dromara.workflow.demo;
 
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.entity.EventWait;
@@ -10,7 +11,7 @@ import org.dromara.workflow.common.ConditionalOnEnable;
 import org.springframework.stereotype.Component;
 
 /**
- * 定时启动 + 业务绑定示例：每日 09:00 自动创建巡检工单，并以工单主键发起审批。
+ * 定时启动示例：为流程实例提供可被业务页面解析的数字业务 ID。
  *
  * <p>接入要点：实现 {@link EventTaskHandler} 后引擎内置默认处理器（EventRuntimeHandler）
  * 自动让位，本类成为全部事件的处理入口——非本演示流程的事件必须委托默认处理器，
@@ -30,7 +31,7 @@ public class DemoTimerInspectHandler implements EventTaskHandler {
     /**
      * 演示流程编码：对应设计器发布的含「定时启动」节点的定义
      */
-    public static final String DEMO_FLOW_CODE = "demo_timer_inspect";
+    public static final String DEMO_FLOW_CODE = "demo_timer_start";
 
     /**
      * 引擎内置默认处理器：兜底所有非本演示流程的事件
@@ -43,11 +44,11 @@ public class DemoTimerInspectHandler implements EventTaskHandler {
     @Override
     public void handle(EventWait wait) {
         if (isInspectTimerStart(wait)) {
-            // 业务先行：创建巡检工单，以工单主键作为 businessId 发起审批
-            long l = System.currentTimeMillis();
-            FlowEngine.insService().startByTimer(String.valueOf(l), wait.getDefinitionId(),
+            // 这里应该使用业务的id demo使用自动生成id 需要用户自行替换
+            String businessId = String.valueOf(IdWorker.getId());
+            FlowEngine.insService().startByTimer(businessId, wait.getDefinitionId(),
                 wait.getNodeCode(), null, null);
-            log.info("巡检工单 {} 已自动发起审批: businessId={}", l, l);
+            log.info("定时启动示例已自动发起审批: businessId={}", businessId);
             return;
         }
         // 非本流程的事件：委托默认处理器，保持定时启动与边界事件原生行为

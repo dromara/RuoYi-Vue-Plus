@@ -229,10 +229,13 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @EventListener(condition = "#processEvent.flowCode.startsWith('demo')")
     public void processHandler(ProcessEvent processEvent) {
         log.info("当前任务执行了{}", processEvent.toString());
-        TestLeave testLeave = leaveMapper.selectById(Convert.toLong(processEvent.getBusinessId()));
+        Long leaveId = parseLeaveId(processEvent.getBusinessId());
+        if (leaveId == null) {
+            return;
+        }
+        TestLeave testLeave = leaveMapper.selectById(leaveId);
         if (ObjectUtil.isNull(testLeave)) {
-            // 定时启动 / 消息启动的流程带的是引擎自造 businessId（如 T2112..._1760...），
-            // 不是请假表主键，回写无从谈起；这里直接跳过，避免示例监听被无关流程的事件打爆。
+            // 其他演示流程没有对应的请假记录。
             return;
         }
         testLeave.setStatus(processEvent.getStatus());
@@ -284,11 +287,23 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @EventListener(condition = "#processDeleteEvent.flowCode.startsWith('demo')")
     public void processDeleteHandler(ProcessDeleteEvent processDeleteEvent) {
         log.info("监听删除流程事件，当前任务执行了{}", processDeleteEvent.toString());
-        TestLeave testLeave = leaveMapper.selectById(Convert.toLong(processDeleteEvent.getBusinessId()));
+        Long leaveId = parseLeaveId(processDeleteEvent.getBusinessId());
+        if (leaveId == null) {
+            return;
+        }
+        TestLeave testLeave = leaveMapper.selectById(leaveId);
         if (ObjectUtil.isNull(testLeave)) {
             return;
         }
         leaveMapper.deleteById(testLeave.getId());
+    }
+
+    static Long parseLeaveId(String businessId) {
+        try {
+            return Long.valueOf(businessId);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
 }
