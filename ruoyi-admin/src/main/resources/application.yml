@@ -31,6 +31,8 @@ logging:
     org.springframework: warn
     org.mybatis.spring.mapper: error
     org.apache.fury: warn
+    com.yomahub.liteflow: warn
+    org.anyline: warn
   config: classpath:logback-plus.xml
 
 # 用户配置
