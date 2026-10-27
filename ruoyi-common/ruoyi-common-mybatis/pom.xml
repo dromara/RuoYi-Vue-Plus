@@ -40,6 +40,12 @@
             <artifactId>dynamic-datasource-spring-boot4-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- MyBatis Plus 启动器 -->
         <dependency>
             <groupId>com.baomidou</groupId>
