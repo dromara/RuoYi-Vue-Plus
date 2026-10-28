@@ -15,14 +15,28 @@ public class StartMessageEventDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /** 业务主键，调用方必须提供。 */
+    /**
+     * 业务主键，调用方必须提供。
+     */
     private String businessId;
-    /** 流程定义编码。 */
+
+    /**
+     * 流程定义编码。
+     */
     private String flowCode;
-    /** 消息启动事件名称。 */
+
+    /**
+     * 消息启动事件名称。
+     */
     private String eventName;
-    /** 合并到流程变量的消息数据，可为空。 */
+
+    /**
+     * 合并到流程变量的消息数据，可为空。
+     */
     private Map<String, Object> payload;
-    /** 操作人，留空时使用系统处理人。 */
+
+    /**
+     * 操作人，留空时使用系统处理人。
+     */
     private String handler;
 }

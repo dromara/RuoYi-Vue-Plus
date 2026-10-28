@@ -178,6 +178,12 @@ public class WorkflowServiceImpl implements WorkflowService {
         return flwTaskService.completeTask(taskBo);
     }
 
+    /**
+     * 外部消息按流程编码和事件名称启动新实例。
+     *
+     * @param request 消息启动参数，业务 ID 由调用方提供
+     * @return 新建流程实例 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long startByMessageEvent(StartMessageEventDTO request) {
@@ -188,6 +194,12 @@ public class WorkflowServiceImpl implements WorkflowService {
             request.getEventName(), request.getPayload(), eventContext(request.getHandler())).getId();
     }
 
+    /**
+     * 触发实例中等待的消息捕获或消息边界事件。重复投递时引擎保持实例不变。
+     *
+     * @param request 消息事件参数
+     * @return 流程实例 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long triggerMessageEvent(TriggerMessageEventDTO request) {
@@ -198,6 +210,12 @@ public class WorkflowServiceImpl implements WorkflowService {
             request.getPayload(), eventContext(request.getHandler())).getId();
     }
 
+    /**
+     * 手动发起定时启动事件，不改变等待记录及下一次自动触发时间。
+     *
+     * @param request 定时启动参数，业务 ID 留空时生成数字雪花 ID
+     * @return 新建流程实例 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long startByTimerEvent(StartTimerEventDTO request) {
@@ -210,18 +228,40 @@ public class WorkflowServiceImpl implements WorkflowService {
             request.getNodeCode(), request.getPayload(), eventContext(request.getHandler())).getId();
     }
 
+    /**
+     * 从实例级错误捕获节点处理外部错误。
+     *
+     * @param instanceId   流程实例 ID
+     * @param errorCode    错误码，精确匹配优先于通配
+     * @param errorMessage 错误描述
+     * @return 错误事件已被处理时返回 true
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean throwInstanceErrorEvent(Long instanceId, String errorCode, String errorMessage) {
         return FlowEngine.insService().throwError(instanceId, errorCode, errorMessage);
     }
 
+    /**
+     * 从当前待办的错误边界节点处理外部错误。
+     *
+     * @param taskId       当前待办任务 ID
+     * @param errorCode    错误码，精确匹配优先于通配
+     * @param errorMessage 错误描述
+     * @return 错误事件已被处理时返回 true
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean throwTaskErrorEvent(Long taskId, String errorCode, String errorMessage) {
         return FlowEngine.taskService().throwError(taskId, errorCode, errorMessage);
     }
 
+    /**
+     * 构建事件上下文
+     *
+     * @param handler 操作人
+     * @return 事件上下文
+     */
     private WorkflowContext eventContext(String handler) {
         WorkflowContext context = new WorkflowContext();
         context.setHandler(StringUtils.isNotBlank(handler) ? handler : FlowEngine.getFlowConfig().getSystemHandler());

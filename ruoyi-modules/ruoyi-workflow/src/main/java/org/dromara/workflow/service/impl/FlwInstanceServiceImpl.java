@@ -306,6 +306,13 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         return flowHisTaskList(null, businessId);
     }
 
+    /**
+     * 按实例 ID、业务 ID 查询流程图及历史办理记录；同时提供时须指向同一实例。
+     *
+     * @param instanceId 流程实例 ID，可为空
+     * @param businessId 业务 ID，可为空
+     * @return 流程图与办理记录
+     */
     @Override
     public Map<String, Object> flowHisTaskList(Long instanceId, String businessId) {
         if (instanceId == null && StringUtils.isBlank(businessId)) {

@@ -229,7 +229,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @EventListener(condition = "#processEvent.flowCode.startsWith('demo')")
     public void processHandler(ProcessEvent processEvent) {
         log.info("当前任务执行了{}", processEvent.toString());
-        Long leaveId = parseLeaveId(processEvent.getBusinessId());
+        Long leaveId = Convert.toLong(processEvent.getBusinessId());
         if (leaveId == null) {
             return;
         }
@@ -287,7 +287,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     @EventListener(condition = "#processDeleteEvent.flowCode.startsWith('demo')")
     public void processDeleteHandler(ProcessDeleteEvent processDeleteEvent) {
         log.info("监听删除流程事件，当前任务执行了{}", processDeleteEvent.toString());
-        Long leaveId = parseLeaveId(processDeleteEvent.getBusinessId());
+        Long leaveId = Convert.toLong(processDeleteEvent.getBusinessId());
         if (leaveId == null) {
             return;
         }
@@ -296,14 +296,6 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
             return;
         }
         leaveMapper.deleteById(testLeave.getId());
-    }
-
-    static Long parseLeaveId(String businessId) {
-        try {
-            return Long.valueOf(businessId);
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 
 }

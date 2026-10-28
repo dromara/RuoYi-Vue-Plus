@@ -127,8 +127,8 @@ public interface WorkflowService {
     /**
      * 从实例级错误捕获节点处理外部错误。
      *
-     * @param instanceId 流程实例 ID
-     * @param errorCode 错误码，精确匹配优先于通配
+     * @param instanceId   流程实例 ID
+     * @param errorCode    错误码，精确匹配优先于通配
      * @param errorMessage 错误描述
      * @return 错误事件已被处理时返回 true
      */
@@ -137,8 +137,8 @@ public interface WorkflowService {
     /**
      * 从当前待办的错误边界节点处理外部错误。
      *
-     * @param taskId 当前待办任务 ID
-     * @param errorCode 错误码，精确匹配优先于通配
+     * @param taskId       当前待办任务 ID
+     * @param errorCode    错误码，精确匹配优先于通配
      * @param errorMessage 错误描述
      * @return 错误事件已被处理时返回 true
      */
