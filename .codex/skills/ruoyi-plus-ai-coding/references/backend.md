@@ -166,6 +166,8 @@
 
 - 分页统一使用 `PageQuery` 和 `PageResult`，不要无故引入新的分页 DTO。
 - 优先使用项目工具类：`MapstructUtils`、`StringUtils`、`StreamUtils`、`ValidatorUtils`、`SpringUtils`、`RedisUtils`。
+- 复用前核对空值、非法输入、默认值、异常和数值精度（含溢出、截断）的行为，不能为了复用改变业务语义；依赖行为以当前版本的实现或测试为准。
+- 例如容错 ID 转换可先查已有调用中的 Hutool `Convert.toLong`，核对所用重载的失败返回值与默认值是否符合需求；必须抛错的严格解析不能改成返回 `null` 或默认值，也要核对小数、越界等输入的处理。此处只示范核对方式，不维护全量工具 API 清单。
 - 数组转列表按附近代码习惯使用 `List.of(ids)` 或 `Arrays.asList(ids)`。
 - 日期范围查询通常从 `bo.getParams()` 中读取 `beginTime`、`endTime` 或 `beginFieldName`、`endFieldName`。
 - 构建查询优先识别 `QueryBuilder.lambda(...)`、`QueryBuilder.lambdaJoin(...)`、`BaseMapperPlus#lambda()` 三类入口，不要退回临时手写 SQL 或自造 wrapper。
