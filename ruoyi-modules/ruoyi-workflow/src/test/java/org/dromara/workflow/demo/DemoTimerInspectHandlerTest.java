@@ -1,16 +1,19 @@
 package org.dromara.workflow.demo;
 
 import org.dromara.warm.flow.core.FlowEngine;
+import org.dromara.warm.flow.core.config.WarmFlow;
 import org.dromara.warm.flow.core.entity.Definition;
 import org.dromara.warm.flow.core.entity.EventWait;
 import org.dromara.warm.flow.core.enums.EventType;
 import org.dromara.warm.flow.core.service.DefService;
 import org.dromara.warm.flow.core.service.InsService;
+import org.dromara.warm.flow.core.workflow.context.WorkflowContext;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -32,17 +35,22 @@ class DemoTimerInspectHandlerTest {
         DefService defService = mock(DefService.class);
         when(defService.getById(12L)).thenReturn(definition);
         InsService insService = mock(InsService.class);
+        WarmFlow flowConfig = mock(WarmFlow.class);
+        when(flowConfig.getSystemHandler()).thenReturn("0");
 
         try (MockedStatic<FlowEngine> engine = mockStatic(FlowEngine.class)) {
             engine.when(FlowEngine::defService).thenReturn(defService);
             engine.when(FlowEngine::insService).thenReturn(insService);
+            engine.when(FlowEngine::getFlowConfig).thenReturn(flowConfig);
 
             assertDoesNotThrow(() -> new DemoTimerInspectHandler().handle(wait));
 
             ArgumentCaptor<String> businessId = ArgumentCaptor.forClass(String.class);
-            verify(insService).startByTimer(businessId.capture(), eq(12L), eq("timerStart"), isNull(), isNull());
+            ArgumentCaptor<WorkflowContext> context = ArgumentCaptor.forClass(WorkflowContext.class);
+            verify(insService).startByTimer(businessId.capture(), eq(12L), eq("timerStart"), isNull(), context.capture());
             assertTrue(businessId.getValue().matches("[0-9]+"));
             assertTrue(Long.parseLong(businessId.getValue()) > 0);
+            assertEquals("0", context.getValue().getHandler());
         }
     }
 }

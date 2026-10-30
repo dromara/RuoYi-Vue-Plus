@@ -7,6 +7,7 @@ import org.dromara.warm.flow.core.entity.EventWait;
 import org.dromara.warm.flow.core.enums.EventType;
 import org.dromara.warm.flow.core.service.impl.EventRuntimeHandler;
 import org.dromara.warm.flow.core.timer.EventTaskHandler;
+import org.dromara.warm.flow.core.workflow.context.WorkflowContext;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.springframework.stereotype.Component;
 
@@ -46,8 +47,10 @@ public class DemoTimerInspectHandler implements EventTaskHandler {
         if (isInspectTimerStart(wait)) {
             // 这里应该使用业务的id demo使用自动生成id 需要用户自行替换
             String businessId = String.valueOf(IdWorker.getId());
+            WorkflowContext context = new WorkflowContext();
+            context.setHandler(FlowEngine.getFlowConfig().getSystemHandler());
             FlowEngine.insService().startByTimer(businessId, wait.getDefinitionId(),
-                wait.getNodeCode(), null, null);
+                wait.getNodeCode(), null, context);
             log.info("定时启动示例已自动发起审批: businessId={}", businessId);
             return;
         }
