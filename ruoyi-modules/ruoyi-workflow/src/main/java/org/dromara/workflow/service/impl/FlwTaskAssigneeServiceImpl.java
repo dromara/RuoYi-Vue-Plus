@@ -10,11 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.*;
 import org.dromara.system.api.domain.DeptDTO;
 import org.dromara.system.api.domain.TaskAssigneeDTO;
-import org.dromara.system.api.domain.UserDTO;
 import org.dromara.system.api.model.TaskAssigneeBody;
+import org.dromara.warm.flow.core.spi.PermissionHandler;
 import org.dromara.warm.flow.ui.dto.HandlerFunDto;
 import org.dromara.warm.flow.ui.dto.HandlerQuery;
 import org.dromara.warm.flow.ui.dto.TreeFunDto;
@@ -24,7 +25,6 @@ import org.dromara.warm.flow.ui.vo.HandlerSelectVo;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskAssigneeEnum;
 import org.dromara.workflow.service.IFlwSpelService;
-import org.dromara.workflow.service.IFlwTaskAssigneeService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, HandlerSelectService {
+public class FlwTaskAssigneeServiceImpl implements PermissionHandler, HandlerSelectService {
 
     private static final String DEFAULT_GROUP_NAME = "默认分组";
 
@@ -49,6 +49,69 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
     private final RoleService roleService;
     private final PostService postService;
     private final IFlwSpelService spelService;
+
+    /**
+     * 办理人权限标识，比如用户，角色，部门等，用于校验是否有权限办理任务
+     * 后续在流程上下文中获取。
+     * 返回当前用户权限集合
+     *
+     * @return 当前用户权限集合
+     */
+    @Override
+    public List<String> permissions() {
+        return Collections.singletonList(LoginHelper.getUserIdStr());
+    }
+
+    /**
+     * 获取当前办理人
+     *
+     * @return 当前办理人
+     */
+    @Override
+    public String getHandler() {
+        return LoginHelper.getUserIdStr();
+    }
+
+    /**
+     * 将预设办理人转换为实际用户 ID 列表。
+     *
+     * @param permissions 预设权限标识列表
+     * @return 用户 ID 列表
+     */
+    @Override
+    public List<String> convertPermissions(List<String> permissions) {
+        if (CollUtil.isEmpty(permissions)) {
+            return permissions;
+        }
+
+        Map<TaskAssigneeEnum, List<String>> typeIdMap = new EnumMap<>(TaskAssigneeEnum.class);
+        for (String storageId : permissions) {
+            Pair<TaskAssigneeEnum, String> parsed = this.parseStorageId(storageId);
+            if (parsed != null) {
+                typeIdMap.computeIfAbsent(parsed.getKey(), k -> new ArrayList<>()).add(parsed.getValue());
+            }
+        }
+
+        return typeIdMap.entrySet()
+            .stream()
+            .map(entry -> {
+                TaskAssigneeEnum type = entry.getKey();
+                List<Long> longIds = StreamUtils.toList(entry.getValue(), Convert::toLong);
+                return switch (type) {
+                    case USER -> longIds;
+                    case ROLE -> userService.selectUserIdsByRoleIds(longIds);
+                    case DEPT -> userService.selectUserIdsByDeptIds(longIds);
+                    case POST -> userService.selectUserIdsByPostIds(longIds);
+                    default -> Collections.<Long>emptyList();
+                };
+            })
+            .filter(CollUtil::isNotEmpty)
+            .flatMap(Collection::stream)
+            .filter(Objects::nonNull)
+            .distinct()
+            .map(Convert::toStr)
+            .toList();
+    }
 
     /**
      * 获取办理人权限设置列表tabs页签
@@ -193,45 +256,6 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
     }
 
     /**
-     * 批量解析多个存储标识符（storageIds），按类型分类并合并查询用户列表
-     * 输入格式支持多个以逗号分隔的标识（如 "user:123,role:456,789"）
-     * 会自动去重返回结果，非法格式的标识将被忽略
-     *
-     * @param storageIds 多个存储标识符字符串（逗号分隔）
-     * @return 合并后的用户列表，去重后返回，非法格式的标识将被跳过
-     */
-    @Override
-    public List<UserDTO> fetchUsersByStorageIds(String storageIds) {
-        if (StringUtils.isEmpty(storageIds)) {
-            return List.of();
-        }
-        Map<TaskAssigneeEnum, List<String>> typeIdMap = new EnumMap<>(TaskAssigneeEnum.class);
-        for (String storageId : StringUtils.str2List(storageIds, StringUtils.SEPARATOR, true, true)) {
-            Pair<TaskAssigneeEnum, String> parsed = this.parseStorageId(storageId);
-            if (parsed != null) {
-                typeIdMap.computeIfAbsent(parsed.getKey(), k -> new ArrayList<>()).add(parsed.getValue());
-            }
-        }
-        return this.getUsersByTypes(typeIdMap).stream()
-            .distinct()
-            .toList();
-    }
-
-    /**
-     * 按任务分配类型批量查询用户。
-     *
-     * @param typeIdMap 任务分配类型与 id 列表映射
-     * @return 用户列表
-     */
-    private List<UserDTO> getUsersByTypes(Map<TaskAssigneeEnum, List<String>> typeIdMap) {
-        return typeIdMap.entrySet().stream()
-            .map(entry -> this.getUsersByType(entry.getKey(), entry.getValue()))
-            .filter(CollUtil::isNotEmpty)
-            .flatMap(Collection::stream)
-            .toList();
-    }
-
-    /**
      * 按任务分配类型批量查询名称映射。
      *
      * @param typeIdMap 任务分配类型与 id 列表映射
@@ -241,30 +265,6 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
         Map<TaskAssigneeEnum, Map<String, String>> nameMap = new EnumMap<>(TaskAssigneeEnum.class);
         typeIdMap.forEach((type, ids) -> nameMap.put(type, this.getNamesByType(type, ids)));
         return nameMap;
-    }
-
-    /**
-     * 根据指定的任务分配类型（TaskAssigneeEnum）和 ID 列表，获取对应的用户信息列表
-     *
-     * @param type 任务分配类型，表示用户、角色、部门或其他（TaskAssigneeEnum 枚举值）
-     * @param ids  与指定分配类型关联的 ID 列表（例如用户ID、角色ID、部门ID等）
-     * @return 返回包含用户信息的列表。如果类型为用户（USER），则通过用户ID列表查询；
-     * 如果类型为角色（ROLE），则通过角色ID列表查询；
-     * 如果类型为部门（DEPT），则通过部门ID列表查询；
-     * 如果类型为岗位（POST）或无法识别的类型，则返回空列表
-     */
-    private List<UserDTO> getUsersByType(TaskAssigneeEnum type, List<String> ids) {
-        if (type == TaskAssigneeEnum.SPEL) {
-            return new ArrayList<>();
-        }
-        List<Long> longIds = StreamUtils.toList(ids, Convert::toLong);
-        return switch (type) {
-            case USER -> userService.selectListByIds(longIds);
-            case ROLE -> userService.selectUsersByRoleIds(longIds);
-            case DEPT -> userService.selectUsersByDeptIds(longIds);
-            case POST -> userService.selectUsersByPostIds(longIds);
-            default -> new ArrayList<>();
-        };
     }
 
     /**

@@ -690,8 +690,12 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         if (CollUtil.isEmpty(roleIds)) {
             return List.of();
         }
-        List<SysUserRole> userRoles = userRoleMapper.lambda().in(SysUserRole::getRoleId, roleIds).list();
-        return StreamUtils.toList(userRoles, SysUserRole::getUserId);
+        List<SysUserRole> userRoles = userRoleMapper.lambda()
+            .select(SysUserRole::getUserId)
+            .in(SysUserRole::getRoleId, roleIds)
+            .list();
+        Set<Long> userIds = StreamUtils.toSet(userRoles, SysUserRole::getUserId);
+        return new ArrayList<>(userIds);
     }
 
     /**
@@ -702,17 +706,8 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public List<UserDTO> selectUsersByRoleIds(Collection<Long> roleIds) {
-        if (CollUtil.isEmpty(roleIds)) {
-            return List.of();
-        }
-
-        // 通过角色ID获取用户角色信息
-        List<SysUserRole> userRoles = userRoleMapper.lambda().in(SysUserRole::getRoleId, roleIds).list();
-
-        // 获取用户ID列表
-        Set<Long> userIds = StreamUtils.toSet(userRoles, SysUserRole::getUserId);
-
-        return this.selectListByIds(new ArrayList<>(userIds));
+        List<Long> userIds = this.selectUserIdsByRoleIds(roleIds);
+        return this.selectListByIds(userIds);
     }
 
     /**
@@ -726,12 +721,31 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         if (CollUtil.isEmpty(deptIds)) {
             return List.of();
         }
-        List<SysUserVo> list = userMapper.lambda()
+        List<SysUser> list = userMapper.lambda()
             .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName, SysUser::getEmail, SysUser::getPhoneNumber)
             .eq(SysUser::getStatus, SystemConstants.NORMAL)
             .in(SysUser::getDeptId, deptIds)
-            .voList();
+            .list();
         return BeanUtil.copyToList(list, UserDTO.class);
+    }
+
+    /**
+     * 通过部门ID查询用户ID
+     *
+     * @param deptIds 部门ids
+     * @return 用户ids
+     */
+    @Override
+    public List<Long> selectUserIdsByDeptIds(Collection<Long> deptIds) {
+        if (CollUtil.isEmpty(deptIds)) {
+            return List.of();
+        }
+        List<SysUser> list = userMapper.lambda()
+            .select(SysUser::getUserId)
+            .eq(SysUser::getStatus, SystemConstants.NORMAL)
+            .in(SysUser::getDeptId, deptIds)
+            .list();
+        return StreamUtils.toList(list, SysUser::getUserId);
     }
 
     /**
@@ -742,17 +756,27 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public List<UserDTO> selectUsersByPostIds(Collection<Long> postIds) {
+        List<Long> userIds = this.selectUserIdsByPostIds(postIds);
+        return this.selectListByIds(userIds);
+    }
+
+    /**
+     * 通过岗位ID查询用户ID
+     *
+     * @param postIds 岗位ids
+     * @return 用户ids
+     */
+    @Override
+    public List<Long> selectUserIdsByPostIds(Collection<Long> postIds) {
         if (CollUtil.isEmpty(postIds)) {
             return List.of();
         }
-
-        // 通过岗位ID获取用户岗位信息
-        List<SysUserPost> userPosts = userPostMapper.lambda().in(SysUserPost::getPostId, postIds).list();
-
-        // 获取用户ID列表
+        List<SysUserPost> userPosts = userPostMapper.lambda()
+            .select(SysUserPost::getUserId)
+            .in(SysUserPost::getPostId, postIds)
+            .list();
         Set<Long> userIds = StreamUtils.toSet(userPosts, SysUserPost::getUserId);
-
-        return this.selectListByIds(new ArrayList<>(userIds));
+        return new ArrayList<>(userIds);
     }
 
     /**
