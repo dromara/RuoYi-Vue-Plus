@@ -189,6 +189,9 @@ public class QuantAccountQueryController {
     @SaCheckPermission("quant:trade:sync")
     @PostMapping("/trade/{credentialId}/sync")
     public R<Integer> syncTrades(@PathVariable Long credentialId, @RequestParam String symbol) {
+        if (symbol == null || symbol.isBlank()) {
+            symbol = "";
+        }
         QuantCredential credential = credentialEntity(credentialId);
         List<ExchangeGateway.TradeSnapshot> snapshots = gateway.queryTrades(credential(credentialId), symbol, new ExchangeGateway.TimeRange(null, null));
         int count = 0;

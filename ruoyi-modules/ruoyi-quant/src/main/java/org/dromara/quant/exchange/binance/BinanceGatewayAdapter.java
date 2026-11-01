@@ -1042,14 +1042,13 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
      */
     @Override
     public List<TradeSnapshot> queryTrades(Credential credential, String symbol, TimeRange range) {
-        if (symbol == null || symbol.isBlank()) {
-            throw new IllegalArgumentException("查询成交记录必须指定交易对");
-        }
+//        if (symbol == null || symbol.isBlank()) {
+//            throw new IllegalArgumentException("查询成交记录必须指定交易对");
+//        }
         Long from = range == null || range.from() == null ? null : range.from().toEpochMilli();
         Long to = range == null || range.to() == null ? null : range.to().toEpochMilli();
         return signedRead(credential, RestRequestScheduler.Kind.ACCOUNT, client -> {
-            ApiResponse<AccountTradeListResponse> response =
-                client.accountTradeList(symbol.trim(), null, from, to, null, 1000L, RECV_WINDOW_MILLIS);
+            ApiResponse<AccountTradeListResponse> response = client.accountTradeList(symbol.trim(), null, from, to, null, 1000L, RECV_WINDOW_MILLIS);
             if (response == null || response.getData() == null) {
                 return List.of();
             }

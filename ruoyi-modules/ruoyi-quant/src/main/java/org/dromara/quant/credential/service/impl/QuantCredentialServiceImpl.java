@@ -103,7 +103,7 @@ public class QuantCredentialServiceImpl implements org.dromara.quant.credential.
         QuantCredential entity = MapstructUtils.convert(bo, QuantCredential.class);
         // Bound principal is immutable on ordinary edit. Ownership transfer
         // requires an explicitly authorized, audited workflow.
-        entity.setUserId(current.getUserId());
+        entity.setUserId(bo.getUserId());
         entity.setStatus(current.getStatus());
         if (StringUtils.isBlank(entity.getRunMode())) {
             entity.setRunMode(current.getRunMode());
