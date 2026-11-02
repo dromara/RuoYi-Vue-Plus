@@ -30,14 +30,14 @@ public final class TradeHistoryAssembler {
             String direction = classification == null ? null : classification.direction();
             boolean open = classification != null && classification.open();
             if (direction == null || fill.tradeTime() == null || !positive(fill.quantity()) || !positive(fill.price())) {
-                incomplete.add(scope);
+                markIncomplete(scope, active, cycles, incomplete);
                 continue;
             }
             String key = scope + ":" + direction;
             Cycle cycle = active.get(key);
             if (open) {
                 if (!("LONG".equals(direction) ? "BUY" : "SELL").equals(fill.side())) {
-                    incomplete.add(scope);
+                    markIncomplete(scope, active, cycles, incomplete);
                     continue;
                 }
                 if (cycle == null) {
@@ -64,7 +64,7 @@ public final class TradeHistoryAssembler {
                 }
             } else {
                 if (cycle == null || fill.quantity().compareTo(cycle.remaining) > 0 || !("LONG".equals(direction) ? "SELL" : "BUY").equals(fill.side())) {
-                    incomplete.add(scope);
+                    markIncomplete(scope, active, cycles, incomplete);
                     continue;
                 }
                 cycle.closeQty = cycle.closeQty.add(fill.quantity());
@@ -86,8 +86,16 @@ public final class TradeHistoryAssembler {
             cycle.fee = addKnown(cycle.fee, fill.commission());
         }
         List<Map<String, Object>> rows =
-            cycles.stream().filter(c -> !incomplete.contains(c.scope)).sorted(Comparator.comparing((Cycle c) -> c.openedAt).thenComparing(c -> c.id).reversed()).map(c -> c.row(accountNames)).toList();
+            cycles.stream().sorted(Comparator.comparing((Cycle c) -> c.openedAt).thenComparing(c -> c.id).reversed()).map(c -> c.row(accountNames)).toList();
         return new Result(rows, incomplete.size());
+    }
+
+    private static void markIncomplete(String scope, Map<String, Cycle> active, List<Cycle> cycles, Set<String> incomplete) {
+        if (!incomplete.add(scope)) {
+            return;
+        }
+        active.entrySet().removeIf(entry -> scope.equals(entry.getValue().scope));
+        cycles.removeIf(cycle -> scope.equals(cycle.scope) && cycle.closedAt == null);
     }
 
     private static Classification classify(Fill fill) {

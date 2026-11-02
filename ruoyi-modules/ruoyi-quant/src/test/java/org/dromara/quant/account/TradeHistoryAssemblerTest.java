@@ -115,6 +115,21 @@ class TradeHistoryAssemblerTest {
     }
 
     @Test
+    void preservesCompletedCyclesBeforeAnUnreconstructableHistoryBoundary() {
+        var result = TradeHistoryAssembler.assemble(List.of(
+            fill(1, 10, "BTCUSDT", "BUY", "LONG", "OPEN", "1", "100", "0", "0"),
+            fill(2, 10, "BTCUSDT", "SELL", "LONG", "CLOSE", "1", "110", "0", "10"),
+            fill(3, 10, "BTCUSDT", "BUY", null, null, "1", "120", "0", "0"),
+            fill(4, 10, "BTCUSDT", "BUY", "LONG", "OPEN", "1", "130", "0", "0")
+        ), Map.of());
+
+        assertEquals(1, result.rows().size());
+        assertEquals("CLOSED", result.rows().getFirst().get("status"));
+        assertEquals("110", result.rows().getFirst().get("closePrice"));
+        assertEquals(1, result.incompleteCount());
+    }
+
+    @Test
     void excludesOverCloseAndDoesNotTreatMissingFeesAsZero() {
         var result = TradeHistoryAssembler.assemble(List.of(fill(1, 10, "BTCUSDT", "BUY", "LONG", "OPEN", "1", "100", "0", "0"), fill(2, 10, "BTCUSDT", "SELL", "LONG", "CLOSE",
             "2", "110", "0", "0"), fill(3, 10, "PUMPUSDT", "BUY", "LONG", "OPEN", "1", "1", null, "0")), Map.of());
