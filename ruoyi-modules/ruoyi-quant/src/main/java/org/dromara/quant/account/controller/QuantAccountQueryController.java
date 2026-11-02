@@ -187,18 +187,18 @@ public class QuantAccountQueryController {
         for (ExchangeGateway.OrderSnapshot snapshot : ExchangeHistoryCollector.collectLast90Days(
             range -> gateway.queryOrderHistory(exchangeCredential, normalizedSymbol, range, 1000L))) {
             if (snapshot == null) continue;
-            if (!normalizedSymbol.equalsIgnoreCase(snapshot.symbol())) {
-                throw new IllegalStateException("交易所历史订单返回了不匹配的交易对，拒绝写入本地账本");
+            if (!normalizedSymbol.equalsIgnoreCase(snapshot.symbol()) || snapshot.orderId() == null) {
+                throw new IllegalStateException("交易所历史订单缺少订单 ID 或返回了不匹配的交易对，拒绝写入本地账本");
             }
-            if (snapshot.orderId() != null) snapshots.put(snapshot.orderId(), snapshot);
+            snapshots.put(snapshot.orderId(), snapshot);
         }
         // 活动订单覆盖历史快照，避免旧状态覆盖当前状态。
         for (ExchangeGateway.OrderSnapshot snapshot : gateway.queryOrders(exchangeCredential, normalizedSymbol)) {
             if (snapshot == null) continue;
-            if (!normalizedSymbol.equalsIgnoreCase(snapshot.symbol())) {
-                throw new IllegalStateException("交易所活动订单返回了不匹配的交易对，拒绝写入本地账本");
+            if (!normalizedSymbol.equalsIgnoreCase(snapshot.symbol()) || snapshot.orderId() == null) {
+                throw new IllegalStateException("交易所活动订单缺少订单 ID 或返回了不匹配的交易对，拒绝写入本地账本");
             }
-            if (snapshot.orderId() != null) snapshots.put(snapshot.orderId(), snapshot);
+            snapshots.put(snapshot.orderId(), snapshot);
         }
         snapshots.values().forEach(snapshot -> orderLedgerService.syncHistoricalSnapshot(credential.getId(), normalizedSymbol, snapshot));
         return snapshots.size();
@@ -294,7 +294,7 @@ public class QuantAccountQueryController {
             range -> gateway.queryTrades(exchangeCredential, normalizedSymbol, range));
         int count = 0;
         for (ExchangeGateway.TradeSnapshot snapshot : snapshots) {
-            if (snapshot == null || snapshot.tradeId() == null || !normalizedSymbol.equalsIgnoreCase(snapshot.symbol())) {
+            if (snapshot == null || snapshot.tradeId() == null || snapshot.orderId() == null || !normalizedSymbol.equalsIgnoreCase(snapshot.symbol())) {
                 throw new IllegalStateException("交易所历史成交缺少成交 ID 或返回了不匹配的交易对，拒绝写入本地账本");
             }
             QuantTrade entity = tradeMapper.selectOne(new LambdaQueryWrapper<QuantTrade>().eq(QuantTrade::getCredentialId, credentialId).eq(QuantTrade::getSymbol, normalizedSymbol)
