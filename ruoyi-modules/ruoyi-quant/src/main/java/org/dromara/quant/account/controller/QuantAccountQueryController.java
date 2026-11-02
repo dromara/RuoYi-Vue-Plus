@@ -294,10 +294,10 @@ public class QuantAccountQueryController {
             range -> gateway.queryTrades(exchangeCredential, normalizedSymbol, range));
         int count = 0;
         for (ExchangeGateway.TradeSnapshot snapshot : snapshots) {
-            if (snapshot == null || snapshot.tradeId() == null || !symbol.equalsIgnoreCase(snapshot.symbol())) {
+            if (snapshot == null || snapshot.tradeId() == null || !normalizedSymbol.equalsIgnoreCase(snapshot.symbol())) {
                 throw new IllegalStateException("交易所历史成交缺少成交 ID 或返回了不匹配的交易对，拒绝写入本地账本");
             }
-            QuantTrade entity = tradeMapper.selectOne(new LambdaQueryWrapper<QuantTrade>().eq(QuantTrade::getCredentialId, credentialId).eq(QuantTrade::getSymbol, symbol)
+            QuantTrade entity = tradeMapper.selectOne(new LambdaQueryWrapper<QuantTrade>().eq(QuantTrade::getCredentialId, credentialId).eq(QuantTrade::getSymbol, normalizedSymbol)
                 .eq(QuantTrade::getExchangeTradeId, snapshot.tradeId()));
             if (entity == null) {
                 entity = new QuantTrade();
