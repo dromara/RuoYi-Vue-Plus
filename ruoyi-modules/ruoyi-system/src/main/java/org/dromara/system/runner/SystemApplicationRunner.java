@@ -27,7 +27,6 @@ public class SystemApplicationRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         ossConfigService.init();
-        log.info("初始化OSS配置成功");
     }
 
 }

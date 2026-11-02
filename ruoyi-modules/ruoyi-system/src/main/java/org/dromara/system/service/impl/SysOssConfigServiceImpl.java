@@ -70,6 +70,8 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
             }
             if (!hasDefaultConfig) {
                 log.warn("OSS配置初始化未找到启用的默认配置");
+            } else {
+                log.info("初始化OSS配置成功");
             }
         } catch (RuntimeException e) {
             log.error("OSS配置初始化失败", e);
