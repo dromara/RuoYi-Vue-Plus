@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -47,7 +46,6 @@ public class TradeHistoryService {
     private final TradeHistoryMapper historyMapper;
     private final ExchangeGateway exchangeGateway;
     private final OrderLedgerService orderLedgerService;
-
 
     /**
      * 从 Binance 历史普通订单中补齐成交账本缺失的订单事实。
