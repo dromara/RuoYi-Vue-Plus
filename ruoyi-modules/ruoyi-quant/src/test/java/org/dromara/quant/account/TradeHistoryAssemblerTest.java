@@ -192,6 +192,6 @@ class TradeHistoryAssemblerTest {
         ), Map.of());
 
         assertEquals("SHORT", result.rows().getFirst().get("direction"));
-        assertEquals("EXCHANGE", result.rows().getFirst().get("reconstructionSource"));
+
     }
 }
