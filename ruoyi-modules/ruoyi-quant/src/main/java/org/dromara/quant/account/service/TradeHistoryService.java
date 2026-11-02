@@ -142,7 +142,9 @@ public class TradeHistoryService {
                         ExchangeGateway.OrderSnapshot snapshot = exchangeGateway.queryOrder(exchangeCredential, currentSymbol, orderId, null);
                         if (snapshot != null && orderId.equals(snapshot.orderId()) && currentSymbol.equalsIgnoreCase(snapshot.symbol())) {
                             orderLedgerService.syncHistoricalSnapshot(credentialId, currentSymbol, snapshot);
-                            recoveredOrderIds.add(orderId);
+                            if (snapshot.positionSide() != null && !snapshot.positionSide().isBlank() && snapshot.reduceOnly() != null) {
+                                recoveredOrderIds.add(orderId);
+                            }
                         }
                     } catch (RuntimeException ex) {
                         log.warn("Binance 精确历史订单补齐失败 credentialId={} symbol={} orderId={} errorType={}",
@@ -174,7 +176,9 @@ public class TradeHistoryService {
             }
             try {
                 orderLedgerService.syncHistoricalSnapshot(credentialId, symbol, snapshot);
-                recoveredOrderIds.add(snapshot.orderId());
+                if (snapshot.positionSide() != null && !snapshot.positionSide().isBlank() && snapshot.reduceOnly() != null) {
+                    recoveredOrderIds.add(snapshot.orderId());
+                }
             } catch (RuntimeException ex) {
                 log.warn("历史订单事实写入冲突 credentialId={} symbol={} orderId={} errorType={}",
                     credentialId, symbol, snapshot.orderId(), ex.getClass().getSimpleName());
