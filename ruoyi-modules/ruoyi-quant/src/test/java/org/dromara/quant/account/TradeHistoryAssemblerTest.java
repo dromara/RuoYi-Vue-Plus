@@ -182,7 +182,7 @@ class TradeHistoryAssemblerTest {
     }
 
     @Test
-    void classifiesOneWayBothSideOrdersFromExactReduceOnlyFact() {
+    void doesNotInferOneWayOpeningFromReduceOnlyFalse() {
         LocalDateTime time = LocalDateTime.of(2026, 10, 9, 1, 0);
         var result = TradeHistoryAssembler.assemble(List.of(
             new TradeHistoryAssembler.Fill(1L, 10L, "BTCUSDT", "SELL", "BOTH", null, false, BigDecimal.ONE, new BigDecimal("100"), BigDecimal.ZERO, BigDecimal.ZERO,
@@ -191,7 +191,7 @@ class TradeHistoryAssemblerTest {
                 time.plusMinutes(1))
         ), Map.of());
 
-        assertEquals("SHORT", result.rows().getFirst().get("direction"));
-
+        assertTrue(result.rows().isEmpty());
+        assertEquals(1, result.incompleteCount());
     }
 }

@@ -94,10 +94,12 @@ public final class TradeHistoryAssembler {
         String direction = direction(fill);
         if (direction == null || (!"BUY".equals(fill.side()) && !"SELL".equals(fill.side()))) return null;
         Boolean open = null;
-        if ("OPEN".equals(fill.operationType())) open = true;
-        else if ("CLOSE".equals(fill.operationType()) || Boolean.TRUE.equals(fill.reduceOnly())) open = false;
-        else if ("BOTH".equalsIgnoreCase(fill.positionSide()) && fill.reduceOnly() != null) open = !fill.reduceOnly();
-        else if ("LONG".equals(fill.positionSide()) || "SHORT".equals(fill.positionSide())) {
+        if ("OPEN".equals(fill.operationType())) {
+            if (Boolean.TRUE.equals(fill.reduceOnly())) return null;
+            open = true;
+        } else if ("CLOSE".equals(fill.operationType()) || Boolean.TRUE.equals(fill.reduceOnly())) {
+            open = false;
+        } else if ("LONG".equals(fill.positionSide()) || "SHORT".equals(fill.positionSide())) {
             open = ("LONG".equals(direction) ? "BUY" : "SELL").equals(fill.side());
         }
         if (open == null) return null;
@@ -117,10 +119,7 @@ public final class TradeHistoryAssembler {
         if ("CLOSE".equals(fill.operationType()) || Boolean.TRUE.equals(fill.reduceOnly())) {
             return "SELL".equals(fill.side()) ? "LONG" : "BUY".equals(fill.side()) ? "SHORT" : null;
         }
-        if ("BOTH".equalsIgnoreCase(fill.positionSide()) && fill.reduceOnly() != null) {
-            return Boolean.TRUE.equals(fill.reduceOnly()) ? ("SELL".equals(fill.side()) ? "LONG" : "BUY".equals(fill.side()) ? "SHORT" : null)
-                : ("BUY".equals(fill.side()) ? "LONG" : "SELL".equals(fill.side()) ? "SHORT" : null);
-        }
+        // 单向仓的 reduceOnly=false 不代表开仓；平仓也可能由非只减仓订单完成。
         return null;
     }
 
