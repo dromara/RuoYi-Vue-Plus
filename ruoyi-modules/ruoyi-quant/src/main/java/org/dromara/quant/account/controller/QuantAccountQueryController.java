@@ -21,6 +21,7 @@ import org.dromara.quant.account.mapper.TradeHistoryMapper;
 import org.dromara.quant.credential.domain.QuantCredential;
 import org.dromara.quant.credential.mapper.QuantCredentialMapper;
 import org.dromara.quant.exchange.ExchangeGateway;
+import org.dromara.quant.exchange.ExchangeHistoryCollector;
 import org.dromara.quant.execution.OrderLedgerService;
 import org.dromara.quant.order.domain.QuantOrder;
 import org.dromara.quant.order.mapper.QuantOrderMapper;
@@ -183,16 +184,23 @@ public class QuantAccountQueryController {
         String normalizedSymbol = symbol.trim().toUpperCase(java.util.Locale.ROOT);
         ExchangeGateway.Credential exchangeCredential = credential(credential.getId());
         Map<Long, ExchangeGateway.OrderSnapshot> snapshots = new java.util.LinkedHashMap<>();
-        for (ExchangeGateway.OrderSnapshot snapshot : gateway.queryOrderHistory(exchangeCredential, normalizedSymbol,
-            new ExchangeGateway.TimeRange(null, null), 1000L)) {
-            if (snapshot != null && snapshot.orderId() != null) snapshots.put(snapshot.orderId(), snapshot);
+        for (ExchangeGateway.OrderSnapshot snapshot : ExchangeHistoryCollector.collectLast90Days(
+            range -> gateway.queryOrderHistory(exchangeCredential, normalizedSymbol, range, 1000L))) {
+            if (snapshot == null) continue;
+            if (!normalizedSymbol.equalsIgnoreCase(snapshot.symbol())) {
+                throw new IllegalStateException("交易所历史订单返回了不匹配的交易对，拒绝写入本地账本");
+            }
+            if (snapshot.orderId() != null) snapshots.put(snapshot.orderId(), snapshot);
         }
         // 活动订单覆盖历史快照，避免旧状态覆盖当前状态。
         for (ExchangeGateway.OrderSnapshot snapshot : gateway.queryOrders(exchangeCredential, normalizedSymbol)) {
-            if (snapshot != null && snapshot.orderId() != null) snapshots.put(snapshot.orderId(), snapshot);
+            if (snapshot == null) continue;
+            if (!normalizedSymbol.equalsIgnoreCase(snapshot.symbol())) {
+                throw new IllegalStateException("交易所活动订单返回了不匹配的交易对，拒绝写入本地账本");
+            }
+            if (snapshot.orderId() != null) snapshots.put(snapshot.orderId(), snapshot);
         }
         snapshots.values().forEach(snapshot -> orderLedgerService.syncHistoricalSnapshot(credential.getId(), normalizedSymbol, snapshot));
-        if (snapshots.size() == 1000) log.warn("订单历史同步命中单次返回上限，仅完成本批订单同步 credentialId={} symbol={}", credential.getId(), normalizedSymbol);
         return snapshots.size();
     }
 
@@ -281,9 +289,14 @@ public class QuantAccountQueryController {
         if (StringUtils.isBlank(symbol)) throw new ServiceException("请指定交易对同步成交记录");
         symbol = symbol.trim().toUpperCase(java.util.Locale.ROOT);
         QuantCredential credential = credentialEntity(credentialId);
-        List<ExchangeGateway.TradeSnapshot> snapshots = gateway.queryTrades(credential(credentialId), symbol, new ExchangeGateway.TimeRange(null, null));
+        ExchangeGateway.Credential exchangeCredential = credential(credentialId);
+        List<ExchangeGateway.TradeSnapshot> snapshots = ExchangeHistoryCollector.collectLast90Days(
+            range -> gateway.queryTrades(exchangeCredential, symbol, range));
         int count = 0;
         for (ExchangeGateway.TradeSnapshot snapshot : snapshots) {
+            if (snapshot == null || snapshot.tradeId() == null || !symbol.equalsIgnoreCase(snapshot.symbol())) {
+                throw new IllegalStateException("交易所历史成交缺少成交 ID 或返回了不匹配的交易对，拒绝写入本地账本");
+            }
             QuantTrade entity = tradeMapper.selectOne(new LambdaQueryWrapper<QuantTrade>().eq(QuantTrade::getCredentialId, credentialId).eq(QuantTrade::getSymbol, symbol)
                 .eq(QuantTrade::getExchangeTradeId, snapshot.tradeId()));
             if (entity == null) {
