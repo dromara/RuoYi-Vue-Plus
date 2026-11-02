@@ -35,4 +35,9 @@ class ExchangeHistoryCollectorTest {
         });
         assertTrue(calls.get() >= 13);
     }
+    @Test
+    void rejectsHistoryWhenRequestBudgetCannotProveCompleteness() {
+        assertThrows(IllegalStateException.class, () -> ExchangeHistoryCollector.collectLast90Days(range -> java.util.Collections.nCopies(1000, 1)));
+    }
+
 }

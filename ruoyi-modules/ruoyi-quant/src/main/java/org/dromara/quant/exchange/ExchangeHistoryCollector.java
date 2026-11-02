@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * Collects complete recent exchange history within the query limits of USDⓈ-M Futures endpoints.
+ * 按 USDⓈ-M Futures 接口限制分段收集最近 90 天的完整历史数据。
  */
 public final class ExchangeHistoryCollector {
     private static final long LOOKBACK_MILLIS = Duration.ofDays(90).toMillis();
     private static final long WINDOW_MILLIS = Duration.ofDays(7).toMillis();
     private static final int PAGE_LIMIT = 1000;
-    private static final int MAX_REQUESTS = 128;
+    private static final int MAX_REQUESTS = 256;
 
     private ExchangeHistoryCollector() {
     }

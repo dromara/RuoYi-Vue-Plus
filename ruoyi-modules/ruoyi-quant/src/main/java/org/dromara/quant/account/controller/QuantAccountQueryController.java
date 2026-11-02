@@ -292,11 +292,13 @@ public class QuantAccountQueryController {
         ExchangeGateway.Credential exchangeCredential = credential(credentialId);
         List<ExchangeGateway.TradeSnapshot> snapshots = ExchangeHistoryCollector.collectLast90Days(
             range -> gateway.queryTrades(exchangeCredential, normalizedSymbol, range));
+        if (snapshots.stream().anyMatch(snapshot -> snapshot == null || snapshot.tradeId() == null || snapshot.orderId() == null
+            || !normalizedSymbol.equalsIgnoreCase(snapshot.symbol()) || StringUtils.isBlank(snapshot.side()) || snapshot.quantity() == null
+            || snapshot.price() == null || snapshot.time() == null || snapshot.commission() == null || snapshot.realizedPnl() == null)) {
+            throw new IllegalStateException("交易所历史成交缺少必要事实或返回了不匹配的交易对，拒绝写入本地账本");
+        }
         int count = 0;
         for (ExchangeGateway.TradeSnapshot snapshot : snapshots) {
-            if (snapshot == null || snapshot.tradeId() == null || snapshot.orderId() == null || !normalizedSymbol.equalsIgnoreCase(snapshot.symbol())) {
-                throw new IllegalStateException("交易所历史成交缺少成交 ID 或返回了不匹配的交易对，拒绝写入本地账本");
-            }
             QuantTrade entity = tradeMapper.selectOne(new LambdaQueryWrapper<QuantTrade>().eq(QuantTrade::getCredentialId, credentialId).eq(QuantTrade::getSymbol, normalizedSymbol)
                 .eq(QuantTrade::getExchangeTradeId, snapshot.tradeId()));
             if (entity == null) {
