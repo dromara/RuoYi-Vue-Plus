@@ -284,7 +284,8 @@ public class QuantAccountQueryController {
         List<ExchangeGateway.TradeSnapshot> snapshots = gateway.queryTrades(credential(credentialId), symbol, new ExchangeGateway.TimeRange(null, null));
         int count = 0;
         for (ExchangeGateway.TradeSnapshot snapshot : snapshots) {
-            QuantTrade entity = tradeMapper.selectOne(new LambdaQueryWrapper<QuantTrade>().eq(QuantTrade::getCredentialId, credentialId).eq(QuantTrade::getExchangeTradeId, snapshot.tradeId()));
+            QuantTrade entity = tradeMapper.selectOne(new LambdaQueryWrapper<QuantTrade>().eq(QuantTrade::getCredentialId, credentialId).eq(QuantTrade::getSymbol, symbol)
+                .eq(QuantTrade::getExchangeTradeId, snapshot.tradeId()));
             if (entity == null) {
                 entity = new QuantTrade();
                 entity.setCredentialId(credentialId);
