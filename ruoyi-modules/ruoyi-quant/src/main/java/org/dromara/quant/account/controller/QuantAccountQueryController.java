@@ -287,11 +287,11 @@ public class QuantAccountQueryController {
     @PostMapping("/trade/{credentialId}/sync")
     public R<Integer> syncTrades(@PathVariable Long credentialId, @RequestParam String symbol) {
         if (StringUtils.isBlank(symbol)) throw new ServiceException("请指定交易对同步成交记录");
-        symbol = symbol.trim().toUpperCase(java.util.Locale.ROOT);
+        String normalizedSymbol = symbol.trim().toUpperCase(java.util.Locale.ROOT);
         QuantCredential credential = credentialEntity(credentialId);
         ExchangeGateway.Credential exchangeCredential = credential(credentialId);
         List<ExchangeGateway.TradeSnapshot> snapshots = ExchangeHistoryCollector.collectLast90Days(
-            range -> gateway.queryTrades(exchangeCredential, symbol, range));
+            range -> gateway.queryTrades(exchangeCredential, normalizedSymbol, range));
         int count = 0;
         for (ExchangeGateway.TradeSnapshot snapshot : snapshots) {
             if (snapshot == null || snapshot.tradeId() == null || !symbol.equalsIgnoreCase(snapshot.symbol())) {
@@ -316,8 +316,8 @@ public class QuantAccountQueryController {
             if (entity.getId() == null) tradeMapper.insert(entity); else tradeMapper.updateById(entity);
             count++;
         }
-        syncOrderSnapshots(credential, symbol);
-        backfillTradeOrderFacts(credential, symbol);
+        syncOrderSnapshots(credential, normalizedSymbol);
+        backfillTradeOrderFacts(credential, normalizedSymbol);
         return R.ok(count);
     }
 
