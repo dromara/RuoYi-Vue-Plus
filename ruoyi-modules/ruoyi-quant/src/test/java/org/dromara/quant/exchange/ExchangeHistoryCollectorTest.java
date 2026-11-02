@@ -1,5 +1,6 @@
 package org.dromara.quant.exchange;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -8,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Tag("dev")
 class ExchangeHistoryCollectorTest {
     @Test
     void splitsFullSevenDayPagesUntilEveryRangeIsComplete() {
