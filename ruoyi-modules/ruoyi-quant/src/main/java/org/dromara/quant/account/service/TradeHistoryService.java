@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -39,7 +40,8 @@ import java.util.stream.Collectors;
 public class TradeHistoryService {
     private static final Duration ORDER_HISTORY_WINDOW = Duration.ofDays(6);
     private static final int MAX_MISSING_ORDER_IDS = 5000;
-    private static final int MAX_ORDER_HISTORY_REQUESTS = 20;
+    private static final int MAX_ORDER_HISTORY_REQUESTS = 15;
+    private static final int MAX_EXACT_ORDER_REQUESTS = 5;
     private static final int ORDER_HISTORY_LIMIT = 1000;
 
     private final QuantCredentialMapper credentialMapper;
@@ -56,6 +58,7 @@ public class TradeHistoryService {
             return;
         }
         int[] remainingRequests = {MAX_ORDER_HISTORY_REQUESTS};
+        int[] remainingExactRequests = {MAX_EXACT_ORDER_REQUESTS};
         Instant retentionStart = Instant.now().minus(Duration.ofDays(90));
 
         for (Long credentialId : credentialIds) {
@@ -84,6 +87,7 @@ public class TradeHistoryService {
                 }
 
                 Set<Long> targetOrderIds = new HashSet<>(missingOrderIds);
+                Set<Long> recoveredOrderIds = new HashSet<>();
                 List<TradeHistoryFill> scopedFills = fills.stream()
                     .filter(fill -> credentialId.equals(fill.getCredentialId()) && currentSymbol.equals(fill.getSymbol())
                         && fill.getExchangeOrderId() != null && targetOrderIds.contains(fill.getExchangeOrderId())
@@ -113,7 +117,7 @@ public class TradeHistoryService {
                         windowEnd = to;
                     }
                     try {
-                        recoverOrderHistoryRange(credentialId, currentSymbol, exchangeCredential, targetOrderIds,
+                        recoverOrderHistoryRange(credentialId, currentSymbol, exchangeCredential, targetOrderIds, recoveredOrderIds,
                             windowStart, windowEnd, 0, remainingRequests);
                     } catch (RuntimeException ex) {
                         log.warn("开平仓记录历史订单补齐失败 credentialId={} symbol={} errorType={}",
@@ -122,7 +126,30 @@ public class TradeHistoryService {
                     }
                     windowStart = windowEnd;
                 }
-                if (remainingRequests[0] <= 0) {
+                Set<Long> recentOrderIds = scopedFills.stream()
+                    .filter(fill -> !fill.getTradeTime().toInstant(ZoneOffset.UTC).isBefore(retentionStart))
+                    .map(TradeHistoryFill::getExchangeOrderId)
+                    .collect(Collectors.toSet());
+                for (Long orderId : missingOrderIds.stream().filter(recentOrderIds::contains).sorted(Comparator.reverseOrder()).toList()) {
+                    if (remainingExactRequests[0] <= 0) {
+                        break;
+                    }
+                    if (recoveredOrderIds.contains(orderId)) {
+                        continue;
+                    }
+                    remainingExactRequests[0]--;
+                    try {
+                        ExchangeGateway.OrderSnapshot snapshot = exchangeGateway.queryOrder(exchangeCredential, currentSymbol, orderId, null);
+                        if (snapshot != null && orderId.equals(snapshot.orderId()) && currentSymbol.equalsIgnoreCase(snapshot.symbol())) {
+                            orderLedgerService.syncHistoricalSnapshot(credentialId, currentSymbol, snapshot);
+                            recoveredOrderIds.add(orderId);
+                        }
+                    } catch (RuntimeException ex) {
+                        log.warn("Binance 精确历史订单补齐失败 credentialId={} symbol={} orderId={} errorType={}",
+                            credentialId, currentSymbol, orderId, ex.getClass().getSimpleName());
+                    }
+                }
+                if (remainingRequests[0] <= 0 && remainingExactRequests[0] <= 0) {
                     return;
                 }
             }
@@ -130,7 +157,8 @@ public class TradeHistoryService {
     }
 
     private void recoverOrderHistoryRange(Long credentialId, String symbol, ExchangeGateway.Credential credential,
-                                          Set<Long> targetOrderIds, Instant from, Instant to, int depth, int[] remainingRequests) {
+                                          Set<Long> targetOrderIds, Set<Long> recoveredOrderIds, Instant from, Instant to,
+                                          int depth, int[] remainingRequests) {
         if (remainingRequests[0] <= 0 || !from.isBefore(to)) {
             return;
         }
@@ -146,6 +174,7 @@ public class TradeHistoryService {
             }
             try {
                 orderLedgerService.syncHistoricalSnapshot(credentialId, symbol, snapshot);
+                recoveredOrderIds.add(snapshot.orderId());
             } catch (RuntimeException ex) {
                 log.warn("历史订单事实写入冲突 credentialId={} symbol={} orderId={} errorType={}",
                     credentialId, symbol, snapshot.orderId(), ex.getClass().getSimpleName());
@@ -155,8 +184,8 @@ public class TradeHistoryService {
             long spanMillis = Duration.between(from, to).toMillis();
             if (spanMillis > 1) {
                 Instant middle = from.plusMillis(spanMillis / 2);
-                recoverOrderHistoryRange(credentialId, symbol, credential, targetOrderIds, from, middle, depth + 1, remainingRequests);
-                recoverOrderHistoryRange(credentialId, symbol, credential, targetOrderIds, middle, to, depth + 1, remainingRequests);
+                recoverOrderHistoryRange(credentialId, symbol, credential, targetOrderIds, recoveredOrderIds, from, middle, depth + 1, remainingRequests);
+                recoverOrderHistoryRange(credentialId, symbol, credential, targetOrderIds, recoveredOrderIds, middle, to, depth + 1, remainingRequests);
                 return;
             }
             log.warn("Binance 历史订单查询达到单次上限且时间窗口无法继续拆分 credentialId={} symbol={}", credentialId, symbol);
